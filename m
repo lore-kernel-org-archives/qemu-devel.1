@@ -2,99 +2,141 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA5EC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 11:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DE6C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 11:50:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AB1D20714
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 11:49:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TPd1rdXO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AB1D20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BBD7D20714
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 11:50:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBD7D20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49961 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY7RB-0007De-UF
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 06:49:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41970)
+	id 1iY7ST-0000Df-Ub
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 06:50:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42075)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iY7OS-0005g1-Mb
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 06:46:39 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iY7P9-0005n7-S3
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 06:47:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iY7OQ-0002P2-Nz
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 06:46:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32888
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iY7OQ-0002Nj-Jr
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 06:46:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574423190;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kpblCqHG+HhmvUzOs4vgsTOkd3JxBPPcNtkBxWZGFuI=;
- b=TPd1rdXOF6eKLI0BIzl0uC0SiveOAURJYWlUUxLJI6yji5YzjMtG6txGFr3aO09ldDuiD3
- QWxgrtNO1i06gmww3XYFj22LH0g9j5R/4AtvY4aq/GY9U61seO3QmHcsQWXLXU6QrbS6O1
- O4lodSVYJ9xREX+0ERjfWdPszzloSQg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-0F62LCvMMw-YAnuU_afSig-1; Fri, 22 Nov 2019 06:46:26 -0500
-Received: by mail-wm1-f70.google.com with SMTP id g14so3263164wmk.9
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 03:46:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=gzars9XQVLu75S7Dd4jqFCb/6b3J2Dx3jFQPwOb3GBY=;
- b=mHzLczGmFn+fzcmp3Rfrg+okGNtWP5kGDkXjfFKJqQaLfP8hkx9SVHf9RKfwGG8FYY
- onoiy61lj+6W0BS5Vs74E2WROWcumAGO79ZkqLOGX13flaQ1s4tNouCQgV0T5LTsIhBT
- QA9vGVsFiucxaW7BC8DX9w8d+SqpilL8l9T2o7ZY5J5lY6NqyUyq1crFQZ5CE1dcV4In
- 68V3f71NUTo2gdyrM1l7cGJTXC7pdbYE3tQteU2COiMDPUvmfr62grLVba4aPVHymtPJ
- prpyOK7tYdr+RHrvoMUqLwPw/K9b9mtal92Jn1aU4tI0e7x2buvLkbpghGDV6nmTd5Jf
- L6+g==
-X-Gm-Message-State: APjAAAVgePD0e58uY4hq1drksEpw4PzJSkwjFMfwMO/GGQhq9WIQ4FXR
- GGi+eLuynwAPZ2SMJzeQWBdzR+xbi2YMrng/ZMxs/rlJhaRDJKNxYPUOK1GtSH0FC5qTcHdzmvg
- t7OR7I4YwKBX/2E4=
-X-Received: by 2002:adf:ef51:: with SMTP id c17mr18487133wrp.266.1574423185594; 
- Fri, 22 Nov 2019 03:46:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyDTO5OBU/8wZcEDo6GrhF4I4hmiOhIjcMjtvZTohBKMTUkdmId76IJvLvdDoa45v/Xso5DmQ==
-X-Received: by 2002:adf:ef51:: with SMTP id c17mr18487110wrp.266.1574423185324; 
- Fri, 22 Nov 2019 03:46:25 -0800 (PST)
-Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
- [88.21.102.131])
- by smtp.gmail.com with ESMTPSA id h97sm4466649wrh.56.2019.11.22.03.46.24
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 22 Nov 2019 03:46:24 -0800 (PST)
-Subject: Re: [PATCH v35 03/13] target/avr: Add instruction decoding
-To: Michael Rolnik <mrolnik@gmail.com>, qemu-devel@nongnu.org
-References: <20191029212430.20617-1-mrolnik@gmail.com>
- <20191029212430.20617-4-mrolnik@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <2f750d23-2413-5596-0b6d-b91bc1adc521@redhat.com>
-Date: Fri, 22 Nov 2019 12:46:23 +0100
+ (envelope-from <frankja@linux.ibm.com>) id 1iY7P7-0002ig-W4
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 06:47:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61598)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iY7P1-0002g2-6M
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 06:47:07 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAMBksiU176783
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 06:47:03 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wadn1nfg2-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 06:47:03 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Fri, 22 Nov 2019 11:46:58 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 22 Nov 2019 11:46:56 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAMBktiH38207518
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 22 Nov 2019 11:46:55 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 090BD11C04C;
+ Fri, 22 Nov 2019 11:46:55 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 905DC11C04A;
+ Fri, 22 Nov 2019 11:46:54 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.41.23])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 22 Nov 2019 11:46:54 +0000 (GMT)
+Subject: Re: [PATCH 4/4] s390x: Beautify machine reset
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20191122075218.23935-1-frankja@linux.ibm.com>
+ <20191122075218.23935-5-frankja@linux.ibm.com>
+ <d026944f-1a0a-0dbe-6514-d8e4fd293e35@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Fri, 22 Nov 2019 12:46:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191029212430.20617-4-mrolnik@gmail.com>
-Content-Language: en-US
-X-MC-Unique: 0F62LCvMMw-YAnuU_afSig-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+In-Reply-To: <d026944f-1a0a-0dbe-6514-d8e4fd293e35@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="TJmiHqqbzQLpDp3dz3xulGYv2dUxMIZ8f"
+X-TM-AS-GCONF: 00
+x-cbid: 19112211-4275-0000-0000-00000384D9DA
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112211-4276-0000-0000-000038985A69
+Message-Id: <c2459655-f205-3294-23ba-ba5d3280df41@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-22_02:2019-11-21,2019-11-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 bulkscore=0
+ mlxlogscore=999 impostorscore=0 mlxscore=0 clxscore=1015
+ priorityscore=1501 spamscore=0 suspectscore=0 lowpriorityscore=0
+ adultscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1911220107
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,216 +148,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Joaquin de Andres <me@xcancerberox.com.ar>,
- richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
- aleksandar.m.mail@gmail.com
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/29/19 10:24 PM, Michael Rolnik wrote:
-> This includes:
-> - encoding of all 16 bit instructions
-> - encoding of all 32 bit instructions
->=20
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TJmiHqqbzQLpDp3dz3xulGYv2dUxMIZ8f
+Content-Type: multipart/mixed; boundary="zkTVMbLxk3gIuTTqS0Rd2zLewtR7RsLwA"
 
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+--zkTVMbLxk3gIuTTqS0Rd2zLewtR7RsLwA
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->   target/avr/insn.decode | 175 +++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 175 insertions(+)
->   create mode 100644 target/avr/insn.decode
+On 11/22/19 11:59 AM, David Hildenbrand wrote:
+> On 22.11.19 08:52, Janosch Frank wrote:
+>> * Add comments that tell you which diag308 subcode caused the reset
+>> * Sort by diag308 reset subcode
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>   hw/s390x/s390-virtio-ccw.c | 20 ++++++++++----------
+>>   1 file changed, 10 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index c1d1440272..88f7758721 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -330,15 +330,7 @@ static void s390_machine_reset(MachineState *mach=
+ine)
+>>       s390_cmma_reset();
+>>  =20
+>>       switch (reset_type) {
+>> -    case S390_RESET_EXTERNAL:
+>> -    case S390_RESET_REIPL:
+>> -        qemu_devices_reset();
+>> -        s390_crypto_reset();
+>> -
+>> -        /* configure and start the ipl CPU only */
+>> -        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
+>> -        break;
+>> -    case S390_RESET_MODIFIED_CLEAR:
+>> +    case S390_RESET_MODIFIED_CLEAR: /* Subcode 0 */
 >=20
-> diff --git a/target/avr/insn.decode b/target/avr/insn.decode
-> new file mode 100644
-> index 0000000000..6b387762c6
-> --- /dev/null
-> +++ b/target/avr/insn.decode
-> @@ -0,0 +1,175 @@
-> +#
-> +#   A =3D [16 .. 31]
-> +#   B =3D [16 .. 23]
-> +#   C =3D [24, 26, 28, 30]
-> +#   D =3D [0, 2, 4, 6, 8, .. 30]
-> +
-> +%rd             4:5
-> +%rr             9:1 0:4
-> +
-> +&rd_rr          rd rr
-> +&rd_imm         rd imm
-> +
-> +@op_rd_rr       .... .. . ..... ....        &rd_rr      rd=3D%rd rr=3D%r=
-r
-> +ADD             0000 11 . ..... ....        @op_rd_rr
-> +ADC             0001 11 . ..... ....        @op_rd_rr
-> +AND             0010 00 . ..... ....        @op_rd_rr
-> +CP              0001 01 . ..... ....        @op_rd_rr
-> +CPC             0000 01 . ..... ....        @op_rd_rr
-> +CPSE            0001 00 . ..... ....        @op_rd_rr
-> +EOR             0010 01 . ..... ....        @op_rd_rr
-> +MOV             0010 11 . ..... ....        @op_rd_rr
-> +MUL             1001 11 . ..... ....        @op_rd_rr
-> +OR              0010 10 . ..... ....        @op_rd_rr
-> +SBC             0000 10 . ..... ....        @op_rd_rr
-> +SUB             0001 10 . ..... ....        @op_rd_rr
-> +
-> +
-> +%rd_c           4:2                         !function=3Dto_C
-> +%imm6           6:2 0:4
-> +
-> +@op_rd_imm6     .... .... .. .. ....        &rd_imm     rd=3D%rd_c imm=
-=3D%imm6
-> +ADIW            1001 0110 .. .. ....        @op_rd_imm6
-> +SBIW            1001 0111 .. .. ....        @op_rd_imm6
-> +
-> +
-> +%rd_a           4:4                         !function=3Dto_A
-> +%rr_a           0:4                         !function=3Dto_A
-> +%rd_d           4:4                         !function=3Dto_D
-> +%rr_d           0:4                         !function=3Dto_D
-> +%imm8           8:4 0:4
-> +
-> +@op_rd_imm8     .... .... .... ....         &rd_imm     rd=3D%rd_a imm=
-=3D%imm8
-> +ANDI            0111 .... .... ....         @op_rd_imm8
-> +CPI             0011 .... .... ....         @op_rd_imm8
-> +LDI             1110 .... .... ....         @op_rd_imm8
-> +ORI             0110 .... .... ....         @op_rd_imm8
-> +SBCI            0100 .... .... ....         @op_rd_imm8
-> +SUBI            0101 .... .... ....         @op_rd_imm8
-> +
-> +
-> +@op_rd          .... ... rd:5 ....
-> +ASR             1001 010 ..... 0101         @op_rd
-> +COM             1001 010 ..... 0000         @op_rd
-> +DEC             1001 010 ..... 1010         @op_rd
-> +ELPM2           1001 000 ..... 0110         @op_rd
-> +ELPMX           1001 000 ..... 0111         @op_rd
-> +INC             1001 010 ..... 0011         @op_rd
-> +LDX1            1001 000 ..... 1100         @op_rd
-> +LDX2            1001 000 ..... 1101         @op_rd
-> +LDX3            1001 000 ..... 1110         @op_rd
-> +LDY2            1001 000 ..... 1001         @op_rd
-> +LDY3            1001 000 ..... 1010         @op_rd
-> +LDZ2            1001 000 ..... 0001         @op_rd
-> +LDZ3            1001 000 ..... 0010         @op_rd
-> +LPM2            1001 000 ..... 0100         @op_rd
-> +LPMX            1001 000 ..... 0101         @op_rd
-> +LSR             1001 010 ..... 0110         @op_rd
-> +NEG             1001 010 ..... 0001         @op_rd
-> +POP             1001 000 ..... 1111         @op_rd
-> +PUSH            1001 001 ..... 1111         @op_rd
-> +ROR             1001 010 ..... 0111         @op_rd
-> +STY2            1001 001 ..... 1001         @op_rd
-> +STY3            1001 001 ..... 1010         @op_rd
-> +STZ2            1001 001 ..... 0001         @op_rd
-> +STZ3            1001 001 ..... 0010         @op_rd
-> +SWAP            1001 010 ..... 0010         @op_rd
-> +
-> +
-> +@op_bit         .... .... . bit:3 ....
-> +BCLR            1001 0100 1 ... 1000        @op_bit
-> +BSET            1001 0100 0 ... 1000        @op_bit
-> +
-> +
-> +@op_rd_bit      .... ... rd:5 . bit:3
-> +BLD             1111 100 ..... 0 ...        @op_rd_bit
-> +BST             1111 101 ..... 0 ...        @op_rd_bit
-> +
-> +
-> +@op_bit_imm     .... .. imm:s7 bit:3
-> +BRBC            1111 01 ....... ...         @op_bit_imm
-> +BRBS            1111 00 ....... ...         @op_bit_imm
-> +
-> +
-> +BREAK           1001 0101 1001 1000
-> +EICALL          1001 0101 0001 1001
-> +EIJMP           1001 0100 0001 1001
-> +ELPM1           1001 0101 1101 1000
-> +ICALL           1001 0101 0000 1001
-> +IJMP            1001 0100 0000 1001
-> +LPM1            1001 0101 1100 1000
-> +NOP             0000 0000 0000 0000
-> +RET             1001 0101 0000 1000
-> +RETI            1001 0101 0001 1000
-> +SLEEP           1001 0101 1000 1000
-> +SPM             1001 0101 1110 1000
-> +SPMX            1001 0101 1111 1000
-> +WDR             1001 0101 1010 1000
-> +
-> +
-> +@op_reg_bit     .... .... reg:5 bit:3
-> +CBI             1001 1000 ..... ...         @op_reg_bit
-> +SBI             1001 1010 ..... ...         @op_reg_bit
-> +SBIC            1001 1001 ..... ...         @op_reg_bit
-> +SBIS            1001 1011 ..... ...         @op_reg_bit
-> +
-> +
-> +DES             1001 0100 imm:4 1011
-> +
-> +
-> +%rd_b           4:3                         !function=3Dto_B
-> +%rr_b           0:3                         !function=3Dto_B
-> +@fmul           .... .... . ... . ...       &rd_rr      rd=3D%rd_b rr=3D=
-%rr_b
-> +FMUL            0000 0011 0 ... 1 ...       @fmul
-> +FMULS           0000 0011 1 ... 0 ...       @fmul
-> +FMULSU          0000 0011 1 ... 1 ...       @fmul
-> +MULSU           0000 0011 0 ... 0 ...       @fmul
-> +
-> +
-> +%io_imm         9:2 0:4
-> +@io_rd_imm      .... . .. ..... ....        &rd_imm     rd=3D%rd imm=3D%=
-io_imm
-> +IN              1011 0 .. ..... ....        @io_rd_imm
-> +OUT             1011 1 .. ..... ....        @io_rd_imm
-> +
-> +
-> +XCH             1001 001 rd:5 0100
-> +LAC             1001 001 rd:5 0110
-> +LAS             1001 001 rd:5 0101
-> +LAT             1001 001 rd:5 0111
-> +STX1            1001 001 rr:5 1100
-> +STX2            1001 001 rr:5 1101
-> +STX3            1001 001 rr:5 1110
-> +
-> +
-> +%ldst_d_imm     13:1 10:2 0:3
-> +@ldst_d         .. . . .. . rd:5  . ...     &rd_imm     imm=3D%ldst_d_im=
-m
-> +LDDY            10 . 0 .. 0 ..... 1 ...     @ldst_d
-> +LDDZ            10 . 0 .. 0 ..... 0 ...     @ldst_d
-> +STDY            10 . 0 .. 1 ..... 1 ...     @ldst_d
-> +STDZ            10 . 0 .. 1 ..... 0 ...     @ldst_d
-> +
-> +
-> +MOVW            0000 0001 .... ....         &rd_rr      rd=3D%rd_d rr=3D=
-%rr_d
-> +MULS            0000 0010 .... ....         &rd_rr      rd=3D%rd_a rr=3D=
-%rr_a
-> +
-> +RCALL           1101 imm:s12
-> +RJMP            1100 imm:s12
-> +
-> +SBRC            1111 110 rr:5 0 bit:3
-> +SBRS            1111 111 rr:5 0 bit:3
-> +
-> +# The 22-bit immediate is partially in the opcode word,
-> +# and partially in the next.  Use append_16 to build the
-> +# complete 22-bit value.
-> +%imm_call       4:5 0:1                     !function=3Dappend_16
-> +CALL            1001 010 ..... 111 .        imm=3D%imm_call
-> +JMP             1001 010 ..... 110 .        imm=3D%imm_call
-> +
-> +
-> +# The 16-bit immediate is completely in the next word.
-> +# Fields cannot be defined with no bits, so we cannot play
-> +# the same trick and append to a zero-bit value.
-> +# Defer reading the immediate until trans_{LDS,STS}.
-> +@ldst_s         .... ... rd:5 ....          imm=3D0
-> +LDS             1001 000 ..... 0000         @ldst_s
-> +STS             1001 001 ..... 0000         @ldst_s
+> IMHO "Subcode X" isn't of much help here. We're out of diag handling.
 >=20
+> I'd suggest to just document the subcodes along with the definitions, i=
+f=20
+> really needed, and drop this patch, at least I don't quite see the valu=
+e=20
+> of moving code around here... or is the code shuffling of any value on =
+
+> your prot virt patches?
+>=20
+
+It keeps me from consulting the POP every time I need to change things
+in the machine resets. This is basically a 1:1 mapping of diag 308
+subcodes to machine resets, so why don't we want to make that obvious
+and order them by the subcodes?
+
+
+--zkTVMbLxk3gIuTTqS0Rd2zLewtR7RsLwA--
+
+--TJmiHqqbzQLpDp3dz3xulGYv2dUxMIZ8f
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3Xyq4ACgkQ41TmuOI4
+ufhtQRAAxLXQS4CGcpUs681EruVwbbEpUKJSgbxwOz8SL6G9Em4/J9JMArzICsQW
+j0GMktPSwa1CTxbn8lRbvP04Dq7Q1hN8lxEaNFB6/13VkraYqlDgIv1PyqyuoDKX
+4p006e02wO0B4t2A9sPkqpwo60G8YAjWTCUIOU4fHCnyopg4zUlfKL5RR10DvGiZ
+DQpYQ7YZl4bk2uNtjOMnbRPwnClQWi4OVKuzPKx32ElZromQFBPxwK6+moZGrf/4
+lOQyETNNa6dCWb4kYGx5QotyN3wzw0tpSQZxzS7shE1LbxEShenXv8ol1n7YvLkM
+ObBjnzzK7DDcB6UGUAuI0KKDWAzpNsth5UYr8dBqBpAub660cciAptU4FtCb6prM
+JHa6/MnOO25jpMSR87qU5B1jAQVC/Ex2ujufbu81DdLy6it6eBmJ9wk10Tn+fyqQ
+rkFFvOwIvfr+Tg87O5tGF4l1uRHEED7dgNB16rny7YQgbEA51zcli/fjxKSx8HWf
+Qpudsaccr8v6hqNKdk3QJyRKQWRpT6JXdMnJAlP0FL4s36z8qrNy1ncHa+veITgs
+JCcE4qk0c1xLJE52rnJLKuGBezd98asLN0TPyQLvs8FhoREkzSCOqX8dPeawmMgU
+wBhk358mnSICVtfvUy8nSNHiAY3BcB7QbiebL+REZmJdW1LW50U=
+=BYN1
+-----END PGP SIGNATURE-----
+
+--TJmiHqqbzQLpDp3dz3xulGYv2dUxMIZ8f--
 
 
