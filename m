@@ -2,88 +2,96 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C1DC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:30:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF75C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:47:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0120B20707
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:30:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 692E220708
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:47:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gmtgbl4u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0120B20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VOLe9Ocd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 692E220708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY3OK-0007fb-Uv
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 02:30:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36915)
+	id 1iY3fM-00046a-Jk
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 02:47:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39137)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iY3NO-0007AS-EQ
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:29:11 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iY3e6-0003cV-6T
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:46:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iY3NM-0005mj-L8
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:29:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46867
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iY3NM-0005ma-HV
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:29:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574407747;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=V5zHUa2oDblpWdPLrJMtE3hOfzL6bagvM7VLAfB+tLE=;
- b=gmtgbl4uBOz33VKIoqgukNVyuAGavc0ASwsdmMccZEc7nxR51m/Cs1sOAZNUAubt/9xTCu
- /V5tuTc4lc8bsNz+qGNoOLDKFKpc/y0uWlfu/yU/Yt1SWGAkUMBNk1/0oKCL/24CMHkeZ2
- bPB1DZ1X3335Squ1XbPJh4C13LJV62s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-X6zO00C1OPiXhrItQV8Beg-1; Fri, 22 Nov 2019 02:29:03 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FF5F593A1;
- Fri, 22 Nov 2019 07:29:02 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E4B415C548;
- Fri, 22 Nov 2019 07:29:01 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 67C611138606; Fri, 22 Nov 2019 08:29:00 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 03/14] qapi: Introduce default values for
- struct members
-References: <20190624173935.25747-1-mreitz@redhat.com>
- <20190624173935.25747-4-mreitz@redhat.com>
- <87eey1b73y.fsf@dusky.pond.sub.org>
- <0214e73e-062e-a9c8-16c9-e99354c07277@redhat.com>
- <871ru1811o.fsf@dusky.pond.sub.org>
- <817914b7-79d7-a2c9-142b-0a040b1da7ff@redhat.com>
-Date: Fri, 22 Nov 2019 08:29:00 +0100
-In-Reply-To: <817914b7-79d7-a2c9-142b-0a040b1da7ff@redhat.com> (Eric Blake's
- message of "Thu, 21 Nov 2019 13:56:04 -0600")
-Message-ID: <874kyw74jn.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <richard.henderson@linaro.org>) id 1iY3e5-000209-3A
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:46:25 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45698)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iY3e4-0001yO-Ow
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:46:25 -0500
+Received: by mail-wr1-x443.google.com with SMTP id z10so7360393wrs.12
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 23:46:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=KzF+wf9uQqfbz246ba8hUqqMzZU9UhjUNPeddx8SVR0=;
+ b=VOLe9OcdXO4oIIZTMPFQmiQgEQXMNPdYQddiAJyixrAVwGIEf0Bgk40MwcO2zzNYqd
+ SrVe1ArreyHtpZJ6dTY9PYuMWQSuzP1gIvmRWwVeRbFOZimpsclk9a6bxGuS5qBEzArx
+ 6w+jGgjIchDlzGpCX6TLVvMwKYCtk99rlDtr+/6ARH91/ZRvwbGNqErtBfX8oV2xajoi
+ aTM/LGtA3/DXjl3+NV7mI/m95FyVhouo5W60w+jzTDWbrkGOHrf6GNZGBUCU/i/X0dqE
+ RbnAVhUVT1DwL6U5AgiAj5XLYYaJWd5hUsxMGfDTGn0vjUwcE4CqHgkHmKVH1rThJPBj
+ lbgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=KzF+wf9uQqfbz246ba8hUqqMzZU9UhjUNPeddx8SVR0=;
+ b=sX328iF7x5h3HIsmrQrc91gs6g7ymTi1m1J4KSYE5BmIaXj8cBagv5Z00KDBMuOqSC
+ eJEWVsG3v0g00krQ2ypwy9Mjd+Au3/08Cwpo0c6loIcxP0xI8btKrwBu7B8k7tvIk0vC
+ YNkbOnLA6oe1ayO4aB1WjvSbxc1C18+dCPKmhPk1GXyLpLyWCzZ4PJEWMX0miw9Y7KNL
+ JDA1pVjUoUik3MflNi2gx85mtvUtw5x94OVJ840EisvOspG5NcIkw28EdHKWzmxLK+sN
+ /OA+aHNLwvojC5GUj2IZ+GdtiOor9/m6Dyz2/v6QbaXyMYmQiFyBUfrVjBftn99jbiW8
+ 61jQ==
+X-Gm-Message-State: APjAAAXIbMhxxzV1ayJ8g9FciiBv4+9oa0j8RRT6X9jGlAcrObrXFz2K
+ 98lCVi2Feiff0uAlRrbLgg1Y5A==
+X-Google-Smtp-Source: APXvYqzxFNwEFFUymDjQtULkOrsD0MCCxTriZkBrtT3pmA9E29L+mTF3JSiDCgwYFJYpza6h9u5+QA==
+X-Received: by 2002:a5d:4c4e:: with SMTP id n14mr17278734wrt.260.1574408782926; 
+ Thu, 21 Nov 2019 23:46:22 -0800 (PST)
+Received: from ?IPv6:2a00:23c5:4e1b:3700:8d83:30a1:2751:30ec?
+ ([2a00:23c5:4e1b:3700:8d83:30a1:2751:30ec])
+ by smtp.gmail.com with ESMTPSA id b8sm6536267wrt.39.2019.11.21.23.46.21
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 21 Nov 2019 23:46:22 -0800 (PST)
+Subject: Re: [PATCH v35 01/13] target/avr: Add outward facing interfaces and
+ core CPU logic
+To: Michael Rolnik <mrolnik@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20191029212430.20617-1-mrolnik@gmail.com>
+ <20191029212430.20617-2-mrolnik@gmail.com>
+ <750745b9-e51c-3757-3eb6-ffce51042d9c@redhat.com>
+ <CAK4993gtPkqESswLBoo1cMuvJFzwSVgUP=Oh-hpG2JSTKezjmw@mail.gmail.com>
+ <CAK4993iFuC3LTzkwjAx7uKA18jh-zOo5aYx2+1ugc9fw8UPtYg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <e1fedeff-3eab-f215-a376-334417f5bf53@linaro.org>
+Date: Fri, 22 Nov 2019 08:46:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: X6zO00C1OPiXhrItQV8Beg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <CAK4993iFuC3LTzkwjAx7uKA18jh-zOo5aYx2+1ugc9fw8UPtYg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,140 +103,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>,
+ Joaquin de Andres <me@xcancerberox.com.ar>, Thomas Huth <thuth@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+On 11/21/19 8:53 PM, Michael Rolnik wrote:
+> It seems to be a huge investment. this function should parse the
+> binary data as `decode_insn` does, so I suggest to modify decodetree
+> tool to make decoding information available to the instruction print
+> function.
+> what do you think?
 
-> On 11/21/19 1:46 PM, Markus Armbruster wrote:
->
->>>> The '*' is redundant in this form.
->>>>
->>>> Can anyone think of reasons for keeping it anyway?  Against?
->>>
->>> Is there ever a reason to allow an optional member but without a
->>> 'default' value?  Or can we just blindly state that if 'default' is
->>> not present, that is the same as 'default':0/'default':null?
->>>
->>> Or, applying your statement further,
->>>
->>> 'data': { '*a':'int', '*b':'str' }
->>>
->>> is shorthand for:
->>>
->>> 'data': { 'a': { 'type':'int', 'default':0 },
->>>            'b': { 'type':'str', 'default':null } }
->>
->> You propose to default 'default' to a type-specific value.
->>
->> I don't think that's a good idea.
->
-> ...
->
->
->> When an absent member behaves just like it was present with a certain
->> value DFLT, we want to be able to say in the schema 'default': DFLT.
->>
->> But the schema language also needs to let us say "absent member behaves
->> unlike any value".
->>
->> If we define 'default' to default to a value, then that value must have
->> this special meaning.
->>
->> Where that value is also a valid value, the schema language cannot
->> express "absent member behaves like it was present with that value".
->>
->> I think this makes 0 a poor default value for 'default': "behaves like
->> member was present with value 0" is fairly common, I think.
->>
->> Defaulting 'default' to null regardless of member type could work.
->>
->> null is a valid value of the 'null' type and of alternate types with a
->> member of type 'null'.  For optional members of such types, the schema
->> language then can't express ""absent member behaves like it was present
->> with value null".  I think the need to say that is much less common than
->> the needs to say "like value 0".
->>
->> Checking...  *sigh*: there are a few optional members that can take null
->> values, e.g. MigrateSetParameters member @tls-creds.  I read its doc
->> comment twice, and I have to admit I can't make heads or tails of it.
->> Can't say for sure whether absent behaves like null, or some other
->> value, or unlike any value.
->>
->> QAPI/QMP introspection already specifies null to have exactly this
->> special meaning.
->
-> Maybe that means we need '*name':'t' to expand into something longer, may=
-be
->  'name':{'type':'t', 'optional':true}
-> which in  turn would be synonymous with your idea of ALL types
-> accepting a default of null:
->  'name':{'type':'t', 'optional':true, 'default':null}
+See target/openrisc/disas.c, which makes use of decodetree.
+It shouldn't be difficult to do something slimiar for avr.
 
-Yes, this is something we can consider.
 
-Currently, we normalize away the '*' prefix when we go from the abstract
-parse tree (which we call "expressions") to the internal representation:
-
-    def _make_member(self, name, typ, ifcond, info):
-        optional =3D False
-        if name.startswith('*'):
-            name =3D name[1:]
-            optional =3D True
-        if isinstance(typ, list):
-            assert len(typ) =3D=3D 1
-            typ =3D self._make_array_type(typ[0], info)
-        return QAPISchemaObjectTypeMember(name, info, typ, optional, ifcond=
-)
-
-This keeps the normalization internal.
-
-Other normalizations we perform on the abstract parse tree.  For
-instance, here's the one that normalizes shorthand member "'KEY': 'ARG'"
-to longhand "'KEY': { 'type': 'ARG' }":
-
-    def normalize_members(members):
-        if isinstance(members, OrderedDict):
-            for key, arg in members.items():
-                if isinstance(arg, dict):
-                    continue
-                members[key] =3D {'type': arg}
-
-For these normalizations, both the shorthand and the longhand form are
-part of the schema language.  We could do the same for '*'.
-
-> At any rate, your counterpoint is taken - whatever we pick, we'll want
-> to make sure that introspection can expose semantics, and whether we
-> can make '*' redundant with some other form of longhand in the qapi
-> language is in part determined by whether we also reflect that through
-> introspection.
-
-Introspection has the true member name, without the '*' prefix.
-
-We'll also want to avoid unnecessary compromises on QAPI schema
-expressiveness.  If we use null to mean "schema does not specify
-behavior when member is absent", we can't use it to mean "absent member
-behaves like the value null".  A bit of a blemish, but I think it's a
-tolerable one.
-
->                 If that means that keeping '*' in the longhand form of
-> optional members (whether or not those members have a default value),
-> then so be it.
-
-I believe both
-
-    '*KEY': { 'type': ARG': 'default': null }
-
-and
-
-    'KEY': { 'type': ARG': 'default': null }
-
-are viable longhand forms for '*KEY': 'ARG'.
-
-I prefer the latter, but I'm open to arguments.
-
+r~
 
