@@ -2,92 +2,82 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C13CC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C240C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:56:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 449D020715
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:49:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB52320708
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:56:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x+KWXQx9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 449D020715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BT7yGk0X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB52320708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY4dA-0007oN-6l
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 03:49:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47754)
+	id 1iY4jV-0002tN-1B
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 03:56:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iY4cQ-0007NM-PE
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:48:47 -0500
+ (envelope-from <quintela@redhat.com>) id 1iY4ib-00029Z-BE
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:55:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iY4cP-0000Hg-HX
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:48:46 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51014)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iY4cP-0000Gy-A2
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:48:45 -0500
-Received: by mail-wm1-x343.google.com with SMTP id l17so6548425wmh.0
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 00:48:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=C83CqTTXMKHVxF9fBHADOxXrwQhrwdOuulbdHa0xEM0=;
- b=x+KWXQx9lCsyIw13nx2bQGMkKZekgoRL1uPL6UURHQngDKPPpSwF5A1mdDC1ygPeHV
- 0UKn+fg0vY5KAn6VM3QdYheOoDfi8Tv8Rc3rxdgHUf824Lv3CRZYAQeJpqFnb3dCwS1E
- HpVajQa+aon87s6PF+2fXt5rY3c6z/5Pq6slOCMSxizPvACg+f0lu3kiY0tAQWK9xR7u
- i/GOkkiVsYWvtgl8WVyZUAa/t6qh2IdO3D84mHT//MSBCClKk9SRrctsgxkdWWgfU1j5
- ZR0WvyxXiBc/0TO8GWuHEmCnNeZAbh+mhuEAzYlh5jmkOGKp0L27wgD5daXNm60YW5tv
- fNgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=C83CqTTXMKHVxF9fBHADOxXrwQhrwdOuulbdHa0xEM0=;
- b=hl07StW2ArDXSJZ7c3t0vKRahTO2ZnuiiY3axpAWGr4U7JN5q0f1Ov0OQEAe6utTAU
- yTXZ7RsrRCZWrB6yYru2NjLavMkrA6kJNP4PPV2xzg0ZYH+x9ReQFoEXAX4RSf+s/hjM
- 3ixlNN87xHyWlJU23/yD/PLwlqMPdYlxean6j6Xi1TSWLpPJnIK7tV37WKd1cBaEEfVk
- 7wmtTll4T4dVBfldA06LUBUwcvXBMs1b9v3yL5eZzFrs+bW34Tac/4vasOHcAnGqmhuy
- /xDO/7Plp5VLjKiIl+HMDuFtQX+x450MeyBx1wqCTtJH28B/bN/gBJmIVxXP2aLXVDy/
- NBOg==
-X-Gm-Message-State: APjAAAXjWO9r+jeZSC5tsn6O1nYpnx8RfZBulT9Wkj4N9iYfYSudjz1U
- /50W+lJjJJ93NyE1As8KPgk1Vw==
-X-Google-Smtp-Source: APXvYqxRBn4AeFNTuZE/2M6a2FYrqu4hUAQ3XbbxBmWZb+BLLQrGrRHBafcKRnwSBEcA23qRT4teCw==
-X-Received: by 2002:a1c:f210:: with SMTP id s16mr15285356wmc.76.1574412523239; 
- Fri, 22 Nov 2019 00:48:43 -0800 (PST)
-Received: from ?IPv6:2a00:23c5:4e1b:3700:8d83:30a1:2751:30ec?
- ([2a00:23c5:4e1b:3700:8d83:30a1:2751:30ec])
- by smtp.gmail.com with ESMTPSA id o189sm2829003wmo.23.2019.11.22.00.48.42
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 22 Nov 2019 00:48:42 -0800 (PST)
-Subject: Re: [PATCH v3 1/4] tcg: cputlb: Add probe_read
-To: Beata Michalska <beata.michalska@linaro.org>, qemu-devel@nongnu.org
-References: <20191121000843.24844-1-beata.michalska@linaro.org>
- <20191121000843.24844-2-beata.michalska@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <1536641d-9291-edd8-e04d-a457f5e50ced@linaro.org>
-Date: Fri, 22 Nov 2019 08:16:38 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <quintela@redhat.com>) id 1iY4iZ-0003lQ-50
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:55:08 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49865
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iY4iY-0003kw-QM
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:55:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574412905;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JUwxCrnzB76cIKSClpenWgv6NBaDCE7HbEhGyx6PRx0=;
+ b=BT7yGk0XpDbeiNjLJo48an0H7smjhaMTq35eJF9TyLyT78Fo8KJPlaCkkjywDCb+5jzIE9
+ 2TDznrWTr+cTiEoK/2VmjNXXtKzjT70QuBerFDyG4K5c7VjIhQEcUtDL+yOjFO6X5la7Rg
+ TXXGucTS5ut7vaRUM94TpdEWnvwmIqc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-fFu7lGW2P5yaylNO0MdYwg-1; Fri, 22 Nov 2019 03:55:01 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8745A91220;
+ Fri, 22 Nov 2019 08:55:00 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.118.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F17105D6A3;
+ Fri, 22 Nov 2019 08:54:59 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v3 1/2] migration: Fix incorrect integer->float conversion
+ caught by clang
+In-Reply-To: <20191122080039.12771-2-armbru@redhat.com> (Markus Armbruster's
+ message of "Fri, 22 Nov 2019 09:00:38 +0100")
+References: <20191122080039.12771-1-armbru@redhat.com>
+ <20191122080039.12771-2-armbru@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Fri, 22 Nov 2019 09:54:56 +0100
+Message-ID: <87zhgoi93z.fsf@trasno.org>
 MIME-Version: 1.0
-In-Reply-To: <20191121000843.24844-2-beata.michalska@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: fFu7lGW2P5yaylNO0MdYwg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,24 +89,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, quintela@redhat.com, dgilbert@redhat.com,
- shameerali.kolothum.thodi@huawei.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, pbonzini@redhat.com, alex.bennee@linaro.org
+Reply-To: quintela@redhat.com
+Cc: Fangrui Song <i@maskray.me>, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/21/19 1:08 AM, Beata Michalska wrote:
-> Add probe_read alongside the write probing equivalent.
-> 
-> Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> ---
->  include/exec/exec-all.h | 6 ++++++
->  1 file changed, 6 insertions(+)
+Markus Armbruster <armbru@redhat.com> wrote:
+> From: Fangrui Song <i@maskray.me>
+>
+> Clang does not like qmp_migrate_set_downtime()'s code to clamp double
+> @value to 0..INT64_MAX:
+>
+>     qemu/migration/migration.c:2038:24: error: implicit conversion from '=
+long' to 'double' changes value from 9223372036854775807 to 922337203685477=
+5808 [-Werror,-Wimplicit-int-float-conversion]
+>
+> The warning will be enabled by default in clang 10. It is not
+> available for clang <=3D 9.
+>
+> The clamp is actually useless; @value is checked to be within
+> 0..MAX_MIGRATE_DOWNTIME_SECONDS immediately before.  Delete it.
+>
+> While there, make the conversion from double to int64_t explicit.
+>
+> Signed-off-by: Fangrui Song <i@maskray.me>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> [Patch split, commit message improved]
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 
+Should I get this through migration tree, or are you going to pull it?
 
-r~
+Later, Juan.
+
 
