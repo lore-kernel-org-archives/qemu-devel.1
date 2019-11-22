@@ -2,141 +2,84 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88475C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF537C43141
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:19:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F5692067D
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:16:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F5692067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id AFC742067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:19:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MGndV64/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFC742067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYDUB-0007u5-3P
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 13:16:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55356)
+	id 1iYDWk-0000gx-3E
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 13:19:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iYCEB-0002Ct-NX
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:56:17 -0500
+ (envelope-from <eblake@redhat.com>) id 1iYDKc-0000pH-P4
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:06:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iYCE8-0008GP-13
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:56:13 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56838)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iYCDv-00089W-D0
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:56:03 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAMGqb8r098134
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 11:55:58 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wdu63t8rf-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 11:55:58 -0500
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Fri, 22 Nov 2019 16:55:56 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 22 Nov 2019 16:55:54 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAMGtqN957147428
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 22 Nov 2019 16:55:52 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 72E9C11C058;
- Fri, 22 Nov 2019 16:55:52 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0805911C05B;
- Fri, 22 Nov 2019 16:55:52 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.73.27])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 22 Nov 2019 16:55:51 +0000 (GMT)
-Subject: Re: [PATCH v2 1/5] s390x: Don't do a normal reset on the initial cpu
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20191122140002.42972-1-frankja@linux.ibm.com>
- <20191122140002.42972-2-frankja@linux.ibm.com>
- <20191122171733.3d60d767.cohuck@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Fri, 22 Nov 2019 17:55:51 +0100
+ (envelope-from <eblake@redhat.com>) id 1iYDKX-0007vf-9y
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:06:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33487
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iYDKU-0007us-DH
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:06:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574446008;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Y0WP6QUHwtKnRXo7X2/Vcg/nhKnykLT67lSc7+bAh/I=;
+ b=MGndV64//b3uEJTuLAdcioW3wb4NUc0yOKTh+cU9rfV/wm5lT4vOFiQRstOrepc3kObYdg
+ Aqwl1U0mVwxuUr+a5LUL2tLDNahHfMqOZMJaGvpjyUbC8pKAWhnn6YNir7HzHx2eBtq9FP
+ WLFD4sTEQnpWk5afAMXUNx8Luui5XRU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-331-95K4HtEdMROs_RMGorUoUg-1; Fri, 22 Nov 2019 13:06:46 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83FA918B5FA0;
+ Fri, 22 Nov 2019 18:06:45 +0000 (UTC)
+Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6F0265D9E1;
+ Fri, 22 Nov 2019 18:06:42 +0000 (UTC)
+Subject: Re: [PATCH v3 4/8] block: truncate: Don't make backing file data
+ visible
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20191122160511.8377-1-kwolf@redhat.com>
+ <20191122160511.8377-5-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <2a970e80-bed8-54ec-506a-4bff46b81577@redhat.com>
+Date: Fri, 22 Nov 2019 12:06:41 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191122171733.3d60d767.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="wdnXLohRfdJgHEloDMWAml1TOKdMzN0Na"
-X-TM-AS-GCONF: 00
-x-cbid: 19112216-0012-0000-0000-0000036ADFD3
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112216-0013-0000-0000-000021A67968
-Message-Id: <ee82dc59-33a1-c163-f6ab-96d906f6a8fc@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-22_03:2019-11-21,2019-11-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0
- adultscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999 phishscore=0
- suspectscore=0 clxscore=1015 bulkscore=0 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911220145
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20191122160511.8377-5-kwolf@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 95K4HtEdMROs_RMGorUoUg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,96 +91,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mihajlov@linux.ibm.com
+Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wdnXLohRfdJgHEloDMWAml1TOKdMzN0Na
-Content-Type: multipart/mixed; boundary="91cB28pIVkJhEdGyqh1oMrlfLb3kK9Fy8"
+On 11/22/19 10:05 AM, Kevin Wolf wrote:
+> When extending the size of an image that has a backing file larger than
+> its old size, make sure that the backing file data doesn't become
+> visible in the guest, but the added area is properly zeroed out.
+> 
+> Consider the following scenario where the overlay is shorter than its
+> backing file:
+> 
+>      base.qcow2:     AAAAAAAA
+>      overlay.qcow2:  BBBB
+> 
+> When resizing (extending) overlay.qcow2, the new blocks should not stay
+> unallocated and make the additional As from base.qcow2 visible like
+> before this patch, but zeros should be read.
+> 
+> A similar case happens with the various variants of a commit job when an
+> intermediate file is short (- for unallocated):
+> 
+>      base.qcow2:     A-A-AAAA
+>      mid.qcow2:      BB-B
+>      top.qcow2:      C--C--C-
+> 
+> After commit top.qcow2 to mid.qcow2, the following happens:
+> 
+>      mid.qcow2:      CB-C00C0 (correct result)
+>      mid.qcow2:      CB-C--C- (before this fix)
+> 
+> Without the fix, blocks that previously read as zeros on top.qcow2
+> suddenly turn into A.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   block/io.c | 33 +++++++++++++++++++++++++++++++++
+>   1 file changed, 33 insertions(+)
 
---91cB28pIVkJhEdGyqh1oMrlfLb3kK9Fy8
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-On 11/22/19 5:17 PM, Cornelia Huck wrote:
-> On Fri, 22 Nov 2019 08:59:58 -0500
-> Janosch Frank <frankja@linux.ibm.com> wrote:
->=20
->> The initiating cpu needs to be reset with an initial reset. While
->> doing a normal reset followed by a initial reset is not wron per-se,
->=20
-> s/wron per-se/wrong per se/
-
-Ups
-
->=20
->> the Ultravisor will only allow the correct reset to be performed.
->=20
-> So... the uv has stricter rules than the architecture has in that
-> respect?
-
-Yeah, the architecture only cares about the state that the cpu will be
-in after the reset. So we can do as many changes to vcpu run as we like,
-if at the end we are in the reset state we intended to be in.
-
-The UV guards all resets including the sigp initiated ones.
-
->=20
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index d3edeef0ad..c1d1440272 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -348,6 +348,9 @@ static void s390_machine_reset(MachineState *machi=
-ne)
->>          break;
->>      case S390_RESET_LOAD_NORMAL:
->>          CPU_FOREACH(t) {
->> +            if (t =3D=3D cs) {
->> +                continue;
->> +            }
->>              run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
->>          }
->>          subsystem_reset();
->=20
-
-
-
---91cB28pIVkJhEdGyqh1oMrlfLb3kK9Fy8--
-
---wdnXLohRfdJgHEloDMWAml1TOKdMzN0Na
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3YExcACgkQ41TmuOI4
-ufhrDw//Youun5VRUUhNOJQv7dHuoBzMhJtKSpfsJ4V7FXXsIdj7HAm0eqiLkF+X
-VC/0cfv5weVyYhPva1B2ddSQMydnYgCWJIz1YUnwMwiXinxz4CJMmL4UlkbdnG6W
-FwdXkQk6hzAy6KRI+vOcvt6qEa9moZOVsyKEuugpmcbAlcubQ8Hw6jT6zI6mp0W5
-B0IwTmE4C0xRICcELgJvxkMKqhI+7XMb62RuWfPZVbgDWH6NNxTlTOii6oTdVb9t
-OeKPPjqhr/9QwuQ7KuuBpRYzO86WFSdP/25yBFtCzXIL9NWRzBLe6Dg9EB1gIDdD
-KTXdG0hO2D9K6lVhUZQyhAyBb4o074GqxCjEaw1zJFBCQDI/jVu1wsTziDYJ11Zt
-UMH5iHUDVxJ/Te8tHoO9rN8sj+UYvFPUzJYnbc9GCClQEbLzmIbCBog3kTmb+H4J
-ciajtCtJt4Y1O/l/ihvUs/QTAu6I8+Xq8Dyo3rnYhcnednlRdraA/mRSoP65KC4Y
-s3huYdT56A22Xcdwq3eFLBNo67BcAX8o7x/CAHBjLPGkQtMJ1oozNscYIxHDp1oW
-bu2nalqIhRcAmUCLLYvL/nHPZUaF261zcxidI60ElMS8GTNmyUuWK9y673x09Ex7
-oLa9vFBs7+ZDFlIOc5Hn8ClbZKU8233CXyx6zUri7jbpZA6zRV4=
-=E+/R
------END PGP SIGNATURE-----
-
---wdnXLohRfdJgHEloDMWAml1TOKdMzN0Na--
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
