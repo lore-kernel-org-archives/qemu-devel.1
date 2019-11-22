@@ -2,89 +2,83 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5310DC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D416C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:45:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C40C20714
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:40:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 684902071C
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:45:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K4+ZfWyC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C40C20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WLY3EVJm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 684902071C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYByY-0000Vg-T8
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 11:40:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43991)
+	id 1iYC3p-00043y-FS
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 11:45:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <qperret@google.com>) id 1iYB1C-0004Jf-SC
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:38:47 -0500
+ (envelope-from <eblake@redhat.com>) id 1iYBzo-0002Bs-8M
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:41:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <qperret@google.com>) id 1iYB1B-0000rs-PE
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:38:46 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54978)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <qperret@google.com>) id 1iYB1B-0000qX-Gb
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:38:45 -0500
-Received: by mail-wm1-x342.google.com with SMTP id x26so7619751wmk.4
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 07:38:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=2bXdv451uXtHSKP2mFUlRRcnaTmxXQD2UXLdESeqDYQ=;
- b=K4+ZfWyCelA/4gucez16m+FoaIk5SAyV4dEBlLeZrYV2Fcx2ZuN1RnnDTU+v1NQxk/
- KShVhuHqA2e7tdi6hlnAeQvYF+V6uxLsUdYhP6qxGl+IRmHLG7GFMW2K9O454pscCuhW
- SOtgnyfpbqm5bYW9xQ0DayvbhIZKVF0asKljlThCDSzd0hdvWP/cSlvgiz0EupNBYz9W
- J+k7U21fb5PXj8UIY0qKU+gmI/yAwNHiodLtHpDygZCeHQELU751kbbjU7I1SZoo+tAX
- LAaV2b4Oo9MkHAJ8JjMNfDebWdr5rzvwlppw7UehseKtw0x8DdO0TDEeklZJEyH3AuYN
- 5n0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=2bXdv451uXtHSKP2mFUlRRcnaTmxXQD2UXLdESeqDYQ=;
- b=sTYfozt6pyb6UN0h/fU8afdUANGToWwyDNk8DZgG2tHQ1rWgdEM7hSf6bSzTYHDTU3
- 9wP52ELPgS1vU8zn8jiI9L4jxwX1EL0u0xAov7zuYfG9sPqPIow75Nu30lelGKTO2Roc
- fRXGzuhF/LaKYhRYPTzRS+UQB4aQ/ZhJga0rNYp0MA3NNbtxKXyWCXi2cFeLrurHtf2i
- vcI3GnHPkK41odYl68gOre+Pj1jHEBiCnn0XZ7dckxNTi54L9QURdfn3uVmMNn9wN/Ga
- abEVPBpwWobi55JO2O5NrcbXaO3fdkB8DTpJEIv/7qbzjXctD7oxKqrIS1aRRM8iOvsi
- eYxA==
-X-Gm-Message-State: APjAAAWYbclx9hOQDFzDA4h5EDY9tgBp1LOb2xWTkOCrZpUpIZhYkin9
- 9A0DIDPKq+KjJjxngr+lOkPnuA==
-X-Google-Smtp-Source: APXvYqxt4TgJV1dS5Bjno9tHw1KVHIZBIvkkQpeod6YkQ3wdPI4vcJ6Tlj3WAb1Og+1pOLvFbZ0HZQ==
-X-Received: by 2002:a7b:ce11:: with SMTP id m17mr18046942wmc.113.1574437120711; 
- Fri, 22 Nov 2019 07:38:40 -0800 (PST)
-Received: from google.com ([2a00:79e0:d:110:d6cc:2030:37c1:9964])
- by smtp.gmail.com with ESMTPSA id k4sm4123806wmk.26.2019.11.22.07.38.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 22 Nov 2019 07:38:40 -0800 (PST)
-Date: Fri, 22 Nov 2019 15:38:36 +0000
-From: Quentin Perret <qperret@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
- Will Deacon <will@kernel.org>, Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] target/arm: Fix ISR_EL1 tracking when executing at EL2
-Message-ID: <20191122153836.GA222628@google.com>
-References: <20191122135833.28953-1-maz@kernel.org>
+ (envelope-from <eblake@redhat.com>) id 1iYBzm-0000gP-JW
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:41:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54964
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iYBzm-0000gD-GG
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:41:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574440882;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=liVD6sDjUk+e5LedLW+Y8/uYozgIvLmpV+Kni3aGZMg=;
+ b=WLY3EVJmFfAPpeH2OSGaswKLKM1fH4+caLYKSOCjZfnws3z3efrI6TLAlBIUWUAy0Tra+s
+ wlhZnEWRVXuvB0otiFArBQpGxj8VjhetBErIzKR+sO17+o7i/j9OyGK0aamiIkEkUrwwAM
+ 72zaxwjvIgEq3RTxL6D+lu23rbi5SZo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-434-0-19wFRkO0yip1ZIp4aL1w-1; Fri, 22 Nov 2019 11:41:18 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58BC1107ACCD;
+ Fri, 22 Nov 2019 16:41:17 +0000 (UTC)
+Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B534177009;
+ Fri, 22 Nov 2019 16:41:13 +0000 (UTC)
+Subject: Re: [PATCH for-4.2? v3 0/8] block: Fix resize (extending) of short
+ overlays
+To: Peter Maydell <peter.maydell@linaro.org>, Kevin Wolf <kwolf@redhat.com>
+References: <20191122160511.8377-1-kwolf@redhat.com>
+ <CAFEAcA_JU9GfNYDuD2K0MKmAD7GZ7vBUHsXU+WS-6mvPCvf8ig@mail.gmail.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <713adac7-b997-6723-6b07-f527d0b804ac@redhat.com>
+Date: Fri, 22 Nov 2019 10:41:13 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191122135833.28953-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
-X-Mailman-Approved-At: Fri, 22 Nov 2019 11:34:39 -0500
+In-Reply-To: <CAFEAcA_JU9GfNYDuD2K0MKmAD7GZ7vBUHsXU+WS-6mvPCvf8ig@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 0-19wFRkO0yip1ZIp4aL1w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,63 +90,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Qemu-block <qemu-block@nongnu.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Friday 22 Nov 2019 at 13:58:33 (+0000), Marc Zyngier wrote:
-> The ARMv8 ARM states when executing at EL2, EL3 or Secure EL1,
-> ISR_EL1 shows the pending status of the physical IRQ, FIQ, or
-> SError interrupts.
+On 11/22/19 10:17 AM, Peter Maydell wrote:
+> On Fri, 22 Nov 2019 at 16:08, Kevin Wolf <kwolf@redhat.com> wrote:
+>>
+>> See patch 4 for the description of the bug fixed.
 > 
-> Unfortunately, QEMU's implementation only considers the HCR_EL2
-> bits, and ignores the current exception level. This means a hypervisor
-> trying to look at its own interrupt state actually sees the guest
-> state, which is unexpected and breaks KVM as of Linux 5.3.
-> 
-> Instead, check for the running EL and return the physical bits
-> if not running in a virtualized context.
-> 
-> Fixes: 636540e9c40b
-> Reported-by: Quentin Perret <qperret@google.com>
+> I guess my questions for trying to answer the "for-4.2?"
+> question in the subject are:
+>   1) is this a security (leaking data into the guest) bug ?
+>   2) is this a regression?
+>   3) is this something a lot of people are likely to run into?
 
-And FWIW, Tested-by: Quentin Perret <qperret@google.com>
+My thoughts (although Kevin's may be more definitive):
 
-Thanks Marc :)
-Quentin
+1) yes, there is a security aspect: certain resize or commit actions can 
+result in the guest seeing a revival of stale data that the guest may 
+have thought that it previously scrubbed.  Similarly, the tail end of 
+the series proves via iotests that we have an actual case of data 
+corruption after a block commit without this patch
 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  target/arm/helper.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+2) no, this is a long-standing bug, we've only recently noticed it
+
+3) no, it is uncommon to have an overlay with a size shorter than its 
+backing file (it's not even all that common to have an overlay longer 
+than the backing file), so this is a corner case not many people will 
+hit.  It's even less common to have the difference in overlay sizes also 
+coincide with formats that introduce the speed penalty of a longer 
+blocking due to the added zeroing.
+
 > 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index a089fb5a69..027fffbff6 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -1934,8 +1934,11 @@ static uint64_t isr_read(CPUARMState *env, const ARMCPRegInfo *ri)
->      CPUState *cs = env_cpu(env);
->      uint64_t hcr_el2 = arm_hcr_el2_eff(env);
->      uint64_t ret = 0;
-> +    bool allow_virt = (arm_current_el(env) == 1 &&
-> +                       (!arm_is_secure_below_el3(env) ||
-> +                        (env->cp15.scr_el3 & SCR_EEL2)));
->  
-> -    if (hcr_el2 & HCR_IMO) {
-> +    if (allow_virt && (hcr_el2 & HCR_IMO)) {
->          if (cs->interrupt_request & CPU_INTERRUPT_VIRQ) {
->              ret |= CPSR_I;
->          }
-> @@ -1945,7 +1948,7 @@ static uint64_t isr_read(CPUARMState *env, const ARMCPRegInfo *ri)
->          }
->      }
->  
-> -    if (hcr_el2 & HCR_FMO) {
-> +    if (allow_virt && (hcr_el2 & HCR_FMO)) {
->          if (cs->interrupt_request & CPU_INTERRUPT_VFIQ) {
->              ret |= CPSR_F;
->          }
-> -- 
-> 2.17.1
-> 
+> Eyeballing of the diffstat plus the fact we're on v4 of
+> the patchset already makes me a little uneasy about
+> putting it into rc3, but if the bug we're fixing matters
+> enough we can do it.
+
+In terms of diffstat, the v3 series was much smaller in impact.  Both 
+versions add robustness, where the difference between v3 and v4 is 
+whether we introduce a speed penalty on an unlikely setup (v3) or reject 
+any operation where it would require a speed penalty to avoid data 
+problems (v4).  I think all the patches in v3 were reviewed, but I'll go 
+ahead and review v4 as well.
+
+Because of point 1, I am leaning towards some version of this patch 
+series (whether 3 or 4) making -rc3; but point 2 (it is not a 4.2 
+regression) also seems to be a reasonable justification for slipping 
+this to 5.0.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
