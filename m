@@ -2,63 +2,77 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19C1CC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:02:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D11A6C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:03:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF5D820659
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:02:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF5D820659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 98CE920659
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:03:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pbx3zAZH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98CE920659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY3tf-0004Fa-Dr
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 03:02:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39661)
+	id 1iY3u7-0004sH-3z
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 03:02:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42020)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iY3gn-0005vS-9i
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:49:14 -0500
+ (envelope-from <armbru@redhat.com>) id 1iY3s5-0002yN-67
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:00:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iY3gl-000300-St
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:49:13 -0500
-Received: from mga18.intel.com ([134.134.136.126]:36768)
+ (envelope-from <armbru@redhat.com>) id 1iY3rz-00007w-Ux
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:00:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22970
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iY3gl-0002kF-L3
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:49:11 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Nov 2019 23:49:11 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,229,1571727600"; d="scan'208";a="210178609"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by orsmga003.jf.intel.com with ESMTP; 21 Nov 2019 23:49:08 -0800
-From: Tao Xu <tao3.xu@intel.com>
-To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
- ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
- sw@weilnetz.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com,
- lvivier@redhat.com
-Subject: [PATCH v17 12/14] hmat acpi: Build Memory Side Cache Information
- Structure(s)
-Date: Fri, 22 Nov 2019 15:48:24 +0800
-Message-Id: <20191122074826.1373-13-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122074826.1373-1-tao3.xu@intel.com>
-References: <20191122074826.1373-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iY3rz-00006w-Oq
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:00:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574409645;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=UCkf56YFWycJ2ZyqHYX6XilU67V7nt1y7EbPDibtrUQ=;
+ b=Pbx3zAZH483dylkMeDctK+u7s0dADI98syu4sM0A+sif62BEm6WaZXAth7uQNzDYrrX1Eb
+ +YtRFFS9raOmbMEL2LJM38Uo+dSQ9nxcI/be1S0HjPvvZR97slam70D0Sjim+52EqCg378
+ CTp21OBmkSaSaOWnur5pnXSGkjhlBL8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-hiO0UWJXPkGLUkX0sYIklg-1; Fri, 22 Nov 2019 03:00:42 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A75B1800D41;
+ Fri, 22 Nov 2019 08:00:41 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1167A60FF9;
+ Fri, 22 Nov 2019 08:00:41 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 89FB51138606; Fri, 22 Nov 2019 09:00:39 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/2] Fix incorrect integer->float conversion caught by clang
+Date: Fri, 22 Nov 2019 09:00:37 +0100
+Message-Id: <20191122080039.12771-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: hiO0UWJXPkGLUkX0sYIklg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,137 +84,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: richard.henderson@linaro.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
+Fangrui Song's "[PATCH v2] Fix incorrect integer->float conversions
+caught by clang -Wimplicit-int-float-conversion" doesn't apply with
+git-am, and it mixes a bug fix, which should be considered for 4.2,
+with a cleanup, which should go into 5.0.  I took the liberty to
+respin, hope that's alright.
 
-This structure describes memory side cache information for memory
-proximity domains if the memory side cache is present and the
-physical device forms the memory side cache.
-The software could use this information to effectively place
-the data in memory to maximize the performance of the system
-memory that use the memory side cache.
+I propose the migration maintainers pick up PATCH 1 for 5.0.
 
-Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
+I can submit PATCH 2 for 4.2-rc3.
 
-No changes in v17.
+Fangrui Song (2):
+  migration: Fix incorrect integer->float conversion caught by clang
+  util/cutils: Fix incorrect integer->float conversion caught by clang
 
-Changes in v16:
-    - Use checks and assert to replace masks (Igor)
-    - Fields in Cache Attributes are promoted to uint32_t before
-      shifting (Igor)
-    - Drop cpu_to_le32() (Igor)
+ migration/migration.c | 3 +--
+ util/cutils.c         | 8 +++++---
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-Changes in v13:
-    - rename level as cache_level
----
- hw/acpi/hmat.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 68 insertions(+), 1 deletion(-)
-
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-index e5ee8b4317..bb6adb0ccf 100644
---- a/hw/acpi/hmat.c
-+++ b/hw/acpi/hmat.c
-@@ -143,14 +143,62 @@ static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
-     g_free(entry_list);
- }
- 
-+/* ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure: Table 5-147 */
-+static void build_hmat_cache(GArray *table_data, uint8_t total_levels,
-+                             NumaHmatCacheOptions *hmat_cache)
-+{
-+    /*
-+     * Cache Attributes: Bits [3:0] – Total Cache Levels
-+     * for this Memory Proximity Domain
-+     */
-+    uint32_t cache_attr = total_levels;
-+
-+    /* Bits [7:4] : Cache Level described in this structure */
-+    cache_attr |= (uint32_t) hmat_cache->level << 4;
-+
-+    /* Bits [11:8] - Cache Associativity */
-+    cache_attr |= (uint32_t) hmat_cache->assoc << 8;
-+
-+    /* Bits [15:12] - Write Policy */
-+    cache_attr |= (uint32_t) hmat_cache->policy << 12;
-+
-+    /* Bits [31:16] - Cache Line size in bytes */
-+    cache_attr |= (uint32_t) hmat_cache->line << 16;
-+
-+    /* Type */
-+    build_append_int_noprefix(table_data, 2, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, 32, 4);
-+    /* Proximity Domain for the Memory */
-+    build_append_int_noprefix(table_data, hmat_cache->node_id, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+    /* Memory Side Cache Size */
-+    build_append_int_noprefix(table_data, hmat_cache->size, 8);
-+    /* Cache Attributes */
-+    build_append_int_noprefix(table_data, cache_attr, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /*
-+     * Number of SMBIOS handles (n)
-+     * Linux kernel uses Memory Side Cache Information Structure
-+     * without SMBIOS entries for now, so set Number of SMBIOS handles
-+     * as 0.
-+     */
-+    build_append_int_noprefix(table_data, 0, 2);
-+}
-+
- /* Build HMAT sub table structures */
- static void hmat_build_table_structs(GArray *table_data, NumaState *numa_state)
- {
-     uint16_t flags;
-     uint32_t num_initiator = 0;
-     uint32_t initiator_list[MAX_NODES];
--    int i, hierarchy, type;
-+    int i, hierarchy, type, cache_level, total_levels;
-     HMAT_LB_Info *hmat_lb;
-+    NumaHmatCacheOptions *hmat_cache;
- 
-     for (i = 0; i < numa_state->num_nodes; i++) {
-         flags = 0;
-@@ -184,6 +232,25 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *numa_state)
-             }
-         }
-     }
-+
-+    /*
-+     * ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure:
-+     * Table 5-147
-+     */
-+    for (i = 0; i < numa_state->num_nodes; i++) {
-+        total_levels = 0;
-+        for (cache_level = 1; cache_level < HMAT_LB_LEVELS; cache_level++) {
-+            if (numa_state->hmat_cache[i][cache_level]) {
-+                total_levels++;
-+            }
-+        }
-+        for (cache_level = 0; cache_level <= total_levels; cache_level++) {
-+            hmat_cache = numa_state->hmat_cache[i][cache_level];
-+            if (hmat_cache) {
-+                build_hmat_cache(table_data, total_levels, hmat_cache);
-+            }
-+        }
-+    }
- }
- 
- void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_state)
--- 
-2.20.1
+--=20
+2.21.0
 
 
