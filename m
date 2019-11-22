@@ -2,80 +2,126 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5074C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE7BFC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:22:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EA6C20706
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:20:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB05120707
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:22:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPVLyKWK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EA6C20706
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F/6jhFcy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB05120707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY9nS-0001GW-JA
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:20:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33422)
+	id 1iY9pg-00039r-UX
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:22:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33834)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iY9m4-0000nD-Nr
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:19:06 -0500
+ (envelope-from <david@redhat.com>) id 1iY9os-0002X5-OW
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:22:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iY9ly-0006yD-Jt
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:19:02 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44180
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1iY9or-0000sn-Kx
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:21:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46160
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iY9lw-0006us-Lr
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:18:57 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iY9or-0000sY-Hn
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:21:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574432333;
+ s=mimecast20190719; t=1574432517;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bp1161RWv8mPdQRg7SmPAsJbHfLrL4NnfRTi78Ppykk=;
- b=XPVLyKWK7sxDN7Hp9BM+tUaNa46ebc3obyoTuV7uwKGQ3aExOzgCPXXIDd0TIvylj5hEUF
- JKyHx5s2jdlTUHYbg1tAbHbxOpt4f34Q7r6/2C6NmQLUYMxRAzCQ+bIvBdd7iuTAoLipCT
- /ZO6csrMp5L/ZsPcXIdre+UK0wcqtQs=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=no7Y78XcGUpscwWNqRnAyW68uwxu3RR3BOrRYLv7/0Y=;
+ b=F/6jhFcybkC0+wgqsW8kCElzvynfwhLxM8RVaF9gOoKFZMfJvK8zmOgbgH5G/juEK7slaf
+ pzFATMmwiI/34hrc0rONL5NxfkfgR+/JnGEqCexsofC06fmdsAX7leuAHptD6SQ24R6B+C
+ mRNx8coDcklhH+reM2PV81b3o26LOBQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-F85LWm6rN36EOz_0GzdZ5A-1; Fri, 22 Nov 2019 09:18:51 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-193-o36Ow3mQMHiBE_62Qx8_dw-1; Fri, 22 Nov 2019 09:21:53 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 185978C6C01
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 14:18:50 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.18])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 459571081314;
- Fri, 22 Nov 2019 14:18:39 +0000 (UTC)
-Date: Fri, 22 Nov 2019 14:18:37 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH] virtiofsd: fix libfuse information leaks
-Message-ID: <20191122141837.GD2785@work-vm>
-References: <20191122113130.481113-1-stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AB2C593A1;
+ Fri, 22 Nov 2019 14:21:52 +0000 (UTC)
+Received: from [10.36.116.122] (ovpn-116-122.ams2.redhat.com [10.36.116.122])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E21BB18203;
+ Fri, 22 Nov 2019 14:21:46 +0000 (UTC)
+Subject: Re: [PATCH v2 3/5] s390x: Move initial reset
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191122140002.42972-1-frankja@linux.ibm.com>
+ <20191122140002.42972-4-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <70378a12-00a5-e465-0f60-87abea9937c5@redhat.com>
+Date: Fri, 22 Nov 2019 15:21:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191122113130.481113-1-stefanha@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: F85LWm6rN36EOz_0GzdZ5A-1
+In-Reply-To: <20191122140002.42972-4-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: o36Ow3mQMHiBE_62Qx8_dw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,343 +133,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> Some FUSE message replies contain padding fields that are not
-> initialized by libfuse.  This is fine in traditional FUSE applications
-> because the kernel is trusted.  virtiofsd does not trust the guest and
-> must not expose uninitialized memory.
+On 22.11.19 15:00, Janosch Frank wrote:
+> Let's move the intial reset into the reset handler and cleanup
+> afterwards.
 >=20
-> Use C struct initializers to automatically zero out memory.  Not all of
-> these code changes are strictly necessary but they will prevent future
-> information leaks if the structs are extended.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-Thanks, merged.
-
-Dave
-
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  contrib/virtiofsd/fuse_lowlevel.c | 150 +++++++++++++++---------------
->  1 file changed, 76 insertions(+), 74 deletions(-)
+>  target/s390x/cpu-qom.h |  2 +-
+>  target/s390x/cpu.c     | 44 +++++++++++++++---------------------------
+>  target/s390x/cpu.h     |  2 +-
+>  target/s390x/sigp.c    |  2 +-
+>  4 files changed, 19 insertions(+), 31 deletions(-)
 >=20
-> diff --git a/contrib/virtiofsd/fuse_lowlevel.c b/contrib/virtiofsd/fuse_l=
-owlevel.c
-> index 7fa8861f5d..8a4234630d 100644
-> --- a/contrib/virtiofsd/fuse_lowlevel.c
-> +++ b/contrib/virtiofsd/fuse_lowlevel.c
-> @@ -45,21 +45,23 @@ static __attribute__((constructor)) void fuse_ll_init=
-_pagesize(void)
+> diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
+> index f3b71bac67..6f0a12042e 100644
+> --- a/target/s390x/cpu-qom.h
+> +++ b/target/s390x/cpu-qom.h
+> @@ -36,6 +36,7 @@ typedef struct S390CPUDef S390CPUDef;
 > =20
->  static void convert_stat(const struct stat *stbuf, struct fuse_attr *att=
-r)
->  {
-> -=09attr->ino=09=3D stbuf->st_ino;
-> -=09attr->mode=09=3D stbuf->st_mode;
-> -=09attr->nlink=09=3D stbuf->st_nlink;
-> -=09attr->uid=09=3D stbuf->st_uid;
-> -=09attr->gid=09=3D stbuf->st_gid;
-> -=09attr->rdev=09=3D stbuf->st_rdev;
-> -=09attr->size=09=3D stbuf->st_size;
-> -=09attr->blksize=09=3D stbuf->st_blksize;
-> -=09attr->blocks=09=3D stbuf->st_blocks;
-> -=09attr->atime=09=3D stbuf->st_atime;
-> -=09attr->mtime=09=3D stbuf->st_mtime;
-> -=09attr->ctime=09=3D stbuf->st_ctime;
-> -=09attr->atimensec =3D ST_ATIM_NSEC(stbuf);
-> -=09attr->mtimensec =3D ST_MTIM_NSEC(stbuf);
-> -=09attr->ctimensec =3D ST_CTIM_NSEC(stbuf);
-> +=09*attr =3D (struct fuse_attr) {
-> +=09=09.ino=09=09=3D stbuf->st_ino,
-> +=09=09.mode=09=09=3D stbuf->st_mode,
-> +=09=09.nlink=09=09=3D stbuf->st_nlink,
-> +=09=09.uid=09=09=3D stbuf->st_uid,
-> +=09=09.gid=09=09=3D stbuf->st_gid,
-> +=09=09.rdev=09=09=3D stbuf->st_rdev,
-> +=09=09.size=09=09=3D stbuf->st_size,
-> +=09=09.blksize=09=3D stbuf->st_blksize,
-> +=09=09.blocks=09=09=3D stbuf->st_blocks,
-> +=09=09.atime=09=09=3D stbuf->st_atime,
-> +=09=09.mtime=09=09=3D stbuf->st_mtime,
-> +=09=09.ctime=09=09=3D stbuf->st_ctime,
-> +=09=09.atimensec=09=3D ST_ATIM_NSEC(stbuf),
-> +=09=09.mtimensec=09=3D ST_MTIM_NSEC(stbuf),
-> +=09=09.ctimensec=09=3D ST_CTIM_NSEC(stbuf),
-> +=09};
->  }
+>  typedef enum cpu_reset_type {
+>      S390_CPU_RESET_NORMAL,
+> +    S390_CPU_RESET_INITIAL,
+>  } cpu_reset_type;
 > =20
->  static void convert_attr(const struct fuse_setattr_in *attr, struct stat=
- *stbuf)
-> @@ -181,16 +183,16 @@ static int fuse_send_msg(struct fuse_session *se, s=
-truct fuse_chan *ch,
->  int fuse_send_reply_iov_nofree(fuse_req_t req, int error, struct iovec *=
-iov,
->  =09=09=09       int count)
->  {
-> -=09struct fuse_out_header out;
-> +=09struct fuse_out_header out =3D {
-> +=09=09.unique =3D req->unique,
-> +=09=09.error =3D error,
-> +=09};
+>  /**
+> @@ -62,7 +63,6 @@ typedef struct S390CPUClass {
+>      void (*parent_reset)(CPUState *cpu);
+>      void (*load_normal)(CPUState *cpu);
+>      void (*reset)(CPUState *cpu, cpu_reset_type type);
+> -    void (*initial_cpu_reset)(CPUState *cpu);
+>  } S390CPUClass;
 > =20
->  =09if (error <=3D -1000 || error > 0) {
->  =09=09fuse_log(FUSE_LOG_ERR, "fuse: bad error value: %i\n",=09error);
->  =09=09error =3D -ERANGE;
->  =09}
+>  typedef struct S390CPU S390CPU;
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index cf13472472..1f423fb676 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -94,37 +94,26 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_typ=
+e type)
+>      s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
 > =20
-> -=09out.unique =3D req->unique;
-> -=09out.error =3D error;
-> -
->  =09iov[0].iov_base =3D &out;
->  =09iov[0].iov_len =3D sizeof(struct fuse_out_header);
-> =20
-> @@ -271,14 +273,16 @@ size_t fuse_add_direntry(fuse_req_t req, char *buf,=
- size_t bufsize,
->  static void convert_statfs(const struct statvfs *stbuf,
->  =09=09=09   struct fuse_kstatfs *kstatfs)
->  {
-> -=09kstatfs->bsize=09 =3D stbuf->f_bsize;
-> -=09kstatfs->frsize=09 =3D stbuf->f_frsize;
-> -=09kstatfs->blocks=09 =3D stbuf->f_blocks;
-> -=09kstatfs->bfree=09 =3D stbuf->f_bfree;
-> -=09kstatfs->bavail=09 =3D stbuf->f_bavail;
-> -=09kstatfs->files=09 =3D stbuf->f_files;
-> -=09kstatfs->ffree=09 =3D stbuf->f_ffree;
-> -=09kstatfs->namelen =3D stbuf->f_namemax;
-> +=09*kstatfs =3D (struct fuse_kstatfs) {
-> +=09=09.bsize=09 =3D stbuf->f_bsize,
-> +=09=09.frsize=09 =3D stbuf->f_frsize,
-> +=09=09.blocks=09 =3D stbuf->f_blocks,
-> +=09=09.bfree=09 =3D stbuf->f_bfree,
-> +=09=09.bavail=09 =3D stbuf->f_bavail,
-> +=09=09.files=09 =3D stbuf->f_files,
-> +=09=09.ffree=09 =3D stbuf->f_ffree,
-> +=09=09.namelen =3D stbuf->f_namemax,
-> +=09};
->  }
-> =20
->  static int send_reply_ok(fuse_req_t req, const void *arg, size_t argsize=
-)
-> @@ -320,12 +324,14 @@ static unsigned int calc_timeout_nsec(double t)
->  static void fill_entry(struct fuse_entry_out *arg,
->  =09=09       const struct fuse_entry_param *e)
->  {
-> -=09arg->nodeid =3D e->ino;
-> -=09arg->generation =3D e->generation;
-> -=09arg->entry_valid =3D calc_timeout_sec(e->entry_timeout);
-> -=09arg->entry_valid_nsec =3D calc_timeout_nsec(e->entry_timeout);
-> -=09arg->attr_valid =3D calc_timeout_sec(e->attr_timeout);
-> -=09arg->attr_valid_nsec =3D calc_timeout_nsec(e->attr_timeout);
-> +=09*arg =3D (struct fuse_entry_out) {
-> +=09=09.nodeid =3D e->ino,
-> +=09=09.generation =3D e->generation,
-> +=09=09.entry_valid =3D calc_timeout_sec(e->entry_timeout),
-> +=09=09.entry_valid_nsec =3D calc_timeout_nsec(e->entry_timeout),
-> +=09=09.attr_valid =3D calc_timeout_sec(e->attr_timeout),
-> +=09=09.attr_valid_nsec =3D calc_timeout_nsec(e->attr_timeout),
-> +=09};
->  =09convert_stat(&e->attr, &arg->attr);
->  }
-> =20
-> @@ -351,10 +357,12 @@ size_t fuse_add_direntry_plus(fuse_req_t req, char =
-*buf, size_t bufsize,
->  =09fill_entry(&dp->entry_out, e);
-> =20
->  =09struct fuse_dirent *dirent =3D &dp->dirent;
-> -=09dirent->ino =3D e->attr.st_ino;
-> -=09dirent->off =3D off;
-> -=09dirent->namelen =3D namelen;
-> -=09dirent->type =3D (e->attr.st_mode & S_IFMT) >> 12;
-> +=09*dirent =3D (struct fuse_dirent) {
-> +=09=09.ino =3D e->attr.st_ino,
-> +=09=09.off =3D off,
-> +=09=09.namelen =3D namelen,
-> +=09=09.type =3D (e->attr.st_mode & S_IFMT) >> 12,
-> +=09};
->  =09memcpy(dirent->name, name, namelen);
->  =09memset(dirent->name + namelen, 0, entlen_padded - entlen);
-> =20
-> @@ -504,15 +512,14 @@ int fuse_reply_data(fuse_req_t req, struct fuse_buf=
-vec *bufv,
->  =09=09    enum fuse_buf_copy_flags flags)
->  {
->  =09struct iovec iov[2];
-> -=09struct fuse_out_header out;
-> +=09struct fuse_out_header out =3D {
-> +=09=09.unique =3D req->unique,
-> +=09};
->  =09int res;
-> =20
->  =09iov[0].iov_base =3D &out;
->  =09iov[0].iov_len =3D sizeof(struct fuse_out_header);
-> =20
-> -=09out.unique =3D req->unique;
-> -=09out.error =3D 0;
-> -
->  =09res =3D fuse_send_data_iov(req->se, req->ch, iov, 1, bufv, flags);
->  =09if (res <=3D 0) {
->  =09=09fuse_free_req(req);
-> @@ -2203,13 +2210,13 @@ static void do_destroy(fuse_req_t req, fuse_ino_t=
- nodeid,
->  static int send_notify_iov(struct fuse_session *se, int notify_code,
->  =09=09=09   struct iovec *iov, int count)
->  {
-> -=09struct fuse_out_header out;
-> +=09struct fuse_out_header out =3D {
-> +=09=09.error =3D notify_code,
-> +=09};
-> =20
->  =09if (!se->got_init)
->  =09=09return -ENOTCONN;
-> =20
-> -=09out.unique =3D 0;
-> -=09out.error =3D notify_code;
->  =09iov[0].iov_base =3D &out;
->  =09iov[0].iov_len =3D sizeof(struct fuse_out_header);
-> =20
-> @@ -2219,11 +2226,11 @@ static int send_notify_iov(struct fuse_session *s=
-e, int notify_code,
->  int fuse_lowlevel_notify_poll(struct fuse_pollhandle *ph)
->  {
->  =09if (ph !=3D NULL) {
-> -=09=09struct fuse_notify_poll_wakeup_out outarg;
-> +=09=09struct fuse_notify_poll_wakeup_out outarg =3D {
-> +=09=09=09.kh =3D ph->kh,
-> +=09=09};
->  =09=09struct iovec iov[2];
-> =20
-> -=09=09outarg.kh =3D ph->kh;
-> -
->  =09=09iov[1].iov_base =3D &outarg;
->  =09=09iov[1].iov_len =3D sizeof(outarg);
-> =20
-> @@ -2236,7 +2243,11 @@ int fuse_lowlevel_notify_poll(struct fuse_pollhand=
-le *ph)
->  int fuse_lowlevel_notify_inval_inode(struct fuse_session *se, fuse_ino_t=
- ino,
->  =09=09=09=09     off_t off, off_t len)
->  {
-> -=09struct fuse_notify_inval_inode_out outarg;
-> +=09struct fuse_notify_inval_inode_out outarg =3D {
-> +=09=09.ino =3D ino,
-> +=09=09.off =3D off,
-> +=09=09.len =3D len,
-> +=09};
->  =09struct iovec iov[2];
-> =20
->  =09if (!se)
-> @@ -2244,10 +2255,6 @@ int fuse_lowlevel_notify_inval_inode(struct fuse_s=
-ession *se, fuse_ino_t ino,
-> =20
->  =09if (se->conn.proto_major < 6 || se->conn.proto_minor < 12)
->  =09=09return -ENOSYS;
-> -=09
-> -=09outarg.ino =3D ino;
-> -=09outarg.off =3D off;
-> -=09outarg.len =3D len;
-> =20
->  =09iov[1].iov_base =3D &outarg;
->  =09iov[1].iov_len =3D sizeof(outarg);
-> @@ -2258,7 +2265,10 @@ int fuse_lowlevel_notify_inval_inode(struct fuse_s=
-ession *se, fuse_ino_t ino,
->  int fuse_lowlevel_notify_inval_entry(struct fuse_session *se, fuse_ino_t=
- parent,
->  =09=09=09=09     const char *name, size_t namelen)
->  {
-> -=09struct fuse_notify_inval_entry_out outarg;
-> +=09struct fuse_notify_inval_entry_out outarg =3D {
-> +=09=09.parent =3D parent,
-> +=09=09.namelen =3D namelen,
-> +=09};
->  =09struct iovec iov[3];
-> =20
->  =09if (!se)
-> @@ -2267,10 +2277,6 @@ int fuse_lowlevel_notify_inval_entry(struct fuse_s=
-ession *se, fuse_ino_t parent,
->  =09if (se->conn.proto_major < 6 || se->conn.proto_minor < 12)
->  =09=09return -ENOSYS;
-> =20
-> -=09outarg.parent =3D parent;
-> -=09outarg.namelen =3D namelen;
-> -=09outarg.padding =3D 0;
-> -
->  =09iov[1].iov_base =3D &outarg;
->  =09iov[1].iov_len =3D sizeof(outarg);
->  =09iov[2].iov_base =3D (void *)name;
-> @@ -2283,7 +2289,11 @@ int fuse_lowlevel_notify_delete(struct fuse_sessio=
-n *se,
->  =09=09=09=09fuse_ino_t parent, fuse_ino_t child,
->  =09=09=09=09const char *name, size_t namelen)
->  {
-> -=09struct fuse_notify_delete_out outarg;
-> +=09struct fuse_notify_delete_out outarg =3D {
-> +=09=09.parent =3D parent,
-> +=09=09.child =3D child,
-> +=09=09.namelen =3D namelen,
-> +=09};
->  =09struct iovec iov[3];
-> =20
->  =09if (!se)
-> @@ -2292,11 +2302,6 @@ int fuse_lowlevel_notify_delete(struct fuse_sessio=
-n *se,
->  =09if (se->conn.proto_major < 6 || se->conn.proto_minor < 18)
->  =09=09return -ENOSYS;
-> =20
-> -=09outarg.parent =3D parent;
-> -=09outarg.child =3D child;
-> -=09outarg.namelen =3D namelen;
-> -=09outarg.padding =3D 0;
-> -
->  =09iov[1].iov_base =3D &outarg;
->  =09iov[1].iov_len =3D sizeof(outarg);
->  =09iov[2].iov_base =3D (void *)name;
-> @@ -2309,10 +2314,15 @@ int fuse_lowlevel_notify_store(struct fuse_sessio=
-n *se, fuse_ino_t ino,
->  =09=09=09       off_t offset, struct fuse_bufvec *bufv,
->  =09=09=09       enum fuse_buf_copy_flags flags)
->  {
-> -=09struct fuse_out_header out;
-> -=09struct fuse_notify_store_out outarg;
-> +=09struct fuse_out_header out =3D {
-> +=09=09.error =3D FUSE_NOTIFY_STORE,
-> +=09};
-> +=09struct fuse_notify_store_out outarg =3D {
-> +=09=09.nodeid =3D ino,
-> +=09=09.offset =3D offset,
-> +=09=09.size =3D fuse_buf_size(bufv),
-> +=09};
->  =09struct iovec iov[3];
-> -=09size_t size =3D fuse_buf_size(bufv);
->  =09int res;
-> =20
->  =09if (!se)
-> @@ -2321,14 +2331,6 @@ int fuse_lowlevel_notify_store(struct fuse_session=
- *se, fuse_ino_t ino,
->  =09if (se->conn.proto_major < 6 || se->conn.proto_minor < 15)
->  =09=09return -ENOSYS;
-> =20
-> -=09out.unique =3D 0;
-> -=09out.error =3D FUSE_NOTIFY_STORE;
-> -
-> -=09outarg.nodeid =3D ino;
-> -=09outarg.offset =3D offset;
-> -=09outarg.size =3D size;
-> -=09outarg.padding =3D 0;
-> -
->  =09iov[0].iov_base =3D &out;
->  =09iov[0].iov_len =3D sizeof(out);
->  =09iov[1].iov_base =3D &outarg;
-> --=20
-> 2.23.0
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>      switch (type) {
+> +    case S390_CPU_RESET_INITIAL:
+> +        /* initial reset does not clear everything! */
+> +        memset(&env->start_initial_reset_fields, 0,
+> +               offsetof(CPUS390XState, end_reset_fields) -
+> +               offsetof(CPUS390XState, start_initial_reset_fields));
+> +
+> +        /* architectured initial value for Breaking-Event-Address regist=
+er */
+> +        env->gbea =3D 1;
+> +
+> +        /* architectured initial values for CR 0 and 14 */
+> +        env->cregs[0] =3D CR0_RESET;
+> +        env->cregs[14] =3D CR14_RESET;
+> +
+> +        /* tininess for underflow is detected before rounding */
+> +        set_float_detect_tininess(float_tininess_before_rounding,
+> +                                  &env->fpu_status);
+
+/* fall through */
+
+>      case S390_CPU_RESET_NORMAL:
+>          env->pfault_token =3D -1UL;
+>          env->bpbc =3D false;
+> -        break;
+>      }
+
+Removing the break here seems strange. I guess this belongs to another
+patch.
+
+
+Apart from that
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
 
