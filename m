@@ -2,69 +2,84 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64492C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 00:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CE5C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 01:11:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 372FE2068D
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 00:03:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 372FE2068D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id BF5F720672
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 01:11:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s2tns8fj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF5F720672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXwQF-0005kM-BC
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 19:03:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38093)
+	id 1iXxU2-00031D-RV
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 20:11:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iXwPK-000584-3x
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 19:02:43 -0500
+ (envelope-from <bmeng.cn@gmail.com>) id 1iXxSx-0002Lp-QX
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 20:10:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iXwPI-0008Ie-1f
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 19:02:41 -0500
-Resent-Date: Thu, 21 Nov 2019 19:02:41 -0500
-Resent-Message-Id: <E1iXwPI-0008Ie-1f@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21177)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iXwPH-0008HP-S7
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 19:02:39 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1574380953; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=HDRABMzmzP9LucPRdtRoVHYDzuLqNrY3BN0QvxgIX3SMRxIzHQ7CUZh1MZ3gf1r0PwJPtWGx52INWTtzSFmURpFaEBvoRwkMao0P/4uqOPYFJXtm7rf/1qU/0ZM0ixtRic1y2xds3L4fq0JSa0009jGHqTSYbhbtKXHt0vOajog=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1574380953;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=feJ2c/4SFkEi8+EEAMcKeblEcj43lK4jyp3OwBXt2hg=; 
- b=NYmobjFbMHBib1X1rDkOD7M5oUSgq81dTcTyO3z0wesPdyJRLKaSlPnsG+CCuPIEaEXrpex/zQxDZvZ60bQcwk4TLW/3kCcfepdtQu4CurxcLVX/cWH9R41MoCvs09BLVtiHjjTP7IyRBQ2oaGNVOgPDBHClS8icGkpOcDsm1Kk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1574380952238154.1694260311889;
- Thu, 21 Nov 2019 16:02:32 -0800 (PST)
-In-Reply-To: <cover.1574375668.git.dirty@apple.com>
-Subject: Re: [PATCH 0/5] hvf: stability fixes for HVF
-Message-ID: <157438095124.7001.5289891906438578030@37313f22b938>
+ (envelope-from <bmeng.cn@gmail.com>) id 1iXxSw-0006UE-NU
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 20:10:31 -0500
+Received: from mail-yw1-xc41.google.com ([2607:f8b0:4864:20::c41]:43274)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1iXxSw-0006U5-Jk; Thu, 21 Nov 2019 20:10:30 -0500
+Received: by mail-yw1-xc41.google.com with SMTP id g77so1934533ywb.10;
+ Thu, 21 Nov 2019 17:10:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=HT7ZTxGge82f0fLPI2qCbPMK27JnbPnTLJT9zIitDPI=;
+ b=s2tns8fjEB0QCxXWKrb7aX66pryhl+m8PJUs42NYJeaU2z4OT52tCpevhxSYCfy/dK
+ pnWPEnRz9w+P9qAVnIEp1MXVFyaf0XbYbR//7e0DgxFk8+MjrxLAaND6GvcoWBkP/O5I
+ 4ZXo2OVmrcoTv8Tg14gYc9Mmr5CdHDZytEpC2uSA2P6WzXRewKSF70iX9BzP91ISr5Af
+ qJha6rsm1sOtqFVfohlCa8xx5g7p6FN7I3++zDzzmj6k7bTu6shgYGf+rJm7bzhgr7Xe
+ njdYHp0TDIRLK3dvjFuQ82BhLKQzotFpkuzLSkd+5yFAXZHVEffb9N7Ndy6WNXuvCgz8
+ exKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=HT7ZTxGge82f0fLPI2qCbPMK27JnbPnTLJT9zIitDPI=;
+ b=GwMRZOLBzzYYrwVDLTnllJuC2nzdhDNIroMDMIvO7ktd+rxHJRlbMFlNEZ70PQHuOM
+ XSdmLPs3ngi2VkcPVrzh9a/BBjJD+vhxLT1WluizBkZkhBWT4bH/uRTkfAHlBSxCKUES
+ RL56JxI31vIsC3490PPbB5nR543AYdwHCWddhatJ+5AaS+37WnIQhSyXtfjmdzFU5f0l
+ CL8m3Voi3/6Fdq5idBLA4ewp33BmhY4unkZuacRW1AHTjDgT4wpBO8CFtVeNjmB58sGa
+ Zl0w0RSXY0KC3AcyfQcAKAtP98fwL5C9WWqoFX7jyoXZe2L7nOsCm4Wky+7PuOtntba6
+ Cfbg==
+X-Gm-Message-State: APjAAAUODqNwWF+6KFgVfsA0a+K8UVTbCEM3iaeN9bSddyLoVWa0vqQJ
+ 0Hc2Rf7lUeyC/GSmRjRohR9mU0/2hc9ZeNWJXcU=
+X-Google-Smtp-Source: APXvYqwOcGtiowgZebPyxqzpj8LMKbFluuCSNtfHGUuPA7F0VSzyOkWI6xRTAljsigPQ7SkJ7al9vqqMFk9BfsR/FaQ=
+X-Received: by 2002:a81:7ad8:: with SMTP id v207mr7791161ywc.140.1574385029718; 
+ Thu, 21 Nov 2019 17:10:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: qemu-devel@nongnu.org
-Date: Thu, 21 Nov 2019 16:02:32 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+References: <1573916930-19068-1-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1573916930-19068-1-git-send-email-bmeng.cn@gmail.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Fri, 22 Nov 2019 09:10:18 +0800
+Message-ID: <CAEUhbmUuCOzd_Y6ip_oh13gt83rM8EffdXWRCa=KybOjAvEN-A@mail.gmail.com>
+Subject: Re: [PATCH] riscv: sifive_u: Add a "serial" property for board serial
+ number
+To: Alistair Francis <Alistair.Francis@wdc.com>, 
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@dabbelt.com>, 
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, 
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::c41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,122 +91,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTc0Mzc1NjY4Lmdp
-dC5kaXJ0eUBhcHBsZS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21l
-IGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1h
-dGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwLzVdIGh2Zjogc3RhYmlsaXR5IGZpeGVzIGZvciBIVkYK
-VHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IGNvdmVyLjE1NzQzNzU2NjguZ2l0LmRpcnR5QGFwcGxl
-LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
-IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
-ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
-LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
-LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEg
-bmV3IGJyYW5jaCAndGVzdCcKZTFkMTY3OSBodmY6IHNhdmUgYXdheSB0eXBlIGFzIHdlbGwgYXMg
-dmVjdG9yIHNvIHdlIGNhbiByZWluamVjdCB0aGVtCmIyMDFhMWIgaHZmOiBtb3JlIGFjY3VyYXRl
-bHkgbWF0Y2ggU0RNIHdoZW4gc2V0dGluZyBDUjAgYW5kIFBEUFRFIHJlZ2lzdGVycwo5OTViZDA3
-IGh2ZjogY29ycmVjdGx5IGhhbmRsZSBSRVggcHJlZml4IGluIHJlbGF0aW9uIHRvIGxlZ2FjeSBw
-cmVmaXhlcwozZWJiN2NmIGh2ZjogcmVtb3ZlIFRTQyBzeW5jaHJvbml6YXRpb24gY29kZSBiZWNh
-dXNlIGl0IGlzbid0IGZ1bGx5IGNvbXBsZXRlCjVhOTllNGYgaHZmOiBub24tUkFNLCBub24tUk9N
-RCBtZW1vcnkgcmFuZ2VzIGFyZSBub3cgY29ycmVjdGx5IG1hcHBlZCBpbgoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KMS81IENoZWNraW5nIGNvbW1pdCA1YTk5ZTRmYzQ2NDMgKGh2Zjogbm9uLVJBTSwg
-bm9uLVJPTUQgbWVtb3J5IHJhbmdlcyBhcmUgbm93IGNvcnJlY3RseSBtYXBwZWQgaW4pCldBUk5J
-Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM3
-MjogRklMRTogdGFyZ2V0L2kzODYvaHZmL2h2Zi5jOjE3MToKKyAgICAgICAgICAgIC8qIElmIHRo
-ZSBtZW1vcnkgZGV2aWNlIGlzIG5vdCBpbiByb21kX21vZGUsIHRoZW4gd2UgYWN0dWFsbHkgd2Fu
-dAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0
-ZSBsaW5lCiM3MzogRklMRTogdGFyZ2V0L2kzODYvaHZmL2h2Zi5jOjE3MjoKKyAgICAgICAgICAg
-ICAqIHRvIHJlbW92ZSB0aGUgaHZmIG1lbW9yeSBzbG90IHNvIGFsbCBhY2Nlc3NlcyB3aWxsIHRy
-YXAuICovCgpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5ld2xpbmVz
-CiM5MjogRklMRTogdGFyZ2V0L2kzODYvaHZmL2h2Zi5jOjE5NDoKKyAgICAgICAgICAgIGVycm9y
-X3JlcG9ydCgiRmFpbGVkIHRvIHJlc2V0IG92ZXJsYXBwaW5nIHNsb3RcbiIpOwoKV0FSTklORzog
-bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEwMDogRklMRTogdGFyZ2V0L2kzODYvaHZmL2h2Zi5j
-OjIwMzoKKyAgICBpZiAoYXJlYS0+cmVhZG9ubHkgfHwgKCFtZW1vcnlfcmVnaW9uX2lzX3JhbShh
-cmVhKSAmJiBtZW1vcnlfcmVnaW9uX2lzX3JvbWQoYXJlYSkpKQoKRVJST1I6IGJyYWNlcyB7fSBh
-cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTAwOiBGSUxFOiB0
-YXJnZXQvaTM4Ni9odmYvaHZmLmM6MjAzOgorICAgIGlmIChhcmVhLT5yZWFkb25seSB8fCAoIW1l
-bW9yeV9yZWdpb25faXNfcmFtKGFyZWEpICYmIG1lbW9yeV9yZWdpb25faXNfcm9tZChhcmVhKSkp
-ClsuLi5dCisgICAgZWxzZQpbLi4uXQoKRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3Qg
-Y29udGFpbiBuZXdsaW5lcwojMTE1OiBGSUxFOiB0YXJnZXQvaTM4Ni9odmYvaHZmLmM6MjI5Ogor
-ICAgICAgICBlcnJvcl9yZXBvcnQoIkVycm9yIHJlZ2lzdGVyaW5nIG5ldyBtZW1vcnkgc2xvdFxu
-Iik7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
-c3RhdGVtZW50CiMxMjQ6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi9odmYuYzozNTc6CisgICAgaWYg
-KCFzbG90KQpbLi4uXQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjY6IEZJTEU6
-IHRhcmdldC9pMzg2L2h2Zi9odmYuYzozNTk6CisgICAgaWYgKCFtZW1vcnlfcmVnaW9uX2lzX3Jh
-bShzbG90LT5yZWdpb24pICYmICEocmVhZCAmJiBtZW1vcnlfcmVnaW9uX2lzX3JvbWQoc2xvdC0+
-cmVnaW9uKSkpCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
-IHRoaXMgc3RhdGVtZW50CiMxMjY6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi9odmYuYzozNTk6Cisg
-ICAgaWYgKCFtZW1vcnlfcmVnaW9uX2lzX3JhbShzbG90LT5yZWdpb24pICYmICEocmVhZCAmJiBt
-ZW1vcnlfcmVnaW9uX2lzX3JvbWQoc2xvdC0+cmVnaW9uKSkpClsuLi5dCgp0b3RhbDogNiBlcnJv
-cnMsIDMgd2FybmluZ3MsIDEyOCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzUgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
-cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
-biBNQUlOVEFJTkVSUy4KCjIvNSBDaGVja2luZyBjb21taXQgM2ViYjdjZjRhYjdmIChodmY6IHJl
-bW92ZSBUU0Mgc3luY2hyb25pemF0aW9uIGNvZGUgYmVjYXVzZSBpdCBpc24ndCBmdWxseSBjb21w
-bGV0ZSkKMy81IENoZWNraW5nIGNvbW1pdCA5OTViZDA3ZWQ3NTYgKGh2ZjogY29ycmVjdGx5IGhh
-bmRsZSBSRVggcHJlZml4IGluIHJlbGF0aW9uIHRvIGxlZ2FjeSBwcmVmaXhlcykKV0FSTklORzog
-bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM0OiBGSUxFOiB0YXJnZXQvaTM4Ni9odmYveDg2X2Rl
-Y29kZS5jOjE2OTE6Cit0YXJnZXRfdWxvbmcgZ2V0X3JlZ19yZWYoQ1BVWDg2U3RhdGUgKmVudiwg
-aW50IHJlZywgaW50IHJleF9wcmVzZW50LCBpbnQgaXNfZXh0ZW5kZWQsCgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojNjU6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi94ODZfZGVjb2Rl
-LmM6MTcxNToKK3RhcmdldF91bG9uZyBnZXRfcmVnX3ZhbChDUFVYODZTdGF0ZSAqZW52LCBpbnQg
-cmVnLCBpbnQgcmV4X3ByZXNlbnQsIGludCBpc19leHRlbmRlZCwKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiM3MDogRklMRTogdGFyZ2V0L2kzODYvaHZmL3g4Nl9kZWNvZGUuYzox
-NzE5OgorICAgIG1lbWNweSgmdmFsLCAodm9pZCAqKWdldF9yZWdfcmVmKGVudiwgcmVnLCByZXhf
-cHJlc2VudCwgaXNfZXh0ZW5kZWQsIHNpemUpLCBzaXplKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiM3ODogRklMRTogdGFyZ2V0L2kzODYvaHZmL3g4Nl9kZWNvZGUuYzoxODUy
-OgorICAgICAgICAvKiBSRVggcHJlZml4IG11c3QgY29tZSBhZnRlciBsZWdhY3kgcHJlZml4ZXMu
-ICBSRVggYmVmb3JlIGxlZ2FjeSBpcyBpZ25vcmVkLgoKV0FSTklORzogQmxvY2sgY29tbWVudHMg
-dXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzc4OiBGSUxFOiB0YXJnZXQvaTM4
-Ni9odmYveDg2X2RlY29kZS5jOjE4NTI6CisgICAgICAgIC8qIFJFWCBwcmVmaXggbXVzdCBjb21l
-IGFmdGVyIGxlZ2FjeSBwcmVmaXhlcy4gIFJFWCBiZWZvcmUgbGVnYWN5IGlzIGlnbm9yZWQuCgpX
-QVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgKiBvbiBzdWJzZXF1ZW50IGxpbmVzCiM3OTogRklM
-RTogdGFyZ2V0L2kzODYvaHZmL3g4Nl9kZWNvZGUuYzoxODUzOgorICAgICAgICAvKiBSRVggcHJl
-Zml4IG11c3QgY29tZSBhZnRlciBsZWdhY3kgcHJlZml4ZXMuICBSRVggYmVmb3JlIGxlZ2FjeSBp
-cyBpZ25vcmVkLgorICAgICAgICAgICBDbGVhciByZXggdG8gc2ltdWxhdGUgdGhpcy4gKi8KCldB
-Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGlu
-ZQojNzk6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi94ODZfZGVjb2RlLmM6MTg1MzoKKyAgICAgICAg
-ICAgQ2xlYXIgcmV4IHRvIHNpbXVsYXRlIHRoaXMuICovCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojMTkyOiBGSUxFOiB0YXJnZXQvaTM4Ni9odmYveDg2X2RlY29kZS5oOjMwNjoK
-K3RhcmdldF91bG9uZyBnZXRfcmVnX3JlZihDUFVYODZTdGF0ZSAqZW52LCBpbnQgcmVnLCBpbnQg
-cmV4X3ByZXNlbnQsIGludCBpc19leHRlbmRlZCwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMxOTU6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi94ODZfZGVjb2RlLmg6MzA4OgordGFy
-Z2V0X3Vsb25nIGdldF9yZWdfdmFsKENQVVg4NlN0YXRlICplbnYsIGludCByZWcsIGludCByZXhf
-cHJlc2VudCwgaW50IGlzX2V4dGVuZGVkLAoKdG90YWw6IDAgZXJyb3JzLCA5IHdhcm5pbmdzLCAx
-NjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy81IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjQv
-NSBDaGVja2luZyBjb21taXQgYjIwMWExYjNiODIyIChodmY6IG1vcmUgYWNjdXJhdGVseSBtYXRj
-aCBTRE0gd2hlbiBzZXR0aW5nIENSMCBhbmQgUERQVEUgcmVnaXN0ZXJzKQo1LzUgQ2hlY2tpbmcg
-Y29tbWl0IGUxZDE2Nzk1Yjk3YSAoaHZmOiBzYXZlIGF3YXkgdHlwZSBhcyB3ZWxsIGFzIHZlY3Rv
-ciBzbyB3ZSBjYW4gcmVpbmplY3QgdGhlbSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
-cnMKIzI1OiBGSUxFOiB0YXJnZXQvaTM4Ni9odmYvaHZmLmM6NjM3OgorICAgICAgICAgICAgLyog
-U2F2ZSBhd2F5IHRoZSBldmVudCB0eXBlIGFzIHdlbGwgc28gd2UgY2FuIGluamVjdCB0aGUgY29y
-cmVjdCB0eXBlLiAqLwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyNjogRklMRTog
-dGFyZ2V0L2kzODYvaHZmL2h2Zi5jOjYzODoKKyAgICAgICAgICAgIGVudi0+aW50ZXJydXB0X2lu
-amVjdGVkID0gaWR0dmVjX2luZm8gJiAoVk1DU19JRFRfVkVDX1RZUEUgfCBWTUNTX0lEVF9WRUNf
-VkVDTlVNKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzNDogRklMRTogdGFy
-Z2V0L2kzODYvaHZmL2h2Zi5jOjY0NToKKyAgICAgICAgICAgIC8qIFNhdmUgYXdheSB0aGUgZXZl
-bnQgdHlwZSBhcyB3ZWxsIHNvIHdlIGNhbiBpbmplY3QgdGhlIGNvcnJlY3QgdHlwZS4gKi8KCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzNTogRklMRTogdGFyZ2V0L2kzODYvaHZm
-L2h2Zi5jOjY0NjoKKyAgICAgICAgICAgIGVudi0+ZXhjZXB0aW9uX25yID0gaWR0dmVjX2luZm8g
-JiAoVk1DU19JRFRfVkVDX1RZUEUgfCBWTUNTX0lEVF9WRUNfVkVDTlVNKTsKCldBUk5JTkc6IGxp
-bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMDg6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi94ODZodmYu
-YzozODk6CisgICAgICAgICAgICAgICAgLyogTWFrZSBzdXJlIHRvIGluZGljYXRlIHRoYXQgVk1D
-U19FTlRSWV9FWENFUFRJT05fRVJST1IgaXMgdmFsaWQgKi8KCnRvdGFsOiAxIGVycm9ycywgNCB3
-YXJuaW5ncywgOTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS81IGhhcyBzdHlsZSBwcm9ibGVtcywg
-cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
-cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
-SU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
-OiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy9jb3Zlci4xNTc0Mzc1NjY4LmdpdC5kaXJ0eUBhcHBsZS5jb20vdGVzdGluZy5jaGVja3BhdGNo
-Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
-aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
-cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Sat, Nov 16, 2019 at 11:08 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> At present the board serial number is hard-coded to 1, and passed
+> to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+> the serial number to generate a unique MAC address for the on-chip
+> ethernet controller. When multiple QEMU 'sifive_u' instances are
+> created and connected to the same subnet, they all have the same
+> MAC address hence it creates a unusable network.
+>
+> A new "serial" property is introduced to specify the board serial
+> number. When not given, the default serial number 1 is used.
+>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+> ---
+>
+>  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
+>  include/hw/riscv/sifive_u.h |  1 +
+>  2 files changed, 21 insertions(+), 1 deletion(-)
+>
 
+ping?
 
