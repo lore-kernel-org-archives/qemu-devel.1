@@ -2,98 +2,64 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4B7C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 15:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E60C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 15:58:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAF1020715
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 15:35:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dw8hFK//"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAF1020715
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 95F462071B
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 15:58:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F462071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYAyP-0002uH-4B
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 10:35:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43411)
+	id 1iYBKQ-0000kq-CL
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 10:58:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45866)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iYAxO-0001kM-R1
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:34:51 -0500
+ (envelope-from <clg@kaod.org>) id 1iYBHk-0006zC-S8
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:55:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iYAxN-0007nj-Oa
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:34:50 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44812
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iYBDm-0005Mq-6y
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:51:47 -0500
+Received: from 5.mo7.mail-out.ovh.net ([178.32.120.239]:36292)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iYAxN-0007nX-L4
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:34:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574436888;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3aAdYcU/DpgTBj1D1MB1Kf+RmmmZXkhKfjH2rk3afw4=;
- b=Dw8hFK//FWaCq7kOfYLzjegbc/LjgbrF5hEq2ZTMtae3Gm+GZPvLC2QOy2wJUiDbt/qbBV
- L/z+dDqWMyMyJujj6uETVVFdPq0YRz366qmrg15TDqLbzERQK6m9mEH0SEaq6FOvVRPWXR
- j5TT4h06hqFiKqMkLCvL9Nc7KtGUhzs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-K4VAiBpCP8mlDuDkgBmIUA-1; Fri, 22 Nov 2019 10:34:47 -0500
-Received: by mail-wm1-f70.google.com with SMTP id y14so3191790wmj.9
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 07:34:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=L1o9pUpmewZ91EzFhu6CTxYRyhDCmevRuCylTHV2sso=;
- b=joQ7LdRJcAOw9aaifcjYIByaCaXPfXjJ8JAnwWdePDrZcEuazmcaQ1xBshI3n1y2AN
- rP6RxB/ouMFZn+n6Uf52qTWVtA3arw6D6yMkihsZ/ds6qlueWQi0nqaq7oq2iv+tAZS9
- w3KfU9PRa/dgLpCbPi3acj+OLlDOWHI0DHiKRe3xpm36PrY6Xu96uObiB+2XPRdXAlfK
- zlzMvVUAkUX91aR7dJ40Z+KJBVvOjjmBnYB5ampb4sIQhRfIhS2gvLyvhX13SeWDm0eb
- oCEUSv68AjQy9NXvOjyEt2x5f2j9ejIYjAN1vsNE/xVTvZo0utEfNOXGohQckaYaV8Cv
- pomw==
-X-Gm-Message-State: APjAAAWKLelB0KX8BlqudJVLp2oFPYsJgMWwFqFXfBFpfbLxI1eL5Cyi
- 31N7tSYcCLBUGuSCFXvvES35N/NvfpkXVxByiRaaZ7Y2BVZeAZl8FOKeF1+a92HXs/6MLTckbzU
- sYNbAv48Q3VrQwH0=
-X-Received: by 2002:adf:f709:: with SMTP id r9mr17784981wrp.8.1574436881401;
- Fri, 22 Nov 2019 07:34:41 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzCEDkMj1/lU3zx1T1EXu+zdCLVq6/aSdGbbbWSWQbZDd/0YIeelbPjztZZ7eCsTFrBxqkP5A==
-X-Received: by 2002:adf:cf10:: with SMTP id o16mr18560218wrj.334.1574436880120; 
- Fri, 22 Nov 2019 07:34:40 -0800 (PST)
-Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
- [88.21.102.131])
- by smtp.gmail.com with ESMTPSA id u18sm7934629wrp.14.2019.11.22.07.34.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 22 Nov 2019 07:34:39 -0800 (PST)
-Subject: Re: [PATCH] target/arm: Fix ISR_EL1 tracking when executing at EL2
-To: Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <maz@kernel.org>
-References: <20191122135833.28953-1-maz@kernel.org>
- <CAFEAcA-aRwc9bogn-QbT-q5FzkqieYmQOZMr6H=kK5ixMGANMg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d91a9721-1a76-7434-cfc0-493ed4d0d7e2@redhat.com>
-Date: Fri, 22 Nov 2019 16:34:38 +0100
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iYBDm-0005L8-0l
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:51:46 -0500
+Received: from player737.ha.ovh.net (unknown [10.108.54.209])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 82A35140261
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 16:51:36 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player737.ha.ovh.net (Postfix) with ESMTPSA id 71C472FF523F;
+ Fri, 22 Nov 2019 15:51:29 +0000 (UTC)
+Subject: Re: [PATCH] ipmi: add SET_SENSOR_READING command
+To: cminyard@mvista.com
+References: <20191118092429.16149-1-clg@kaod.org>
+ <20191122142800.GT3556@minyard.net>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <e1108da3-b211-13a8-8383-3da78a393006@kaod.org>
+Date: Fri, 22 Nov 2019 16:51:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-aRwc9bogn-QbT-q5FzkqieYmQOZMr6H=kK5ixMGANMg@mail.gmail.com>
+In-Reply-To: <20191122142800.GT3556@minyard.net>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: K4VAiBpCP8mlDuDkgBmIUA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-Ovh-Tracer-Id: 290482176950373350
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehgedgkeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 178.32.120.239
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,35 +71,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Will Deacon <will@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu,
- Quentin Perret <qperret@google.com>
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/22/19 3:16 PM, Peter Maydell wrote:
-> On Fri, 22 Nov 2019 at 13:59, Marc Zyngier <maz@kernel.org> wrote:
+On 22/11/2019 15:28, Corey Minyard wrote:
+> On Mon, Nov 18, 2019 at 10:24:29AM +0100, C=C3=A9dric Le Goater wrote:
+>> SET_SENSOR_READING is a complex IPMI command (see IPMI spec 35.17)
+>> which enables the host software to set the reading value and the event
+>> status of sensors supporting it.
 >>
->> The ARMv8 ARM states when executing at EL2, EL3 or Secure EL1,
->> ISR_EL1 shows the pending status of the physical IRQ, FIQ, or
->> SError interrupts.
+>> Below is a proposal for all the operations (reading, assert, deassert,
+>> event data) with the following limitations :
 >>
->> Unfortunately, QEMU's implementation only considers the HCR_EL2
->> bits, and ignores the current exception level. This means a hypervisor
->> trying to look at its own interrupt state actually sees the guest
->> state, which is unexpected and breaks KVM as of Linux 5.3.
->>
->> Instead, check for the running EL and return the physical bits
->> if not running in a virtualized context.
->>
->> Fixes: 636540e9c40b
->> Reported-by: Quentin Perret <qperret@google.com>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>>  - No event are generated for threshold-based sensors.
+>>  - The case in which the BMC needs to generate its own events is not
+>>    supported.
 >=20
-> Congratulations on your first QEMU patch :-)
+> Ok, I've included this in my tree.  I made one small change mentioned
+> below.  Beyond that, I think you could make this function shorter, but =
+I
+> think that would actually make it harder to understand.  Breaking it
+> into multiple functions doesn't make sense to me, either.
+>=20
+> If you are including this in the ppc tree:
+>=20
+> Acked-by: Corey Minyard <cminyard@mvista.com>
+>=20
+> with the change below and I can remove it from mine.
 
-:))
+I don't think there is a strong need to have it in the PPC tree. It's=20
+a stand alone function adding an extra IPMI command.
+
+
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> Reviewed-by: Corey Minyard <cminyard@mvista.com>
+>> ---
+>> +
+>> +    switch (do_gen_event) {
+>> +    case SENSOR_GEN_EVENT_DATA: {
+>> +        unsigned int bit =3D evd1 & 0xf;
+>> +        uint16_t mask =3D (1 << bit);
+>> +
+>> +        if (sens->assert_states & mask & sens->assert_enable) {
+>> +            gen_event(ibs, cmd[2], 0, evd1, evd2, evd3);
+>> +        }
+>> +
+>> +        if (sens->deassert_states & mask & sens->deassert_enable) {
+>> +            gen_event(ibs, cmd[2], 1, evd1, evd2, evd3);
+>> +        }
+>> +    }
+>> +        break;
+>=20
+> I moved this break statement above the brace before it to keep the
+> indention consistent.  It just screwed with my brain too much :).
+>
+> I looked and there is nothing in the coding style about this, and I
+> found this done in three different ways:
+>=20
+>   case x: {  /* in vl.c */
+>       ....
+>       break;
+>   }
+>   case y: /* in thunk.c */
+>       {
+>            ....
+>       }
+>       break;
+>   case z: /* In vl.c */
+>   {
+>       ....
+>       break;
+>   }
+>=20
+> Oddly enough, I didn't find anything about this in the Linux coding
+> style document, either (I was curious).  One could argue, I suppose,
+> that according to the "Block structure" section in the qemu style and
+> the similar section in the Linux style that the first is correct,
+> but then case statements violate the "Every indented statement is
+> braced" statement in the qemu style.  This has always bugged me in
+> C, sorry for the diatribe on this.
+
+Thanks,
+
+C.=20
+
+>=20
+> -corey
+>=20
+>> +    case SENSOR_GEN_EVENT_BMC:
 
 
