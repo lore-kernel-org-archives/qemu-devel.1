@@ -2,73 +2,77 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F069C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 09:18:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D55C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 09:25:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61D8320674
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 09:18:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D8320674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id F25452070E
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 09:25:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="pxaMR8FF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F25452070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY559-0001qm-EZ
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 04:18:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51123)
+	id 1iY5Br-00048j-6X
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 04:25:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iY54N-0001S7-DA
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 04:17:40 -0500
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1iY5B4-0003fH-8W
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 04:24:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iY54L-0005cT-Ij
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 04:17:39 -0500
-Resent-Date: Fri, 22 Nov 2019 04:17:39 -0500
-Resent-Message-Id: <E1iY54L-0005cT-Ij@eggs.gnu.org>
-Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21873)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iY54L-0005cD-DW
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 04:17:37 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1574414233; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=HPqZC213plGyRkBsf8ALmIHTYdkX3fxP+gKL7M/zTQHSWxhh8vd7rdOIDW7BYE4hSWNsMKD4cOT1LW5gB0xc/mYWdquY0wi6bFQZ2LI5n+8CoGrkVwj45p0NGrMKgaJiJ6ZZMCPIXc8F8yhpEesXYmLt07cJhliqvW0+1PKUj3U=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1574414233;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=tuNm13um/w6YwFaKXMkCCIp2AKbpyvT9Dear3Mx4vuM=; 
- b=lIiaKRD5aFP3o16Y3PoZNpjd3z5tY6FKf+UsOwynhUmraqp62febRj8AVDLw8DSZHP9IXDNhAFSac7eCEGy4rLYhPucQvgvq+Jw6xqzlZi7i9aMKAx4AWzWja6dr+q7T1+1uzkHY8yixpRrGSIKdrQHy1h6mdrA3r7XoQYc3Jow=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 157441423264943.993407061239736;
- Fri, 22 Nov 2019 01:17:12 -0800 (PST)
-In-Reply-To: <20191122074826.1373-1-tao3.xu@intel.com>
-Subject: Re: [PATCH v17 00/14] Build ACPI Heterogeneous Memory Attribute Table
- (HMAT)
-Message-ID: <157441423058.7001.17579951694228090696@37313f22b938>
+ (envelope-from <yury-kotov@yandex-team.ru>) id 1iY5B1-0007vd-35
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 04:24:32 -0500
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:52294)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
+ id 1iY5B0-0007ur-Hf
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 04:24:31 -0500
+Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net
+ [IPv6:2a02:6b8:0:1619::162])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 7C8092E1547;
+ Fri, 22 Nov 2019 12:24:26 +0300 (MSK)
+Received: from myt5-6212ef07a9ec.qloud-c.yandex.net
+ (myt5-6212ef07a9ec.qloud-c.yandex.net [2a02:6b8:c12:3b2d:0:640:6212:ef07])
+ by mxbackcorp1j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ 1nHpQYuaPq-OQTutWFe; Fri, 22 Nov 2019 12:24:26 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1574414666; bh=insK5ULVBnraPS+Iwhi0j+3xaw3LrkQmybXW3buT7bc=;
+ h=Message-Id:Date:Subject:To:From:Cc;
+ b=pxaMR8FFDlNWp77cJ6UtgZwkath4ZQ4MHx8jz9LtZCQ2DanldT0mbzNZf4SPt9Twa
+ Whj+MVqhilOnByVLcKpy2TtAhPM6hO+r50GmkcydfFmis31xeEz70V9ZKHeWW8hmq3
+ EVu3IFXw+lHXMEA2KeW5LBKgn7hEhEWdVpTTEvfc=
+Authentication-Results: mxbackcorp1j.mail.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
+ [2a02:6b8:0:408:1460:716c:11e2:7064])
+ by myt5-6212ef07a9ec.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ IIDretiYZ4-OQVah5Yc; Fri, 22 Nov 2019 12:24:26 +0300
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client certificate not present)
+From: Yury Kotov <yury-kotov@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] monitor: Fix slow reading
+Date: Fri, 22 Nov 2019 12:23:47 +0300
+Message-Id: <20191122092347.28309-1-yury-kotov@yandex-team.ru>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: tao3.xu@intel.com
-Date: Fri, 22 Nov 2019 01:17:12 -0800 (PST)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.58
+X-Received-From: 77.88.29.217
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,109 +81,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, sw@weilnetz.de, tao3.xu@intel.com, fan.du@intel.com,
- armbru@redhat.com, mdroth@linux.vnet.ibm.com, jingqi.liu@intel.com,
- imammedo@redhat.com, jonathan.cameron@huawei.com
+Cc: Markus Armbruster <armbru@redhat.com>, yc-core@yandex-team.ru,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyMjA3NDgyNi4xMzcz
-LTEtdGFvMy54dUBpbnRlbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MTcgMDAvMTRdIEJ1aWxkIEFDUEkgSGV0ZXJvZ2Vu
-ZW91cyBNZW1vcnkgQXR0cmlidXRlIFRhYmxlIChITUFUKQpUeXBlOiBzZXJpZXMKTWVzc2FnZS1p
-ZDogMjAxOTExMjIwNzQ4MjYuMTM3My0xLXRhbzMueHVAaW50ZWwuY29tCgo9PT0gVEVTVCBTQ1JJ
-UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8
-fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3Jp
-dGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9
-PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRl
-ZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3Qv
-cWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkxMTIxMDAwODQzLjI0ODQ0LTEt
-YmVhdGEubWljaGFsc2thQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDE5MTEyMTAwMDg0My4yNDg0
-NC0xLWJlYXRhLm1pY2hhbHNrYUBsaW5hcm8ub3JnCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNo
-ZXcvMjAxOTExMjIwODAwMzkuMTI3NzEtMS1hcm1icnVAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIw
-MTkxMTIyMDgwMDM5LjEyNzcxLTEtYXJtYnJ1QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcg
-YnJhbmNoICd0ZXN0Jwo5MTkyYWE2IHRlc3RzL2Jpb3MtdGFibGVzLXRlc3Q6IGFkZCB0ZXN0IGNh
-c2VzIGZvciBBQ1BJIEhNQVQKMzA5ZmQ4NSB0ZXN0cy9udW1hOiBBZGQgY2FzZSBmb3IgUU1QIGJ1
-aWxkIEhNQVQKODY0ZGE0OSBobWF0IGFjcGk6IEJ1aWxkIE1lbW9yeSBTaWRlIENhY2hlIEluZm9y
-bWF0aW9uIFN0cnVjdHVyZShzKQo2ZDkyOTMxIGhtYXQgYWNwaTogQnVpbGQgU3lzdGVtIExvY2Fs
-aXR5IExhdGVuY3kgYW5kIEJhbmR3aWR0aCBJbmZvcm1hdGlvbiBTdHJ1Y3R1cmUocykKMzliYTMw
-OCBobWF0IGFjcGk6IEJ1aWxkIE1lbW9yeSBQcm94aW1pdHkgRG9tYWluIEF0dHJpYnV0ZXMgU3Ry
-dWN0dXJlKHMpCjdkMGJmZmMgbnVtYTogRXh0ZW5kIENMSSB0byBwcm92aWRlIG1lbW9yeSBzaWRl
-IGNhY2hlIGluZm9ybWF0aW9uCjNmYzhhNTQgbnVtYTogRXh0ZW5kIENMSSB0byBwcm92aWRlIG1l
-bW9yeSBsYXRlbmN5IGFuZCBiYW5kd2lkdGggaW5mb3JtYXRpb24KNTkyYTk2YSBudW1hOiBFeHRl
-bmQgQ0xJIHRvIHByb3ZpZGUgaW5pdGlhdG9yIGluZm9ybWF0aW9uIGZvciBudW1hIG5vZGVzCjcw
-MzJmYzQgdGVzdHM6IEFkZCB0ZXN0IGZvciBRQVBJIGJ1aWx0aW4gdHlwZSB0aW1lCjJkODljOTMg
-cWFwaTogQWRkIGJ1aWx0aW4gdHlwZSB0aW1lCmRiZTgyZjUgdXRpbC9jdXRpbHM6IEFkZCBxZW11
-X3N0cnRvdGltZV9ucygpCjJmZWY2NmYgdXRpbC9jdXRpbHM6IHJlZmFjdG9yIGRvX3N0cnRvc3oo
-KSB0byBzdXBwb3J0IHN1ZmZpeGVzIGxpc3QKMmNhZTQ1NyB1dGlsL2N1dGlsczogVXNlIHFlbXVf
-c3RydG9sZF9maW5pdGUgdG8gcGFyc2Ugc2l6ZQphNjkxYjVmIHV0aWwvY3V0aWxzOiBBZGQgQWRk
-IHFlbXVfc3RydG9sZCBhbmQgcWVtdV9zdHJ0b2xkX2Zpbml0ZQoKPT09IE9VVFBVVCBCRUdJTiA9
-PT0KMS8xNCBDaGVja2luZyBjb21taXQgYTY5MWI1ZjkyMTkxICh1dGlsL2N1dGlsczogQWRkIEFk
-ZCBxZW11X3N0cnRvbGQgYW5kIHFlbXVfc3RydG9sZF9maW5pdGUpCkVSUk9SOiBjb25zaWRlciB1
-c2luZyBxZW11X3N0cnRvbGQgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b2xkCiM2MTogRklMRTogdXRp
-bC9jdXRpbHMuYzo2MzY6CisgICAgKnJlc3VsdCA9IHN0cnRvbGQobnB0ciwgJmVwKTsKCnRvdGFs
-OiAxIGVycm9ycywgMCB3YXJuaW5ncywgNjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8xNCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi8xNCBDaGVja2luZyBjb21taXQgMmNhZTQ1NzY2OWI5
-ICh1dGlsL2N1dGlsczogVXNlIHFlbXVfc3RydG9sZF9maW5pdGUgdG8gcGFyc2Ugc2l6ZSkKMy8x
-NCBDaGVja2luZyBjb21taXQgMmZlZjY2ZmQyYTgyICh1dGlsL2N1dGlsczogcmVmYWN0b3IgZG9f
-c3RydG9zeigpIHRvIHN1cHBvcnQgc3VmZml4ZXMgbGlzdCkKNC8xNCBDaGVja2luZyBjb21taXQg
-ZGJlODJmNTBjZjg2ICh1dGlsL2N1dGlsczogQWRkIHFlbXVfc3RydG90aW1lX25zKCkpCjUvMTQg
-Q2hlY2tpbmcgY29tbWl0IDJkODljOTM1MDExNSAocWFwaTogQWRkIGJ1aWx0aW4gdHlwZSB0aW1l
-KQo2LzE0IENoZWNraW5nIGNvbW1pdCA3MDMyZmM0NzU2YTAgKHRlc3RzOiBBZGQgdGVzdCBmb3Ig
-UUFQSSBidWlsdGluIHR5cGUgdGltZSkKNy8xNCBDaGVja2luZyBjb21taXQgNTkyYTk2YTBmZjIx
-IChudW1hOiBFeHRlbmQgQ0xJIHRvIHByb3ZpZGUgaW5pdGlhdG9yIGluZm9ybWF0aW9uIGZvciBu
-dW1hIG5vZGVzKQo4LzE0IENoZWNraW5nIGNvbW1pdCAzZmM4YTU0MmE0YjcgKG51bWE6IEV4dGVu
-ZCBDTEkgdG8gcHJvdmlkZSBtZW1vcnkgbGF0ZW5jeSBhbmQgYmFuZHdpZHRoIGluZm9ybWF0aW9u
-KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTMwOiBGSUxFOiBody9jb3JlL251
-bWEuYzoyOTk6CisgICAgICAgICAgICAvKiBTZXQgbGJfaW5mb19wcm92aWRlZCBiaXQgMCBhcyAx
-LCBsYXRlbmN5IGluZm9ybWF0aW9uIGlzIHByb3ZpZGVkICovCgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDQ2MiBsaW5lcyBjaGVja2VkCgpQYXRjaCA4LzE0IGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCjkvMTQgQ2hlY2tpbmcgY29tbWl0IDdkMGJmZmNhNjM4MiAobnVtYTogRXh0ZW5k
-IENMSSB0byBwcm92aWRlIG1lbW9yeSBzaWRlIGNhY2hlIGluZm9ybWF0aW9uKQoxMC8xNCBDaGVj
-a2luZyBjb21taXQgMzliYTMwOGI1NjEyIChobWF0IGFjcGk6IEJ1aWxkIE1lbW9yeSBQcm94aW1p
-dHkgRG9tYWluIEF0dHJpYnV0ZXMgU3RydWN0dXJlKHMpKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQg
-b3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM3Mjog
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDE4NSBs
-aW5lcyBjaGVja2VkCgpQYXRjaCAxMC8xNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxMS8x
-NCBDaGVja2luZyBjb21taXQgNmQ5MjkzMWEwYTQwIChobWF0IGFjcGk6IEJ1aWxkIFN5c3RlbSBM
-b2NhbGl0eSBMYXRlbmN5IGFuZCBCYW5kd2lkdGggSW5mb3JtYXRpb24gU3RydWN0dXJlKHMpKQox
-Mi8xNCBDaGVja2luZyBjb21taXQgODY0ZGE0OWMwY2U0IChobWF0IGFjcGk6IEJ1aWxkIE1lbW9y
-eSBTaWRlIENhY2hlIEluZm9ybWF0aW9uIFN0cnVjdHVyZShzKSkKMTMvMTQgQ2hlY2tpbmcgY29t
-bWl0IDMwOWZkODVkMzlmYyAodGVzdHMvbnVtYTogQWRkIGNhc2UgZm9yIFFNUCBidWlsZCBITUFU
-KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTI0OiBGSUxFOiB0ZXN0cy9udW1h
-LXRlc3QuYzo0MzM6CisgICAgZ19hc3NlcnQoIXFtcF9yc3BfaXNfZXJyKHF0ZXN0X3FtcChxcywg
-InsgJ2V4ZWN1dGUnOiAneC1leGl0LXByZWNvbmZpZycgfSIpKSk7CgpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojMTU5OiBGSUxFOiB0ZXN0cy9udW1hLXRlc3QuYzo0Njg6CisgICAg
-Z19hc3NlcnQoIXFtcF9yc3BfaXNfZXJyKHF0ZXN0X3FtcChxcywgInsgJ2V4ZWN1dGUnOiAneC1l
-eGl0LXByZWNvbmZpZycgfSIpKSk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-MjA2OiBGSUxFOiB0ZXN0cy9udW1hLXRlc3QuYzo1MTU6CisgICAgZ19hc3NlcnQoIXFtcF9yc3Bf
-aXNfZXJyKHF0ZXN0X3FtcChxcywgInsgJ2V4ZWN1dGUnOiAneC1leGl0LXByZWNvbmZpZycgfSIp
-KSk7Cgp0b3RhbDogMCBlcnJvcnMsIDMgd2FybmluZ3MsIDIwNiBsaW5lcyBjaGVja2VkCgpQYXRj
-aCAxMy8xNCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxNC8xNCBDaGVja2luZyBjb21taXQg
-OTE5MmFhNmIyNzNmICh0ZXN0cy9iaW9zLXRhYmxlcy10ZXN0OiBhZGQgdGVzdCBjYXNlcyBmb3Ig
-QUNQSSBITUFUKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
-IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMDY6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
-dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA2NSBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8x
-NCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTEyMjA3NDgyNi4xMzczLTEtdGFvMy54dUBpbnRl
-bC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0
-ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFz
-ZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+The monitor_can_read (as a callback of qemu_chr_fe_set_handlers)
+should return size of buffer which monitor_qmp_read or monitor_read
+can process.
+Currently, monitor_can_read returns 1 as a result of logical not.
+Thus, for each QMP command, len(QMD) iterations of the main loop
+are required to handle a command.
+In fact, these both functions can process any buffer size.
+So, return 1024 as a reasonable size which is enough to process
+the most QMP commands, but not too big to block the main loop for
+a long time.
+
+Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+---
+ monitor/monitor.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/monitor/monitor.c b/monitor/monitor.c
+index 12898b6448..cac3f39727 100644
+--- a/monitor/monitor.c
++++ b/monitor/monitor.c
+@@ -50,6 +50,13 @@ typedef struct {
+     int64_t rate;       /* Minimum time (in ns) between two events */
+ } MonitorQAPIEventConf;
+=20
++/*
++ * The maximum buffer size which the monitor can process in one iteratio=
+n
++ * of the main loop. We don't want to block the loop for a long time
++ * because of JSON parser, so use a reasonable value.
++ */
++#define MONITOR_READ_LEN_MAX 1024
++
+ /* Shared monitor I/O thread */
+ IOThread *mon_iothread;
+=20
+@@ -498,7 +505,7 @@ int monitor_can_read(void *opaque)
+ {
+     Monitor *mon =3D opaque;
+=20
+-    return !atomic_mb_read(&mon->suspend_cnt);
++    return atomic_mb_read(&mon->suspend_cnt) ? 0 : MONITOR_READ_LEN_MAX;
+ }
+=20
+ void monitor_list_append(Monitor *mon)
+--=20
+2.24.0
 
 
