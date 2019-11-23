@@ -2,64 +2,101 @@ Return-Path: <SRS0=9vyd=ZP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A100C432C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 Nov 2019 09:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28410C432C0
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 Nov 2019 09:58:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF5E720719
-	for <qemu-devel@archiver.kernel.org>; Sat, 23 Nov 2019 09:33:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0B3620714
+	for <qemu-devel@archiver.kernel.org>; Sat, 23 Nov 2019 09:58:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XyRmEItX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF5E720719
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CBKRI4Nd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B3620714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYRnO-0000S6-V0
-	for qemu-devel@archiver.kernel.org; Sat, 23 Nov 2019 04:33:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48923)
+	id 1iYSB0-0005gg-2A
+	for qemu-devel@archiver.kernel.org; Sat, 23 Nov 2019 04:58:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50876)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iYRmj-0008ML-AF
- for qemu-devel@nongnu.org; Sat, 23 Nov 2019 04:32:59 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iYSAB-0005F3-UI
+ for qemu-devel@nongnu.org; Sat, 23 Nov 2019 04:57:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iYRmh-000760-O4
- for qemu-devel@nongnu.org; Sat, 23 Nov 2019 04:32:56 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:49439 helo=ozlabs.org)
+ (envelope-from <pbonzini@redhat.com>) id 1iYSA8-0007pW-VV
+ for qemu-devel@nongnu.org; Sat, 23 Nov 2019 04:57:09 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38130
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iYRmg-00073d-LY; Sat, 23 Nov 2019 04:32:55 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47Kp4C2RDBz9sPc; Sat, 23 Nov 2019 20:32:43 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1574501563;
- bh=bi17XhG6IXPhqsvEU4h98tcF6Ipm7+ozCiCX17Wm/9M=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=XyRmEItXnIjJ78X/WqsUdj5MPRNHGSygsSUENpq8ga6bvzT2zCA8HNsLyoEUzw6hj
- 7LUB7e+zGGSfrPQziIZGva7XGC867IkyEyi/la1KixF1BAymPodFHUxhmVj+e2SqXY
- 6C3l3iK8Lgs0wgFlHBRGy1uy/KPNdMuM6c1L9tRo=
-Date: Sat, 23 Nov 2019 20:25:24 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH for-5.0 v5 00/23] ppc/pnv: add XIVE support for KVM guests
-Message-ID: <20191123092524.GG5582@umbus.fritz.box>
-References: <20191115162436.30548-1-clg@kaod.org>
- <3a76eea8-9009-8762-be89-c2c045db8721@kaod.org>
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iYSA8-0007nz-Lq
+ for qemu-devel@nongnu.org; Sat, 23 Nov 2019 04:57:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574503026;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=Rmw1BIRMgvP8cb+Z+9WPtAF/dlgEmCzaZOHBOb9Fc7o=;
+ b=CBKRI4NdfX+fiFDidUR0CUm1Z/7z7WZuNZpMbzqExwJsDJ+v2x8GXb3JHEoVeEWN3MKXY7
+ 5+AxwAcvWF7WlmkbjXtSGDeDjqw31WJ2CW3ht1GNeq8tPQDMnSCYHuSYbW543tRrDPytEB
+ bytnB4fHa/nTVjs5Uh6G9MLU903Z/80=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-pDwu8nqLMA-jv9QFJGZggQ-1; Sat, 23 Nov 2019 04:57:02 -0500
+Received: by mail-wr1-f71.google.com with SMTP id c6so5206821wrm.18
+ for <qemu-devel@nongnu.org>; Sat, 23 Nov 2019 01:57:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=i13vXjWajqVEAuEauYEE2AGbBWkm54NumRttjCNvl34=;
+ b=YvSOtkEfBS6bmfZVL0i9jPe+Ze8b/v7f3BagiKBCRiEEfECfEUh2Zt7y1TbPBLlXPa
+ ouqQybEbKan3n0Z4kkG0XhvlO84D5i5yBEgSFsw7Tzg5zVzyZBPmvWEU6GZzPGv7lX+8
+ QbHryeI7tFMvkwK+oIY0oNSvV6pWUKdCcaau8be5kwKwqI6SyO5YUwP+/l8x8mLojYQB
+ 3p7czqT8mb6OWer41+8g/MTdwIYpCXmYO13iXjcvDRdwp/tl4uBFcfvTsnYQKb05f5NH
+ j5gRw7LQCyP1vVOmPeM2AWWelPUVR7GcmcBeysjpvdi2WWrV8eB2wzrMRMU4CWYl35FL
+ keuA==
+X-Gm-Message-State: APjAAAUS+bWouSUKbdLCqs7J7N7csuNHUd1/KekGOSs0ygCx7ZqtXKhV
+ 8nSG8l61QAw//g9bynXpWp9f3tkHrhd0214FryKf5slOCtm2wE6XHeTLvSk3N+aX7uJ6vpUIZp/
+ Km6GcyPQum8QdpWo=
+X-Received: by 2002:adf:cf0a:: with SMTP id o10mr7535970wrj.340.1574503020976; 
+ Sat, 23 Nov 2019 01:57:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxq1gG80eBd7XJBEMV/SMd4PWS2ijr9ihivnW/KfCuOS389PdeKAfQQJr5PoTeNyaNBWUiJIw==
+X-Received: by 2002:adf:cf0a:: with SMTP id o10mr7535945wrj.340.1574503020731; 
+ Sat, 23 Nov 2019 01:57:00 -0800 (PST)
+Received: from [192.168.42.104] (mob-109-112-4-118.net.vodafone.it.
+ [109.112.4.118])
+ by smtp.gmail.com with ESMTPSA id x2sm1291785wmc.3.2019.11.23.01.56.58
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 23 Nov 2019 01:57:00 -0800 (PST)
+Subject: Re: [RFC PATCH-for-5.0] hw/pci-host: Add Kconfig selector for IGD
+ PCIe pass-through
+To: Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20191122172201.11456-1-philmd@redhat.com>
+ <20191122103438.5cfa0570@x1.home>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <a8aefe83-86fc-b696-0cbe-20e40a07c849@redhat.com>
+Date: Sat, 23 Nov 2019 10:56:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="jUCoXxerhcimRwK6"
-Content-Disposition: inline
-In-Reply-To: <3a76eea8-9009-8762-be89-c2c045db8721@kaod.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+In-Reply-To: <20191122103438.5cfa0570@x1.home>
+Content-Language: en-US
+X-MC-Unique: pDwu8nqLMA-jv9QFJGZggQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,95 +108,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 22/11/19 18:34, Alex Williamson wrote:
+> +config INTEL_IGD_PASSTHROUGH
+> +    default y
 
---jUCoXxerhcimRwK6
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+If it's "default y", it need not be "implied".  It probably shouldn't be
+"default y", since it's I440FX-specific.
 
-On Fri, Nov 22, 2019 at 07:17:05PM +0100, C=E9dric Le Goater wrote:
-> On 15/11/2019 17:24, C=E9dric Le Goater wrote:
-> > Hello,
-> >=20
-> > The QEMU PowerNV machine emulates a baremetal OpenPOWER system and
-> > acts as an hypervisor (L0). Supporting emulation of KVM to run guests
-> > (L1) requires a few more extensions, among which guest support for the
-> > XIVE interrupt controller on POWER9 processor.
-> >=20
-> > The following changes extend the XIVE models with the new XiveFabric
-> > and XivePresenter interfaces to provide support for XIVE escalations
-> > and interrupt resend. This mechanism is used by XIVE to notify the
-> > hypervisor that a vCPU is not dispatched on a HW thread. Tested on a
-> > QEMU PowerNV machine and a simple QEMU pseries guest doing network on
-> > a local bridge.
-> >=20
-> > The XIVE interrupt controller offers a way to increase the XIVE
-> > resources per chip by configuring multiple XIVE blocks on a chip. This
-> > is not currently supported by the model. However, some configurations,
-> > such as OPAL/skiboot, use one block-per-chip configuration with some
-> > optimizations. One of them is to override the hardwired chip ID by the
-> > block id in the PowerBUS operations and for CAM line compares. This
-> > patchset improves the support for this setup. Tested with 4 chips.
-> >=20
-> > A series from Suraj adding guest support in the Radix MMU model of the
-> > QEMU PowerNV machine is still required and will be send later. The
-> > whole patchset can be found under :
-> >=20
-> >   https://github.com/legoater/qemu/tree/powernv-4.2
->=20
->=20
->  [ ... ]
->=20
-> > C=E9dric Le Goater (23):
-> >   ppc/xive: Record the IPB in the associated NVT
-> >   ppc/xive: Introduce helpers for the NVT id
-> >   ppc/pnv: Remove pnv_xive_vst_size() routine
-> >   ppc/pnv: Dump the XIVE NVT table
-> >   ppc/pnv: Quiesce some XIVE errors
-> >   ppc/xive: Introduce OS CAM line helpers
-> >   ppc/xive: Check V bit in TM_PULL_POOL_CTX
-> >   ppc/xive: Introduce a XivePresenter interface
-> >   ppc/xive: Implement the XivePresenter interface
->=20
-> David,
->=20
-> I have reworked the following patches to address Greg's comments=20
-> and your comment on "ppc/pnv: Dump the XIVE NVT table".=20
->=20
-> Shall I wait for some feedback from you or just resend ?
+Paolo
 
-Just resend, thanks.
+> +    bool
+> +
+>  config PREP_PCI
+>      bool
+>      select PCI
+> @@ -32,6 +36,7 @@ config PCI_I440FX
+>      bool
+>      select PCI
+>      select PAM
+> +    imply INTEL_IGD_PASSTHROUGH
+> =20
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---jUCoXxerhcimRwK6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3Y+wIACgkQbDjKyiDZ
-s5Lr3Q//Xbr9q6lluA7u12xf46657YezIItHNAFVSYLlNEQGdCXHnISJ4t5dcZPJ
-H0hPHlD8Mzi7ovwI1COLYv62gjoigxnGORIIMfC8BLsLPSpf3OLOLm8SrqrCZAEC
-RGnqNmZUSh203gh71w4jEuUSjThZTVpjPHkj4uB2gNLzn4x3xTIyctbQWmJ/SBWJ
-Q/cVFimtxBvkWyCcZu4mAVA3sS/UodzD3JV3ubLbDZbEt0UqfOpqyFSRAAKFHCyP
-FysotfK3bJhP9pFGPiCRq7swcnmWsYpYrNVsNJQtUPHNMK5uvEWLO1ENQok76rKy
-4LpSAMDThJUyJ0DF6pzX1EHxxbds8CPSj5fAsT66cVAhuakp581qEx60HfQusWD5
-xJaaE4R/oyLsz0Oc7ems7Z86QjofM7f9AipjnvYb1EFZBpEewgBbn6lv/ST2rjE+
-/J5J1Ah1yM0MKQJPXD03OGWB1PKUQR8YP6XetK4zbShdstNXgNx7SGV5eIS8PPt2
-FzPYYb7KMG08mj9Euw8JL8UfIePsFz8THeOgwongx4raJ5ud7mHqpHajTktgxpQv
-J8R9d11TOtlRYa+1HOD7AIRkzAjoLgRBBGOa9u4Ssgqr40lJ+fpHM+0ar+lFijwA
-HDeNqbIFnXlj34EZuEU2tZtGlpqVaPhXsgBwlq50XmRNpdWomNo=
-=bReB
------END PGP SIGNATURE-----
-
---jUCoXxerhcimRwK6--
 
