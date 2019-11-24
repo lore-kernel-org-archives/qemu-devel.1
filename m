@@ -2,80 +2,81 @@ Return-Path: <SRS0=aI0a=ZQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA95C432C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 07:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AAAFC432C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 07:36:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2D112071A
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 07:34:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 278C6207DD
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 07:36:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E/CJ/4iJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D112071A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G51FSc4l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 278C6207DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYmPt-0000ab-Up
-	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 02:34:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41838)
+	id 1iYmRu-0001jG-99
+	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 02:36:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iYmPF-00008g-KE
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 02:34:07 -0500
+ (envelope-from <alistair23@gmail.com>) id 1iYmR0-0001DQ-Ar
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 02:35:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iYmPE-0006tv-3X
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 02:34:05 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:39930)
+ (envelope-from <alistair23@gmail.com>) id 1iYmQz-0007UE-74
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 02:35:54 -0500
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:38224)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iYmPA-0006qJ-E0; Sun, 24 Nov 2019 02:34:00 -0500
-Received: by mail-lj1-x243.google.com with SMTP id e10so2928585ljj.6;
- Sat, 23 Nov 2019 23:33:59 -0800 (PST)
+ id 1iYmQy-0007U0-Vk; Sun, 24 Nov 2019 02:35:53 -0500
+Received: by mail-lf1-x144.google.com with SMTP id q28so8555662lfa.5;
+ Sat, 23 Nov 2019 23:35:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=s7Zmr8bvQVhMBLI//4GPF3vV9J/C4rxuzQb97UON0t8=;
- b=E/CJ/4iJKAOZL/rYkI3U+p8BsKd4VZzcfHC9bjPC1SwbFKfJHN9Rq2JZG2pNvk2rux
- e3Rk3dJpjc2w/Sg9M2a3fwnEZpTjADnXai58PQlBn6LEDwa9bNL9jKyGNyJuzfcUhH5t
- gdq2dWKpm2TOZtPLMH/yof31tExTbwYd1MsvlTxZvtdDksbyCcI7rp6ofTuGra0y16rt
- Ntto0vcLxW4ig/4YPo5yxpn7ywGwhFWzk4rWFBTYu9Depwn6XR5Jqkx1Dj3a616pwpbj
- gbXyWOosHLaifNMl4BUjltLNi2QTII/ZuVRiqtX2l5nMOdLHXk5Ra1ex0c+kVRhreUeA
- bppQ==
+ :cc; bh=2NIWd2V+BoD2R7kVAtzNAq+nRRdu513tjVeVMOAHXJU=;
+ b=G51FSc4lBRwBNetv4D6c6IaL/4JRqU4NJ9UGrkbCbNREv/qk3ia0Zq5tZCLetjz8xP
+ Xsb0NkatlJghcZ7en0DAmKHf2oN8tF/7fM6tADOY/PZiwaW2xmjAYn+UAHdlIXCIazzO
+ gvyeVSpmfA6n2PJNluRI/1QFxca9ztgK8IIU0YFe+aZnWETT5AwhIjQzd/eovnB5elqL
+ 4oSCacB0VTwddUQAXQJydFITwshDX+g2jcLcy5q4vJpyozcVblDmIaaMD6k8H9NnMqdc
+ cJ+BJYalDe7pltnBM8cPVD8eAFnJbM9X1WPbnkjPaKEjKIse/LhVYlknfefHI2okGMIq
+ lC+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=s7Zmr8bvQVhMBLI//4GPF3vV9J/C4rxuzQb97UON0t8=;
- b=Sz21EQh8YH1+vx+G4XGzF34QkEHs9DCNCca7MPwbWpwwIAIYIm4LCsIpg+r+hHYC83
- oI/TVsSt1IP+/4GWBmsocN0jqNqDARZAE5IBITszA8OF/wBEs7NG2CCGpPVxJnYJ9/wL
- jT4G6hIJ/pjp1LbKRsc+MRdzgL2JoHyATVx3mwYVX1UI734SoWwveYHJm1p09I1iT+jb
- Lpua/pqNHN618ADLgcn2unk4cKWYUf5NkWL70a2bfR1GXgkc9pUCQWiqiFouM2CjAwmE
- 2Q+MjNnoT2sXtCsGI63pfBikodTiTDWCitsC6KBeD4zLqE+faPE7qSMQI29l3JWXklkv
- AV0g==
-X-Gm-Message-State: APjAAAUglDxIRG5fZkVIZqtuGbDGQhVTS73PPrXJwV6g/vCRvFXPbW+q
- Fap0TB3x7w6hcEdxWP947dhW+E0HAdEcCBHkPKI=
-X-Google-Smtp-Source: APXvYqzhxZypmHxeKNZLJpSP4+NVaDU0uKT6bswuZv5Lupdv7hmLHK4MoWthjxhc8PvIIheI6RRTpTOezvOaJmfSTEM=
-X-Received: by 2002:a2e:7301:: with SMTP id o1mr18440345ljc.16.1574580838008; 
- Sat, 23 Nov 2019 23:33:58 -0800 (PST)
+ bh=2NIWd2V+BoD2R7kVAtzNAq+nRRdu513tjVeVMOAHXJU=;
+ b=CPlpL00VgI5jRIBDyjsd0PjqR8CtgwbJWanG4trecqtrGBaUyQJ7e+0/QYKlksxFPM
+ F2pn2m/z9IwqHkFD2JAGvksgANSsy/dUuIdZL20FOxK8GjEftFr6tTmXj9xh2tmh1/bW
+ xgk36ybgX/BIaBR4PUy+7xN9iPPmEdUrlsAmqHjCcxVL09rkb0hFNAX/PkOmiVx8vfis
+ E/rKzfh6s5sq7LH5NXgGIDjzt+YBUfiSluWTYgRIve8Ep9WV1CPHSsgkp7u/uT1ZsT4q
+ wbhApqrDorS4PAZ73Y8rxNV+ITEKrpzpdtH+EnLaVVC4Ta21rEghhHQYXz01GjAMXuWv
+ 4RZw==
+X-Gm-Message-State: APjAAAWoHneHWKVJGzUAKwqAs1ZGeqFNJDuSYSehOMx4URDqohYqHot2
+ KZHJOI6JGbMA/HejbwwJjTL8jXmpWwIbHwsOGPE=
+X-Google-Smtp-Source: APXvYqzhGqhJkwqgMn8peCcLIBZHOoi0BZHLTY4M10qRMG2qiFYvNmXRWu8kmBi0yyrl9zIcEypruvqOciNvLUL50T4=
+X-Received: by 2002:a05:6512:4c1:: with SMTP id
+ w1mr16857852lfq.141.1574580951491; 
+ Sat, 23 Nov 2019 23:35:51 -0800 (PST)
 MIME-Version: 1.0
-References: <20191119062005.5787-1-siwei.zhuang@data61.csiro.au>
-In-Reply-To: <20191119062005.5787-1-siwei.zhuang@data61.csiro.au>
+References: <1573916930-19068-1-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1573916930-19068-1-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Sat, 23 Nov 2019 23:33:30 -0800
-Message-ID: <CAKmqyKNjAxxT+QbYBDngG6ad7VBJuEvnDDXw-AyPaCjZpeiEZg@mail.gmail.com>
-Subject: Re: [PATCH] hw/riscv: Add optional symbol callback ptr to
- riscv_load_kernel()
-To: "Zhuang, Siwei (Data61, Kensington NSW)" <Siwei.Zhuang@data61.csiro.au>
+Date: Sat, 23 Nov 2019 23:35:24 -0800
+Message-ID: <CAKmqyKPtk6V+9Z9dgMSa_thgPCP_B6jQmQCoGAw1=BczfPyKVw@mail.gmail.com>
+Subject: Re: [PATCH] riscv: sifive_u: Add a "serial" property for board serial
+ number
+To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::243
+X-Received-From: 2a00:1450:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,152 +88,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
  Sagar Karandikar <sagark@eecs.berkeley.edu>,
  Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
  Alistair Francis <Alistair.Francis@wdc.com>,
  Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 19, 2019 at 12:03 AM Zhuang, Siwei (Data61, Kensington
-NSW) <Siwei.Zhuang@data61.csiro.au> wrote:
+On Sat, Nov 16, 2019 at 7:09 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
-> This patch adds an optional function pointer, "sym_cb", to
-> riscv_load_kernel() which provides the possibility to access the symbol
-> table during kernel loading.
+> At present the board serial number is hard-coded to 1, and passed
+> to OTP model during initialization. Firmware (FSBL, U-Boot) uses
+> the serial number to generate a unique MAC address for the on-chip
+> ethernet controller. When multiple QEMU 'sifive_u' instances are
+> created and connected to the same subnet, they all have the same
+> MAC address hence it creates a unusable network.
 >
-> The pointer is ignored, if supplied with Image or uImage file.
+> A new "serial" property is introduced to specify the board serial
+> number. When not given, the default serial number 1 is used.
 >
-> The Spike board requires the access to locate the HTIF symbols.
->
-> Fixes: 0ac24d56c5e7 ("hw/riscv: Split out the boot functions")
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1835827
-> Signed-off-by: Siwei Zhuang <siwei.zhuang@data61.csiro.au>
+> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
 
 Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
 > ---
->  hw/riscv/boot.c         | 7 ++++---
->  hw/riscv/sifive_e.c     | 2 +-
->  hw/riscv/sifive_u.c     | 3 ++-
->  hw/riscv/spike.c        | 6 +++---
->  hw/riscv/virt.c         | 3 ++-
->  include/hw/riscv/boot.h | 3 ++-
->  6 files changed, 14 insertions(+), 10 deletions(-)
 >
-> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-> index 7fee98d2f8..027303d2a3 100644
-> --- a/hw/riscv/boot.c
-> +++ b/hw/riscv/boot.c
-> @@ -114,12 +114,13 @@ target_ulong riscv_load_firmware(const char *firmware_filename,
->      exit(1);
->  }
->
-> -target_ulong riscv_load_kernel(const char *kernel_filename)
-> +target_ulong riscv_load_kernel(const char *kernel_filename, symbol_fn_t sym_cb)
->  {
->      uint64_t kernel_entry, kernel_high;
->
-> -    if (load_elf(kernel_filename, NULL, NULL, NULL,
-> -                 &kernel_entry, NULL, &kernel_high, 0, EM_RISCV, 1, 0) > 0) {
-> +    if (load_elf_ram_sym(kernel_filename, NULL, NULL, NULL,
-> +                         &kernel_entry, NULL, &kernel_high, 0,
-> +                         EM_RISCV, 1, 0, NULL, true, sym_cb) > 0) {
->          return kernel_entry;
->      }
->
-> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-> index 0f9d641a0e..8a6b0348df 100644
-> --- a/hw/riscv/sifive_e.c
-> +++ b/hw/riscv/sifive_e.c
-> @@ -111,7 +111,7 @@ static void riscv_sifive_e_init(MachineState *machine)
->                            memmap[SIFIVE_E_MROM].base, &address_space_memory);
->
->      if (machine->kernel_filename) {
-> -        riscv_load_kernel(machine->kernel_filename);
-> +        riscv_load_kernel(machine->kernel_filename, NULL);
->      }
->  }
+>  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
+>  include/hw/riscv/sifive_u.h |  1 +
+>  2 files changed, 21 insertions(+), 1 deletion(-)
 >
 > diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 9552abf4dd..0140e95732 100644
+> index 9552abf..e1a5536 100644
 > --- a/hw/riscv/sifive_u.c
 > +++ b/hw/riscv/sifive_u.c
-> @@ -344,7 +344,8 @@ static void riscv_sifive_u_init(MachineState *machine)
->                                   memmap[SIFIVE_U_DRAM].base);
+> @@ -34,6 +34,7 @@
+>  #include "qemu/log.h"
+>  #include "qemu/error-report.h"
+>  #include "qapi/error.h"
+> +#include "qapi/visitor.h"
+>  #include "hw/boards.h"
+>  #include "hw/loader.h"
+>  #include "hw/sysbus.h"
+> @@ -401,6 +402,7 @@ static void riscv_sifive_u_init(MachineState *machine)
+>  static void riscv_sifive_u_soc_init(Object *obj)
+>  {
+>      MachineState *ms = MACHINE(qdev_get_machine());
+> +    SiFiveUState *us = RISCV_U_MACHINE(ms);
+>      SiFiveUSoCState *s = RISCV_U_SOC(obj);
 >
->      if (machine->kernel_filename) {
-> -        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename);
-> +        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
-> +                                                  NULL);
+>      object_initialize_child(obj, "e-cluster", &s->e_cluster,
+> @@ -433,7 +435,7 @@ static void riscv_sifive_u_soc_init(Object *obj)
+>                            TYPE_SIFIVE_U_PRCI);
+>      sysbus_init_child_obj(obj, "otp", &s->otp, sizeof(s->otp),
+>                            TYPE_SIFIVE_U_OTP);
+> -    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
+> +    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", us->serial);
+>      sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
+>                            TYPE_CADENCE_GEM);
+>  }
+> @@ -452,6 +454,18 @@ static void sifive_u_set_start_in_flash(Object *obj, bool value, Error **errp)
+>      s->start_in_flash = value;
+>  }
 >
->          if (machine->initrd_filename) {
->              hwaddr start;
-> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index 8bbffbcd0f..8823681783 100644
-> --- a/hw/riscv/spike.c
-> +++ b/hw/riscv/spike.c
-> @@ -184,7 +184,7 @@ static void spike_board_init(MachineState *machine)
->                                  mask_rom);
+> +static void sifive_u_get_serial(Object *obj, Visitor *v, const char *name,
+> +                                void *opaque, Error **errp)
+> +{
+> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> +}
+> +
+> +static void sifive_u_set_serial(Object *obj, Visitor *v, const char *name,
+> +                                void *opaque, Error **errp)
+> +{
+> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+> +}
+> +
+>  static void riscv_sifive_u_machine_instance_init(Object *obj)
+>  {
+>      SiFiveUState *s = RISCV_U_MACHINE(obj);
+> @@ -463,6 +477,11 @@ static void riscv_sifive_u_machine_instance_init(Object *obj)
+>                                      "Set on to tell QEMU's ROM to jump to " \
+>                                      "flash. Otherwise QEMU will jump to DRAM",
+>                                      NULL);
+> +
+> +    s->serial = OTP_SERIAL;
+> +    object_property_add(obj, "serial", "uint32", sifive_u_get_serial,
+> +                        sifive_u_set_serial, NULL, &s->serial, NULL);
+> +    object_property_set_description(obj, "serial", "Board serial number", NULL);
+>  }
 >
->      if (machine->kernel_filename) {
-> -        riscv_load_kernel(machine->kernel_filename);
-> +        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
->      }
+>  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 82667b5..7cf742e 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -59,6 +59,7 @@ typedef struct SiFiveUState {
+>      int fdt_size;
 >
->      /* reset vector */
-> @@ -273,7 +273,7 @@ static void spike_v1_10_0_board_init(MachineState *machine)
->                                  mask_rom);
+>      bool start_in_flash;
+> +    uint32_t serial;
+>  } SiFiveUState;
 >
->      if (machine->kernel_filename) {
-> -        riscv_load_kernel(machine->kernel_filename);
-> +        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
->      }
->
->      /* reset vector */
-> @@ -359,7 +359,7 @@ static void spike_v1_09_1_board_init(MachineState *machine)
->                                  mask_rom);
->
->      if (machine->kernel_filename) {
-> -        riscv_load_kernel(machine->kernel_filename);
-> +        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
->      }
->
->      /* reset vector */
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 23f340df19..65557c837e 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -476,7 +476,8 @@ static void riscv_virt_board_init(MachineState *machine)
->                                   memmap[VIRT_DRAM].base);
->
->      if (machine->kernel_filename) {
-> -        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename);
-> +        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
-> +                                                  NULL);
->
->          if (machine->initrd_filename) {
->              hwaddr start;
-> diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
-> index 66075d0e57..df80051fbc 100644
-> --- a/include/hw/riscv/boot.h
-> +++ b/include/hw/riscv/boot.h
-> @@ -28,7 +28,8 @@ void riscv_find_and_load_firmware(MachineState *machine,
->  char *riscv_find_firmware(const char *firmware_filename);
->  target_ulong riscv_load_firmware(const char *firmware_filename,
->                                   hwaddr firmware_load_addr);
-> -target_ulong riscv_load_kernel(const char *kernel_filename);
-> +target_ulong riscv_load_kernel(const char *kernel_filename,
-> +                               symbol_fn_t sym_cb);
->  hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
->                           uint64_t kernel_entry, hwaddr *start);
->
+>  enum {
 > --
-> 2.24.0
+> 2.7.4
+>
 >
 
