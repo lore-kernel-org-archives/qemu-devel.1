@@ -2,84 +2,84 @@ Return-Path: <SRS0=aI0a=ZQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09816C432C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D77AC432C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:05:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A684E2073F
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:04:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 53FA32073F
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:05:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D1BMKfE1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A684E2073F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUvcK3P2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53FA32073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYk4i-0005Bh-DO
-	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 00:04:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60412)
+	id 1iYk4y-0005aM-7x
+	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 00:05:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60489)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iYk35-0003Po-LQ
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:07 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1iYk3I-0003hX-LW
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iYk31-0007Sk-IL
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:03 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35772)
+ (envelope-from <mrolnik@gmail.com>) id 1iYk3D-0007YY-Se
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:16 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36771)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iYk31-0007SN-7g
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:02:59 -0500
-Received: by mail-wr1-x441.google.com with SMTP id s5so13405323wrw.2
- for <qemu-devel@nongnu.org>; Sat, 23 Nov 2019 21:02:59 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iYk3D-0007YB-IB
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:11 -0500
+Received: by mail-wr1-x442.google.com with SMTP id z3so13396756wru.3
+ for <qemu-devel@nongnu.org>; Sat, 23 Nov 2019 21:03:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=S4JKoWQgwvve4UFXaw631RhUTGE2khyNoxL2TB8vr6Q=;
- b=D1BMKfE1b0BV/LWqX6mmn423UzBhkoaMtUk+5z3IUDGDzns0MtgB/AngblWvs6D5HP
- RUvlsgZNC9gD5pHXX6dfb6j+LI21AxYFqD8gaLRISR/WGPTDOv2WVJz/hf1Tc2x/AXgc
- nCk9kgRyG3kvGSirIOz8Gp/2moS1sKtvxCFT7i+NaUiV3MMyRR9o8papjKzFA/8UK3/d
- 4aTOhg92q+qCwG/zBnqmgMX7QbHS6nzoMEPlvzdDS8dpu/kBm7LNl/vHV/jFfQYY8HRV
- hQdQBuvLxFbjrCsllgJ6ZPAsIvxY7IJW3RAOGWckGyuSlUHiuDhL1hLD5g3SkDCuIF7x
- arnQ==
+ bh=PDvO1rvE0ZwIMwmyQXzDOgpL6QiwzoaK0zBS+hQZVKY=;
+ b=QUvcK3P2Xmndix+2+v8V2+UkTD9Oa90YDG5d3pJIHCu45kmG3nzCon/Ugq+KFKzvJo
+ 09yrimm/rwMNq67bS4d1F0u5Vrg/7z0P5j35SRvaLkoeW/SCq3eojn2hIWUgeM3ecLZ0
+ bimppl3ytjGYMT8/XvNrojwBI8qG8jsCqH4Yp9e9wgJmHtRWDjD9TahLxiRBqbmv1iyL
+ 7Tt45m6gUS4XJ+bnqbEtAPiT08YCbe/XBlUjXUkfE+lQqa03Af9UNa+0U98fK1lSRhER
+ dHdXnocRNT6UgPxfzz7uWlEG7xsy7xAsoHh6JBlLG+kUJw3HBmKB/ynK3kpAL21+ybEZ
+ Ol3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=S4JKoWQgwvve4UFXaw631RhUTGE2khyNoxL2TB8vr6Q=;
- b=QUiTq8WLivzcjNfU/UDMUMAO8ovSwWIrxLstqiqoNCgYBPwhfs8GEAlTEvJ9BQY/Nn
- x0FoI/rKe3pZrY3qz9LhrwKOAGFU00u9Je8S0WKtRazFDurQanVUjLaYpGjxAcQtQsxI
- 0iXUbWLxj+Omv+Z6dC/YICbziJFQ6Jepn32n92N2a3ZI8KaiISaQTqgGBXVd+79skXfb
- x7fqSS9TrbOzbRMOaoa1WM5Em/P10OT6Oq26YotMKYGXpI67jbpFVtqDe8t+lTAPyAmR
- Cn26wRzuxsAzF+EZvWQm3z04cWy2WJDoQypputuFfMf/h89GJzbY04Kc5D/UnHDoS+QK
- kyMg==
-X-Gm-Message-State: APjAAAVFDqqiwnlhNH2PC/GjmucnM5n7ATODPLn3j1Phed6nEzdsDGdd
- gRzGg28Rubsg6wEb/FqUmtHRnNp5oDkMgiCc
-X-Google-Smtp-Source: APXvYqy5T6IahaLTkXBa6VeoEF/B9fHkNcs1EYk6jvZG9h8vbmatLDsPfhWXluodggZvphbxbeQeQA==
-X-Received: by 2002:adf:f147:: with SMTP id y7mr24903062wro.236.1574571777551; 
- Sat, 23 Nov 2019 21:02:57 -0800 (PST)
+ bh=PDvO1rvE0ZwIMwmyQXzDOgpL6QiwzoaK0zBS+hQZVKY=;
+ b=eZbg40cjA42/CzrR8fAfTQpejDYNERSPMs2Qfl0EZT7/M71U5XmUAmtzp3laHkZQ3O
+ hV2jmfdFkeMxPFQGXHcdn8zqaE9PFiEQx80AiZTp0gR2PESLruucmkXAm+ritqpM6Qee
+ StA4ZqLT2ViBq3dQ0e5+1a0hA2tBjoD3gUCeI9cmd8oEfp/xpBQCFYYvIJSMdR9QI0X8
+ SVWawQ0+gRU4NcXeckqXfKCmPzI63A6nuStEOkGWEyrNjHR92pminAEaDN9K/8DF/CwJ
+ /qDBPr87Dl+xZl18KnfyR3SO1dOz0hbSyJxzXCywK52QhVwRH11vQ9smVdlV8odQ78/Y
+ qfag==
+X-Gm-Message-State: APjAAAVOxORpQ/pBm3Hv7j2oOSTaUuUoe9cgZL3XTELkGHz7mzq5RuId
+ miOl56fy1tvY6GHnGaid0//e1HmVMcdW88ZW
+X-Google-Smtp-Source: APXvYqyuL/ksozzV34e3pEmn7LVEzS4qhKeqA6kaQQppj4TXWqlrPjoXaH4IRLv3A7kcf4k+TDcpTA==
+X-Received: by 2002:adf:94a6:: with SMTP id 35mr24399132wrr.108.1574571789648; 
+ Sat, 23 Nov 2019 21:03:09 -0800 (PST)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-178-10-38.red.bezeqint.net. [79.178.10.38])
- by smtp.gmail.com with ESMTPSA id t185sm4173976wmf.45.2019.11.23.21.02.55
+ by smtp.gmail.com with ESMTPSA id t185sm4173976wmf.45.2019.11.23.21.03.07
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sat, 23 Nov 2019 21:02:57 -0800 (PST)
+ Sat, 23 Nov 2019 21:03:08 -0800 (PST)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v36 01/17] target/avr: Add outward facing interfaces and core
- CPU logic
-Date: Sun, 24 Nov 2019 07:02:09 +0200
-Message-Id: <20191124050225.30351-2-mrolnik@gmail.com>
+Subject: [PATCH v36 07/17] target/avr: Add instruction translation - Bit and
+ Bit-test Instructions
+Date: Sun, 24 Nov 2019 07:02:15 +0200
+Message-Id: <20191124050225.30351-8-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191124050225.30351-1-mrolnik@gmail.com>
 References: <20191124050225.30351-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,1259 +92,1163 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- richard.henderson@linaro.org, Sarah Harris <S.E.Harris@kent.ac.uk>,
- dovgaluk@ispras.ru, imammedo@redhat.com, philmd@redhat.com,
- aleksandar.m.mail@gmail.com
+ richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
+ philmd@redhat.com, aleksandar.m.mail@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This includes:
-- CPU data structures
-- object model classes and functions
-- migration functions
-- GDB hooks
+    - LSR, ROR
+    - ASR
+    - SWAP
+    - SBI, CBI
+    - BST, BLD
+    - BSET, BCLR
 
-Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
-Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Acked-by: Igor Mammedov <imammedo@redhat.com>
 ---
- target/avr/cpu-param.h |  37 +++
- target/avr/cpu-qom.h   |  54 ++++
- target/avr/cpu.h       | 253 ++++++++++++++++++
- target/avr/cpu.c       | 576 +++++++++++++++++++++++++++++++++++++++++
- target/avr/gdbstub.c   |  85 ++++++
- target/avr/machine.c   | 121 +++++++++
- gdb-xml/avr-cpu.xml    |  49 ++++
- 7 files changed, 1175 insertions(+)
- create mode 100644 target/avr/cpu-param.h
- create mode 100644 target/avr/cpu-qom.h
- create mode 100644 target/avr/cpu.h
- create mode 100644 target/avr/cpu.c
- create mode 100644 target/avr/gdbstub.c
- create mode 100644 target/avr/machine.c
- create mode 100644 gdb-xml/avr-cpu.xml
+ target/avr/translate.c | 1123 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 1123 insertions(+)
 
-diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h
-new file mode 100644
-index 0000000000..ccd1ea3429
---- /dev/null
-+++ b/target/avr/cpu-param.h
-@@ -0,0 +1,37 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
-+
-+#ifndef AVR_CPU_PARAM_H
-+#define AVR_CPU_PARAM_H 1
-+
-+#define TARGET_LONG_BITS 32
-+/*
-+ * TARGET_PAGE_BITS cannot be more than 8 bits because
-+ * 1.  all IO registers occupy [0x0000 .. 0x00ff] address range, and they
-+ *     should be implemented as a device and not memory
-+ * 2.  SRAM starts at the address 0x0100
-+ */
-+#define TARGET_PAGE_BITS 8
-+#define TARGET_PHYS_ADDR_SPACE_BITS 24
-+#define TARGET_VIRT_ADDR_SPACE_BITS 24
-+#define NB_MMU_MODES 2
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 4ef3294a40..f2ec2e2d2f 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -304,6 +304,15 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+ }
+ 
+ 
++static void gen_rshift_ZNVSf(TCGv R)
++{
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
++    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
++    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
++    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
++}
 +
 +
-+#endif
-diff --git a/target/avr/cpu-qom.h b/target/avr/cpu-qom.h
-new file mode 100644
-index 0000000000..e28b58c897
---- /dev/null
-+++ b/target/avr/cpu-qom.h
-@@ -0,0 +1,54 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
-+
-+#ifndef QEMU_AVR_QOM_H
-+#define QEMU_AVR_QOM_H
-+
-+#include "hw/core/cpu.h"
-+
-+#define TYPE_AVR_CPU "avr-cpu"
-+
-+#define AVR_CPU_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(AVRCPUClass, (klass), TYPE_AVR_CPU)
-+#define AVR_CPU(obj) \
-+    OBJECT_CHECK(AVRCPU, (obj), TYPE_AVR_CPU)
-+#define AVR_CPU_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(AVRCPUClass, (obj), TYPE_AVR_CPU)
-+
-+/**
-+ *  AVRCPUClass:
-+ *  @parent_realize: The parent class' realize handler.
-+ *  @parent_reset: The parent class' reset handler.
-+ *  @vr: Version Register value.
-+ *
-+ *  A AVR CPU model.
-+ */
-+typedef struct AVRCPUClass {
-+    /*< private >*/
-+    CPUClass parent_class;
-+    /*< public >*/
-+    DeviceRealize parent_realize;
-+    void (*parent_reset)(CPUState *cpu);
-+} AVRCPUClass;
-+
-+typedef struct AVRCPU AVRCPU;
-+
-+
-+#endif /* !defined (QEMU_AVR_CPU_QOM_H) */
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-new file mode 100644
-index 0000000000..ed9218af5f
---- /dev/null
-+++ b/target/avr/cpu.h
-@@ -0,0 +1,253 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
-+
-+#ifndef QEMU_AVR_CPU_H
-+#define QEMU_AVR_CPU_H
-+
-+#include "cpu-qom.h"
-+#include "exec/cpu-defs.h"
-+
-+#define TCG_GUEST_DEFAULT_MO 0
-+
-+#define CPU_RESOLVING_TYPE TYPE_AVR_CPU
+ /*
+  *  Adds two registers without the C Flag and places the result in the
+  *  destination register Rd.
+@@ -1495,3 +1504,1117 @@ static bool trans_BRBS(DisasContext *ctx, arg_BRBS *a)
+     return true;
+ }
+ 
 +
 +/*
-+ * AVR has two memory spaces, data & code.
-+ * e.g. both have 0 address
-+ * ST/LD instructions access data space
-+ * LPM/SPM and instruction fetching access code memory space
++ *  This instruction makes a copy of one register into another. The source
++ *  register Rr is left unchanged, while the destination register Rd is loaded
++ *  with a copy of Rr.
 + */
-+#define MMU_CODE_IDX 0
-+#define MMU_DATA_IDX 1
++static bool trans_MOV(DisasContext *ctx, arg_MOV *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv Rr = cpu_r[a->rr];
 +
-+#define EXCP_RESET 1
-+#define EXCP_INT(n) (EXCP_RESET + (n) + 1)
++    tcg_gen_mov_tl(Rd, Rr);
 +
-+/* Number of CPU registers */
-+#define NO_CPU_REGISTERS 32
-+/* Number of IO registers accessible by ld/st/in/out */
-+#define NO_IO_REGISTERS 64
++    return true;
++}
++
 +
 +/*
-+ * Offsets of AVR memory regions in host memory space.
-+ *
-+ * This is needed because the AVR has separate code and data address
-+ * spaces that both have start from zero but have to go somewhere in
-+ * host memory.
-+ *
-+ * It's also useful to know where some things are, like the IO registers.
++ *  This instruction makes a copy of one register pair into another register
++ *  pair. The source register pair Rr+1:Rr is left unchanged, while the
++ *  destination register pair Rd+1:Rd is loaded with a copy of Rr + 1:Rr.  This
++ *  instruction is not available in all devices. Refer to the device specific
++ *  instruction set summary.
 + */
-+/* Flash program memory */
-+#define OFFSET_CODE 0x00000000
-+/* CPU registers, IO registers, and SRAM */
-+#define OFFSET_DATA 0x00800000
-+/* CPU registers specifically, these are mapped at the start of data */
-+#define OFFSET_CPU_REGISTERS OFFSET_DATA
++static bool trans_MOVW(DisasContext *ctx, arg_MOVW *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_MOVW)) {
++        return true;
++    }
++
++    TCGv RdL = cpu_r[a->rd];
++    TCGv RdH = cpu_r[a->rd + 1];
++    TCGv RrL = cpu_r[a->rr];
++    TCGv RrH = cpu_r[a->rr + 1];
++
++    tcg_gen_mov_tl(RdH, RrH);
++    tcg_gen_mov_tl(RdL, RrL);
++
++    return true;
++}
++
++
 +/*
-+ * IO registers, including status register, stack pointer, and memory
-+ * mapped peripherals, mapped just after CPU registers
++ * Loads an 8 bit constant directly to register 16 to 31.
 + */
-+#define OFFSET_IO_REGISTERS (OFFSET_DATA + NO_CPU_REGISTERS)
-+
-+enum avr_features {
-+    AVR_FEATURE_SRAM,
-+
-+    AVR_FEATURE_1_BYTE_PC,
-+    AVR_FEATURE_2_BYTE_PC,
-+    AVR_FEATURE_3_BYTE_PC,
-+
-+    AVR_FEATURE_1_BYTE_SP,
-+    AVR_FEATURE_2_BYTE_SP,
-+
-+    AVR_FEATURE_BREAK,
-+    AVR_FEATURE_DES,
-+    AVR_FEATURE_RMW, /* Read Modify Write - XCH LAC LAS LAT */
-+
-+    AVR_FEATURE_EIJMP_EICALL,
-+    AVR_FEATURE_IJMP_ICALL,
-+    AVR_FEATURE_JMP_CALL,
-+
-+    AVR_FEATURE_ADIW_SBIW,
-+
-+    AVR_FEATURE_SPM,
-+    AVR_FEATURE_SPMX,
-+
-+    AVR_FEATURE_ELPMX,
-+    AVR_FEATURE_ELPM,
-+    AVR_FEATURE_LPMX,
-+    AVR_FEATURE_LPM,
-+
-+    AVR_FEATURE_MOVW,
-+    AVR_FEATURE_MUL,
-+    AVR_FEATURE_RAMPD,
-+    AVR_FEATURE_RAMPX,
-+    AVR_FEATURE_RAMPY,
-+    AVR_FEATURE_RAMPZ,
-+};
-+
-+typedef struct CPUAVRState CPUAVRState;
-+
-+struct CPUAVRState {
-+    uint32_t pc_w; /* 0x003fffff up to 22 bits */
-+
-+    uint32_t sregC; /* 0x00000001 1 bit */
-+    uint32_t sregZ; /* 0x00000001 1 bit */
-+    uint32_t sregN; /* 0x00000001 1 bit */
-+    uint32_t sregV; /* 0x00000001 1 bit */
-+    uint32_t sregS; /* 0x00000001 1 bit */
-+    uint32_t sregH; /* 0x00000001 1 bit */
-+    uint32_t sregT; /* 0x00000001 1 bit */
-+    uint32_t sregI; /* 0x00000001 1 bit */
-+
-+    uint32_t rampD; /* 0x00ff0000 8 bits */
-+    uint32_t rampX; /* 0x00ff0000 8 bits */
-+    uint32_t rampY; /* 0x00ff0000 8 bits */
-+    uint32_t rampZ; /* 0x00ff0000 8 bits */
-+    uint32_t eind; /* 0x00ff0000 8 bits */
-+
-+    uint32_t r[NO_CPU_REGISTERS]; /* 8 bits each */
-+    uint32_t sp; /* 16 bits */
-+
-+    uint32_t skip; /* if set skip instruction */
-+
-+    uint64_t intsrc; /* interrupt sources */
-+    bool fullacc; /* CPU/MEM if true MEM only otherwise */
-+
-+    uint32_t features;
-+};
-+
-+/**
-+ *  AVRCPU:
-+ *  @env: #CPUAVRState
-+ *
-+ *  A AVR CPU.
-+ */
-+typedef struct AVRCPU {
-+    /*< private >*/
-+    CPUState parent_obj;
-+    /*< public >*/
-+
-+    CPUNegativeOffsetState neg;
-+    CPUAVRState env;
-+} AVRCPU;
-+
-+#ifndef CONFIG_USER_ONLY
-+extern const struct VMStateDescription vms_avr_cpu;
-+#endif
-+
-+void avr_cpu_do_interrupt(CPUState *cpu);
-+bool avr_cpu_exec_interrupt(CPUState *cpu, int int_req);
-+hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
-+int avr_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
-+int avr_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-+
-+static inline int avr_feature(CPUAVRState *env, int feature)
++static bool trans_LDI(DisasContext *ctx, arg_LDI *a)
 +{
-+    return (env->features & (1U << feature)) != 0;
++    TCGv Rd = cpu_r[a->rd];
++    int imm = a->imm;
++
++    tcg_gen_movi_tl(Rd, imm);
++
++    return true;
 +}
 +
-+static inline void avr_set_feature(CPUAVRState *env, int feature)
-+{
-+    env->features |= (1U << feature);
-+}
 +
-+#define cpu_list avr_cpu_list
-+#define cpu_signal_handler cpu_avr_signal_handler
-+#define cpu_mmu_index avr_cpu_mmu_index
-+
-+static inline int avr_cpu_mmu_index(CPUAVRState *env, bool ifetch)
-+{
-+    return ifetch ? MMU_CODE_IDX : MMU_DATA_IDX;
-+}
-+
-+void avr_cpu_tcg_init(void);
-+
-+void avr_cpu_list(void);
-+int cpu_avr_exec(CPUState *cpu);
-+int cpu_avr_signal_handler(int host_signum, void *pinfo, void *puc);
-+int avr_cpu_handle_mmu_fault(CPUState *cpu, vaddr address, int size,
-+                                int rw, int mmu_idx);
-+int avr_cpu_memory_rw_debug(CPUState *cs, vaddr address, uint8_t *buf,
-+                                int len, bool is_write);
-+
-+enum {
-+    TB_FLAGS_FULL_ACCESS = 1,
-+    TB_FLAGS_SKIP = 2,
-+};
-+
-+static inline void cpu_get_tb_cpu_state(CPUAVRState *env, target_ulong *pc,
-+                                target_ulong *cs_base, uint32_t *pflags)
-+{
-+    uint32_t flags = 0;
-+
-+    *pc = env->pc_w * 2;
-+    *cs_base = 0;
-+
-+    if (env->fullacc) {
-+        flags |= TB_FLAGS_FULL_ACCESS;
-+    }
-+    if (env->skip) {
-+        flags |= TB_FLAGS_SKIP;
-+    }
-+
-+    *pflags = flags;
-+}
-+
-+static inline int cpu_interrupts_enabled(CPUAVRState *env)
-+{
-+    return env->sregI != 0;
-+}
-+
-+static inline uint8_t cpu_get_sreg(CPUAVRState *env)
-+{
-+    uint8_t sreg;
-+    sreg = (env->sregC) << 0
-+         | (env->sregZ) << 1
-+         | (env->sregN) << 2
-+         | (env->sregV) << 3
-+         | (env->sregS) << 4
-+         | (env->sregH) << 5
-+         | (env->sregT) << 6
-+         | (env->sregI) << 7;
-+    return sreg;
-+}
-+
-+static inline void cpu_set_sreg(CPUAVRState *env, uint8_t sreg)
-+{
-+    env->sregC = (sreg >> 0) & 0x01;
-+    env->sregZ = (sreg >> 1) & 0x01;
-+    env->sregN = (sreg >> 2) & 0x01;
-+    env->sregV = (sreg >> 3) & 0x01;
-+    env->sregS = (sreg >> 4) & 0x01;
-+    env->sregH = (sreg >> 5) & 0x01;
-+    env->sregT = (sreg >> 6) & 0x01;
-+    env->sregI = (sreg >> 7) & 0x01;
-+}
-+
-+bool avr_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-+                        MMUAccessType access_type, int mmu_idx,
-+                        bool probe, uintptr_t retaddr);
-+
-+typedef CPUAVRState CPUArchState;
-+typedef AVRCPU ArchCPU;
-+
-+#include "exec/cpu-all.h"
-+
-+#endif /* !defined (QEMU_AVR_CPU_H) */
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-new file mode 100644
-index 0000000000..dae56d7845
---- /dev/null
-+++ b/target/avr/cpu.c
-@@ -0,0 +1,576 @@
 +/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ *  Loads one byte from the data space to a register. For parts with SRAM,
++ *  the data space consists of the Register File, I/O memory and internal SRAM
++ *  (and external SRAM if applicable). For parts without SRAM, the data space
++ *  consists of the register file only. The EEPROM has a separate address space.
++ *  A 16-bit address must be supplied. Memory access is limited to the current
++ *  data segment of 64KB. The LDS instruction uses the RAMPD Register to access
++ *  memory above 64KB. To access another data segment in devices with more than
++ *  64KB data space, the RAMPD in register in the I/O area has to be changed.
++ *  This instruction is not available in all devices. Refer to the device
++ *  specific instruction set summary.
 + */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/qemu-print.h"
-+#include "exec/exec-all.h"
-+#include "cpu.h"
-+
-+static void avr_cpu_set_pc(CPUState *cs, vaddr value)
++static bool trans_LDS(DisasContext *ctx, arg_LDS *a)
 +{
-+    AVRCPU *cpu = AVR_CPU(cs);
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_rampD;
++    a->imm = next_word(ctx);
 +
-+    cpu->env.pc_w = value / 2; /* internally PC points to words */
++    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
++    tcg_gen_shli_tl(addr, addr, 16);
++    tcg_gen_ori_tl(addr, addr, a->imm);
++
++    gen_data_load(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
 +}
 +
-+static bool avr_cpu_has_work(CPUState *cs)
-+{
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
 +
-+    return (cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUPT_RESET))
-+            && cpu_interrupts_enabled(env);
-+}
-+
-+static void avr_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
-+{
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
-+
-+    env->pc_w = tb->pc / 2; /* internally PC points to words */
-+}
-+
-+static void avr_cpu_reset(CPUState *cs)
-+{
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    AVRCPUClass *mcc = AVR_CPU_GET_CLASS(cpu);
-+    CPUAVRState *env = &cpu->env;
-+
-+    mcc->parent_reset(cs);
-+
-+    env->pc_w = 0;
-+    env->sregI = 1;
-+    env->sregC = 0;
-+    env->sregZ = 0;
-+    env->sregN = 0;
-+    env->sregV = 0;
-+    env->sregS = 0;
-+    env->sregH = 0;
-+    env->sregT = 0;
-+
-+    env->rampD = 0;
-+    env->rampX = 0;
-+    env->rampY = 0;
-+    env->rampZ = 0;
-+    env->eind = 0;
-+    env->sp = 0;
-+
-+    env->skip = 0;
-+
-+    memset(env->r, 0, sizeof(env->r));
-+
-+    tlb_flush(cs);
-+}
-+
-+static void avr_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
-+{
-+    info->mach = bfd_arch_avr;
-+    info->print_insn = NULL;
-+}
-+
-+static void avr_cpu_realizefn(DeviceState *dev, Error **errp)
-+{
-+    CPUState *cs = CPU(dev);
-+    AVRCPUClass *mcc = AVR_CPU_GET_CLASS(dev);
-+    Error *local_err = NULL;
-+
-+    cpu_exec_realizefn(cs, &local_err);
-+    if (local_err != NULL) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    qemu_init_vcpu(cs);
-+    cpu_reset(cs);
-+
-+    mcc->parent_realize(dev, errp);
-+}
-+
-+static void avr_cpu_set_int(void *opaque, int irq, int level)
-+{
-+    AVRCPU *cpu = opaque;
-+    CPUAVRState *env = &cpu->env;
-+    CPUState *cs = CPU(cpu);
-+
-+    uint64_t mask = (1ull << irq);
-+    if (level) {
-+        env->intsrc |= mask;
-+        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+    } else {
-+        env->intsrc &= ~mask;
-+        if (env->intsrc == 0) {
-+            cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-+        }
-+    }
-+}
-+
-+static void avr_cpu_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+
-+    cpu_set_cpustate_pointers(cpu);
-+
-+#ifndef CONFIG_USER_ONLY
-+    /* Set the number of interrupts supported by the CPU. */
-+    qdev_init_gpio_in(DEVICE(cpu), avr_cpu_set_int, 57);
-+#endif
-+}
-+
-+static ObjectClass *avr_cpu_class_by_name(const char *cpu_model)
-+{
-+    ObjectClass *oc;
-+
-+    oc = object_class_by_name(cpu_model);
-+    if (object_class_dynamic_cast(oc, TYPE_AVR_CPU) == NULL ||
-+        object_class_is_abstract(oc)) {
-+        oc = NULL;
-+    }
-+    return oc;
-+}
-+
-+static void avr_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-+{
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
-+    int i;
-+
-+    qemu_fprintf(f, "\n");
-+    qemu_fprintf(f, "PC:    %06x\n", env->pc_w);
-+    qemu_fprintf(f, "SP:      %04x\n", env->sp);
-+    qemu_fprintf(f, "rampD:     %02x\n", env->rampD >> 16);
-+    qemu_fprintf(f, "rampX:     %02x\n", env->rampX >> 16);
-+    qemu_fprintf(f, "rampY:     %02x\n", env->rampY >> 16);
-+    qemu_fprintf(f, "rampZ:     %02x\n", env->rampZ >> 16);
-+    qemu_fprintf(f, "EIND:      %02x\n", env->eind >> 16);
-+    qemu_fprintf(f, "X:       %02x%02x\n", env->r[27], env->r[26]);
-+    qemu_fprintf(f, "Y:       %02x%02x\n", env->r[29], env->r[28]);
-+    qemu_fprintf(f, "Z:       %02x%02x\n", env->r[31], env->r[30]);
-+    qemu_fprintf(f, "SREG:    [ %c %c %c %c %c %c %c %c ]\n",
-+                        env->sregI ? 'I' : '-',
-+                        env->sregT ? 'T' : '-',
-+                        env->sregH ? 'H' : '-',
-+                        env->sregS ? 'S' : '-',
-+                        env->sregV ? 'V' : '-',
-+                        env->sregN ? '-' : 'N', /* Zf has negative logic */
-+                        env->sregZ ? 'Z' : '-',
-+                        env->sregC ? 'I' : '-');
-+    qemu_fprintf(f, "SKIP:    %02x\n", env->skip);
-+
-+    qemu_fprintf(f, "\n");
-+    for (i = 0; i < ARRAY_SIZE(env->r); i++) {
-+        qemu_fprintf(f, "R[%02d]:  %02x   ", i, env->r[i]);
-+
-+        if ((i % 8) == 7) {
-+            qemu_fprintf(f, "\n");
-+        }
-+    }
-+    qemu_fprintf(f, "\n");
-+}
-+
-+static void avr_cpu_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    CPUClass *cc = CPU_CLASS(oc);
-+    AVRCPUClass *mcc = AVR_CPU_CLASS(oc);
-+
-+    mcc->parent_realize = dc->realize;
-+    dc->realize = avr_cpu_realizefn;
-+
-+    mcc->parent_reset = cc->reset;
-+    cc->reset = avr_cpu_reset;
-+
-+    cc->class_by_name = avr_cpu_class_by_name;
-+
-+    cc->has_work = avr_cpu_has_work;
-+    cc->do_interrupt = avr_cpu_do_interrupt;
-+    cc->cpu_exec_interrupt = avr_cpu_exec_interrupt;
-+    cc->dump_state = avr_cpu_dump_state;
-+    cc->set_pc = avr_cpu_set_pc;
-+#if !defined(CONFIG_USER_ONLY)
-+    cc->memory_rw_debug = avr_cpu_memory_rw_debug;
-+#endif
-+#ifdef CONFIG_USER_ONLY
-+    cc->handle_mmu_fault = avr_cpu_handle_mmu_fault;
-+#else
-+    cc->get_phys_page_debug = avr_cpu_get_phys_page_debug;
-+    cc->vmsd = &vms_avr_cpu;
-+#endif
-+    cc->disas_set_info = avr_cpu_disas_set_info;
-+    cc->tlb_fill = avr_cpu_tlb_fill;
-+    cc->tcg_initialize = avr_cpu_tcg_init;
-+    cc->synchronize_from_tb = avr_cpu_synchronize_from_tb;
-+    cc->gdb_read_register = avr_cpu_gdb_read_register;
-+    cc->gdb_write_register = avr_cpu_gdb_write_register;
-+    cc->gdb_num_core_regs = 35;
-+    cc->gdb_core_xml_file = "avr-cpu.xml";
-+}
-+
-+static void avr_avr1_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+}
-+
-+static void avr_avr2_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+}
-+
-+static void avr_avr25_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+}
-+
-+static void avr_avr3_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+}
-+
-+static void avr_avr31_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_RAMPZ);
-+    avr_set_feature(env, AVR_FEATURE_ELPM);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+}
-+
-+static void avr_avr35_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+}
-+
-+static void avr_avr4_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+    avr_set_feature(env, AVR_FEATURE_MUL);
-+}
-+
-+static void avr_avr5_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+    avr_set_feature(env, AVR_FEATURE_MUL);
-+}
-+
-+static void avr_avr51_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_RAMPZ);
-+    avr_set_feature(env, AVR_FEATURE_ELPMX);
-+    avr_set_feature(env, AVR_FEATURE_ELPM);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+    avr_set_feature(env, AVR_FEATURE_MUL);
-+}
-+
-+static void avr_avr6_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_RAMPZ);
-+    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
-+    avr_set_feature(env, AVR_FEATURE_ELPMX);
-+    avr_set_feature(env, AVR_FEATURE_ELPM);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+    avr_set_feature(env, AVR_FEATURE_MUL);
-+}
-+
-+static void avr_xmega2_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+    avr_set_feature(env, AVR_FEATURE_MUL);
-+    avr_set_feature(env, AVR_FEATURE_RMW);
-+}
-+
-+static void avr_xmega4_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_RAMPZ);
-+    avr_set_feature(env, AVR_FEATURE_ELPMX);
-+    avr_set_feature(env, AVR_FEATURE_ELPM);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+    avr_set_feature(env, AVR_FEATURE_MUL);
-+    avr_set_feature(env, AVR_FEATURE_RMW);
-+}
-+
-+static void avr_xmega5_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_RAMPD);
-+    avr_set_feature(env, AVR_FEATURE_RAMPX);
-+    avr_set_feature(env, AVR_FEATURE_RAMPY);
-+    avr_set_feature(env, AVR_FEATURE_RAMPZ);
-+    avr_set_feature(env, AVR_FEATURE_ELPMX);
-+    avr_set_feature(env, AVR_FEATURE_ELPM);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+    avr_set_feature(env, AVR_FEATURE_MUL);
-+    avr_set_feature(env, AVR_FEATURE_RMW);
-+}
-+
-+static void avr_xmega6_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_RAMPZ);
-+    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
-+    avr_set_feature(env, AVR_FEATURE_ELPMX);
-+    avr_set_feature(env, AVR_FEATURE_ELPM);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+    avr_set_feature(env, AVR_FEATURE_MUL);
-+    avr_set_feature(env, AVR_FEATURE_RMW);
-+}
-+
-+static void avr_xmega7_initfn(Object *obj)
-+{
-+    AVRCPU *cpu = AVR_CPU(obj);
-+    CPUAVRState *env = &cpu->env;
-+
-+    avr_set_feature(env, AVR_FEATURE_LPM);
-+    avr_set_feature(env, AVR_FEATURE_IJMP_ICALL);
-+    avr_set_feature(env, AVR_FEATURE_ADIW_SBIW);
-+    avr_set_feature(env, AVR_FEATURE_SRAM);
-+    avr_set_feature(env, AVR_FEATURE_BREAK);
-+
-+    avr_set_feature(env, AVR_FEATURE_3_BYTE_PC);
-+    avr_set_feature(env, AVR_FEATURE_2_BYTE_SP);
-+    avr_set_feature(env, AVR_FEATURE_RAMPD);
-+    avr_set_feature(env, AVR_FEATURE_RAMPX);
-+    avr_set_feature(env, AVR_FEATURE_RAMPY);
-+    avr_set_feature(env, AVR_FEATURE_RAMPZ);
-+    avr_set_feature(env, AVR_FEATURE_EIJMP_EICALL);
-+    avr_set_feature(env, AVR_FEATURE_ELPMX);
-+    avr_set_feature(env, AVR_FEATURE_ELPM);
-+    avr_set_feature(env, AVR_FEATURE_JMP_CALL);
-+    avr_set_feature(env, AVR_FEATURE_LPMX);
-+    avr_set_feature(env, AVR_FEATURE_MOVW);
-+    avr_set_feature(env, AVR_FEATURE_MUL);
-+    avr_set_feature(env, AVR_FEATURE_RMW);
-+}
-+
-+typedef struct AVRCPUInfo {
-+    const char *name;
-+    void (*initfn)(Object *obj);
-+} AVRCPUInfo;
-+
-+
-+static void avr_cpu_list_entry(gpointer data, gpointer user_data)
-+{
-+    const char *typename = object_class_get_name(OBJECT_CLASS(data));
-+
-+    qemu_printf("%s\n", typename);
-+}
-+
-+void avr_cpu_list(void)
-+{
-+    GSList *list;
-+    list = object_class_get_list_sorted(TYPE_AVR_CPU, false);
-+    g_slist_foreach(list, avr_cpu_list_entry, NULL);
-+    g_slist_free(list);
-+}
-+
-+#define DEFINE_AVR_CPU_TYPE(model, initfn) \
-+    { \
-+        .parent = TYPE_AVR_CPU, \
-+        .instance_init = initfn, \
-+        .name = model "-avr-cpu", \
-+    }
-+
-+static const TypeInfo avr_cpu_type_info[] = {
-+    {
-+        .name = TYPE_AVR_CPU,
-+        .parent = TYPE_CPU,
-+        .instance_size = sizeof(AVRCPU),
-+        .instance_init = avr_cpu_initfn,
-+        .class_size = sizeof(AVRCPUClass),
-+        .class_init = avr_cpu_class_init,
-+        .abstract = true,
-+    },
-+    DEFINE_AVR_CPU_TYPE("avr1", avr_avr1_initfn),
-+    DEFINE_AVR_CPU_TYPE("avr2", avr_avr2_initfn),
-+    DEFINE_AVR_CPU_TYPE("avr25", avr_avr25_initfn),
-+    DEFINE_AVR_CPU_TYPE("avr3", avr_avr3_initfn),
-+    DEFINE_AVR_CPU_TYPE("avr31", avr_avr31_initfn),
-+    DEFINE_AVR_CPU_TYPE("avr35", avr_avr35_initfn),
-+    DEFINE_AVR_CPU_TYPE("avr4", avr_avr4_initfn),
-+    DEFINE_AVR_CPU_TYPE("avr5", avr_avr5_initfn),
-+    DEFINE_AVR_CPU_TYPE("avr51", avr_avr51_initfn),
-+    DEFINE_AVR_CPU_TYPE("avr6", avr_avr6_initfn),
-+    DEFINE_AVR_CPU_TYPE("xmega2", avr_xmega2_initfn),
-+    DEFINE_AVR_CPU_TYPE("xmega4", avr_xmega4_initfn),
-+    DEFINE_AVR_CPU_TYPE("xmega5", avr_xmega5_initfn),
-+    DEFINE_AVR_CPU_TYPE("xmega6", avr_xmega6_initfn),
-+    DEFINE_AVR_CPU_TYPE("xmega7", avr_xmega7_initfn),
-+};
-+
-+DEFINE_TYPES(avr_cpu_type_info)
-diff --git a/target/avr/gdbstub.c b/target/avr/gdbstub.c
-new file mode 100644
-index 0000000000..20a5252482
---- /dev/null
-+++ b/target/avr/gdbstub.c
-@@ -0,0 +1,85 @@
 +/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ *  Loads one byte indirect from the data space to a register. For parts
++ *  with SRAM, the data space consists of the Register File, I/O memory and
++ *  internal SRAM (and external SRAM if applicable). For parts without SRAM, the
++ *  data space consists of the Register File only. In some parts the Flash
++ *  Memory has been mapped to the data space and can be read using this command.
++ *  The EEPROM has a separate address space.  The data location is pointed to by
++ *  the X (16 bits) Pointer Register in the Register File. Memory access is
++ *  limited to the current data segment of 64KB. To access another data segment
++ *  in devices with more than 64KB data space, the RAMPX in register in the I/O
++ *  area has to be changed.  The X-pointer Register can either be left unchanged
++ *  by the operation, or it can be post-incremented or predecremented.  These
++ *  features are especially suited for accessing arrays, tables, and Stack
++ *  Pointer usage of the X-pointer Register. Note that only the low byte of the
++ *  X-pointer is updated in devices with no more than 256 bytes data space. For
++ *  such devices, the high byte of the pointer is not used by this instruction
++ *  and can be used for other purposes. The RAMPX Register in the I/O area is
++ *  updated in parts with more than 64KB data space or more than 64KB Program
++ *  memory, and the increment/decrement is added to the entire 24-bit address on
++ *  such devices.  Not all variants of this instruction is available in all
++ *  devices. Refer to the device specific instruction set summary.  In the
++ *  Reduced Core tinyAVR the LD instruction can be used to achieve the same
++ *  operation as LPM since the program memory is mapped to the data memory
++ *  space.
 + */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "exec/gdbstub.h"
-+
-+int avr_cpu_gdb_read_register(CPUState *cs, uint8_t *mem_buf, int n)
++static bool trans_LDX1(DisasContext *ctx, arg_LDX1 *a)
 +{
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_xaddr();
 +
-+    /*  R */
-+    if (n < 32) {
-+        return gdb_get_reg8(mem_buf, env->r[n]);
-+    }
++    gen_data_load(ctx, Rd, addr);
 +
-+    /*  SREG */
-+    if (n == 32) {
-+        uint8_t sreg = cpu_get_sreg(env);
++    tcg_temp_free_i32(addr);
 +
-+        return gdb_get_reg8(mem_buf, sreg);
-+    }
-+
-+    /*  SP */
-+    if (n == 33) {
-+        return gdb_get_reg16(mem_buf, env->sp & 0x0000ffff);
-+    }
-+
-+    /*  PC */
-+    if (n == 34) {
-+        return gdb_get_reg32(mem_buf, env->pc_w * 2);
-+    }
-+
-+    return 0;
++    return true;
 +}
 +
-+int avr_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
++
++static bool trans_LDX2(DisasContext *ctx, arg_LDX2 *a)
 +{
-+    AVRCPU *cpu = AVR_CPU(cs);
-+    CPUAVRState *env = &cpu->env;
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_xaddr();
 +
-+    /*  R */
-+    if (n < 32) {
-+        env->r[n] = *mem_buf;
-+        return 1;
-+    }
++    gen_data_load(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
 +
-+    /*  SREG */
-+    if (n == 32) {
-+        cpu_set_sreg(env, *mem_buf);
-+        return 1;
-+    }
++    gen_set_xaddr(addr);
 +
-+    /*  SP */
-+    if (n == 33) {
-+        env->sp = lduw_p(mem_buf);
-+        return 2;
-+    }
++    tcg_temp_free_i32(addr);
 +
-+    /*  PC */
-+    if (n == 34) {
-+        env->pc_w = ldl_p(mem_buf) / 2;
-+        return 4;
-+    }
-+
-+    return 0;
++    return true;
 +}
-diff --git a/target/avr/machine.c b/target/avr/machine.c
-new file mode 100644
-index 0000000000..f6dcda7adc
---- /dev/null
-+++ b/target/avr/machine.c
-@@ -0,0 +1,121 @@
++
++
++static bool trans_LDX3(DisasContext *ctx, arg_LDX3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_xaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_load(ctx, Rd, addr);
++    gen_set_xaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STX1(DisasContext *ctx, arg_STX1 *a)
++{
++    TCGv Rd = cpu_r[a->rr];
++    TCGv addr = gen_get_xaddr();
++
++    gen_data_store(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++static bool trans_STX2(DisasContext *ctx, arg_STX2 *a)
++{
++    TCGv Rd = cpu_r[a->rr];
++    TCGv addr = gen_get_xaddr();
++
++    gen_data_store(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++    gen_set_xaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++static bool trans_STX3(DisasContext *ctx, arg_STX3 *a)
++{
++    TCGv Rd = cpu_r[a->rr];
++    TCGv addr = gen_get_xaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_store(ctx, Rd, addr);
++    gen_set_xaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
 +/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ *  Loads one byte indirect with or without displacement from the data space
++ *  to a register. For parts with SRAM, the data space consists of the Register
++ *  File, I/O memory and internal SRAM (and external SRAM if applicable). For
++ *  parts without SRAM, the data space consists of the Register File only. In
++ *  some parts the Flash Memory has been mapped to the data space and can be
++ *  read using this command. The EEPROM has a separate address space.  The data
++ *  location is pointed to by the Y (16 bits) Pointer Register in the Register
++ *  File. Memory access is limited to the current data segment of 64KB. To
++ *  access another data segment in devices with more than 64KB data space, the
++ *  RAMPY in register in the I/O area has to be changed.  The Y-pointer Register
++ *  can either be left unchanged by the operation, or it can be post-incremented
++ *  or predecremented.  These features are especially suited for accessing
++ *  arrays, tables, and Stack Pointer usage of the Y-pointer Register. Note that
++ *  only the low byte of the Y-pointer is updated in devices with no more than
++ *  256 bytes data space. For such devices, the high byte of the pointer is not
++ *  used by this instruction and can be used for other purposes. The RAMPY
++ *  Register in the I/O area is updated in parts with more than 64KB data space
++ *  or more than 64KB Program memory, and the increment/decrement/displacement
++ *  is added to the entire 24-bit address on such devices.  Not all variants of
++ *  this instruction is available in all devices. Refer to the device specific
++ *  instruction set summary.  In the Reduced Core tinyAVR the LD instruction can
++ *  be used to achieve the same operation as LPM since the program memory is
++ *  mapped to the data memory space.
 + */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "migration/cpu.h"
-+
-+static int get_sreg(QEMUFile *f, void *opaque, size_t size,
-+    const VMStateField *field)
++static bool trans_LDY2(DisasContext *ctx, arg_LDY2 *a)
 +{
-+    CPUAVRState *env = opaque;
-+    uint8_t sreg;
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
 +
-+    sreg = qemu_get_byte(f);
-+    cpu_set_sreg(env, sreg);
-+    return 0;
++    gen_data_load(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    gen_set_yaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
 +}
 +
-+static int put_sreg(
-+    QEMUFile *f, void *opaque, size_t size,
-+    const VMStateField *field, QJSON *vmdesc)
-+{
-+    CPUAVRState *env = opaque;
-+    uint8_t sreg = cpu_get_sreg(env);
 +
-+    qemu_put_byte(f, sreg);
-+    return 0;
++static bool trans_LDY3(DisasContext *ctx, arg_LDY3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_load(ctx, Rd, addr);
++    gen_set_yaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
 +}
 +
-+static const VMStateInfo vms_sreg = {
-+    .name = "sreg",
-+    .get = get_sreg,
-+    .put = put_sreg,
-+};
 +
-+static int get_segment(
-+    QEMUFile *f, void *opaque, size_t size, const VMStateField *field)
++static bool trans_LDDY(DisasContext *ctx, arg_LDDY *a)
 +{
-+    uint32_t *ramp = opaque;
-+    uint8_t temp;
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
 +
-+    temp = qemu_get_byte(f);
-+    *ramp = ((uint32_t)temp) << 16;
-+    return 0;
++    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
++    gen_data_load(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
 +}
 +
-+static int put_segment(
-+    QEMUFile *f, void *opaque, size_t size,
-+    const VMStateField *field, QJSON *vmdesc)
-+{
-+    uint32_t *ramp = opaque;
-+    uint8_t temp = *ramp >> 16;
 +
-+    qemu_put_byte(f, temp);
-+    return 0;
++static bool trans_STY2(DisasContext *ctx, arg_STY2 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
++
++    gen_data_store(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++    gen_set_yaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
 +}
 +
-+static const VMStateInfo vms_rampD = {
-+    .name = "rampD",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
-+static const VMStateInfo vms_rampX = {
-+    .name = "rampX",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
-+static const VMStateInfo vms_rampY = {
-+    .name = "rampY",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
-+static const VMStateInfo vms_rampZ = {
-+    .name = "rampZ",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
-+static const VMStateInfo vms_eind = {
-+    .name = "eind",
-+    .get = get_segment,
-+    .put = put_segment,
-+};
 +
-+const VMStateDescription vms_avr_cpu = {
-+    .name = "cpu",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.pc_w, AVRCPU),
-+        VMSTATE_UINT32(env.sp, AVRCPU),
-+        VMSTATE_UINT32(env.skip, AVRCPU),
++static bool trans_STY3(DisasContext *ctx, arg_STY3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
 +
-+        VMSTATE_UINT32_ARRAY(env.r, AVRCPU, NO_CPU_REGISTERS),
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_store(ctx, Rd, addr);
++    gen_set_yaddr(addr);
 +
-+        VMSTATE_SINGLE(env, AVRCPU, 0, vms_sreg, CPUAVRState),
-+        VMSTATE_SINGLE(env.rampD, AVRCPU, 0, vms_rampD, uint32_t),
-+        VMSTATE_SINGLE(env.rampX, AVRCPU, 0, vms_rampX, uint32_t),
-+        VMSTATE_SINGLE(env.rampY, AVRCPU, 0, vms_rampY, uint32_t),
-+        VMSTATE_SINGLE(env.rampZ, AVRCPU, 0, vms_rampZ, uint32_t),
-+        VMSTATE_SINGLE(env.eind, AVRCPU, 0, vms_eind, uint32_t),
++    tcg_temp_free_i32(addr);
 +
-+        VMSTATE_END_OF_LIST()
++    return true;
++}
++
++
++static bool trans_STDY(DisasContext *ctx, arg_STDY *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
++
++    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
++    gen_data_store(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Loads one byte indirect with or without displacement from the data space
++ *  to a register. For parts with SRAM, the data space consists of the Register
++ *  File, I/O memory and internal SRAM (and external SRAM if applicable). For
++ *  parts without SRAM, the data space consists of the Register File only. In
++ *  some parts the Flash Memory has been mapped to the data space and can be
++ *  read using this command. The EEPROM has a separate address space.  The data
++ *  location is pointed to by the Z (16 bits) Pointer Register in the Register
++ *  File. Memory access is limited to the current data segment of 64KB. To
++ *  access another data segment in devices with more than 64KB data space, the
++ *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer Register
++ *  can either be left unchanged by the operation, or it can be post-incremented
++ *  or predecremented.  These features are especially suited for Stack Pointer
++ *  usage of the Z-pointer Register, however because the Z-pointer Register can
++ *  be used for indirect subroutine calls, indirect jumps and table lookup, it
++ *  is often more convenient to use the X or Y-pointer as a dedicated Stack
++ *  Pointer. Note that only the low byte of the Z-pointer is updated in devices
++ *  with no more than 256 bytes data space. For such devices, the high byte of
++ *  the pointer is not used by this instruction and can be used for other
++ *  purposes. The RAMPZ Register in the I/O area is updated in parts with more
++ *  than 64KB data space or more than 64KB Program memory, and the
++ *  increment/decrement/displacement is added to the entire 24-bit address on
++ *  such devices.  Not all variants of this instruction is available in all
++ *  devices. Refer to the device specific instruction set summary.  In the
++ *  Reduced Core tinyAVR the LD instruction can be used to achieve the same
++ *  operation as LPM since the program memory is mapped to the data memory
++ *  space.  For using the Z-pointer for table lookup in Program memory see the
++ *  LPM and ELPM instructions.
++ */
++static bool trans_LDZ2(DisasContext *ctx, arg_LDZ2 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    gen_data_load(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LDZ3(DisasContext *ctx, arg_LDZ3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_load(ctx, Rd, addr);
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LDDZ(DisasContext *ctx, arg_LDDZ *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
++    gen_data_load(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STZ2(DisasContext *ctx, arg_STZ2 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    gen_data_store(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STZ3(DisasContext *ctx, arg_STZ3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_store(ctx, Rd, addr);
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STDZ(DisasContext *ctx, arg_STDZ *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
++    gen_data_store(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++
++/*
++ *  Stores one byte from a Register to the data space. For parts with SRAM,
++ *  the data space consists of the Register File, I/O memory and internal SRAM
++ *  (and external SRAM if applicable). For parts without SRAM, the data space
++ *  consists of the Register File only. The EEPROM has a separate address space.
++ *  A 16-bit address must be supplied. Memory access is limited to the current
++ *  data segment of 64KB. The STS instruction uses the RAMPD Register to access
++ *  memory above 64KB. To access another data segment in devices with more than
++ *  64KB data space, the RAMPD in register in the I/O area has to be changed.
++ *  This instruction is not available in all devices. Refer to the device
++ *  specific instruction set summary.
++ */
++static bool trans_STS(DisasContext *ctx, arg_STS *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_rampD;
++    a->imm = next_word(ctx);
++
++    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
++    tcg_gen_shli_tl(addr, addr, 16);
++    tcg_gen_ori_tl(addr, addr, a->imm);
++
++    gen_data_store(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Loads one byte pointed to by the Z-register into the destination
++ *  register Rd. This instruction features a 100% space effective constant
++ *  initialization or constant data fetch. The Program memory is organized in
++ *  16-bit words while the Z-pointer is a byte address. Thus, the least
++ *  significant bit of the Z-pointer selects either low byte (ZLSB = 0) or high
++ *  byte (ZLSB = 1). This instruction can address the first 64KB (32K words) of
++ *  Program memory. The Zpointer Register can either be left unchanged by the
++ *  operation, or it can be incremented. The incrementation does not apply to
++ *  the RAMPZ Register.  Devices with Self-Programming capability can use the
++ *  LPM instruction to read the Fuse and Lock bit values.  Refer to the device
++ *  documentation for a detailed description.  The LPM instruction is not
++ *  available in all devices. Refer to the device specific instruction set
++ *  summary
++ */
++static bool trans_LPM1(DisasContext *ctx, arg_LPM1 *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
++        return true;
 +    }
-+};
-diff --git a/gdb-xml/avr-cpu.xml b/gdb-xml/avr-cpu.xml
-new file mode 100644
-index 0000000000..c4747f5b40
---- /dev/null
-+++ b/gdb-xml/avr-cpu.xml
-@@ -0,0 +1,49 @@
-+<?xml version="1.0"?>
-+<!-- Copyright (C) 2018-2019 Free Software Foundation, Inc.
 +
-+     Copying and distribution of this file, with or without modification,
-+     are permitted in any medium without royalty provided the copyright
-+     notice and this notice are preserved.  -->
++    TCGv Rd = cpu_r[0];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_r[31];
++    TCGv L = cpu_r[30];
 +
-+<!-- Register numbers are hard-coded in order to maintain backward
-+     compatibility with older versions of tools that didn't use xml
-+     register descriptions.  -->
++    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
++    tcg_gen_or_tl(addr, addr, L);
 +
-+<!DOCTYPE feature SYSTEM "gdb-target.dtd">
-+<feature name="org.gnu.gdb.riscv.cpu">
-+  <reg name="r0" bitsize="8" type="int" regnum="0"/>
-+  <reg name="r1" bitsize="8" type="int"/>
-+  <reg name="r2" bitsize="8" type="int"/>
-+  <reg name="r3" bitsize="8" type="int"/>
-+  <reg name="r4" bitsize="8" type="int"/>
-+  <reg name="r5" bitsize="8" type="int"/>
-+  <reg name="r6" bitsize="8" type="int"/>
-+  <reg name="r7" bitsize="8" type="int"/>
-+  <reg name="r8" bitsize="8" type="int"/>
-+  <reg name="r9" bitsize="8" type="int"/>
-+  <reg name="r10" bitsize="8" type="int"/>
-+  <reg name="r11" bitsize="8" type="int"/>
-+  <reg name="r12" bitsize="8" type="int"/>
-+  <reg name="r13" bitsize="8" type="int"/>
-+  <reg name="r14" bitsize="8" type="int"/>
-+  <reg name="r15" bitsize="8" type="int"/>
-+  <reg name="r16" bitsize="8" type="int"/>
-+  <reg name="r17" bitsize="8" type="int"/>
-+  <reg name="r18" bitsize="8" type="int"/>
-+  <reg name="r19" bitsize="8" type="int"/>
-+  <reg name="r20" bitsize="8" type="int"/>
-+  <reg name="r21" bitsize="8" type="int"/>
-+  <reg name="r22" bitsize="8" type="int"/>
-+  <reg name="r23" bitsize="8" type="int"/>
-+  <reg name="r24" bitsize="8" type="int"/>
-+  <reg name="r25" bitsize="8" type="int"/>
-+  <reg name="r26" bitsize="8" type="int"/>
-+  <reg name="r27" bitsize="8" type="int"/>
-+  <reg name="r28" bitsize="8" type="int"/>
-+  <reg name="r29" bitsize="8" type="int"/>
-+  <reg name="r30" bitsize="8" type="int"/>
-+  <reg name="r31" bitsize="8" type="int"/>
-+  <reg name="sreg" bitsize="8" type="int"/>
-+  <reg name="sp" bitsize="8" type="int"/>
-+  <reg name="pc" bitsize="8" type="int"/>
-+</feature>
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LPM2(DisasContext *ctx, arg_LPM2 *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_r[31];
++    TCGv L = cpu_r[30];
++
++    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
++    tcg_gen_or_tl(addr, addr, L);
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LPMX(DisasContext *ctx, arg_LPMX *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_LPMX)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_r[31];
++    TCGv L = cpu_r[30];
++
++    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
++    tcg_gen_or_tl(addr, addr, L);
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    tcg_gen_andi_tl(L, addr, 0xff);
++
++    tcg_gen_shri_tl(addr, addr, 8);
++    tcg_gen_andi_tl(H, addr, 0xff);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Loads one byte pointed to by the Z-register and the RAMPZ Register in
++ *  the I/O space, and places this byte in the destination register Rd. This
++ *  instruction features a 100% space effective constant initialization or
++ *  constant data fetch. The Program memory is organized in 16-bit words while
++ *  the Z-pointer is a byte address. Thus, the least significant bit of the
++ *  Z-pointer selects either low byte (ZLSB = 0) or high byte (ZLSB = 1). This
++ *  instruction can address the entire Program memory space. The Z-pointer
++ *  Register can either be left unchanged by the operation, or it can be
++ *  incremented. The incrementation applies to the entire 24-bit concatenation
++ *  of the RAMPZ and Z-pointer Registers.  Devices with Self-Programming
++ *  capability can use the ELPM instruction to read the Fuse and Lock bit value.
++ *  Refer to the device documentation for a detailed description.  This
++ *  instruction is not available in all devices. Refer to the device specific
++ *  instruction set summary.
++ */
++static bool trans_ELPM1(DisasContext *ctx, arg_ELPM1 *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[0];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_ELPM2(DisasContext *ctx, arg_ELPM2 *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_ELPMX(DisasContext *ctx, arg_ELPMX *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_ELPMX)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  SPM can be used to erase a page in the Program memory, to write a page
++ *  in the Program memory (that is already erased), and to set Boot Loader Lock
++ *  bits. In some devices, the Program memory can be written one word at a time,
++ *  in other devices an entire page can be programmed simultaneously after first
++ *  filling a temporary page buffer. In all cases, the Program memory must be
++ *  erased one page at a time. When erasing the Program memory, the RAMPZ and
++ *  Z-register are used as page address. When writing the Program memory, the
++ *  RAMPZ and Z-register are used as page or word address, and the R1:R0
++ *  register pair is used as data(1). When setting the Boot Loader Lock bits,
++ *  the R1:R0 register pair is used as data. Refer to the device documentation
++ *  for detailed description of SPM usage. This instruction can address the
++ *  entire Program memory.  The SPM instruction is not available in all devices.
++ *  Refer to the device specific instruction set summary.  Note: 1. R1
++ *  determines the instruction high byte, and R0 determines the instruction low
++ *  byte.
++ */
++static bool trans_SPM(DisasContext *ctx, arg_SPM *a)
++{
++    /* TODO */
++    if (!avr_have_feature(ctx, AVR_FEATURE_SPM)) {
++        return true;
++    }
++
++    return true;
++}
++
++
++static bool trans_SPMX(DisasContext *ctx, arg_SPMX *a)
++{
++    /* TODO */
++    if (!avr_have_feature(ctx, AVR_FEATURE_SPMX)) {
++        return true;
++    }
++
++    return true;
++}
++
++
++/*
++ *  Loads data from the I/O Space (Ports, Timers, Configuration Registers,
++ *  etc.) into register Rd in the Register File.
++ */
++static bool trans_IN(DisasContext *ctx, arg_IN *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv port = tcg_const_i32(a->imm);
++
++    gen_helper_inb(Rd, cpu_env, port);
++
++    tcg_temp_free_i32(port);
++
++    return true;
++}
++
++
++/*
++ *  Stores data from register Rr in the Register File to I/O Space (Ports,
++ *  Timers, Configuration Registers, etc.).
++ */
++static bool trans_OUT(DisasContext *ctx, arg_OUT *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv port = tcg_const_i32(a->imm);
++
++    gen_helper_outb(cpu_env, port, Rd);
++
++    tcg_temp_free_i32(port);
++
++    return true;
++}
++
++
++/*
++ *  This instruction stores the contents of register Rr on the STACK. The
++ *  Stack Pointer is post-decremented by 1 after the PUSH.  This instruction is
++ *  not available in all devices. Refer to the device specific instruction set
++ *  summary.
++ */
++static bool trans_PUSH(DisasContext *ctx, arg_PUSH *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++
++    gen_data_store(ctx, Rd, cpu_sp);
++    tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
++
++    return true;
++}
++
++
++/*
++ *  This instruction loads register Rd with a byte from the STACK. The Stack
++ *  Pointer is pre-incremented by 1 before the POP.  This instruction is not
++ *  available in all devices. Refer to the device specific instruction set
++ *  summary.
++ */
++static bool trans_POP(DisasContext *ctx, arg_POP *a)
++{
++    /*
++     * Using a temp to work around some strange behaviour:
++     * tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
++     * gen_data_load(ctx, Rd, cpu_sp);
++     * seems to cause the add to happen twice.
++     * This doesn't happen if either the add or the load is removed.
++     */
++    TCGv t1 = tcg_temp_new_i32();
++    TCGv Rd = cpu_r[a->rd];
++
++    tcg_gen_addi_tl(t1, cpu_sp, 1);
++    gen_data_load(ctx, Rd, t1);
++    tcg_gen_mov_tl(cpu_sp, t1);
++
++    return true;
++}
++
++
++/*
++ *  Exchanges one byte indirect between register and data space.  The data
++ *  location is pointed to by the Z (16 bits) Pointer Register in the Register
++ *  File. Memory access is limited to the current data segment of 64KB. To
++ *  access another data segment in devices with more than 64KB data space, the
++ *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer Register
++ *  is left unchanged by the operation. This instruction is especially suited
++ *  for writing/reading status bits stored in SRAM.
++ */
++static bool trans_XCH(DisasContext *ctx, arg_XCH *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv addr = gen_get_zaddr();
++
++    gen_data_load(ctx, t0, addr);
++    gen_data_store(ctx, Rd, addr);
++    tcg_gen_mov_tl(Rd, t0);
++
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Load one byte indirect from data space to register and set bits in data
++ *  space specified by the register. The instruction can only be used towards
++ *  internal SRAM.  The data location is pointed to by the Z (16 bits) Pointer
++ *  Register in the Register File. Memory access is limited to the current data
++ *  segment of 64KB. To access another data segment in devices with more than
++ *  64KB data space, the RAMPZ in register in the I/O area has to be changed.
++ *  The Z-pointer Register is left unchanged by the operation. This instruction
++ *  is especially suited for setting status bits stored in SRAM.
++ */
++static bool trans_LAS(DisasContext *ctx, arg_LAS *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
++        return true;
++    }
++
++    TCGv Rr = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv t1 = tcg_temp_new_i32();
++
++    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
++    tcg_gen_or_tl(t1, t0, Rr);
++
++    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
++    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Load one byte indirect from data space to register and stores and clear
++ *  the bits in data space specified by the register. The instruction can
++ *  only be used towards internal SRAM.  The data location is pointed to by
++ *  the Z (16 bits) Pointer Register in the Register File. Memory access is
++ *  limited to the current data segment of 64KB. To access another data
++ *  segment in devices with more than 64KB data space, the RAMPZ in register
++ *  in the I/O area has to be changed.  The Z-pointer Register is left
++ *  unchanged by the operation. This instruction is especially suited for
++ *  clearing status bits stored in SRAM.
++ */
++static bool trans_LAC(DisasContext *ctx, arg_LAC *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
++        return true;
++    }
++
++    TCGv Rr = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv t1 = tcg_temp_new_i32();
++
++    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
++        /* t1 = t0 & (0xff - Rr) = t0 and ~Rr */
++    tcg_gen_andc_tl(t1, t0, Rr);
++
++    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
++    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Load one byte indirect from data space to register and toggles bits in
++ *  the data space specified by the register.  The instruction can only be used
++ *  towards SRAM.  The data location is pointed to by the Z (16 bits) Pointer
++ *  Register in the Register File. Memory access is limited to the current data
++ *  segment of 64KB. To access another data segment in devices with more than
++ *  64KB data space, the RAMPZ in register in the I/O area has to be changed.
++ *  The Z-pointer Register is left unchanged by the operation. This instruction
++ *  is especially suited for changing status bits stored in SRAM.
++ */
++static bool trans_LAT(DisasContext *ctx, arg_LAT *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv t1 = tcg_temp_new_i32();
++
++    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
++    tcg_gen_xor_tl(t1, t0, Rd);
++
++    tcg_gen_mov_tl(Rd, t0); /* Rd = t0 */
++    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit 0 is
++ *  loaded into the C Flag of the SREG. This operation effectively divides an
++ *  unsigned value by two. The C Flag can be used to round the result.
++ */
++static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
++
++    tcg_gen_shri_tl(Rd, Rd, 1);
++
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf = Rd == 0 */
++    tcg_gen_movi_tl(cpu_Nf, 0);
++    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
++    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
++
++    return true;
++}
++
++
++/*
++ *  Shifts all bits in Rd one place to the right. The C Flag is shifted into
++ *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation, combined
++ *  with ASR, effectively divides multi-byte signed values by two. Combined with
++ *  LSR it effectively divides multi-byte unsigned values by two. The Carry Flag
++ *  can be used to round the result.
++ */
++static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++
++    tcg_gen_shli_tl(t0, cpu_Cf, 7);
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
++    tcg_gen_shri_tl(Rd, Rd, 1);
++    tcg_gen_or_tl(Rd, Rd, t0);
++
++    gen_rshift_ZNVSf(Rd);
++
++    tcg_temp_free_i32(t0);
++
++    return true;
++}
++
++
++/*
++ *  Shifts all bits in Rd one place to the right. Bit 7 is held constant. Bit 0
++ *  is loaded into the C Flag of the SREG. This operation effectively divides a
++ *  signed value by two without changing its sign. The Carry Flag can be used to
++ *  round the result.
++ */
++static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++
++    /* Cf */
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf = Rd(0) */
++
++    /* op */
++    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd = (Rd & 0x80) | (Rd >> 1) */
++    tcg_gen_shri_tl(Rd, Rd, 1);
++    tcg_gen_or_tl(Rd, Rd, t0);
++
++    gen_rshift_ZNVSf(Rd);
++
++    tcg_temp_free_i32(t0);
++
++    return true;
++}
++
++
++/*
++ *  Swaps high and low nibbles in a register.
++ */
++static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv t1 = tcg_temp_new_i32();
++
++    tcg_gen_andi_tl(t0, Rd, 0x0f);
++    tcg_gen_shli_tl(t0, t0, 4);
++    tcg_gen_andi_tl(t1, Rd, 0xf0);
++    tcg_gen_shri_tl(t1, t1, 4);
++    tcg_gen_or_tl(Rd, t0, t1);
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++
++    return true;
++}
++
++
++/*
++ *  Sets a specified bit in an I/O Register. This instruction operates on
++ *  the lower 32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
++{
++    TCGv data = tcg_temp_new_i32();
++    TCGv port = tcg_const_i32(a->reg);
++
++    gen_helper_inb(data, cpu_env, port);
++    tcg_gen_ori_tl(data, data, 1 << a->bit);
++    gen_helper_outb(cpu_env, port, data);
++
++    tcg_temp_free_i32(port);
++    tcg_temp_free_i32(data);
++
++    return true;
++}
++
++
++/*
++ *  Clears a specified bit in an I/O Register. This instruction operates on
++ *  the lower 32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
++{
++    TCGv data = tcg_temp_new_i32();
++    TCGv port = tcg_const_i32(a->reg);
++
++    gen_helper_inb(data, cpu_env, port);
++    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
++    gen_helper_outb(cpu_env, port, data);
++
++    tcg_temp_free_i32(data);
++    tcg_temp_free_i32(port);
++
++    return true;
++}
++
++
++/*
++ *  Stores bit b from Rd to the T Flag in SREG (Status Register).
++ */
++static bool trans_BST(DisasContext *ctx, arg_BST *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++
++    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
++    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
++
++    return true;
++}
++
++
++/*
++ *  Copies the T Flag in the SREG (Status Register) to bit b in register Rd.
++ */
++static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t1 = tcg_temp_new_i32();
++
++    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
++    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
++    tcg_gen_or_tl(Rd, Rd, t1);
++
++    tcg_temp_free_i32(t1);
++
++    return true;
++}
++
++
++/*
++ *  Sets a single Flag or bit in SREG.
++ */
++static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
++{
++    switch (a->bit) {
++    case 0x00:
++        tcg_gen_movi_tl(cpu_Cf, 0x01);
++        break;
++    case 0x01:
++        tcg_gen_movi_tl(cpu_Zf, 0x01);
++        break;
++    case 0x02:
++        tcg_gen_movi_tl(cpu_Nf, 0x01);
++        break;
++    case 0x03:
++        tcg_gen_movi_tl(cpu_Vf, 0x01);
++        break;
++    case 0x04:
++        tcg_gen_movi_tl(cpu_Sf, 0x01);
++        break;
++    case 0x05:
++        tcg_gen_movi_tl(cpu_Hf, 0x01);
++        break;
++    case 0x06:
++        tcg_gen_movi_tl(cpu_Tf, 0x01);
++        break;
++    case 0x07:
++        tcg_gen_movi_tl(cpu_If, 0x01);
++        break;
++    }
++
++    return true;
++}
++
++
++/*
++ *  Clears a single Flag in SREG.
++ */
++static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
++{
++    switch (a->bit) {
++    case 0x00:
++        tcg_gen_movi_tl(cpu_Cf, 0x00);
++        break;
++    case 0x01:
++        tcg_gen_movi_tl(cpu_Zf, 0x00);
++        break;
++    case 0x02:
++        tcg_gen_movi_tl(cpu_Nf, 0x00);
++        break;
++    case 0x03:
++        tcg_gen_movi_tl(cpu_Vf, 0x00);
++        break;
++    case 0x04:
++        tcg_gen_movi_tl(cpu_Sf, 0x00);
++        break;
++    case 0x05:
++        tcg_gen_movi_tl(cpu_Hf, 0x00);
++        break;
++    case 0x06:
++        tcg_gen_movi_tl(cpu_Tf, 0x00);
++        break;
++    case 0x07:
++        tcg_gen_movi_tl(cpu_If, 0x00);
++        break;
++    }
++
++    return true;
++}
 -- 
 2.17.2 (Apple Git-113)
 
