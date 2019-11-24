@@ -2,83 +2,80 @@ Return-Path: <SRS0=aI0a=ZQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C234C432C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA95C432C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 07:34:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 414422075E
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:17:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2D112071A
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 07:34:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ALANuYbv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 414422075E
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E/CJ/4iJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D112071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYkH7-0002ul-Cq
-	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 00:17:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60592)
+	id 1iYmPt-0000ab-Up
+	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 02:34:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41838)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iYk3V-00042X-67
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:30 -0500
+ (envelope-from <alistair23@gmail.com>) id 1iYmPF-00008g-KE
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 02:34:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iYk3U-0007gV-82
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:29 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40658)
+ (envelope-from <alistair23@gmail.com>) id 1iYmPE-0006tv-3X
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 02:34:05 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:39930)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iYk3U-0007g6-2R
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:28 -0500
-Received: by mail-wr1-x442.google.com with SMTP id 4so10068380wro.7
- for <qemu-devel@nongnu.org>; Sat, 23 Nov 2019 21:03:27 -0800 (PST)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iYmPA-0006qJ-E0; Sun, 24 Nov 2019 02:34:00 -0500
+Received: by mail-lj1-x243.google.com with SMTP id e10so2928585ljj.6;
+ Sat, 23 Nov 2019 23:33:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=RoDkq87PVBTW9aFVtZ0L8lH/ywykSKiy6WnoU09+ajM=;
- b=ALANuYbvZlZQo1eauLNGljnP8/eV+58YkOMfqPgXh5av/L/MC8Qx/ry9SAEvKYKzwZ
- oOdFJ3N/sB1QfTGoYJxEDVy4XMPJROqazDZaTtdyUYF2mf88AEaonTAM02BkHVtyBW/L
- HxvDgRO69XZq2iNrI/31Cjl+FQgUDQYtB68qzGJtv9dkvNSFHyP9c4JtS/iLphRTmiDP
- 3zX3EJ2o5sCaznPvMg2aO9VJhMWGVW8B3qoc4TdXv/Af0c8WsfATrR5LdHJmJtzCJbwS
- /hK7aQQr0Vz16D+isbCA2uAYI7GxfSLwgK++B8iuS9Zl/UTuK3HjVZqU7W7E8g/uwTzD
- gACA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=s7Zmr8bvQVhMBLI//4GPF3vV9J/C4rxuzQb97UON0t8=;
+ b=E/CJ/4iJKAOZL/rYkI3U+p8BsKd4VZzcfHC9bjPC1SwbFKfJHN9Rq2JZG2pNvk2rux
+ e3Rk3dJpjc2w/Sg9M2a3fwnEZpTjADnXai58PQlBn6LEDwa9bNL9jKyGNyJuzfcUhH5t
+ gdq2dWKpm2TOZtPLMH/yof31tExTbwYd1MsvlTxZvtdDksbyCcI7rp6ofTuGra0y16rt
+ Ntto0vcLxW4ig/4YPo5yxpn7ywGwhFWzk4rWFBTYu9Depwn6XR5Jqkx1Dj3a616pwpbj
+ gbXyWOosHLaifNMl4BUjltLNi2QTII/ZuVRiqtX2l5nMOdLHXk5Ra1ex0c+kVRhreUeA
+ bppQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=RoDkq87PVBTW9aFVtZ0L8lH/ywykSKiy6WnoU09+ajM=;
- b=UI+9n3yBff8exaT8AQwnRuTveDRAM1PngRmE4l+MZqxHVmefl5zAPWAfeliCE+ZgTt
- Q4IHBtErMHi2hDI7l3mEeriDgz3jtTngo5oxSSW28c2uLf019MM9zXcFMRXr9C4JgM80
- qOBP5CSSAZQbmfBU70UwUvkoPM4s9mJM0D+qGT5Z0DD2QoJs8G63Gs66UPCDNLXOtgG4
- BqKgpLUCoHP5S5tvsuKLx1sJ4luGbZJgswkoc8fIwArH8njvJjTLtnY+bccqlLBH3OyM
- vIPdHaGX7CngTlKInYkCQ+USpVFFQ+l6NuBVKUFYXkSXcmcmclZxcwmjN2m6LNAwVnA6
- 4DYw==
-X-Gm-Message-State: APjAAAUmy3DHDs6s9akN7jlDzwuOH64lyUZxk7BCPn2vLLa2VEQCvQX9
- icxJDfVUmcZTBUcCXTTAaoHWa3Ga0OZuiAKP
-X-Google-Smtp-Source: APXvYqzqSbQOrzRYFUqBuLg9NDeIM6N2JoxON/dlkALDou/Ote96qeFAXFWnPw97K+u0mS9XdQPK5Q==
-X-Received: by 2002:a5d:4d4a:: with SMTP id a10mr16992272wru.220.1574571806840; 
- Sat, 23 Nov 2019 21:03:26 -0800 (PST)
-Received: from 8c859074c0ff.ant.amazon.com.com
- (bzq-79-178-10-38.red.bezeqint.net. [79.178.10.38])
- by smtp.gmail.com with ESMTPSA id t185sm4173976wmf.45.2019.11.23.21.03.25
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sat, 23 Nov 2019 21:03:26 -0800 (PST)
-From: Michael Rolnik <mrolnik@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v36 17/17] target/avr: Update MAINTAINERS file
-Date: Sun, 24 Nov 2019 07:02:25 +0200
-Message-Id: <20191124050225.30351-18-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.17.2 (Apple Git-113)
-In-Reply-To: <20191124050225.30351-1-mrolnik@gmail.com>
-References: <20191124050225.30351-1-mrolnik@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=s7Zmr8bvQVhMBLI//4GPF3vV9J/C4rxuzQb97UON0t8=;
+ b=Sz21EQh8YH1+vx+G4XGzF34QkEHs9DCNCca7MPwbWpwwIAIYIm4LCsIpg+r+hHYC83
+ oI/TVsSt1IP+/4GWBmsocN0jqNqDARZAE5IBITszA8OF/wBEs7NG2CCGpPVxJnYJ9/wL
+ jT4G6hIJ/pjp1LbKRsc+MRdzgL2JoHyATVx3mwYVX1UI734SoWwveYHJm1p09I1iT+jb
+ Lpua/pqNHN618ADLgcn2unk4cKWYUf5NkWL70a2bfR1GXgkc9pUCQWiqiFouM2CjAwmE
+ 2Q+MjNnoT2sXtCsGI63pfBikodTiTDWCitsC6KBeD4zLqE+faPE7qSMQI29l3JWXklkv
+ AV0g==
+X-Gm-Message-State: APjAAAUglDxIRG5fZkVIZqtuGbDGQhVTS73PPrXJwV6g/vCRvFXPbW+q
+ Fap0TB3x7w6hcEdxWP947dhW+E0HAdEcCBHkPKI=
+X-Google-Smtp-Source: APXvYqzhxZypmHxeKNZLJpSP4+NVaDU0uKT6bswuZv5Lupdv7hmLHK4MoWthjxhc8PvIIheI6RRTpTOezvOaJmfSTEM=
+X-Received: by 2002:a2e:7301:: with SMTP id o1mr18440345ljc.16.1574580838008; 
+ Sat, 23 Nov 2019 23:33:58 -0800 (PST)
+MIME-Version: 1.0
+References: <20191119062005.5787-1-siwei.zhuang@data61.csiro.au>
+In-Reply-To: <20191119062005.5787-1-siwei.zhuang@data61.csiro.au>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Sat, 23 Nov 2019 23:33:30 -0800
+Message-ID: <CAKmqyKNjAxxT+QbYBDngG6ad7VBJuEvnDDXw-AyPaCjZpeiEZg@mail.gmail.com>
+Subject: Re: [PATCH] hw/riscv: Add optional symbol callback ptr to
+ riscv_load_kernel()
+To: "Zhuang, Siwei (Data61, Kensington NSW)" <Siwei.Zhuang@data61.csiro.au>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,41 +87,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- richard.henderson@linaro.org, dovgaluk@ispras.ru, imammedo@redhat.com,
- philmd@redhat.com, aleksandar.m.mail@gmail.com
+Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Include AVR maintaners in MAINTAINERS file
+On Tue, Nov 19, 2019 at 12:03 AM Zhuang, Siwei (Data61, Kensington
+NSW) <Siwei.Zhuang@data61.csiro.au> wrote:
+>
+> This patch adds an optional function pointer, "sym_cb", to
+> riscv_load_kernel() which provides the possibility to access the symbol
+> table during kernel loading.
+>
+> The pointer is ignored, if supplied with Image or uImage file.
+>
+> The Spike board requires the access to locate the HTIF symbols.
+>
+> Fixes: 0ac24d56c5e7 ("hw/riscv: Split out the boot functions")
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1835827
+> Signed-off-by: Siwei Zhuang <siwei.zhuang@data61.csiro.au>
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5e5e3e52d6..ad2d9dd04a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -163,6 +163,15 @@ S: Maintained
- F: hw/arm/smmu*
- F: include/hw/arm/smmu*
- 
-+AVR TCG CPUs
-+M: Michael Rolnik <mrolnik@gmail.com>
-+S: Maintained
-+F: target/avr/
-+F: hw/misc/avr_mask.c
-+F: hw/char/avr_usart.c
-+F: hw/timer/avr_timer16.c
-+F: hw/avr/
-+
- CRIS TCG CPUs
- M: Edgar E. Iglesias <edgar.iglesias@gmail.com>
- S: Maintained
--- 
-2.17.2 (Apple Git-113)
+Alistair
 
+> ---
+>  hw/riscv/boot.c         | 7 ++++---
+>  hw/riscv/sifive_e.c     | 2 +-
+>  hw/riscv/sifive_u.c     | 3 ++-
+>  hw/riscv/spike.c        | 6 +++---
+>  hw/riscv/virt.c         | 3 ++-
+>  include/hw/riscv/boot.h | 3 ++-
+>  6 files changed, 14 insertions(+), 10 deletions(-)
+>
+> diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+> index 7fee98d2f8..027303d2a3 100644
+> --- a/hw/riscv/boot.c
+> +++ b/hw/riscv/boot.c
+> @@ -114,12 +114,13 @@ target_ulong riscv_load_firmware(const char *firmware_filename,
+>      exit(1);
+>  }
+>
+> -target_ulong riscv_load_kernel(const char *kernel_filename)
+> +target_ulong riscv_load_kernel(const char *kernel_filename, symbol_fn_t sym_cb)
+>  {
+>      uint64_t kernel_entry, kernel_high;
+>
+> -    if (load_elf(kernel_filename, NULL, NULL, NULL,
+> -                 &kernel_entry, NULL, &kernel_high, 0, EM_RISCV, 1, 0) > 0) {
+> +    if (load_elf_ram_sym(kernel_filename, NULL, NULL, NULL,
+> +                         &kernel_entry, NULL, &kernel_high, 0,
+> +                         EM_RISCV, 1, 0, NULL, true, sym_cb) > 0) {
+>          return kernel_entry;
+>      }
+>
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 0f9d641a0e..8a6b0348df 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -111,7 +111,7 @@ static void riscv_sifive_e_init(MachineState *machine)
+>                            memmap[SIFIVE_E_MROM].base, &address_space_memory);
+>
+>      if (machine->kernel_filename) {
+> -        riscv_load_kernel(machine->kernel_filename);
+> +        riscv_load_kernel(machine->kernel_filename, NULL);
+>      }
+>  }
+>
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 9552abf4dd..0140e95732 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -344,7 +344,8 @@ static void riscv_sifive_u_init(MachineState *machine)
+>                                   memmap[SIFIVE_U_DRAM].base);
+>
+>      if (machine->kernel_filename) {
+> -        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename);
+> +        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
+> +                                                  NULL);
+>
+>          if (machine->initrd_filename) {
+>              hwaddr start;
+> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+> index 8bbffbcd0f..8823681783 100644
+> --- a/hw/riscv/spike.c
+> +++ b/hw/riscv/spike.c
+> @@ -184,7 +184,7 @@ static void spike_board_init(MachineState *machine)
+>                                  mask_rom);
+>
+>      if (machine->kernel_filename) {
+> -        riscv_load_kernel(machine->kernel_filename);
+> +        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
+>      }
+>
+>      /* reset vector */
+> @@ -273,7 +273,7 @@ static void spike_v1_10_0_board_init(MachineState *machine)
+>                                  mask_rom);
+>
+>      if (machine->kernel_filename) {
+> -        riscv_load_kernel(machine->kernel_filename);
+> +        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
+>      }
+>
+>      /* reset vector */
+> @@ -359,7 +359,7 @@ static void spike_v1_09_1_board_init(MachineState *machine)
+>                                  mask_rom);
+>
+>      if (machine->kernel_filename) {
+> -        riscv_load_kernel(machine->kernel_filename);
+> +        riscv_load_kernel(machine->kernel_filename, htif_symbol_callback);
+>      }
+>
+>      /* reset vector */
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index 23f340df19..65557c837e 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -476,7 +476,8 @@ static void riscv_virt_board_init(MachineState *machine)
+>                                   memmap[VIRT_DRAM].base);
+>
+>      if (machine->kernel_filename) {
+> -        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename);
+> +        uint64_t kernel_entry = riscv_load_kernel(machine->kernel_filename,
+> +                                                  NULL);
+>
+>          if (machine->initrd_filename) {
+>              hwaddr start;
+> diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
+> index 66075d0e57..df80051fbc 100644
+> --- a/include/hw/riscv/boot.h
+> +++ b/include/hw/riscv/boot.h
+> @@ -28,7 +28,8 @@ void riscv_find_and_load_firmware(MachineState *machine,
+>  char *riscv_find_firmware(const char *firmware_filename);
+>  target_ulong riscv_load_firmware(const char *firmware_filename,
+>                                   hwaddr firmware_load_addr);
+> -target_ulong riscv_load_kernel(const char *kernel_filename);
+> +target_ulong riscv_load_kernel(const char *kernel_filename,
+> +                               symbol_fn_t sym_cb);
+>  hwaddr riscv_load_initrd(const char *filename, uint64_t mem_size,
+>                           uint64_t kernel_entry, hwaddr *start);
+>
+> --
+> 2.24.0
+>
 
