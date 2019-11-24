@@ -2,81 +2,147 @@ Return-Path: <SRS0=aI0a=ZQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AAAFC432C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 07:36:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B5AC432C3
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 11:59:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 278C6207DD
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 07:36:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC38F20748
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 11:59:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G51FSc4l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 278C6207DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="AWZuuZRc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC38F20748
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYmRu-0001jG-99
-	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 02:36:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41980)
+	id 1iYqXo-0006DV-Kn
+	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 06:59:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34671)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iYmR0-0001DQ-Ar
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 02:35:55 -0500
+ (envelope-from <deller@gmx.de>) id 1iYqTh-0004nJ-OI
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 06:54:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iYmQz-0007UE-74
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 02:35:54 -0500
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:38224)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iYmQy-0007U0-Vk; Sun, 24 Nov 2019 02:35:53 -0500
-Received: by mail-lf1-x144.google.com with SMTP id q28so8555662lfa.5;
- Sat, 23 Nov 2019 23:35:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2NIWd2V+BoD2R7kVAtzNAq+nRRdu513tjVeVMOAHXJU=;
- b=G51FSc4lBRwBNetv4D6c6IaL/4JRqU4NJ9UGrkbCbNREv/qk3ia0Zq5tZCLetjz8xP
- Xsb0NkatlJghcZ7en0DAmKHf2oN8tF/7fM6tADOY/PZiwaW2xmjAYn+UAHdlIXCIazzO
- gvyeVSpmfA6n2PJNluRI/1QFxca9ztgK8IIU0YFe+aZnWETT5AwhIjQzd/eovnB5elqL
- 4oSCacB0VTwddUQAXQJydFITwshDX+g2jcLcy5q4vJpyozcVblDmIaaMD6k8H9NnMqdc
- cJ+BJYalDe7pltnBM8cPVD8eAFnJbM9X1WPbnkjPaKEjKIse/LhVYlknfefHI2okGMIq
- lC+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=2NIWd2V+BoD2R7kVAtzNAq+nRRdu513tjVeVMOAHXJU=;
- b=CPlpL00VgI5jRIBDyjsd0PjqR8CtgwbJWanG4trecqtrGBaUyQJ7e+0/QYKlksxFPM
- F2pn2m/z9IwqHkFD2JAGvksgANSsy/dUuIdZL20FOxK8GjEftFr6tTmXj9xh2tmh1/bW
- xgk36ybgX/BIaBR4PUy+7xN9iPPmEdUrlsAmqHjCcxVL09rkb0hFNAX/PkOmiVx8vfis
- E/rKzfh6s5sq7LH5NXgGIDjzt+YBUfiSluWTYgRIve8Ep9WV1CPHSsgkp7u/uT1ZsT4q
- wbhApqrDorS4PAZ73Y8rxNV+ITEKrpzpdtH+EnLaVVC4Ta21rEghhHQYXz01GjAMXuWv
- 4RZw==
-X-Gm-Message-State: APjAAAWoHneHWKVJGzUAKwqAs1ZGeqFNJDuSYSehOMx4URDqohYqHot2
- KZHJOI6JGbMA/HejbwwJjTL8jXmpWwIbHwsOGPE=
-X-Google-Smtp-Source: APXvYqzhGqhJkwqgMn8peCcLIBZHOoi0BZHLTY4M10qRMG2qiFYvNmXRWu8kmBi0yyrl9zIcEypruvqOciNvLUL50T4=
-X-Received: by 2002:a05:6512:4c1:: with SMTP id
- w1mr16857852lfq.141.1574580951491; 
- Sat, 23 Nov 2019 23:35:51 -0800 (PST)
+ (envelope-from <deller@gmx.de>) id 1iYqTf-0007Dx-Uj
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 06:54:57 -0500
+Received: from mout.gmx.net ([212.227.15.15]:35387)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <deller@gmx.de>) id 1iYqTe-0007Cw-7p
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 06:54:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+ s=badeba3b8450; t=1574596490;
+ bh=1kZAy9gMICozO0RCt4Ha40SPF2cYOc3tln4q+AIz67Y=;
+ h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+ b=AWZuuZRcEr4OFhpw3RX65s5djU1WrSrF1wf2YtA8SMB8lHIzvdUrRZQbapjdZ2pMk
+ NTyZpSAz8UVuxL4AuBfHIMJPcQdjo+jLhEzd4+RBOl00q2bCQvv21sQlqsO4q4vGKF
+ hiKClQtnuWzgVp9ZDmEp6t0MSFPwtsWU5KmSjscA=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.20.60] ([92.116.140.120]) by mail.gmx.com (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MybGh-1hctbb1QZ3-00yv9Q; Sun, 24
+ Nov 2019 12:54:50 +0100
+Subject: Re: [PATCH] linux-user: Improve strace output for read() and getcwd()
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+References: <20191121201448.GA3133@ls3530.fritz.box>
+ <CAL1e-=ia9kmSUOztiGD=Mk4e8+r3oh2P3j_bAR2971FEGvAFyw@mail.gmail.com>
+From: Helge Deller <deller@gmx.de>
+Autocrypt: addr=deller@gmx.de; keydata=
+ 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
+ c2TFWAS8k6RLkk41ZUU8ENX8+qZx/Q==
+Message-ID: <bc2a9dfb-cc5b-0916-38c7-6e07287b1080@gmx.de>
+Date: Sun, 24 Nov 2019 12:54:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <1573916930-19068-1-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1573916930-19068-1-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Sat, 23 Nov 2019 23:35:24 -0800
-Message-ID: <CAKmqyKPtk6V+9Z9dgMSa_thgPCP_B6jQmQCoGAw1=BczfPyKVw@mail.gmail.com>
-Subject: Re: [PATCH] riscv: sifive_u: Add a "serial" property for board serial
- number
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::144
+In-Reply-To: <CAL1e-=ia9kmSUOztiGD=Mk4e8+r3oh2P3j_bAR2971FEGvAFyw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:0IxPh/6z8fIgwmjnznm/pyUZot5wPhgIQG50/hUbY2DXK8N3yEN
+ 9gHeuG6GTnAorRHU+ajN+oLY8Kyw1Q9QjIzWMtDhkcPsEe64J0yo9AAwSWn36tc3kOLSl7V
+ lEqLmzcX1uwe4Do+CuD66IWRst99CU8tXrk3R7urK7TF/qP6XAqFpfnQN6EQHEVd14bVDCo
+ HRPM3JtaR3z4xbVJ/09fA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:nNbltAHaBc0=:YU/t5OueqbgUF0uhxElF1z
+ aLUeiIISAvzVHHYdnuai+A1EkVhkG1EKZp7RvbnokDhd6nxosfBVSU/UZxWfyXUCOYx6nzIIy
+ 0meWxzNueyYsDphysrydaRV7FFmmLpMC3cqt9sTCze9g+8pEe6WqLG3euMWBvZbmc0U7QCQX+
+ ZCxpoLo1itxZwoUgAfqM70OKac+zRJDEJ3ha4L04JqFE/l0H4LtALO+Fs/+S//InDvb3XMOY5
+ Xy/dKrO+fDHdQVpNdVs1BkstGllPWzcHemzWc8TccGEws5eMNWc/2NeUu2PcESQKmLAImXta3
+ /5psnQi46OX/Mkn06vCBWYYurzFjvP/F/Q8zIdSHmXnb2otQafXNgN/0XNd6GiJ9b4rDBom9E
+ PIew79etDFN3CaYOZug29YDRHm0bEQJ/SWqRGRMV68b+x6I0XELumXJx2sXpjt7+hXBKcGPFX
+ yPnHC68fB5V1iyl1Lfcx0LQyvLFHMUXwKcXXamYG6lU5lqYbWMIplRo1VMcTAKEFGdK3Jd8dJ
+ QmD7bLiXFyFYBVn5L8WFhigadkvnFvdcqwyXt59wEIgx0ed/vdVajGeyGTusMj9dkPSk9WVs+
+ BbHQAqYi8tdAY7ajs/pvHrBeWhPBE6UwkYq+G/aFva8acn5KF2FRbFTGk1ibeHL2ptwrJTcK6
+ oCxCw+qGC4/1iWd5pnFQCEad79rEHhtCM30ufo45OES19yBP3NAn0lgWApSLAh1YBgrn96Poi
+ jj++rFtURWpXGkGcsRSjahs6fdAPLuuYVuE4kfIV1Qo6O/BJSIAmEOYdclqkPBPcUZh9/zvXF
+ BpdiHbu1ustqGHH03+Vbm4oFpmP5EmUYNGPoycSt+dPPta+xwm6F7BsdIK3eKzns7yzSD41rm
+ YKIJNvPUTn73Iy6yo/mzC+LZ3oFKG75a4bpLxHRIi4vGkgp2eAq/Fe/yUtgLZ2zlBsZj5NLkK
+ JYpUVlTi8A7NczP/KjQmTkoa7fthDavmH9dKDvQr8G2dx0idTy6hzPtJI/26chISAvPtOZrTF
+ mEcdWKm8PsPI7ZOEoPPyE58TcWIJu3mFMdgIhJf1bXBA1NXzHWckvfkNYPgGyiedEfjj7k9TK
+ V0Rxjm67fUMdEiDHQZDQbDYXd90ZFJo3yiPk2VIAq237Kmy8vGgj3Id3vkK3ZiAs9K1aTY6xC
+ KA+xF27JQ7A/L+1NHOtCxXVEl2Ay5stiZGRkdC0mUbbG486XUuEgmihpSs2N87/e1+nsnTkx2
+ pso4NUFGcCxgxwByKJxUgB4y23yATWxRqvQL3XA==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.15.15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,114 +154,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Nov 16, 2019 at 7:09 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On 23.11.19 12:34, Aleksandar Markovic wrote:
+> On Thursday, November 21, 2019, Helge Deller <deller@gmx.de <mailto:dell=
+er@gmx.de>> wrote:
 >
-> At present the board serial number is hard-coded to 1, and passed
-> to OTP model during initialization. Firmware (FSBL, U-Boot) uses
-> the serial number to generate a unique MAC address for the on-chip
-> ethernet controller. When multiple QEMU 'sifive_u' instances are
-> created and connected to the same subnet, they all have the same
-> MAC address hence it creates a unusable network.
+>     The strace functionality in qemu-user lacks the possibility to trace
+>     which real values get returned to pointers in userspace by syscalls.
 >
-> A new "serial" property is introduced to specify the board serial
-> number. When not given, the default serial number 1 is used.
+>     For example, the read() and getcwd() syscalls currently only show th=
+e
+>     destination address where the syscalls should put the return values:
+>     2532 read(3,0xff80038c,512) =3D 512
+>     2532 getcwd(0x18180,4096) =3D 9
 >
-> Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+>     With the patch below, one now can specify in print_syscall_late() wh=
+ich
+>     syscalls should be executed first, before they get printed.
+>     After adding the read() and getcwd() syscalls, we now get this outpu=
+t in
+>     with strace instead:
+>     1708 read(3,"\177ELF\1\2\1\3\0\0\0\0\0\0\0\0\0\3\0\17\0\0\0\1\0\2bl\=
+0\0\04"...,512) =3D 512
+>     1708 getcwd("/usr/bin",4096) =3D 9
+>
+>     This patch adds just the framework with the respective implemenation=
+s for
+>     read() and getcwd(). If applied, more functions can be added easily =
+later.
+>
+>
+> Great out-of-the-box idea! However, there are some things that are
+> not thought over yet. There is a good reason why strace happens
+> "early": if something crash-like happens during syscall translation,
+> we still have trace of original target syscall. In case of "late"
+> flavor, we don't have anything. Another potentially problematic
+> aspect is that end user certainly should know whether the trace was
+> done "early" or "late" - otherwise, there will be, for certain, cases
+> of misinterpretation / misleading / confusion of end users.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Thanks for the feedback - I'm shortly sending a v2 version which
+prints the syscall name with an open parenthesis, e.g. "read(" or "getcwd(=
+",
+before calling the syscall. That way you can see where it crashed/hangs...
 
-Alistair
+Helge
 
-> ---
 >
->  hw/riscv/sifive_u.c         | 21 ++++++++++++++++++++-
->  include/hw/riscv/sifive_u.h |  1 +
->  2 files changed, 21 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-> index 9552abf..e1a5536 100644
-> --- a/hw/riscv/sifive_u.c
-> +++ b/hw/riscv/sifive_u.c
-> @@ -34,6 +34,7 @@
->  #include "qemu/log.h"
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
-> +#include "qapi/visitor.h"
->  #include "hw/boards.h"
->  #include "hw/loader.h"
->  #include "hw/sysbus.h"
-> @@ -401,6 +402,7 @@ static void riscv_sifive_u_init(MachineState *machine)
->  static void riscv_sifive_u_soc_init(Object *obj)
->  {
->      MachineState *ms = MACHINE(qdev_get_machine());
-> +    SiFiveUState *us = RISCV_U_MACHINE(ms);
->      SiFiveUSoCState *s = RISCV_U_SOC(obj);
->
->      object_initialize_child(obj, "e-cluster", &s->e_cluster,
-> @@ -433,7 +435,7 @@ static void riscv_sifive_u_soc_init(Object *obj)
->                            TYPE_SIFIVE_U_PRCI);
->      sysbus_init_child_obj(obj, "otp", &s->otp, sizeof(s->otp),
->                            TYPE_SIFIVE_U_OTP);
-> -    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", OTP_SERIAL);
-> +    qdev_prop_set_uint32(DEVICE(&s->otp), "serial", us->serial);
->      sysbus_init_child_obj(obj, "gem", &s->gem, sizeof(s->gem),
->                            TYPE_CADENCE_GEM);
->  }
-> @@ -452,6 +454,18 @@ static void sifive_u_set_start_in_flash(Object *obj, bool value, Error **errp)
->      s->start_in_flash = value;
->  }
->
-> +static void sifive_u_get_serial(Object *obj, Visitor *v, const char *name,
-> +                                void *opaque, Error **errp)
-> +{
-> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
-> +}
-> +
-> +static void sifive_u_set_serial(Object *obj, Visitor *v, const char *name,
-> +                                void *opaque, Error **errp)
-> +{
-> +    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
-> +}
-> +
->  static void riscv_sifive_u_machine_instance_init(Object *obj)
->  {
->      SiFiveUState *s = RISCV_U_MACHINE(obj);
-> @@ -463,6 +477,11 @@ static void riscv_sifive_u_machine_instance_init(Object *obj)
->                                      "Set on to tell QEMU's ROM to jump to " \
->                                      "flash. Otherwise QEMU will jump to DRAM",
->                                      NULL);
-> +
-> +    s->serial = OTP_SERIAL;
-> +    object_property_add(obj, "serial", "uint32", sifive_u_get_serial,
-> +                        sifive_u_set_serial, NULL, &s->serial, NULL);
-> +    object_property_set_description(obj, "serial", "Board serial number", NULL);
->  }
->
->  static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-> index 82667b5..7cf742e 100644
-> --- a/include/hw/riscv/sifive_u.h
-> +++ b/include/hw/riscv/sifive_u.h
-> @@ -59,6 +59,7 @@ typedef struct SiFiveUState {
->      int fdt_size;
->
->      bool start_in_flash;
-> +    uint32_t serial;
->  } SiFiveUState;
->
->  enum {
-> --
-> 2.7.4
+> Yours,
+> Aleksandar
 >
 >
+> =C2=A0
+>
+>     Signed-off-by: Helge Deller <deller@gmx.de <mailto:deller@gmx.de>>
+>
+>     diff --git a/linux-user/strace.c b/linux-user/strace.c
+>     index de43238fa4..ff254732af 100644
+>     --- a/linux-user/strace.c
+>     +++ b/linux-user/strace.c
+>     @@ -61,6 +61,7 @@ UNUSED static void print_open_flags(abi_long, int)=
+;
+>     =C2=A0UNUSED static void print_syscall_prologue(const struct syscall=
+name *);
+>     =C2=A0UNUSED static void print_syscall_epilogue(const struct syscall=
+name *);
+>     =C2=A0UNUSED static void print_string(abi_long, int);
+>     +UNUSED static void print_encoded_string(abi_long addr, unsigned int=
+ maxlen, int last);
+>     =C2=A0UNUSED static void print_buf(abi_long addr, abi_long len, int =
+last);
+>     =C2=A0UNUSED static void print_raw_param(const char *, abi_long, int=
+);
+>     =C2=A0UNUSED static void print_timeval(abi_ulong, int);
+>     @@ -1204,6 +1205,37 @@ print_syscall_epilogue(const struct syscallna=
+me *sc)
+>     =C2=A0 =C2=A0 =C2=A0gemu_log(")");
+>     =C2=A0}
+>
+>     +#define MAX_ENCODED_CHARS 32
+>     +static void
+>     +print_encoded_string(abi_long addr, unsigned int maxlen, int last)
+>     +{
+>     +=C2=A0 =C2=A0 unsigned int maxout;
+>     +=C2=A0 =C2=A0 char *s, *str;
+>     +
+>     +=C2=A0 =C2=A0 s =3D lock_user_string(addr);
+>     +=C2=A0 =C2=A0 if (s =3D=3D NULL) {
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* can't get string out of it, so print=
+ it as pointer */
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 print_pointer(addr, last);
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return;
+>     +=C2=A0 =C2=A0 }
+>     +
+>     +=C2=A0 =C2=A0 str =3D s;
+>     +=C2=A0 =C2=A0 gemu_log("\"");
+>     +=C2=A0 =C2=A0 maxout =3D MIN(maxlen, MAX_ENCODED_CHARS);
+>     +=C2=A0 =C2=A0 while (maxout--) {
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 unsigned char c =3D *str++;
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (isprint(c)) {
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gemu_log("%c", c);
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 } else {
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 gemu_log("\\%o", (unsigne=
+d int) c);
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+>     +=C2=A0 =C2=A0 }
+>     +=C2=A0 =C2=A0 unlock_user(s, addr, 0);
+>     +
+>     +=C2=A0 =C2=A0 gemu_log("\"%s%s", maxlen > MAX_ENCODED_CHARS ? "..."=
+ : "",
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 get_comma(last));
+>     +}
+>     +
+>     =C2=A0static void
+>     =C2=A0print_string(abi_long addr, int last)
+>     =C2=A0{
+>     @@ -1633,6 +1665,19 @@ print_futimesat(const struct syscallname *nam=
+e,
+>     =C2=A0}
+>     =C2=A0#endif
+>
+>     +#ifdef TARGET_NR_getcwd
+>     +static void
+>     +print_getcwd(const struct syscallname *name,
+>     +=C2=A0 =C2=A0 abi_long arg0, abi_long arg1, abi_long arg2,
+>     +=C2=A0 =C2=A0 abi_long arg3, abi_long arg4, abi_long arg5)
+>     +{
+>     +=C2=A0 =C2=A0 print_syscall_prologue(name);
+>     +=C2=A0 =C2=A0 print_string(arg0, 0);
+>     +=C2=A0 =C2=A0 print_raw_param("%u", arg1, 1);
+>     +=C2=A0 =C2=A0 print_syscall_epilogue(name);
+>     +}
+>     +#endif
+>     +
+>     =C2=A0#ifdef TARGET_NR_settimeofday
+>     =C2=A0static void
+>     =C2=A0print_settimeofday(const struct syscallname *name,
+>     @@ -2428,6 +2473,20 @@ print_fstatat64(const struct syscallname *nam=
+e,
+>     =C2=A0#define print_newfstatat=C2=A0 =C2=A0 print_fstatat64
+>     =C2=A0#endif
+>
+>     +#ifdef TARGET_NR_read
+>     +static void
+>     +print_read(const struct syscallname *name,
+>     +=C2=A0 =C2=A0 abi_long arg0, abi_long arg1, abi_long arg2,
+>     +=C2=A0 =C2=A0 abi_long arg3, abi_long arg4, abi_long arg5)
+>     +{
+>     +=C2=A0 =C2=A0 print_syscall_prologue(name);
+>     +=C2=A0 =C2=A0 print_raw_param("%d", arg0, 0);
+>     +=C2=A0 =C2=A0 print_encoded_string(arg1, arg2, 0);
+>     +=C2=A0 =C2=A0 print_raw_param("%u", arg2, 1);
+>     +=C2=A0 =C2=A0 print_syscall_epilogue(name);
+>     +}
+>     +#endif
+>     +
+>     =C2=A0#ifdef TARGET_NR_readlink
+>     =C2=A0static void
+>     =C2=A0print_readlink(const struct syscallname *name,
+>     diff --git a/linux-user/strace.list b/linux-user/strace.list
+>     index d49a1e92a8..220b1f4c46 100644
+>     --- a/linux-user/strace.list
+>     +++ b/linux-user/strace.list
+>     @@ -272,7 +272,7 @@
+>     =C2=A0{ TARGET_NR_getcpu, "getcpu" , "%s(%p,%d)", NULL, NULL },
+>     =C2=A0#endif
+>     =C2=A0#ifdef TARGET_NR_getcwd
+>     -{ TARGET_NR_getcwd, "getcwd" , "%s(%p,%d)", NULL, NULL },
+>     +{ TARGET_NR_getcwd, "getcwd" , NULL, print_getcwd, NULL },
+>     =C2=A0#endif
+>     =C2=A0#ifdef TARGET_NR_getdents
+>     =C2=A0{ TARGET_NR_getdents, "getdents" , NULL, NULL, NULL },
+>     @@ -1080,7 +1080,7 @@
+>     =C2=A0{ TARGET_NR_quotactl, "quotactl" , NULL, NULL, NULL },
+>     =C2=A0#endif
+>     =C2=A0#ifdef TARGET_NR_read
+>     -{ TARGET_NR_read, "read" , "%s(%d,%#x,%d)", NULL, NULL },
+>     +{ TARGET_NR_read, "read" , NULL, print_read, NULL },
+>     =C2=A0#endif
+>     =C2=A0#ifdef TARGET_NR_readahead
+>     =C2=A0{ TARGET_NR_readahead, "readahead" , NULL, NULL, NULL },
+>     diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>     index ce399a55f0..c0079ca2b7 100644
+>     --- a/linux-user/syscall.c
+>     +++ b/linux-user/syscall.c
+>     @@ -12069,6 +12069,21 @@ static abi_long do_syscall1(void *cpu_env, =
+int num, abi_long arg1,
+>     =C2=A0 =C2=A0 =C2=A0return ret;
+>     =C2=A0}
+>
+>     +/*
+>     + * True if this syscall should be printed after having called the n=
+ative
+>     + * syscall, so that values which are fed back to userspace gets pri=
+nted.
+>     + */
+>     +static int print_syscall_late(int syscall)
+>     +{
+>     +=C2=A0 =C2=A0 switch (syscall) {
+>     +=C2=A0 =C2=A0 case TARGET_NR_getcwd:
+>     +=C2=A0 =C2=A0 case TARGET_NR_read:
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 1;
+>     +=C2=A0 =C2=A0 default:
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;
+>     +=C2=A0 =C2=A0 }
+>     +}
+>     +
+>     =C2=A0abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>     =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0abi_long arg2, abi_long arg3, abi_long arg4,
+>     =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0abi_long arg5, abi_long arg6, abi_long arg7,
+>     @@ -12095,9 +12110,16 @@ abi_long do_syscall(void *cpu_env, int num,=
+ abi_long arg1,
+>     =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+>
+>     =C2=A0 =C2=A0 =C2=A0if (unlikely(do_strace)) {
+>     -=C2=A0 =C2=A0 =C2=A0 =C2=A0 print_syscall(num, arg1, arg2, arg3, ar=
+g4, arg5, arg6);
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 int late_printing;
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 late_printing =3D print_syscall_late(nu=
+m);
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (!late_printing) {
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 print_syscall(num, arg1, =
+arg2, arg3, arg4, arg5, arg6);
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+>     =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D do_syscall1(cpu_env, num, =
+arg1, arg2, arg3, arg4,
+>     =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0arg5, arg6, arg7, arg8);
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (late_printing) {
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 print_syscall(num, arg1, =
+arg2, arg3, arg4, arg5, arg6);
+>     +=C2=A0 =C2=A0 =C2=A0 =C2=A0 }
+>     =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0print_syscall_ret(num, ret);
+>     =C2=A0 =C2=A0 =C2=A0} else {
+>     =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D do_syscall1(cpu_env, num, =
+arg1, arg2, arg3, arg4,
+>
+
 
