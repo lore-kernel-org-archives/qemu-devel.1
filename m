@@ -2,78 +2,78 @@ Return-Path: <SRS0=aI0a=ZQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A10CC432C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08410C432C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:11:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F2A120748
-	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:10:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C54CC2075E
+	for <qemu-devel@archiver.kernel.org>; Sun, 24 Nov 2019 05:11:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhMzTSlt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F2A120748
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pSDTCslj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C54CC2075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYkAH-00048M-Tc
-	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 00:10:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60580)
+	id 1iYkAx-0004rk-B3
+	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 00:11:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60547)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iYk3U-00040v-6p
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:29 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1iYk3Q-0003up-GQ
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iYk3S-0007fn-Rh
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:28 -0500
-Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:42275)
+ (envelope-from <mrolnik@gmail.com>) id 1iYk3P-0007dx-6e
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:24 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45228)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iYk3S-0007fI-LS
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:26 -0500
-Received: by mail-wr1-x433.google.com with SMTP id a15so13378489wrf.9
- for <qemu-devel@nongnu.org>; Sat, 23 Nov 2019 21:03:26 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iYk3P-0007dW-0c
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 00:03:23 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z10so13344367wrs.12
+ for <qemu-devel@nongnu.org>; Sat, 23 Nov 2019 21:03:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=PWvHTATx1P5cJRWP5UbdfJCdwe3FSZcOH5uS+KaaF0k=;
- b=HhMzTSltnJKGQVzDUcu66T4sOaQfMOIPeY0jmmGJ5ojQs2cYGFjrtuWR7d/nuh46Ac
- rS1pI6dlqnPJNMfm4phoCtCzq+2ic/unGqWSialZurXBYjC964OUA714MZulyaNgJ+JR
- 1nvcXaTZaLwHpx1GrsyYQVuVm36ENkqDb7GY3tuY852+0NOivbVIETReQFl+33hPB8Vj
- PuMc6mo3OqkF1gbqxi0a6o5Tx5InbFbjyLw3C9S5afFA6fA1/iGL5p2Ou/mrly93FmyQ
- Bgu8UACqsPvhjcnztgnV6lwpeNqHVDNwTgStXBW5c5q6Bz7oVfed4fpVZ78E0BVU9WBY
- fWqw==
+ bh=lmKu0nadoIAF5aXT323Ji4zM6wR9fpqsiNsQ/AlTLlc=;
+ b=pSDTCsljsmM5N7FSP+1oieM7loAjgnAiiHxi1GTewJX6OMRW6dXBTbUdoZF9ngsZkI
+ hyzSyZikuQerxbDc4QMX+rolmuqmr02d1MABlNYj5EIFH63u50N8fv+oBcXI1YiEYlc6
+ saGM8+ALVkZNrn1tT+ysqVbH5bQ8P92vtE2XyPQdXxDjEPJhUamPFr0ruySI5XUCxQov
+ w/VAxkVnTB8b3lUl0WmUDscZZM4QlUzyTj3NpVnjf9psqbDwgAgyoRQP0ehsiV0UQaSu
+ HWPY2w8ZiOfNmkAdpshcYhO5RYwMr5lCPLNInsFG5Qhi5RKA1F4CKGl4zw99u022VYeA
+ sfSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=PWvHTATx1P5cJRWP5UbdfJCdwe3FSZcOH5uS+KaaF0k=;
- b=USosGP4qNbOVolltm26G8kgLYyMjAaAraFwoy0m1Qe+ubDYbXtreVVscMn7wR+QOwt
- sB9S/tuf5WhCuJ7ye816sthL9XTdsagVZvlUZN6NDT/gy7NkWc3FhRPpj1yqPHtabVYw
- 5Ul7iMFQGSi0U9klpa7/Xg2s+xjl4mql3oYPtNdcmDdR12VSLw5q5D/gbDL85jXrj7/i
- FzCLIq0otGp8w6TLZSgrYf68mKQUMM2r9M7EbzZCuWFoBcc1VyvGuqTx43sZWvSLjvIJ
- /FX/W4dZp4ynJKd/JNxmEE+9peK1c4ZLTvs2pfZ+rSRYgoRzJtUdEHD43covW7Ob9Cve
- Y4Dw==
-X-Gm-Message-State: APjAAAWpZqXyo0HLtibJI/MCyZidnZw3+BwfnFAtRGXQlXBxDeU6ycIR
- qN1rWsem7nHfpg/PmPQuxkerrQmcdd7JnUWP
-X-Google-Smtp-Source: APXvYqzuE+XdU7KiLFU3dtLoez6Up6+y/dvHO5noxs0aCuZnYTAQk2crsvq1psI2fNiwyCMactC23w==
-X-Received: by 2002:adf:f445:: with SMTP id f5mr2226674wrp.193.1574571805322; 
- Sat, 23 Nov 2019 21:03:25 -0800 (PST)
+ bh=lmKu0nadoIAF5aXT323Ji4zM6wR9fpqsiNsQ/AlTLlc=;
+ b=jeQMcFDpdOATWIG/vwrEtckKw/Nlwmmry/0kAjUHCbURxbndu8IKogVywHJHuH/1eW
+ +WM6gysGGw4/ldA4fP2wpHC1MX5gkTlmkovXl5ZBfCS9wM3K9kTpGAzYzwS7ez+NXiF2
+ njsavup8ilfnU4LIA2XoAHgum5JoAfGebEeO2d18zLr37WO+7gGs7kasDprsX/F5jLGa
+ VXfAB/WIdDyJpNIcVYK7t4+JRHehF3oL/qU0rpS576wUs1Pd9e4jIHRQVzwWHfolH4pF
+ aUEl46br1+g/eo5zmDNUow0UVnZyZd5vMntPJf5FDgXQXaOJh9NPbvRqh4rFDnXOoXRD
+ R9LA==
+X-Gm-Message-State: APjAAAVba3apdyeRNcuxUkc4wLO/ASJtdthpSll4DTQX0ccprpjdwAya
+ uZnoB7uhoFAJeNArXsWlF9xeVF/kE/pwqb89
+X-Google-Smtp-Source: APXvYqy7NgZooijVDPPdPwbTk5qb0zfFErEABRpsv22omr91FT7q8cnXKZ3ewlEvd4v/ka7bF3PPeA==
+X-Received: by 2002:adf:dd4d:: with SMTP id u13mr6031896wrm.394.1574571801626; 
+ Sat, 23 Nov 2019 21:03:21 -0800 (PST)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-178-10-38.red.bezeqint.net. [79.178.10.38])
- by smtp.gmail.com with ESMTPSA id t185sm4173976wmf.45.2019.11.23.21.03.23
+ by smtp.gmail.com with ESMTPSA id t185sm4173976wmf.45.2019.11.23.21.03.20
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sat, 23 Nov 2019 21:03:24 -0800 (PST)
+ Sat, 23 Nov 2019 21:03:21 -0800 (PST)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v36 16/17] target/avr: Add Avocado test
-Date: Sun, 24 Nov 2019 07:02:24 +0200
-Message-Id: <20191124050225.30351-17-mrolnik@gmail.com>
+Subject: [PATCH v36 14/17] target/avr: Update build system
+Date: Sun, 24 Nov 2019 07:02:22 +0200
+Message-Id: <20191124050225.30351-15-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191124050225.30351-1-mrolnik@gmail.com>
 References: <20191124050225.30351-1-mrolnik@gmail.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::433
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,62 +101,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The test is based on
-https://github.com/seharris/qemu-avr-tests/tree/master/free-rtos/Demo
-demo which. If working correctly, prints 'ABCDEFGHIJKLMNOPQRSTUVWX' out.
-it also demostrates that timer and IRQ are working
+Make AVR support buildable
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- tests/acceptance/machine_avr6.py | 36 ++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
- create mode 100644 tests/acceptance/machine_avr6.py
+ configure                       |  7 +++++++
+ default-configs/avr-softmmu.mak |  5 +++++
+ target/avr/Makefile.objs        | 34 +++++++++++++++++++++++++++++++++
+ 3 files changed, 46 insertions(+)
+ create mode 100644 default-configs/avr-softmmu.mak
+ create mode 100644 target/avr/Makefile.objs
 
-diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machine_avr6.py
+diff --git a/configure b/configure
+index 6099be1d84..e9dab313d5 100755
+--- a/configure
++++ b/configure
+@@ -7649,6 +7649,10 @@ case "$target_name" in
+     mttcg="yes"
+     gdb_xml_files="aarch64-core.xml aarch64-fpu.xml arm-core.xml arm-vfp.xml arm-vfp3.xml arm-neon.xml"
+   ;;
++  avr)
++    gdb_xml_files="avr-cpu.xml"
++    target_compiler=$cross_cc_avr
++  ;;
+   cris)
+   ;;
+   hppa)
+@@ -7868,6 +7872,9 @@ for i in $ARCH $TARGET_BASE_ARCH ; do
+       disas_config "ARM_A64"
+     fi
+   ;;
++  avr)
++    disas_config "AVR"
++  ;;
+   cris)
+     disas_config "CRIS"
+   ;;
+diff --git a/default-configs/avr-softmmu.mak b/default-configs/avr-softmmu.mak
 new file mode 100644
-index 0000000000..0601080b01
+index 0000000000..d1e1c28118
 --- /dev/null
-+++ b/tests/acceptance/machine_avr6.py
-@@ -0,0 +1,36 @@
-+import logging
-+import time
-+import distutils.spawn
++++ b/default-configs/avr-softmmu.mak
+@@ -0,0 +1,5 @@
++# Default configuration for avr-softmmu
 +
-+from avocado import skipUnless
-+from avocado_qemu import Test
-+from avocado.utils import process
++# Boards:
++#
++CONFIG_AVR_SAMPLE=y
+diff --git a/target/avr/Makefile.objs b/target/avr/Makefile.objs
+new file mode 100644
+index 0000000000..7523e0c6e2
+--- /dev/null
++++ b/target/avr/Makefile.objs
+@@ -0,0 +1,34 @@
++#
++#  QEMU AVR CPU
++#
++#  Copyright (c) 2019 Michael Rolnik
++#
++#  This library is free software; you can redistribute it and/or
++#  modify it under the terms of the GNU Lesser General Public
++#  License as published by the Free Software Foundation; either
++#  version 2.1 of the License, or (at your option) any later version.
++#
++#  This library is distributed in the hope that it will be useful,
++#  but WITHOUT ANY WARRANTY; without even the implied warranty of
++#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++#  Lesser General Public License for more details.
++#
++#  You should have received a copy of the GNU Lesser General Public
++#  License along with this library; if not, see
++#  <http://www.gnu.org/licenses/lgpl-2.1.html>
++#
 +
-+class AVR6Machine(Test):
-+    timeout = 5
++DECODETREE = $(SRC_PATH)/scripts/decodetree.py
++decode-y = $(SRC_PATH)/target/avr/insn.decode
 +
-+    def test_freertos(self):
-+        """
-+        :avocado: tags=arch:avr
-+        :avocado: tags=machine:sample
-+        """
-+        """
-+        https://github.com/seharris/qemu-avr-tests/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf
-+        constantly prints out 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
-+        """
-+        rom_url = 'https://github.com/seharris/qemu-avr-tests'
-+        rom_url += '/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf'
-+        rom_hash = '7eb521f511ca8f2622e0a3c5e8dd686efbb911d4'
-+        rom_path = self.fetch_asset(rom_url, asset_hash=rom_hash)
++target/avr/decode_insn.inc.c: $(decode-y) $(DECODETREE)
++	$(call quiet-command, \
++	  $(PYTHON) $(DECODETREE) -o $@ --decode decode_insn --insnwidth 16 $<, \
++	  "GEN", $(TARGET_DIR)$@)
 +
-+        self.vm.set_machine('sample')
-+        self.vm.add_args('-bios', rom_path)
-+        self.vm.add_args('-nographic')
-+        self.vm.launch()
++target/avr/translate.o: target/avr/decode_insn.inc.c
 +
-+        time.sleep(2)
-+        self.vm.shutdown()
-+
-+        match = 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
-+
-+        self.assertIn(match, self.vm.get_log())
++obj-y += translate.o cpu.o helper.o
++obj-y += gdbstub.o
++obj-y += disas.o
++obj-$(CONFIG_SOFTMMU) += machine.o
 -- 
 2.17.2 (Apple Git-113)
 
