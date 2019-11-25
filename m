@@ -6,79 +6,80 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40167C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB90C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:59:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC3C420679
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:58:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69EB520679
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:59:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=livekentac.onmicrosoft.com header.i=@livekentac.onmicrosoft.com header.b="NptusfeC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC3C420679
+	dkim=pass (1024-bit key) header.d=livekentac.onmicrosoft.com header.i=@livekentac.onmicrosoft.com header.b="PQvUQrWu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69EB520679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kent.ac.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZGl4-00028H-0r
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 10:58:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36329)
+	id 1iZGlX-0002Rg-Iy
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 10:59:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36433)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <S.E.Harris@kent.ac.uk>) id 1iZGjP-0000x6-Rn
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:57:01 -0500
+ (envelope-from <S.E.Harris@kent.ac.uk>) id 1iZGkD-0001Iu-TS
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:57:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <S.E.Harris@kent.ac.uk>) id 1iZGjL-0005Xs-0V
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:56:55 -0500
-Received: from mail-eopbgr50058.outbound.protection.outlook.com
- ([40.107.5.58]:43267 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ (envelope-from <S.E.Harris@kent.ac.uk>) id 1iZGk7-0005xa-Eb
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:57:45 -0500
+Received: from mail-ve1eur03on0607.outbound.protection.outlook.com
+ ([2a01:111:f400:fe09::607]:9184
+ helo=EUR03-VE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <S.E.Harris@kent.ac.uk>)
- id 1iZGjK-0005Vo-5v
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:56:50 -0500
+ id 1iZGk5-0005wj-7r
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:57:39 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KCTXn+ck+h/wJOMBJJE4wuTNWwu8BdDX//f1NTp0zGV820BaEfXVjMWYEq4H4FtXX5+SHvw4vt2sPrFEOVBKpz/fJRax2Ymm9pSeJwVZSKG3sxDCuxi9NEmKKctv9FqpnYnVHHTTo71ELcQtiXkGwoi+CzpLLPmmXsdFZWG/klwxOZsle6CtlIkRytqSlrM8hiGzRWzCNIMy8M5eo3wGMI71Z/8TBdUC19JG4NjcorMVb1QIyujkcyWXzzIYyLCADcUbLTkq/+8MonBytUXCHBhYxf+/sxjnR/sBTaSo5V7tDccAKyAhi4XarEoI4dlAZecUkzE3FqonBEj0j8BnTQ==
+ b=Ne2vibrM5OJwp5+N9QteceBVVeXBUfy2myRGqaqqFV0TxWM9sW0FN/YgmzIyFnOyd6QfeC7FMcMSHZ5i7aiEkQmUY+Zk/lemCbiBuH8KoSqq3LZxytAcKmUdsOiiTU+Mi/lBBLlF8X/miAtRcCrvQzqBuoi5fF9UGOF8Iv/3lKTwTjbJsRE89b3Z8dUCCcxgI1NTWBXW2LpSeR1MUJ+/q/6DwhDyWg/H0OBkA0jxWhM1Xv2rRhLeQoJvi0OP7sZiSC8wefX0t9KNYftrp1y3LZcET5TSH/uY6srRBg53EYPNaSDiT3Jl2ZMcTPORfcDLJODnUhre0RDgyWG4JWX04Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iO34gxt9hLTlfewWuXw6g8X5ZNLe8a0MQ8OCeNdS80U=;
- b=O99Mq/Hv66nl91Cog1SO0iDdXM9YhTbwzReWbEizOxnuszDwN6SiYzWsai8k4UKjPdgtrSx8reJqMLfEsnYx2y7oPMMZXYQRx/7yF+B5DC7gEjhkseFcU8JpGnTCuNnY0YdK6ebmdCMrSWrkiKXyJdfnbktXBfbqjyVqWOpeoro4ZtnqEoqJpTDNPlYwDs1tbjqUE4bmXQNqWayABWeq86SjfzapxuqxUiMEYYc1rjvU29FUrAzkxnVmNnWur1R97k6LwE2EeLp1bLdqc7JX0ksArdipoXTyk6yOjhEsS84fwKRd6F9yCUC4LZDwlNRavloQ7+FthGVKJwkXCQY79A==
+ bh=Y8LvyShrnhBFYN10HCQWwmRtxTE7boY4Nbo3fXFKAfo=;
+ b=jaymO22NOTSRFgNZ5C1XFmvkqsKNpTeqlRt1EzikyzPCc4TDq1A2Hs7NQ//ScVtYW4MfcmFSK1IIGGEVTgNJdX1BrIrrdf3AqQcUuosYLxiRDLn4EXQZohYVw8w2hg14fMnC+fjJc3AvCPsfU1qOvRZoUmMghq4v/YkK4faA38P5lN+m0ajr3VSvdzqpxocVAg87s4znkB+8FqBjbw+DNnHR6nZuBBnIikPK1XUC6+RL9mGeER53DQaA3ewlGfpfj5gx6lFk0/BYd19owzqihE2QZK06ae/OJ5yjpkrs1Q46mzLkeHp14qJR02PJathSpNKkrSuQCLWF2mdmyvCu/Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=kent.ac.uk; dmarc=pass action=none header.from=kent.ac.uk;
  dkim=pass header.d=kent.ac.uk; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=livekentac.onmicrosoft.com; s=selector2-livekentac-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iO34gxt9hLTlfewWuXw6g8X5ZNLe8a0MQ8OCeNdS80U=;
- b=NptusfeCrCiRDLxWU0GvluFHGlPD6Sc+QevuiocQdaMg/KX8zmZMyJp4/r/D4Mh9TceQvU0SsQRAViQV5UFp64zSaq4WOcTdvE53VEbPgrm8CpAGo/Zt7rfGBLX6UDora2Qp+sKIykxqjiEPrv/sh5O5FDX9G1ko1BRf4Z8O9RU=
+ bh=Y8LvyShrnhBFYN10HCQWwmRtxTE7boY4Nbo3fXFKAfo=;
+ b=PQvUQrWum9M6UdtPp7Nqn/ws8UefFyQor89OMzYoDWCGXid5ugGeu3QCHe+PJpYNJtcJ6za5ay6r+4VNgiVjFTJy/BIIZU7EZwXChybFxuPAFDRtbp7aHSJT8xIdHi4JfoZwYKAFkeCdTcq1rgMeBNai7GHCdAyvl/wLVrjRiYM=
 Received: from DB7PR01MB4348.eurprd01.prod.exchangelabs.com (52.135.135.22) by
  DB7PR01MB4011.eurprd01.prod.exchangelabs.com (52.135.133.16) with
  Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2474.21; Mon, 25 Nov 2019 15:56:44 +0000
+ 15.20.2474.21; Mon, 25 Nov 2019 15:57:34 +0000
 Received: from DB7PR01MB4348.eurprd01.prod.exchangelabs.com
  ([fe80::c426:70fc:26fe:b0e3]) by DB7PR01MB4348.eurprd01.prod.exchangelabs.com
  ([fe80::c426:70fc:26fe:b0e3%3]) with mapi id 15.20.2474.023; Mon, 25 Nov 2019
- 15:56:44 +0000
+ 15:57:34 +0000
 From: Sarah Harris <seh53@kent.ac.uk>
 To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Subject: Re: [PATCH v35 10/13] target/avr: Add limited support for USART and
  16 bit timer peripherals
 Thread-Topic: [PATCH v35 10/13] target/avr: Add limited support for USART and
  16 bit timer peripherals
-Thread-Index: AQHVjp9xkfwQU2MQhU6RI1c47qT536eXjDYAgASoYgA=
-Date: Mon, 25 Nov 2019 15:56:44 +0000
-Message-ID: <20191125155638.4529e02722ad36231366dd09@kent.ac.uk>
+Thread-Index: AQHVjp9xkfwQU2MQhU6RI1c47qT536eXcJQAgATEPwA=
+Date: Mon, 25 Nov 2019 15:57:34 +0000
+Message-ID: <20191125155728.aaedf5d65b5121be1ad9f52f@kent.ac.uk>
 References: <20191029212430.20617-1-mrolnik@gmail.com>
  <20191029212430.20617-11-mrolnik@gmail.com>
- <CAL1e-=hciFV8OjoiEBVz3B1ZWREh441M8PaESnQCafeSZX2WFw@mail.gmail.com>
-In-Reply-To: <CAL1e-=hciFV8OjoiEBVz3B1ZWREh441M8PaESnQCafeSZX2WFw@mail.gmail.com>
+ <CAL1e-=i5S65283Ypg6-qDKkrhcG1r=w5ZqMyxp3CaAcAkPskUw@mail.gmail.com>
+In-Reply-To: <CAL1e-=i5S65283Ypg6-qDKkrhcG1r=w5ZqMyxp3CaAcAkPskUw@mail.gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-clientproxiedby: LO2P265CA0182.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:a::26) To DB7PR01MB4348.eurprd01.prod.exchangelabs.com
+x-clientproxiedby: LO2P265CA0299.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:a5::23) To DB7PR01MB4348.eurprd01.prod.exchangelabs.com
  (2603:10a6:5:2f::22)
 authentication-results: spf=none (sender IP is )
  smtp.mailfrom=S.E.Harris@kent.ac.uk; 
@@ -86,11 +87,11 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-mailer: Sylpheed 3.7.0 (GTK+ 2.24.32; x86_64-unknown-linux-gnu)
 x-originating-ip: [80.189.49.198]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4f6300b0-fb24-4de4-7998-08d771c011be
+x-ms-office365-filtering-correlation-id: 87a15103-daca-415c-fd3f-08d771c02f72
 x-ms-traffictypediagnostic: DB7PR01MB4011:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB7PR01MB40119C385C98622B7A25E4FDF74A0@DB7PR01MB4011.eurprd01.prod.exchangelabs.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-microsoft-antispam-prvs: <DB7PR01MB401124C3FBE6313C065BD592F74A0@DB7PR01MB4011.eurprd01.prod.exchangelabs.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
 x-forefront-prvs: 0232B30BBC
 x-forefront-antispam-report: SFV:NSPM;
  SFS:(10009020)(4636009)(396003)(39860400002)(366004)(376002)(136003)(346002)(189003)(199004)(76176011)(52116002)(99286004)(64756008)(66556008)(66476007)(66946007)(66446008)(229853002)(5660300002)(14444005)(256004)(30864003)(4326008)(1076003)(71200400001)(71190400001)(107886003)(6246003)(6486002)(6512007)(55236004)(6506007)(386003)(66066001)(53546011)(102836004)(2616005)(478600001)(14454004)(316002)(786003)(25786009)(7736002)(305945005)(36756003)(81156014)(81166006)(8936002)(3846002)(6116002)(8676002)(2906002)(50226002)(446003)(54906003)(26005)(6436002)(11346002)(6916009)(186003)(21314003)(559001)(569006);
@@ -101,21 +102,21 @@ received-spf: None (protection.outlook.com: kent.ac.uk does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lgDuHPjyC28I/osBwO6xJ8Zm4teb3sbIwNAmHYhLZqPPRxHSwKiZED8G3nUMSNddKO3sl9LXSOvLfPOmrYlFI9ntUD+DuzqqtmhTcqf4cX/ycy8rAyt+sNsUOGChdS6ClG63TbQI1fR8uQm8RDxwLQBQVl5LCOwo14Haz7s+vfjpQXavqIZ6kQTKEMY/to1wI1LUbiPxRyZ2P/MAtzJ+MeoqmNE5wYMVgSmuN1fA7kXDJ7mYLooyNcIZzFXI5EuPqJuWVMuRjnt28mcQNDPJMNfX7yJYodJs4NZwEcDIL3AQ09dJ3rzfLqNCPY40vJv2naYOW9VfbC7UdHh2xQsCs+nw7x2nMz6O95xLBa1R4kAYg5D60yCKwV8D8InbbLLF2VTiYPMymFNR9f6vSRobNVqThkyyV58s9iqNn51YsfgCSmCR4x9p/7y4ATsaUvCq
+x-microsoft-antispam-message-info: DyhhCusVirmT1w7TYe73qtQ5joZpRcGdXih+HAOqwr1gxRPdiSYRKHxBaIochLMg8ehoEL/qkliJ38oG2yo7Mm+eFzRqu+CqhPckUDNBsoRbqq1WcZEGR+u+A+0Bpc4EFycRVyrHeHLmFakjZKvRJCZoeOcbjA9XYY0TtG/NygT9iQVzI7YDjO62etmdpInse7OUbt0XuUryBZb/ZeDJY5CkXQYFxbngxh5goOhcbU4Jtp3Fkf+ZwiUK2yWSrd6clMXCsusi14R+CVPgDrbwZNaJa9hAoMaaOoNwUiweFmfd8TdAatngdlsz5VVwhUN6d/o3uIZnz18gLHcVnkLf0vibnsx7DGWHsHzmFhkN/L4krc9P5SN2n+zo/zHeDrE0mrAuFNJEuhLLhpVP9litmsWek9RR3E6QzGXGTAspfLcyPJyM0VU74zXm6EF0irRj
 Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <4B71D55DFDD6D64EBF3E2591DA1A8F35@eurprd01.prod.exchangelabs.com>
+Content-ID: <A7ABDD504D1EF449B7685D9BFCA4BDB4@eurprd01.prod.exchangelabs.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: kent.ac.uk
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f6300b0-fb24-4de4-7998-08d771c011be
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Nov 2019 15:56:44.4378 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 87a15103-daca-415c-fd3f-08d771c02f72
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Nov 2019 15:57:34.1888 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 51a9fa56-3f32-449a-a721-3e3f49aa5e9a
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /ToGthOTr4M+JNldxQCeMLgN7sMsKofBfPoT1lULEJvZ8XAHEHFVjSE8nP6QQ2mwqdq/ILLn0usDeL6RJhi6+g==
+X-MS-Exchange-CrossTenant-userprincipalname: LZ4l04uAmQ0u+M5sO9ghpt21WYCMugU6Uvc8Uf7M/uAb0BFS7CHV42npCp1OAWcSrBNFZIMuZNHVxY3DKMUKEA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR01MB4011
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.58
+X-Received-From: 2a01:111:f400:fe09::607
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -138,18 +139,45 @@ Sender: "Qemu-devel"
 
 Hi Aleksandar,
 
-I think returning immediately should be ok, it just happened to make sense =
-to me to think in terms of this being a special case of a normal read.
-The else handles the case in which no data has been received, but the user'=
-s program reads the incoming buffer anyway.
-(As far as I'm aware this is undefined behaviour, so returning zero is reas=
-onable)
+> - Is there a place in docs that explain its implementation in general?
+This implementation was based on the datasheet for the ATmega2560 ("ATmega6=
+40/1280/1281/2560/2561 datasheet" available from Microchip's website).
+(I'm not sure if posting a URL will trigger any spam filters, so I'll leave=
+ it for now)
+See section 22.10, "USART - Register Description".
+
+> - Why do cases 4, 5, 6 issue relatively unclear error message
+> ""update_char_mask(): Reserved character size <mode>"? Is there a
+> better wording perhaps? Where is justification in the doc for these
+> cases?
+The hardware can send/receive characters of various lengths, specified by s=
+ettings in these configuration registers.
+The cases are defined in table 22-7, "UCSZn Bits Settings", which specifies=
+ that modes 4, 5, and 6 are reserved and should not be used.
+I'm not sure how better to explain this fault to the user; this is an edge =
+case that I'd expect only an AVR developer testing their own program to see=
+, so describing it in the same way as the datasheet seems a good idea.
+
+> - What would be the docs justification for case 7? Why is an error
+> message issued, but still "char_mask" is set, and I guess, further
+> processing will go on? Why the error message says "Nine bit character
+> requested"? Who said that (that *nine* bit characters were requested?
+> :-)
+Case 7 also comes from table 22-7, and specifies that the USART should send=
+/receive 9 bits per character.
+For characters <=3D 8 bits it's easy to pad them to the 8 bit bytes that th=
+e character device subsystem operates on.
+For characters of 9 bits we'd have to throw away one bit, which seems like =
+a bad thing to do.
+I decided it wasn't enough to justify crashing, but the user should be made=
+ aware that data is being lost and the output might not be what they would =
+otherwise expect.
 
 Kind regards,
 Sarah Harris
 
 
-On Fri, 22 Nov 2019 17:48:56 +0100
+On Fri, 22 Nov 2019 16:10:02 +0100
 Aleksandar Markovic <aleksandar.m.mail@gmail.com> wrote:
 
 > On Tue, Oct 29, 2019 at 10:25 PM Michael Rolnik <mrolnik@gmail.com> wrote=
@@ -323,6 +351,32 @@ NGS IN
 > > +    }
 > > +}
 > > +
+>=20
+> Hello, Michael.
+>=20
+> Please explain to me some details of update_char_mask():
+>=20
+> - Is there a place in docs that explain its implementation in general?
+>=20
+> - Why do cases 4, 5, 6 issue relatively unclear error message
+> ""update_char_mask(): Reserved character size <mode>"? Is there a
+> better wording perhaps? Where is justification in the doc for these
+> cases?
+>=20
+> - What would be the docs justification for case 7? Why is an error
+> message issued, but still "char_mask" is set, and I guess, further
+> processing will go on? Why the error message says "Nine bit character
+> requested"? Who said that (that *nine* bit characters were requested?
+> :-)
+>=20
+> Sincerely,
+> Aleksandar
+>=20
+>=20
+>=20
+>=20
+>=20
+>=20
 > > +static void avr_usart_reset(DeviceState *dev)
 > > +{
 > > +    AVRUsartState *usart =3D AVR_USART(dev);
@@ -365,21 +419,6 @@ NGS IN
 > > +        qemu_set_irq(usart->rxc_irq, 0);
 > > +        qemu_chr_fe_accept_input(&usart->chr);
 > > +        return data;
->=20
-> Hi, Michael.
->=20
-> Can you please explain to me why in the only "else" block within
-> avr_usart_read():
->=20
->         } else {
->             data =3D 0;
->         }
->=20
-> we don't use "return 0;" instead of "data =3D 0;"?
->=20
-> Yours,
-> Aleksandar
->=20
 > > +    case USART_CSRA:
 > > +        return usart->csra;
 > > +    case USART_CSRB:
