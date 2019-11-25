@@ -6,64 +6,67 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 047DEC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 19:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA7E0C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 20:20:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C93F72071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 19:56:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C93F72071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7F2A120659
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 20:20:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F2A120659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZKTU-0001Jd-VP
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 14:56:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48492)
+	id 1iZKqd-0005rf-FG
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 15:20:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iZKSR-0000mO-0C
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 14:55:40 -0500
+ (envelope-from <bounces@canonical.com>) id 1iZKoj-0004VR-FA
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 15:18:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iZKSP-0004ZF-Lh
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 14:55:38 -0500
-Received: from indium.canonical.com ([91.189.90.7]:43512)
+ (envelope-from <bounces@canonical.com>) id 1iZKhw-00020i-6u
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 15:11:42 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47586)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iZKSP-0004XX-1E
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 14:55:37 -0500
+ id 1iZKhu-0001yu-E2
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 15:11:39 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iZKSN-00032w-M7
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 19:55:35 +0000
+ id 1iZKhr-0005U6-Qm
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 20:11:35 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A51132E802B
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 19:55:35 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id C8C412E80C8
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 20:11:35 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Nov 2019 19:48:37 -0000
-From: Tony Asleson <tasleson@redhat.com>
+Date: Mon, 25 Nov 2019 19:59:31 -0000
+From: Evan Rysdam <1853781@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: baremetal raspi2
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: tasleson
-X-Launchpad-Bug-Reporter: Tony Asleson (tasleson)
-X-Launchpad-Bug-Modifier: Tony Asleson (tasleson)
-Message-Id: <157471131796.22652.8509856251989177519.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1853898] [NEW] qemu/hw/scsi/lsi53c895a.c:417: lsi_soft_reset:
- Assertion `QTAILQ_EMPTY(&s->queue)' failed.
+X-Launchpad-Bug-Commenters: evan-rysdam philmd
+X-Launchpad-Bug-Reporter: Evan Rysdam (evan-rysdam)
+X-Launchpad-Bug-Modifier: Evan Rysdam (evan-rysdam)
+References: <157463269344.7205.8988702228388398977.malonedeb@gac.canonical.com>
+Message-Id: <157471197186.21339.8674560025998428594.malone@soybean.canonical.com>
+Subject: [Bug 1853781] Re: Baremetal kernel built from assembly runs multiple
+ times
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="c597c3229eb023b1e626162d5947141bf7befb13";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a112afa31b9f78fa21d0d062f7373b18611a1223
+X-Launchpad-Hash: b2fea205530efe52aba346313dd0c80b2b725964
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -77,99 +80,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1853898 <1853898@bugs.launchpad.net>
+Reply-To: Bug 1853781 <1853781@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
-
-While experimenting with blkdebug I can consistently hit this assertion
-in lsi53c895a.c.
-
-Using locally built from master, commit:
-2061735ff09f9d5e67c501a96227b470e7de69b1
-
-Steps to reproduce
-
-$ qemu-img create -f raw empty.raw 8G
-$ sudo losetup -f --show empty.raw
-$ sudo mkfs.ext3 /dev/loop0
-$ sudo losetup -D
-
-$ cat blkdebug.conf =
-
-[inject-error]
-event =3D "read_aio"
-errno =3D "5"
-
-$ qemu-system-x86_64 -enable-kvm -m 2048 -cpu host -smp 4 -nic
-user,ipv6=3Doff,model=3De1000,hostfwd=3Dtcp::2222-:22,net=3D172.16.0.0/255.=
-255.255.0
--device lsi53c895a,id=3Dscsi -device scsi-hd,drive=3Dhd,wwn=3D12345678 -dri=
-ve
-if=3Dscsi,id=3Dhd,file=3Dblkdebug:blkdebug.conf:empty.raw,cache=3Dnone,form=
-at=3Draw
--cdrom Fedora-Server-dvd-x86_64-31-1.9.iso -display gtk
-
-Initiate install from cdrom ISO image results in:
-
-qemu-system-x86_64: /builddir/build/BUILD/qemu-3.1.1/hw/scsi/lsi53c895a.c:3=
-81: lsi_soft_reset: Assertion `QTAILQ_EMPTY(&s->queue)' failed.
-Aborted (core dumped)
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+Ah, I've been missing out on a whole host of ARM instructions. I haven't
+tried it yet, but I should be able to get it working from here. Thanks
+so much for your help!
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1853898
+https://bugs.launchpad.net/bugs/1853781
 
 Title:
-  qemu/hw/scsi/lsi53c895a.c:417: lsi_soft_reset: Assertion
-  `QTAILQ_EMPTY(&s->queue)' failed.
+  Baremetal kernel built from assembly runs multiple times
 
 Status in QEMU:
-  New
+  Invalid
 
 Bug description:
-  While experimenting with blkdebug I can consistently hit this
-  assertion in lsi53c895a.c.
+  QEMU version: 4.1.0.
 
-  Using locally built from master, commit:
-  2061735ff09f9d5e67c501a96227b470e7de69b1
+  Full command used to launch: qemu-system-arm -machine raspi2 -kernel
+  main
 
-  Steps to reproduce
+  (Technically, the first term of the command is actually
+  "~/Applications/QEMU/qemu-4.1.0/build/arm-softmmu/qemu-system-arm",
+  but I shortened it for readability.)
 
-  $ qemu-img create -f raw empty.raw 8G
-  $ sudo losetup -f --show empty.raw
-  $ sudo mkfs.ext3 /dev/loop0
-  $ sudo losetup -D
+  Host information: Running debian 9.9 on a 64-bit x86 processor (Intel
+  i5-2520M).
 
-  $ cat blkdebug.conf =
+  Guest information: No operating system. I'm providing my own kernel,
+  which I assembled from a 60-line ARM assembly program using arm-none-
+  eabi-as and then linked with arm-none-eabi-ld, both version
+  2.28-5+9+b3.
 
-  [inject-error]
-  event =3D "read_aio"
-  errno =3D "5"
+  Additional details: To view the screen output of the program, I am
+  using vncviewer version 6.19.1115 (r42122). All of the above software
+  packages were installed as debian packages using apt, except for QEMU,
+  which I built from source after downloading from the official website.
 
-  $ qemu-system-x86_64 -enable-kvm -m 2048 -cpu host -smp 4 -nic
-  user,ipv6=3Doff,model=3De1000,hostfwd=3Dtcp::2222-:22,net=3D172.16.0.0/25=
-5.255.255.0
-  -device lsi53c895a,id=3Dscsi -device scsi-hd,drive=3Dhd,wwn=3D12345678
-  -drive
-  if=3Dscsi,id=3Dhd,file=3Dblkdebug:blkdebug.conf:empty.raw,cache=3Dnone,fo=
-rmat=3Draw
-  -cdrom Fedora-Server-dvd-x86_64-31-1.9.iso -display gtk
+  .
 
-  Initiate install from cdrom ISO image results in:
+  The issue here is that I have written a program in assembly and it
+  isn't doing what I expect it to when I emulate it. Here's a summary of
+  the code:
 
-  qemu-system-x86_64: /builddir/build/BUILD/qemu-3.1.1/hw/scsi/lsi53c895a.c=
-:381: lsi_soft_reset: Assertion `QTAILQ_EMPTY(&s->queue)' failed.
-  Aborted (core dumped)
+  1) Read a number from zero-initialized memory.
+
+  2) Add one to the number and write it back.
+
+  3) Use the number to determine a screen location to write to.
+
+  4) Use the number to determine what color to write.
+
+  5) Write 4000 half-words to the screen starting at that offset and
+  using that color. This should result in a stripe across the whole
+  screen that's about 6 pixels tall.
+
+  The expected behavior is that *one* stripe should appear on the screen
+  in a single color. However, the actual behavior is that up to *four*
+  stripes appear, each in a different color. Furthermore, if I comment
+  out the line that writes the incremented counter back to memory, then
+  only one stripe will appear.
+
+  I will also note that the Raspberry Pi 2, which is the system I'm
+  emulating, has four cores. What I suspect is going on here is that my
+  code is being loaded onto all four cores of the emulated machine. I
+  couldn't find anything about this anywhere in the documentation, and
+  it strikes me as bug.
+
+  I have attached the assmebly code that I'm using, as well as a short
+  makefile. Since I can only add one attachment to this report, I've
+  combined the two into a single text file and labeled each. After
+  separating the two into two files, you will need to change the first
+  line of the makefile to point to your installation of qemu-system-arm
+  v4.1.0. After that, type "make run" to run the program.
+
+  Thanks in advance,
+  Evan Rysdam
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1853898/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1853781/+subscriptions
 
