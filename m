@@ -2,81 +2,83 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D34C432C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 09:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 862FDC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 09:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11361207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 09:38:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49F74207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 09:49:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MxtuzZw5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11361207FD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aIJofAWW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49F74207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZAp6-0000BN-3E
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 04:38:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59236)
+	id 1iZB0D-0003PQ-55
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 04:49:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iZAo4-0007vR-SH
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:37:22 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iZAzZ-00030Z-Tl
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:49:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iZAo3-0005yu-8N
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:37:20 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28737
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <imammedo@redhat.com>) id 1iZAzY-0007cQ-B9
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:49:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46209
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iZAo3-0005wO-4o
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:37:19 -0500
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iZAzX-0007bV-Sd
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:49:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574674638;
+ s=mimecast20190719; t=1574675350;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PiqjedxAFN+dSi/udCuMYwMO1iGMtAE7u2HqW+1iDsw=;
- b=MxtuzZw5NL03FbM1TZmzrCMsI9B+zKBv7AMa7WQyFnKHK2+IGNEEm67AJnfti1um6rERMJ
- BzGcmNRuKI3g4VPw+mVUKyfnvNvHyL/XqGCBO8lMNfF736rPGlCvtYa1eQ/MUm6flRAanU
- LhbM7CjykuSwiennrERXZzNrucaThPI=
+ bh=LI90vjXh2HXUGcnDPIxy5xrhkGpcg6ttLKuY2YJfARU=;
+ b=aIJofAWWfB45O1ifaaxgp7F/Mjy1pA1nLVDUAcyWtMsyiRe3ITdUx6z74ODSBP6PynCYGg
+ eM1z+ZGaFwr3N4hMhV50tdhiULR7DbGujZAbjcREIuq90IJNcRakCl2cop7aIl7OPRYzM6
+ ZrxQdxOGrQZuhqC8koLF60rIleQGw6o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-LZIhOXWON6yAqii7gehcAg-1; Mon, 25 Nov 2019 04:37:16 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-20-8zfc_lBjPRynSK0RUXnuaA-1; Mon, 25 Nov 2019 04:49:09 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93B7B801E5E;
- Mon, 25 Nov 2019 09:37:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1D0E107ACE5;
+ Mon, 25 Nov 2019 09:49:07 +0000 (UTC)
 Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5DA585C1D4;
- Mon, 25 Nov 2019 09:37:08 +0000 (UTC)
-Date: Mon, 25 Nov 2019 10:37:06 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DDD510016DA;
+ Mon, 25 Nov 2019 09:49:00 +0000 (UTC)
+Date: Mon, 25 Nov 2019 10:48:59 +0100
 From: Igor Mammedov <imammedo@redhat.com>
-To: Beata Michalska <beata.michalska@linaro.org>
-Subject: Re: [RESEND PATCH v21 5/6] target-arm: kvm64: handle SIGBUS signal
- from kernel or KVM
-Message-ID: <20191125103706.46300ff1@redhat.com>
-In-Reply-To: <CADSWDzsg9aMCbbLadmc+twmJw3dZvRYgqKKWsDQRiJSRS7=GDQ@mail.gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [RESEND PATCH v21 3/6] ACPI: Add APEI GHES table generation
+ support
+Message-ID: <20191125104859.70047602@redhat.com>
+In-Reply-To: <20191118082036-mutt-send-email-mst@kernel.org>
 References: <20191111014048.21296-1-zhengxiang9@huawei.com>
- <20191111014048.21296-6-zhengxiang9@huawei.com>
- <20191115173713.795e5f63@redhat.com>
- <CADSWDzsg9aMCbbLadmc+twmJw3dZvRYgqKKWsDQRiJSRS7=GDQ@mail.gmail.com>
+ <20191111014048.21296-4-zhengxiang9@huawei.com>
+ <20191115103801.547fc84d@redhat.com>
+ <cf5e5aa4-2283-6cf9-70d0-278d167e3a13@huawei.com>
+ <87758ec2-c242-71c3-51f8-a5d348f8e7fd@huawei.com>
+ <20191118082036-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: LZIhOXWON6yAqii7gehcAg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 8zfc_lBjPRynSK0RUXnuaA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,83 +90,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, ehabkost@redhat.com,
- kvm@vger.kernel.org, mst@redhat.com, pbonzini@redhat.com, mtosatti@redhat.com,
- linuxarm@huawei.com, qemu-devel@nongnu.org, shannon.zhaosl@gmail.com,
- Xiang Zheng <zhengxiang9@huawei.com>, qemu-arm@nongnu.org, james.morse@arm.com,
- xuwei5@huawei.com, jonathan.cameron@huawei.com, wanghaibin.wang@huawei.com,
- gengdongjiu@huawei.com, Laszlo Ersek <lersek@redhat.com>, rth@twiddle.net
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+ pbonzini@redhat.com, mtosatti@redhat.com, linuxarm@huawei.com,
+ qemu-devel@nongnu.org, gengdongjiu <gengdongjiu@huawei.com>,
+ shannon.zhaosl@gmail.com, Xiang Zheng <zhengxiang9@huawei.com>,
+ qemu-arm@nongnu.org, james.morse@arm.com, xuwei5@huawei.com,
+ jonathan.cameron@huawei.com, wanghaibin.wang@huawei.com, lersek@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 22 Nov 2019 15:47:24 +0000
-Beata Michalska <beata.michalska@linaro.org> wrote:
+On Mon, 18 Nov 2019 08:21:18 -0500
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-> Hi,
+> On Mon, Nov 18, 2019 at 09:18:01PM +0800, gengdongjiu wrote:
+> > On 2019/11/18 20:49, gengdongjiu wrote:  
+> > >>> +     */
+> > >>> +    build_append_int_noprefix(table_data, source_id, 2);
+> > >>> +    /* Related Source Id */
+> > >>> +    build_append_int_noprefix(table_data, 0xffff, 2);
+> > >>> +    /* Flags */
+> > >>> +    build_append_int_noprefix(table_data, 0, 1);
+> > >>> +    /* Enabled */
+> > >>> +    build_append_int_noprefix(table_data, 1, 1);
+> > >>> +
+> > >>> +    /* Number of Records To Pre-allocate */
+> > >>> +    build_append_int_noprefix(table_data, 1, 4);
+> > >>> +    /* Max Sections Per Record */
+> > >>> +    build_append_int_noprefix(table_data, 1, 4);
+> > >>> +    /* Max Raw Data Length */
+> > >>> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
+> > >>> +
+> > >>> +    /* Error Status Address */
+> > >>> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
+> > >>> +                     4 /* QWord access */, 0);
+> > >>> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> > >>> +        ACPI_GHES_ERROR_STATUS_ADDRESS_OFFSET(hest_start, source_id),  
+> > >> it's fine only if GHESv2 is the only entries in HEST, but once
+> > >> other types are added this macro will silently fall apart and
+> > >> cause table corruption.  
+> >    why  silently fall?
+> >    I think the acpi_ghes.c only support GHESv2 type, not support other type.
+> >   
+> > >>
+> > >> Instead of offset from hest_start, I suggest to use offset relative
+> > >> to GAS structure, here is an idea>>
+> > >> #define GAS_ADDR_OFFSET 4
+> > >>
+> > >>     off = table->len
+> > >>     build_append_gas()
+> > >>     bios_linker_loader_add_pointer(...,
+> > >>         off + GAS_ADDR_OFFSET, ...  
+> > 
+> > If use offset relative to GAS structure, the code does not easily extend to support more Generic Hardware Error Source.
+> > if use offset relative to hest_start, just use a loop, the code can support  more error source, for example:
+> > for (source_id = 0; i<n; source_id++)
+> > {
+> >    ......
+> >     bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
+> >         ACPI_GHES_ERROR_STATUS_ADDRESS_OFFSET(hest_start, source_id),
+> >         sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
+> >         source_id * sizeof(uint64_t));
+> >   .......
+> > }
+> > 
+> > My previous series patch support 2 error sources, but now only enable 'SEA' type Error Source  
 > 
-> On Fri, 15 Nov 2019 at 16:54, Igor Mammedov <imammedo@redhat.com> wrote:
-> >
-> > On Mon, 11 Nov 2019 09:40:47 +0800
-> > Xiang Zheng <zhengxiang9@huawei.com> wrote:
-> >  
-> > > From: Dongjiu Geng <gengdongjiu@huawei.com>
-> > >
-> > > Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
-> > > translates the host VA delivered by host to guest PA, then fills this PA
-> > > to guest APEI GHES memory, then notifies guest according to the SIGBUS
-> > > type.
-> > >
-> > > When guest accesses the poisoned memory, it will generate a Synchronous
-> > > External Abort(SEA). Then host kernel gets an APEI notification and calls
-> > > memory_failure() to unmapped the affected page in stage 2, finally
-> > > returns to guest.
-> > >
-> > > Guest continues to access the PG_hwpoison page, it will trap to KVM as
-> > > stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
-> > > Qemu, Qemu records this error address into guest APEI GHES memory and
-> > > notifes guest using Synchronous-External-Abort(SEA).
-> > >
-> > > In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
-> > > in which we can setup the type of exception and the syndrome information.
-> > > When switching to guest, the target vcpu will jump to the synchronous
-> > > external abort vector table entry.
-> > >
-> > > The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
-> > > ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
-> > > not valid and hold an UNKNOWN value. These values will be set to KVM
-> > > register structures through KVM_SET_ONE_REG IOCTL.
-> > >
-> > > Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> > > Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >  hw/acpi/acpi_ghes.c         | 297 ++++++++++++++++++++++++++++++++++++
-[...]
-> > > +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
-> > > +                                      uint64_t error_physical_addr,
-> > > +                                      uint32_t data_length)
-> > > +{
-> > > +    GArray *block;
-> > > +    uint64_t current_block_length;
-> > > +    /* Memory Error Section Type */
-> > > +    QemuUUID mem_section_id_le = UEFI_CPER_SEC_PLATFORM_MEM;  
-> >                                ^^
-> > UEFI_CPER_SEC_PLATFORM_MEM is defined as BE, so _le here is wrong
-> > and then later you use qemu_uuid_bswap() to make it LE.
-> >
-> > Why not define it as LE to begin with, like it's been done for NVDIMM_UUID_LE?
-> >  
-> Is there a chance to make it common for both ?
+> I'd try to merge this, worry about extending things later.
+> This is at v21 and the simpler you can keep things,
+> the faster it'll go in.
+I don't think the series is ready for merging yet.
+It has a number of issues (not stylistic ones) that need to be fixed first.
 
-sure, it just should be a separate patch.
+As for extending, I think I've suggested to simplify series
+to account for single error source only in some places so it
+would be easier on author and reviewers and worry about extending
+it later.
 
-Maybe put it in include/qemu/uuid.h
-or maybe make qemu_uuid_parse() return QemuUUID
-so we could initialize like this:
-  QemuUUID mem_section_id_le = qemu_uuid_parse("00000000-0000-0000-0000-000000000000", &error_abort);
-where used UUID value is easy to read and compare with spec.
-
-[...]
 
 
