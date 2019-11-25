@@ -2,68 +2,63 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98EA0C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 23:21:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46970C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 23:42:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C68420740
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 23:21:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C68420740
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1077820733
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 23:42:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="D4AETldL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1077820733
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZNg3-0003sS-Fb
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 18:21:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46440)
+	id 1iZO05-0008Jc-0L
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 18:42:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iZNeu-00031p-ET
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:20:48 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iZNz8-0007MC-GL
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:41:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iZNes-0008C6-JV
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:20:43 -0500
-Resent-Date: Mon, 25 Nov 2019 18:20:43 -0500
-Resent-Message-Id: <E1iZNes-0008C6-JV@eggs.gnu.org>
-Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21842)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iZNes-0008Bp-Bf; Mon, 25 Nov 2019 18:20:42 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1574724029; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Zx6MgozdAYKTnQ4CxNvP9HR3t5Y67M7RkL63gTc6OCXFbsKr5iD4tutMbHxX3+Hn0GHP9gEVDZDq2cfj2U4WEg0gOL0Wb/kTDPdLAH5t6fQDT/Y7CUlQMzBlZImWFpTQCIk/1TU6dVgVrBuJ4g7Fv2R8MESq7kfKzMox6UNSqzE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1574724029;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=XNtKQQdJm9jYMdXyexvtCI8NLGMJh+NTIZNPjTx+i7Q=; 
- b=kiosqyhjCPz6WzfuxFEDk51hXahpYOJpUlRZXCRARaL7gf243OQbBjrFC9pIG3HMk37MsYPdSJbRPVRnEIkukNXHNtaOvL/1Ts6P3powGounWYmKLDNmpmtiqh8etaZ9qQLjxWrTmGcGSq96JJt0aHo5MIVi5k7wxTfQxftLqFU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 157472402749278.99801083434284;
- Mon, 25 Nov 2019 15:20:27 -0800 (PST)
-In-Reply-To: <20191125172031.16282-1-david@redhat.com>
-Subject: Re: [PATCH v2 0/2] s390x/cpumodel: Introduce dynamic feature group
-Message-ID: <157472402533.28656.6410799825544177136@37313f22b938>
+ (envelope-from <dgibson@ozlabs.org>) id 1iZNz6-0002Ix-V4
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:41:38 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:35767 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iZNz5-0002Gu-Mw; Mon, 25 Nov 2019 18:41:36 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47MNpb1ZDWz9sPZ; Tue, 26 Nov 2019 10:41:27 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1574725287;
+ bh=gNmi8kLyIlz2bazcTXuD81lF9+J/avPP0XYrEx8ojjY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=D4AETldL3L9oouKJWZp2ZmKFobkhCgtgEJoUIJVTlO8KDhvet0CiGw7Lwv/BXad27
+ r4BATZ0ftKV3J68l4EvFElsyZmrDg8+ObtEQMqrq1lP2Xd1YskWDNnS063m9reN7Xh
+ wCigRav8kHLKng99c0rhh48kNQcTaq/cbXtBSYh0=
+Date: Tue, 26 Nov 2019 10:12:17 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Laurent Vivier <laurent@vivier.eu>
+Subject: Re: [PATCH] mos6522: update counters when timer interrupts are off
+Message-ID: <20191125231217.GI5582@umbus.fritz.box>
+References: <20191125141414.5015-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: david@redhat.com
-Date: Mon, 25 Nov 2019 15:20:27 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.58
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="6gQwMJXxXgY8ZpDE"
+Content-Disposition: inline
+In-Reply-To: <20191125141414.5015-1-laurent@vivier.eu>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,52 +70,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, thuth@redhat.com, berrange@redhat.com,
- frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- richard.henderson@linaro.org, qemu-devel@nongnu.org, armbru@redhat.com,
- pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mimu@linux.ibm.com, jdenemar@redhat.com, ehabkost@redhat.com
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, Andrew Randrianasulu <randrianasulu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyNTE3MjAzMS4xNjI4
-Mi0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
-b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
-cm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MiAwLzJdIHMzOTB4L2NwdW1vZGVsOiBJbnRyb2R1
-Y2UgZHluYW1pYyBmZWF0dXJlIGdyb3VwClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MTEy
-NTE3MjAzMS4xNjI4Mi0xLWRhdmlkQHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmFiYjFiYmEgczM5
-MHgvY3B1bW9kZWw6IEludHJvZHVjZSBkeW5hbWljIGZlYXR1cmUgZ3JvdXBzCmY4YjM2MmYgczM5
-MHgvY3B1bW9kZWw6IEZhY3RvciBvdXQgQ1BVIGZlYXR1cmUgZGVwZW5kZW5jaWVzCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IGY4YjM2MmY0MDQ1MSAoczM5MHgvY3B1
-bW9kZWw6IEZhY3RvciBvdXQgQ1BVIGZlYXR1cmUgZGVwZW5kZW5jaWVzKQoyLzIgQ2hlY2tpbmcg
-Y29tbWl0IGFiYjFiYmE4MjI4NyAoczM5MHgvY3B1bW9kZWw6IEludHJvZHVjZSBkeW5hbWljIGZl
-YXR1cmUgZ3JvdXBzKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODI6IEZJTEU6
-IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxODY6CisgICAgRFlOX0ZFQVRfR1JPVVBfSU5J
-VCgiYWxsLWZlYXR1cmVzIiwgQUxMLCAiRmVhdHVyZXMgdmFsaWQgZm9yIGEgQ1BVIGRlZmluaXRp
-b24iKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODQ6IEZJTEU6IHRhcmdldC9z
-MzkweC9jcHVfZmVhdHVyZXMuYzoxODg6CisgICAgRFlOX0ZFQVRfR1JPVVBfSU5JVCgicmVjb21t
-ZW5kZWQtZmVhdHVyZXMiLCBSRUNPTU1FTkRFRCwgIkF2YWlsYWJsZSwgcmVjb21tZW5kZWQgZmVh
-dHVyZXMgc3VwcG9ydGVkIGJ5IHRoZSBhY2NlbGVyYXRvciBpbiB0aGUgY3VycmVudCBob3N0IGZv
-ciBhIENQVSBkZWZpbml0aW9uIiksCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg2
-OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MTkwOgorICAgIERZTl9GRUFUX0dS
-T1VQX0lOSVQoImF2YWlsYWJsZS1mZWF0dXJlcyIsIEFWQUlMQUJMRSwgIkF2YWlsYWJsZSBmZWF0
-dXJlcyBzdXBwb3J0ZWQgYnkgdGhlIGFjY2VsZXJhdG9yIGluIHRoZSBjdXJyZW50IGhvc3QgZm9y
-IGEgQ1BVIGRlZmluaXRpb24iKSwKCnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgMjA5IGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDIvMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
-ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9V
-VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
-IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTExMjUxNzIw
-MzEuMTYyODItMS1kYXZpZEByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
-YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAcmVkaGF0LmNvbQ==
 
+--6gQwMJXxXgY8ZpDE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Nov 25, 2019 at 03:14:14PM +0100, Laurent Vivier wrote:
+> Even if the interrupts are off, counters must be updated because
+> they are running anyway and kernel can try to read them
+> (it's the case with g3beige kernel).
+>=20
+> Reported-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+
+Applied to ppc-for-4.2, thanks.
+
+> ---
+>  hw/misc/mos6522.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
+> index aa3bfe1afd..cecf0be59e 100644
+> --- a/hw/misc/mos6522.c
+> +++ b/hw/misc/mos6522.c
+> @@ -113,6 +113,10 @@ static int64_t get_next_irq_time(MOS6522State *s, MO=
+S6522Timer *ti,
+>      int64_t d, next_time;
+>      unsigned int counter;
+> =20
+> +    if (ti->frequency =3D=3D 0) {
+> +        return INT64_MAX;
+> +    }
+> +
+>      /* current counter value */
+>      d =3D muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - ti->load_time,
+>                   ti->frequency, NANOSECONDS_PER_SECOND);
+> @@ -149,10 +153,10 @@ static void mos6522_timer1_update(MOS6522State *s, =
+MOS6522Timer *ti,
+>      if (!ti->timer) {
+>          return;
+>      }
+> +    ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
+>      if ((s->ier & T1_INT) =3D=3D 0 || (s->acr & T1MODE) !=3D T1MODE_CONT=
+) {
+>          timer_del(ti->timer);
+>      } else {
+> -        ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
+>          timer_mod(ti->timer, ti->next_irq_time);
+>      }
+>  }
+> @@ -163,10 +167,10 @@ static void mos6522_timer2_update(MOS6522State *s, =
+MOS6522Timer *ti,
+>      if (!ti->timer) {
+>          return;
+>      }
+> +    ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
+>      if ((s->ier & T2_INT) =3D=3D 0) {
+>          timer_del(ti->timer);
+>      } else {
+> -        ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
+>          timer_mod(ti->timer, ti->next_irq_time);
+>      }
+>  }
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--6gQwMJXxXgY8ZpDE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3cX88ACgkQbDjKyiDZ
+s5LxnQ/+Jvncu8f+o+y4a6lqwr24YqYv5Fdm9bnJDWbSaRQvRQWQakf5THF9kR5/
+2129yCrK3kVWo0iXUyU+qvHTgpriPQS28vRokLspenI5bLFK+i6MDKkDFxtol/rL
+bi+kzoPQZBFkDHpIpgmcYdmBaPilIZ7fuuLb8YtTT+4/krl5LOY0D+Hc91b6NKT7
+XD/MnZkztC6E3sk+YyEcNa0pDVimlHrV+wEmc9nn0PGrrEt1LSJ1vwbfxRhlgtyw
+91Vw96y9exWFuDjl4mFhSg5bnXFjzL05v23x0otCFlVN4OtWpym4DMxlZOM6LmPm
+aJ/xDcBqdrxfZCv+3pzLQGfuO9THptkBKgeSZZxsEXInMWiwSk/ClUcQTXUUayqQ
+hDdVTFi1URTRb8DuVLGbjPiHRCCZTcnTPygaFzAMCL2bknPyfIEGoRV1evCP++9m
+BcLeg5+rHI1XSyoOWwslCAvtsLFPO6Crdf/zAABnZ9ZAu9JamwvPWcw6Y5HM1KJc
+cNohXquC30plKXOgzgkDoheJIC8mRGwfB4eKPV9yCnKXkQIfqqV3oo5MwFEpzWu4
+uEKmz7xHqrWEV2M/blqm/LnwQnfo7jVcJogN28/NMKYnc9HcvgPAkUuXjq5us90/
+H6NooBbxlpKpVfA+KBJ6Vkxi0ycGgF6+tMbahndz156CdwX6bPM=
+=42bo
+-----END PGP SIGNATURE-----
+
+--6gQwMJXxXgY8ZpDE--
 
