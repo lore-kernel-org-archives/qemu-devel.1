@@ -2,100 +2,55 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C46C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C135C43215
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 967E82082F
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:09:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vhdnqh5d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 967E82082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 657C92082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:10:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 657C92082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZE7T-0007Rt-EK
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:09:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39145)
+	id 1iZE7v-0007n6-Dy
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:10:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39319)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iZE3s-0004Nq-Jw
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:05:55 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4D-0004dB-UV
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iZE3r-0005wp-3s
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:05:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42290
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4C-00069t-6a
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:13 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:45543 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iZE3q-0005v9-EA
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:05:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574687148;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Lr6W4KR9wCbeu3QHPLleS62fXfo9S/hzHQ4EieD02R8=;
- b=Vhdnqh5dwaDJQAEuvCUgdYqjYB6SyqINqNUr1cjUmqjeATDNW3lrtieNp6i6jSHWKU7PPo
- fUKpcte6SJwXHdq5s0d5oeQQJPKNliOPzt7UjUsACFZt6J83DiHdLbW7MleuPsaifxpx/x
- 3p830dJgZPcmFthRheklbcbU07oYIDc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-Ui7liGxSNXCVa43C1JfoQg-1; Mon, 25 Nov 2019 08:05:47 -0500
-Received: by mail-wr1-f71.google.com with SMTP id 90so5446625wrq.6
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 05:05:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mgG0bIcOz7g59k5sOe8AK4HwNncmlMwW5U4m6dEUMwA=;
- b=NTyBGPNb2PEByYc14zV/jx3k024ReC9X+0JbKUC7jQLxoEu1xrCAUSUpwmDa4XuKNC
- WKVD9oAeySJSvvqAtH3gK4yCh3g3g77mEF7+8mliJLssGqhdQ2kuqre7i/AjFB4DSmuJ
- jaMTMODR9ZJV0qunGZ7G1SOK2HGJc/qs11/CArOHQ0DHtMISwaPRorF6s/1zOpDOQwwb
- tOWPvbQybjkqm3PRanONmJTOHyguX4njqGfP/AF9svzaKylDjEDoTkolj2dixxZAfRVd
- 1MAiESWzsV7qdzX+PGSbVHQABGG1cyB8TRXvWWMi2CNOvgRcS9b1+mU158kY3P+OEcK7
- tb2g==
-X-Gm-Message-State: APjAAAUTKHr+mWv+RAUKnAOz+2Ic5j+05SDU6S0o56uZlllkD5TqO0UL
- KDJ5iqz3zUJw+fVF6tY5LYtgpoaHyEmvJBWxHVgDgTl3Vo10rlFRsJp3VAeEARvW1YQ5P1iWd6w
- w2ANjCdHqHYmS1qY=
-X-Received: by 2002:adf:e387:: with SMTP id e7mr16114375wrm.180.1574687145756; 
- Mon, 25 Nov 2019 05:05:45 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwlWpOjbK+PSoKQj49eohkl9fLZYT0FBE5ZorBZrUYHjzliKPlGUkJTWpHfSVo2Com/Ea4n7A==
-X-Received: by 2002:adf:e387:: with SMTP id e7mr16114323wrm.180.1574687145301; 
- Mon, 25 Nov 2019 05:05:45 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id o187sm8561351wmo.20.2019.11.25.05.05.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 25 Nov 2019 05:05:44 -0800 (PST)
-Subject: Re: [PATCH v6 2/9] hw/core/clock-vmstate: define a vmstate entry for
- clock state
-To: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
-References: <20190904125531.27545-1-damien.hedde@greensocs.com>
- <20190904125531.27545-3-damien.hedde@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e024d6ba-42a7-5f67-7cdd-edfc1b3a73e4@redhat.com>
-Date: Mon, 25 Nov 2019 14:05:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20190904125531.27545-3-damien.hedde@greensocs.com>
-Content-Language: en-US
-X-MC-Unique: Ui7liGxSNXCVa43C1JfoQg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+ (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
+ id 1iZE4B-0005Ra-Po
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:12 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id AA2BC1A225E;
+ Mon, 25 Nov 2019 14:05:05 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
+ [10.10.14.93])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 70E0E1A2251;
+ Mon, 25 Nov 2019 14:05:05 +0100 (CET)
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 4/5] mips: r4000: Renovate coding style
+Date: Mon, 25 Nov 2019 14:04:57 +0100
+Message-Id: <1574687098-26689-5-git-send-email-Filip.Bozuta@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,93 +62,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
- alistair@alistair23.me, mark.burton@greensocs.com, marcandre.lureau@redhat.com,
- qemu-arm@nongnu.org, pbonzini@redhat.com, edgar.iglesias@gmail.com
+Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
+ amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/4/19 2:55 PM, Damien Hedde wrote:
-> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+The script checkpatch.pl located in scripts folder was
+used to detect all errors and warrnings in file:
+    hw/mips/mips_r4k.c
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+This mips r4000 machine file was edited and
+all the errors and warrings generated by the checkpatch.pl
+script were corrected and then the script was
+ran again to make sure there are no more errors and warnings.
 
-> ---
-> This was in the previous reviewed commit. But it can't be in the
-> clock.c file in order to allow linux-user builds.
-> ---
->   hw/core/Makefile.objs   |  1 +
->   hw/core/clock-vmstate.c | 25 +++++++++++++++++++++++++
->   include/hw/clock.h      |  9 +++++++++
->   3 files changed, 35 insertions(+)
->   create mode 100644 hw/core/clock-vmstate.c
->=20
-> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-> index c66a5b2c6b..8fcebf2e67 100644
-> --- a/hw/core/Makefile.objs
-> +++ b/hw/core/Makefile.objs
-> @@ -4,6 +4,7 @@ common-obj-y +=3D bus.o reset.o
->   common-obj-y +=3D resettable.o
->   common-obj-$(CONFIG_SOFTMMU) +=3D qdev-fw.o
->   common-obj-$(CONFIG_SOFTMMU) +=3D fw-path-provider.o
-> +common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
->   # irq.o needed for qdev GPIO handling:
->   common-obj-y +=3D irq.o
->   common-obj-y +=3D hotplug.o
-> diff --git a/hw/core/clock-vmstate.c b/hw/core/clock-vmstate.c
-> new file mode 100644
-> index 0000000000..c781369c15
-> --- /dev/null
-> +++ b/hw/core/clock-vmstate.c
-> @@ -0,0 +1,25 @@
-> +/*
-> + * Clock migration structure
-> + *
-> + * Copyright GreenSocs 2019
-> + *
-> + * Authors:
-> + *  Damien Hedde <damien.hedde@greensocs.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "migration/vmstate.h"
-> +#include "hw/clock.h"
-> +
-> +const VMStateDescription vmstate_clockin =3D {
-> +    .name =3D "clock",
-> +    .version_id =3D 0,
-> +    .minimum_version_id =3D 0,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT64(frequency, ClockIn),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> diff --git a/include/hw/clock.h b/include/hw/clock.h
-> index fd11202ba4..e7efb6ad17 100644
-> --- a/include/hw/clock.h
-> +++ b/include/hw/clock.h
-> @@ -34,6 +34,15 @@ struct ClockOut {
->       QLIST_HEAD(, ClockIn) followers; /* list of registered clocks */
->   };
->  =20
-> +/*
-> + * vmstate description entry to be added in device vmsd.
-> + */
-> +extern const VMStateDescription vmstate_clockin;
-> +#define VMSTATE_CLOCKIN(_field, _state) \
-> +    VMSTATE_CLOCKIN_V(_field, _state, 0)
-> +#define VMSTATE_CLOCKIN_V(_field, _state, _version) \
-> +    VMSTATE_STRUCT_POINTER_V(_field, _state, _version, vmstate_clockin, =
-ClockIn)
-> +
->   /**
->    * clock_out_setup_canonical_path:
->    * @clk: clock
->=20
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+---
+ hw/mips/mips_r4k.c | 55 +++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 34 insertions(+), 21 deletions(-)
+
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index 7002423..d638358 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -6,7 +6,7 @@
+  * ISA memory at the 0x10000000 (PHYS, 16Mb in size).
+  * All peripherial devices are attached to this "bus" with
+  * the standard PC ISA addresses.
+-*/
++ */
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
+@@ -54,17 +54,18 @@ static struct _loaderparams {
+     const char *initrd_filename;
+ } loaderparams;
+ 
+-static void mips_qemu_write (void *opaque, hwaddr addr,
+-                             uint64_t val, unsigned size)
++static void mips_qemu_write(void *opaque, hwaddr addr,
++                            uint64_t val, unsigned size)
+ {
+-    if ((addr & 0xffff) == 0 && val == 42)
++    if ((addr & 0xffff) == 0 && val == 42) {
+         qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+-    else if ((addr & 0xffff) == 4 && val == 42)
++    } else if ((addr & 0xffff) == 4 && val == 42) {
+         qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++    }
+ }
+ 
+-static uint64_t mips_qemu_read (void *opaque, hwaddr addr,
+-                                unsigned size)
++static uint64_t mips_qemu_read(void *opaque, hwaddr addr,
++                               unsigned size)
+ {
+     return 0;
+ }
+@@ -100,8 +101,9 @@ static int64_t load_kernel(void)
+                            (uint64_t *)&kernel_high, big_endian,
+                            EM_MIPS, 1, 0);
+     if (kernel_size >= 0) {
+-        if ((entry & ~0x7fffffffULL) == 0x80000000)
++        if ((entry & ~0x7fffffffULL) == 0x80000000) {
+             entry = (int32_t)entry;
++        }
+     } else {
+         error_report("could not load kernel '%s': %s",
+                      loaderparams.kernel_filename,
+@@ -113,9 +115,10 @@ static int64_t load_kernel(void)
+     initrd_size = 0;
+     initrd_offset = 0;
+     if (loaderparams.initrd_filename) {
+-        initrd_size = get_image_size (loaderparams.initrd_filename);
++        initrd_size = get_image_size(loaderparams.initrd_filename);
+         if (initrd_size > 0) {
+-            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
++            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) &
++            INITRD_PAGE_MASK;
+             if (initrd_offset + initrd_size > ram_size) {
+                 error_report("memory too small for initial ram disk '%s'",
+                              loaderparams.initrd_filename);
+@@ -139,11 +142,13 @@ static int64_t load_kernel(void)
+     params_buf[1] = tswap32(0x12345678);
+ 
+     if (initrd_size > 0) {
+-        snprintf((char *)params_buf + 8, 256, "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
++        snprintf((char *)params_buf + 8, 256,
++                 "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
+                  cpu_mips_phys_to_kseg0(NULL, initrd_offset),
+                  initrd_size, loaderparams.kernel_cmdline);
+     } else {
+-        snprintf((char *)params_buf + 8, 256, "%s", loaderparams.kernel_cmdline);
++        snprintf((char *)params_buf + 8, 256,
++        "%s", loaderparams.kernel_cmdline);
+     }
+ 
+     rom_add_blob_fixed("params", params_buf, params_size,
+@@ -207,15 +212,21 @@ void mips_r4k_init(MachineState *machine)
+ 
+     memory_region_add_subregion(address_space_mem, 0, ram);
+ 
+-    memory_region_init_io(iomem, NULL, &mips_qemu_ops, NULL, "mips-qemu", 0x10000);
++    memory_region_init_io(iomem, NULL, &mips_qemu_ops,
++                          NULL, "mips-qemu", 0x10000);
++
+     memory_region_add_subregion(address_space_mem, 0x1fbf0000, iomem);
+ 
+-    /* Try to load a BIOS image. If this fails, we continue regardless,
+-       but initialize the hardware ourselves. When a kernel gets
+-       preloaded we also initialize the hardware, since the BIOS wasn't
+-       run. */
+-    if (bios_name == NULL)
++    /*
++     * Try to load a BIOS image. If this fails, we continue regardless,
++     * but initialize the hardware ourselves. When a kernel gets
++     * preloaded we also initialize the hardware, since the BIOS wasn't
++     * run.
++     */
++
++    if (bios_name == NULL) {
+         bios_name = BIOS_FILENAME;
++    }
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+     if (filename) {
+         bios_size = get_image_size(filename);
+@@ -227,6 +238,7 @@ void mips_r4k_init(MachineState *machine)
+ #else
+     be = 0;
+ #endif
++    dinfo = drive_get(IF_PFLASH, 0, 0);
+     if ((bios_size > 0) && (bios_size <= BIOS_SIZE)) {
+         bios = g_new(MemoryRegion, 1);
+         memory_region_init_ram(bios, NULL, "mips_r4k.bios", BIOS_SIZE,
+@@ -235,7 +247,7 @@ void mips_r4k_init(MachineState *machine)
+         memory_region_add_subregion(get_system_memory(), 0x1fc00000, bios);
+ 
+         load_image_targphys(filename, 0x1fc00000, BIOS_SIZE);
+-    } else if ((dinfo = drive_get(IF_PFLASH, 0, 0)) != NULL) {
++    } else if (dinfo != NULL) {
+         uint32_t mips_rom = 0x00400000;
+         if (!pflash_cfi01_register(0x1fc00000, "mips_r4k.bios", mips_rom,
+                                    blk_by_legacy_dinfo(dinfo),
+@@ -280,11 +292,12 @@ void mips_r4k_init(MachineState *machine)
+ 
+     isa_vga_init(isa_bus);
+ 
+-    if (nd_table[0].used)
++    if (nd_table[0].used) {
+         isa_ne2000_init(isa_bus, 0x300, 9, &nd_table[0]);
++    }
+ 
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+-    for(i = 0; i < MAX_IDE_BUS; i++)
++    for (i = 0; i < MAX_IDE_BUS; i++)
+         isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[i], ide_irq[i],
+                      hd[MAX_IDE_DEVS * i],
+                      hd[MAX_IDE_DEVS * i + 1]);
+-- 
+2.7.4
 
 
