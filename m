@@ -6,88 +6,88 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D242DC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 09:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77121C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 09:05:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A53AF207FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 09:05:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53AF207FD
+	by mail.kernel.org (Postfix) with ESMTPS id 4CD8C207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 09:05:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CD8C207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZAJf-0001pj-C2
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 04:05:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54998)
+	id 1iZAJh-0001uc-PC
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 04:05:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55043)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iZAHs-000862-T2
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:04:06 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iZAHw-000895-7e
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:04:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iZAHr-0000Bd-Jf
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:04:04 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31972
+ (envelope-from <frankja@linux.ibm.com>) id 1iZAHv-0000DU-2P
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:04:08 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55108
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iZAHr-0000BK-Es
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:04:03 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAP8uiPB070579
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 04:04:01 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wfk9a9qsm-1
+ id 1iZAHu-0000DK-TZ
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 04:04:07 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAP8ucmF111719
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 04:04:06 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wfjywjbx3-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 04:04:01 -0500
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 04:04:06 -0500
 Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Mon, 25 Nov 2019 09:03:59 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Mon, 25 Nov 2019 09:04:04 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 25 Nov 2019 09:03:58 -0000
+ Mon, 25 Nov 2019 09:04:02 -0000
 Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAP93uai55378078
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAP940KC58327194
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 25 Nov 2019 09:03:56 GMT
+ Mon, 25 Nov 2019 09:04:00 GMT
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A473C42041;
- Mon, 25 Nov 2019 09:03:56 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id CF9BF42049;
+ Mon, 25 Nov 2019 09:04:00 +0000 (GMT)
 Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 75B7742042;
- Mon, 25 Nov 2019 09:03:55 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id B740E4203F;
+ Mon, 25 Nov 2019 09:03:59 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.152.224.205])
  by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 25 Nov 2019 09:03:55 +0000 (GMT)
+ Mon, 25 Nov 2019 09:03:59 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 2/5] s390x: Move reset normal to shared reset handler
-Date: Mon, 25 Nov 2019 04:03:45 -0500
+Subject: [PATCH v3 5/5] s390x: Beautify diag308 handling
+Date: Mon, 25 Nov 2019 04:03:48 -0500
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191125090348.27010-1-frankja@linux.ibm.com>
 References: <20191125090348.27010-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19112509-0028-0000-0000-000003BF20D4
+x-cbid: 19112509-0012-0000-0000-0000036BE132
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112509-0029-0000-0000-0000248253B4
-Message-Id: <20191125090348.27010-3-frankja@linux.ibm.com>
+x-cbparentid: 19112509-0013-0000-0000-000021A7802D
+Message-Id: <20191125090348.27010-6-frankja@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-25_02:2019-11-21,2019-11-25 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=1
- impostorscore=0 clxscore=1015 mlxscore=0 priorityscore=1501
- mlxlogscore=999 phishscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0
- adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911250084
+ suspectscore=3 phishscore=0
+ mlxscore=0 malwarescore=0 impostorscore=0 priorityscore=1501 spamscore=0
+ adultscore=0 clxscore=1015 bulkscore=0 mlxlogscore=999 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1911250084
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,121 +107,109 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's start moving the cpu reset functions into a single function with
-a switch/case, so we can use fallthroughs and share more code between
-resets.
-
-This patch introduces the reset function by renaming cpu_reset() and
-cleaning up leftovers.
+Let's improve readability by:
+* Using constants for the subcodes
+* Moving parameter checking into a function
+* Removing subcode > 6 check as the default case catches that
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu-qom.h |  6 +++++-
- target/s390x/cpu.c     | 16 ++++++++++------
- target/s390x/cpu.h     |  2 +-
- target/s390x/sigp.c    |  2 +-
- 4 files changed, 17 insertions(+), 9 deletions(-)
+ target/s390x/diag.c | 54 +++++++++++++++++++++++++++------------------
+ 1 file changed, 32 insertions(+), 22 deletions(-)
 
-diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-index b809ec8418..f3b71bac67 100644
---- a/target/s390x/cpu-qom.h
-+++ b/target/s390x/cpu-qom.h
-@@ -34,6 +34,10 @@
- typedef struct S390CPUModel S390CPUModel;
- typedef struct S390CPUDef S390CPUDef;
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index 53c2f81f2a..b5aec06d6b 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -53,6 +53,29 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+ #define DIAG_308_RC_NO_CONF         0x0102
+ #define DIAG_308_RC_INVALID         0x0402
  
-+typedef enum cpu_reset_type {
-+    S390_CPU_RESET_NORMAL,
-+} cpu_reset_type;
++#define DIAG308_RESET_MOD_CLR       0
++#define DIAG308_RESET_LOAD_NORM     1
++#define DIAG308_LOAD_CLEAR          3
++#define DIAG308_LOAD_NORMAL_DUMP    4
++#define DIAG308_SET                 5
++#define DIAG308_STORE               6
 +
- /**
-  * S390CPUClass:
-  * @parent_realize: The parent class' realize handler.
-@@ -57,7 +61,7 @@ typedef struct S390CPUClass {
-     DeviceRealize parent_realize;
-     void (*parent_reset)(CPUState *cpu);
-     void (*load_normal)(CPUState *cpu);
--    void (*cpu_reset)(CPUState *cpu);
-+    void (*reset)(CPUState *cpu, cpu_reset_type type);
-     void (*initial_cpu_reset)(CPUState *cpu);
- } S390CPUClass;
- 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 3abe7e80fd..8d35a2a723 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -82,18 +82,22 @@ static void s390_cpu_load_normal(CPUState *s)
- }
- #endif
- 
--/* S390CPUClass::cpu_reset() */
--static void s390_cpu_reset(CPUState *s)
-+/* S390CPUClass::reset() */
-+static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
- {
-     S390CPU *cpu = S390_CPU(s);
-     S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
-     CPUS390XState *env = &cpu->env;
- 
--    env->pfault_token = -1UL;
--    env->bpbc = false;
-     scc->parent_reset(s);
-     cpu->env.sigp_order = 0;
-     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
-+
-+    switch (type) {
-+    case S390_CPU_RESET_NORMAL:
-+        env->pfault_token = -1UL;
-+        env->bpbc = false;
++static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t addr,
++                              uintptr_t ra, bool write)
++{
++    if ((r1 & 1) || (addr & ~TARGET_PAGE_MASK)) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
++        return -1;
 +    }
- }
- 
- /* S390CPUClass::initial_reset() */
-@@ -102,7 +106,7 @@ static void s390_cpu_initial_reset(CPUState *s)
-     S390CPU *cpu = S390_CPU(s);
-     CPUS390XState *env = &cpu->env;
- 
--    s390_cpu_reset(s);
-+    s390_cpu_reset(s, S390_CPU_RESET_NORMAL);
-     /* initial reset does not clear everything! */
-     memset(&env->start_initial_reset_fields, 0,
-         offsetof(CPUS390XState, end_reset_fields) -
-@@ -473,7 +477,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
- #if !defined(CONFIG_USER_ONLY)
-     scc->load_normal = s390_cpu_load_normal;
- #endif
--    scc->cpu_reset = s390_cpu_reset;
-+    scc->reset = s390_cpu_reset;
-     scc->initial_cpu_reset = s390_cpu_initial_reset;
-     cc->reset = s390_cpu_full_reset;
-     cc->class_by_name = s390_cpu_class_by_name,
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 17460ed7b3..18123dfd5b 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -741,7 +741,7 @@ static inline void s390_do_cpu_reset(CPUState *cs, run_on_cpu_data arg)
++    if (!address_space_access_valid(&address_space_memory, addr,
++                                    sizeof(IplParameterBlock), write,
++                                    MEMTXATTRS_UNSPECIFIED)) {
++        s390_program_interrupt(env, PGM_ADDRESSING, ra);
++        return -1;
++    }
++    return 0;
++}
++
+ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
  {
-     S390CPUClass *scc = S390_CPU_GET_CLASS(cs);
+     CPUState *cs = env_cpu(env);
+@@ -65,30 +88,24 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+         return;
+     }
  
--    scc->cpu_reset(cs);
-+    scc->reset(cs, S390_CPU_RESET_NORMAL);
- }
+-    if ((subcode & ~0x0ffffULL) || (subcode > 6)) {
++    if (subcode & ~0x0ffffULL) {
+         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+         return;
+     }
  
- static inline void s390_do_cpu_initial_reset(CPUState *cs, run_on_cpu_data arg)
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index 2ce22d4dc1..850139b9cd 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -266,7 +266,7 @@ static void sigp_cpu_reset(CPUState *cs, run_on_cpu_data arg)
-     SigpInfo *si = arg.host_ptr;
- 
-     cpu_synchronize_state(cs);
--    scc->cpu_reset(cs);
-+    scc->reset(cs, S390_CPU_RESET_NORMAL);
-     cpu_synchronize_post_reset(cs);
-     si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
- }
+     switch (subcode) {
+-    case 0:
++    case DIAG308_RESET_MOD_CLR:
+         s390_ipl_reset_request(cs, S390_RESET_MODIFIED_CLEAR);
+         break;
+-    case 1:
++    case DIAG308_RESET_LOAD_NORM:
+         s390_ipl_reset_request(cs, S390_RESET_LOAD_NORMAL);
+         break;
+-    case 3:
++    case DIAG308_LOAD_CLEAR:
++        /* Well we still lack the clearing bit... */
+         s390_ipl_reset_request(cs, S390_RESET_REIPL);
+         break;
+-    case 5:
+-        if ((r1 & 1) || (addr & 0x0fffULL)) {
+-            s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+-            return;
+-        }
+-        if (!address_space_access_valid(&address_space_memory, addr,
+-                                        sizeof(IplParameterBlock), false,
+-                                        MEMTXATTRS_UNSPECIFIED)) {
+-            s390_program_interrupt(env, PGM_ADDRESSING, ra);
++    case DIAG308_SET:
++        if (diag308_parm_check(env, r1, addr, ra, false)) {
+             return;
+         }
+         iplb = g_new0(IplParameterBlock, 1);
+@@ -110,15 +127,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+ out:
+         g_free(iplb);
+         return;
+-    case 6:
+-        if ((r1 & 1) || (addr & 0x0fffULL)) {
+-            s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+-            return;
+-        }
+-        if (!address_space_access_valid(&address_space_memory, addr,
+-                                        sizeof(IplParameterBlock), true,
+-                                        MEMTXATTRS_UNSPECIFIED)) {
+-            s390_program_interrupt(env, PGM_ADDRESSING, ra);
++    case DIAG308_STORE:
++        if (diag308_parm_check(env, r1, addr, ra, true)) {
+             return;
+         }
+         iplb = s390_ipl_get_iplb();
 -- 
 2.20.1
 
