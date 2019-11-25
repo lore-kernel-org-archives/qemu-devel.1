@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA0B0C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 07:54:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC42EC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 07:56:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B25921736
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 07:54:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B25921736
+	by mail.kernel.org (Postfix) with ESMTPS id 7EAD621739
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 07:56:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EAD621739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaEcm-0001t0-BE
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 02:54:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54119)
+	id 1iaEeh-0004Xe-Ki
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 02:56:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53266)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aaron@localhost>) id 1iaEaw-0008CD-VZ
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:52:11 -0500
+ (envelope-from <aaron@localhost>) id 1iaEai-0007x8-Az
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:51:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aaron@localhost>) id 1iaEau-0003hv-R6
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:52:09 -0500
-Received: from [2406:7400:73:186d:af79:94fc:29ef:77e6] (port=56110
+ (envelope-from <aaron@localhost>) id 1iaEag-0003Rb-Ct
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:51:55 -0500
+Received: from [2406:7400:73:186d:af79:94fc:29ef:77e6] (port=56092
  helo=localhost) by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aaron@localhost>) id 1iaEau-0003fd-Eb
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:52:08 -0500
+ (envelope-from <aaron@localhost>) id 1iaEaf-0003AC-VY
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:51:54 -0500
 Received: by localhost (Postfix, from userid 1000)
- id 63415D4170B; Mon, 25 Nov 2019 19:53:03 +0530 (IST)
+ id B9524D41714; Mon, 25 Nov 2019 19:55:12 +0530 (IST)
 From: aaron.zakhrov@gmail.com
 To: qemu-devel@nongnu.org
-Subject: [RFC 3/8] R300 fixes
-Date: Mon, 25 Nov 2019 19:49:08 +0530
-Message-Id: <20191125141908.5441-4-aaron.zakhrov@gmail.com>
+Subject: [RFC 7/8] R300 fixes
+Date: Mon, 25 Nov 2019 19:49:16 +0530
+Message-Id: <20191125141908.5441-8-aaron.zakhrov@gmail.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191125141908.5441-1-aaron.zakhrov@gmail.com>
 References: <20191125141908.5441-1-aaron.zakhrov@gmail.com>
