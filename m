@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADA2C432C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A890C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:03:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E49AF20748
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:03:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E49AF20748
+	by mail.kernel.org (Postfix) with ESMTPS id 3E88A20748
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:03:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E88A20748
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZ8Oz-0004yg-NC
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 02:03:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41503)
+	id 1iZ8PC-0005F5-PV
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 02:03:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41608)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iZ8Kk-00020v-NO
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:56 -0500
+ (envelope-from <clg@kaod.org>) id 1iZ8L6-0002Ue-KA
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:59:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iZ8Ki-0001Fj-CU
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:54 -0500
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:41688)
+ (envelope-from <clg@kaod.org>) id 1iZ8L5-0001VV-EO
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:59:16 -0500
+Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:49033)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iZ8Kh-0001Ed-TK
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:52 -0500
-Received: from player697.ha.ovh.net (unknown [10.109.143.210])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 34F351B5C51
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 07:58:49 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iZ8L5-0001UN-8z
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:59:15 -0500
+Received: from player697.ha.ovh.net (unknown [10.109.160.153])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id BAC9B14DE65
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 07:59:13 +0100 (CET)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player697.ha.ovh.net (Postfix) with ESMTPSA id 043C0C809459;
- Mon, 25 Nov 2019 06:58:43 +0000 (UTC)
+ by player697.ha.ovh.net (Postfix) with ESMTPSA id DDBD5C8094C1;
+ Mon, 25 Nov 2019 06:59:06 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v6 03/20] ppc/pnv: Instantiate cores separately
-Date: Mon, 25 Nov 2019 07:58:03 +0100
-Message-Id: <20191125065820.927-4-clg@kaod.org>
+Subject: [PATCH v6 07/20] ppc/pnv: Fix TIMA indirect access
+Date: Mon, 25 Nov 2019 07:58:07 +0100
+Message-Id: <20191125065820.927-8-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191125065820.927-1-clg@kaod.org>
 References: <20191125065820.927-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 8910653341843950566
+X-Ovh-Tracer-Id: 8917408738711538662
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeitddggeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.165.38
+X-Received-From: 46.105.79.203
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,169 +74,106 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+When the TIMA of a CPU needs to be accessed from the indirect page,
+the thread id of the target CPU is first stored in the PC_TCTXT_INDIR0
+register. This thread id is relative to the chip and not to the system.
 
-Allocating a big void * array to store multiple objects isn't a
-recommended practice for various reasons:
- - no compile time type checking
- - potential dangling pointers if a reference on an individual is
-  taken and the array is freed later on
- - duplicate boiler plate everywhere the array is browsed through
+Introduce a helper routine to look for a CPU of a given PIR and fix
+pnv_xive_get_indirect_tctx() to scan only the threads of the local
+chip and not the whole machine.
 
-Allocate an array of pointers and populate it instead.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/pnv.h |  2 +-
- hw/ppc/pnv.c         | 30 ++++++++++++------------------
- 2 files changed, 13 insertions(+), 19 deletions(-)
+ include/hw/ppc/pnv.h |  2 ++
+ hw/intc/pnv_xive.c   | 13 +++++++------
+ hw/ppc/pnv.c         | 17 +++++++++++++++++
+ 3 files changed, 26 insertions(+), 6 deletions(-)
 
 diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 90f1343ed07c..03cb429f2131 100644
+index 12b0169a4010..a58cfea3f2fd 100644
 --- a/include/hw/ppc/pnv.h
 +++ b/include/hw/ppc/pnv.h
-@@ -56,7 +56,7 @@ typedef struct PnvChip {
+@@ -162,6 +162,8 @@ typedef struct PnvChipClass {
+ #define PNV_CHIP_INDEX(chip)                                    \
+     (((chip)->chip_id >> 2) * 2 + ((chip)->chip_id & 0x3))
 =20
-     uint32_t     nr_cores;
-     uint64_t     cores_mask;
--    void         *cores;
-+    PnvCore      **cores;
++PowerPCCPU *pnv_chip_find_cpu(PnvChip *chip, uint32_t pir);
++
+ #define TYPE_PNV_MACHINE       MACHINE_TYPE_NAME("powernv")
+ #define PNV_MACHINE(obj) \
+     OBJECT_CHECK(PnvMachineState, (obj), TYPE_PNV_MACHINE)
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index ec8349ee4a1f..b2ab2ccc91e7 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -1400,12 +1400,13 @@ static const MemoryRegionOps pnv_xive_ic_lsi_ops =
+=3D {
+  */
 =20
-     MemoryRegion xscom_mmio;
-     MemoryRegion xscom;
+ /*
+- * When the TIMA is accessed from the indirect page, the thread id
+- * (PIR) has to be configured in the IC registers before. This is used
+- * for resets and for debug purpose also.
++ * When the TIMA is accessed from the indirect page, the thread id of
++ * the target CPU is configured in the PC_TCTXT_INDIR0 register before
++ * use. This is used for resets and for debug purpose also.
+  */
+ static XiveTCTX *pnv_xive_get_indirect_tctx(PnvXive *xive)
+ {
++    PnvChip *chip =3D xive->chip;
+     uint64_t tctxt_indir =3D xive->regs[PC_TCTXT_INDIR0 >> 3];
+     PowerPCCPU *cpu =3D NULL;
+     int pir;
+@@ -1415,15 +1416,15 @@ static XiveTCTX *pnv_xive_get_indirect_tctx(PnvXi=
+ve *xive)
+         return NULL;
+     }
+=20
+-    pir =3D GETFIELD(PC_TCTXT_INDIR_THRDID, tctxt_indir) & 0xff;
+-    cpu =3D ppc_get_vcpu_by_pir(pir);
++    pir =3D (chip->chip_id << 8) | GETFIELD(PC_TCTXT_INDIR_THRDID, tctxt=
+_indir);
++    cpu =3D pnv_chip_find_cpu(chip, pir);
+     if (!cpu) {
+         xive_error(xive, "IC: invalid PIR %x for indirect access", pir);
+         return NULL;
+     }
+=20
+     /* Check that HW thread is XIVE enabled */
+-    if (!(xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(pir & 0x3f))) {
++    if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
+         xive_error(xive, "IC: CPU %x is not enabled", pir);
+     }
+=20
 diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index f0adb06c8d65..d899c83e5255 100644
+index d899c83e5255..8f688f4efc5a 100644
 --- a/hw/ppc/pnv.c
 +++ b/hw/ppc/pnv.c
-@@ -280,14 +280,12 @@ static void pnv_dt_icp(PnvChip *chip, void *fdt, ui=
-nt32_t pir,
-=20
- static void pnv_chip_power8_dt_populate(PnvChip *chip, void *fdt)
- {
--    const char *typename =3D pnv_chip_core_typename(chip);
--    size_t typesize =3D object_type_get_instance_size(typename);
-     int i;
-=20
-     pnv_dt_xscom(chip, fdt, 0);
-=20
-     for (i =3D 0; i < chip->nr_cores; i++) {
--        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-+        PnvCore *pnv_core =3D chip->cores[i];
-=20
-         pnv_dt_core(chip, pnv_core, fdt);
-=20
-@@ -302,14 +300,12 @@ static void pnv_chip_power8_dt_populate(PnvChip *ch=
-ip, void *fdt)
-=20
- static void pnv_chip_power9_dt_populate(PnvChip *chip, void *fdt)
- {
--    const char *typename =3D pnv_chip_core_typename(chip);
--    size_t typesize =3D object_type_get_instance_size(typename);
-     int i;
-=20
-     pnv_dt_xscom(chip, fdt, 0);
-=20
-     for (i =3D 0; i < chip->nr_cores; i++) {
--        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-+        PnvCore *pnv_core =3D chip->cores[i];
-=20
-         pnv_dt_core(chip, pnv_core, fdt);
-     }
-@@ -913,8 +909,6 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip8, Err=
-or **errp)
-  {
-     PnvChip *chip =3D PNV_CHIP(chip8);
-     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
--    const char *typename =3D pnv_chip_core_typename(chip);
--    size_t typesize =3D object_type_get_instance_size(typename);
-     int i, j;
-     char *name;
-     XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
-@@ -928,7 +922,7 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip8, Err=
-or **errp)
-=20
-     /* Map the ICP registers for each thread */
-     for (i =3D 0; i < chip->nr_cores; i++) {
--        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
-+        PnvCore *pnv_core =3D chip->cores[i];
-         int core_hwid =3D CPU_CORE(pnv_core)->core_id;
-=20
-         for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
-@@ -1108,8 +1102,6 @@ static void pnv_chip_power9_instance_init(Object *o=
-bj)
- static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
- {
-     PnvChip *chip =3D PNV_CHIP(chip9);
--    const char *typename =3D pnv_chip_core_typename(chip);
--    size_t typesize =3D object_type_get_instance_size(typename);
-     int i;
-=20
-     chip9->nr_quads =3D DIV_ROUND_UP(chip->nr_cores, 4);
-@@ -1118,7 +1110,7 @@ static void pnv_chip_quad_realize(Pnv9Chip *chip9, =
-Error **errp)
-     for (i =3D 0; i < chip9->nr_quads; i++) {
-         char eq_name[32];
-         PnvQuad *eq =3D &chip9->quads[i];
--        PnvCore *pnv_core =3D PNV_CORE(chip->cores + (i * 4) * typesize)=
-;
-+        PnvCore *pnv_core =3D chip->cores[i * 4];
-         int core_id =3D CPU_CORE(pnv_core)->core_id;
-=20
-         snprintf(eq_name, sizeof(eq_name), "eq[%d]", core_id);
-@@ -1290,7 +1282,6 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
-ror **errp)
-     Error *error =3D NULL;
-     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
-     const char *typename =3D pnv_chip_core_typename(chip);
--    size_t typesize =3D object_type_get_instance_size(typename);
-     int i, core_hwid;
-=20
-     if (!object_class_by_name(typename)) {
-@@ -1305,21 +1296,24 @@ static void pnv_chip_core_realize(PnvChip *chip, =
-Error **errp)
-         return;
-     }
-=20
--    chip->cores =3D g_malloc0(typesize * chip->nr_cores);
-+    chip->cores =3D g_new0(PnvCore *, chip->nr_cores);
-=20
-     for (i =3D 0, core_hwid =3D 0; (core_hwid < sizeof(chip->cores_mask)=
- * 8)
-              && (i < chip->nr_cores); core_hwid++) {
-         char core_name[32];
--        void *pnv_core =3D chip->cores + i * typesize;
-+        PnvCore *pnv_core;
-         uint64_t xscom_core_base;
-=20
-         if (!(chip->cores_mask & (1ull << core_hwid))) {
-             continue;
-         }
-=20
-+        pnv_core =3D PNV_CORE(object_new(typename));
-+
-         snprintf(core_name, sizeof(core_name), "core[%d]", core_hwid);
--        object_initialize_child(OBJECT(chip), core_name, pnv_core, types=
-ize,
--                                typename, &error_fatal, NULL);
-+        object_property_add_child(OBJECT(chip), core_name, OBJECT(pnv_co=
-re),
-+                                  &error_abort);
-+        chip->cores[i] =3D pnv_core;
-         object_property_set_int(OBJECT(pnv_core), ms->smp.threads, "nr-t=
-hreads",
-                                 &error_fatal);
-         object_property_set_int(OBJECT(pnv_core), core_hwid,
-@@ -1340,7 +1334,7 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
-ror **errp)
-         }
-=20
-         pnv_xscom_add_subregion(chip, xscom_core_base,
--                                &PNV_CORE(pnv_core)->xscom_regs);
-+                                &pnv_core->xscom_regs);
-         i++;
-     }
+@@ -1371,6 +1371,23 @@ static void pnv_chip_class_init(ObjectClass *klass=
+, void *data)
+     dc->desc =3D "PowerNV Chip";
  }
+=20
++PowerPCCPU *pnv_chip_find_cpu(PnvChip *chip, uint32_t pir)
++{
++    int i, j;
++
++    for (i =3D 0; i < chip->nr_cores; i++) {
++        PnvCore *pc =3D chip->cores[i];
++        CPUCore *cc =3D CPU_CORE(pc);
++
++        for (j =3D 0; j < cc->nr_threads; j++) {
++            if (ppc_cpu_pir(pc->threads[j]) =3D=3D pir) {
++                return pc->threads[j];
++            }
++        }
++    }
++    return NULL;
++}
++
+ static ICSState *pnv_ics_get(XICSFabric *xi, int irq)
+ {
+     PnvMachineState *pnv =3D PNV_MACHINE(xi);
 --=20
 2.21.0
 
