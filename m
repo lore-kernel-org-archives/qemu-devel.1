@@ -8,39 +8,39 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E561AC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 07:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7226C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 07:53:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA468215E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 07:53:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA468215E5
+	by mail.kernel.org (Postfix) with ESMTPS id 96A4C215E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 07:53:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A4C215E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaEcN-0001KU-Gf
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 02:53:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52571)
+	id 1iaEcY-0001SP-IA
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 02:53:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aaron@localhost>) id 1iaEaZ-0007s8-Sj
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:51:48 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aaron@localhost>) id 1iaEaX-0003Aj-R6
+ (envelope-from <aaron@localhost>) id 1iaEaX-0007s1-RN
  for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:51:46 -0500
-Received: from [2406:7400:73:186d:af79:94fc:29ef:77e6] (port=56076
- helo=localhost) by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <aaron@localhost>) id 1iaEaX-0002k0-E3
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <aaron@localhost>) id 1iaEaW-00037d-QF
  for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:51:45 -0500
+Received: from [2406:7400:73:186d:af79:94fc:29ef:77e6] (port=56078
+ helo=localhost) by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <aaron@localhost>) id 1iaEaW-0002k2-Dq
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 02:51:44 -0500
 Received: by localhost (Postfix, from userid 1000)
- id 61E46D41707; Mon, 25 Nov 2019 19:52:26 +0530 (IST)
+ id 1FB10D41713; Mon, 25 Nov 2019 19:54:43 +0530 (IST)
 From: aaron.zakhrov@gmail.com
 To: qemu-devel@nongnu.org
-Subject: [RFC 2/8] Fix MC STATUS resgister
-Date: Mon, 25 Nov 2019 19:49:06 +0530
-Message-Id: <20191125141908.5441-3-aaron.zakhrov@gmail.com>
+Subject: [RFC 6/8] Fix MC STATUS resgister
+Date: Mon, 25 Nov 2019 19:49:14 +0530
+Message-Id: <20191125141908.5441-7-aaron.zakhrov@gmail.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191125141908.5441-1-aaron.zakhrov@gmail.com>
 References: <20191125141908.5441-1-aaron.zakhrov@gmail.com>
