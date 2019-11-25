@@ -2,51 +2,53 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D6DC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:12:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4B4C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:13:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 555FC2082F
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:12:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 555FC2082F
+	by mail.kernel.org (Postfix) with ESMTPS id 40B372082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:13:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40B372082F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZEAj-0001u7-OQ
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:12:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39326)
+	id 1iZEAw-0002Fw-0N
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:13:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4E-0004dR-3f
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4E-0004dV-DX
  for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4C-00069i-5a
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4C-00069e-5g
  for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:14 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:45374 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:45501 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1iZE4B-0005Qa-Ss
+ id 1iZE4B-0005RG-PV
  for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:12 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 62C7F1A226C;
+ by mail.rt-rk.com (Postfix) with ESMTP id 9B36F1A225C;
  Mon, 25 Nov 2019 14:05:05 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
  [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 43B8A1A2251;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 5EF531A225E;
  Mon, 25 Nov 2019 14:05:05 +0100 (CET)
 From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/5] mips: machines: Renovate coding style
-Date: Mon, 25 Nov 2019 14:04:53 +0100
-Message-Id: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
+Subject: [PATCH 3/5] mips: mipssim: Renovate coding style
+Date: Mon, 25 Nov 2019 14:04:56 +0100
+Message-Id: <1574687098-26689-4-git-send-email-Filip.Bozuta@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -66,51 +68,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The scripts checkpatch.pl located in scripts folder
-was used to check for errors and warnings in fllowing
-mips machines:
+The script checkpatch.pl located in scripts folder was
+used to detect all errors and warrnings in files:
+    hw/mips/mips_mipssim.c
+    hw/net/mipsnet.c
 
-   Jazz
-   Malta
-   Mipssim
-   R4000
-   Fulong 2E
-   Boston
+All these mips mipssim machine files were edited and
+all the errors and warrings generated by the checkpatch.pl
+script were corrected and then the script was
+ran again to make sure there are no more errors and warnings.
 
-All generated errors and warnings were corrected
-and the script was ran again to make sure there
-are no more errors and warnings
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+---
+ hw/net/mipsnet.c | 44 ++++++++++++++++++++++++--------------------
+ 1 file changed, 24 insertions(+), 20 deletions(-)
 
-Note:
-   Boston machine was already clear of errors
-   and warnings so the boston machine files 
-   were not edited.
-
-Note:
-   One error occured due to the machro #IF 0.
-   That error was not corrected beacuse there
-   is some reduntant code within that macro that
-   might be used in future versions.
-
-
-Filip Bozuta (5):
-  mips: jazz: Renovate coding style
-  mips: malta: Renovate coding style
-  mips: mipssim: Renovate coding style
-  mips: r4000: Renovate coding style
-  mips: fulong 2e: Renovate coding style
-
- hw/display/jazz_led.c                    | 123 +++++++++++++--------------
- hw/dma/rc4030.c                          |  12 +--
- hw/isa/vt82c686.c                        |  23 ++---
- hw/mips/mips_jazz.c                      |  32 ++++---
- hw/mips/mips_malta.c                     | 139 ++++++++++++++++---------------
- hw/mips/mips_r4k.c                       |  55 +++++++-----
- hw/net/mipsnet.c                         |  44 +++++-----
- hw/pci-host/bonito.c                     |  60 +++++++------
- tests/acceptance/linux_ssh_mips_malta.py |   6 +-
- 9 files changed, 266 insertions(+), 228 deletions(-)
-
+diff --git a/hw/net/mipsnet.c b/hw/net/mipsnet.c
+index f7ae1ce..cb3331f 100644
+--- a/hw/net/mipsnet.c
++++ b/hw/net/mipsnet.c
+@@ -9,19 +9,19 @@
+ 
+ /* MIPSnet register offsets */
+ 
+-#define MIPSNET_DEV_ID		0x00
+-#define MIPSNET_BUSY		0x08
+-#define MIPSNET_RX_DATA_COUNT	0x0c
+-#define MIPSNET_TX_DATA_COUNT	0x10
+-#define MIPSNET_INT_CTL		0x14
+-# define MIPSNET_INTCTL_TXDONE		0x00000001
+-# define MIPSNET_INTCTL_RXDONE		0x00000002
+-# define MIPSNET_INTCTL_TESTBIT		0x80000000
+-#define MIPSNET_INTERRUPT_INFO	0x18
+-#define MIPSNET_RX_DATA_BUFFER	0x1c
+-#define MIPSNET_TX_DATA_BUFFER	0x20
+-
+-#define MAX_ETH_FRAME_SIZE	1514
++#define MIPSNET_DEV_ID          0x00
++#define MIPSNET_BUSY            0x08
++#define MIPSNET_RX_DATA_COUNT   0x0c
++#define MIPSNET_TX_DATA_COUNT   0x10
++#define MIPSNET_INT_CTL         0x14
++# define MIPSNET_INTCTL_TXDONE          0x00000001
++# define MIPSNET_INTCTL_RXDONE          0x00000002
++# define MIPSNET_INTCTL_TESTBIT         0x80000000
++#define MIPSNET_INTERRUPT_INFO  0x18
++#define MIPSNET_RX_DATA_BUFFER  0x1c
++#define MIPSNET_TX_DATA_BUFFER  0x20
++
++#define MAX_ETH_FRAME_SIZE      1514
+ 
+ #define TYPE_MIPS_NET "mipsnet"
+ #define MIPS_NET(obj) OBJECT_CHECK(MIPSnetState, (obj), TYPE_MIPS_NET)
+@@ -64,8 +64,9 @@ static void mipsnet_update_irq(MIPSnetState *s)
+ 
+ static int mipsnet_buffer_full(MIPSnetState *s)
+ {
+-    if (s->rx_count >= MAX_ETH_FRAME_SIZE)
++    if (s->rx_count >= MAX_ETH_FRAME_SIZE) {
+         return 1;
++    }
+     return 0;
+ }
+ 
+@@ -73,18 +74,21 @@ static int mipsnet_can_receive(NetClientState *nc)
+ {
+     MIPSnetState *s = qemu_get_nic_opaque(nc);
+ 
+-    if (s->busy)
++    if (s->busy) {
+         return 0;
++    }
+     return !mipsnet_buffer_full(s);
+ }
+ 
+-static ssize_t mipsnet_receive(NetClientState *nc, const uint8_t *buf, size_t size)
++static ssize_t mipsnet_receive(NetClientState *nc,
++                               const uint8_t *buf, size_t size)
+ {
+     MIPSnetState *s = qemu_get_nic_opaque(nc);
+ 
+-    trace_mipsnet_receive(size);
+-    if (!mipsnet_can_receive(nc))
++    race_mipsnet_receive(size);
++    if (!mipsnet_can_receive(nc)) {
+         return 0;
++    }
+ 
+     if (size >= sizeof(s->rx_buffer)) {
+         return 0;
+@@ -115,10 +119,10 @@ static uint64_t mipsnet_ioport_read(void *opaque, hwaddr addr,
+     addr &= 0x3f;
+     switch (addr) {
+     case MIPSNET_DEV_ID:
+-        ret = be32_to_cpu(0x4d495053);		/* MIPS */
++        ret = be32_to_cpu(0x4d495053);          /* MIPS */
+         break;
+     case MIPSNET_DEV_ID + 4:
+-        ret = be32_to_cpu(0x4e455430);		/* NET0 */
++        ret = be32_to_cpu(0x4e455430);          /* NET0 */
+         break;
+     case MIPSNET_BUSY:
+         ret = s->busy;
 -- 
 2.7.4
 
