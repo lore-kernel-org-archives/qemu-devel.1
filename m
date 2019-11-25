@@ -2,75 +2,89 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 032A7C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 04:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2792C432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 05:19:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBD8820706
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 04:26:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBD8820706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9D94F20722
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 05:19:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EQRaE/ZG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D94F20722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZ5xU-0002OO-TA
-	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 23:26:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55743)
+	id 1iZ6m3-0002dR-O9
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 00:18:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60937)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iZ5wi-0001yY-AA
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 23:25:57 -0500
+ (envelope-from <chanmickyyun@gmail.com>) id 1iZ6kk-00021v-Vv
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 00:17:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iZ5wg-0003Jn-GG
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 23:25:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:48800)
+ (envelope-from <chanmickyyun@gmail.com>) id 1iZ6kj-0008Tb-IY
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 00:17:38 -0500
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:34776)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iZ5wg-0003Ih-9T
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 23:25:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iZ5we-0005Ek-R7
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 04:25:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id CB4D02E8074
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 04:25:52 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Nov 2019 04:17:23 -0000
-From: Launchpad Bug Tracker <1824704@bugs.launchpad.net>
+ (Exim 4.71) (envelope-from <chanmickyyun@gmail.com>)
+ id 1iZ6kj-0008T9-A6
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 00:17:37 -0500
+Received: by mail-pj1-x1044.google.com with SMTP id bo14so6041023pjb.1
+ for <qemu-devel@nongnu.org>; Sun, 24 Nov 2019 21:17:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ygmWUQVGfjQeEcsNMJj7J5gbbH1BMIpxqZhVGLERJX8=;
+ b=EQRaE/ZGRGqEx81+k4D2+W3bEMAL4TosveOUr0jC1BcHp2G7ELSIA1/imPLNckoXhQ
+ BZ4MB375onMjHHY3nYEH2WxlekUfj1MG4GSw7qvYOFFttWG5GoI1jwf0EYn/i6Rfowcy
+ zxnQLAB88cPbRFAAVNx0vRGp00fKnPxtntQMlBkK77xfMnd6cA0CaqAj5ZAh94JsTwoe
+ 704CwG/21TCDtQ3YbQHd6mw7HA1KMA1iX6g+9arBGSw7Zl+VzOMlRBa+UOA9I/uxij9Z
+ xvGKR1oDGvxplTOzx+m+rYQJNRbBCA30i5WsMkJe+XwpGsUrv7MfkLsQw6Dtu4ujtYVD
+ JR6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ygmWUQVGfjQeEcsNMJj7J5gbbH1BMIpxqZhVGLERJX8=;
+ b=AY9gf/OTomC0heQGpIKPoEfzJ1aSmOU4A3yS8gtF5jrDpi5c6kJ+H48oYFCbBtPpL5
+ b2dPetxS7MPcEmvkrSSqNagIIlMhTCM6VcRyKTqcY5Y20SH+tNaxrdpVgx1Tbq/4lVrU
+ AFJbaq8bjX5MHoeahuScQVMFTCSaWd9s5cqqz4O90k7vyo77zMr42WU5OPHeN8GlscFd
+ QN42qP20vW9rV72IJcHkKVssKXAJb5BmRtL34r1y+853S1bf4MhdsM6RGywifrqzLFPj
+ PfJtWiEVj9gCbnxMpMvWUZjpRqCydDw/ujjZAOSPZQrbnNPUtoWn/SvkR3xF9Gf5oM6P
+ +IWA==
+X-Gm-Message-State: APjAAAVKWbUTdr2YNp2hPMu73i7ig3fbCgB3QsOhY2ewkBACv+oYpPyz
+ 8e7RbZCeH61u52jOiVqah93HeT+81UOazEK2
+X-Google-Smtp-Source: APXvYqykIpww8Evp/oAAURusglwiAHcaunlmt96RBfehKS1gzoOYtme0k47KsQX5PaNjv+tYo41hYA==
+X-Received: by 2002:a17:90b:144:: with SMTP id
+ em4mr37383246pjb.29.1574659055159; 
+ Sun, 24 Nov 2019 21:17:35 -0800 (PST)
+Received: from localhost.localdomain.com ([209.132.188.80])
+ by smtp.gmail.com with ESMTPSA id f5sm6088153pjp.1.2019.11.24.21.17.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 24 Nov 2019 21:17:34 -0800 (PST)
+From: "Micky Yun Chan(michiboo)" <chanmickyyun@gmail.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Expired; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: drjs5x janitor kraxel-redhat th-huth
-X-Launchpad-Bug-Reporter: mustafa (drjs5x)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <155524844990.21262.8108456842078597088.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157465544374.20922.4700100549341397375.malone@loganberry.canonical.com>
-Subject: [Bug 1824704] Re: -k tr not working after v20171217! turkish keyboard
- dont working
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 13f6ee48fe2b255774a5e44ec377f9ddd346f112
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Subject: [PATCH v7] Implement backend program convention command for
+ vhost-user-blk
+Date: Mon, 25 Nov 2019 13:17:22 +0800
+Message-Id: <20191125051722.15523-1-chanmickyyun@gmail.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1044
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,48 +93,238 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1824704 <1824704@bugs.launchpad.net>
+Cc: Micky Yun Chan <chanmickyyun@gmail.com>, stefanha@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[Expired for QEMU because there has been no activity for 60 days.]
+From: Micky Yun Chan <chanmickyyun@gmail.com>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+This patch is to add standard commands defined in docs/interop/vhost-user.rst
+For vhost-user-* program
 
--- =
+Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
+---
+ contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
+ docs/interop/vhost-user.json            |  31 +++++++
+ docs/interop/vhost-user.rst             |  15 ++++
+ 3 files changed, 110 insertions(+), 44 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1824704
+diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
+index ae61034656..6fd91c7e99 100644
+--- a/contrib/vhost-user-blk/vhost-user-blk.c
++++ b/contrib/vhost-user-blk/vhost-user-blk.c
+@@ -576,70 +576,90 @@ vub_new(char *blk_file)
+     return vdev_blk;
+ }
+ 
++static int opt_fdnum = -1;
++static char *opt_socket_path;
++static char *opt_blk_file;
++static gboolean opt_print_caps;
++static gboolean opt_read_only;
++
++static GOptionEntry entries[] = {
++    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
++      "Print capabilities", NULL },
++    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
++      "Use inherited fd socket", "FDNUM" },
++    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
++      "Use UNIX socket path", "PATH" },
++    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
++     "block device or file path", "PATH"},
++    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
++      "Enable read-only", NULL }
++};
++
+ int main(int argc, char **argv)
+ {
+-    int opt;
+-    char *unix_socket = NULL;
+-    char *blk_file = NULL;
+-    bool enable_ro = false;
+     int lsock = -1, csock = -1;
+     VubDev *vdev_blk = NULL;
++    GError *error = NULL;
++    GOptionContext *context;
+ 
+-    while ((opt = getopt(argc, argv, "b:rs:h")) != -1) {
+-        switch (opt) {
+-        case 'b':
+-            blk_file = g_strdup(optarg);
+-            break;
+-        case 's':
+-            unix_socket = g_strdup(optarg);
+-            break;
+-        case 'r':
+-            enable_ro = true;
+-            break;
+-        case 'h':
+-        default:
+-            printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
+-                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+-            return 0;
++    context = g_option_context_new(NULL);
++    g_option_context_add_main_entries(context, entries, NULL);
++    if (!g_option_context_parse(context, &argc, &argv, &error)) {
++        g_printerr("Option parsing failed: %s\n", error->message);
++        exit(EXIT_FAILURE);
++    }
++    if (opt_print_caps) {
++        g_print("{\n");
++        g_print("  \"type\": \"block\",\n");
++        g_print("  \"features\": [\n");
++        g_print("    \"read-only\",\n");
++        g_print("    \"blk-file\"\n");
++        g_print("  ]\n");
++        g_print("}\n");
++        exit(EXIT_SUCCESS);
++    }
++
++    if (!opt_blk_file) {
++        g_print("%s\n", g_option_context_get_help(context, true, NULL));
++        exit(EXIT_FAILURE);
++    }
++
++    if (opt_socket_path) {
++        lsock = unix_sock_new(opt_socket_path);
++        if (lsock < 0) {
++            exit(EXIT_FAILURE);
+         }
++    } else if (opt_fdnum < 0) {
++        g_print("%s\n", g_option_context_get_help(context, true, NULL));
++        exit(EXIT_FAILURE);
++    } else {
++        lsock = opt_fdnum;
+     }
+ 
+-    if (!unix_socket || !blk_file) {
+-        printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
+-               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+-        return -1;
+-    }
+-
+-    lsock = unix_sock_new(unix_socket);
+-    if (lsock < 0) {
+-        goto err;
+-    }
+-
+-    csock = accept(lsock, (void *)0, (void *)0);
++    csock = accept(lsock, NULL, NULL);
+     if (csock < 0) {
+-        fprintf(stderr, "Accept error %s\n", strerror(errno));
+-        goto err;
++        g_printerr("Accept error %s\n", strerror(errno));
++        exit(EXIT_FAILURE);
+     }
+ 
+-    vdev_blk = vub_new(blk_file);
++    vdev_blk = vub_new(opt_blk_file);
+     if (!vdev_blk) {
+-        goto err;
++        exit(EXIT_FAILURE);
+     }
+-    if (enable_ro) {
++    if (opt_read_only) {
+         vdev_blk->enable_ro = true;
+     }
+ 
+     if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
+                   vub_panic_cb, &vub_iface)) {
+-        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
+-        goto err;
++        g_printerr("Failed to initialize libvhost-user-glib\n");
++        exit(EXIT_FAILURE);
+     }
+ 
+     g_main_loop_run(vdev_blk->loop);
+-
++    g_main_loop_unref(vdev_blk->loop);
++    g_option_context_free(context);
+     vug_deinit(&vdev_blk->parent);
+-
+-err:
+     vub_free(vdev_blk);
+     if (csock >= 0) {
+         close(csock);
+@@ -647,8 +667,8 @@ err:
+     if (lsock >= 0) {
+         close(lsock);
+     }
+-    g_free(unix_socket);
+-    g_free(blk_file);
++    g_free(opt_socket_path);
++    g_free(opt_blk_file);
+ 
+     return 0;
+ }
+diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
+index da6aaf51c8..ce0ef74db5 100644
+--- a/docs/interop/vhost-user.json
++++ b/docs/interop/vhost-user.json
+@@ -54,6 +54,37 @@
+   ]
+ }
+ 
++##
++# @VHostUserBackendBlockFeature:
++#
++# List of vhost user "block" features.
++#
++# @read-only: The --read-only command line option is supported.
++# @blk-file: The --blk-file command line option is supported.
++#
++# Since: 5.0
++##
++{
++  'enum': 'VHostUserBackendBlockFeature',
++  'data': [ 'read-only', 'blk-file' ]
++}
++
++##
++# @VHostUserBackendCapabilitiesBlock:
++#
++# Capabilities reported by vhost user "block" backends
++#
++# @features: list of supported features.
++#
++# Since: 5.0
++##
++{
++  'struct': 'VHostUserBackendCapabilitiesBlock',
++  'data': {
++    'features': [ 'VHostUserBackendBlockFeature' ]
++  }
++}
++
+ ##
+ # @VHostUserBackendInputFeature:
+ #
+diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+index 7827b710aa..2f0910d515 100644
+--- a/docs/interop/vhost-user.rst
++++ b/docs/interop/vhost-user.rst
+@@ -1376,3 +1376,18 @@ Command line options:
+   Enable virgl rendering support.
+ 
+   (optional)
++
++vhost-user-blk
++--------------
++
++Command line options:
++
++--blk-file=PATH
++
++  Specify block device or file path.
++
++--read-only
++
++  Enable read-only.
++
++  (optional)
+-- 
+2.21.0
 
-Title:
-  -k tr not working after v20171217! turkish keyboard dont working
-
-Status in QEMU:
-  Expired
-
-Bug description:
-  hi qemu
-
-  -k tr not working after v20171217! turkish keyboard dont working
-
-  last working without proplem at v20171217!
-
-  after this version  tr keyboard proplem.
-  freedos  , winpe  ,  linux images   all dont working tr  turkish keyboard.
-
-  example   press key " =C3=A7 "  show " , "
-  example 2 press key " . "  show " =C3=A7 "
-
-  tr keyboard work  always "en-us" kbd.
-  :((((((((
-
-  please fix this critical bug.
-
-  Sincerely
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1824704/+subscriptions
 
