@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91EA1C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5962C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:12:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 611092071A
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:12:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 611092071A
+	by mail.kernel.org (Postfix) with ESMTPS id 7BFAF2071A
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:12:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BFAF2071A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZ8Xu-0007hd-V1
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 02:12:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42086)
+	id 1iZ8Y0-0007un-Uo
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 02:12:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iZ8MM-0003sR-LV
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 02:00:36 -0500
+ (envelope-from <clg@kaod.org>) id 1iZ8Kz-0002JT-KK
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:59:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iZ8ML-0002HU-3S
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 02:00:34 -0500
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:37053)
+ (envelope-from <clg@kaod.org>) id 1iZ8Ky-0001Qj-Hp
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:59:09 -0500
+Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:54080)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iZ8MK-0002FP-NT
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 02:00:32 -0500
-Received: from player697.ha.ovh.net (unknown [10.108.54.108])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 588CB1AFDFF
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 08:00:31 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iZ8Ky-0001Pj-Bn
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:59:08 -0500
+Received: from player697.ha.ovh.net (unknown [10.109.146.175])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id DE5CF1B5BFA
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 07:59:06 +0100 (CET)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player697.ha.ovh.net (Postfix) with ESMTPSA id C945BC8098FB;
- Mon, 25 Nov 2019 07:00:24 +0000 (UTC)
+ by player697.ha.ovh.net (Postfix) with ESMTPSA id 4EDC1C8094A4;
+ Mon, 25 Nov 2019 06:59:01 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v6 20/20] ppc/pnv: Dump the XIVE NVT table
-Date: Mon, 25 Nov 2019 07:58:20 +0100
-Message-Id: <20191125065820.927-21-clg@kaod.org>
+Subject: [PATCH v6 06/20] ppc/pnv: Introduce a pnv_xive_is_cpu_enabled() helper
+Date: Mon, 25 Nov 2019 07:58:06 +0100
+Message-Id: <20191125065820.927-7-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191125065820.927-1-clg@kaod.org>
 References: <20191125065820.927-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 8939363785798683622
+X-Ovh-Tracer-Id: 8915438412849712102
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeitddggedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedv
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeitddggeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedu
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.165.38
+X-Received-From: 46.105.63.121
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,145 +74,70 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is useful to dump the saved contexts of the vCPUs : configuration
-of the base END index of the vCPU and the Interrupt Pending Buffer
-register, which is updated when an interrupt can not be presented.
-
-When dumping the NVT table, we skip empty indirect pages which are not
-necessarily allocated.
+and use this helper to exclude CPUs which are not enabled in the XIVE
+controller.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/xive_regs.h |  3 ++
- hw/intc/pnv_xive.c         | 64 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 67 insertions(+)
+ include/hw/ppc/pnv.h |  5 +++++
+ hw/intc/pnv_xive.c   | 19 +++++++++++++++++++
+ 2 files changed, 24 insertions(+)
 
-diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
-index 1a5622f8ded8..09f243600c5d 100644
---- a/include/hw/ppc/xive_regs.h
-+++ b/include/hw/ppc/xive_regs.h
-@@ -252,6 +252,8 @@ typedef struct XiveNVT {
-         uint32_t        w0;
- #define NVT_W0_VALID             PPC_BIT32(0)
-         uint32_t        w1;
-+#define NVT_W1_EQ_BLOCK          PPC_BITMASK32(0, 3)
-+#define NVT_W1_EQ_INDEX          PPC_BITMASK32(4, 31)
-         uint32_t        w2;
-         uint32_t        w3;
-         uint32_t        w4;
-@@ -277,6 +279,7 @@ typedef struct XiveNVT {
-  * field of the XIVE END
-  */
- #define XIVE_NVT_SHIFT                19
-+#define XIVE_NVT_COUNT                (1 << XIVE_NVT_SHIFT)
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 03cb429f2131..12b0169a4010 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -99,6 +99,11 @@ typedef struct Pnv9Chip {
+     PnvQuad      *quads;
+ } Pnv9Chip;
 =20
- static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
-dx)
- {
++/*
++ * A SMT8 fused core is a pair of SMT4 cores.
++ */
++#define PNV9_PIR2FUSEDCORE(pir) (((pir) >> 3) & 0xf)
++
+ typedef struct PnvChipClass {
+     /*< private >*/
+     SysBusDeviceClass parent_class;
 diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 43c760efd137..a0a69b98a713 100644
+index 9798bd9e729f..ec8349ee4a1f 100644
 --- a/hw/intc/pnv_xive.c
 +++ b/hw/intc/pnv_xive.c
-@@ -527,6 +527,44 @@ static uint32_t pnv_xive_nr_ipis(PnvXive *xive, uint=
-8_t blk)
-     return VSD_INDIRECT & vsd ? 0 : vst_tsize * SBE_PER_BYTE;
+@@ -372,6 +372,21 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_=
+t blk, uint32_t idx,
+     return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
  }
 =20
 +/*
-+ * Compute the number of entries per indirect subpage.
++ * One bit per thread id. The first register PC_THREAD_EN_REG0 covers
++ * the first cores 0-15 (normal) of the chip or 0-7 (fused). The
++ * second register covers cores 16-23 (normal) or 8-11 (fused).
 + */
-+static uint64_t pnv_xive_vst_per_subpage(PnvXive *xive, uint32_t type)
++static bool pnv_xive_is_cpu_enabled(PnvXive *xive, PowerPCCPU *cpu)
 +{
-+    uint8_t blk =3D pnv_xive_block_id(xive);
-+    uint64_t vsd =3D xive->vsds[type][blk];
-+    const XiveVstInfo *info =3D &vst_infos[type];
-+    uint64_t vsd_addr;
-+    uint32_t page_shift;
++    int pir =3D ppc_cpu_pir(cpu);
++    uint32_t fc =3D PNV9_PIR2FUSEDCORE(pir);
++    uint64_t reg =3D fc < 8 ? PC_THREAD_EN_REG0 : PC_THREAD_EN_REG1;
++    uint32_t bit =3D pir & 0x3f;
 +
-+    /* For direct tables, fake a valid value */
-+    if (!(VSD_INDIRECT & vsd)) {
-+        return 1;
-+    }
-+
-+    /* Get the page size of the indirect table. */
-+    vsd_addr =3D vsd & VSD_ADDRESS_MASK;
-+    vsd =3D ldq_be_dma(&address_space_memory, vsd_addr);
-+
-+    if (!(vsd & VSD_ADDRESS_MASK)) {
-+#ifdef XIVE_DEBUG
-+        xive_error(xive, "VST: invalid %s entry %x !?", info->name, idx)=
-;
-+#endif
-+        return 0;
-+    }
-+
-+    page_shift =3D GETFIELD(VSD_TSIZE, vsd) + 12;
-+
-+    if (!pnv_xive_vst_page_size_allowed(page_shift)) {
-+        xive_error(xive, "VST: invalid %s page shift %d", info->name,
-+                   page_shift);
-+        return 0;
-+    }
-+
-+    return (1ull << page_shift) / info->size;
++    return xive->regs[reg >> 3] & PPC_BIT(bit);
 +}
 +
- /*
-  * EDT Table
-  *
-@@ -1665,6 +1703,21 @@ static const MemoryRegionOps pnv_xive_pc_ops =3D {
-     },
- };
+ static int pnv_xive_match_nvt(XivePresenter *xptr, uint8_t format,
+                               uint8_t nvt_blk, uint32_t nvt_idx,
+                               bool cam_ignore, uint8_t priority,
+@@ -391,6 +406,10 @@ static int pnv_xive_match_nvt(XivePresenter *xptr, u=
+int8_t format,
+             XiveTCTX *tctx;
+             int ring;
 =20
-+static void xive_nvt_pic_print_info(XiveNVT *nvt, uint32_t nvt_idx,
-+                                    Monitor *mon)
-+{
-+    uint8_t  eq_blk =3D xive_get_field32(NVT_W1_EQ_BLOCK, nvt->w1);
-+    uint32_t eq_idx =3D xive_get_field32(NVT_W1_EQ_INDEX, nvt->w1);
++            if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
++                continue;
++            }
 +
-+    if (!xive_nvt_is_valid(nvt)) {
-+        return;
-+    }
-+
-+    monitor_printf(mon, "  %08x end:%02x/%04x IPB:%02x\n", nvt_idx,
-+                   eq_blk, eq_idx,
-+                   xive_get_field32(NVT_W4_IPB, nvt->w4));
-+}
-+
- void pnv_xive_pic_print_info(PnvXive *xive, Monitor *mon)
- {
-     XiveRouter *xrtr =3D XIVE_ROUTER(xive);
-@@ -1674,7 +1727,9 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monitor=
- *mon)
-     uint32_t nr_ipis =3D pnv_xive_nr_ipis(xive, blk);
-     XiveEAS eas;
-     XiveEND end;
-+    XiveNVT nvt;
-     int i;
-+    uint64_t xive_nvt_per_subpage;
+             tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
 =20
-     monitor_printf(mon, "XIVE[%x] #%d Source %08x .. %08x\n", chip_id, b=
-lk,
-                    srcno0, srcno0 + nr_ipis - 1);
-@@ -1702,6 +1757,15 @@ void pnv_xive_pic_print_info(PnvXive *xive, Monito=
-r *mon)
-     while (!xive_router_get_end(xrtr, blk, i, &end)) {
-         xive_end_eas_pic_print_info(&end, i++, mon);
-     }
-+
-+    monitor_printf(mon, "XIVE[%x] #%d NVTT %08x .. %08x\n", chip_id, blk=
-,
-+                   0, XIVE_NVT_COUNT - 1);
-+    xive_nvt_per_subpage =3D pnv_xive_vst_per_subpage(xive, VST_TSEL_VPD=
-T);
-+    for (i =3D 0; i < XIVE_NVT_COUNT; i +=3D xive_nvt_per_subpage) {
-+        while (!xive_router_get_nvt(xrtr, blk, i, &nvt)) {
-+            xive_nvt_pic_print_info(&nvt, i++, mon);
-+        }
-+    }
- }
-=20
- static void pnv_xive_reset(void *dev)
+             /*
 --=20
 2.21.0
 
