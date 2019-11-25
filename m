@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D4FBC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 18:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC34C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 18:35:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A65B20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 18:24:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB44D2068F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 18:35:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LTKXiTOg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A65B20674
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ACuau9WE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB44D2068F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZJ2D-0007DI-8C
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 13:24:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37148)
+	id 1iZJDI-0001hS-13
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 13:35:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38503)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZJ0O-0006JQ-9X
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 13:22:43 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZJCC-000185-2L
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 13:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZJ0J-00031b-Dj
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 13:22:36 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33838)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZJC7-0004B8-6N
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 13:34:47 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37202)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iZJ0J-000319-4Y
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 13:22:31 -0500
-Received: by mail-oi1-x244.google.com with SMTP id l202so14056325oig.1
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 10:22:31 -0800 (PST)
+ id 1iZJC2-00047W-KW
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 13:34:41 -0500
+Received: by mail-ot1-x344.google.com with SMTP id d5so13536408otp.4
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 10:34:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=l+Um/ghnTVT/kvZmLMp+sGI2UADKId2IJ9f0CfHzDSQ=;
- b=LTKXiTOghAby3ZYjWDKU6UsXlMHzqeWXhj3IAN5InlQCp8vhl6Qq30qnv1GYKYGS+u
- uWkCRYrmstlqdNyvLkFJhRAPDlNg2OZttEk0IsU8yLHfA7vpajEZbRPODP2U7rFm0gsO
- VhYFHJrvaXEQLmZwRmmeRDkHV1DQtP4fy88cu3Qrwi6w9AlZ08gYnPVzKo+vms0MK/V3
- Lagi7We962fMP3MwtnqFsNES3FOdCg5bWOB2UL0gdXQEnq6KJpseqxALntzxfXyGIntx
- Dyd441umNaT4HTNiUoew9KwXuGZysmrFtke6vyfuQQUVIpv+V7ktt0/sgrAYZIWIKy79
- AhgQ==
+ :cc; bh=IRwYwl0WOvYLmUrqJBTLe1M8xX7czjtn8seHKY0u1OI=;
+ b=ACuau9WEB6fM6PYNWmY0+JVxjOeKt3CAf5rSc9pwEwow42YbG+ZYRrSN0WnRQnYbO0
+ P2ubSLSnAwdvGtJ9EDmDNTeWtLcHDlBUvVyNYmdtle2GrOZK6xgPNrIveW0111SbKKtN
+ HyV07Tb5VVryQ9a9JSYeMY/eu4nd3OLlUMfb7BmEa9ppbAhh6x3SPcCKjG5olJasY2Xm
+ Nx8gWVoQHJKEOQd8bZ0Ix+Uz2aApsjRI9Tgcec7+WIVONgVA0aeuE2ubki6ErL+OK89Q
+ lIls5Z44DEnZr5IUB11NUWvV1ZozHFNxurxhk08z7uGUjnc53B1cvF3axs+e2+XW2IJf
+ zI1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=l+Um/ghnTVT/kvZmLMp+sGI2UADKId2IJ9f0CfHzDSQ=;
- b=oXtNQMbQKGcDrbkl5PUnBgPsvRiG8OvtlElNjupZeKJI6IAeK/gDYtNqJsrX+mPYTr
- sK5+jogyOH/aUs8INEGKjhUc6vBSIk37r8UL2uj8Vx2bDX/Q3+KTkPwsy3YbMV5MBRLH
- 3teSfZNgbwhha8dS98MlVSeIGwSWJBla/a8hZjV0w8jvshNYHGApparRdwS8SPqwqHNY
- OYQYbPNwo0kGfBy9Ayed/zspaEoTNzr/tXVg3S0HmOxYFCTQ8CysYtzhhVPGRzRUbJP+
- kCszV1wKBreZnBXwxG2/3kgaomS5prcl3XL7Fqh9/rpZSc+6UfoS+XINJgj3VarRVPCZ
- PSZg==
-X-Gm-Message-State: APjAAAXP99AUEXz3mek80WsH020R3Ilknq6xAVhmH4QVgEmXrYlJnTnl
- wyvtSGwkwXXV7oWHUpMxsTFaOsXORvtDsRO0Nqk=
-X-Google-Smtp-Source: APXvYqwPO845BfZUf1LvOzdGwiytHTNJoUDGNwkwX5UKgSPKdGHEre6Gp33Q3Asb2JRkwj7mA5KZmqOR83wmuMMiVxE=
-X-Received: by 2002:aca:5786:: with SMTP id l128mr165817oib.53.1574706149706; 
- Mon, 25 Nov 2019 10:22:29 -0800 (PST)
+ bh=IRwYwl0WOvYLmUrqJBTLe1M8xX7czjtn8seHKY0u1OI=;
+ b=aqON/2vE+UgolYsoyqOF8QakObtQNZ6+20P3w+aFPw4ftj4tnMU71uXyjmonL4acbZ
+ rE4ALOw/Xb4i72NPA/Ms7+TJIhU3XPNstarqDcvdl2nhhv37/SYpY14aXNrzER0Eujwi
+ lZTvB+/5JoPUpgmnEUHDnJ3xQllZrcn6fk2tMMgIvSSyiXyT7llEw8Hy2enmQzCTiEgc
+ Vyzpj/9ht2Y7DodNcr8fYGQytq/8OJdX0h7aWmdyPXTxW0+MPY7G4fHvvuBR+q4Cd+23
+ vTTVm8LFjdKOVLV503+ec07YfhvLcK1IrBffYZVVYF6lEG3befPzXWuvJrZ7E8ujTpmC
+ upjw==
+X-Gm-Message-State: APjAAAUgwDNj7bcMAWPFl0KP+NM9HnEzCbsKKOod3fM1r/YT6MYQ4JEP
+ V6PS7gy6v10ecCM4QpaZJe/u1qZkXUFp13te6BY=
+X-Google-Smtp-Source: APXvYqwLekSiNub6oFiq+qYj9VxSBoHIebI2wMQyutpHileamop0uDroqVTUbfsL+V3FblYUnGKy019hM3cncq1t/LU=
+X-Received: by 2002:a05:6830:44c:: with SMTP id
+ d12mr20233958otc.121.1574706875068; 
+ Mon, 25 Nov 2019 10:34:35 -0800 (PST)
 MIME-Version: 1.0
 References: <20191029212430.20617-1-mrolnik@gmail.com>
  <20191029212430.20617-11-mrolnik@gmail.com>
- <CAL1e-=g783x53PYxd43e77fSmzokhW-hDvdfRCKn+k7AqQ-Cdg@mail.gmail.com>
- <20191125150739.ac66232e205552893ae07d8d@kent.ac.uk>
-In-Reply-To: <20191125150739.ac66232e205552893ae07d8d@kent.ac.uk>
+ <CAL1e-=hciFV8OjoiEBVz3B1ZWREh441M8PaESnQCafeSZX2WFw@mail.gmail.com>
+ <20191125155638.4529e02722ad36231366dd09@kent.ac.uk>
+In-Reply-To: <20191125155638.4529e02722ad36231366dd09@kent.ac.uk>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 25 Nov 2019 19:22:18 +0100
-Message-ID: <CAL1e-=iOafkKgsfeCaKLoOije8-vvNxOgA8QBQb6ym0WDV5umw@mail.gmail.com>
+Date: Mon, 25 Nov 2019 19:34:24 +0100
+Message-ID: <CAL1e-=hqz04NLbrQbxMN70LVc-kaKjEK1waPJw8yyPQeqc=jZQ@mail.gmail.com>
 Subject: Re: [PATCH v35 10/13] target/avr: Add limited support for USART and
  16 bit timer peripherals
 To: Sarah Harris <seh53@kent.ac.uk>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,42 +100,27 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 25, 2019 at 4:07 PM Sarah Harris <seh53@kent.ac.uk> wrote:
+On Mon, Nov 25, 2019 at 4:56 PM Sarah Harris <seh53@kent.ac.uk> wrote:
 >
 > Hi Aleksandar,
 >
-> In avr_usart_receive():
-> The two assertions check that we get only what avr_usart_can_receive() asked for.
-> It always requests zero or one byte and I must have assumed zero bytes isn't a valid read (so assert size==1).
-> It only requests data when !usart->data_valid (so assert !usart->data_valid).
-> (I think this is what Philippe already said)
+> I think returning immediately should be ok, it just happened to make sense to me to think in terms of this being a special case of a normal read.
+> The else handles the case in which no data has been received, but the user's program reads the incoming buffer anyway.
+> (As far as I'm aware this is undefined behaviour, so returning zero is reasonable)
 >
-> In avr_usart_read() and avr_usart_write():
-> I assumed that accesses would only ever be a single byte at a time; I don't think the AVR has any multi-byte memory access instructions.
-> I wasn't convinced I understood QEMU's memory model in enough depth to be certain of this so I left an assertion to document and check my assumption.
-> Sorry for the lack of explanatory comments, I was thinking of this as test code at the time so I wasn't being as thorough as I probably would have been otherwise!
->
-> All of these functions use existing QEMU APIs (the read and write functions are passed via the MemoryRegionOps struct, the receive function is passed to qemu_chr_fe_set_handlers), so the size parameters are required to match the existing interfaces.
->
+
+Since people were testing with the current code for some time, and
+taking into account what Sarah just said, I suggest that we don't
+change the code in question (leaving "data = 0;" line as is).
+
+Thanks again,
+Aleksandar
+
 > Kind regards,
 > Sarah Harris
 >
-
-Hello, Sarah.
-
-I accept your explanation.
-
-Michael, in my opinion, there is no need for any code change wrt
-"assert(size==1)" topic. Sarah perhaps may add more applicable
-comments surrounding mentioned functions in future, when she amends or
-revises the code, but this is not crucial at all at this moment.
-
-Thanks a lot, Sarah!
-
-Aleksandar
-
 >
-> On Fri, 22 Nov 2019 15:41:03 +0100
+> On Fri, 22 Nov 2019 17:48:56 +0100
 > Aleksandar Markovic <aleksandar.m.mail@gmail.com> wrote:
 >
 > > On Tue, Oct 29, 2019 at 10:25 PM Michael Rolnik <mrolnik@gmail.com> wrote:
@@ -240,20 +226,6 @@ Aleksandar
 > > > +{
 > > > +    AVRUsartState *usart = opaque;
 > > > +    assert(size == 1);
-> >
-> > Hello, Michael.
-> >
-> > I see the line "assert(size == 1);" is used here, and in really numerous
-> > places in USART emulation (as a rule, at the very beginnings of function
-> > bodies). Could you explain to me the justification for that line? Is there
-> > a place in documentation that would expain the need for it? If this is
-> > justified, why is there the need for argument "int size" in corresponding
-> > functions? If some external rule/API forces you to have that argument for
-> > all such functions, can you tell me what rule/API is that?
-> >
-> > Yours,
-> > Aleksandar
-> >
 > > > +    assert(!usart->data_valid);
 > > > +    usart->data = buffer[0];
 > > > +    usart->data_valid = true;
@@ -345,6 +317,21 @@ Aleksandar
 > > > +        qemu_set_irq(usart->rxc_irq, 0);
 > > > +        qemu_chr_fe_accept_input(&usart->chr);
 > > > +        return data;
+> >
+> > Hi, Michael.
+> >
+> > Can you please explain to me why in the only "else" block within
+> > avr_usart_read():
+> >
+> >         } else {
+> >             data = 0;
+> >         }
+> >
+> > we don't use "return 0;" instead of "data = 0;"?
+> >
+> > Yours,
+> > Aleksandar
+> >
 > > > +    case USART_CSRA:
 > > > +        return usart->csra;
 > > > +    case USART_CSRB:
