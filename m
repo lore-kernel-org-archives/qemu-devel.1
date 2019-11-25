@@ -2,81 +2,79 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A2CC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57172C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:51:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 707D620674
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:50:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22CFA20674
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:51:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vnv1TkWs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 707D620674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rZgwNhWu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22CFA20674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZGch-0000Kp-T1
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 10:49:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34025)
+	id 1iZGdq-00025v-U4
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 10:51:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35013)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iZGTp-0000U2-8f
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:40:50 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iZGaZ-0007cr-FO
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:47:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iZGTo-00031R-37
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:40:49 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41614
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iZGTn-00030p-V6
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:40:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574696447;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UpOn6Na2p1Jiw8koUNq+IGodiPP9AnTwGCaopCORq/k=;
- b=Vnv1TkWsvclPgAmEg+/wZ5TH1v4H2TMluLAvob4E/3xDEuwoODSQuXCBLDOPuQ2h5+s+Gx
- ELdHU3KiqEz0aM7zlc52tWstsEAUycvqbkp5IlUfO1b7utLZI826lQzyXY5tUf9AOPtCxJ
- lNuyzeoNAW9LVtx8Dl+bBx/HMM5zUs4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-lt4pjHqWOCqoGXdOgGQ1Yw-1; Mon, 25 Nov 2019 10:40:41 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2506E881D30;
- Mon, 25 Nov 2019 15:40:40 +0000 (UTC)
-Received: from redhat.com (ovpn-112-59.ams2.redhat.com [10.36.112.59])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B1125C290;
- Mon, 25 Nov 2019 15:40:24 +0000 (UTC)
-Date: Mon, 25 Nov 2019 15:40:21 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Subject: Re: [libvirt] [PATCH-for-4.2] hw/mips: Deprecate the r4k machine
-Message-ID: <20191125154021.GI4157473@redhat.com>
-References: <20191125104103.28962-1-philmd@redhat.com>
- <CAL1e-=hktyuAzESyZMz3P4a9aq17dsrrzWpyXYfFYn=cWP3e4A@mail.gmail.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iZGaY-0001SB-3O
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:47:47 -0500
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:42162)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iZGaX-0001RM-Qe
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:47:46 -0500
+Received: by mail-ot1-x32f.google.com with SMTP id 66so6859113otd.9
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 07:47:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=e0Antpu18es8uOSN2yjyqhIWvG6lJsh+Ei81WeFXyC0=;
+ b=rZgwNhWunAOA+rEft/kfpX+sW24TZ9axq4HNI90hmE4nLlW/329/i+mVXq2H0BI1+t
+ w1lNN6k3jbsGGXEejDh3XBwqMuQLFFFlMcB6m+KMh67e8dNfS1VBoCd6I1gPibQALW+3
+ ZrAVtrgdixTPdRQzdTijpn4AlF6pzNxTugXFWKs0lSNja+fUbqtL+xJM/iXlfE+sMEzp
+ uDdMedzzAn6288kH3aIKTwW+SEuqF9+7GKfUaDwwnOkRC6IifZhccmZM5x1oY2NPEcXA
+ ipNMFRLGYwtzl/ImuCQehgHxKFn10/Rk3ucIoHV3QIArYEIdb00esh9a32TPiv5IBYCy
+ 7pTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=e0Antpu18es8uOSN2yjyqhIWvG6lJsh+Ei81WeFXyC0=;
+ b=fnAQbHvSPsLHboeyvnOOGNK4CNC+8CNdkeJdluR1GZT0tziEttJ9mn+38ZZV+FVWZj
+ 62UYpbhOiRxZiah2mlDnlFI4m4Merx6mTUE5yFJ0dwqzmj6qC2p3TkNF5T+QRd7X19SK
+ BOeXVwVYxf4soElzaWCxMZtbGEkCWReZvLZLZ7RtpXfoL+oUzjuzv9tYtdLNdmsLbh7E
+ 4zm5mQkyDq+aqeFMPa4wP7vzHELwiiLVLApJzNxFpE/62TGrKLq3nBkRF4bbEqhJRzil
+ pW50WkedXiO6f9NRAW/WM29jTO1JjjOMA5cRt3n3nnC+oyLLAeY5cqqPni8WmydukAmD
+ cSFw==
+X-Gm-Message-State: APjAAAWpHDVg0XFvhjZi+bUi7JDsibZH6cRPuj/pFMgikRsDu0IMLQTo
+ C0UK8+DZ+FMmovVanDHjhNp4vdUCzT3aWfkbnWZaPk60pnc=
+X-Google-Smtp-Source: APXvYqxK9TS81gZJYPwCu8HstbfMCNAVZCK99F0v30XqHi5iEE7S1MEeK7GTjYN+dsyb8hjAzpwb49yD52h9cFVV2Po=
+X-Received: by 2002:a9d:12d2:: with SMTP id g76mr21620210otg.232.1574696864554; 
+ Mon, 25 Nov 2019 07:47:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=hktyuAzESyZMz3P4a9aq17dsrrzWpyXYfFYn=cWP3e4A@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: lt4pjHqWOCqoGXdOgGQ1Yw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20191125060434.22997-1-armbru@redhat.com>
+In-Reply-To: <20191125060434.22997-1-armbru@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 25 Nov 2019 15:47:33 +0000
+Message-ID: <CAFEAcA8TQu3-Ut8-zgsxENN_PJc8bd9dYHmeO3aAHek6kDLMoQ@mail.gmail.com>
+Subject: Re: [PULL 0/1] Miscellaneous patches for 2019-11-25
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,59 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 25, 2019 at 03:45:35PM +0100, Aleksandar Markovic wrote:
-> On Monday, November 25, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-> wrote:
->=20
-> > The r4k machine was introduced in 2005 (6af0bf9c7) and its last
-> > logical change was in 2005 (9542611a6). After we can count 164
-> > maintenance commits (QEMU API changes) with the exception of
-> > 1 fix in 2015 (memory leak, commit 3ad9fd5a).
-> >
-> >
-> Please don't start any deprecation process. This requires certain
-> consultation within my company. Rest assured that everyone's opinion will
-> be taken into account while doing consiltation.
+On Mon, 25 Nov 2019 at 06:06, Markus Armbruster <armbru@redhat.com> wrote:
+>
+> The following changes since commit 2061735ff09f9d5e67c501a96227b470e7de69b1:
+>
+>   Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into staging (2019-11-21 17:18:40 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://repo.or.cz/qemu/armbru.git tags/pull-misc-2019-11-25
+>
+> for you to fetch changes up to 25f74087c695364dfaa87443b1040a3aa5c29008:
+>
+>   util/cutils: Fix incorrect integer->float conversion caught by clang (2019-11-25 06:00:05 +0100)
+>
+> ----------------------------------------------------------------
+> Miscellaneous patches for 2019-11-25
+>
+> ----------------------------------------------------------------
+> Fangrui Song (1):
+>       util/cutils: Fix incorrect integer->float conversion caught by clang
+>
+>  util/cutils.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> --
 
-The idea of having a deprecation process is precisely to
-allow time for people like to provide feedback before any
-deletion takes place. So this is not a reason to delay
-starting of deprecation.
 
-The process lasts for 2 releases before we delete anything:
+Applied, thanks.
 
-  https://qemu.weilnetz.de/doc/qemu-doc.html#Deprecated-features
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
-When we start the clock now, it is deprecated when 5.0 releases
-in April 2020, and still deprecated with 5.1 in August 2020.
-
-The code won't be deleted until Sep 2020 when 5.2 dev cycle opens,
-and there's still time to undelete it right up until the 5.2 feature
-freeze in late Oct 2020. That's 11 months away, which is plenty of
-time for feedback IMHO.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+-- PMM
 
