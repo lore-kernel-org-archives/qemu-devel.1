@@ -2,60 +2,82 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D219C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C8CC432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3493A2068F
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:27:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3493A2068F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aurel32.net
+	by mail.kernel.org (Postfix) with ESMTPS id DB82D20836
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:32:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hPb6n+u6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB82D20836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZGGV-0008Lt-5H
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 10:27:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59701)
+	id 1iZGLT-0002nG-PG
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 10:32:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aurelien@aurel32.net>) id 1iZGDj-0007VX-DW
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:24:12 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1iZGJk-0000vm-Qy
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:30:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aurelien@aurel32.net>) id 1iZGDh-0002SF-Sb
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:24:11 -0500
-Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:58894)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <aurelien@aurel32.net>)
- id 1iZGDh-0002Po-N0
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:24:09 -0500
-Received: from [2a01:e35:2fdd:a4e1:fe91:fc89:bc43:b814] (helo=ohm.rr44.fr)
- by hall.aurel32.net with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.92) (envelope-from <aurelien@aurel32.net>)
- id 1iZGDU-0000Tn-1q; Mon, 25 Nov 2019 16:23:56 +0100
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.92.3)
- (envelope-from <aurelien@aurel32.net>)
- id 1iZGDT-005kvo-HX; Mon, 25 Nov 2019 16:23:55 +0100
-Date: Mon, 25 Nov 2019 16:23:55 +0100
-From: Aurelien Jarno <aurelien@aurel32.net>
-To: Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH-for-4.2] hw/mips: Deprecate the r4k machine
-Message-ID: <20191125152355.GA1367280@aurel32.net>
-References: <20191125104103.28962-1-philmd@redhat.com>
+ (envelope-from <ehabkost@redhat.com>) id 1iZGJi-0004YN-Rl
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:30:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43301
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iZGJi-0004XI-KW
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:30:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574695816;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=YZbiYLayArMquGA5JBDU6i7utj9gksE3W3AxwNDmDq4=;
+ b=hPb6n+u6PcDXjKyXuaGFLrwpp5uQZcnWPR8FQavvmuVCiz/aMbVLuX00cIyLANKcFhlHkh
+ zgaPNEF1e0A9A8u3+wdEnkkp/FxVsR4vQW2P/4PfPihpHUj6aiy6ZHFudUBWRBTTr1PlXk
+ vJF3ZOVBWfLh/pYKOp+D+ArIuS4g3yc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-X0Gl7k1nPcmyOk62aJJq7Q-1; Mon, 25 Nov 2019 10:30:14 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C0A9911E8;
+ Mon, 25 Nov 2019 15:30:13 +0000 (UTC)
+Received: from localhost (ovpn-116-101.gru2.redhat.com [10.97.116.101])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99ECE75E2C;
+ Mon, 25 Nov 2019 15:30:12 +0000 (UTC)
+Date: Mon, 25 Nov 2019 12:30:11 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Subject: Re: [PATCH v0 1/2] qdev-properties-system: extend set_pionter for
+ unrealized devices
+Message-ID: <20191125153011.GL4438@habkost.net>
+References: <20191110190310.19799-1-dplotnikov@virtuozzo.com>
+ <20191110190310.19799-2-dplotnikov@virtuozzo.com>
+ <20191118185453.GC3812@habkost.net>
+ <d5d3ac62-4f46-08d6-bf66-620e410fa954@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
+In-Reply-To: <d5d3ac62-4f46-08d6-bf66-620e410fa954@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: X0Gl7k1nPcmyOk62aJJq7Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20191125104103.28962-1-philmd@redhat.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:bc8:30d7:100::1
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,55 +89,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, libvir-list@redhat.com,
- qemu-devel@nongnu.org,
- =?iso-8859-15?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "berrange@redhat.com" <berrange@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-11-25 11:41, Philippe Mathieu-Daud=E9 wrote:
-> The r4k machine was introduced in 2005 (6af0bf9c7) and its last
-> logical change was in 2005 (9542611a6). After we can count 164
-> maintenance commits (QEMU API changes) with the exception of
-> 1 fix in 2015 (memory leak, commit 3ad9fd5a).
+On Fri, Nov 22, 2019 at 11:36:30AM +0000, Denis Plotnikov wrote:
 >=20
-> This machine was introduced as a proof of concept to run a MIPS
-> CPU. 2 years later, the Malta machine was add (commit 5856de80)
-> modeling a real platform.
 >=20
-> Note also this machine has no specification except 5 lines in
-> the header of this file:
->=20
->  * emulates a simple machine with ISA-like bus.
->  * ISA IO space mapped to the 0x14000000 (PHYS) and
->  * ISA memory at the 0x10000000 (PHYS, 16Mb in size).
->  * All peripherial devices are attached to this "bus" with
->  * the standard PC ISA addresses.
->=20
-> It is time to deprecate this obsolete machine. Users are
-> recommended to use the Malta board, which hardware is well
-> documented.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  qemu-deprecated.texi | 5 +++++
->  hw/mips/mips_r4k.c   | 1 +
->  MAINTAINERS          | 2 +-
->  3 files changed, 7 insertions(+), 1 deletion(-)
+> On 18.11.2019 21:54, Eduardo Habkost wrote:
+> > On Sun, Nov 10, 2019 at 10:03:09PM +0300, Denis Plotnikov wrote:
+> >> Some device's property can be changed if the device has been already
+> >> realized. For example, it could be "drive" property of a scsi disk dev=
+ice.
+> >>
+> >> So far, set_pointer could operate only on a relized device. The patch
+> >> extends its interface for operation on an unrealized device.
+> >>
+> >> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> >> ---
+> >>   hw/core/qdev-properties-system.c | 32 +++++++++++++++++++++---------=
+--
+> >>   1 file changed, 21 insertions(+), 11 deletions(-)
+> >>
+> >> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-propertie=
+s-system.c
+> >> index ba412dd2ca..c534590dcd 100644
+> >> --- a/hw/core/qdev-properties-system.c
+> >> +++ b/hw/core/qdev-properties-system.c
+> >> @@ -38,9 +38,14 @@ static void get_pointer(Object *obj, Visitor *v, Pr=
+operty *prop,
+> >>   }
+> >>  =20
+> >>   static void set_pointer(Object *obj, Visitor *v, Property *prop,
+> >> -                        void (*parse)(DeviceState *dev, const char *s=
+tr,
+> >> -                                      void **ptr, const char *propnam=
+e,
+> >> -                                      Error **errp),
+> >> +                        void (*parse_realized)(DeviceState *dev,
+> >> +                                               const char *str, void =
+**ptr,
+> >> +                                               const char *propname,
+> >> +                                               Error **errp),
+> >> +                        void (*parse_unrealized)(DeviceState *dev,
+> >> +                                                 const char *str, voi=
+d **ptr,
+> >> +                                                 const char *propname=
+,
+> >> +                                                 Error **errp),
+> >>                           const char *name, Error **errp)
+> > Wouldn't it be simpler to just add a PropertyInfo::allow_set_after_real=
+ize
+> > bool field, and call the same setter function?  Then you can
+> > simply change do_parse_drive() to check if realized is true.
+> May be, but I thought It would be more clear to have a separate callback=
+=20
+> for all the devices supporting the property setting when realized.
+> Also the "drive" property setting on realized and non-realized device a=
+=20
+> little bit different: in the realized case the setter function expects=20
+> to get
+> BlockDriverState only, when in the unrealized case the setter can accept=
+=20
+> both BlockBackend and BlockDriverState. Also, in the unrealized case the=
+=20
+> setter function doesn't expect to have a device with an empty BlockBacken=
+d.
+> I decided that extending do_parse_drive would make it more complex for=20
+> understanding. That's why I made two separate functions for both cases.
 
-The Linux kernel support for this machine has been dropped more than 10
-years ago in this commit:
+I understand you might want two separate functions in the
+specific case of drive.  You can still call different
+functions after checking dev->realized inside do_parse_drive().
 
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
-id=3D302922e5f6901eb6f29c58539631f71b3d9746b8
+My point was that you don't need to make set_pointer() require
+two separate function pointers just to propagate 1 bit of
+information that is already available in DeviceState.  In patch
+2/2 you had to create 4 different copies of parse_drive*()
+because of this.
 
-I therefore think it's time to also drop support for it on the QEMU
-side.
+
+>=20
+> I'd like to mention that I have a few concerns about=20
+> do_parse_drive_realized (please see the next patch from the series) and=
+=20
+> I'd like them to be reviewed as well. After that, may be it would be=20
+> better to go the way you suggested.
+
+In the case if your questions in patch 2/2, I'm afraid I don't
+know the answers and we need help from the block maintainers.
 
 --=20
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+Eduardo
+
 
