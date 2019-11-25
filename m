@@ -2,104 +2,55 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44574C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6982C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ECBB2053B
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:06:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RbXJR3tR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECBB2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A36B2082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:08:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A36B2082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZE4A-00042b-Hy
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:06:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38736)
+	id 1iZE6n-0006ON-JO
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:08:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39338)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iZE27-0003BD-UI
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:04:09 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4E-0004e8-T5
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iZE25-0004yB-Kz
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:04:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27498
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4C-00069S-4J
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:14 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:45425 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iZE25-0004y1-HV
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:04:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574687040;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bLS+SqnLnXRCJVT3KuMONORqerXizxmCbod68H89uWg=;
- b=RbXJR3tR0mSQx5YJjunem70YtxYOA/2Cmkt9di2yVnkp14KGKqDvNMhnuza+QPYRDO7SzO
- FiQTQuq5KMvOJ7KDIqRl6aXRNoLfkkz9+L4d0cmU/Kn6L0NuWGIcSOlv/PLjBLgKeiTEu4
- GVjOgDn3Gw3DuridVi6o/VzhSDCySQQ=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-piSav1kCNzSstXMjw7YWJg-1; Mon, 25 Nov 2019 08:03:59 -0500
-Received: by mail-wr1-f69.google.com with SMTP id k15so8735480wrp.22
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 05:03:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=TKW+uNdHuIzmgPbFmfdRDEeo4YTsY36xRNfmZ5QeZmY=;
- b=dFswoXtd59mPDgZfBh+IDWlNGh+ao5kvfG4Cql32sbZfK0MC4FqmoGgjAd9LyOkwtM
- uH6pq5yiyiTO1XqfiDS7LbyavLmXnzVXyxp+aUy6aWGUmdIHWxlLKq//4HA8MgDZ+3pS
- kHozi5ivzIVHJDXN7exa8KHoi+CvVLqRt2E67Wq6UTKAJPHdmjrSsDMnoySGPmOoPHQl
- a4nCUj9JDNIrEM2TMdae42WilzIhYegVktYN++NG4gq+04spRVILhwsZDLxNq0LV/Xib
- pUOYjWX5rwwyOPYyopgxEo8PVp6T2Su8vG792Fs8FmcVXZDN2Bo/S87UAE9MNQDsUZdJ
- OZqg==
-X-Gm-Message-State: APjAAAVpu7tK5LyMYsJzPnqekxDe552k5RjKMJBdcVYAG2I2P5mqOYcv
- b3kE34XlXEYu1cp+n9r1UcUviR4mhoBwaUDv21mmvR7drYn9ZQVHhc2pa5CMA23mmxm6CEYndqY
- dbh3wqCyW/fCRsy8=
-X-Received: by 2002:a7b:c8c2:: with SMTP id f2mr27304066wml.99.1574687037072; 
- Mon, 25 Nov 2019 05:03:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwyyf/Cde4oDnlxvpoQLMyeKwSLhDCqt2b540sXRBvYAwWR0kKhe0BiVEz2uTB1NCeUA7wbTQ==
-X-Received: by 2002:a7b:c8c2:: with SMTP id f2mr27304040wml.99.1574687036805; 
- Mon, 25 Nov 2019 05:03:56 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id c9sm8088474wmb.42.2019.11.25.05.03.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 25 Nov 2019 05:03:56 -0800 (PST)
-Subject: Re: [PATCH v4 18/37] mips: baudbase is 115200 by default
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <20191120152442.26657-19-marcandre.lureau@redhat.com>
- <CAL1e-=huXgGw-uXtNXqu111O8yE-Jw_+vHXqE7Wfw1efPZATSw@mail.gmail.com>
- <CAMxuvawAL5wK31-BdGWNj4p8ZavMDAvtNgjJN7Yn6EhDyB-=uw@mail.gmail.com>
- <58a5a515-2244-a927-9ca7-c0bb64ceca53@redhat.com>
- <c61a0426-bf43-9afe-3110-51bb11d75bd1@redhat.com>
-Message-ID: <8992c003-5d65-77e9-17eb-592449cf9fdc@redhat.com>
-Date: Mon, 25 Nov 2019 14:03:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <c61a0426-bf43-9afe-3110-51bb11d75bd1@redhat.com>
-Content-Language: en-US
-X-MC-Unique: piSav1kCNzSstXMjw7YWJg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+ (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
+ id 1iZE4B-0005RA-N8
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:12 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 772581A2276;
+ Mon, 25 Nov 2019 14:05:05 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
+ [10.10.14.93])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 4B3BB1A225C;
+ Mon, 25 Nov 2019 14:05:05 +0100 (CET)
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/5] mips: jazz: Renovate coding style
+Date: Mon, 25 Nov 2019 14:04:54 +0100
+Message-Id: <1574687098-26689-2-git-send-email-Filip.Bozuta@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,158 +62,323 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
+ amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/25/19 1:54 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 11/25/19 12:26 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 11/25/19 11:12 AM, Marc-Andr=C3=A9 Lureau wrote:
->>> Hi
->>>
->>> On Mon, Nov 25, 2019 at 2:07 PM Aleksandar Markovic
->>> <aleksandar.m.mail@gmail.com> wrote:
->>>>
->>>>
->>>>
->>>> On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau=20
->>>> <marcandre.lureau@redhat.com> wrote:
->>>>>
->>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->>>>> ---
->>>>> =C2=A0 hw/mips/mips_mipssim.c | 1 -
->>>>> =C2=A0 1 file changed, 1 deletion(-)
->>>>>
->>>>> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
->>>>> index bfafa4d7e9..3cd0e6eb33 100644
->>>>> --- a/hw/mips/mips_mipssim.c
->>>>> +++ b/hw/mips/mips_mipssim.c
->>>>> @@ -223,7 +223,6 @@ mips_mipssim_init(MachineState *machine)
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (serial_hd(0)) {
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DeviceState *d=
-ev =3D qdev_create(NULL, TYPE_SERIAL_IO);
->>>>>
->>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qdev_prop_set_uint32(DEVI=
-CE(dev), "baudbase", 115200);
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qdev_prop_set_=
-chr(dev, "chardev", serial_hd(0));
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qdev_set_legac=
-y_instance_id(dev, 0x3f8, 2);
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qdev_init_nofa=
-il(dev);
->>>>> --=20
->>>>
->>>>
->>>> Please mention in your commit message where the default baudbase is=20
->>>> set.
->>>
->>> ok
->>>
->>>> Also, is there a guarantie that default value 115200 will never=20
->>>> change in future?
->>>
->>> The level of stability on properties in general is unclear to me.
->>>
->>> Given that 115200 is standard for serial, it is unlikely to change
->>> though.. We can have an assert there instead?
->>>
->>> Peter, what do you think? thanks
+The script checkpatch.pl located in scripts folder was
+used to detect all errors and warrnings in files:
+    hw/mips/mips_jazz.c
+    hw/display/jazz_led.c
+    hw/dma/rc4030.c
 
-IOW, until we merge Damien's "Clock framework API" series, I'd:
+All these mips jazz machine files were edited and
+all the errors and warrings generated by the checkpatch.pl
+script were corrected and then the script was
+ran again to make sure there are no more errors and warnings.
 
-- rename 'baudbase' -> 'input_frequency_hz'
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+---
+ hw/display/jazz_led.c | 123 +++++++++++++++++++++++++-------------------------
+ hw/dma/rc4030.c       |  12 +++--
+ hw/mips/mips_jazz.c   |  32 +++++++------
+ 3 files changed, 88 insertions(+), 79 deletions(-)
 
-- set a 0 default value
-
-  DEFINE_PROP_UINT32("input-frequency-hz", SerialState,
-                      input_frequency_hz, 0),
-
-- add a check in serial_realize()
-
-     if (s->input_frequency_hz =3D=3D 0) {
-         error_setg(errp,
-               "serial: input-frequency-hz property must be set");
-         return;
+diff --git a/hw/display/jazz_led.c b/hw/display/jazz_led.c
+index 3e0112b..1d84559 100644
+--- a/hw/display/jazz_led.c
++++ b/hw/display/jazz_led.c
+@@ -90,25 +90,25 @@ static void draw_horizontal_line(DisplaySurface *ds,
+ 
+     bpp = (surface_bits_per_pixel(ds) + 7) >> 3;
+     d = surface_data(ds) + surface_stride(ds) * posy + bpp * posx1;
+-    switch(bpp) {
+-        case 1:
+-            for (x = posx1; x <= posx2; x++) {
+-                *((uint8_t *)d) = color;
+-                d++;
+-            }
+-            break;
+-        case 2:
+-            for (x = posx1; x <= posx2; x++) {
+-                *((uint16_t *)d) = color;
+-                d += 2;
+-            }
+-            break;
+-        case 4:
+-            for (x = posx1; x <= posx2; x++) {
+-                *((uint32_t *)d) = color;
+-                d += 4;
+-            }
+-            break;
++    switch (bpp) {
++    case 1:
++        for (x = posx1; x <= posx2; x++) {
++            *((uint8_t *)d) = color;
++            d++;
++        }
++        break;
++    case 2:
++        for (x = posx1; x <= posx2; x++) {
++            *((uint16_t *)d) = color;
++            d += 2;
++        }
++        break;
++    case 4:
++        for (x = posx1; x <= posx2; x++) {
++            *((uint32_t *)d) = color;
++            d += 4;
++        }
++        break;
      }
-
-[*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg642174.html
-
->> This property confused me by the past. It is _not_ the baudrate.
->> It is the input frequency clocking the UART ('XIN' pin, Xtal INput).
->>
->> Each board has its own frequency, and it can even be variable (the=20
->> clock domain tree can reconfigure it at a different rate).
->=20
-> Laurent pointed me to the following commit which confirms my=20
-> interpretation:
->=20
-> $ git show 038eaf82c853
-> commit 038eaf82c853f3bf8d4c106c0677bbf4adada7de
-> Author: Stefan Weil <weil@mail.berlios.de>
-> Date:=C2=A0=C2=A0 Sat Oct 31 11:28:11 2009 +0100
->=20
->  =C2=A0=C2=A0=C2=A0 serial: Add interface to set reference oscillator fre=
-quency
->=20
->  =C2=A0=C2=A0=C2=A0 Many (most?) serial interfaces have a programmable
->  =C2=A0=C2=A0=C2=A0 clock which provides the reference frequency ("baudba=
-se").
->  =C2=A0=C2=A0=C2=A0 So a fixed baudbase which is only set once can be wro=
-ng.
->=20
->  =C2=A0=C2=A0=C2=A0 omap1.c is an example which could use the new interfa=
-ce
->  =C2=A0=C2=A0=C2=A0 to change baudbase when the programmable clock change=
-s.
->  =C2=A0=C2=A0=C2=A0 ar7 system emulation (still not part of standard QEMU=
-)
->  =C2=A0=C2=A0=C2=A0 is similar to omap and already uses serial_set_freque=
-ncy.
->=20
->  =C2=A0=C2=A0=C2=A0 Signed-off-by: Stefan Weil <weil@mail.berlios.de>
->  =C2=A0=C2=A0=C2=A0 Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
->=20
-> diff --git a/hw/pc.h b/hw/pc.h
-> index 15fff8d103..03ffc91536 100644
-> --- a/hw/pc.h
-> +++ b/hw/pc.h
-> @@ -13,6 +13,7 @@ SerialState *serial_mm_init (target_phys_addr_t base,=
-=20
-> int it_shift,
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 qemu_irq irq, int baudbase,
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 CharDriverState *chr, int ioregister);
->  =C2=A0SerialState *serial_isa_init(int index, CharDriverState *chr);
-> +void serial_set_frequency(SerialState *s, uint32_t frequency);
->=20
->  =C2=A0/* parallel.c */
->=20
-> diff --git a/hw/serial.c b/hw/serial.c
-> index fa12dcc075..0063260569 100644
-> --- a/hw/serial.c
-> +++ b/hw/serial.c
-> @@ -730,6 +730,13 @@ static void serial_init_core(SerialState *s)
->  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 serial_event, s);
->  =C2=A0}
->=20
-> +/* Change the main reference oscillator frequency. */
-> +void serial_set_frequency(SerialState *s, uint32_t frequency)
-> +{
-> +=C2=A0=C2=A0=C2=A0 s->baudbase =3D frequency;
-> +=C2=A0=C2=A0=C2=A0 serial_update_parameters(s);
-> +}
-> +
+ }
+ 
+@@ -121,25 +121,25 @@ static void draw_vertical_line(DisplaySurface *ds,
+ 
+     bpp = (surface_bits_per_pixel(ds) + 7) >> 3;
+     d = surface_data(ds) + surface_stride(ds) * posy1 + bpp * posx;
+-    switch(bpp) {
+-        case 1:
+-            for (y = posy1; y <= posy2; y++) {
+-                *((uint8_t *)d) = color;
+-                d += surface_stride(ds);
+-            }
+-            break;
+-        case 2:
+-            for (y = posy1; y <= posy2; y++) {
+-                *((uint16_t *)d) = color;
+-                d += surface_stride(ds);
+-            }
+-            break;
+-        case 4:
+-            for (y = posy1; y <= posy2; y++) {
+-                *((uint32_t *)d) = color;
+-                d += surface_stride(ds);
+-            }
+-            break;
++    switch (bpp) {
++    case 1:
++        for (y = posy1; y <= posy2; y++) {
++            *((uint8_t *)d) = color;
++            d += surface_stride(ds);
++        }
++        break;
++    case 2:
++        for (y = posy1; y <= posy2; y++) {
++            *((uint16_t *)d) = color;
++            d += surface_stride(ds);
++        }
++        break;
++    case 4:
++        for (y = posy1; y <= posy2; y++) {
++            *((uint32_t *)d) = color;
++            d += surface_stride(ds);
++        }
++        break;
+     }
+ }
+ 
+@@ -164,28 +164,28 @@ static void jazz_led_update_display(void *opaque)
+     if (s->state & REDRAW_SEGMENTS) {
+         /* set colors according to bpp */
+         switch (surface_bits_per_pixel(surface)) {
+-            case 8:
+-                color_segment = rgb_to_pixel8(0xaa, 0xaa, 0xaa);
+-                color_led = rgb_to_pixel8(0x00, 0xff, 0x00);
+-                break;
+-            case 15:
+-                color_segment = rgb_to_pixel15(0xaa, 0xaa, 0xaa);
+-                color_led = rgb_to_pixel15(0x00, 0xff, 0x00);
+-                break;
+-            case 16:
+-                color_segment = rgb_to_pixel16(0xaa, 0xaa, 0xaa);
+-                color_led = rgb_to_pixel16(0x00, 0xff, 0x00);
+-                break;
+-            case 24:
+-                color_segment = rgb_to_pixel24(0xaa, 0xaa, 0xaa);
+-                color_led = rgb_to_pixel24(0x00, 0xff, 0x00);
+-                break;
+-            case 32:
+-                color_segment = rgb_to_pixel32(0xaa, 0xaa, 0xaa);
+-                color_led = rgb_to_pixel32(0x00, 0xff, 0x00);
+-                break;
+-            default:
+-                return;
++        case 8:
++            color_segment = rgb_to_pixel8(0xaa, 0xaa, 0xaa);
++            color_led = rgb_to_pixel8(0x00, 0xff, 0x00);
++            break;
++        case 15:
++            color_segment = rgb_to_pixel15(0xaa, 0xaa, 0xaa);
++            color_led = rgb_to_pixel15(0x00, 0xff, 0x00);
++            break;
++        case 16:
++            color_segment = rgb_to_pixel16(0xaa, 0xaa, 0xaa);
++            color_led = rgb_to_pixel16(0x00, 0xff, 0x00);
++            break;
++        case 24:
++            color_segment = rgb_to_pixel24(0xaa, 0xaa, 0xaa);
++            color_led = rgb_to_pixel24(0x00, 0xff, 0x00);
++            break;
++        case 32:
++            color_segment = rgb_to_pixel32(0xaa, 0xaa, 0xaa);
++            color_led = rgb_to_pixel32(0x00, 0xff, 0x00);
++            break;
++        default:
++            return;
+         }
+ 
+         /* display segments */
+@@ -205,8 +205,9 @@ static void jazz_led_update_display(void *opaque)
+                              (s->segments & 0x80) ? color_segment : 0);
+ 
+         /* display led */
+-        if (!(s->segments & 0x01))
++        if (!(s->segments & 0x01)) {
+             color_led = 0; /* black */
++        }
+         draw_horizontal_line(surface, 68, 50, 50, color_led);
+         draw_horizontal_line(surface, 69, 49, 51, color_led);
+         draw_horizontal_line(surface, 70, 48, 52, color_led);
+diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
+index d54e296..f7542f3 100644
+--- a/hw/dma/rc4030.c
++++ b/hw/dma/rc4030.c
+@@ -397,10 +397,11 @@ static void update_jazz_irq(rc4030State *s)
+ 
+     pending = s->isr_jazz & s->imr_jazz;
+ 
+-    if (pending != 0)
++    if (pending != 0) {
+         qemu_irq_raise(s->jazz_bus_irq);
+-    else
++    } else {
+         qemu_irq_lower(s->jazz_bus_irq);
++    }
+ }
+ 
+ static void rc4030_irq_jazz_request(void *opaque, int irq, int level)
+@@ -588,7 +589,8 @@ static const VMStateDescription vmstate_rc4030 = {
+     }
+ };
+ 
+-static void rc4030_do_dma(void *opaque, int n, uint8_t *buf, int len, int is_write)
++static void rc4030_do_dma(void *opaque, int n, uint8_t *buf,
++                          int len, int is_write)
+ {
+     rc4030State *s = opaque;
+     hwaddr dma_addr;
+@@ -643,8 +645,8 @@ static rc4030_dma *rc4030_allocate_dmas(void *opaque, int n)
+     struct rc4030DMAState *p;
+     int i;
+ 
+-    s = (rc4030_dma *)g_malloc0(sizeof(rc4030_dma) * n);
+-    p = (struct rc4030DMAState *)g_malloc0(sizeof(struct rc4030DMAState) * n);
++    s = (rc4030_dma *)g_new0(sizeof(rc4030_dma) * n);
++    p = (struct rc4030DMAState *)g_new0(sizeof(struct rc4030DMAState) * n);
+     for (i = 0; i < n; i++) {
+         p->opaque = opaque;
+         p->n = i;
+diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
+index d978bb6..ac4d7ac 100644
+--- a/hw/mips/mips_jazz.c
++++ b/hw/mips/mips_jazz.c
+@@ -52,8 +52,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu/help_option.h"
+ 
+-enum jazz_model_e
+-{
++enum jazz_model_e {
+     JAZZ_MAGNUM,
+     JAZZ_PICA61,
+ };
+@@ -90,16 +89,20 @@ static const MemoryRegionOps rtc_ops = {
+ static uint64_t dma_dummy_read(void *opaque, hwaddr addr,
+                                unsigned size)
+ {
+-    /* Nothing to do. That is only to ensure that
+-     * the current DMA acknowledge cycle is completed. */
++    /*
++     * Nothing to do. That is only to ensure that
++     * the current DMA acknowledge cycle is completed.
++     */
+     return 0xff;
+ }
+ 
+ static void dma_dummy_write(void *opaque, hwaddr addr,
+                             uint64_t val, unsigned size)
+ {
+-    /* Nothing to do. That is only to ensure that
+-     * the current DMA acknowledge cycle is completed. */
++    /*
++     * Nothing to do. That is only to ensure that
++     * the current DMA acknowledge cycle is completed.
++     */
+ }
+ 
+ static const MemoryRegionOps dma_dummy_ops = {
+@@ -109,8 +112,8 @@ static const MemoryRegionOps dma_dummy_ops = {
+ };
+ 
+ #define MAGNUM_BIOS_SIZE_MAX 0x7e000
+-#define MAGNUM_BIOS_SIZE (BIOS_SIZE < MAGNUM_BIOS_SIZE_MAX ? BIOS_SIZE : MAGNUM_BIOS_SIZE_MAX)
+-
++#define MAGNUM_BIOS_SIZE                                                       \
++        (BIOS_SIZE < MAGNUM_BIOS_SIZE_MAX ? BIOS_SIZE : MAGNUM_BIOS_SIZE_MAX)
+ static void (*real_do_transaction_failed)(CPUState *cpu, hwaddr physaddr,
+                                           vaddr addr, unsigned size,
+                                           MMUAccessType access_type,
+@@ -201,8 +204,9 @@ static void mips_jazz_init(MachineState *machine,
+     memory_region_add_subregion(address_space, 0xfff00000LL, bios2);
+ 
+     /* load the BIOS image. */
+-    if (bios_name == NULL)
++    if (bios_name == NULL) {
+         bios_name = BIOS_FILENAME;
++    }
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+     if (filename) {
+         bios_size = load_image_targphys(filename, 0xfff00000LL,
+@@ -229,7 +233,8 @@ static void mips_jazz_init(MachineState *machine,
+                                 sysbus_mmio_get_region(sysbus, 0));
+     memory_region_add_subregion(address_space, 0xf0000000,
+                                 sysbus_mmio_get_region(sysbus, 1));
+-    memory_region_init_io(dma_dummy, NULL, &dma_dummy_ops, NULL, "dummy_dma", 0x1000);
++    memory_region_init_io(dma_dummy, NULL, &dma_dummy_ops,
++                          NULL, "dummy_dma", 0x1000);
+     memory_region_add_subregion(address_space, 0x8000d000, dma_dummy);
+ 
+     /* ISA bus: IO space at 0x90000000, mem space at 0x91000000 */
+@@ -276,8 +281,9 @@ static void mips_jazz_init(MachineState *machine,
+     /* Network controller */
+     for (n = 0; n < nb_nics; n++) {
+         nd = &nd_table[n];
+-        if (!nd->model)
++        if (!nd->model) {
+             nd->model = g_strdup("dp83932");
++        }
+         if (strcmp(nd->model, "dp83932") == 0) {
+             qemu_check_nic_model(nd, "dp83932");
+ 
+@@ -338,12 +344,12 @@ static void mips_jazz_init(MachineState *machine,
+     /* Serial ports */
+     if (serial_hd(0)) {
+         serial_mm_init(address_space, 0x80006000, 0,
+-                       qdev_get_gpio_in(rc4030, 8), 8000000/16,
++                       qdev_get_gpio_in(rc4030, 8), 8000000 / 16,
+                        serial_hd(0), DEVICE_NATIVE_ENDIAN);
+     }
+     if (serial_hd(1)) {
+         serial_mm_init(address_space, 0x80007000, 0,
+-                       qdev_get_gpio_in(rc4030, 9), 8000000/16,
++                       qdev_get_gpio_in(rc4030, 9), 8000000 / 16,
+                        serial_hd(1), DEVICE_NATIVE_ENDIAN);
+     }
+ 
+-- 
+2.7.4
 
 
