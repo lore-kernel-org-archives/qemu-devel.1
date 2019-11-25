@@ -2,86 +2,82 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2792C432C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 05:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EB9C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 06:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D94F20722
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 05:19:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C342B2071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 06:06:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EQRaE/ZG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D94F20722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g+31myNZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C342B2071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZ6m3-0002dR-O9
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 00:18:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60937)
+	id 1iZ7VY-0004pY-S8
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 01:06:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chanmickyyun@gmail.com>) id 1iZ6kk-00021v-Vv
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 00:17:40 -0500
+ (envelope-from <armbru@redhat.com>) id 1iZ7UK-00040P-NV
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:04:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chanmickyyun@gmail.com>) id 1iZ6kj-0008Tb-IY
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 00:17:38 -0500
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:34776)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chanmickyyun@gmail.com>)
- id 1iZ6kj-0008T9-A6
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 00:17:37 -0500
-Received: by mail-pj1-x1044.google.com with SMTP id bo14so6041023pjb.1
- for <qemu-devel@nongnu.org>; Sun, 24 Nov 2019 21:17:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ygmWUQVGfjQeEcsNMJj7J5gbbH1BMIpxqZhVGLERJX8=;
- b=EQRaE/ZGRGqEx81+k4D2+W3bEMAL4TosveOUr0jC1BcHp2G7ELSIA1/imPLNckoXhQ
- BZ4MB375onMjHHY3nYEH2WxlekUfj1MG4GSw7qvYOFFttWG5GoI1jwf0EYn/i6Rfowcy
- zxnQLAB88cPbRFAAVNx0vRGp00fKnPxtntQMlBkK77xfMnd6cA0CaqAj5ZAh94JsTwoe
- 704CwG/21TCDtQ3YbQHd6mw7HA1KMA1iX6g+9arBGSw7Zl+VzOMlRBa+UOA9I/uxij9Z
- xvGKR1oDGvxplTOzx+m+rYQJNRbBCA30i5WsMkJe+XwpGsUrv7MfkLsQw6Dtu4ujtYVD
- JR6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ygmWUQVGfjQeEcsNMJj7J5gbbH1BMIpxqZhVGLERJX8=;
- b=AY9gf/OTomC0heQGpIKPoEfzJ1aSmOU4A3yS8gtF5jrDpi5c6kJ+H48oYFCbBtPpL5
- b2dPetxS7MPcEmvkrSSqNagIIlMhTCM6VcRyKTqcY5Y20SH+tNaxrdpVgx1Tbq/4lVrU
- AFJbaq8bjX5MHoeahuScQVMFTCSaWd9s5cqqz4O90k7vyo77zMr42WU5OPHeN8GlscFd
- QN42qP20vW9rV72IJcHkKVssKXAJb5BmRtL34r1y+853S1bf4MhdsM6RGywifrqzLFPj
- PfJtWiEVj9gCbnxMpMvWUZjpRqCydDw/ujjZAOSPZQrbnNPUtoWn/SvkR3xF9Gf5oM6P
- +IWA==
-X-Gm-Message-State: APjAAAVKWbUTdr2YNp2hPMu73i7ig3fbCgB3QsOhY2ewkBACv+oYpPyz
- 8e7RbZCeH61u52jOiVqah93HeT+81UOazEK2
-X-Google-Smtp-Source: APXvYqykIpww8Evp/oAAURusglwiAHcaunlmt96RBfehKS1gzoOYtme0k47KsQX5PaNjv+tYo41hYA==
-X-Received: by 2002:a17:90b:144:: with SMTP id
- em4mr37383246pjb.29.1574659055159; 
- Sun, 24 Nov 2019 21:17:35 -0800 (PST)
-Received: from localhost.localdomain.com ([209.132.188.80])
- by smtp.gmail.com with ESMTPSA id f5sm6088153pjp.1.2019.11.24.21.17.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 24 Nov 2019 21:17:34 -0800 (PST)
-From: "Micky Yun Chan(michiboo)" <chanmickyyun@gmail.com>
+ (envelope-from <armbru@redhat.com>) id 1iZ7UI-0006Ep-Mw
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:04:43 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:38380
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iZ7UI-0006ES-JP
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:04:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574661881;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4ot0NJdWkQNmsmox6r+YbvvtibIqJK4VygzoFGdX+ng=;
+ b=g+31myNZjMQfBx0mIllK/0Zpc4YJkBM8wdcPLtUT/S8NE9Y0GsUrDrY8ENveYPtE1SJoNk
+ mYXzK0CO0ORQM2GAE5m9f9OaNBojo0l3O6AI77yXXokhuUlGmhjdQUrb7Noqh9/eJxd4sF
+ sNPcTC1LeEFySuwjSvJHvndSDoLUmdI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-294-LlPSZyZTP4ijNBP_fpYB1w-1; Mon, 25 Nov 2019 01:04:37 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 554571883525;
+ Mon, 25 Nov 2019 06:04:36 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0CD191001281;
+ Mon, 25 Nov 2019 06:04:36 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 82DB811385C7; Mon, 25 Nov 2019 07:04:34 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7] Implement backend program convention command for
- vhost-user-blk
-Date: Mon, 25 Nov 2019 13:17:22 +0800
-Message-Id: <20191125051722.15523-1-chanmickyyun@gmail.com>
-X-Mailer: git-send-email 2.21.0
+Subject: [PULL 1/1] util/cutils: Fix incorrect integer->float conversion
+ caught by clang
+Date: Mon, 25 Nov 2019 07:04:34 +0100
+Message-Id: <20191125060434.22997-2-armbru@redhat.com>
+In-Reply-To: <20191125060434.22997-1-armbru@redhat.com>
+References: <20191125060434.22997-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1044
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: LlPSZyZTP4ijNBP_fpYB1w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,238 +89,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Micky Yun Chan <chanmickyyun@gmail.com>, stefanha@redhat.com,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Fangrui Song <i@maskray.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Micky Yun Chan <chanmickyyun@gmail.com>
+From: Fangrui Song <i@maskray.me>
 
-This patch is to add standard commands defined in docs/interop/vhost-user.rst
-For vhost-user-* program
+Clang does not like do_strtosz()'s code to guard against overflow:
 
-Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
+    qemu/util/cutils.c:245:23: error: implicit conversion from 'unsigned lo=
+ng' to 'double' changes value from 18446744073709550592 to 1844674407370955=
+1616 [-Werror,-Wimplicit-int-float-conversion]
+
+The warning will be enabled by default in clang 10. It is not
+available for clang <=3D 9.
+
+val * mul >=3D 0xfffffffffffffc00 is indeed wrong.  0xfffffffffffffc00
+is not representable exactly as double.  It's half-way between the
+representable values 0xfffffffffffff800 and 0x10000000000000000.
+Which one we get is implementation-defined.  Bad.
+
+We want val * mul > (the largest uint64_t exactly representable as
+double).  That's 0xfffffffffffff800.  Write it as nextafter(0x1p64, 0)
+with a suitable comment.
+
+Signed-off-by: Fangrui Song <i@maskray.me>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+[Patch split, commit message improved]
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20191122080039.12771-3-armbru@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 ---
- contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
- docs/interop/vhost-user.json            |  31 +++++++
- docs/interop/vhost-user.rst             |  15 ++++
- 3 files changed, 110 insertions(+), 44 deletions(-)
+ util/cutils.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-index ae61034656..6fd91c7e99 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -576,70 +576,90 @@ vub_new(char *blk_file)
-     return vdev_blk;
- }
- 
-+static int opt_fdnum = -1;
-+static char *opt_socket_path;
-+static char *opt_blk_file;
-+static gboolean opt_print_caps;
-+static gboolean opt_read_only;
-+
-+static GOptionEntry entries[] = {
-+    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-+      "Print capabilities", NULL },
-+    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-+      "Use inherited fd socket", "FDNUM" },
-+    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-+      "Use UNIX socket path", "PATH" },
-+    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
-+     "block device or file path", "PATH"},
-+    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
-+      "Enable read-only", NULL }
-+};
-+
- int main(int argc, char **argv)
- {
--    int opt;
--    char *unix_socket = NULL;
--    char *blk_file = NULL;
--    bool enable_ro = false;
-     int lsock = -1, csock = -1;
-     VubDev *vdev_blk = NULL;
-+    GError *error = NULL;
-+    GOptionContext *context;
- 
--    while ((opt = getopt(argc, argv, "b:rs:h")) != -1) {
--        switch (opt) {
--        case 'b':
--            blk_file = g_strdup(optarg);
--            break;
--        case 's':
--            unix_socket = g_strdup(optarg);
--            break;
--        case 'r':
--            enable_ro = true;
--            break;
--        case 'h':
--        default:
--            printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
--                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--            return 0;
-+    context = g_option_context_new(NULL);
-+    g_option_context_add_main_entries(context, entries, NULL);
-+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-+        g_printerr("Option parsing failed: %s\n", error->message);
-+        exit(EXIT_FAILURE);
-+    }
-+    if (opt_print_caps) {
-+        g_print("{\n");
-+        g_print("  \"type\": \"block\",\n");
-+        g_print("  \"features\": [\n");
-+        g_print("    \"read-only\",\n");
-+        g_print("    \"blk-file\"\n");
-+        g_print("  ]\n");
-+        g_print("}\n");
-+        exit(EXIT_SUCCESS);
-+    }
-+
-+    if (!opt_blk_file) {
-+        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (opt_socket_path) {
-+        lsock = unix_sock_new(opt_socket_path);
-+        if (lsock < 0) {
-+            exit(EXIT_FAILURE);
-         }
-+    } else if (opt_fdnum < 0) {
-+        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-+        exit(EXIT_FAILURE);
-+    } else {
-+        lsock = opt_fdnum;
+diff --git a/util/cutils.c b/util/cutils.c
+index fd591cadf0..77acadc70a 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -239,10 +239,12 @@ static int do_strtosz(const char *nptr, const char **=
+end,
+         goto out;
      }
- 
--    if (!unix_socket || !blk_file) {
--        printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
--               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--        return -1;
--    }
--
--    lsock = unix_sock_new(unix_socket);
--    if (lsock < 0) {
--        goto err;
--    }
--
--    csock = accept(lsock, (void *)0, (void *)0);
-+    csock = accept(lsock, NULL, NULL);
-     if (csock < 0) {
--        fprintf(stderr, "Accept error %s\n", strerror(errno));
--        goto err;
-+        g_printerr("Accept error %s\n", strerror(errno));
-+        exit(EXIT_FAILURE);
+     /*
+-     * Values >=3D 0xfffffffffffffc00 overflow uint64_t after their trip
+-     * through double (53 bits of precision).
++     * Values near UINT64_MAX overflow to 2**64 when converting to double
++     * precision.  Compare against the maximum representable double precis=
+ion
++     * value below 2**64, computed as "the next value after 2**64 (0x1p64)=
+ in
++     * the direction of 0".
+      */
+-    if ((val * mul >=3D 0xfffffffffffffc00) || val < 0) {
++    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
+         retval =3D -ERANGE;
+         goto out;
      }
- 
--    vdev_blk = vub_new(blk_file);
-+    vdev_blk = vub_new(opt_blk_file);
-     if (!vdev_blk) {
--        goto err;
-+        exit(EXIT_FAILURE);
-     }
--    if (enable_ro) {
-+    if (opt_read_only) {
-         vdev_blk->enable_ro = true;
-     }
- 
-     if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
-                   vub_panic_cb, &vub_iface)) {
--        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
--        goto err;
-+        g_printerr("Failed to initialize libvhost-user-glib\n");
-+        exit(EXIT_FAILURE);
-     }
- 
-     g_main_loop_run(vdev_blk->loop);
--
-+    g_main_loop_unref(vdev_blk->loop);
-+    g_option_context_free(context);
-     vug_deinit(&vdev_blk->parent);
--
--err:
-     vub_free(vdev_blk);
-     if (csock >= 0) {
-         close(csock);
-@@ -647,8 +667,8 @@ err:
-     if (lsock >= 0) {
-         close(lsock);
-     }
--    g_free(unix_socket);
--    g_free(blk_file);
-+    g_free(opt_socket_path);
-+    g_free(opt_blk_file);
- 
-     return 0;
- }
-diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-index da6aaf51c8..ce0ef74db5 100644
---- a/docs/interop/vhost-user.json
-+++ b/docs/interop/vhost-user.json
-@@ -54,6 +54,37 @@
-   ]
- }
- 
-+##
-+# @VHostUserBackendBlockFeature:
-+#
-+# List of vhost user "block" features.
-+#
-+# @read-only: The --read-only command line option is supported.
-+# @blk-file: The --blk-file command line option is supported.
-+#
-+# Since: 5.0
-+##
-+{
-+  'enum': 'VHostUserBackendBlockFeature',
-+  'data': [ 'read-only', 'blk-file' ]
-+}
-+
-+##
-+# @VHostUserBackendCapabilitiesBlock:
-+#
-+# Capabilities reported by vhost user "block" backends
-+#
-+# @features: list of supported features.
-+#
-+# Since: 5.0
-+##
-+{
-+  'struct': 'VHostUserBackendCapabilitiesBlock',
-+  'data': {
-+    'features': [ 'VHostUserBackendBlockFeature' ]
-+  }
-+}
-+
- ##
- # @VHostUserBackendInputFeature:
- #
-diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-index 7827b710aa..2f0910d515 100644
---- a/docs/interop/vhost-user.rst
-+++ b/docs/interop/vhost-user.rst
-@@ -1376,3 +1376,18 @@ Command line options:
-   Enable virgl rendering support.
- 
-   (optional)
-+
-+vhost-user-blk
-+--------------
-+
-+Command line options:
-+
-+--blk-file=PATH
-+
-+  Specify block device or file path.
-+
-+--read-only
-+
-+  Enable read-only.
-+
-+  (optional)
--- 
+--=20
 2.21.0
 
 
