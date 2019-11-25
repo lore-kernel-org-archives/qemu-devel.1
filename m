@@ -2,65 +2,66 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E27D7C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:05:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A33C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:22:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABAA22075C
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:05:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A60BB207FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:22:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lexk+/ht"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABAA22075C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPLtnuzu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A60BB207FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZD7T-0003J6-SK
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 07:05:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56604)
+	id 1iZDNq-0000Zx-IN
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 07:22:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58931)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iZD4W-0001PI-0x
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:02:28 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iZDM8-0007Hq-6o
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:20:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iZD4V-00080Z-0G
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:02:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37950
+ (envelope-from <mreitz@redhat.com>) id 1iZDKr-0007Tv-KL
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:19:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36537
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iZD4U-000802-Si
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:02:26 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iZDKr-0007TV-Fv
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:19:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574683346;
+ s=mimecast20190719; t=1574684360;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=RZasd1jzsERD00vSG6IV2L+mtNaVW+NnUpSjJ9fFilE=;
- b=Lexk+/htORZbs/LIiMBeOegQBpchkkuuB4pVDAtr/oJbow0KCD0lwfi+4fyWmtJpn5IBsk
- CzlpOK1yZY8xNSsQ6BbH5Ykeg0kchubigWG+V1Za0xYbfI6um9F5jR1414I9HpzGoSk9yM
- yqTixfM+dYhmwCq5IsezdBq43j614no=
+ bh=YArkaHTKwh4qpgiVm5BJjVUH78OxmyQ2lfP1CUQzAcc=;
+ b=NPLtnuzup9EmMQBLci6lNq4QB5I0atfJFdLGLB2/ONMlqoaWBwAe0b4sFjJgPvIbWeG8EE
+ PqO3HqF1K9xMUCqBVYzoZ0X/ZGm8C/WmAt7CTvnmJAK1DefX/vNsDimY7RrZEm5lOkzuEk
+ e2fEg2aVdFTkhWdu5u08arZ1WLdOkJc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-fTYQDrozPuORqRwsQr8zgA-1; Mon, 25 Nov 2019 07:02:23 -0500
-X-MC-Unique: fTYQDrozPuORqRwsQr8zgA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-380-9TlXY63KOEyozqAE65ERFw-1; Mon, 25 Nov 2019 07:19:19 -0500
+X-MC-Unique: 9TlXY63KOEyozqAE65ERFw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E73718C54B5;
- Mon, 25 Nov 2019 12:02:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5410780058F;
+ Mon, 25 Nov 2019 12:19:17 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F75D600C6;
- Mon, 25 Nov 2019 12:02:17 +0000 (UTC)
-Subject: Re: [PATCH v3 3/8] qcow2: Declare BDRV_REQ_NO_FALLBACK supported
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C8620165D3;
+ Mon, 25 Nov 2019 12:19:12 +0000 (UTC)
+Subject: Re: [PATCH v3 8/8] iotests: Test committing to short backing file
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 References: <20191122160511.8377-1-kwolf@redhat.com>
- <20191122160511.8377-4-kwolf@redhat.com>
+ <20191122160511.8377-9-kwolf@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,17 +87,17 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <422fbd18-a1e0-8d8c-f2ad-e7d16115d2a8@redhat.com>
-Date: Mon, 25 Nov 2019 13:02:15 +0100
+Message-ID: <3d25cde9-5153-8c16-0c47-eeb0038891dc@redhat.com>
+Date: Mon, 25 Nov 2019 13:19:10 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191122160511.8377-4-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20191122160511.8377-9-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="DXtmWIOyttkn3ZUprmsHjwP7Qp6R7UlXO"
+ boundary="KYIag6UH8yblv9yjHl73l8scK7wKsGHmN"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -117,52 +118,79 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DXtmWIOyttkn3ZUprmsHjwP7Qp6R7UlXO
-Content-Type: multipart/mixed; boundary="sJqOnoCBbphE3YjqCMXYSJCElCndK3NA9"
+--KYIag6UH8yblv9yjHl73l8scK7wKsGHmN
+Content-Type: multipart/mixed; boundary="EPYg29A41k9mQqBsexcUZihidvCUEZr2g"
 
---sJqOnoCBbphE3YjqCMXYSJCElCndK3NA9
+--EPYg29A41k9mQqBsexcUZihidvCUEZr2g
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 22.11.19 17:05, Kevin Wolf wrote:
-> In the common case, qcow2_co_pwrite_zeroes() already only modifies
-> metadata case, so we're fine with or without BDRV_REQ_NO_FALLBACK set.
->=20
-> The only exception is when using an external data file, where the
-> request is passed down to the block driver of the external data file. We
-> are forwarding the BDRV_REQ_NO_FALLBACK flag there, though, so this is
-> fine, too.
->=20
-> Declare the flag supported therefore.
->=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block/qcow2.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  tests/qemu-iotests/274        | 152 +++++++++++++++++++++++++
+>  tests/qemu-iotests/274.out    | 203 ++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/group      |   1 +
+>  tests/qemu-iotests/iotests.py |   2 +-
+>  4 files changed, 357 insertions(+), 1 deletion(-)
+>  create mode 100755 tests/qemu-iotests/274
+>  create mode 100644 tests/qemu-iotests/274.out
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+[...]
+
+> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
+y
+> index b46d298766..9135dd52b6 100644
+> --- a/tests/qemu-iotests/iotests.py
+> +++ b/tests/qemu-iotests/iotests.py
+> @@ -149,7 +149,7 @@ def img_info_log(filename, filter_path=3DNone, imgopt=
+s=3DFalse, extra_args=3D[]):
+>      output =3D qemu_img_pipe(*args)
+>      if not filter_path:
+>          filter_path =3D filename
+> -    log(filter_img_info(output, filter_path))
+> +    log(filter_img_info(output, filter_path), filters=3D[filter_testfile=
+s])
+
+This doesn=E2=80=99t work when the path contains $IMGFMT.  The test dir fil=
+ter
+must then run before the image format filter.  For example, I usually
+run the tests in /tmp/test-${IMGFMT}-${IMGPROTO} (i.e.
+/tmp/test-qcow2-file for -qcow2), and this test fails for me:
+
+@@ -49,7 +49,7 @@
+ file format: IMGFMT
+ virtual size: 2 MiB (2097152 bytes)
+ cluster_size: 65536
+-backing file: TEST_DIR/PID-base
++backing file: /tmp/test-IMGFMT-file/40083-base
+ Format specific information:
+     compat: 1.1
+     lazy refcounts: false
+
+Max
 
 
---sJqOnoCBbphE3YjqCMXYSJCElCndK3NA9--
+--EPYg29A41k9mQqBsexcUZihidvCUEZr2g--
 
---DXtmWIOyttkn3ZUprmsHjwP7Qp6R7UlXO
+--KYIag6UH8yblv9yjHl73l8scK7wKsGHmN
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3bwscACgkQ9AfbAGHV
-z0BakwgAlgfyxQmNjJB1Ncv5zNQyCXKdDCHoQEQQ0asAJooqZusG1VZucNZha/0g
-auxa2AIf31T0nsFAP1YQY4Wl52fVPAQ5tRr5WXrS3raTulwlaX1zovcUS1ObYUl4
-mJLXMDXTfUGSmD3UTVOrCo15U+IrDzmf7KlV8a01UHYqkTM6zjXAeOLdHoiasgi9
-g1bzWyYDtWVapCZmaAa/qArDv736oE3GAaGmvrgRdRsMbpjpSn2GBqfMFTSI7M5L
-WCnLY3Dtg2fnniiUaYtaNg32pEXLLjMGZ1DuzRnRSbag0nlE9TQOFh5lJqY7hBKQ
-C5bRMc2JM1j+SkDd5NPDpwtxZNk+Cw==
-=X4UJ
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3bxr4ACgkQ9AfbAGHV
+z0C6BQf+IIApyNNBMJCp4kx61NNzweyUoqGv7PszGs/EbGaKlzJAM0cuJIJa+aqm
+MF6S1h3cbqvZUVGXwN1grNDGU6wcuBCmAZLlL85fCRCShAId1KdgpK8uNfgkYR0s
+gKnVTUo5b5+VCKFo1HmGn8Hz+AIdzstJ7CVd/4o2JfXib6hiFbl0G0fuZLn373Jo
+xdMeRntONuMHsuEqiBm96OH6ZxNGVe7BHmyfvk896oFQMPWA5a5Ll94zh3o20FHB
+nzapiHlx1ecJpeMZW0VCG9RUUzGZiBRhcyHWq6sPJhw7GLB7qrBoyVI62vNarrBy
++X5TaCjr4Oh2S03/1z8NYhREvgZ1iw==
+=jFQp
 -----END PGP SIGNATURE-----
 
---DXtmWIOyttkn3ZUprmsHjwP7Qp6R7UlXO--
+--KYIag6UH8yblv9yjHl73l8scK7wKsGHmN--
 
 
