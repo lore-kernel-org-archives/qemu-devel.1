@@ -2,104 +2,68 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94007C432C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 23:16:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98EA0C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 23:21:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D42320659
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 23:16:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BlfQLmcU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D42320659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C68420740
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 23:21:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C68420740
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZNaN-0001G5-Br
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 18:16:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45214)
+	id 1iZNg3-0003sS-Fb
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 18:21:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46440)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iZNYS-00087w-9n
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:14:05 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iZNeu-00031p-ET
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:20:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iZNJo-0005pa-Pj
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 17:58:58 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51500
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iZNJo-0005p7-M3
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 17:58:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574722735;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0UKnSsYStnsFscai7T5yUT6EQXCsmR9aRmU8AE3GsBA=;
- b=BlfQLmcUZgOe7fE5TelGObaHdT6H3UCoKepkrh9fF7KrLTgrgCEOMajIEtt/aoIzL/+ONo
- C0XSg6fTrMRG78DJIYX7/xXgq80DRdxeNrk9QJpApR94YmLLCLB5G9xLZe14qocD4ptqIE
- 2/cizNFDlaXbCWSfSfwwIaOm0Vi1AMo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-375-HmUROV1BNU2xm6utGUfq0g-1; Mon, 25 Nov 2019 17:58:52 -0500
-Received: by mail-wr1-f70.google.com with SMTP id d8so5629191wrq.12
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 14:58:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NpXhVvMGh0MKJHmPhQtvc16wZPx18TO9OgQ/Cw3ghic=;
- b=gJpkwatoCcDN3Pz+1RH3EgUyT/98zIf6R8LeUQojZGBFR5iu4XSDUOnL18M6TXpVXM
- bf0XnP7eLtSpiPcBlJBVHKawOO2TEDw++i5kIbPKJao2xBYGNq2z+ufWX0mPCKkGrSfP
- rkNiuX4s36R1ZdBK2vsqUdGm1MuaHfkRCuTIOAWz1mh2tVAOoZhIa1IaFgTTN7N+RnV9
- nrad5RCnu4eJh+ysb7wyYw+NE4E48x1SCl0S6Zvg05zUCboBmZ9ujCSneO16lrUZA3o2
- R0A6oYznOXjQ5q111sz79TZW9XPoeof9cAlli1WmydW9VTcjTshuJsJnzwfCyprdmvJV
- Az7Q==
-X-Gm-Message-State: APjAAAU9apGANfiX9OOG3fuGnYacy+0/XEUW4Nai2a86F+UqGQVCo7oP
- vAAg/NDYz/3U6uGzdT5qg7theX65MrPXaeOF3cGQQkLYw0EDJU2sOg50Xm2gi175UGWY2MWLopN
- twL9qjXGdVIEZx0M=
-X-Received: by 2002:adf:9f43:: with SMTP id f3mr34108763wrg.76.1574722731596; 
- Mon, 25 Nov 2019 14:58:51 -0800 (PST)
-X-Google-Smtp-Source: APXvYqydJhRGuhL+XmGR0w7ajKA26c8Sr/c/5HiskZknAlJf6ck2pMmDODmiaRgQLJ+58RsfUT8xbA==
-X-Received: by 2002:adf:9f43:: with SMTP id f3mr34108753wrg.76.1574722731345; 
- Mon, 25 Nov 2019 14:58:51 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id w12sm892941wmi.17.2019.11.25.14.58.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 25 Nov 2019 14:58:50 -0800 (PST)
-Subject: Re: [EXTERNAL]Re: [PATCH v2 2/5] MAINTAINERS: Adjust maintainership
- for Fulong 2E board
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-To: chen huacai <zltjiangshi@gmail.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>
-References: <1573652826-23987-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1573652826-23987-3-git-send-email-aleksandar.markovic@rt-rk.com>
- <c053c16c-c6f4-4f73-7383-7b66e54ad696@redhat.com>
- <BN6PR2201MB12512B977314BCFCA202449DC6710@BN6PR2201MB1251.namprd22.prod.outlook.com>
- <CABDp7VoVpZsQpDc7U4uJ1B7ZVCc8A2KO5qNaOucHQH6xUdX8tQ@mail.gmail.com>
- <4a94a570-301b-e2db-6090-929e63f907cd@redhat.com>
-Message-ID: <c6779bb7-7353-7c4a-e458-b0d60ca662de@redhat.com>
-Date: Mon, 25 Nov 2019 23:58:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <no-reply@patchew.org>) id 1iZNes-0008C6-JV
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:20:43 -0500
+Resent-Date: Mon, 25 Nov 2019 18:20:43 -0500
+Resent-Message-Id: <E1iZNes-0008C6-JV@eggs.gnu.org>
+Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21842)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iZNes-0008Bp-Bf; Mon, 25 Nov 2019 18:20:42 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574724029; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Zx6MgozdAYKTnQ4CxNvP9HR3t5Y67M7RkL63gTc6OCXFbsKr5iD4tutMbHxX3+Hn0GHP9gEVDZDq2cfj2U4WEg0gOL0Wb/kTDPdLAH5t6fQDT/Y7CUlQMzBlZImWFpTQCIk/1TU6dVgVrBuJ4g7Fv2R8MESq7kfKzMox6UNSqzE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1574724029;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=XNtKQQdJm9jYMdXyexvtCI8NLGMJh+NTIZNPjTx+i7Q=; 
+ b=kiosqyhjCPz6WzfuxFEDk51hXahpYOJpUlRZXCRARaL7gf243OQbBjrFC9pIG3HMk37MsYPdSJbRPVRnEIkukNXHNtaOvL/1Ts6P3powGounWYmKLDNmpmtiqh8etaZ9qQLjxWrTmGcGSq96JJt0aHo5MIVi5k7wxTfQxftLqFU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 157472402749278.99801083434284;
+ Mon, 25 Nov 2019 15:20:27 -0800 (PST)
+In-Reply-To: <20191125172031.16282-1-david@redhat.com>
+Subject: Re: [PATCH v2 0/2] s390x/cpumodel: Introduce dynamic feature group
+Message-ID: <157472402533.28656.6410799825544177136@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <4a94a570-301b-e2db-6090-929e63f907cd@redhat.com>
-Content-Language: en-US
-X-MC-Unique: HmUROV1BNU2xm6utGUfq0g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: david@redhat.com
+Date: Mon, 25 Nov 2019 15:20:27 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 136.143.188.58
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,145 +75,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- "hpoussin@reactos.org" <hpoussin@reactos.org>, Huacai Chen <chenhc@lemote.com>,
- "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
- "aurelien@aurel32.net" <aurelien@aurel32.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, thuth@redhat.com, berrange@redhat.com,
+ frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ pasic@linux.ibm.com, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mimu@linux.ibm.com, jdenemar@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Zoltan,
-
-On 11/14/19 2:50 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 11/14/19 2:08 PM, chen huacai wrote:
->> Hi, all,
->>
->> On Thu, Nov 14, 2019 at 8:34 PM Aleksandar Markovic
->> <amarkovic@wavecomp.com> wrote:
->>>
->>> Hi, Philippe,
->>>
->>>> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>>
->>>> Hi Aleksandar,
->>>>
->>>> On 11/13/19 2:47 PM, Aleksandar Markovic wrote:
->>>>> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->>>>>
->>>>> Change the maintainership for Fulong 2E board to improve its quality.
->>>>
->>>> IIRC you told me once this board is named Fuloong, and its CPU is a
->>> =E2=80=8E> Loongson, both with 2x 'o' :) I have a patch renaming the va=
-rious
->>>> occurrences.
->>>>
->>>
->>> I still think that the oficial name is "Fuloong 2E", however, it is
->>> shortened to "Fulong 2E" quite often in communication, and, it seems,
->>> sometimes even in various docs/app notes etc.
->>>
->>> Can perhaps Huacai Chen enlighten us regarding the right spelling?
->> The right spelling is Fuloong.
->>
-> [...]>>> The original author is active on the Linux kernel, let ask him=
-=20
-> if he'd
->>>> be OK to keep an eye on his work.
->>>>
->>>> Huacai, would you agree to be listed as a reviewer on the Fuloong
->>>> related QEMU files? You don't have to worry about the generic QEMU cod=
-e
->>>> plate (like keeping API up to date) I'll manage that, but I'd like to
->>>> have you listed to assert the hardware is properly modeled.
->>>>
->>>> You would appear as:
->>>> R: Huacai Chen <chenhc@lemote.com>
->>>>
->>>
->>> That is a great idea!
->>>
->>> Please, Chen, get involved, you would be very welcomed, there is a plac=
-e
->>> for you in QEMU community!
->> I'm sorry that I'm busy now, but I think I will do something in QEMU
->> in the next year.
->=20
-> No problem, we'll keep in touch.
->=20
->>>>> +R: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
->>>>
->>>> I don't think Herv=C3=A9 is interested by this board, he has not modif=
-ied=20
->>>> the
->>>> code.
->>>>
->>>>> +R: Aleksandar Markovic <amarkovic@wavecomp.com>
->>>>> +S: Maintained
->>>>
->>>> Let keep it as "Odd Fixes" :)
->>>>
->>>
->>> OK.
->>>
->>>> =C2=A0=C2=A0=C2=A0 Odd Fixes:=C2=A0=C2=A0 It has a maintainer but they=
- don't have
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 time to do much other than throw the odd
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0 patch in.
->>>>
->>>>> =C2=A0=C2=A0 F: hw/mips/mips_fulong2e.c
->>>>> =C2=A0=C2=A0 F: hw/isa/vt82c686.c
->>>>> =C2=A0=C2=A0 F: hw/pci-host/bonito.c
->>>>>
->>>>
->>>> So the patch would be:
->>>>
->>>> -- 8< --
->>>> =C2=A0=C2=A0 Fulong 2E
->>>> -M: Aleksandar Markovic <amarkovic@wavecomp.com>
->>>> -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
->>>> +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->>>> +R: Aleksandar Markovic <amarkovic@wavecomp.com>
->>>> +R: Huacai Chen <chenhc@lemote.com>
->>>> =C2=A0=C2=A0 S: Odd Fixes
->>>> =C2=A0=C2=A0 F: hw/mips/mips_fulong2e.c
->>>> =C2=A0=C2=A0 F: hw/isa/vt82c686.c
->>>
->>> Plus possible s/Fulong 2E/Fuloong 2E/
->=20
-> I'd prefer to keep this change for later, with the patch cleaning its=20
-> use in the codebase (not that trivial because we need to alias the=20
-> machine name to keep backward compatibility).
->=20
->>>
->>>> ---
->>>>
->>>> But let's wait to see what Huacai Chen thinks of it, before posting it=
-.
->=20
-> Aleksandar, can you stay as co-maintainer?
->=20
-> The patch would be:
->=20
-> -- 8< --
->  =C2=A0=C2=A0 Fulong 2E
-> +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->  =C2=A0M: Aleksandar Markovic <amarkovic@wavecomp.com>
-> -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-
-You are a prolific contributor of the Fuloong, are you OK to be listed=20
-as reviewer in this section?
-
->  =C2=A0=C2=A0 S: Odd Fixes
->  =C2=A0=C2=A0 F: hw/mips/mips_fulong2e.c
->  =C2=A0=C2=A0 F: hw/isa/vt82c686.c
-> ---
->=20
-> Either this way, or if you prefer to be listed with a R-tag:
-> Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyNTE3MjAzMS4xNjI4
+Mi0xLWRhdmlkQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MiAwLzJdIHMzOTB4L2NwdW1vZGVsOiBJbnRyb2R1
+Y2UgZHluYW1pYyBmZWF0dXJlIGdyb3VwClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MTEy
+NTE3MjAzMS4xNjI4Mi0xLWRhdmlkQHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
+PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
+aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
+cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
+UklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmFiYjFiYmEgczM5
+MHgvY3B1bW9kZWw6IEludHJvZHVjZSBkeW5hbWljIGZlYXR1cmUgZ3JvdXBzCmY4YjM2MmYgczM5
+MHgvY3B1bW9kZWw6IEZhY3RvciBvdXQgQ1BVIGZlYXR1cmUgZGVwZW5kZW5jaWVzCgo9PT0gT1VU
+UFVUIEJFR0lOID09PQoxLzIgQ2hlY2tpbmcgY29tbWl0IGY4YjM2MmY0MDQ1MSAoczM5MHgvY3B1
+bW9kZWw6IEZhY3RvciBvdXQgQ1BVIGZlYXR1cmUgZGVwZW5kZW5jaWVzKQoyLzIgQ2hlY2tpbmcg
+Y29tbWl0IGFiYjFiYmE4MjI4NyAoczM5MHgvY3B1bW9kZWw6IEludHJvZHVjZSBkeW5hbWljIGZl
+YXR1cmUgZ3JvdXBzKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojODI6IEZJTEU6
+IHRhcmdldC9zMzkweC9jcHVfZmVhdHVyZXMuYzoxODY6CisgICAgRFlOX0ZFQVRfR1JPVVBfSU5J
+VCgiYWxsLWZlYXR1cmVzIiwgQUxMLCAiRmVhdHVyZXMgdmFsaWQgZm9yIGEgQ1BVIGRlZmluaXRp
+b24iKSwKCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojODQ6IEZJTEU6IHRhcmdldC9z
+MzkweC9jcHVfZmVhdHVyZXMuYzoxODg6CisgICAgRFlOX0ZFQVRfR1JPVVBfSU5JVCgicmVjb21t
+ZW5kZWQtZmVhdHVyZXMiLCBSRUNPTU1FTkRFRCwgIkF2YWlsYWJsZSwgcmVjb21tZW5kZWQgZmVh
+dHVyZXMgc3VwcG9ydGVkIGJ5IHRoZSBhY2NlbGVyYXRvciBpbiB0aGUgY3VycmVudCBob3N0IGZv
+ciBhIENQVSBkZWZpbml0aW9uIiksCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg2
+OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1X2ZlYXR1cmVzLmM6MTkwOgorICAgIERZTl9GRUFUX0dS
+T1VQX0lOSVQoImF2YWlsYWJsZS1mZWF0dXJlcyIsIEFWQUlMQUJMRSwgIkF2YWlsYWJsZSBmZWF0
+dXJlcyBzdXBwb3J0ZWQgYnkgdGhlIGFjY2VsZXJhdG9yIGluIHRoZSBjdXJyZW50IGhvc3QgZm9y
+IGEgQ1BVIGRlZmluaXRpb24iKSwKCnRvdGFsOiAyIGVycm9ycywgMSB3YXJuaW5ncywgMjA5IGxp
+bmVzIGNoZWNrZWQKClBhdGNoIDIvMiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxs
+IGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTExMjUxNzIw
+MzEuMTYyODItMS1kYXZpZEByZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
+YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
+Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
+ZWxAcmVkaGF0LmNvbQ==
 
 
