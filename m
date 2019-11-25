@@ -2,70 +2,81 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC32C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3011CC432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:04:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 021182075C
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:02:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 021182075C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0484520409
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:04:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0484520409
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZD4M-0000s8-4R
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 07:02:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56304)
+	id 1iZD61-0002AQ-I7
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 07:04:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56330)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iZD38-0008S6-Q1
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:01:04 -0500
+ (envelope-from <bounces@canonical.com>) id 1iZD3D-00005w-MH
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:01:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iZD33-0006tg-HI
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:01:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37612)
+ (envelope-from <bounces@canonical.com>) id 1iZD3C-0006yT-BR
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:01:07 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37852)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iZD33-0006tM-BJ
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:00:57 -0500
+ id 1iZD3C-0006y8-5V
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:01:06 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iZD32-0001Jq-1R
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 12:00:56 +0000
+ id 1iZD3B-0001Pa-2j
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 12:01:05 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C673B2E80C9
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 12:00:55 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 130BF2E8074
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 12:01:05 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Nov 2019 11:46:29 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 25 Nov 2019 11:55:06 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1848556@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Fix Released; importance=Medium;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
+ component=main; status=Fix Committed; importance=Medium;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
+ component=main; status=Fix Released; importance=Medium;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug-Tags: verification-done verification-done-eoan
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee carolineconcatto
-X-Launchpad-Bug-Reporter: Caroline Concatto (carolineconcatto)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <157468002661.30952.10642264809488923382.malonedeb@wampee.canonical.com>
-Message-Id: <157468238993.7124.9781992062438988399.malone@gac.canonical.com>
-Subject: [Bug 1853826] Re: ELF loader fails to load shared object on ThunderX2
- running RHEL7
+X-Launchpad-Bug-Commenters: janitor paelzer rodsmith tjaalton ubuntu-sru-bot
+ xanclic
+X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
+ =?utf-8?q?=29?=
+References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
+Message-Id: <157468290644.21449.7874268802659407042.malone@soybean.canonical.com>
+Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="c597c3229eb023b1e626162d5947141bf7befb13";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a98209e3fd4f2ed960f826ad2c056436db4ea1fd
+X-Launchpad-Hash: 20dbbe292addbd27f0b37b80dc8a200d4f856ba1
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -79,208 +90,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1853826 <1853826@bugs.launchpad.net>
+Reply-To: Bug 1848556 <1848556@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Could you invoke one of the failing and passing cases with -d page and
-post the results please.
+Eoan - without fix -> hang
 
+With fix:
+qemu-img check http://10.193.37.117/cloud/eoan-server-cloudimg-amd64.img   =
+                                                                           =
+                              =
 
-** Tags added: arm linux-user
+No errors were found on the image.                                         =
+                                                                           =
+                                        =
+
+19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed clus=
+ters                                                                       =
+                                          =
+
+Image end offset: 514064384
+
+Setting verified
+
+** Tags removed: verification-needed verification-needed-eoan
+** Tags added: verification-done verification-done-eoan
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1853826
+https://bugs.launchpad.net/bugs/1848556
 
 Title:
-  ELF loader fails to load shared object on ThunderX2 running RHEL7
+  qemu-img check failing on remote image in Eoan
 
 Status in QEMU:
-  New
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Eoan:
+  Fix Committed
+Status in qemu source package in Focal:
+  Fix Released
 
 Bug description:
-  Simple test:
-  hello.c
+  Ubuntu SRU Template:
 
-  include <stdio.h>
+  [Impact]
 
-  int main(int argc, char* argv[])
-  {
-    {
-      printf("Hello World... \n");
-    }
-    return 0;
-  }
+   * There is fallout due to changes in libcurl that affect qemu and might =
 
-  when compiled with :
-  *Compiler =
+     lead to a hang.
 
-  https://developer.arm.com/tools-and-software/server-and-hpc/arm-architect=
-ure-tools/arm-allinea-studio/download
-  Arm-Compiler-for-HPC_19.3_RHEL_7_aarch64.tar	 =
+   * Fix by backporting the upstream fix
 
+  [Test Case]
 
-  *Running:
-  1) with -armpl
-       armclang -armpl hello.c
-       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
-  2) without flag
-      armclang hello.c
-       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
+   * If you have network just run
+     $ qemu-img check http://10.193.37.117/cloud/eoan-server-cloudimg-amd64=
+.img
 
-  =E2=80=A2With Docker image:
-         CentOS Linux release 7.7.1908 (AltArch)
+   * Without network, install apache2, and get a complex qemu file (like a =
 
-  *Two different machines:
-         AArch64, Taishan. tsv110, Kunpeng 920, ARMv8.2-A
-         AArch64, Taishan 2280, Cortex-A72, ARMv8-A
+     cloud image) onto the system. Then access the file via apache http but =
 
-  *QEMU 4.0
-       qemu-aarch64 version 4.1.91 (v4.2.0-rc1)
+     not localhost (that would work)
 
-  =
+  [Regression Potential]
 
-  Results:
+   * The change is local to the libcurl usage of qemu, so that could be =
 
-  =
+     affected. But then this is what has been found to not work here, so I'=
+d =
 
-   ****Taishan 2280 Cortex-A72 =
+     expect not too much trouble. But if so then in the curl usage (which =
 
-        Running =
+     means disks on http)
 
-  1)with -armpl flag with and without the docker
-            WORKS-> Hello World...
-                 -> ldd a.out
-  ldd a.out =
+  [Other Info]
+   =
 
-  linux-vdso.so.1 =3D>  (0x0000ffffbc6a2000) =
+   * n/a
 
-  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
-_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
-0x0000ffffbc544000) =
+  ---
 
-  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffbc493000) =
+  The "qemu-img check" function is failing on remote (HTTP-hosted)
+  images, beginning with Ubuntu 19.10 (qemu-utils version 1:4.0+dfsg-
+  0ubuntu9). With previous versions, through Ubuntu 19.04/qemu-utils
+  version 1:3.1+dfsg-2ubuntu3.5, the following worked:
 
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffbc472000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
-3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffbbfd30=
-00) =
+  $ /usr/bin/qemu-img check  http://10.193.37.117/cloud/eoan-server-cloudim=
+g-amd64.img
+  No errors were found on the image.
+  19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed cl=
+usters
+  Image end offset: 514064384
 
-  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
-rch64-linux/lib/libomp.so (0x0000ffffbbef5000) =
-
-  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffbbed4000) =
-
-  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffbbe9f000) =
-
-  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
-rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
-neric.so (0x0000ffffb3306000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffb3180000) =
-
-  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
-ux/lib64/libstdc++.so.6 (0x0000ffffb2f30000) =
-
-  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
-x/lib64/libgcc_s.so.1 (0x0000ffffb2eff000) =
-
-  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffb2ede000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffbc674000)
-             =
-
-
-  Running =
-
-  2) without -armpl flag with and without the docker
-             WORKS -> Hello World...        =
-
-                   -> ldd a.out
-  ldd a.out
-   linux-vdso.so.1 =3D>  (0x0000ffffa6895000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffa6846000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa66c0000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffa6867000)
-      =
-
-
-  ****Taishan - tsv110  Kunpeng 920
-         For Running =
-
-
-  1)with -armpl flag with and without the docker
-             DOES NOT WORK -> with and without Docker
-                           -> It shows : qemu:handle_cpu_signal received si=
-gnal outside vCPU
-   context @ pc=3D0xffffaaa8844a
-                           -> ldd a.out =
-
-  ldd a.out =
-
-  linux-vdso.so.1 =3D>  (0x0000ffffad4b0000)
-  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
-_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
-0x0000ffffad370000) =
-
-  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffad2a0000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffad270000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
-3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffacdd00=
-00) =
-
-  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
-rch64-linux/lib/libomp.so (0x0000ffffaccf0000) =
-
-  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffaccc0000) =
-
-  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffacc80000) =
-
-  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
-rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
-neric.so (0x0000ffffa40e0000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa3f50000) =
-
-  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
-ux/lib64/libstdc++.so.6 (0x0000ffffa3d00000) =
-
-  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
-x/lib64/libgcc_s.so.1 (0x0000ffffa3cc0000)
-  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffa3c90000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffad4c0000)
-              =
-
-
-  Running =
-
-  2) without -armpl flag with and without the docker
-                 WORKS -> Hello World..
-                       -> ldd a.out
-  ldd a.out  =
-
-  linux-vdso.so.1 =3D>  (0x0000ffff880c0000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffff88080000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffff87ee0000)
-  /lib/ld-linux-aarch64.so.1 (0x0000ffff880d0000)
+  The 10.193.37.117 server holds an Apache server that hosts the cloud
+  images on a LAN. Beginning with Ubuntu 19.10/qemu-utils 1:4.0+dfsg-
+  0ubuntu9, the same command never returns. (I've left it for up to an
+  hour with no change.) I'm able to wget the image from the same server
+  and installation on which qemu-img check fails. I've tried several
+  .img files on the server, ranging from Bionic to Eoan, with the same
+  results with all of them.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1853826/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1848556/+subscriptions
 
