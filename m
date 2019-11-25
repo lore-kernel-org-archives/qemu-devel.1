@@ -2,55 +2,84 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D2EFC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C366C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:17:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C498A20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:15:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C498A20674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 062A120674
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:17:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M7KBxTHR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 062A120674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZEDd-0004BU-Ni
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:15:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39365)
+	id 1iZEEs-0005Xf-NC
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:17:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4G-0004hv-Vw
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:22 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1iZEAi-0002QX-47
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:12:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4F-0006CB-3d
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:16 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:34904 helo=mail.rt-rk.com)
+ (envelope-from <eric.auger@redhat.com>) id 1iZEAg-0001yt-CY
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:12:55 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30568
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1iZE4E-0006A7-Oj
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:15 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id AB9281A2278;
- Mon, 25 Nov 2019 14:05:05 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
- [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 7B3F61A227C;
- Mon, 25 Nov 2019 14:05:05 +0100 (CET)
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 5/5] mips: fulong 2e: Renovate coding style
-Date: Mon, 25 Nov 2019 14:04:58 +0100
-Message-Id: <1574687098-26689-6-git-send-email-Filip.Bozuta@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
-References: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iZEAg-0001xI-7Q
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:12:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574687573;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KCj9Yfp+83ssIsc/IRJb5o8YNorZE1O//gJcW+rMbFs=;
+ b=M7KBxTHRSMqXTpjhq7aRxsaIMGgXaIJO/n74x/69e9VaID0Qwg1IOOOvGK0aKKGZfF58w1
+ GFOsuLaE/ahzEvg98TRhGoBB1DmTDmY+orTt7lDMxwscc0McPKLn8H8ffs4a3Oe9IaAqRn
+ xpXFipqb/3J8jUxJDmGdYVnugUvT74k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-38-bN1DQj8pMdCbiiwz9gW-dw-1; Mon, 25 Nov 2019 08:12:50 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70450805BC1;
+ Mon, 25 Nov 2019 13:12:47 +0000 (UTC)
+Received: from [10.36.116.37] (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 479535D6A0;
+ Mon, 25 Nov 2019 13:12:37 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v11 12/20] qapi: Introduce DEFINE_PROP_INTERVAL
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <20191122182943.4656-1-eric.auger@redhat.com>
+ <20191122182943.4656-13-eric.auger@redhat.com>
+ <20191122190343.GP2785@work-vm>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <5b19eb33-ae98-d72f-3e6b-646543070388@redhat.com>
+Date: Mon, 25 Nov 2019 14:12:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <20191122190343.GP2785@work-vm>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: bN1DQj8pMdCbiiwz9gW-dw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,292 +91,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
- amarkovic@wavecomp.com, aurelien@aurel32.net
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ armbru@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The script checkpatch.pl located in scripts folder was
-used to detect all errors and warrnings in files:
-    hw/mips/mips_fulong2e.c
-    hw/isa/vt82c686.c
-    hw/pci-host/bonito.c
-    include/hw/isa/vt82c686.h
+Hi Dave,
 
-These mips Fulong 2E machine files were edited and
-all the errors and warrings generated by the checkpatch.pl
-script were corrected and then the script was
-ran again to make sure there are no more errors and warnings.
+On 11/22/19 8:03 PM, Dr. David Alan Gilbert wrote:
+> * Eric Auger (eric.auger@redhat.com) wrote:
+>> Introduce a new property defining a labelled interval:
+>> <low address>,<high address>,label.
+>>
+>> This will be used to encode reserved IOVA regions. The label
+>> is left undefined to ease reuse accross use cases.
+>>
+>> For instance, in virtio-iommu use case, reserved IOVA regions
+>> will be passed by the machine code to the virtio-iommu-pci
+>> device (an array of those). The label will match the
+>> virtio_iommu_probe_resv_mem subtype value:
+>> - VIRTIO_IOMMU_RESV_MEM_T_RESERVED (0)
+>> - VIRTIO_IOMMU_RESV_MEM_T_MSI (1)
+>>
+>> This is used to inform the virtio-iommu-pci device it should
+>> bypass the MSI region: 0xfee00000, 0xfeefffff, 1.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  hw/core/qdev-properties.c    | 90 ++++++++++++++++++++++++++++++++++++
+>>  include/exec/memory.h        |  6 +++
+>>  include/hw/qdev-properties.h |  3 ++
+>>  include/qemu/typedefs.h      |  1 +
+>>  4 files changed, 100 insertions(+)
+>>
+>> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+>> index ac28890e5a..8d70f34e37 100644
+>> --- a/hw/core/qdev-properties.c
+>> +++ b/hw/core/qdev-properties.c
+>> @@ -13,6 +13,7 @@
+>>  #include "qapi/visitor.h"
+>>  #include "chardev/char.h"
+>>  #include "qemu/uuid.h"
+>> +#include "qemu/cutils.h"
+>>  
+>>  void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
+>>                                    Error **errp)
+>> @@ -585,6 +586,95 @@ const PropertyInfo qdev_prop_macaddr = {
+>>      .set   = set_mac,
+>>  };
+>>  
+>> +/* --- Labelled Interval --- */
+>> +
+>> +/*
+>> + * accepted syntax versions:
+>> + *   <low address>,<high address>,<type>
+>> + *   where low/high addresses are uint64_t in hexa (feat. 0x prefix)
+>> + *   and type is an unsigned integer
+>> + */
+>> +static void get_interval(Object *obj, Visitor *v, const char *name,
+>> +                         void *opaque, Error **errp)
+>> +{
+>> +    DeviceState *dev = DEVICE(obj);
+>> +    Property *prop = opaque;
+>> +    Interval *interval = qdev_get_prop_ptr(dev, prop);
+>> +    char buffer[64];
+>> +    char *p = buffer;
+>> +
+>> +    snprintf(buffer, sizeof(buffer), "0x%"PRIx64",0x%"PRIx64",%d",
+>> +             interval->low, interval->high, interval->type);
+>> +
+>> +    visit_type_str(v, name, &p, errp);
+>> +}
+>> +
+>> +static void set_interval(Object *obj, Visitor *v, const char *name,
+>> +                         void *opaque, Error **errp)
+>> +{
+>> +    DeviceState *dev = DEVICE(obj);
+>> +    Property *prop = opaque;
+>> +    Interval *interval = qdev_get_prop_ptr(dev, prop);
+>> +    Error *local_err = NULL;
+>> +    unsigned int type;
+>> +    gchar **fields;
+>> +    uint64_t addr;
+>> +    char *str;
+>> +    int ret;
+>> +
+>> +    if (dev->realized) {
+>> +        qdev_prop_set_after_realize(dev, name, errp);
+>> +        return;
+>> +    }
+>> +
+>> +    visit_type_str(v, name, &str, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        return;
+>> +    }
+>> +
+>> +    fields = g_strsplit(str, ",", 3);
+>> +
+>> +    ret = qemu_strtou64(fields[0], NULL, 16, &addr);
+>> +    if (!ret) {
+>> +        interval->low = addr;
+>> +    } else {
+>> +        error_setg(errp, "Failed to decode interval low addr");
+>> +        error_append_hint(errp,
+>> +                          "should be an address in hexa with 0x prefix\n");
+>> +        goto out;
+>> +    }
+>> +
+>> +    ret = qemu_strtou64(fields[1], NULL, 16, &addr);
+>> +    if (!ret) {
+>> +        interval->high = addr;
+>> +    } else {
+>> +        error_setg(errp, "Failed to decode interval high addr");
+>> +        error_append_hint(errp,
+>> +                          "should be an address in hexa with 0x prefix\n");
+>> +        goto out;
+>> +    }
+>> +
+>> +    ret = qemu_strtoui(fields[2], NULL, 10, &type);
+>> +    if (!ret) {
+>> +        interval->type = type;
+>> +    } else {
+>> +        error_setg(errp, "Failed to decode interval type");
+>> +        error_append_hint(errp, "should be an unsigned int in decimal\n");
+>> +    }
+>> +out:
+>> +    g_free(str);
+>> +    g_strfreev(fields);
+>> +    return;
+>> +}
+>> +
+>> +const PropertyInfo qdev_prop_interval = {
+>> +    .name  = "labelled_interval",
+>> +    .description = "Labelled interval, example: 0xFEE00000,0xFEEFFFFF,0",
+>> +    .get   = get_interval,
+>> +    .set   = set_interval,
+>> +};
+>> +
+>>  /* --- on/off/auto --- */
+>>  
+>>  const PropertyInfo qdev_prop_on_off_auto = {
+>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>> index e499dc215b..e238d1c352 100644
+>> --- a/include/exec/memory.h
+>> +++ b/include/exec/memory.h
+>> @@ -57,6 +57,12 @@ struct MemoryRegionMmio {
+>>      CPUWriteMemoryFunc *write[3];
+>>  };
+>>  
+>> +struct Interval {
+>> +    hwaddr low;
+>> +    hwaddr high;
+>> +    unsigned int type;
+>> +};
+>> +
+> 
+> Just an observation that 'Interval' is a very generic name.
+> We've got 'AddrRange' but that's Int128.
+As it is defined in memory.h it may make sense to rename it
+ReservedRegion then?
 
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
----
- hw/isa/vt82c686.c    | 23 ++++++++++----------
- hw/pci-host/bonito.c | 60 +++++++++++++++++++++++++++++-----------------------
- 2 files changed, 45 insertions(+), 38 deletions(-)
+Thanks
 
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index 616f67f..f828708 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -27,7 +27,7 @@
- #include "qemu/timer.h"
- #include "exec/address-spaces.h"
- 
--//#define DEBUG_VT82C686B
-+/* #define DEBUG_VT82C686B */
- 
- #ifdef DEBUG_VT82C686B
- #define DPRINTF(fmt, ...) fprintf(stderr, "%s: " fmt, __func__, ##__VA_ARGS__)
-@@ -35,8 +35,7 @@
- #define DPRINTF(fmt, ...)
- #endif
- 
--typedef struct SuperIOConfig
--{
-+typedef struct SuperIOConfig {
-     uint8_t config[0x100];
-     uint8_t index;
-     uint8_t data;
-@@ -102,7 +101,7 @@ static uint64_t superio_ioport_readb(void *opaque, hwaddr addr, unsigned size)
-     SuperIOConfig *superio_conf = opaque;
- 
-     DPRINTF("superio_ioport_readb  address 0x%x\n", addr);
--    return (superio_conf->config[superio_conf->index]);
-+    return superio_conf->config[superio_conf->index];
- }
- 
- static const MemoryRegionOps superio_ops = {
-@@ -143,7 +142,7 @@ static void vt82c686b_isa_reset(DeviceState *dev)
- }
- 
- /* write config pci function0 registers. PCI-ISA bridge */
--static void vt82c686b_write_config(PCIDevice * d, uint32_t address,
-+static void vt82c686b_write_config(PCIDevice *d, uint32_t address,
-                                    uint32_t val, int len)
- {
-     VT82C686BState *vt686 = VT82C686B_DEVICE(d);
-@@ -365,7 +364,7 @@ static void vt82c686b_pm_realize(PCIDevice *dev, Error **errp)
-     pci_set_long(pci_conf + 0x48, 0x00000001);
- 
-     /* SMB ports:0xeee0~0xeeef */
--    s->smb_io_base =((s->smb_io_base & 0xfff0) + 0x0);
-+    s->smb_io_base = ((s->smb_io_base & 0xfff0) + 0x0);
-     pci_conf[0x90] = s->smb_io_base | 1;
-     pci_conf[0x91] = s->smb_io_base >> 8;
-     pci_conf[0xd2] = 0x90;
-@@ -462,16 +461,18 @@ static void vt82c686b_realize(PCIDevice *d, Error **errp)
- 
-     wmask = d->wmask;
-     for (i = 0x00; i < 0xff; i++) {
--       if (i<=0x03 || (i>=0x08 && i<=0x3f)) {
--           wmask[i] = 0x00;
--       }
-+        if (i <= 0x03 || (i >= 0x08 && i <= 0x3f)) {
-+            wmask[i] = 0x00;
-+        }
-     }
- 
-     memory_region_init_io(&vt82c->superio, OBJECT(d), &superio_ops,
-                           &vt82c->superio_conf, "superio", 2);
-     memory_region_set_enabled(&vt82c->superio, false);
--    /* The floppy also uses 0x3f0 and 0x3f1.
--     * But we do not emulate a floppy, so just set it here. */
-+    /*
-+     * The floppy also uses 0x3f0 and 0x3f1.
-+     * But we do not emulate a floppy, so just set it here.
-+     */
-     memory_region_add_subregion(isa_bus->address_space_io, 0x3f0,
-                                 &vt82c->superio);
- }
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index ceee463..4692d41 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -14,7 +14,8 @@
-  * fulong 2e mini pc has a bonito north bridge.
-  */
- 
--/* what is the meaning of devfn in qemu and IDSEL in bonito northbridge?
-+/*
-+ * what is the meaning of devfn in qemu and IDSEL in bonito northbridge?
-  *
-  * devfn   pci_slot<<3  + funno
-  * one pci bus can have 32 devices and each device can have 8 functions.
-@@ -49,7 +50,7 @@
- #include "sysemu/runstate.h"
- #include "exec/address-spaces.h"
- 
--//#define DEBUG_BONITO
-+/* #define DEBUG_BONITO */
- 
- #ifdef DEBUG_BONITO
- #define DPRINTF(fmt, ...) fprintf(stderr, "%s: " fmt, __func__, ##__VA_ARGS__)
-@@ -60,45 +61,45 @@
- /* from linux soure code. include/asm-mips/mips-boards/bonito64.h*/
- #define BONITO_BOOT_BASE        0x1fc00000
- #define BONITO_BOOT_SIZE        0x00100000
--#define BONITO_BOOT_TOP         (BONITO_BOOT_BASE+BONITO_BOOT_SIZE-1)
-+#define BONITO_BOOT_TOP         (BONITO_BOOT_BASE + BONITO_BOOT_SIZE - 1)
- #define BONITO_FLASH_BASE       0x1c000000
- #define BONITO_FLASH_SIZE       0x03000000
--#define BONITO_FLASH_TOP        (BONITO_FLASH_BASE+BONITO_FLASH_SIZE-1)
-+#define BONITO_FLASH_TOP        (BONITO_FLASH_BASE + BONITO_FLASH_SIZE - 1)
- #define BONITO_SOCKET_BASE      0x1f800000
- #define BONITO_SOCKET_SIZE      0x00400000
--#define BONITO_SOCKET_TOP       (BONITO_SOCKET_BASE+BONITO_SOCKET_SIZE-1)
-+#define BONITO_SOCKET_TOP       (BONITO_SOCKET_BASE + BONITO_SOCKET_SIZE - 1)
- #define BONITO_REG_BASE         0x1fe00000
- #define BONITO_REG_SIZE         0x00040000
--#define BONITO_REG_TOP          (BONITO_REG_BASE+BONITO_REG_SIZE-1)
-+#define BONITO_REG_TOP          (BONITO_REG_BASE + BONITO_REG_SIZE - 1)
- #define BONITO_DEV_BASE         0x1ff00000
- #define BONITO_DEV_SIZE         0x00100000
--#define BONITO_DEV_TOP          (BONITO_DEV_BASE+BONITO_DEV_SIZE-1)
-+#define BONITO_DEV_TOP          (BONITO_DEV_BASE + BONITO_DEV_SIZE - 1)
- #define BONITO_PCILO_BASE       0x10000000
- #define BONITO_PCILO_BASE_VA    0xb0000000
- #define BONITO_PCILO_SIZE       0x0c000000
--#define BONITO_PCILO_TOP        (BONITO_PCILO_BASE+BONITO_PCILO_SIZE-1)
-+#define BONITO_PCILO_TOP        (BONITO_PCILO_BASE + BONITO_PCILO_SIZE - 1)
- #define BONITO_PCILO0_BASE      0x10000000
- #define BONITO_PCILO1_BASE      0x14000000
- #define BONITO_PCILO2_BASE      0x18000000
- #define BONITO_PCIHI_BASE       0x20000000
- #define BONITO_PCIHI_SIZE       0x20000000
--#define BONITO_PCIHI_TOP        (BONITO_PCIHI_BASE+BONITO_PCIHI_SIZE-1)
-+#define BONITO_PCIHI_TOP        (BONITO_PCIHI_BASE + BONITO_PCIHI_SIZE - 1)
- #define BONITO_PCIIO_BASE       0x1fd00000
- #define BONITO_PCIIO_BASE_VA    0xbfd00000
- #define BONITO_PCIIO_SIZE       0x00010000
--#define BONITO_PCIIO_TOP        (BONITO_PCIIO_BASE+BONITO_PCIIO_SIZE-1)
-+#define BONITO_PCIIO_TOP        (BONITO_PCIIO_BASE + BONITO_PCIIO_SIZE - 1)
- #define BONITO_PCICFG_BASE      0x1fe80000
- #define BONITO_PCICFG_SIZE      0x00080000
--#define BONITO_PCICFG_TOP       (BONITO_PCICFG_BASE+BONITO_PCICFG_SIZE-1)
-+#define BONITO_PCICFG_TOP       (BONITO_PCICFG_BASE + BONITO_PCICFG_SIZE - 1)
- 
- 
- #define BONITO_PCICONFIGBASE    0x00
- #define BONITO_REGBASE          0x100
- 
--#define BONITO_PCICONFIG_BASE   (BONITO_PCICONFIGBASE+BONITO_REG_BASE)
-+#define BONITO_PCICONFIG_BASE   (BONITO_PCICONFIGBASE + BONITO_REG_BASE)
- #define BONITO_PCICONFIG_SIZE   (0x100)
- 
--#define BONITO_INTERNAL_REG_BASE  (BONITO_REGBASE+BONITO_REG_BASE)
-+#define BONITO_INTERNAL_REG_BASE  (BONITO_REGBASE + BONITO_REG_BASE)
- #define BONITO_INTERNAL_REG_SIZE  (0x70)
- 
- #define BONITO_SPCICONFIG_BASE  (BONITO_PCICFG_BASE)
-@@ -111,7 +112,7 @@
- 
- #define BONITO_BONPONCFG        (0x00 >> 2)      /* 0x100 */
- #define BONITO_BONGENCFG_OFFSET 0x4
--#define BONITO_BONGENCFG        (BONITO_BONGENCFG_OFFSET>>2)   /*0x104 */
-+#define BONITO_BONGENCFG        (BONITO_BONGENCFG_OFFSET >> 2)   /*0x104 */
- 
- /* 2. IO & IDE configuration */
- #define BONITO_IODEVCFG         (0x08 >> 2)      /* 0x108 */
-@@ -177,15 +178,15 @@
- /* idsel BIT = pci slot number +12 */
- #define PCI_SLOT_BASE              12
- #define PCI_IDSEL_VIA686B_BIT      (17)
--#define PCI_IDSEL_VIA686B          (1<<PCI_IDSEL_VIA686B_BIT)
-+#define PCI_IDSEL_VIA686B          (1 << PCI_IDSEL_VIA686B_BIT)
- 
--#define PCI_ADDR(busno,devno,funno,regno)  \
--    ((((busno)<<16)&0xff0000) + (((devno)<<11)&0xf800) + (((funno)<<8)&0x700) + (regno))
-+#define PCI_ADDR(busno , devno , funno , regno)  \
-+    ((((busno) << 16) & 0xff0000) + (((devno) << 11) & 0xf800) + \
-+    (((funno) << 8) & 0x700) + (regno))
- 
- typedef struct BonitoState BonitoState;
- 
--typedef struct PCIBonitoState
--{
-+typedef struct PCIBonitoState {
-     PCIDevice dev;
- 
-     BonitoState *pcihost;
-@@ -239,7 +240,8 @@ static void bonito_writel(void *opaque, hwaddr addr,
- 
-     saddr = addr >> 2;
- 
--    DPRINTF("bonito_writel "TARGET_FMT_plx" val %x saddr %x\n", addr, val, saddr);
-+    DPRINTF("bonito_writel "TARGET_FMT_plx" val %x saddr %x\n",
-+            addr, val, saddr);
-     switch (saddr) {
-     case BONITO_BONPONCFG:
-     case BONITO_IODEVCFG:
-@@ -363,7 +365,7 @@ static uint64_t bonito_ldma_readl(void *opaque, hwaddr addr,
-         return 0;
-     }
- 
--    val = ((uint32_t *)(&s->bonldma))[addr/sizeof(uint32_t)];
-+    val = ((uint32_t *)(&s->bonldma))[addr / sizeof(uint32_t)];
- 
-     return val;
- }
-@@ -377,7 +379,7 @@ static void bonito_ldma_writel(void *opaque, hwaddr addr,
-         return;
-     }
- 
--    ((uint32_t *)(&s->bonldma))[addr/sizeof(uint32_t)] = val & 0xffffffff;
-+    ((uint32_t *)(&s->bonldma))[addr / sizeof(uint32_t)] = val & 0xffffffff;
- }
- 
- static const MemoryRegionOps bonito_ldma_ops = {
-@@ -400,7 +402,7 @@ static uint64_t bonito_cop_readl(void *opaque, hwaddr addr,
-         return 0;
-     }
- 
--    val = ((uint32_t *)(&s->boncop))[addr/sizeof(uint32_t)];
-+    val = ((uint32_t *)(&s->boncop))[addr / sizeof(uint32_t)];
- 
-     return val;
- }
-@@ -414,7 +416,7 @@ static void bonito_cop_writel(void *opaque, hwaddr addr,
-         return;
-     }
- 
--    ((uint32_t *)(&s->boncop))[addr/sizeof(uint32_t)] = val & 0xffffffff;
-+    ((uint32_t *)(&s->boncop))[addr / sizeof(uint32_t)] = val & 0xffffffff;
- }
- 
- static const MemoryRegionOps bonito_cop_ops = {
-@@ -446,7 +448,8 @@ static uint32_t bonito_sbridge_pciaddr(void *opaque, hwaddr addr)
-     cfgaddr = addr & 0xffff;
-     cfgaddr |= (s->regs[BONITO_PCIMAP_CFG] & 0xffff) << 16;
- 
--    idsel = (cfgaddr & BONITO_PCICONF_IDSEL_MASK) >> BONITO_PCICONF_IDSEL_OFFSET;
-+    idsel = (cfgaddr & BONITO_PCICONF_IDSEL_MASK) >>
-+             BONITO_PCICONF_IDSEL_OFFSET;
-     devno = ctz32(idsel);
-     funno = (cfgaddr & BONITO_PCICONF_FUN_MASK) >> BONITO_PCICONF_FUN_OFFSET;
-     regno = (cfgaddr & BONITO_PCICONF_REG_MASK) >> BONITO_PCICONF_REG_OFFSET;
-@@ -550,7 +553,7 @@ static void pci_bonito_set_irq(void *opaque, int irq_num, int level)
- }
- 
- /* map the original irq (0~3) to bonito irq (16~47, but 16~31 are unused) */
--static int pci_bonito_map_irq(PCIDevice * pci_dev, int irq_num)
-+static int pci_bonito_map_irq(PCIDevice *pci_dev, int irq_num)
- {
-     int slot;
- 
-@@ -618,7 +621,10 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
-     SysBusDevice *sysbus = SYS_BUS_DEVICE(s->pcihost);
-     PCIHostState *phb = PCI_HOST_BRIDGE(s->pcihost);
- 
--    /* Bonito North Bridge, built on FPGA, VENDOR_ID/DEVICE_ID are "undefined" */
-+    /*
-+     * Bonito North Bridge, built on FPGA,
-+     * VENDOR_ID/DEVICE_ID are "undefined"
-+     */
-     pci_config_set_prog_interface(dev->config, 0x00);
- 
-     /* set the north bridge register mapping */
--- 
-2.7.4
+Eric
+
+> 
+> Dave
+> 
+>>  typedef struct IOMMUTLBEntry IOMMUTLBEntry;
+>>  
+>>  /* See address_space_translate: bit 0 is read, bit 1 is write.  */
+>> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+>> index c6a8cb5516..2ba7c8711b 100644
+>> --- a/include/hw/qdev-properties.h
+>> +++ b/include/hw/qdev-properties.h
+>> @@ -20,6 +20,7 @@ extern const PropertyInfo qdev_prop_chr;
+>>  extern const PropertyInfo qdev_prop_tpm;
+>>  extern const PropertyInfo qdev_prop_ptr;
+>>  extern const PropertyInfo qdev_prop_macaddr;
+>> +extern const PropertyInfo qdev_prop_interval;
+>>  extern const PropertyInfo qdev_prop_on_off_auto;
+>>  extern const PropertyInfo qdev_prop_losttickpolicy;
+>>  extern const PropertyInfo qdev_prop_blockdev_on_error;
+>> @@ -202,6 +203,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+>>      DEFINE_PROP(_n, _s, _f, qdev_prop_drive_iothread, BlockBackend *)
+>>  #define DEFINE_PROP_MACADDR(_n, _s, _f)         \
+>>      DEFINE_PROP(_n, _s, _f, qdev_prop_macaddr, MACAddr)
+>> +#define DEFINE_PROP_INTERVAL(_n, _s, _f)         \
+>> +    DEFINE_PROP(_n, _s, _f, qdev_prop_interval, Interval)
+>>  #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
+>>      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
+>>  #define DEFINE_PROP_LOSTTICKPOLICY(_n, _s, _f, _d) \
+>> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+>> index 375770a80f..a827c9a3fe 100644
+>> --- a/include/qemu/typedefs.h
+>> +++ b/include/qemu/typedefs.h
+>> @@ -58,6 +58,7 @@ typedef struct ISABus ISABus;
+>>  typedef struct ISADevice ISADevice;
+>>  typedef struct IsaDma IsaDma;
+>>  typedef struct MACAddr MACAddr;
+>> +typedef struct Interval Interval;
+>>  typedef struct MachineClass MachineClass;
+>>  typedef struct MachineState MachineState;
+>>  typedef struct MemoryListener MemoryListener;
+>> -- 
+>> 2.20.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
 
 
