@@ -2,75 +2,67 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF53C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 00:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B0DC432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 01:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92D3A20748
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 00:51:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92D3A20748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6F9B32073F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 01:06:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F9B32073F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZ2b5-00012N-P6
-	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 19:51:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37975)
+	id 1iZ2pk-0004AL-Hw
+	for qemu-devel@archiver.kernel.org; Sun, 24 Nov 2019 20:06:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iZ2aL-0000bL-Fz
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 19:50:38 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iZ2p2-0003YC-9r
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 20:05:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iZ2aJ-0001FR-Qv
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 19:50:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33006)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iZ2aJ-0001Ew-LV
- for qemu-devel@nongnu.org; Sun, 24 Nov 2019 19:50:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iZ2aH-0008Mh-Vg
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 00:50:33 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E6DB62E8073
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 00:50:33 +0000 (UTC)
+ (envelope-from <tao3.xu@intel.com>) id 1iZ2p0-0007sO-BL
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 20:05:47 -0500
+Received: from mga09.intel.com ([134.134.136.24]:19133)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iZ2p0-0007mk-1v
+ for qemu-devel@nongnu.org; Sun, 24 Nov 2019 20:05:46 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 24 Nov 2019 17:05:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,239,1571727600"; d="scan'208";a="205950853"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.197.13])
+ ([10.239.197.13])
+ by fmsmga008.fm.intel.com with ESMTP; 24 Nov 2019 17:05:35 -0800
+Subject: Re: [PATCH v17 01/14] util/cutils: Add Add qemu_strtold and
+ qemu_strtold_finite
+To: "armbru@redhat.com" <armbru@redhat.com>
+References: <20191122074826.1373-1-tao3.xu@intel.com>
+ <20191122074826.1373-2-tao3.xu@intel.com>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <8088b091-8f7c-a637-6333-e7c40935974f@intel.com>
+Date: Mon, 25 Nov 2019 09:05:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Nov 2019 00:43:53 -0000
-From: Evan Rysdam <1853781@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: baremetal raspi2
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: evan-rysdam
-X-Launchpad-Bug-Reporter: Evan Rysdam (evan-rysdam)
-X-Launchpad-Bug-Modifier: Evan Rysdam (evan-rysdam)
-References: <157463269344.7205.8988702228388398977.malonedeb@gac.canonical.com>
-Message-Id: <157464263407.31407.4195301570066035384.malone@wampee.canonical.com>
-Subject: [Bug 1853781] Re: Baremetal kernel built from assembly runs multiple
- times
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 495d11d13d65bae26dc6a85bf1c0aaeab4ce1a5d
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+In-Reply-To: <20191122074826.1373-2-tao3.xu@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,90 +71,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1853781 <1853781@bugs.launchpad.net>
+Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
+ "thuth@redhat.com" <thuth@redhat.com>, "Du, Fan" <fan.du@intel.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ "sw@weilnetz.de" <sw@weilnetz.de>,
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
+ Jingqi" <jingqi.liu@intel.com>, "imammedo@redhat.com" <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I just noticed that on lines 53 and 55 of the attached file, I forgot to
-replace the register "r0" with its alias "address". Fixing these lines
-doesn't change the behavior of the program.
+Hi Markus,
 
--- =
+Do you have any comments on this patch and 02/14 05/14 06/14.
+Thank you!
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1853781
+On 11/22/2019 3:48 PM, Xu, Tao3 wrote:
+> Work like qemu_strtod() and qemu_strtold_finite, except store long
+> double.
+> 
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+> ---
+> 
+> No changes in v17.
+> ---
+>   include/qemu/cutils.h |  3 +++
+>   util/cutils.c         | 48 ++++++++++++++++++++++++++++++++++++++++++-
+>   2 files changed, 50 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+> index b54c847e0f..48cf9bf776 100644
+> --- a/include/qemu/cutils.h
+> +++ b/include/qemu/cutils.h
+> @@ -146,6 +146,9 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+>                     uint64_t *result);
+>   int qemu_strtod(const char *nptr, const char **endptr, double *result);
+>   int qemu_strtod_finite(const char *nptr, const char **endptr, double *result);
+> +int qemu_strtold(const char *nptr, const char **endptr, long double *result);
+> +int qemu_strtold_finite(const char *nptr, const char **endptr,
+> +                        long double *result);
+>   
+>   int parse_uint(const char *s, unsigned long long *value, char **endptr,
+>                  int base);
+> diff --git a/util/cutils.c b/util/cutils.c
+> index fd591cadf0..5db3b2add5 100644
+> --- a/util/cutils.c
+> +++ b/util/cutils.c
+> @@ -553,7 +553,7 @@ int qemu_strtou64(const char *nptr, const char **endptr, int base,
+>   
+>   /**
+>    * Convert string @nptr to a double.
+> -  *
+> + *
+>    * This is a wrapper around strtod() that is harder to misuse.
+>    * Semantics of @nptr and @endptr match strtod() with differences
+>    * noted below.
+> @@ -616,6 +616,52 @@ int qemu_strtod_finite(const char *nptr, const char **endptr, double *result)
+>       return ret;
+>   }
+>   
+> +/*
+> + * Convert string @nptr to a long double.
+> + *
+> + * Works like qemu_strtod(), except it stores long double.
+> + */
+> +int qemu_strtold(const char *nptr, const char **endptr, long double *result)
+> +{
+> +    char *ep;
+> +
+> +    if (!nptr) {
+> +        if (endptr) {
+> +            *endptr = nptr;
+> +        }
+> +        return -EINVAL;
+> +    }
+> +
+> +    errno = 0;
+> +    *result = strtold(nptr, &ep);
+> +    return check_strtox_error(nptr, ep, endptr, errno);
+> +}
+> +
+> +/*
+> + * Convert string @nptr to a finite long double.
+> + *
+> + * Works like qemu_strtod_finite(), except it stores long double.
+> + */
+> +int qemu_strtold_finite(const char *nptr, const char **endptr,
+> +                        long double *result)
+> +{
+> +    long double tmp;
+> +    int ret;
+> +
+> +    ret = qemu_strtold(nptr, endptr, &tmp);
+> +    if (!ret && !isfinite(tmp)) {
+> +        if (endptr) {
+> +            *endptr = nptr;
+> +        }
+> +        ret = -EINVAL;
+> +    }
+> +
+> +    if (ret != -EINVAL) {
+> +        *result = tmp;
+> +    }
+> +    return ret;
+> +}
+> +
+>   /**
+>    * Searches for the first occurrence of 'c' in 's', and returns a pointer
+>    * to the trailing null byte if none was found.
+> 
 
-Title:
-  Baremetal kernel built from assembly runs multiple times
-
-Status in QEMU:
-  New
-
-Bug description:
-  QEMU version: 4.1.0.
-
-  Full command used to launch: qemu-system-arm -machine raspi2 -kernel
-  main
-
-  (Technically, the first term of the command is actually
-  "~/Applications/QEMU/qemu-4.1.0/build/arm-softmmu/qemu-system-arm",
-  but I shortened it for readability.)
-
-  Host information: Running debian 9.9 on a 64-bit x86 processor (Intel
-  i5-2520M).
-
-  Guest information: No operating system. I'm providing my own kernel,
-  which I assembled from a 60-line ARM assembly program using arm-none-
-  eabi-as and then linked with arm-none-eabi-ld, both version
-  2.28-5+9+b3.
-
-  Additional details: To view the screen output of the program, I am
-  using vncviewer version 6.19.1115 (r42122). All of the above software
-  packages were installed as debian packages using apt, except for QEMU,
-  which I built from source after downloading from the official website.
-
-  .
-
-  The issue here is that I have written a program in assembly and it
-  isn't doing what I expect it to when I emulate it. Here's a summary of
-  the code:
-
-  1) Read a number from zero-initialized memory.
-
-  2) Add one to the number and write it back.
-
-  3) Use the number to determine a screen location to write to.
-
-  4) Use the number to determine what color to write.
-
-  5) Write 4000 half-words to the screen starting at that offset and
-  using that color. This should result in a stripe across the whole
-  screen that's about 6 pixels tall.
-
-  The expected behavior is that *one* stripe should appear on the screen
-  in a single color. However, the actual behavior is that up to *four*
-  stripes appear, each in a different color. Furthermore, if I comment
-  out the line that writes the incremented counter back to memory, then
-  only one stripe will appear.
-
-  I will also note that the Raspberry Pi 2, which is the system I'm
-  emulating, has four cores. What I suspect is going on here is that my
-  code is being loaded onto all four cores of the emulated machine. I
-  couldn't find anything about this anywhere in the documentation, and
-  it strikes me as bug.
-
-  I have attached the assmebly code that I'm using, as well as a short
-  makefile. Since I can only add one attachment to this report, I've
-  combined the two into a single text file and labeled each. After
-  separating the two into two files, you will need to change the first
-  line of the makefile to point to your installation of qemu-system-arm
-  v4.1.0. After that, type "make run" to run the program.
-
-  Thanks in advance,
-  Evan Rysdam
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1853781/+subscriptions
 
