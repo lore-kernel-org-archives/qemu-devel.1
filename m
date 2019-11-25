@@ -2,114 +2,83 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DDBC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 10:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B51C432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 10:13:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31BA52071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 10:10:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B5032071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 10:13:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KZwnFBut"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31BA52071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K+Xp/hYT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B5032071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZBKC-0003N6-CN
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 05:10:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36319)
+	id 1iZBMn-0004mI-96
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 05:13:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36989)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iZBII-00025v-6H
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:08:35 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZBLf-0004JB-8T
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:12:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iZBIG-0000Zn-ST
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:08:34 -0500
-Received: from mail-eopbgr80135.outbound.protection.outlook.com
- ([40.107.8.135]:21153 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iZBIG-0000Yr-Kp; Mon, 25 Nov 2019 05:08:32 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fQWl8lOLzUOjxSg3upZ2arHjSbGQBvGncEWxq4vqI2v9g+f5V2eUiWT08dk3Nv8VPpICABKMdikm2mKt5y2tyByU+V+rvFfpxEhYAIx4dAbAAOhJZPwT0ZTPNyfiVymbdIK9tDg03lt183K6HozBpOv3cPpxIC5qxO/oydyHtPN3LaUNaC1LKwHuCYrvaxI/ZpY+L1icGfH+RtkihJD6saDwsJm8f3WtC+0JJEV1eQACZNMfnMttxkG30UajqJrn0BMOE/lBZPwAc6dsuAsmvZPOJ4SuuSWvAx/5PdfRRwta2iq7DcP/mBFJmo0gSdI8YVh3nM+izxsPxLpdPbzbdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3d890H8ZOO3J3bKnJoEcClzOZeadt8IDGoNq2V2OO8U=;
- b=VZQS6eudbgH+iHKj0tGC1cvupXmkh3JBENij98feaLF7vAZAkaN92TKaT88rJgOcraSVMSjwYTJrm4tfTLJAdvWMFTu1iu/3uhOJ8Hje8SNvV5ssvKCfKzCnIfDrheQTMHj83j2K1/MVp1SGBtnwyLWwuPuUkZjTJT9eivIdCCdq4LVKRVv1AbAcYe4SocZJrHcOAYRGd14f+nPh0KC9Kxl193yg4LYhPaWvh4IYPalyRsBziReWkZD3N2nte5IY5xDTSOaGjd1c9BcG03Kp1nqFahY0stNnm5bedOU7S+B1g4kMKeOQiVSLEp6bxS16SMYpBNRl7BPGuh44x1bWVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3d890H8ZOO3J3bKnJoEcClzOZeadt8IDGoNq2V2OO8U=;
- b=KZwnFButrbbKJZ1nG3wPjN3Ag2fJIIyVa5KhHyvZey8htfvXIyNzBc3nG2PBKFS24HHb8EDfuNbp7MWqn0ViYXz3HqyUNPMlYhYy5hZSrUhPU2P8oVZwbp8e/zVoCF0r2XW3nskYE8gIxA1pc5lcLu0ewVvwjQ2KvWCulbGA6x4=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3254.eurprd08.prod.outlook.com (52.135.167.160) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2474.19; Mon, 25 Nov 2019 10:08:28 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2474.023; Mon, 25 Nov 2019
- 10:08:28 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
-Thread-Topic: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
-Thread-Index: AQHVnJu0qDM7Hy9Fo0iUR1ci8onW5Kebt1WA
-Date: Mon, 25 Nov 2019 10:08:28 +0000
-Message-ID: <4f6f9488-8ec1-85bf-5584-bac5b0f8ce92@virtuozzo.com>
-References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20191116163410.12129-1-vsementsov@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0102CA0009.eurprd01.prod.exchangelabs.com
- (2603:10a6:7:14::22) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191125130825727
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9d27e69f-1dd5-455c-2132-08d7718f6a9f
-x-ms-traffictypediagnostic: AM6PR08MB3254:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB3254AF0ECB9EC9C655320DFEC14A0@AM6PR08MB3254.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3968;
-x-forefront-prvs: 0232B30BBC
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(376002)(396003)(366004)(39840400004)(346002)(189003)(199004)(53754006)(446003)(11346002)(2616005)(36756003)(6246003)(2351001)(6506007)(4326008)(386003)(14444005)(256004)(6486002)(76176011)(31696002)(6916009)(54906003)(66946007)(99286004)(52116002)(71190400001)(86362001)(71200400001)(66476007)(2501003)(6512007)(316002)(66446008)(64756008)(66556008)(25786009)(6116002)(7736002)(478600001)(31686004)(3846002)(229853002)(66066001)(5660300002)(305945005)(5640700003)(6436002)(81166006)(81156014)(186003)(8676002)(14454004)(102836004)(26005)(2906002)(8936002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3254;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: E9FEyv1OvEyArGH8bO4BqCibe1d/6Ron139j0wb/2pRZB7YMLDPlvZ66UzSUpjt/YPQvjAqkpPMlSKHOBoTdno+kXXG+k8xvXZPUHOeIx1VNLDWJaG124A4if6rbvS3C+cvd0pF3cFn72hHh0r/1fqlHm56JkHJipUkrZUxY7jnP+oYGaldGeBCCu33YNOJ8wIH1avq2XNIILjb75QZpjD10F/8m5uf41GMf21rUTQYWKFJ4G1JlNRjwjSlE3B+4lEx89k1U7eGhe8uo5iHwx9LnC0TkltfNmeorqwll/QQrCkZ3pF2HCetNXgcrQBk+kwgw+D6khHv3nfpXnbKCoerL4z2MkXFXP93DyJ9pXwLdezboGbd+mMJkWJgunz8l5XqZJAAD4GM+ykIoF7ap8K+tbtyPzWPutSSXEH62uzE/S5dz4WkoigGbOgJ0Y0n9
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9DACBE1BE5502140A315FD71D7C88851@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZBLd-0002Bv-H4
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:12:03 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45846)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iZBLd-0002Bb-AO
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:12:01 -0500
+Received: by mail-ot1-x341.google.com with SMTP id r24so12040090otk.12
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 02:12:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=kFLxIXAZZRqTnDHKG4CAmTTRKFhMRyNK61BosGaQDcc=;
+ b=K+Xp/hYTPHYY2RsulMlWxmY8yV9IoIU62Blh5DsK6UCE5/DHqZJ5H72cZg0oKc8HIf
+ j3tXZmSicg0PR+GGWhOtMhnQ58sUjFnHiumV/dTx0CZhy+WM5louc4d6B/3m9+edMEAc
+ K0tRXPemvDaWWD6NnLYFCGA+yGiARSYn0zl95qMqBkn91L+TnHSaiyQZZCXk6E9+Qf1i
+ rKS48xWbH4Dat3tDc4eZ9fEYUKqLTaquts3plPf0h20+NgK4Q6Z20f+DSAYU7iaoKkx0
+ 6sEuxBGrk96cilF9L3kg1BsIpG+oTYCRUF8dzfEefJS3dUcZTvdIxWJcLvOjiX2K1MRm
+ ZOsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=kFLxIXAZZRqTnDHKG4CAmTTRKFhMRyNK61BosGaQDcc=;
+ b=BHs7GA9jKq2IYzDj1/o8zBZ7pl3qE20uW/1nouCFKE9aWPe5fH31gmWPtSVGipcbyh
+ BRlpKo8w+R/ccAHMUb0O+UPx+czW3Lx8AEd2PdIvdf3L0md5HZ2lr4VBWOy2BNRuvbHA
+ mb37xkDihUEeA7yqJKQ2zEA8GlT4fGkvSltgTHLfUbbAG957rfSzMB56agmZoGh+2OmL
+ 1Sr6FN5czX1ipUB0I+5KdVWn1IOVLq/LHyek4k2W4AzZ3poiIQsXbr7nTVkEhQoe5cE1
+ Nk1K6IY0MnqJ8GFkEUaQoOqSrB7Seh6dnPX94snfsAPWOwsmJOhpvKnfOWwiva/m3YYe
+ zoDw==
+X-Gm-Message-State: APjAAAUGnOrf8P6PACkpS7UBzgRK9g4uV4BMVj5M56QEXEO5GZU3jWV+
+ EXkvMFhoi4GWTmo4kqaO3g/GZhLN/nJlqXtHN0U=
+X-Google-Smtp-Source: APXvYqwK/ObaUOq9x/HJ7+jEzG/NJEmY51qqCENZAG5r5RrIoShrDvcVRbklMNMlMz8jicop37U12Eu442GRf4bqQ1c=
+X-Received: by 2002:a9d:1b3:: with SMTP id e48mr20484083ote.341.1574676720462; 
+ Mon, 25 Nov 2019 02:12:00 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d27e69f-1dd5-455c-2132-08d7718f6a9f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Nov 2019 10:08:28.0299 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6dANK5iTLJroPfZqZLnIIs4MFaGlSrpe8szt1Ko3ppdRGJsDrd/7o1XumtNAHc2uC81CjVCWR0KpD7tYSttwJo0CSekGyyFvdOqRFAa1nBA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3254
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.135
+Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Mon, 25 Nov 2019 02:12:00
+ -0800 (PST)
+In-Reply-To: <20191120152442.26657-18-marcandre.lureau@redhat.com>
+References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
+ <20191120152442.26657-18-marcandre.lureau@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 25 Nov 2019 11:12:00 +0100
+Message-ID: <CAL1e-=iqhBRcscTEDHczoqTGbCZnu386AX-WHnVdq-0uYA25ug@mail.gmail.com>
+Subject: Re: [PATCH v4 17/37] mips: inline serial_init()
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000008f307a059828fe8d"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,69 +90,246 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- Alberto Garcia <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>,
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGluZz8NCg0KSGkhIFdoeSBzbyBzaWxlbnQ/IFBvc3Rwb25lIHRoaXMgdG8gNS4wPyBUaGlzIGlz
-IGZpeGluZyB0aGUgc2FtZSBwcm9ibGVtIHdpdGggYmxvY2sNCmNvbW1pdCwgbGlrZSBLZXZpbidz
-IHNlcmllcywganVzdCBjb21taXQgbm90IHRvIG1pZCBidXQgdG8gYmFzZS4uDQoNCjE2LjExLjIw
-MTkgMTk6MzQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+IEhpIGFsbCEN
-Cj4gDQo+IEkgd2FudGVkIHRvIHVuZGVyc3RhbmQsIHdoYXQgaXMgdGhlIHJlYWwgZGlmZmVyZW5j
-ZSBiZXR3ZWVuIGJkcnZfYmxvY2tfc3RhdHVzX2Fib3ZlDQo+IGFuZCBiZHJ2X2lzX2FsbG9jYXRl
-ZF9hYm92ZSwgSU1ITyBiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZSBzaG91bGQgd29yayB0aHJvdWdo
-DQo+IGJkcnZfYmxvY2tfc3RhdHVzX2Fib3ZlLi4NCj4gDQo+IEFuZCBJIGZvdW5kIHRoZSBwcm9i
-bGVtOiBiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZSBjb25zaWRlcnMgc3BhY2UgYWZ0ZXIgRU9GIGFz
-DQo+IFVOQUxMT0NBVEVEIGZvciBpbnRlcm1lZGlhdGUgbm9kZXMuLg0KPiANCj4gVU5BTExPQ0FU
-RUQgaXMgbm90IGFib3V0IGFsbG9jYXRpb24gYXQgZnMgbGV2ZWwsIGJ1dCBhYm91dCBzaG91bGQg
-d2UgZ28gdG8gYmFja2luZyBvcg0KPiBub3QuLiBBbmQgaXQgc2VlbXMgaW5jb3JyZWN0IGZvciBt
-ZSwgYXMgaW4gY2FzZSBvZiBzaG9ydCBiYWNraW5nIGZpbGUsIHdlJ2xsIHJlYWQNCj4gemVyb2Vz
-IGFmdGVyIEVPRiwgaW5zdGVhZCBvZiBnb2luZyBmdXJ0aGVyIGJ5IGJhY2tpbmcgY2hhaW4uDQo+
-IA0KPiBUaGlzIGxlYWRzIHRvIHRoZSBmb2xsb3dpbmcgZWZmZWN0Og0KPiANCj4gLi9xZW11LWlt
-ZyBjcmVhdGUgLWYgcWNvdzIgYmFzZS5xY293MiAyTQ0KPiAuL3FlbXUtaW8gLWMgIndyaXRlIC1Q
-IDB4MSAwIDJNIiBiYXNlLnFjb3cyDQo+IA0KPiAuL3FlbXUtaW1nIGNyZWF0ZSAtZiBxY293MiAt
-YiBiYXNlLnFjb3cyIG1pZC5xY293MiAxTQ0KPiAuL3FlbXUtaW1nIGNyZWF0ZSAtZiBxY293MiAt
-YiBtaWQucWNvdzIgdG9wLnFjb3cyIDJNDQo+IA0KPiBSZWdpb24gMU0uLjJNIGlzIHNoYWRvd2Vk
-IGJ5IHNob3J0IG1pZGRsZSBpbWFnZSwgc28gZ3Vlc3Qgc2VlcyB6ZXJvZXM6DQo+IC4vcWVtdS1p
-byAtYyAicmVhZCAtUCAwIDFNIDFNIiB0b3AucWNvdzINCj4gcmVhZCAxMDQ4NTc2LzEwNDg1NzYg
-Ynl0ZXMgYXQgb2Zmc2V0IDEwNDg1NzYNCj4gMSBNaUIsIDEgb3BzOyAwMC4wMCBzZWMgKDIyLjc5
-NSBHaUIvc2VjIGFuZCAyMzM0MS41ODA3IG9wcy9zZWMpDQo+IA0KPiBCdXQgYWZ0ZXIgY29tbWl0
-IGd1ZXN0IHZpc2libGUgc3RhdGUgaXMgY2hhbmdlZCwgd2hpY2ggc2VlbXMgd3JvbmcgZm9yIG1l
-Og0KPiAuL3FlbXUtaW1nIGNvbW1pdCB0b3AucWNvdzIgLWIgbWlkLnFjb3cyDQo+IA0KPiAuL3Fl
-bXUtaW8gLWMgInJlYWQgLVAgMCAxTSAxTSIgbWlkLnFjb3cyDQo+IFBhdHRlcm4gdmVyaWZpY2F0
-aW9uIGZhaWxlZCBhdCBvZmZzZXQgMTA0ODU3NiwgMTA0ODU3NiBieXRlcw0KPiByZWFkIDEwNDg1
-NzYvMTA0ODU3NiBieXRlcyBhdCBvZmZzZXQgMTA0ODU3Ng0KPiAxIE1pQiwgMSBvcHM7IDAwLjAw
-IHNlYyAoNC45ODEgR2lCL3NlYyBhbmQgNTEwMC40Nzk0IG9wcy9zZWMpDQo+IA0KPiAuL3FlbXUt
-aW8gLWMgInJlYWQgLVAgMSAxTSAxTSIgbWlkLnFjb3cyDQo+IHJlYWQgMTA0ODU3Ni8xMDQ4NTc2
-IGJ5dGVzIGF0IG9mZnNldCAxMDQ4NTc2DQo+IDEgTWlCLCAxIG9wczsgMDAuMDAgc2VjICgzLjM2
-NSBHaUIvc2VjIGFuZCAzNDQ2LjE2MDYgb3BzL3NlYykNCj4gDQo+IA0KPiBJIGRvbid0IGtub3cs
-IGlzIGl0IGEgcmVhbCBidWcsIGFzIEkgZG9uJ3Qga25vdywgZG8gd2Ugc3VwcG9ydCBiYWNraW5n
-IGZpbGUgbGFyZ2VyIHRoYW4NCj4gaXRzIHBhcmVudC4gU3RpbGwsIEknbSBub3Qgc3VyZSB0aGF0
-IHRoaXMgYmVoYXZpb3Igb2YgYmRydl9pc19hbGxvY2F0ZWRfYWJvdmUgZG9uJ3QgbGVhZA0KPiB0
-byBvdGhlciBwcm9ibGVtcy4NCj4gDQo+ID09PT09DQo+IA0KPiBIbW0sIGJkcnZfYmxvY2tfYWxs
-b2NhdGVkX2Fib3ZlIGJlaGF2ZXMgc3RyYW5nZSB0b286DQo+IA0KPiB3aXRoIHdhbnRfemVybz10
-cnVlLCBpdCBtYXkgcmVwb3J0IHVuYWxsb2NhdGVkIHplcm9lcyBiZWNhdXNlIG9mIHNob3J0IGJh
-Y2tpbmcgZmlsZXMsIHdoaWNoDQo+IGFyZSBhY3R1YWxseSAiYWxsb2NhdGVkIiBpbiBQT1Ygb2Yg
-YmFja2luZyBjaGFpbnMuIEJ1dCBJIHNlZSB0aGlzIG1heSBpbmZsdWVuY2Ugb25seQ0KPiBxZW11
-LWltZyBjb21wYXJlLCBhbmQgSSBkb24ndCBzZWUgY2FuIGl0IHRyaWdnZXIgc29tZSBidWcuLg0K
-PiANCj4gd2l0aCB3YW50X3plcm89ZmFsc2UsIGl0IG1heSBkbyBubyBwcm9ncmVzcyBiZWNhdXNl
-IG9mIHNob3J0IGJhY2tpbmcgZmlsZS4gTW9yZW92ZXIgaXQgbWF5DQo+IHJlcG9ydCBFT0YgaW4g
-dGhlIG1pZGRsZSEhIEJ1dCB3YW50X3plcm89ZmFsc2UgdXNlZCBvbmx5IGluIGJkcnZfaXNfYWxs
-b2NhdGVkLCB3aGljaCBjb25zaWRlcnMNCj4gb25seXQgdG9wIGxheWVyLCBzbyBpdCBzZWVtcyBP
-Sy4NCj4gDQo+ID09PT09DQo+IA0KPiBTbywgSSBwcm9wb3NlIHRoZXNlIHNlcmllcywgc3RpbGwg
-SSdtIG5vdCBzdXJlIGlzIHRoZXJlIGEgcmVhbCBidWcuDQo+IA0KPiBWbGFkaW1pciBTZW1lbnRz
-b3YtT2dpZXZza2l5ICg0KToNCj4gICAgYmxvY2svaW86IGZpeCBiZHJ2X2NvX2Jsb2NrX3N0YXR1
-c19hYm92ZQ0KPiAgICBibG9jay9pbzogYmRydl9jb21tb25fYmxvY2tfc3RhdHVzX2Fib3ZlOiBz
-dXBwb3J0IGluY2x1ZGVfYmFzZQ0KPiAgICBibG9jay9pbzogYmRydl9jb21tb25fYmxvY2tfc3Rh
-dHVzX2Fib3ZlOiBzdXBwb3J0IGJzID09IGJhc2UNCj4gICAgYmxvY2svaW86IGZpeCBiZHJ2X2lz
-X2FsbG9jYXRlZF9hYm92ZQ0KPiANCj4gICBibG9jay9pby5jICAgICAgICAgICAgICAgICB8IDEw
-NCArKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgdGVzdHMvcWVtdS1p
-b3Rlc3RzLzE1NC5vdXQgfCAgIDQgKy0NCj4gICAyIGZpbGVzIGNoYW5nZWQsIDUzIGluc2VydGlv
-bnMoKyksIDU1IGRlbGV0aW9ucygtKQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
-bWlyDQo=
+--0000000000008f307a059828fe8d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau <
+marcandre.lureau@redhat.com> wrote:
+
+> The function is specific to mipssim, let's inline it.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/char/serial.c         | 16 ----------------
+>  hw/mips/mips_mipssim.c   | 15 ++++++++++++---
+>  include/hw/char/serial.h |  2 --
+>  3 files changed, 12 insertions(+), 21 deletions(-)
+>
+> diff --git a/hw/char/serial.c b/hw/char/serial.c
+> index 164146ede8..23f0b02516 100644
+> --- a/hw/char/serial.c
+> +++ b/hw/char/serial.c
+> @@ -1023,22 +1023,6 @@ static const TypeInfo serial_io_info =3D {
+>      .class_init =3D serial_io_class_init,
+>  };
+>
+> -SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
+> -                         Chardev *chr, MemoryRegion *system_io)
+> -{
+> -    SerialIO *sio =3D SERIAL_IO(qdev_create(NULL, TYPE_SERIAL_IO));
+> -
+> -    qdev_prop_set_uint32(DEVICE(sio), "baudbase", baudbase);
+> -    qdev_prop_set_chr(DEVICE(sio), "chardev", chr);
+> -    qdev_set_legacy_instance_id(DEVICE(sio), base, 2);
+> -    qdev_init_nofail(DEVICE(sio));
+> -
+> -    sysbus_connect_irq(SYS_BUS_DEVICE(sio), 0, irq);
+> -    memory_region_add_subregion(system_io, base, &sio->serial.io);
+> -
+> -    return sio;
+> -}
+> -
+>  static Property serial_properties[] =3D {
+>      DEFINE_PROP_CHR("chardev", SerialState, chr),
+>      DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
+> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+> index 282bbecb24..bfafa4d7e9 100644
+> --- a/hw/mips/mips_mipssim.c
+> +++ b/hw/mips/mips_mipssim.c
+> @@ -40,6 +40,7 @@
+>  #include "hw/loader.h"
+>  #include "elf.h"
+>  #include "hw/sysbus.h"
+> +#include "hw/qdev-properties.h"
+>  #include "exec/address-spaces.h"
+>  #include "qemu/error-report.h"
+>  #include "sysemu/qtest.h"
+> @@ -219,9 +220,17 @@ mips_mipssim_init(MachineState *machine)
+>       * A single 16450 sits at offset 0x3f8. It is attached to
+>       * MIPS CPU INT2, which is interrupt 4.
+>       */
+> -    if (serial_hd(0))
+> -        serial_init(0x3f8, env->irq[4], 115200, serial_hd(0),
+> -                    get_system_io());
+> +    if (serial_hd(0)) {
+> +        DeviceState *dev =3D qdev_create(NULL, TYPE_SERIAL_IO);
+> +
+> +        qdev_prop_set_uint32(DEVICE(dev), "baudbase", 115200);
+> +        qdev_prop_set_chr(dev, "chardev", serial_hd(0));
+> +        qdev_set_legacy_instance_id(dev, 0x3f8, 2);
+> +        qdev_init_nofail(dev);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
+> +        memory_region_add_subregion(get_system_io(), 0x3f8,
+> +                                    &SERIAL_IO(dev)->serial.io);
+> +    }
+
+
+
+Please explain why the code in the deleted function and the new function
+are not identical. Why is the new code better?
+
+Thanks, Aleksandar
+
+
+>
+>      if (nd_table[0].used)
+>          /* MIPSnet uses the MIPS CPU INT0, which is interrupt 2. */
+> diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+> index d356ba838c..535fa23a2b 100644
+> --- a/include/hw/char/serial.h
+> +++ b/include/hw/char/serial.h
+> @@ -108,8 +108,6 @@ void serial_set_frequency(SerialState *s, uint32_t
+> frequency);
+>  #define TYPE_SERIAL_IO "serial-io"
+>  #define SERIAL_IO(s) OBJECT_CHECK(SerialIO, (s), TYPE_SERIAL_IO)
+>
+> -SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
+> -                      Chardev *chr, MemoryRegion *system_io);
+>  SerialMM *serial_mm_init(MemoryRegion *address_space,
+>                           hwaddr base, int regshift,
+>                           qemu_irq irq, int baudbase,
+> --
+> 2.24.0
+>
+>
+>
+
+--0000000000008f307a059828fe8d
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau &lt;<a href=
+=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;=
+ wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bor=
+der-left:1px #ccc solid;padding-left:1ex">The function is specific to mipss=
+im, let&#39;s inline it.<br>
+<br>
+Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lurea=
+u@redhat.com">marcandre.lureau@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/char/serial.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 16 --------------=
+--<br>
+=C2=A0hw/mips/mips_mipssim.c=C2=A0 =C2=A0| 15 ++++++++++++---<br>
+=C2=A0include/hw/char/serial.h |=C2=A0 2 --<br>
+=C2=A03 files changed, 12 insertions(+), 21 deletions(-)<br>
+<br>
+diff --git a/hw/char/serial.c b/hw/char/serial.c<br>
+index 164146ede8..23f0b02516 100644<br>
+--- a/hw/char/serial.c<br>
++++ b/hw/char/serial.c<br>
+@@ -1023,22 +1023,6 @@ static const TypeInfo serial_io_info =3D {<br>
+=C2=A0 =C2=A0 =C2=A0.class_init =3D serial_io_class_init,<br>
+=C2=A0};<br>
+<br>
+-SerialIO *serial_init(int base, qemu_irq irq, int baudbase,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0Chardev *chr, MemoryRegion *system_io)<br>
+-{<br>
+-=C2=A0 =C2=A0 SerialIO *sio =3D SERIAL_IO(qdev_create(NULL, TYPE_SERIAL_IO=
+));<br>
+-<br>
+-=C2=A0 =C2=A0 qdev_prop_set_uint32(DEVICE(<wbr>sio), &quot;baudbase&quot;,=
+ baudbase);<br>
+-=C2=A0 =C2=A0 qdev_prop_set_chr(DEVICE(sio), &quot;chardev&quot;, chr);<br=
+>
+-=C2=A0 =C2=A0 qdev_set_legacy_instance_id(<wbr>DEVICE(sio), base, 2);<br>
+-=C2=A0 =C2=A0 qdev_init_nofail(DEVICE(sio));<br>
+-<br>
+-=C2=A0 =C2=A0 sysbus_connect_irq(SYS_BUS_<wbr>DEVICE(sio), 0, irq);<br>
+-=C2=A0 =C2=A0 memory_region_add_subregion(<wbr>system_io, base, &amp;sio-&=
+gt;<a href=3D"http://serial.io" target=3D"_blank">serial.io</a>);<br>
+-<br>
+-=C2=A0 =C2=A0 return sio;<br>
+-}<br>
+-<br>
+=C2=A0static Property serial_properties[] =3D {<br>
+=C2=A0 =C2=A0 =C2=A0DEFINE_PROP_CHR(&quot;chardev&quot;, SerialState, chr),=
+<br>
+=C2=A0 =C2=A0 =C2=A0DEFINE_PROP_UINT32(&quot;baudbase&quot;, SerialState, b=
+audbase, 115200),<br>
+diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c<br>
+index 282bbecb24..bfafa4d7e9 100644<br>
+--- a/hw/mips/mips_mipssim.c<br>
++++ b/hw/mips/mips_mipssim.c<br>
+@@ -40,6 +40,7 @@<br>
+=C2=A0#include &quot;hw/loader.h&quot;<br>
+=C2=A0#include &quot;elf.h&quot;<br>
+=C2=A0#include &quot;hw/sysbus.h&quot;<br>
++#include &quot;hw/qdev-properties.h&quot;<br>
+=C2=A0#include &quot;exec/address-spaces.h&quot;<br>
+=C2=A0#include &quot;qemu/error-report.h&quot;<br>
+=C2=A0#include &quot;sysemu/qtest.h&quot;<br>
+@@ -219,9 +220,17 @@ mips_mipssim_init(MachineState *machine)<br>
+=C2=A0 =C2=A0 =C2=A0 * A single 16450 sits at offset 0x3f8. It is attached =
+to<br>
+=C2=A0 =C2=A0 =C2=A0 * MIPS CPU INT2, which is interrupt 4.<br>
+=C2=A0 =C2=A0 =C2=A0 */<br>
+-=C2=A0 =C2=A0 if (serial_hd(0))<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 serial_init(0x3f8, env-&gt;irq[4], 115200, ser=
+ial_hd(0),<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_=
+system_io());<br>
++=C2=A0 =C2=A0 if (serial_hd(0)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 DeviceState *dev =3D qdev_create(NULL, TYPE_SE=
+RIAL_IO);<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_prop_set_uint32(DEVICE(<wbr>dev), &quot;b=
+audbase&quot;, 115200);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_prop_set_chr(dev, &quot;chardev&quot;, se=
+rial_hd(0));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_set_legacy_instance_id(<wbr>dev, 0x3f8, 2=
+);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_init_nofail(dev);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 sysbus_connect_irq(SYS_BUS_<wbr>DEVICE(dev), 0=
+, env-&gt;irq[4]);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 memory_region_add_subregion(<wbr>get_system_io=
+(), 0x3f8,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;SERIAL_IO(dev)-&g=
+t;<a href=3D"http://serial.io" target=3D"_blank">serial.io</a>);<br>
++=C2=A0 =C2=A0 }</blockquote><div><br></div><div><br></div><div>Please expl=
+ain why the code in the deleted function and the new function are not ident=
+ical. Why is the new code better?</div><div><br></div><div>Thanks, Aleksand=
+ar</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:=
+0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+<br>
+=C2=A0 =C2=A0 =C2=A0if (nd_table[0].used)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* MIPSnet uses the MIPS CPU INT0, which =
+is interrupt 2. */<br>
+diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h<br>
+index d356ba838c..535fa23a2b 100644<br>
+--- a/include/hw/char/serial.h<br>
++++ b/include/hw/char/serial.h<br>
+@@ -108,8 +108,6 @@ void serial_set_frequency(<wbr>SerialState *s, uint32_t=
+ frequency);<br>
+=C2=A0#define TYPE_SERIAL_IO &quot;serial-io&quot;<br>
+=C2=A0#define SERIAL_IO(s) OBJECT_CHECK(SerialIO, (s), TYPE_SERIAL_IO)<br>
+<br>
+-SerialIO *serial_init(int base, qemu_irq irq, int baudbase,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 Chardev *chr, MemoryRegion *system_io);<br>
+=C2=A0SerialMM *serial_mm_init(MemoryRegion *address_space,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 hwaddr base, int regshift,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 qemu_irq irq, int baudbase,<br>
+-- <br>
+2.24.0<br>
+<br>
+<br>
+</blockquote>
+
+--0000000000008f307a059828fe8d--
 
