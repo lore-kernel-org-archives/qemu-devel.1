@@ -2,55 +2,100 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6982C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C46C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A36B2082F
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:08:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A36B2082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 967E82082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 13:09:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vhdnqh5d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 967E82082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZE6n-0006ON-JO
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:08:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39338)
+	id 1iZE7T-0007Rt-EK
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 08:09:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39145)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4E-0004e8-T5
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:16 -0500
+ (envelope-from <philmd@redhat.com>) id 1iZE3s-0004Nq-Jw
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:05:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iZE4C-00069S-4J
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:14 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:45425 helo=mail.rt-rk.com)
+ (envelope-from <philmd@redhat.com>) id 1iZE3r-0005wp-3s
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:05:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42290
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1iZE4B-0005RA-N8
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:06:12 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 772581A2276;
- Mon, 25 Nov 2019 14:05:05 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
- [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 4B3BB1A225C;
- Mon, 25 Nov 2019 14:05:05 +0100 (CET)
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/5] mips: jazz: Renovate coding style
-Date: Mon, 25 Nov 2019 14:04:54 +0100
-Message-Id: <1574687098-26689-2-git-send-email-Filip.Bozuta@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
-References: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iZE3q-0005v9-EA
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 08:05:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574687148;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Lr6W4KR9wCbeu3QHPLleS62fXfo9S/hzHQ4EieD02R8=;
+ b=Vhdnqh5dwaDJQAEuvCUgdYqjYB6SyqINqNUr1cjUmqjeATDNW3lrtieNp6i6jSHWKU7PPo
+ fUKpcte6SJwXHdq5s0d5oeQQJPKNliOPzt7UjUsACFZt6J83DiHdLbW7MleuPsaifxpx/x
+ 3p830dJgZPcmFthRheklbcbU07oYIDc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-269-Ui7liGxSNXCVa43C1JfoQg-1; Mon, 25 Nov 2019 08:05:47 -0500
+Received: by mail-wr1-f71.google.com with SMTP id 90so5446625wrq.6
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 05:05:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=mgG0bIcOz7g59k5sOe8AK4HwNncmlMwW5U4m6dEUMwA=;
+ b=NTyBGPNb2PEByYc14zV/jx3k024ReC9X+0JbKUC7jQLxoEu1xrCAUSUpwmDa4XuKNC
+ WKVD9oAeySJSvvqAtH3gK4yCh3g3g77mEF7+8mliJLssGqhdQ2kuqre7i/AjFB4DSmuJ
+ jaMTMODR9ZJV0qunGZ7G1SOK2HGJc/qs11/CArOHQ0DHtMISwaPRorF6s/1zOpDOQwwb
+ tOWPvbQybjkqm3PRanONmJTOHyguX4njqGfP/AF9svzaKylDjEDoTkolj2dixxZAfRVd
+ 1MAiESWzsV7qdzX+PGSbVHQABGG1cyB8TRXvWWMi2CNOvgRcS9b1+mU158kY3P+OEcK7
+ tb2g==
+X-Gm-Message-State: APjAAAUTKHr+mWv+RAUKnAOz+2Ic5j+05SDU6S0o56uZlllkD5TqO0UL
+ KDJ5iqz3zUJw+fVF6tY5LYtgpoaHyEmvJBWxHVgDgTl3Vo10rlFRsJp3VAeEARvW1YQ5P1iWd6w
+ w2ANjCdHqHYmS1qY=
+X-Received: by 2002:adf:e387:: with SMTP id e7mr16114375wrm.180.1574687145756; 
+ Mon, 25 Nov 2019 05:05:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwlWpOjbK+PSoKQj49eohkl9fLZYT0FBE5ZorBZrUYHjzliKPlGUkJTWpHfSVo2Com/Ea4n7A==
+X-Received: by 2002:adf:e387:: with SMTP id e7mr16114323wrm.180.1574687145301; 
+ Mon, 25 Nov 2019 05:05:45 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id o187sm8561351wmo.20.2019.11.25.05.05.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 25 Nov 2019 05:05:44 -0800 (PST)
+Subject: Re: [PATCH v6 2/9] hw/core/clock-vmstate: define a vmstate entry for
+ clock state
+To: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
+References: <20190904125531.27545-1-damien.hedde@greensocs.com>
+ <20190904125531.27545-3-damien.hedde@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e024d6ba-42a7-5f67-7cdd-edfc1b3a73e4@redhat.com>
+Date: Mon, 25 Nov 2019 14:05:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20190904125531.27545-3-damien.hedde@greensocs.com>
+Content-Language: en-US
+X-MC-Unique: Ui7liGxSNXCVa43C1JfoQg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,323 +107,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
- amarkovic@wavecomp.com, aurelien@aurel32.net
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ alistair@alistair23.me, mark.burton@greensocs.com, marcandre.lureau@redhat.com,
+ qemu-arm@nongnu.org, pbonzini@redhat.com, edgar.iglesias@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The script checkpatch.pl located in scripts folder was
-used to detect all errors and warrnings in files:
-    hw/mips/mips_jazz.c
-    hw/display/jazz_led.c
-    hw/dma/rc4030.c
+On 9/4/19 2:55 PM, Damien Hedde wrote:
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 
-All these mips jazz machine files were edited and
-all the errors and warrings generated by the checkpatch.pl
-script were corrected and then the script was
-ran again to make sure there are no more errors and warnings.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
----
- hw/display/jazz_led.c | 123 +++++++++++++++++++++++++-------------------------
- hw/dma/rc4030.c       |  12 +++--
- hw/mips/mips_jazz.c   |  32 +++++++------
- 3 files changed, 88 insertions(+), 79 deletions(-)
-
-diff --git a/hw/display/jazz_led.c b/hw/display/jazz_led.c
-index 3e0112b..1d84559 100644
---- a/hw/display/jazz_led.c
-+++ b/hw/display/jazz_led.c
-@@ -90,25 +90,25 @@ static void draw_horizontal_line(DisplaySurface *ds,
- 
-     bpp = (surface_bits_per_pixel(ds) + 7) >> 3;
-     d = surface_data(ds) + surface_stride(ds) * posy + bpp * posx1;
--    switch(bpp) {
--        case 1:
--            for (x = posx1; x <= posx2; x++) {
--                *((uint8_t *)d) = color;
--                d++;
--            }
--            break;
--        case 2:
--            for (x = posx1; x <= posx2; x++) {
--                *((uint16_t *)d) = color;
--                d += 2;
--            }
--            break;
--        case 4:
--            for (x = posx1; x <= posx2; x++) {
--                *((uint32_t *)d) = color;
--                d += 4;
--            }
--            break;
-+    switch (bpp) {
-+    case 1:
-+        for (x = posx1; x <= posx2; x++) {
-+            *((uint8_t *)d) = color;
-+            d++;
-+        }
-+        break;
-+    case 2:
-+        for (x = posx1; x <= posx2; x++) {
-+            *((uint16_t *)d) = color;
-+            d += 2;
-+        }
-+        break;
-+    case 4:
-+        for (x = posx1; x <= posx2; x++) {
-+            *((uint32_t *)d) = color;
-+            d += 4;
-+        }
-+        break;
-     }
- }
- 
-@@ -121,25 +121,25 @@ static void draw_vertical_line(DisplaySurface *ds,
- 
-     bpp = (surface_bits_per_pixel(ds) + 7) >> 3;
-     d = surface_data(ds) + surface_stride(ds) * posy1 + bpp * posx;
--    switch(bpp) {
--        case 1:
--            for (y = posy1; y <= posy2; y++) {
--                *((uint8_t *)d) = color;
--                d += surface_stride(ds);
--            }
--            break;
--        case 2:
--            for (y = posy1; y <= posy2; y++) {
--                *((uint16_t *)d) = color;
--                d += surface_stride(ds);
--            }
--            break;
--        case 4:
--            for (y = posy1; y <= posy2; y++) {
--                *((uint32_t *)d) = color;
--                d += surface_stride(ds);
--            }
--            break;
-+    switch (bpp) {
-+    case 1:
-+        for (y = posy1; y <= posy2; y++) {
-+            *((uint8_t *)d) = color;
-+            d += surface_stride(ds);
-+        }
-+        break;
-+    case 2:
-+        for (y = posy1; y <= posy2; y++) {
-+            *((uint16_t *)d) = color;
-+            d += surface_stride(ds);
-+        }
-+        break;
-+    case 4:
-+        for (y = posy1; y <= posy2; y++) {
-+            *((uint32_t *)d) = color;
-+            d += surface_stride(ds);
-+        }
-+        break;
-     }
- }
- 
-@@ -164,28 +164,28 @@ static void jazz_led_update_display(void *opaque)
-     if (s->state & REDRAW_SEGMENTS) {
-         /* set colors according to bpp */
-         switch (surface_bits_per_pixel(surface)) {
--            case 8:
--                color_segment = rgb_to_pixel8(0xaa, 0xaa, 0xaa);
--                color_led = rgb_to_pixel8(0x00, 0xff, 0x00);
--                break;
--            case 15:
--                color_segment = rgb_to_pixel15(0xaa, 0xaa, 0xaa);
--                color_led = rgb_to_pixel15(0x00, 0xff, 0x00);
--                break;
--            case 16:
--                color_segment = rgb_to_pixel16(0xaa, 0xaa, 0xaa);
--                color_led = rgb_to_pixel16(0x00, 0xff, 0x00);
--                break;
--            case 24:
--                color_segment = rgb_to_pixel24(0xaa, 0xaa, 0xaa);
--                color_led = rgb_to_pixel24(0x00, 0xff, 0x00);
--                break;
--            case 32:
--                color_segment = rgb_to_pixel32(0xaa, 0xaa, 0xaa);
--                color_led = rgb_to_pixel32(0x00, 0xff, 0x00);
--                break;
--            default:
--                return;
-+        case 8:
-+            color_segment = rgb_to_pixel8(0xaa, 0xaa, 0xaa);
-+            color_led = rgb_to_pixel8(0x00, 0xff, 0x00);
-+            break;
-+        case 15:
-+            color_segment = rgb_to_pixel15(0xaa, 0xaa, 0xaa);
-+            color_led = rgb_to_pixel15(0x00, 0xff, 0x00);
-+            break;
-+        case 16:
-+            color_segment = rgb_to_pixel16(0xaa, 0xaa, 0xaa);
-+            color_led = rgb_to_pixel16(0x00, 0xff, 0x00);
-+            break;
-+        case 24:
-+            color_segment = rgb_to_pixel24(0xaa, 0xaa, 0xaa);
-+            color_led = rgb_to_pixel24(0x00, 0xff, 0x00);
-+            break;
-+        case 32:
-+            color_segment = rgb_to_pixel32(0xaa, 0xaa, 0xaa);
-+            color_led = rgb_to_pixel32(0x00, 0xff, 0x00);
-+            break;
-+        default:
-+            return;
-         }
- 
-         /* display segments */
-@@ -205,8 +205,9 @@ static void jazz_led_update_display(void *opaque)
-                              (s->segments & 0x80) ? color_segment : 0);
- 
-         /* display led */
--        if (!(s->segments & 0x01))
-+        if (!(s->segments & 0x01)) {
-             color_led = 0; /* black */
-+        }
-         draw_horizontal_line(surface, 68, 50, 50, color_led);
-         draw_horizontal_line(surface, 69, 49, 51, color_led);
-         draw_horizontal_line(surface, 70, 48, 52, color_led);
-diff --git a/hw/dma/rc4030.c b/hw/dma/rc4030.c
-index d54e296..f7542f3 100644
---- a/hw/dma/rc4030.c
-+++ b/hw/dma/rc4030.c
-@@ -397,10 +397,11 @@ static void update_jazz_irq(rc4030State *s)
- 
-     pending = s->isr_jazz & s->imr_jazz;
- 
--    if (pending != 0)
-+    if (pending != 0) {
-         qemu_irq_raise(s->jazz_bus_irq);
--    else
-+    } else {
-         qemu_irq_lower(s->jazz_bus_irq);
-+    }
- }
- 
- static void rc4030_irq_jazz_request(void *opaque, int irq, int level)
-@@ -588,7 +589,8 @@ static const VMStateDescription vmstate_rc4030 = {
-     }
- };
- 
--static void rc4030_do_dma(void *opaque, int n, uint8_t *buf, int len, int is_write)
-+static void rc4030_do_dma(void *opaque, int n, uint8_t *buf,
-+                          int len, int is_write)
- {
-     rc4030State *s = opaque;
-     hwaddr dma_addr;
-@@ -643,8 +645,8 @@ static rc4030_dma *rc4030_allocate_dmas(void *opaque, int n)
-     struct rc4030DMAState *p;
-     int i;
- 
--    s = (rc4030_dma *)g_malloc0(sizeof(rc4030_dma) * n);
--    p = (struct rc4030DMAState *)g_malloc0(sizeof(struct rc4030DMAState) * n);
-+    s = (rc4030_dma *)g_new0(sizeof(rc4030_dma) * n);
-+    p = (struct rc4030DMAState *)g_new0(sizeof(struct rc4030DMAState) * n);
-     for (i = 0; i < n; i++) {
-         p->opaque = opaque;
-         p->n = i;
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index d978bb6..ac4d7ac 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -52,8 +52,7 @@
- #include "qemu/error-report.h"
- #include "qemu/help_option.h"
- 
--enum jazz_model_e
--{
-+enum jazz_model_e {
-     JAZZ_MAGNUM,
-     JAZZ_PICA61,
- };
-@@ -90,16 +89,20 @@ static const MemoryRegionOps rtc_ops = {
- static uint64_t dma_dummy_read(void *opaque, hwaddr addr,
-                                unsigned size)
- {
--    /* Nothing to do. That is only to ensure that
--     * the current DMA acknowledge cycle is completed. */
-+    /*
-+     * Nothing to do. That is only to ensure that
-+     * the current DMA acknowledge cycle is completed.
-+     */
-     return 0xff;
- }
- 
- static void dma_dummy_write(void *opaque, hwaddr addr,
-                             uint64_t val, unsigned size)
- {
--    /* Nothing to do. That is only to ensure that
--     * the current DMA acknowledge cycle is completed. */
-+    /*
-+     * Nothing to do. That is only to ensure that
-+     * the current DMA acknowledge cycle is completed.
-+     */
- }
- 
- static const MemoryRegionOps dma_dummy_ops = {
-@@ -109,8 +112,8 @@ static const MemoryRegionOps dma_dummy_ops = {
- };
- 
- #define MAGNUM_BIOS_SIZE_MAX 0x7e000
--#define MAGNUM_BIOS_SIZE (BIOS_SIZE < MAGNUM_BIOS_SIZE_MAX ? BIOS_SIZE : MAGNUM_BIOS_SIZE_MAX)
--
-+#define MAGNUM_BIOS_SIZE                                                       \
-+        (BIOS_SIZE < MAGNUM_BIOS_SIZE_MAX ? BIOS_SIZE : MAGNUM_BIOS_SIZE_MAX)
- static void (*real_do_transaction_failed)(CPUState *cpu, hwaddr physaddr,
-                                           vaddr addr, unsigned size,
-                                           MMUAccessType access_type,
-@@ -201,8 +204,9 @@ static void mips_jazz_init(MachineState *machine,
-     memory_region_add_subregion(address_space, 0xfff00000LL, bios2);
- 
-     /* load the BIOS image. */
--    if (bios_name == NULL)
-+    if (bios_name == NULL) {
-         bios_name = BIOS_FILENAME;
-+    }
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
-     if (filename) {
-         bios_size = load_image_targphys(filename, 0xfff00000LL,
-@@ -229,7 +233,8 @@ static void mips_jazz_init(MachineState *machine,
-                                 sysbus_mmio_get_region(sysbus, 0));
-     memory_region_add_subregion(address_space, 0xf0000000,
-                                 sysbus_mmio_get_region(sysbus, 1));
--    memory_region_init_io(dma_dummy, NULL, &dma_dummy_ops, NULL, "dummy_dma", 0x1000);
-+    memory_region_init_io(dma_dummy, NULL, &dma_dummy_ops,
-+                          NULL, "dummy_dma", 0x1000);
-     memory_region_add_subregion(address_space, 0x8000d000, dma_dummy);
- 
-     /* ISA bus: IO space at 0x90000000, mem space at 0x91000000 */
-@@ -276,8 +281,9 @@ static void mips_jazz_init(MachineState *machine,
-     /* Network controller */
-     for (n = 0; n < nb_nics; n++) {
-         nd = &nd_table[n];
--        if (!nd->model)
-+        if (!nd->model) {
-             nd->model = g_strdup("dp83932");
-+        }
-         if (strcmp(nd->model, "dp83932") == 0) {
-             qemu_check_nic_model(nd, "dp83932");
- 
-@@ -338,12 +344,12 @@ static void mips_jazz_init(MachineState *machine,
-     /* Serial ports */
-     if (serial_hd(0)) {
-         serial_mm_init(address_space, 0x80006000, 0,
--                       qdev_get_gpio_in(rc4030, 8), 8000000/16,
-+                       qdev_get_gpio_in(rc4030, 8), 8000000 / 16,
-                        serial_hd(0), DEVICE_NATIVE_ENDIAN);
-     }
-     if (serial_hd(1)) {
-         serial_mm_init(address_space, 0x80007000, 0,
--                       qdev_get_gpio_in(rc4030, 9), 8000000/16,
-+                       qdev_get_gpio_in(rc4030, 9), 8000000 / 16,
-                        serial_hd(1), DEVICE_NATIVE_ENDIAN);
-     }
- 
--- 
-2.7.4
+> ---
+> This was in the previous reviewed commit. But it can't be in the
+> clock.c file in order to allow linux-user builds.
+> ---
+>   hw/core/Makefile.objs   |  1 +
+>   hw/core/clock-vmstate.c | 25 +++++++++++++++++++++++++
+>   include/hw/clock.h      |  9 +++++++++
+>   3 files changed, 35 insertions(+)
+>   create mode 100644 hw/core/clock-vmstate.c
+>=20
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index c66a5b2c6b..8fcebf2e67 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -4,6 +4,7 @@ common-obj-y +=3D bus.o reset.o
+>   common-obj-y +=3D resettable.o
+>   common-obj-$(CONFIG_SOFTMMU) +=3D qdev-fw.o
+>   common-obj-$(CONFIG_SOFTMMU) +=3D fw-path-provider.o
+> +common-obj-$(CONFIG_SOFTMMU) +=3D clock-vmstate.o
+>   # irq.o needed for qdev GPIO handling:
+>   common-obj-y +=3D irq.o
+>   common-obj-y +=3D hotplug.o
+> diff --git a/hw/core/clock-vmstate.c b/hw/core/clock-vmstate.c
+> new file mode 100644
+> index 0000000000..c781369c15
+> --- /dev/null
+> +++ b/hw/core/clock-vmstate.c
+> @@ -0,0 +1,25 @@
+> +/*
+> + * Clock migration structure
+> + *
+> + * Copyright GreenSocs 2019
+> + *
+> + * Authors:
+> + *  Damien Hedde <damien.hedde@greensocs.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "migration/vmstate.h"
+> +#include "hw/clock.h"
+> +
+> +const VMStateDescription vmstate_clockin =3D {
+> +    .name =3D "clock",
+> +    .version_id =3D 0,
+> +    .minimum_version_id =3D 0,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT64(frequency, ClockIn),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> diff --git a/include/hw/clock.h b/include/hw/clock.h
+> index fd11202ba4..e7efb6ad17 100644
+> --- a/include/hw/clock.h
+> +++ b/include/hw/clock.h
+> @@ -34,6 +34,15 @@ struct ClockOut {
+>       QLIST_HEAD(, ClockIn) followers; /* list of registered clocks */
+>   };
+>  =20
+> +/*
+> + * vmstate description entry to be added in device vmsd.
+> + */
+> +extern const VMStateDescription vmstate_clockin;
+> +#define VMSTATE_CLOCKIN(_field, _state) \
+> +    VMSTATE_CLOCKIN_V(_field, _state, 0)
+> +#define VMSTATE_CLOCKIN_V(_field, _state, _version) \
+> +    VMSTATE_STRUCT_POINTER_V(_field, _state, _version, vmstate_clockin, =
+ClockIn)
+> +
+>   /**
+>    * clock_out_setup_canonical_path:
+>    * @clk: clock
+>=20
 
 
