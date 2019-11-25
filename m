@@ -2,59 +2,61 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 529A5C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1343C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:02:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D69E020748
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:02:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D69E020748
+	by mail.kernel.org (Postfix) with ESMTPS id A6CE820748
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:02:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6CE820748
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZ8O7-0004GT-4h
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 02:02:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41434)
+	id 1iZ8OC-0004LM-IF
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 02:02:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iZ8KZ-0001tt-H0
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:44 -0500
+ (envelope-from <clg@kaod.org>) id 1iZ8Ke-0001uj-F2
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iZ8KX-00016z-BG
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:42 -0500
-Received: from 9.mo173.mail-out.ovh.net ([46.105.72.44]:41677)
+ (envelope-from <clg@kaod.org>) id 1iZ8Kb-00019m-S7
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:48 -0500
+Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:52996)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iZ8KX-00013M-5P
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:41 -0500
-Received: from player697.ha.ovh.net (unknown [10.108.57.18])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 33D91123F9D
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 07:58:31 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iZ8Kb-00018i-Ge
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:45 -0500
+Received: from player697.ha.ovh.net (unknown [10.109.146.137])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 05080233542
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 07:58:44 +0100 (CET)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player697.ha.ovh.net (Postfix) with ESMTPSA id 2AB40C8093DF;
- Mon, 25 Nov 2019 06:58:25 +0000 (UTC)
+ by player697.ha.ovh.net (Postfix) with ESMTPSA id 89C62C809435;
+ Mon, 25 Nov 2019 06:58:38 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v6 00/20] ppc/pnv: add XIVE support for KVM guests
-Date: Mon, 25 Nov 2019 07:58:00 +0100
-Message-Id: <20191125065820.927-1-clg@kaod.org>
+Subject: [PATCH v6 02/20] ppc/xive: Implement the XivePresenter interface
+Date: Mon, 25 Nov 2019 07:58:02 +0100
+Message-Id: <20191125065820.927-3-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191125065820.927-1-clg@kaod.org>
+References: <20191125065820.927-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 8905586788175285222
+X-Ovh-Tracer-Id: 8908964491588832230
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeitddggeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffogggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeljedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeitddggeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedu
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.72.44
+X-Received-From: 87.98.172.162
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,113 +74,243 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+Each XIVE Router model, sPAPR and PowerNV, now implements the 'match_nvt'
+handler of the XivePresenter QOM interface. This is simply moving code
+and taking into account the new API.
 
-The QEMU PowerNV machine emulates a baremetal OpenPOWER system and
-acts as an hypervisor (L0). Supporting emulation of KVM to run guests
-(L1) requires a few more extensions, among which guest support for the
-XIVE interrupt controller on POWER9 processor.
+To be noted that the xive_router_get_tctx() helper is not used anymore
+when doing CAM matching and will be removed later on after other changes.
 
-The following changes extend the XIVE models with the new XiveFabric
-and XivePresenter interfaces to provide support for XIVE escalations
-and interrupt resend. This mechanism is used by XIVE to notify the
-hypervisor that a vCPU is not dispatched on a HW thread. Tested on a
-QEMU PowerNV machine and a simple QEMU pseries guest doing network on
-a local bridge.
+The XIVE presenter model is still too simple for the PowerNV machine
+and the CAM matching algo is not correct on multichip system. Subsequent
+patches will introduce more changes to scan all chips of the system.
 
-The XIVE interrupt controller offers a way to increase the XIVE
-resources per chip by configuring multiple XIVE blocks on a chip. This
-is not currently supported by the model. However, some configurations,
-such as OPAL/skiboot, use one block-per-chip configuration with some
-optimizations. One of them is to override the hardwired chip ID by the
-block id in the PowerBUS operations and for CAM line compares. This
-patchset improves the support for this setup. Tested with 4 chips.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/intc/pnv_xive.c   | 41 +++++++++++++++++++++++++++++++++++
+ hw/intc/spapr_xive.c | 49 ++++++++++++++++++++++++++++++++++++++++++
+ hw/intc/xive.c       | 51 ++++++--------------------------------------
+ 3 files changed, 97 insertions(+), 44 deletions(-)
 
-A series from Suraj adding guest support in the Radix MMU model of the
-QEMU PowerNV machine is still required and will be send later. The
-whole patchset can be found under :
-
-  https://github.com/legoater/qemu/tree/powernv-4.2
-
-Thanks,
-
-C.
-
-Changes since v5:
-
- - Included Greg's rework of the PowerNV chip core list
- - Introduced a ppc_cpu_pir() helper
- - Better pnv_xive_is_cpu_enabled() helper
- - Extra fixes in  pnv_xive_get_indirect_tctx()=20
- - rework of the dump of the NVT table
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 9a771f640763..8055de89cf63 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -372,6 +372,45 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_=
+t blk, uint32_t idx,
+     return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
+ }
 =20
-Changes since v4:
-
- - rebased on QEMU 4.2-rc1
- - better commit logs
- - moved fixes at the beginning of the patchset
- - reworked pnv_xive_match_nvt() handler to loop on the all threads of
-   a PnvChip
-
-Changes since v3:
-
- - reworked the patches introducing the XiveFabric and XivePresenter
-   interfaces
- - moved the get_block_id() handler to the XiveRouter
- - new small addons related to the format of the trigger data
++static int pnv_xive_match_nvt(XivePresenter *xptr, uint8_t format,
++                              uint8_t nvt_blk, uint32_t nvt_idx,
++                              bool cam_ignore, uint8_t priority,
++                              uint32_t logic_serv, XiveTCTXMatch *match)
++{
++    CPUState *cs;
++    int count =3D 0;
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++        XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
++        int ring;
++
++        /*
++         * Check the thread context CAM lines and record matches.
++         */
++        ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_blk, =
+nvt_idx,
++                                         cam_ignore, logic_serv);
++        /*
++         * Save the context and follow on to catch duplicates, that we
++         * don't support yet.
++         */
++        if (ring !=3D -1) {
++            if (match->tctx) {
++                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a "
++                              "thread context NVT %x/%x\n",
++                              nvt_blk, nvt_idx);
++                return -1;
++            }
++
++            match->ring =3D ring;
++            match->tctx =3D tctx;
++            count++;
++        }
++    }
++
++    return count;
++}
++
+ static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+ {
+     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+@@ -1780,6 +1819,7 @@ static void pnv_xive_class_init(ObjectClass *klass,=
+ void *data)
+     PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
+     XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
+     XiveNotifierClass *xnc =3D XIVE_NOTIFIER_CLASS(klass);
++    XivePresenterClass *xpc =3D XIVE_PRESENTER_CLASS(klass);
 =20
-Changes since v2:
-
- - introduced the XiveFabric and XivePresenter interfaces
- - removed the need of a XiveRouter pointer under XiveTCTX
-
-Changes since v1:
-
- - minor extra fixes=20
- - split the escalation support in different patches
- - kept the XiveRouter type for XiveTCTX back pointer (will address
-   this in P10)
- - removed pnv_xive_vst_size(). Really broken on indirect tables.
- - improved the dump of the NVT table
- - introduce pnv_xive_get_block_id()
-
-C=C3=A9dric Le Goater (19):
-  ppc/xive: Introduce a XivePresenter interface
-  ppc/xive: Implement the XivePresenter interface
-  ppc/pnv: Loop on the threads of the chip to find a matching NVT
-  ppc: Introduce a ppc_cpu_pir() helper
-  ppc/pnv: Introduce a pnv_xive_is_cpu_enabled() helper
-  ppc/pnv: Fix TIMA indirect access
-  ppc/xive: Introduce a XiveFabric interface
-  ppc/pnv: Implement the XiveFabric interface
-  ppc/spapr: Implement the XiveFabric interface
-  ppc/xive: Use the XiveFabric and XivePresenter interfaces
-  ppc/xive: Extend the TIMA operation with a XivePresenter parameter
-  ppc/pnv: Clarify how the TIMA is accessed on a multichip system
-  ppc/xive: Move the TIMA operations to the controller model
-  ppc/xive: Remove the get_tctx() XiveRouter handler
-  ppc/xive: Introduce a xive_tctx_ipb_update() helper
-  ppc/xive: Synthesize interrupt from the saved IPB in the NVT
-  ppc/pnv: Introduce a pnv_xive_block_id() helper
-  ppc/pnv: Extend XiveRouter with a get_block_id() handler
-  ppc/pnv: Dump the XIVE NVT table
-
-Greg Kurz (1):
-  ppc/pnv: Instantiate cores separately
-
- include/hw/ppc/pnv.h       |  12 +-
- include/hw/ppc/pnv_xive.h  |   3 -
- include/hw/ppc/ppc.h       |   1 +
- include/hw/ppc/xive.h      |  67 ++++++++-
- include/hw/ppc/xive_regs.h |   3 +
- hw/intc/pnv_xive.c         | 290 ++++++++++++++++++++++++++++--------
- hw/intc/spapr_xive.c       |  88 ++++++++++-
- hw/intc/xive.c             | 293 +++++++++++++++++++------------------
- hw/ppc/pnv.c               |  96 +++++++++---
- hw/ppc/ppc.c               |   9 +-
- hw/ppc/spapr.c             |  39 +++++
- 11 files changed, 657 insertions(+), 244 deletions(-)
-
+     xdc->dt_xscom =3D pnv_xive_dt_xscom;
+=20
+@@ -1795,6 +1835,7 @@ static void pnv_xive_class_init(ObjectClass *klass,=
+ void *data)
+     xrc->get_tctx =3D pnv_xive_get_tctx;
+=20
+     xnc->notify =3D pnv_xive_notify;
++    xpc->match_nvt  =3D pnv_xive_match_nvt;
+ };
+=20
+ static const TypeInfo pnv_xive_info =3D {
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 729246e906c9..bb3b2dfdb77f 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -405,6 +405,52 @@ static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrt=
+r, CPUState *cs)
+     return spapr_cpu_state(cpu)->tctx;
+ }
+=20
++static int spapr_xive_match_nvt(XivePresenter *xptr, uint8_t format,
++                                uint8_t nvt_blk, uint32_t nvt_idx,
++                                bool cam_ignore, uint8_t priority,
++                                uint32_t logic_serv, XiveTCTXMatch *matc=
+h)
++{
++    CPUState *cs;
++    int count =3D 0;
++
++    CPU_FOREACH(cs) {
++        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
++        XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
++        int ring;
++
++        /*
++         * Skip partially initialized vCPUs. This can happen when
++         * vCPUs are hotplugged.
++         */
++        if (!tctx) {
++            continue;
++        }
++
++        /*
++         * Check the thread context CAM lines and record matches.
++         */
++        ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_blk, =
+nvt_idx,
++                                         cam_ignore, logic_serv);
++        /*
++         * Save the matching thread interrupt context and follow on to
++         * check for duplicates which are invalid.
++         */
++        if (ring !=3D -1) {
++            if (match->tctx) {
++                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a th=
+read "
++                              "context NVT %x/%x\n", nvt_blk, nvt_idx);
++                return -1;
++            }
++
++            match->ring =3D ring;
++            match->tctx =3D tctx;
++            count++;
++        }
++    }
++
++    return count;
++}
++
+ static const VMStateDescription vmstate_spapr_xive_end =3D {
+     .name =3D TYPE_SPAPR_XIVE "/end",
+     .version_id =3D 1,
+@@ -684,6 +730,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
+ void *data)
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+     XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
+     SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_CLASS(klass);
++    XivePresenterClass *xpc =3D XIVE_PRESENTER_CLASS(klass);
+=20
+     dc->desc    =3D "sPAPR XIVE Interrupt Controller";
+     dc->props   =3D spapr_xive_properties;
+@@ -708,6 +755,8 @@ static void spapr_xive_class_init(ObjectClass *klass,=
+ void *data)
+     sicc->print_info =3D spapr_xive_print_info;
+     sicc->dt =3D spapr_xive_dt;
+     sicc->post_load =3D spapr_xive_post_load;
++
++    xpc->match_nvt  =3D spapr_xive_match_nvt;
+ }
+=20
+ static const TypeInfo spapr_xive_info =3D {
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 344bb3f3bc4b..da6196ca958f 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1428,51 +1428,14 @@ static bool xive_presenter_match(XiveRouter *xrtr=
+, uint8_t format,
+                                  bool cam_ignore, uint8_t priority,
+                                  uint32_t logic_serv, XiveTCTXMatch *mat=
+ch)
+ {
+-    CPUState *cs;
++    XivePresenter *xptr =3D XIVE_PRESENTER(xrtr);
++    XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);
++    int count;
+=20
+-    /*
+-     * TODO (PowerNV): handle chip_id overwrite of block field for
+-     * hardwired CAM compares
+-     */
+-
+-    CPU_FOREACH(cs) {
+-        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
+-        int ring;
+-
+-        /*
+-         * Skip partially initialized vCPUs. This can happen when
+-         * vCPUs are hotplugged.
+-         */
+-        if (!tctx) {
+-            continue;
+-        }
+-
+-        /*
+-         * HW checks that the CPU is enabled in the Physical Thread
+-         * Enable Register (PTER).
+-         */
+-
+-        /*
+-         * Check the thread context CAM lines and record matches. We
+-         * will handle CPU exception delivery later
+-         */
+-        ring =3D xive_presenter_tctx_match(XIVE_PRESENTER(xrtr), tctx, f=
+ormat,
+-                                         nvt_blk, nvt_idx,
+-                                         cam_ignore, logic_serv);
+-        /*
+-         * Save the context and follow on to catch duplicates, that we
+-         * don't support yet.
+-         */
+-        if (ring !=3D -1) {
+-            if (match->tctx) {
+-                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a th=
+read "
+-                              "context NVT %x/%x\n", nvt_blk, nvt_idx);
+-                return false;
+-            }
+-
+-            match->ring =3D ring;
+-            match->tctx =3D tctx;
+-        }
++    count =3D xpc->match_nvt(xptr, format, nvt_blk, nvt_idx, cam_ignore,
++                           priority, logic_serv, match);
++    if (count < 0) {
++        return false;
+     }
+=20
+     if (!match->tctx) {
 --=20
 2.21.0
 
