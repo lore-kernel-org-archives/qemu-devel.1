@@ -6,61 +6,64 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD24C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC46FC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:31:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15A422082F
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:29:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A79022082F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 12:31:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hA3A/v1D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15A422082F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3i1izOo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A79022082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZDUS-0007tW-67
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 07:29:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60080)
+	id 1iZDWV-00016g-LE
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 07:31:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59525)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iZDQL-0003zr-Po
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:25:02 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iZDNC-00007E-Al
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:21:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iZDQK-0001gq-Pd
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:25:01 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43451
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iZDNA-0000bt-FQ
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:21:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49524
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iZDQK-0001fs-Jx
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:25:00 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iZDN8-0000aL-Mc
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 07:21:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574684699;
+ s=mimecast20190719; t=1574684502;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=rSDu+lQO6hqd6BI3z4HG0NCrKMgqEfLDf0Mywtin4+Y=;
- b=hA3A/v1Df1qtEtMVhwGiy+x1jsX4VQ0H+RrQLPtIccbSGoUXoeE12ZB21Pxmk8of3K6Yiz
- 764qGKW2YG0Qjruplf/MvSESOr8/UlWQfhowkBgdwF46OJ9sZj31XEwvaco89J7N80dx3E
- 95BxJ//cuLOsfnrNIyZULsaJO6uD79Y=
+ bh=m2bKZgh21qPmLIeEXnnceEm5+4m2Fui7uXCrCcuZj0k=;
+ b=V3i1izOoxucT9chEyhQmFqpvVf75TEhkX5NXtDLg4LhUfvOTHnqL/NcNEUuXFLKAtqwC+s
+ hUZpBKGldZyEkaJ5M0gEPAG9MrHpYOru3g+gysuFQnSeVy5yoAKC+DFG5liO3eUQkIUwaE
+ 7bsSpy6F3OcDDqcQiTNPOjihdS4AU2w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-R_Z6XmYKOHG8HndefJZklw-1; Mon, 25 Nov 2019 07:24:58 -0500
-X-MC-Unique: R_Z6XmYKOHG8HndefJZklw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-293-xWAh3EatPFyirj6hiSB_OQ-1; Mon, 25 Nov 2019 07:21:40 -0500
+X-MC-Unique: xWAh3EatPFyirj6hiSB_OQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A9A3107ACE5;
- Mon, 25 Nov 2019 12:24:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70EFD801E61;
+ Mon, 25 Nov 2019 12:21:39 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.205.102])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 019C85D9CA;
- Mon, 25 Nov 2019 12:24:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 15CE35C1D4;
+ Mon, 25 Nov 2019 12:21:33 +0000 (UTC)
 Subject: Re: [PATCH for-4.2? v3 0/8] block: Fix resize (extending) of short
  overlays
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, 
+ Kevin Wolf <kwolf@redhat.com>
 References: <20191122160511.8377-1-kwolf@redhat.com>
+ <CAFEAcA_JU9GfNYDuD2K0MKmAD7GZ7vBUHsXU+WS-6mvPCvf8ig@mail.gmail.com>
+ <713adac7-b997-6723-6b07-f527d0b804ac@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,20 +89,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <67c2abd7-26a3-eef6-0fc7-d8901d031248@redhat.com>
-Date: Mon, 25 Nov 2019 13:24:51 +0100
+Message-ID: <0b865e2b-2318-2d14-2674-d33f84e05f65@redhat.com>
+Date: Mon, 25 Nov 2019 13:21:32 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191122160511.8377-1-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <713adac7-b997-6723-6b07-f527d0b804ac@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="T5gWw7VS2Se6B77u3GjIK1CZAGn9lWXqa"
+ boundary="sXF6L5wLfezWlathVnFjFO0K1haYCzys0"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,71 +114,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: Qemu-block <qemu-block@nongnu.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---T5gWw7VS2Se6B77u3GjIK1CZAGn9lWXqa
-Content-Type: multipart/mixed; boundary="vwfnoqsKN8mw4BYxKQin039BEysxgZeu1"
+--sXF6L5wLfezWlathVnFjFO0K1haYCzys0
+Content-Type: multipart/mixed; boundary="VGJHFxBOlfZQj0a7WJKWH5O3F4PrMNekc"
 
---vwfnoqsKN8mw4BYxKQin039BEysxgZeu1
+--VGJHFxBOlfZQj0a7WJKWH5O3F4PrMNekc
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 22.11.19 17:05, Kevin Wolf wrote:
-> See patch 4 for the description of the bug fixed.
+On 22.11.19 17:41, Eric Blake wrote:
+> On 11/22/19 10:17 AM, Peter Maydell wrote:
+
+[...]
+
+>> Eyeballing of the diffstat plus the fact we're on v4 of
+>> the patchset already makes me a little uneasy about
+>> putting it into rc3, but if the bug we're fixing matters
+>> enough we can do it.
 >=20
-> v3:
-> - Don't allow blocking the monitor for a zero write in block_resize
->   (even though we can already blockfor other reasons there). This is
->   mainly responsible for the increased complexity compared to v2.
->   Personally, I think this is not an improvement over v2, but if this is
->   what it takes to fix a corruption issue in 4.2... [Max]
+> In terms of diffstat, the v3 series was much smaller in impact.=C2=A0 Bot=
+h
+> versions add robustness, where the difference between v3 and v4 is
+> whether we introduce a speed penalty on an unlikely setup (v3) or reject
+> any operation where it would require a speed penalty to avoid data
+> problems (v4).
 
-I don=E2=80=99t find it so bad because the added complexity is:
-
-(1) A mainly mechanical change of code to add another parameter to
-{blk,bdrv}(_co)?_truncate(),
-
-(2) qcow2 providing BDRV_REQ_NO_FALLBACK, and
-
-(3) passing BDRV_REQ_NO_FALLBACK in bdrv_co_truncate() if the new
-parameter is true.
-
-(1) sees the most LoC changed, but it isn=E2=80=99t a complex change.  (2) =
-and
-(3) are both basically one-line changes each.
-
-
-OTOH, as I=E2=80=99ve said on IRC, I believe you have a sufficient number o=
-f
-R-bs on v2 to take it without mine, so the choice is yours.
+I=E2=80=99d just like to add that this isn=E2=80=99t just about a speed pen=
+alty, but
+about the fact that the monitor is blocked while the operation is
+running.  So the speed penalty has more impact than just some background
+operation being slow.
 
 Max
 
 
---vwfnoqsKN8mw4BYxKQin039BEysxgZeu1--
+--VGJHFxBOlfZQj0a7WJKWH5O3F4PrMNekc--
 
---T5gWw7VS2Se6B77u3GjIK1CZAGn9lWXqa
+--sXF6L5wLfezWlathVnFjFO0K1haYCzys0
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3byBMACgkQ9AfbAGHV
-z0BVjwf/cuTSaNgrXEsqC8yeE49UE9zUaklXWfiXMLM2gg91FhfaeyIhwwV9uN6z
-3Yoca/W6VCDexDdUOdC0L5dCoM8cuI4i6b1e5L0xtn7m5qak5p/EQ1sR2t+n8dwT
-IulQdGg/yy8ZstAmTdv/rGqenLuZkpCIp6pv9+Nj8UlbLwLntINkL70r/6fZf/6O
-OZO9SIlb+eLZOPThkjqt8cYx2N3xkjEFcAlZt0U49jHpNRaobaIDtsZR2eC47k6A
-1u16lG4GK/sl41dk5nPiLIvDV+tTkmTmJEKVV4PIB6SfJvtipiqC7ruNy6I+dzq2
-jvO2amNX7+pYMxsv1T6x8JMa4CtIbQ==
-=h3mM
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3bx0wACgkQ9AfbAGHV
+z0ATJgf+Oac7gxHyGxoBUdcpNkD/kSUy0ztl8S/9Q+p3QSBGeX/DTDDTkYI45WP6
+JqaHkm1nhjJC8OYPyqL3sOgKP9WqOGZcTLgTekz2HtGJNJmCYbaOlrp7Z3ty3Zto
+uisZob14pjuLyFl5gwAgXTKIN17zrCSys/ZbvdKhR2gEEcSyqzB0oZ0cQXp/Fz1Z
+NDkl2Y2NDL/8EutdmJw6oyPP8ylEsTnxEeDMzXa0GzVjQNSV3shPizC6AokZ47Ug
+Lucel/HQD0HwAjkgz8S/C9dfMo+Bcxfn+XLJsu2RlfddVwWaulSuznp6I7w9V0Sc
+nsKd4j68J45eQtDkNBE/mWHkCfGBHA==
+=IBQK
 -----END PGP SIGNATURE-----
 
---T5gWw7VS2Se6B77u3GjIK1CZAGn9lWXqa--
+--sXF6L5wLfezWlathVnFjFO0K1haYCzys0--
 
 
