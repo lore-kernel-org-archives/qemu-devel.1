@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1343C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:02:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADA2C432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:03:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6CE820748
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:02:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6CE820748
+	by mail.kernel.org (Postfix) with ESMTPS id E49AF20748
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 07:03:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E49AF20748
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZ8OC-0004LM-IF
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 02:02:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41455)
+	id 1iZ8Oz-0004yg-NC
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 02:03:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41503)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iZ8Ke-0001uj-F2
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:49 -0500
+ (envelope-from <clg@kaod.org>) id 1iZ8Kk-00020v-NO
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iZ8Kb-00019m-S7
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:48 -0500
-Received: from 18.mo3.mail-out.ovh.net ([87.98.172.162]:52996)
+ (envelope-from <clg@kaod.org>) id 1iZ8Ki-0001Fj-CU
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:54 -0500
+Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:41688)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iZ8Kb-00018i-Ge
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:45 -0500
-Received: from player697.ha.ovh.net (unknown [10.109.146.137])
- by mo3.mail-out.ovh.net (Postfix) with ESMTP id 05080233542
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 07:58:44 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iZ8Kh-0001Ed-TK
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 01:58:52 -0500
+Received: from player697.ha.ovh.net (unknown [10.109.143.210])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 34F351B5C51
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 07:58:49 +0100 (CET)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player697.ha.ovh.net (Postfix) with ESMTPSA id 89C62C809435;
- Mon, 25 Nov 2019 06:58:38 +0000 (UTC)
+ by player697.ha.ovh.net (Postfix) with ESMTPSA id 043C0C809459;
+ Mon, 25 Nov 2019 06:58:43 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v6 02/20] ppc/xive: Implement the XivePresenter interface
-Date: Mon, 25 Nov 2019 07:58:02 +0100
-Message-Id: <20191125065820.927-3-clg@kaod.org>
+Subject: [PATCH v6 03/20] ppc/pnv: Instantiate cores separately
+Date: Mon, 25 Nov 2019 07:58:03 +0100
+Message-Id: <20191125065820.927-4-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191125065820.927-1-clg@kaod.org>
 References: <20191125065820.927-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 8908964491588832230
+X-Ovh-Tracer-Id: 8910653341843950566
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeitddggeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedu
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeitddggeduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.172.162
+X-Received-From: 87.98.165.38
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,243 +74,169 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Each XIVE Router model, sPAPR and PowerNV, now implements the 'match_nvt'
-handler of the XivePresenter QOM interface. This is simply moving code
-and taking into account the new API.
+From: Greg Kurz <groug@kaod.org>
 
-To be noted that the xive_router_get_tctx() helper is not used anymore
-when doing CAM matching and will be removed later on after other changes.
+Allocating a big void * array to store multiple objects isn't a
+recommended practice for various reasons:
+ - no compile time type checking
+ - potential dangling pointers if a reference on an individual is
+  taken and the array is freed later on
+ - duplicate boiler plate everywhere the array is browsed through
 
-The XIVE presenter model is still too simple for the PowerNV machine
-and the CAM matching algo is not correct on multichip system. Subsequent
-patches will introduce more changes to scan all chips of the system.
+Allocate an array of pointers and populate it instead.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/pnv_xive.c   | 41 +++++++++++++++++++++++++++++++++++
- hw/intc/spapr_xive.c | 49 ++++++++++++++++++++++++++++++++++++++++++
- hw/intc/xive.c       | 51 ++++++--------------------------------------
- 3 files changed, 97 insertions(+), 44 deletions(-)
+ include/hw/ppc/pnv.h |  2 +-
+ hw/ppc/pnv.c         | 30 ++++++++++++------------------
+ 2 files changed, 13 insertions(+), 19 deletions(-)
 
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 9a771f640763..8055de89cf63 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -372,6 +372,45 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uint8_=
-t blk, uint32_t idx,
-     return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
- }
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 90f1343ed07c..03cb429f2131 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -56,7 +56,7 @@ typedef struct PnvChip {
 =20
-+static int pnv_xive_match_nvt(XivePresenter *xptr, uint8_t format,
-+                              uint8_t nvt_blk, uint32_t nvt_idx,
-+                              bool cam_ignore, uint8_t priority,
-+                              uint32_t logic_serv, XiveTCTXMatch *match)
-+{
-+    CPUState *cs;
-+    int count =3D 0;
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+        XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
-+        int ring;
-+
-+        /*
-+         * Check the thread context CAM lines and record matches.
-+         */
-+        ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_blk, =
-nvt_idx,
-+                                         cam_ignore, logic_serv);
-+        /*
-+         * Save the context and follow on to catch duplicates, that we
-+         * don't support yet.
-+         */
-+        if (ring !=3D -1) {
-+            if (match->tctx) {
-+                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a "
-+                              "thread context NVT %x/%x\n",
-+                              nvt_blk, nvt_idx);
-+                return -1;
-+            }
-+
-+            match->ring =3D ring;
-+            match->tctx =3D tctx;
-+            count++;
-+        }
-+    }
-+
-+    return count;
-+}
-+
- static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+     uint32_t     nr_cores;
+     uint64_t     cores_mask;
+-    void         *cores;
++    PnvCore      **cores;
+=20
+     MemoryRegion xscom_mmio;
+     MemoryRegion xscom;
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index f0adb06c8d65..d899c83e5255 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -280,14 +280,12 @@ static void pnv_dt_icp(PnvChip *chip, void *fdt, ui=
+nt32_t pir,
+=20
+ static void pnv_chip_power8_dt_populate(PnvChip *chip, void *fdt)
  {
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-@@ -1780,6 +1819,7 @@ static void pnv_xive_class_init(ObjectClass *klass,=
- void *data)
-     PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
-     XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
-     XiveNotifierClass *xnc =3D XIVE_NOTIFIER_CLASS(klass);
-+    XivePresenterClass *xpc =3D XIVE_PRESENTER_CLASS(klass);
+-    const char *typename =3D pnv_chip_core_typename(chip);
+-    size_t typesize =3D object_type_get_instance_size(typename);
+     int i;
 =20
-     xdc->dt_xscom =3D pnv_xive_dt_xscom;
+     pnv_dt_xscom(chip, fdt, 0);
 =20
-@@ -1795,6 +1835,7 @@ static void pnv_xive_class_init(ObjectClass *klass,=
- void *data)
-     xrc->get_tctx =3D pnv_xive_get_tctx;
+     for (i =3D 0; i < chip->nr_cores; i++) {
+-        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
++        PnvCore *pnv_core =3D chip->cores[i];
 =20
-     xnc->notify =3D pnv_xive_notify;
-+    xpc->match_nvt  =3D pnv_xive_match_nvt;
- };
+         pnv_dt_core(chip, pnv_core, fdt);
 =20
- static const TypeInfo pnv_xive_info =3D {
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 729246e906c9..bb3b2dfdb77f 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -405,6 +405,52 @@ static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrt=
-r, CPUState *cs)
-     return spapr_cpu_state(cpu)->tctx;
- }
+@@ -302,14 +300,12 @@ static void pnv_chip_power8_dt_populate(PnvChip *ch=
+ip, void *fdt)
 =20
-+static int spapr_xive_match_nvt(XivePresenter *xptr, uint8_t format,
-+                                uint8_t nvt_blk, uint32_t nvt_idx,
-+                                bool cam_ignore, uint8_t priority,
-+                                uint32_t logic_serv, XiveTCTXMatch *matc=
-h)
-+{
-+    CPUState *cs;
-+    int count =3D 0;
-+
-+    CPU_FOREACH(cs) {
-+        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-+        XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
-+        int ring;
-+
-+        /*
-+         * Skip partially initialized vCPUs. This can happen when
-+         * vCPUs are hotplugged.
-+         */
-+        if (!tctx) {
-+            continue;
-+        }
-+
-+        /*
-+         * Check the thread context CAM lines and record matches.
-+         */
-+        ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_blk, =
-nvt_idx,
-+                                         cam_ignore, logic_serv);
-+        /*
-+         * Save the matching thread interrupt context and follow on to
-+         * check for duplicates which are invalid.
-+         */
-+        if (ring !=3D -1) {
-+            if (match->tctx) {
-+                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a th=
-read "
-+                              "context NVT %x/%x\n", nvt_blk, nvt_idx);
-+                return -1;
-+            }
-+
-+            match->ring =3D ring;
-+            match->tctx =3D tctx;
-+            count++;
-+        }
-+    }
-+
-+    return count;
-+}
-+
- static const VMStateDescription vmstate_spapr_xive_end =3D {
-     .name =3D TYPE_SPAPR_XIVE "/end",
-     .version_id =3D 1,
-@@ -684,6 +730,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     DeviceClass *dc =3D DEVICE_CLASS(klass);
-     XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
-     SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_CLASS(klass);
-+    XivePresenterClass *xpc =3D XIVE_PRESENTER_CLASS(klass);
-=20
-     dc->desc    =3D "sPAPR XIVE Interrupt Controller";
-     dc->props   =3D spapr_xive_properties;
-@@ -708,6 +755,8 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     sicc->print_info =3D spapr_xive_print_info;
-     sicc->dt =3D spapr_xive_dt;
-     sicc->post_load =3D spapr_xive_post_load;
-+
-+    xpc->match_nvt  =3D spapr_xive_match_nvt;
- }
-=20
- static const TypeInfo spapr_xive_info =3D {
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 344bb3f3bc4b..da6196ca958f 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -1428,51 +1428,14 @@ static bool xive_presenter_match(XiveRouter *xrtr=
-, uint8_t format,
-                                  bool cam_ignore, uint8_t priority,
-                                  uint32_t logic_serv, XiveTCTXMatch *mat=
-ch)
+ static void pnv_chip_power9_dt_populate(PnvChip *chip, void *fdt)
  {
--    CPUState *cs;
-+    XivePresenter *xptr =3D XIVE_PRESENTER(xrtr);
-+    XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);
-+    int count;
+-    const char *typename =3D pnv_chip_core_typename(chip);
+-    size_t typesize =3D object_type_get_instance_size(typename);
+     int i;
 =20
--    /*
--     * TODO (PowerNV): handle chip_id overwrite of block field for
--     * hardwired CAM compares
--     */
--
--    CPU_FOREACH(cs) {
--        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
--        int ring;
--
--        /*
--         * Skip partially initialized vCPUs. This can happen when
--         * vCPUs are hotplugged.
--         */
--        if (!tctx) {
--            continue;
--        }
--
--        /*
--         * HW checks that the CPU is enabled in the Physical Thread
--         * Enable Register (PTER).
--         */
--
--        /*
--         * Check the thread context CAM lines and record matches. We
--         * will handle CPU exception delivery later
--         */
--        ring =3D xive_presenter_tctx_match(XIVE_PRESENTER(xrtr), tctx, f=
-ormat,
--                                         nvt_blk, nvt_idx,
--                                         cam_ignore, logic_serv);
--        /*
--         * Save the context and follow on to catch duplicates, that we
--         * don't support yet.
--         */
--        if (ring !=3D -1) {
--            if (match->tctx) {
--                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a th=
-read "
--                              "context NVT %x/%x\n", nvt_blk, nvt_idx);
--                return false;
--            }
--
--            match->ring =3D ring;
--            match->tctx =3D tctx;
--        }
-+    count =3D xpc->match_nvt(xptr, format, nvt_blk, nvt_idx, cam_ignore,
-+                           priority, logic_serv, match);
-+    if (count < 0) {
-+        return false;
+     pnv_dt_xscom(chip, fdt, 0);
+=20
+     for (i =3D 0; i < chip->nr_cores; i++) {
+-        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
++        PnvCore *pnv_core =3D chip->cores[i];
+=20
+         pnv_dt_core(chip, pnv_core, fdt);
+     }
+@@ -913,8 +909,6 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip8, Err=
+or **errp)
+  {
+     PnvChip *chip =3D PNV_CHIP(chip8);
+     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+-    const char *typename =3D pnv_chip_core_typename(chip);
+-    size_t typesize =3D object_type_get_instance_size(typename);
+     int i, j;
+     char *name;
+     XICSFabric *xi =3D XICS_FABRIC(qdev_get_machine());
+@@ -928,7 +922,7 @@ static void pnv_chip_icp_realize(Pnv8Chip *chip8, Err=
+or **errp)
+=20
+     /* Map the ICP registers for each thread */
+     for (i =3D 0; i < chip->nr_cores; i++) {
+-        PnvCore *pnv_core =3D PNV_CORE(chip->cores + i * typesize);
++        PnvCore *pnv_core =3D chip->cores[i];
+         int core_hwid =3D CPU_CORE(pnv_core)->core_id;
+=20
+         for (j =3D 0; j < CPU_CORE(pnv_core)->nr_threads; j++) {
+@@ -1108,8 +1102,6 @@ static void pnv_chip_power9_instance_init(Object *o=
+bj)
+ static void pnv_chip_quad_realize(Pnv9Chip *chip9, Error **errp)
+ {
+     PnvChip *chip =3D PNV_CHIP(chip9);
+-    const char *typename =3D pnv_chip_core_typename(chip);
+-    size_t typesize =3D object_type_get_instance_size(typename);
+     int i;
+=20
+     chip9->nr_quads =3D DIV_ROUND_UP(chip->nr_cores, 4);
+@@ -1118,7 +1110,7 @@ static void pnv_chip_quad_realize(Pnv9Chip *chip9, =
+Error **errp)
+     for (i =3D 0; i < chip9->nr_quads; i++) {
+         char eq_name[32];
+         PnvQuad *eq =3D &chip9->quads[i];
+-        PnvCore *pnv_core =3D PNV_CORE(chip->cores + (i * 4) * typesize)=
+;
++        PnvCore *pnv_core =3D chip->cores[i * 4];
+         int core_id =3D CPU_CORE(pnv_core)->core_id;
+=20
+         snprintf(eq_name, sizeof(eq_name), "eq[%d]", core_id);
+@@ -1290,7 +1282,6 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
+ror **errp)
+     Error *error =3D NULL;
+     PnvChipClass *pcc =3D PNV_CHIP_GET_CLASS(chip);
+     const char *typename =3D pnv_chip_core_typename(chip);
+-    size_t typesize =3D object_type_get_instance_size(typename);
+     int i, core_hwid;
+=20
+     if (!object_class_by_name(typename)) {
+@@ -1305,21 +1296,24 @@ static void pnv_chip_core_realize(PnvChip *chip, =
+Error **errp)
+         return;
      }
 =20
-     if (!match->tctx) {
+-    chip->cores =3D g_malloc0(typesize * chip->nr_cores);
++    chip->cores =3D g_new0(PnvCore *, chip->nr_cores);
+=20
+     for (i =3D 0, core_hwid =3D 0; (core_hwid < sizeof(chip->cores_mask)=
+ * 8)
+              && (i < chip->nr_cores); core_hwid++) {
+         char core_name[32];
+-        void *pnv_core =3D chip->cores + i * typesize;
++        PnvCore *pnv_core;
+         uint64_t xscom_core_base;
+=20
+         if (!(chip->cores_mask & (1ull << core_hwid))) {
+             continue;
+         }
+=20
++        pnv_core =3D PNV_CORE(object_new(typename));
++
+         snprintf(core_name, sizeof(core_name), "core[%d]", core_hwid);
+-        object_initialize_child(OBJECT(chip), core_name, pnv_core, types=
+ize,
+-                                typename, &error_fatal, NULL);
++        object_property_add_child(OBJECT(chip), core_name, OBJECT(pnv_co=
+re),
++                                  &error_abort);
++        chip->cores[i] =3D pnv_core;
+         object_property_set_int(OBJECT(pnv_core), ms->smp.threads, "nr-t=
+hreads",
+                                 &error_fatal);
+         object_property_set_int(OBJECT(pnv_core), core_hwid,
+@@ -1340,7 +1334,7 @@ static void pnv_chip_core_realize(PnvChip *chip, Er=
+ror **errp)
+         }
+=20
+         pnv_xscom_add_subregion(chip, xscom_core_base,
+-                                &PNV_CORE(pnv_core)->xscom_regs);
++                                &pnv_core->xscom_regs);
+         i++;
+     }
+ }
 --=20
 2.21.0
 
