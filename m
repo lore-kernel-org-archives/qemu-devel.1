@@ -2,65 +2,60 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D76C43215
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D219C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:27:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88AB520836
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:07:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="YwCDi5OS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88AB520836
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3493A2068F
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 15:27:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3493A2068F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aurel32.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZFxv-00023E-HQ
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 10:07:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57481)
+	id 1iZGGV-0008Lt-5H
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 10:27:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59701)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1iZFwv-0000ve-Vk
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:06:50 -0500
+ (envelope-from <aurelien@aurel32.net>) id 1iZGDj-0007VX-DW
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:24:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1iZFwv-0004rj-1K
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:06:49 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:59231)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1iZFwm-0004fX-P4; Mon, 25 Nov 2019 10:06:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=/9gu02rifEO+MVaVl8KSkcNB03HCWmZd9FBt1FBlsD4=; 
- b=YwCDi5OS4Fy7KKuouazeXF5EoYi8xKpQOlO0jMV8RT5kItDSvKNhHswULnBWND/nuprCbCqZvtMGan86LZrOGJKk3afZ5btZvIq+pccbfrAlibS44Wqv7seLLQHllFyRw0cLWf7/pN14RxhnC+O0EvI0j+rgZ/GMzTHrWdx3K1fNuyTrhhKPFypPFRHDd2z/efMQOmBW90aDCUHCuu2NDF5UrMrXmg9YkV6JexT+wI3loUH8x7kyZkh6FhltcMvyheXins9XyEA+C1M8XW5AuDGJOgRa5vrUs5L1Z5nVP3RUJAe3zDKPAhOgP8z63YjQxKBV/5XUfdaQiJMuUvASbg==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1iZFwj-00075A-2Y; Mon, 25 Nov 2019 16:06:37 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1iZFwi-0004aQ-Ve; Mon, 25 Nov 2019 16:06:36 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Subject: Re: [PATCH v3 2/8] block: Add no_fallback parameter to
- bdrv_co_truncate()
-In-Reply-To: <20191122160511.8377-3-kwolf@redhat.com>
-References: <20191122160511.8377-1-kwolf@redhat.com>
- <20191122160511.8377-3-kwolf@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Mon, 25 Nov 2019 16:06:36 +0100
-Message-ID: <w515zj8hu6b.fsf@maestria.local.igalia.com>
+ (envelope-from <aurelien@aurel32.net>) id 1iZGDh-0002SF-Sb
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:24:11 -0500
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:58894)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+ id 1iZGDh-0002Po-N0
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 10:24:09 -0500
+Received: from [2a01:e35:2fdd:a4e1:fe91:fc89:bc43:b814] (helo=ohm.rr44.fr)
+ by hall.aurel32.net with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.92) (envelope-from <aurelien@aurel32.net>)
+ id 1iZGDU-0000Tn-1q; Mon, 25 Nov 2019 16:23:56 +0100
+Received: from aurel32 by ohm.rr44.fr with local (Exim 4.92.3)
+ (envelope-from <aurelien@aurel32.net>)
+ id 1iZGDT-005kvo-HX; Mon, 25 Nov 2019 16:23:55 +0100
+Date: Mon, 25 Nov 2019 16:23:55 +0100
+From: Aurelien Jarno <aurelien@aurel32.net>
+To: Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-4.2] hw/mips: Deprecate the r4k machine
+Message-ID: <20191125152355.GA1367280@aurel32.net>
+References: <20191125104103.28962-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191125104103.28962-1-philmd@redhat.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:bc8:30d7:100::1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,33 +67,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- stefanha@redhat.com, mreitz@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, libvir-list@redhat.com,
+ qemu-devel@nongnu.org,
+ =?iso-8859-15?Q?Herv=E9?= Poussineau <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri 22 Nov 2019 05:05:05 PM CET, Kevin Wolf wrote:
+On 2019-11-25 11:41, Philippe Mathieu-Daud=E9 wrote:
+> The r4k machine was introduced in 2005 (6af0bf9c7) and its last
+> logical change was in 2005 (9542611a6). After we can count 164
+> maintenance commits (QEMU API changes) with the exception of
+> 1 fix in 2015 (memory leak, commit 3ad9fd5a).
+>=20
+> This machine was introduced as a proof of concept to run a MIPS
+> CPU. 2 years later, the Malta machine was add (commit 5856de80)
+> modeling a real platform.
+>=20
+> Note also this machine has no specification except 5 lines in
+> the header of this file:
+>=20
+>  * emulates a simple machine with ISA-like bus.
+>  * ISA IO space mapped to the 0x14000000 (PHYS) and
+>  * ISA memory at the 0x10000000 (PHYS, 16Mb in size).
+>  * All peripherial devices are attached to this "bus" with
+>  * the standard PC ISA addresses.
+>=20
+> It is time to deprecate this obsolete machine. Users are
+> recommended to use the Malta board, which hardware is well
+> documented.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+>  qemu-deprecated.texi | 5 +++++
+>  hw/mips/mips_r4k.c   | 1 +
+>  MAINTAINERS          | 2 +-
+>  3 files changed, 7 insertions(+), 1 deletion(-)
 
-> @@ -3405,6 +3412,7 @@ typedef struct TruncateCo {
->      int64_t offset;
->      bool exact;
->      PreallocMode prealloc;
-> +    bool no_fallback;
->      Error **errp;
->      int ret;
->  } TruncateCo;
+The Linux kernel support for this machine has been dropped more than 10
+years ago in this commit:
 
-You add the 'no_fallback' field here...
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
+id=3D302922e5f6901eb6f29c58539631f71b3d9746b8
 
->  int bdrv_truncate(BdrvChild *child, int64_t offset, bool exact,
-> -                  PreallocMode prealloc, Error **errp)
-> +                  PreallocMode prealloc, bool no_fallback, Error **errp)
->  {
->      Coroutine *co;
->      TruncateCo tco = {
+I therefore think it's time to also drop support for it on the QEMU
+side.
 
-...but then you don't use it when the structure is initialized.
-
-Berto
+--=20
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
 
