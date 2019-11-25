@@ -2,75 +2,86 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C07EC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 14:28:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90DDFC432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 14:31:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51AEE20674
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 14:28:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51AEE20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5FEE320740
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 14:31:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a3T4JdO8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FEE320740
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZFM7-0000zC-FH
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 09:28:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49612)
+	id 1iZFON-0002Y0-J1
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 09:31:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iZFG6-0002wW-Uj
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 09:22:36 -0500
+ (envelope-from <eblake@redhat.com>) id 1iZFNJ-0001rf-JG
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 09:30:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iZF4q-0001ne-22
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 09:10:57 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38916)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iZF4p-0001nP-S8
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 09:10:56 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iZF4o-0001Or-HU
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 14:10:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 822672E80C7
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 14:10:54 +0000 (UTC)
+ (envelope-from <eblake@redhat.com>) id 1iZFNI-00076B-11
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 09:30:01 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38450
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iZFNH-000754-UC
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 09:29:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574692198;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=f4N1anJTy6jp3i0s5tloOI+fkwziQcjAChkMt5/oVUM=;
+ b=a3T4JdO8UWANY30I/N/wzmWmFbiE96zqepnaJ5HTrGUsrLFIFp8QdjArMyR+cWEUsx5GSf
+ quLnOwfHKHMfzynJJhnw0jAXxy7aqFljFWQr0jWFBBZ283X1JCg3bxB7I7/CuXudvAFRCp
+ TqRvOSt5mBtpUfH9TxoJlDimi9vVd3E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-fdNILsyhOpifxHLBtgVziA-1; Mon, 25 Nov 2019 09:29:56 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AFA6F8FC075;
+ Mon, 25 Nov 2019 14:29:55 +0000 (UTC)
+Received: from [10.3.116.163] (ovpn-116-163.phx2.redhat.com [10.3.116.163])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 50CF360C18;
+ Mon, 25 Nov 2019 14:29:55 +0000 (UTC)
+Subject: Re: [PATCH 2/2] test-keyval: Tighten test of trailing crap after size
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20191125133846.27790-1-armbru@redhat.com>
+ <20191125133846.27790-3-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b06f7807-b201-5a52-5a62-b50f52cc4d44@redhat.com>
+Date: Mon, 25 Nov 2019 08:29:54 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 25 Nov 2019 14:00:40 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ajbennee carolineconcatto
-X-Launchpad-Bug-Reporter: Caroline Concatto (carolineconcatto)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <157468002661.30952.10642264809488923382.malonedeb@wampee.canonical.com>
-Message-Id: <157469044081.31911.8887280582119301943.malone@wampee.canonical.com>
-Subject: [Bug 1853826] Re: ELF loader fails to load shared object on ThunderX2
- running RHEL7
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0dc9e13c73db02624634320edf246562a15e7f84
+In-Reply-To: <20191125133846.27790-3-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: fdNILsyhOpifxHLBtgVziA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,206 +90,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1853826 <1853826@bugs.launchpad.net>
+Cc: qemu-trivial@nongnu.org, tao3.xu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As it's taking longer to get the compiler up and running on my system
-could you attach the failing binary along with the extra .so libs from
-/scratch/arm-linux-compiler/*
+On 11/25/19 7:38 AM, Markus Armbruster wrote:
+> test_keyval_visit_size() should test for trailing crap after size with
+> and without suffix.  It does test the latter: "sz2=16Gi" has size
+> "16G" followed by crap "i".  It fails to test the former "sz1=16E" is
+> a syntactically valid size that overflows uint64_t.  Replace by
+> "sz1=0Z".
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   tests/test-keyval.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tests/test-keyval.c b/tests/test-keyval.c
+> index 09b0ae3c68..e331a84149 100644
+> --- a/tests/test-keyval.c
+> +++ b/tests/test-keyval.c
+> @@ -478,7 +478,7 @@ static void test_keyval_visit_size(void)
+>       visit_free(v);
+>   
+>       /* Trailing crap */
+> -    qdict = keyval_parse("sz1=16E,sz2=16Gi", NULL, &error_abort);
+> +    qdict = keyval_parse("sz1=0Z,sz2=16Gi", NULL, &error_abort);
 
--- =
+Does this actually test both failure cases, or does it abort the parse 
+after the first failure (sz1=0Z) without ever hitting the second half of 
+the parse (sz2=16Gi)?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1853826
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-Title:
-  ELF loader fails to load shared object on ThunderX2 running RHEL7
-
-Status in QEMU:
-  New
-
-Bug description:
-  Simple test:
-  hello.c
-
-  include <stdio.h>
-
-  int main(int argc, char* argv[])
-  {
-    {
-      printf("Hello World... \n");
-    }
-    return 0;
-  }
-
-  when compiled with :
-  *Compiler =
-
-  https://developer.arm.com/tools-and-software/server-and-hpc/arm-architect=
-ure-tools/arm-allinea-studio/download
-  Arm-Compiler-for-HPC_19.3_RHEL_7_aarch64.tar	 =
-
-
-  *Running:
-  1) with -armpl
-       armclang -armpl hello.c
-       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
-  2) without flag
-      armclang hello.c
-       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
-
-  =E2=80=A2With Docker image:
-         CentOS Linux release 7.7.1908 (AltArch)
-
-  *Two different machines:
-         AArch64, Taishan. tsv110, Kunpeng 920, ARMv8.2-A
-         AArch64, Taishan 2280, Cortex-A72, ARMv8-A
-
-  *QEMU 4.0
-       qemu-aarch64 version 4.1.91 (v4.2.0-rc1)
-
-  =
-
-  Results:
-
-  =
-
-   ****Taishan 2280 Cortex-A72 =
-
-        Running =
-
-  1)with -armpl flag with and without the docker
-            WORKS-> Hello World...
-                 -> ldd a.out
-  ldd a.out =
-
-  linux-vdso.so.1 =3D>  (0x0000ffffbc6a2000) =
-
-  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
-_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
-0x0000ffffbc544000) =
-
-  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffbc493000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffbc472000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
-3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffbbfd30=
-00) =
-
-  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
-rch64-linux/lib/libomp.so (0x0000ffffbbef5000) =
-
-  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffbbed4000) =
-
-  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffbbe9f000) =
-
-  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
-rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
-neric.so (0x0000ffffb3306000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffb3180000) =
-
-  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
-ux/lib64/libstdc++.so.6 (0x0000ffffb2f30000) =
-
-  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
-x/lib64/libgcc_s.so.1 (0x0000ffffb2eff000) =
-
-  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffb2ede000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffbc674000)
-             =
-
-
-  Running =
-
-  2) without -armpl flag with and without the docker
-             WORKS -> Hello World...        =
-
-                   -> ldd a.out
-  ldd a.out
-   linux-vdso.so.1 =3D>  (0x0000ffffa6895000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffa6846000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa66c0000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffa6867000)
-      =
-
-
-  ****Taishan - tsv110  Kunpeng 920
-         For Running =
-
-
-  1)with -armpl flag with and without the docker
-             DOES NOT WORK -> with and without Docker
-                           -> It shows : qemu:handle_cpu_signal received si=
-gnal outside vCPU
-   context @ pc=3D0xffffaaa8844a
-                           -> ldd a.out =
-
-  ldd a.out =
-
-  linux-vdso.so.1 =3D>  (0x0000ffffad4b0000)
-  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
-_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
-0x0000ffffad370000) =
-
-  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffad2a0000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffad270000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
-3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffacdd00=
-00) =
-
-  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
-rch64-linux/lib/libomp.so (0x0000ffffaccf0000) =
-
-  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffaccc0000) =
-
-  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffacc80000) =
-
-  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
-rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
-neric.so (0x0000ffffa40e0000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa3f50000) =
-
-  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
-ux/lib64/libstdc++.so.6 (0x0000ffffa3d00000) =
-
-  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
-x/lib64/libgcc_s.so.1 (0x0000ffffa3cc0000)
-  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffa3c90000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffad4c0000)
-              =
-
-
-  Running =
-
-  2) without -armpl flag with and without the docker
-                 WORKS -> Hello World..
-                       -> ldd a.out
-  ldd a.out  =
-
-  linux-vdso.so.1 =3D>  (0x0000ffff880c0000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffff88080000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffff87ee0000)
-  /lib/ld-linux-aarch64.so.1 (0x0000ffff880d0000)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1853826/+subscriptions
 
