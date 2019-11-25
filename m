@@ -2,83 +2,114 @@ Return-Path: <SRS0=/cID=ZR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E574CC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 10:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DDBC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 10:10:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1A562071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 10:08:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31BA52071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 25 Nov 2019 10:10:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cg75Ay0a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1A562071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KZwnFBut"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31BA52071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZBIb-00023r-M3
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 05:08:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36092)
+	id 1iZBKC-0003N6-CN
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 05:10:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36319)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZBHP-0001OB-5N
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:07:41 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iZBII-00025v-6H
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:08:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZBHO-0008Q1-38
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:07:39 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:38505)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iZBHN-0008Nt-Pt
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:07:38 -0500
-Received: by mail-oi1-x241.google.com with SMTP id a14so12556062oid.5
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 02:07:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=6eolbGp4gch1dz6iRpvVtbysy9FRaOZEzSkNlOtP5DQ=;
- b=Cg75Ay0avNJQFa1gjTGHR0xidkMktsDU7dTqtk4lZNNWbGvu9uu5o89DqWpD+g7J2s
- v0KoAwJsZumMvsQNw1gwCl2dLAppk1+CaZwuy810eCeDB6PqcRvNt2/NXo69OJOcVh4G
- UHbPaFrIG8KH0ivka654jeZTpQRiGDdPC1ruPeATOvP/PSUZ++SIQYOfJoO8mJHooaf2
- PAsRwwK4Avk5AUn82IjJN/tO3ZEY//ilBedg8pJM/8v6g1oYc7Wg9pMAh7kLaKQM4OLu
- mF+RPP/V53YusxDoVz4Oc7V08nlc7HKBCOeUL2/4c0cPQKsDOyqiwyNelsD/xKsEh5WG
- uWgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=6eolbGp4gch1dz6iRpvVtbysy9FRaOZEzSkNlOtP5DQ=;
- b=qKTa1e0zsbt23PADesxtQ5iERSkOctHsprujPjNyCxgCwh8Sc8JnYidYqpqQUKxvy4
- BKCxMS5dRXZC6IoV5O9ONd9deN5tLHWO4C9Uz/fCQkEKP/dKJ4OD/YKzs+5/8+4v8sJk
- JyGMHiT3BCEjiyC6tah+LcrBWvVAz1VJN4rzk7CcV2X9isIUEqmWEFRtHn7HGHUQAX5H
- BYci4Ge5N9zs0lTthRffnRGvy/NcCv76kEfopP/H96qzxd1LKkUv5iI5pQZGj+eddp9d
- IGjQ7U5P8fxLFxb5G2N9APmutsaPdHeSYXWwgP+KKpjvRkxMpQWFeNWQnLuui/h8Ghyi
- 8meg==
-X-Gm-Message-State: APjAAAXtNrhIw1YMsTOthCREyA1QYH4dP3vpWfPzQGdJG4sQMmyDKGW2
- kk9uI9WzwXgOZ3ZdmZpRAG4svMmJ12rrP0eRWzE=
-X-Google-Smtp-Source: APXvYqwhOtBKhiLLUwdynYRqeBp4BSZC34HQyPsD7UIOs6KOQ02L1yOV9xT2tSrA9LuepTbW/jZwOOWLPt/ln67NiA4=
-X-Received: by 2002:aca:484f:: with SMTP id v76mr22475342oia.62.1574676454894; 
- Mon, 25 Nov 2019 02:07:34 -0800 (PST)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iZBIG-0000Zn-ST
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 05:08:34 -0500
+Received: from mail-eopbgr80135.outbound.protection.outlook.com
+ ([40.107.8.135]:21153 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iZBIG-0000Yr-Kp; Mon, 25 Nov 2019 05:08:32 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fQWl8lOLzUOjxSg3upZ2arHjSbGQBvGncEWxq4vqI2v9g+f5V2eUiWT08dk3Nv8VPpICABKMdikm2mKt5y2tyByU+V+rvFfpxEhYAIx4dAbAAOhJZPwT0ZTPNyfiVymbdIK9tDg03lt183K6HozBpOv3cPpxIC5qxO/oydyHtPN3LaUNaC1LKwHuCYrvaxI/ZpY+L1icGfH+RtkihJD6saDwsJm8f3WtC+0JJEV1eQACZNMfnMttxkG30UajqJrn0BMOE/lBZPwAc6dsuAsmvZPOJ4SuuSWvAx/5PdfRRwta2iq7DcP/mBFJmo0gSdI8YVh3nM+izxsPxLpdPbzbdA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3d890H8ZOO3J3bKnJoEcClzOZeadt8IDGoNq2V2OO8U=;
+ b=VZQS6eudbgH+iHKj0tGC1cvupXmkh3JBENij98feaLF7vAZAkaN92TKaT88rJgOcraSVMSjwYTJrm4tfTLJAdvWMFTu1iu/3uhOJ8Hje8SNvV5ssvKCfKzCnIfDrheQTMHj83j2K1/MVp1SGBtnwyLWwuPuUkZjTJT9eivIdCCdq4LVKRVv1AbAcYe4SocZJrHcOAYRGd14f+nPh0KC9Kxl193yg4LYhPaWvh4IYPalyRsBziReWkZD3N2nte5IY5xDTSOaGjd1c9BcG03Kp1nqFahY0stNnm5bedOU7S+B1g4kMKeOQiVSLEp6bxS16SMYpBNRl7BPGuh44x1bWVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3d890H8ZOO3J3bKnJoEcClzOZeadt8IDGoNq2V2OO8U=;
+ b=KZwnFButrbbKJZ1nG3wPjN3Ag2fJIIyVa5KhHyvZey8htfvXIyNzBc3nG2PBKFS24HHb8EDfuNbp7MWqn0ViYXz3HqyUNPMlYhYy5hZSrUhPU2P8oVZwbp8e/zVoCF0r2XW3nskYE8gIxA1pc5lcLu0ewVvwjQ2KvWCulbGA6x4=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3254.eurprd08.prod.outlook.com (52.135.167.160) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.19; Mon, 25 Nov 2019 10:08:28 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2474.023; Mon, 25 Nov 2019
+ 10:08:28 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
+Thread-Topic: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
+Thread-Index: AQHVnJu0qDM7Hy9Fo0iUR1ci8onW5Kebt1WA
+Date: Mon, 25 Nov 2019 10:08:28 +0000
+Message-ID: <4f6f9488-8ec1-85bf-5584-bac5b0f8ce92@virtuozzo.com>
+References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
+In-Reply-To: <20191116163410.12129-1-vsementsov@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0102CA0009.eurprd01.prod.exchangelabs.com
+ (2603:10a6:7:14::22) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191125130825727
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 9d27e69f-1dd5-455c-2132-08d7718f6a9f
+x-ms-traffictypediagnostic: AM6PR08MB3254:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB3254AF0ECB9EC9C655320DFEC14A0@AM6PR08MB3254.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3968;
+x-forefront-prvs: 0232B30BBC
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(376002)(396003)(366004)(39840400004)(346002)(189003)(199004)(53754006)(446003)(11346002)(2616005)(36756003)(6246003)(2351001)(6506007)(4326008)(386003)(14444005)(256004)(6486002)(76176011)(31696002)(6916009)(54906003)(66946007)(99286004)(52116002)(71190400001)(86362001)(71200400001)(66476007)(2501003)(6512007)(316002)(66446008)(64756008)(66556008)(25786009)(6116002)(7736002)(478600001)(31686004)(3846002)(229853002)(66066001)(5660300002)(305945005)(5640700003)(6436002)(81166006)(81156014)(186003)(8676002)(14454004)(102836004)(26005)(2906002)(8936002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3254;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: E9FEyv1OvEyArGH8bO4BqCibe1d/6Ron139j0wb/2pRZB7YMLDPlvZ66UzSUpjt/YPQvjAqkpPMlSKHOBoTdno+kXXG+k8xvXZPUHOeIx1VNLDWJaG124A4if6rbvS3C+cvd0pF3cFn72hHh0r/1fqlHm56JkHJipUkrZUxY7jnP+oYGaldGeBCCu33YNOJ8wIH1avq2XNIILjb75QZpjD10F/8m5uf41GMf21rUTQYWKFJ4G1JlNRjwjSlE3B+4lEx89k1U7eGhe8uo5iHwx9LnC0TkltfNmeorqwll/QQrCkZ3pF2HCetNXgcrQBk+kwgw+D6khHv3nfpXnbKCoerL4z2MkXFXP93DyJ9pXwLdezboGbd+mMJkWJgunz8l5XqZJAAD4GM+ykIoF7ap8K+tbtyPzWPutSSXEH62uzE/S5dz4WkoigGbOgJ0Y0n9
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9DACBE1BE5502140A315FD71D7C88851@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Mon, 25 Nov 2019 02:07:34
- -0800 (PST)
-In-Reply-To: <20191120152442.26657-19-marcandre.lureau@redhat.com>
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <20191120152442.26657-19-marcandre.lureau@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 25 Nov 2019 11:07:34 +0100
-Message-ID: <CAL1e-=huXgGw-uXtNXqu111O8yE-Jw_+vHXqE7Wfw1efPZATSw@mail.gmail.com>
-Subject: Re: [PATCH v4 18/37] mips: baudbase is 115200 by default
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000baf106059828ee66"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d27e69f-1dd5-455c-2132-08d7718f6a9f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Nov 2019 10:08:28.0299 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6dANK5iTLJroPfZqZLnIIs4MFaGlSrpe8szt1Ko3ppdRGJsDrd/7o1XumtNAHc2uC81CjVCWR0KpD7tYSttwJo0CSekGyyFvdOqRFAa1nBA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3254
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.8.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,96 +121,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
+ Alberto Garcia <berto@igalia.com>, Denis Lunev <den@virtuozzo.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000baf106059828ee66
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau <
-marcandre.lureau@redhat.com> wrote:
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/mips/mips_mipssim.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-> index bfafa4d7e9..3cd0e6eb33 100644
-> --- a/hw/mips/mips_mipssim.c
-> +++ b/hw/mips/mips_mipssim.c
-> @@ -223,7 +223,6 @@ mips_mipssim_init(MachineState *machine)
->      if (serial_hd(0)) {
->          DeviceState *dev =3D qdev_create(NULL, TYPE_SERIAL_IO);
->
-> -        qdev_prop_set_uint32(DEVICE(dev), "baudbase", 115200);
->          qdev_prop_set_chr(dev, "chardev", serial_hd(0));
->          qdev_set_legacy_instance_id(dev, 0x3f8, 2);
->          qdev_init_nofail(dev);
-> --
-
-
-Please mention in your commit message where the default baudbase is set.
-
-Also, is there a guarantie that default value 115200 will never change in
-future?
-
-Yours, Aleksandar
-
-
-
-> 2.24.0
->
->
->
-
---000000000000baf106059828ee66
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau &lt;<a href=
-=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;=
- wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bor=
-der-left:1px #ccc solid;padding-left:1ex">Signed-off-by: Marc-Andr=C3=A9 Lu=
-reau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@re=
-dhat.com</a>&gt;<br>
----<br>
-=C2=A0hw/mips/mips_mipssim.c | 1 -<br>
-=C2=A01 file changed, 1 deletion(-)<br>
-<br>
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c<br>
-index bfafa4d7e9..3cd0e6eb33 100644<br>
---- a/hw/mips/mips_mipssim.c<br>
-+++ b/hw/mips/mips_mipssim.c<br>
-@@ -223,7 +223,6 @@ mips_mipssim_init(MachineState *machine)<br>
-=C2=A0 =C2=A0 =C2=A0if (serial_hd(0)) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DeviceState *dev =3D qdev_create(NULL, TY=
-PE_SERIAL_IO);<br>
-<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_prop_set_uint32(DEVICE(<wbr>dev), &quot;b=
-audbase&quot;, 115200);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_prop_set_chr(dev, &quot;chardev&quot=
-;, serial_hd(0));<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_set_legacy_instance_id(<wbr>dev, 0x3=
-f8, 2);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_init_nofail(dev);<br>
---=C2=A0</blockquote><div><br></div><div>Please mention in your commit mess=
-age where the default baudbase is set.</div><div><br></div><div>Also, is th=
-ere a guarantie that default value 115200 will never change in future?</div=
-><div><br></div><div>Yours, Aleksandar</div><div><br></div><div>=C2=A0</div=
-><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1=
-px #ccc solid;padding-left:1ex">
-2.24.0<br>
-<br>
-<br>
-</blockquote>
-
---000000000000baf106059828ee66--
+UGluZz8NCg0KSGkhIFdoeSBzbyBzaWxlbnQ/IFBvc3Rwb25lIHRoaXMgdG8gNS4wPyBUaGlzIGlz
+IGZpeGluZyB0aGUgc2FtZSBwcm9ibGVtIHdpdGggYmxvY2sNCmNvbW1pdCwgbGlrZSBLZXZpbidz
+IHNlcmllcywganVzdCBjb21taXQgbm90IHRvIG1pZCBidXQgdG8gYmFzZS4uDQoNCjE2LjExLjIw
+MTkgMTk6MzQsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+IEhpIGFsbCEN
+Cj4gDQo+IEkgd2FudGVkIHRvIHVuZGVyc3RhbmQsIHdoYXQgaXMgdGhlIHJlYWwgZGlmZmVyZW5j
+ZSBiZXR3ZWVuIGJkcnZfYmxvY2tfc3RhdHVzX2Fib3ZlDQo+IGFuZCBiZHJ2X2lzX2FsbG9jYXRl
+ZF9hYm92ZSwgSU1ITyBiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZSBzaG91bGQgd29yayB0aHJvdWdo
+DQo+IGJkcnZfYmxvY2tfc3RhdHVzX2Fib3ZlLi4NCj4gDQo+IEFuZCBJIGZvdW5kIHRoZSBwcm9i
+bGVtOiBiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZSBjb25zaWRlcnMgc3BhY2UgYWZ0ZXIgRU9GIGFz
+DQo+IFVOQUxMT0NBVEVEIGZvciBpbnRlcm1lZGlhdGUgbm9kZXMuLg0KPiANCj4gVU5BTExPQ0FU
+RUQgaXMgbm90IGFib3V0IGFsbG9jYXRpb24gYXQgZnMgbGV2ZWwsIGJ1dCBhYm91dCBzaG91bGQg
+d2UgZ28gdG8gYmFja2luZyBvcg0KPiBub3QuLiBBbmQgaXQgc2VlbXMgaW5jb3JyZWN0IGZvciBt
+ZSwgYXMgaW4gY2FzZSBvZiBzaG9ydCBiYWNraW5nIGZpbGUsIHdlJ2xsIHJlYWQNCj4gemVyb2Vz
+IGFmdGVyIEVPRiwgaW5zdGVhZCBvZiBnb2luZyBmdXJ0aGVyIGJ5IGJhY2tpbmcgY2hhaW4uDQo+
+IA0KPiBUaGlzIGxlYWRzIHRvIHRoZSBmb2xsb3dpbmcgZWZmZWN0Og0KPiANCj4gLi9xZW11LWlt
+ZyBjcmVhdGUgLWYgcWNvdzIgYmFzZS5xY293MiAyTQ0KPiAuL3FlbXUtaW8gLWMgIndyaXRlIC1Q
+IDB4MSAwIDJNIiBiYXNlLnFjb3cyDQo+IA0KPiAuL3FlbXUtaW1nIGNyZWF0ZSAtZiBxY293MiAt
+YiBiYXNlLnFjb3cyIG1pZC5xY293MiAxTQ0KPiAuL3FlbXUtaW1nIGNyZWF0ZSAtZiBxY293MiAt
+YiBtaWQucWNvdzIgdG9wLnFjb3cyIDJNDQo+IA0KPiBSZWdpb24gMU0uLjJNIGlzIHNoYWRvd2Vk
+IGJ5IHNob3J0IG1pZGRsZSBpbWFnZSwgc28gZ3Vlc3Qgc2VlcyB6ZXJvZXM6DQo+IC4vcWVtdS1p
+byAtYyAicmVhZCAtUCAwIDFNIDFNIiB0b3AucWNvdzINCj4gcmVhZCAxMDQ4NTc2LzEwNDg1NzYg
+Ynl0ZXMgYXQgb2Zmc2V0IDEwNDg1NzYNCj4gMSBNaUIsIDEgb3BzOyAwMC4wMCBzZWMgKDIyLjc5
+NSBHaUIvc2VjIGFuZCAyMzM0MS41ODA3IG9wcy9zZWMpDQo+IA0KPiBCdXQgYWZ0ZXIgY29tbWl0
+IGd1ZXN0IHZpc2libGUgc3RhdGUgaXMgY2hhbmdlZCwgd2hpY2ggc2VlbXMgd3JvbmcgZm9yIG1l
+Og0KPiAuL3FlbXUtaW1nIGNvbW1pdCB0b3AucWNvdzIgLWIgbWlkLnFjb3cyDQo+IA0KPiAuL3Fl
+bXUtaW8gLWMgInJlYWQgLVAgMCAxTSAxTSIgbWlkLnFjb3cyDQo+IFBhdHRlcm4gdmVyaWZpY2F0
+aW9uIGZhaWxlZCBhdCBvZmZzZXQgMTA0ODU3NiwgMTA0ODU3NiBieXRlcw0KPiByZWFkIDEwNDg1
+NzYvMTA0ODU3NiBieXRlcyBhdCBvZmZzZXQgMTA0ODU3Ng0KPiAxIE1pQiwgMSBvcHM7IDAwLjAw
+IHNlYyAoNC45ODEgR2lCL3NlYyBhbmQgNTEwMC40Nzk0IG9wcy9zZWMpDQo+IA0KPiAuL3FlbXUt
+aW8gLWMgInJlYWQgLVAgMSAxTSAxTSIgbWlkLnFjb3cyDQo+IHJlYWQgMTA0ODU3Ni8xMDQ4NTc2
+IGJ5dGVzIGF0IG9mZnNldCAxMDQ4NTc2DQo+IDEgTWlCLCAxIG9wczsgMDAuMDAgc2VjICgzLjM2
+NSBHaUIvc2VjIGFuZCAzNDQ2LjE2MDYgb3BzL3NlYykNCj4gDQo+IA0KPiBJIGRvbid0IGtub3cs
+IGlzIGl0IGEgcmVhbCBidWcsIGFzIEkgZG9uJ3Qga25vdywgZG8gd2Ugc3VwcG9ydCBiYWNraW5n
+IGZpbGUgbGFyZ2VyIHRoYW4NCj4gaXRzIHBhcmVudC4gU3RpbGwsIEknbSBub3Qgc3VyZSB0aGF0
+IHRoaXMgYmVoYXZpb3Igb2YgYmRydl9pc19hbGxvY2F0ZWRfYWJvdmUgZG9uJ3QgbGVhZA0KPiB0
+byBvdGhlciBwcm9ibGVtcy4NCj4gDQo+ID09PT09DQo+IA0KPiBIbW0sIGJkcnZfYmxvY2tfYWxs
+b2NhdGVkX2Fib3ZlIGJlaGF2ZXMgc3RyYW5nZSB0b286DQo+IA0KPiB3aXRoIHdhbnRfemVybz10
+cnVlLCBpdCBtYXkgcmVwb3J0IHVuYWxsb2NhdGVkIHplcm9lcyBiZWNhdXNlIG9mIHNob3J0IGJh
+Y2tpbmcgZmlsZXMsIHdoaWNoDQo+IGFyZSBhY3R1YWxseSAiYWxsb2NhdGVkIiBpbiBQT1Ygb2Yg
+YmFja2luZyBjaGFpbnMuIEJ1dCBJIHNlZSB0aGlzIG1heSBpbmZsdWVuY2Ugb25seQ0KPiBxZW11
+LWltZyBjb21wYXJlLCBhbmQgSSBkb24ndCBzZWUgY2FuIGl0IHRyaWdnZXIgc29tZSBidWcuLg0K
+PiANCj4gd2l0aCB3YW50X3plcm89ZmFsc2UsIGl0IG1heSBkbyBubyBwcm9ncmVzcyBiZWNhdXNl
+IG9mIHNob3J0IGJhY2tpbmcgZmlsZS4gTW9yZW92ZXIgaXQgbWF5DQo+IHJlcG9ydCBFT0YgaW4g
+dGhlIG1pZGRsZSEhIEJ1dCB3YW50X3plcm89ZmFsc2UgdXNlZCBvbmx5IGluIGJkcnZfaXNfYWxs
+b2NhdGVkLCB3aGljaCBjb25zaWRlcnMNCj4gb25seXQgdG9wIGxheWVyLCBzbyBpdCBzZWVtcyBP
+Sy4NCj4gDQo+ID09PT09DQo+IA0KPiBTbywgSSBwcm9wb3NlIHRoZXNlIHNlcmllcywgc3RpbGwg
+SSdtIG5vdCBzdXJlIGlzIHRoZXJlIGEgcmVhbCBidWcuDQo+IA0KPiBWbGFkaW1pciBTZW1lbnRz
+b3YtT2dpZXZza2l5ICg0KToNCj4gICAgYmxvY2svaW86IGZpeCBiZHJ2X2NvX2Jsb2NrX3N0YXR1
+c19hYm92ZQ0KPiAgICBibG9jay9pbzogYmRydl9jb21tb25fYmxvY2tfc3RhdHVzX2Fib3ZlOiBz
+dXBwb3J0IGluY2x1ZGVfYmFzZQ0KPiAgICBibG9jay9pbzogYmRydl9jb21tb25fYmxvY2tfc3Rh
+dHVzX2Fib3ZlOiBzdXBwb3J0IGJzID09IGJhc2UNCj4gICAgYmxvY2svaW86IGZpeCBiZHJ2X2lz
+X2FsbG9jYXRlZF9hYm92ZQ0KPiANCj4gICBibG9jay9pby5jICAgICAgICAgICAgICAgICB8IDEw
+NCArKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgdGVzdHMvcWVtdS1p
+b3Rlc3RzLzE1NC5vdXQgfCAgIDQgKy0NCj4gICAyIGZpbGVzIGNoYW5nZWQsIDUzIGluc2VydGlv
+bnMoKyksIDU1IGRlbGV0aW9ucygtKQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
+bWlyDQo=
 
