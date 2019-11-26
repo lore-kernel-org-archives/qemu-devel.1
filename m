@@ -2,88 +2,86 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1F8C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F033C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:31:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 262162073F
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:29:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B5D52073F
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:31:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qNxv9rom"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 262162073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MtjR7HGe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B5D52073F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZY6I-0006sb-SR
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:29:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57426)
+	id 1iZY7l-0008AF-02
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:31:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57349)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsK-0005eM-4Z
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:17 -0500
+ (envelope-from <armbru@redhat.com>) id 1iZXsT-0005R4-RT
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXmj-0003Mt-QM
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:31 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:43251)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
- id 1iZXmj-0003M8-KN
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:29 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id a10so8055355pju.10
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:09:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=04y2jMBz+TniBsSijixdhxAgItaCRW1Bg/M7TEdqtZw=;
- b=qNxv9romfmc3q9HrRe1SsyMGoaUYYBfCAqMUu5CAK2O3s3+yZxepf2025cJPH3wVaq
- YdPZyUS+KjlG/AyXxckpOaJIFC/CznF+s9mOw22e/xJsgsAaSfC+QzI6FDrXI81xPOtl
- jHxPnXyPvnymn3KeFZk8QSD+AqaskNH3wrtAVq4sk73gCruVUF8q2EL+osao+obGfuXa
- E4Yvk9grWBs1sV7Ecjvmb2aJXX2sdhUMcocV9tdygaC/9AnOyqH6hyLQHPQRz4EYZYed
- OROth7uyN6VTu0xFGEmoI2bu6lRMgCUIYSq4c1GTkIT6StqdUJfKPl1MlLtm9JNoEsMG
- eJtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=04y2jMBz+TniBsSijixdhxAgItaCRW1Bg/M7TEdqtZw=;
- b=BY3wq07Yy9TYQYW5GNQPRsfK0Vc8Nxs9H9mh7JzQOpIIJdJzU52iQGANo2eC5lbQP5
- v2ACNE2z0YJRuJ5LeKo/ETdJwlVrt74P6QWxDmCNZRHYB9Oi1GmT++wjyBwsfUTToeKy
- d1ndZgKyaNhb0JM9Hev+yrg9nXTbrTqPzR89ZEibFJjDk/YHUvpvxpU3iA2pdzN2PqQl
- CbZspZV3ZWlO+ZNSUiwmNXncSAiM9w7xC4PNPacPPaEIOX0KoPOAFoweTNfGyTJ6OBMm
- q5bbuDQlOz9IQvvm5Uzzoj0/D78Kq0B0XPqZVFrdtCqIzMb7i/Vy0XCR9OU4rGgr4gBu
- 0Mag==
-X-Gm-Message-State: APjAAAV/1X3lIMp4UMWv6B3E3nSCLYSVtdl5Lsv9U9iKgnKX9gFaXhOK
- psYRU4xD0bHcxmry+nA8hHA=
-X-Google-Smtp-Source: APXvYqwRnyofw+ROJrA/0vdTheynnaSCjgx1858Q2XAMEgN8s0N0WdIa2wiPcUAvtMOS75RBHUMq6A==
-X-Received: by 2002:a17:902:758a:: with SMTP id
- j10mr34601161pll.29.1574762968666; 
- Tue, 26 Nov 2019 02:09:28 -0800 (PST)
-Received: from localhost.localdomain ([222.151.198.97])
- by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.09.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 02:09:28 -0800 (PST)
-From: Prashant Bhole <prashantbhole.linux@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
- "Michael S . Tsirkin" <mst@redhat.com>
-Subject: [RFC net-next 12/18] virtio-net: store xdp_prog in device
-Date: Tue, 26 Nov 2019 19:07:38 +0900
-Message-Id: <20191126100744.5083-13-prashantbhole.linux@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+ (envelope-from <armbru@redhat.com>) id 1iZXiG-00017p-Sz
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:04:55 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57599
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iZXiG-00017J-Pj
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:04:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574762690;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UcgV5nUGY6qSF67eIFoj07CtVtZBZFfJ2ofaNZP5R50=;
+ b=MtjR7HGevod5tLJ1r2TM67BThG5dCnQ2lvyqMeXujzqdSXA2zcF3BpoNsNFxqC9/Foir6S
+ tkk9mhAErFw03I0fSxFLht27GXJCGwANv24t11mUdFEOlbsotxCLWL+jeqCMp81Ysu/Nsj
+ 3eJZyq5PFUrObXlP4HK3AEVtlWddfKM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-113-zkxcDclZP96i1Kp5huwFsw-1; Tue, 26 Nov 2019 05:04:47 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38139184CAA2;
+ Tue, 26 Nov 2019 10:04:46 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 418211001DC0;
+ Tue, 26 Nov 2019 10:04:43 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C056F1138606; Tue, 26 Nov 2019 11:04:41 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v17 03/14] util/cutils: refactor do_strtosz() to support
+ suffixes list
+References: <20191122074826.1373-1-tao3.xu@intel.com>
+ <20191122074826.1373-4-tao3.xu@intel.com>
+ <87pnhgjubs.fsf@dusky.pond.sub.org>
+ <20191125121531.GD4438@habkost.net>
+Date: Tue, 26 Nov 2019 11:04:41 +0100
+In-Reply-To: <20191125121531.GD4438@habkost.net> (Eduardo Habkost's message of
+ "Mon, 25 Nov 2019 09:15:31 -0300")
+Message-ID: <87y2w37y2u.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: zkxcDclZP96i1Kp5huwFsw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,209 +93,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Song Liu <songliubraving@fb.com>,
- Jakub Kicinski <jakub.kicinski@netronome.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, qemu-devel@nongnu.org,
- Prashant Bhole <prashantbhole.linux@gmail.com>, kvm@vger.kernel.org,
- Yonghong Song <yhs@fb.com>, Andrii Nakryiko <andriin@fb.com>,
- Martin KaFai Lau <kafai@fb.com>
+Cc: lvivier@redhat.com, thuth@redhat.com, mst@redhat.com, sw@weilnetz.de,
+ Tao Xu <tao3.xu@intel.com>, fan.du@intel.com, mdroth@linux.vnet.ibm.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com, imammedo@redhat.com,
+ jingqi.liu@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jason Wang <jasowang@redhat.com>
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-This is a preparation for adding XDP offload support in virtio_net
-driver. By storing XDP program in virtionet_info will make it
-consistent with the offloaded program which will introduce in next
-patches.
+> On Mon, Nov 25, 2019 at 08:20:23AM +0100, Markus Armbruster wrote:
+>> Tao Xu <tao3.xu@intel.com> writes:
+>>=20
+>> > Add do_strtomul() to convert string according to different suffixes.
+>> >
+>> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>> > Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>>=20
+>> What's the actual change here?  "Refactor" suggests the interfaces stay
+>> the same, only their implementation changes.  "Support suffixes list"
+>> suggests some interface supports something new.
+>
+> 1) Parameters added to suffix_mul() (suffix table);
+> 2) do_strtomul() is being extracted from do_strtosz().
+>
+> do_strtomul() interface and behavior stays the same.
 
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Co-developed-by: Prashant Bhole <prashantbhole.linux@gmail.com>
-Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
----
- drivers/net/virtio_net.c | 62 ++++++++++++++++------------------------
- 1 file changed, 25 insertions(+), 37 deletions(-)
+Alright, it's two related changes squashed together (which tends to
+complicate writing good commit messages).  2) is really a refactoring.
+1) is not: it makes suffix_mul() more flexible.  Summarizing 1) and 2)
+as "refactor do_strtosz() to support suffixes list" is confusing,
+because it's about 1), while the interesting part is actually 2).
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 4d7d5434cc5d..c8bbb1b90c1c 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -137,8 +137,6 @@ struct receive_queue {
- 
- 	struct napi_struct napi;
- 
--	struct bpf_prog __rcu *xdp_prog;
--
- 	struct virtnet_rq_stats stats;
- 
- 	/* Chain pages by the private ptr. */
-@@ -229,6 +227,8 @@ struct virtnet_info {
- 
- 	/* failover when STANDBY feature enabled */
- 	struct failover *failover;
-+
-+	struct bpf_prog __rcu *xdp_prog;
- };
- 
- struct padded_vnet_hdr {
-@@ -486,7 +486,6 @@ static int virtnet_xdp_xmit(struct net_device *dev,
- 			    int n, struct xdp_frame **frames, u32 flags)
- {
- 	struct virtnet_info *vi = netdev_priv(dev);
--	struct receive_queue *rq = vi->rq;
- 	struct bpf_prog *xdp_prog;
- 	struct send_queue *sq;
- 	unsigned int len;
-@@ -501,7 +500,7 @@ static int virtnet_xdp_xmit(struct net_device *dev,
- 	/* Only allow ndo_xdp_xmit if XDP is loaded on dev, as this
- 	 * indicate XDP resources have been successfully allocated.
- 	 */
--	xdp_prog = rcu_dereference(rq->xdp_prog);
-+	xdp_prog = rcu_dereference(vi->xdp_prog);
- 	if (!xdp_prog)
- 		return -ENXIO;
- 
-@@ -649,7 +648,7 @@ static struct sk_buff *receive_small(struct net_device *dev,
- 	stats->bytes += len;
- 
- 	rcu_read_lock();
--	xdp_prog = rcu_dereference(rq->xdp_prog);
-+	xdp_prog = rcu_dereference(vi->xdp_prog);
- 	if (xdp_prog) {
- 		struct virtio_net_hdr_mrg_rxbuf *hdr = buf + header_offset;
- 		struct xdp_frame *xdpf;
-@@ -798,7 +797,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
- 	stats->bytes += len - vi->hdr_len;
- 
- 	rcu_read_lock();
--	xdp_prog = rcu_dereference(rq->xdp_prog);
-+	xdp_prog = rcu_dereference(vi->xdp_prog);
- 	if (xdp_prog) {
- 		struct xdp_frame *xdpf;
- 		struct page *xdp_page;
-@@ -2060,7 +2059,7 @@ static int virtnet_set_channels(struct net_device *dev,
- 	 * also when XDP is loaded all RX queues have XDP programs so we only
- 	 * need to check a single RX queue.
- 	 */
--	if (vi->rq[0].xdp_prog)
-+	if (vi->xdp_prog)
- 		return -EINVAL;
- 
- 	get_online_cpus();
-@@ -2441,13 +2440,10 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 		return -ENOMEM;
- 	}
- 
--	old_prog = rtnl_dereference(vi->rq[0].xdp_prog);
-+	old_prog = rtnl_dereference(vi->xdp_prog);
- 	if (!prog && !old_prog)
- 		return 0;
- 
--	if (prog)
--		bpf_prog_add(prog, vi->max_queue_pairs - 1);
--
- 	/* Make sure NAPI is not using any XDP TX queues for RX. */
- 	if (netif_running(dev)) {
- 		for (i = 0; i < vi->max_queue_pairs; i++) {
-@@ -2457,11 +2453,8 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 	}
- 
- 	if (!prog) {
--		for (i = 0; i < vi->max_queue_pairs; i++) {
--			rcu_assign_pointer(vi->rq[i].xdp_prog, prog);
--			if (i == 0)
--				virtnet_restore_guest_offloads(vi);
--		}
-+		rcu_assign_pointer(vi->xdp_prog, prog);
-+		virtnet_restore_guest_offloads(vi);
- 		synchronize_net();
- 	}
- 
-@@ -2472,16 +2465,12 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 	vi->xdp_queue_pairs = xdp_qp;
- 
- 	if (prog) {
--		for (i = 0; i < vi->max_queue_pairs; i++) {
--			rcu_assign_pointer(vi->rq[i].xdp_prog, prog);
--			if (i == 0 && !old_prog)
--				virtnet_clear_guest_offloads(vi);
--		}
-+		rcu_assign_pointer(vi->xdp_prog, prog);
-+		if (!old_prog)
-+			virtnet_clear_guest_offloads(vi);
- 	}
- 
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
--		if (old_prog)
--			bpf_prog_put(old_prog);
- 		if (netif_running(dev)) {
- 			virtnet_napi_enable(vi->rq[i].vq, &vi->rq[i].napi);
- 			virtnet_napi_tx_enable(vi, vi->sq[i].vq,
-@@ -2489,13 +2478,15 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 		}
- 	}
- 
-+	if (old_prog)
-+		bpf_prog_put(old_prog);
-+
- 	return 0;
- 
- err:
- 	if (!prog) {
- 		virtnet_clear_guest_offloads(vi);
--		for (i = 0; i < vi->max_queue_pairs; i++)
--			rcu_assign_pointer(vi->rq[i].xdp_prog, old_prog);
-+		rcu_assign_pointer(vi->xdp_prog, old_prog);
- 	}
- 
- 	if (netif_running(dev)) {
-@@ -2514,13 +2505,11 @@ static u32 virtnet_xdp_query(struct net_device *dev)
- {
- 	struct virtnet_info *vi = netdev_priv(dev);
- 	const struct bpf_prog *xdp_prog;
--	int i;
- 
--	for (i = 0; i < vi->max_queue_pairs; i++) {
--		xdp_prog = rtnl_dereference(vi->rq[i].xdp_prog);
--		if (xdp_prog)
--			return xdp_prog->aux->id;
--	}
-+	xdp_prog = rtnl_dereference(vi->xdp_prog);
-+	if (xdp_prog)
-+		return xdp_prog->aux->id;
-+
- 	return 0;
- }
- 
-@@ -2657,18 +2646,17 @@ static void virtnet_free_queues(struct virtnet_info *vi)
- 
- static void _free_receive_bufs(struct virtnet_info *vi)
- {
--	struct bpf_prog *old_prog;
-+	struct bpf_prog *old_prog = rtnl_dereference(vi->xdp_prog);
- 	int i;
- 
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
- 		while (vi->rq[i].pages)
- 			__free_pages(get_a_page(&vi->rq[i], GFP_KERNEL), 0);
--
--		old_prog = rtnl_dereference(vi->rq[i].xdp_prog);
--		RCU_INIT_POINTER(vi->rq[i].xdp_prog, NULL);
--		if (old_prog)
--			bpf_prog_put(old_prog);
- 	}
-+
-+	RCU_INIT_POINTER(vi->xdp_prog, NULL);
-+	if (old_prog)
-+		bpf_prog_put(old_prog);
- }
- 
- static void free_receive_bufs(struct virtnet_info *vi)
--- 
-2.20.1
+Moreover, the commit message should state why these two changes are
+useful.  It tries, but "to support suffixes list" merely kicks the can
+down the road, because the reader is left to wonder why supporting
+suffix lists is useful.  It's actually for use by the next patch.  So
+say that.
+
+I'll review the actual patch now.
 
 
