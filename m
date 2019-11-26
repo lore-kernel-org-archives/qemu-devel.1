@@ -2,83 +2,122 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 245B7C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 21:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8734C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 21:26:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBB0720863
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 21:24:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="f1r0GgTt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBB0720863
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7CCEE20866
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 21:26:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CCEE20866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZiJo-000459-VO
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 16:24:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49592)
+	id 1iZiLd-0005Om-LQ
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 16:26:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49798)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1iZiIW-0003e5-QV
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 16:23:02 -0500
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1iZiKH-0004ed-DP
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 16:24:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1iZiIV-0001cn-Gy
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 16:23:00 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37704)
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1iZiKF-0003QY-Ec
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 16:24:49 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:39344)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1iZiIU-0001bq-Pb
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 16:22:59 -0500
-Received: by mail-wr1-x441.google.com with SMTP id g7so3523200wrw.4
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 13:22:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id;
- bh=lBGJA2/RhKvSalgnovBC2N7a3rcBtlnFkJxCbDoF1h0=;
- b=f1r0GgTtxWr7q64L/SLDDrQcOHbsbh8wx1f+Y+AFmAVJyLylXntNnpoVWofutHqEJ6
- walbhegcpOT0gz1ztE0CfY1Ya/bwfKv9Pj7WOOsvoYPLLdZ/M12Fy7e5PfiFsZAs5Zeu
- B8ECCV6klm910b23K+VgD9Ga7R/Q4tggIuAe+y6zu7KIcJWM/Rbq8QImdzJB0+GjhHLb
- BSXhbo5BfVOgVRnKf1phAwnRn+TAjrrIp7k186qGmSOEnKXOTOiZOyEyrjw4BDJtcETo
- LA/+iOsgDNpvnVAn/XKaBihx1+dniHe6LtHUNcUFjFjzJZw1noyc95ro+RyB3QDoxRBG
- M/5Q==
+ (Exim 4.71) (envelope-from <a13xp0p0v88@gmail.com>)
+ id 1iZiKB-0003OM-D8; Tue, 26 Nov 2019 16:24:43 -0500
+Received: by mail-lj1-f196.google.com with SMTP id e10so12778060ljj.6;
+ Tue, 26 Nov 2019 13:24:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=lBGJA2/RhKvSalgnovBC2N7a3rcBtlnFkJxCbDoF1h0=;
- b=PcVtXAFABS5irxcsWreHOBXwAW6JxwsMuOQJzoPj1YZF1qgUiDFHvGVl8Ph2Dgkc4I
- SNUncgaOrWoXTaDpZLePxkAKSfNwBrESY6yaATagCOK4gONp9F1HnO2r5+oWgM9Qn9gy
- 5T1+LjlhT8Hw0+YiBwiA8m2q32kmdQU+ym7BQT0o6kXCU33VhGgGU6/GBVHvoVVe94Vi
- rG3MfK//XGXQm4/EJZ6sSp0yiDZZ8keXhLxAMuPGr+hmHDn1Y4KECq40QZEZsfs8bjkP
- 33FI2JZ1LveOnIc2QcvQjVJ2sP9MG1sY7+CnWV9KBIZsAHMFvM/SSJczyAoyhJpRlDDm
- AM5w==
-X-Gm-Message-State: APjAAAV8QYXwO2T9ABqjBA0hWfBsVhK7vRE9GQP3lces9anD0/yyV/s6
- bJe87e4lYXMCv/lG4FjGw9N69veP+oI=
-X-Google-Smtp-Source: APXvYqzqfVhGDroq/VZjbsmWCuG61AS3uEeVZPBI5Zt8SDhwQcjdOJtrG65IQOVSEXF5PjcHOKolLg==
-X-Received: by 2002:adf:f20f:: with SMTP id p15mr36686021wro.370.1574803376889; 
- Tue, 26 Nov 2019 13:22:56 -0800 (PST)
-Received: from f2.redhat.com (bzq-79-182-78-197.red.bezeqint.net.
- [79.182.78.197])
- by smtp.gmail.com with ESMTPSA id g21sm17950252wrb.48.2019.11.26.13.22.55
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Tue, 26 Nov 2019 13:22:55 -0800 (PST)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: qemu-devel@nongnu.org,
-	kraxel@redhat.com
-Subject: [PATCH] usbredir: remove 'remote wake' capability from configuration
- descriptor
-Date: Tue, 26 Nov 2019 23:22:45 +0200
-Message-Id: <20191126212245.27735-1-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+ h=x-gm-message-state:reply-to:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=yb+mC5s0JCgXztY2N9alGMagADFKEpdOeAAmWnGTt/4=;
+ b=pURBdSgoiB0WkSWDSZk5kInfieQ9v1sR4o2jZMjUv2vwuyoEKA5h56Geeh/2SuVmOJ
+ o2tiHZM37Di931WKZ1zXw2QANHxNej5rr+NS8p3eIhPWdEWv2L2jWu4gcAG3VQXMrHpR
+ qWM/HNWLXVShXGAr4mZbp+FqybQ00nMMLPreUkJA7SNfHU8NyAdcNFMPMTjsx/jAnArw
+ +gsp85cjEczJ2dfGK3qyaGAsm0voaYYmF+fl7J56oeTzrJzGsi/tEiljsLZd6kJxzRCz
+ lZHWH+zmsAESuZJMh9uXca886o65rAioB1rZYY0KY/OGafXHK3USMZxLCj9QV4QhzAEn
+ 9SNg==
+X-Gm-Message-State: APjAAAWs5hUJG5RwHhoMJa1VrkGRq8/JoAD2vI7xQfhSsFj1DgUyJH+S
+ kOnc5GeDh9UAL2uvsJr/ASk=
+X-Google-Smtp-Source: APXvYqykHe4MTpk/Bsxik9DWuayXimobe2wpwQsgbfcN45wKA0nH9OtKia1MkkRILP+UIPfOTHiS9w==
+X-Received: by 2002:a2e:580c:: with SMTP id m12mr12086056ljb.150.1574803481782; 
+ Tue, 26 Nov 2019 13:24:41 -0800 (PST)
+Received: from [192.168.1.183] (128-68-70-109.broadband.corbina.ru.
+ [128.68.70.109])
+ by smtp.gmail.com with ESMTPSA id a23sm1070785ljn.79.2019.11.26.13.24.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 26 Nov 2019 13:24:40 -0800 (PST)
+Subject: Re: [PATCH v2 1/1] ide: check DMA transfer size in ide_dma_cb() to
+ prevent qemu DoS from quests
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20191114172531.10644-1-alex.popov@linux.com>
+ <20191121150352.GH6007@linux.fritz.box>
+From: Alexander Popov <alex.popov@linux.com>
+Autocrypt: addr=alex.popov@linux.com; prefer-encrypt=mutual; keydata=
+ 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
+ j3lCqPk=
+Message-ID: <214785dc-d4b3-598f-4c48-c5703a28b8c4@linux.com>
+Date: Wed, 27 Nov 2019 00:24:38 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191121150352.GH6007@linux.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.208.196
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,68 +129,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com
+Reply-To: alex.popov@linux.com
+Cc: Andrea Arcangeli <aarcange@redhat.com>,
+ Darren Kenny <darren.kenny@oracle.com>, sstabellini@kernel.org,
+ pmatouse@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org, Kashyap Chamarthy <kashyap.cv@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ pjp@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the redirected device has this capability, Windows guest may
-place the device into D2 and expect it to wake when the device
-becomes active, but this will never happen. For example, when
-internal Bluetooth adapter is redirected, keyboards and mice
-connected to it do not work. Setting global property
-'usb-redir.nowake=off' keeps 'remote wake' as is.
+Hello Kevin,
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- hw/usb/redirect.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+Thanks for your review,
 
-diff --git a/hw/usb/redirect.c b/hw/usb/redirect.c
-index e0f5ca6f81..e95898fe80 100644
---- a/hw/usb/redirect.c
-+++ b/hw/usb/redirect.c
-@@ -113,6 +113,7 @@ struct USBRedirDevice {
-     /* Properties */
-     CharBackend cs;
-     bool enable_streams;
-+    bool suppress_remote_wake;
-     uint8_t debug;
-     int32_t bootindex;
-     char *filter_str;
-@@ -1989,6 +1990,23 @@ static void usbredir_control_packet(void *priv, uint64_t id,
-             memcpy(dev->dev.data_buf, data, data_len);
-         }
-         p->actual_length = len;
-+        /*
-+         * If this is GET_DESCRIPTOR request for configuration descriptor,
-+         * remove 'remote wakeup' flag from it to prevent idle power down
-+         * in Windows guest
-+         */
-+        if (dev->suppress_remote_wake &&
-+            control_packet->requesttype == USB_DIR_IN &&
-+            control_packet->request == USB_REQ_GET_DESCRIPTOR &&
-+            control_packet->value == (USB_DT_CONFIG << 8) &&
-+            control_packet->index == 0 &&
-+            /* bmAttributes field of config descriptor */
-+            len > 7 && (dev->dev.data_buf[7] & USB_CFG_ATT_WAKEUP)) {
-+                DPRINTF("Removed remote wake %04X:%04X\n",
-+                    dev->device_info.vendor_id,
-+                    dev->device_info.product_id);
-+                dev->dev.data_buf[7] &= ~USB_CFG_ATT_WAKEUP;
-+            }
-         usb_generic_async_ctrl_complete(&dev->dev, p);
-     }
-     free(data);
-@@ -2530,6 +2548,7 @@ static Property usbredir_properties[] = {
-     DEFINE_PROP_UINT8("debug", USBRedirDevice, debug, usbredirparser_warning),
-     DEFINE_PROP_STRING("filter", USBRedirDevice, filter_str),
-     DEFINE_PROP_BOOL("streams", USBRedirDevice, enable_streams, true),
-+    DEFINE_PROP_BOOL("nowake", USBRedirDevice, suppress_remote_wake, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
--- 
-2.17.1
+On 21.11.2019 18:03, Kevin Wolf wrote:
+> Am 14.11.2019 um 18:25 hat Alexander Popov geschrieben:
+>> The commit a718978ed58a from July 2015 introduced the assertion which
+>> implies that the size of successful DMA transfers handled in ide_dma_cb()
+>> should be multiple of 512 (the size of a sector). But guest systems can
+>> initiate DMA transfers that don't fit this requirement.
+>>
+>> PoC for Linux that uses SCSI_IOCTL_SEND_COMMAND to perform such an ATA
+>> command and crash qemu:
+...
+> 
+> It would be nicer to turn the reproducer into a test case for
+> tests/ide-test.c.
 
+Yes, I can do that.
+
+>> For fixing that let's check the number of bytes prepared for the transfer
+>> by the prepare_buf() handler. If it is not a multiple of 512 then end
+>> the DMA transfer with an error.
+>>
+>> That also fixes the I/O stall in guests after a DMA transfer request
+>> for less than the size of a sector.
+>>
+>> Signed-off-by: Alexander Popov <alex.popov@linux.com>
+> 
+> This patch makes ide-test fail:
+> 
+>   TEST    check-qtest-x86_64: tests/ide-test
+> **
+> ERROR:tests/ide-test.c:469:test_bmdma_short_prdt: assertion failed (status == 0): (0x00000004 == 0x00000000)
+> ERROR - Bail out! ERROR:tests/ide-test.c:469:test_bmdma_short_prdt: assertion failed (status == 0): (0x00000004 == 0x00000000)
+
+Thanks for the notice.
+Yes, I can reproduce it too with `make check-qtest-i386`.
+
+>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>> index 754ff4dc34..85aac614f0 100644
+>> --- a/hw/ide/core.c
+>> +++ b/hw/ide/core.c
+>> @@ -849,6 +849,7 @@ static void ide_dma_cb(void *opaque, int ret)
+>>      int64_t sector_num;
+>>      uint64_t offset;
+>>      bool stay_active = false;
+>> +    int32_t prepared = 0;
+>>  
+>>      if (ret == -EINVAL) {
+>>          ide_dma_error(s);
+>> @@ -892,12 +893,10 @@ static void ide_dma_cb(void *opaque, int ret)
+>>      n = s->nsector;
+>>      s->io_buffer_index = 0;
+>>      s->io_buffer_size = n * 512;
+>> -    if (s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) < 512) {
+>> -        /* The PRDs were too short. Reset the Active bit, but don't raise an
+>> -         * interrupt. */
+>> -        s->status = READY_STAT | SEEK_STAT;
+>> -        dma_buf_commit(s, 0);
+>> -        goto eot;
+>> +    prepared = s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size);
+>> +    if (prepared % 512) {
+>> +        ide_dma_error(s);
+> 
+> Which I assume is because you changed the error mode here compared to
+> the old version.
+
+Yes, you are right.
+
+> I'm not sure offhand what the correct behaviour is for non-aligned
+> values > 512. I think we actually have two cases here: Either a short or
+> a long PRD. The commit message should explain this with spec references
+> and a test case should be added for both cases.
+
+I've found the "Programming Interface for Bus Master IDE Controller" (revision
+1.0 5/16/94). The chapter 3.1 (Status Bit Interpretation) provides some answers.
+It says that:
+  1. If PRD's specified a smaller size than the IDE transfer size, then the
+Interrupt and Active bits in the Controller status register are not set.
+  2. If the size of the physical memory regions was larger than the IDE device
+transfer size, the Interrupt and Active bits in the Controller status register
+are both set to 1.
+
+So my changing of the error mode in short PRD's case was wrong, and the
+test_bmdma_short_prdt() is correct.
+
+Now let's think about the proper fix of the qemu crash.
+
+Currently I don't really understand how ide_dma_cb() emulates the logic
+described in Status Bit Interpretation chapter. I don't see any comparison
+between the DMA transfer size and PRD's size.
+
+We only have this check against the size of a sector (512 bytes), which doesn't
+catch all short PRD's cases (PRD in my PoC is 1337 bytes).
+
+Kevin, do you have any clues?
+
+Best regards,
+Alexander
 
