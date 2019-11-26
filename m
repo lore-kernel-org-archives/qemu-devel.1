@@ -1,70 +1,70 @@
 Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6245EC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 07:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF70DC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 07:22:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B55ED20722
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 07:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 349952071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 07:22:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tyDg674Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B55ED20722
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PQNk2e2B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 349952071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZV2R-0001tq-Ql
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 02:13:32 -0500
-Received: from eggs.gnu.org ([209.51.188.92]:40709)
+	id 1iZVAx-0007bG-MQ
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 02:22:20 -0500
+Received: from eggs.gnu.org ([209.51.188.92]:40665)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aaron.zakhrov@gmail.com>) id 1iZTAF-0000PP-Ei
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 00:13:37 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:36177)
+ (envelope-from <aaron.zakhrov@gmail.com>) id 1iZTAL-0000M9-JL
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 00:13:44 -0500
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:44377)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aaron.zakhrov@gmail.com>)
- id 1iZSvB-0006Zo-1N
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 23:57:55 -0500
-Received: by mail-pl1-x644.google.com with SMTP id d7so7563119pls.3
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 20:57:52 -0800 (PST)
+ id 1iZSun-0006LZ-8h
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 23:57:32 -0500
+Received: by mail-pl1-x62d.google.com with SMTP id az9so7542586plb.11
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 20:57:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
  bh=k25+3GtzK1U5AEgF6DxZUKMEEsUGjeMShA+PxLVQR7E=;
- b=tyDg674ZaHICyGOYLFp5ObBBLGkowsT1t4a3OuNApbbsY0gKRc9bjSzBOwJyJTZ8n6
- GtfDLMnx4R8MzQS+ho46eFVsu0lA2Udid30SsNU5VULxWC3B02R+HJ37ekTozBXEqFyO
- Y5oxszlZBF7YkcfTot3nZ+Sfcgi62PKpn5zFYHSWJM6jcRRzHwBvtU+fQStxCbCOnEpu
- 3A1fnL4Gx2gMXlr1WkkKF62JfoAc4TyPSF4N5DiHJi+Wl/eE6wCm6cY5OUu52hKlxJZv
- Zng7TJ8mTlSToTGAqdeyAXiZvZ5V3NBSqnfSlO+yxa9E2gU/Cl7uYuo57e7yrpiPcyhX
- z0Jg==
+ b=PQNk2e2Bl+CJw1npXX7vAbapPWgjadAPMWZguxnmq4H02XPLZsc67Gi7pFjxqOSYnz
+ /pd+thHnQh19tqRPQm7UX3JXYcxyKecMBi3jZo6ELhuYMBCtGdkcQcMn+E1XcSgjfXN0
+ yYeGnu8QF9qdid5WwLFLJy2pKrYG0ERDitoBvDE8FYKHzX5cipZsFWIOWdsVt8x6n53Y
+ XgvcOSCKxPlo5e9rlQROxLbTZ//5UIp668a9Xeq3MR+xUAR8VmD1QTm8h48lAlS9938u
+ FGsA6HNZ1psKICnhDlBAcmSMn4PIzB6CB/Ar2kw6Gua3OwE9CQYq5vTna1fmMuDQ+Rrt
+ d59g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
  bh=k25+3GtzK1U5AEgF6DxZUKMEEsUGjeMShA+PxLVQR7E=;
- b=mQcDM+eLezYErdLAf7jGii4Yk+iZ/sRdedTmIuhP5fV56TGHgwpCcsKiaOTe2oOC7S
- 3degJNzlzXGu2qYRpSrgxLced5fxgPGgoKuka3Uzij/WTPx0wuRWQ+3zLV7Mkk+sy1Z+
- FAnBw2nnRiaEcICn0SnG/h5Ed6+F6ZstIBLDyHoqNBNBp8tcGGUzDVyE546/ufX/RK+/
- dKSvjKl+lP2xls9Ir88jwQgML+Tn2RuZlgFKIj2fL5Wk+xrFJ3ZERbEfLlsJ748h2hDl
- C69Xn1U/QDCHTsKf+mXGgLHfULlusrZWah2smlDe4Jx7yHJrZ7jbR8vQIeYr9gJO7IJJ
- 7Xlg==
-X-Gm-Message-State: APjAAAV0z3Vl6Dzbi9YM3cTVancCN2XPwm8JOQht8TgRV1ll/n062vZV
- T5lXZt4e+fFGlt4ukZWZE7/fDjhrzvzDbCMG
-X-Google-Smtp-Source: APXvYqz0Xe2kfwFsm5qpXSMrPpMY6X9otDfWYOEqNx1nUzXaZeW7g6qEFkI12NHjETbu3TIsYa4Ciw==
-X-Received: by 2002:a17:90b:4386:: with SMTP id
- in6mr4000909pjb.33.1574744268719; 
- Mon, 25 Nov 2019 20:57:48 -0800 (PST)
+ b=AqKNJCvgm8t5KA1P1h18hxvp0FSnbL990JpIYI+/gFfEO4/9V+AbDaURuOIaoW8pEl
+ UcykTB4kT/V+slPdQU3Zrj+LWlwYZumHbRH/KacYkiOnrpiV7RaheuZL7eDFbwmoaXnN
+ YsWImlCSrfD7bPKKTTYdKDyCeu31fj4o+75YTvzhQpD4NE1a3I1USF/SUe7eFqBx5VSx
+ hCxMyy5bI0fgHRUMsw7x2Qt81/2+HaIY1iF0u4o9lIK/L7wWX5rcKoDcn2LFEXMq0P0I
+ YftWLFSNlR5er2g3dhziVATFD9UZxGw8cvWl15Y9e98BeiDt93HKd3xpH0TBnYshTWgd
+ B5Xg==
+X-Gm-Message-State: APjAAAU0JzcGonfkJ6TrFR2XdE+pkZKpL0wHMjh00ggri5UIqOwae0j6
+ k1UKW/2T6NaoGnOj1a/oJnDwPZ5x2LY9wNG6
+X-Google-Smtp-Source: APXvYqy84cvjtzjvxn9ZTbWB3/EDWiEmNqp8Gj+cUp3wp2JJEbYTtigjc0y/MymO4CyQIiyhlDlywQ==
+X-Received: by 2002:a17:90b:1252:: with SMTP id
+ gx18mr813470pjb.95.1574744245720; 
+ Mon, 25 Nov 2019 20:57:25 -0800 (PST)
 Received: from localhost.localdomain ([2406:7400:73:1f7e:c8d0:6181:5329:cc21])
  by smtp.gmail.com with ESMTPSA id
- z1sm1081328pju.27.2019.11.25.20.57.34
+ z1sm1081328pju.27.2019.11.25.20.57.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 25 Nov 2019 20:57:46 -0800 (PST)
+ Mon, 25 Nov 2019 20:57:22 -0800 (PST)
 From: aaron.zakhrov@gmail.com
 To: qemu-devel@nongnu.org
-Subject: [RFC 5/8] Add Radeon kernel headers. Will clean up later
-Date: Tue, 26 Nov 2019 10:26:18 +0530
-Message-Id: <20191126045621.11344-6-aaron.zakhrov@gmail.com>
+Subject: [RFC 1/8] Add Radeon kernel headers. Will clean up later
+Date: Tue, 26 Nov 2019 10:26:14 +0530
+Message-Id: <20191126045621.11344-2-aaron.zakhrov@gmail.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191126045621.11344-1-aaron.zakhrov@gmail.com>
 References: <20191126045621.11344-1-aaron.zakhrov@gmail.com>
