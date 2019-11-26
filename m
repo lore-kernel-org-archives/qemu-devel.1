@@ -2,94 +2,88 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A76BAC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A336C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:33:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 758F22071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:32:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA36B2071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:33:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="f20k+M1r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 758F22071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ajEYLyOj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA36B2071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZY9R-0001QF-Sw
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:32:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59402)
+	id 1iZY9y-00022w-FS
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:33:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57349)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuval.shaia@oracle.com>) id 1iZY5W-0006WB-Qe
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:28:55 -0500
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsL-0005R4-He
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuval.shaia@oracle.com>) id 1iZY5V-0004cd-9x
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:28:54 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:58876)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yuval.shaia@oracle.com>)
- id 1iZY5V-0004YE-0b
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:28:53 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQAOW60028235;
- Tue, 26 Nov 2019 10:28:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2019-08-05; bh=PXOsTrpH7/9uDHp9JJqbJ25Q2HdcOuZEX4qGLEP5Oig=;
- b=f20k+M1rIUDmMfU4Q11pJO9j/rpyzUfUHArDxz4Zk/QxeKh0V6I5LdA3rKZ49PGlC50b
- DasFVqIGMRIMCzFoybthoQPnjzm4rETNRsPUspKRoic4ghgf94CbBoEp5RdMs8hmcizg
- j+pFoS5IMVy22ml/DdDEyPeVzZ+MkboRfxhYMzpy6va0vwj4D6S6PTQCbpdbgDhwu6+0
- Zq0AXw2P2ZFYB+fuuysaLdr/mi4oWM312kCzVbdiSreJ/IE9F4UU6i/SUkPIbLKcHizf
- we3jZlEp7bCN1HfZDQQzjRITOjUeWFZ7+58aMFlpFVhYNCzkMsmL4QA/O9+Nv0OfrdOr Fw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 2wevqq5xb0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 26 Nov 2019 10:28:45 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQANP4w180186;
- Tue, 26 Nov 2019 10:26:45 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3030.oracle.com with ESMTP id 2wgvh9rqs5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 26 Nov 2019 10:26:44 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAQAQgJ2027932;
- Tue, 26 Nov 2019 10:26:43 GMT
-Received: from host4.lan (/37.142.197.130)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 26 Nov 2019 02:26:42 -0800
-From: Yuval Shaia <yuval.shaia@oracle.com>
-To: qemu-devel@nongnu.org, marcel.apfelbaum@gmail.com
-Subject: [PATCH] MAINTAINERS: Update Yuval Shaia's email address
-Date: Tue, 26 Nov 2019 12:26:37 +0200
-Message-Id: <20191126102637.2038-1-yuval.shaia@oracle.com>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXmY-0003FS-4J
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:19 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:42163)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
+ id 1iZXmX-0003FA-Ul
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:18 -0500
+Received: by mail-pg1-x543.google.com with SMTP id i5so479321pgj.9
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:09:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=A+zZHbHPcf2+kZRFz8qYInOcnfbpxMipg8cRARobJQk=;
+ b=ajEYLyOj6rPflxN/F4j7gzmTTfjkzFiOUEnj4x/mlPjwT6HScKGEYBOt5supKzMBi7
+ YBKGt62f0nlaJKL+4zEw20xBeu1qYjK6d3SjEQUAl982WY7KJ01zVqk8DP3SnV/E/4fE
+ CvaL6nj6eGp7V+momNglWpxUiWUrQvkycbmynW0f+hE5TfdRhAIloHm1ZaWraGj06zkS
+ pbNZdnR7LBGBbDTgO7C2YbNJOL1telar0aLkM/XV6T7hkE7/6YBVYNdFfy3Jeey0Oa37
+ By6HHXTNu/fbLWGSKnYoHiZtOXRdndYXg/KtDhSuf3L0sVTRKHyC/x4qHts5RUV3kdo8
+ txrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=A+zZHbHPcf2+kZRFz8qYInOcnfbpxMipg8cRARobJQk=;
+ b=ED0RwVLROOHKuiyISVTOLQkU4T6a/C53aIRq7LL8kL78ttgXrY6iGxeD3KwQVAuvKW
+ KeGW6hIRoHWyleh2Q0K0QSbIrGEHX9grof+b4cQ1Kbk1dGj6z6NIeGVKVb+biItRLWHL
+ f3qGE+LLJlV/fUASAwVZRuAn3V5K6URgNx/HnTWsoKNZrFsE9QKttA9dWlxFBwvP1b4D
+ u2bnCbwA0QCLjrVpIf1j7yORUtnzvTOS4XEKilM/85CqBfQNGnIgyG80r/vhVaR3ZujT
+ qaik9HmHVM8vnSEDqkAUQTfHzgKuxswQclLwoJs1YJ/Q3V5GS168wv5tEvAFaM2hcxHl
+ G53g==
+X-Gm-Message-State: APjAAAW3ugsu87NI7D4w7bb9SSd4iAYCaSsMxVZNdz8CzvdeIduwrcQo
+ o+nIRVWBjOAt1bxOk9pBQDk=
+X-Google-Smtp-Source: APXvYqza/1KXHr4vy/bIqcXkAf21DPD3YjEsUIsSGZ5/9H4FB/QXnB77j4wEUyEgpjV4ork9q/KtvA==
+X-Received: by 2002:a63:b40d:: with SMTP id s13mr38800406pgf.215.1574762957081; 
+ Tue, 26 Nov 2019 02:09:17 -0800 (PST)
+Received: from localhost.localdomain ([222.151.198.97])
+ by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.09.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 26 Nov 2019 02:09:16 -0800 (PST)
+From: Prashant Bhole <prashantbhole.linux@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+ "Michael S . Tsirkin" <mst@redhat.com>
+Subject: [RFC net-next 09/18] tun: add a way to inject Tx path packet into Rx
+ path
+Date: Tue, 26 Nov 2019 19:07:35 +0900
+Message-Id: <20191126100744.5083-10-prashantbhole.linux@gmail.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9452
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=958
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911260095
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9452
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911260095
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,31 +95,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yuval Shaia <yuval.shaia@oracle.com>
+Cc: Song Liu <songliubraving@fb.com>,
+ Jakub Kicinski <jakub.kicinski@netronome.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, qemu-devel@nongnu.org,
+ Prashant Bhole <prashantbhole.linux@gmail.com>, kvm@vger.kernel.org,
+ Yonghong Song <yhs@fb.com>, Andrii Nakryiko <andriin@fb.com>,
+ Martin KaFai Lau <kafai@fb.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use gmail account for maintainer tasks.
+In order to support XDP_TX from offloaded XDP program, we need a way
+to inject Tx path packet into Rx path. Let's modify the Rx path
+function tun_xdp_one() for this purpose.
 
-Signed-off-by: Yuval Shaia <yuval.shaia@oracle.com>
+This patch adds a parameter to pass information whether packet has
+virtio_net header. When header isn't present, it is considered as
+XDP_TX'ed packet from offloaded program.
+
+Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/tun.c | 35 ++++++++++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 7 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5e5e3e52d6..4297b54fcb 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2640,7 +2640,7 @@ F: tests/test-replication.c
- F: docs/block-replication.txt
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 466ea69f00ee..8d6cdd3e5139 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -2221,6 +2221,13 @@ static u32 tun_do_xdp_offload_generic(struct tun_struct *tun,
+ 	return act;
+ }
  
- PVRDMA
--M: Yuval Shaia <yuval.shaia@oracle.com>
-+M: Yuval Shaia <yuval.shaia.ml@gmail.com>
- M: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
- S: Maintained
- F: hw/rdma/*
++static int tun_xdp_one(struct tun_struct *tun,
++		       struct tun_file *tfile,
++		       struct xdp_buff *xdp, int *flush,
++		       struct tun_page *tpage, int has_hdr);
++
++static void tun_put_page(struct tun_page *tpage);
++
+ static u32 tun_do_xdp_offload(struct tun_struct *tun, struct tun_file *tfile,
+ 			      struct xdp_frame *frame)
+ {
+@@ -2527,23 +2534,36 @@ static void tun_put_page(struct tun_page *tpage)
+ static int tun_xdp_one(struct tun_struct *tun,
+ 		       struct tun_file *tfile,
+ 		       struct xdp_buff *xdp, int *flush,
+-		       struct tun_page *tpage)
++		       struct tun_page *tpage, int has_hdr)
+ {
+ 	unsigned int datasize = xdp->data_end - xdp->data;
+-	struct tun_xdp_hdr *hdr = xdp->data_hard_start;
+-	struct virtio_net_hdr *gso = &hdr->gso;
++	struct tun_xdp_hdr *hdr;
++	struct virtio_net_hdr *gso;
+ 	struct tun_pcpu_stats *stats;
+ 	struct bpf_prog *xdp_prog;
+ 	struct sk_buff *skb = NULL;
++	unsigned int headroom;
+ 	u32 rxhash = 0, act;
+-	int buflen = hdr->buflen;
++	int buflen;
+ 	int err = 0;
+ 	bool skb_xdp = false;
+ 	struct page *page;
+ 
++	if (has_hdr) {
++		hdr = xdp->data_hard_start;
++		gso = &hdr->gso;
++		buflen = hdr->buflen;
++	} else {
++		/* came here from tun tx path */
++		xdp->data_hard_start -= sizeof(struct xdp_frame);
++		headroom = xdp->data - xdp->data_hard_start;
++		buflen = datasize + headroom +
++			 SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
++	}
++
+ 	xdp_prog = rcu_dereference(tun->xdp_prog);
+ 	if (xdp_prog) {
+-		if (gso->gso_type) {
++		if (has_hdr && gso->gso_type) {
+ 			skb_xdp = true;
+ 			goto build;
+ 		}
+@@ -2588,7 +2608,8 @@ static int tun_xdp_one(struct tun_struct *tun,
+ 	skb_reserve(skb, xdp->data - xdp->data_hard_start);
+ 	skb_put(skb, xdp->data_end - xdp->data);
+ 
+-	if (virtio_net_hdr_to_skb(skb, gso, tun_is_little_endian(tun))) {
++	if (has_hdr &&
++	    virtio_net_hdr_to_skb(skb, gso, tun_is_little_endian(tun))) {
+ 		this_cpu_inc(tun->pcpu_stats->rx_frame_errors);
+ 		kfree_skb(skb);
+ 		err = -EINVAL;
+@@ -2652,7 +2673,7 @@ static int tun_sendmsg(struct socket *sock, struct msghdr *m, size_t total_len)
+ 
+ 		for (i = 0; i < n; i++) {
+ 			xdp = &((struct xdp_buff *)ctl->ptr)[i];
+-			tun_xdp_one(tun, tfile, xdp, &flush, &tpage);
++			tun_xdp_one(tun, tfile, xdp, &flush, &tpage, true);
+ 		}
+ 
+ 		if (flush)
 -- 
 2.20.1
 
