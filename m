@@ -7,54 +7,52 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63B8FC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 06:22:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D0F2C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 06:23:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2618E2071A
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 06:22:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58CC72071A
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 06:23:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RxoooOJC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2618E2071A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="h1ek9pH5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58CC72071A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZUEk-0005rU-4a
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 01:22:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59804)
+	id 1iZUG8-0007En-Cn
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 01:23:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59763)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iZU8y-0007Jf-Sd
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 01:16:13 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iZU91-0007Ip-AS
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 01:16:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iZTvI-0004PC-Un
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 01:02:06 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38781 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iZTvF-0004N5-Sy
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 01:02:03 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:39575 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iZTvI-0004NP-JN; Tue, 26 Nov 2019 01:02:04 -0500
+ id 1iZTvE-0004KO-W3; Tue, 26 Nov 2019 01:02:01 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47MYFd3L5gz9sRG; Tue, 26 Nov 2019 17:01:56 +1100 (AEDT)
+ id 47MYFc2RSmz9sPW; Tue, 26 Nov 2019 17:01:56 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1574748117;
- bh=/Lv46GlVbuezd+dx9seCW3M8TgeG6tuTmE2nbMPiE+A=;
+ d=gibson.dropbear.id.au; s=201602; t=1574748116;
+ bh=DBWNlmEdXRBvV4bu8GympRzKtyJTqOVJKjfUJEgfyh0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=RxoooOJCcQDnZLrDegDqBMfk7mb0FiKoGGjECSSrqvo9+edcGaeEiVyi0L0kcCEeU
- /kOnzJCMnJJ57QVgflOq3eVPoRlNWnmUx00mdCdBac+YFpwpvOgNmUzaRwNV2TJYFN
- 4/lll/+ry+7sGu3D28KW8aTErtGWOFSVsQv0jmAM=
+ b=h1ek9pH5qjU3bpzE4RCbtHRMi0rHSg0ypZIikEnBaSIOOW8bfcZX8VxKhYO6f2dmj
+ /j/VPtVKau8b95drcRWdeB2JlthLqfFM/XSjF48R2f5mT5n+BdnWJ+Mkox7JLNhvYt
+ kn4YJ/3haUbHMNPVnPDBPMEv7TVsEGmEZhrQSbWE=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 6/8] spapr: Work around spurious warnings from vfio INTx
- initialization
-Date: Tue, 26 Nov 2019 17:01:49 +1100
-Message-Id: <20191126060151.729845-7-david@gibson.dropbear.id.au>
+Subject: [PULL 1/8] pseries: fix migration-test and pxe-test
+Date: Tue, 26 Nov 2019 17:01:44 +1100
+Message-Id: <20191126060151.729845-2-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191126060151.729845-1-david@gibson.dropbear.id.au>
 References: <20191126060151.729845-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -70,77 +68,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Alexey Kardashevskiy <aik@ozlabs.ru>,
- qemu-devel@nongnu.org, groug@kaod.org,
- Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
- clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, Thomas Huth <thuth@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Traditional PCI INTx for vfio devices can only perform well if using
-an in-kernel irqchip.  Therefore, vfio_intx_update() issues a warning
-if an in kernel irqchip is not available.
+From: Laurent Vivier <lvivier@redhat.com>
 
-We usually do have an in-kernel irqchip available for pseries machines
-on POWER hosts.  However, because the platform allows feature
-negotiation of what interrupt controller model to use, we don't
-currently initialize it until machine reset.  vfio_intx_update() is
-called (first) from vfio_realize() before that, so it can issue a
-spurious warning, even if we will have an in kernel irqchip by the
-time we need it.
+Commit 29cb4187497d ("spapr: Set VSMT to smp_threads by default")
+has introduced a new default value for VSMT that is not supported
+by old kernels (before 4.13 kernel) and this breaks "make check"
+on these kernels.
 
-To workaround this, make a call to spapr_irq_update_active_intc() from
-spapr_irq_init() which is called at machine realize time, before the
-vfio realize.  This call will be pretty much obsoleted by the later
-call at reset time, but it serves to suppress the spurious warning
-from VFIO.
+To fix that, explicitly set in the involved tests the value that was
+used as the default value before the change.
 
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-
+Cc: Greg Kurz <groug@kaod.org>
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Message-Id: <20191120142539.236279-1-lvivier@redhat.com>
+Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Tested-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Tested-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/ppc/spapr_irq.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ tests/migration-test.c | 4 ++--
+ tests/pxe-test.c       | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 1d27034962..d6bb7fd2d6 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -373,6 +373,14 @@ void spapr_irq_init(SpaprMachineState *spapr, Error =
-**errp)
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index ac780dffda..ebd77a581a 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -614,7 +614,7 @@ static int test_migrate_start(QTestState **from, QTes=
+tState **to,
+         end_address =3D S390_TEST_MEM_END;
+     } else if (strcmp(arch, "ppc64") =3D=3D 0) {
+         extra_opts =3D use_shmem ? get_shmem_opts("256M", shmem_path) : =
+NULL;
+-        cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 256M -nodefa=
+ults"
++        cmd_src =3D g_strdup_printf("-machine accel=3D%s,vsmt=3D8 -m 256=
+M -nodefaults"
+                                   " -name source,debug-threads=3Don"
+                                   " -serial file:%s/src_serial"
+                                   " -prom-env 'use-nvramrc?=3Dtrue' -pro=
+m-env "
+@@ -623,7 +623,7 @@ static int test_migrate_start(QTestState **from, QTes=
+tState **to,
+                                   "until' %s %s",  accel, tmpfs, end_add=
+ress,
+                                   start_address, extra_opts ? extra_opts=
+ : "",
+                                   opts_src);
+-        cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 256M"
++        cmd_dst =3D g_strdup_printf("-machine accel=3D%s,vsmt=3D8 -m 256=
+M"
+                                   " -name target,debug-threads=3Don"
+                                   " -serial file:%s/dest_serial"
+                                   " -incoming %s %s %s",
+diff --git a/tests/pxe-test.c b/tests/pxe-test.c
+index 948b0fbdc7..aaae54f755 100644
+--- a/tests/pxe-test.c
++++ b/tests/pxe-test.c
+@@ -46,15 +46,15 @@ static testdef_t x86_tests_slow[] =3D {
 =20
-     spapr->qirqs =3D qemu_allocate_irqs(spapr_set_irq, spapr,
-                                       smc->nr_xirqs + SPAPR_XIRQ_BASE);
-+
-+    /*
-+     * Mostly we don't actually need this until reset, except that not
-+     * having this set up can cause VFIO devices to issue a
-+     * false-positive warning during realize(), because they don't yet
-+     * have an in-kernel irq chip.
-+     */
-+    spapr_irq_update_active_intc(spapr);
- }
+ static testdef_t ppc64_tests[] =3D {
+     { "pseries", "spapr-vlan",
+-      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken" },
++      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken,vsm=
+t=3D8" },
+     { "pseries", "virtio-net-pci",
+-      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken" },
++      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken,vsm=
+t=3D8" },
+     { NULL },
+ };
 =20
- int spapr_irq_claim(SpaprMachineState *spapr, int irq, bool lsi, Error *=
-*errp)
-@@ -528,7 +536,8 @@ void spapr_irq_update_active_intc(SpaprMachineState *=
-spapr)
-          * this.
-          */
-         new_intc =3D SPAPR_INTC(spapr->xive);
--    } else if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-+    } else if (spapr->ov5_cas
-+               && spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-         new_intc =3D SPAPR_INTC(spapr->xive);
-     } else {
-         new_intc =3D SPAPR_INTC(spapr->ics);
+ static testdef_t ppc64_tests_slow[] =3D {
+     { "pseries", "e1000",
+-      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken" },
++      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken,vsm=
+t=3D8" },
+     { NULL },
+ };
+=20
 --=20
 2.23.0
 
