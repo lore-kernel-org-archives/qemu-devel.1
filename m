@@ -2,88 +2,87 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D07C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CC9EC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:56:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A99B820722
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:45:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A99B820722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C89C12068E
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:56:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="hP8MBek+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C89C12068E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netronome.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZjaS-0006tq-Td
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 17:45:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59409)
+	id 1iZjkZ-0001No-V8
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 17:56:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43372)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iZjZD-0006Cy-Mz
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:44:21 -0500
+ (envelope-from <jakub.kicinski@netronome.com>) id 1iZhYn-0005YL-BB
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 15:35:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iZjZB-0007Qj-8n
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:44:19 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24000)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iZjZ9-0007OZ-CM
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:44:16 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAQMcDie104653; Tue, 26 Nov 2019 17:44:12 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2whcxpr8a6-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 26 Nov 2019 17:44:12 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xAQMenbY003427;
- Tue, 26 Nov 2019 22:44:12 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma03dal.us.ibm.com with ESMTP id 2wevd6q62a-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 26 Nov 2019 22:44:12 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAQMiAtd59703762
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 26 Nov 2019 22:44:10 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A11D6BE053;
- Tue, 26 Nov 2019 22:44:10 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8ABC7BE04F;
- Tue, 26 Nov 2019 22:44:10 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.218])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 26 Nov 2019 22:44:10 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <jakub.kicinski@netronome.com>) id 1iZhYj-0003K7-D3
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 15:35:45 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:39230)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jakub.kicinski@netronome.com>)
+ id 1iZhYd-0003Fj-I2
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 15:35:38 -0500
+Received: by mail-lj1-x242.google.com with SMTP id e10so12634942ljj.6
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 12:35:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=netronome-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:in-reply-to:references
+ :organization:mime-version:content-transfer-encoding;
+ bh=K4Bc+8eHqvfcdZUohVg+/Nb9ohh1S05Ow4H5opvoqhk=;
+ b=hP8MBek+jIyGLD+HG0jW2xvdPV0teuBv/6k2y1ZOfuFlO/HjwikQPbJcxccaCkY4ca
+ gjaTQdQJuJuuDe7KXGd7CHEz647Qh6NX9XAIW3c4Z8FK6pZpjhGsPKjwmxaJVD5IlM/X
+ Z5/WxylRjt2WqI7WJW+aZcE6o+zYKjTFcMG7c0n8bOuwNbF7ICmk+Fxg7pHQ7dwDF31l
+ NmFxlfLTZZuYjXH9EvJKULzXQ8K11aH69Hhg25nRJk/+Jd3ZLFE+87+CG7Iv/YLiH0r1
+ 8nEtemUANXF+RxlU+k7p/LnGQqcmKLtW90x47b0ZBqnVjm14VykY0TyefIzMoDaXqk0J
+ rZ7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+ :references:organization:mime-version:content-transfer-encoding;
+ bh=K4Bc+8eHqvfcdZUohVg+/Nb9ohh1S05Ow4H5opvoqhk=;
+ b=hW0WRMNs1SoP0r5VYDllDSCI8fWPqe3ZiruxCKgVOty9nYhq2nnyUMX0eYuk5vNRRd
+ IuD+VJksUgjG+eBsdCvLco6ofpXzuBwx97jx7AxcrzSwWTjcuIK9XtPC4sRiZ+rK9J2T
+ Ckwv/P6JY/e/8Lrimsxkph6FcNaNvjKDPCslxFejA4IkxrypL5Cu7Ol/PUcVVK8/CFku
+ RkN60su9g7Y4LhWcvp+K+xYYDIAolgi+FwReYdIHDv+AfPvmkDnFOtHsWAR3yu7LFDAx
+ qvYg1ZjiUXWCubnOk4x9eZCksdX44qRRJoeUMfUn0GI+hzjxKFkQK4waqEFmTT026QqI
+ A3tw==
+X-Gm-Message-State: APjAAAU7N8L3P6ZMzgdUmaE1bQqhdZIYzTFqRD1aRqQZqt+EICAssXLv
+ xpDL/smUSqyymF6bsNZbIhPenw==
+X-Google-Smtp-Source: APXvYqx9IqBt3lkqgKwa8lRqh+EMXV4Z5INEt5vZARRFzhNGU5/ykWOAvkTYwnAGobZix7373gRwCQ==
+X-Received: by 2002:a2e:8885:: with SMTP id k5mr11915374lji.98.1574800532208; 
+ Tue, 26 Nov 2019 12:35:32 -0800 (PST)
+Received: from cakuba.netronome.com ([66.60.152.14])
+ by smtp.gmail.com with ESMTPSA id z127sm5839668lfa.19.2019.11.26.12.35.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 26 Nov 2019 12:35:31 -0800 (PST)
+Date: Tue, 26 Nov 2019 12:35:14 -0800
+From: Jakub Kicinski <jakub.kicinski@netronome.com>
+To: Prashant Bhole <prashantbhole.linux@gmail.com>
+Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
+Message-ID: <20191126123514.3bdf6d6f@cakuba.netronome.com>
+In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-User-Agent: alot/0.7
-To: qemu-devel@nongnu.org
-Message-ID: <157480824614.4193.78264727333377290@sif>
-Subject: [ANNOUNCE] QEMU 4.2.0-rc3 is now available
-Date: Tue, 26 Nov 2019 16:44:06 -0600
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-26_07:2019-11-26,2019-11-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- lowpriorityscore=0 adultscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0
- impostorscore=0 phishscore=0 spamscore=0 malwarescore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911260192
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::242
+X-Mailman-Approved-At: Tue, 26 Nov 2019 17:53:42 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,130 +94,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Song Liu <songliubraving@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, "Michael S . Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
+ kvm@vger.kernel.org, Yonghong Song <yhs@fb.com>,
+ Andrii Nakryiko <andriin@fb.com>, "David S . Miller" <davem@davemloft.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+On Tue, 26 Nov 2019 19:07:26 +0900, Prashant Bhole wrote:
+> Note: This RFC has been sent to netdev as well as qemu-devel lists
+> 
+> This series introduces XDP offloading from virtio_net. It is based on
+> the following work by Jason Wang:
+> https://netdevconf.info/0x13/session.html?xdp-offload-with-virtio-net
+> 
+> Current XDP performance in virtio-net is far from what we can achieve
+> on host. Several major factors cause the difference:
+> - Cost of virtualization
+> - Cost of virtio (populating virtqueue and context switching)
+> - Cost of vhost, it needs more optimization
+> - Cost of data copy
+> Because of above reasons there is a need of offloading XDP program to
+> host. This set is an attempt to implement XDP offload from the guest.
 
-On behalf of the QEMU Team, I'd like to announce the availability of the
-fourth release candidate for the QEMU 4.2 release.  This release is meant
-for testing purposes and should not be used in a production environment.
+This turns the guest kernel into a uAPI proxy.
 
-  http://download.qemu-project.org/qemu-4.2.0-rc3.tar.xz
-  http://download.qemu-project.org/qemu-4.2.0-rc3.tar.xz.sig
+BPF uAPI calls related to the "offloaded" BPF objects are forwarded 
+to the hypervisor, they pop up in QEMU which makes the requested call
+to the hypervisor kernel. Today it's the Linux kernel tomorrow it may 
+be someone's proprietary "SmartNIC" implementation.
 
-A note from the maintainer:
+Why can't those calls be forwarded at the higher layer? Why do they
+have to go through the guest kernel?
 
-  Unless any release-critical bugs are found in the next week, we
-  will make the final 4.2.0 release on Tuesday 3rd December;
-  otherwise we'll have an rc4 on the 3rd and make the final
-  release the week after on the 10th.
+If kernel performs no significant work (or "adds value", pardon the
+expression), and problem can easily be solved otherwise we shouldn't 
+do the work of maintaining the mechanism.
 
-You can help improve the quality of the QEMU 4.2 release by testing this
-release and reporting bugs on Launchpad:
+The approach of kernel generating actual machine code which is then
+loaded into a sandbox on the hypervisor/SmartNIC is another story.
 
-  https://bugs.launchpad.net/qemu/
-
-The release plan, as well a documented known issues for release
-candidates, are available at:
-
-  http://wiki.qemu.org/Planning/4.2
-
-Please add entries to the ChangeLog for the 4.2 release below:
-
-  http://wiki.qemu.org/ChangeLog/4.2
-
-Thank you to everyone involved!
-
-Changes since rc2:
-
-1a61a081ac: Update version for v4.2.0-rc3 release (Peter Maydell)
-6a4ef4e5d1: target/arm: Honor HCR_EL2.TID3 trapping requirements (Marc Zyng=
-ier)
-7cf95aed53: target/arm: Fix ISR_EL1 tracking when executing at EL2 (Marc Zy=
-ngier)
-f0138990ce: hw/arm: versal: Add the CRP as unimplemented (Edgar E. Iglesias)
-f900b1e5b0: target/arm: Fix handling of cortex-m FTYPE flag in EXCRET (Jean=
--Hugues Desch=C3=AAnes)
-d8130f4c42: iotests: add new test cases to bitmap migration (Vladimir Semen=
-tsov-Ogievskiy)
-a505475b95: block/qcow2-bitmap: fix bitmap migration (Vladimir Sementsov-Og=
-ievskiy)
-b3b9a433b0: tests/vm/ubuntu: update i386 image to 18.04 (Alex Benn=C3=A9e)
-b4eca581b9: tests/vm/ubuntu: include language pack to silence locale warnin=
-gs (Alex Benn=C3=A9e)
-6cd7b60848: tests/vm/centos: fix centos build target (Alex Benn=C3=A9e)
-e37aa8b0e4: hvf: more accurately match SDM when setting CR0 and PDPTE regis=
-ters (Cameron Esfahani)
-8c3b0e9e67: hvf: correctly handle REX prefix in relation to legacy prefixes=
- (Cameron Esfahani)
-9fedbbeeee: hvf: remove TSC synchronization code because it isn't fully com=
-plete (Cameron Esfahani)
-fbafbb6db7: hvf: non-RAM, non-ROMD memory ranges are now correctly mapped i=
-n (Cameron Esfahani)
-c6f3215ffa: target/i386: add two missing VMX features for Skylake and Casca=
-deLake Server (Paolo Bonzini)
-59d0533b85: ppc/spapr_events: fix potential NULL pointer dereference in rta=
-s_event_log_dequeue (PanNengyuan)
-6cf80f90c4: mos6522: update counters when timer interrupts are off (Laurent=
- Vivier)
-b14848f5d7: spapr: Work around spurious warnings from vfio INTx initializat=
-ion (David Gibson)
-e532e1d93c: spapr: Handle irq backend changes with VFIO PCI devices (David =
-Gibson)
-c5478fea27: vfio/pci: Respond to KVM irqchip change notifier (David Gibson)
-ad54dbd89d: vfio/pci: Split vfio_intx_update() (David Gibson)
-3607715a30: kvm: Introduce KVM irqchip change notifier (David Gibson)
-454590916c: pseries: fix migration-test and pxe-test (Laurent Vivier)
-e8d0ac5801: vmstate-static-checker: Fix for current python (Dr. David Alan =
-Gilbert)
-6478dd745d: hw/riscv: Add optional symbol callback ptr to riscv_load_kernel=
-() (Zhuang, Siwei (Data61, Kensington NSW))
-9c0fb20c4b: RISC-V: virt: This is a "sifive,test1" test finisher (Palmer Da=
-bbelt)
-4d0e59ace2: net/virtio: return error when device_opts arg is NULL (Jens Fre=
-imann)
-150ab54aa6: net/virtio: fix re-plugging of primary device (Jens Freimann)
-117378bf03: net/virtio: return early when failover primary alread added (Je=
-ns Freimann)
-284f42a520: net/virtio: fix dev_unplug_pending (Jens Freimann)
-d1e2670741: linux-user: fix translation of statx structures (Ariadne Conill)
-e48929c787: intel_iommu: TM field should not be in reserved bits (Qi, Yadon=
-g)
-ce586f3b8d: intel_iommu: refine SL-PEs reserved fields checking (Qi, Yadong)
-509ec36c1e: virtio-input: fix memory leak on unrealize (Marc-Andr=C3=A9 Lur=
-eau)
-25f74087c6: util/cutils: Fix incorrect integer->float conversion caught by =
-clang (Fangrui Song)
-68d654daee: 9pfs: Fix divide by zero bug (Dan Schatzberg)
-02fa60d101: i386: Add -noTSX aliases for hle=3Doff, rtm=3Doff CPU models (E=
-duardo Habkost)
-9ab2237f19: i386: Add new versions of Skylake/Cascadelake/Icelake without T=
-SX (Eduardo Habkost)
-2a9758c51e: target/i386: add support for MSR_IA32_TSX_CTRL (Paolo Bonzini)
-0723cc8a55: target/i386: add VMX features to named CPU models (Paolo Bonzin=
-i)
-c55c974486: ui/gtk: fix gettext message's charset. (yanminhui)
-0f6ed883e7: display: xlnx_dp: Provide sufficient bytes for silent audio cha=
-nnel (Sai Pavan Boddu)
-22c30b2d20: tests/tcg: modify multiarch tests to work with clang (Taylor Si=
-mpson)
-6e98888041: .travis.yml: drop 32 bit systems from MAIN_SOFTMMU_TARGETS (Ale=
-x Benn=C3=A9e)
-5c6ecbdc83: docs/devel: update tcg-plugins.rst with API versioning details =
-(Alex Benn=C3=A9e)
-8ea6abf0d0: docs/devel: rename plugins.rst to tcg-plugins.rst (Alex Benn=C3=
-=A9e)
-bcc388df07: tests/vm: make --interactive (and therefore DEBUG=3D1) uncondit=
-ional (Alex Benn=C3=A9e)
-6c77aa909e: tests: acpi: always retain dumped ACPI tables in case of error =
-(Igor Mammedov)
-ec244b1739: vhost-user-input: use free(elem) instead of g_free(elem) (Stefa=
-n Hajnoczi)
-d9b3ade54e: libvhost-user: Zero memory allocated for VuVirtqInflightDesc (X=
-ie Yongji)
-7ffc90f3ae: audio: fix audio recording (Volker R=C3=BCmelin)
-
+I'd appreciate if others could chime in.
 
