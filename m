@@ -8,73 +8,74 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73491C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1F8C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:29:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DF1C2071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:28:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 262162073F
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:29:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fRo5+9ZK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DF1C2071E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qNxv9rom"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 262162073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZY5T-0005uB-Vc
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:28:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57434)
+	id 1iZY6I-0006sb-SR
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:29:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57426)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsI-0005f2-Vh
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:16 -0500
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsK-0005eM-4Z
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXmr-0003QA-CV
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:38 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44699)
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXmj-0003Mt-QM
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:31 -0500
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:43251)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
- id 1iZXmr-0003Pe-6W
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:37 -0500
-Received: by mail-pf1-x444.google.com with SMTP id d199so4299196pfd.11
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:09:37 -0800 (PST)
+ id 1iZXmj-0003M8-KN
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:29 -0500
+Received: by mail-pj1-x1043.google.com with SMTP id a10so8055355pju.10
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:09:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=L8/5aZaE5i5lcakkRBtwP3FriVl4GQ+xN5YrOjIUlCM=;
- b=fRo5+9ZKWTD3s5uJLU9TNtKkQVCRPVzYcxVxl6Lb9D5Sflcesxx6GY10RfAqq10k3L
- 2dKkTp08HPOBLdXS0wZZPqLpVXU51DY9oXE2b9DC9UxnCDjdvcM1IukuHoVC1n4l7jyy
- ic145rX5r2EoWdTs4R+LaZL+vi+pwlT7G0BG07erZKekmBETQ63fioUFdc3gK1FBFBVl
- 0TnAFzy1s0cYyK+PPgWGbwH9g275XIrgsW06CMWNnSW9E8TnlJnbcCnYK2GVgBWiFkNI
- 7otab7zMtDrWC6ZLW4+mk7e6VL4XojLzPtRhSIbukm9LRqIKdMUAAATJq1dn7YseW9QI
- I8lQ==
+ bh=04y2jMBz+TniBsSijixdhxAgItaCRW1Bg/M7TEdqtZw=;
+ b=qNxv9romfmc3q9HrRe1SsyMGoaUYYBfCAqMUu5CAK2O3s3+yZxepf2025cJPH3wVaq
+ YdPZyUS+KjlG/AyXxckpOaJIFC/CznF+s9mOw22e/xJsgsAaSfC+QzI6FDrXI81xPOtl
+ jHxPnXyPvnymn3KeFZk8QSD+AqaskNH3wrtAVq4sk73gCruVUF8q2EL+osao+obGfuXa
+ E4Yvk9grWBs1sV7Ecjvmb2aJXX2sdhUMcocV9tdygaC/9AnOyqH6hyLQHPQRz4EYZYed
+ OROth7uyN6VTu0xFGEmoI2bu6lRMgCUIYSq4c1GTkIT6StqdUJfKPl1MlLtm9JNoEsMG
+ eJtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=L8/5aZaE5i5lcakkRBtwP3FriVl4GQ+xN5YrOjIUlCM=;
- b=Zxjq3l0WbmSNCbsQ6agcYnLgULQ926FzUl4t3D6ShFRUtVyU/+j2xShei2TYqahIL8
- +bM/obc9QpSzPYBjai33AOz37Xdu+2bF0g2Xi0PcEY/hNWaGPCuJBtKC0mkxWwVdly9S
- qntGFQToGgbjnDsSlaA0JLeUJ905V7742iEL4cr1icKxZ+05bQ/hxbMV4vzhqJKbA4cN
- C8zHygmXUN5RzN379vhB2Zt4tSHFcfbpU25y+Qopgdc2CgGfLFwITiTiTCKxjPKx405b
- RwlnEDoVcDPLfq9xO9Iw6gkP5u3FVi5++mcgfrDD4GeZrMWd5G3yaGv9+Y6NGGThdX2S
- tP+w==
-X-Gm-Message-State: APjAAAU5QxmkuQzAD/F7Ict8oJUvLlG1sY8fcZygbTvlwbFXHe1YkIIS
- lucZ8kGHqwuEi2wjxlalmjZAWOyy
-X-Google-Smtp-Source: APXvYqwM6Ee33ApLWb/jq6ETiPN5BAkCEQ3rIFbqFuJ25Hzp+y84mxjBl6KWK1nKTl45ek26gmxnEQ==
-X-Received: by 2002:aa7:90d0:: with SMTP id k16mr40811463pfk.131.1574762976474; 
- Tue, 26 Nov 2019 02:09:36 -0800 (PST)
+ bh=04y2jMBz+TniBsSijixdhxAgItaCRW1Bg/M7TEdqtZw=;
+ b=BY3wq07Yy9TYQYW5GNQPRsfK0Vc8Nxs9H9mh7JzQOpIIJdJzU52iQGANo2eC5lbQP5
+ v2ACNE2z0YJRuJ5LeKo/ETdJwlVrt74P6QWxDmCNZRHYB9Oi1GmT++wjyBwsfUTToeKy
+ d1ndZgKyaNhb0JM9Hev+yrg9nXTbrTqPzR89ZEibFJjDk/YHUvpvxpU3iA2pdzN2PqQl
+ CbZspZV3ZWlO+ZNSUiwmNXncSAiM9w7xC4PNPacPPaEIOX0KoPOAFoweTNfGyTJ6OBMm
+ q5bbuDQlOz9IQvvm5Uzzoj0/D78Kq0B0XPqZVFrdtCqIzMb7i/Vy0XCR9OU4rGgr4gBu
+ 0Mag==
+X-Gm-Message-State: APjAAAV/1X3lIMp4UMWv6B3E3nSCLYSVtdl5Lsv9U9iKgnKX9gFaXhOK
+ psYRU4xD0bHcxmry+nA8hHA=
+X-Google-Smtp-Source: APXvYqwRnyofw+ROJrA/0vdTheynnaSCjgx1858Q2XAMEgN8s0N0WdIa2wiPcUAvtMOS75RBHUMq6A==
+X-Received: by 2002:a17:902:758a:: with SMTP id
+ j10mr34601161pll.29.1574762968666; 
+ Tue, 26 Nov 2019 02:09:28 -0800 (PST)
 Received: from localhost.localdomain ([222.151.198.97])
- by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.09.32
+ by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.09.25
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 02:09:35 -0800 (PST)
+ Tue, 26 Nov 2019 02:09:28 -0800 (PST)
 From: Prashant Bhole <prashantbhole.linux@gmail.com>
 To: "David S . Miller" <davem@davemloft.net>,
  "Michael S . Tsirkin" <mst@redhat.com>
-Subject: [RFC net-next 14/18] virtio_net: add XDP prog offload infrastructure
-Date: Tue, 26 Nov 2019 19:07:40 +0900
-Message-Id: <20191126100744.5083-15-prashantbhole.linux@gmail.com>
+Subject: [RFC net-next 12/18] virtio-net: store xdp_prog in device
+Date: Tue, 26 Nov 2019 19:07:38 +0900
+Message-Id: <20191126100744.5083-13-prashantbhole.linux@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
 References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
@@ -82,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,163 +110,193 @@ Sender: "Qemu-devel"
 
 From: Jason Wang <jasowang@redhat.com>
 
-This patch prepares virtio_net of XDP offloading. It adds data
-structures, blank callback implementations for bpf_prog_offload_ops.
-It also implements ndo_init, ndo_uninit operations for setting up
-offload related data structures.
+This is a preparation for adding XDP offload support in virtio_net
+driver. By storing XDP program in virtionet_info will make it
+consistent with the offloaded program which will introduce in next
+patches.
 
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 Co-developed-by: Prashant Bhole <prashantbhole.linux@gmail.com>
 Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
 ---
- drivers/net/virtio_net.c | 103 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 103 insertions(+)
+ drivers/net/virtio_net.c | 62 ++++++++++++++++------------------------
+ 1 file changed, 25 insertions(+), 37 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index cee5c2b15c62..a1088d0114f2 100644
+index 4d7d5434cc5d..c8bbb1b90c1c 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -229,8 +229,14 @@ struct virtnet_info {
+@@ -137,8 +137,6 @@ struct receive_queue {
+ 
+ 	struct napi_struct napi;
+ 
+-	struct bpf_prog __rcu *xdp_prog;
+-
+ 	struct virtnet_rq_stats stats;
+ 
+ 	/* Chain pages by the private ptr. */
+@@ -229,6 +227,8 @@ struct virtnet_info {
+ 
+ 	/* failover when STANDBY feature enabled */
  	struct failover *failover;
- 
- 	struct bpf_prog __rcu *xdp_prog;
-+	struct bpf_prog __rcu *offload_xdp_prog;
- 
- 	struct xdp_attachment_info xdp;
-+	struct xdp_attachment_info xdp_hw;
 +
-+	struct bpf_offload_dev *bpf_dev;
-+
-+	struct list_head bpf_bound_progs;
++	struct bpf_prog __rcu *xdp_prog;
  };
  
  struct padded_vnet_hdr {
-@@ -258,6 +264,14 @@ static struct xdp_frame *ptr_to_xdp(void *ptr)
- 	return (struct xdp_frame *)((unsigned long)ptr & ~VIRTIO_XDP_FLAG);
- }
- 
-+struct virtnet_bpf_bound_prog {
-+	struct virtnet_info *vi;
-+	struct bpf_prog *prog;
-+	struct list_head list;
-+	u32 len;
-+	struct bpf_insn insnsi[0];
-+};
-+
- /* Converting between virtqueue no. and kernel tx/rx queue no.
-  * 0:rx0 1:tx0 2:rx1 3:tx1 ... 2N:rxN 2N+1:txN 2N+2:cvq
-  */
-@@ -2506,13 +2520,63 @@ static int virtnet_xdp_set(struct net_device *dev, struct netdev_bpf *bpf)
- 	return err;
- }
- 
-+static int virtnet_bpf_verify_insn(struct bpf_verifier_env *env, int insn_idx,
-+				   int prev_insn)
-+{
-+	return 0;
-+}
-+
-+static void virtnet_bpf_destroy_prog(struct bpf_prog *prog)
-+{
-+}
-+
-+static int virtnet_xdp_set_offload(struct virtnet_info *vi,
-+				   struct netdev_bpf *bpf)
-+{
-+	return -EBUSY;
-+}
-+
-+static int virtnet_bpf_verifier_setup(struct bpf_prog *prog)
-+{
-+	return -ENOMEM;
-+}
-+
-+static int virtnet_bpf_verifier_prep(struct bpf_prog *prog)
-+{
-+	return 0;
-+}
-+
-+static int virtnet_bpf_translate(struct bpf_prog *prog)
-+{
-+	return 0;
-+}
-+
-+static int virtnet_bpf_finalize(struct bpf_verifier_env *env)
-+{
-+	return 0;
-+}
-+
-+static const struct bpf_prog_offload_ops virtnet_bpf_dev_ops = {
-+	.setup		= virtnet_bpf_verifier_setup,
-+	.prepare	= virtnet_bpf_verifier_prep,
-+	.insn_hook	= virtnet_bpf_verify_insn,
-+	.finalize	= virtnet_bpf_finalize,
-+	.translate	= virtnet_bpf_translate,
-+	.destroy	= virtnet_bpf_destroy_prog,
-+};
-+
- static int virtnet_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+@@ -486,7 +486,6 @@ static int virtnet_xdp_xmit(struct net_device *dev,
+ 			    int n, struct xdp_frame **frames, u32 flags)
  {
-+	struct virtnet_info *vi = netdev_priv(dev);
- 	switch (xdp->command) {
- 	case XDP_SETUP_PROG:
- 		return virtnet_xdp_set(dev, xdp);
- 	case XDP_QUERY_PROG:
- 		return xdp_attachment_query(&vi->xdp, xdp);
-+	case XDP_SETUP_PROG_HW:
-+		return virtnet_xdp_set_offload(vi, xdp);
-+	case XDP_QUERY_PROG_HW:
-+		return xdp_attachment_query(&vi->xdp_hw, xdp);
- 	default:
+ 	struct virtnet_info *vi = netdev_priv(dev);
+-	struct receive_queue *rq = vi->rq;
+ 	struct bpf_prog *xdp_prog;
+ 	struct send_queue *sq;
+ 	unsigned int len;
+@@ -501,7 +500,7 @@ static int virtnet_xdp_xmit(struct net_device *dev,
+ 	/* Only allow ndo_xdp_xmit if XDP is loaded on dev, as this
+ 	 * indicate XDP resources have been successfully allocated.
+ 	 */
+-	xdp_prog = rcu_dereference(rq->xdp_prog);
++	xdp_prog = rcu_dereference(vi->xdp_prog);
+ 	if (!xdp_prog)
+ 		return -ENXIO;
+ 
+@@ -649,7 +648,7 @@ static struct sk_buff *receive_small(struct net_device *dev,
+ 	stats->bytes += len;
+ 
+ 	rcu_read_lock();
+-	xdp_prog = rcu_dereference(rq->xdp_prog);
++	xdp_prog = rcu_dereference(vi->xdp_prog);
+ 	if (xdp_prog) {
+ 		struct virtio_net_hdr_mrg_rxbuf *hdr = buf + header_offset;
+ 		struct xdp_frame *xdpf;
+@@ -798,7 +797,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
+ 	stats->bytes += len - vi->hdr_len;
+ 
+ 	rcu_read_lock();
+-	xdp_prog = rcu_dereference(rq->xdp_prog);
++	xdp_prog = rcu_dereference(vi->xdp_prog);
+ 	if (xdp_prog) {
+ 		struct xdp_frame *xdpf;
+ 		struct page *xdp_page;
+@@ -2060,7 +2059,7 @@ static int virtnet_set_channels(struct net_device *dev,
+ 	 * also when XDP is loaded all RX queues have XDP programs so we only
+ 	 * need to check a single RX queue.
+ 	 */
+-	if (vi->rq[0].xdp_prog)
++	if (vi->xdp_prog)
  		return -EINVAL;
+ 
+ 	get_online_cpus();
+@@ -2441,13 +2440,10 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 		return -ENOMEM;
  	}
-@@ -2559,7 +2623,46 @@ static int virtnet_set_features(struct net_device *dev,
+ 
+-	old_prog = rtnl_dereference(vi->rq[0].xdp_prog);
++	old_prog = rtnl_dereference(vi->xdp_prog);
+ 	if (!prog && !old_prog)
+ 		return 0;
+ 
+-	if (prog)
+-		bpf_prog_add(prog, vi->max_queue_pairs - 1);
+-
+ 	/* Make sure NAPI is not using any XDP TX queues for RX. */
+ 	if (netif_running(dev)) {
+ 		for (i = 0; i < vi->max_queue_pairs; i++) {
+@@ -2457,11 +2453,8 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 	}
+ 
+ 	if (!prog) {
+-		for (i = 0; i < vi->max_queue_pairs; i++) {
+-			rcu_assign_pointer(vi->rq[i].xdp_prog, prog);
+-			if (i == 0)
+-				virtnet_restore_guest_offloads(vi);
+-		}
++		rcu_assign_pointer(vi->xdp_prog, prog);
++		virtnet_restore_guest_offloads(vi);
+ 		synchronize_net();
+ 	}
+ 
+@@ -2472,16 +2465,12 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 	vi->xdp_queue_pairs = xdp_qp;
+ 
+ 	if (prog) {
+-		for (i = 0; i < vi->max_queue_pairs; i++) {
+-			rcu_assign_pointer(vi->rq[i].xdp_prog, prog);
+-			if (i == 0 && !old_prog)
+-				virtnet_clear_guest_offloads(vi);
+-		}
++		rcu_assign_pointer(vi->xdp_prog, prog);
++		if (!old_prog)
++			virtnet_clear_guest_offloads(vi);
+ 	}
+ 
+ 	for (i = 0; i < vi->max_queue_pairs; i++) {
+-		if (old_prog)
+-			bpf_prog_put(old_prog);
+ 		if (netif_running(dev)) {
+ 			virtnet_napi_enable(vi->rq[i].vq, &vi->rq[i].napi);
+ 			virtnet_napi_tx_enable(vi, vi->sq[i].vq,
+@@ -2489,13 +2478,15 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 		}
+ 	}
+ 
++	if (old_prog)
++		bpf_prog_put(old_prog);
++
+ 	return 0;
+ 
+ err:
+ 	if (!prog) {
+ 		virtnet_clear_guest_offloads(vi);
+-		for (i = 0; i < vi->max_queue_pairs; i++)
+-			rcu_assign_pointer(vi->rq[i].xdp_prog, old_prog);
++		rcu_assign_pointer(vi->xdp_prog, old_prog);
+ 	}
+ 
+ 	if (netif_running(dev)) {
+@@ -2514,13 +2505,11 @@ static u32 virtnet_xdp_query(struct net_device *dev)
+ {
+ 	struct virtnet_info *vi = netdev_priv(dev);
+ 	const struct bpf_prog *xdp_prog;
+-	int i;
+ 
+-	for (i = 0; i < vi->max_queue_pairs; i++) {
+-		xdp_prog = rtnl_dereference(vi->rq[i].xdp_prog);
+-		if (xdp_prog)
+-			return xdp_prog->aux->id;
+-	}
++	xdp_prog = rtnl_dereference(vi->xdp_prog);
++	if (xdp_prog)
++		return xdp_prog->aux->id;
++
  	return 0;
  }
  
-+static int virtnet_bpf_init(struct virtnet_info *vi)
-+{
-+	int err;
+@@ -2657,18 +2646,17 @@ static void virtnet_free_queues(struct virtnet_info *vi)
+ 
+ static void _free_receive_bufs(struct virtnet_info *vi)
+ {
+-	struct bpf_prog *old_prog;
++	struct bpf_prog *old_prog = rtnl_dereference(vi->xdp_prog);
+ 	int i;
+ 
+ 	for (i = 0; i < vi->max_queue_pairs; i++) {
+ 		while (vi->rq[i].pages)
+ 			__free_pages(get_a_page(&vi->rq[i], GFP_KERNEL), 0);
+-
+-		old_prog = rtnl_dereference(vi->rq[i].xdp_prog);
+-		RCU_INIT_POINTER(vi->rq[i].xdp_prog, NULL);
+-		if (old_prog)
+-			bpf_prog_put(old_prog);
+ 	}
 +
-+	vi->bpf_dev = bpf_offload_dev_create(&virtnet_bpf_dev_ops, NULL);
-+	err = PTR_ERR_OR_ZERO(vi->bpf_dev);
-+	if (err)
-+		return err;
-+
-+	err = bpf_offload_dev_netdev_register(vi->bpf_dev, vi->dev);
-+	if (err)
-+		goto err_netdev_register;
-+
-+	INIT_LIST_HEAD(&vi->bpf_bound_progs);
-+
-+	return 0;
-+
-+err_netdev_register:
-+	bpf_offload_dev_destroy(vi->bpf_dev);
-+	return err;
-+}
-+
-+static int virtnet_init(struct net_device *dev)
-+{
-+	struct virtnet_info *vi = netdev_priv(dev);
-+
-+	return virtnet_bpf_init(vi);
-+}
-+
-+static void virtnet_uninit(struct net_device *dev)
-+{
-+	struct virtnet_info *vi = netdev_priv(dev);
-+
-+	bpf_offload_dev_netdev_unregister(vi->bpf_dev, vi->dev);
-+	bpf_offload_dev_destroy(vi->bpf_dev);
-+}
-+
- static const struct net_device_ops virtnet_netdev = {
-+	.ndo_init            = virtnet_init,
-+	.ndo_uninit          = virtnet_uninit,
- 	.ndo_open            = virtnet_open,
- 	.ndo_stop   	     = virtnet_close,
- 	.ndo_start_xmit      = start_xmit,
++	RCU_INIT_POINTER(vi->xdp_prog, NULL);
++	if (old_prog)
++		bpf_prog_put(old_prog);
+ }
+ 
+ static void free_receive_bufs(struct virtnet_info *vi)
 -- 
 2.20.1
 
