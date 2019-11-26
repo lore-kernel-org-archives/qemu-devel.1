@@ -2,88 +2,69 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B27C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E8EC432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:41:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E59320748
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:39:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rA6x08ok"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E59320748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C38520748
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:41:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C38520748
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZYFv-0001Iu-Qz
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:39:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57349)
+	id 1iZYI1-0003fs-9w
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:41:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60467)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsM-0005R4-PE
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:23 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iZYCt-0006Pm-K5
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:36:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXm3-0002qT-52
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:08:48 -0500
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:43244)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
- id 1iZXm2-0002qK-Va
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:08:47 -0500
-Received: by mail-pj1-x1042.google.com with SMTP id a10so8054367pju.10
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:08:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=1Sl43iVtC4+YcjLflynrQtIj0zEs25bg62I/x2OEQu0=;
- b=rA6x08okN9S24McUdG2LHlghnPmhIHd24jmymmQaGlT2PAs6RXcIrFN4KgQ3vtEJQH
- ienFzUlPPNlyI9b9KsozGHG9jQpVMUrYON+jnaQvRyei7uhWiVfPBjDJK/c0EY88qnZp
- ZDkq7a+rI2J1MXnLhIb+/EQ22pDhhmb3BAM7x8wEHqFYQ02bE0rYvl/KjEMarmxBop+q
- p94+hXB+SsDfHHCvbR+iONGBx5fsJeIFS9XDNF/UJ7uD0+X9HjxSjqCZa8oiIpnB76Hg
- UUUoXmIcImh1gfbohC0t5i//haGFawSR5oYyXeA/IjzMZkOh/+g99F3i75HTqeit7+cx
- TveQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=1Sl43iVtC4+YcjLflynrQtIj0zEs25bg62I/x2OEQu0=;
- b=fx3f6QLmZvbavRB7Mk90Za2/X7aYlhmnHhiaVfGPKJBhES4uQpbXepR56hRyGkKpT/
- GoaTK7ru77nbkW47JfKumtDFogU2aP1kNemjx34Q7FK3utPRCqpWIKcK8V3Pe4OY9dfX
- +ibQnY5VbqamFUJnOeHG7f9VRyGKONZNY0Tp0S13TqiehSo6dSKk3qNN58L74DTBJAO+
- DehD6zaSlyj59fI1p4UB+yfnoIn897/lUqVnQ5AIII5O2BfRCYYgwSzBTffKL7Ih5NqV
- HmUkBCXos1KmCSj26jeFy0L6SQXGhyqpWlNDfCeEC9Gz9UsqwBUVDy7yxBgtzAM2B98+
- 3ksQ==
-X-Gm-Message-State: APjAAAWpiXlCx9iMaP3wVzufF3wNAcXh2/LqO63ohdJjvwmPNRKQrbbr
- /fCf49Zy5I2siTSk0EiaoJI=
-X-Google-Smtp-Source: APXvYqxA6tuNs0G2K7BYOi/UgwxlWXR+3qbxnD5Hrpm6hj4529qhKxDgIXplkY5qr6yeBIl6U2CJIw==
-X-Received: by 2002:a17:90a:5aa3:: with SMTP id
- n32mr5651673pji.97.1574762926051; 
- Tue, 26 Nov 2019 02:08:46 -0800 (PST)
-Received: from localhost.localdomain ([222.151.198.97])
- by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.08.42
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 02:08:45 -0800 (PST)
-From: Prashant Bhole <prashantbhole.linux@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
- "Michael S . Tsirkin" <mst@redhat.com>
-Subject: [RFC net-next 01/18] bpf: introduce bpf_prog_offload_verifier_setup()
-Date: Tue, 26 Nov 2019 19:07:27 +0900
-Message-Id: <20191126100744.5083-2-prashantbhole.linux@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+ (envelope-from <no-reply@patchew.org>) id 1iZYCs-000076-7K
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:36:31 -0500
+Resent-Date: Tue, 26 Nov 2019 05:36:31 -0500
+Resent-Message-Id: <E1iZYCs-000076-7K@eggs.gnu.org>
+Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21863)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iZYCs-00006e-1k
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:36:30 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574764565; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=KSgbP/SaLhDXQJUQjdEUcPeGhxe0CYtNcs4Bq0Y9ODob+Je/UrLu98rxvpfYIWXsZtPCVR3E+zfsijfAM2DwvCGVxZLJQPP6aBpYLuTasHSq1wXTtzYqtpYstqIFXX05/hxEFEZWd3IE/EwzvtAR+rLUWr+tXzeEYfM5g0ob0O4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1574764565;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=c/3dqYrZaGnc4tGwwSDhNLs/aSCK3LS7JS9Z5nKVpVQ=; 
+ b=cqGrFulyhlNmpspgekpi8My0kjBFvNpBm58ST6wK/w4QISPFLOzeq4ohsUAlN3wb1h0ofM+Qq/3Hea0l05x4w5gmES3qhZIIQ6utNA58cpj462vST8nx3Rk83JilkPIkxPCmlI3e6zYXON7fW5+x6xBz8vtHnZGw6X5HUVj1VPk=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1574764563537255.54649937131023;
+ Tue, 26 Nov 2019 02:36:03 -0800 (PST)
+In-Reply-To: <20191126100914.5150-1-prashantbhole.linux@gmail.com>
+Subject: Re: [RFC 0/3] Qemu: virtio-net XDP offload
+Message-ID: <157476456132.31055.15214499348148879084@37313f22b938>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: prashantbhole.linux@gmail.com
+Date: Tue, 26 Nov 2019 02:36:03 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.58
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,116 +76,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Song Liu <songliubraving@fb.com>,
- Jakub Kicinski <jakub.kicinski@netronome.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, qemu-devel@nongnu.org,
- Prashant Bhole <prashantbhole.linux@gmail.com>, kvm@vger.kernel.org,
- Yonghong Song <yhs@fb.com>, Andrii Nakryiko <andriin@fb.com>,
- Martin KaFai Lau <kafai@fb.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: songliubraving@fb.com, jakub.kicinski@netronome.com, hawk@kernel.org,
+ daniel@iogearbox.net, mst@redhat.com, netdev@vger.kernel.org,
+ jasowang@redhat.com, john.fastabend@gmail.com, qemu-devel@nongnu.org,
+ ast@kernel.org, davem@davemloft.net, prashantbhole.linux@gmail.com,
+ kvm@vger.kernel.org, yhs@fb.com, andriin@fb.com, kafai@fb.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jason Wang <jasowang@redhat.com>
-
-Background:
-This change was initiated from virtio_net XDP offload work. As per
-the implementation plan, a copy of original program with map fds from
-guest replaced with map fds from host needs to be offloaded to the
-host. To implement this fd replacement, insn_hook() must provide an
-insn with map fd intact. bpf_map and driver specific map data can be
-derived from map_fd.
-
-Since verifier calls all the offload callbacks after replacing map
-fds, it was difficult to implement virtio_net XDP offload feature.
-If virtio_net gets only one callback with original bpf program, it
-will get a chance to perform the fd replacement in its own copy of the
-program.
-
-Solution:
-Let's introduce a setup() callback in bpf_prog_offload_ops. It will be
-non mandetory. The verifier will call it just before replacing the map
-fds.
-
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
----
- include/linux/bpf.h          |  1 +
- include/linux/bpf_verifier.h |  1 +
- kernel/bpf/offload.c         | 14 ++++++++++++++
- kernel/bpf/verifier.c        |  6 ++++++
- 4 files changed, 22 insertions(+)
-
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 35903f148be5..1cdba120357c 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -361,6 +361,7 @@ struct bpf_prog_offload_ops {
- 			    struct bpf_insn *insn);
- 	int (*remove_insns)(struct bpf_verifier_env *env, u32 off, u32 cnt);
- 	/* program management callbacks */
-+	int (*setup)(struct bpf_prog *prog);
- 	int (*prepare)(struct bpf_prog *prog);
- 	int (*translate)(struct bpf_prog *prog);
- 	void (*destroy)(struct bpf_prog *prog);
-diff --git a/include/linux/bpf_verifier.h b/include/linux/bpf_verifier.h
-index 26e40de9ef55..de7028e17c0d 100644
---- a/include/linux/bpf_verifier.h
-+++ b/include/linux/bpf_verifier.h
-@@ -418,6 +418,7 @@ static inline struct bpf_reg_state *cur_regs(struct bpf_verifier_env *env)
- 	return cur_func(env)->regs;
- }
- 
-+int bpf_prog_offload_verifier_setup(struct bpf_prog *prog);
- int bpf_prog_offload_verifier_prep(struct bpf_prog *prog);
- int bpf_prog_offload_verify_insn(struct bpf_verifier_env *env,
- 				 int insn_idx, int prev_insn_idx);
-diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
-index 5b9da0954a27..04ca7a31d947 100644
---- a/kernel/bpf/offload.c
-+++ b/kernel/bpf/offload.c
-@@ -124,6 +124,20 @@ int bpf_prog_offload_init(struct bpf_prog *prog, union bpf_attr *attr)
- 	return err;
- }
- 
-+int bpf_prog_offload_verifier_setup(struct bpf_prog *prog)
-+{
-+	struct bpf_prog_offload *offload;
-+	int ret = 0;
-+
-+	down_read(&bpf_devs_lock);
-+	offload = prog->aux->offload;
-+	if (offload && offload->offdev->ops->setup)
-+		ret = offload->offdev->ops->setup(prog);
-+	up_read(&bpf_devs_lock);
-+
-+	return ret;
-+}
-+
- int bpf_prog_offload_verifier_prep(struct bpf_prog *prog)
- {
- 	struct bpf_prog_offload *offload;
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index a0482e1c4a77..94b43542439e 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -9737,6 +9737,12 @@ int bpf_check(struct bpf_prog **prog, union bpf_attr *attr,
- 
- 	env->allow_ptr_leaks = is_priv;
- 
-+	if (bpf_prog_is_dev_bound(env->prog->aux)) {
-+		ret = bpf_prog_offload_verifier_setup(env->prog);
-+		if (ret)
-+			goto skip_full_check;
-+	}
-+
- 	if (is_priv)
- 		env->test_state_freq = attr->prog_flags & BPF_F_TEST_STATE_FREQ;
- 
--- 
-2.20.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyNjEwMDkxNC41MTUw
+LTEtcHJhc2hhbnRiaG9sZS5saW51eEBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
+bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
+ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
+ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
+VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFr
+ZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0
+LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
+QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vbXVzaWNwYWwubwogIENDICAgICAgYWFyY2g2
+NC1zb2Z0bW11L2h3L2FybS9uZXRkdWlubzIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3
+L2FybS9uc2VyaWVzLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L25ldC92aXJ0aW8tbmV0LmM6NjM2
+OjEyOiBlcnJvcjogJ3BlZXJfYXR0YWNoX2VicGYnIGRlZmluZWQgYnV0IG5vdCB1c2VkIFstV2Vy
+cm9yPXVudXNlZC1mdW5jdGlvbl0KIHN0YXRpYyBpbnQgcGVlcl9hdHRhY2hfZWJwZihWaXJ0SU9O
+ZXQgKm4sIGludCBsZW4sIHZvaWQgKmluc25zLCB1aW50OF90IGdwbCkKICAgICAgICAgICAgXn5+
+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwpt
+YWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IGh3L25ldC92aXJ0
+aW8tbmV0Lm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
+cy4uLi4KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vb21hcF9zeDEubwogIENDICAg
+ICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9wYWxtLm8KbWFrZTogKioqIFtNYWtlZmlsZTo0OTE6
+IHg4Nl82NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5p
+c2hlZCBqb2JzLi4uLgogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9ndW1zdGl4Lm8K
+ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vc3BpdHoubwotLS0KICBDQyAgICAgIGFh
+cmNoNjQtc29mdG1tdS9nZGJzdHViLXhtbC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdHJh
+Y2UvZ2VuZXJhdGVkLWhlbHBlcnMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9h
+cm0vdHJhbnNsYXRlLXN2ZS5vCi90bXAvcWVtdS10ZXN0L3NyYy9ody9uZXQvdmlydGlvLW5ldC5j
+OjYzNjoxMjogZXJyb3I6ICdwZWVyX2F0dGFjaF9lYnBmJyBkZWZpbmVkIGJ1dCBub3QgdXNlZCBb
+LVdlcnJvcj11bnVzZWQtZnVuY3Rpb25dCiBzdGF0aWMgaW50IHBlZXJfYXR0YWNoX2VicGYoVmly
+dElPTmV0ICpuLCBpbnQgbGVuLCB2b2lkICppbnNucywgdWludDhfdCBncGwpCiAgICAgICAgICAg
+IF5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJv
+cnMKbWFrZVsxXTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBody9uZXQv
+dmlydGlvLW5ldC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDkxOiBhYXJjaDY0LXNv
+ZnRtbXUvYWxsXSBFcnJvciAyClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBG
+aWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2MiwgaW4gPG1vZHVsZT4KICAg
+IHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29k
+ZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywg
+Jy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlk
+PTViNmFjYzJhYzc0OTRhZDZiNTk3MDZjOWRkMjZjM2NkJywgJy11JywgJzEwMDEnLCAnLS1zZWN1
+cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJ
+U1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdK
+PTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJ
+Uj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2Nr
+ZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVz
+dGVyLXRtcC00ZTJobm5kNS9zcmMvZG9ja2VyLXNyYy4yMDE5LTExLTI2LTA1LjMzLjM3LjMzMjov
+dmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAn
+dGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1m
+aWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD01YjZhY2MyYWM3NDk0YWQ2YjU5NzA2
+YzlkZDI2YzNjZAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVh
+dmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC00ZTJobm5kNS9zcmMn
+Cm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAg
+ICAybTI0Ljk2N3MKdXNlciAgICAwbTguOTk5cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
+YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTExMjYxMDA5MTQuNTE1MC0xLXByYXNoYW50
+YmhvbGUubGludXhAZ21haWwuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1t
+ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
