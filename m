@@ -2,87 +2,80 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E65CC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 18:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44874C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 18:39:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 154B22073F
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 18:36:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BB222080F
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 18:39:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PlSCBgqH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 154B22073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B08ir5qE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BB222080F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZfhN-000627-P5
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 13:36:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55004)
+	id 1iZfkB-0000ZS-8s
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 13:39:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tasleson@redhat.com>) id 1iZfdL-0000pu-3B
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 13:32:20 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iZfif-0007yd-R9
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 13:37:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tasleson@redhat.com>) id 1iZfRT-0005Uy-Im
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 13:20:04 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28965
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tasleson@redhat.com>) id 1iZfRS-0005SU-VG
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 13:20:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574792400;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hGc5IeRdQXTLWSO1OjW/sXUHjgBlWWWtEJIRb5/BoYU=;
- b=PlSCBgqHT8mLeWiliSZLw6CAH6COZQ9/+VGpii00RCYHip3lH1fLnhrf56ZAeoUslAQXCG
- Y3hRD6oSOtd0IqLWmaUMt5RhH7RsUGEJEOH5dWDowrD0EbYz1yE87j44gWuN72NdH89aF2
- m4qiJzhXmq4upegG4ziM8d6zhwjkjbg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-YYW9KPVZMqiniDxeNOQSFg-1; Tue, 26 Nov 2019 13:19:59 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A18980183C;
- Tue, 26 Nov 2019 18:19:58 +0000 (UTC)
-Received: from [10.10.112.50] (ovpn-112-50.rdu2.redhat.com [10.10.112.50])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 47DD45C21A;
- Tue, 26 Nov 2019 18:19:56 +0000 (UTC)
-Subject: Re: [RFC 0/4] POC: Generating realistic block errors
-To: Stefan Hajnoczi <stefanha@gmail.com>
-References: <20190919194847.18518-1-tasleson@redhat.com>
- <20190920092226.GH14365@stefanha-x1.localdomain>
- <32a302d7-b85a-991b-4366-2a82e38a9382@redhat.com>
- <0752f1c5-ed79-bda4-ad53-6b2566cc35a2@redhat.com>
- <20191121103012.GE439743@stefanha-x1.localdomain>
-From: Tony Asleson <tasleson@redhat.com>
-Organization: Red Hat
-Message-ID: <376e4a8d-e910-605e-9dbe-be0162a3cc1e@redhat.com>
-Date: Tue, 26 Nov 2019 12:19:56 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <peter.maydell@linaro.org>) id 1iZfid-00060D-LR
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 13:37:49 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:40513)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iZfid-0005zA-Ek
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 13:37:47 -0500
+Received: by mail-ot1-x344.google.com with SMTP id m15so16804885otq.7
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 10:37:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=qpCSyw2qmn8BwYwSDCVvcIZLliFZldzXehTfpB7nKys=;
+ b=B08ir5qETzG/2I/0vJfTxvg8lB361RUC4mZ/kPZrz2NZvXnB6IIiVzC4kltVjEGc1m
+ jTcgeXPzkumrtXQqVXdXXYW5SveBqBR8n+gMUNoZYh0QwHGyY0MQ0+ofvGOcvA3aWX+/
+ neuBmLl/wUin/WUnxns3j4eVhiaQx81FFcIMzU2fkzfl00lM4pssf1N0/UmIcJDtLglJ
+ rgW0M9Fe/MZCJHg4J5uz5T9RSo4OaGHdYm6OADCwzvkyKI12Bmv7yxHFXi9TVphfUdH7
+ Dvl4+LqSXq5rVzJE5WcjsqxZPhW1pmFwyShfSUeu6g5Z4DVNeFZf37JveCLnefhjY1O4
+ xuqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=qpCSyw2qmn8BwYwSDCVvcIZLliFZldzXehTfpB7nKys=;
+ b=KVPyR0CxsDUIWYUHHo6wl8NZQoU5DycQGk2U+CfumEZWp5z5uET/JmZ+E+/43NpBSU
+ 3URT/Yp6oR84ahlzcvlN2B9Q184b2qEA91Qd6G5n7F5lQhb3L2w2wIwFMwAG7rGqw4yc
+ N4GKsbeFQXBNy2kRFlVH3dUnM7p8vpumI/x7EcQaL2O7OTPR6RvuSaQz9WE9QS+oQfKj
+ rM9CLru79GV61UD5PGKF9faObSiWdZfTGIv4X6tREn5AF+nAguGJizhe8bh9nZwITlcc
+ K7r16kxMVIk8sNqsqqIAru8jZNCe1VBju2Yhguz/EO/suLzVhKu+dHU/C5nKGR5ajQwB
+ n++g==
+X-Gm-Message-State: APjAAAXk9RIPWG93HjhGMrotXNNYfrsHEyoG3bJkbmVjs1u6UJF/U5yu
+ DiWo/GooSm7vqT3cCxrz31WR0kQzdrtnFaxJZMVI0A==
+X-Google-Smtp-Source: APXvYqyKGaqeU9bTxsqwIyhXAJ0Y9vM1Btu2g4i5YuLd07hp68JKLDGJ5UCwrHbBXtoRMR6tx0tJHg2dd43a66oCbqU=
+X-Received: by 2002:a05:6830:1583:: with SMTP id
+ i3mr294976otr.221.1574793466387; 
+ Tue, 26 Nov 2019 10:37:46 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191121103012.GE439743@stefanha-x1.localdomain>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: YYW9KPVZMqiniDxeNOQSFg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191126132936.1141588-1-mreitz@redhat.com>
+In-Reply-To: <20191126132936.1141588-1-mreitz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Nov 2019 18:37:35 +0000
+Message-ID: <CAFEAcA8D3Rh29a_th114jTEvpzcf_+hW4Rcu7s0pUfLfVcSHBg@mail.gmail.com>
+Subject: Re: [PULL 0/2] Block patches for 4.2.0-rc3
+To: Max Reitz <mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,53 +87,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: tasleson@redhat.com
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/21/19 4:30 AM, Stefan Hajnoczi wrote:
-> blkdebug can inject EIO when a specific LBA is accessed.  Is that
-> enough for what you want to do?  Then you can reuse and maybe extend
-> blkdebug.
-
-Not exactly.  For SCSI, I would like to be able to return different
-types of device errors on reads eg. 03/1101, 03/1600 and writes.  The
-SCSI sense data needs to include the first block in error for the
-transfer.  It would be good to also have the ability to include things
-like SCSI check conditions with recoverable errors too.
-
-I've been experimenting with blkdebug, to learn more and to see how it
-would need to be extended.  One thing that I was trying to understand is
-how an EIO from blkdebug gets translated into a bus/device specific
-error.  At the moment I'm not sure.  I've been trying to figure out the
-layering.  I think that blkdebug sits between the device specific model
-and the underlying block representation on disk.  Thus it injects error
-return values when accessing the underlying data, but that could be
-incorrect.  If it is correct I should see some code that translates the
-EIO to something transport/device specific.  Although I don't understand
-how returning an ENOSPC from read_aio in blkdebug would get translated
-for a SCSI disk as it doesn't make sense to me (one of the examples in
-the documentation).  Actually I don't know how getting ENOSPC on a read
-could happen?
-
-During my blkdebug experimentation, I've been using lsi53c895a  with
-scsi-disk and thus far I've not been able to generate a read error back
-to the guest kernel.  I've managed to abort qemu with an assert and hang
-qemu without being able to get an error back to the guest kernel.  I
-wrote up one of them: https://bugs.launchpad.net/qemu/+bug/1853898 .
-Specifying a specific sector hasn't worked for me yet.  I'm still trying
-to figure out how to enable tracing/debugging etc. to see what I'm going
-incorrectly.
-
-If someone can point me to any relevant docs, diagrams, talks etc. that
-would be greatly appreciated.  I've been looking in the source tree docs
-directory and the source code itself and things I've found from web
-searches.
-
-Thanks,
-Tony
+On Tue, 26 Nov 2019 at 13:29, Max Reitz <mreitz@redhat.com> wrote:
+>
+> The following changes since commit 4ecc984210ca1bf508a96a550ec8a93a5f833f6c:
+>
+>   Merge remote-tracking branch 'remotes/palmer/tags/riscv-for-master-4.2-rc3' into staging (2019-11-26 12:36:40 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/XanClic/qemu.git tags/pull-block-2019-11-26
+>
+> for you to fetch changes up to d8130f4c420acafbf15a59436fa47199b82dc00e:
+>
+>   iotests: add new test cases to bitmap migration (2019-11-26 14:18:01 +0100)
+>
+> ----------------------------------------------------------------
+> Block patches for 4.2.0-rc3:
+> - Fix for shared storage migration with persistent dirty bitmaps
+>
+> ----------------------------------------------------------------
+> Vladimir Sementsov-Ogievskiy (2):
+>   block/qcow2-bitmap: fix bitmap migration
+>   iotests: add new test cases to bitmap migration
+>
+>  block/qcow2-bitmap.c       | 21 ++++++++++++++++++++-
+>  tests/qemu-iotests/169     | 22 +++++++++++++++-------
+>  tests/qemu-iotests/169.out |  4 ++--
+>  3 files changed, 37 insertions(+), 10 deletions(-)
 
 
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+
+-- PMM
 
