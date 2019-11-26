@@ -2,93 +2,84 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB9BDC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 15:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD544C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 15:57:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7A232071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 15:57:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7A232071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9D4E52071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 15:57:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fhnRtdgu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D4E52071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZdDC-0003YS-Mg
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 10:57:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60374)
+	id 1iZdDt-0004er-ND
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 10:57:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33033)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iZd79-00051p-Rx
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:50:57 -0500
+ (envelope-from <eblake@redhat.com>) id 1iZdD7-0003lK-1T
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:57:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iZd77-00048o-Rd
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:50:55 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:21236
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iZd77-00040Z-GI
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:50:53 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAQFnFFr133145
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 10:50:43 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wh41n0nvw-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 10:50:43 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Tue, 26 Nov 2019 15:50:41 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 26 Nov 2019 15:50:39 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAQFocOk48824436
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 26 Nov 2019 15:50:38 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AEEE04204C;
- Tue, 26 Nov 2019 15:50:38 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8530242045;
- Tue, 26 Nov 2019 15:50:38 +0000 (GMT)
-Received: from bahia.tlslab.ibm.com (unknown [9.101.4.41])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 26 Nov 2019 15:50:38 +0000 (GMT)
-Subject: [PATCH for-5.0 0/4] spapr: Use less XIVE HW resources in KVM
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Tue, 26 Nov 2019 16:50:38 +0100
-User-Agent: StGit/unknown-version
+ (envelope-from <eblake@redhat.com>) id 1iZdD5-0007mH-UO
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:57:04 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47439
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iZdD5-0007lp-RK
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:57:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574783823;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hJCM1RRVC1OWqzLcYNheTD3NDgNGgluGpNAeKDE5wP0=;
+ b=fhnRtdguGhwVL/I0WspBV+LzYRGxCi4v0weXoBmwXIqK+Mc2E8UFZFikL9j2FlecG+4KdU
+ irE8XglWVXF2L1L1uL7qM1WSOTJbSyoIq2aFY+pYNUrIaX8un3hImf5AUPDid6VTpKzWTx
+ IM0kvKO2X3t7agS258sSMjfGBMIZn8o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-63--BJAE0-UPPK0zarQn5fBiw-1; Tue, 26 Nov 2019 10:56:59 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE10464A7D;
+ Tue, 26 Nov 2019 15:56:58 +0000 (UTC)
+Received: from [10.3.116.163] (ovpn-116-163.phx2.redhat.com [10.3.116.163])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B7761001281;
+ Tue, 26 Nov 2019 15:56:58 +0000 (UTC)
+Subject: Re: [PATCH] block: Error out on image creation with conflicting size
+ options
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20191126154835.27915-1-kwolf@redhat.com>
+ <cf113754-c582-03ae-9e53-ab0213c0ccf9@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <2e913e12-4819-a729-2179-2b664601087a@redhat.com>
+Date: Tue, 26 Nov 2019 09:56:57 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19112615-0028-0000-0000-000003C043E1
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112615-0029-0000-0000-0000248346BC
-Message-Id: <157478338194.62031.4716158446072147622.stgit@bahia.tlslab.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-26_04:2019-11-26,2019-11-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 mlxlogscore=814
- spamscore=0 malwarescore=0 adultscore=0 clxscore=1034 priorityscore=1501
- phishscore=0 suspectscore=0 bulkscore=0 impostorscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
- definitions=main-1911260135
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+In-Reply-To: <cf113754-c582-03ae-9e53-ab0213c0ccf9@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: -BJAE0-UPPK0zarQn5fBiw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,70 +91,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On POWER9 systems, the XICS-on-XIVE and XIVE KVM devices currently
-allocate a bunch of VPs in the XIVE HW to accomodate the highest
-VCPU id that may be possibly used in a VM. This limits the number
-of VMs that can run with an in-kernel interrupt controller to 63
-per POWER9 chip, irrespectively of its number of HW threads, eg.
-up to 96 on a POWER9 Nimbus socket. This is an unfortunate waste
-of scarce HW resources since a typical VM doesn't need that much
-VPs to run.
+On 11/26/19 9:54 AM, Eric Blake wrote:
+> On 11/26/19 9:48 AM, Kevin Wolf wrote:
+>> If both the create options (qemu-img create -o ...) and the size
+>> parameter were given, the size parameter was silently ignored. Instead,
+>> make specifying two sizes an error.
+>>
+>> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>> ---
+>> =C2=A0 block.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 10 ++++++++--
+>> =C2=A0 tests/qemu-iotests/049=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 5 +++++
+>> =C2=A0 tests/qemu-iotests/049.out |=C2=A0 5 +++++
+>> =C2=A0 3 files changed, 18 insertions(+), 2 deletions(-)
+>=20
+> Longtime bug, so not essential for 4.2-rc3.=C2=A0 But small enough that y=
+ou=20
+> could sneak it in if you have other patches to queue and don't want to=20
+> wait for 5.0.
+>=20
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-This series exploits new attributes of the XICS-on-XIVE and XIVE
-KVM devices that allow userspace to tune the numbers of VPs it
-really needs.
+Actually, your patch fails to diagnose:
 
-Patches 1 to 3 are preliminary work to teach the XICS and XIVE
-backends about the range of needed VCPU ids, according to the
-maximum number of VCPUs specified in the QEMU command line.
+$ qemu-img create -o size=3D1m,size=3D2m -f qcow2 x.qcow2
+Formatting 'x.qcow2', fmt=3Dqcow2 size=3D2097152 cluster_size=3D65536=20
+lazy_refcounts=3Doff refcount_bits=3D16
 
-Patch 5 and 6 do the actual work of configuring the KVM devices,
-based on new defines brought by a patch 4. RFC since the patches
-for KVM are still being discussed on the kvm-ppc list:
+so you may want to enhance this patch to also catch the case of -o size=20
+used more than once.
 
-https://patchwork.ozlabs.org/project/kvm-ppc/list/?series=132910
-
-As a bonus, patch 7 allows the latest machine type to automatically
-set int KVM the guest core stride (VSMT) to be equal to the number
-of threads per core (-smp threads=N). This makes VCPU ids contiguous
-and allows to reduce the VP consumption even more.
-
-Both KVM and QEMU changes are available here:
-https://github.com/gkurz/linux/commits/xive-nr-servers-5.3
-https://github.com/gkurz/qemu/commits/xive-nr-servers-for-4.2
----
-
-Greg Kurz (4):
-      linux-headers: Update
-      spapr: Pass the maximum number of vCPUs to the KVM interrupt controller
-      spapr/xics: Configure number of servers in KVM
-      spapr/xive: Configure number of servers in KVM
-
-
- hw/intc/spapr_xive.c                         |    6 ++++--
- hw/intc/spapr_xive_kvm.c                     |   26 +++++++++++++++++++++++---
- hw/intc/xics_kvm.c                           |   24 +++++++++++++++++++++---
- hw/intc/xics_spapr.c                         |    5 +++--
- hw/ppc/spapr_irq.c                           |    8 +++++---
- include/hw/ppc/spapr_irq.h                   |   10 ++++++++--
- include/hw/ppc/spapr_xive.h                  |    3 ++-
- include/hw/ppc/xics_spapr.h                  |    3 ++-
- include/standard-headers/linux/ethtool.h     |    6 ++++++
- include/standard-headers/linux/virtio_ring.h |    2 +-
- linux-headers/asm-arm/kvm.h                  |    3 ++-
- linux-headers/asm-arm64/kvm.h                |    5 ++++-
- linux-headers/asm-mips/unistd_n32.h          |    1 +
- linux-headers/asm-mips/unistd_n64.h          |    1 +
- linux-headers/asm-mips/unistd_o32.h          |    1 +
- linux-headers/asm-powerpc/kvm.h              |    3 +++
- linux-headers/linux/kvm.h                    |   11 +++++++++++
- linux-headers/linux/psp-sev.h                |    3 +++
- 18 files changed, 101 insertions(+), 20 deletions(-)
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
