@@ -7,83 +7,81 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB972C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 14:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FC91C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 14:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 858C020727
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 14:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3DCC20727
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 14:14:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l4Vw1Mu7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 858C020727
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KLs7laL0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3DCC20727
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZbbS-0008Oo-FX
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 09:14:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47101)
+	id 1iZbbT-0008RU-RX
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 09:14:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47121)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iZbaA-00078t-7W
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 09:12:47 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iZbaB-00078z-Of
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 09:12:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iZba9-0005kz-0o
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 09:12:45 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51943)
+ (envelope-from <peter.maydell@linaro.org>) id 1iZbaA-0005lh-BA
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 09:12:47 -0500
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:38315)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iZba8-0005kO-Qs
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 09:12:44 -0500
-Received: by mail-wm1-x342.google.com with SMTP id g206so3393114wme.1
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 06:12:44 -0800 (PST)
+ id 1iZbaA-0005lD-5M
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 09:12:46 -0500
+Received: by mail-wm1-x32e.google.com with SMTP id z19so3494017wmk.3
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 06:12:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=Er5f9rC8C8GOvtgbGPLP84tJvHsrIKrKDE2TS/iWzsk=;
- b=l4Vw1Mu7s5FmEufBZTSgO2m0KdYjVROitAgPcLcUO19ujTQtQqRc5NGrl/Yl7KNKZd
- T9LKB+cU5A9g1+af80BZtPTPz+/x3r+LYt7CoGNWolzQMS/KrZiZ2cBXCK2AUNuQjr7m
- iCkH5P/IGVD7TPd5DqbPaRM9ZJ/T5wP3ukXMj+AJ2SlqU0TiRzxJbH7XmWFF/EhfAmsB
- ee57Fd5YAH9pe1xGqscJ6yOs//cMNUFr92+XCr16ecct99xyd2LbMdx3eY4pMPaqFIq8
- dWWnfZwXw5xAPVvtdDnVsZbi432pz0dmZN797UIt0CV/wa4VgMk48CnfC4gvcJG4VPzA
- 1WGA==
+ bh=MI8rgCF2zRK6V6XHR4h853R4A2OJBzAcqupbIenPjRs=;
+ b=KLs7laL0I+25LPU9dOr7wyMZRU0PxmdkHEJA0wN4PEzwn4FPb960EtFGi0RTlOcIxW
+ BUrQRTtgE4//88FrR1JjUey98PFaXxPXplZDxYpWqrai6xQMGhv1A4CoXfs7Xlx2ShMh
+ 9Txh9M5KE3EcQwp0/qR77wE1mhnmXbMrr3ggm6voB3VOyfZWK/Ba/eVlygLMmr36Y54B
+ GonteMGBRsz3Yxn0mX3y4rhMeV5bG2w+yEx1CJDjzIg3ow7B//4TDMo2neaZvbehVvNz
+ DyBcKJDMJmqgEqU2vRY4PuxaHsDjrxk5/bAxSKykLsw42zAm/FzpC5TVaWQhICtIXHa8
+ WHeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Er5f9rC8C8GOvtgbGPLP84tJvHsrIKrKDE2TS/iWzsk=;
- b=BsEQlxWPGSaVtN4giRmFy+PJ/N0jth4nDHWIcWAAtwyoGKwv2x8UGET7NyG0xyQLu2
- FaX+ARx3bRmRdDx9Oa/yCUxpDrAHnP+B9VUHpUchw1f5LrgGGKB5shg6nngRlB/F9P9H
- UA5Y1peiCr3jsOeHLVgKstsA0wAQi5OlXky+1+Q3igLMtuf+vLBueQB3ta8eAjVG1cAM
- TH3gSsGni2gWxynaLlyymirSsNUxKdi0xYVRUmY5VSkSR+yRrYZp7p/xLlqoIZzKuSP+
- oje98y/Ueiv8Y/wupX6b47CHheRQXe8FKJMXOO3F1x2rbWu2CKHL0dXlHymXP6oB66ju
- amHA==
-X-Gm-Message-State: APjAAAVysibkUcAYLnjoU+lKAyY61nwKu2tj6FKTqpDcTt3VXPN0W2W9
- /Of/A0xpI4+KmYwRD+icaBGCsyRHEj4=
-X-Google-Smtp-Source: APXvYqz5wSSeUsoOdGmQmfpLpuwrHBEIqwb38Hwd8nSaM80vIY3fnX1qDixh6aRknK0+zRTt9T3Z6w==
-X-Received: by 2002:a05:600c:218e:: with SMTP id
- e14mr4268611wme.22.1574777563506; 
- Tue, 26 Nov 2019 06:12:43 -0800 (PST)
+ bh=MI8rgCF2zRK6V6XHR4h853R4A2OJBzAcqupbIenPjRs=;
+ b=qeX+7PX9c4RC06lSg4F5A6q2GPcwgs9iMC3/bqNVFWeOuBzfqwAZ0jNWyzhXkZfPi+
+ udMByi1oGASguLHiV3AvnOEohjDbsGanSVQAu7vFT88XpTtCE0smQr26aM9Jpn9CLVwf
+ MFdtPDZBFTVLAH9w+QNQP+CGeLCklk4wfqIPUHGytimJ5wuuCkpZoKJGVtnP1tlyAmcF
+ 6RQiC9hW5RxeauuTpxAHXqPBIswIBE46V83xIJduZelMDIifo0vad8bI7gXdqxV0Moqd
+ dKEmqACEevenBGKMRI+KusweAc7ohbSiVOMYhNGH5SPRQAkzImTXB7hxIOAu1hIlFzrO
+ vIFw==
+X-Gm-Message-State: APjAAAV139NUdSQJ1hFk3TVehyhc3kxjIznhtf0OZ4F+qwcYzOwA7/vE
+ GF/jdr7loBTz2GBzEmCm/7cNOkl4CFs=
+X-Google-Smtp-Source: APXvYqyb7bGiS9bbKZUYZyQ+KdQlzqC989ybsinI6Wt6WVyKY9zgH7fQxVCAgN4Un/0J7Ij9mwT46A==
+X-Received: by 2002:a1c:7e82:: with SMTP id z124mr4157000wmc.136.1574777564714; 
+ Tue, 26 Nov 2019 06:12:44 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id i127sm3364581wma.35.2019.11.26.06.12.42
+ by smtp.gmail.com with ESMTPSA id i127sm3364581wma.35.2019.11.26.06.12.43
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 06:12:42 -0800 (PST)
+ Tue, 26 Nov 2019 06:12:43 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/4] target/arm: Fix handling of cortex-m FTYPE flag in EXCRET
-Date: Tue, 26 Nov 2019 14:12:36 +0000
-Message-Id: <20191126141239.8219-2-peter.maydell@linaro.org>
+Subject: [PULL 2/4] hw/arm: versal: Add the CRP as unimplemented
+Date: Tue, 26 Nov 2019 14:12:37 +0000
+Message-Id: <20191126141239.8219-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191126141239.8219-1-peter.maydell@linaro.org>
 References: <20191126141239.8219-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,48 +97,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jean-Hugues Deschênes <Jean-Hugues.Deschenes@ossiaco.com>
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-According to the PushStack() pseudocode in the armv7m RM,
-bit 4 of the LR should be set to NOT(CONTROL.PFCA) when
-an FPU is present. Current implementation is doing it for
-armv8, but not for armv7. This patch makes the existing
-logic applicable to both code paths.
+Add the CRP as unimplemented thus avoiding bus errors when
+guests access these registers.
 
-Signed-off-by: Jean-Hugues Deschenes <jean-hugues.deschenes@ossiaco.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Message-id: 20191115154734.26449-2-edgar.iglesias@gmail.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/m_helper.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ include/hw/arm/xlnx-versal.h | 3 +++
+ hw/arm/xlnx-versal.c         | 2 ++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/target/arm/m_helper.c b/target/arm/m_helper.c
-index 4a48b792520..76de317e6af 100644
---- a/target/arm/m_helper.c
-+++ b/target/arm/m_helper.c
-@@ -2233,19 +2233,18 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-         if (env->v7m.secure) {
-             lr |= R_V7M_EXCRET_S_MASK;
-         }
--        if (!(env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK)) {
--            lr |= R_V7M_EXCRET_FTYPE_MASK;
--        }
-     } else {
-         lr = R_V7M_EXCRET_RES1_MASK |
-             R_V7M_EXCRET_S_MASK |
-             R_V7M_EXCRET_DCRS_MASK |
--            R_V7M_EXCRET_FTYPE_MASK |
-             R_V7M_EXCRET_ES_MASK;
-         if (env->v7m.control[M_REG_NS] & R_V7M_CONTROL_SPSEL_MASK) {
-             lr |= R_V7M_EXCRET_SPSEL_MASK;
-         }
-     }
-+    if (!(env->v7m.control[M_REG_S] & R_V7M_CONTROL_FPCA_MASK)) {
-+        lr |= R_V7M_EXCRET_FTYPE_MASK;
-+    }
-     if (!arm_v7m_is_handler_mode(env)) {
-         lr |= R_V7M_EXCRET_MODE_MASK;
-     }
+diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
+index 14405c1465d..d844c4ffe47 100644
+--- a/include/hw/arm/xlnx-versal.h
++++ b/include/hw/arm/xlnx-versal.h
+@@ -119,4 +119,7 @@ typedef struct Versal {
+ #define MM_IOU_SCNTRS_SIZE          0x10000
+ #define MM_FPD_CRF                  0xfd1a0000U
+ #define MM_FPD_CRF_SIZE             0x140000
++
++#define MM_PMC_CRP                  0xf1260000U
++#define MM_PMC_CRP_SIZE             0x10000
+ #endif
+diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
+index 98163eb1aad..8b3d8d85b86 100644
+--- a/hw/arm/xlnx-versal.c
++++ b/hw/arm/xlnx-versal.c
+@@ -257,6 +257,8 @@ static void versal_unimp(Versal *s)
+                         MM_CRL, MM_CRL_SIZE);
+     versal_unimp_area(s, "crf", &s->mr_ps,
+                         MM_FPD_CRF, MM_FPD_CRF_SIZE);
++    versal_unimp_area(s, "crp", &s->mr_ps,
++                        MM_PMC_CRP, MM_PMC_CRP_SIZE);
+     versal_unimp_area(s, "iou-scntr", &s->mr_ps,
+                         MM_IOU_SCNTR, MM_IOU_SCNTR_SIZE);
+     versal_unimp_area(s, "iou-scntr-seucre", &s->mr_ps,
 -- 
 2.20.1
 
