@@ -2,117 +2,142 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90B24C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 07:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F9BC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 07:55:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B37520659
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 07:29:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="l8bVQ/cn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B37520659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id E33DD20748
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 07:55:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E33DD20748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZVHR-00035C-Gs
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 02:29:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39013)
+	id 1iZVhE-0007YA-1y
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 02:55:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41570)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iZVFu-0001qA-13
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 02:27:27 -0500
+ (envelope-from <borntraeger@de.ibm.com>) id 1iZVgS-000712-Mx
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 02:54:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iZVFt-0006CW-22
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 02:27:25 -0500
-Received: from mail-vi1eur04on0711.outbound.protection.outlook.com
- ([2a01:111:f400:fe0e::711]:54941
- helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ (envelope-from <borntraeger@de.ibm.com>) id 1iZVgQ-0003iM-7b
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 02:54:52 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10594
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iZVFs-0006B3-Rr; Tue, 26 Nov 2019 02:27:25 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OYMuzmBDP1Oi/UEwAgUAbdXOZf2zjDr0+zWiL0kFhqYasMahsgXAT4gYliea6bBjL1qyrdRuDF4Utm0CA+qzC0Yvhyq7MCxxC1BHq9mPEeSGXxob8sUtXDHOIui0TcdKEWswF92x6q6Zad1CtPr0re+kr3zzkvHSuBVr8yDBnXx3K2oUBJsdJ49zxUN8hxwshLuqPMGZu7o7HystNtMWw2PilTuKC5C1kY7Wfk5pEt6D8yECKrxhVgUcUSWKQ+HTmaWGX6CmA2+x4EetEuJugOAgyktRABQ/8SaiJ7ZhJImRL4xysNEUYe4LgjZfN2O2iuE855AVXoELOOkK07xnXg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p8ba6ebTKRYRvKm+xw3WzXF+IzNEs3+B1OCM2JZHb/U=;
- b=SHtpw0tOPRaONZMAkIGC1Pzgd2UKwoZijYP9Rrp1WBbyzc3wJL+XJk6aO3VOfpxdMWFIMw5+lPtJcKEE/zS6GzwRucswd5/LLmtAL2Ls2UZM5YUTTXaVncL8b4+mspy/uF8fYO4A36V7afHKo4nbo4Gi4bLvofJqxYykQjeLnXyo2q3GcqqCfp5AA0Nw0ggNCEZZi9pv+TWdra+Y5Fqm3YhzuuSvAkNiSu3FVh7GNOyxVL3kRvPinMmnH8stbGbeb7KS0EfZxh5jZYQDDVG0NVzLcMRFvp4/a5mKgy6oqnTP/+UtNL7wiPuoRKXHbeSUwK263dJqUGql9F1i+nF42w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=p8ba6ebTKRYRvKm+xw3WzXF+IzNEs3+B1OCM2JZHb/U=;
- b=l8bVQ/cnqJ4ZIagzvp5xGTNNRWg1Ncr7gpQgWlC4Zf/QYEoIrU20WrbR9fOaPUoq77wffaVI1CZdfdn3oqQ8jowzSsbUIhaPsAP0umshbbvD3wM6mSwEBsViVJPNOtKC0g8xJiUkR2jjEjXVaRnc8yGOIqRQPcTY4ENtOt+e9yA=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3398.eurprd08.prod.outlook.com (20.177.115.151) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2474.21; Tue, 26 Nov 2019 07:27:21 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2474.023; Tue, 26 Nov 2019
- 07:27:21 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
-Thread-Topic: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
-Thread-Index: AQHVnJu0qDM7Hy9Fo0iUR1ci8onW5Keb6aCAgAAsM4CAAQbTAA==
-Date: Tue, 26 Nov 2019 07:27:21 +0000
-Message-ID: <9d5766bf-65de-1087-70d5-58e6997f9002@virtuozzo.com>
-References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
- <4f6f9488-8ec1-85bf-5584-bac5b0f8ce92@virtuozzo.com>
- <20191125154637.GC4638@linux.fritz.box>
-In-Reply-To: <20191125154637.GC4638@linux.fritz.box>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0402CA0026.eurprd04.prod.outlook.com
- (2603:10a6:7:7c::15) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191126102718388
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c7104906-161d-4de6-7448-08d772421314
-x-ms-traffictypediagnostic: AM6PR08MB3398:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB3398AE44E5782E755E186F56C1450@AM6PR08MB3398.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2958;
-x-forefront-prvs: 0233768B38
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(366004)(396003)(136003)(39840400004)(376002)(189003)(199004)(4744005)(11346002)(31696002)(86362001)(2616005)(446003)(229853002)(305945005)(6116002)(3846002)(7736002)(186003)(66446008)(64756008)(66556008)(5660300002)(66946007)(6246003)(81156014)(8676002)(26005)(36756003)(66066001)(52116002)(8936002)(256004)(478600001)(102836004)(81166006)(54906003)(71190400001)(6486002)(6436002)(71200400001)(316002)(14454004)(25786009)(2906002)(99286004)(386003)(6916009)(6506007)(66476007)(4326008)(31686004)(6512007)(76176011);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3398;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: iGYOclrjvsyfek3x7JlQKMpVhyPszNtCqsSBdk2PjZt8vhc/bFaxUg+2pKz7jTlNVU6l8B8OPOeWrWCnayxBlONF5saiYHKDIqMavuqNxFrWnHdBgFFB2ZLoC2dGlFdYjvXh1zfjQP68Z5ylwfvDjHbpQIh8qlyv9SHmfan/xl96oNv0sfj3WnCJthVwFRCXnaoZ0etgZVFXux2Irp0hkzIqz7E1rkYqtuHSMZM7P6gJD0GStDjcGbZ/w+AGg4WcVF0PwcJqyHgX+l8RBXET6fc6gPBSNay53VBFyFSuVGVbb4ov/HUYnAyYHE9qmTBcusuRks1iaJVtQGggvyPTFrvvOxHZr4dwj5TLQXqMLDgYtgbU0RzUWK75PKB97GYHdoEj/4NNA89S97Zs4vterTxIvyBylAtd1PFTvd3ED1hbiFWspyRPy8wTRuU7BIAc
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DB0EA0E6B22FFF4692EFDEBBFB27C3AE@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1iZVgQ-0003i9-1X
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 02:54:50 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAQ7qOab075834
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:54:47 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wfjyxug8r-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:54:47 -0500
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Tue, 26 Nov 2019 07:54:45 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 26 Nov 2019 07:54:42 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAQ7sfuc46858250
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 26 Nov 2019 07:54:41 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3469C4C05C;
+ Tue, 26 Nov 2019 07:54:41 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D11624C058;
+ Tue, 26 Nov 2019 07:54:40 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.22.13])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue, 26 Nov 2019 07:54:40 +0000 (GMT)
+Subject: Re: [PATCH v2 2/2] s390x/cpumodel: Introduce dynamic feature groups
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20191125172031.16282-1-david@redhat.com>
+ <20191125172031.16282-3-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Tue, 26 Nov 2019 08:54:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c7104906-161d-4de6-7448-08d772421314
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Nov 2019 07:27:21.1439 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MVeqmhLGkzd77jc+u/5KjXBqlM6S1iZ5tK8B7gTDI1JuccDqW/TJQe8UHc9K8e90leG5cCH9oywROeRQadOclF74E/QUrKvM7buG3ST5aC0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3398
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe0e::711
+In-Reply-To: <20191125172031.16282-3-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19112607-0008-0000-0000-0000033858FE
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112607-0009-0000-0000-00004A575B7A
+Message-Id: <b062f580-d664-f68c-2364-1f65df6ee265@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-26_01:2019-11-21,2019-11-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 phishscore=0
+ mlxscore=0 malwarescore=0 impostorscore=0 priorityscore=1501 spamscore=0
+ adultscore=0 clxscore=1015 bulkscore=0 mlxlogscore=925 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1911260070
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,31 +149,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, Alberto Garcia <berto@igalia.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Halil Pasic <pasic@linux.ibm.com>, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjUuMTEuMjAxOSAxODo0NiwgS2V2aW4gV29sZiB3cm90ZToNCj4gQW0gMjUuMTEuMjAxOSB1bSAx
-MTowOCBoYXQgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSBnZXNjaHJpZWJlbjoNCj4+IFBp
-bmc/DQo+Pg0KPj4gSGkhIFdoeSBzbyBzaWxlbnQ/IFBvc3Rwb25lIHRoaXMgdG8gNS4wPyBUaGlz
-IGlzIGZpeGluZyB0aGUgc2FtZQ0KPj4gcHJvYmxlbSB3aXRoIGJsb2NrIGNvbW1pdCwgbGlrZSBL
-ZXZpbidzIHNlcmllcywganVzdCBjb21taXQgbm90IHRvIG1pZA0KPj4gYnV0IHRvIGJhc2UuLg0K
-PiANCj4gVG8gYmUgaG9uZXN0LCBJIHRoaW5rIGJ5IG5vdyB3ZSd2ZSBmb3VuZCBzbyBtYW55IHBy
-b2JsZW1zIGFyb3VuZCBzaG9ydA0KPiBiYWNraW5nIGZpbGVzLCBlYWNoIHdpdGggYSBub24tdHJp
-dmlhbCBmaXgsIHRoYXQgSSBkb24ndCB0aGluayB3ZSBjYW4NCj4gaGF2ZSBhIHJlYXNvbmFibHkg
-Y29tcGxldGUgZml4IGluIC1yYzMgd2l0aG91dCByaXNraW5nIGJyZWFraW5nDQo+IGV2ZXJ5dGhp
-bmcuIE5vbmUgb2YgdGhlIHByb2JsZW1zIGFyZSBuZXcsIGluIGZhY3QgSSB0aGluayB0aGV5IGhh
-dmUNCj4gZXhpc3RlZCBzaW5jZSBkYXkgb25lIG9mIHJlc2l6ZS9jb21taXQsIGFuZCBub2JvZHkg
-aGFzIHJlcG9ydGVkIHByb2JsZW1zDQo+IGJlZm9yZSwgc28gdGhleSBjYW4ndCBiZSBoaXR0aW5n
-IGEgbGFyZ2UgbnVtYmVyIG9mIHVzZXJzLg0KPiANCj4gU28sIHJlbHVjdGFudGx5LCBJIGhhdmUg
-dG8gYWRtaXQgdGhhdCBib3RoIHNlcmllcyBhbmQgd2hhdGV2ZXIgd2UnbGwgYWRkDQo+IG9uIHRv
-cCBhcmUgcHJvYmFibHkgYmV0dGVyIGtlcHQgZm9yIDUuMCAoYW5kIDQuMi4xKSByYXRoZXIgdGhh
-biBhZGRlZA0KPiB2ZXJ5IGxhdGUgaW50byA0LjIuDQo+IA0KDQpPSywgSSBhZ3JlZS4NCg0KDQot
-LSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+
+
+On 25.11.19 18:20, David Hildenbrand wrote:
+> 
+> As soon as dynamic feature groups are used, the CPU model becomes
+> migration-unsafe. Upper layers can expand these models to migration-safe
+> and static variants, allowing them to be migrated.
+
+I really dislike that. I am trying to get rid of the unsafe variants (e.g. now
+defaulting to host-model instead of host-passthrough). I do not want to give
+users new ways of hurting themselves.
+
+Unless I misunderstood Eduardo, I think his versioning approach is actually better
+in regard to migration, no?
+I z terms, you can still say -cpu z13  which is just an alias to z13v1 z13v2 etc.
+Assuming that the version is checked this will be safe.
+
 
