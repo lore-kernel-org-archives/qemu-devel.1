@@ -2,81 +2,86 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEFBC432C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 09:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B25C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 09:06:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAF5E20722
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 09:04:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5356F20722
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 09:06:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XqWvYO8o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAF5E20722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hwg2t4mj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5356F20722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51743 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZWll-000688-NN
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 04:04:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50323)
+	id 1iZWnR-00089q-HX
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 04:06:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49992)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iZWjm-0004Mk-FW
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 04:02:23 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iZWhE-00020a-JU
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:59:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iZWjg-00049y-ID
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 04:02:22 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:37421)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iZWhD-00036o-3z
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:59:44 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:53113)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iZWjg-00049a-A6
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 04:02:16 -0500
-Received: by mail-wm1-x336.google.com with SMTP id f129so2333011wmf.2
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 01:02:16 -0800 (PST)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iZWhC-00036J-Td
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:59:43 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id l1so2260867wme.2
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 00:59:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=4g6DFYGNdDGjfZc5GLBMg/U+DjxAAWPrM01NS+p/b1o=;
- b=XqWvYO8onTu6h2H8uCdKYhFl8yGcqBUCI50YcWE7PraT2HgwKt16ciyuldeId23chq
- OqHTffpn0y+TBoXYX8SvYeTPSoIg/qqFvblf8vyR969pVeRCKvueTVeamPK52gg4u21d
- yc7ZJ6b/HpBHhTWdbHc/OWwXUQ5+5a0BypHHQdXFnS7x8UZBB7o8Qd5hCbVIlbY2vyv5
- 6/VC+jQWe24J58PuG88/DrH1DJ/fcPOJ7pcwPe27Pg88WXQfRxhRvHOcZyWkQl+x5bkX
- 9AvpBcQnEpVHb6wsSO1OPep/RO+TMVTXIFmfzXOFiaMivOmSNjRs3J5z/76llrbZBOd0
- h3lQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=zlo3vNzRp6z3EanSOjFlpKBYoVA1NruT4oaby34LW/4=;
+ b=Hwg2t4mjO6rQWRpXbKIiGXrdqAWE9AiuTGQIAxJ4hosbtJJMyn7IksJ+M0KUuOSiQZ
+ 2EKLsmEzhCKNERZ1vkOqkzs/9XJlV5PFcPOxKZOjxwxMOp02/Ki3+ZnvUsyWC77Ppj6U
+ aG+NrAOaRllldv+iX9M29in3wVYaq19OLRybyjo6IDWyu0uz+PfIKhoUQRrFkNXYIVMA
+ CwxsktD3oCLqBqtYYYwYKm3XM30necPyafJsXg+cShZQAq86AkuQn337BDweo5KwWyrr
+ wcWMa0THznRYINgsUo7IoDphV5SmSJaFTM2TSVGU6HfjGmx3PfW9HIAHTURoQGFexZ7P
+ 1HhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=4g6DFYGNdDGjfZc5GLBMg/U+DjxAAWPrM01NS+p/b1o=;
- b=gH0ZXnNu9Zz7A0P7arV8dhYyCz3Z9xsEdFzVM5ChkT4K+yznJ36UL686zv60tF2pM/
- KBNQngLM6KXmkzJgu19klT4nhXwnRVJWgTL3c+zzuvZyeV00ficWqXqWTV6/68dAb1VW
- v8q0hdWFfvAn9acnr0Pu9mB9S7uTMsPaiOPAeaKyMJxiDiH6t9yRDD9IdBLsGt1YJnp7
- xGB/Rw2j5Sg1aWgMVg4OP1TVUVNzR+R8xfIVBwfKnAqYzu/i++2y7EsCZBeAM1XDIowh
- RDiYqsTKMUqlIy9+pAmQJONt3x845JwBqSDbk3tgfJUz1QGKK/daoaz+fjQYlyQtt6vg
- Ut9Q==
-X-Gm-Message-State: APjAAAXX+K4XrQZ7UNeZXt90hd55B48eTR5Q6TzJZw63b6oA4CBxbrqh
- du30oOoW9h3J5AGdxPStqPuzaazNcBbpbt4rAU8=
-X-Google-Smtp-Source: APXvYqwBEmn1qjbVPyjEwDMMISGmn9/vmv48cw1gsguSZtk+k9zQwIMrm2Om8Koy83HR3lfWnRwEKl3HiWe6P9v3tqc=
-X-Received: by 2002:a7b:cc0c:: with SMTP id f12mr3113414wmh.5.1574758933698;
- Tue, 26 Nov 2019 01:02:13 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=zlo3vNzRp6z3EanSOjFlpKBYoVA1NruT4oaby34LW/4=;
+ b=e8O1wL+7razx6LnH4qZGLFbmHj+n0dc5qDECpywGJ5g0p7jybjMV4mSxfxXLXUmGag
+ NKdhDRhHDkXg55a+mk5WjDOW9O6Vjv7tGvweCWWMbKJRMQlSUA8feKzjsbTwOh5iSIe5
+ LmjVWWRcjNUi/mpHX2zJYq20drQft5XXt226GlRh7vPMRSonyIJSnLKBoFe3H9KFG8RX
+ zWyo3TK7/LVUvnr3cL1dXV/kSvALxI/9o8O1EeP50YUP7lTok6smwEtL/3MRkumQ5+/q
+ AnOGnMrdx1VCWVCeWdIqtNs65IhJGHKhV59ghF5rXt7EhP3Pb9HOEffDW5Xk+qT5D3n8
+ AYNA==
+X-Gm-Message-State: APjAAAVj7MyYXyb5nbyUX0VsnneBBXlMVcS7tKje4PlpTAsIO6i4BbKB
+ 8xuj07irmKuqz04t3TcnLFqOJGfs
+X-Google-Smtp-Source: APXvYqxr4uNF/SUvr7CkSDiUTOm4K3dEY415kMZVxZpPbmruyHAkmsreLx2bOLcWqtskGZOi4ep1Vg==
+X-Received: by 2002:a7b:c357:: with SMTP id l23mr3099268wmj.152.1574758781462; 
+ Tue, 26 Nov 2019 00:59:41 -0800 (PST)
+Received: from donizetti.lan ([2001:b07:6468:f312:5454:a592:5a0a:75c])
+ by smtp.gmail.com with ESMTPSA id a206sm2349172wmf.15.2019.11.26.00.59.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 26 Nov 2019 00:59:40 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 4/5] hvf: correctly handle REX prefix in relation to legacy
+ prefixes
+Date: Tue, 26 Nov 2019 09:59:35 +0100
+Message-Id: <20191126085936.1689-5-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191126085936.1689-1-pbonzini@redhat.com>
+References: <20191126085936.1689-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20191125185021.GB3767@work-vm>
-In-Reply-To: <20191125185021.GB3767@work-vm>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 26 Nov 2019 13:02:01 +0400
-Message-ID: <CAJ+F1C+6kgO5kX=fYQno3g-YoxxqOyph+zanpDmFaOnOqirKYQ@mail.gmail.com>
-Subject: Re: virtiofsd: Where should it live?
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,68 +93,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, mszeredi@redhat.com,
- "Daniel P. Berrange" <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- vgoyal@redhat.com
+Cc: Cameron Esfahani <dirty@apple.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi David
+From: Cameron Esfahani <dirty@apple.com>
 
-On Mon, Nov 25, 2019 at 10:50 PM Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
->
-> Hi,
->   There's been quite a bit of discussion about where virtiofsd, our
-> implemenation of a virtiofs daemon, should live.  I'd like to get
-> this settled now, because I'd like to tidy it up for the next
-> qemu cycle.
->
-> For reference it's based on qemu's livhost-user+chunks of libfuse.
-> It can't live in libfuse because we change enough of the library
-> to break their ABI.  It's C, and we've got ~100 patches - which
-> we can split into about 3 chunks.
->
-> Some suggestions so far:
->   a) In contrib
->      This is my current working assumption; the main objection is it's
->      a bit big and pulls in a chunk of libfuse
->
->   b) In a submodule
->
->   c) Just separate
->
-> Your suggestions/ideas please.  My preference is (a).
->
+In real x86 processors, the REX prefix must come after legacy prefixes.
+REX before legacy is ignored.  Update the HVF emulation code to properly
+handle this.  Fix some spelling errors in constants.  Fix some decoder
+table initialization issues found by Coverity.
+
+Signed-off-by: Cameron Esfahani <dirty@apple.com>
+Message-Id: <eff30ded8307471936bec5d84c3b6efbc95e3211.1574625592.git.dirty@apple.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ target/i386/hvf/x86_decode.c | 64 ++++++++++++++++++++----------------
+ target/i386/hvf/x86_decode.h | 20 +++++------
+ 2 files changed, 46 insertions(+), 38 deletions(-)
+
+diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
+index 822fa1866e..77c346605f 100644
+--- a/target/i386/hvf/x86_decode.c
++++ b/target/i386/hvf/x86_decode.c
+@@ -122,7 +122,8 @@ static void decode_rax(CPUX86State *env, struct x86_decode *decode,
+ {
+     op->type = X86_VAR_REG;
+     op->reg = R_EAX;
+-    op->ptr = get_reg_ref(env, op->reg, decode->rex.rex, 0,
++    /* Since reg is always AX, REX prefix has no impact. */
++    op->ptr = get_reg_ref(env, op->reg, false, 0,
+                           decode->operand_size);
+ }
+ 
+@@ -1687,40 +1688,37 @@ calc_addr:
+     }
+ }
+ 
+-target_ulong get_reg_ref(CPUX86State *env, int reg, int rex, int is_extended,
+-                         int size)
++target_ulong get_reg_ref(CPUX86State *env, int reg, int rex_present,
++                         int is_extended, int size)
+ {
+     target_ulong ptr = 0;
+-    int which = 0;
+ 
+     if (is_extended) {
+         reg |= R_R8;
+     }
+ 
+-
+     switch (size) {
+     case 1:
+-        if (is_extended || reg < 4 || rex) {
+-            which = 1;
++        if (is_extended || reg < 4 || rex_present) {
+             ptr = (target_ulong)&RL(env, reg);
+         } else {
+-            which = 2;
+             ptr = (target_ulong)&RH(env, reg - 4);
+         }
+         break;
+     default:
+-        which = 3;
+         ptr = (target_ulong)&RRX(env, reg);
+         break;
+     }
+     return ptr;
+ }
+ 
+-target_ulong get_reg_val(CPUX86State *env, int reg, int rex, int is_extended,
+-                         int size)
++target_ulong get_reg_val(CPUX86State *env, int reg, int rex_present,
++                         int is_extended, int size)
+ {
+     target_ulong val = 0;
+-    memcpy(&val, (void *)get_reg_ref(env, reg, rex, is_extended, size), size);
++    memcpy(&val,
++           (void *)get_reg_ref(env, reg, rex_present, is_extended, size),
++           size);
+     return val;
+ }
+ 
+@@ -1853,28 +1851,38 @@ void calc_modrm_operand(CPUX86State *env, struct x86_decode *decode,
+ static void decode_prefix(CPUX86State *env, struct x86_decode *decode)
+ {
+     while (1) {
++        /*
++         * REX prefix must come after legacy prefixes.
++         * REX before legacy is ignored.
++         * Clear rex to simulate this.
++         */
+         uint8_t byte = decode_byte(env, decode);
+         switch (byte) {
+         case PREFIX_LOCK:
+             decode->lock = byte;
++            decode->rex.rex = 0;
+             break;
+         case PREFIX_REPN:
+         case PREFIX_REP:
+             decode->rep = byte;
++            decode->rex.rex = 0;
+             break;
+-        case PREFIX_CS_SEG_OVEERIDE:
+-        case PREFIX_SS_SEG_OVEERIDE:
+-        case PREFIX_DS_SEG_OVEERIDE:
+-        case PREFIX_ES_SEG_OVEERIDE:
+-        case PREFIX_FS_SEG_OVEERIDE:
+-        case PREFIX_GS_SEG_OVEERIDE:
++        case PREFIX_CS_SEG_OVERRIDE:
++        case PREFIX_SS_SEG_OVERRIDE:
++        case PREFIX_DS_SEG_OVERRIDE:
++        case PREFIX_ES_SEG_OVERRIDE:
++        case PREFIX_FS_SEG_OVERRIDE:
++        case PREFIX_GS_SEG_OVERRIDE:
+             decode->segment_override = byte;
++            decode->rex.rex = 0;
+             break;
+         case PREFIX_OP_SIZE_OVERRIDE:
+             decode->op_size_override = byte;
++            decode->rex.rex = 0;
+             break;
+         case PREFIX_ADDR_SIZE_OVERRIDE:
+             decode->addr_size_override = byte;
++            decode->rex.rex = 0;
+             break;
+         case PREFIX_REX ... (PREFIX_REX + 0xf):
+             if (x86_is_long_mode(env_cpu(env))) {
+@@ -2111,14 +2119,14 @@ void init_decoder()
+ {
+     int i;
+     
+-    for (i = 0; i < ARRAY_SIZE(_decode_tbl2); i++) {
+-        memcpy(_decode_tbl1, &invl_inst, sizeof(invl_inst));
++    for (i = 0; i < ARRAY_SIZE(_decode_tbl1); i++) {
++        memcpy(&_decode_tbl1[i], &invl_inst, sizeof(invl_inst));
+     }
+     for (i = 0; i < ARRAY_SIZE(_decode_tbl2); i++) {
+-        memcpy(_decode_tbl2, &invl_inst, sizeof(invl_inst));
++        memcpy(&_decode_tbl2[i], &invl_inst, sizeof(invl_inst));
+     }
+     for (i = 0; i < ARRAY_SIZE(_decode_tbl3); i++) {
+-        memcpy(_decode_tbl3, &invl_inst, sizeof(invl_inst_x87));
++        memcpy(&_decode_tbl3[i], &invl_inst_x87, sizeof(invl_inst_x87));
+     
+     }
+     for (i = 0; i < ARRAY_SIZE(_1op_inst); i++) {
+@@ -2167,22 +2175,22 @@ target_ulong decode_linear_addr(CPUX86State *env, struct x86_decode *decode,
+                                target_ulong addr, X86Seg seg)
+ {
+     switch (decode->segment_override) {
+-    case PREFIX_CS_SEG_OVEERIDE:
++    case PREFIX_CS_SEG_OVERRIDE:
+         seg = R_CS;
+         break;
+-    case PREFIX_SS_SEG_OVEERIDE:
++    case PREFIX_SS_SEG_OVERRIDE:
+         seg = R_SS;
+         break;
+-    case PREFIX_DS_SEG_OVEERIDE:
++    case PREFIX_DS_SEG_OVERRIDE:
+         seg = R_DS;
+         break;
+-    case PREFIX_ES_SEG_OVEERIDE:
++    case PREFIX_ES_SEG_OVERRIDE:
+         seg = R_ES;
+         break;
+-    case PREFIX_FS_SEG_OVEERIDE:
++    case PREFIX_FS_SEG_OVERRIDE:
+         seg = R_FS;
+         break;
+-    case PREFIX_GS_SEG_OVEERIDE:
++    case PREFIX_GS_SEG_OVERRIDE:
+         seg = R_GS;
+         break;
+     default:
+diff --git a/target/i386/hvf/x86_decode.h b/target/i386/hvf/x86_decode.h
+index bc574a7a44..ef7960113f 100644
+--- a/target/i386/hvf/x86_decode.h
++++ b/target/i386/hvf/x86_decode.h
+@@ -27,12 +27,12 @@ typedef enum x86_prefix {
+     PREFIX_REPN =                  0xf2,
+     PREFIX_REP =                   0xf3,
+     /* group 2 */
+-    PREFIX_CS_SEG_OVEERIDE =       0x2e,
+-    PREFIX_SS_SEG_OVEERIDE =       0x36,
+-    PREFIX_DS_SEG_OVEERIDE =       0x3e,
+-    PREFIX_ES_SEG_OVEERIDE =       0x26,
+-    PREFIX_FS_SEG_OVEERIDE =       0x64,
+-    PREFIX_GS_SEG_OVEERIDE =       0x65,
++    PREFIX_CS_SEG_OVERRIDE =       0x2e,
++    PREFIX_SS_SEG_OVERRIDE =       0x36,
++    PREFIX_DS_SEG_OVERRIDE =       0x3e,
++    PREFIX_ES_SEG_OVERRIDE =       0x26,
++    PREFIX_FS_SEG_OVERRIDE =       0x64,
++    PREFIX_GS_SEG_OVERRIDE =       0x65,
+     /* group 3 */
+     PREFIX_OP_SIZE_OVERRIDE =      0x66,
+     /* group 4 */
+@@ -303,10 +303,10 @@ uint64_t sign(uint64_t val, int size);
+ 
+ uint32_t decode_instruction(CPUX86State *env, struct x86_decode *decode);
+ 
+-target_ulong get_reg_ref(CPUX86State *env, int reg, int rex, int is_extended,
+-                         int size);
+-target_ulong get_reg_val(CPUX86State *env, int reg, int rex, int is_extended,
+-                         int size);
++target_ulong get_reg_ref(CPUX86State *env, int reg, int rex_present,
++                         int is_extended, int size);
++target_ulong get_reg_val(CPUX86State *env, int reg, int rex_present,
++                         int is_extended, int size);
+ void calc_modrm_operand(CPUX86State *env, struct x86_decode *decode,
+                         struct x86_decode_op *op);
+ target_ulong decode_linear_addr(CPUX86State *env, struct x86_decode *decode,
+-- 
+2.21.0
 
 
-It's more about code sharing and lifecycle.
-
-The project started in a separate repository, and the proposed patches
-for qemu aren't a clean series. Reviewing it is harder than it should
-be, as we have to review/accept the whole thing.
-
-As you said, it doesn't share much with qemu, but libvhost-user (which
-we could quite easily copy or make standalone/submodule).
-
-Then it dumps code from libfuse that is questionnable (showing age)
-and often redundant with facilities provided by either glib, qemu
-utils etc.
-
-Is vhost-user-fs (the qemu device) going to have a strong relation
-with virtiofsd?
-Are we going to support different version of qemu and virtiofsd
-combination? I suppose we have to, as vhost-user protocol should allow
-that, and it's nice to allow other to experiment and implement it in
-different ways.
-If not, then perhaps we should think about introducing some version
-checking between qemu and external processes (with config_stamp,
-similar to modules).
-
-From what I understand, I think c) would be fine. However, for
-convenience/testing reasons, b) would be my preference.
-
---=20
-Marc-Andr=C3=A9 Lureau
 
