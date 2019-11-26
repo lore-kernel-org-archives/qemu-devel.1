@@ -8,83 +8,82 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE0E0C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24335C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:18:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 890632071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:18:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E444B2071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:18:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mc9u7EWT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 890632071E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRF5Tm8j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E444B2071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZXvh-0000aI-4S
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:18:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57349)
+	id 1iZXvi-0000bc-C3
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:18:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57458)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsK-0005R4-9X
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:17 -0500
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsE-0005g9-Sn
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXmf-0003Iq-NZ
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:26 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38914)
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXna-0003jy-9E
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:10:27 -0500
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:40860)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
- id 1iZXmf-0003IZ-IG
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:25 -0500
-Received: by mail-pg1-x542.google.com with SMTP id b137so6441484pga.6
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:09:25 -0800 (PST)
+ id 1iZXna-0003jo-2y
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:10:22 -0500
+Received: by mail-pj1-x1043.google.com with SMTP id ep1so8070951pjb.7
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:10:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=EWBtU+IlOUXhhtmkIhJ52D/yxzedCQhAg5N/fljwEYM=;
- b=mc9u7EWTbaAvtKBfR1FxVgVgSAqvpWaqH4I+At8oqCl0wPs4cfCfmxX5bUF+7APNl4
- Xmw2dKPJ0fdmby7ayXU98TCOKpU3tQ1wLifizZBS9IU8NwE5tsD4IoVzY5pYlcirUpf9
- GML0jDXsPkYpnJe+/RALaLB8XlL6sdizXEjybBT7EgZxdovS1whnnDXgS67wftULUchR
- O3p4sPYpo+nunkY6U7wrAUIFDpc4+vzXWVNuD0tkqqUfIITHpRM0zfXFvhm5VUEnlf0k
- FecGp1HqFADGdhQP1ea4gIcNAQRIySeCIanS7L8aCvBvaHue4K/B4u8Yk6YJPLPoV0QZ
- x0AQ==
+ bh=8RYu51EDNv1nof9QqLb6ITvPij8Y0e1oqvT4ZWA3MBk=;
+ b=nRF5Tm8jxrFWVSKwm9O8IM/CbmQqEsu5rCN9Jyr5Imv6QqQfq9VRMYS7YLJ5wUJCxh
+ qIt9XGVC1HAjJFjMFfh2wiMDJ1RsUshx7jiDLkSxPCruk/EpIJA5uWjo33nVwjrwg7KQ
+ iqAIss99ASYM2cGrf4dQrhfnPWjiHbnNJiSrsXNoPQPG99KrN1YdAAsafpM+Mau9iN3X
+ g3ZrKf6tLLLyKSYyX6wrhJ2QDhD4/HkK2AbM4EASZg5bK2CrlgHNsZiMnfc8ye1r2Vti
+ 5CmHfDMSNkWzgKkbp2IsgZJrdCp3p41Vbh3TvrO36cyVwu+Ef5NXYan++ww4AzfpXKdS
+ H29w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=EWBtU+IlOUXhhtmkIhJ52D/yxzedCQhAg5N/fljwEYM=;
- b=PVaHsPmnSaBAoIewRpmzJmfZq5fV5nLfNy93C8l+NMKvPl+z2BsS/D3j4CQwSCbm5Q
- 94OCaZhqyintRtuA5iPvo00f322K5lBDvS2uttcAoUxFCRw1bPv+HzTmvEfX1h+VHxka
- ajnldUiR+2+APDxVzDDyoBE6F9reCwbgkthHMIdhRT5D+aAxQf8uIkwENPsIXGiqIh6b
- LIfhYxslH1W1TkvYFMQALClYhNT1IKp2mHBnv0Orjk1IRjPf/arLordQAIlq1S79w0Je
- ANM8OmTo6YAzo5EfDiWG+Yc05ZZdXzTaJ6/RirspYlAfY5UQ6n6xAJi9TxEgdgayA94q
- MKLQ==
-X-Gm-Message-State: APjAAAW689sirDqQY+U4xOl9jjcA3M6T5zHD0A98zDdZzWpVR8G9LGiF
- qPbNt1OdHN5Ow2cQk/fWaxU=
-X-Google-Smtp-Source: APXvYqz49czbgi+kYj34fPF5hK5fvqdKlFHvat1AI4Q3wYxfqfWIPNVeAlyJ9wlfZ+jcUET4SjDAZg==
-X-Received: by 2002:a63:6b87:: with SMTP id
- g129mr29079841pgc.438.1574762964825; 
- Tue, 26 Nov 2019 02:09:24 -0800 (PST)
+ bh=8RYu51EDNv1nof9QqLb6ITvPij8Y0e1oqvT4ZWA3MBk=;
+ b=oBWp7l1ht7s+f4IJ8Uf9Hrel56EiShbJ2Ub7A5rA30AhgGGtFCbRvMrb761gOWlJ20
+ oBihnB9w040b0KcG/nXfgy22DbO28CcGZf9bg0bChXP30Ahu6PUf5Mc0IkZd6+ioNHge
+ wDc50MBYuIY61zuQDmrQvlcbM8PLl3WcKJZmglgwsmSC+KooZa3Uco+xBPNmcJ0eASbk
+ 8MbZPpl0wj5HgIC+S6kcRs0fpPz7wPydsVA2Hbz/qJI/jn8aI7KjjWNpNEpm7jk7A96i
+ V6TAa7uK/uACwOPWhG1xAxAtQiO4BJg8Yd4m2J/C2l/EzMKpuPBIly/5lQLWuEiQcRSr
+ vjUA==
+X-Gm-Message-State: APjAAAUsZy4HsnwZYCrQKDiszmIgBF+Xv1qso4p9D/nukXEfhPH5kzZf
+ G/NOLvarMV8150ulMXnMqZc=
+X-Google-Smtp-Source: APXvYqxADjKHatHur+fxT/01AG/vZgD9nSsRNGb2AyFD7GjgVAPzN1abgIppTbaJ/3338My3voR1ig==
+X-Received: by 2002:a17:90a:650c:: with SMTP id
+ i12mr5948361pjj.28.1574763021275; 
+ Tue, 26 Nov 2019 02:10:21 -0800 (PST)
 Received: from localhost.localdomain ([222.151.198.97])
- by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.09.21
+ by smtp.gmail.com with ESMTPSA id h9sm12059065pgk.84.2019.11.26.02.10.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 02:09:24 -0800 (PST)
+ Tue, 26 Nov 2019 02:10:20 -0800 (PST)
 From: Prashant Bhole <prashantbhole.linux@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
- "Michael S . Tsirkin" <mst@redhat.com>
-Subject: [RFC net-next 11/18] tun: run xdp prog when tun is read from file
- interface
-Date: Tue, 26 Nov 2019 19:07:37 +0900
-Message-Id: <20191126100744.5083-12-prashantbhole.linux@gmail.com>
+To: "Michael S . Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org
+Subject: [RFC 3/3] virtio-net: add support for offloading an ebpf map
+Date: Tue, 26 Nov 2019 19:09:14 +0900
+Message-Id: <20191126100914.5150-4-prashantbhole.linux@gmail.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+In-Reply-To: <20191126100914.5150-1-prashantbhole.linux@gmail.com>
+References: <20191126100914.5150-1-prashantbhole.linux@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,54 +99,189 @@ Cc: Song Liu <songliubraving@fb.com>,
  Jakub Kicinski <jakub.kicinski@netronome.com>,
  Jesper Dangaard Brouer <hawk@kernel.org>,
  Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, qemu-devel@nongnu.org,
+ John Fastabend <john.fastabend@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
+ Martin KaFai Lau <kafai@fb.com>,
  Prashant Bhole <prashantbhole.linux@gmail.com>, kvm@vger.kernel.org,
  Yonghong Song <yhs@fb.com>, Andrii Nakryiko <andriin@fb.com>,
- Martin KaFai Lau <kafai@fb.com>
+ "David S . Miller" <davem@davemloft.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It handles the case when qemu performs read on tun using file
-operations.
+From: Jason Wang <jasowang@redhat.com>
 
+This change is a part of XDP offload feature. It handles offloading
+of eBPF map from the guest.
+
+A command handler for VIRTIO_NET_CTRL_EBPF now checks for subcommand
+VIRTIO_NET_CTRL_EBPF_MAP and. The control buffer consists of struct
+virtio_net_ctrl_ebpf_map followed by map key/value or key/key pair.
+Map manipulation is done using libbpf APIs.
+
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+Co-developed-by: Prashant Bhole <prashantbhole.linux@gmail.com>
 Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
 ---
- drivers/net/tun.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ hw/net/Makefile.objs                        |  2 +
+ hw/net/virtio-net.c                         | 88 +++++++++++++++++++++
+ include/standard-headers/linux/virtio_net.h | 23 ++++++
+ 3 files changed, 113 insertions(+)
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 084ca95358fe..639921c10e32 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -2318,8 +2318,10 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
- 			   struct iov_iter *to,
- 			   int noblock, void *ptr)
- {
-+	struct xdp_frame *frame;
- 	ssize_t ret;
- 	int err;
-+	u32 act;
+diff --git a/hw/net/Makefile.objs b/hw/net/Makefile.objs
+index 7907d2c199..5928497a01 100644
+--- a/hw/net/Makefile.objs
++++ b/hw/net/Makefile.objs
+@@ -52,3 +52,5 @@ common-obj-$(CONFIG_ROCKER) += rocker/rocker.o rocker/rocker_fp.o \
+ obj-$(call lnot,$(CONFIG_ROCKER)) += rocker/qmp-norocker.o
  
- 	tun_debug(KERN_INFO, tun, "tun_do_read\n");
- 
-@@ -2333,6 +2335,15 @@ static ssize_t tun_do_read(struct tun_struct *tun, struct tun_file *tfile,
- 		ptr = tun_ring_recv(tfile, noblock, &err);
- 		if (!ptr)
- 			return err;
+ common-obj-$(CONFIG_CAN_BUS) += can/
 +
-+		if (tun_is_xdp_frame(ptr)) {
-+			frame = tun_ptr_to_xdp(ptr);
-+			act = tun_do_xdp_offload(tun, tfile, frame);
-+		} else {
-+			act = tun_do_xdp_offload_generic(tun, ptr);
-+		}
-+		if (act != XDP_PASS)
-+			return err;
- 	}
++virtio-net.o-libs := $(LIBBPF_LIBS)
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 7cc1bd1654..3c49273796 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -1011,6 +1011,92 @@ static int virtio_net_handle_offloads(VirtIONet *n, uint8_t cmd,
+     }
+ }
  
- 	if (tun_is_xdp_frame(ptr)) {
++static int virtio_net_handle_ebpf_map(VirtIONet *n, struct iovec *iov,
++                                      unsigned int iov_cnt)
++{
++#ifdef CONFIG_LIBBPF
++    struct virtio_net_ctrl_ebpf_map *ctrl = NULL;
++    struct bpf_create_map_attr map_attr = {};
++    uint8_t *key, *val;
++    uint32_t buf_len;
++    int fd, err = 0;
++    size_t s;
++
++    s = iov_to_buf(iov, iov_cnt, 0, &buf_len, sizeof(buf_len));
++    if (s != sizeof(buf_len)) {
++        goto err;
++    }
++
++    ctrl = malloc(sizeof(*ctrl) + buf_len);
++    if (!ctrl) {
++        goto err;
++    }
++
++    s = iov_to_buf(iov, iov_cnt, 0, ctrl, sizeof(*ctrl) + buf_len);
++    if (s != (sizeof(*ctrl) + buf_len)) {
++        error_report("Invalid map control buffer");
++        goto err;
++    }
++
++    key = ctrl->buf;
++    val = ctrl->buf + ctrl->key_size;
++
++    switch (ctrl->cmd) {
++    case VIRTIO_NET_BPF_CMD_CREATE_MAP:
++        map_attr.map_type = ctrl->map_type;
++        map_attr.map_flags = ctrl->map_flags;
++        map_attr.key_size = ctrl->key_size;
++        map_attr.value_size = ctrl->value_size;
++        map_attr.max_entries = ctrl->max_entries;
++        fd = bpf_create_map_xattr(&map_attr);
++        if (fd < 0) {
++            goto err;
++        }
++        ctrl->map_fd = fd;
++        break;
++    case VIRTIO_NET_BPF_CMD_FREE_MAP:
++        close(ctrl->map_fd);
++        break;
++    case VIRTIO_NET_BPF_CMD_LOOKUP_ELEM:
++        err = bpf_map_lookup_elem(ctrl->map_fd, key, val);
++        break;
++    case VIRTIO_NET_BPF_CMD_GET_FIRST:
++        err = bpf_map_get_next_key(ctrl->map_fd, NULL, val);
++        break;
++    case VIRTIO_NET_BPF_CMD_GET_NEXT:
++        err = bpf_map_get_next_key(ctrl->map_fd, key, val);
++        break;
++    case VIRTIO_NET_BPF_CMD_UPDATE_ELEM:
++        err = bpf_map_update_elem(ctrl->map_fd, key, val, ctrl->flags);
++        break;
++    case VIRTIO_NET_BPF_CMD_DELETE_ELEM:
++        err = bpf_map_delete_elem(ctrl->map_fd, key);
++    default:
++        error_report("map operation not implemented %d", ctrl->cmd);
++        goto err;
++    }
++
++    if (err) {
++        goto err;
++    }
++
++    s = iov_from_buf(iov, iov_cnt, 0, ctrl, sizeof(*ctrl) + buf_len);
++    if (s != sizeof(*ctrl) + buf_len) {
++        error_report("failed to write map operation result");
++        goto err;
++    }
++
++    free(ctrl);
++    return VIRTIO_NET_OK;
++
++err:
++    if (ctrl) {
++        free(ctrl);
++    }
++#endif
++    return VIRTIO_NET_ERR;
++}
++
+ static int virtio_net_handle_ebpf_prog(VirtIONet *n, struct iovec *iov,
+                                        unsigned int iov_cnt)
+ {
+@@ -1053,6 +1139,8 @@ static int virtio_net_handle_ebpf(VirtIONet *n, uint8_t cmd,
+ {
+     if (cmd == VIRTIO_NET_CTRL_EBPF_PROG) {
+         return virtio_net_handle_ebpf_prog(n, iov, iov_cnt);
++    } else if (cmd == VIRTIO_NET_CTRL_EBPF_MAP) {
++        return virtio_net_handle_ebpf_map(n, iov, iov_cnt);
+     }
+ 
+     return VIRTIO_NET_ERR;
+diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
+index 83292c81bc..cca234e0e8 100644
+--- a/include/standard-headers/linux/virtio_net.h
++++ b/include/standard-headers/linux/virtio_net.h
+@@ -281,11 +281,34 @@ struct virtio_net_ctrl_ebpf_prog {
+ 	uint8_t insns[0];
+ };
+ 
++struct virtio_net_ctrl_ebpf_map {
++	__virtio32 buf_len;
++	__virtio32 cmd;
++	__virtio32 map_type;
++	__virtio32 key_size;
++	__virtio32 value_size;
++	__virtio32 max_entries;
++	__virtio32 map_flags;
++	__virtio32 map_fd;
++	__virtio64 flags;
++	uint8_t buf[0];
++};
++
+ #define VIRTIO_NET_CTRL_EBPF 	6
+  #define VIRTIO_NET_CTRL_EBPF_PROG 1
++ #define VIRTIO_NET_CTRL_EBPF_MAP 2
+ 
+ /* Commands for VIRTIO_NET_CTRL_EBPF_PROG */
+ #define VIRTIO_NET_BPF_CMD_SET_OFFLOAD 1
+ #define VIRTIO_NET_BPF_CMD_UNSET_OFFLOAD 2
+ 
++/* Commands for VIRTIO_NET_CTRL_EBPF_MAP */
++#define VIRTIO_NET_BPF_CMD_CREATE_MAP 1
++#define VIRTIO_NET_BPF_CMD_FREE_MAP 2
++#define VIRTIO_NET_BPF_CMD_UPDATE_ELEM 3
++#define VIRTIO_NET_BPF_CMD_LOOKUP_ELEM 4
++#define VIRTIO_NET_BPF_CMD_DELETE_ELEM 5
++#define VIRTIO_NET_BPF_CMD_GET_FIRST 6
++#define VIRTIO_NET_BPF_CMD_GET_NEXT 7
++
+ #endif /* _LINUX_VIRTIO_NET_H */
 -- 
 2.20.1
 
