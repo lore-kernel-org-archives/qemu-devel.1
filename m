@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32EE5C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 06:20:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B6B3C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 06:21:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 004F620656
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 06:20:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA9CD20656
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 06:21:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TUcPwJBO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 004F620656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="SBQwqCNq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA9CD20656
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZUCg-0002iy-HK
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 01:20:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59763)
+	id 1iZUDs-0004jw-OH
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 01:21:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59862)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iZU8z-0007Ip-2n
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 01:16:14 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iZU8y-0007Ll-PF
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 01:16:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iZTvI-0004P2-Or
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 01:02:05 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:54781 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1iZTvJ-0004PX-4u
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 01:02:06 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:59837 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iZTvI-0004NM-DQ; Tue, 26 Nov 2019 01:02:04 -0500
+ id 1iZTvI-0004Nd-PT; Tue, 26 Nov 2019 01:02:05 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47MYFd0yGmz9sR7; Tue, 26 Nov 2019 17:01:56 +1100 (AEDT)
+ id 47MYFd4rHCz9sRK; Tue, 26 Nov 2019 17:01:57 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1574748117;
- bh=SxK6+XV9oC+qJiIgiSf0DCPEib3NB/uxEW2Hla1LRZc=;
+ bh=Yad6EHt74mRLNq20SFLUJExdglivkS35/7wuW+BoRaQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=TUcPwJBO+jIcmbBolMyUcx/sFb25lAdjRP48mt9mRMCwQ7m8od/Tg6Kf5o32wsKtp
- ExepQNiUR9SSLTjPAf+uMjAjp1ShKAb2PyJrhA9zqL2mmiMO3borZsJBM/DSQ6StsI
- +/ZL/W5TSX2tlUmoo3qE/GFxVCtUIsCFKBqIJHEk=
+ b=SBQwqCNqSEHYYC3avOx751ogCk94YLb6q4hqLWmAZlJty6Vktx5Ez3nmexu3sATP3
+ XTjxgp51yBlnW+UOHsc7tTAhVvlww023g55YXDq3Jktl+57FD+9GuYrouAksuAyA8i
+ K+XBYkex+bY4opS6ZSJR+Uc/e/QMnbIkoejiCgIw=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 5/8] spapr: Handle irq backend changes with VFIO PCI devices
-Date: Tue, 26 Nov 2019 17:01:48 +1100
-Message-Id: <20191126060151.729845-6-david@gibson.dropbear.id.au>
+Subject: [PULL 7/8] mos6522: update counters when timer interrupts are off
+Date: Tue, 26 Nov 2019 17:01:50 +1100
+Message-Id: <20191126060151.729845-8-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191126060151.729845-1-david@gibson.dropbear.id.au>
 References: <20191126060151.729845-1-david@gibson.dropbear.id.au>
@@ -69,57 +69,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, Alexey Kardashevskiy <aik@ozlabs.ru>,
- qemu-devel@nongnu.org, groug@kaod.org,
- Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
- clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, Laurent Vivier <laurent@vivier.eu>,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Andrew Randrianasulu <randrianasulu@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-pseries machine type can have one of two different interrupt controllers =
-in
-use depending on feature negotiation with the guest.  Usually this is
-invisible to devices, because they route to a common set of qemu_irqs whi=
-ch
-in turn dispatch to the correct back end.
+From: Laurent Vivier <laurent@vivier.eu>
 
-VFIO passthrough devices, however, wire themselves up directly to the KVM
-irqchip for performance, which means they are affected by this change in
-interrupt controller.  To get them to adjust correctly for the change in
-irqchip, we need to fire the kvm irqchip change notifier.
+Even if the interrupts are off, counters must be updated because
+they are running anyway and kernel can try to read them
+(it's the case with g3beige kernel).
 
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-
+Reported-by: Andrew Randrianasulu <randrianasulu@gmail.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20191125141414.5015-1-laurent@vivier.eu>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Tested-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Acked-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/ppc/spapr_irq.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/misc/mos6522.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 168044be85..1d27034962 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -508,6 +508,12 @@ static void set_active_intc(SpaprMachineState *spapr=
-,
-     }
+diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
+index aa3bfe1afd..cecf0be59e 100644
+--- a/hw/misc/mos6522.c
++++ b/hw/misc/mos6522.c
+@@ -113,6 +113,10 @@ static int64_t get_next_irq_time(MOS6522State *s, MO=
+S6522Timer *ti,
+     int64_t d, next_time;
+     unsigned int counter;
 =20
-     spapr->active_intc =3D new_intc;
++    if (ti->frequency =3D=3D 0) {
++        return INT64_MAX;
++    }
 +
-+    /*
-+     * We've changed the kernel irqchip, let VFIO devices know they
-+     * need to readjust.
-+     */
-+    kvm_irqchip_change_notify();
+     /* current counter value */
+     d =3D muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - ti->load_time=
+,
+                  ti->frequency, NANOSECONDS_PER_SECOND);
+@@ -149,10 +153,10 @@ static void mos6522_timer1_update(MOS6522State *s, =
+MOS6522Timer *ti,
+     if (!ti->timer) {
+         return;
+     }
++    ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
+     if ((s->ier & T1_INT) =3D=3D 0 || (s->acr & T1MODE) !=3D T1MODE_CONT=
+) {
+         timer_del(ti->timer);
+     } else {
+-        ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
+         timer_mod(ti->timer, ti->next_irq_time);
+     }
  }
-=20
- void spapr_irq_update_active_intc(SpaprMachineState *spapr)
+@@ -163,10 +167,10 @@ static void mos6522_timer2_update(MOS6522State *s, =
+MOS6522Timer *ti,
+     if (!ti->timer) {
+         return;
+     }
++    ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
+     if ((s->ier & T2_INT) =3D=3D 0) {
+         timer_del(ti->timer);
+     } else {
+-        ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
+         timer_mod(ti->timer, ti->next_irq_time);
+     }
+ }
 --=20
 2.23.0
 
