@@ -2,84 +2,69 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4D8C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 00:01:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28E6CC432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 01:07:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 649CC20748
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 00:01:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqlhig1T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 649CC20748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0302F2075C
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 01:07:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0302F2075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZOHt-0005VY-JC
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 19:01:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50521)
+	id 1iZPJk-0005KE-Dz
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 20:07:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57023)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZOGX-0004Wg-U7
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:59:39 -0500
+ (envelope-from <yan.y.zhao@intel.com>) id 1iZPIu-0004dO-9g
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 20:06:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZOGW-0000VF-KZ
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:59:37 -0500
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:39409)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iZOGW-0000U0-Fs
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 18:59:36 -0500
-Received: by mail-oi1-x231.google.com with SMTP id v138so14933772oif.6
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 15:59:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=cxD/1Mkh2cW7gJIgBC9LAhbgtS/10Z7ZEDjjxqBlk3Q=;
- b=nqlhig1Tw4RbBsbbrsA+nOvsWuR3AAljUAFtMsDQJu31Yte8T1IojV247Cn6N7rC9j
- npkeTFCOFEL6JOinD934TU+43LDHP5fxO7blP4N7RdiADBiSr7INqUh+skiuIjDZm6qP
- GZtrG+i14XdgaLNlX3KP6Pw9UScWhaORdQaFB3H1GB5S2nsAYQMrJSx6PhoKA1bJb3Sv
- gXH/P3E/B/ozSXRZ/mXHBODMU2Mfka9ykn+Wn5Eo8qYc2FOdPhbnM99HQknHU8Yvs9ZU
- Onla7PZGA4n0YlQ0tbc7l7dfPOdJ7DGg+u3hh1s87CaPy41ysKIlLO7iarlFMVN3Te3b
- DZJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=cxD/1Mkh2cW7gJIgBC9LAhbgtS/10Z7ZEDjjxqBlk3Q=;
- b=FJU5OaHtR1dIiwhjpRCNY6F9p1Sw+wWBNZORlBX2cxT7Ci2Y54t6wwMe77mxxMgcUP
- tgkQE60K3rx1lIV5Ek1dgvwka+N0YeeyYZ9BbfroV27bCZBhv6B8yd6bvDNhlIBU4lcl
- loYs2UrMQcywkjj3Pho9tTglySZ/hMh7fnj4fw/F4k7As5OH2kaVIxrOyuNup0Ms678N
- nQ8k06zYk+q3UIIPJntXsw4Yj7jEL56szLz7y+FpI0yBWporhtkJZXIAprQqUOvU8seK
- Mhn/9p89R99TXIDHHf1y/avL5Xen8B4lkYxeRh7qy2Ukj+Nrc6JgpGTM3KsbVjTkSUtm
- NHwQ==
-X-Gm-Message-State: APjAAAVU6S1WFvZJYgX9jqrSF3NLxMnhm7Z4bgyMe+HnWamqkF97pTsp
- K9I2SMfuBxaz0bupSLYotknucYmTpBQv040yVyo=
-X-Google-Smtp-Source: APXvYqxL+9PYaTi6gQrLb2Zx8zCTasUDueuQp/qbShPfxcjIv0Nl2bDYj0tsKhUAsckCOIGF1nMF9x7qE/DIT5xa+WI=
-X-Received: by 2002:aca:670b:: with SMTP id z11mr1128222oix.79.1574726364356; 
- Mon, 25 Nov 2019 15:59:24 -0800 (PST)
+ (envelope-from <yan.y.zhao@intel.com>) id 1iZPIp-0007Ur-QU
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 20:06:07 -0500
+Received: from mga17.intel.com ([192.55.52.151]:29494)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1iZPIn-0007Pm-Md
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 20:06:03 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 25 Nov 2019 17:05:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,243,1571727600"; d="scan'208";a="291559203"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by orsmga001.jf.intel.com with ESMTP; 25 Nov 2019 17:05:46 -0800
+Date: Mon, 25 Nov 2019 19:57:39 -0500
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
+ dirty pages bitmap.
+Message-ID: <20191126005739.GA31144@joy-OptiPlex-7040>
+References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
+ <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
+ <20191112153020.71406c44@x1.home>
+ <324ce4f8-d655-ee37-036c-fc9ef9045bef@nvidia.com>
+ <20191113130705.32c6b663@x1.home>
+ <7f74a2a1-ba1c-9d4c-dc5e-343ecdd7d6d6@nvidia.com>
+ <20191114140625.213e8a99@x1.home>
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Mon, 25 Nov 2019 15:59:23
- -0800 (PST)
-In-Reply-To: <5edee836-b97b-57fb-70fb-9b6b6bc44a52@redhat.com>
-References: <CAL1e-=gmaimCBh5NBBYFp6Z1ci4ZheQtXpyjU9Uexqi4zSHh2A@mail.gmail.com>
- <CAL1e-=i-u5eR7Fk_Muobbe0-Viim0iPceHoEGtJWCq7L1o9teA@mail.gmail.com>
- <5edee836-b97b-57fb-70fb-9b6b6bc44a52@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 26 Nov 2019 00:59:23 +0100
-Message-ID: <CAL1e-=ijZQrDw6ABJcJ6DPD=VmAXgOCHdy+qE63Jd6jkLefu4A@mail.gmail.com>
-Subject: Re: [QUESTION] What is the best license option for new files
- introduced in QEMU?
-To: Eric Blake <eblake@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000090e60d0598348d5c"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191114140625.213e8a99@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::231
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,140 +76,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000090e60d0598348d5c
-Content-Type: text/plain; charset="UTF-8"
+On Fri, Nov 15, 2019 at 05:06:25AM +0800, Alex Williamson wrote:
+> On Fri, 15 Nov 2019 00:26:07 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+> > On 11/14/2019 1:37 AM, Alex Williamson wrote:
+> > > On Thu, 14 Nov 2019 01:07:21 +0530
+> > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > >   
+> > >> On 11/13/2019 4:00 AM, Alex Williamson wrote:  
+> > >>> On Tue, 12 Nov 2019 22:33:37 +0530
+> > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> > >>>      
+> > >>>> All pages pinned by vendor driver through vfio_pin_pages API should be
+> > >>>> considered as dirty during migration. IOMMU container maintains a list of
+> > >>>> all such pinned pages. Added an ioctl defination to get bitmap of such  
+> > >>>
+> > >>> definition
+> > >>>      
+> > >>>> pinned pages for requested IO virtual address range.  
+> > >>>
+> > >>> Additionally, all mapped pages are considered dirty when physically
+> > >>> mapped through to an IOMMU, modulo we discussed devices opting in to
+> > >>> per page pinning to indicate finer granularity with a TBD mechanism to
+> > >>> figure out if any non-opt-in devices remain.
+> > >>>      
+> > >>
+> > >> You mean, in case of device direct assignment (device pass through)?  
+> > > 
+> > > Yes, or IOMMU backed mdevs.  If vfio_dmas in the container are fully
+> > > pinned and mapped, then the correct dirty page set is all mapped pages.
+> > > We discussed using the vpfn list as a mechanism for vendor drivers to
+> > > reduce their migration footprint, but we also discussed that we would
+> > > need a way to determine that all participants in the container have
+> > > explicitly pinned their working pages or else we must consider the
+> > > entire potential working set as dirty.
+> > >   
+> > 
+> > How can vendor driver tell this capability to iommu module? Any suggestions?
+> 
+> I think it does so by pinning pages.  Is it acceptable that if the
+> vendor driver pins any pages, then from that point forward we consider
+> the IOMMU group dirty page scope to be limited to pinned pages?  There
+we should also be aware of that dirty page scope is pinned pages + unpinned pages,
+which means ever since a page is pinned, it should be regarded as dirty
+no matter whether it's unpinned later. only after log_sync is called and
+dirty info retrieved, its dirty state should be cleared.
 
-On Monday, November 25, 2019, Eric Blake <eblake@redhat.com> wrote:
-
-> On 11/25/19 1:25 PM, Aleksandar Markovic wrote:
->
-> Thomas pointed to me that I mixed up GPL and LGPL - which is true.
->>
->> Still, the question remains with these options:
->>
->> * GPL 2.0
->>
->
-> Not good. It artificially limits who can reuse this code.
->
-> * GPL 2.0 + wording "or later (at your option)"
->>
->
-> Matches what qemu itself uses, so fine; but makes it harder to reuse the
-> code in a standalone library.
->
-> * LGPL 2.1
->>
->
-> Same problems as GPL2-only
->
-> * LGPL 2.1 + wording "or later (at your option)"
->>
->
-> Looser than qemu as a whole, has all the benefits of GPL2+ plus the
-> additional benefit of being able to copy the code into other LGPL
-> standalone libraries.
->
-> It's also acceptable to use even looser licenses, like BSD 2-clause, but
-> preferably only if that other license is already used by part of qemu (we
-> don't need to make our mix even worse than it already is).
->
->
->> The context of my question is that I am reviewing a series that came
->> with files with different license preambles (or without it at all), and I
->> want to advice the submitters on the best option.
->>
->
-> You may also want advice from lawyers, based on how you see your code
-> being reused outside of qemu.  This list can offer advice, but it is
-> non-binding and may not best fit your needs.
->
->
-I truly appreciate your response!
-
--- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
->
->
-
---00000000000090e60d0598348d5c
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Monday, November 25, 2019, Eric Blake &lt;<a href=3D"mailto:ebla=
-ke@redhat.com">eblake@redhat.com</a>&gt; wrote:<br><blockquote class=3D"gma=
-il_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-lef=
-t:1ex">On 11/25/19 1:25 PM, Aleksandar Markovic wrote:<br>
-<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-Thomas pointed to me that I mixed up GPL and LGPL - which is true.<br>
-<br>
-Still, the question remains with these options:<br>
-<br>
-* GPL 2.0<br>
-</blockquote>
-<br>
-Not good. It artificially limits who can reuse this code.<br>
-<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-* GPL 2.0 + wording &quot;or later (at your option)&quot;<br>
-</blockquote>
-<br>
-Matches what qemu itself uses, so fine; but makes it harder to reuse the co=
-de in a standalone library.<br>
-<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-* LGPL 2.1<br>
-</blockquote>
-<br>
-Same problems as GPL2-only<br>
-<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-* LGPL 2.1 + wording &quot;or later (at your option)&quot;<br>
-</blockquote>
-<br>
-Looser than qemu as a whole, has all the benefits of GPL2+ plus the additio=
-nal benefit of being able to copy the code into other LGPL standalone libra=
-ries.<br>
-<br>
-It&#39;s also acceptable to use even looser licenses, like BSD 2-clause, bu=
-t preferably only if that other license is already used by part of qemu (we=
- don&#39;t need to make our mix even worse than it already is).<br>
-<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-<br>
-The context of my question is that I am reviewing a series that came<br>
-with files with different license preambles (or without it at all), and I<b=
-r>
-want to advice the submitters on the best option.<br>
-</blockquote>
-<br>
-You may also want advice from lawyers, based on how you see your code being=
- reused outside of qemu.=C2=A0 This list can offer advice, but it is non-bi=
-nding and may not best fit your needs.<br>
-<br></blockquote><div><br></div><div>I truly appreciate your response!</div=
-><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8e=
-x;border-left:1px #ccc solid;padding-left:1ex">
--- <br>
-Eric Blake, Principal Software Engineer<br>
-Red Hat, Inc.=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0+1-919-301-3226<br>
-Virtualization:=C2=A0 <a href=3D"http://qemu.org" target=3D"_blank">qemu.or=
-g</a> | <a href=3D"http://libvirt.org" target=3D"_blank">libvirt.org</a><br=
->
-<br>
-</blockquote>
-
---00000000000090e60d0598348d5c--
+> are complications around non-singleton IOMMU groups, but I think we're
+> already leaning towards that being a non-worthwhile problem to solve.
+> So if we require that only singleton IOMMU groups can pin pages and we
+> pass the IOMMU group as a parameter to
+> vfio_iommu_driver_ops.pin_pages(), then the type1 backend can set a
+> flag on its local vfio_group struct to indicate dirty page scope is
+> limited to pinned pages.  We might want to keep a flag on the
+> vfio_iommu struct to indicate if all of the vfio_groups for each
+> vfio_domain in the vfio_iommu.domain_list dirty page scope limited to
+> pinned pages as an optimization to avoid walking lists too often.  Then
+> we could test if vfio_iommu.domain_list is not empty and this new flag
+> does not limit the dirty page scope, then everything within each
+> vfio_dma is considered dirty.
+>  
+> > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > >>>> ---
+> > >>>>    include/uapi/linux/vfio.h | 23 +++++++++++++++++++++++
+> > >>>>    1 file changed, 23 insertions(+)
+> > >>>>
+> > >>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > >>>> index 35b09427ad9f..6fd3822aa610 100644
+> > >>>> --- a/include/uapi/linux/vfio.h
+> > >>>> +++ b/include/uapi/linux/vfio.h
+> > >>>> @@ -902,6 +902,29 @@ struct vfio_iommu_type1_dma_unmap {
+> > >>>>    #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+> > >>>>    #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+> > >>>>    
+> > >>>> +/**
+> > >>>> + * VFIO_IOMMU_GET_DIRTY_BITMAP - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
+> > >>>> + *                                     struct vfio_iommu_type1_dirty_bitmap)
+> > >>>> + *
+> > >>>> + * IOCTL to get dirty pages bitmap for IOMMU container during migration.
+> > >>>> + * Get dirty pages bitmap of given IO virtual addresses range using
+> > >>>> + * struct vfio_iommu_type1_dirty_bitmap. Caller sets argsz, which is size of
+> > >>>> + * struct vfio_iommu_type1_dirty_bitmap. User should allocate memory to get
+> > >>>> + * bitmap and should set size of allocated memory in bitmap_size field.
+> > >>>> + * One bit is used to represent per page consecutively starting from iova
+> > >>>> + * offset. Bit set indicates page at that offset from iova is dirty.
+> > >>>> + */
+> > >>>> +struct vfio_iommu_type1_dirty_bitmap {
+> > >>>> +	__u32        argsz;
+> > >>>> +	__u32        flags;
+> > >>>> +	__u64        iova;                      /* IO virtual address */
+> > >>>> +	__u64        size;                      /* Size of iova range */
+> > >>>> +	__u64        bitmap_size;               /* in bytes */  
+> > >>>
+> > >>> This seems redundant.  We can calculate the size of the bitmap based on
+> > >>> the iova size.
+> > >>>     
+> > >>
+> > >> But in kernel space, we need to validate the size of memory allocated by
+> > >> user instead of assuming user is always correct, right?  
+> > > 
+> > > What does it buy us for the user to tell us the size?  They could be
+> > > wrong, they could be malicious.  The argsz field on the ioctl is mostly
+> > > for the handshake that the user is competent, we should get faults from
+> > > the copy-user operation if it's incorrect.
+> > >  
+> > 
+> > It is to mainly fail safe.
+> > 
+> > >>>> +	void __user *bitmap;                    /* one bit per page */  
+> > >>>
+> > >>> Should we define that as a __u64* to (a) help with the size
+> > >>> calculation, and (b) assure that we can use 8-byte ops on it?
+> > >>>
+> > >>> However, who defines page size?  Is it necessarily the processor page
+> > >>> size?  A physical IOMMU may support page sizes other than the CPU page
+> > >>> size.  It might be more important to indicate the expected page size
+> > >>> than the bitmap size.  Thanks,
+> > >>>     
+> > >>
+> > >> I see in QEMU and in vfio_iommu_type1 module, page sizes considered for
+> > >> mapping are CPU page size, 4K. Do we still need to have such argument?  
+> > > 
+> > > That assumption exists for backwards compatibility prior to supporting
+> > > the iova_pgsizes field in vfio_iommu_type1_info.  AFAIK the current
+> > > interface has no page size assumptions and we should not add any.  
+> > 
+> > So userspace has iova_pgsizes information, which can be input to this 
+> > ioctl. Bitmap should be considering smallest page size. Does that makes 
+> > sense?
+> 
+> I'm not sure.  I thought I had an argument that the iova_pgsize could
+> indicate support for sizes smaller than the processor page size, which
+> would make the user responsible for using a different base for their
+> page size, but vfio_pgsize_bitmap() already masks out sub-page sizes.
+> Clearly the vendor driver is pinning based on processor sized pages,
+> but that's independent of an IOMMU and not part of a user ABI.
+> 
+> I'm tempted to say your bitmap_size field has a use here, but it seems
+> to fail in validating the user page size at the low extremes.  For
+> example if we have a single page mapping, the user can specify the iova
+> size as 4K (for example), but the minimum bitmap_size they can indicate
+> is 1 byte, would we therefore assume the user's bitmap page size is 512
+> bytes (ie. they provided us with 8 bits to describe a 4K range)?  We'd
+> need to be careful to specify that the minimum iova_pgsize indicated
+> page size is our lower bound as well.  But then what do we do if the
+> user provides us with a smaller buffer than we expect?  For example, a
+> 128MB iova range and only an 8-byte buffer.  Do we go ahead and assume
+> a 2MB page size and fill the bitmap accordingly or do we generate an
+> error?  If the latter, might we support that at some point in time and
+> is it sufficient to let the user perform trial and error to test if that
+> exists?  Thanks,
+> 
+> Alex
+> 
 
