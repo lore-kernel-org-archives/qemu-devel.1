@@ -8,75 +8,73 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B5AC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:35:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA4AC432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D4CF2071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:35:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 011442071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:36:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QkhGdXqA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D4CF2071E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T0I1EGJ6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 011442071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZYCG-0004nT-BE
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:35:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57458)
+	id 1iZYCg-0005Wb-SF
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:36:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57422)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsL-0005g9-RE
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:19 -0500
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsL-0005e4-Ja
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXmI-00032L-Fc
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:03 -0500
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:35121)
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXmQ-00037J-BC
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:11 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44193)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
- id 1iZXmI-00031y-9S
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:02 -0500
-Received: by mail-pj1-x1041.google.com with SMTP id s8so8071090pji.2
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:09:02 -0800 (PST)
+ id 1iZXmQ-00036b-2i
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:10 -0500
+Received: by mail-pg1-x542.google.com with SMTP id e6so8732569pgi.11
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:09:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JOqfaTjB9hR4SvgWUY3wyefTnNCZb7GyoEbULC6AJJo=;
- b=QkhGdXqAqq10xMSu+2CnyH8h3k9xRLREYvQrc7Kl+Q0+83MDkF+tuhBxvnRiUIrU5H
- eLqXuIZUtQQQafXXx5KJYDzw+cbyREKs1xo+xDhrhWrKOz2Hfe+KnD5BCeK8L6z7FoGB
- H8uL0SKa0QBz+PC6YnjRyHOBKKwWwEqH1f4T41+MgFl+QMvSklHCyhIdh8muKtDnfRAe
- wnppauQ8mL6ut7U+3hHZwdGgDP61KM8PE2qspO4rG1wmunzRjivSxjNu6ss3SQdisLdS
- 3CD2OlXrfUF8AsknNCn14UV/RDnRG4uS2zPqKLV30IbvCAr64AsnlplUmR+oN2N7ka5Y
- wSMg==
+ bh=o7wWeRbc+tNqQMSjrOB4Aqcs6TIYjdNZ6xF+Z6+tUq0=;
+ b=T0I1EGJ6YTSRSu/Y4XLTUBBYnqBS9LwqseER/BjzdXl8Q7YQ6BBhOS6hWPwJ+Fampz
+ P7EI5RxePE3I3u7Y94Tky0n+nFE78T2UBuBrF7foiUu5ODFJMPS7xZL9Attd9J/fv2xk
+ YC0mrtwZW0lEhmUYXkLjAnrzjGf0MLJJzOGH6wypDpR4PUbQQZUzKRmWBcG+SeZ9cW79
+ sSdTVoF36tW8MK07iZfRmuRxtHw8eS3BBMGKOv/L1m+aD66CZK50R2dRXBlpOSt96TbP
+ YzvoGyvxaN5aONyAay/kSX0/Rb7Ga8eSzdNDD3OD5e5IZ1t55ny2HbvmNcgnnY5mr39+
+ 5zeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=JOqfaTjB9hR4SvgWUY3wyefTnNCZb7GyoEbULC6AJJo=;
- b=r1HQErNXhMJuAqWRgQHy3zA/D8NjN9+wDLpajNoQONnS+bcXXGnu6qxHpmZ+ezWu5J
- PRAIcp4lB6zAhtdu4PwcixuAJ9dmriplIHLJoqexqwPP/mAXL4QYQPluDi4UymdLUFuQ
- geTEEdijM+9LnWrkL/9LwcOl3W2Ocrp/cDdK7SuIOjjIBhBC+YZJzNDc4vCwrvr1FAjA
- K+zf0kqcuygRA7nyj2Gv/uJtTzgg+a2/0SgJFUIfAFmlH0JGo87/4B5KvHpxvF8qXiTS
- yygvEG4S1jdQZUgKJGmi1QbUOAO1y1IiK1W/Ijl/zHXXw8YJ7Zvj5YTyR1O3BbTIH1rv
- +SQA==
-X-Gm-Message-State: APjAAAUZF+DiX07ZkvyDEwMtz4Y8LPLxgd5eZpeg2JD8LUkaj8hcgJ+d
- OWWDqZ0Y0ENpSeX7EkSeFseDnnaz
-X-Google-Smtp-Source: APXvYqwPyv6+pc3DP4PZm1a3x96MwS0Kc6f03xdB6l2+mtJteT+8mFJPIbbpCn/sngodhdsZCCyQtA==
-X-Received: by 2002:a17:90b:f0c:: with SMTP id
- br12mr5745156pjb.67.1574762941343; 
- Tue, 26 Nov 2019 02:09:01 -0800 (PST)
+ bh=o7wWeRbc+tNqQMSjrOB4Aqcs6TIYjdNZ6xF+Z6+tUq0=;
+ b=GMGmW5Y8m7INysfbiSg6JqAFJcDd/EUovNOObRPxIOvJxlNBkvTPRExjm8doau2/6N
+ GMLhYPMfU8zCb47CIaXGnPHxC5o5QOl38uNwp6vOBXgWtEdpsRmYr8lF3/dD5lDC0oaE
+ BMoDcplzh1JzCe0OTZFcc/M3s02Nfr8SeQ0ZZvMx2sCrvinOZV6zy/wCB6WDIPgvKmCj
+ rLqhLhThhnnAeqYsZpXo/fI3jeK+pIkSgdLxVNUwht57GBG+dGxnuytQix/jwkGNaruH
+ KOUtWjO0yRrlfHvvofpBn83gcHEM/bA+kKupqaxTOT2HiCfY77gTu3IpyZTZN9rTiPJq
+ cwLQ==
+X-Gm-Message-State: APjAAAVLu/Hw11cdMCl7u/04C2FsNF5lyOAjj9T29VHkbKkUgSVTALby
+ vrMrA+JxlLNhkYT4OAeYRf4=
+X-Google-Smtp-Source: APXvYqwfaVLiFIs0iXc/+SHQsi0c/jFNHsDcCU5mOA5Ky5UmlUqcVt7e8bS0r/y9o05pZ3I6c6EV8A==
+X-Received: by 2002:a65:4342:: with SMTP id k2mr38951684pgq.63.1574762949130; 
+ Tue, 26 Nov 2019 02:09:09 -0800 (PST)
 Received: from localhost.localdomain ([222.151.198.97])
- by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.08.57
+ by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.09.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 02:09:00 -0800 (PST)
+ Tue, 26 Nov 2019 02:09:08 -0800 (PST)
 From: Prashant Bhole <prashantbhole.linux@gmail.com>
 To: "David S . Miller" <davem@davemloft.net>,
  "Michael S . Tsirkin" <mst@redhat.com>
-Subject: [RFC net-next 05/18] vhost_net: user tap recvmsg api to access ptr
- ring
-Date: Tue, 26 Nov 2019 19:07:31 +0900
-Message-Id: <20191126100744.5083-6-prashantbhole.linux@gmail.com>
+Subject: [RFC net-next 07/18] tun: set offloaded xdp program
+Date: Tue, 26 Nov 2019 19:07:33 +0900
+Message-Id: <20191126100744.5083-8-prashantbhole.linux@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
 References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
@@ -84,7 +82,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,234 +107,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently vhost_net directly accesses ptr ring of tap driver to
-fetch Rx packet pointers. In order to avoid it this patch modifies
-tap driver's recvmsg api to do additional task of fetching Rx packet
-pointers.
+From: Jason Wang <jasowang@redhat.com>
 
-A special struct tun_msg_ctl is already being passed via msg_control
-for tun Rx XDP batching. This patch extends tun_msg_ctl usage to
-send sub commands to recvmsg api. Now tun_recvmsg will handle commands
-to consume and unconsume packet pointers from ptr ring.
+This patch introduces an ioctl way to set an offloaded XDP program
+to tun driver. This ioctl will be used by qemu to offload XDP program
+from virtio_net in the guest.
 
-This will be useful in implementation of virtio-net XDP offload
-feature, where packets will be XDP processed before they are passed
-to vhost_net.
-
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
 ---
- drivers/net/tap.c      | 22 ++++++++++++++++++-
- drivers/net/tun.c      | 24 ++++++++++++++++++++-
- drivers/vhost/net.c    | 48 +++++++++++++++++++++++++++++++-----------
- include/linux/if_tun.h | 18 ++++++++++++++++
- 4 files changed, 98 insertions(+), 14 deletions(-)
+ drivers/net/tun.c           | 19 ++++++++++++++-----
+ include/uapi/linux/if_tun.h |  1 +
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 4df7bf00af66..8635cdfd7aa4 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1234,8 +1234,28 @@ static int tap_recvmsg(struct socket *sock, struct msghdr *m,
- 		       size_t total_len, int flags)
- {
- 	struct tap_queue *q = container_of(sock, struct tap_queue, sock);
--	struct sk_buff *skb = m->msg_control;
-+	struct tun_msg_ctl *ctl = m->msg_control;
-+	struct sk_buff *skb = NULL;
- 	int ret;
-+
-+	if (ctl) {
-+		switch (ctl->type) {
-+		case TUN_MSG_PKT:
-+			skb = ctl->ptr;
-+			break;
-+		case TUN_MSG_CONSUME_PKTS:
-+			return ptr_ring_consume_batched(&q->ring,
-+							ctl->ptr,
-+							ctl->num);
-+		case TUN_MSG_UNCONSUME_PKTS:
-+			ptr_ring_unconsume(&q->ring, ctl->ptr, ctl->num,
-+					   tun_ptr_free);
-+			return 0;
-+		default:
-+			return -EINVAL;
-+		}
-+	}
-+
- 	if (flags & ~(MSG_DONTWAIT|MSG_TRUNC)) {
- 		kfree_skb(skb);
- 		return -EINVAL;
 diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 1e436d9ec4e1..4f28f2387435 100644
+index d078b4659897..ecb49101b0b5 100644
 --- a/drivers/net/tun.c
 +++ b/drivers/net/tun.c
-@@ -2577,7 +2577,8 @@ static int tun_recvmsg(struct socket *sock, struct msghdr *m, size_t total_len,
- {
- 	struct tun_file *tfile = container_of(sock, struct tun_file, socket);
- 	struct tun_struct *tun = tun_get(tfile);
--	void *ptr = m->msg_control;
-+	struct tun_msg_ctl *ctl = m->msg_control;
-+	void *ptr = NULL;
- 	int ret;
+@@ -241,6 +241,7 @@ struct tun_struct {
+ 	struct bpf_prog __rcu *xdp_prog;
+ 	struct tun_prog __rcu *steering_prog;
+ 	struct tun_prog __rcu *filter_prog;
++	struct tun_prog __rcu *offloaded_xdp_prog;
+ 	struct ethtool_link_ksettings link_ksettings;
+ };
  
- 	if (!tun) {
-@@ -2585,6 +2586,27 @@ static int tun_recvmsg(struct socket *sock, struct msghdr *m, size_t total_len,
- 		goto out_free;
+@@ -2256,7 +2257,7 @@ static void tun_prog_free(struct rcu_head *rcu)
+ {
+ 	struct tun_prog *prog = container_of(rcu, struct tun_prog, rcu);
+ 
+-	bpf_prog_destroy(prog->prog);
++	bpf_prog_put(prog->prog);
+ 	kfree(prog);
+ }
+ 
+@@ -2301,6 +2302,7 @@ static void tun_free_netdev(struct net_device *dev)
+ 	security_tun_dev_free_security(tun->security);
+ 	__tun_set_ebpf(tun, &tun->steering_prog, NULL);
+ 	__tun_set_ebpf(tun, &tun->filter_prog, NULL);
++	__tun_set_ebpf(tun, &tun->offloaded_xdp_prog, NULL);
+ }
+ 
+ static void tun_setup(struct net_device *dev)
+@@ -3036,7 +3038,7 @@ static int tun_set_queue(struct file *file, struct ifreq *ifr)
+ }
+ 
+ static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog **prog_p,
+-			void __user *data)
++			void __user *data, int type)
+ {
+ 	struct bpf_prog *prog;
+ 	int fd;
+@@ -3047,7 +3049,7 @@ static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog **prog_p,
+ 	if (fd == -1) {
+ 		prog = NULL;
+ 	} else {
+-		prog = bpf_prog_get_type(fd, BPF_PROG_TYPE_SOCKET_FILTER);
++		prog = bpf_prog_get_type(fd, type);
+ 		if (IS_ERR(prog))
+ 			return PTR_ERR(prog);
  	}
+@@ -3345,11 +3347,18 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+ 		break;
  
-+	if (ctl) {
-+		switch (ctl->type) {
-+		case TUN_MSG_PKT:
-+			ptr = ctl->ptr;
-+			break;
-+		case TUN_MSG_CONSUME_PKTS:
-+			ret = ptr_ring_consume_batched(&tfile->tx_ring,
-+						       ctl->ptr,
-+						       ctl->num);
-+			goto out;
-+		case TUN_MSG_UNCONSUME_PKTS:
-+			ptr_ring_unconsume(&tfile->tx_ring, ctl->ptr,
-+					   ctl->num, tun_ptr_free);
-+			ret = 0;
-+			goto out;
-+		default:
-+			ret = -EINVAL;
-+			goto out_put_tun;
-+		}
-+	}
+ 	case TUNSETSTEERINGEBPF:
+-		ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
++		ret = tun_set_ebpf(tun, &tun->steering_prog, argp,
++				   BPF_PROG_TYPE_SOCKET_FILTER);
+ 		break;
+ 
+ 	case TUNSETFILTEREBPF:
+-		ret = tun_set_ebpf(tun, &tun->filter_prog, argp);
++		ret = tun_set_ebpf(tun, &tun->filter_prog, argp,
++				   BPF_PROG_TYPE_SOCKET_FILTER);
++		break;
 +
- 	if (flags & ~(MSG_DONTWAIT|MSG_TRUNC|MSG_ERRQUEUE)) {
- 		ret = -EINVAL;
- 		goto out_put_tun;
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 1a2dd53caade..0f91b374a558 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -175,24 +175,44 @@ static void *vhost_net_buf_consume(struct vhost_net_buf *rxq)
++	case TUNSETOFFLOADEDXDP:
++		ret = tun_set_ebpf(tun, &tun->offloaded_xdp_prog, argp,
++				   BPF_PROG_TYPE_XDP);
+ 		break;
  
- static int vhost_net_buf_produce(struct vhost_net_virtqueue *nvq)
- {
-+	struct vhost_virtqueue *vq = &nvq->vq;
-+	struct socket *sock = vq->private_data;
- 	struct vhost_net_buf *rxq = &nvq->rxq;
-+	struct tun_msg_ctl ctl = {
-+		.type = TUN_MSG_CONSUME_PKTS,
-+		.ptr = (void *) rxq->queue,
-+		.num = VHOST_NET_BATCH,
-+	};
-+	struct msghdr msg = {
-+		.msg_control = &ctl,
-+	};
+ 	case TUNSETCARRIER:
+diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+index 454ae31b93c7..21dbd8db2401 100644
+--- a/include/uapi/linux/if_tun.h
++++ b/include/uapi/linux/if_tun.h
+@@ -61,6 +61,7 @@
+ #define TUNSETFILTEREBPF _IOR('T', 225, int)
+ #define TUNSETCARRIER _IOW('T', 226, int)
+ #define TUNGETDEVNETNS _IO('T', 227)
++#define TUNSETOFFLOADEDXDP _IOW('T', 228, int)
  
- 	rxq->head = 0;
--	rxq->tail = ptr_ring_consume_batched(nvq->rx_ring, rxq->queue,
--					      VHOST_NET_BATCH);
-+	rxq->tail = sock->ops->recvmsg(sock, &msg, 0, 0);
-+	if (WARN_ON_ONCE(rxq->tail < 0))
-+		rxq->tail = 0;
-+
- 	return rxq->tail;
- }
- 
- static void vhost_net_buf_unproduce(struct vhost_net_virtqueue *nvq)
- {
-+	struct vhost_virtqueue *vq = &nvq->vq;
-+	struct socket *sock = vq->private_data;
- 	struct vhost_net_buf *rxq = &nvq->rxq;
-+	struct tun_msg_ctl ctl = {
-+		.type = TUN_MSG_UNCONSUME_PKTS,
-+		.ptr = (void *) (rxq->queue + rxq->head),
-+		.num = vhost_net_buf_get_size(rxq),
-+	};
-+	struct msghdr msg = {
-+		.msg_control = &ctl,
-+	};
- 
--	if (nvq->rx_ring && !vhost_net_buf_is_empty(rxq)) {
--		ptr_ring_unconsume(nvq->rx_ring, rxq->queue + rxq->head,
--				   vhost_net_buf_get_size(rxq),
--				   tun_ptr_free);
--		rxq->head = rxq->tail = 0;
--	}
-+	if (!vhost_net_buf_is_empty(rxq))
-+		sock->ops->recvmsg(sock, &msg, 0, 0);
-+
-+	rxq->head = rxq->tail = 0;
- }
- 
- static int vhost_net_buf_peek_len(void *ptr)
-@@ -1109,6 +1129,7 @@ static void handle_rx(struct vhost_net *net)
- 		.flags = 0,
- 		.gso_type = VIRTIO_NET_HDR_GSO_NONE
- 	};
-+	struct tun_msg_ctl ctl;
- 	size_t total_len = 0;
- 	int err, mergeable;
- 	s16 headcount;
-@@ -1166,8 +1187,11 @@ static void handle_rx(struct vhost_net *net)
- 			goto out;
- 		}
- 		busyloop_intr = false;
--		if (nvq->rx_ring)
--			msg.msg_control = vhost_net_buf_consume(&nvq->rxq);
-+		if (nvq->rx_ring) {
-+			ctl.type = TUN_MSG_PKT;
-+			ctl.ptr = vhost_net_buf_consume(&nvq->rxq);
-+			msg.msg_control = &ctl;
-+		}
- 		/* On overrun, truncate and discard */
- 		if (unlikely(headcount > UIO_MAXIOV)) {
- 			iov_iter_init(&msg.msg_iter, READ, vq->iov, 1, 1);
-@@ -1346,8 +1370,8 @@ static struct socket *vhost_net_stop_vq(struct vhost_net *n,
- 	mutex_lock(&vq->mutex);
- 	sock = vq->private_data;
- 	vhost_net_disable_vq(n, vq);
--	vq->private_data = NULL;
- 	vhost_net_buf_unproduce(nvq);
-+	vq->private_data = NULL;
- 	nvq->rx_ring = NULL;
- 	mutex_unlock(&vq->mutex);
- 	return sock;
-@@ -1538,8 +1562,8 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 		}
- 
- 		vhost_net_disable_vq(n, vq);
--		vq->private_data = sock;
- 		vhost_net_buf_unproduce(nvq);
-+		vq->private_data = sock;
- 		r = vhost_vq_init_access(vq);
- 		if (r)
- 			goto err_used;
-diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
-index 5bda8cf457b6..bb94843e3829 100644
---- a/include/linux/if_tun.h
-+++ b/include/linux/if_tun.h
-@@ -11,8 +11,26 @@
- 
- #define TUN_XDP_FLAG 0x1UL
- 
-+/*
-+ * tun_msg_ctl types
-+ */
-+
- #define TUN_MSG_UBUF 1
- #define TUN_MSG_PTR  2
-+/*
-+ * Used for passing a packet pointer from vhost to tun
-+ */
-+#define TUN_MSG_PKT  3
-+/*
-+ * Used for passing an array of pointer from vhost to tun.
-+ * tun consumes packets from ptr ring and stores in pointer array.
-+ */
-+#define TUN_MSG_CONSUME_PKTS    4
-+/*
-+ * Used for passing an array of pointer from vhost to tun.
-+ * tun consumes get pointer from array and puts back into ptr ring.
-+ */
-+#define TUN_MSG_UNCONSUME_PKTS  5
- struct tun_msg_ctl {
- 	unsigned short type;
- 	unsigned short num;
+ /* TUNSETIFF ifr flags */
+ #define IFF_TUN		0x0001
 -- 
 2.20.1
 
