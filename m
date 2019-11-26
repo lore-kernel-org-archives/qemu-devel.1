@@ -2,85 +2,74 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B4F8C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED57C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:40:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D66962071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:37:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F12A20722
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:40:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PrMvV3Tq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D66962071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PDiFiahq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F12A20722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZjSj-0002a2-03
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 17:37:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58201)
+	id 1iZjVx-0004JI-SG
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 17:40:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58832)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jcmvbkbc@gmail.com>) id 1iZjPJ-0007ln-0c
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:34:05 -0500
+ (envelope-from <philmd@redhat.com>) id 1iZjTV-000368-O0
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:38:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jcmvbkbc@gmail.com>) id 1iZjI6-0007lT-Er
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:26:39 -0500
-Received: from mail-lf1-x12c.google.com ([2a00:1450:4864:20::12c]:46587)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1iZjI6-0007kT-7y
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:26:38 -0500
-Received: by mail-lf1-x12c.google.com with SMTP id a17so15407867lfi.13
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 14:26:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+Fx+vf32likHXwrbJij7DVsy01KxeAQ/wZxvM8xQt6o=;
- b=PrMvV3Tq6Y9OzpyN+wkUc4yZKBJyCEWevt6UtsFSr/3iLSiV5zlt8A99RSRkr9Sgmu
- LULz4Ou0jFtahvqUg25nikV5Ss1gnCEaelmJWQSxTltNUXxdt9HVZPP1b2MZ5rkvcGwB
- bqWHQtuOfMAILp5tKzXMlbgD2zmu5ByvpMjAZfgYSj6qvrOWALyZoNi/4sWdZrPPy62z
- NW4/HSeCMmhxNZ2Wc7vqcMuaGDVTT+gRmplZkYekVyKiorSTeViSVQqOcdF9JrQU6rQT
- rG86sm+WhVmF6bFgQYwteGU0goa1IMPPBDxVCIvuitY4kaK5DxOe1H7qN/UaYieJYnip
- ftYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=+Fx+vf32likHXwrbJij7DVsy01KxeAQ/wZxvM8xQt6o=;
- b=dn9YzVMT/whv6NIwpHKUGKNG3sKjTPzEbQZ501uzWPVCoB1QYYnnv5RI8Qeq6QdNoa
- RFwhm8AdoEUJ+AoGQ8/AmABG+g8l/5YKB87wt4gqHZn88Rslyiu0j8GFFq+XIChoDvo6
- p2n+BbiCoWTBr7eAcPKoFH6G1II5/n1Pcpg5mpYTMbH5Vt398tO33Yn3ZPig7hyOjl2w
- oyZcd045+u4zssHVwrlcaOSZRe8/LSHrg17jFN9roqFwPPZJZaQIo498TFF5MeoZdH4b
- QkYk0YLwr0cPLVXaZmHhDu3YwfDK7Sqw94IPwiqkDsvqMkdif01qYFjbFUK6p22rlza8
- Cn6Q==
-X-Gm-Message-State: APjAAAWbpBID7XDl0GN5/GF+kusVvgHbMKZzcnEJUuXBZanj+CQNuEc5
- Ge9w9lrBVQJNAmHgqhIAGvvqMYEoPPU=
-X-Google-Smtp-Source: APXvYqyfubyGCtH4z4W58z6ClPk9FfP/R2+O6YNFKwhhbdtvieclnDd5E5bSfVGlnZiRwT0fPnJt3A==
-X-Received: by 2002:a19:f606:: with SMTP id x6mr25589663lfe.160.1574807194818; 
- Tue, 26 Nov 2019 14:26:34 -0800 (PST)
-Received: from octofox.cadence.com
- (jcmvbkbc-1-pt.tunnel.tserv24.sto1.ipv6.he.net. [2001:470:27:1fa::2])
- by smtp.gmail.com with ESMTPSA id g11sm5897127lfb.94.2019.11.26.14.26.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 14:26:34 -0800 (PST)
-From: Max Filippov <jcmvbkbc@gmail.com>
+ (envelope-from <philmd@redhat.com>) id 1iZjTS-0004IX-K8
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:38:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:25687
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iZjTS-0004I4-DL
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:38:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574807901;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=GOI8hlh4rNYFnYi6cQyI2O84IzEY+5wysmDUx/JsS20=;
+ b=PDiFiahqj7iRRtUDfQCyAUh4AYKYrCS0UnLadcb0aDpVVoZGN851crm0jtPa69FbAq6vMT
+ K3ZFc+iDl0kZF+G1+vpC7XR32wStwf7x2wFDHETjIzT0E8EnlVPuek0SDE6PgDhJHWetcX
+ 6pJvOgXLby+H6qcubeVWZP7VYSp+8DU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-57-GW-uhDy_OhSFO1XUxsNsSg-1; Tue, 26 Nov 2019 17:38:19 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0EB5100551D;
+ Tue, 26 Nov 2019 22:38:18 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-63.brq.redhat.com [10.40.205.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A614600C8;
+ Tue, 26 Nov 2019 22:38:13 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC] exec: flush CPU TB cache when breakpoint address translation
- fails
-Date: Tue, 26 Nov 2019 14:26:07 -0800
-Message-Id: <20191126222607.25653-1-jcmvbkbc@gmail.com>
-X-Mailer: git-send-email 2.20.1
+Subject: [PATCH-for-4.2? v2 0/2] tests/acceptance: Fix the m68k/q800 Linux test
+Date: Tue, 26 Nov 2019 23:38:08 +0100
+Message-Id: <20191126223810.20180-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::12c
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: GW-uhDy_OhSFO1XUxsNsSg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,47 +81,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Willian Rampazzo <wrampazz@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When a breakpoint is inserted at location for which there's currently no
-virtual to physical translation no action is taken on CPU TB cache. If a
-TB for that virtual address already exists but is not visible ATM the
-breakpoint won't be hit next time an instruction at that address will be
-executed.
+Today someone (William/Beraldo?) complained this test was still
+failing while fetching the asset. This test already handle the
+OSError exception, maybe we are missing another one.
 
-Flush entire CPU TB cache when a breakpoint is set for a virtual address
-that cannot be translated to physical address.
+Regardless, it is easier to refresh my previous patch which use
+a stable link, so the problem should be fixed.
 
-This change fixes the following workflow:
-- linux user application is running
-- a breakpoint is inserted from QEMU gdbstub for a user address that is
-  not currently present in the target CPU TLB
-- an instruction at that address is executed, but the external debugger
-  doesn't get control.
+It seems cleaner to add the 2nd patch after the 1st one, but we don't need
+it for 4.2, so it can wait 5.0 (and I'll update its description to refer to
+the 1st patch sha1).
 
-Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
----
- exec.c | 2 ++
- 1 file changed, 2 insertions(+)
+William/Beraldo, can you test this please?
 
-diff --git a/exec.c b/exec.c
-index ffdb5185353b..918945f8097e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1024,6 +1024,8 @@ static void breakpoint_invalidate(CPUState *cpu, target_ulong pc)
-         /* Locks grabbed by tb_invalidate_phys_addr */
-         tb_invalidate_phys_addr(cpu->cpu_ases[asidx].as,
-                                 phys | (pc & ~TARGET_PAGE_MASK), attrs);
-+    } else {
-+        tb_flush(cpu);
-     }
- }
- #endif
--- 
-2.20.1
+Thanks!
+
+Phil.
+
+v1: https://www.mail-archive.com/qemu-devel@nongnu.org/msg656892.html
+
+Philippe Mathieu-Daud=C3=A9 (2):
+  tests/boot_linux_console: Fetch assets from Debian snapshot archives
+  Revert "Acceptance test: cancel test if m68k kernel packages goes
+    missing"
+
+ tests/acceptance/boot_linux_console.py | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+--=20
+2.21.0
 
 
