@@ -6,99 +6,97 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A533C432C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 20:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E10C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 20:11:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FE7D20684
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 20:06:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B264E2073F
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 20:11:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="enpnbgVI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FE7D20684
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="KTC+pHk2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B264E2073F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZh6F-0005Zp-Vz
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 15:06:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40104)
+	id 1iZhBD-000052-Pg
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 15:11:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty@apple.com>) id 1iZh4v-0004yg-A8
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 15:04:54 -0500
+ (envelope-from <dirty@apple.com>) id 1iZhAF-0007zt-LD
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 15:10:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty@apple.com>) id 1iZh4u-0002G2-B3
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 15:04:53 -0500
-Received: from nwk-aaemail-lapp03.apple.com ([17.151.62.68]:55850)
+ (envelope-from <dirty@apple.com>) id 1iZhAD-00054H-QF
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 15:10:23 -0500
+Received: from nwk-aaemail-lapp01.apple.com ([17.151.62.66]:42308)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dirty@apple.com>) id 1iZh4t-0002Ej-Va
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 15:04:52 -0500
-Received: from pps.filterd (nwk-aaemail-lapp03.apple.com [127.0.0.1])
- by nwk-aaemail-lapp03.apple.com (8.16.0.27/8.16.0.27) with SMTP id
- xAQK1lRU026600; Tue, 26 Nov 2019 12:04:49 -0800
+ (Exim 4.71) (envelope-from <dirty@apple.com>) id 1iZhAC-00052g-Cv
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 15:10:21 -0500
+Received: from pps.filterd (nwk-aaemail-lapp01.apple.com [127.0.0.1])
+ by nwk-aaemail-lapp01.apple.com (8.16.0.27/8.16.0.27) with SMTP id
+ xAQK7dnt011279; Tue, 26 Nov 2019 12:10:17 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
  h=sender : content-type
  : mime-version : subject : from : in-reply-to : date : cc :
  content-transfer-encoding : message-id : references : to; s=20180706;
- bh=fHFjGvpNn5tGAD/h7UqR9A+7RnRCEIXJzBrikPoDVo0=;
- b=enpnbgVI9oq3rm/NWyZOkAPFhueYqM758zdjYNvIsNhb5HIOXx4WY3SDyB6dendpavFu
- sCJS2XJK3CpVVmQkBw7Sqy6z7phGYfXZyaTa21MoFzHzIgXuHx18VSoNa/c1NY0LBDBO
- zoyJfHDiLrrq2KBtezv9AiXdlW9+vWqqs/Wgv4Etko1yjC4MOg2dxGbw43YNW38yRF34
- eYzWziQ2eFcHYqJSrEvsLXnFejfH7rRSSBDEpCeGdqj/YoXqpADBSh7nJcyIPq7dmJiJ
- QQL2jIlqL9lTqw+otnrRRS/mMMck/8JnCc+U+LrevNfXmbb+qfm/P/RKNiO3KuNUfvDE gw== 
-Received: from ma1-mtap-s01.corp.apple.com (ma1-mtap-s01.corp.apple.com
- [17.40.76.5])
- by nwk-aaemail-lapp03.apple.com with ESMTP id 2wfnvpb3eu-1
+ bh=CB3IElBDl66OjYZAMoV+TZGUt3w6S4iBnkOkmbYa1SM=;
+ b=KTC+pHk20AJwCwR8562SOdGK+W5x8HeCM7+N62kOP7r2eXKQ2RideX939pJxBUxRxjaL
+ HptDcdFsrpRRXbmBnlj57RfvaxzlaYNfu0YXodiCS67mKZvAJnRs9PokLBH56S/hkHvC
+ jAJDvz1nDZInYaiEvAZjC7bz5HAmDgUm+9Zct1nm3ymuTFpHl6gD+Cclmi3gZX5BDEpl
+ iBZBhWQpiQHVhFmnj/tpO5K65D2HoKi8U+vWvi2eR/xVrW4mnkJdRQhiM2v4YJ9dQOri
+ gDU3XtjM/6cHzlrl/zufnJU/J9eIazmttIZlcwCKTBPsd87T9sNvtQHXvI3jpn9cgI17 CQ== 
+Received: from ma1-mtap-s02.corp.apple.com (ma1-mtap-s02.corp.apple.com
+ [17.40.76.6])
+ by nwk-aaemail-lapp01.apple.com with ESMTP id 2wf4k4mmkb-4
  (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
- Tue, 26 Nov 2019 12:04:49 -0800
+ Tue, 26 Nov 2019 12:10:17 -0800
 Received: from nwk-mmpp-sz12.apple.com
- (nwk-mmpp-sz12.apple.com [17.128.115.204]) by ma1-mtap-s01.corp.apple.com
+ (nwk-mmpp-sz12.apple.com [17.128.115.204]) by ma1-mtap-s02.corp.apple.com
  (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
- 2019)) with ESMTPS id <0Q1L005OGEG02Y10@ma1-mtap-s01.corp.apple.com>; Tue,
- 26 Nov 2019 12:04:49 -0800 (PST)
+ 2019)) with ESMTPS id <0Q1L00GQDEP3HQ20@ma1-mtap-s02.corp.apple.com>; Tue,
+ 26 Nov 2019 12:10:16 -0800 (PST)
 Received: from process_milters-daemon.nwk-mmpp-sz12.apple.com by
  nwk-mmpp-sz12.apple.com
  (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
- 2019)) id <0Q1L00J00E82QD00@nwk-mmpp-sz12.apple.com>; Tue,
- 26 Nov 2019 12:04:48 -0800 (PST)
+ 2019)) id <0Q1L00E00EGJ9M00@nwk-mmpp-sz12.apple.com>; Tue,
+ 26 Nov 2019 12:10:16 -0800 (PST)
 X-Va-A: 
 X-Va-T-CD: 07468e1da2f6e987d649ff6cb4055ea6
-X-Va-E-CD: 41404d9c28fbc215bab670c20d826187
-X-Va-R-CD: eb29b0577443ea815658bc1e1be1b1f2
+X-Va-E-CD: 0290939b57f26f9636033cc1cdfe3215
+X-Va-R-CD: cc7fb021a0d3ff63779d08eb77fd3ee2
 X-Va-CD: 0
-X-Va-ID: f0ee5913-400c-44d1-afd3-bd93606da9ec
+X-Va-ID: 6e8e123c-778a-413d-952e-e7fb051df89c
 X-V-A: 
 X-V-T-CD: 07468e1da2f6e987d649ff6cb4055ea6
-X-V-E-CD: 41404d9c28fbc215bab670c20d826187
-X-V-R-CD: eb29b0577443ea815658bc1e1be1b1f2
+X-V-E-CD: 0290939b57f26f9636033cc1cdfe3215
+X-V-R-CD: cc7fb021a0d3ff63779d08eb77fd3ee2
 X-V-CD: 0
-X-V-ID: d2e12f96-5b3b-496a-8bec-dd487d67b1e6
+X-V-ID: b5b81fd6-3f02-4a68-a6c4-3ecc3a403c0e
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,,
  definitions=2019-11-26_06:,, signatures=0
 Received: from [17.234.111.141] (unknown [17.234.111.141])
  by nwk-mmpp-sz12.apple.com
  (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
- 2019)) with ESMTPSA id <0Q1L00EH8EG0UI90@nwk-mmpp-sz12.apple.com>; Tue,
- 26 Nov 2019 12:04:48 -0800 (PST)
+ 2019)) with ESMTPSA id <0Q1L00ENGEP3UI90@nwk-mmpp-sz12.apple.com>; Tue,
+ 26 Nov 2019 12:10:16 -0800 (PST)
 Content-type: text/plain; charset=us-ascii
 MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v2 5/5] hvf: save away type as well as vector so we can
- reinject them
-In-reply-to: <eb3a2de7-fcfe-f0d5-8534-1c59ff40f61e@redhat.com>
-Date: Tue, 26 Nov 2019 12:04:47 -0800
-Cc: qemu-devel@nongnu.org
-Content-transfer-encoding: quoted-printable
-Message-id: <5F8C8B54-3653-4417-9A08-E724032294F9@apple.com>
+Subject: Re: [PATCH v2 0/5] hvf: stability fixes for HVF
+In-reply-to: <78511040-b432-c456-b737-50ec839bde30@redhat.com>
+Date: Tue, 26 Nov 2019 12:10:15 -0800
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Content-transfer-encoding: 7bit
+Message-id: <C1DEB273-5B29-484B-B9EE-DAFD2B3E77FB@apple.com>
 References: <cover.1574625592.git.dirty@apple.com>
- <e07e6085d8ab9054e58f85ae58e112df6adc024d.1574625592.git.dirty@apple.com>
- <eb3a2de7-fcfe-f0d5-8534-1c59ff40f61e@redhat.com>
+ <78511040-b432-c456-b737-50ec839bde30@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
  definitions=2019-11-26_06:, , signatures=0
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 17.151.62.68
+X-Received-From: 17.151.62.66
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,33 +114,23 @@ Sender: "Qemu-devel"
 Reply-to: Cameron Esfahani <dirty@apple.com>
 From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-Our test case was booting many concurrent macOS VMs under heavy system =
-load.  I don't know if I could create one to replicate that.
+Let me see if I can add some assertions.
 
 Cameron Esfahani
 dirty@apple.com
 
-"In the elder days of Art, Builders wrought with greatest care each =
-minute and unseen part; For the gods see everywhere."
+"The cake is a lie."
 
-"The Builders", H. W. Longfellow
-
+Common wisdom
 
 
-> On Nov 25, 2019, at 2:26 AM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->=20
-> On 24/11/19 21:05, Cameron Esfahani wrote:
->> Save away type as well as vector in hvf_store_events() so we can
->> correctly reinject both in hvf_inject_interrupts().
->>=20
->> Make sure to clear ins_len and has_error_code when ins_len isn't
->> valid and error_code isn't set.
->=20
-> Do you have a testcase for this?  (I could guess it's about the INT1
-> instruction).
->=20
-> Paolo
->=20
+
+> On Nov 25, 2019, at 2:28 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> 
+> Certainly no doubt about patches 1-4, while for patch 5 I'm wondering if
+> it's masking another bug; I'd prefer to have also some assertions that
+> interrupt_injected is never an exception and exception_nr is never an
+> interrupt.
+> 
 
 
