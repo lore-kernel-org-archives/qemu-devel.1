@@ -2,79 +2,88 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD9F5C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D07C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:45:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97E5F20722
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:41:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bc6+1rNI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97E5F20722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A99B820722
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 22:45:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A99B820722
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59800 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZjW5-0004cu-Kv
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 17:41:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58861)
+	id 1iZjaS-0006tq-Td
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 17:45:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iZjTc-0003B5-Bo
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:38:33 -0500
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iZjZD-0006Cy-Mz
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:44:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iZjTb-0004MC-DM
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:38:32 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39438
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iZjTb-0004Lt-9a
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:38:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574807910;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OOw3cVgyxFNk4vzDn7EiINfiKta858f+7/DJp4pf1kk=;
- b=bc6+1rNIKP7lx6HJa8YQ4QBgSvuoyyFJKVdRwCeQmhKdU2YfMSku3PhjQKkbCLP0NRvZ8U
- HQ8Amg3Im/L5g52+L2TLZ1dAP4gAI6lSV6rD0O1uF7VQgkZedTLCR2ruXrbZYMjoG45fzm
- ZOleVUbKsbmwQMjNgvLy9aC7bDZC/zc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-z2BmtB6VPyCWqGBtFQSJ-Q-1; Tue, 26 Nov 2019 17:38:27 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F50B800D54;
- Tue, 26 Nov 2019 22:38:26 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-63.brq.redhat.com [10.40.205.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 31847600C8;
- Tue, 26 Nov 2019 22:38:22 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0? v2 2/2] Revert "Acceptance test: cancel test if m68k
- kernel packages goes missing"
-Date: Tue, 26 Nov 2019 23:38:10 +0100
-Message-Id: <20191126223810.20180-3-philmd@redhat.com>
-In-Reply-To: <20191126223810.20180-1-philmd@redhat.com>
-References: <20191126223810.20180-1-philmd@redhat.com>
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iZjZB-0007Qj-8n
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:44:19 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24000)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+ id 1iZjZ9-0007OZ-CM
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 17:44:16 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAQMcDie104653; Tue, 26 Nov 2019 17:44:12 -0500
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2whcxpr8a6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 26 Nov 2019 17:44:12 -0500
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xAQMenbY003427;
+ Tue, 26 Nov 2019 22:44:12 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma03dal.us.ibm.com with ESMTP id 2wevd6q62a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 26 Nov 2019 22:44:12 +0000
+Received: from b03ledav005.gho.boulder.ibm.com
+ (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAQMiAtd59703762
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 26 Nov 2019 22:44:10 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A11D6BE053;
+ Tue, 26 Nov 2019 22:44:10 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8ABC7BE04F;
+ Tue, 26 Nov 2019 22:44:10 +0000 (GMT)
+Received: from localhost (unknown [9.53.179.218])
+ by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 26 Nov 2019 22:44:10 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: z2BmtB6VPyCWqGBtFQSJ-Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+User-Agent: alot/0.7
+To: qemu-devel@nongnu.org
+Message-ID: <157480824614.4193.78264727333377290@sif>
+Subject: [ANNOUNCE] QEMU 4.2.0-rc3 is now available
+Date: Tue, 26 Nov 2019 16:44:06 -0600
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-26_07:2019-11-26,2019-11-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ lowpriorityscore=0 adultscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0
+ impostorscore=0 phishscore=0 spamscore=0 malwarescore=0 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911260192
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +95,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Willian Rampazzo <wrampazz@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Beraldo Leal <bleal@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now than we use the stable snapshot archive, we can remove this check.
+Hello,
 
-This reverts commit d2499aca4bac613d837e2720e7bbe3378bc91245.
+On behalf of the QEMU Team, I'd like to announce the availability of the
+fourth release candidate for the QEMU 4.2 release.  This release is meant
+for testing purposes and should not be used in a production environment.
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- tests/acceptance/boot_linux_console.py | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+  http://download.qemu-project.org/qemu-4.2.0-rc3.tar.xz
+  http://download.qemu-project.org/qemu-4.2.0-rc3.tar.xz.sig
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
-_linux_console.py
-index 752f776f68..ab4c8a5e5a 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -483,10 +483,7 @@ class BootLinuxConsole(Test):
-                    '/20191021T083923Z/pool-m68k/main'
-                    '/l/linux/kernel-image-5.3.0-1-m68k-di_5.3.7-1_m68k.ude=
-b')
-         deb_hash =3D '044954bb9be4160a3ce81f8bc1b5e856b75cccd1'
--        try:
--            deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
--        except OSError as exp:
--            self.cancel(exp)
-+        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
-         kernel_path =3D self.extract_from_deb(deb_path,
-                                             '/boot/vmlinux-5.3.0-1-m68k')
-=20
---=20
-2.21.0
+A note from the maintainer:
+
+  Unless any release-critical bugs are found in the next week, we
+  will make the final 4.2.0 release on Tuesday 3rd December;
+  otherwise we'll have an rc4 on the 3rd and make the final
+  release the week after on the 10th.
+
+You can help improve the quality of the QEMU 4.2 release by testing this
+release and reporting bugs on Launchpad:
+
+  https://bugs.launchpad.net/qemu/
+
+The release plan, as well a documented known issues for release
+candidates, are available at:
+
+  http://wiki.qemu.org/Planning/4.2
+
+Please add entries to the ChangeLog for the 4.2 release below:
+
+  http://wiki.qemu.org/ChangeLog/4.2
+
+Thank you to everyone involved!
+
+Changes since rc2:
+
+1a61a081ac: Update version for v4.2.0-rc3 release (Peter Maydell)
+6a4ef4e5d1: target/arm: Honor HCR_EL2.TID3 trapping requirements (Marc Zyng=
+ier)
+7cf95aed53: target/arm: Fix ISR_EL1 tracking when executing at EL2 (Marc Zy=
+ngier)
+f0138990ce: hw/arm: versal: Add the CRP as unimplemented (Edgar E. Iglesias)
+f900b1e5b0: target/arm: Fix handling of cortex-m FTYPE flag in EXCRET (Jean=
+-Hugues Desch=C3=AAnes)
+d8130f4c42: iotests: add new test cases to bitmap migration (Vladimir Semen=
+tsov-Ogievskiy)
+a505475b95: block/qcow2-bitmap: fix bitmap migration (Vladimir Sementsov-Og=
+ievskiy)
+b3b9a433b0: tests/vm/ubuntu: update i386 image to 18.04 (Alex Benn=C3=A9e)
+b4eca581b9: tests/vm/ubuntu: include language pack to silence locale warnin=
+gs (Alex Benn=C3=A9e)
+6cd7b60848: tests/vm/centos: fix centos build target (Alex Benn=C3=A9e)
+e37aa8b0e4: hvf: more accurately match SDM when setting CR0 and PDPTE regis=
+ters (Cameron Esfahani)
+8c3b0e9e67: hvf: correctly handle REX prefix in relation to legacy prefixes=
+ (Cameron Esfahani)
+9fedbbeeee: hvf: remove TSC synchronization code because it isn't fully com=
+plete (Cameron Esfahani)
+fbafbb6db7: hvf: non-RAM, non-ROMD memory ranges are now correctly mapped i=
+n (Cameron Esfahani)
+c6f3215ffa: target/i386: add two missing VMX features for Skylake and Casca=
+deLake Server (Paolo Bonzini)
+59d0533b85: ppc/spapr_events: fix potential NULL pointer dereference in rta=
+s_event_log_dequeue (PanNengyuan)
+6cf80f90c4: mos6522: update counters when timer interrupts are off (Laurent=
+ Vivier)
+b14848f5d7: spapr: Work around spurious warnings from vfio INTx initializat=
+ion (David Gibson)
+e532e1d93c: spapr: Handle irq backend changes with VFIO PCI devices (David =
+Gibson)
+c5478fea27: vfio/pci: Respond to KVM irqchip change notifier (David Gibson)
+ad54dbd89d: vfio/pci: Split vfio_intx_update() (David Gibson)
+3607715a30: kvm: Introduce KVM irqchip change notifier (David Gibson)
+454590916c: pseries: fix migration-test and pxe-test (Laurent Vivier)
+e8d0ac5801: vmstate-static-checker: Fix for current python (Dr. David Alan =
+Gilbert)
+6478dd745d: hw/riscv: Add optional symbol callback ptr to riscv_load_kernel=
+() (Zhuang, Siwei (Data61, Kensington NSW))
+9c0fb20c4b: RISC-V: virt: This is a "sifive,test1" test finisher (Palmer Da=
+bbelt)
+4d0e59ace2: net/virtio: return error when device_opts arg is NULL (Jens Fre=
+imann)
+150ab54aa6: net/virtio: fix re-plugging of primary device (Jens Freimann)
+117378bf03: net/virtio: return early when failover primary alread added (Je=
+ns Freimann)
+284f42a520: net/virtio: fix dev_unplug_pending (Jens Freimann)
+d1e2670741: linux-user: fix translation of statx structures (Ariadne Conill)
+e48929c787: intel_iommu: TM field should not be in reserved bits (Qi, Yadon=
+g)
+ce586f3b8d: intel_iommu: refine SL-PEs reserved fields checking (Qi, Yadong)
+509ec36c1e: virtio-input: fix memory leak on unrealize (Marc-Andr=C3=A9 Lur=
+eau)
+25f74087c6: util/cutils: Fix incorrect integer->float conversion caught by =
+clang (Fangrui Song)
+68d654daee: 9pfs: Fix divide by zero bug (Dan Schatzberg)
+02fa60d101: i386: Add -noTSX aliases for hle=3Doff, rtm=3Doff CPU models (E=
+duardo Habkost)
+9ab2237f19: i386: Add new versions of Skylake/Cascadelake/Icelake without T=
+SX (Eduardo Habkost)
+2a9758c51e: target/i386: add support for MSR_IA32_TSX_CTRL (Paolo Bonzini)
+0723cc8a55: target/i386: add VMX features to named CPU models (Paolo Bonzin=
+i)
+c55c974486: ui/gtk: fix gettext message's charset. (yanminhui)
+0f6ed883e7: display: xlnx_dp: Provide sufficient bytes for silent audio cha=
+nnel (Sai Pavan Boddu)
+22c30b2d20: tests/tcg: modify multiarch tests to work with clang (Taylor Si=
+mpson)
+6e98888041: .travis.yml: drop 32 bit systems from MAIN_SOFTMMU_TARGETS (Ale=
+x Benn=C3=A9e)
+5c6ecbdc83: docs/devel: update tcg-plugins.rst with API versioning details =
+(Alex Benn=C3=A9e)
+8ea6abf0d0: docs/devel: rename plugins.rst to tcg-plugins.rst (Alex Benn=C3=
+=A9e)
+bcc388df07: tests/vm: make --interactive (and therefore DEBUG=3D1) uncondit=
+ional (Alex Benn=C3=A9e)
+6c77aa909e: tests: acpi: always retain dumped ACPI tables in case of error =
+(Igor Mammedov)
+ec244b1739: vhost-user-input: use free(elem) instead of g_free(elem) (Stefa=
+n Hajnoczi)
+d9b3ade54e: libvhost-user: Zero memory allocated for VuVirtqInflightDesc (X=
+ie Yongji)
+7ffc90f3ae: audio: fix audio recording (Volker R=C3=BCmelin)
 
 
