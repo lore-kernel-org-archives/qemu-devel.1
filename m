@@ -2,104 +2,57 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F63C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 08:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4622CC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 08:48:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 719E3206BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 08:28:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbmA1TQX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 719E3206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19B08206BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 08:48:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19B08206BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZWDR-0006Nd-G6
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 03:28:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45376)
+	id 1iZWW8-0002if-IH
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 03:48:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iZWBv-0005V5-Lb
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:27:24 -0500
+ (envelope-from <its@irrelevant.dk>) id 1iZWTM-0000cq-17
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iZWBt-0001ut-Vn
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:27:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28361
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <its@irrelevant.dk>) id 1iZWON-0000J8-9j
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:40:16 -0500
+Received: from charlie.dont.surf ([128.199.63.193]:49396)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iZWBt-0001uW-Qj
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:27:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574756841;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=VPDJxes/KE4MdhMZGKemQpjLCOe4XAn8z8vHR3xE/eU=;
- b=GbmA1TQXznNiG1yRW4zQGYHn6LQLx5f1/ySWp62cBENsUZwBR5q92MWwldh2iWpTW1E6IW
- LxG4XtASLDC8qe4uNYFGrFycPNNjMEfLloIIYgrzZLgVncmsrufaJXDmEpzfDn5fT5pPpV
- nwAR4vbjP7rQPMin/XIRgZbrBk8ge0Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-29-Lpvl4_LCM1i2sGIkl645iQ-1; Tue, 26 Nov 2019 03:27:16 -0500
-X-MC-Unique: Lpvl4_LCM1i2sGIkl645iQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 302C8593BA;
- Tue, 26 Nov 2019 08:27:15 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-240.brq.redhat.com
- [10.40.204.240])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 013996B8CD;
- Tue, 26 Nov 2019 08:27:13 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v4 0/5] iotests: Test failing mirror complete
-To: qemu-block@nongnu.org
-References: <20191108123455.39445-1-mreitz@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <c3005f55-b7d6-ebfe-641a-d221ddfb33ca@redhat.com>
-Date: Tue, 26 Nov 2019 09:27:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1iZWOL-0000Hb-Fp; Tue, 26 Nov 2019 03:40:13 -0500
+Received: from apples.localdomain (unknown [194.62.217.57])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 32D2DBF533;
+ Tue, 26 Nov 2019 08:40:12 +0000 (UTC)
+Date: Tue, 26 Nov 2019 09:40:10 +0100
+From: Klaus Birkelund <its@irrelevant.dk>
+To: Beata Michalska <beata.michalska@linaro.org>
+Subject: Re: [PATCH v2 12/20] nvme: bump supported specification version to 1.3
+Message-ID: <20191126084010.GB225199@apples.localdomain>
+References: <20191015103900.313928-1-its@irrelevant.dk>
+ <20191015103900.313928-13-its@irrelevant.dk>
+ <CADSWDzt-YfwuxmxL=c7qQzac-Xby1azxAsGhAfviSRXz2FkNhg@mail.gmail.com>
+ <20191118094856.GB812803@apples.localdomain>
+ <CADSWDztth45nn0iAR3B1KpfjbZGKgqif1eKt-+c=v+bWHWFGrQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191108123455.39445-1-mreitz@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="WpV17Cc2Yr2dao9Jpw2k6zAxv3ey3ALeL"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADSWDztth45nn0iAR3B1KpfjbZGKgqif1eKt-+c=v+bWHWFGrQ@mail.gmail.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,72 +64,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WpV17Cc2Yr2dao9Jpw2k6zAxv3ey3ALeL
-Content-Type: multipart/mixed; boundary="sJu4LAJtlbMoPjJpyLVVhiwOeEYLXrGrk"
+On Mon, Nov 25, 2019 at 12:13:15PM +0000, Beata Michalska wrote:
+> On Mon, 18 Nov 2019 at 09:48, Klaus Birkelund <its@irrelevant.dk> wrote:
+> >
+> > On Tue, Nov 12, 2019 at 03:05:06PM +0000, Beata Michalska wrote:
+> > > Hi Klaus,
+> > >
+> > > On Tue, 15 Oct 2019 at 11:52, Klaus Jensen <its@irrelevant.dk> wrote:
+> > > >
+> > > > +static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeCmd *c)
+> > > > +{
+> > > > +    static const int len = 4096;
+> > > > +
+> > > > +    struct ns_descr {
+> > > > +        uint8_t nidt;
+> > > > +        uint8_t nidl;
+> > > > +        uint8_t rsvd2[2];
+> > > > +        uint8_t nid[16];
+> > > > +    };
+> > > > +
+> > > > +    uint32_t nsid = le32_to_cpu(c->nsid);
+> > > > +    uint64_t prp1 = le64_to_cpu(c->prp1);
+> > > > +    uint64_t prp2 = le64_to_cpu(c->prp2);
+> > > > +
+> > > > +    struct ns_descr *list;
+> > > > +    uint16_t ret;
+> > > > +
+> > > > +    trace_nvme_identify_ns_descr_list(nsid);
+> > > > +
+> > > > +    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> > > > +        trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
+> > > > +        return NVME_INVALID_NSID | NVME_DNR;
+> > > > +    }
+> > > > +
+> > > In theory this should abort the command for inactive NSIDs as well.
+> > > But I guess this will come later on.
+> > >
+> >
+> > At this point in the series, the device does not support multiple
+> > namespaces anyway and num_namespaces is always 1. But this has also been
+> > reported seperately in relation the patch adding multiple namespaces and
+> > is fixed in v3.
+> >
+> > > > +    list = g_malloc0(len);
+> > > > +    list->nidt = 0x3;
+> > > > +    list->nidl = 0x10;
+> > > > +    *(uint32_t *) &list->nid[12] = cpu_to_be32(nsid);
+> > > > +
+> > > Might be worth to add some comment here -> as per the NGUID/EUI64 format.
+> > > Also those are not specified currently in the namespace identity data structure.
+> > >
+> >
+> > I'll add a comment for why the Namespace UUID is set to this value here.
+> > The NGUID/EUI64 fields are not set in the namespace identity data
+> > structure as they are not required. See the descriptions of NGUID and
+> > EUI64. Here for NGUID:
+> >
+> >     "The controller shall specify a globally unique namespace identifier
+> >     in this field, the EUI64 field, or a Namespace UUID in the Namespace
+> >     Identification Descriptor..."
+> >
+> > Here, I chose to provide it in the Namespace Identification Descriptor
+> > (by setting `list->nidt = 0x3`).
+> >
+> > > > +    ret = nvme_dma_read_prp(n, (uint8_t *) list, len, prp1, prp2);
+> > > > +    g_free(list);
+> > > > +    return ret;
+> > > > +}
+> > > > +
+> > > >  static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+> > > >  {
+> > > >      NvmeIdentify *c = (NvmeIdentify *)cmd;
+> > > > @@ -934,7 +978,9 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+> > > >      case 0x01:
+> > > >          return nvme_identify_ctrl(n, c);
+> > > >      case 0x02:
+> > > > -        return nvme_identify_nslist(n, c);
+> > > > +        return nvme_identify_ns_list(n, c);
+> > > > +    case 0x03:
+> > > > +        return nvme_identify_ns_descr_list(n, cmd);
+> > > >      default:
+> > > >          trace_nvme_err_invalid_identify_cns(le32_to_cpu(c->cns));
+> > > >          return NVME_INVALID_FIELD | NVME_DNR;
+> > > > @@ -1101,6 +1147,14 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> > > >          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+> > > >          break;
+> > > >      case NVME_NUMBER_OF_QUEUES:
+> > > > +        if (n->qs_created > 2) {
+> > > > +            return NVME_CMD_SEQ_ERROR | NVME_DNR;
+> > > > +        }
+> > > > +
+> > > I am not sure this is entirely correct as the spec says:
+> > > "if any I/O Submission and/or Completion Queues (...)"
+> > > so it might be enough to have a single queue created
+> > > for this command to be valid.
+> > > Also I think that the condition here is to make sure that the number
+> > > of queues requested is being set once at init phase. Currently this will
+> > > allow the setting to happen if there is no active queue -> so at any
+> > > point of time (provided the condition mentioned). I might be wrong here
+> > > but it seems that what we need is a single status saying any queue
+> > > has been created prior to the Set Feature command at all
+> > >
+> >
+> > Internally, the admin queue pair is counted in qs_created, which is the
+> > reason for checking if is above 2. The admin queues are created when the
+> > controller is enabled (mmio write to the EN register in CC).
+> >
+> > I'll add a comment about that - I see why it is unclear.
+> >
+> 
+> Ok, so indeed I have missed the fact that the admin queues are being tracked by
+> 'qs_created'. Still, I might be wrong, but, it is enough to create I/O
+> submission queue and delete it and the code will allow the command to proceed
+> Whereas the spec says :
+> "If a Set Features command is issued for this feature after creation of
+> any I/O Submission and/or I/O Completion Queues, then the Set Features
+> command shall fail with status code of Command Sequence Error"
+> 
+> I might be misreading it though but it is not entirely clear to me whether
+> this is : at least one queue create ... or created and in use.
+> 
+> But I guess that is really minor.
+> 
+ 
+Ohh! I see. Yes you are right. "This feature shall only be issued during
+initialization prior to creation of any I/O Submission and/or Completion
+Queues.".
 
---sJu4LAJtlbMoPjJpyLVVhiwOeEYLXrGrk
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+To me it looks like the controller shall not allow the Set Feature
+command again until after a controller reset. Then we also don't need
+the counter, but just a flag to indicate if any I/O queue has been
+configured.
 
-On 08.11.19 13:34, Max Reitz wrote:
-> Hi,
->=20
-> v3 of this series was this:
->=20
-> https://lists.nongnu.org/archive/html/qemu-block/2019-10/msg00868.html
->=20
-> In the meantime, I=E2=80=99ve merged the first patch, so the subject of t=
-he
-> series has changed.
->=20
-> In v4, I=E2=80=99ve tried to address Vladimir=E2=80=99s concern of how to=
- map QAPI
-> BlockPermission values to BLK_PERM_* flags with the new patches 1 and 2,
-> and a minor change to patch 3:
-> - Patch 1: Added, this new function will translate QAPI BlockPermission
->            values to BLK_PERM_* flags
-> - Patch 2: Added; we can make use of the new function in
->            xdbg_graph_add_edge() to save some LoC
-> - Patch 3:
->   - %s/4.2/5.0/
->   - Let blkdebug_parse_perm_list() initialize *dest
->   - Use bdrv_qapi_perm_to_blk_perm() to translate QAPI BlockPermission
->     values instead of blindly assuming an x -> 2^x mapping
-
-Thanks for the review, applied to my block-next branch:
-
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block-next
-
-Max
-
-
---sJu4LAJtlbMoPjJpyLVVhiwOeEYLXrGrk--
-
---WpV17Cc2Yr2dao9Jpw2k6zAxv3ey3ALeL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3c4d8ACgkQ9AfbAGHV
-z0AUlggAi14Eq7RRmVmziJlBuRPUQuRNWahWkIbIuOGysMBd/0c2Fuig3lbAH4uA
-Y1YOuX1dY6lQAwv2zHMhl+Smml9zvfHzyWgBZNnCcSvW55WmAXaaic+Jvz8MxWTg
-2JOkNPJXHa6ZtAHXK1wQ6Kkcwq6zs0XVNMp6GgQrI3Mtthje5KGtt8h5A7OuE31Q
-HJkVilXhSgQK7s88f+1nnfKf86PYuxHy0XvoLw6Iow/FPA43qXWu1TxL8PdWJvpT
-8N5bEXczaK6YpzfhkTXUfMVXrsFdPrDvW5jrUyxHldn+LJAN7poHUrjXUK3JIU46
-0MKylmTuAHZ0YDQ0JnQQ0rrwXvmylA==
-=EcqE
------END PGP SIGNATURE-----
-
---WpV17Cc2Yr2dao9Jpw2k6zAxv3ey3ALeL--
-
+I've fixed that up.
 
