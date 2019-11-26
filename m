@@ -2,117 +2,89 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 328C5C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 17:50:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F38C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 18:35:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 049862075C
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 17:50:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 049862075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 8C33A2073F
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 18:35:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iCzu1Mi0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C33A2073F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZez3-0000oU-68
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 12:50:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49284)
+	id 1iZfg6-0004AY-DF
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 13:35:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iZeyL-0000Jd-3o
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 12:49:58 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iZfd1-00010t-J9
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 13:32:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iZeyJ-0002AE-U2
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 12:49:57 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:53357)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iZeyJ-00027n-L7
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 12:49:55 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mlvr3-1i9djw2eP5-00j2f3; Tue, 26 Nov 2019 18:49:43 +0100
-Subject: Re: [PATCH] pseries: disable migration-test if /dev/kvm cannot be used
-To: quintela@redhat.com, Laurent Vivier <lvivier@redhat.com>
-References: <20191120170955.242900-1-lvivier@redhat.com>
- <87zhgpn1dt.fsf@trasno.org> <e96b3dd9-05d3-d260-852a-13423ed9b8cc@redhat.com>
- <87v9rdmy1o.fsf@trasno.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <efacec86-24d9-d499-cb90-ec601618ef7b@vivier.eu>
-Date: Tue, 26 Nov 2019 18:49:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <dgilbert@redhat.com>) id 1iZfWc-0008Uh-CE
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 13:25:23 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29876
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iZfWc-0008UL-74
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 13:25:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574792721;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=J5KXBw2Z7wIzzvyD5duK9Ack6xhcwHgk5GwwwudnHFM=;
+ b=iCzu1Mi0pikOIlII8fGDnF/LgdCEuyBMmz9/f37SoPG6rCusSOhefQJftgjXgFTA9A8BxH
+ KJnXXbiPnwRWtbAWN9JweBzoP31btkB1vMEq4B6FpJPKDgN9n8s6kjpfNsDCPqIOnYEVZd
+ uESdCS+fTXr2V3k+O2fGgVEPWvghdGQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-u33569RqMTihaNa31tSIPQ-1; Tue, 26 Nov 2019 13:25:19 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71FEC107ACE3;
+ Tue, 26 Nov 2019 18:25:18 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 94F5B10016E8;
+ Tue, 26 Nov 2019 18:25:11 +0000 (UTC)
+Date: Tue, 26 Nov 2019 18:25:09 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Subject: Re: RFC: New device for zero-copy VM memory access
+Message-ID: <20191126182509.GN2928@work-vm>
+References: <20191031132443.GB3128@work-vm>
+ <b36330ecd38ce872982df4d41d3d4695@hostfission.com>
+ <CAFEAcA8uWCQY8GwtH4oHU8ybXsvmYaB4Qa5hnxyd+344WFjJ_Q@mail.gmail.com>
+ <b87d5b2fb84ac0a3c98a62dcc0c19077@hostfission.com>
+ <20191031155204.GD3128@work-vm>
+ <cd00c2ba412361d707ab02575d74aacd@hostfission.com>
+ <e23eb129dddc5d18bb9f9b15d116f957@hostfission.com>
+ <20191104115546.GB3420@work-vm>
+ <9b49de1379825ac1445766f4a8d198dc@hostfission.com>
+ <CAMxuvaxa820krw5gdRbbY-bbqf9zaE01GkC6mRVbrEaN9Fp56w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87v9rdmy1o.fsf@trasno.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BsjwJUKmwlUsnN/BPc2OBdtSRiqyHW+mV6h6T/VaFeG67jz6ano
- s+8lcd3MgOpoNFfy2wzcr3GZWlMHyZ2Kc2s5zbAN8x1H1c37yQJ2yljmsEZlZ18Mt/zxbLH
- 3znfT6UfQvSDNBsddQzEIcQztlOxbLBzthLwTfbrabMFUjjihkx7GId6GpOfF68vOF3uIA7
- SUZbrXNBcvSM+GjzD+ZTg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:cevzoFSOIso=:Cdk2HgrfzOSCp478ERoC9F
- 2ccxENhzxPeuMcHm3eIqcnl8shD0clrOYMPmtQyqNwx5gj4tR58Y5IvZmdVLK+CYLe3rwbfhX
- AWz5k1rP5zAGV+aZbNhOnuV5MRyTKjtvT0TjXY1RghtXQVP7jKWj9nMndt/8B4l5Jw/rdesuz
- eKaWx0OeTsDlV9BTE9vG5VPdu6w9In8M7h+w/Jvc4vPyT+GR4n4WbX5CfDBGtNLLVJXmVwuei
- AbBBxuYeVUFfk3FKsgyHaMVvJvgbt0ks3wYPi/GHtFb0fU+f0SgZmDVHtZCG1RFEuBYHbz0z+
- M0jUs6o2Vpev4i6bhLrVu7WqGYeVkmEFh4IZbwHq9RakmP3hzBzcGaQzmZbh70C87krwAspNQ
- BXUN30sRN2d6djeHIypinbGxsInVKzo/0Kbag+qO0RILR9lO8p5Y1/mZno5WeZd1jDCHUSh76
- VBATWmbZsIAsDgbKbU6/dkt4TVsT2+fMyrqNVuRS/YPc1eG5luCIepT/Vi5O1VG7gLp0ZyGp3
- eVPBa6nrIeELMmMOmz3wp6zKuUw5Oe3H5Drf1wRR/J0ipOEooCt+VFUHdaYG70kOWCCap7Fb6
- T+x3blEA/VqFUhKH3hN7Rf6Thncy/UunwgZ/p7iMFkUJxTUdTmZ/DXG/f+HRQkQ/lsvFj4oFq
- y2OtIUHDWdRLix6K/MLPUahZdVpvCiyqxiiT5MTg8Tz1Xle6pWc8cKMJQb+F73fr13ZMFdBpl
- kVuflrkCfkCvP8KPWlKwh7mYXztntWnJ1nLwOMW/gVxNln6h2J5Vhc8VEaP6iJ0qT9qKa73YA
- ttrq5ZsJT1e7Wn+T4UbzJuizLmDGpYzVJDzCWCCnJ6lKGcbObC3leCvkg2tpSzOqA5MKi14S6
- PPKCBrbzJHDwEXwVHNBQ==
+In-Reply-To: <CAMxuvaxa820krw5gdRbbY-bbqf9zaE01GkC6mRVbrEaN9Fp56w@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: u33569RqMTihaNa31tSIPQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.13
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,60 +96,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Cole Robinson <crobinso@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: geoff@hostfission.com, Peter Maydell <peter.maydell@linaro.org>, "Coquelin,
+ Maxime" <maxime.coquelin@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 21/11/2019 à 09:30, Juan Quintela a écrit :
-> Laurent Vivier <lvivier@redhat.com> wrote:
->> On 21/11/2019 08:18, Juan Quintela wrote:
->>> Laurent Vivier <lvivier@redhat.com> wrote:
->>>> On ppc64, migration-test only works with kvm_hv, and we already
->>>> have a check to verify the module is loaded.
->>>>
->>>> kvm_hv module can be loaded in memory and /sys/module/kvm_hv exists,
->>>> but on some systems (like build systems) /dev/kvm can be missing
->>>> (by administrators choice).
->>>>
->>>> And as kvm_hv exists test-migration is started but QEMU falls back to
->>>> TCG because it cannot be used:
->>>>
->>>>     Could not access KVM kernel module: No such file or directory
->>>>     failed to initialize KVM: No such file or directory
->>>>     Back to tcg accelerator
->>>>
->>>> And as the test is done with TCG, it fails.
->>>>
->>>> As for s390x, we must check for the existence and the access rights
->>>> of /dev/kvm.
->>>>
->>>> Reported-by: Cole Robinson <crobinso@redhat.com>
->>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>>
->>> Reviewed-by: Juan Quintela <quintela@redhat.com>
->>>
->>> Oh, why it is so difficult!!!
->>>
->>> Thanks, Juan.
->>>
->>
->> David,
->>
->> could you add this one too to your ppc-for-4.2 queue?
-> 
-> I was about to ask if you preffered it to go through the migration tree.
-> 
-> David?
-> 
-> Later, Juan.
+* Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> Hi
+>=20
+> On Mon, Nov 4, 2019 at 4:05 PM <geoff@hostfission.com> wrote:
+> >
+> >
+> >
+> > On 2019-11-04 22:55, Dr. David Alan Gilbert wrote:
+> > > * geoff@hostfission.com (geoff@hostfission.com) wrote:
+> > >>
+> > >>
+> > >> On 2019-11-03 21:10, geoff@hostfission.com wrote:
+> > >> > On 2019-11-01 02:52, Dr. David Alan Gilbert wrote:
+> > >> > > * geoff@hostfission.com (geoff@hostfission.com) wrote:
+> > >> > > >
+> > >> > > >
+> > >> > > > On 2019-11-01 01:52, Peter Maydell wrote:
+> > >> > > > > On Thu, 31 Oct 2019 at 14:26, <geoff@hostfission.com> wrote:
+> > >> > > > > > As the author of Looking Glass, I also have to consider th=
+e
+> > >> > > > > > maintenance
+> > >> > > > > > and the complexity of implementing the vhost protocol into=
+ the
+> > >> > > > > > project.
+> > >> > > > > > At this time a complete Porthole client can be implemented=
+ in 150
+> > >> > > > > > lines
+> > >> > > > > > of C without external dependencies, and most of that is bo=
+ilerplate
+> > >> > > > > > socket code. This IMO is a major factor in deciding to avo=
+id
+> > >> > > > > > vhost-user.
+> > >> > > > >
+> > >> > > > > This is essentially a proposal that we should make our proje=
+ct and
+> > >> > > > > code more complicated so that your project and code can be s=
+impler.
+> > >> > > > > I hope you can see why this isn't necessarily an argument th=
+at will hold
+> > >> > > > > very much weight for us :-)
+> > >> > > >
+> > >> > > > Certainly, I do which is why I am still going to see about usi=
+ng
+> > >> > > > vhost,
+> > >> > > > however, a device that uses vhost is likely more complex then
+> > >> > > > the device
+> > >> > > > as it stands right now and as such more maintenance would be
+> > >> > > > involved on
+> > >> > > > your end also. Or have I missed something in that vhost-user c=
+an
+> > >> > > > be used
+> > >> > > > directly as a device?
+> > >> > >
+> > >> > > The basic vhost-user stuff isn't actually that hard;  if you are=
+n't
+> > >> > > actually shuffling commands over the queues you should find it p=
+retty
+> > >> > > simple - so I think your assumption about it being simpler if yo=
+u
+> > >> > > avoid
+> > >> > > it might be wrong.  It might be easier if you use it!
+> > >> >
+> > >> > I have been looking into this and I am yet to find some decent
+> > >> > documentation or a simple device example I can use to understand h=
+ow to
+> > >> > create such a device. Do you know of any reading or examples I can
+> > >> > obtain
+> > >> > on how to get an initial do nothing device up and running?
+> > >> >
+> > >> > -Geoff
+> > >>
+> > >> Scratch that, the design just solidified for me and I am now making
+> > >> progress, however it seems that vhost-user can't do what we need her=
+e:
+> > >>
+> > >> 1) I dont see any way to recieve notification of socket disconnectio=
+n,
+> > >> in
+> > >> our use case the client app needs to be able to be (re)connected
+> > >> dynamically. It might be possible to get this event by registering i=
+t
+> > >> on
+> > >> the chardev manually but this seems like it would be a kludge.
+> > >
+> > > My understanding was that someone added support for reconnection of
+> > > vhost-user;  I'm not sure of the detail - cc'ing in Maxime and
+> > > Marc-Andre.
+> > >
+> > >> 2) I don't see any method of notifying the vhost-user client of the
+> > >> removal of a shared memory mapping. Again, these may not be
+> > >> persistently
+> > >> mapped in the guest as we have no control over the buffer allocation=
+,
+> > >> and
+> > >> as such, we need a method to notify the client that the mapping has
+> > >> become
+> > >> invalid.
+> > >>
+> > >> 3) VHOST_USER_SET_MEM_TABLE is a one time request, again this breaks
+> > >> our
+> > >> usage as we need to change this dynamically at runtime.
+> > >
+> > > I've seen (3) being sent multiple times (It's messy but it happens); =
+so
+> > > I think that fixes (2) as well for you.
+> >
+> > Yes, but it's ignored.
+> >
+> >      /*
+> >       * For non-vring specific requests, like VHOST_USER_SET_MEM_TABLE,
+> >       * we just need send it once in the first time. For later such
+> >       * request, we just ignore it.
+> >       */
+> >      if (vhost_user_one_time_request(msg->hdr.request) && dev->vq_index
+> > !=3D 0) {
+> >           msg->hdr.flags &=3D ~VHOST_USER_NEED_REPLY_MASK;
+> >           return 0;
+> >      }
+>=20
+> This code was added to avoid sending the same mapping for each queue:
+> https://github.com/qemu/qemu/commit/b931bfbf042983f311b3b09894d8030b2755a=
+638
+> (arguably, the filtering could have been done earlier)
+>=20
+> But if you reconnect, it should still send it again at least once (for vq=
+ #0).
+>=20
+> vhost-user-bridge reconnect used to work quite reliably, I haven't
+> tested recently.
 
-Juan, as it's a fix it should go in rc3.
+Doesn't this also happen sometimes if the guest sees memory devices
+change?
 
-Thanks,
-Laurent
+Dave
+
+>=20
+> >
+> > >
+> > > Dave
+> > >
+> > >> Unless there are viable solutions to these problems there is no way
+> > >> that
+> > >> vhost-user can be used for this kind of a device.
+> > >>
+> > >> -Geoff
+> > >>
+> > >> >
+> > >> > >
+> > >> > > Dave
+> > >> > >
+> > >> > > > >
+> > >> > > > > thanks
+> > >> > > > > -- PMM
+> > >> > > --
+> > >> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > > --
+> > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
