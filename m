@@ -2,86 +2,69 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B25C432C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 09:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06616C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 09:20:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5356F20722
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 09:06:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hwg2t4mj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5356F20722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE3B72075C
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 09:20:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE3B72075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51743 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZWnR-00089q-HX
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 04:06:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49992)
+	id 1iZX0u-0003Tg-TU
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 04:20:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51811)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iZWhE-00020a-JU
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:59:45 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iZX08-000313-Dx
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 04:19:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iZWhD-00036o-3z
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:59:44 -0500
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:53113)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iZWhC-00036J-Td
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 03:59:43 -0500
-Received: by mail-wm1-x32c.google.com with SMTP id l1so2260867wme.2
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 00:59:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=zlo3vNzRp6z3EanSOjFlpKBYoVA1NruT4oaby34LW/4=;
- b=Hwg2t4mjO6rQWRpXbKIiGXrdqAWE9AiuTGQIAxJ4hosbtJJMyn7IksJ+M0KUuOSiQZ
- 2EKLsmEzhCKNERZ1vkOqkzs/9XJlV5PFcPOxKZOjxwxMOp02/Ki3+ZnvUsyWC77Ppj6U
- aG+NrAOaRllldv+iX9M29in3wVYaq19OLRybyjo6IDWyu0uz+PfIKhoUQRrFkNXYIVMA
- CwxsktD3oCLqBqtYYYwYKm3XM30necPyafJsXg+cShZQAq86AkuQn337BDweo5KwWyrr
- wcWMa0THznRYINgsUo7IoDphV5SmSJaFTM2TSVGU6HfjGmx3PfW9HIAHTURoQGFexZ7P
- 1HhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=zlo3vNzRp6z3EanSOjFlpKBYoVA1NruT4oaby34LW/4=;
- b=e8O1wL+7razx6LnH4qZGLFbmHj+n0dc5qDECpywGJ5g0p7jybjMV4mSxfxXLXUmGag
- NKdhDRhHDkXg55a+mk5WjDOW9O6Vjv7tGvweCWWMbKJRMQlSUA8feKzjsbTwOh5iSIe5
- LmjVWWRcjNUi/mpHX2zJYq20drQft5XXt226GlRh7vPMRSonyIJSnLKBoFe3H9KFG8RX
- zWyo3TK7/LVUvnr3cL1dXV/kSvALxI/9o8O1EeP50YUP7lTok6smwEtL/3MRkumQ5+/q
- AnOGnMrdx1VCWVCeWdIqtNs65IhJGHKhV59ghF5rXt7EhP3Pb9HOEffDW5Xk+qT5D3n8
- AYNA==
-X-Gm-Message-State: APjAAAVj7MyYXyb5nbyUX0VsnneBBXlMVcS7tKje4PlpTAsIO6i4BbKB
- 8xuj07irmKuqz04t3TcnLFqOJGfs
-X-Google-Smtp-Source: APXvYqxr4uNF/SUvr7CkSDiUTOm4K3dEY415kMZVxZpPbmruyHAkmsreLx2bOLcWqtskGZOi4ep1Vg==
-X-Received: by 2002:a7b:c357:: with SMTP id l23mr3099268wmj.152.1574758781462; 
- Tue, 26 Nov 2019 00:59:41 -0800 (PST)
-Received: from donizetti.lan ([2001:b07:6468:f312:5454:a592:5a0a:75c])
- by smtp.gmail.com with ESMTPSA id a206sm2349172wmf.15.2019.11.26.00.59.40
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 00:59:40 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 4/5] hvf: correctly handle REX prefix in relation to legacy
- prefixes
-Date: Tue, 26 Nov 2019 09:59:35 +0100
-Message-Id: <20191126085936.1689-5-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <no-reply@patchew.org>) id 1iZX06-0004wO-Lh
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 04:19:16 -0500
+Resent-Date: Tue, 26 Nov 2019 04:19:16 -0500
+Resent-Message-Id: <E1iZX06-0004wO-Lh@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21174)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iZX06-0004vx-Ds
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 04:19:14 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574759947; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=bbAMUGjHnqLvbI9H7CcQoCI+4NejHccw16yig7V6tY1qBe82b5HKHmEMRj+R66VlTLkMbk9edF5k2TU7vOpk5O9VOoKl4um1VVtvg1ecrnR/oP+MqUd1e2THucG9fWT7p7LuW0rCLl6PhbIsdt8aJm3X1U0ydly3K/J8viZA4rs=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1574759947;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=4EqSbH7kYowDZ7O1nw8NCjcGIOsKF5fq4W1cBHHQseo=; 
+ b=CQHjWKShte1cTu/KZoYEKJdVjKGfhALUDgJkRj1C1VVGJ3apxRzSLTeqkb44w0mYoINXVsNkP5mnqcPwIn5N6VaC/uCgIemSDpQxnVOWrP0d/KI7giBMdmGjmtI64ThFyjGziUqrsUV10oDLwbsV61O4UDNVQr/CxSJn/eEioK0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1574759945805587.4380374486793;
+ Tue, 26 Nov 2019 01:19:05 -0800 (PST)
 In-Reply-To: <20191126085936.1689-1-pbonzini@redhat.com>
-References: <20191126085936.1689-1-pbonzini@redhat.com>
+Subject: Re: [PULL 0/5] i386 patches for QEMU 4.2-rc
+Message-ID: <157475994490.31055.5778115059405326734@37313f22b938>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32c
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: pbonzini@redhat.com
+Date: Tue, 26 Nov 2019 01:19:05 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,222 +76,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cameron Esfahani <dirty@apple.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cameron Esfahani <dirty@apple.com>
-
-In real x86 processors, the REX prefix must come after legacy prefixes.
-REX before legacy is ignored.  Update the HVF emulation code to properly
-handle this.  Fix some spelling errors in constants.  Fix some decoder
-table initialization issues found by Coverity.
-
-Signed-off-by: Cameron Esfahani <dirty@apple.com>
-Message-Id: <eff30ded8307471936bec5d84c3b6efbc95e3211.1574625592.git.dirty@apple.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/hvf/x86_decode.c | 64 ++++++++++++++++++++----------------
- target/i386/hvf/x86_decode.h | 20 +++++------
- 2 files changed, 46 insertions(+), 38 deletions(-)
-
-diff --git a/target/i386/hvf/x86_decode.c b/target/i386/hvf/x86_decode.c
-index 822fa1866e..77c346605f 100644
---- a/target/i386/hvf/x86_decode.c
-+++ b/target/i386/hvf/x86_decode.c
-@@ -122,7 +122,8 @@ static void decode_rax(CPUX86State *env, struct x86_decode *decode,
- {
-     op->type = X86_VAR_REG;
-     op->reg = R_EAX;
--    op->ptr = get_reg_ref(env, op->reg, decode->rex.rex, 0,
-+    /* Since reg is always AX, REX prefix has no impact. */
-+    op->ptr = get_reg_ref(env, op->reg, false, 0,
-                           decode->operand_size);
- }
- 
-@@ -1687,40 +1688,37 @@ calc_addr:
-     }
- }
- 
--target_ulong get_reg_ref(CPUX86State *env, int reg, int rex, int is_extended,
--                         int size)
-+target_ulong get_reg_ref(CPUX86State *env, int reg, int rex_present,
-+                         int is_extended, int size)
- {
-     target_ulong ptr = 0;
--    int which = 0;
- 
-     if (is_extended) {
-         reg |= R_R8;
-     }
- 
--
-     switch (size) {
-     case 1:
--        if (is_extended || reg < 4 || rex) {
--            which = 1;
-+        if (is_extended || reg < 4 || rex_present) {
-             ptr = (target_ulong)&RL(env, reg);
-         } else {
--            which = 2;
-             ptr = (target_ulong)&RH(env, reg - 4);
-         }
-         break;
-     default:
--        which = 3;
-         ptr = (target_ulong)&RRX(env, reg);
-         break;
-     }
-     return ptr;
- }
- 
--target_ulong get_reg_val(CPUX86State *env, int reg, int rex, int is_extended,
--                         int size)
-+target_ulong get_reg_val(CPUX86State *env, int reg, int rex_present,
-+                         int is_extended, int size)
- {
-     target_ulong val = 0;
--    memcpy(&val, (void *)get_reg_ref(env, reg, rex, is_extended, size), size);
-+    memcpy(&val,
-+           (void *)get_reg_ref(env, reg, rex_present, is_extended, size),
-+           size);
-     return val;
- }
- 
-@@ -1853,28 +1851,38 @@ void calc_modrm_operand(CPUX86State *env, struct x86_decode *decode,
- static void decode_prefix(CPUX86State *env, struct x86_decode *decode)
- {
-     while (1) {
-+        /*
-+         * REX prefix must come after legacy prefixes.
-+         * REX before legacy is ignored.
-+         * Clear rex to simulate this.
-+         */
-         uint8_t byte = decode_byte(env, decode);
-         switch (byte) {
-         case PREFIX_LOCK:
-             decode->lock = byte;
-+            decode->rex.rex = 0;
-             break;
-         case PREFIX_REPN:
-         case PREFIX_REP:
-             decode->rep = byte;
-+            decode->rex.rex = 0;
-             break;
--        case PREFIX_CS_SEG_OVEERIDE:
--        case PREFIX_SS_SEG_OVEERIDE:
--        case PREFIX_DS_SEG_OVEERIDE:
--        case PREFIX_ES_SEG_OVEERIDE:
--        case PREFIX_FS_SEG_OVEERIDE:
--        case PREFIX_GS_SEG_OVEERIDE:
-+        case PREFIX_CS_SEG_OVERRIDE:
-+        case PREFIX_SS_SEG_OVERRIDE:
-+        case PREFIX_DS_SEG_OVERRIDE:
-+        case PREFIX_ES_SEG_OVERRIDE:
-+        case PREFIX_FS_SEG_OVERRIDE:
-+        case PREFIX_GS_SEG_OVERRIDE:
-             decode->segment_override = byte;
-+            decode->rex.rex = 0;
-             break;
-         case PREFIX_OP_SIZE_OVERRIDE:
-             decode->op_size_override = byte;
-+            decode->rex.rex = 0;
-             break;
-         case PREFIX_ADDR_SIZE_OVERRIDE:
-             decode->addr_size_override = byte;
-+            decode->rex.rex = 0;
-             break;
-         case PREFIX_REX ... (PREFIX_REX + 0xf):
-             if (x86_is_long_mode(env_cpu(env))) {
-@@ -2111,14 +2119,14 @@ void init_decoder()
- {
-     int i;
-     
--    for (i = 0; i < ARRAY_SIZE(_decode_tbl2); i++) {
--        memcpy(_decode_tbl1, &invl_inst, sizeof(invl_inst));
-+    for (i = 0; i < ARRAY_SIZE(_decode_tbl1); i++) {
-+        memcpy(&_decode_tbl1[i], &invl_inst, sizeof(invl_inst));
-     }
-     for (i = 0; i < ARRAY_SIZE(_decode_tbl2); i++) {
--        memcpy(_decode_tbl2, &invl_inst, sizeof(invl_inst));
-+        memcpy(&_decode_tbl2[i], &invl_inst, sizeof(invl_inst));
-     }
-     for (i = 0; i < ARRAY_SIZE(_decode_tbl3); i++) {
--        memcpy(_decode_tbl3, &invl_inst, sizeof(invl_inst_x87));
-+        memcpy(&_decode_tbl3[i], &invl_inst_x87, sizeof(invl_inst_x87));
-     
-     }
-     for (i = 0; i < ARRAY_SIZE(_1op_inst); i++) {
-@@ -2167,22 +2175,22 @@ target_ulong decode_linear_addr(CPUX86State *env, struct x86_decode *decode,
-                                target_ulong addr, X86Seg seg)
- {
-     switch (decode->segment_override) {
--    case PREFIX_CS_SEG_OVEERIDE:
-+    case PREFIX_CS_SEG_OVERRIDE:
-         seg = R_CS;
-         break;
--    case PREFIX_SS_SEG_OVEERIDE:
-+    case PREFIX_SS_SEG_OVERRIDE:
-         seg = R_SS;
-         break;
--    case PREFIX_DS_SEG_OVEERIDE:
-+    case PREFIX_DS_SEG_OVERRIDE:
-         seg = R_DS;
-         break;
--    case PREFIX_ES_SEG_OVEERIDE:
-+    case PREFIX_ES_SEG_OVERRIDE:
-         seg = R_ES;
-         break;
--    case PREFIX_FS_SEG_OVEERIDE:
-+    case PREFIX_FS_SEG_OVERRIDE:
-         seg = R_FS;
-         break;
--    case PREFIX_GS_SEG_OVEERIDE:
-+    case PREFIX_GS_SEG_OVERRIDE:
-         seg = R_GS;
-         break;
-     default:
-diff --git a/target/i386/hvf/x86_decode.h b/target/i386/hvf/x86_decode.h
-index bc574a7a44..ef7960113f 100644
---- a/target/i386/hvf/x86_decode.h
-+++ b/target/i386/hvf/x86_decode.h
-@@ -27,12 +27,12 @@ typedef enum x86_prefix {
-     PREFIX_REPN =                  0xf2,
-     PREFIX_REP =                   0xf3,
-     /* group 2 */
--    PREFIX_CS_SEG_OVEERIDE =       0x2e,
--    PREFIX_SS_SEG_OVEERIDE =       0x36,
--    PREFIX_DS_SEG_OVEERIDE =       0x3e,
--    PREFIX_ES_SEG_OVEERIDE =       0x26,
--    PREFIX_FS_SEG_OVEERIDE =       0x64,
--    PREFIX_GS_SEG_OVEERIDE =       0x65,
-+    PREFIX_CS_SEG_OVERRIDE =       0x2e,
-+    PREFIX_SS_SEG_OVERRIDE =       0x36,
-+    PREFIX_DS_SEG_OVERRIDE =       0x3e,
-+    PREFIX_ES_SEG_OVERRIDE =       0x26,
-+    PREFIX_FS_SEG_OVERRIDE =       0x64,
-+    PREFIX_GS_SEG_OVERRIDE =       0x65,
-     /* group 3 */
-     PREFIX_OP_SIZE_OVERRIDE =      0x66,
-     /* group 4 */
-@@ -303,10 +303,10 @@ uint64_t sign(uint64_t val, int size);
- 
- uint32_t decode_instruction(CPUX86State *env, struct x86_decode *decode);
- 
--target_ulong get_reg_ref(CPUX86State *env, int reg, int rex, int is_extended,
--                         int size);
--target_ulong get_reg_val(CPUX86State *env, int reg, int rex, int is_extended,
--                         int size);
-+target_ulong get_reg_ref(CPUX86State *env, int reg, int rex_present,
-+                         int is_extended, int size);
-+target_ulong get_reg_val(CPUX86State *env, int reg, int rex_present,
-+                         int is_extended, int size);
- void calc_modrm_operand(CPUX86State *env, struct x86_decode *decode,
-                         struct x86_decode_op *op);
- target_ulong decode_linear_addr(CPUX86State *env, struct x86_decode *decode,
--- 
-2.21.0
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyNjA4NTkzNi4xNjg5
+LTEtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQgdGhlIGRv
+Y2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNv
+bW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxs
+ZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJ
+UFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcgVj0xIE5F
+VFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VOVj0xIEo9
+MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgY2hlY2stdW5p
+dDogdGVzdHMvdGVzdC10aHJlYWQtcG9vbAp3YWl0X2Zvcl9taWdyYXRpb25fZmFpbDogdW5leHBl
+Y3RlZCBzdGF0dXMgc3RhdHVzPXdhaXQtdW5wbHVnIGFsbG93X2FjdGl2ZT0xCioqCkVSUk9SOi90
+bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9taWdyYXRpb24tdGVzdC5jOjkwODp3YWl0X2Zvcl9taWdy
+YXRpb25fZmFpbDogYXNzZXJ0aW9uIGZhaWxlZDogKHJlc3VsdCkKRVJST1IgLSBCYWlsIG91dCEg
+RVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL21pZ3JhdGlvbi10ZXN0LmM6OTA4OndhaXRf
+Zm9yX21pZ3JhdGlvbl9mYWlsOiBhc3NlcnRpb24gZmFpbGVkOiAocmVzdWx0KQptYWtlOiAqKiog
+W2NoZWNrLXF0ZXN0LWFhcmNoNjRdIEVycm9yIDEKbWFrZTogKioqIFdhaXRpbmcgZm9yIHVuZmlu
+aXNoZWQgam9icy4uLi4KICBURVNUICAgIGNoZWNrLXVuaXQ6IHRlc3RzL3Rlc3QtaGJpdG1hcAog
+IFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMvdGVzdC1iZHJ2LWRyYWluCi0tLQogICAgcmFpc2Ug
+Q2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNz
+RXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwn
+LCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD0zZDE1ZTgzNjhiM2E0MmYzOWI0MjlhOGI0YWUyNmYy
+OScsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcs
+ICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BU
+Uz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hP
+V19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9t
+ZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAn
+LXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWRkdXhrM2I4L3NyYy9kb2NrZXItc3Jj
+LjIwMTktMTEtMjYtMDQuMDkuMzguMjAxNTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50
+b3M3JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXpl
+cm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNl
+LnV1aWQ9M2QxNWU4MzY4YjNhNDJmMzliNDI5YThiNGFlMjZmMjkKbWFrZVsxXTogKioqIFtkb2Nr
+ZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRj
+aGV3LXRlc3Rlci10bXAtZGR1eGszYjgvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1x
+dWlja0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDltMjYuNjEwcwp1c2VyICAgIDBtOC4zMjhz
+CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8y
+MDE5MTEyNjA4NTkzNi4xNjg5LTEtcGJvbnppbmlAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1x
+dWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
+ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
