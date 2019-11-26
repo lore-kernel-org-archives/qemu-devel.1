@@ -2,69 +2,80 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40E8EC432C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0B76C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:43:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C38520748
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:41:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C38520748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7D44D20748
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:43:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O08c+fdn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D44D20748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZYI1-0003fs-9w
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:41:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60467)
+	id 1iZYJi-0005Ei-KS
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:43:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iZYCt-0006Pm-K5
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:36:33 -0500
+ (envelope-from <berrange@redhat.com>) id 1iZY31-0003NN-CG
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:26:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iZYCs-000076-7K
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:36:31 -0500
-Resent-Date: Tue, 26 Nov 2019 05:36:31 -0500
-Resent-Message-Id: <E1iZYCs-000076-7K@eggs.gnu.org>
-Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21863)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iZYCs-00006e-1k
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:36:30 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1574764565; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=KSgbP/SaLhDXQJUQjdEUcPeGhxe0CYtNcs4Bq0Y9ODob+Je/UrLu98rxvpfYIWXsZtPCVR3E+zfsijfAM2DwvCGVxZLJQPP6aBpYLuTasHSq1wXTtzYqtpYstqIFXX05/hxEFEZWd3IE/EwzvtAR+rLUWr+tXzeEYfM5g0ob0O4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1574764565;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=c/3dqYrZaGnc4tGwwSDhNLs/aSCK3LS7JS9Z5nKVpVQ=; 
- b=cqGrFulyhlNmpspgekpi8My0kjBFvNpBm58ST6wK/w4QISPFLOzeq4ohsUAlN3wb1h0ofM+Qq/3Hea0l05x4w5gmES3qhZIIQ6utNA58cpj462vST8nx3Rk83JilkPIkxPCmlI3e6zYXON7fW5+x6xBz8vtHnZGw6X5HUVj1VPk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1574764563537255.54649937131023;
- Tue, 26 Nov 2019 02:36:03 -0800 (PST)
-In-Reply-To: <20191126100914.5150-1-prashantbhole.linux@gmail.com>
-Subject: Re: [RFC 0/3] Qemu: virtio-net XDP offload
-Message-ID: <157476456132.31055.15214499348148879084@37313f22b938>
+ (envelope-from <berrange@redhat.com>) id 1iZY2y-0003Xj-D1
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:26:18 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41990
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iZY2x-0003XA-SB
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:26:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574763974;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Jun8ydUo8qDErM3Dj7H++uoe8Gz1TUchBI8znFnwte4=;
+ b=O08c+fdn8FW+FqnLZnZ9PUD69jjeQnHzRZfJdTV8rsr90XeyERkhiEFdaoLdzsQcelVgDs
+ ZiWxi9HL6QfvGQNuz+IKHS4HMXQ/OTqChWMCw2EriRYbsCZ0RgXIBke2vCtdQwTLNonprx
+ 6UMnsG0bwcIdX9FNYHBXh+jX6aPg5SM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-91-tFL1jfsTPoeHmKKOkrkKUg-1; Tue, 26 Nov 2019 05:26:12 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFB1C188352E
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 10:26:11 +0000 (UTC)
+Received: from redhat.com (ovpn-112-62.ams2.redhat.com [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F076C60C80;
+ Tue, 26 Nov 2019 10:26:03 +0000 (UTC)
+Date: Tue, 26 Nov 2019 10:26:00 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: virtiofsd: Where should it live?
+Message-ID: <20191126102600.GG556568@redhat.com>
+References: <20191125185021.GB3767@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: prashantbhole.linux@gmail.com
-Date: Tue, 26 Nov 2019 02:36:03 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20191125185021.GB3767@work-vm>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: tFL1jfsTPoeHmKKOkrkKUg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.58
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,70 +87,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: songliubraving@fb.com, jakub.kicinski@netronome.com, hawk@kernel.org,
- daniel@iogearbox.net, mst@redhat.com, netdev@vger.kernel.org,
- jasowang@redhat.com, john.fastabend@gmail.com, qemu-devel@nongnu.org,
- ast@kernel.org, davem@davemloft.net, prashantbhole.linux@gmail.com,
- kvm@vger.kernel.org, yhs@fb.com, andriin@fb.com, kafai@fb.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: mszeredi@redhat.com, marcandre.lureau@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyNjEwMDkxNC41MTUw
-LTEtcHJhc2hhbnRiaG9sZS5saW51eEBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
-bGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0
-ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tl
-ciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFzaApleHBvcnQgQVJDSD14ODZfNjQKbWFr
-ZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0
-LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBD
-QyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vbXVzaWNwYWwubwogIENDICAgICAgYWFyY2g2
-NC1zb2Z0bW11L2h3L2FybS9uZXRkdWlubzIubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3
-L2FybS9uc2VyaWVzLm8KL3RtcC9xZW11LXRlc3Qvc3JjL2h3L25ldC92aXJ0aW8tbmV0LmM6NjM2
-OjEyOiBlcnJvcjogJ3BlZXJfYXR0YWNoX2VicGYnIGRlZmluZWQgYnV0IG5vdCB1c2VkIFstV2Vy
-cm9yPXVudXNlZC1mdW5jdGlvbl0KIHN0YXRpYyBpbnQgcGVlcl9hdHRhY2hfZWJwZihWaXJ0SU9O
-ZXQgKm4sIGludCBsZW4sIHZvaWQgKmluc25zLCB1aW50OF90IGdwbCkKICAgICAgICAgICAgXn5+
-fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwpt
-YWtlWzFdOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6Njk6IGh3L25ldC92aXJ0
-aW8tbmV0Lm9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
-cy4uLi4KICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vb21hcF9zeDEubwogIENDICAg
-ICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9wYWxtLm8KbWFrZTogKioqIFtNYWtlZmlsZTo0OTE6
-IHg4Nl82NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5p
-c2hlZCBqb2JzLi4uLgogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L2h3L2FybS9ndW1zdGl4Lm8K
-ICBDQyAgICAgIGFhcmNoNjQtc29mdG1tdS9ody9hcm0vc3BpdHoubwotLS0KICBDQyAgICAgIGFh
-cmNoNjQtc29mdG1tdS9nZGJzdHViLXhtbC5vCiAgQ0MgICAgICBhYXJjaDY0LXNvZnRtbXUvdHJh
-Y2UvZ2VuZXJhdGVkLWhlbHBlcnMubwogIENDICAgICAgYWFyY2g2NC1zb2Z0bW11L3RhcmdldC9h
-cm0vdHJhbnNsYXRlLXN2ZS5vCi90bXAvcWVtdS10ZXN0L3NyYy9ody9uZXQvdmlydGlvLW5ldC5j
-OjYzNjoxMjogZXJyb3I6ICdwZWVyX2F0dGFjaF9lYnBmJyBkZWZpbmVkIGJ1dCBub3QgdXNlZCBb
-LVdlcnJvcj11bnVzZWQtZnVuY3Rpb25dCiBzdGF0aWMgaW50IHBlZXJfYXR0YWNoX2VicGYoVmly
-dElPTmV0ICpuLCBpbnQgbGVuLCB2b2lkICppbnNucywgdWludDhfdCBncGwpCiAgICAgICAgICAg
-IF5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJv
-cnMKbWFrZVsxXTogKioqIFsvdG1wL3FlbXUtdGVzdC9zcmMvcnVsZXMubWFrOjY5OiBody9uZXQv
-dmlydGlvLW5ldC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDkxOiBhYXJjaDY0LXNv
-ZnRtbXUvYWxsXSBFcnJvciAyClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBG
-aWxlICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2MiwgaW4gPG1vZHVsZT4KICAg
-IHN5cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29k
-ZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywg
-Jy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlk
-PTViNmFjYzJhYzc0OTRhZDZiNTk3MDZjOWRkMjZjM2NkJywgJy11JywgJzEwMDEnLCAnLS1zZWN1
-cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJ
-U1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdK
-PTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAnLWUnLCAnQ0NBQ0hFX0RJ
-Uj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2Nr
-ZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVz
-dGVyLXRtcC00ZTJobm5kNS9zcmMvZG9ja2VyLXNyYy4yMDE5LTExLTI2LTA1LjMzLjM3LjMzMjov
-dmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAn
-dGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1m
-aWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD01YjZhY2MyYWM3NDk0YWQ2YjU5NzA2
-YzlkZDI2YzNjZAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVh
-dmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC00ZTJobm5kNS9zcmMn
-Cm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAg
-ICAybTI0Ljk2N3MKdXNlciAgICAwbTguOTk5cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUg
-YXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTExMjYxMDA5MTQuNTE1MC0xLXByYXNoYW50
-YmhvbGUubGludXhAZ21haWwuY29tL3Rlc3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1t
-ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
-cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAcmVkaGF0LmNvbQ==
+On Mon, Nov 25, 2019 at 06:50:21PM +0000, Dr. David Alan Gilbert wrote:
+> Hi,
+>   There's been quite a bit of discussion about where virtiofsd, our
+> implemenation of a virtiofs daemon, should live.  I'd like to get
+> this settled now, because I'd like to tidy it up for the next
+> qemu cycle.
+>=20
+> For reference it's based on qemu's livhost-user+chunks of libfuse.
+> It can't live in libfuse because we change enough of the library
+> to break their ABI.  It's C, and we've got ~100 patches - which
+> we can split into about 3 chunks.
+>=20
+> Some suggestions so far:
+>   a) In contrib
+>      This is my current working assumption; the main objection is it's
+>      a bit big and pulls in a chunk of libfuse.
+
+My main objection to 'contrib/' is actually the perceived notions
+about what the contrib directory is for. When I see 'contrib/'
+code in either QEMU, or other open source projects, my general
+impression is that this is largely unsupported code which is just
+there as it might be interesting to someone, and doesn't typically
+get much ongoing dev attention.
+
+Parts that are fully supported & actively developed by projects
+usually live elsewhere like a src/ or lib/ or tools/ directory.
+
+This has kind of been the case with QEMU historically, with
+the vhost-user-blk, vhost-user-scsi not being real production
+quality implementations. Rather they are just technology demos
+to show what you might do.   vhost-user-gpu/input blurred this
+boundary a bit as they're more supported tools, and so I'd
+argue contrib/ probably wasn't the right place for them either
+in hindsight.
+
+virtiofsd is definitely different as it is intended to be a
+fully production quality supported tool with active dev into
+the future IIUC.
+
+IOW, if we did decide we want it in QEMU, then instead of
+'$GIT/contrib/virtiofsd', I'd prefer to see '$GIT/virtiofsd'.
+
+>   b) In a submodule
+>=20
+>   c) Just separate
+>=20
+> Your suggestions/ideas please.  My preference is (a).
+
+What I'm wondering is just how much sharing / overlap of code and concepts
+and community operation there is going otbetween QEMU and virtiofsd. From
+the tech POV, IIUC, the main blocker it would need to be in QEMU is because
+it links to libvhost-user and we've not declared that to be a stable API
+for 3rd party linking.
+
+Personally I'm always biased towards self-contained apps being in their
+own repositories, rather than bundling too much stuff into one repo. You
+can see that in the way we've created independant git repos for any libvirt
+module that didn't need to be part of the main libvirt.git.
+
+To me the key benefit this gives is flexibility in approach. ie the app
+doesn't need to blindly follow every precedent that QEMU has set. It
+can instead take the most appropriate path for its needs. For example...
+
+It could use meson for its build system already. This would be good as
+builds will be done in a matter of seconds. For contributors it would
+be a much less daunting project to join as it wouldn't be lost in the
+firehose of other non-virtiofsd contributions on qemu-devel.
+
+It doesn't have to follow QEMU's 3-times a year release model, with 6
+week long freeze periods. It can be more agile releasing 6 times a year
+with 1 week freezes if desired, I personally think tihs would be quite
+desirable for a young project like virtiofsd which is evolving rapidly
+as it would get new work available to users much more rapidly.
+
+It doesn't have to follow QEMU's API stability & deprecation policies.
+It could be more flexible in taking non-compatible changes, which again
+may be valuable for a young rapidly evolving app.
+
+
+
+Anyway to be clear, I'm not a contributor to virtiofsd, nor likely to
+be one in the future, so just consider this a personal POV. From QEMU's
+POV I don't think it'll matter whether virtiofsd in or out of QEMU git.
+It is more about the impact & burden QEMU's dev process & standards might
+impose on virtiofsd itself.
+
+I'm fine with whatever option above is chosen, with the only caveat
+being that if its in qemu.git, I don't think it belongs under contrib/
+it should be a top level dir of its own.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
