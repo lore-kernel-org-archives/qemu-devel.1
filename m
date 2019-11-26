@@ -2,85 +2,81 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79BBCC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 01:12:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F00C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 01:23:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 322D02068F
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 01:12:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44FD72071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 01:23:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iwImLEh0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 322D02068F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zk4ZfnSp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44FD72071E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49482 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZPPB-00081N-CG
-	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 20:12:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57722)
+	id 1iZPZd-0002Cj-B2
+	for qemu-devel@archiver.kernel.org; Mon, 25 Nov 2019 20:23:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58741)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZPNl-0007J4-8p
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 20:11:11 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZPYu-0001mc-BN
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 20:22:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZPNh-0001Qp-VR
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 20:11:08 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:38417)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZPYq-0006V2-ST
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 20:22:40 -0500
+Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:42110)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iZPNh-0001QV-OE
- for qemu-devel@nongnu.org; Mon, 25 Nov 2019 20:11:05 -0500
-Received: by mail-ot1-x342.google.com with SMTP id z25so14429527oti.5
- for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 17:11:05 -0800 (PST)
+ id 1iZPYq-0006Uh-I6
+ for qemu-devel@nongnu.org; Mon, 25 Nov 2019 20:22:36 -0500
+Received: by mail-ot1-x32a.google.com with SMTP id 66so8325866otd.9
+ for <qemu-devel@nongnu.org>; Mon, 25 Nov 2019 17:22:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=dXLtRat1sNW7UyHmIF/j2xb3hlqxWll83/Jnml7Aw6M=;
- b=iwImLEh07RXGKaGz7r1WdGgXGdHg9/aldTF9k1OVJg6h8UglXFAc72wGMaCYx+K5od
- cV0MQUEhwfqg91TyweOZnvcYquvnM/cwXmRv1XkW94nMYuMCHE2WwUrf1EHicbGJqGo0
- dAydO/DM42EZwilpsZwtVmT4IWXrP2zpApSd32bVVQjy/V5F8tJhM2nUKKHJja8CDcWA
- OTnCJDo5puEofD4rcL1mzGzQnRtGO/+cRHitC4depZR2AeuM6s6WavWwfpJkEeBO9ONc
- qgAE2VXh5jTSqaTo+YZ9+ZWM030k8iE35dS0Q7W0q26h85w4RVhKEneN9Y3GCmae7un4
- xV+Q==
+ :cc; bh=O3eSjJfNn7J0ArQwBEech8aqSYnak71U7Kkvol1u2+4=;
+ b=Zk4ZfnSpKcjo3iUD2kwdg1BmGTVGcr+4ho27Ns/dKBfzq6eW0HBEU9JPxSXX3K+FuZ
+ fOHu57G4j3gi4lRnkdZggR5eahca/kmtcPeRoKp7+OXkwSnAyBVqMaRk5Obvwha1CCvv
+ 44SBndf8HjyYeCs8nbMihoJ33UqDaQ0jvlkyTmlSnz/M3SaaTFMl8Oz8I/QHkeS+FlfX
+ W4OexqcfFP2AgabWFmu/Rl+txB1LwOU6gXFd0tz6qR6Y78QdgJNpniAroLtzvZDsX2ZP
+ b0dMBYbY4PiOPlvVpMzGGpCGm7KDRpVxW6CNViIf25J+ZArBHBNr++aG2F8VD+5nNllJ
+ gRKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=dXLtRat1sNW7UyHmIF/j2xb3hlqxWll83/Jnml7Aw6M=;
- b=lH2eGfqdZGYZi61TAf9dK92l5YW6KHCOQXmC7tGiOLzSqWD5oFJUsCzqZsEhFRzsuT
- rYbDe5o9H1wlnEM0p7cr1/r6ScGabWYbcdwHtE+lPsSQpnjcKDaMmOT9HyidudgpZLQf
- 3HUQKzMIxfi6/hbE6/8AEIIpahL2P7SYEN4IyEgb/tEsSmrD2uD4iIz8GDvtolxldQ4b
- akWy2poOlICsqs4KBcECO5mt9RXtPPyHZ1yEMBWl0WMzPjSJ21FQx+yAV7s52e5BHpuf
- N0P9NqVoguYVph/nt8McrhjIYCS1t2OVYWrkicr1/DpQAZj0Ns71WB4fxCh50VXo8k1Y
- /WFw==
-X-Gm-Message-State: APjAAAXmvPqedG0qVvVgYFRJpcc9YXgt0TxHrEjmOzJp63vMKNZgsv8u
- +bsxdNu/SFNviTf2sRbRLGdlT1sta2Biy9E0LL4=
-X-Google-Smtp-Source: APXvYqxCTzTNnG/TrwVtkbFwDUJc6urcNUvk6JKhOMbybRK6BXuL0Dvw5UTWi+E0jFSSGuH+YYVYwgiY+wYtNBSCD84=
-X-Received: by 2002:a05:6830:1383:: with SMTP id
- d3mr475981otq.306.1574730664692; 
- Mon, 25 Nov 2019 17:11:04 -0800 (PST)
+ bh=O3eSjJfNn7J0ArQwBEech8aqSYnak71U7Kkvol1u2+4=;
+ b=mNB8hsL3c+3H3oZUd1Q6pteLZ7qVLc/msKSUJu7IrrJUh8MpA193fb9NW3Zn4owVmK
+ vDZLJLSH6632tJrZHhTPjLP68ROjRLvBIEhz8wHBgLZJGppHIT6RWc++JWTJ46Ga1WpQ
+ nh5IhLfR0cg0JltRPwMgbQQLHuhu/nfjbiOFhHpYPwvGu9NXQRlwQmrdFGxkfVOXWX+M
+ 9Ad+nICRfdu/UG/046QfKdgk5Jcuv1+bsP+GcsCe4FQto54F0WB5XvncjKS2ZuEmGUQV
+ Kyfgsl4/sJygePwj6LVT/cROFaH/5ElT5uZzjzR4ApyPxFrAC7W1UcM5uCHeYnpHtU8J
+ EtTA==
+X-Gm-Message-State: APjAAAU0HPit2fWcZaMoPTaO+0fYTVP2FZbqKBGUov1bNgCdUVzCzSKG
+ Kt4rc6LJgiSm/dtQ35Sni8gRjtFl6qxq1hzcBLM=
+X-Google-Smtp-Source: APXvYqytWCiBN8KjSfAMeXeRB9wotnSZivrhv9ru+wd6YThOq2b+QWv0zEUtyOGUCxzTWmXQm1t0Yh/LcOFwUszgFNw=
+X-Received: by 2002:a9d:3d05:: with SMTP id a5mr506293otc.295.1574731355596;
+ Mon, 25 Nov 2019 17:22:35 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Mon, 25 Nov 2019 17:11:04
+Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Mon, 25 Nov 2019 17:22:35
  -0800 (PST)
-In-Reply-To: <20191124050225.30351-11-mrolnik@gmail.com>
+In-Reply-To: <20191124050225.30351-1-mrolnik@gmail.com>
 References: <20191124050225.30351-1-mrolnik@gmail.com>
- <20191124050225.30351-11-mrolnik@gmail.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 26 Nov 2019 02:11:04 +0100
-Message-ID: <CAL1e-=ji61MH=akB_r95Fgsa=ZvyhQXb7Njfn=PJdbSO+TWhKg@mail.gmail.com>
-Subject: Re: [PATCH v36 10/17] target/avr: Add instruction disassembly function
-To: Michael Rolnik <mrolnik@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000e2cf550598358d3f"
+Date: Tue, 26 Nov 2019 02:22:35 +0100
+Message-ID: <CAL1e-=hPubt0Rzcd6+mtqgU9nNTfDNafQA1UsgMYY1+Wsj3pvw@mail.gmail.com>
+Subject: Re: [PATCH v36 00/17] QEMU AVR 8 bit cores
+To: Michael Rolnik <mrolnik@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000112c60059835b701"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,673 +88,821 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "thuth@redhat.com" <thuth@redhat.com>, "philmd@redhat.com" <philmd@redhat.com>,
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "imammedo@redhat.com" <imammedo@redhat.com>
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e2cf550598358d3f
+--000000000000112c60059835b701
 Content-Type: text/plain; charset="UTF-8"
 
 On Sunday, November 24, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
 
-> Provide function disassembles executed instruction when `-d in_asm` is
-> provided
+> This series of patches adds 8bit AVR cores to QEMU.
+> All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully
+> tested yet.
+> However I was able to execute simple code with functions. e.g fibonacci
+> calculation.
+> This series of patches include a non real, sample board.
+> No fuses support yet. PC is set to 0 at reset.
 >
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-> ---
+>
+Michael,
 
+Please, in the next version, add or clean up licence preambles in ALL added
+files. It looks the most suitable license for you is LPGL 2.1 with "or
+later (at your option)" wording, like you already have in some (but not
+all) files, but it is your choice. If possible, make it consistent
+throughout the series. Sarah indicated to me she agreed with GPL-like
+license, but she will certainly have the chance to speak up if something is
+not right in her view. Don't misspell her name (as I did in one of my
+responses). All this license thing is important so that one more item of
+the series is resolved, and after that you don't need to think about it
+anymore.
 
-Richard, is this what you expected from Michael, or there are still some
-caveats?
-
-Thanks for the suggestion!
-
+Regards,
 Aleksandar
 
- target/avr/cpu.h       |   1 +
->  target/avr/cpu.c       |   2 +-
->  target/avr/disas.c     | 214 +++++++++++++++++++++++++++++++++++++++++
->  target/avr/translate.c |  11 +++
->  4 files changed, 227 insertions(+), 1 deletion(-)
+
+
+> the patches include the following
+> 1. just a basic 8bit AVR CPU, without instruction decoding or translation
+> 2. CPU features which allow define the following 8bit AVR cores
+>      avr1
+>      avr2 avr25
+>      avr3 avr31 avr35
+>      avr4
+>      avr5 avr51
+>      avr6
+>      xmega2 xmega4 xmega5 xmega6 xmega7
+> 3. a definition of sample machine with SRAM, FLASH and CPU which allows to
+> execute simple code
+> 4. encoding for all AVR instructions
+> 5. interrupt handling
+> 6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
+> 7. a decoder which given an opcode decides what istruction it is
+> 8. translation of AVR instruction into TCG
+> 9. all features together
+>
+> changes since v3
+> 1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff)
+> for faster address manipulaton
+> 2. ffs changed to ctz32
+> 3. duplicate code removed at avr_cpu_do_interrupt
+> 4. using andc instead of not + and
+> 5. fixing V flag calculation in varios instructions
+> 6. freeing local variables in PUSH
+> 7. tcg_const_local_i32 -> tcg_const_i32
+> 8. using sextract32 instead of my implementation
+> 9. fixing BLD instruction
+> 10.xor(r) instead of 0xff - r at COM
+> 11.fixing MULS/MULSU not to modify inputs' content
+> 12.using SUB for NEG
+> 13.fixing tcg_gen_qemu_ld/st call in XCH
+>
+> changes since v4
+> 1. target is now defined as big endian in order to optimize
+> push_ret/pop_ret
+> 2. all style warnings are fixed
+> 3. adding cpu_set/get_sreg functions
+> 4. simplifying gen_goto_tb as there is no real paging
+> 5. env->pc -> env->pc_w
+> 6. making flag dump more compact
+> 7. more spacing
+> 8. renaming CODE/DATA_INDEX -> MMU_CODE/DATA_IDX
+> 9. removing avr_set_feature
+> 10. SPL/SPH set bug fix
+> 11. switching stb_phys to cpu_stb_data
+> 12. cleaning up avr_decode
+> 13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)
+> 14. saving CPU features (savevm)
+>
+> changes since v5
+> 1. BLD bug fix
+> 2. decoder generator is added
+>
+> chages since v6
+> 1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_
+> cpu_gdb_write_register
+> 2. configure the target as little endian because otherwise GDB does not
+> work
+> 3. fixing and testing gen_push_ret/gen_pop_ret
+>
+> changes since v7
+> 1. folding back v6
+> 2. logging at helper_outb and helper_inb are done for non supported yet
+> registers only
+> 3. MAINTAINERS updated
+>
+> changes since v8
+> 1. removing hw/avr from hw/Makefile.obj as it should not be built for all
+> 2. making linux compilable
+> 3. testing on
+>     a. Mac, Apple LLVM version 7.0.0
+>     b. Ubuntu 12.04, gcc 4.9.2
+>     c. Fedora 23, gcc 5.3.1
+> 4. folding back some patches
+> 5. translation bug fixes for ORI, CPI, XOR instructions
+> 6. propper handling of cpu register writes though memory
+>
+> changes since v9
+> 1. removing forward declarations of static functions
+> 2. disabling debug prints
+> 3. switching to case range instead of if else if ...
+> 4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any
+> device
+> 5. commenst about sample board and sample IO device added
+> 6. sample board description is more descriptive now
+> 7. memory_region_allocate_system_memory is used to create RAM
+> 8. now there are helper_fullrd & helper_fullwr when LD/ST try to access
+> registers
+>
+> changes since v10
+> 1. movig back fullwr & fullrd into the commit where outb and inb were
+> introduced
+> 2. changing tlb_fill function signature
+> 3. adding empty line between functions
+> 4. adding newline on the last line of the file
+> 5. using tb->flags to generae full access ST/LD instructions
+> 6. fixing SBRC bug
+> 7. folding back 10th commit
+> 8. whenever a new file is introduced it's added to Makefile.objs
+>
+> changes since v11
+> 1. updating to v2.7.0-rc
+> 2. removing assignment to env->fullacc from gen_intermediate_code
+>
+> changes since v12
+> 1. fixing spacing
+> 2. fixing get/put_segment functions
+> 3. removing target-avr/machine.h file
+> 4. VMSTATE_SINGLE_TEST -> VMSTATE_SINGLE
+> 5. comment spelling
+> 6. removing hw/avr/sample_io.c
+> 7. char const* -> const char*
+> 8. proper ram allocation
+> 9. fixing breakpoint functionality.
+> 10.env1 -> env
+> 11.fixing avr_cpu_gdb_write_register & avr_cpu_gdb_read_register functions
+> 12.any cpu is removed
+> 12.feature bits are not saved into vm state
+>
+> changes since v13
+> 1. rebasing to v2.7.0-rc1
+>
+> changes since v14
+> 1. I made self review with git gui tool. (I did not know such a thing
+> exists)
+> 2. removing all double/tripple spaces
+> 3. removing comment reference to SampleIO
+> 4. folding back some changes, so there is not deleted lines in my code
+> 5. moving avr configuration, within configure file, before chris
+>
+> changes since v15
+> 1. removing IO registers cache from CPU
+> 2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)
+> 3. implementing CBIC/SBIC as read(helper_inb), check, branch
+> 4. adding missing tcg_temp_free_i32 for tcg_const_i32
+>
+> changes since v16
+> 1. removing EXT IO registers knoledge from CPU. These registers are
+> accessible
+>    by LD/ST only. CPU has no interest in them
+>
+> changes since v17 (by Richard Henderson)
+> This is Michael's v17, with some adjustments of my own:
+>
+> 1. Fix the whitespace errors reported by "git am",
+> 2. Replace the utf-8 characters with normal ascii,
+> 3. Ditch the separate compilation of translate.c.
+>
+> I retained the two separate files that could be regenerated
+> from the included cpugen program, but merged in translate-insn.c.
+> Not that it matters, but the code generated is about 3k smaller.
+>
+> changes since v18
+> 1.  moving target-avr into target/avr
+> 2.  do not call cpu_exec_initfn function from avr_cpu_initfn
+> 3.  call cpu_exec_realizefn avr_cpu_realizefn
+> 4.  do not fail sample machine creation if no rom is suplied
+> 5.  add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code
+> 6.  fix a register getters/setters in machine.c
+> 7.  changing QEMU_ARCH_AVR from 1<<17 to 1<<18
+>
+> changes since v19
+> 1.  use decodetree.py tool to decode instructions
+> 2.  adding USART
+> 3.  adding 16 bit timer peripherals
+> 4.  changing QEMU_ARCH_AVR from 1<<18 to 1<<20
+> 5.  renaming tlb_fill to avr_cpu_tlb_fill
+>
+> changes since v20
+> 1.  use one CPU naming convention
+> 2.  merging insn16.decode & insn32.decode files
+> 3.  modifying skip next instruction mechanizm
+> 4.  translate BREAK as NOP for now
+>
+> changes since v21
+> 1.  Reorganize bstate.
+>     This will make transition to <exec/translator.h> easier, and fixes a
+> couple of bugs wrt single stepping
+>     by richard.henderson@linaro.org
+> 2.  Drop cpc and fix page cross condition.
+>     by richard.henderson@linaro.org
+> 3.  Refactor checking supported/unsupported instructions
+> 4.  Add gdb-xml/avr-cpu.xml
+>
+> changes since v22
+> 1.  Rebase
+> 2.  Split long comment
+>
+> changes since v23
+> 1.  remove avr_cpu_list_compare function
+> 2.  modify avr_cpu_class_by_name function
+> 3.  modify avr_cpu_list_entry function
+> 4.  modify avr_cpu_list function
+>
+> changes since v24
+> 1.  remove AVR_CPU_TYPE_NAME macro
+>
+> changes since v25
+> 1.  fix patches. every file belong to one patch only
+> 2.  change copyright year from 2016 to 2019
+> 3.  create mask device to emulate prr0/prr1
+>
+> changes since v26
+> 1.  add avocado acceptence test
+> 2.  add boot serial test
+>
+> changes since v27
+> 1.  list atmel2560 devices as unimplemented
+> 2.  fix sram base/size
+>
+> changes since v28
+> 1.  rebase
+> 2.  fix includes & build
+>
+> changes since v29
+> 1.  fixing ownership
+> 2.  using 'since' instread of 'added in'
+>
+> changes since v30
+> 1.  rebase
+>
+> changes since v31
+> 1.  splitting 'Add instruction translation' commit
+> 2.  fixing typo in qapi/machine.json sicne -> since
+> 3.  removing unintended changes in configure file
+> 4.  adding Richard Henderson as a co developer to 'Add instruction
+> translation - CPU main translation funcions' commit
+>
+> changes since v32
+> 1.  modify cpu_get_sreg to treat sreg C as other flags, except sreg Z
+>
+> changes since v33
+> 1.  ensure flag C is always calculated as one bit
+> 2.  calculate flag Z as one bit, without using inverse logic
+>
+> changes since v34
+> 1.  rebase
+>
+> changes since v35
+> 1.  rebase
+> 2.  use NANOSECONDS_PER_SECOND instead of 1000000000 in avr_timer16.c
+> 3.  split "target/avr: Register AVR support with the rest of QEMU" into
+> three patches
+>     1.  "target/avr: Register AVR support with the rest of QEMU"
+>     2.  "target/avr: Update build system"
+>     3.  "target/avr: Update MAINTAINERS file"
+> 4.  split "target/avr: Add tests" patch into two patches
+>     1.  "target/avr: Add Avocado test"
+>     2.  "target/avr: Add boot serial test"
+> 5.  Add instruction disassembly function
+> 6.  change "since 4.2" to "since 5.0"
+>
+> Michael Rolnik (16):
+>   target/avr: Add outward facing interfaces and core CPU logic
+>   target/avr: Add instruction helpers
+>   target/avr: Add instruction decoding
+>   target/avr: Add instruction translation - Registers definition
+>   target/avr: Add instruction translation - Arithmetic and Logic
+>     Instructions
+>   target/avr: Add instruction translation - Branch Instructions
+>   target/avr: Add instruction translation - Bit and Bit-test
+>     Instructions
+>   target/avr: Add instruction translation - MCU Control Instructions
+>   target/avr: Add instruction translation - CPU main translation
+>     function
+>   target/avr: Add instruction disassembly function
+>   target/avr: Add example board configuration
+>   target/avr: Register AVR support with the rest of QEMU
+>   target/avr: Update build system
+>   target/avr: Add boot serial test
+>   target/avr: Add Avocado test
+>   target/avr: Update MAINTAINERS file
+>
+> Sarah Harris (1):
+>   target/avr: Add limited support for USART and 16 bit timer peripherals
+>
+>  configure                        |    7 +
+>  default-configs/avr-softmmu.mak  |    5 +
+>  qapi/machine.json                |    3 +-
+>  include/disas/dis-asm.h          |    6 +
+>  include/hw/char/avr_usart.h      |   97 +
+>  include/hw/misc/avr_mask.h       |   47 +
+>  include/hw/timer/avr_timer16.h   |   97 +
+>  include/sysemu/arch_init.h       |    1 +
+>  target/avr/cpu-param.h           |   37 +
+>  target/avr/cpu-qom.h             |   54 +
+>  target/avr/cpu.h                 |  254 +++
+>  target/avr/helper.h              |   29 +
+>  arch_init.c                      |    2 +
+>  hw/avr/sample.c                  |  282 +++
+>  hw/char/avr_usart.c              |  324 ++++
+>  hw/misc/avr_mask.c               |  112 ++
+>  hw/timer/avr_timer16.c           |  605 ++++++
+>  target/avr/cpu.c                 |  576 ++++++
+>  target/avr/disas.c               |  214 +++
+>  target/avr/gdbstub.c             |   85 +
+>  target/avr/helper.c              |  354 ++++
+>  target/avr/machine.c             |  121 ++
+>  target/avr/translate.c           | 3039 ++++++++++++++++++++++++++++++
+>  tests/boot-serial-test.c         |   10 +
+>  tests/machine-none-test.c        |    1 +
+>  MAINTAINERS                      |    9 +
+>  gdb-xml/avr-cpu.xml              |   49 +
+>  hw/Kconfig                       |    1 +
+>  hw/avr/Kconfig                   |    6 +
+>  hw/avr/Makefile.objs             |    1 +
+>  hw/char/Kconfig                  |    3 +
+>  hw/char/Makefile.objs            |    1 +
+>  hw/misc/Kconfig                  |    3 +
+>  hw/misc/Makefile.objs            |    2 +
+>  hw/timer/Kconfig                 |    3 +
+>  hw/timer/Makefile.objs           |    2 +
+>  target/avr/Makefile.objs         |   34 +
+>  target/avr/insn.decode           |  175 ++
+>  tests/Makefile.include           |    2 +
+>  tests/acceptance/machine_avr6.py |   36 +
+>  40 files changed, 6688 insertions(+), 1 deletion(-)
+>  create mode 100644 default-configs/avr-softmmu.mak
+>  create mode 100644 include/hw/char/avr_usart.h
+>  create mode 100644 include/hw/misc/avr_mask.h
+>  create mode 100644 include/hw/timer/avr_timer16.h
+>  create mode 100644 target/avr/cpu-param.h
+>  create mode 100644 target/avr/cpu-qom.h
+>  create mode 100644 target/avr/cpu.h
+>  create mode 100644 target/avr/helper.h
+>  create mode 100644 hw/avr/sample.c
+>  create mode 100644 hw/char/avr_usart.c
+>  create mode 100644 hw/misc/avr_mask.c
+>  create mode 100644 hw/timer/avr_timer16.c
+>  create mode 100644 target/avr/cpu.c
 >  create mode 100644 target/avr/disas.c
+>  create mode 100644 target/avr/gdbstub.c
+>  create mode 100644 target/avr/helper.c
+>  create mode 100644 target/avr/machine.c
+>  create mode 100644 target/avr/translate.c
+>  create mode 100644 gdb-xml/avr-cpu.xml
+>  create mode 100644 hw/avr/Kconfig
+>  create mode 100644 hw/avr/Makefile.objs
+>  create mode 100644 target/avr/Makefile.objs
+>  create mode 100644 target/avr/insn.decode
+>  create mode 100644 tests/acceptance/machine_avr6.py
 >
-> diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-> index ed9218af5f..574118beab 100644
-> --- a/target/avr/cpu.h
-> +++ b/target/avr/cpu.h
-> @@ -157,6 +157,7 @@ bool avr_cpu_exec_interrupt(CPUState *cpu, int
-> int_req);
->  hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
->  int avr_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
->  int avr_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-> +int avr_print_insn(bfd_vma addr, disassemble_info *info);
->
->  static inline int avr_feature(CPUAVRState *env, int feature)
->  {
-> diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-> index dae56d7845..52ec21dd16 100644
-> --- a/target/avr/cpu.c
-> +++ b/target/avr/cpu.c
-> @@ -83,7 +83,7 @@ static void avr_cpu_reset(CPUState *cs)
->  static void avr_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
->  {
->      info->mach = bfd_arch_avr;
-> -    info->print_insn = NULL;
-> +    info->print_insn = avr_print_insn;
->  }
->
->  static void avr_cpu_realizefn(DeviceState *dev, Error **errp)
-> diff --git a/target/avr/disas.c b/target/avr/disas.c
-> new file mode 100644
-> index 0000000000..727fc463ce
-> --- /dev/null
-> +++ b/target/avr/disas.c
-> @@ -0,0 +1,214 @@
-> +/*
-> + * OpenRISC disassembler
-> + *
-> + * Copyright (c) 2018 Richard Henderson <rth@twiddle.net>
-> + *
-> + * This program is free software: you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation, either version 2 of the License, or
-> + * (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "disas/dis-asm.h"
-> +#include "qemu/bitops.h"
-> +#include "cpu.h"
-> +
-> +typedef struct {
-> +    disassemble_info *info;
-> +    uint16_t next_word;
-> +    bool next_word_used;
-> +} DisasContext;
-> +
-> +static int to_A(DisasContext *ctx, int indx) { return 16 + (indx % 16); }
-> +static int to_B(DisasContext *ctx, int indx) { return 16 + (indx % 8); }
-> +static int to_C(DisasContext *ctx, int indx) { return 24 + (indx % 4) *
-> 2; }
-> +static int to_D(DisasContext *ctx, int indx) { return (indx % 16) * 2; }
-> +
-> +static uint16_t next_word(DisasContext *ctx)
-> +{
-> +    ctx->next_word_used = true;
-> +    return ctx->next_word;
-> +}
-> +
-> +static int append_16(DisasContext *ctx, int x)
-> +{
-> +    return x << 16 | next_word(ctx);
-> +}
-> +
-> +
-> +/* Include the auto-generated decoder.  */
-> +static bool decode_insn(DisasContext *ctx, uint16_t insn);
-> +#include "decode_insn.inc.c"
-> +
-> +#define output(mnemonic, format, ...) \
-> +    (pctx->info->fprintf_func(pctx->info->stream, "%-9s " format, \
-> +                        mnemonic, ##__VA_ARGS__))
-> +
-> +int avr_print_insn(bfd_vma addr, disassemble_info *info)
-> +{
-> +    DisasContext ctx;
-> +    DisasContext *pctx = &ctx;
-> +    bfd_byte buffer[4];
-> +    uint16_t insn;
-> +    int status;
-> +
-> +    ctx.info = info;
-> +
-> +    status = info->read_memory_func(addr, buffer, 4, info);
-> +    if (status != 0) {
-> +        info->memory_error_func(status, addr, info);
-> +        return -1;
-> +    }
-> +    insn = bfd_getl16(buffer);
-> +    ctx.next_word = bfd_getl16(buffer + 2);
-> +    ctx.next_word_used = false;
-> +
-> +    if (!decode_insn(&ctx, insn)) {
-> +        output(".db", "0x%02x, 0x%02x", buffer[0], buffer[1]);
-> +    }
-> +
-> +    return ctx.next_word_used ? 4 : 2;
-> +}
-> +
-> +
-> +#define INSN(opcode, format, ...)                                       \
-> +static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)        \
-> +{                                                                       \
-> +    output(#opcode, format, ##__VA_ARGS__);                             \
-> +    return true;                                                        \
-> +}
-> +
-> +#define INSN_MNEMONIC(opcode, mnemonic, format, ...)                    \
-> +static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)        \
-> +{                                                                       \
-> +    output(mnemonic, format, ##__VA_ARGS__);                            \
-> +    return true;                                                        \
-> +}
-> +
-> +/*
-> + *   C       Z       N       V       S       H       T       I
-> + *   0       1       2       3       4       5       6       7
-> + */
-> +static const char *brbc[] = {
-> +    "BRCC", "BRNE", "BRPL", "BRVC", "BRGE", "BRHC", "BRTC", "BRID"
-> +};
-> +
-> +static const char *brbs[] = {
-> +    "BRCS", "BREQ", "BRMI", "BRVS", "BRLT", "BRHS", "BRTS", "BRIE"
-> +};
-> +
-> +static const char *bset[] = {
-> +    "SEC",  "SEZ",  "SEN",  "SEZ",  "SES",  "SEH",  "SET",  "SEI"
-> +};
-> +
-> +static const char *bclr[] = {
-> +    "CLC",  "CLZ",  "CLN",  "CLZ",  "CLS",  "CLH",  "CLT",  "CLI"
-> +};
-> +
-> +INSN(ADC,    "r%d, r%d", a->rd, a->rr)
-> +INSN(ADD,    "r%d, r%d", a->rd, a->rr)
-> +INSN(ADIW,   "r%d:r%r, %d", a->rd + 1, a->rd, a->imm)
-> +INSN(AND,    "r%d, r%d", a->rd, a->rr)
-> +INSN(ANDI,   "r%d, %d", a->rd, a->imm)
-> +INSN(ASR,    "r%d", a->rd)
-> +INSN_MNEMONIC(BCLR,  bclr[a->bit], "")
-> +INSN(BLD,    "r%d, %d", a->rd, a->bit)
-> +INSN_MNEMONIC(BRBC,  brbc[a->bit], ".%+d", a->imm * 2)
-> +INSN_MNEMONIC(BRBS,  brbs[a->bit], ".%+d", a->imm * 2)
-> +INSN(BREAK,  "")
-> +INSN_MNEMONIC(BSET,  bset[a->bit], "")
-> +INSN(BST,    "r%d, %d", a->rd, a->bit)
-> +INSN(CALL,   "0x%x", a->imm * 2)
-> +INSN(CBI,    "%d, %d", a->reg, a->bit)
-> +INSN(COM,    "r%d", a->rd)
-> +INSN(CP,     "r%d, r%d", a->rd, a->rr)
-> +INSN(CPC,    "r%d, r%d", a->rd, a->rr)
-> +INSN(CPI,    "r%d, %d", a->rd, a->imm)
-> +INSN(CPSE,   "r%d, r%d", a->rd, a->rr)
-> +INSN(DEC,    "r%d", a->rd)
-> +INSN(DES,    "%d", a->imm)
-> +INSN(EICALL, "")
-> +INSN(EIJMP,  "")
-> +INSN(ELPM1,  "")
-> +INSN(ELPM2,  "r%d, Z", a->rd)
-> +INSN(ELPMX,  "r%d, Z+", a->rd)
-> +INSN(EOR,    "r%d, r%d", a->rd, a->rr)
-> +INSN(FMUL,   "r%d, r%d", a->rd, a->rr)
-> +INSN(FMULS,  "r%d, r%d", a->rd, a->rr)
-> +INSN(FMULSU, "r%d, r%d", a->rd, a->rr)
-> +INSN(ICALL,  "")
-> +INSN(IJMP,   "")
-> +INSN(IN,     "r%d, $%d", a->rd, a->imm)
-> +INSN(INC,    "r%d", a->rd)
-> +INSN(JMP,    "0x%x", a->imm * 2)
-> +INSN(LAC,    "Z, r%d", a->rd)
-> +INSN(LAS,    "Z, r%d", a->rd)
-> +INSN(LAT,    "Z, r%d", a->rd)
-> +INSN(LDDY,   "r%d, Y+%d", a->rd, a->imm)
-> +INSN(LDDZ,   "r%d, Z+%d", a->rd, a->imm)
-> +INSN(LDI,    "r%d, %d", a->rd, a->imm)
-> +INSN(LDS,    "r%d, %d", a->rd, a->imm)
-> +INSN(LDX1,   "r%d, X", a->rd)
-> +INSN(LDX2,   "r%d, X+", a->rd)
-> +INSN(LDX3,   "r%d, -X", a->rd)
-> +INSN(LDY2,   "r%d, Y+", a->rd)
-> +INSN(LDY3,   "r%d, -Y", a->rd)
-> +INSN(LDZ2,   "r%d, Z+", a->rd)
-> +INSN(LDZ3,   "r%d, -Z", a->rd)
-> +INSN(LPM1,   "")
-> +INSN(LPM2,   "r%d, Z", a->rd)
-> +INSN(LPMX,   "r%d, Z+", a->rd)
-> +INSN(LSR,    "r%d", a->rd)
-> +INSN(MOV,    "r%d, r%d", a->rd, a->rr)
-> +INSN(MOVW,   "r%d:r%d, r%d,r:r%d", a->rd + 1, a->rd, a->rr + 1, a->rr)
-> +INSN(MUL,    "r%d, r%d", a->rd, a->rr)
-> +INSN(MULS,   "r%d, r%d", a->rd, a->rr)
-> +INSN(MULSU,  "r%d, r%d", a->rd, a->rr)
-> +INSN(NEG,    "r%d", a->rd)
-> +INSN(NOP,    "")
-> +INSN(OR,     "r%d, r%d", a->rd, a->rr)
-> +INSN(ORI,    "r%d, %d", a->rd, a->imm)
-> +INSN(OUT,    "$%d, r%d", a->imm, a->rd)
-> +INSN(POP,    "r%d", a->rd)
-> +INSN(PUSH,   "r%d", a->rd)
-> +INSN(RCALL,  ".%+d", a->imm * 2)
-> +INSN(RET,    "")
-> +INSN(RETI,   "")
-> +INSN(RJMP,   ".%+d", a->imm * 2)
-> +INSN(ROR,    "r%d", a->rd)
-> +INSN(SBC,    "r%d, r%d", a->rd, a->rr)
-> +INSN(SBCI,   "r%d, %d", a->rd, a->imm)
-> +INSN(SBI,    "$%d, %d", a->reg, a->bit)
-> +INSN(SBIC,   "$%d, %d", a->reg, a->bit)
-> +INSN(SBIS,   "$%d, %d", a->reg, a->bit)
-> +INSN(SBIW,   "r%d:r%d, %d", a->rd + 1, a->rd, a->imm)
-> +INSN(SBRC,   "r%d, %d", a->rr, a->bit)
-> +INSN(SBRS,   "r%d, %d", a->rr, a->bit)
-> +INSN(SLEEP,  "")
-> +INSN(SPM,    "")
-> +INSN(SPMX,   "Z+")
-> +INSN(STDY,   "r%d, Y+%d", a->rd, a->imm)
-> +INSN(STDZ,   "r%d, Z+%d", a->rd, a->imm)
-> +INSN(STS,    "r%d, %d", a->rd, a->imm)
-> +INSN(STX1,   "r%d, X", a->rr)
-> +INSN(STX2,   "r%d, X+", a->rr)
-> +INSN(STX3,   "r%d, -X", a->rr)
-> +INSN(STY2,   "r%d, Y+", a->rd)
-> +INSN(STY3,   "r%d, -Y", a->rd)
-> +INSN(STZ2,   "r%d, Z+", a->rd)
-> +INSN(STZ3,   "r%d, -Z", a->rd)
-> +INSN(SUB,    "r%d, r%d", a->rd, a->rr)
-> +INSN(SUBI,   "r%d, %d", a->rd, a->imm)
-> +INSN(SWAP,   "r%d", a->rd)
-> +INSN(WDR,    "")
-> +INSN(XCH,    "Z, r%d", a->rd)
-> +
-> diff --git a/target/avr/translate.c b/target/avr/translate.c
-> index fdf4e11f58..0446009d68 100644
-> --- a/target/avr/translate.c
-> +++ b/target/avr/translate.c
-> @@ -3019,6 +3019,17 @@ done_generating:
->
->      tb->size = (ctx.npc - pc_start) * 2;
->      tb->icount = num_insns;
-> +
-> +#ifdef DEBUG_DISAS
-> +    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-> +        && qemu_log_in_addr_range(tb->pc)) {
-> +        qemu_log_lock();
-> +        qemu_log("IN: %s\n", lookup_symbol(tb->pc));
-> +        log_target_disas(cs, tb->pc, tb->size);
-> +        qemu_log("\n");
-> +        qemu_log_unlock();
-> +    }
-> +#endif
->  }
->
->  void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
 > --
 > 2.17.2 (Apple Git-113)
 >
 >
 
---000000000000e2cf550598358d3f
+--000000000000112c60059835b701
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 <br><br>On Sunday, November 24, 2019, Michael Rolnik &lt;<a href=3D"mailto:=
 mrolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=3D=
 "gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding=
--left:1ex">Provide function disassembles executed instruction when `-d in_a=
-sm` is<br>
-provided<br>
+-left:1ex">This series of patches adds 8bit AVR cores to QEMU.<br>
+All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully test=
+ed yet.<br>
+However I was able to execute simple code with functions. e.g fibonacci cal=
+culation.<br>
+This series of patches include a non real, sample board.<br>
+No fuses support yet. PC is set to 0 at reset.<br>
+<br></blockquote><div><br></div><div>Michael,</div><div><br></div><div>Plea=
+se, in the next version, add or clean up licence preambles in ALL added fil=
+es. It looks the most suitable license for you is LPGL 2.1 with &quot;or la=
+ter (at your option)&quot; wording, like you already have in some (but not =
+all) files, but it is your choice. If possible, make it consistent througho=
+ut the series. Sarah indicated to me she agreed with GPL-like license, but =
+she will certainly have the chance to speak up if something is not right in=
+ her view. Don&#39;t misspell her name (as I did in one of my responses). A=
+ll this license thing is important so that one more item of the series is r=
+esolved, and after that you don&#39;t need to think about it anymore.</div>=
+<div><br></div><div>Regards,</div><div>Aleksandar</div><div><br></div><div>=
+=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bo=
+rder-left:1px #ccc solid;padding-left:1ex">
+the patches include the following<br>
+1. just a basic 8bit AVR CPU, without instruction decoding or translation<b=
+r>
+2. CPU features which allow define the following 8bit AVR cores<br>
+=C2=A0 =C2=A0 =C2=A0avr1<br>
+=C2=A0 =C2=A0 =C2=A0avr2 avr25<br>
+=C2=A0 =C2=A0 =C2=A0avr3 avr31 avr35<br>
+=C2=A0 =C2=A0 =C2=A0avr4<br>
+=C2=A0 =C2=A0 =C2=A0avr5 avr51<br>
+=C2=A0 =C2=A0 =C2=A0avr6<br>
+=C2=A0 =C2=A0 =C2=A0xmega2 xmega4 xmega5 xmega6 xmega7<br>
+3. a definition of sample machine with SRAM, FLASH and CPU which allows to =
+execute simple code<br>
+4. encoding for all AVR instructions<br>
+5. interrupt handling<br>
+6. helpers for IN, OUT, SLEEP, WBR &amp; unsupported instructions<br>
+7. a decoder which given an opcode decides what istruction it is<br>
+8. translation of AVR instruction into TCG<br>
+9. all features together<br>
 <br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com">mrol=
-nik@gmail.com</a>&gt;<br>
----</blockquote><div><br></div><div>Richard, is this what you expected from=
- Michael, or there are still some caveats?</div><div><br></div><div>Thanks =
-for the suggestion!</div><div><br></div><div>Aleksandar</div><div><br></div=
-><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1=
-px #ccc solid;padding-left:1ex">
-=C2=A0target/avr/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A01 +<br>
-=C2=A0target/avr/cpu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A02 +-<br>
-=C2=A0target/avr/disas.c=C2=A0 =C2=A0 =C2=A0| 214 +++++++++++++++++++++++++=
-+++++<wbr>+++++++++++<br>
-=C2=A0target/avr/translate.c |=C2=A0 11 +++<br>
-=C2=A04 files changed, 227 insertions(+), 1 deletion(-)<br>
+changes since v3<br>
+1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff) =
+for faster address manipulaton<br>
+2. ffs changed to ctz32<br>
+3. duplicate code removed at avr_cpu_do_interrupt<br>
+4. using andc instead of not + and<br>
+5. fixing V flag calculation in varios instructions<br>
+6. freeing local variables in PUSH<br>
+7. tcg_const_local_i32 -&gt; tcg_const_i32<br>
+8. using sextract32 instead of my implementation<br>
+9. fixing BLD instruction<br>
+10.xor(r) instead of 0xff - r at COM<br>
+11.fixing MULS/MULSU not to modify inputs&#39; content<br>
+12.using SUB for NEG<br>
+13.fixing tcg_gen_qemu_ld/st call in XCH<br>
+<br>
+changes since v4<br>
+1. target is now defined as big endian in order to optimize push_ret/pop_re=
+t<br>
+2. all style warnings are fixed<br>
+3. adding cpu_set/get_sreg functions<br>
+4. simplifying gen_goto_tb as there is no real paging<br>
+5. env-&gt;pc -&gt; env-&gt;pc_w<br>
+6. making flag dump more compact<br>
+7. more spacing<br>
+8. renaming CODE/DATA_INDEX -&gt; MMU_CODE/DATA_IDX<br>
+9. removing avr_set_feature<br>
+10. SPL/SPH set bug fix<br>
+11. switching stb_phys to cpu_stb_data<br>
+12. cleaning up avr_decode<br>
+13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)<br>
+14. saving CPU features (savevm)<br>
+<br>
+changes since v5<br>
+1. BLD bug fix<br>
+2. decoder generator is added<br>
+<br>
+chages since v6<br>
+1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_<wbr>cp=
+u_gdb_write_register<br>
+2. configure the target as little endian because otherwise GDB does not wor=
+k<br>
+3. fixing and testing gen_push_ret/gen_pop_ret<br>
+<br>
+changes since v7<br>
+1. folding back v6<br>
+2. logging at helper_outb and helper_inb are done for non supported yet reg=
+isters only<br>
+3. MAINTAINERS updated<br>
+<br>
+changes since v8<br>
+1. removing hw/avr from hw/Makefile.obj as it should not be built for all<b=
+r>
+2. making linux compilable<br>
+3. testing on<br>
+=C2=A0 =C2=A0 a. Mac, Apple LLVM version 7.0.0<br>
+=C2=A0 =C2=A0 b. Ubuntu 12.04, gcc 4.9.2<br>
+=C2=A0 =C2=A0 c. Fedora 23, gcc 5.3.1<br>
+4. folding back some patches<br>
+5. translation bug fixes for ORI, CPI, XOR instructions<br>
+6. propper handling of cpu register writes though memory<br>
+<br>
+changes since v9<br>
+1. removing forward declarations of static functions<br>
+2. disabling debug prints<br>
+3. switching to case range instead of if else if ...<br>
+4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any d=
+evice<br>
+5. commenst about sample board and sample IO device added<br>
+6. sample board description is more descriptive now<br>
+7. memory_region_allocate_system_<wbr>memory is used to create RAM<br>
+8. now there are helper_fullrd &amp; helper_fullwr when LD/ST try to access=
+ registers<br>
+<br>
+changes since v10<br>
+1. movig back fullwr &amp; fullrd into the commit where outb and inb were i=
+ntroduced<br>
+2. changing tlb_fill function signature<br>
+3. adding empty line between functions<br>
+4. adding newline on the last line of the file<br>
+5. using tb-&gt;flags to generae full access ST/LD instructions<br>
+6. fixing SBRC bug<br>
+7. folding back 10th commit<br>
+8. whenever a new file is introduced it&#39;s added to Makefile.objs<br>
+<br>
+changes since v11<br>
+1. updating to v2.7.0-rc<br>
+2. removing assignment to env-&gt;fullacc from gen_intermediate_code<br>
+<br>
+changes since v12<br>
+1. fixing spacing<br>
+2. fixing get/put_segment functions<br>
+3. removing target-avr/machine.h file<br>
+4. VMSTATE_SINGLE_TEST -&gt; VMSTATE_SINGLE<br>
+5. comment spelling<br>
+6. removing hw/avr/sample_io.c<br>
+7. char const* -&gt; const char*<br>
+8. proper ram allocation<br>
+9. fixing breakpoint functionality.<br>
+10.env1 -&gt; env<br>
+11.fixing avr_cpu_gdb_write_register &amp; avr_cpu_gdb_read_register functi=
+ons<br>
+12.any cpu is removed<br>
+12.feature bits are not saved into vm state<br>
+<br>
+changes since v13<br>
+1. rebasing to v2.7.0-rc1<br>
+<br>
+changes since v14<br>
+1. I made self review with git gui tool. (I did not know such a thing exist=
+s)<br>
+2. removing all double/tripple spaces<br>
+3. removing comment reference to SampleIO<br>
+4. folding back some changes, so there is not deleted lines in my code<br>
+5. moving avr configuration, within configure file, before chris<br>
+<br>
+changes since v15<br>
+1. removing IO registers cache from CPU<br>
+2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)<br>
+3. implementing CBIC/SBIC as read(helper_inb), check, branch<br>
+4. adding missing tcg_temp_free_i32 for tcg_const_i32<br>
+<br>
+changes since v16<br>
+1. removing EXT IO registers knoledge from CPU. These registers are accessi=
+ble<br>
+=C2=A0 =C2=A0by LD/ST only. CPU has no interest in them<br>
+<br>
+changes since v17 (by Richard Henderson)<br>
+This is Michael&#39;s v17, with some adjustments of my own:<br>
+<br>
+1. Fix the whitespace errors reported by &quot;git am&quot;,<br>
+2. Replace the utf-8 characters with normal ascii,<br>
+3. Ditch the separate compilation of translate.c.<br>
+<br>
+I retained the two separate files that could be regenerated<br>
+from the included cpugen program, but merged in translate-insn.c.<br>
+Not that it matters, but the code generated is about 3k smaller.<br>
+<br>
+changes since v18<br>
+1.=C2=A0 moving target-avr into target/avr<br>
+2.=C2=A0 do not call cpu_exec_initfn function from avr_cpu_initfn<br>
+3.=C2=A0 call cpu_exec_realizefn avr_cpu_realizefn<br>
+4.=C2=A0 do not fail sample machine creation if no rom is suplied<br>
+5.=C2=A0 add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code<br>
+6.=C2=A0 fix a register getters/setters in machine.c<br>
+7.=C2=A0 changing QEMU_ARCH_AVR from 1&lt;&lt;17 to 1&lt;&lt;18<br>
+<br>
+changes since v19<br>
+1.=C2=A0 use decodetree.py tool to decode instructions<br>
+2.=C2=A0 adding USART<br>
+3.=C2=A0 adding 16 bit timer peripherals<br>
+4.=C2=A0 changing QEMU_ARCH_AVR from 1&lt;&lt;18 to 1&lt;&lt;20<br>
+5.=C2=A0 renaming tlb_fill to avr_cpu_tlb_fill<br>
+<br>
+changes since v20<br>
+1.=C2=A0 use one CPU naming convention<br>
+2.=C2=A0 merging insn16.decode &amp; insn32.decode files<br>
+3.=C2=A0 modifying skip next instruction mechanizm<br>
+4.=C2=A0 translate BREAK as NOP for now<br>
+<br>
+changes since v21<br>
+1.=C2=A0 Reorganize bstate.<br>
+=C2=A0 =C2=A0 This will make transition to &lt;exec/translator.h&gt; easier=
+, and fixes a couple of bugs wrt single stepping<br>
+=C2=A0 =C2=A0 by <a href=3D"mailto:richard.henderson@linaro.org">richard.he=
+nderson@linaro.org</a><br>
+2.=C2=A0 Drop cpc and fix page cross condition.<br>
+=C2=A0 =C2=A0 by <a href=3D"mailto:richard.henderson@linaro.org">richard.he=
+nderson@linaro.org</a><br>
+3.=C2=A0 Refactor checking supported/unsupported instructions<br>
+4.=C2=A0 Add gdb-xml/avr-cpu.xml<br>
+<br>
+changes since v22<br>
+1.=C2=A0 Rebase<br>
+2.=C2=A0 Split long comment<br>
+<br>
+changes since v23<br>
+1.=C2=A0 remove avr_cpu_list_compare function<br>
+2.=C2=A0 modify avr_cpu_class_by_name function<br>
+3.=C2=A0 modify avr_cpu_list_entry function<br>
+4.=C2=A0 modify avr_cpu_list function<br>
+<br>
+changes since v24<br>
+1.=C2=A0 remove AVR_CPU_TYPE_NAME macro<br>
+<br>
+changes since v25<br>
+1.=C2=A0 fix patches. every file belong to one patch only<br>
+2.=C2=A0 change copyright year from 2016 to 2019<br>
+3.=C2=A0 create mask device to emulate prr0/prr1<br>
+<br>
+changes since v26<br>
+1.=C2=A0 add avocado acceptence test<br>
+2.=C2=A0 add boot serial test<br>
+<br>
+changes since v27<br>
+1.=C2=A0 list atmel2560 devices as unimplemented<br>
+2.=C2=A0 fix sram base/size<br>
+<br>
+changes since v28<br>
+1.=C2=A0 rebase<br>
+2.=C2=A0 fix includes &amp; build<br>
+<br>
+changes since v29<br>
+1.=C2=A0 fixing ownership<br>
+2.=C2=A0 using &#39;since&#39; instread of &#39;added in&#39;<br>
+<br>
+changes since v30<br>
+1.=C2=A0 rebase<br>
+<br>
+changes since v31<br>
+1.=C2=A0 splitting &#39;Add instruction translation&#39; commit<br>
+2.=C2=A0 fixing typo in qapi/machine.json sicne -&gt; since<br>
+3.=C2=A0 removing unintended changes in configure file<br>
+4.=C2=A0 adding Richard Henderson as a co developer to &#39;Add instruction=
+ translation - CPU main translation funcions&#39; commit<br>
+<br>
+changes since v32<br>
+1.=C2=A0 modify cpu_get_sreg to treat sreg C as other flags, except sreg Z<=
+br>
+<br>
+changes since v33<br>
+1.=C2=A0 ensure flag C is always calculated as one bit<br>
+2.=C2=A0 calculate flag Z as one bit, without using inverse logic<br>
+<br>
+changes since v34<br>
+1.=C2=A0 rebase<br>
+<br>
+changes since v35<br>
+1.=C2=A0 rebase<br>
+2.=C2=A0 use NANOSECONDS_PER_SECOND instead of 1000000000 in avr_timer16.c<=
+br>
+3.=C2=A0 split &quot;target/avr: Register AVR support with the rest of QEMU=
+&quot; into three patches<br>
+=C2=A0 =C2=A0 1.=C2=A0 &quot;target/avr: Register AVR support with the rest=
+ of QEMU&quot;<br>
+=C2=A0 =C2=A0 2.=C2=A0 &quot;target/avr: Update build system&quot;<br>
+=C2=A0 =C2=A0 3.=C2=A0 &quot;target/avr: Update MAINTAINERS file&quot;<br>
+4.=C2=A0 split &quot;target/avr: Add tests&quot; patch into two patches<br>
+=C2=A0 =C2=A0 1.=C2=A0 &quot;target/avr: Add Avocado test&quot;<br>
+=C2=A0 =C2=A0 2.=C2=A0 &quot;target/avr: Add boot serial test&quot;<br>
+5.=C2=A0 Add instruction disassembly function<br>
+6.=C2=A0 change &quot;since 4.2&quot; to &quot;since 5.0&quot;<br>
+<br>
+Michael Rolnik (16):<br>
+=C2=A0 target/avr: Add outward facing interfaces and core CPU logic<br>
+=C2=A0 target/avr: Add instruction helpers<br>
+=C2=A0 target/avr: Add instruction decoding<br>
+=C2=A0 target/avr: Add instruction translation - Registers definition<br>
+=C2=A0 target/avr: Add instruction translation - Arithmetic and Logic<br>
+=C2=A0 =C2=A0 Instructions<br>
+=C2=A0 target/avr: Add instruction translation - Branch Instructions<br>
+=C2=A0 target/avr: Add instruction translation - Bit and Bit-test<br>
+=C2=A0 =C2=A0 Instructions<br>
+=C2=A0 target/avr: Add instruction translation - MCU Control Instructions<b=
+r>
+=C2=A0 target/avr: Add instruction translation - CPU main translation<br>
+=C2=A0 =C2=A0 function<br>
+=C2=A0 target/avr: Add instruction disassembly function<br>
+=C2=A0 target/avr: Add example board configuration<br>
+=C2=A0 target/avr: Register AVR support with the rest of QEMU<br>
+=C2=A0 target/avr: Update build system<br>
+=C2=A0 target/avr: Add boot serial test<br>
+=C2=A0 target/avr: Add Avocado test<br>
+=C2=A0 target/avr: Update MAINTAINERS file<br>
+<br>
+Sarah Harris (1):<br>
+=C2=A0 target/avr: Add limited support for USART and 16 bit timer periphera=
+ls<br>
+<br>
+=C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 7 +<br>
+=C2=A0default-configs/avr-softmmu.<wbr>mak=C2=A0 |=C2=A0 =C2=A0 5 +<br>
+=C2=A0qapi/machine.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 =C2=A0 3 +-<br>
+=C2=A0include/disas/dis-asm.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=
+=A0 6 +<br>
+=C2=A0include/hw/char/avr_usart.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A097 +<br=
+>
+=C2=A0include/hw/misc/avr_mask.h=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A047=
+ +<br>
+=C2=A0include/hw/timer/avr_timer16.h=C2=A0 =C2=A0|=C2=A0 =C2=A097 +<br>
+=C2=A0include/sysemu/arch_init.h=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A0 1=
+ +<br>
+=C2=A0target/avr/cpu-param.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 =C2=A037 +<br>
+=C2=A0target/avr/cpu-qom.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A054 +<br>
+=C2=A0target/avr/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0|=C2=A0 254 +++<br>
+=C2=A0target/avr/helper.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 =C2=A029 +<br>
+=C2=A0arch_init.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 2 +<br>
+=C2=A0hw/avr/sample.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 282 +++<br>
+=C2=A0hw/char/avr_usart.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 324 ++++<br>
+=C2=A0hw/misc/avr_mask.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0|=C2=A0 112 ++<br>
+=C2=A0hw/timer/avr_timer16.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 605 ++++++<br>
+=C2=A0target/avr/cpu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0|=C2=A0 576 ++++++<br>
+=C2=A0target/avr/disas.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0|=C2=A0 214 +++<br>
+=C2=A0target/avr/gdbstub.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A085 +<br>
+=C2=A0target/avr/helper.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 354 ++++<br>
+=C2=A0target/avr/machine.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 121 ++<br>
+=C2=A0target/avr/translate.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 3039=
+ ++++++++++++++++++++++++++++++<br>
+=C2=A0tests/boot-serial-test.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=
+=A010 +<br>
+=C2=A0tests/machine-none-test.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 1=
+ +<br>
+=C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 9 +<br>
+=C2=A0gdb-xml/avr-cpu.xml=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 =C2=A049 +<br>
+=C2=A0hw/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A0 1 +<br>
+=C2=A0hw/avr/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0|=C2=A0 =C2=A0 6 +<br>
+=C2=A0hw/avr/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A0 1 +<br>
+=C2=A0hw/char/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 =C2=A0 3 +<br>
+=C2=A0hw/char/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A0 1 +<br>
+=C2=A0hw/misc/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 =C2=A0 3 +<br>
+=C2=A0hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A0 2 +<br>
+=C2=A0hw/timer/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0|=C2=A0 =C2=A0 3 +<br>
+=C2=A0hw/timer/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 =C2=A0 2 +<br>
+=C2=A0target/avr/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=
+=A034 +<br>
+=C2=A0target/avr/insn.decode=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 175 ++<br>
+=C2=A0tests/Makefile.include=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 =C2=A0 2 +<br>
+=C2=A0tests/acceptance/machine_avr6.<wbr>py |=C2=A0 =C2=A036 +<br>
+=C2=A040 files changed, 6688 insertions(+), 1 deletion(-)<br>
+=C2=A0create mode 100644 default-configs/avr-softmmu.<wbr>mak<br>
+=C2=A0create mode 100644 include/hw/char/avr_usart.h<br>
+=C2=A0create mode 100644 include/hw/misc/avr_mask.h<br>
+=C2=A0create mode 100644 include/hw/timer/avr_timer16.h<br>
+=C2=A0create mode 100644 target/avr/cpu-param.h<br>
+=C2=A0create mode 100644 target/avr/cpu-qom.h<br>
+=C2=A0create mode 100644 target/avr/cpu.h<br>
+=C2=A0create mode 100644 target/avr/helper.h<br>
+=C2=A0create mode 100644 hw/avr/sample.c<br>
+=C2=A0create mode 100644 hw/char/avr_usart.c<br>
+=C2=A0create mode 100644 hw/misc/avr_mask.c<br>
+=C2=A0create mode 100644 hw/timer/avr_timer16.c<br>
+=C2=A0create mode 100644 target/avr/cpu.c<br>
 =C2=A0create mode 100644 target/avr/disas.c<br>
+=C2=A0create mode 100644 target/avr/gdbstub.c<br>
+=C2=A0create mode 100644 target/avr/helper.c<br>
+=C2=A0create mode 100644 target/avr/machine.c<br>
+=C2=A0create mode 100644 target/avr/translate.c<br>
+=C2=A0create mode 100644 gdb-xml/avr-cpu.xml<br>
+=C2=A0create mode 100644 hw/avr/Kconfig<br>
+=C2=A0create mode 100644 hw/avr/Makefile.objs<br>
+=C2=A0create mode 100644 target/avr/Makefile.objs<br>
+=C2=A0create mode 100644 target/avr/insn.decode<br>
+=C2=A0create mode 100644 tests/acceptance/machine_avr6.<wbr>py<br>
 <br>
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h<br>
-index ed9218af5f..574118beab 100644<br>
---- a/target/avr/cpu.h<br>
-+++ b/target/avr/cpu.h<br>
-@@ -157,6 +157,7 @@ bool avr_cpu_exec_interrupt(<wbr>CPUState *cpu, int int=
-_req);<br>
-=C2=A0hwaddr avr_cpu_get_phys_page_debug(<wbr>CPUState *cpu, vaddr addr);<b=
-r>
-=C2=A0int avr_cpu_gdb_read_register(<wbr>CPUState *cpu, uint8_t *buf, int r=
-eg);<br>
-=C2=A0int avr_cpu_gdb_write_register(<wbr>CPUState *cpu, uint8_t *buf, int =
-reg);<br>
-+int avr_print_insn(bfd_vma addr, disassemble_info *info);<br>
-<br>
-=C2=A0static inline int avr_feature(CPUAVRState *env, int feature)<br>
-=C2=A0{<br>
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c<br>
-index dae56d7845..52ec21dd16 100644<br>
---- a/target/avr/cpu.c<br>
-+++ b/target/avr/cpu.c<br>
-@@ -83,7 +83,7 @@ static void avr_cpu_reset(CPUState *cs)<br>
-=C2=A0static void avr_cpu_disas_set_info(<wbr>CPUState *cpu, disassemble_in=
-fo *info)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0info-&gt;mach =3D bfd_arch_avr;<br>
--=C2=A0 =C2=A0 info-&gt;print_insn =3D NULL;<br>
-+=C2=A0 =C2=A0 info-&gt;print_insn =3D avr_print_insn;<br>
-=C2=A0}<br>
-<br>
-=C2=A0static void avr_cpu_realizefn(DeviceState *dev, Error **errp)<br>
-diff --git a/target/avr/disas.c b/target/avr/disas.c<br>
-new file mode 100644<br>
-index 0000000000..727fc463ce<br>
---- /dev/null<br>
-+++ b/target/avr/disas.c<br>
-@@ -0,0 +1,214 @@<br>
-+/*<br>
-+ * OpenRISC disassembler<br>
-+ *<br>
-+ * Copyright (c) 2018 Richard Henderson &lt;<a href=3D"mailto:rth@twiddle.=
-net">rth@twiddle.net</a>&gt;<br>
-+ *<br>
-+ * This program is free software: you can redistribute it and/or modify<br=
->
-+ * it under the terms of the GNU General Public License as published by<br=
->
-+ * the Free Software Foundation, either version 2 of the License, or<br>
-+ * (at your option) any later version.<br>
-+ *<br>
-+ * This program is distributed in the hope that it will be useful,<br>
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the<br>
-+ * GNU General Public License for more details.<br>
-+ *<br>
-+ * You should have received a copy of the GNU General Public License<br>
-+ * along with this program.=C2=A0 If not, see &lt;<a href=3D"http://www.gn=
-u.org/licenses/" target=3D"_blank">http://www.gnu.org/licenses/</a>&gt;<wbr=
->.<br>
-+ */<br>
-+<br>
-+#include &quot;qemu/osdep.h&quot;<br>
-+#include &quot;disas/dis-asm.h&quot;<br>
-+#include &quot;qemu/bitops.h&quot;<br>
-+#include &quot;cpu.h&quot;<br>
-+<br>
-+typedef struct {<br>
-+=C2=A0 =C2=A0 disassemble_info *info;<br>
-+=C2=A0 =C2=A0 uint16_t next_word;<br>
-+=C2=A0 =C2=A0 bool next_word_used;<br>
-+} DisasContext;<br>
-+<br>
-+static int to_A(DisasContext *ctx, int indx) { return 16 + (indx % 16); }<=
-br>
-+static int to_B(DisasContext *ctx, int indx) { return 16 + (indx % 8); }<b=
-r>
-+static int to_C(DisasContext *ctx, int indx) { return 24 + (indx % 4) * 2;=
- }<br>
-+static int to_D(DisasContext *ctx, int indx) { return (indx % 16) * 2; }<b=
-r>
-+<br>
-+static uint16_t next_word(DisasContext *ctx)<br>
-+{<br>
-+=C2=A0 =C2=A0 ctx-&gt;next_word_used =3D true;<br>
-+=C2=A0 =C2=A0 return ctx-&gt;next_word;<br>
-+}<br>
-+<br>
-+static int append_16(DisasContext *ctx, int x)<br>
-+{<br>
-+=C2=A0 =C2=A0 return x &lt;&lt; 16 | next_word(ctx);<br>
-+}<br>
-+<br>
-+<br>
-+/* Include the auto-generated decoder.=C2=A0 */<br>
-+static bool decode_insn(DisasContext *ctx, uint16_t insn);<br>
-+#include &quot;decode_insn.inc.c&quot;<br>
-+<br>
-+#define output(mnemonic, format, ...) \<br>
-+=C2=A0 =C2=A0 (pctx-&gt;info-&gt;fprintf_func(<wbr>pctx-&gt;info-&gt;strea=
-m, &quot;%-9s &quot; format, \<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 mnemonic, ##__VA_ARGS__))<br>
-+<br>
-+int avr_print_insn(bfd_vma addr, disassemble_info *info)<br>
-+{<br>
-+=C2=A0 =C2=A0 DisasContext ctx;<br>
-+=C2=A0 =C2=A0 DisasContext *pctx =3D &amp;ctx;<br>
-+=C2=A0 =C2=A0 bfd_byte buffer[4];<br>
-+=C2=A0 =C2=A0 uint16_t insn;<br>
-+=C2=A0 =C2=A0 int status;<br>
-+<br>
-+=C2=A0 =C2=A0 <a href=3D"http://ctx.info" target=3D"_blank">ctx.info</a> =
-=3D info;<br>
-+<br>
-+=C2=A0 =C2=A0 status =3D info-&gt;read_memory_func(addr, buffer, 4, info);=
-<br>
-+=C2=A0 =C2=A0 if (status !=3D 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 info-&gt;memory_error_func(<wbr>status, addr, =
-info);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 insn =3D bfd_getl16(buffer);<br>
-+=C2=A0 =C2=A0 ctx.next_word =3D bfd_getl16(buffer + 2);<br>
-+=C2=A0 =C2=A0 ctx.next_word_used =3D false;<br>
-+<br>
-+=C2=A0 =C2=A0 if (!decode_insn(&amp;ctx, insn)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 output(&quot;.db&quot;, &quot;0x%02x, 0x%02x&q=
-uot;, buffer[0], buffer[1]);<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 return ctx.next_word_used ? 4 : 2;<br>
-+}<br>
-+<br>
-+<br>
-+#define INSN(opcode, format, ...)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0\<br>
-+static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \<br>
-+{=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
-+=C2=A0 =C2=A0 output(#opcode, format, ##__VA_ARGS__);=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0\<br>
-+=C2=A0 =C2=A0 return true;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \=
-<br>
-+}<br>
-+<br>
-+#define INSN_MNEMONIC(opcode, mnemonic, format, ...)=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
-+static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \<br>
-+{=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
-+=C2=A0 =C2=A0 output(mnemonic, format, ##__VA_ARGS__);=C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 \<br>
-+=C2=A0 =C2=A0 return true;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \=
-<br>
-+}<br>
-+<br>
-+/*<br>
-+ *=C2=A0 =C2=A0C=C2=A0 =C2=A0 =C2=A0 =C2=A0Z=C2=A0 =C2=A0 =C2=A0 =C2=A0N=
-=C2=A0 =C2=A0 =C2=A0 =C2=A0V=C2=A0 =C2=A0 =C2=A0 =C2=A0S=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0H=C2=A0 =C2=A0 =C2=A0 =C2=A0T=C2=A0 =C2=A0 =C2=A0 =C2=A0I<br>
-+ *=C2=A0 =C2=A00=C2=A0 =C2=A0 =C2=A0 =C2=A01=C2=A0 =C2=A0 =C2=A0 =C2=A02=
-=C2=A0 =C2=A0 =C2=A0 =C2=A03=C2=A0 =C2=A0 =C2=A0 =C2=A04=C2=A0 =C2=A0 =C2=
-=A0 =C2=A05=C2=A0 =C2=A0 =C2=A0 =C2=A06=C2=A0 =C2=A0 =C2=A0 =C2=A07<br>
-+ */<br>
-+static const char *brbc[] =3D {<br>
-+=C2=A0 =C2=A0 &quot;BRCC&quot;, &quot;BRNE&quot;, &quot;BRPL&quot;, &quot;=
-BRVC&quot;, &quot;BRGE&quot;, &quot;BRHC&quot;, &quot;BRTC&quot;, &quot;BRI=
-D&quot;<br>
-+};<br>
-+<br>
-+static const char *brbs[] =3D {<br>
-+=C2=A0 =C2=A0 &quot;BRCS&quot;, &quot;BREQ&quot;, &quot;BRMI&quot;, &quot;=
-BRVS&quot;, &quot;BRLT&quot;, &quot;BRHS&quot;, &quot;BRTS&quot;, &quot;BRI=
-E&quot;<br>
-+};<br>
-+<br>
-+static const char *bset[] =3D {<br>
-+=C2=A0 =C2=A0 &quot;SEC&quot;,=C2=A0 &quot;SEZ&quot;,=C2=A0 &quot;SEN&quot=
-;,=C2=A0 &quot;SEZ&quot;,=C2=A0 &quot;SES&quot;,=C2=A0 &quot;SEH&quot;,=C2=
-=A0 &quot;SET&quot;,=C2=A0 &quot;SEI&quot;<br>
-+};<br>
-+<br>
-+static const char *bclr[] =3D {<br>
-+=C2=A0 =C2=A0 &quot;CLC&quot;,=C2=A0 &quot;CLZ&quot;,=C2=A0 &quot;CLN&quot=
-;,=C2=A0 &quot;CLZ&quot;,=C2=A0 &quot;CLS&quot;,=C2=A0 &quot;CLH&quot;,=C2=
-=A0 &quot;CLT&quot;,=C2=A0 &quot;CLI&quot;<br>
-+};<br>
-+<br>
-+INSN(ADC,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ADD,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ADIW,=C2=A0 =C2=A0&quot;r%d:r%r, %d&quot;, a-&gt;rd + 1, a-&gt;rd, a-=
-&gt;imm)<br>
-+INSN(AND,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ANDI,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(ASR,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN_MNEMONIC(BCLR,=C2=A0 bclr[a-&gt;bit], &quot;&quot;)<br>
-+INSN(BLD,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;bit)<br>
-+INSN_MNEMONIC(BRBC,=C2=A0 brbc[a-&gt;bit], &quot;.%+d&quot;, a-&gt;imm * 2=
-)<br>
-+INSN_MNEMONIC(BRBS,=C2=A0 brbs[a-&gt;bit], &quot;.%+d&quot;, a-&gt;imm * 2=
-)<br>
-+INSN(BREAK,=C2=A0 &quot;&quot;)<br>
-+INSN_MNEMONIC(BSET,=C2=A0 bset[a-&gt;bit], &quot;&quot;)<br>
-+INSN(BST,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;bit)<br>
-+INSN(CALL,=C2=A0 =C2=A0&quot;0x%x&quot;, a-&gt;imm * 2)<br>
-+INSN(CBI,=C2=A0 =C2=A0 &quot;%d, %d&quot;, a-&gt;reg, a-&gt;bit)<br>
-+INSN(COM,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(CP,=C2=A0 =C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(CPC,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(CPI,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(CPSE,=C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(DEC,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(DES,=C2=A0 =C2=A0 &quot;%d&quot;, a-&gt;imm)<br>
-+INSN(EICALL, &quot;&quot;)<br>
-+INSN(EIJMP,=C2=A0 &quot;&quot;)<br>
-+INSN(ELPM1,=C2=A0 &quot;&quot;)<br>
-+INSN(ELPM2,=C2=A0 &quot;r%d, Z&quot;, a-&gt;rd)<br>
-+INSN(ELPMX,=C2=A0 &quot;r%d, Z+&quot;, a-&gt;rd)<br>
-+INSN(EOR,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(FMUL,=C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(FMULS,=C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(FMULSU, &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ICALL,=C2=A0 &quot;&quot;)<br>
-+INSN(IJMP,=C2=A0 =C2=A0&quot;&quot;)<br>
-+INSN(IN,=C2=A0 =C2=A0 =C2=A0&quot;r%d, $%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(INC,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(JMP,=C2=A0 =C2=A0 &quot;0x%x&quot;, a-&gt;imm * 2)<br>
-+INSN(LAC,=C2=A0 =C2=A0 &quot;Z, r%d&quot;, a-&gt;rd)<br>
-+INSN(LAS,=C2=A0 =C2=A0 &quot;Z, r%d&quot;, a-&gt;rd)<br>
-+INSN(LAT,=C2=A0 =C2=A0 &quot;Z, r%d&quot;, a-&gt;rd)<br>
-+INSN(LDDY,=C2=A0 =C2=A0&quot;r%d, Y+%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(LDDZ,=C2=A0 =C2=A0&quot;r%d, Z+%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(LDI,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(LDS,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(LDX1,=C2=A0 =C2=A0&quot;r%d, X&quot;, a-&gt;rd)<br>
-+INSN(LDX2,=C2=A0 =C2=A0&quot;r%d, X+&quot;, a-&gt;rd)<br>
-+INSN(LDX3,=C2=A0 =C2=A0&quot;r%d, -X&quot;, a-&gt;rd)<br>
-+INSN(LDY2,=C2=A0 =C2=A0&quot;r%d, Y+&quot;, a-&gt;rd)<br>
-+INSN(LDY3,=C2=A0 =C2=A0&quot;r%d, -Y&quot;, a-&gt;rd)<br>
-+INSN(LDZ2,=C2=A0 =C2=A0&quot;r%d, Z+&quot;, a-&gt;rd)<br>
-+INSN(LDZ3,=C2=A0 =C2=A0&quot;r%d, -Z&quot;, a-&gt;rd)<br>
-+INSN(LPM1,=C2=A0 =C2=A0&quot;&quot;)<br>
-+INSN(LPM2,=C2=A0 =C2=A0&quot;r%d, Z&quot;, a-&gt;rd)<br>
-+INSN(LPMX,=C2=A0 =C2=A0&quot;r%d, Z+&quot;, a-&gt;rd)<br>
-+INSN(LSR,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(MOV,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(MOVW,=C2=A0 =C2=A0&quot;r%d:r%d, r%d,r:r%d&quot;, a-&gt;rd + 1, a-&gt=
-;rd, a-&gt;rr + 1, a-&gt;rr)<br>
-+INSN(MUL,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(MULS,=C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(MULSU,=C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(NEG,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(NOP,=C2=A0 =C2=A0 &quot;&quot;)<br>
-+INSN(OR,=C2=A0 =C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ORI,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(OUT,=C2=A0 =C2=A0 &quot;$%d, r%d&quot;, a-&gt;imm, a-&gt;rd)<br>
-+INSN(POP,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(PUSH,=C2=A0 =C2=A0&quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(RCALL,=C2=A0 &quot;.%+d&quot;, a-&gt;imm * 2)<br>
-+INSN(RET,=C2=A0 =C2=A0 &quot;&quot;)<br>
-+INSN(RETI,=C2=A0 =C2=A0&quot;&quot;)<br>
-+INSN(RJMP,=C2=A0 =C2=A0&quot;.%+d&quot;, a-&gt;imm * 2)<br>
-+INSN(ROR,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(SBC,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(SBCI,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(SBI,=C2=A0 =C2=A0 &quot;$%d, %d&quot;, a-&gt;reg, a-&gt;bit)<br>
-+INSN(SBIC,=C2=A0 =C2=A0&quot;$%d, %d&quot;, a-&gt;reg, a-&gt;bit)<br>
-+INSN(SBIS,=C2=A0 =C2=A0&quot;$%d, %d&quot;, a-&gt;reg, a-&gt;bit)<br>
-+INSN(SBIW,=C2=A0 =C2=A0&quot;r%d:r%d, %d&quot;, a-&gt;rd + 1, a-&gt;rd, a-=
-&gt;imm)<br>
-+INSN(SBRC,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rr, a-&gt;bit)<br>
-+INSN(SBRS,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rr, a-&gt;bit)<br>
-+INSN(SLEEP,=C2=A0 &quot;&quot;)<br>
-+INSN(SPM,=C2=A0 =C2=A0 &quot;&quot;)<br>
-+INSN(SPMX,=C2=A0 =C2=A0&quot;Z+&quot;)<br>
-+INSN(STDY,=C2=A0 =C2=A0&quot;r%d, Y+%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(STDZ,=C2=A0 =C2=A0&quot;r%d, Z+%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(STS,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(STX1,=C2=A0 =C2=A0&quot;r%d, X&quot;, a-&gt;rr)<br>
-+INSN(STX2,=C2=A0 =C2=A0&quot;r%d, X+&quot;, a-&gt;rr)<br>
-+INSN(STX3,=C2=A0 =C2=A0&quot;r%d, -X&quot;, a-&gt;rr)<br>
-+INSN(STY2,=C2=A0 =C2=A0&quot;r%d, Y+&quot;, a-&gt;rd)<br>
-+INSN(STY3,=C2=A0 =C2=A0&quot;r%d, -Y&quot;, a-&gt;rd)<br>
-+INSN(STZ2,=C2=A0 =C2=A0&quot;r%d, Z+&quot;, a-&gt;rd)<br>
-+INSN(STZ3,=C2=A0 =C2=A0&quot;r%d, -Z&quot;, a-&gt;rd)<br>
-+INSN(SUB,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(SUBI,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(SWAP,=C2=A0 =C2=A0&quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(WDR,=C2=A0 =C2=A0 &quot;&quot;)<br>
-+INSN(XCH,=C2=A0 =C2=A0 &quot;Z, r%d&quot;, a-&gt;rd)<br>
-+<br>
-diff --git a/target/avr/translate.c b/target/avr/translate.c<br>
-index fdf4e11f58..0446009d68 100644<br>
---- a/target/avr/translate.c<br>
-+++ b/target/avr/translate.c<br>
-@@ -3019,6 +3019,17 @@ done_generating:<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0tb-&gt;size =3D (ctx.npc - pc_start) * 2;<br>
-=C2=A0 =C2=A0 =C2=A0tb-&gt;icount =3D num_insns;<br>
-+<br>
-+#ifdef DEBUG_DISAS<br>
-+=C2=A0 =C2=A0 if (qemu_loglevel_mask(CPU_LOG_<wbr>TB_IN_ASM)<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;&amp; qemu_log_in_addr_range(tb-&gt;pc)<w=
-br>) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_lock();<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IN: %s\n&quot;, lookup_symbol(t=
-b-&gt;pc));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 log_target_disas(cs, tb-&gt;pc, tb-&gt;size);<=
-br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_unlock();<br>
-+=C2=A0 =C2=A0 }<br>
-+#endif<br>
-=C2=A0}<br>
-<br>
-=C2=A0void restore_state_to_opc(<wbr>CPUAVRState *env, TranslationBlock *tb=
-,<br>
 -- <br>
 2.17.2 (Apple Git-113)<br>
 <br>
 </blockquote>
 
---000000000000e2cf550598358d3f--
+--000000000000112c60059835b701--
 
