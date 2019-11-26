@@ -2,51 +2,83 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A193C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 15:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E232CC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 15:56:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55AAA2071E
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 15:54:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55AAA2071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id AE3022071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 15:56:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HJY5dJwU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE3022071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZdAm-0000zK-IS
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 10:54:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60069)
+	id 1iZdC4-0002Km-PE
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 10:56:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iZd5G-0003FV-LB
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:49:00 -0500
+ (envelope-from <eblake@redhat.com>) id 1iZdAt-0001HZ-IO
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:54:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iZd5F-0002eV-12
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:48:58 -0500
-Received: from relay.sw.ru ([185.231.240.75]:52184)
+ (envelope-from <eblake@redhat.com>) id 1iZdAs-0006bK-GZ
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:54:47 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:25241
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iZd5E-0002c3-PX; Tue, 26 Nov 2019 10:48:56 -0500
-Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iZd57-00069i-K4; Tue, 26 Nov 2019 18:48:49 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Subject: [PATCH for-5.0 v2 1/3] python: add simplebench.py
-Date: Tue, 26 Nov 2019 18:48:46 +0300
-Message-Id: <20191126154848.193407-2-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20191126154848.193407-1-vsementsov@virtuozzo.com>
-References: <20191126154848.193407-1-vsementsov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iZdAs-0006b8-DE
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 10:54:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574783686;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=60VUjwtLrwMqI1MqQMIQwAZJTw7gaSuGKA4pVxVQ448=;
+ b=HJY5dJwUbzcPlf63VLj+xcC+aUdMddaG1LTw+JtcWFE8xTh5xwjE7RZ8C7VMs99KTaI3bN
+ A1l/PNCB+XJcFXouXax0Lq+qRJlrfSARUbN/ZcRGhrMHWwWvLDvV/db4IPnm5vONsi2LAz
+ PtytSJ9tHvwPPU2eEO5ahAAtdfWbj7c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-PHbKwvbYNjaiJNkJtT4tKA-1; Tue, 26 Nov 2019 10:54:42 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67F2F107ACE8;
+ Tue, 26 Nov 2019 15:54:41 +0000 (UTC)
+Received: from [10.3.116.163] (ovpn-116-163.phx2.redhat.com [10.3.116.163])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1FB83600CD;
+ Tue, 26 Nov 2019 15:54:41 +0000 (UTC)
+Subject: Re: [PATCH] block: Error out on image creation with conflicting size
+ options
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20191126154835.27915-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <cf113754-c582-03ae-9e53-ab0213c0ccf9@redhat.com>
+Date: Tue, 26 Nov 2019 09:54:40 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191126154835.27915-1-kwolf@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: PHbKwvbYNjaiJNkJtT4tKA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,156 +90,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, ehabkost@redhat.com,
- stefanha@gmail.com, mreitz@redhat.com, crosa@redhat.com, den@openvz.org,
- jsnow@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add simple benchmark table creator.
+On 11/26/19 9:48 AM, Kevin Wolf wrote:
+> If both the create options (qemu-img create -o ...) and the size
+> parameter were given, the size parameter was silently ignored. Instead,
+> make specifying two sizes an error.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>   block.c                    | 10 ++++++++--
+>   tests/qemu-iotests/049     |  5 +++++
+>   tests/qemu-iotests/049.out |  5 +++++
+>   3 files changed, 18 insertions(+), 2 deletions(-)
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- python/simplebench.py | 128 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 128 insertions(+)
- create mode 100644 python/simplebench.py
+Longtime bug, so not essential for 4.2-rc3.  But small enough that you 
+could sneak it in if you have other patches to queue and don't want to 
+wait for 5.0.
 
-diff --git a/python/simplebench.py b/python/simplebench.py
-new file mode 100644
-index 0000000000..59e7314ff6
---- /dev/null
-+++ b/python/simplebench.py
-@@ -0,0 +1,128 @@
-+#!/usr/bin/env python
-+#
-+# Simple benchmarking framework
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+
-+def bench_one(test_func, test_env, test_case, count=5, initial_run=True):
-+    """Benchmark one test-case
-+
-+    test_func   -- benchmarking function with prototype
-+                   test_func(env, case), which takes test_env and test_case
-+                   arguments and returns {'seconds': int} (which is benchmark
-+                   result) on success and {'error': str} on error. Returned
-+                   dict may contain any other additional fields.
-+    test_env    -- test environment - opaque first argument for test_func
-+    test_case   -- test case - opaque second argument for test_func
-+    count       -- how many times to call test_func, to calculate average
-+    initial_run -- do initial run of test_func, which don't get into result
-+
-+    Returns dict with the following fields:
-+        'runs':     list of test_func results
-+        'average':  average seconds per run (exists only if at least one run
-+                    succeeded)
-+        'delta':    maximum delta between test_func result and the average
-+                    (exists only if at least one run succeeded)
-+        'n-failed': number of failed runs (exists only if at least one run
-+                    failed)
-+    """
-+    if initial_run:
-+        print('  #initial run:')
-+        print('   ', test_func(test_env, test_case))
-+
-+    runs = []
-+    for i in range(count):
-+        print('  #run {}'.format(i+1))
-+        res = test_func(test_env, test_case)
-+        print('   ', res)
-+        runs.append(res)
-+
-+    result = {'runs': runs}
-+
-+    successed = [r for r in runs if ('seconds' in r)]
-+    if successed:
-+        avg = sum(r['seconds'] for r in successed) / len(successed)
-+        result['average'] = avg
-+        result['delta'] = max(abs(r['seconds'] - avg) for r in successed)
-+
-+    if len(successed) < count:
-+        result['n-failed'] = count - len(successed)
-+
-+    return result
-+
-+
-+def ascii_one(result):
-+    """Return ASCII representation of bench_one() returned dict."""
-+    if 'average' in result:
-+        s = '{:.2f} +- {:.2f}'.format(result['average'], result['delta'])
-+        if 'n-failed' in result:
-+            s += '\n({} failed)'.format(result['n-failed'])
-+        return s
-+    else:
-+        return 'FAILED'
-+
-+
-+def bench(test_func, test_envs, test_cases, *args, **vargs):
-+    """Fill benchmark table
-+
-+    test_func -- benchmarking function, see bench_one for description
-+    test_envs -- list of test environments, see bench_one
-+    test_cases -- list of test cases, see bench_one
-+    args, vargs -- additional arguments for bench_one
-+
-+    Returns dict with the following fields:
-+        'envs':  test_envs
-+        'cases': test_cases
-+        'tab':   filled 2D array, where cell [i][j] is bench_one result for
-+                 test_cases[i] for test_envs[j] (i.e., rows are test cases and
-+                 columns are test environments)
-+    """
-+    tab = {}
-+    results = {
-+        'envs': test_envs,
-+        'cases': test_cases,
-+        'tab': tab
-+    }
-+    n = 1
-+    n_tests = len(test_envs) * len(test_cases)
-+    for env in test_envs:
-+        for case in test_cases:
-+            print('Testing {}/{}: {} :: {}'.format(n, n_tests,
-+                                                   env['id'], case['id']))
-+            if case['id'] not in tab:
-+                tab[case['id']] = {}
-+            tab[case['id']][env['id']] = bench_one(test_func, env, case,
-+                                                   *args, **vargs)
-+            n += 1
-+
-+    print('Done')
-+    return results
-+
-+
-+def ascii(results):
-+    """Return ASCII representation of bench() returned dict."""
-+    from tabulate import tabulate
-+
-+    tab = [[""] + [c['id'] for c in results['envs']]]
-+    for case in results['cases']:
-+        row = [case['id']]
-+        for env in results['envs']:
-+            row.append(ascii_one(results['tab'][case['id']][env['id']]))
-+        tab.append(row)
-+
-+    return tabulate(tab)
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 -- 
-2.18.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
