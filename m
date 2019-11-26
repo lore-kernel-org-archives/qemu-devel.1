@@ -2,144 +2,82 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6333BC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 13:00:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E29C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 13:03:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39996206BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 13:00:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39996206BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id D5CD1206BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 13:03:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OttBhaWd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5CD1206BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZaS5-0001ED-B8
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 08:00:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33655)
+	id 1iZaVW-0003c0-2B
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 08:03:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1iZaR2-0000gZ-MA
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 07:59:17 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iZaUa-00035u-2l
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 08:03:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1iZaR1-0007sh-HI
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 07:59:16 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20016
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1iZaR1-0007s8-CO
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 07:59:15 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAQCx4ck147451
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 07:59:14 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wgxq6vw5q-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 07:59:14 -0500
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Tue, 26 Nov 2019 12:59:12 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 26 Nov 2019 12:59:07 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAQCx5sw55378142
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 26 Nov 2019 12:59:05 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7B51242045;
- Tue, 26 Nov 2019 12:59:05 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2806242041;
- Tue, 26 Nov 2019 12:59:04 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.12.33])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 26 Nov 2019 12:59:04 +0000 (GMT)
-Subject: Re: [PATCH v2 2/2] s390x/cpumodel: Introduce dynamic feature groups
-To: David Hildenbrand <david@redhat.com>
-References: <b062f580-d664-f68c-2364-1f65df6ee265@de.ibm.com>
- <C829F458-099D-4E95-B835-67F008E60B13@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- xsFNBE6cPPgBEAC2VpALY0UJjGmgAmavkL/iAdqul2/F9ONz42K6NrwmT+SI9CylKHIX+fdf
- J34pLNJDmDVEdeb+brtpwC9JEZOLVE0nb+SR83CsAINJYKG3V1b3Kfs0hydseYKsBYqJTN2j
- CmUXDYq9J7uOyQQ7TNVoQejmpp5ifR4EzwIFfmYDekxRVZDJygD0wL/EzUr8Je3/j548NLyL
- 4Uhv6CIPf3TY3/aLVKXdxz/ntbLgMcfZsDoHgDk3lY3r1iwbWwEM2+eYRdSZaR4VD+JRD7p8
- 0FBadNwWnBce1fmQp3EklodGi5y7TNZ/CKdJ+jRPAAnw7SINhSd7PhJMruDAJaUlbYaIm23A
- +82g+IGe4z9tRGQ9TAflezVMhT5J3ccu6cpIjjvwDlbxucSmtVi5VtPAMTLmfjYp7VY2Tgr+
- T92v7+V96jAfE3Zy2nq52e8RDdUo/F6faxcumdl+aLhhKLXgrozpoe2nL0Nyc2uqFjkjwXXI
- OBQiaqGeWtxeKJP+O8MIpjyGuHUGzvjNx5S/592TQO3phpT5IFWfMgbu4OreZ9yekDhf7Cvn
- /fkYsiLDz9W6Clihd/xlpm79+jlhm4E3xBPiQOPCZowmHjx57mXVAypOP2Eu+i2nyQrkapaY
- IdisDQfWPdNeHNOiPnPS3+GhVlPcqSJAIWnuO7Ofw1ZVOyg/jwARAQABzUNDaHJpc3RpYW4g
- Qm9ybnRyYWVnZXIgKDJuZCBJQk0gYWRkcmVzcykgPGJvcm50cmFlZ2VyQGxpbnV4LmlibS5j
- b20+wsF5BBMBAgAjBQJdP/hMAhsDBwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQEXu8
- gLWmHHy/pA/+JHjpEnd01A0CCyfVnb5fmcOlQ0LdmoKWLWPvU840q65HycCBFTt6V62cDljB
- kXFFxMNA4y/2wqU0H5/CiL963y3gWIiJsZa4ent+KrHl5GK1nIgbbesfJyA7JqlB0w/E/SuY
- NRQwIWOo/uEvOgXnk/7+rtvBzNaPGoGiiV1LZzeaxBVWrqLtmdi1iulW/0X/AlQPuF9dD1Px
- hx+0mPjZ8ClLpdSp5d0yfpwgHtM1B7KMuQPQZGFKMXXTUd3ceBUGGczsgIMipZWJukqMJiJj
- QIMH0IN7XYErEnhf0GCxJ3xAn/J7iFpPFv8sFZTvukntJXSUssONnwiKuld6ttUaFhSuSoQg
- OFYR5v7pOfinM0FcScPKTkrRsB5iUvpdthLq5qgwdQjmyINt3cb+5aSvBX2nNN135oGOtlb5
- tf4dh00kUR8XFHRrFxXx4Dbaw4PKgV3QLIHKEENlqnthH5t0tahDygQPnSucuXbVQEcDZaL9
- WgJqlRAAj0pG8M6JNU5+2ftTFXoTcoIUbb0KTOibaO9zHVeGegwAvPLLNlKHiHXcgLX1tkjC
- DrvE2Z0e2/4q7wgZgn1kbvz7ZHQZB76OM2mjkFu7QNHlRJ2VXJA8tMXyTgBX6kq1cYMmd/Hl
- OhFrAU3QO1SjCsXA2CDk9MM1471mYB3CTXQuKzXckJnxHkHOwU0ETpw8+AEQAJjyNXvMQdJN
- t07BIPDtbAQk15FfB0hKuyZVs+0lsjPKBZCamAAexNRk11eVGXK/YrqwjChkk60rt3q5i42u
- PpNMO9aS8cLPOfVft89Y654Qd3Rs1WRFIQq9xLjdLfHh0i0jMq5Ty+aiddSXpZ7oU6E+ud+X
- Czs3k5RAnOdW6eV3+v10sUjEGiFNZwzN9Udd6PfKET0J70qjnpY3NuWn5Sp1ZEn6lkq2Zm+G
- 9G3FlBRVClT30OWeiRHCYB6e6j1x1u/rSU4JiNYjPwSJA8EPKnt1s/Eeq37qXXvk+9DYiHdT
- PcOa3aNCSbIygD3jyjkg6EV9ZLHibE2R/PMMid9FrqhKh/cwcYn9FrT0FE48/2IBW5mfDpAd
- YvpawQlRz3XJr2rYZJwMUm1y+49+1ZmDclaF3s9dcz2JvuywNq78z/VsUfGz4Sbxy4ShpNpG
- REojRcz/xOK+FqNuBk+HoWKw6OxgRzfNleDvScVmbY6cQQZfGx/T7xlgZjl5Mu/2z+ofeoxb
- vWWM1YCJAT91GFvj29Wvm8OAPN/+SJj8LQazd9uGzVMTz6lFjVtH7YkeW/NZrP6znAwv5P1a
- DdQfiB5F63AX++NlTiyA+GD/ggfRl68LheSskOcxDwgI5TqmaKtX1/8RkrLpnzO3evzkfJb1
- D5qh3wM1t7PZ+JWTluSX8W25ABEBAAHCwV8EGAECAAkFAk6cPPgCGwwACgkQEXu8gLWmHHz8
- 2w//VjRlX+tKF3szc0lQi4X0t+pf88uIsvR/a1GRZpppQbn1jgE44hgF559K6/yYemcvTR7r
- 6Xt7cjWGS4wfaR0+pkWV+2dbw8Xi4DI07/fN00NoVEpYUUnOnupBgychtVpxkGqsplJZQpng
- v6fauZtyEcUK3dLJH3TdVQDLbUcL4qZpzHbsuUnTWsmNmG4Vi0NsEt1xyd/Wuw+0kM/oFEH1
- 4BN6X9xZcG8GYUbVUd8+bmio8ao8m0tzo4pseDZFo4ncDmlFWU6hHnAVfkAs4tqA6/fl7RLN
- JuWBiOL/mP5B6HDQT9JsnaRdzqF73FnU2+WrZPjinHPLeE74istVgjbowvsgUqtzjPIG5pOj
- cAsKoR0M1womzJVRfYauWhYiW/KeECklci4TPBDNx7YhahSUlexfoftltJA8swRshNA/M90/
- i9zDo9ySSZHwsGxG06ZOH5/MzG6HpLja7g8NTgA0TD5YaFm/oOnsQVsf2DeAGPS2xNirmknD
- jaqYefx7yQ7FJXXETd2uVURiDeNEFhVZWb5CiBJM5c6qQMhmkS4VyT7/+raaEGgkEKEgHOWf
- ZDP8BHfXtszHqI3Fo1F4IKFo/AP8GOFFxMRgbvlAs8z/+rEEaQYjxYJqj08raw6P4LFBqozr
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Tue, 26 Nov 2019 13:59:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (envelope-from <dgilbert@redhat.com>) id 1iZaUV-0002tI-Ff
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 08:02:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25955
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iZaUV-0002kW-AB
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 08:02:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574773362;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KkTELlyxIg/uHwxWC4H7gfz5evz4gPtdAFm4Cnvn1Cg=;
+ b=OttBhaWd4NNVbIYpWb0jYMGaFJEKBT0JZ/9TBUSE3QoxExBH1X/PBbtdA7Q+K0AtdEeh2V
+ ZA16iaIuUinWQpT1gADSEH51o1+whsG3VKcnc5A/FKgkV1Sifn0IY/gkwwuGns6DpSYWS9
+ bseX/gKBso8nlPZ/2MjeMMO2vFn5z1k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-gNQUEgrdPMiX4S9g73BubA-1; Tue, 26 Nov 2019 08:02:41 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 884A2DBF3;
+ Tue, 26 Nov 2019 13:02:38 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A87E05D9E2;
+ Tue, 26 Nov 2019 13:02:31 +0000 (UTC)
+Date: Tue, 26 Nov 2019 13:02:29 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: [Virtio-fs] [PATCH 4/4] virtiofsd: Implement blocking posix locks
+Message-ID: <20191126130229.GG2928@work-vm>
+References: <20191115205543.1816-1-vgoyal@redhat.com>
+ <20191115205543.1816-5-vgoyal@redhat.com>
+ <20191122174732.GL2785@work-vm> <20191125154414.GC13247@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <C829F458-099D-4E95-B835-67F008E60B13@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19112612-4275-0000-0000-0000038696C2
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112612-4276-0000-0000-0000389A211C
-Message-Id: <b4f4546d-b620-0428-40bf-59f4584a80f3@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-26_03:2019-11-26,2019-11-26 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 phishscore=0
- impostorscore=0 mlxscore=0 clxscore=1015 spamscore=0 suspectscore=0
- priorityscore=1501 malwarescore=0 lowpriorityscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911260116
+In-Reply-To: <20191125154414.GC13247@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: gNQUEgrdPMiX4S9g73BubA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id xAQCx4ck147451
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -151,75 +89,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- qemu-s390x@nongnu.org, Jiri Denemark <jdenemar@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org, miklos@szeredi.hu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-re-adding ccs from the cover-letter
-
->>> On 25.11.19 18:20, David Hildenbrand wrote:
->>>
->>> As soon as dynamic feature groups are used, the CPU model becomes
->>> migration-unsafe. Upper layers can expand these models to migration-s=
-afe
->>> and static variants, allowing them to be migrated.
->>
->> I really dislike that. I am trying to get rid of the unsafe variants (=
-e.g. now
->> defaulting to host-model instead of host-passthrough). I do not want t=
-o give
->> users new ways of hurting themselves.
->>
+* Vivek Goyal (vgoyal@redhat.com) wrote:
+> On Fri, Nov 22, 2019 at 05:47:32PM +0000, Dr. David Alan Gilbert wrote:
 >=20
-> Please note that this is just on the bare command line. Libvirt and fri=
-ends will expand the model and have proper migration in place. What exact=
-ly is your concern in that regard?
-
-What is then the value? libvirt can also use host-model or  baselining if=
- necessary.
-And for the command line this will just add more opportunity to shot your=
-self in the
-foot, no?
-
-Let me put it this way, I might have misunderstood what you are trying to=
- do here,
-but if I do not get, then others (e.g. users) will also not get it.
-
-Maybe its just the interface or the name. But I find this very non-intuit=
-ive
-
-e.g. you wrote
-
-    Get the maximum possible feature set (e.g., including deprecated
-    features) for a CPU definition in the configuration ("everything that
-    could be enabled"):
-        -cpu z14,all-features=3Doff,available-features=3Don
-
-    Get all valid features for a CPU definition:
-        -cpu z14,all-features=3Don
-
-What is the point of this? It is either the same as the one before, or it=
- wont
-be able to start.=20
-
+> [..]
+> > > +static int virtio_send_notify_msg(struct fuse_session *se, struct io=
+vec *iov,
+> > > +=09=09=09=09  int count)
+> > > +{
+> > > +    struct fv_QueueInfo *qi;
+> > > +    VuDev *dev =3D &se->virtio_dev->dev;
+> > > +    VuVirtq *q;
+> > > +    FVRequest *req;
+> > > +    VuVirtqElement *elem;
+> > > +    unsigned int in_num, bad_in_num =3D 0, bad_out_num =3D 0;
+> > > +    struct fuse_out_header *out =3D iov[0].iov_base;
+> > > +    size_t in_len, tosend_len =3D iov_size(iov, count);
+> > > +    struct iovec *in_sg;
+> > > +    int ret =3D 0;
+> > > +
+> > > +    /* Notifications have unique =3D=3D 0 */
+> > > +    assert (!out->unique);
+> > > +
+> > > +    if (!se->notify_enabled)
+> > > +        return -EOPNOTSUPP;
+> > > +
+> > > +    /* If notifications are enabled, queue index 1 is notification q=
+ueue */
+> > > +    qi =3D se->virtio_dev->qi[1];
+> > > +    q =3D vu_get_queue(dev, qi->qidx);
+> > > +
+> > > +    pthread_rwlock_rdlock(&qi->virtio_dev->vu_dispatch_rwlock);
+> > > +    pthread_mutex_lock(&qi->vq_lock);
+> > > +    /* Pop an element from queue */
+> > > +    req =3D vu_queue_pop(dev, q, sizeof(FVRequest), &bad_in_num, &ba=
+d_out_num);
+> >=20
+> > You don't need bad_in_num/bad_out_num - just pass NULL for both; they'r=
+e
+> > only needed if you expect to read/write data that's not mappable (i.e.
+> > in our direct write case).
 >=20
->> Unless I misunderstood Eduardo, I think his versioning approach is act=
-ually better
->> in regard to migration, no?
->> I z terms, you can still say -cpu z13  which is just an alias to z13v1=
- z13v2 etc.
->> Assuming that the version is checked this will be safe.
->>
+> Will do.
 >=20
-> It=E2=80=98s even worse AFAIKS. A =E2=80=9E-cpu z13=E2=80=9C would dyna=
-mically map to whatever is best on the host.
+> [..]
+> > > @@ -1950,21 +1948,54 @@ static void lo_setlk(fuse_req_t req, fuse_ino=
+_t ino,
+> > > =20
+> > >  =09if (!plock) {
+> > >  =09=09saverr =3D ret;
+> > > +=09=09pthread_mutex_unlock(&inode->plock_mutex);
+> > >  =09=09goto out;
+> > >  =09}
+> > > =20
+> > > +=09/*
+> > > +=09 * plock is now released when inode is going away. We already hav=
+e
+> > > +=09 * a reference on inode, so it is guaranteed that plock->fd is
+> > > +=09 * still around even after dropping inode->plock_mutex lock
+> > > +=09 */
+> > > +=09ofd =3D plock->fd;
+> > > +=09pthread_mutex_unlock(&inode->plock_mutex);
+> > > +
+> > > +=09/*
+> > > +=09 * If this lock request can block, request caller to wait for
+> > > +=09 * notification. Do not access req after this. Once lock is
+> > > +=09 * available, send a notification instead.
+> > > +=09 */
+> > > +=09if (sleep && lock->l_type !=3D F_UNLCK) {
+> > > +=09=09/*
+> > > +=09=09 * If notification queue is not enabled, can't support async
+> > > +=09=09 * locks.
+> > > +=09=09 */
+> > > +=09=09if (!se->notify_enabled) {
+> > > +=09=09=09saverr =3D EOPNOTSUPP;
+> > > +=09=09=09goto out;
+> > > +=09=09}
+> > > +=09=09async_lock =3D true;
+> > > +=09=09unique =3D req->unique;
+> > > +=09=09fuse_reply_wait(req);
+> > > +=09}
+> > >  =09/* TODO: Is it alright to modify flock? */
+> > >  =09lock->l_pid =3D 0;
+> > > -=09ret =3D fcntl(plock->fd, F_OFD_SETLK, lock);
+> > > +=09if (async_lock)
+> > > +=09=09ret =3D fcntl(ofd, F_OFD_SETLKW, lock);
+> > > +=09else
+> > > +=09=09ret =3D fcntl(ofd, F_OFD_SETLK, lock);
+> >=20
+> > What happens if the guest is rebooted after it's asked
+> > for, but not been granted a lock?
 >=20
+> I think a regular reboot can't be done till a request is pending, because
+> virtio-fs can't be unmounted and unmount will wait for all pending
+> requests to finish.
+>=20
+> Destroying qemu will destroy deamon too.
+>=20
+> Are there any other reboot paths I have missed.
+
+Yes, there are a few other ways the guest can reboot:
+  a) A echo b > /proc/sysrq-trigger
+  b) Telling qemu to do a reset
+
+probably a few more as well; but they all end up with the daemon
+still running over the same connection.   See
+'virtiofsd: Handle hard reboot' where I handle that case where
+a FUSE_INIT turns up unexpectedly.
+
+Dave
+
+
+> Thanks
+> Vivek
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
