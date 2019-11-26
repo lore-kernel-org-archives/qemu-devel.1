@@ -5,77 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC434C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F65C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:26:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 787102073F
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:26:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 735372073F
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:26:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dad2fXqh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 787102073F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="olv12Gp3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 735372073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZY2t-0002hm-Fh
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:26:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57426)
+	id 1iZY37-0002y5-A2
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:26:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57439)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsL-0005eM-Pg
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsM-0005fI-IF
  for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXmM-000341-RC
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:08 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40799)
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXm6-0002re-Nx
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:08:51 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:34727)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
- id 1iZXmM-00033Z-Ld
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:06 -0500
-Received: by mail-pl1-x644.google.com with SMTP id f9so7935164plr.7
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:09:06 -0800 (PST)
+ id 1iZXm6-0002rZ-Ig
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:08:50 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id bo14so8069590pjb.1
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:08:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+QD4/vKzpUKJ7oAMMcWF4SBVUkQv/vIBx+F+3VPKSIM=;
- b=Dad2fXqh5PjlpIH3rO+thxIGofHNhYZUm+ZLETyge4e7luum6aCm1A3AI5ThMS310E
- R4Xj/8Eh+TByGj7pfweNNFqDHyqQKsaKv7ujNrigl64aOA5ORPDVuVwF8DBwlLQA/xsN
- 2ICt4DG1Q+3waVVvDBsMLEigv3rmbn1vXvQDRuRdH7w2/jXjlYjlC09XERU2kaL7p9Db
- MEY1/8o4irNqzMaJuU5BozHQ9JT/4oEIQ6655AN0p1nRUuGHXJHKBb/VYgmPs+Bzrcx6
- VcfSImSIuac8mJWcGQMOg8yxKY4j1WneWZfogz3EYkU6dkoWEiuYjotAtqoP44jBGAOe
- Utcg==
+ bh=TORKveKiyyu6m2oHodE9IBcjkbwEar3Vt5jDpzgDylY=;
+ b=olv12Gp3grnekpbckL4cgsuKfI3uibM/xyKgxKaXAgysBCG0gD1zfwzI4bdTig2QPa
+ bYj2KhBwBQCyeYdYx2+f9ANR6ntDY1QlasYD6qxyDMTFGZj2uvm7ko8kE58GZXl1Gx83
+ yxZQsAPqwNrJ0vcBYS7ybC0BFUlHVtzRy09jDp4McRhur9+hRM3WTEt+lbKHstbWmP9z
+ At4RGyUZXvbnGh/bg5mBCIRT9jJzXZ/XyUpQTxrGKC9T6fcorgnyhMn8Hm9GLjMjBr2J
+ pd/ik9nqYGr+vwPtpw0IYIaT05AfrD53fQBnlXT6YI9axZ6zErZc8n6ZW5g2ZslzHp5l
+ 2UEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+QD4/vKzpUKJ7oAMMcWF4SBVUkQv/vIBx+F+3VPKSIM=;
- b=c5IVbOu1bAatxLIg2Zo7eiadI3gbFci0LQgUhhJi68XQzjb4TXakVbUqTC4DTzL4Od
- F4LFX7qBYu3XJC6S3KTJSmlRGuP2JiyiXtF4nqA8Pg4OM6Dterfg/9AbrmW+ye5A6MH6
- c1lJVt6ZRhEozsbUfRqAZzBCs2rQY1uNthddT3n4vqSXZgRHJLESiQwH7tBKKOtBAlx4
- A2peNmnmzhoGjptkU1KHjc3fGpz+0R269cwCepsTU6imh9yNIF/IlI04WBnzTAMKxnRq
- vbOVX5UPJ19ulQjn49f6ffEzXOqrBwn4nhwTnznKQ6yd/+Cd+AfZuamWfxtNNz2lCEMK
- QiUg==
-X-Gm-Message-State: APjAAAVl6NIrgXEZNGN7qK4BmTk1QzVm7/a/oEyFra1w9poELh0ca508
- Q2dw+mb1oEatlr5fsb20Ho4=
-X-Google-Smtp-Source: APXvYqxxHoIpfqZB5NCqWS+mIJcFEPH5D91ww1dQwvhntGuceZdTfPynWee8zZHRxK2/XD+OeSmwNA==
-X-Received: by 2002:a17:902:9891:: with SMTP id
- s17mr33484924plp.101.1574762945278; 
- Tue, 26 Nov 2019 02:09:05 -0800 (PST)
+ bh=TORKveKiyyu6m2oHodE9IBcjkbwEar3Vt5jDpzgDylY=;
+ b=Tn1DFshuUTrhfJLWiab+IittF8NmIHLYNURZsYVt2vW1tZaEqVVxBQf7Vk+rKoSqt5
+ MNUkiDc6CpRLxsgoW0ANmWF0xGWEpQBkbAOnIPG2LExYK5cIBVSWmbVBW1hNcocN96dV
+ k1Ix9D+OC0umb8vF0/NOiL1CS27wfSR5QZT4w1Ca1HdtWEckl5G5Cah/i466iECeDceo
+ VO99Y/VRy9scL9LY5/JJydQSRnNceeRCBphuWsaoIeISStZ38kPc7+LgiBpBu26N5tKx
+ pFfDxERqSUEPjthn934HGstXt4b8p0YSs8MNatgzyxlQ+Ql8gh+L4GvWFyUNEHwOyFUy
+ ipcg==
+X-Gm-Message-State: APjAAAUoi1OcaxCW2/fjoRUXssZbv4SAjy6bZHaheiqCuTlxxNXjVHKD
+ 8J6wZfdDlDJBAHvJEHEVums=
+X-Google-Smtp-Source: APXvYqy7uBDP8l0aXZ/j5b2P/uoXgigesp5vSEQ3UrSFY/YqyNb+UCqonnG8Y2jEb1rpt6g0c9YHbg==
+X-Received: by 2002:a17:90a:c789:: with SMTP id
+ gn9mr5574668pjb.99.1574762929845; 
+ Tue, 26 Nov 2019 02:08:49 -0800 (PST)
 Received: from localhost.localdomain ([222.151.198.97])
- by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.09.01
+ by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.08.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 02:09:04 -0800 (PST)
+ Tue, 26 Nov 2019 02:08:49 -0800 (PST)
 From: Prashant Bhole <prashantbhole.linux@gmail.com>
 To: "David S . Miller" <davem@davemloft.net>,
  "Michael S . Tsirkin" <mst@redhat.com>
-Subject: [RFC net-next 06/18] tuntap: remove usage of ptr ring in vhost_net
-Date: Tue, 26 Nov 2019 19:07:32 +0900
-Message-Id: <20191126100744.5083-7-prashantbhole.linux@gmail.com>
+Subject: [RFC net-next 02/18] net: core: rename netif_receive_generic_xdp() to
+ do_generic_xdp_core()
+Date: Tue, 26 Nov 2019 19:07:28 +0900
+Message-Id: <20191126100744.5083-3-prashantbhole.linux@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
 References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
@@ -83,7 +84,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,196 +109,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove usage of ptr ring of tuntap in vhost_net and remove the
-functions exported from tuntap drivers to get ptr ring.
+From: Jason Wang <jasowang@redhat.com>
 
+In skb generic path, we need a way to run XDP program on skb but
+to have customized handling of XDP actions. netif_receive_generic_xdp
+will be more helpful in such cases than do_xdp_generic.
+
+This patch prepares netif_receive_generic_xdp() to be used as general
+purpose function by renaming it.
+
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
 ---
- drivers/net/tap.c      | 13 -------------
- drivers/net/tun.c      | 13 -------------
- drivers/vhost/net.c    | 31 ++++---------------------------
- include/linux/if_tap.h |  5 -----
- include/linux/if_tun.h |  5 -----
- 5 files changed, 4 insertions(+), 63 deletions(-)
+ net/core/dev.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-index 8635cdfd7aa4..6426501b8d0e 100644
---- a/drivers/net/tap.c
-+++ b/drivers/net/tap.c
-@@ -1298,19 +1298,6 @@ struct socket *tap_get_socket(struct file *file)
+diff --git a/net/core/dev.c b/net/core/dev.c
+index c7fc902ccbdc..5ae647b9914f 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4461,9 +4461,9 @@ static struct netdev_rx_queue *netif_get_rxqueue(struct sk_buff *skb)
+ 	return rxqueue;
  }
- EXPORT_SYMBOL_GPL(tap_get_socket);
  
--struct ptr_ring *tap_get_ptr_ring(struct file *file)
--{
--	struct tap_queue *q;
--
--	if (file->f_op != &tap_fops)
--		return ERR_PTR(-EINVAL);
--	q = file->private_data;
--	if (!q)
--		return ERR_PTR(-EBADFD);
--	return &q->ring;
--}
--EXPORT_SYMBOL_GPL(tap_get_ptr_ring);
--
- int tap_queue_resize(struct tap_dev *tap)
+-static u32 netif_receive_generic_xdp(struct sk_buff *skb,
+-				     struct xdp_buff *xdp,
+-				     struct bpf_prog *xdp_prog)
++static u32 do_xdp_generic_core(struct sk_buff *skb,
++			       struct xdp_buff *xdp,
++			       struct bpf_prog *xdp_prog)
  {
- 	struct net_device *dev = tap->dev;
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 4f28f2387435..d078b4659897 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -3750,19 +3750,6 @@ struct socket *tun_get_socket(struct file *file)
- }
- EXPORT_SYMBOL_GPL(tun_get_socket);
+ 	struct netdev_rx_queue *rxqueue;
+ 	void *orig_data, *orig_data_end;
+@@ -4610,7 +4610,7 @@ int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff *skb)
+ 		u32 act;
+ 		int err;
  
--struct ptr_ring *tun_get_tx_ring(struct file *file)
--{
--	struct tun_file *tfile;
--
--	if (file->f_op != &tun_fops)
--		return ERR_PTR(-EINVAL);
--	tfile = file->private_data;
--	if (!tfile)
--		return ERR_PTR(-EBADFD);
--	return &tfile->tx_ring;
--}
--EXPORT_SYMBOL_GPL(tun_get_tx_ring);
--
- module_init(tun_init);
- module_exit(tun_cleanup);
- MODULE_DESCRIPTION(DRV_DESCRIPTION);
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 0f91b374a558..2e069d1ef946 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -122,7 +122,6 @@ struct vhost_net_virtqueue {
- 	/* Reference counting for outstanding ubufs.
- 	 * Protected by vq mutex. Writers must also take device mutex. */
- 	struct vhost_net_ubuf_ref *ubufs;
--	struct ptr_ring *rx_ring;
- 	struct vhost_net_buf rxq;
- 	/* Batched XDP buffs */
- 	struct xdp_buff *xdp;
-@@ -997,8 +996,9 @@ static int peek_head_len(struct vhost_net_virtqueue *rvq, struct sock *sk)
- 	int len = 0;
- 	unsigned long flags;
- 
--	if (rvq->rx_ring)
--		return vhost_net_buf_peek(rvq);
-+	len = vhost_net_buf_peek(rvq);
-+	if (len)
-+		return len;
- 
- 	spin_lock_irqsave(&sk->sk_receive_queue.lock, flags);
- 	head = skb_peek(&sk->sk_receive_queue);
-@@ -1187,7 +1187,7 @@ static void handle_rx(struct vhost_net *net)
- 			goto out;
- 		}
- 		busyloop_intr = false;
--		if (nvq->rx_ring) {
-+		if (!vhost_net_buf_is_empty(&nvq->rxq)) {
- 			ctl.type = TUN_MSG_PKT;
- 			ctl.ptr = vhost_net_buf_consume(&nvq->rxq);
- 			msg.msg_control = &ctl;
-@@ -1343,7 +1343,6 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 		n->vqs[i].batched_xdp = 0;
- 		n->vqs[i].vhost_hlen = 0;
- 		n->vqs[i].sock_hlen = 0;
--		n->vqs[i].rx_ring = NULL;
- 		vhost_net_buf_init(&n->vqs[i].rxq);
- 	}
- 	vhost_dev_init(dev, vqs, VHOST_NET_VQ_MAX,
-@@ -1372,7 +1371,6 @@ static struct socket *vhost_net_stop_vq(struct vhost_net *n,
- 	vhost_net_disable_vq(n, vq);
- 	vhost_net_buf_unproduce(nvq);
- 	vq->private_data = NULL;
--	nvq->rx_ring = NULL;
- 	mutex_unlock(&vq->mutex);
- 	return sock;
- }
-@@ -1468,25 +1466,6 @@ static struct socket *get_raw_socket(int fd)
- 	return ERR_PTR(r);
- }
- 
--static struct ptr_ring *get_tap_ptr_ring(int fd)
--{
--	struct ptr_ring *ring;
--	struct file *file = fget(fd);
--
--	if (!file)
--		return NULL;
--	ring = tun_get_tx_ring(file);
--	if (!IS_ERR(ring))
--		goto out;
--	ring = tap_get_ptr_ring(file);
--	if (!IS_ERR(ring))
--		goto out;
--	ring = NULL;
--out:
--	fput(file);
--	return ring;
--}
--
- static struct socket *get_tap_socket(int fd)
- {
- 	struct file *file = fget(fd);
-@@ -1570,8 +1549,6 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 		r = vhost_net_enable_vq(n, vq);
- 		if (r)
- 			goto err_used;
--		if (index == VHOST_NET_VQ_RX)
--			nvq->rx_ring = get_tap_ptr_ring(fd);
- 
- 		oldubufs = nvq->ubufs;
- 		nvq->ubufs = ubufs;
-diff --git a/include/linux/if_tap.h b/include/linux/if_tap.h
-index 915a187cfabd..68fe366fb185 100644
---- a/include/linux/if_tap.h
-+++ b/include/linux/if_tap.h
-@@ -4,7 +4,6 @@
- 
- #if IS_ENABLED(CONFIG_TAP)
- struct socket *tap_get_socket(struct file *);
--struct ptr_ring *tap_get_ptr_ring(struct file *file);
- #else
- #include <linux/err.h>
- #include <linux/errno.h>
-@@ -14,10 +13,6 @@ static inline struct socket *tap_get_socket(struct file *f)
- {
- 	return ERR_PTR(-EINVAL);
- }
--static inline struct ptr_ring *tap_get_ptr_ring(struct file *f)
--{
--	return ERR_PTR(-EINVAL);
--}
- #endif /* CONFIG_TAP */
- 
- #include <net/sock.h>
-diff --git a/include/linux/if_tun.h b/include/linux/if_tun.h
-index bb94843e3829..f01a255e076d 100644
---- a/include/linux/if_tun.h
-+++ b/include/linux/if_tun.h
-@@ -44,7 +44,6 @@ struct tun_xdp_hdr {
- 
- #if defined(CONFIG_TUN) || defined(CONFIG_TUN_MODULE)
- struct socket *tun_get_socket(struct file *);
--struct ptr_ring *tun_get_tx_ring(struct file *file);
- bool tun_is_xdp_frame(void *ptr);
- void *tun_xdp_to_ptr(void *ptr);
- void *tun_ptr_to_xdp(void *ptr);
-@@ -58,10 +57,6 @@ static inline struct socket *tun_get_socket(struct file *f)
- {
- 	return ERR_PTR(-EINVAL);
- }
--static inline struct ptr_ring *tun_get_tx_ring(struct file *f)
--{
--	return ERR_PTR(-EINVAL);
--}
- static inline bool tun_is_xdp_frame(void *ptr)
- {
- 	return false;
+-		act = netif_receive_generic_xdp(skb, &xdp, xdp_prog);
++		act = do_xdp_generic_core(skb, &xdp, xdp_prog);
+ 		if (act != XDP_PASS) {
+ 			switch (act) {
+ 			case XDP_REDIRECT:
 -- 
 2.20.1
 
