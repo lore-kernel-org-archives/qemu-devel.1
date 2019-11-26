@@ -2,65 +2,79 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C70C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 17:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1923C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 17:29:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 701BA20722
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 17:11:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 701BA20722
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id B5F022071E
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 17:29:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X2XFDDdF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F022071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZeNI-0000Hc-Ka
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 12:11:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42200)
+	id 1iZeei-0004HR-UL
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 12:29:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iZeEY-0001gb-21
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 12:02:39 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iZedz-0003ku-3U
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 12:28:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iZeEV-0001Lz-0y
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 12:02:37 -0500
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:45930)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iZeEU-0001Kn-PD
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 12:02:34 -0500
-Received: from player711.ha.ovh.net (unknown [10.109.146.1])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 6AE9E1B6448
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 18:02:32 +0100 (CET)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: clg@kaod.org)
- by player711.ha.ovh.net (Postfix) with ESMTPSA id B54F2C75C8AB;
- Tue, 26 Nov 2019 17:02:27 +0000 (UTC)
-Subject: Re: [for-5.0 PATCH v2 3/4] spapr/xics: Configure number of servers in
- KVM
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <157478677206.67101.11965554900825793694.stgit@bahia.tlslab.ibm.com>
- <157478678846.67101.9660531022460517710.stgit@bahia.tlslab.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <682c6644-066d-02dd-7695-9633138cad43@kaod.org>
-Date: Tue, 26 Nov 2019 18:02:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <peter.maydell@linaro.org>) id 1iZedx-0006Qf-KP
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 12:28:54 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:43281)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iZedx-00067b-Dp
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 12:28:53 -0500
+Received: by mail-oi1-x244.google.com with SMTP id l20so17378516oie.10
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 09:28:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6E5Zz+nsatp7YbmGgKzLft6/AOjAeWergoVmwhS3AS4=;
+ b=X2XFDDdFRYZ3m7OwYoHrPytUwSPiqLhADyZ2jeNroPU40v7FW0iiZqiE+MMjuF1s4J
+ RVgMICKXon6mqtw47hM/qz0q/MkiLicgcZewE+0eDl0ZLePpGKksrXHoVh76EwkIob0l
+ du4e9N75zR3vWv/LxSuMbclsgiNOyGHQI0PmnlcRW+MrgMa1RVRGgceksh3byVKM9zqK
+ N76IH8g116ZkgUrpHVnPnLgpgEuIkkhVGo2ZW+KUg3OVULGTJ7sP6wO9+Ox4xlYbQmhw
+ 7oMox+TTH/tJYgEpTizZ3S2l9O3s8mzMcdB+f0Zmxu270VOuoGvry5pGEgRM2AjThwHG
+ LWKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6E5Zz+nsatp7YbmGgKzLft6/AOjAeWergoVmwhS3AS4=;
+ b=Zvqn/uxpBUUMVFeEDTQgAV5D/bHG+X/uPPE3xt+xHI9FTsSluF8QMkMbaktmRDqta+
+ UGFs5IEEiZVJzAp11HG1NUOxrJI2xAG613WbhNu8n0OsrJAw71eSFn3pBN5higHjqtcF
+ Gv1R7qxPQivTcx5sTjd0OFFjs835ew4w02C9vAgiU+77KrLH5eWcK6bJyTUljhTvZist
+ 7cAR/FGsDrpce9dqgrw1/mnnQX06+52WTmkAa3mP42uW784p2RfUTTHzsXSPjFWrjw0Y
+ 3kAjb6cgrAaIfHX9d407dnlbKEWV5lI6EUDshkmrzHdcuYokPzUXmJcQjB700AqLoLBS
+ HDOQ==
+X-Gm-Message-State: APjAAAWTbClJW+jlip7bT2i+MPDtbGmZ9nvyFDJ+0zq9Qxo9q5kjBMn3
+ fspde85jx+1QDJBhHOWzS2tnLj1ykJe5lvsVUCP2kw==
+X-Google-Smtp-Source: APXvYqxRWh4fl51fxzNom6n6WBOYXy/ZOENpDhqmDptIx0uARzQbNvz1270rZfOJ6slLhIi2RxDtyhPv0zRfsQkEKlU=
+X-Received: by 2002:a05:6808:8c2:: with SMTP id k2mr89260oij.163.1574789319091; 
+ Tue, 26 Nov 2019 09:28:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <157478678846.67101.9660531022460517710.stgit@bahia.tlslab.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 6532471262125919040
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeifedgleejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejuddurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 87.98.172.75
+References: <20191126060151.729845-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20191126060151.729845-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 26 Nov 2019 17:28:28 +0000
+Message-ID: <CAFEAcA_RKRqfCbK=Ah142Hwx2VAFqMM8M52t74KadxtGdw0K0g@mail.gmail.com>
+Subject: Re: [PULL 0/8] ppc-for-4.2 queue 20191126
+To: David Gibson <david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,83 +86,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/11/2019 17:46, Greg Kurz wrote:
-> The XICS-on-XIVE KVM devices now has an attribute to configure the numb=
-er
-> of interrupt servers. This allows to greatly optimize the usage of the =
-VP
-> space in the XIVE HW, and thus to start a lot more VMs.
->=20
-> Only set this attribute if available in order to support older POWER9 K=
-VM
-> and pre-POWER9 XICS KVM devices.
->=20
-> The XICS-on-XIVE KVM device now reports the exhaustion of VPs upon the
-> connection of the first VCPU. Check that in order to have a chance to
-> provide a hint to the user.
-> `
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On Tue, 26 Nov 2019 at 06:01, David Gibson <david@gibson.dropbear.id.au> wrote:
+>
+> The following changes since commit 65e05c82bdc6d348155e301c9d87dba7a08a5701:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2019-11-25 15:47:44 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/dgibson/qemu.git tags/ppc-for-4.2-20191126
+>
+> for you to fetch changes up to 59d0533b85158fdbe43bad696d4f50ec29a04c32:
+>
+>   ppc/spapr_events: fix potential NULL pointer dereference in rtas_event_log_dequeue (2019-11-26 10:12:58 +1100)
+>
+> ----------------------------------------------------------------
+> ppc patch queue for 2019-11-26
+>
+> Here's the first 4.2 hard freeze pull request from me.  This has:
+>
+>   * A fix for some testcases that cause errors on older host kernels
+>     (e.g. RHEL7), with our new default configuration of VSMT mode
+>   * Changes to make VFIO devices interact properly with change of irq
+>     chip caused by PAPR feature negotiation.  This is more involved
+>     than I would like, but it's a problem in real use cases and I
+>     can't see an easier way to handle it.
+>   * Fix an error with ms6522 counters for the g3beige machine
+>   * Fix a coverity warning
+>
+> ----------------------------------------------------------------
 
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Applied, thanks.
 
-> ---
->  hw/intc/xics_kvm.c |   21 +++++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-> index a1f1b7b0d37c..8d6156578fbc 100644
-> --- a/hw/intc/xics_kvm.c
-> +++ b/hw/intc/xics_kvm.c
-> @@ -165,8 +165,15 @@ void icp_kvm_realize(DeviceState *dev, Error **err=
-p)
-> =20
->      ret =3D kvm_vcpu_enable_cap(cs, KVM_CAP_IRQ_XICS, 0, kernel_xics_f=
-d, vcpu_id);
->      if (ret < 0) {
-> -        error_setg(errp, "Unable to connect CPU%ld to kernel XICS: %s"=
-, vcpu_id,
-> -                   strerror(errno));
-> +        Error *local_err =3D NULL;
-> +
-> +        error_setg(&local_err, "Unable to connect CPU%ld to kernel XIC=
-S: %s",
-> +                   vcpu_id, strerror(errno));
-> +        if (errno =3D=3D ENOSPC) {
-> +            error_append_hint(&local_err, "Try -smp maxcpus=3DN with N=
- < %u\n",
-> +                              MACHINE(qdev_get_machine())->smp.max_cpu=
-s);
-> +        }
-> +        error_propagate(errp, local_err);
->          return;
->      }
->      enabled_icp =3D g_malloc(sizeof(*enabled_icp));
-> @@ -399,6 +406,16 @@ int xics_kvm_connect(SpaprInterruptController *int=
-c, uint32_t nr_servers,
->          goto fail;
->      }
-> =20
-> +    /* Tell KVM about the # of VCPUs we may have (POWER9 and newer onl=
-y) */
-> +    if (kvm_device_check_attr(rc, KVM_DEV_XICS_GRP_CTRL,
-> +                              KVM_DEV_XICS_NR_SERVERS)) {
-> +        if (kvm_device_access(rc, KVM_DEV_XICS_GRP_CTRL,
-> +                              KVM_DEV_XICS_NR_SERVERS, &nr_servers, tr=
-ue,
-> +                              &local_err)) {
-> +            goto fail;
-> +        }
-> +    }
-> +
->      kernel_xics_fd =3D rc;
->      kvm_kernel_irqchip =3D true;
->      kvm_msi_via_irqfd_allowed =3D true;
->=20
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
+-- PMM
 
