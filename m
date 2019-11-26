@@ -2,85 +2,84 @@ Return-Path: <SRS0=u80H=ZS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E58C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE18C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:38:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2238620748
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:37:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31D2420748
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:38:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fiGPq0vh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2238620748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gs+0EL6D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31D2420748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52499 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZYDz-0006zL-R1
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:37:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59293)
+	id 1iZYF0-00089X-0J
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:38:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57422)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iZY4g-0005Pw-AV
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:28:07 -0500
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsM-0005e4-Sj
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iZY4e-0004FZ-RS
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:28:02 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54452
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iZY4e-0004Dr-Ne
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:28:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574764079;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Lk52ND9z7x1MZHxY1MDZVQbgoF4N7AGoaCb7ZPVnzuc=;
- b=fiGPq0vhIXD9ytW59clhNh/w3bPe4QzoSzP9bfV+yeAbrD6NiBAAFcl790NTs1cmhQxXEB
- ujt/yxK4F+Ucohwx+eNWeVWNNhQCFPGzdQpcRbnMfJ6x7XxcONqhSUbkBBSxtE4PmgdZrG
- KdoL7CEhJoPUMQJVPQpmqUE50Pu4Z5k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-QK2Mn6XHOrO5cPRBg4R8yg-1; Tue, 26 Nov 2019 05:27:56 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E54911801B9E;
- Tue, 26 Nov 2019 10:27:54 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AEBD7A5D3;
- Tue, 26 Nov 2019 10:27:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 89B941138606; Tue, 26 Nov 2019 11:27:49 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v17 03/14] util/cutils: refactor do_strtosz() to support
- suffixes list
-References: <20191122074826.1373-1-tao3.xu@intel.com>
- <20191122074826.1373-4-tao3.xu@intel.com>
-Date: Tue, 26 Nov 2019 11:27:49 +0100
-In-Reply-To: <20191122074826.1373-4-tao3.xu@intel.com> (Tao Xu's message of
- "Fri, 22 Nov 2019 15:48:15 +0800")
-Message-ID: <87imn77x0a.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXlz-0002nL-TH
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:08:45 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:41820)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
+ id 1iZXlz-0002kP-Kp
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:08:43 -0500
+Received: by mail-pg1-x543.google.com with SMTP id 207so8739422pge.8
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:08:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Dgd0qtYqKPxWRq61gIy+YSZx4uaumU6Lw6yTRUkuKx0=;
+ b=gs+0EL6DS1qVd1mMjn03U+2SDg6BSsQVIyn0+mx8IIpB8UAx3DnmpfJFTBT/AEWeNz
+ Ua6Xppf1hn8qdJYs1a1lKJWj7IrM6R/D7Y05mrE/xLQFhPQoD2vH9unk/hkT0nP9+4tA
+ ihI7ZBBam46tspN95Zi/BG+/QrzMr1t1sXiWMn5xDcGmxqUNnxIoQJB/vpF53VhuXPLt
+ VNUXFTzR9umKDYl3w7bCn7avJVtoJiZcj3D8hr5vO9YiT3TxNoDTV7oqKGFRtJvxLQx+
+ wx5M+gVfwYgXnpQzBwQyqul0jNyDUNn018vPemJHcyNqaSdT0vbhgrPCHJnJKnSwFOy6
+ bDpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Dgd0qtYqKPxWRq61gIy+YSZx4uaumU6Lw6yTRUkuKx0=;
+ b=Z3FrEsyqplb1Z/UGtepIZu+UnOEzEW3fJtk/oyuBb4HQYid1RcaUA+i//9sGwbR2FW
+ oMxlspFRtjt+yvtmD2wuQyAjdchurTmQaoNE9RwMiF0vYHNHkBeTFvo5Y8G/Q7K6c3Ng
+ pok/HIlbwaI0JTsfr56tv+c9tRV3UoPefbbkuj28zJmjerjnTZ9gHrUY9XPXbGxUL/HF
+ flK9roVkQNfrPowGRaomxlyUOk9FbGpoKcZSXxCl7VJ2e561TVU1Hr3+NohMMwnNc65h
+ hbsVf3i6CHw+ksKRxFNg+KR27s47BxSDXlFJ589kYezogR52H1vj6Bi8Xn806n4nUTr0
+ Zb6Q==
+X-Gm-Message-State: APjAAAW5IHKeQSXTajr8cY3pPUsB4AsCNXYbE3NhkBiu1drq5kwR9JtY
+ A6bMlRDGsOxLEIbYMwhDK5A=
+X-Google-Smtp-Source: APXvYqxqGp3aRO3lANC9+LKjj3icpyAXEIh7gRlveUqd4Gk4vqKsYBQHP2rU8rGQsQy92j3SmhTT4Q==
+X-Received: by 2002:a63:9d41:: with SMTP id i62mr38895730pgd.310.1574762921848; 
+ Tue, 26 Nov 2019 02:08:41 -0800 (PST)
+Received: from localhost.localdomain ([222.151.198.97])
+ by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.08.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 26 Nov 2019 02:08:41 -0800 (PST)
+From: Prashant Bhole <prashantbhole.linux@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+ "Michael S . Tsirkin" <mst@redhat.com>
+Subject: [RFC net-next 00/18] virtio_net XDP offload
+Date: Tue, 26 Nov 2019 19:07:26 +0900
+Message-Id: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: QK2Mn6XHOrO5cPRBg4R8yg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,198 +91,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- jonathan.cameron@huawei.com, sw@weilnetz.de, fan.du@intel.com,
- mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, jingqi.liu@intel.com,
- imammedo@redhat.com
+Cc: Song Liu <songliubraving@fb.com>,
+ Jakub Kicinski <jakub.kicinski@netronome.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, qemu-devel@nongnu.org,
+ Prashant Bhole <prashantbhole.linux@gmail.com>, kvm@vger.kernel.org,
+ Yonghong Song <yhs@fb.com>, Andrii Nakryiko <andriin@fb.com>,
+ Martin KaFai Lau <kafai@fb.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tao Xu <tao3.xu@intel.com> writes:
+Note: This RFC has been sent to netdev as well as qemu-devel lists
 
-> Add do_strtomul() to convert string according to different suffixes.
->
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
->
-> No changes in v17.
->
-> Changes in v15:
->     - Add a new patch to refactor do_strtosz() (Eduardo)
-> ---
->  util/cutils.c | 72 ++++++++++++++++++++++++++++++---------------------
->  1 file changed, 42 insertions(+), 30 deletions(-)
->
-> diff --git a/util/cutils.c b/util/cutils.c
-> index d94a468954..ffef92338a 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -181,41 +181,37 @@ int fcntl_setfl(int fd, int flag)
->  }
->  #endif
-> =20
-> -static int64_t suffix_mul(char suffix, int64_t unit)
-> +static int64_t suffix_mul(const char *suffixes[], int num_suffix,
-> +                          const char *endptr, int *offset, int64_t unit)
+This series introduces XDP offloading from virtio_net. It is based on
+the following work by Jason Wang:
+https://netdevconf.info/0x13/session.html?xdp-offload-with-virtio-net
 
-This function could really use a contract comment now.
+Current XDP performance in virtio-net is far from what we can achieve
+on host. Several major factors cause the difference:
+- Cost of virtualization
+- Cost of virtio (populating virtqueue and context switching)
+- Cost of vhost, it needs more optimization
+- Cost of data copy
+Because of above reasons there is a need of offloading XDP program to
+host. This set is an attempt to implement XDP offload from the guest.
 
->  {
-> -    switch (qemu_toupper(suffix)) {
-> -    case 'B':
-> -        return 1;
-> -    case 'K':
-> -        return unit;
-> -    case 'M':
-> -        return unit * unit;
-> -    case 'G':
-> -        return unit * unit * unit;
-> -    case 'T':
-> -        return unit * unit * unit * unit;
-> -    case 'P':
-> -        return unit * unit * unit * unit * unit;
-> -    case 'E':
-> -        return unit * unit * unit * unit * unit * unit;
-> +    int i, suffix_len;
-> +    int64_t mul =3D 1;
-> +
-> +    for (i =3D 0; i < num_suffix; i++) {
 
-Aha: @num_suffix is the number of elements in suffixes[].
+* High level design:
 
-I'd put a terminating NULL into suffixes[] and dispense with
-@num_suffix:
+virtio_net exposes itself as offload capable device and works as a
+transport of commands to load the program on the host. When offload is
+requested, it sends the program to Qemu. Qemu then loads the program
+and attaches to corresponding tap device. Similarly virtio_net sends
+control commands to create and control maps. tap device runs the XDP
+prog in its Tx path. The fast datapath remains on host whereas slow
+path in which user program reads/updates map values remains in the
+guest.
 
-       for (i =3D 0; suffix[i]; i++) {
+When offloading to actual hardware the program needs to be translated
+and JITed for the target hardware. In case of offloading from guest
+we pass almost raw program to the host. The verifier on the host
+verifies the offloaded program.
 
-> +        suffix_len =3D strlen(suffixes[i]);
 
-@suffix_len should be size_t, because that's what strlen() returns.
+* Implementation in Kernel
 
-> +        if (g_ascii_strncasecmp(suffixes[i], endptr, suffix_len) =3D=3D =
-0) {
 
-@endptr is a terrible name: it points to the *beginning* of the suffix.
+virtio_net
+==========
+Creates bpf offload device and registers as offload capable device.
+It also implements bpf_map_dev_ops to handle the offloaded map. A new
+command structure is defined to communicate with qemu.
 
-> +            *offset =3D suffix_len;
+Map offload:
+- In offload sequence maps are always offloaded before the program. In
+  map offloading stage, virtio_net sends control commands to qemu to
+  create a map and return a map fd which is valid on host. This fd is
+  stored in driver specific map structure. A list of such maps is
+  maintained.
 
-@offset is a terrible name: it provides no clue whatsoever on its
-meaning.  It's actually for receiving the length of the suffix.
+- Currently BPF_MAP_TYPE_ARRAY and BPF_MAP_TYPE_HASH are supported.
+  Offloading a per cpu array from guest to host doesn't make sense.
 
-Please replace it by char **end, because that's how the related
-functions work.
+Program offload:
+- In general the verifier in the guest replaces map fds in the user
+  submitted programs with map pointers then bpf_prog_offload_ops
+  callbacks are called.
 
-> +            return mul;
-> +    }
-> +        mul *=3D unit;
->      }
-> +
->      return -1;
->  }
-> =20
->  /*
-> - * Convert string to bytes, allowing either B/b for bytes, K/k for KB,
-> - * M/m for MB, G/g for GB or T/t for TB. End pointer will be returned
-> - * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
-> - * other error.
-> + * Convert string according to different suffixes. End pointer will be r=
-eturned
-> + * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on othe=
-r error.
->   */
-> -static int do_strtosz(const char *nptr, const char **end,
-> -                      const char default_suffix, int64_t unit,
-> +static int do_strtomul(const char *nptr, const char **end,
-> +                       const char *suffixes[], int num_suffix,
-> +                       const char *default_suffix, int64_t unit,
->                        uint64_t *result)
+- This set introduces new program offload callback 'setup()' which
+  verifier calls before replacing map fds with map pointers. This way
+  virtio_net can create a copy of the program with guest map fds. It
+  was needed because virtio_net wants to derive driver specific map
+  data from guest map fd. Then guest map fd will be replaced with
+  host map fd in the copy of the program, hence the copy of the
+  program which will be submitted to the host will have valid host map
+  fds.
 
-The function comment is barely adequate before your patch: it doesn't
-explain the arguments.  Your patch adds more arguments, thus more
-guesswork for the reader.
+- Alternatively if we can move the prep() call in the verifier before
+  map fd replacement happens, there is not need to introduce 'setup()'
+  callback.
 
-Again, I'd put a terminating NULL into suffixes[] and dispense with
-@num_suffix.
+- As per current implementation of 'setup()' callback in virtio_net,
+  it verifies full program for allowed helper functions and performs
+  above mentioned map fd replacement.
 
->  {
->      int retval;
->      const char *endptr;
-> -    unsigned char c;
->      int mul_required =3D 0;
-> +    int offset =3D 0;
->      long double val, mul, integral, fraction;
-> =20
->      retval =3D qemu_strtold_finite(nptr, &endptr, &val);
-> @@ -226,12 +222,12 @@ static int do_strtosz(const char *nptr, const char =
-**end,
->      if (fraction !=3D 0) {
->          mul_required =3D 1;
->      }
-> -    c =3D *endptr;
-> -    mul =3D suffix_mul(c, unit);
-> +
-> +    mul =3D suffix_mul(suffixes, num_suffix, endptr, &offset, unit);
+- A list of allowed helper function is maintained and it is currently
+  experimental, it will be updated later as per need. Using this
+  list we can filter out most non-XDP type programs to some extent.
+  Also we prevent the guest from collecting host specific information
+  by not allowing some helper calls.
 
-@endptr points behind the number, i.e. to the suffix, and @offset is the
-length of the suffix.  Suggest to rename @endptr to @suffix, and replace
-@offset by @endptr.
+- XDP_PROG_SETUP_HW is called after successful program verification.
+  In this call a control buffer is prepared, program instructions are
+  appended to the buffer and it is sent to qemu.
 
->      if (mul >=3D 0) {
-> -        endptr++;
-> +        endptr +=3D offset;
->      } else {
-> -        mul =3D suffix_mul(default_suffix, unit);
-> +        mul =3D suffix_mul(suffixes, num_suffix, default_suffix, &offset=
-, unit);
->          assert(mul >=3D 0);
+tun
+===
+This set makes changes in tun to run XDP prog in Tx path. It will be
+the offloaded program from the guest. This program can be set using
+tun ioctl interface. There were multiple places where this program can
+be executed.
+- tun_net_xmit
+- tun_xdp_xmit
+- tun_recvmsg
+tun_recvmsg was chosen because it runs in process context. The other
+two run in bh context. Running in process context helps in setting up
+service chaining using XDP redirect.
 
-Please assert "no trailing crap in @default_suffix".
+XDP_REDIRECT action of offloaded program isn't handled. It is because
+target interface's ndo_xdp_xmit is called when we redirect a packet.
+In offload case the target interface will be some tap interface. Any
+packet redirected towards it will sent back to the guest, which is not
+what we expect. Such redirect will need special handling in the kernel
 
->      }
->      if (mul =3D=3D 1 && mul_required) {
-> @@ -256,19 +252,35 @@ out:
->      return retval;
->  }
-> =20
-> +/*
-> + * Convert string to bytes, allowing either B/b for bytes, K/k for KB,
-> + * M/m for MB, G/g for GB or T/t for TB. End pointer will be returned
-> + * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
-> + * other error.
-> + */
-> +static int do_strtosz(const char *nptr, const char **end,
-> +                      const char *default_suffix, int64_t unit,
-> +                      uint64_t *result)
-> +{
-> +    static const char *suffixes[] =3D { "B", "K", "M", "G", "T", "P", "E=
-" };
-> +
-> +    return do_strtomul(nptr, end, suffixes, ARRAY_SIZE(suffixes),
-> +                       default_suffix, unit, result);
-> +}
-> +
->  int qemu_strtosz(const char *nptr, const char **end, uint64_t *result)
->  {
-> -    return do_strtosz(nptr, end, 'B', 1024, result);
-> +    return do_strtosz(nptr, end, "B", 1024, result);
->  }
-> =20
->  int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *resul=
-t)
->  {
-> -    return do_strtosz(nptr, end, 'M', 1024, result);
-> +    return do_strtosz(nptr, end, "M", 1024, result);
->  }
-> =20
->  int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *re=
-sult)
->  {
-> -    return do_strtosz(nptr, end, 'B', 1000, result);
-> +    return do_strtosz(nptr, end, "B", 1000, result);
->  }
-> =20
->  /**
+XDP_TX action of offloaded program is handled. Packet is injected into
+the Rx path in this case. Care is taken such that the tap's native Rx
+path XDP will be executed in such case.
+
+
+* Implementation in Qemu
+
+Qemu is modified to handle handle control commands from the guest.
+When program offload command is received, it loads the program in the
+host OS and attaches program fd to tap device. All the program and map
+operations are performed using libbpf APIs.
+
+
+* Performance numbers
+
+Single flow tests were performed. The diagram below shows the setup.
+xdp1 and xdp2 sample programs were modified to use BPF_MAP_TYPE_ARRAY
+instead of per cpu array and xdp1_user.c was modified to have hardware
+offload parameter.
+
+                     (Rx path XDP to drop      (Tx path XDP.
+                      XDP_TX'ed pkts from       Program offloaded
+                      tun Tx path XDP)          from virtio_net)
+                          XDP_DROP ----------.  XDP_DROP/XDP_TX
+                                              \   |
+                                    (Case 2)   \  |   XDP_DROP/XDP_TX
+ pktgen ---> 10G-NIC === 10G-NIC --- bridge --- tun --- virtio-net
+|<------ netns ------>|    |                     ^   |<----guest---->|
+                           v                     |
+                           '---- XDP_REDIRECT----'
+                                  (Case 1)
+
+Case 1: Packets XDP_REDIRECT'ed towards tun.
+                        Non-offload        Offload
+  xdp1 (XDP_DROP)        2.46 Mpps        12.90 Mpps
+  xdp2 (XDP_TX)          1.50 Mpps         7.26 Mpps
+
+Case 2: Packets are not redirected. They pass through the bridge.
+                        Non-offload        Offload
+  xdp1 (XDP_DROP)        1.03 Mpps         1.01 Mpps
+  xdp2 (XDP_TX)          1.10 Mpps         0.99 Mpps
+
+  In case 2, the offload performance is low. In this case the
+  producer function is tun_net_xmit. It puts single packet in ptr ring
+  and spends most of the time in waking up vhost thread. On the other
+  hand, each time when vhost thread wakes up, it calls tun_recvmsg.
+  Since Tx path XDP runs in tun_recvmsg, vhost doesn't see any packet.
+  It sleeps frequently and producer function most spends more time in
+  waking it up. vhost polling improves these numbers but in that case
+  non-offload performance also improves and remains higher than the
+  offload case. Performance in this case can be improved later in a
+  separate work.
+
+Since this set makes changes in virtio_net, tun and vhost_net, it was
+necessary to measure the performance difference after applying this
+set. Performance numbers are in table below:
+
+   Netperf Test         Before      After      Difference
+  UDP_STREAM 18byte     89.43       90.74       +1.46%
+  UDP_STREAM 1472byte    6882        7026       +2.09%
+  TCP_STREAM             9403        9407       +0.04%
+  UDP_RR                13520       13478       -0.31%
+  TCP_RR                13120       12918       -1.53%
+
+
+* Points for improvement (TODO)
+
+- In current implementation, qemu passes host map fd to the guest,
+  which means guest is poking host information. It can be avoided by
+  moving the map fd replacement task from guest to qemu.
+
+- Currently there is no way on the host side to show whether a tap
+  interface has offloaded XDP program attached.
+
+- When sending program and map related control commands from guest to
+  host, it will be better if we pass metadata about the program, map.
+  For example BTF data.
+
+- In future virtio can have feature bit for offloading capability
+
+- TUNGETFEATURES should have a flag to notify about offloading
+  capability
+
+- Submit virtio spec patch to describe XDP offloading feature
+
+- When offloading is enabled, it should be a migration blocker.
+
+- DoS: Offloaded map uses host's memory which is other than what has
+  been allocated for the guest. Offloading many maps of large size can
+  be one of the DoS strategy. Hence qemu should have parameter to
+  limit how many maps guest can offload or how much memory offloaded
+  maps use.
+
+
+* Other dependencies
+
+- Loading a bpf program requires CAP_SYS_ADMIN capability. We tested
+  this set by running qemu as root OR adding CAP_SYS_ADMIN to the
+  qemu binary. In other cases Qemu doesn't have this capability.
+  Alexei's recent work CAP_BPF can be a solution to this problem.
+  The CAP_BPF work is still being discussed in the mailing list.
+
+Jason Wang (9):
+  bpf: introduce bpf_prog_offload_verifier_setup()
+  net: core: rename netif_receive_generic_xdp() to do_generic_xdp_core()
+  net: core: export do_xdp_generic_core()
+  tun: set offloaded xdp program
+  virtio-net: store xdp_prog in device
+  virtio_net: add XDP prog offload infrastructure
+  virtio_net: implement XDP prog offload functionality
+  bpf: export function __bpf_map_get
+  virtio_net: implment XDP map offload functionality
+
+Prashant Bhole (9):
+  tuntap: check tun_msg_ctl type at necessary places
+  vhost_net: user tap recvmsg api to access ptr ring
+  tuntap: remove usage of ptr ring in vhost_net
+  tun: run offloaded XDP program in Tx path
+  tun: add a way to inject Tx path packet into Rx path
+  tun: handle XDP_TX action of offloaded program
+  tun: run xdp prog when tun is read from file interface
+  virtio_net: use XDP attachment helpers
+  virtio_net: restrict bpf helper calls from offloaded program
+
+ drivers/net/tap.c               |  42 ++-
+ drivers/net/tun.c               | 257 +++++++++++++--
+ drivers/net/virtio_net.c        | 552 +++++++++++++++++++++++++++++---
+ drivers/vhost/net.c             |  77 ++---
+ include/linux/bpf.h             |   1 +
+ include/linux/bpf_verifier.h    |   1 +
+ include/linux/if_tap.h          |   5 -
+ include/linux/if_tun.h          |  23 +-
+ include/linux/netdevice.h       |   2 +
+ include/uapi/linux/if_tun.h     |   1 +
+ include/uapi/linux/virtio_net.h |  50 +++
+ kernel/bpf/offload.c            |  14 +
+ kernel/bpf/syscall.c            |   1 +
+ kernel/bpf/verifier.c           |   6 +
+ net/core/dev.c                  |   8 +-
+ 15 files changed, 901 insertions(+), 139 deletions(-)
+
+-- 
+2.20.1
 
 
