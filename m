@@ -8,75 +8,74 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE4F3C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC24C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:23:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B66E2073F
-	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:23:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 681D020656
+	for <qemu-devel@archiver.kernel.org>; Tue, 26 Nov 2019 10:23:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hfC8Y0Gl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B66E2073F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIZgXrZn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 681D020656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZY0T-0007L8-A2
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:23:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57458)
+	id 1iZY0e-0007by-Tr
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 05:23:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57434)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsH-0005g9-0R
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:14 -0500
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXsM-0005f2-8h
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:15:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXn6-0003Vy-Lm
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:53 -0500
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:44384)
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1iZXmA-0002t5-JW
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:08:56 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:40844)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
- id 1iZXn6-0003Vo-GQ
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:09:52 -0500
-Received: by mail-pj1-x1043.google.com with SMTP id w8so8053496pjh.11
- for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:09:52 -0800 (PST)
+ id 1iZXmA-0002sg-EF
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 05:08:54 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id ep1so8068919pjb.7
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 02:08:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=vjhBcNZlvW0lMvmwhzAhIEHJGNVVbcL/eLdp//zF+fg=;
- b=hfC8Y0GlPj/uXQPu3A2bgAU/XKe+wQFyKu/9eLipQh61lukaue4hfFzl2ix7VClJjZ
- eqSqR/bDgLg7pVcqACj11DMCuCv0gwXL7+xHhsNh5NwgCfARRwd9PlFnobWiTzP9n90N
- Cad2Cf8SKecEWov8eZLUH408k+NDKtsw7byKo/MzSxyDe560t1bn8KA8Nw44LvCzF9vm
- USGyVrg3TbYALODisuOSe3Ve8xKDQg/MXtM9pDiIBi8Zs54oRtnKLNOLXzCEtbzwdMLf
- iPJ/eSOXkY0IEK3bI3VUv0V9mmMlT1OQKz3zMG/tabHlx5zqAMJowhWzs1hYAg70KyV9
- hpug==
+ bh=2bAHX0FXOgqRwz29p5ya1CXvQIHb2CLin8kXdVB/0KE=;
+ b=LIZgXrZnUx86XNNP0wmHAcrNw9/JIZ8Z/K+g4m7VRaHAmOxfSZCyPu0eA26cNr146y
+ o7pf4ACxMyylsjo6uGEODbNQv8BRy46PhL70owQw/xwCKefsVPclpEamrqGo72ehYh+9
+ v63wDQiT5CznqvW3e78uI6rd3/N+sk3gekTAk9Ai4rTTvwCGcYckKvWPtFjd9xcw1oOG
+ 8R1NnTguMJFxf9tZ09BhOA6+IrzVhQlaOh9GYKE9/yZf9zK1SwVLEIg5oFO2RFCUDefS
+ 13vpeM20b7IeXPytkqCO5Efyk0g/6IAoInedl5KOOFZshV6zSMntUF6MhlF1jpnMUsy2
+ W+Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=vjhBcNZlvW0lMvmwhzAhIEHJGNVVbcL/eLdp//zF+fg=;
- b=CVQlQFewAhhiN7RLm8YnklniqS+uPZmHF3V8bGkG2wLJE+I+ASYdydJoNaFbG0yCX+
- hHMpEo22eEswVK+42piVUxYTdvIyGyKGs7nEbe5mMj2yEUGpRdsICAR9iJhuZY2f22f3
- Y3pGLZT8ZI/qNShq068zMU/uTQP9IiOFVx9KDj0BlAivLgt4LYA8tw3E8jaW8DqUO9RE
- qTf9mqMb0q0n209XGORQuD8Hqef0lRXPfrgXnahfQieJhbXJXjnWFqejkObHrMI+FSFD
- QuDxVU162x4zptgMjKrgNbFvTH4A+xIHtvLDjrCcKsYtWOdeZ+YKXtL2ytWN4SYpc1gC
- nsdw==
-X-Gm-Message-State: APjAAAXtnd+t5hnperiL9htMB4nhdu/cxonVSdT8vCFSshQ2tUBesXhD
- b/jZLzMwWgoL857+aQzPhyo=
-X-Google-Smtp-Source: APXvYqzqJGhF3OWpPSeJBTojUttgXbH4VXymhLmS8Ad3+dmUNyuhjPT2iweDPV8n33fEjuC8F6+rjQ==
-X-Received: by 2002:a17:90a:a612:: with SMTP id
- c18mr5725937pjq.49.1574762991777; 
- Tue, 26 Nov 2019 02:09:51 -0800 (PST)
+ bh=2bAHX0FXOgqRwz29p5ya1CXvQIHb2CLin8kXdVB/0KE=;
+ b=WJMSp3WnIiicw0kmXEAUL0jiCFFeWfLrISiy53+4QcJQFtDce7Wul9pDKJzZum6SzW
+ 94vtSk0y8+Xo1ZoMeCRx1K1G1OW7fjExw+vj4uWe6u3vL7KWTNX0PwdLv2qxnmgXvW+4
+ xCjfN8gfvg4kM6lBdFy4HvmRMwg/ygKBuiFnegPT92gk7kYCfjfpu6Kz0OF/g9lJIFwj
+ 070roNI/YUMpO3cpIxZKRYf4EhpSwwfW+uw59VlIWP70Q8OISIIAEvs7/S/knoHyQ2af
+ YTaJ9vlBlUUC73SL9YIQgRME2gWEdh2P0hKCYh8nmsOWj/s3s/TgCaruhJdnw9Rk7A8R
+ B/Iw==
+X-Gm-Message-State: APjAAAXJQ04sYb3VJzhaHCyGqEpuM3yTJsP52P/70nnXaiFmLvnX/yWD
+ i7J6J3E498GmVDpI+rgTOpQ=
+X-Google-Smtp-Source: APXvYqyvpP2N7hYAzxx2bd4M9VJ+Jp8Kjxs/E28fT/8KVvvGyoey0uyI2syTr1ITSFDcJg6CMebg+A==
+X-Received: by 2002:a17:902:7290:: with SMTP id
+ d16mr32584601pll.340.1574762933671; 
+ Tue, 26 Nov 2019 02:08:53 -0800 (PST)
 Received: from localhost.localdomain ([222.151.198.97])
- by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.09.48
+ by smtp.gmail.com with ESMTPSA id s24sm11848485pfh.108.2019.11.26.02.08.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 26 Nov 2019 02:09:51 -0800 (PST)
+ Tue, 26 Nov 2019 02:08:53 -0800 (PST)
 From: Prashant Bhole <prashantbhole.linux@gmail.com>
 To: "David S . Miller" <davem@davemloft.net>,
  "Michael S . Tsirkin" <mst@redhat.com>
-Subject: [RFC net-next 18/18] virtio_net: restrict bpf helper calls from
- offloaded program
-Date: Tue, 26 Nov 2019 19:07:44 +0900
-Message-Id: <20191126100744.5083-19-prashantbhole.linux@gmail.com>
+Subject: [RFC net-next 03/18] net: core: export do_xdp_generic_core()
+Date: Tue, 26 Nov 2019 19:07:29 +0900
+Message-Id: <20191126100744.5083-4-prashantbhole.linux@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
 References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
@@ -84,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1043
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,72 +108,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since we are offloading this program to the host, some of the helper
-calls will not make sense. For example get_numa_node_id. Some helpers
-can not be used because we don't handle them yet.
+From: Jason Wang <jasowang@redhat.com>
 
-So let's allow a small set of helper calls for now.
+Let's export do_xdp_generic as a general purpose function. It will
+just run XDP program on skb but will not handle XDP actions.
 
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
 ---
- drivers/net/virtio_net.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ include/linux/netdevice.h | 2 ++
+ net/core/dev.c            | 6 +++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 91a94b787c64..ab5be6b95bbd 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2549,6 +2549,25 @@ static struct virtnet_bpf_map *virtnet_get_bpf_map(struct virtnet_info *vi,
- 	return NULL;
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 9e6fb8524d91..2b6317ac9795 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -3648,6 +3648,8 @@ static inline void dev_consume_skb_any(struct sk_buff *skb)
+ 
+ void generic_xdp_tx(struct sk_buff *skb, struct bpf_prog *xdp_prog);
+ int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff *skb);
++u32 do_xdp_generic_core(struct sk_buff *skb, struct xdp_buff *xdp,
++			struct bpf_prog *xdp_prog);
+ int netif_rx(struct sk_buff *skb);
+ int netif_rx_ni(struct sk_buff *skb);
+ int netif_receive_skb(struct sk_buff *skb);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 5ae647b9914f..d97c3f35e047 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4461,9 +4461,8 @@ static struct netdev_rx_queue *netif_get_rxqueue(struct sk_buff *skb)
+ 	return rxqueue;
  }
  
-+static int virtnet_bpf_check_helper_call(struct bpf_insn *insn)
-+{
-+	switch (insn->imm) {
-+	case BPF_FUNC_map_lookup_elem:
-+	case BPF_FUNC_map_update_elem:
-+	case BPF_FUNC_map_delete_elem:
-+	case BPF_FUNC_ktime_get_ns:
-+	case BPF_FUNC_get_prandom_u32:
-+	case BPF_FUNC_csum_update:
-+	case BPF_FUNC_xdp_adjust_head:
-+	case BPF_FUNC_xdp_adjust_meta:
-+	case BPF_FUNC_xdp_adjust_tail:
-+	case BPF_FUNC_strtol:
-+	case BPF_FUNC_strtoul:
-+		return 0;
-+	}
-+	return -EOPNOTSUPP;
-+}
-+
- static int virtnet_bpf_verify_insn(struct bpf_verifier_env *env, int insn_idx,
- 				   int prev_insn)
+-static u32 do_xdp_generic_core(struct sk_buff *skb,
+-			       struct xdp_buff *xdp,
+-			       struct bpf_prog *xdp_prog)
++u32 do_xdp_generic_core(struct sk_buff *skb, struct xdp_buff *xdp,
++			struct bpf_prog *xdp_prog)
  {
-@@ -2830,6 +2849,7 @@ static int virtnet_bpf_verifier_setup(struct bpf_prog *prog)
- 	struct virtnet_bpf_bound_prog *state;
- 	struct virtnet_bpf_map *virtnet_map;
- 	struct bpf_map *map;
-+	u8 opcode, class;
- 	struct fd mapfd;
- 	int i, err = 0;
+ 	struct netdev_rx_queue *rxqueue;
+ 	void *orig_data, *orig_data_end;
+@@ -4574,6 +4573,7 @@ static u32 do_xdp_generic_core(struct sk_buff *skb,
  
-@@ -2846,6 +2866,16 @@ static int virtnet_bpf_verifier_setup(struct bpf_prog *prog)
- 	for (i = 0; i < state->len; i++) {
- 		struct bpf_insn *insn = &state->insnsi[i];
+ 	return act;
+ }
++EXPORT_SYMBOL_GPL(do_xdp_generic_core);
  
-+		opcode = BPF_OP(insn->code);
-+		class = BPF_CLASS(insn->code);
-+
-+		if ((class == BPF_JMP || class == BPF_JMP32) &&
-+		    opcode == BPF_CALL && insn->src_reg != BPF_PSEUDO_CALL) {
-+			if (virtnet_bpf_check_helper_call(insn))
-+				return -EOPNOTSUPP;
-+			continue;
-+		}
-+
- 		if (insn->code != (BPF_LD | BPF_IMM | BPF_DW))
- 			continue;
- 
+ /* When doing generic XDP we have to bypass the qdisc layer and the
+  * network taps in order to match in-driver-XDP behavior.
 -- 
 2.20.1
 
