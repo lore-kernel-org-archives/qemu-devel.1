@@ -2,84 +2,51 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 659F3C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC194C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 320AF206E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:31:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bxsw3/A5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 320AF206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9339C2080F
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:32:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9339C2080F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia32Z-0001Wz-60
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:31:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40797)
+	id 1ia33C-0001ul-Nv
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:32:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41015)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ia30M-0000Pf-4I
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:29:39 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia30i-0000ea-LH
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:30:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ia30L-0002pr-66
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:29:38 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37391)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ia30J-0002mF-6a
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:29:35 -0500
-Received: by mail-oi1-x242.google.com with SMTP id 128so13080283oih.4
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 11:29:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cVkrzkWqcgEKI0CFuGe2OQcbBZV1wgSoD4taVQijJDE=;
- b=Bxsw3/A58XuWAVAc3xrs/gVggRdq/1cF3b82dQqwUJjpFjZnO1jqndFK6rWCt/+JCB
- fZ4wFXhLUcuIXwTX2cKuY+k1g5V3P99qzTGU5nLxHRw2Nc0ve+KFvMuNQk7QrBZvIFJu
- uhwS0e7wTT5PsWw1pSYRsDUNBjeh8vemBhiQdhlta6r/MZWWYs5ODgSuEC/3SOcDLOHf
- C/ZaFmZh3RoNThK2H9aj9i8Jtqf6rqKVOoD95X6k7sM3Xj3LwBJRJH2vTMK3C8RsLpwG
- Kbd0lWO8nvyQrCKra4S3VHVbKBk9+beXDZLxOpOyzkPN8MIWs41Ps9MDt82Zc7Bj41r6
- aRtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=cVkrzkWqcgEKI0CFuGe2OQcbBZV1wgSoD4taVQijJDE=;
- b=JO0tqyxBqBXnIdKUYNr1kgzmSTmN69D2bx7I8zuUffOXOZJRsVvxE+hWXF1i76Ksw7
- KFwqf+hGhc8Sxz9R3dryQUFGkya2Y7LHf2LYAGBm+0FH/SAE+Yv6c6h24BYXZI7ieu54
- KVRh2m/TFvcq7a0uCMtUWiIzY4LMhTfZtBLAdMm5DVR3RXl0YYTI+DEaGdkpx1EZ4ctJ
- SLloTd6MXtn5bXyPW3iRj5XVe/dy/QHVcKnbDD3eOnNvK/mW4hel3Bjog4W6J6sXMtSa
- ZSlwsmq4KhRkfvIqJaORoESQHbP2RykTEDwYGEVujjm+KKSjyyLi6+DlcNvCoGqGrfnW
- LZww==
-X-Gm-Message-State: APjAAAVe3TRX0yrnvPesc1zaxfAUxKiohwmMHXUtYHM2TumGvY5ZRJcJ
- MoA/q/nMN+HBUJPSK35xoVQ+jiht7S3jOdP48RY=
-X-Google-Smtp-Source: APXvYqwtKlOU4PcuYyfWNEqk2hVFPKnS8lgxTmJDRwwv4gsLaA/QoESwoalYGhGc3Oa+dZZHgJJkgrQJz58ZVtkx+2U=
-X-Received: by 2002:aca:d17:: with SMTP id 23mr5576657oin.136.1574882973057;
- Wed, 27 Nov 2019 11:29:33 -0800 (PST)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia30f-0003Jd-V5
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:30:00 -0500
+Received: from relay.sw.ru ([185.231.240.75]:54638)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ia30f-0003Eq-MC
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:29:57 -0500
+Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ia30W-0004MZ-Vm; Wed, 27 Nov 2019 22:29:49 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6] qga: rename Error ** parameter to more common errp
+Date: Wed, 27 Nov 2019 22:29:48 +0300
+Message-Id: <20191127192948.22266-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20191124050225.30351-1-mrolnik@gmail.com>
- <20191124050225.30351-12-mrolnik@gmail.com>
- <81b62c00-243e-b76e-f52c-4f681b47b727@redhat.com>
- <CAL1e-=i6tctJ6bKo7mz2fmSzPXpdMY1kV1WrKhL5TCAKd0DkcQ@mail.gmail.com>
- <CAK4993hKFzOStiG=A4jybEXQWcdXYZMF-+gF_SHq+7vsB_P03g@mail.gmail.com>
-In-Reply-To: <CAK4993hKFzOStiG=A4jybEXQWcdXYZMF-+gF_SHq+7vsB_P03g@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 27 Nov 2019 20:29:22 +0100
-Message-ID: <CAL1e-=jfpkf5_KaG0YOBHP_SGA+7-q8ZZWpxaqfNHfQJoGdLKA@mail.gmail.com>
-Subject: Re: [PATCH v36 11/17] target/avr: Add limited support for USART and
- 16 bit timer peripherals
-To: Michael Rolnik <mrolnik@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,20 +58,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: vsementsov@virtuozzo.com, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 27, 2019 at 7:48 PM Michael Rolnik <mrolnik@gmail.com> wrote:
->
-> too late :)
->
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ qga/commands-posix.c |  2 +-
+ qga/commands-win32.c |  2 +-
+ qga/commands.c       | 12 ++++++------
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-There will be opportunities in future versions. Whaaat, did you really
-think you would get away with only 37 versions? ;-)
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 1c1a165dae..3bd7b54c08 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -2781,7 +2781,7 @@ static double ga_get_login_time(struct utmpx *user_info)
+     return seconds + useconds;
+ }
+ 
+-GuestUserList *qmp_guest_get_users(Error **err)
++GuestUserList *qmp_guest_get_users(Error **errp)
+ {
+     GHashTable *cache = NULL;
+     GuestUserList *head = NULL, *cur_item = NULL;
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 55ba5b263a..2461fd19bf 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -1946,7 +1946,7 @@ typedef struct _GA_WTSINFOA {
+ 
+ } GA_WTSINFOA;
+ 
+-GuestUserList *qmp_guest_get_users(Error **err)
++GuestUserList *qmp_guest_get_users(Error **errp)
+ {
+ #define QGA_NANOSECONDS 10000000
+ 
+diff --git a/qga/commands.c b/qga/commands.c
+index 0c7d1385c2..43c323cead 100644
+--- a/qga/commands.c
++++ b/qga/commands.c
+@@ -143,7 +143,7 @@ static GuestExecInfo *guest_exec_info_find(int64_t pid_numeric)
+     return NULL;
+ }
+ 
+-GuestExecStatus *qmp_guest_exec_status(int64_t pid, Error **err)
++GuestExecStatus *qmp_guest_exec_status(int64_t pid, Error **errp)
+ {
+     GuestExecInfo *gei;
+     GuestExecStatus *ges;
+@@ -152,7 +152,7 @@ GuestExecStatus *qmp_guest_exec_status(int64_t pid, Error **err)
+ 
+     gei = guest_exec_info_find(pid);
+     if (gei == NULL) {
+-        error_setg(err, QERR_INVALID_PARAMETER, "pid");
++        error_setg(errp, QERR_INVALID_PARAMETER, "pid");
+         return NULL;
+     }
+ 
+@@ -385,7 +385,7 @@ GuestExec *qmp_guest_exec(const char *path,
+                        bool has_env, strList *env,
+                        bool has_input_data, const char *input_data,
+                        bool has_capture_output, bool capture_output,
+-                       Error **err)
++                       Error **errp)
+ {
+     GPid pid;
+     GuestExec *ge = NULL;
+@@ -405,7 +405,7 @@ GuestExec *qmp_guest_exec(const char *path,
+     arglist.next = has_arg ? arg : NULL;
+ 
+     if (has_input_data) {
+-        input = qbase64_decode(input_data, -1, &ninput, err);
++        input = qbase64_decode(input_data, -1, &ninput, errp);
+         if (!input) {
+             return NULL;
+         }
+@@ -424,7 +424,7 @@ GuestExec *qmp_guest_exec(const char *path,
+             guest_exec_task_setup, NULL, &pid, has_input_data ? &in_fd : NULL,
+             has_output ? &out_fd : NULL, has_output ? &err_fd : NULL, &gerr);
+     if (!ret) {
+-        error_setg(err, QERR_QGA_COMMAND_FAILED, gerr->message);
++        error_setg(errp, QERR_QGA_COMMAND_FAILED, gerr->message);
+         g_error_free(gerr);
+         goto done;
+     }
+@@ -499,7 +499,7 @@ int ga_parse_whence(GuestFileWhence *whence, Error **errp)
+     return -1;
+ }
+ 
+-GuestHostName *qmp_guest_get_host_name(Error **err)
++GuestHostName *qmp_guest_get_host_name(Error **errp)
+ {
+     GuestHostName *result = NULL;
+     gchar const *hostname = g_get_host_name();
+-- 
+2.21.0
+
 
