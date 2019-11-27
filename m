@@ -2,83 +2,69 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13EEAC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:31:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8540AC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:40:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEEE92071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:31:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OcgkqkJg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEEE92071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 59F872068E
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:40:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59F872068E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=asm.pp.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZwTV-0005RV-Un
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 07:31:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54985)
+	id 1iZwcY-0000jR-Fx
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 07:40:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZwRF-0004O9-JF
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:28:58 -0500
+ (envelope-from <bsdasm@gmail.com>) id 1iZwbJ-00008N-3b
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:39:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZwRE-000610-9h
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:28:57 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44779)
+ (envelope-from <bsdasm@gmail.com>) id 1iZwbG-00069D-I8
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:39:20 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:45747)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iZwRE-00060e-1y
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:28:56 -0500
-Received: by mail-ot1-x343.google.com with SMTP id c19so18931766otr.11
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 04:28:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=vaa9bfJGQyeUNU4uvVkA9ieAU9FUB0cecVok8R/wDAA=;
- b=OcgkqkJgRoeug1bK75cjZSSASXSCP7/1BNAEGzTP+Vy8jzqoeryLvdfRdTU+BxdWw6
- qtg9MWuqE5ZJN5vkQUo8KrzG1PkaQWq+zgU2cnTcV3j98T9r64JgCC28v59BGZpE2ehA
- dHsyUIpUdvGLVb67vWLZOyyrwGYi6Rp6ilOyW04xlLTZW2nXx9VRXDl/Hf8D/kGn5UFY
- yZEAGcUFJiNHg/DFYPJ442Qw1fAVqBZrd2PhSxHkOVEDLBYKXu08SRJ/JEg7qZPQ+0oi
- FuWWVxHH1lsXHnlojhHleavHGxhXag0bxCwj+BYf4AmGze2pLiiWOtwlkxyzKORdTLm9
- MxSA==
+ (Exim 4.71) (envelope-from <bsdasm@gmail.com>) id 1iZwbG-000600-Bj
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:39:18 -0500
+Received: by mail-ot1-f67.google.com with SMTP id r24so18942895otk.12
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 04:39:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=vaa9bfJGQyeUNU4uvVkA9ieAU9FUB0cecVok8R/wDAA=;
- b=BVYrf8iK2MBu2s9xCvwsq/I/6QQRBwvQwYtfFuJ+xo6C4HfDmoiHV9JPe3HuMlFq1/
- N1U7o9XsUUdy3PJ13e4QVGhxV2BkwHHcSu3WLG+ug8z2AUernmzpiVU80g9cvhj6vdX6
- gONpoC5hyoaWuSD2/FBekmunjPF3MhfPZiuNi1kfn29Xy5O/z2UyoFi1ZOn/mrA2wyHW
- 5u93qeKbCyYZhNywRt9dnWVgKMzNEyWyxP33BAowKc50VOi2Q1/dn5vWrmRgcXb3rWZ5
- n1EHYGF6Y0xVJbM0O/5WkBn+uyL9CZnBXu6DSbwDO3SWcqjOD7Dovzfy3jW2adeSW9vE
- B3+g==
-X-Gm-Message-State: APjAAAVEN899SYtui3ICZcwjvU89wicZ97PqXNIWr90aB4uvJU62mVf8
- VqH1XiUhkH0M2CI+Q4/k1zv/gJ53arxtHDcB540=
-X-Google-Smtp-Source: APXvYqzSe01s9cRzAHUQwisot8WPsJs3GR/1f1aTq/x+B+cEkK0YqGQntTcabUIuCfIw4vuY2ZmUBKfV7jn1NevSyAk=
-X-Received: by 2002:a05:6830:81:: with SMTP id a1mr3298104oto.64.1574857734765; 
- Wed, 27 Nov 2019 04:28:54 -0800 (PST)
+ bh=tH54vR3iTV4YMr4MtDHBodme86IwJmzB+hLkR7d7X6I=;
+ b=cLM6GJm4XjPiAOUPVHCNBSvfyMhAbnjr66imvhZzEyAu2O+fN9mfXwieEpcAXkY/Ig
+ s1CjOyrTZeChDws2HE+OB4ZFSdULEYpqK3GaZWzHLf3cOo6gIiY7tboOBCHtBEtqqPeB
+ zC85kemmHLYj0CssVx9qYfemfia2SQwt4MUY6UjwVVmxY/7wofFK4g8A0654rxlL8sX2
+ qu74GIl48JczaIrbVTwbTrQSKxw66lo6+CwXeoqPadz+60XlrNTvF7MmRy6yQU3T+EcR
+ OF7lYkI/u8XSvmHKRx1hmjEOvhadS5rfpvoqpuovLO/MWVVFMsX8W1ZzhE0mGdmStGa1
+ cc8g==
+X-Gm-Message-State: APjAAAVByapQDfQ1nvSFn4ypL/T5fxoWjt6fQ4HL3eFgQLcqeeJFh7G9
+ /PWenXdMgs7ECHb2XLl6OnmwWAbVlphF67ucxTo=
+X-Google-Smtp-Source: APXvYqxJ65XyRJymNv+BSZbnfVvjA4OPHDnz2yISHeIDN4OQbWcyEIVx2zuuQAm3zyXWqNceujq8tJ+4c2ocXFPG2Uk=
+X-Received: by 2002:a05:6830:1512:: with SMTP id
+ k18mr3375804otp.123.1574858354965; 
+ Wed, 27 Nov 2019 04:39:14 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Wed, 27 Nov 2019 04:28:54
- -0800 (PST)
-In-Reply-To: <20191120152442.26657-20-marcandre.lureau@redhat.com>
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <20191120152442.26657-20-marcandre.lureau@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 27 Nov 2019 13:28:54 +0100
-Message-ID: <CAL1e-=j1eWx47fiVWKSTQ-bwn95Bw0tnDpiA8cke7WDMnjL_dw@mail.gmail.com>
-Subject: Re: [PATCH v4 19/37] mips: use sysbus_add_io()
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000da3ed0059853236b"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+References: <CAMmAVbWzrYWZBXwKxSd-f5SXmq6qP1ok8abvyKJhp3=REEaMPA@mail.gmail.com>
+ <CAMmAVbXNMjk=FasuySEcUa0U8CqGkCghehsJsWbVV2VHCAPA-w@mail.gmail.com>
+ <20191121140502.GX439743@stefanha-x1.localdomain>
+In-Reply-To: <20191121140502.GX439743@stefanha-x1.localdomain>
+From: ASM <asm@asm.pp.ru>
+Date: Wed, 27 Nov 2019 15:39:03 +0300
+Message-ID: <CAMmAVbW5a+v_dJ6NM3erwouOqpXyTzL36_W566SL1KuPFPFSEw@mail.gmail.com>
+Subject: Re: PCI memory sync question (kvm,dpdk,e1000,packet stalled)
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.210.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,105 +76,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, dmitry.fleytman@gmail.com,
+ qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000da3ed0059853236b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Stefan, thanks for answering.
 
-On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau <
-marcandre.lureau@redhat.com> wrote:
+When the packet is received, e1000 writes it to memory directrly
+without any RCU.
+The address of memory for writing is set by the driver from dpdk driver.
+Driver writes to RDBA (RDBAH,RDBAL) base address of ring.
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/mips/mips_mipssim.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+It turns out that MMIO RCU (mentioned from e1000_mmio_setup) does not
+protect, and can't protect the ring descriptors.
+The area for protection may be any area of operational memory. And it
+becomes famous when writing to registers RDBA by driver.
+(see datasheet 82574 GbE Controller "7.1.8 Receive Descriptor Queue Structure")
+
+How can this memory be protected? As I understand it, the e1000 should
+track the record in RDBA and enable memory protection in this region.
+But how to do it right?
+
+Source code qemu:
+hw/net/e1000.c:954 (version master)
+
+ 954         base = rx_desc_base(s) + sizeof(desc) * s->mac_reg[RDH];
+where rx_desc_base -- address RDBAH regs. It address no have RCU protect.
+...
+955         pci_dma_read(d, base, &desc, sizeof(desc));
+...
+957         desc.status |= (vlan_status | E1000_RXD_STAT_DD);
+...
+990         pci_dma_write(d, base, &desc, sizeof(desc));
+->
+exec.c:
+3111 static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
+3112                                            MemTxAttrs attrs,
+3113                                            const uint8_t *buf,
+3114                                            hwaddr len, hwaddr addr1,
+3115                                            hwaddr l, MemoryRegion *mr)
+3116 {
+...
+3123         if (!memory_access_is_direct(mr, true)) {
+(false)
+3131         } else {
+3132             /* RAM case */
+3133             ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
+3134             memcpy(ptr, buf, l);
+
+where I be seeing weird behavior with KVM due to MMIO write coalescing
+
+3135             invalidate_and_set_dirty(mr, addr1, l);
+3136         }
+3137
+
+Source code dpdk(e1000): (version dpdk-stable-17.11.9)
+drivers/net/e1000/em_rxtx.c:
+
+699 uint16_t
+700 eth_em_recv_pkts(void *rx_queue, struct rte_mbuf **rx_pkts,
+701                 uint16_t nb_pkts)
+...
+718         rxq = rx_queue
+...
+722         rx_id = rxq->rx_tail;
+723         rx_ring = rxq->rx_ring
+...
+734                 rxdp = &rx_ring[rx_id];
+735                 status = rxdp->status;
+736                 if (! (status & E1000_RXD_STAT_DD))
+737                         break;
+...
+807                 rxdp->buffer_addr = dma_addr;
+808                 rxdp->status = 0;
+where I be seeing weird behavior with KVM due to MMIO write
+coalescing
+
+
+P.S.
+> Also, is DPDK accessing the e1000 device from more than 1 vCPU?
+ All tests on single virtual CPU.
+
+I created github project for quick reproduction of this error:
+https://github.com/BASM/qemu_dpdk_e1000_test
+
+---
+Best regards,
+Leonid Myravjev
+
+On Thu, 21 Nov 2019 at 17:05, Stefan Hajnoczi <stefanha@gmail.com> wrote:
 >
+> On Wed, Nov 20, 2019 at 08:36:32PM +0300, ASM wrote:
+> > I trying solve the problem, with packets stopping (e1000,tap,kvm).
+> > My studies led to the following:
+> > 1. From flatview_write_continue() I see, what e1000 writes the number
+> > "7" to the STAT register.
+> > 2. The driver from target OS reads STAT register with number "7" and
+> > writes to the register the number "0".
+> > 3. From flatview_write_continue() (I make edits):
+> >             memcpy(ptr, buf, l);
+> >             new1=ptr[0xc];
+> >             usleep(100);
+> >             new2=ptr[0xc];
+> >             invalidate_and_set_dirty(mr, addr1, l);
+> >             new3=ptr[0xc];
+> > printf("Old: %i, new1, %i, new2: %i, new3: %i\n", old,new1,new2,new3);
+> >
+> > I see what memory in first printf is "7", but after usleep() is "0".
+> > Do I understand correctly that this should not be? Or RCU lock
+> > suggests the ability to the multiple writers?
+> >
+> > The problem is that qemu(e1000) writes the number 7, after which
+> > target(dpdk driver) reads 7, on the basis of this it writes the number
+> > 0, but as a result (extremely rarely), the value STATUS still remains
+> > 7. Therefore, packet processing is interrupted. This behavior is
+> > observed only on kvm (it is not observed on tcg).
+> >
+> > Please help with advice or ideas.
 >
-I agree with the change, and with overall series in general, but please add
-at least a sentence in the commit message here, explaining what is achieved
-by the change.
-
-With that sentence, certainly:
-
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-
-> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-> index 3cd0e6eb33..2c2c7f25b2 100644
-> --- a/hw/mips/mips_mipssim.c
-> +++ b/hw/mips/mips_mipssim.c
-> @@ -227,8 +227,7 @@ mips_mipssim_init(MachineState *machine)
->          qdev_set_legacy_instance_id(dev, 0x3f8, 2);
->          qdev_init_nofail(dev);
->          sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
-> -        memory_region_add_subregion(get_system_io(), 0x3f8,
-> -                                    &SERIAL_IO(dev)->serial.io);
-> +        sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8, &SERIAL_IO(dev)->
-> serial.io);
->      }
+> Hi Leonid,
+> Could you be seeing weird behavior with KVM due to MMIO write
+> coalescing?
 >
->      if (nd_table[0].used)
-> --
-> 2.24.0
+>   static void e1000_mmio_setup(E1000State *d)
+>   {
+>       int i;
+>       const uint32_t excluded_regs[] = {
+>           E1000_MDIC, E1000_ICR, E1000_ICS, E1000_IMS,
+>           E1000_IMC, E1000_TCTL, E1000_TDT, PNPMMIO_SIZE
+>       };
 >
+>       memory_region_init_io(&d->mmio, OBJECT(d), &e1000_mmio_ops, d,
+>                             "e1000-mmio", PNPMMIO_SIZE);
+>       memory_region_add_coalescing(&d->mmio, 0, excluded_regs[0]);
+>       for (i = 0; excluded_regs[i] != PNPMMIO_SIZE; i++)
+>           memory_region_add_coalescing(&d->mmio, excluded_regs[i] + 4,
+>                                        excluded_regs[i+1] - excluded_regs[i] - 4);
+>       memory_region_init_io(&d->io, OBJECT(d), &e1000_io_ops, d, "e1000-io", IOPORT_SIZE);
+>   }
 >
+> MMIO write coalescing means that QEMU doesn't see the register writes
+> immediately.  Instead kvm.ko records them into a ring buffer and QEMU
+> processes the ring when the next ioctl(KVM_RUN) exit occurs.
 >
-
---000000000000da3ed0059853236b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau &lt;<a href=
-=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;=
- wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bor=
-der-left:1px #ccc solid;padding-left:1ex">Signed-off-by: Marc-Andr=C3=A9 Lu=
-reau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@re=
-dhat.com</a>&gt;<br>
----<br>
-=C2=A0hw/mips/mips_mipssim.c | 3 +--<br>
-=C2=A01 file changed, 1 insertion(+), 2 deletions(-)<br>
-<br></blockquote><div><br></div><div>I agree with the change, and with over=
-all series in general, but please add at least a sentence in the commit mes=
-sage here, explaining what is achieved by the change.</div><div><br></div><=
-div>With that sentence, certainly:</div><div><br></div><div>Reviewed-by: Al=
-eksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com">amarkovic@w=
-avecomp.com</a>&gt;<br></div><div>=C2=A0</div><blockquote class=3D"gmail_qu=
-ote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex=
-">
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c<br>
-index 3cd0e6eb33..2c2c7f25b2 100644<br>
---- a/hw/mips/mips_mipssim.c<br>
-+++ b/hw/mips/mips_mipssim.c<br>
-@@ -227,8 +227,7 @@ mips_mipssim_init(MachineState *machine)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_set_legacy_instance_id(<wbr>dev, 0x3=
-f8, 2);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_init_nofail(dev);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0sysbus_connect_irq(SYS_BUS_<wbr>DEVICE(de=
-v), 0, env-&gt;irq[4]);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 memory_region_add_subregion(<wbr>get_system_io=
-(), 0x3f8,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;SERIAL_IO(dev)-&g=
-t;<a href=3D"http://serial.io" target=3D"_blank">serial.io</a>);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 sysbus_add_io(SYS_BUS_DEVICE(<wbr>dev), 0x3f8,=
- &amp;SERIAL_IO(dev)-&gt;<a href=3D"http://serial.io" target=3D"_blank">ser=
-ial.io</a>);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0if (nd_table[0].used)<br>
--- <br>
-2.24.0<br>
-<br>
-<br>
-</blockquote>
-
---000000000000da3ed0059853236b--
+> See Linux Documentation/virt/kvm/api.txt "4.116
+> KVM_(UN)REGISTER_COALESCED_MMIO" for more details.
+>
+> I don't really understand your printf debugging explanation.  It would
+> help to see the DPDK code and the exact printf() output.
+>
+> Also, is DPDK accessing the e1000 device from more than 1 vCPU?
+>
+> Stefan
 
