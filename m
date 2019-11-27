@@ -2,60 +2,127 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A47C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 17:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA79C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 17:47:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABE12206E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 17:21:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABE12206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57DE120835
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 17:47:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TDb36/SK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57DE120835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia0zu-0004DR-SK
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 12:21:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37966)
+	id 1ia1Ph-0006cH-CT
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 12:47:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44684)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.kiszka@siemens.com>) id 1ia0ym-0003SZ-2A
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:19:53 -0500
+ (envelope-from <david@redhat.com>) id 1ia1O4-0005oI-EF
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:46:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@siemens.com>) id 1ia0yj-0007pB-Hz
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:19:51 -0500
-Received: from gecko.sbs.de ([194.138.37.40]:48773)
+ (envelope-from <david@redhat.com>) id 1ia1O2-0005k4-9F
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:45:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43443
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
- id 1ia0yg-0007l4-NT
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:19:47 -0500
-Received: from mail1.sbs.de (mail1.sbs.de [192.129.41.35])
- by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id xARHJajl008247
- (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 27 Nov 2019 18:19:37 +0100
-Received: from [139.25.68.37] ([139.25.68.37])
- by mail1.sbs.de (8.15.2/8.15.2) with ESMTP id xARHJa7L001485;
- Wed, 27 Nov 2019 18:19:36 +0100
-Subject: Re: [RFC][PATCH 0/3] IVSHMEM version 2 device for QEMU
-To: Liang Yan <LYan@suse.com>, qemu-devel <qemu-devel@nongnu.org>
-References: <cover.1573477032.git.jan.kiszka@siemens.com>
- <efd5fa87-90de-fccc-97a5-a4fc71a050c8@suse.com>
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <fb213f9e-8bd8-6c33-7a6e-47dda982903d@siemens.com>
-Date: Wed, 27 Nov 2019 18:19:36 +0100
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1ia1O1-0005hh-Ue
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:45:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574876756;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=1GMYdCCzSqR8weemLdBvAMUW5vy5LM8mliGB9EQ5c7c=;
+ b=TDb36/SKV3epZT2nOzWY+Inx4QUM0uS3m0BhbNjHMmdJeamoJfQ1FJlw3OmIhazIoJlqfK
+ hGgNTKUc8GDwtlPuVhOdcU0faH3a6tF7sA2z/Oe0Hz8HYGAsluvpv3seFQgsxvzVW9OCtY
+ pwv5YXvOIyA2orm/OC6dVdmkIN6TMZg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-300-L6Z1l4SNMjmbnCUS3vOVqg-1; Wed, 27 Nov 2019 12:45:53 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1982580183D;
+ Wed, 27 Nov 2019 17:45:52 +0000 (UTC)
+Received: from [10.36.116.69] (ovpn-116-69.ams2.redhat.com [10.36.116.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 26D1F1001281;
+ Wed, 27 Nov 2019 17:45:49 +0000 (UTC)
+Subject: Re: [PATCH v3 2/5] s390x: Move reset normal to shared reset handler
+To: Cornelia Huck <cohuck@redhat.com>, Janosch Frank <frankja@linux.ibm.com>
+References: <20191125090348.27010-1-frankja@linux.ibm.com>
+ <20191125090348.27010-3-frankja@linux.ibm.com>
+ <20191125141926.427c30e6.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <e47ebb75-9c5b-98f9-bc83-640829e02bb1@redhat.com>
+Date: Wed, 27 Nov 2019 18:45:49 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <efd5fa87-90de-fccc-97a5-a4fc71a050c8@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191125141926.427c30e6.cohuck@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: L6Z1l4SNMjmbnCUS3vOVqg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 194.138.37.40
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,111 +134,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jailhouse <jailhouse-dev@googlegroups.com>,
- Claudio Fontana <claudio.fontana@gmail.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, qemu-devel@nongnu.org,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Liang,
-
-On 27.11.19 16:28, Liang Yan wrote:
+On 25.11.19 14:19, Cornelia Huck wrote:
+> On Mon, 25 Nov 2019 04:03:45 -0500
+> Janosch Frank <frankja@linux.ibm.com> wrote:
 > 
+>> Let's start moving the cpu reset functions into a single function with
+>> a switch/case, so we can use fallthroughs and share more code between
+>> resets.
+>>
+>> This patch introduces the reset function by renaming cpu_reset() and
+>> cleaning up leftovers.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Reviewed-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/cpu-qom.h |  6 +++++-
+>>  target/s390x/cpu.c     | 16 ++++++++++------
+>>  target/s390x/cpu.h     |  2 +-
+>>  target/s390x/sigp.c    |  2 +-
+>>  4 files changed, 17 insertions(+), 9 deletions(-)
+>>
 > 
-> On 11/11/19 7:57 AM, Jan Kiszka wrote:
->> To get the ball rolling after my presentation of the topic at KVM Forum
->> [1] and many fruitful discussions around it, this is a first concrete
->> code series. As discussed, I'm starting with the IVSHMEM implementation
->> of a QEMU device and server. It's RFC because, besides specification and
->> implementation details, there will still be some decisions needed about
->> how to integrate the new version best into the existing code bases.
->>
->> If you want to play with this, the basic setup of the shared memory
->> device is described in patch 1 and 3. UIO driver and also the
->> virtio-ivshmem prototype can be found at
->>
->>      http://git.kiszka.org/?p=linux.git;a=shortlog;h=refs/heads/queues/ivshmem2
->>
->> Accessing the device via UIO is trivial enough. If you want to use it
->> for virtio, this is additionally to the description in patch 3 needed on
->> the virtio console backend side:
->>
->>      modprobe uio_ivshmem
->>      echo "1af4 1110 1af4 1100 ffc003 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
->>      linux/tools/virtio/virtio-ivshmem-console /dev/uio0
->>
->> And for virtio block:
->>
->>      echo "1af4 1110 1af4 1100 ffc002 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
->>      linux/tools/virtio/virtio-ivshmem-console /dev/uio0 /path/to/disk.img
->>
->> After that, you can start the QEMU frontend instance with the
->> virtio-ivshmem driver installed which can use the new /dev/hvc* or
->> /dev/vda* as usual.
->>
->> Any feedback welcome!
+>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+>> index 3abe7e80fd..8d35a2a723 100644
+>> --- a/target/s390x/cpu.c
+>> +++ b/target/s390x/cpu.c
+>> @@ -82,18 +82,22 @@ static void s390_cpu_load_normal(CPUState *s)
+>>  }
+>>  #endif
+>>  
+>> -/* S390CPUClass::cpu_reset() */
+>> -static void s390_cpu_reset(CPUState *s)
+>> +/* S390CPUClass::reset() */
+>> +static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
+>>  {
+>>      S390CPU *cpu = S390_CPU(s);
+>>      S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
+>>      CPUS390XState *env = &cpu->env;
+>>  
+>> -    env->pfault_token = -1UL;
+>> -    env->bpbc = false;
+>>      scc->parent_reset(s);
+>>      cpu->env.sigp_order = 0;
+>>      s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+>> +
+>> +    switch (type) {
+>> +    case S390_CPU_RESET_NORMAL:
+>> +        env->pfault_token = -1UL;
+>> +        env->bpbc = false;
 > 
-> Hi, Jan,
-> 
-> I have been playing your code for last few weeks, mostly study and test,
-> of course. Really nice work. I have a few questions here:
-> 
-> First, qemu part looks good, I tried test between couple VMs, and device
-> could pop up correctly for all of them, but I had some problems when
-> trying load driver. For example, if set up two VMs, vm1 and vm2, start
-> ivshmem server as you suggested. vm1 could load uio_ivshmem and
-> virtio_ivshmem correctly, vm2 could load uio_ivshmem but could not show
-> up "/dev/uio0", virtio_ivshmem could not be loaded at all, these still
-> exist even I switch the load sequence of vm1 and vm2, and sometimes
-> reset "virtio_ivshmem" could crash both vm1 and vm2. Not quite sure this
-> is bug or "Ivshmem Mode" issue, but I went through ivshmem-server code,
-> did not related information.
+> I'm wondering whether we want a default case here to catch programming
+> errors.
 
-If we are only talking about one ivshmem link and vm1 is the master, 
-there is not role for virtio_ivshmem on it as backend. That is purely a 
-frontend driver. Vice versa for vm2: If you want to use its ivshmem 
-instance as virtio frontend, uio_ivshmem plays no role.
++1, g_assert_not_reached().
 
-The "crash" is would be interesting to understand: Do you see kernel 
-panics of the guests? Or are they stuck? Or are the QEMU instances 
-stuck? Do you know that you can debug the guest kernels via gdb (and 
-gdb-scripts of the kernel)?
-
-> 
-> I started some code work recently, such as fix code style issues and
-> some work based on above testing, however I know you are also working on
-> RFC V2, beside the protocol between server-client and client-client is
-> not finalized yet either, things may change, so much appreciate if you
-> could squeeze me into your develop schedule and share with me some
-> plans, :-)  Maybe I could send some pull request in your github repo?
-
-I'm currently working on a refresh of the Jailhouse queue and the kernel 
-patches to incorporate just two smaller changes:
-
-  - use Siemens device ID
-  - drop "features" register from ivshmem device
-
-I have not yet touched the QEMU code for that so far, thus no conflict 
-yet. I would wait for your patches then.
-
-If it helps us to work on this together, I can push things to github as 
-well. Will drop you a note when done. We should just present the outcome 
-frequently as new series to the list.
-
-> 
-> I personally like this project a lot, there would be a lot of potential
-> and user case for it, especially some devices like
-> ivshmem-net/ivshmem-block. Anyway, thanks for adding me to the list, and
-> looking forward to your reply.
-
-Thanks for the positive feedback. I'm looking forward to work on this 
-together!
-
-Jan
 
 -- 
-Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-Corporate Competence Center Embedded Linux
+Thanks,
+
+David / dhildenb
+
 
