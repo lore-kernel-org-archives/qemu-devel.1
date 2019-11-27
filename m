@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F9CC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE6B0C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:42:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE3E62084D
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:37:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE3E62084D
+	by mail.kernel.org (Postfix) with ESMTPS id C409E205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:42:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C409E205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia38D-0005de-W9
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:37:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43785)
+	id 1ia3Cw-0002mJ-2N
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:42:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44791)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ia35y-0004PW-43
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:35:28 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia37O-0005d2-O4
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:36:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ia35x-0001e2-3p
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:35:26 -0500
-Received: from relay.sw.ru ([185.231.240.75]:55034)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia37N-0003SN-Hd
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:36:54 -0500
+Received: from relay.sw.ru ([185.231.240.75]:55074)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ia35w-0001c7-Ai; Wed, 27 Nov 2019 14:35:24 -0500
+ id 1ia37N-0003Oo-8M
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:36:53 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1ia35u-0004XR-LV; Wed, 27 Nov 2019 22:35:22 +0300
+ id 1ia37J-0004Xw-3a; Wed, 27 Nov 2019 22:36:49 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6] hw/sd: drop extra whitespace in sdhci_sysbus_realize()
- header
-Date: Wed, 27 Nov 2019 22:35:22 +0300
-Message-Id: <20191127193522.23134-1-vsementsov@virtuozzo.com>
+Subject: [PATCH v6] hw/tpm: rename Error ** parameter to more common errp
+Date: Wed, 27 Nov 2019 22:36:48 +0300
+Message-Id: <20191127193648.23403-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -58,35 +58,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, vsementsov@virtuozzo.com, philmd@redhat.com
+Cc: vsementsov@virtuozzo.com, stefanb@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
 
-v6: improve patch subject
- (was [RFC v5 016/126] hw/sd: rename Error ** parameter to more common errp)
- add Eric's r-b
+v6: add Stefan's r-b
 
- hw/sd/sdhci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/tpm/tpm_emulator.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 88404d0e9d..18c0c052ce 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -1459,7 +1459,7 @@ static void sdhci_sysbus_finalize(Object *obj)
-     sdhci_uninitfn(s);
- }
- 
--static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
-+static void sdhci_sysbus_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+index 22f9113432..10d587ed40 100644
+--- a/hw/tpm/tpm_emulator.c
++++ b/hw/tpm/tpm_emulator.c
+@@ -155,7 +155,7 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
+                                      const uint8_t *in, uint32_t in_len,
+                                      uint8_t *out, uint32_t out_len,
+                                      bool *selftest_done,
+-                                     Error **err)
++                                     Error **errp)
  {
-     SDHCIState *s = SYSBUS_SDHCI(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+     ssize_t ret;
+     bool is_selftest = false;
+@@ -165,20 +165,20 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
+         is_selftest = tpm_util_is_selftest(in, in_len);
+     }
+ 
+-    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, err);
++    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, errp);
+     if (ret != 0) {
+         return -1;
+     }
+ 
+     ret = qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+-              sizeof(struct tpm_resp_hdr), err);
++              sizeof(struct tpm_resp_hdr), errp);
+     if (ret != 0) {
+         return -1;
+     }
+ 
+     ret = qio_channel_read_all(tpm_emu->data_ioc,
+               (char *)out + sizeof(struct tpm_resp_hdr),
+-              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), err);
++              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), errp);
+     if (ret != 0) {
+         return -1;
+     }
 -- 
 2.21.0
 
