@@ -2,85 +2,99 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F21C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D39C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:39:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 443D320684
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:37:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C77502073F
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:39:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a0s3Ua9t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 443D320684
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YKdd06HS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C77502073F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia0Jr-00013N-1k
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 11:37:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58904)
+	id 1ia0LU-0002US-CS
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 11:39:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60119)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ia0Ax-0004z4-Bz
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:28:24 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ia0Iv-00010R-F1
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:36:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iZzvZ-0000Mr-Ry
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:12:30 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50048
+ (envelope-from <pbonzini@redhat.com>) id 1ia0Iu-0004pD-E0
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:36:37 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41102
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iZzvZ-0000Ma-Oj
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:12:29 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ia0Iu-0004oN-9d
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:36:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574871149;
+ s=mimecast20190719; t=1574872595;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7kSHyNakhpnfN3uIPCCKdBsmup5ZS0T/FitgipkbsLQ=;
- b=a0s3Ua9t2V+RXlkGnZkvEmZQJeeoBJEQgQXMepEvs1gBOUYRXdOyJ9BbvU0OziLHbSA0cL
- 3Xyn4bPoAWYFtUOIETFhY/zkH6Tm9J5rDak4qSbAcQaVq6G3I8AAhVAUINeN+vdPE/eDNZ
- qkW1kQDKPK9z1GmwonwOf59cbuI6OEI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-YlPBbR1EPZabdcau0F8fyw-1; Wed, 27 Nov 2019 11:12:27 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1E72800D53;
- Wed, 27 Nov 2019 16:12:25 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CF7260BEC;
- Wed, 27 Nov 2019 16:12:25 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 99D4F1138606; Wed, 27 Nov 2019 17:12:23 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH 3/6] qapi: Generate command registration stuff into
- separate files
-References: <20191120182551.23795-1-armbru@redhat.com>
- <20191120182551.23795-4-armbru@redhat.com>
- <d9fc4c2a-61d0-43b9-e792-35f5f5d39798@redhat.com>
-Date: Wed, 27 Nov 2019 17:12:23 +0100
-In-Reply-To: <d9fc4c2a-61d0-43b9-e792-35f5f5d39798@redhat.com> (Eric Blake's
- message of "Wed, 20 Nov 2019 13:26:10 -0600")
-Message-ID: <87sgm9ti1k.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ bh=Ns6bG00FeBlVjwhggyNLeklsajsLyZ+Sj3iMuQnkWG8=;
+ b=YKdd06HS6n/zkvsntHnnWkdcmKtHBYgOHJ2u6FnR6XN1O1o//DEI7WFfjA+bl6lh96o3os
+ gRtCG10oCph9eTycp48p/IQzNdwNOwyRGRrLwMWJFymnmHWy+/ebCBPVsTLZVROdM/0ORR
+ jP86DGnAwQiWQivNUbHsdMefnU5tq0A=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-3-Sv8Lj0MjOvnwNa6U-Q_A-1; Wed, 27 Nov 2019 11:36:34 -0500
+Received: by mail-wr1-f72.google.com with SMTP id z10so12416277wrr.5
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 08:36:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ns6bG00FeBlVjwhggyNLeklsajsLyZ+Sj3iMuQnkWG8=;
+ b=f5TIp0b7raFEzEeVMHjrlLN6lmEnlE+VjOO2IFd3iQW7oOKxtfFSfRJnfrA5+9xYN+
+ sgWC5Wd01InIOG6AacINUshQ0sdzohLtEjxEqsCQJHsPqpwsyHC+ApHFkq2EZAyDwwxR
+ 350BnpPAFGq4LjsfOFBLNfEfvybZ+ZDthybj52eQjQJFplaBhWqee9fxGDkLEKSJeC4S
+ RIR/zDZb/dn4Ec4eBDAKCzWwR3/D1m1oRSEikqMLYVmkWpPfJta+bUfdqm0H8KLd2zIW
+ nu2x3/zsnzZsptx+VZPpzsXUwgfaRsM+jG/lmzsuBNXBOH70wd/b0ha43NRO2gJjobHr
+ CQ6g==
+X-Gm-Message-State: APjAAAWNHkGRkc/s672YYaMLVtZUSZvP+tEd2NZEKb1ADzp+HByPIk48
+ iMUR9EniSgplIQobkpfzxgZpdPdyaQv1EYG7MZuifKf7dVamVAiReWSa+71WA/y1hoDBIWAbayI
+ JGUFPQ4KcLHl1yVQ=
+X-Received: by 2002:a1c:ed09:: with SMTP id l9mr5422981wmh.101.1574872593291; 
+ Wed, 27 Nov 2019 08:36:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwnCmySr1pjzc84CGG6QSzMtsx0XzTxiJQv+2bgHL0rEDAKxt+H/1RrljB2nh4ISuS8rLhn+w==
+X-Received: by 2002:a1c:ed09:: with SMTP id l9mr5422954wmh.101.1574872592965; 
+ Wed, 27 Nov 2019 08:36:32 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:459f:99a9:39f1:65ba?
+ ([2001:b07:6468:f312:459f:99a9:39f1:65ba])
+ by smtp.gmail.com with ESMTPSA id t12sm2007523wrs.96.2019.11.27.08.36.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 27 Nov 2019 08:36:32 -0800 (PST)
+Subject: Re: [RFC] exec: flush CPU TB cache when breakpoint address
+ translation fails
+To: Max Filippov <jcmvbkbc@gmail.com>, qemu-devel@nongnu.org
+References: <20191126222607.25653-1-jcmvbkbc@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <876396e7-7a6e-122f-3846-63d14c204691@redhat.com>
+Date: Wed, 27 Nov 2019 17:36:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: YlPBbR1EPZabdcau0F8fyw-1
+In-Reply-To: <20191126222607.25653-1-jcmvbkbc@gmail.com>
+Content-Language: en-US
+X-MC-Unique: 3-Sv8Lj0MjOvnwNa6U-Q_A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,83 +106,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, kwolf@pond.sub.org, mdroth@linux.vnet.ibm.com
+Cc: Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
+On 26/11/19 23:26, Max Filippov wrote:
+> When a breakpoint is inserted at location for which there's currently no
+> virtual to physical translation no action is taken on CPU TB cache. If a
+> TB for that virtual address already exists but is not visible ATM the
+> breakpoint won't be hit next time an instruction at that address will be
+> executed.
+> 
+> Flush entire CPU TB cache when a breakpoint is set for a virtual address
+> that cannot be translated to physical address.
+> 
+> This change fixes the following workflow:
+> - linux user application is running
+> - a breakpoint is inserted from QEMU gdbstub for a user address that is
+>   not currently present in the target CPU TLB
+> - an instruction at that address is executed, but the external debugger
+>   doesn't get control.
 
-> On 11/20/19 12:25 PM, Markus Armbruster wrote:
->> Having to include qapi-commands.h just for qmp_init_marshal() is
->> suboptimal.  Generate it into separate files.  This lets
->> monitor/misc.c, qga/main.c, and the generated qapi-commands-FOO.h
->> include less.
->>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->> ---
->
->> +++ b/docs/devel/qapi-code-gen.txt
->> @@ -1493,6 +1493,10 @@ $(prefix)qapi-commands.c: Command marshal/dispatc=
-h functions for each
->>   $(prefix)qapi-commands.h: Function prototypes for the QMP commands
->>                             specified in the schema
->>   +$(prefix)qapi-init-commands.h - Command initialization prototype
->> +
->> +$(prefix)qapi-init-commands.h - Command initialization code
->
-> Looks like you meant s/h/c/
+That's quite heavyweight, but perhaps since it's debugging we might as
+well _always_ just flush the TB cache?
 
-I did.  Thanks!
+In any case, it deserves a comment in the code.
 
->> +    #endif /* EXAMPLE_QAPI_INIT_COMMANDS_H */
->> +    $ cat qapi-generated/example-qapi-init-commands.
->> +[Uninteresting stuff omitted...]
->
-> missing a 'c'
-
-Yes.
-
->> +++ b/Makefile
->
->>   -QGALIB_GEN=3D$(addprefix qga/qapi-generated/, qga-qapi-types.h
->> qga-qapi-visit.h qga-qapi-commands.h)
->> +QGALIB_GEN=3D$(addprefix qga/qapi-generated/, qga-qapi-types.h qga-qapi=
--visit.h qga-qapi-commands.h qga-qapi-init-commands.h)
->
-> Worth using \ for line-wrapping?
-
-Hmm, it's used only in the following line, could just as well inline
-there and line-wrap that:
-
-    $(qga-obj-y): $(QGALIB_GEN)
-
-Hmm^2, why do we even have that line?  The compiler-generated .d should
-take care of dependencies.  Dig, dig, ...
-
-    commit 016c77ad62a8ad607dd4349d8cb8ad1365bab831
-    Author: Michael Roth <mdroth@linux.vnet.ibm.com>
-    Date:   Tue Jul 26 11:39:24 2011 -0500
-
-        Makefile: add missing deps on $(GENERATED_HEADERS)
-
-        This fixes a build issue with make -j6+ due to qapi-generated files
-        being built before $(GENERATED_HEADERS) have been created.
-
-        Tested-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-        Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-        Signed-off-by: Stefan Hajnoczi <stefanha@linux.vnet.ibm.com>
-
-Yes, but the same issue exists for all the other generated headers, and
-we solve it differently: put them into $(generated-files-y), have
-Makefile depend on them.
-
-I'll clean this up on top.  No need to beautify lines now that will go
-away then.
-
-> With those addressed,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+Paolo
 
 
