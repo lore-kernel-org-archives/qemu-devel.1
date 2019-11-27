@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06D11C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 13:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80792C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 13:42:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C690520678
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 13:41:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 484842084B
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 13:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fk2+LupF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C690520678
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="clSssEyt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 484842084B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZxZl-0002Bo-EK
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 08:41:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34097)
+	id 1iZxaq-0003aY-L5
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 08:42:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iZxCE-0004Qd-Ld
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 08:17:31 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iZxBm-0003yL-Rf
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 08:17:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iZxCD-000764-F4
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 08:17:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59410
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iZxBl-0006eb-8L
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 08:17:02 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25282
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iZxCD-00075b-Bn
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 08:17:29 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iZxBl-0006aZ-35
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 08:17:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574860648;
+ s=mimecast20190719; t=1574860615;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hUcoJFZmL63uc2AX5HnnkY9UColT/h3fdc3ujtmCuKY=;
- b=fk2+LupF0RLFuJ8umbopbmIBIhclvINS/RXd+E9R6+4xICjrWDx7pvsbBnsjotIItOQdKz
- QcLkgIZcH82hgt/uuLZtwOoe22hFswAUZ5hJpxi6A4ft4uxcBMdbcBxff8gCmsx8cjD+Bw
- tIw/cJ00T3YD3segwPNox23FioYGtBU=
+ bh=65FYcCTXhKt/O8uUSr6GIPXQ7xK9wYozvq0GpXr+0Z4=;
+ b=clSssEytn7PAJs7KX+U5qpXtqFBdzJ6edPJfcKEp6Wyt3bW9o1XQVpoKaPnhS0AqOIPSiJ
+ twdjsNfZxEsykvytR2C/xemvZRrixO5cRuzgpJmC9SIIeK8UvsyVKAc0OONTv/INu2vQw2
+ aHb1DhKYHMJl2km66Qcd/x4+Ehzmh+A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-PS18mk0bM1Cb7aGYvCXqMQ-1; Wed, 27 Nov 2019 08:17:25 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-321-KnFbDWStN_C_0NeW0WgPkQ-1; Wed, 27 Nov 2019 08:16:52 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6B33106C00E;
- Wed, 27 Nov 2019 13:17:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92D4A80259D;
+ Wed, 27 Nov 2019 13:16:51 +0000 (UTC)
 Received: from localhost (ovpn-205-186.brq.redhat.com [10.40.205.186])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 70DB6600C8;
- Wed, 27 Nov 2019 13:17:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A3665C219;
+ Wed, 27 Nov 2019 13:16:50 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH for-5.0 24/31] block: Use child_of_bds in remaining places
-Date: Wed, 27 Nov 2019 14:16:17 +0100
-Message-Id: <20191127131624.1062403-25-mreitz@redhat.com>
+Subject: [PATCH for-5.0 10/31] block: Unify bdrv_child_cb_detach()
+Date: Wed, 27 Nov 2019 14:16:03 +0100
+Message-Id: <20191127131624.1062403-11-mreitz@redhat.com>
 In-Reply-To: <20191127131624.1062403-1-mreitz@redhat.com>
 References: <20191127131624.1062403-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: PS18mk0bM1Cb7aGYvCXqMQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: KnFbDWStN_C_0NeW0WgPkQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,125 +90,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace child_file by child_of_bds in all remaining places (excluding
-tests).
+Make bdrv_child_cb_detach() call bdrv_backing_detach() for children with
+a COW role (and drop the reverse call from bdrv_backing_detach()), so it
+can be used for any child (with a proper role set).
+
+Because so far no child has a proper role set, we need a temporary new
+callback for child_backing.detach that ensures bdrv_backing_detach() is
+called for all COW children that do not have their role set yet.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c              |  3 ++-
- block/backup-top.c   |  4 ++--
- block/blklogwrites.c |  3 ++-
- block/blkreplay.c    |  5 +++--
- block/raw-format.c   | 16 ++++++++++++++--
- 5 files changed, 23 insertions(+), 8 deletions(-)
+ block.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/block.c b/block.c
-index 0530c81c6d..e800ce862e 100644
+index 24a8910047..89214efa36 100644
 --- a/block.c
 +++ b/block.c
-@@ -3182,7 +3182,8 @@ static BlockDriverState *bdrv_open_inherit(const char=
- *filename,
-         BlockDriverState *file_bs;
+@@ -921,6 +921,7 @@ static void bdrv_child_cb_drained_end(BdrvChild *child,
+ }
 =20
-         file_bs =3D bdrv_open_child_bs(filename, options, "file", bs,
--                                     &child_file, 0, true, &local_err);
-+                                     &child_of_bds, BDRV_CHILD_IMAGE,
-+                                     true, &local_err);
-         if (local_err) {
-             goto fail;
-         }
-diff --git a/block/backup-top.c b/block/backup-top.c
-index ce97c0146a..eccd6bfae0 100644
---- a/block/backup-top.c
-+++ b/block/backup-top.c
-@@ -200,8 +200,8 @@ BlockDriverState *bdrv_backup_top_append(BlockDriverSta=
-te *source,
-     top->opaque =3D state =3D g_new0(BDRVBackupTopState, 1);
+ static void bdrv_backing_attach(BdrvChild *c);
++static void bdrv_backing_detach(BdrvChild *c);
 =20
-     bdrv_ref(target);
--    state->target =3D bdrv_attach_child(top, target, "target", &child_file=
-, 0,
--                                      errp);
-+    state->target =3D bdrv_attach_child(top, target, "target", &child_of_b=
-ds,
-+                                      BDRV_CHILD_DATA, errp);
-     if (!state->target) {
-         bdrv_unref(target);
-         bdrv_unref(top);
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 78b0c49460..3ee991b38e 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -167,7 +167,8 @@ static int blk_log_writes_open(BlockDriverState *bs, QD=
-ict *options, int flags,
-     }
-=20
-     /* Open the log file */
--    s->log_file =3D bdrv_open_child(NULL, options, "log", bs, &child_file,=
- 0,
-+    s->log_file =3D bdrv_open_child(NULL, options, "log", bs, &child_of_bd=
-s,
-+                                  BDRV_CHILD_METADATA | BDRV_CHILD_PROTOCO=
-L,
-                                   false, &local_err);
-     if (local_err) {
-         ret =3D -EINVAL;
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index f97493f45a..71628f4d56 100644
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -27,8 +27,9 @@ static int blkreplay_open(BlockDriverState *bs, QDict *op=
-tions, int flags,
-     int ret;
-=20
-     /* Open the image file */
--    bs->file =3D bdrv_open_child(NULL, options, "image",
--                               bs, &child_file, 0, false, &local_err);
-+    bs->file =3D bdrv_open_child(NULL, options, "image", bs, &child_of_bds=
-,
-+                               BDRV_CHILD_DATA | BDRV_CHILD_PRIMARY,
-+                               false, &local_err);
-     if (local_err) {
-         ret =3D -EINVAL;
-         error_propagate(errp, local_err);
-diff --git a/block/raw-format.c b/block/raw-format.c
-index 4d47e59b7a..6c46dee996 100644
---- a/block/raw-format.c
-+++ b/block/raw-format.c
-@@ -444,6 +444,7 @@ static int raw_open(BlockDriverState *bs, QDict *option=
-s, int flags,
-     BDRVRawState *s =3D bs->opaque;
-     bool has_size;
-     uint64_t offset, size;
-+    BdrvChildRole file_role;
-     int ret;
-=20
-     ret =3D raw_read_options(options, &offset, &has_size, &size, errp);
-@@ -451,8 +452,19 @@ static int raw_open(BlockDriverState *bs, QDict *optio=
-ns, int flags,
-         return ret;
-     }
-=20
--    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_file, 0=
-,
--                               false, errp);
-+    /*
-+     * Without offset and a size limit, this driver behaves very much
-+     * like a filter.  With any such limit, it does not.
-+     */
-+    if (offset || has_size) {
-+        file_role =3D BDRV_CHILD_DATA | BDRV_CHILD_PROTOCOL | BDRV_CHILD_P=
-RIMARY;
-+    } else {
-+        file_role =3D BDRV_CHILD_FILTERED | BDRV_CHILD_PROTOCOL |
-+                    BDRV_CHILD_PRIMARY;
+ static void bdrv_child_cb_attach(BdrvChild *child)
+ {
+@@ -936,6 +937,11 @@ static void bdrv_child_cb_attach(BdrvChild *child)
+ static void bdrv_child_cb_detach(BdrvChild *child)
+ {
+     BlockDriverState *bs =3D child->opaque;
++
++    if (child->role & BDRV_CHILD_COW) {
++        bdrv_backing_detach(child);
 +    }
 +
-+    bs->file =3D bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
-+                               file_role, false, errp);
-     if (!bs->file) {
-         return -EINVAL;
-     }
+     bdrv_unapply_subtree_drain(child, bs);
+ }
+=20
+@@ -1159,7 +1165,14 @@ static void bdrv_backing_detach(BdrvChild *c)
+     bdrv_op_unblock_all(c->bs, parent->backing_blocker);
+     error_free(parent->backing_blocker);
+     parent->backing_blocker =3D NULL;
++}
+=20
++/* XXX: Will be removed along with child_backing */
++static void bdrv_child_cb_detach_backing(BdrvChild *c)
++{
++    if (!(c->role & BDRV_CHILD_COW)) {
++        bdrv_backing_detach(c);
++    }
+     bdrv_child_cb_detach(c);
+ }
+=20
+@@ -1207,7 +1220,7 @@ const BdrvChildClass child_backing =3D {
+     .parent_is_bds   =3D true,
+     .get_parent_desc =3D bdrv_child_get_parent_desc,
+     .attach          =3D bdrv_child_cb_attach_backing,
+-    .detach          =3D bdrv_backing_detach,
++    .detach          =3D bdrv_child_cb_detach_backing,
+     .inherit_options =3D bdrv_backing_options,
+     .drained_begin   =3D bdrv_child_cb_drained_begin,
+     .drained_poll    =3D bdrv_child_cb_drained_poll,
 --=20
 2.23.0
 
