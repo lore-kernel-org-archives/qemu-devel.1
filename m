@@ -2,106 +2,83 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E993BC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13EEAC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:31:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFC292071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:30:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEEE92071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:31:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NJPRjK7r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFC292071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OcgkqkJg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEEE92071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZwSX-0004mj-N4
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 07:30:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54910)
+	id 1iZwTV-0005RV-Un
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 07:31:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54985)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iZwQf-00045w-De
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:28:22 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZwRF-0004O9-JF
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:28:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iZwQc-0005cz-Ux
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:28:20 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42356
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iZwQc-0005at-Ei
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:28:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574857697;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=LfRDFH6gCSksgshK05JTUMVpEfzUYYF447jZyp44ULo=;
- b=NJPRjK7r6PC9jJnEKIN4CzCPTOSst0MuRrYAo3ScH90hq4HG7LrxgztoB7magoQtxTkAeE
- wd0inH2WKAPCGH/0Y78ljxfnWB7gjzl1bbnEQd7DDYXMl/uGm24IMQ82mmqRddWxlvxV4i
- Gj9GRlCGSQdSD8NhBkEXIPLg2MfOseE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-253-OcBHgO_aNzOMDIxSMqdvKQ-1; Wed, 27 Nov 2019 07:28:14 -0500
-X-MC-Unique: OcBHgO_aNzOMDIxSMqdvKQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4CDAD80183C;
- Wed, 27 Nov 2019 12:28:12 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-205-186.brq.redhat.com
- [10.40.205.186])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F2815600C8;
- Wed, 27 Nov 2019 12:28:09 +0000 (UTC)
-Subject: Re: [PATCH V2] throttle-groups: fix memory leak in
- throttle_group_set_limit:
-To: pannengyuan@huawei.com, berto@igalia.com, kwolf@redhat.com
-References: <1574835614-42028-1-git-send-email-pannengyuan@huawei.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <079361c7-8474-ca67-7e7c-8fd49cd913b6@redhat.com>
-Date: Wed, 27 Nov 2019 13:28:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZwRE-000610-9h
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:28:57 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44779)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iZwRE-00060e-1y
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:28:56 -0500
+Received: by mail-ot1-x343.google.com with SMTP id c19so18931766otr.11
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 04:28:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=vaa9bfJGQyeUNU4uvVkA9ieAU9FUB0cecVok8R/wDAA=;
+ b=OcgkqkJgRoeug1bK75cjZSSASXSCP7/1BNAEGzTP+Vy8jzqoeryLvdfRdTU+BxdWw6
+ qtg9MWuqE5ZJN5vkQUo8KrzG1PkaQWq+zgU2cnTcV3j98T9r64JgCC28v59BGZpE2ehA
+ dHsyUIpUdvGLVb67vWLZOyyrwGYi6Rp6ilOyW04xlLTZW2nXx9VRXDl/Hf8D/kGn5UFY
+ yZEAGcUFJiNHg/DFYPJ442Qw1fAVqBZrd2PhSxHkOVEDLBYKXu08SRJ/JEg7qZPQ+0oi
+ FuWWVxHH1lsXHnlojhHleavHGxhXag0bxCwj+BYf4AmGze2pLiiWOtwlkxyzKORdTLm9
+ MxSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=vaa9bfJGQyeUNU4uvVkA9ieAU9FUB0cecVok8R/wDAA=;
+ b=BVYrf8iK2MBu2s9xCvwsq/I/6QQRBwvQwYtfFuJ+xo6C4HfDmoiHV9JPe3HuMlFq1/
+ N1U7o9XsUUdy3PJ13e4QVGhxV2BkwHHcSu3WLG+ug8z2AUernmzpiVU80g9cvhj6vdX6
+ gONpoC5hyoaWuSD2/FBekmunjPF3MhfPZiuNi1kfn29Xy5O/z2UyoFi1ZOn/mrA2wyHW
+ 5u93qeKbCyYZhNywRt9dnWVgKMzNEyWyxP33BAowKc50VOi2Q1/dn5vWrmRgcXb3rWZ5
+ n1EHYGF6Y0xVJbM0O/5WkBn+uyL9CZnBXu6DSbwDO3SWcqjOD7Dovzfy3jW2adeSW9vE
+ B3+g==
+X-Gm-Message-State: APjAAAVEN899SYtui3ICZcwjvU89wicZ97PqXNIWr90aB4uvJU62mVf8
+ VqH1XiUhkH0M2CI+Q4/k1zv/gJ53arxtHDcB540=
+X-Google-Smtp-Source: APXvYqzSe01s9cRzAHUQwisot8WPsJs3GR/1f1aTq/x+B+cEkK0YqGQntTcabUIuCfIw4vuY2ZmUBKfV7jn1NevSyAk=
+X-Received: by 2002:a05:6830:81:: with SMTP id a1mr3298104oto.64.1574857734765; 
+ Wed, 27 Nov 2019 04:28:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1574835614-42028-1-git-send-email-pannengyuan@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="NNHSipPOXuX7LFoX7YsDxu4z7zsTG6jpR"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Wed, 27 Nov 2019 04:28:54
+ -0800 (PST)
+In-Reply-To: <20191120152442.26657-20-marcandre.lureau@redhat.com>
+References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
+ <20191120152442.26657-20-marcandre.lureau@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 27 Nov 2019 13:28:54 +0100
+Message-ID: <CAL1e-=j1eWx47fiVWKSTQ-bwn95Bw0tnDpiA8cke7WDMnjL_dw@mail.gmail.com>
+Subject: Re: [PATCH v4 19/37] mips: use sysbus_add_io()
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000da3ed0059853236b"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,86 +90,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liyiting@huawei.com, kuhn.chenqun@huawei.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, zhang.zhanghailiang@huawei.com
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NNHSipPOXuX7LFoX7YsDxu4z7zsTG6jpR
-Content-Type: multipart/mixed; boundary="GRDK7aBoCN1lcaQUDPYMCpHfEOm3kshtq"
-
---GRDK7aBoCN1lcaQUDPYMCpHfEOm3kshtq
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--000000000000da3ed0059853236b
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 27.11.19 07:20, pannengyuan@huawei.com wrote:
-> From: PanNengyuan <pannengyuan@huawei.com>
->=20
-> This avoid a memory leak when qom-set is called to set throttle_group
-> limits, here is an easy way to reproduce:
->=20
-> 1. run qemu-iotests as follow and check the result with asan:
->        ./check -qcow2 184
->=20
-> Following is the asan output backtrack:
-> Direct leak of 912 byte(s) in 3 object(s) allocated from:
->     #0 0xffff8d7ab3c3 in __interceptor_calloc   (/lib64/libasan.so.4+0xd3=
-3c3)
->     #1 0xffff8d4c31cb in g_malloc0   (/lib64/libglib-2.0.so.0+0x571cb)
->     #2 0x190c857 in qobject_input_start_struct  /mnt/sdc/qemu-master/qemu=
--4.2.0-rc0/qapi/qobject-input-visitor.c:295
->     #3 0x19070df in visit_start_struct   /mnt/sdc/qemu-master/qemu-4.2.0-=
-rc0/qapi/qapi-visit-core.c:49
->     #4 0x1948b87 in visit_type_ThrottleLimits   qapi/qapi-visit-block-cor=
-e.c:3759
->     #5 0x17e4aa3 in throttle_group_set_limits   /mnt/sdc/qemu-master/qemu=
--4.2.0-rc0/block/throttle-groups.c:900
->     #6 0x1650eff in object_property_set     /mnt/sdc/qemu-master/qemu-4.2=
-.0-rc0/qom/object.c:1272
->     #7 0x1658517 in object_property_set_qobject   /mnt/sdc/qemu-master/qe=
-mu-4.2.0-rc0/qom/qom-qobject.c:26
->     #8 0x15880bb in qmp_qom_set  /mnt/sdc/qemu-master/qemu-4.2.0-rc0/qom/=
-qom-qmp-cmds.c:74
->     #9 0x157e3e3 in qmp_marshal_qom_set  qapi/qapi-commands-qom.c:154
->=20
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
+On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau <
+marcandre.lureau@redhat.com> wrote:
+
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
-> Changes v2 to v1:
-> - remove unused var 'arg' (suggested by Alberto Garcia)
-> ---
->  block/throttle-groups.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  hw/mips/mips_mipssim.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+>
+I agree with the change, and with overall series in general, but please add
+at least a sentence in the commit message here, explaining what is achieved
+by the change.
 
-Thanks, applied to my block-next branch for 5.0:
+With that sentence, certainly:
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block-next
-
-Max
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
 
---GRDK7aBoCN1lcaQUDPYMCpHfEOm3kshtq--
+> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+> index 3cd0e6eb33..2c2c7f25b2 100644
+> --- a/hw/mips/mips_mipssim.c
+> +++ b/hw/mips/mips_mipssim.c
+> @@ -227,8 +227,7 @@ mips_mipssim_init(MachineState *machine)
+>          qdev_set_legacy_instance_id(dev, 0x3f8, 2);
+>          qdev_init_nofail(dev);
+>          sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
+> -        memory_region_add_subregion(get_system_io(), 0x3f8,
+> -                                    &SERIAL_IO(dev)->serial.io);
+> +        sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8, &SERIAL_IO(dev)->
+> serial.io);
+>      }
+>
+>      if (nd_table[0].used)
+> --
+> 2.24.0
+>
+>
+>
 
---NNHSipPOXuX7LFoX7YsDxu4z7zsTG6jpR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+--000000000000da3ed0059853236b
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
------BEGIN PGP SIGNATURE-----
+<br><br>On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau &lt;<a href=
+=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;=
+ wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bor=
+der-left:1px #ccc solid;padding-left:1ex">Signed-off-by: Marc-Andr=C3=A9 Lu=
+reau &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@re=
+dhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/mips/mips_mipssim.c | 3 +--<br>
+=C2=A01 file changed, 1 insertion(+), 2 deletions(-)<br>
+<br></blockquote><div><br></div><div>I agree with the change, and with over=
+all series in general, but please add at least a sentence in the commit mes=
+sage here, explaining what is achieved by the change.</div><div><br></div><=
+div>With that sentence, certainly:</div><div><br></div><div>Reviewed-by: Al=
+eksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com">amarkovic@w=
+avecomp.com</a>&gt;<br></div><div>=C2=A0</div><blockquote class=3D"gmail_qu=
+ote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex=
+">
+diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c<br>
+index 3cd0e6eb33..2c2c7f25b2 100644<br>
+--- a/hw/mips/mips_mipssim.c<br>
++++ b/hw/mips/mips_mipssim.c<br>
+@@ -227,8 +227,7 @@ mips_mipssim_init(MachineState *machine)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_set_legacy_instance_id(<wbr>dev, 0x3=
+f8, 2);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_init_nofail(dev);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0sysbus_connect_irq(SYS_BUS_<wbr>DEVICE(de=
+v), 0, env-&gt;irq[4]);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 memory_region_add_subregion(<wbr>get_system_io=
+(), 0x3f8,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;SERIAL_IO(dev)-&g=
+t;<a href=3D"http://serial.io" target=3D"_blank">serial.io</a>);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 sysbus_add_io(SYS_BUS_DEVICE(<wbr>dev), 0x3f8,=
+ &amp;SERIAL_IO(dev)-&gt;<a href=3D"http://serial.io" target=3D"_blank">ser=
+ial.io</a>);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (nd_table[0].used)<br>
+-- <br>
+2.24.0<br>
+<br>
+<br>
+</blockquote>
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3ea9cACgkQ9AfbAGHV
-z0DymAf9HHIqVOi2JmQAP+pBgBj8ovts1JuWoD//L5AlF3o7/p4YUtqupSLU7Dqc
-YBAHPT96HAx/6XRYsUFLyiwWFOLz0cw2C1sGT0vVnCV80GTP5jG0hYWK/xV9ok+9
-eGos+kKQOyNeJhXw6k6z2NhsEsMDMYpWohtRASSE4OdJCQhbva7DRGLR8Ag3DOrb
-s1HTZ1eb2UxkP/BFWvXmQy48Lawdh3WjEaRjjvemoZTJEhiRXumuf4G04B960lzZ
-CdSI+yvLYFxJD7WOIzH0SvJiLu/kJk84bruWNTEYlAAOBlPeuT27ZVumetYhw9Mv
-yzcsyYA5MwbBLUE9R2Erx3//iPcL5w==
-=KTZd
------END PGP SIGNATURE-----
-
---NNHSipPOXuX7LFoX7YsDxu4z7zsTG6jpR--
-
+--000000000000da3ed0059853236b--
 
