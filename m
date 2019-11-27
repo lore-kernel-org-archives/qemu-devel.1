@@ -2,75 +2,63 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10CA9C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 17:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A47C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 17:21:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D832E206E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 17:12:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D832E206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id ABE12206E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 17:21:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABE12206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia0rb-0000de-11
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 12:12:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37037)
+	id 1ia0zu-0004DR-SK
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 12:21:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ia0qE-0007sa-QL
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:11:04 -0500
+ (envelope-from <jan.kiszka@siemens.com>) id 1ia0ym-0003SZ-2A
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:19:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ia0qD-0007bx-1e
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:11:02 -0500
-Received: from indium.canonical.com ([91.189.90.7]:44868)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ia0qC-0007ZU-Fy
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:11:00 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ia0qA-0007yG-26
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 17:10:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0C1072E804F
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 17:10:58 +0000 (UTC)
+ (envelope-from <jan.kiszka@siemens.com>) id 1ia0yj-0007pB-Hz
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:19:51 -0500
+Received: from gecko.sbs.de ([194.138.37.40]:48773)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+ id 1ia0yg-0007l4-NT
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:19:47 -0500
+Received: from mail1.sbs.de (mail1.sbs.de [192.129.41.35])
+ by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id xARHJajl008247
+ (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 27 Nov 2019 18:19:37 +0100
+Received: from [139.25.68.37] ([139.25.68.37])
+ by mail1.sbs.de (8.15.2/8.15.2) with ESMTP id xARHJa7L001485;
+ Wed, 27 Nov 2019 18:19:36 +0100
+Subject: Re: [RFC][PATCH 0/3] IVSHMEM version 2 device for QEMU
+To: Liang Yan <LYan@suse.com>, qemu-devel <qemu-devel@nongnu.org>
+References: <cover.1573477032.git.jan.kiszka@siemens.com>
+ <efd5fa87-90de-fccc-97a5-a4fc71a050c8@suse.com>
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <fb213f9e-8bd8-6c33-7a6e-47dda982903d@siemens.com>
+Date: Wed, 27 Nov 2019 18:19:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Nov 2019 17:03:16 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a-hashmi ajbennee carolineconcatto
-X-Launchpad-Bug-Reporter: Caroline Concatto (carolineconcatto)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <157468002661.30952.10642264809488923382.malonedeb@wampee.canonical.com>
-Message-Id: <157487419668.23081.15300873960832030619.malone@chaenomeles.canonical.com>
-Subject: [Bug 1853826] Re: ELF loader fails to load shared object on ThunderX2
- running RHEL7
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 70596c773f93c38b73a0b7692f99b424614f542e
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+In-Reply-To: <efd5fa87-90de-fccc-97a5-a4fc71a050c8@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 194.138.37.40
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,231 +67,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1853826 <1853826@bugs.launchpad.net>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>,
+ Claudio Fontana <claudio.fontana@gmail.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I've attempted to replicate but it works for me:
-
-16:55:37 [alex@idun:~/l/t/hello-armpl] $ ~/lsrc/qemu.git/builds/all/aarch64=
--linux-user/qemu-aarch64 ./hello-armpl
-Hello World...
-16:55:52 [alex@idun:~/l/t/hello-armpl] $ ldd ./hello-armpl
-        linux-vdso.so.1 (0x0000ffffb9e78000)
-        libamath_generic.so =3D> /home/alex/lsrc/tests/hello-armpl/libamath=
-_generic.so (0x0000ffffb9d1a000)
-        libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffb9c50000)
-        libastring_generic.so =3D> /home/alex/lsrc/tests/hello-armpl/libast=
-ring_generic.so (0x0000ffffb9c2f000)
-        libarmflang.so =3D> /home/alex/lsrc/tests/hello-armpl/libarmflang.s=
-o (0x0000ffffb97b2000)
-        libomp.so =3D> /home/alex/lsrc/tests/hello-armpl/libomp.so (0x0000f=
-fffb96d4000)
-        librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffb96bc000)
-        libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffb968a000)
-        libarmpl_lp64_generic.so =3D> /home/alex/lsrc/tests/hello-armpl/lib=
-armpl_lp64_generic.so (0x0000ffffb0e12000)
-        libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffb0c95000)
-        /lib/ld-linux-aarch64.so.1 =3D> /lib64/ld-linux-aarch64.so.1 (0x000=
-0ffffb9e4a000)
-        libstdc++.so.6 =3D> /home/alex/lsrc/tests/hello-armpl/libstdc++.so.=
-6 (0x0000ffffb0a9c000)
-        libgcc_s.so.1 =3D> /home/alex/lsrc/tests/hello-armpl/libgcc_s.so.1 =
-(0x0000ffffb0a6b000)
-        libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffb0a57000)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1853826
-
-Title:
-  ELF loader fails to load shared object on ThunderX2 running RHEL7
-
-Status in QEMU:
-  New
-
-Bug description:
-  Simple test:
-  hello.c
-
-  include <stdio.h>
-
-  int main(int argc, char* argv[])
-  {
-    {
-      printf("Hello World... \n");
-    }
-    return 0;
-  }
-
-  when compiled with :
-  *Compiler =
-
-  https://developer.arm.com/tools-and-software/server-and-hpc/arm-architect=
-ure-tools/arm-allinea-studio/download
-  Arm-Compiler-for-HPC_19.3_RHEL_7_aarch64.tar	 =
-
-
-  *Running:
-  1) with -armpl
-       armclang -armpl hello.c
-       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
-  2) without flag
-      armclang hello.c
-       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
-
-  =E2=80=A2With Docker image:
-         CentOS Linux release 7.7.1908 (AltArch)
-
-  *Two different machines:
-         AArch64, Taishan. tsv110, Kunpeng 920, ARMv8.2-A
-         AArch64, Taishan 2280, Cortex-A72, ARMv8-A
-
-  *QEMU 4.0
-       qemu-aarch64 version 4.1.91 (v4.2.0-rc1)
-
-  =
-
-  Results:
-
-  =
-
-   ****Taishan 2280 Cortex-A72 =
-
-        Running =
-
-  1)with -armpl flag with and without the docker
-            WORKS-> Hello World...
-                 -> ldd a.out
-  ldd a.out =
-
-  linux-vdso.so.1 =3D>  (0x0000ffffbc6a2000) =
-
-  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
-_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
-0x0000ffffbc544000) =
-
-  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffbc493000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffbc472000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
-3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffbbfd30=
-00) =
-
-  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
-rch64-linux/lib/libomp.so (0x0000ffffbbef5000) =
-
-  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffbbed4000) =
-
-  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffbbe9f000) =
-
-  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
-rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
-neric.so (0x0000ffffb3306000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffb3180000) =
-
-  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
-ux/lib64/libstdc++.so.6 (0x0000ffffb2f30000) =
-
-  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
-x/lib64/libgcc_s.so.1 (0x0000ffffb2eff000) =
-
-  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffb2ede000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffbc674000)
-             =
-
-
-  Running =
-
-  2) without -armpl flag with and without the docker
-             WORKS -> Hello World...        =
-
-                   -> ldd a.out
-  ldd a.out
-   linux-vdso.so.1 =3D>  (0x0000ffffa6895000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffa6846000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa66c0000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffa6867000)
-      =
-
-
-  ****Taishan - tsv110  Kunpeng 920
-         For Running =
-
-
-  1)with -armpl flag with and without the docker
-             DOES NOT WORK -> with and without Docker
-                           -> It shows : qemu:handle_cpu_signal received si=
-gnal outside vCPU
-   context @ pc=3D0xffffaaa8844a
-                           -> ldd a.out =
-
-  ldd a.out =
-
-  linux-vdso.so.1 =3D>  (0x0000ffffad4b0000)
-  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
-_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
-0x0000ffffad370000) =
-
-  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffad2a0000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffad270000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
-3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffacdd00=
-00) =
-
-  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
-rch64-linux/lib/libomp.so (0x0000ffffaccf0000) =
-
-  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffaccc0000) =
-
-  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffacc80000) =
-
-  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
-rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
-neric.so (0x0000ffffa40e0000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa3f50000) =
-
-  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
-ux/lib64/libstdc++.so.6 (0x0000ffffa3d00000) =
-
-  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
-x/lib64/libgcc_s.so.1 (0x0000ffffa3cc0000)
-  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffa3c90000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffad4c0000)
-              =
-
-
-  Running =
-
-  2) without -armpl flag with and without the docker
-                 WORKS -> Hello World..
-                       -> ldd a.out
-  ldd a.out  =
-
-  linux-vdso.so.1 =3D>  (0x0000ffff880c0000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffff88080000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffff87ee0000)
-  /lib/ld-linux-aarch64.so.1 (0x0000ffff880d0000)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1853826/+subscriptions
+Hi Liang,
+
+On 27.11.19 16:28, Liang Yan wrote:
+> 
+> 
+> On 11/11/19 7:57 AM, Jan Kiszka wrote:
+>> To get the ball rolling after my presentation of the topic at KVM Forum
+>> [1] and many fruitful discussions around it, this is a first concrete
+>> code series. As discussed, I'm starting with the IVSHMEM implementation
+>> of a QEMU device and server. It's RFC because, besides specification and
+>> implementation details, there will still be some decisions needed about
+>> how to integrate the new version best into the existing code bases.
+>>
+>> If you want to play with this, the basic setup of the shared memory
+>> device is described in patch 1 and 3. UIO driver and also the
+>> virtio-ivshmem prototype can be found at
+>>
+>>      http://git.kiszka.org/?p=linux.git;a=shortlog;h=refs/heads/queues/ivshmem2
+>>
+>> Accessing the device via UIO is trivial enough. If you want to use it
+>> for virtio, this is additionally to the description in patch 3 needed on
+>> the virtio console backend side:
+>>
+>>      modprobe uio_ivshmem
+>>      echo "1af4 1110 1af4 1100 ffc003 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
+>>      linux/tools/virtio/virtio-ivshmem-console /dev/uio0
+>>
+>> And for virtio block:
+>>
+>>      echo "1af4 1110 1af4 1100 ffc002 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
+>>      linux/tools/virtio/virtio-ivshmem-console /dev/uio0 /path/to/disk.img
+>>
+>> After that, you can start the QEMU frontend instance with the
+>> virtio-ivshmem driver installed which can use the new /dev/hvc* or
+>> /dev/vda* as usual.
+>>
+>> Any feedback welcome!
+> 
+> Hi, Jan,
+> 
+> I have been playing your code for last few weeks, mostly study and test,
+> of course. Really nice work. I have a few questions here:
+> 
+> First, qemu part looks good, I tried test between couple VMs, and device
+> could pop up correctly for all of them, but I had some problems when
+> trying load driver. For example, if set up two VMs, vm1 and vm2, start
+> ivshmem server as you suggested. vm1 could load uio_ivshmem and
+> virtio_ivshmem correctly, vm2 could load uio_ivshmem but could not show
+> up "/dev/uio0", virtio_ivshmem could not be loaded at all, these still
+> exist even I switch the load sequence of vm1 and vm2, and sometimes
+> reset "virtio_ivshmem" could crash both vm1 and vm2. Not quite sure this
+> is bug or "Ivshmem Mode" issue, but I went through ivshmem-server code,
+> did not related information.
+
+If we are only talking about one ivshmem link and vm1 is the master, 
+there is not role for virtio_ivshmem on it as backend. That is purely a 
+frontend driver. Vice versa for vm2: If you want to use its ivshmem 
+instance as virtio frontend, uio_ivshmem plays no role.
+
+The "crash" is would be interesting to understand: Do you see kernel 
+panics of the guests? Or are they stuck? Or are the QEMU instances 
+stuck? Do you know that you can debug the guest kernels via gdb (and 
+gdb-scripts of the kernel)?
+
+> 
+> I started some code work recently, such as fix code style issues and
+> some work based on above testing, however I know you are also working on
+> RFC V2, beside the protocol between server-client and client-client is
+> not finalized yet either, things may change, so much appreciate if you
+> could squeeze me into your develop schedule and share with me some
+> plans, :-)  Maybe I could send some pull request in your github repo?
+
+I'm currently working on a refresh of the Jailhouse queue and the kernel 
+patches to incorporate just two smaller changes:
+
+  - use Siemens device ID
+  - drop "features" register from ivshmem device
+
+I have not yet touched the QEMU code for that so far, thus no conflict 
+yet. I would wait for your patches then.
+
+If it helps us to work on this together, I can push things to github as 
+well. Will drop you a note when done. We should just present the outcome 
+frequently as new series to the list.
+
+> 
+> I personally like this project a lot, there would be a lot of potential
+> and user case for it, especially some devices like
+> ivshmem-net/ivshmem-block. Anyway, thanks for adding me to the list, and
+> looking forward to your reply.
+
+Thanks for the positive feedback. I'm looking forward to work on this 
+together!
+
+Jan
+
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
 
