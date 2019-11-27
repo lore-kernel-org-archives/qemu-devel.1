@@ -2,90 +2,84 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95FCFC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 21:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4B0C43215
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 21:32:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CB02215A5
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 21:26:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A96B20665
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 21:32:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="CH46k52L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CB02215A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAC8u3BR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A96B20665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia4p7-0007dR-Ac
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 16:26:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48399)
+	id 1ia4v5-0001L4-Em
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 16:32:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lukasstraub2@web.de>) id 1ia4k7-00061p-GO
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:21:00 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ia4td-0000nW-63
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:30:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lukasstraub2@web.de>) id 1ia4k5-0003vr-FP
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:20:59 -0500
-Received: from mout.web.de ([212.227.15.3]:44435)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1ia4k5-0003tp-65
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:20:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1574889628;
- bh=LKc1iDdS1DWAi20HHG8PgRzARPzSCeDVTLfGvhjFxbs=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=CH46k52L/xNjrHDwboYwyDjtmO3KToywfnMHbyfaOpm/F4HTfgDJtFFsT/0q4jX0L
- qmwN70JfJXbQwNCJ687qD64MKvbapu6ORJWWUjMheN1trNnRUhlGFeYaYLedxkTCdR
- qMN5Z93/85IfXlvcAGX2UM4dhCVHzynhgIYZ6U2w=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([87.123.206.185]) by smtp.web.de (mrweb001
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MRTvU-1iOxsJ3sds-00SfFl; Wed, 27
- Nov 2019 22:20:28 +0100
-Date: Wed, 27 Nov 2019 22:20:24 +0100
-From: Lukas Straub <lukasstraub2@web.de>
-To: Alberto Garcia <berto@igalia.com>
-Subject: Re: [PATCH 1/4] block/quorum.c: stable children names
-Message-ID: <20191127222024.4bcb34b8@luklap>
-In-Reply-To: <w51imn667m6.fsf@maestria.local.igalia.com>
-References: <cover.1574356137.git.lukasstraub2@web.de>
- <ce10f8cf2bb9ae8a1505b59bbc2199f7b4966990.1574356137.git.lukasstraub2@web.de>
- <2ce1be55-010b-d3c3-9df4-e8e02eb522f9@redhat.com>
- <20191121193445.2361b846@luklap>
- <w51imn667m6.fsf@maestria.local.igalia.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ia4tb-0004OD-27
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:30:48 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38375)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ia4ta-0004Mz-Qh
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:30:46 -0500
+Received: by mail-ot1-x344.google.com with SMTP id z25so20413406oti.5
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 13:30:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=JXvT5o0Gd1gREWBesSjnwOkZo5sOzRG0oiFQV1LhO+s=;
+ b=JAC8u3BRqU8wXpkdV0IrZthe6a8ggBPUhmnMHlzwx6qA6/6rA326qtZATONeWcu9ME
+ xLJ7WcTnChk/5bVAY3jcQSH7MOH1P8v7Ap/U1Wy9MJf1pg42ToR0966u7dGkjkAdm5op
+ BluXH7nQ6xPywl/rQhPMsotyZ1QHTPRRJ0c7a5nkYm3OjPh8C1+jKxYVAA6tk7lAOsMR
+ SqKWuxCongk1Fq6/9HIk0o3/aG24oDfo0ArUsnOWVDtZnu9U80KEWRogMItKI/b7MXel
+ kpvFjFsp6/IUAWBXHHdPcuPOs3Q8OKUtkNXNRNLV5geiUQnWXrIRdQLFu6DB7fm0BnNe
+ E50Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=JXvT5o0Gd1gREWBesSjnwOkZo5sOzRG0oiFQV1LhO+s=;
+ b=XP4fWlweyMmhkeJrkvG/fu+rxkM44UemftqXht7+byl3oTgBZy8K1SIkTznkHvQ/Bv
+ ujmsgrUPhhSdDWOAB77c37v1U97eSZR7srtrm4rA2V6SYfyjl+VEvV0NlyRimDzcK3gM
+ k6WwPQydOXuYQ3SbGm4MarceVBoAH0J/ZzTTIF98lkKsdysnxbISabgNkgdfG3iHN733
+ ziDwSqPdIA94V24Akia3YZtqTJouKdX2lULgAOxRJgiXs37IRsKDPwEflVc5ieySSgAA
+ 7Sv2KmYzFFjf0uiBHxYal8NxY1RDwWZNABZEVcW9mx+7YVACuIKgzVdae9ij4HhHYT3S
+ SmXg==
+X-Gm-Message-State: APjAAAXqaz7qNcAJbLH2oNu+Bkx9goniFEz8TXoLWOtcqOLWKO73UFd5
+ 9A/34riq9frypcZQ7jDuXRd/bL949WVgiR0tvQI=
+X-Google-Smtp-Source: APXvYqzensJkU8k64d4o9XHDyXcxLzs/aNF9HaJDpNxCcbBHZYNJvAWmBF7dvLMiZ7gwflXpNeq822zmQdfKzCmCQJ4=
+X-Received: by 2002:a9d:58c9:: with SMTP id s9mr609704oth.121.1574890245234;
+ Wed, 27 Nov 2019 13:30:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20191125104103.28962-1-philmd@redhat.com>
+ <CAL1e-=gJxBRvkiPzdAKOqVLEc7mmLpJRrprv5Rjcd8p2jD+_Hg@mail.gmail.com>
+ <8fa0f275-797a-6a3c-4fac-43f4f7a8b975@redhat.com>
+In-Reply-To: <8fa0f275-797a-6a3c-4fac-43f4f7a8b975@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 27 Nov 2019 22:30:34 +0100
+Message-ID: <CAL1e-=gyUQh7zZ_2sj=DfvZ856m2Ugm+9vS3xvjHUniWmUUsdw@mail.gmail.com>
+Subject: Re: [PATCH-for-4.2] hw/mips: Deprecate the r4k machine
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:zuP7AkDvxcuZSCvAXPYn+t5Qr0FAZlnsmRce2RRQmZ1LDYRt3bK
- 6GatUnghNRdCp+cximZMKJ9LfYiqHFYAWo7e8O1MO8oXNfwEFZMLJL7y+EwdgA2WkJ/30w3
- Hjh1ScUoeatRQZJ73AQPeIrtQXJUi94kZrEdy8ldm5cH1ob90qjmXlhwfiOLqbEtJH/RhKW
- 9mh7caccOk8+HZUL9Rc/g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KJiB3i0PsdY=:fw6qXx5Usf39vuMOQyM5R3
- yZQehWXLGkga3xD2+nT9alcu1waI56o1z0c+rSdifePsTOtHB+33nGqoNcAJjzff9t+nIFJcB
- vnkeS42G537gM7xdII0lqEDsrVYfxOwPeVe3B0HEYb/YKrDfCCG6aYUlJaNWT62izxXrfeQA0
- NUEY3wzMbs/dr2m99HyRrwKD3LKsEayZpzVRa6Cvpp/Xk+F65EHd/M6VuX2qzaKdtycmM3H6F
- 9JHwbfV6oOXArihKljSaxRLhQ1UE667mCnH+fzj3eiQMwNca+Er9QUNoZpj+jXR7oPHAH4Y6w
- OyxW7Sx5c3oWAswrk3Lv52Hkw3KFrrbFAmIEkvo4N9y3vghOpq0wBQiHbdrd1fY39gEEWkGao
- ws37C+bjlJREZJ5/rHWmBf1dcPH7ldAXeAk1DP6x1Fetrvy5sEXISR1Rz4kmhq6/3YCdrrllq
- oPumvSaWB+PUqjZAUdH/EHMPAo5vpFWhc/qoGQvfw+sle+uNowdVP+0b0wDciv1EnVriOgnIH
- h9BV1jYZfLSFvZU0iGfnLPlh2X2NQjSnm4xAQLrwy8W71fGRjZ8CsFc8+N7fme+mXzz2NXBsH
- 7OfbsTGKScEIPZELTD5wkPDenOfqpg8rboSjjRGOSA/Hd4k6u5SNeQnK8e1fNf08vA8cv/QFi
- zoySV59c2Kywc09Ltp0vvm0IXabVJdv9EwbTqCiqgsmUOkeWv1kAfeKpmOrur6JzJWhKfS+yy
- Wob++f++f6MK/9qTeJOuB5D3bsfZi2VVoMisp6N87ohJ8UsOcYB8zkdOCx3skkvK0hhFVoNIZ
- 6FLDwSvALRK6Rn6URoj0FmFtAe2jUwQVWz27dUXwkUYEkShLhMqWj3r03vIuMVNoHrLbDTVhK
- 1RNw8OKXlCpSDm7+Z7415uVZh7Sw1TgBFrt9GdWbcyRgcAx6EsQCEurCR50ZFNY9nnzWywtgD
- usDzpyeQsMFTw2tilAdjRE8TakKHIDlVoKvf6EjJA1FFGwDLmxO4upDAkVY9LfConcxEs69HV
- n0HmFbf8beEDZD4bvzmI63m9nGQQ0b8HVKgnvQb9EsRx6W6B73dHJz4hUhG6nA6amhwS1WrQ3
- Bfm6IO9JrMehCGCC0kes0HjCHF7u3UCudTCgj7r1bTU/N67l+NDiV2oIwEBK4CJMNV+wv7MV9
- LPjS1DFP0QZ3Dbzb5PRz5gK/ojoLxV+sTF3vGs8iOPY2H6zTcid/j6KTfWKFZe1/tXDrWICoo
- V/6PbHdscxblgtBN87kw9HBkCE24/XhCb21KDG5iNBIackwGBW/Xl1YoN7GA=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.15.3
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,60 +91,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhang, Chen" <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, libvir-list@redhat.com,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 26 Nov 2019 15:21:37 +0100
-Alberto Garcia <berto@igalia.com> wrote:
-
-> On Thu 21 Nov 2019 07:34:45 PM CET, Lukas Straub wrote:
-> >> > diff --git a/block/quorum.c b/block/quorum.c
-> >> > index df68adcfaa..6100d4108a 100644
-> >> > --- a/block/quorum.c
-> >> > +++ b/block/quorum.c
-> >> > @@ -1054,6 +1054,12 @@ static void quorum_del_child(BlockDriverStat=
-e *bs, BdrvChild *child,
-> >> >       /* We know now that num_children > threshold, so blkverify mu=
-st be false */
-> >> >       assert(!s->is_blkverify);
-> >> >
-> >> > +    unsigned child_id;
-> >> > +    sscanf(child->name, "children.%u", &child_id);
+On Wed, Nov 27, 2019 at 10:17 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> Hi Aleksandar,
+>
+> On 11/27/19 7:47 PM, Aleksandar Markovic wrote:
+> > On Mon, Nov 25, 2019 at 11:41 AM Philippe Mathieu-Daud=C3=A9
+> > <philmd@redhat.com> wrote:
 > >>
-> >> sscanf() cannot detect overflow. Do we trust our input enough to
-> >> ignore this shortfall in the interface, or should we be using saner
-> >> interfaces like qemu_strtoul()?  For that matter, why do we have to
-> >> reparse something; is it not already available somewhere in numerical
-> >> form?
+> >> The r4k machine was introduced in 2005 (6af0bf9c7) and its last
+> >> logical change was in 2005 (9542611a6). After we can count 164
+> >> maintenance commits (QEMU API changes) with the exception of
+> >> 1 fix in 2015 (memory leak, commit 3ad9fd5a).
+> >>
+> >> This machine was introduced as a proof of concept to run a MIPS
+> >> CPU. 2 years later, the Malta machine was add (commit 5856de80)
+> >> modeling a real platform.
+> >>
+>
+> Since you queued this patch, do you mind adding Aurelien comment to the
+> patch description, as it appears important information:
+>
+> '''
+> The Linux kernel support for this machine has been dropped more
+> than 10 years ago in this commit:
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit=
+/?id=3D302922e5f6901eb6f29c58539631f71b3d9746b8
+> '''
+>
+
+Sure.
+
+> I was not sure when sending the patch, but as an improvement, we can
+> also remove Aurelien and Aleksandar Rikalo from the MAINTAINERS section.
+>
+
+I would leave that section intact please. They are currently formally
+in charge of this machine, and if they have been so by now for so long
+time, let them be the same even during deprecation period.
+
+I would of course remove the patch related to R4000 maintainership fro
+my separate series covering chang in the maintainership, since it
+really loses any sense.
+
+> And I assume we can also add (which was explicit in your previous patch):
+> Acked-by: Aurelien Jarno <aurelien@aurel32.net>
+>
+
+OK.
+
+> If you want I can resend this patch with all that amended.
+>
+> >> Note also this machine has no specification except 5 lines in
+> >> the header of this file:
+> >>
+> >>   * emulates a simple machine with ISA-like bus.
+> >>   * ISA IO space mapped to the 0x14000000 (PHYS) and
+> >>   * ISA memory at the 0x10000000 (PHYS, 16Mb in size).
+> >>   * All peripherial devices are attached to this "bus" with
+> >>   * the standard PC ISA addresses.
+> >>
+> >> It is time to deprecate this obsolete machine. Users are
+> >> recommended to use the Malta board, which hardware is well
+> >> documented.
+> >>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> >> ---
+> >>   qemu-deprecated.texi | 5 +++++
+> >>   hw/mips/mips_r4k.c   | 1 +
+> >>   MAINTAINERS          | 2 +-
+> >>   3 files changed, 7 insertions(+), 1 deletion(-)
+> >>
 > >
-> > Yes, I wondered about that too, but found no other way. But the input
-> > is trusted, AFAIK the only way to add child nodes is trough
-> > quorum_add_child above and quorum_open and there already are adequate
-> > checks there.
+> > Applied to MIPS queue.
+> >
+> >> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> >> index 4b4b7425ac..05265b43c8 100644
+> >> --- a/qemu-deprecated.texi
+> >> +++ b/qemu-deprecated.texi
+> >> @@ -266,6 +266,11 @@ The 'scsi-disk' device is deprecated. Users shoul=
+d use 'scsi-hd' or
+> >>
+> >>   @section System emulator machines
+> >>
+> >> +@subsection mips r4k platform (since 4.2)
+> >> +
+> >> +This machine type is very old and unmaintained. Users should use the =
+'malta'
+> >> +machine type instead.
+> >> +
+> >>   @subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
+> >>
+> >>   These machine types are very old and likely can not be used for live=
+ migration
+> >> diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+> >> index 70024235ae..0b79ad26cb 100644
+> >> --- a/hw/mips/mips_r4k.c
+> >> +++ b/hw/mips/mips_r4k.c
+> >> @@ -294,6 +294,7 @@ void mips_r4k_init(MachineState *machine)
+> >>
+> >>   static void mips_machine_init(MachineClass *mc)
+> >>   {
+> >> +    mc->deprecation_reason =3D "use malta machine type instead";
+> >>       mc->desc =3D "mips r4k platform";
+> >>       mc->init =3D mips_r4k_init;
+> >>       mc->block_default_type =3D IF_IDE;
+> >> diff --git a/MAINTAINERS b/MAINTAINERS
+> >> index 5e5e3e52d6..3b3a88e264 100644
+> >> --- a/MAINTAINERS
+> >> +++ b/MAINTAINERS
+> >> @@ -972,7 +972,7 @@ F: hw/net/mipsnet.c
+> >>   R4000
+> >>   M: Aurelien Jarno <aurelien@aurel32.net>
+> >>   R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+> >> -S: Maintained
+> >> +S: Obsolete
+> >>   F: hw/mips/mips_r4k.c
+> >>
+> >>   Fulong 2E
+> >> --
+> >> 2.21.0
+> >>
+> >>
+> >
 >
-> I also don't see any other way to get that value, unless we change
-> BDRVQuorumState to store that information (e.g. instead of children
-> being a list of pointers BdrvChild ** it could be a list of {pointer,
-> index}, or something like that).
->
-> There's another (more convoluted) alternative if we don't want to parse
-> child->name. Since we only want to know if the child number equals
-> s->next_child_index - 1, we can do it the other way around:
->
->    snprintf(str, 32, "children.%u", s->next_child_index - 1);
->
-> and then compare str and child->name.
->
-> Berto
-
-Hi,
-I will do it your way, then it's also more consistent with the name
-creation in quorum_add and quorum_open.
-
-Regards,
-Lukas Straub
 
