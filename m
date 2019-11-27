@@ -2,84 +2,106 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F5DC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 15:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6068C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 15:56:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25018206E0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 15:56:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84BA020684
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 15:56:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUlmrXrs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25018206E0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YkrMAtkX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84BA020684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZzfa-0005hG-Tk
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 10:55:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54348)
+	id 1iZzgL-0007F1-OF
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 10:56:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54238)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iZzeH-00040n-Ls
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 10:54:38 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iZzcx-0002eD-EJ
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 10:53:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iZzeG-0004eF-BH
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 10:54:37 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59612
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iZzcw-00047n-8i
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 10:53:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59826
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iZzeG-0004e7-7G
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 10:54:36 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iZzcw-00047R-4f
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 10:53:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574870075;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ALF4jJwO5q4RkITvrx4plX8f8cUyIdPesOtnzRHHy+Y=;
- b=BUlmrXrsM7g2ikbk7KMoER4uLu7DonsPrBlZQuNcUmfZQWd7D9KPvH0krQ2YtTxA9EKsfS
- yswe9TvICXdTm10BuvUlkMRPSrumA9MstBantaKZ04fNS8kKKrJ+3KZX8BCFB7TM7SQDh0
- a5UN/1xWLM06kyutqkgucxpQQXkJll0=
+ s=mimecast20190719; t=1574869993;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=MH1p2Y4rvDvlKjFWJIFluIozj/LBPxkYZHS7WVQsMIA=;
+ b=YkrMAtkXQLsT5W8x/tjY29DsE02LbJbJlJSlpUoBXduZEtiAXiWA+ZwHUI/bTUU2eZ7klh
+ 3xUIZeK4ABYjBb8ZYmv3sV40O5HKlttNKnAtY8XMnbbhdC3HVw7whLcQBlrYZfydbO4Wb/
+ J6Ib7jALsUEnc+MvhZ6TuwWhqhmfhi4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-RyiNKD_nN3CPoGW-Y__3MA-1; Wed, 27 Nov 2019 10:54:33 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-24-jCeoyksFNByWToLtenFj2Q-1; Wed, 27 Nov 2019 10:53:10 -0500
+X-MC-Unique: jCeoyksFNByWToLtenFj2Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40E46A0372;
- Wed, 27 Nov 2019 15:54:32 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E727C5D9D6;
- Wed, 27 Nov 2019 15:54:25 +0000 (UTC)
-Date: Wed, 27 Nov 2019 15:54:23 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [RFC 00/10] R300 QEMU device V2
-Message-ID: <20191127155423.GH2131806@redhat.com>
-References: <20191126124433.860-1-aaron.zakhrov@gmail.com>
- <20191126141924.GQ556568@redhat.com>
- <09273ecd-be76-ab61-304f-7ea0f1f0b107@redhat.com>
- <20191127150520.GG2131806@redhat.com>
- <19e8e458-04dc-874d-d372-04a0e2d5246b@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AB32101F7F4;
+ Wed, 27 Nov 2019 15:53:09 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-205-186.brq.redhat.com
+ [10.40.205.186])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DECB219C69;
+ Wed, 27 Nov 2019 15:53:05 +0000 (UTC)
+Subject: Re: [PATCH v4 1/5] blockdev: fix coding style issues in
+ drive_backup_prepare
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+References: <20191121135759.101655-1-slp@redhat.com>
+ <20191121135759.101655-2-slp@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <1402aafb-7eae-f336-be8c-fb61f5f969c7@redhat.com>
+Date: Wed, 27 Nov 2019 16:53:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <19e8e458-04dc-874d-d372-04a0e2d5246b@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: RyiNKD_nN3CPoGW-Y__3MA-1
+In-Reply-To: <20191121135759.101655-2-slp@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="6w7z7lVuttDKcwbgaaAnjMjSAHdykxe1P"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,102 +113,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- kraxel@redhat.com, Aaron Dominick <aaron.zakhrov@gmail.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 27, 2019 at 04:13:18PM +0100, Philippe Mathieu-Daud=C3=A9 wrote=
-:
-> Cc'ing more.
->=20
-> On 11/27/19 4:05 PM, Daniel P. Berrang=C3=A9 wrote:
-> > On Wed, Nov 27, 2019 at 04:00:01PM +0100, Philippe Mathieu-Daud=C3=A9 w=
-rote:
-> > > Hi Daniel, Aaron.
-> > >=20
-> > > On 11/26/19 3:19 PM, Daniel P. Berrang=C3=A9 wrote:
-> > > > On Tue, Nov 26, 2019 at 06:14:27PM +0530, aaron.zakhrov@gmail.com w=
-rote:
-> > > > > From: Aaron Dominick <aaron.zakhrov@gmail.com>
-> > > > >=20
-> > > > > I have removed the botched patches and have got the code working =
-upto the GART initialization.
-> > > > > I am not sure how to implement the GART. I am guessing it should =
-be an IOMMU device but I think that is a bit much for an emulated card.
-> > > > > The earlier problem of display probing seems to be resolved by us=
-ing an R300 bios I got from TechPowerUP's GPU database:
-> > > > >=20
-> > > > > =09https://www.techpowerup.com/vgabios/14509/14509
-> > > > > I am NOT sure if we can distribute it in the QEMU source tree. If=
- it
-> > > > > does cause problems I can send a patch to remove it.
-> > > >=20
-> > > > That site seems to be a repository of BIOS uploaded by arbitrary us=
-ers,
-> > > > with no information on what license terms might apply to the upload=
-s.
-> > > >=20
-> > > > We have to therefore assume the worst and treat the BIOS images on =
-that
-> > > > site as proprietary and not re-distributable, despite the fact that=
- the
-> > > > site itself is acting as a 3rd party distributor.
-> > >=20
-> > > We can not redistribute this BIOS.
-> > >=20
-> > > > IOW, we can't have this in QEMU git I'm afraid, unless someone can =
-find
-> > > > a trustworthy vendor source for the original image with accompanyin=
-g
-> > > > license information.
-> > >=20
-> > > Daniel, I think there is no problem if Aaron contributes a model of t=
-he R300
-> > > device to QEMU, right? This doesn't involve redistributing any BIOS.
-> >=20
-> > Having just the device impl doesn't cause any legal problems.
-> >=20
-> > It does become a slight usability issue, as any users need to go and fi=
-nd
-> > the suitable BIOS in order to use the device. No downstream OS vendors =
-are
-> > going to be able to distribute this BIOS either
-> >=20
-> > I don't know if we have hit this problem before & if we have any
-> > general policies about it ?
->=20
-> This appears to me the same case as a user downloading a proprietary
-> driver/firmware at some vendor website, accepting the EULA, then using th=
-e
-> driver within a QEMU VM.
->=20
-> No close source blob are redistributed, but users can still run them, and
-> both party (the QEMU project, and the users) are legally correct, right? =
-But
-> IANAL.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6w7z7lVuttDKcwbgaaAnjMjSAHdykxe1P
+Content-Type: multipart/mixed; boundary="9iIDrc018XS9mh0jLqDFAirPXWY1NfzCF"
 
-Well in this case the user wouldn't be reading or accepting any EULA,
-because this 3rd party site doesn't provide any such things with the
-firmware it is re-distributing.
+--9iIDrc018XS9mh0jLqDFAirPXWY1NfzCF
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-IOW, the only way the user can use this device is to download the
-firmware from this 3rd site & ignore the lack of legal information
-they provide about license/distribution rules.
+On 21.11.19 14:57, Sergio Lopez wrote:
+> Fix a couple of minor coding style issues in drive_backup_prepare.
+>=20
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  blockdev.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+
+
+--9iIDrc018XS9mh0jLqDFAirPXWY1NfzCF--
+
+--6w7z7lVuttDKcwbgaaAnjMjSAHdykxe1P
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3em+AACgkQ9AfbAGHV
+z0CiEAf7Bd3NXb65KZvJJX/BHOgvGVJ+EJRUiNnXs3njN4hXM/T2c5IMXX9Bdaga
+/Wy82OaGzSFR23K4tQIyxszQvYQwzW+YE70DmJ54LNz9Z8fBI51UzSfArkaiXFpB
+qjOF+ILAKk5czBGvCWmDsNvKAh6jxXkS1bKM2wxGR+u9O4AoGYseAe9nVRQiusHf
+sf/XufLNJwDFNRI2AtO523SfNKU6id7Xzljfb6mwQSBREUbGjijOKqD8y7rnWiB3
+56URY05RkJvYuNJ7q83JEr5hXLJgSKlRrIjtC1ZjZmkcPejBc+BNSI+z6JzF2F5k
+3HqKgbS9OyOOq8OYgS7OrOlc03FKeA==
+=L+iT
+-----END PGP SIGNATURE-----
+
+--6w7z7lVuttDKcwbgaaAnjMjSAHdykxe1P--
 
 
