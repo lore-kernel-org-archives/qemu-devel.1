@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4B0C43215
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 21:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC088C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 21:34:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A96B20665
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 21:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7629F20665
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 21:34:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAC8u3BR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A96B20665
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gdsHLjyj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7629F20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia4v5-0001L4-Em
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 16:32:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55524)
+	id 1ia4wu-0002UG-H4
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 16:34:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56717)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ia4td-0000nW-63
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:30:50 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ia4us-0001Me-Nf
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:32:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ia4tb-0004OD-27
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:30:48 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:38375)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ia4ur-0005lY-6h
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:32:06 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37953)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ia4ta-0004Mz-Qh
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:30:46 -0500
-Received: by mail-ot1-x344.google.com with SMTP id z25so20413406oti.5
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 13:30:46 -0800 (PST)
+ id 1ia4ur-0005jm-0o
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 16:32:05 -0500
+Received: by mail-oi1-x241.google.com with SMTP id a14so21441199oid.5
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 13:32:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=JXvT5o0Gd1gREWBesSjnwOkZo5sOzRG0oiFQV1LhO+s=;
- b=JAC8u3BRqU8wXpkdV0IrZthe6a8ggBPUhmnMHlzwx6qA6/6rA326qtZATONeWcu9ME
- xLJ7WcTnChk/5bVAY3jcQSH7MOH1P8v7Ap/U1Wy9MJf1pg42ToR0966u7dGkjkAdm5op
- BluXH7nQ6xPywl/rQhPMsotyZ1QHTPRRJ0c7a5nkYm3OjPh8C1+jKxYVAA6tk7lAOsMR
- SqKWuxCongk1Fq6/9HIk0o3/aG24oDfo0ArUsnOWVDtZnu9U80KEWRogMItKI/b7MXel
- kpvFjFsp6/IUAWBXHHdPcuPOs3Q8OKUtkNXNRNLV5geiUQnWXrIRdQLFu6DB7fm0BnNe
- E50Q==
+ bh=SM5Y17btB8Qa9QN2opy96oNU0EB80foFS6DIUCshMCs=;
+ b=gdsHLjyjpWT5yvVaOEilJgJ7mBd2/2M8fgyzct1RhRDyaNR0J2dhyYEefltQeClnLy
+ Yv9W83atspxwcXObPZa3yU1JS74tDZTtkAxtGuIU27hTtLBjxE+KG99qsi6XjVhxOgZP
+ thTz10xJovhDLNQCI7HZEVfH3BqNJiUzFbEOVh4EKd6k/LUPRB3uNfE02LsdJd5y4DFY
+ HrsW4d/hv2zgoAEnDAFWyJQShy3xH8uRxHSelz5rgQZ/INzZ2D/63Z7x7P4VwOyfjEs2
+ n3b7jJ31dGsYABuAmVcqkGJVPI4YgCM3jVsgPo6hfYXGnhJ7ZB7HXzxsYtOz4GFbzdug
+ 36Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=JXvT5o0Gd1gREWBesSjnwOkZo5sOzRG0oiFQV1LhO+s=;
- b=XP4fWlweyMmhkeJrkvG/fu+rxkM44UemftqXht7+byl3oTgBZy8K1SIkTznkHvQ/Bv
- ujmsgrUPhhSdDWOAB77c37v1U97eSZR7srtrm4rA2V6SYfyjl+VEvV0NlyRimDzcK3gM
- k6WwPQydOXuYQ3SbGm4MarceVBoAH0J/ZzTTIF98lkKsdysnxbISabgNkgdfG3iHN733
- ziDwSqPdIA94V24Akia3YZtqTJouKdX2lULgAOxRJgiXs37IRsKDPwEflVc5ieySSgAA
- 7Sv2KmYzFFjf0uiBHxYal8NxY1RDwWZNABZEVcW9mx+7YVACuIKgzVdae9ij4HhHYT3S
- SmXg==
-X-Gm-Message-State: APjAAAXqaz7qNcAJbLH2oNu+Bkx9goniFEz8TXoLWOtcqOLWKO73UFd5
- 9A/34riq9frypcZQ7jDuXRd/bL949WVgiR0tvQI=
-X-Google-Smtp-Source: APXvYqzensJkU8k64d4o9XHDyXcxLzs/aNF9HaJDpNxCcbBHZYNJvAWmBF7dvLMiZ7gwflXpNeq822zmQdfKzCmCQJ4=
-X-Received: by 2002:a9d:58c9:: with SMTP id s9mr609704oth.121.1574890245234;
- Wed, 27 Nov 2019 13:30:45 -0800 (PST)
+ bh=SM5Y17btB8Qa9QN2opy96oNU0EB80foFS6DIUCshMCs=;
+ b=k4fdR23SuniJqC2II+z5b1aTi/d6wmqGaZhuQYAy3uu4RkFiacBMNAnRZPAM2MqbUV
+ dgtmEqF7HcLLs/aXLtClC0xgfLJMJJHo3xj1QcFARX8nplpmzKoHC/b6l+xaoqURqPOv
+ 1gOmU7sdbBmLsgzwO/lHp2kRLQy0cr8DrsIvqqMrbqFvdbVG9SxKXpGya1uuGDiGOTVh
+ FX2kZqzH8ViMBqs3siZbzVSugn5tf4+0HwX1Cf3s/3fK3s8Y+IhI87F/eoNYuNtCEMtt
+ lQey8OXfCfitKWiFXoltN+LIx8lm7UkrsC6bX2lj2j1kJQCyOOcbQ5Ws/05SRrT8C2Ru
+ wMDw==
+X-Gm-Message-State: APjAAAUGzgRIrbHypcy3bV5oGZFrJuLkkqEtUFJ07EA7mMgPo7TXmMml
+ In53Z3qZI5HrlxdgTQX5m18ieFjiaU66A+KX30Q=
+X-Google-Smtp-Source: APXvYqymFPqHCAVRj8mgaGjhqC+c2ctjaBxMjxQylpa5I2l98rDvRutZ7B4qVQV03Y0AWHMpzC7phfxtpTsqt5xIjwc=
+X-Received: by 2002:aca:670b:: with SMTP id z11mr5671962oix.79.1574890324092; 
+ Wed, 27 Nov 2019 13:32:04 -0800 (PST)
 MIME-Version: 1.0
 References: <20191125104103.28962-1-philmd@redhat.com>
  <CAL1e-=gJxBRvkiPzdAKOqVLEc7mmLpJRrprv5Rjcd8p2jD+_Hg@mail.gmail.com>
  <8fa0f275-797a-6a3c-4fac-43f4f7a8b975@redhat.com>
 In-Reply-To: <8fa0f275-797a-6a3c-4fac-43f4f7a8b975@redhat.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 27 Nov 2019 22:30:34 +0100
-Message-ID: <CAL1e-=gyUQh7zZ_2sj=DfvZ856m2Ugm+9vS3xvjHUniWmUUsdw@mail.gmail.com>
+Date: Wed, 27 Nov 2019 22:31:52 +0100
+Message-ID: <CAL1e-=i8vTPSPPCWBZfwd4c7cVD7cQPZSeJX7w7iWitAMYJuog@mail.gmail.com>
 Subject: Re: [PATCH-for-4.2] hw/mips: Deprecate the r4k machine
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,29 +131,17 @@ On Wed, Nov 27, 2019 at 10:17 PM Philippe Mathieu-Daud=C3=A9
 /?id=3D302922e5f6901eb6f29c58539631f71b3d9746b8
 > '''
 >
-
-Sure.
-
 > I was not sure when sending the patch, but as an improvement, we can
 > also remove Aurelien and Aleksandar Rikalo from the MAINTAINERS section.
 >
-
-I would leave that section intact please. They are currently formally
-in charge of this machine, and if they have been so by now for so long
-time, let them be the same even during deprecation period.
-
-I would of course remove the patch related to R4000 maintainership fro
-my separate series covering chang in the maintainership, since it
-really loses any sense.
-
 > And I assume we can also add (which was explicit in your previous patch):
 > Acked-by: Aurelien Jarno <aurelien@aurel32.net>
 >
-
-OK.
-
 > If you want I can resend this patch with all that amended.
 >
+
+No need to resend, I'll fix the things while applying.
+
 > >> Note also this machine has no specification except 5 lines in
 > >> the header of this file:
 > >>
