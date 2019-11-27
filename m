@@ -2,67 +2,75 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6566FC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 01:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE9FBC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 02:32:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39D7C2068E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 01:51:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39D7C2068E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C096B2071A
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 02:32:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C096B2071A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZmUk-0005dW-Ba
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 20:51:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49417)
+	id 1iZn7k-0004ju-TN
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 21:32:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52999)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhengxiang9@huawei.com>) id 1iZmSV-0003jk-Ao
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 20:49:36 -0500
+ (envelope-from <bounces@canonical.com>) id 1iZn6m-00048P-NA
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 21:31:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhengxiang9@huawei.com>) id 1iZmHb-0003cc-PH
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 20:38:21 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:45350 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
- id 1iZmHZ-0003VB-I2; Tue, 26 Nov 2019 20:38:18 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 4F42ECA742D128B964E0;
- Wed, 27 Nov 2019 09:38:09 +0800 (CST)
-Received: from [127.0.0.1] (10.133.224.57) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Wed, 27 Nov 2019
- 09:37:59 +0800
-From: Xiang Zheng <zhengxiang9@huawei.com>
-Subject: Re: [RESEND PATCH v21 2/6] docs: APEI GHES generation and CPER record
- description
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20191111014048.21296-1-zhengxiang9@huawei.com>
- <20191111014048.21296-3-zhengxiang9@huawei.com>
- <20191115104458.200a6231@redhat.com>
-Message-ID: <05d2ba81-501f-bd7e-8da4-73e413169688@huawei.com>
-Date: Wed, 27 Nov 2019 09:37:57 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
+ (envelope-from <bounces@canonical.com>) id 1iZn6l-0001qw-EJ
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 21:31:12 -0500
+Received: from indium.canonical.com ([91.189.90.7]:45236)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iZn6k-0001qH-3e
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 21:31:10 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iZn6i-0007TH-FM
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 02:31:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 61B102E80D0
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 02:31:08 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20191115104458.200a6231@redhat.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.224.57]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 27 Nov 2019 02:24:11 -0000
+From: =?utf-8?b?5p2O56mX5oGS?= <1754542@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: colo
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: chao.wang lisuiheng zhangckid
+X-Launchpad-Bug-Reporter: =?utf-8?b?5p2O56mX5oGSIChsaXN1aWhlbmcp?=
+X-Launchpad-Bug-Modifier: =?utf-8?b?5p2O56mX5oGSIChsaXN1aWhlbmcp?=
+References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
+Message-Id: <157482145242.21375.11551343254424532154.launchpad@soybean.canonical.com>
+Subject: [Bug 1754542] Re: colo:  vm crash with segmentation fault
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 22d71b50917042907929ba481b8f615f9c4e3623
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -71,190 +79,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
- mst@redhat.com, wanghaibin.wang@huawei.com, mtosatti@redhat.com,
- linuxarm@huawei.com, qemu-devel@nongnu.org, gengdongjiu@huawei.com,
- shannon.zhaosl@gmail.com, qemu-arm@nongnu.org, james.morse@arm.com,
- xuwei5@huawei.com, jonathan.cameron@huawei.com, pbonzini@redhat.com,
- lersek@redhat.com, rth@twiddle.net
+Reply-To: Bug 1754542 <1754542@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Igor,
+** Changed in: qemu
+       Status: New =3D> Fix Released
 
-Thanks for your review!
-Since the series of patches are going to be merged, we will address your comments by follow up patches.
+-- =
 
-On 2019/11/15 17:44, Igor Mammedov wrote:
-> On Mon, 11 Nov 2019 09:40:44 +0800
-> Xiang Zheng <zhengxiang9@huawei.com> wrote:
-> 
->> From: Dongjiu Geng <gengdongjiu@huawei.com>
->>
->> Add APEI/GHES detailed design document
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->> ---
->>  docs/specs/acpi_hest_ghes.rst | 95 +++++++++++++++++++++++++++++++++++
->>  docs/specs/index.rst          |  1 +
->>  2 files changed, 96 insertions(+)
->>  create mode 100644 docs/specs/acpi_hest_ghes.rst
->>
->> diff --git a/docs/specs/acpi_hest_ghes.rst b/docs/specs/acpi_hest_ghes.rst
->> new file mode 100644
->> index 0000000000..348825f9d3
->> --- /dev/null
->> +++ b/docs/specs/acpi_hest_ghes.rst
->> @@ -0,0 +1,95 @@
->> +APEI tables generating and CPER record
->> +======================================
->> +
->> +..
->> +   Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
->> +
->> +   This work is licensed under the terms of the GNU GPL, version 2 or later.
->> +   See the COPYING file in the top-level directory.
->> +
->> +Design Details
->> +--------------
->> +
->> +::
->> +
->> +         etc/acpi/tables                                 etc/hardware_errors
->> +      ====================                      ==========================================
->> +  + +--------------------------+            +-----------------------+
->> +  | | HEST                     |            |    address            |            +--------------+
->> +  | +--------------------------+            |    registers          |            | Error Status |
->> +  | | GHES1                    |            | +---------------------+            | Data Block 1 |
->> +  | +--------------------------+ +--------->| |error_block_address1 |----------->| +------------+
->> +  | | .................        | |          | +---------------------+            | |  CPER      |
->> +  | | error_status_address-----+-+ +------->| |error_block_address2 |--------+   | |  CPER      |
->> +  | | .................        |   |        | +---------------------+        |   | |  ....      |
->> +  | | read_ack_register--------+-+ |        | |    ..............   |        |   | |  CPER      |
->> +  | | read_ack_preserve        | | |        +-----------------------+        |   | +------------+
->> +  | | read_ack_write           | | | +----->| |error_block_addressN |------+ |   | Error Status |
->> +  + +--------------------------+ | | |      | +---------------------+      | |   | Data Block 2 |
->> +  | | GHES2                    | +-+-+----->| |read_ack_register1   |      | +-->| +------------+
->> +  + +--------------------------+   | |      | +---------------------+      |     | |  CPER      |
->> +  | | .................        |   | | +--->| |read_ack_register2   |      |     | |  CPER      |
->> +  | | error_status_address-----+---+ | |    | +---------------------+      |     | |  ....      |
->> +  | | .................        |     | |    | |  .............      |      |     | |  CPER      |
->> +  | | read_ack_register--------+-----+-+    | +---------------------+      |     +-+------------+
->> +  | | read_ack_preserve        |     |   +->| |read_ack_registerN   |      |     | |..........  |
->> +  | | read_ack_write           |     |   |  | +---------------------+      |     | +------------+
->> +  + +--------------------------|     |   |                                 |     | Error Status |
->> +  | | ...............          |     |   |                                 |     | Data Block N |
->> +  + +--------------------------+     |   |                                 +---->| +------------+
->> +  | | GHESN                    |     |   |                                       | |  CPER      |
->> +  + +--------------------------+     |   |                                       | |  CPER      |
->> +  | | .................        |     |   |                                       | |  ....      |
->> +  | | error_status_address-----+-----+   |                                       | |  CPER      |
->> +  | | .................        |         |                                       +-+------------+
->> +  | | read_ack_register--------+---------+
->> +  | | read_ack_preserve        |
->> +  | | read_ack_write           |
->> +  + +--------------------------+
-> 
-> I'd merge "Error Status Data Block" with "address registers", so it would be
-> clear that "Error Status Data Block" is located after "read_ack_registerN"
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1754542
 
-Yes, this image doesn't demonstrate this point. We will make some changes on
-this image.
+Title:
+  colo:  vm crash with segmentation fault
 
-> 
->> +
->> +(1) QEMU generates the ACPI HEST table. This table goes in the current
->> +    "etc/acpi/tables" fw_cfg blob. Each error source has different
->> +    notification types.
->> +
->> +(2) A new fw_cfg blob called "etc/hardware_errors" is introduced. QEMU
->> +    also needs to populate this blob. The "etc/hardware_errors" fw_cfg blob
->> +    contains an address registers table and an Error Status Data Block table.
->> +
->> +(3) The address registers table contains N Error Block Address entries
->> +    and N Read Ack Register entries. The size for each entry is 8-byte.
->> +    The Error Status Data Block table contains N Error Status Data Block
->> +    entries. The size for each entry is 4096(0x1000) bytes. The total size
->> +    for the "etc/hardware_errors" fw_cfg blob is (N * 8 * 2 + N * 4096) bytes.
->> +    N is the number of the kinds of hardware error sources.
->> +
->> +(4) QEMU generates the ACPI linker/loader script for the firmware. The
->> +    firmware pre-allocates memory for "etc/acpi/tables", "etc/hardware_errors"
->> +    and copies blob contents there.
->> +
->> +(5) QEMU generates N ADD_POINTER commands, which patch addresses in the
->> +    "error_status_address" fields of the HEST table with a pointer to the
->> +    corresponding "address registers" in the "etc/hardware_errors" blob.
->> +
->> +(6) QEMU generates N ADD_POINTER commands, which patch addresses in the
->> +    "read_ack_register" fields of the HEST table with a pointer to the
->> +    corresponding "address registers" in the "etc/hardware_errors" blob.
-> 
-> s/"address registers" in/"read_ack_register" within/
+Status in QEMU:
+  Fix Released
 
-OK.
+Bug description:
+  I use Arch Linux x86_64
+  Zhang Chen's(https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10)
+  Following document 'COLO-FT.txt',
+  I test colo feature on my hosts
 
-> 
->> +
->> +(7) QEMU generates N ADD_POINTER commands for the firmware, which patch
->> +    addresses in the "error_block_address" fields with a pointer to the
->> +    respective "Error Status Data Block" in the "etc/hardware_errors" blob.
->> +
->> +(8) QEMU defines a third and write-only fw_cfg blob which is called
->> +    "etc/hardware_errors_addr". Through that blob, the firmware can send back
->> +    the guest-side allocation addresses to QEMU. The "etc/hardware_errors_addr"
->> +    blob contains a 8-byte entry. QEMU generates a single WRITE_POINTER command
->> +    for the firmware. The firmware will write back the start address of
->> +    "etc/hardware_errors" blob to the fw_cfg file "etc/hardware_errors_addr".
->> +
-> 
->> +(9) When QEMU gets a SIGBUS from the kernel, QEMU formats the CPER right into
->> +    guest memory, 
-> 
-> s/
-> QEMU formats the CPER right into guest memory
-> /
-> QEMU writes CPER into corresponding "Error Status Data Block"
-> /
-> 
+  I run this command
+  Primary:
+  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
+dio -name primary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3Dfifo=
+,vote-threshold=3D1,\
+  children.0.file.filename=3D/var/lib/libvirt/images/1.raw,\
+  children.0.driver=3Draw -S
 
-OK.
+  Secondary:
+  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
+dio -name secondary \
+  -device piix3-usb-uhci \
+  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
+  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
+  -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D/var/lib/libvirt/im=
+ages/2.raw,driver=3Draw,node-name=3Dnode0 \
+  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
+y,\
+  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
+  file.file.filename=3D/mnt/ramfs/active_disk.img,\
+  file.backing.driver=3Dqcow2,\
+  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
+  file.backing.backing=3Dsecondary-disk0 \
+  -incoming tcp:0:8888
 
->> and then injects platform specific interrupt (in case of
->> +    arm/virt machine it's Synchronous External Abort) as a notification which
->> +    is necessary for notifying the guest.
-> 
-> 
->> +
->> +(10) This notification (in virtual hardware) will be handled by the guest
->> +     kernel, guest APEI driver will read the CPER which is recorded by QEMU and
->> +     do the recovery.
-> Maybe better would be to say:
-> "
-> On receiving notification, guest APEI driver cold read the CPER error
-> and take appropriate action
-> "
+  Secondary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'nbd-server-start',
+    'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.34',=
+ 'port': '8889'} } }
+  }
+  {'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', =
+'writable': true } }
 
-OK.
+  Primary:
+  {'execute':'qmp_capabilities'}
+  { 'execute': 'human-monitor-command',
+    'arguments': {'command-line': 'drive_add -n buddy driver=3Dreplication,=
+mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.port=3D8889,=
+file.export=3Dsecondary-disk0,node-name=3Dnbd_client0'}}
+  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', =
+'node': 'nbd_client0' } }
+  { 'execute': 'migrate-set-capabilities',
+        'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': t=
+rue } ] } }
+  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
+  And two VM with cash
+  Primary:
+  {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "=
+RESUME"}
+  [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
 
-> 
-> 
-> also in HEST patches there is implicit ABI, which probably should be documented here.
-> More specifically kvm_arch_on_sigbus_vcpu() error injection
-> uses source_id as index in "etc/hardware_errors" to find out "Error Status Data Block"
-> entry corresponding to error source. So supported source_id values should be assigned
-> here and not be changed afterwards to make sure that guest will write error into
-> expected "Error Status Data Block" even if guest was migrated to a newer QEMU.
-> 
+  Secondary:
+  {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "=
+RESUME"}
+  [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
+ot c -enable-kvm -m 2048 -smp 2 -qm
 
-OK, I will add the descriptions of the implicit ABI.
-
--- 
-
-Thanks,
-Xiang
-
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions
 
