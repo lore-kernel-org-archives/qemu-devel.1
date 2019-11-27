@@ -2,94 +2,96 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 123A3C43215
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 20:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5632C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 20:44:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D190E2158C
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 20:34:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81E10217BC
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 20:44:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1ekSSoO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D190E2158C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ahGkdjdl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81E10217BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia40n-0008It-0x
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 15:34:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50015)
+	id 1ia4B4-0002ll-Il
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 15:44:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ia3zN-0007eq-U4
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 15:32:43 -0500
+ (envelope-from <mst@redhat.com>) id 1ia49X-00020S-8S
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 15:43:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ia3zK-0001pI-3B
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 15:32:40 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36242
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1ia49U-0002mm-A1
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 15:43:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38310
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ia3zF-0001j6-SU
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 15:32:35 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ia49T-0002lx-Q0
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 15:43:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574886749;
+ s=mimecast20190719; t=1574887387;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zH/T5jU4tH/8Gb+1qmuFB+rSdeHGBSoJ0BA6rM2mcnc=;
- b=S1ekSSoONW6WJ38wUMM7o0k/VTEavatvgWPE/oNWWSnrxmz+I8CqgKLZP24neXT74HScJG
- UrrAddVG7awCIO+vxSQB82T1uFxagtnd7Y4Kr743RqkaS24UxO+uNdCUQb8WLcwu2HzD2k
- 28BTKeztYyKCBEU0aqbVYBX5tUN4A7g=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-273-DsfRQc8dMnyBKbjVSs3vBQ-1; Wed, 27 Nov 2019 15:32:25 -0500
-Received: by mail-qv1-f69.google.com with SMTP id b6so15615065qvo.4
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 12:32:25 -0800 (PST)
+ bh=8VtRa1Zz20b5b10jpSH5pRIv9rgjEaD1p8lzUZ+0jqY=;
+ b=ahGkdjdl4hhJ/DnzJFPJH4HiQ7nnK/CBD7prfDB4tIBCA4e3O8uUtw/gDEDUeLoWuxlsks
+ YDhg6VbY+cHaJS/anwILT59aLw4Rz21I9eMUmbNa5hC+y2LgYOK2QLe4W7Oz8oz58wiLwr
+ jQ6CiGa4/bsDSHUHnACIp9zfIq6P2ks=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-9jAIgU25PuilP9ZZe-VYsg-1; Wed, 27 Nov 2019 15:43:05 -0500
+Received: by mail-qk1-f200.google.com with SMTP id b72so9233705qkg.12
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 12:43:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=7MY+sx+Nuv189evu6jc/7Ff6+j+qSUxD3qsuDjudl3E=;
- b=eh/15nz/CB7cF/Tt0HYVB+TU3yOXw/+aa/aqpIXsIXLKfv1ZuuBM8k9KFmZCWwH0Gq
- CiH1qTZLCDgwbmr26cfB+O20WLBz4ZelCg9GI4DrguBLFhkMXY6Gw6yNeVXhqmlIsBli
- ByFf4HpeKuqcNlVw8sRL/6URQtV0CfMOfD6exKeFWqgEJH5RcX867Y0h8/ExDIGLbmnk
- baHrK1feP+b9FwSqV1JX8bNl23ve3uop/eDmzdLKw7Xw2kDW1bB8610NuGCtvQkd8fUw
- 1L8Q/wz2Ql7U/fPM6a8rvgVCMXJa6LW9iR6xdSYWF5hoWstSXAA1l3gLdvKpklFj0/pa
- /BJg==
-X-Gm-Message-State: APjAAAWxZqpR+hg7iVX/1MIXWIeDUX5/bBGAhsTHjX4NqOTFN3owjnDu
- C+Qs555UwqynIjQ85KIp1dY8epFO4lh31/q8TtqT8bBxvN/CsR+MG10cX+sQ4wguWDamOJRNQM4
- DUfLDzZF/scY1gSw=
-X-Received: by 2002:ad4:55e8:: with SMTP id bu8mr3198581qvb.61.1574886745491; 
- Wed, 27 Nov 2019 12:32:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzOaXOFxvrAACGTJt/FeYHy85AqcOBKnTlQND1DqS/Jm+RE0uTl1tA+4+iDEbGw4t6w2fwm7A==
-X-Received: by 2002:ad4:55e8:: with SMTP id bu8mr3198538qvb.61.1574886745141; 
- Wed, 27 Nov 2019 12:32:25 -0800 (PST)
+ bh=IpiO73hZN5mV+C5Sl/ZBsA/NT2kVH34L2RQ1hX6wMwk=;
+ b=pLLUreOjZobDcXFbMS0Dy3BvrkD05DfhxRy0XEAco1tjmcCBjdT/a4zdzSWB4/g4w3
+ zzHiS1qvMXMDV/nQQbtWKeUAAvWR3dLrGt8TR5x1r0fbbW2ZNidvcrRMb+4Xeq7GC0x+
+ VcE5tkEJ7d+Cl54T/9QGEOKt2INpDgyUnctr4MIkHpU7ViPb5urv9mSu6sFRmKpa2aJr
+ OjPUZ0BA/r/000+NBfRgzsEUyYPkEmtdKVkRN9tMIyJSmqVg0i6qbWzq6d5aLZkcpLq4
+ U7egwMor3hca+DMLwpeEjbtbcUn4onU2E9idnxVN30bZri3mS6uccIkc91a6FbwVHAzf
+ Bt6w==
+X-Gm-Message-State: APjAAAX2fjTf4zXGnHEEMb1w7aHH7hUcluWMSAnV5WyNplXXHl98YZS8
+ TreyEvDzzwZIYTOrhFf9QhaM7kFvzwf5rjXWKi+bD096qFpKAcTb2PoZTK6/gsxZfhqbR6pa8pV
+ 8ySEJLU3aY3oIhY8=
+X-Received: by 2002:ac8:53c4:: with SMTP id c4mr28703517qtq.305.1574887385364; 
+ Wed, 27 Nov 2019 12:43:05 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyPfDbPX7GkwQcGm4ohIai3j7SSNh11smpeg28a1YKbGYFJSsL7k0CmYXBmYl5+vHBhtVDfHQ==
+X-Received: by 2002:ac8:53c4:: with SMTP id c4mr28703488qtq.305.1574887385088; 
+ Wed, 27 Nov 2019 12:43:05 -0800 (PST)
 Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id o70sm7418083qke.47.2019.11.27.12.32.20
+ by smtp.gmail.com with ESMTPSA id u67sm7279188qkf.115.2019.11.27.12.43.00
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 Nov 2019 12:32:24 -0800 (PST)
-Date: Wed, 27 Nov 2019 15:32:17 -0500
+ Wed, 27 Nov 2019 12:43:04 -0800 (PST)
+Date: Wed, 27 Nov 2019 15:42:57 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jakub Kicinski <jakub.kicinski@netronome.com>
-Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
-Message-ID: <20191127152653-mutt-send-email-mst@kernel.org>
+To: Prashant Bhole <prashantbhole.linux@gmail.com>
+Subject: Re: [RFC net-next 15/18] virtio_net: implement XDP prog offload
+ functionality
+Message-ID: <20191127153253-mutt-send-email-mst@kernel.org>
 References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
- <20191126123514.3bdf6d6f@cakuba.netronome.com>
+ <20191126100744.5083-16-prashantbhole.linux@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191126123514.3bdf6d6f@cakuba.netronome.com>
-X-MC-Unique: DsfRQc8dMnyBKbjVSs3vBQ-1
+In-Reply-To: <20191126100744.5083-16-prashantbhole.linux@gmail.com>
+X-MC-Unique: 9jAIgU25PuilP9ZZe-VYsg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,67 +103,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Song Liu <songliubraving@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+Cc: Song Liu <songliubraving@fb.com>,
+ Jakub Kicinski <jakub.kicinski@netronome.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
  Daniel Borkmann <daniel@iogearbox.net>, qemu-devel@nongnu.org,
  netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
  John Fastabend <john.fastabend@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
- Martin KaFai Lau <kafai@fb.com>,
- Prashant Bhole <prashantbhole.linux@gmail.com>, kvm@vger.kernel.org,
+ Martin KaFai Lau <kafai@fb.com>, kvm@vger.kernel.org,
  Yonghong Song <yhs@fb.com>, Andrii Nakryiko <andriin@fb.com>,
  "David S . Miller" <davem@davemloft.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 26, 2019 at 12:35:14PM -0800, Jakub Kicinski wrote:
-> On Tue, 26 Nov 2019 19:07:26 +0900, Prashant Bhole wrote:
-> > Note: This RFC has been sent to netdev as well as qemu-devel lists
-> >=20
-> > This series introduces XDP offloading from virtio_net. It is based on
-> > the following work by Jason Wang:
-> > https://netdevconf.info/0x13/session.html?xdp-offload-with-virtio-net
-> >=20
-> > Current XDP performance in virtio-net is far from what we can achieve
-> > on host. Several major factors cause the difference:
-> > - Cost of virtualization
-> > - Cost of virtio (populating virtqueue and context switching)
-> > - Cost of vhost, it needs more optimization
-> > - Cost of data copy
-> > Because of above reasons there is a need of offloading XDP program to
-> > host. This set is an attempt to implement XDP offload from the guest.
+On Tue, Nov 26, 2019 at 07:07:41PM +0900, Prashant Bhole wrote:
+> From: Jason Wang <jasowang@redhat.com>
 >=20
-> This turns the guest kernel into a uAPI proxy.
+> This patch implements bpf_prog_offload_ops callbacks and adds handling
+> for XDP_SETUP_PROG_HW. Handling of XDP_SETUP_PROG_HW involves setting
+> up struct virtio_net_ctrl_ebpf_prog and appending program instructions
+> to it. This control buffer is sent to Qemu with class
+> VIRTIO_NET_CTRL_EBPF and command VIRTIO_NET_BPF_CMD_SET_OFFLOAD.
+> The expected behavior from Qemu is that it should try to load the
+> program in host os and report the status.
+
+That's not great e.g. for migration: different hosts might have
+a different idea about what's allowed.
+Device capabilities should be preferably exported through
+feature bits or config space such that it's easy to
+intercept and limit these as needed.
+
+Also, how are we going to handle e.g. endian-ness here?
+
 >=20
-> BPF uAPI calls related to the "offloaded" BPF objects are forwarded=20
-> to the hypervisor, they pop up in QEMU which makes the requested call
-> to the hypervisor kernel. Today it's the Linux kernel tomorrow it may=20
-> be someone's proprietary "SmartNIC" implementation.
+> It also adds restriction to have either driver or offloaded program
+> at a time.
+
+I'm not sure I understand what does the above say.
+virtnet_xdp_offload_check?
+Please add code comments so we remember what to do and when.
+
+> This restriction can be removed later after proper testing.
+
+What kind of testing is missing here?
+
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> Co-developed-by: Prashant Bhole <prashantbhole.linux@gmail.com>
+> Signed-off-by: Prashant Bhole <prashantbhole.linux@gmail.com>
+
+Any UAPI changes need to be copied to virtio-dev@lists.oasis-open.org
+(subscriber only) list please.
+
+> ---
+>  drivers/net/virtio_net.c        | 114 +++++++++++++++++++++++++++++++-
+>  include/uapi/linux/virtio_net.h |  27 ++++++++
+>  2 files changed, 139 insertions(+), 2 deletions(-)
 >=20
-> Why can't those calls be forwarded at the higher layer? Why do they
-> have to go through the guest kernel?
-
-Well everyone is writing these programs and attaching them to NICs.
-
-For better or worse that's how userspace is written.
-
-Yes, in the simple case where everything is passed through, it could
-instead be passed through some other channel just as well, but then
-userspace would need significant changes just to make it work with
-virtio.
-
-
-
-> If kernel performs no significant work (or "adds value", pardon the
-> expression), and problem can easily be solved otherwise we shouldn't=20
-> do the work of maintaining the mechanism.
->=20
-> The approach of kernel generating actual machine code which is then
-> loaded into a sandbox on the hypervisor/SmartNIC is another story.
-
-But that's transparent to guest userspace. Making userspace care whether
-it's a SmartNIC or a software device breaks part of virtualization's
-appeal, which is that it looks like a hardware box to the guest.
-
-> I'd appreciate if others could chime in.
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index a1088d0114f2..dddfbb2a2075 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -169,6 +169,7 @@ struct control_buf {
+>  =09u8 allmulti;
+>  =09__virtio16 vid;
+>  =09__virtio64 offloads;
+> +=09struct virtio_net_ctrl_ebpf_prog prog_ctrl;
+>  };
+> =20
+>  struct virtnet_info {
+> @@ -272,6 +273,8 @@ struct virtnet_bpf_bound_prog {
+>  =09struct bpf_insn insnsi[0];
+>  };
+> =20
+> +#define VIRTNET_EA(extack, msg)=09NL_SET_ERR_MSG_MOD((extack), msg)
+> +
+>  /* Converting between virtqueue no. and kernel tx/rx queue no.
+>   * 0:rx0 1:tx0 2:rx1 3:tx1 ... 2N:rxN 2N+1:txN 2N+2:cvq
+>   */
+> @@ -2427,6 +2430,11 @@ static int virtnet_xdp_set(struct net_device *dev,=
+ struct netdev_bpf *bpf)
+>  =09if (!xdp_attachment_flags_ok(&vi->xdp, bpf))
+>  =09=09return -EBUSY;
+> =20
+> +=09if (rtnl_dereference(vi->offload_xdp_prog)) {
+> +=09=09VIRTNET_EA(bpf->extack, "program already attached in offload mode"=
+);
+> +=09=09return -EINVAL;
+> +=09}
+> +
+>  =09if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_GUEST_OFFLOADS)
+>  =09    && (virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO4) ||
+>  =09        virtio_has_feature(vi->vdev, VIRTIO_NET_F_GUEST_TSO6) ||
+> @@ -2528,17 +2536,114 @@ static int virtnet_bpf_verify_insn(struct bpf_ve=
+rifier_env *env, int insn_idx,
+> =20
+>  static void virtnet_bpf_destroy_prog(struct bpf_prog *prog)
+>  {
+> +=09struct virtnet_bpf_bound_prog *state;
+> +
+> +=09state =3D prog->aux->offload->dev_priv;
+> +=09list_del(&state->list);
+> +=09kfree(state);
+> +}
+> +
+> +static int virtnet_xdp_offload_check(struct virtnet_info *vi,
+> +=09=09=09=09     struct netdev_bpf *bpf)
+> +{
+> +=09if (!bpf->prog)
+> +=09=09return 0;
+> +
+> +=09if (!bpf->prog->aux->offload) {
+> +=09=09VIRTNET_EA(bpf->extack, "xdpoffload of non-bound program");
+> +=09=09return -EINVAL;
+> +=09}
+> +=09if (bpf->prog->aux->offload->netdev !=3D vi->dev) {
+> +=09=09VIRTNET_EA(bpf->extack, "program bound to different dev");
+> +=09=09return -EINVAL;
+> +=09}
+> +
+> +=09if (rtnl_dereference(vi->xdp_prog)) {
+> +=09=09VIRTNET_EA(bpf->extack, "program already attached in driver mode")=
+;
+> +=09=09return -EINVAL;
+> +=09}
+> +
+> +=09return 0;
+>  }
+> =20
+>  static int virtnet_xdp_set_offload(struct virtnet_info *vi,
+>  =09=09=09=09   struct netdev_bpf *bpf)
+>  {
+> -=09return -EBUSY;
+> +=09struct virtio_net_ctrl_ebpf_prog *ctrl;
+> +=09struct virtnet_bpf_bound_prog *bound_prog =3D NULL;
+> +=09struct virtio_device *vdev =3D vi->vdev;
+> +=09struct bpf_prog *prog =3D bpf->prog;
+> +=09void *ctrl_buf =3D NULL;
+> +=09struct scatterlist sg;
+> +=09int prog_len;
+> +=09int err =3D 0;
+> +
+> +=09if (!xdp_attachment_flags_ok(&vi->xdp_hw, bpf))
+> +=09=09return -EBUSY;
+> +
+> +=09if (prog) {
+> +=09=09if (prog->type !=3D BPF_PROG_TYPE_XDP)
+> +=09=09=09return -EOPNOTSUPP;
+> +=09=09bound_prog =3D prog->aux->offload->dev_priv;
+> +=09=09prog_len =3D prog->len * sizeof(bound_prog->insnsi[0]);
+> +
+> +=09=09ctrl_buf =3D kmalloc(GFP_KERNEL, sizeof(*ctrl) + prog_len);
+> +=09=09if (!ctrl_buf)
+> +=09=09=09return -ENOMEM;
+> +=09=09ctrl =3D ctrl_buf;
+> +=09=09ctrl->cmd =3D cpu_to_virtio32(vi->vdev,
+> +=09=09=09=09=09    VIRTIO_NET_BPF_CMD_SET_OFFLOAD);
+> +=09=09ctrl->len =3D cpu_to_virtio32(vi->vdev, prog_len);
+> +=09=09ctrl->gpl_compatible =3D cpu_to_virtio16(vi->vdev,
+> +=09=09=09=09=09=09       prog->gpl_compatible);
+> +=09=09memcpy(ctrl->insns, bound_prog->insnsi,
+> +=09=09       prog->len * sizeof(bound_prog->insnsi[0]));
+> +=09=09sg_init_one(&sg, ctrl_buf, sizeof(*ctrl) + prog_len);
+> +=09} else {
+> +=09=09ctrl =3D &vi->ctrl->prog_ctrl;
+> +=09=09ctrl->cmd  =3D cpu_to_virtio32(vi->vdev,
+> +=09=09=09=09=09     VIRTIO_NET_BPF_CMD_UNSET_OFFLOAD);
+> +=09=09sg_init_one(&sg, ctrl, sizeof(*ctrl));
+> +=09}
+> +
+> +=09if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_EBPF,
+> +=09=09=09=09  VIRTIO_NET_CTRL_EBPF_PROG,
+> +=09=09=09=09  &sg)) {
+> +=09=09dev_warn(&vdev->dev, "Failed to set bpf offload prog\n");
+> +=09=09err =3D -EFAULT;
+> +=09=09goto out;
+> +=09}
+> +
+> +=09rcu_assign_pointer(vi->offload_xdp_prog, prog);
+> +
+> +=09xdp_attachment_setup(&vi->xdp_hw, bpf);
+> +
+> +out:
+> +=09kfree(ctrl_buf);
+> +=09return err;
+>  }
+> =20
+>  static int virtnet_bpf_verifier_setup(struct bpf_prog *prog)
+>  {
+> -=09return -ENOMEM;
+> +=09struct virtnet_info *vi =3D netdev_priv(prog->aux->offload->netdev);
+> +=09size_t insn_len =3D prog->len * sizeof(struct bpf_insn);
+> +=09struct virtnet_bpf_bound_prog *state;
+> +
+> +=09state =3D kzalloc(sizeof(*state) + insn_len, GFP_KERNEL);
+> +=09if (!state)
+> +=09=09return -ENOMEM;
+> +
+> +=09memcpy(&state->insnsi[0], prog->insnsi, insn_len);
+> +
+> +=09state->vi =3D vi;
+> +=09state->prog =3D prog;
+> +=09state->len =3D prog->len;
+> +
+> +=09list_add_tail(&state->list, &vi->bpf_bound_progs);
+> +
+> +=09prog->aux->offload->dev_priv =3D state;
+> +
+> +=09return 0;
+>  }
+> =20
+>  static int virtnet_bpf_verifier_prep(struct bpf_prog *prog)
+> @@ -2568,12 +2673,17 @@ static const struct bpf_prog_offload_ops virtnet_=
+bpf_dev_ops =3D {
+>  static int virtnet_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+>  {
+>  =09struct virtnet_info *vi =3D netdev_priv(dev);
+> +=09int err;
+> +
+>  =09switch (xdp->command) {
+>  =09case XDP_SETUP_PROG:
+>  =09=09return virtnet_xdp_set(dev, xdp);
+>  =09case XDP_QUERY_PROG:
+>  =09=09return xdp_attachment_query(&vi->xdp, xdp);
+>  =09case XDP_SETUP_PROG_HW:
+> +=09=09err =3D virtnet_xdp_offload_check(vi, xdp);
+> +=09=09if (err)
+> +=09=09=09return err;
+>  =09=09return virtnet_xdp_set_offload(vi, xdp);
+>  =09case XDP_QUERY_PROG_HW:
+>  =09=09return xdp_attachment_query(&vi->xdp_hw, xdp);
+> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_=
+net.h
+> index a3715a3224c1..0ea2f7910a5a 100644
+> --- a/include/uapi/linux/virtio_net.h
+> +++ b/include/uapi/linux/virtio_net.h
+> @@ -261,4 +261,31 @@ struct virtio_net_ctrl_mq {
+>  #define VIRTIO_NET_CTRL_GUEST_OFFLOADS   5
+>  #define VIRTIO_NET_CTRL_GUEST_OFFLOADS_SET        0
+> =20
+> +/*
+> + * Control XDP offloads offloads
+> + *
+> + * When guest wants to offload XDP program to the device, it calls
+> + * VIRTIO_NET_CTRL_EBPF_PROG along with VIRTIO_NET_BPF_CMD_SET_OFFLOAD
+> + * subcommands. When offloading is successful, the device runs offloaded
+> + * XDP program for each packet before sending it to the guest.
+> + *
+> + * VIRTIO_NET_BPF_CMD_UNSET_OFFLOAD removes the the offloaded program fr=
+om
+> + * the device, if exists.
+> + */
+> +
+> +struct virtio_net_ctrl_ebpf_prog {
+> +=09/* program length in bytes */
+> +=09__virtio32 len;
+> +=09__virtio16 cmd;
+> +=09__virtio16 gpl_compatible;
+> +=09__u8 insns[0];
+> +};
+> +
+> +#define VIRTIO_NET_CTRL_EBPF 6
+> + #define VIRTIO_NET_CTRL_EBPF_PROG 1
+> +
+> +/* Commands for VIRTIO_NET_CTRL_EBPF_PROG */
+> +#define VIRTIO_NET_BPF_CMD_SET_OFFLOAD 1
+> +#define VIRTIO_NET_BPF_CMD_UNSET_OFFLOAD 2
+> +
+>  #endif /* _UAPI_LINUX_VIRTIO_NET_H */
+> --=20
+> 2.20.1
 
 
