@@ -2,77 +2,75 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1DC2C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 03:16:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A0BC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 04:22:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDFB32071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 03:16:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDFB32071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 443212075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 04:22:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="U1VBhXqP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 443212075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZnop-0008Hr-Te
-	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 22:16:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56533)
+	id 1iZoqO-0001MA-Am
+	for qemu-devel@archiver.kernel.org; Tue, 26 Nov 2019 23:22:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34948)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iZno4-0007qk-9Q
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 22:15:57 -0500
+ (envelope-from <danielcho@qnap.com>) id 1iZopA-0000Rh-2i
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 23:21:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iZno2-0005Cw-N8
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 22:15:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51184)
+ (envelope-from <danielcho@qnap.com>) id 1iZop6-0002Fk-6d
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 23:21:06 -0500
+Received: from mail-yb1-xb31.google.com ([2607:f8b0:4864:20::b31]:37746)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iZno2-0005CI-HI
- for qemu-devel@nongnu.org; Tue, 26 Nov 2019 22:15:54 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iZno0-0003EE-B7
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 03:15:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5221A2E80CB
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 03:15:52 +0000 (UTC)
+ (Exim 4.71) (envelope-from <danielcho@qnap.com>) id 1iZop5-0002Em-2M
+ for qemu-devel@nongnu.org; Tue, 26 Nov 2019 23:21:04 -0500
+Received: by mail-yb1-xb31.google.com with SMTP id q7so8539269ybk.4
+ for <qemu-devel@nongnu.org>; Tue, 26 Nov 2019 20:21:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=9uCjUX17RwTpxBDMtbNLOpvkKBrSedOS2hRwHBDHKrk=;
+ b=U1VBhXqP/440hG2wsb+SehvMiHJMgyZyvW/qsVe1q4zpi3cMDUyvIQwx0nJponGAXj
+ 82JYIAXPu0KIGI0rbd4u5XkVJZlmLJM/jB/OZRL8TuQXkf4va2WkQvBhaRQZWLW4x9jU
+ r3P13/+VGgvF/Y/lUiEVBeAyVpasv/ugJ3USg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=9uCjUX17RwTpxBDMtbNLOpvkKBrSedOS2hRwHBDHKrk=;
+ b=MeDkg/BhTPfSsxDd59QO+y9gvg0svrHa+ZWVXFG3m4p9tqh9sSnqZbz9m/XaAFD/ye
+ kHNgtfhnL8KdIIO4DefYFcOvJbeUD9gb1LCfdTBcTKUgD6resEq9Loo0JkaPo+BVPMry
+ jQm1YZX4Mx9IjdVjxruR5a8Sm3nIIY+GLIXZwGCrWubvsPBGKXZMp6/W7GSJq12qkMDv
+ sxFH8z+oqZVZ/eLgctk+1Uh3YD+c4OKknJRXaLu82qkzgZRfRwK6/OL3gi6Tp1Z4xiRd
+ R6BzXvsVpJvs3HmwPxbIlMyLRe5Di9OuS1p7V/zSXNV16fGjPK3hY8YyfRnsl6W8qPTy
+ Xb0w==
+X-Gm-Message-State: APjAAAX3Yubs7CNDSUZSIIlxnhosI3Hyq56MKXmCzVm/iqks71IUE0o1
+ qMP/fet71k966Oy0n6Hv944x6Akpx85WAycKSua1yZeZVcw=
+X-Google-Smtp-Source: APXvYqzunGPoa83mRF9g0Hf7forXe9icJb2tRKSKvK+sJ/XH1s+G9N9gCRYnyqZFoqkZ2uTlOXiJdSZYea2nUhybEdQ=
+X-Received: by 2002:a25:dfcb:: with SMTP id w194mr30426424ybg.79.1574828460797; 
+ Tue, 26 Nov 2019 20:21:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 27 Nov 2019 03:06:13 -0000
-From: Zhang Chen <zhangckid@gmail.com>
+From: Daniel Cho <danielcho@qnap.com>
+Date: Wed, 27 Nov 2019 12:20:44 +0800
+Message-ID: <CA+XQNE4eP8tfHB5eV8813bqaE+L5yooBDFCdbMWJPysvev4UKg@mail.gmail.com>
+Subject: Network connection with COLO VM
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: colo
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: chao.wang lisuiheng zhangckid
-X-Launchpad-Bug-Reporter: lee (lisuiheng)
-X-Launchpad-Bug-Modifier: Zhang Chen (zhangckid)
-References: <152056405865.7543.8980677605113063936.malonedeb@wampee.canonical.com>
- <157482230188.6492.6320869898088738043.malone@gac.canonical.com>
-Message-Id: <CAK3tnv+Xi2s2sAmdxDA6ip3YOQUA3St909BF+_LEULCQkeVoNw@mail.gmail.com>
-Subject: Re: [Bug 1754542] Re: colo: vm crash with segmentation fault
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 38b8cb5e85a89ba1ecb3fdff703175059e8ddc28
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+Content-Type: multipart/alternative; boundary="000000000000fd140a05984c52cb"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::b31
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,196 +79,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1754542 <1754542@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Lee,
+--000000000000fd140a05984c52cb
+Content-Type: text/plain; charset="UTF-8"
 
-Can you introduce to me the detail test step about disk performance?
-I want to look into it when I have time.
+Hello everyone,
 
-Thanks
-Zhang Chen
+Could we ssh to colo VM (means PVM & SVM are starting)?
 
-On Wed, Nov 27, 2019 at 10:50 AM lee <1754542@bugs.launchpad.net> wrote:
->
-> Hi Zhang Chen ,
->
-> I try colo follow https://wiki.qemu.org/Features/COLO.
-> It work well. But disk performance slow.
-> Only host performance 10%.
-> Can virtio blk supported by current colo?
-> Or is there any other way to improve disk performance.
->
-> Thanks
-> Zhang Chen
->
-> --
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1754542
->
-> Title:
->   colo:  vm crash with segmentation fault
->
-> Status in QEMU:
->   Fix Released
->
-> Bug description:
->   I use Arch Linux x86_64
->   Zhang Chen's(https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10)
->   Following document 'COLO-FT.txt',
->   I test colo feature on my hosts
->
->   I run this command
->   Primary:
->   sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp =
-stdio -name primary \
->   -device piix3-usb-uhci \
->   -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
->   -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
->   -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3Dfi=
-fo,vote-threshold=3D1,\
->   children.0.file.filename=3D/var/lib/libvirt/images/1.raw,\
->   children.0.driver=3Draw -S
->
->   Secondary:
->   sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp =
-stdio -name secondary \
->   -device piix3-usb-uhci \
->   -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
->   -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
->   -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D/var/lib/libvirt/=
-images/2.raw,driver=3Draw,node-name=3Dnode0 \
->   -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecond=
-ary,\
->   file.driver=3Dqcow2,top-id=3Dactive-disk0,\
->   file.file.filename=3D/mnt/ramfs/active_disk.img,\
->   file.backing.driver=3Dqcow2,\
->   file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
->   file.backing.backing=3Dsecondary-disk0 \
->   -incoming tcp:0:8888
->
->   Secondary:
->   {'execute':'qmp_capabilities'}
->   { 'execute': 'nbd-server-start',
->     'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.34=
-', 'port': '8889'} } }
->   }
->   {'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0'=
-, 'writable': true } }
->
->   Primary:
->   {'execute':'qmp_capabilities'}
->   { 'execute': 'human-monitor-command',
->     'arguments': {'command-line': 'drive_add -n buddy driver=3Dreplicatio=
-n,mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.port=3D888=
-9,file.export=3Dsecondary-disk0,node-name=3Dnbd_client0'}}
->   { 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0'=
-, 'node': 'nbd_client0' } }
->   { 'execute': 'migrate-set-capabilities',
->         'arguments': {'capabilities': [ {'capability': 'x-colo', 'state':=
- true } ] } }
->   { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
->   And two VM with cash
->   Primary:
->   {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event":=
- "RESUME"}
->   [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -=
-boot c -enable-kvm -m 2048 -smp 2 -qm
->
->   Secondary:
->   {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event":=
- "RESUME"}
->   [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -=
-boot c -enable-kvm -m 2048 -smp 2 -qm
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions
+SSH will connect to colo VM for a while, but it will disconnect with error
+*client_loop: send disconnect: Broken pipe*
 
--- =
+It seems to colo VM could not keep network session.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1754542
+Does it be a known issue?
 
-Title:
-  colo:  vm crash with segmentation fault
+Best Regard,
+Daniel Cho
 
-Status in QEMU:
-  Fix Released
+--000000000000fd140a05984c52cb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Bug description:
-  I use Arch Linux x86_64
-  Zhang Chen's(https://github.com/zhangckid/qemu/tree/qemu-colo-18mar10)
-  Following document 'COLO-FT.txt',
-  I test colo feature on my hosts
+<div dir=3D"ltr">Hello everyone,=C2=A0<div><br></div><div>Could we ssh to c=
+olo VM (means PVM &amp; SVM are starting)?</div><div><br></div><div>SSH wil=
+l connect to colo VM for a while, but it will disconnect with error</div><d=
+iv><b>client_loop: send disconnect: Broken pipe</b><br></div><div><b><br></=
+b></div><div>It seems to colo VM could not keep network session.</div><div>=
+<b><br></b></div><div>Does it be a known issue?</div><div><br></div><div>Be=
+st Regard,=C2=A0</div><div>Daniel Cho=C2=A0</div></div>
 
-  I run this command
-  Primary:
-  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
-dio -name primary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dvirtio,id=3Dprimary-disk0,driver=3Dquorum,read-pattern=3Dfifo=
-,vote-threshold=3D1,\
-  children.0.file.filename=3D/var/lib/libvirt/images/1.raw,\
-  children.0.driver=3Draw -S
-
-  Secondary:
-  sudo /usr/local/bin/qemu-system-x86_64 -enable-kvm -m 2048 -smp 2 -qmp st=
-dio -name secondary \
-  -device piix3-usb-uhci \
-  -device usb-tablet -netdev tap,id=3Dhn0,vhost=3Doff \
-  -device virtio-net-pci,id=3Dnet-pci0,netdev=3Dhn0 \
-  -drive if=3Dnone,id=3Dsecondary-disk0,file.filename=3D/var/lib/libvirt/im=
-ages/2.raw,driver=3Draw,node-name=3Dnode0 \
-  -drive if=3Dvirtio,id=3Dactive-disk0,driver=3Dreplication,mode=3Dsecondar=
-y,\
-  file.driver=3Dqcow2,top-id=3Dactive-disk0,\
-  file.file.filename=3D/mnt/ramfs/active_disk.img,\
-  file.backing.driver=3Dqcow2,\
-  file.backing.file.filename=3D/mnt/ramfs/hidden_disk.img,\
-  file.backing.backing=3Dsecondary-disk0 \
-  -incoming tcp:0:8888
-
-  Secondary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'nbd-server-start',
-    'arguments': {'addr': {'type': 'inet', 'data': {'host': '192.168.0.34',=
- 'port': '8889'} } }
-  }
-  {'execute': 'nbd-server-add', 'arguments': {'device': 'secondary-disk0', =
-'writable': true } }
-
-  Primary:
-  {'execute':'qmp_capabilities'}
-  { 'execute': 'human-monitor-command',
-    'arguments': {'command-line': 'drive_add -n buddy driver=3Dreplication,=
-mode=3Dprimary,file.driver=3Dnbd,file.host=3D192.168.0.34,file.port=3D8889,=
-file.export=3Dsecondary-disk0,node-name=3Dnbd_client0'}}
-  { 'execute':'x-blockdev-change', 'arguments':{'parent': 'primary-disk0', =
-'node': 'nbd_client0' } }
-  { 'execute': 'migrate-set-capabilities',
-        'arguments': {'capabilities': [ {'capability': 'x-colo', 'state': t=
-rue } ] } }
-  { 'execute': 'migrate', 'arguments': {'uri': 'tcp:192.168.0.34:8888' } }
-  And two VM with cash
-  Primary:
-  {"timestamp": {"seconds": 1520763655, "microseconds": 511415}, "event": "=
-RESUME"}
-  [1]    329 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
-ot c -enable-kvm -m 2048 -smp 2 -qm
-
-  Secondary:
-  {"timestamp": {"seconds": 1520763655, "microseconds": 510907}, "event": "=
-RESUME"}
-  [1]    367 segmentation fault  sudo /usr/local/bin/qemu-system-x86_64 -bo=
-ot c -enable-kvm -m 2048 -smp 2 -qm
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1754542/+subscriptions
+--000000000000fd140a05984c52cb--
 
