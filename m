@@ -2,61 +2,58 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8762C43215
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 05:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B04BC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 06:04:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B50082071E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 05:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C65120684
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 06:04:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Pp/NP8j3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B50082071E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cHwZ/Qgy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C65120684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZq4l-0001MM-9j
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 00:41:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40827)
+	id 1iZqQo-0002IH-7P
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 01:04:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iZpzc-0005Qm-6z
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 00:36:01 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iZqPy-0001As-2X
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 01:03:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iZpza-0000Jb-H4
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 00:35:59 -0500
-Received: from ozlabs.org ([203.11.71.1]:33875)
+ (envelope-from <dgibson@ozlabs.org>) id 1iZqPw-0003Vp-FH
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 01:03:13 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:52135 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iZpzZ-0000DC-NE; Wed, 27 Nov 2019 00:35:58 -0500
+ id 1iZqPv-0003Iq-5T; Wed, 27 Nov 2019 01:03:12 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47N8d24xG8z9sSw; Wed, 27 Nov 2019 16:35:50 +1100 (AEDT)
+ id 47N9DV71QDz9sSw; Wed, 27 Nov 2019 17:03:06 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1574832950;
- bh=Mvh09Vm/J2IXnalg8BbOymoNpcowOUoByIveRV4xx2U=;
+ d=gibson.dropbear.id.au; s=201602; t=1574834586;
+ bh=sgcHE5ZixYgXaifxhnowhHGFrJYbvzsjfjBUkTPjnpA=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Pp/NP8j3BvvnuNJhjpibDbFkaXrSGC2izbyjtSCJCeaQ1Hoi9RcrHTT90/ktXvU8f
- BtnU+L0GaRP5EJhpULSCo78H1f4LpQShkOTsIqEfubF1uRpR9i3LGCd/6WKncUPCpN
- H0YHD0oOuXvw0PjJu+O61B0znq+GRUGIn+Z8pO+E=
-Date: Wed, 27 Nov 2019 16:07:51 +1100
+ b=cHwZ/Qgyq0NufxEGktCjda+CyLe2Kma3zCDzHYShyWa73y8Im9vWLqEVLYSpLixgp
+ Eqtb7pe4s6+vikxOk6EE9ziu2Lzz3sNypuNWKQ2nAQ9zsCwoeUPbuVbwn7tmI7CSJ7
+ LXGGvmeozaAovSgGr0zdUgqr2pO6QaqoIr92aRFc=
+Date: Wed, 27 Nov 2019 16:41:50 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v6 11/20] ppc/xive: Use the XiveFabric and XivePresenter
- interfaces
-Message-ID: <20191127050751.GQ5582@umbus.fritz.box>
-References: <20191125065820.927-1-clg@kaod.org>
- <20191125065820.927-12-clg@kaod.org>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [for-5.0 PATCH v2 0/4] spapr: Use less XIVE HW resources in KVM
+Message-ID: <20191127054150.GT5582@umbus.fritz.box>
+References: <157478677206.67101.11965554900825793694.stgit@bahia.tlslab.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="cB4CxVy2Gp1bd2mA"
+ protocol="application/pgp-signature"; boundary="RWwYAm6PHzOoZjya"
 Content-Disposition: inline
-In-Reply-To: <20191125065820.927-12-clg@kaod.org>
+In-Reply-To: <157478677206.67101.11965554900825793694.stgit@bahia.tlslab.ibm.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -72,120 +69,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---cB4CxVy2Gp1bd2mA
-Content-Type: text/plain; charset=iso-8859-1
+--RWwYAm6PHzOoZjya
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 25, 2019 at 07:58:11AM +0100, C=E9dric Le Goater wrote:
-> Now that the machines have handlers implementing the XiveFabric and
-> XivePresenter interfaces, remove xive_presenter_match() and make use
-> of the 'match_nvt' handler of the machine.
+On Tue, Nov 26, 2019 at 05:46:12PM +0100, Greg Kurz wrote:
+> On POWER9 systems, the XICS-on-XIVE and XIVE KVM devices currently
+> allocate a bunch of VPs in the XIVE HW to accomodate the highest
+> VCPU id that may be possibly used in a VM. This limits the number
+> of VMs that can run with an in-kernel interrupt controller to 63
+> per POWER9 chip, irrespectively of its number of HW threads, eg.
+> up to 96 on a POWER9 Nimbus socket. This is an unfortunate waste
+> of scarce HW resources since a typical VM doesn't need that much
+> VPs to run.
 >=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-8..11 applied to ppc-for-5.0.
-
-> ---
->  hw/intc/xive.c | 48 +++++++++++++++++-------------------------------
->  1 file changed, 17 insertions(+), 31 deletions(-)
+> This series exploits new attributes of the XICS-on-XIVE and XIVE
+> KVM devices that allow userspace to tune the numbers of VPs it
+> really needs. Support for this attributes has just reached linux
+> mainline.
 >=20
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 1c9e58f8deac..8e683847bf81 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -1423,30 +1423,6 @@ int xive_presenter_tctx_match(XivePresenter *xptr,=
- XiveTCTX *tctx,
->      return -1;
->  }
-> =20
-> -static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
-> -                                 uint8_t nvt_blk, uint32_t nvt_idx,
-> -                                 bool cam_ignore, uint8_t priority,
-> -                                 uint32_t logic_serv, XiveTCTXMatch *mat=
-ch)
-> -{
-> -    XivePresenter *xptr =3D XIVE_PRESENTER(xrtr);
-> -    XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);
-> -    int count;
-> -
-> -    count =3D xpc->match_nvt(xptr, format, nvt_blk, nvt_idx, cam_ignore,
-> -                           priority, logic_serv, match);
-> -    if (count < 0) {
-> -        return false;
-> -    }
-> -
-> -    if (!match->tctx) {
-> -        qemu_log_mask(LOG_UNIMP, "XIVE: NVT %x/%x is not dispatched\n",
-> -                      nvt_blk, nvt_idx);
-> -        return false;
-> -    }
-> -
-> -    return true;
-> -}
-> -
->  /*
->   * This is our simple Xive Presenter Engine model. It is merged in the
->   * Router as it does not require an extra object.
-> @@ -1462,22 +1438,32 @@ static bool xive_presenter_match(XiveRouter *xrtr=
-, uint8_t format,
->   *
->   * The parameters represent what is sent on the PowerBus
->   */
-> -static bool xive_presenter_notify(XiveRouter *xrtr, uint8_t format,
-> +static bool xive_presenter_notify(uint8_t format,
->                                    uint8_t nvt_blk, uint32_t nvt_idx,
->                                    bool cam_ignore, uint8_t priority,
->                                    uint32_t logic_serv)
->  {
-> +    XiveFabric *xfb =3D XIVE_FABRIC(qdev_get_machine());
-> +    XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xfb);
->      XiveTCTXMatch match =3D { .tctx =3D NULL, .ring =3D 0 };
-> -    bool found;
-> +    int count;
-> =20
-> -    found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx, cam_i=
-gnore,
-> -                                 priority, logic_serv, &match);
-> -    if (found) {
-> +    /*
-> +     * Ask the machine to scan the interrupt controllers for a match
-> +     */
-> +    count =3D xfc->match_nvt(xfb, format, nvt_blk, nvt_idx, cam_ignore,
-> +                           priority, logic_serv, &match);
-> +    if (count < 0) {
-> +        return false;
-> +    }
-> +
-> +    /* handle CPU exception delivery */
-> +    if (count) {
->          ipb_update(&match.tctx->regs[match.ring], priority);
->          xive_tctx_notify(match.tctx, match.ring);
->      }
-> =20
-> -    return found;
-> +    return !!count;
->  }
-> =20
->  /*
-> @@ -1590,7 +1576,7 @@ static void xive_router_end_notify(XiveRouter *xrtr=
-, uint8_t end_blk,
->          return;
->      }
-> =20
-> -    found =3D xive_presenter_notify(xrtr, format, nvt_blk, nvt_idx,
-> +    found =3D xive_presenter_notify(format, nvt_blk, nvt_idx,
->                            xive_get_field32(END_W7_F0_IGNORE, end.w7),
->                            priority,
->                            xive_get_field32(END_W7_F1_LOG_SERVER_ID, end.=
-w7));
+> In combination with recent commit 29cb4187497d "spapr: Set VSMT to
+> smp_threads by default" which makes VCPU ids contiguous, it is
+> possible to start more than 200 VMs instead of 127 on an AC922
+> system (two sockets, 144 HW threads).
+>=20
+> Changes in v2:
+> - add an nr_servers argument to the activate() handler instead of
+>   a QOM property for XIVE and a XICSFabric method for XICS-on-XIVE.
+> - even if the last two patches haven't changed much, the code base
+>   itself has, so I've deliberately dropped Cedric's R-b tags
+
+Applied to ppc-for-5.0, thanks.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -193,25 +115,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---cB4CxVy2Gp1bd2mA
+--RWwYAm6PHzOoZjya
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3eBKYACgkQbDjKyiDZ
-s5KiXRAAuK82z7yATDi7iMKCRF3dA9yextq2g3xBQyMOInQ73c+Ad67NECkYM5RQ
-7M6HLhRHIhwODynA3AxO4HNbu+jMgD5jn4nobx3eW0Efv4nr9ntMoyI7s1+xzKfT
-hc+9joN+peCEGfib1C7/92qFr1IHsdYFlm9LZiU1+QrF8zHFO74jwxfJL30pKO6A
-CA6PHzaVcvG75a+AXE3/lvtJDEFcGBtZ1zHku7kEV442JWDtYF9BL1wQgRNTTOiQ
-tzXrz5BNaLblirf7/Tsjp3uelSmkcyhZDNsYm7TueQIGm7xYhXHkLmcmWRXggZp7
-AQF2AQxXiq4qiV1ARaAzdEmAbKzVzTN4+1eZefpIAkm4H8qgq21g/hVCJyeEp3AH
-VFvcWu6h6LGOvTet3GZ2ye9v4jmUerUuVSKt2t0KqWSY0DLsQHeNkYJamX4TOWI7
-7UsdBjPGuwUK5VDHlpypA6fWguBKbkZRp8XcEFQna2DaLzXKuGrDMdJqKou9ce68
-cOujbJm5r3+M8Xp/ExqM7xGmsJEk/va6szBLvgXKY4bXETc73NHTRxt9eCRUiS3Q
-v+xSjxrcoTzB5uvBrZ3IH4I3jPN8AFW57L3jObJxgC5QdG3AwZ9GWrBED4wJrlB5
-nN5ls3cc2Av262FfAgIa/UNRQPZDr6M76j7v/O71N+rvA0/n1Ig=
-=0E7P
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3eDJsACgkQbDjKyiDZ
+s5Ix4BAAlewqDT7GSyOO8JOM2Ace14C31doT+b9Qq4s5XTlWWFJEZMneIGMCN0O/
+Qw6xu+u5y7kQGNod6QhtEdZdaUNARZEzrBGUe7NiIS2u6uhLabeYIUklg5qC5ije
+M7dFe1wl/Q/Oj7d666kimcOMoZyvkCSerIGaBD47v2FkOgC1szLKpdZb2Gzpz604
+7+hHlpi6/KwsYcNOsc+Ij9rjsx1lbnBwle/u3TdeJTtVSi4+G40FZYFwkq1L9Wfa
+ids+hPmaSfkr4XGn1weqB3EpjlPuDFG2HgYrzopEkgq108QbfQTgQOeIYKwl2aky
+1ft2qjk//3y5gm3MVwVZnah0wUYA/81+uv95h55wUnctLWzRvkUArkvphI4chzWh
+B62RMyM4zyAG8gMy9y0jPCsHXfoyRNEzpIhat3m3Rm4oN1OkKmFXt5HapRfH2C7I
+ELZIAmrRmIXVIdOuwiaVrDItJU+bWYOBSgdlkWdBooSpjI1sQElW7Nzq6oPS2hkj
+f9KvKV7WL2+LsCEs9w4HOUjGDPG5FXfMqEe3vdO203SHlGN6FSGXtAmbxwDxJNI6
+gffByKxmYS7QVwGrfz77+JKnnJwK+Q0XUuALxTbmHXUHpWgXWorWW55CBNLoV3RN
+n0qqIgvX4d7dpHlNuZuWp1Pd2SO4pE2ogSFvbgK3gmBxWgfV3qs=
+=DpCL
 -----END PGP SIGNATURE-----
 
---cB4CxVy2Gp1bd2mA--
+--RWwYAm6PHzOoZjya--
 
