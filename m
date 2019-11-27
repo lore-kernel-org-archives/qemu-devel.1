@@ -2,89 +2,83 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BOUND_DIGITS_15,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CBC1C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:21:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AA98C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:22:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA42A2070B
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:21:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F33C42070B
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:22:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bz6tCNLP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA42A2070B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h7u38m0V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F33C42070B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZwKA-0000Ie-4N
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 07:21:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54024)
+	id 1iZwLS-0001SA-4E
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 07:22:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54213)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZwJF-00087l-CR
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:20:43 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZwKh-0000pT-AV
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:22:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZwJD-0007n0-J1
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:20:41 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41964)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iZwKd-0008Ne-C0
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:22:11 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36257)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iZwJD-0007mL-CQ
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:20:39 -0500
-Received: by mail-ot1-x343.google.com with SMTP id r27so4363728otc.8
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 04:20:39 -0800 (PST)
+ id 1iZwKb-0008MX-Mu
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:22:07 -0500
+Received: by mail-oi1-x242.google.com with SMTP id j7so19923558oib.3
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 04:22:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=279Fmm/vsf0UQqCpTtaG+gB5Ik8aR3mquYi0KYl8n7s=;
- b=Bz6tCNLP/DfrF6QfcefEfT1/JzKdYR1eKfsl83+jwp3qq/XMUdA0j93GX24U7CmZjY
- RQb6+U21dh7kG5GXvz3WlrA4yt1uocamFJYcrtYJacdX9pn6/l/TNXYXHBq1NnsgTryt
- N+dvn9bgpp2WH1ti/HUPRmMq6Ow0aEF2bmDyRPEXj5lDp11gnX2RmbwkBIqyy0ea2mul
- 3UqnLFCUQ6KVQiqjtnpPmasVG5q/L6M7VLHTLSFJpB4KbcWIJl6RP0A6pn1kAs2cysXP
- 9YOwIOfvcTktbY6jox7/0Tmfc/8+8yUSPjfXsGtsjd1N8IMY2/bxGX6ZUwZTct8JhQ4o
- j3cA==
+ :cc; bh=FfCG7TaEbIWD8VpjZo9pQL688Tq0ZW1CAnlxzdTGQxI=;
+ b=h7u38m0VwP7IeXSHo5PKyz7zefNS8ez7WdZEQkm3Y47ehdlODIW1P+LRZxZu4QXZRP
+ 3T5ADA1QmlYqR0Qq7zunHTgnj8DDNaxOQ/sg9FfEgf50FZQUT87pLF+FHZxPZeeNUVx7
+ e2JQzQTy6R8Q1bwx4g629q8eFcsCqC0pnvAhfRDmTsE226WfoEhHiY70PC9T4P7zTsQd
+ ZEdhMoE4VAr8e6yT0Ks1p1lLx3wGRD5wxXhKkXTpDRbbYahtgQjj4qVFroJroQGhPLWQ
+ 4jeNw3vGBP4y0GYAqBR3pnxVsYn0iK1XagNkabhCqopKOdqEADsrpWKsY7XGZYbuFg0u
+ 0YcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=279Fmm/vsf0UQqCpTtaG+gB5Ik8aR3mquYi0KYl8n7s=;
- b=bpsGl1LlI8g8z/RPQB+wtMLLbvQmt/irwcIHiZRT3BI8Os8zg781R9I4gVQREUKXdA
- tm530lsW9Kg3XRvATpzGGS9HMpKLl4PA8H4tEfo9ADrMopDPuvtlYZ7R+D8TPTt0IVOi
- snRf2j1mJxdrXwbHg+Uuv0e2ONTYlYjCDzeoH2dKUMhFPd13rc1KqbPlyuxViFHNugME
- 7gHvId/RL1ZSFoeirMj3Ym+CYy23KEg6EkWm3vGUn3LuMF4pxNrrrfFkoT90sglv7RCD
- /4no89jQs3mDNixRfzDPerPqwoyS2w5QRhI2az8yHQYnvBFcVdy82b+6ZRXq1Ju81vBB
- gR3w==
-X-Gm-Message-State: APjAAAWYYEr9COT7WzqN+OBdsd2aD1DnqsspsYm1vR+q8OU+xMlKdCg3
- 43Vk/z+EpSmD/AidecAk9yfQxP3TtsCSreGg/Mw=
-X-Google-Smtp-Source: APXvYqw5oRfRMp5jhFxJhUofzPKkWh7t0YkTxAics1dZ0qc8Iipwm696nLVFi3fiXQsygSztZNZxUjKr9//CbuAhyA4=
-X-Received: by 2002:a9d:3d05:: with SMTP id a5mr3514745otc.295.1574857238445; 
- Wed, 27 Nov 2019 04:20:38 -0800 (PST)
+ bh=FfCG7TaEbIWD8VpjZo9pQL688Tq0ZW1CAnlxzdTGQxI=;
+ b=GUUT6p1LK3wbLGxBbrx/WADTzSIXjrQsinfGIxARXZB5vwqRPhBgTrwb+EBD81JgeY
+ gSSZWWjvUi6tWrh+zT3KYe8wkiQpYBZ+xU2s6DiwwFdQ/MHXKPfmhUMOjd2/AxUj4Pbv
+ 1A6DQbIJGrgkBnkCcg9DEYX0rz/gqmpezMAQrJov2DXjD0FXSkuhMevnvjOOC7OXTcJL
+ NAEA5R6pHCiFDaYp8+cJofsoyL5MlSxFRsJaGgs4DfmVVD7RvSHRruK66hZ/gGyrlDp3
+ HsqZa2CIpzEyHey5/pDiiC/yMUk7E/sm65wQjUE41Lh2x3EnJrYL8BaVcnncnlpI4Mvd
+ N0Sg==
+X-Gm-Message-State: APjAAAWfiyZ2DDICa0sDnSjtO26P1SwLQj6kDk5gBveNwmL9BOSHoovm
+ /cBe7o4vNVZBRufZtBOeYxdJ0ZDIALr4rpntHO4=
+X-Google-Smtp-Source: APXvYqxY9FqOdHy3qzi5BCDCqWLBaEJn6p2Jzr840jILZx1g7QhJmWhwUgyfte3WK5a+doCvTFvNJc13ZmQzxpNqtKQ=
+X-Received: by 2002:aca:670b:: with SMTP id z11mr3732477oix.79.1574857324707; 
+ Wed, 27 Nov 2019 04:22:04 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Wed, 27 Nov 2019 04:20:37
+Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Wed, 27 Nov 2019 04:22:04
  -0800 (PST)
-In-Reply-To: <CAMxuvazMYFLqamMw6s=7=fzhNB_6kqnvnAd2_d=2pZCjQwqL3Q@mail.gmail.com>
+In-Reply-To: <20191120152442.26657-18-marcandre.lureau@redhat.com>
 References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <20191120152442.26657-19-marcandre.lureau@redhat.com>
- <CAL1e-=huXgGw-uXtNXqu111O8yE-Jw_+vHXqE7Wfw1efPZATSw@mail.gmail.com>
- <CAMxuvawAL5wK31-BdGWNj4p8ZavMDAvtNgjJN7Yn6EhDyB-=uw@mail.gmail.com>
- <58a5a515-2244-a927-9ca7-c0bb64ceca53@redhat.com>
- <c61a0426-bf43-9afe-3110-51bb11d75bd1@redhat.com>
- <8992c003-5d65-77e9-17eb-592449cf9fdc@redhat.com>
- <CAMxuvazMYFLqamMw6s=7=fzhNB_6kqnvnAd2_d=2pZCjQwqL3Q@mail.gmail.com>
+ <20191120152442.26657-18-marcandre.lureau@redhat.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 27 Nov 2019 13:20:37 +0100
-Message-ID: <CAL1e-=i32Wpd1FqL8TD-oDZxwyF+U2P4QGvtFaR+jBi2xktN3w@mail.gmail.com>
-Subject: Re: [PATCH v4 18/37] mips: baudbase is 115200 by default
+Date: Wed, 27 Nov 2019 13:22:04 +0100
+Message-ID: <CAL1e-=jzWDA13HU35ez9CaU_LQymJQt7MFumNjSqRbNzBTYLEw@mail.gmail.com>
+Subject: Re: [PATCH v4 17/37] mips: inline serial_init()
 To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000004504890598530697"
+Content-Type: multipart/alternative; boundary="0000000000006942df0598530bf5"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,368 +90,240 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004504890598530697
+--0000000000006942df0598530bf5
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wednesday, November 27, 2019, Marc-Andr=C3=A9 Lureau <
+On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau <
 marcandre.lureau@redhat.com> wrote:
 
-> Hi
+> The function is specific to mipssim, let's inline it.
 >
-> On Mon, Nov 25, 2019 at 5:04 PM Philippe Mathieu-Daud=C3=A9
-> <philmd@redhat.com> wrote:
-> >
-> > On 11/25/19 1:54 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > > On 11/25/19 12:26 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > >> On 11/25/19 11:12 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > >>> Hi
-> > >>>
-> > >>> On Mon, Nov 25, 2019 at 2:07 PM Aleksandar Markovic
-> > >>> <aleksandar.m.mail@gmail.com> wrote:
-> > >>>>
-> > >>>>
-> > >>>>
-> > >>>> On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau
-> > >>>> <marcandre.lureau@redhat.com> wrote:
-> > >>>>>
-> > >>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m>
-> > >>>>> ---
-> > >>>>>   hw/mips/mips_mipssim.c | 1 -
-> > >>>>>   1 file changed, 1 deletion(-)
-> > >>>>>
-> > >>>>> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-> > >>>>> index bfafa4d7e9..3cd0e6eb33 100644
-> > >>>>> --- a/hw/mips/mips_mipssim.c
-> > >>>>> +++ b/hw/mips/mips_mipssim.c
-> > >>>>> @@ -223,7 +223,6 @@ mips_mipssim_init(MachineState *machine)
-> > >>>>>       if (serial_hd(0)) {
-> > >>>>>           DeviceState *dev =3D qdev_create(NULL, TYPE_SERIAL_IO);
-> > >>>>>
-> > >>>>> -        qdev_prop_set_uint32(DEVICE(dev), "baudbase", 115200);
-> > >>>>>           qdev_prop_set_chr(dev, "chardev", serial_hd(0));
-> > >>>>>           qdev_set_legacy_instance_id(dev, 0x3f8, 2);
-> > >>>>>           qdev_init_nofail(dev);
-> > >>>>> --
-> > >>>>
-> > >>>>
-> > >>>> Please mention in your commit message where the default baudbase i=
-s
-> > >>>> set.
-> > >>>
-> > >>> ok
-> > >>>
-> > >>>> Also, is there a guarantie that default value 115200 will never
-> > >>>> change in future?
-> > >>>
-> > >>> The level of stability on properties in general is unclear to me.
-> > >>>
-> > >>> Given that 115200 is standard for serial, it is unlikely to change
-> > >>> though.. We can have an assert there instead?
-> > >>>
-> > >>> Peter, what do you think? thanks
-> >
-> > IOW, until we merge Damien's "Clock framework API" series, I'd:
-> >
-> > - rename 'baudbase' -> 'input_frequency_hz'
-> >
-> > - set a 0 default value
-> >
-> >   DEFINE_PROP_UINT32("input-frequency-hz", SerialState,
-> >                       input_frequency_hz, 0),
-> >
-> > - add a check in serial_realize()
-> >
-> >      if (s->input_frequency_hz =3D=3D 0) {
-> >          error_setg(errp,
-> >                "serial: input-frequency-hz property must be set");
-> >          return;
-> >      }
-> >
-> > [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg642174.html
-> >
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  hw/char/serial.c         | 16 ----------------
+>  hw/mips/mips_mipssim.c   | 15 ++++++++++++---
+>  include/hw/char/serial.h |  2 --
+>  3 files changed, 12 insertions(+), 21 deletions(-)
 >
-> This is getting further away from this series goal, and my initial
-> goal. Let's add this to the backlog. I can drop a FIXME there.
-
-
-I agree. But please update commit message and/or add FIXME so that future
-readers are given at least some background.
-
+>
 Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
 
+> diff --git a/hw/char/serial.c b/hw/char/serial.c
+> index 164146ede8..23f0b02516 100644
+> --- a/hw/char/serial.c
+> +++ b/hw/char/serial.c
+> @@ -1023,22 +1023,6 @@ static const TypeInfo serial_io_info =3D {
+>      .class_init =3D serial_io_class_init,
+>  };
 >
-> > >> This property confused me by the past. It is _not_ the baudrate.
-> > >> It is the input frequency clocking the UART ('XIN' pin, Xtal INput).
-> > >>
-> > >> Each board has its own frequency, and it can even be variable (the
-> > >> clock domain tree can reconfigure it at a different rate).
-> > >
-> > > Laurent pointed me to the following commit which confirms my
-> > > interpretation:
-> > >
-> > > $ git show 038eaf82c853
-> > > commit 038eaf82c853f3bf8d4c106c0677bbf4adada7de
-> > > Author: Stefan Weil <weil@mail.berlios.de>
-> > > Date:   Sat Oct 31 11:28:11 2009 +0100
-> > >
-> > >      serial: Add interface to set reference oscillator frequency
-> > >
-> > >      Many (most?) serial interfaces have a programmable
-> > >      clock which provides the reference frequency ("baudbase").
-> > >      So a fixed baudbase which is only set once can be wrong.
-> > >
-> > >      omap1.c is an example which could use the new interface
-> > >      to change baudbase when the programmable clock changes.
-> > >      ar7 system emulation (still not part of standard QEMU)
-> > >      is similar to omap and already uses serial_set_frequency.
-> > >
-> > >      Signed-off-by: Stefan Weil <weil@mail.berlios.de>
-> > >      Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
-> > >
-> > > diff --git a/hw/pc.h b/hw/pc.h
-> > > index 15fff8d103..03ffc91536 100644
-> > > --- a/hw/pc.h
-> > > +++ b/hw/pc.h
-> > > @@ -13,6 +13,7 @@ SerialState *serial_mm_init (target_phys_addr_t bas=
-e,
-> > > int it_shift,
-> > >                                qemu_irq irq, int baudbase,
-> > >                                CharDriverState *chr, int ioregister);
-> > >   SerialState *serial_isa_init(int index, CharDriverState *chr);
-> > > +void serial_set_frequency(SerialState *s, uint32_t frequency);
-> > >
-> > >   /* parallel.c */
-> > >
-> > > diff --git a/hw/serial.c b/hw/serial.c
-> > > index fa12dcc075..0063260569 100644
-> > > --- a/hw/serial.c
-> > > +++ b/hw/serial.c
-> > > @@ -730,6 +730,13 @@ static void serial_init_core(SerialState *s)
-> > >                             serial_event, s);
-> > >   }
-> > >
-> > > +/* Change the main reference oscillator frequency. */
-> > > +void serial_set_frequency(SerialState *s, uint32_t frequency)
-> > > +{
-> > > +    s->baudbase =3D frequency;
-> > > +    serial_update_parameters(s);
-> > > +}
-> > > +
-> >
+> -SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
+> -                         Chardev *chr, MemoryRegion *system_io)
+> -{
+> -    SerialIO *sio =3D SERIAL_IO(qdev_create(NULL, TYPE_SERIAL_IO));
+> -
+> -    qdev_prop_set_uint32(DEVICE(sio), "baudbase", baudbase);
+> -    qdev_prop_set_chr(DEVICE(sio), "chardev", chr);
+> -    qdev_set_legacy_instance_id(DEVICE(sio), base, 2);
+> -    qdev_init_nofail(DEVICE(sio));
+> -
+> -    sysbus_connect_irq(SYS_BUS_DEVICE(sio), 0, irq);
+> -    memory_region_add_subregion(system_io, base, &sio->serial.io);
+> -
+> -    return sio;
+> -}
+> -
+>  static Property serial_properties[] =3D {
+>      DEFINE_PROP_CHR("chardev", SerialState, chr),
+>      DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
+> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+> index 282bbecb24..bfafa4d7e9 100644
+> --- a/hw/mips/mips_mipssim.c
+> +++ b/hw/mips/mips_mipssim.c
+> @@ -40,6 +40,7 @@
+>  #include "hw/loader.h"
+>  #include "elf.h"
+>  #include "hw/sysbus.h"
+> +#include "hw/qdev-properties.h"
+>  #include "exec/address-spaces.h"
+>  #include "qemu/error-report.h"
+>  #include "sysemu/qtest.h"
+> @@ -219,9 +220,17 @@ mips_mipssim_init(MachineState *machine)
+>       * A single 16450 sits at offset 0x3f8. It is attached to
+>       * MIPS CPU INT2, which is interrupt 4.
+>       */
+> -    if (serial_hd(0))
+> -        serial_init(0x3f8, env->irq[4], 115200, serial_hd(0),
+> -                    get_system_io());
+> +    if (serial_hd(0)) {
+> +        DeviceState *dev =3D qdev_create(NULL, TYPE_SERIAL_IO);
+> +
+> +        qdev_prop_set_uint32(DEVICE(dev), "baudbase", 115200);
+> +        qdev_prop_set_chr(dev, "chardev", serial_hd(0));
+> +        qdev_set_legacy_instance_id(dev, 0x3f8, 2);
+> +        qdev_init_nofail(dev);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
+> +        memory_region_add_subregion(get_system_io(), 0x3f8,
+> +                                    &SERIAL_IO(dev)->serial.io);
+> +    }
+>
+>      if (nd_table[0].used)
+>          /* MIPSnet uses the MIPS CPU INT0, which is interrupt 2. */
+> diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+> index d356ba838c..535fa23a2b 100644
+> --- a/include/hw/char/serial.h
+> +++ b/include/hw/char/serial.h
+> @@ -108,8 +108,6 @@ void serial_set_frequency(SerialState *s, uint32_t
+> frequency);
+>  #define TYPE_SERIAL_IO "serial-io"
+>  #define SERIAL_IO(s) OBJECT_CHECK(SerialIO, (s), TYPE_SERIAL_IO)
+>
+> -SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
+> -                      Chardev *chr, MemoryRegion *system_io);
+>  SerialMM *serial_mm_init(MemoryRegion *address_space,
+>                           hwaddr base, int regshift,
+>                           qemu_irq irq, int baudbase,
+> --
+> 2.24.0
+>
 >
 >
 
---0000000000004504890598530697
+--0000000000006942df0598530bf5
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<br><br>On Wednesday, November 27, 2019, Marc-Andr=C3=A9 Lureau &lt;<a href=
+<br><br>On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau &lt;<a href=
 =3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;=
  wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bor=
-der-left:1px #ccc solid;padding-left:1ex">Hi<br>
+der-left:1px #ccc solid;padding-left:1ex">The function is specific to mipss=
+im, let&#39;s inline it.<br>
 <br>
-On Mon, Nov 25, 2019 at 5:04 PM Philippe Mathieu-Daud=C3=A9<br>
-&lt;<a href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<b=
-r>
-&gt;<br>
-&gt; On 11/25/19 1:54 PM, Philippe Mathieu-Daud=C3=A9 wrote:<br>
-&gt; &gt; On 11/25/19 12:26 PM, Philippe Mathieu-Daud=C3=A9 wrote:<br>
-&gt; &gt;&gt; On 11/25/19 11:12 AM, Marc-Andr=C3=A9 Lureau wrote:<br>
-&gt; &gt;&gt;&gt; Hi<br>
-&gt; &gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt; On Mon, Nov 25, 2019 at 2:07 PM Aleksandar Markovic<br>
-&gt; &gt;&gt;&gt; &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com">aleksa=
-ndar.m.mail@gmail.com</a>&gt; wrote:<br>
-&gt; &gt;&gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt; On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lure=
-au<br>
-&gt; &gt;&gt;&gt;&gt; &lt;<a href=3D"mailto:marcandre.lureau@redhat.com">ma=
-rcandre.lureau@redhat.com</a>&gt; wrote:<br>
-&gt; &gt;&gt;&gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt;&gt; Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=
-=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;=
+Signed-off-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lurea=
+u@redhat.com">marcandre.lureau@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0hw/char/serial.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 16 --------------=
+--<br>
+=C2=A0hw/mips/mips_mipssim.c=C2=A0 =C2=A0| 15 ++++++++++++---<br>
+=C2=A0include/hw/char/serial.h |=C2=A0 2 --<br>
+=C2=A03 files changed, 12 insertions(+), 21 deletions(-)<br>
+<br></blockquote><div><br></div><div>Reviewed-by: Aleksandar Markovic &lt;<=
+a href=3D"mailto:amarkovic@wavecomp.com">amarkovic@wavecomp.com</a>&gt;</di=
+v><div>=C2=A0<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 =
+0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+diff --git a/hw/char/serial.c b/hw/char/serial.c<br>
+index 164146ede8..23f0b02516 100644<br>
+--- a/hw/char/serial.c<br>
++++ b/hw/char/serial.c<br>
+@@ -1023,22 +1023,6 @@ static const TypeInfo serial_io_info =3D {<br>
+=C2=A0 =C2=A0 =C2=A0.class_init =3D serial_io_class_init,<br>
+=C2=A0};<br>
 <br>
-&gt; &gt;&gt;&gt;&gt;&gt; ---<br>
-&gt; &gt;&gt;&gt;&gt;&gt;=C2=A0 =C2=A0hw/mips/mips_mipssim.c | 1 -<br>
-&gt; &gt;&gt;&gt;&gt;&gt;=C2=A0 =C2=A01 file changed, 1 deletion(-)<br>
-&gt; &gt;&gt;&gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt;&gt; diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mip=
-s_mipssim.c<br>
-&gt; &gt;&gt;&gt;&gt;&gt; index bfafa4d7e9..3cd0e6eb33 100644<br>
-&gt; &gt;&gt;&gt;&gt;&gt; --- a/hw/mips/mips_mipssim.c<br>
-&gt; &gt;&gt;&gt;&gt;&gt; +++ b/hw/mips/mips_mipssim.c<br>
-&gt; &gt;&gt;&gt;&gt;&gt; @@ -223,7 +223,6 @@ mips_mipssim_init(MachineStat=
-e *machine)<br>
-&gt; &gt;&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0if (serial_hd(0)) {<br>
-&gt; &gt;&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0DeviceSta=
-te *dev =3D qdev_create(NULL, TYPE_SERIAL_IO);<br>
-&gt; &gt;&gt;&gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt;&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_prop_set_uint32=
-(DEVICE(<wbr>dev), &quot;baudbase&quot;, 115200);<br>
-&gt; &gt;&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_prop=
-_set_chr(dev, &quot;chardev&quot;, serial_hd(0));<br>
-&gt; &gt;&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_set_=
-legacy_instance_id(<wbr>dev, 0x3f8, 2);<br>
-&gt; &gt;&gt;&gt;&gt;&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_init=
-_nofail(dev);<br>
-&gt; &gt;&gt;&gt;&gt;&gt; --<br>
-&gt; &gt;&gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt; Please mention in your commit message where the defau=
-lt baudbase is<br>
-&gt; &gt;&gt;&gt;&gt; set.<br>
-&gt; &gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt; ok<br>
-&gt; &gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt;&gt; Also, is there a guarantie that default value 115200 =
-will never<br>
-&gt; &gt;&gt;&gt;&gt; change in future?<br>
-&gt; &gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt; The level of stability on properties in general is unclea=
-r to me.<br>
-&gt; &gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt; Given that 115200 is standard for serial, it is unlikely =
-to change<br>
-&gt; &gt;&gt;&gt; though.. We can have an assert there instead?<br>
-&gt; &gt;&gt;&gt;<br>
-&gt; &gt;&gt;&gt; Peter, what do you think? thanks<br>
-&gt;<br>
-&gt; IOW, until we merge Damien&#39;s &quot;Clock framework API&quot; serie=
-s, I&#39;d:<br>
-&gt;<br>
-&gt; - rename &#39;baudbase&#39; -&gt; &#39;input_frequency_hz&#39;<br>
-&gt;<br>
-&gt; - set a 0 default value<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0DEFINE_PROP_UINT32(&quot;input-<wbr>frequency-hz&quot;, Se=
-rialState,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0input_frequency_hz, 0),<br>
-&gt;<br>
-&gt; - add a check in serial_realize()<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 if (s-&gt;input_frequency_hz =3D=3D 0) {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 error_setg(errp,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;serial: i=
-nput-frequency-hz property must be set&quot;);<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
-&gt;<br>
-&gt; [*] <a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg6=
-42174.html" target=3D"_blank">https://www.mail-archive.com/<wbr>qemu-devel@=
-nongnu.org/<wbr>msg642174.html</a><br>
-&gt;<br>
-<br>
-This is getting further away from this series goal, and my initial<br>
-goal. Let&#39;s add this to the backlog. I can drop a FIXME there.</blockqu=
-ote><div><br></div><div>I agree. But please update commit message and/or ad=
-d FIXME so that future readers are given at least some background.</div><di=
-v><br></div><div>Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:ama=
-rkovic@wavecomp.com">amarkovic@wavecomp.com</a>&gt;</div><div>=C2=A0</div><=
-blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px=
- #ccc solid;padding-left:1ex">
-<br>
-&gt; &gt;&gt; This property confused me by the past. It is _not_ the baudra=
-te.<br>
-&gt; &gt;&gt; It is the input frequency clocking the UART (&#39;XIN&#39; pi=
-n, Xtal INput).<br>
-&gt; &gt;&gt;<br>
-&gt; &gt;&gt; Each board has its own frequency, and it can even be variable=
- (the<br>
-&gt; &gt;&gt; clock domain tree can reconfigure it at a different rate).<br=
+-SerialIO *serial_init(int base, qemu_irq irq, int baudbase,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0Chardev *chr, MemoryRegion *system_io)<br>
+-{<br>
+-=C2=A0 =C2=A0 SerialIO *sio =3D SERIAL_IO(qdev_create(NULL, TYPE_SERIAL_IO=
+));<br>
+-<br>
+-=C2=A0 =C2=A0 qdev_prop_set_uint32(DEVICE(<wbr>sio), &quot;baudbase&quot;,=
+ baudbase);<br>
+-=C2=A0 =C2=A0 qdev_prop_set_chr(DEVICE(sio), &quot;chardev&quot;, chr);<br=
 >
-&gt; &gt;<br>
-&gt; &gt; Laurent pointed me to the following commit which confirms my<br>
-&gt; &gt; interpretation:<br>
-&gt; &gt;<br>
-&gt; &gt; $ git show 038eaf82c853<br>
-&gt; &gt; commit 038eaf82c853f3bf8d4c106c0677bb<wbr>f4adada7de<br>
-&gt; &gt; Author: Stefan Weil &lt;<a href=3D"mailto:weil@mail.berlios.de">w=
-eil@mail.berlios.de</a>&gt;<br>
-&gt; &gt; Date:=C2=A0 =C2=A0Sat Oct 31 11:28:11 2009 +0100<br>
-&gt; &gt;<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 serial: Add interface to set reference oscill=
-ator frequency<br>
-&gt; &gt;<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 Many (most?) serial interfaces have a program=
-mable<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 clock which provides the reference frequency =
-(&quot;baudbase&quot;).<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 So a fixed baudbase which is only set once ca=
-n be wrong.<br>
-&gt; &gt;<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 omap1.c is an example which could use the new=
- interface<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 to change baudbase when the programmable cloc=
-k changes.<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 ar7 system emulation (still not part of stand=
-ard QEMU)<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 is similar to omap and already uses serial_se=
-t_frequency.<br>
-&gt; &gt;<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 Signed-off-by: Stefan Weil &lt;<a href=3D"mai=
-lto:weil@mail.berlios.de">weil@mail.berlios.de</a>&gt;<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 Signed-off-by: Anthony Liguori &lt;<a href=3D=
-"mailto:aliguori@us.ibm.com">aliguori@us.ibm.com</a>&gt;<br>
-&gt; &gt;<br>
-&gt; &gt; diff --git a/hw/pc.h b/hw/pc.h<br>
-&gt; &gt; index 15fff8d103..03ffc91536 100644<br>
-&gt; &gt; --- a/hw/pc.h<br>
-&gt; &gt; +++ b/hw/pc.h<br>
-&gt; &gt; @@ -13,6 +13,7 @@ SerialState *serial_mm_init (target_phys_addr_t=
- base,<br>
-&gt; &gt; int it_shift,<br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_irq irq, int baudbase,<b=
-r>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 CharDriverState *chr, int ior=
-egister);<br>
-&gt; &gt;=C2=A0 =C2=A0SerialState *serial_isa_init(int index, CharDriverSta=
-te *chr);<br>
-&gt; &gt; +void serial_set_frequency(<wbr>SerialState *s, uint32_t frequenc=
-y);<br>
-&gt; &gt;<br>
-&gt; &gt;=C2=A0 =C2=A0/* parallel.c */<br>
-&gt; &gt;<br>
-&gt; &gt; diff --git a/hw/serial.c b/hw/serial.c<br>
-&gt; &gt; index fa12dcc075..0063260569 100644<br>
-&gt; &gt; --- a/hw/serial.c<br>
-&gt; &gt; +++ b/hw/serial.c<br>
-&gt; &gt; @@ -730,6 +730,13 @@ static void serial_init_core(SerialState *s)=
+-=C2=A0 =C2=A0 qdev_set_legacy_instance_id(<wbr>DEVICE(sio), base, 2);<br>
+-=C2=A0 =C2=A0 qdev_init_nofail(DEVICE(sio));<br>
+-<br>
+-=C2=A0 =C2=A0 sysbus_connect_irq(SYS_BUS_<wbr>DEVICE(sio), 0, irq);<br>
+-=C2=A0 =C2=A0 memory_region_add_subregion(<wbr>system_io, base, &amp;sio-&=
+gt;<a href=3D"http://serial.io" target=3D"_blank">serial.io</a>);<br>
+-<br>
+-=C2=A0 =C2=A0 return sio;<br>
+-}<br>
+-<br>
+=C2=A0static Property serial_properties[] =3D {<br>
+=C2=A0 =C2=A0 =C2=A0DEFINE_PROP_CHR(&quot;chardev&quot;, SerialState, chr),=
 <br>
-&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0serial_event, s);<br>
-&gt; &gt;=C2=A0 =C2=A0}<br>
-&gt; &gt;<br>
-&gt; &gt; +/* Change the main reference oscillator frequency. */<br>
-&gt; &gt; +void serial_set_frequency(<wbr>SerialState *s, uint32_t frequenc=
-y)<br>
-&gt; &gt; +{<br>
-&gt; &gt; +=C2=A0 =C2=A0 s-&gt;baudbase =3D frequency;<br>
-&gt; &gt; +=C2=A0 =C2=A0 serial_update_parameters(s);<br>
-&gt; &gt; +}<br>
-&gt; &gt; +<br>
-&gt;<br>
+=C2=A0 =C2=A0 =C2=A0DEFINE_PROP_UINT32(&quot;baudbase&quot;, SerialState, b=
+audbase, 115200),<br>
+diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c<br>
+index 282bbecb24..bfafa4d7e9 100644<br>
+--- a/hw/mips/mips_mipssim.c<br>
++++ b/hw/mips/mips_mipssim.c<br>
+@@ -40,6 +40,7 @@<br>
+=C2=A0#include &quot;hw/loader.h&quot;<br>
+=C2=A0#include &quot;elf.h&quot;<br>
+=C2=A0#include &quot;hw/sysbus.h&quot;<br>
++#include &quot;hw/qdev-properties.h&quot;<br>
+=C2=A0#include &quot;exec/address-spaces.h&quot;<br>
+=C2=A0#include &quot;qemu/error-report.h&quot;<br>
+=C2=A0#include &quot;sysemu/qtest.h&quot;<br>
+@@ -219,9 +220,17 @@ mips_mipssim_init(MachineState *machine)<br>
+=C2=A0 =C2=A0 =C2=A0 * A single 16450 sits at offset 0x3f8. It is attached =
+to<br>
+=C2=A0 =C2=A0 =C2=A0 * MIPS CPU INT2, which is interrupt 4.<br>
+=C2=A0 =C2=A0 =C2=A0 */<br>
+-=C2=A0 =C2=A0 if (serial_hd(0))<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 serial_init(0x3f8, env-&gt;irq[4], 115200, ser=
+ial_hd(0),<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_=
+system_io());<br>
++=C2=A0 =C2=A0 if (serial_hd(0)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 DeviceState *dev =3D qdev_create(NULL, TYPE_SE=
+RIAL_IO);<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_prop_set_uint32(DEVICE(<wbr>dev), &quot;b=
+audbase&quot;, 115200);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_prop_set_chr(dev, &quot;chardev&quot;, se=
+rial_hd(0));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_set_legacy_instance_id(<wbr>dev, 0x3f8, 2=
+);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_init_nofail(dev);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 sysbus_connect_irq(SYS_BUS_<wbr>DEVICE(dev), 0=
+, env-&gt;irq[4]);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 memory_region_add_subregion(<wbr>get_system_io=
+(), 0x3f8,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;SERIAL_IO(dev)-&g=
+t;<a href=3D"http://serial.io" target=3D"_blank">serial.io</a>);<br>
++=C2=A0 =C2=A0 }<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (nd_table[0].used)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* MIPSnet uses the MIPS CPU INT0, which =
+is interrupt 2. */<br>
+diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h<br>
+index d356ba838c..535fa23a2b 100644<br>
+--- a/include/hw/char/serial.h<br>
++++ b/include/hw/char/serial.h<br>
+@@ -108,8 +108,6 @@ void serial_set_frequency(<wbr>SerialState *s, uint32_t=
+ frequency);<br>
+=C2=A0#define TYPE_SERIAL_IO &quot;serial-io&quot;<br>
+=C2=A0#define SERIAL_IO(s) OBJECT_CHECK(SerialIO, (s), TYPE_SERIAL_IO)<br>
+<br>
+-SerialIO *serial_init(int base, qemu_irq irq, int baudbase,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 Chardev *chr, MemoryRegion *system_io);<br>
+=C2=A0SerialMM *serial_mm_init(MemoryRegion *address_space,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 hwaddr base, int regshift,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 qemu_irq irq, int baudbase,<br>
+-- <br>
+2.24.0<br>
+<br>
 <br>
 </blockquote>
 
---0000000000004504890598530697--
+--0000000000006942df0598530bf5--
 
