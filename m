@@ -1,85 +1,53 @@
 Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61602C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 494C1C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28EC2204FD
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:18:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uUdufGvS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28EC2204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 205BA206E0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:24:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 205BA206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia2q0-0001yL-Tx
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:18:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60737)
+	id 1ia2v7-00055L-Az
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:24:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jcmvbkbc@gmail.com>) id 1ia2lC-0007L8-6z
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:13:59 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia2rW-0003jK-BS
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:20:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jcmvbkbc@gmail.com>) id 1ia2lB-00027y-9N
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:13:58 -0500
-Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:41890)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1ia2lB-00026k-3w
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:13:57 -0500
-Received: by mail-pl1-x634.google.com with SMTP id t8so10151880plr.8
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 11:13:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=cVi4SDW3zgmcQiv99H3YNyDW1Bmnvv1njWuQ2UJDy44=;
- b=uUdufGvSpPRYi8hYYFG0xnpKbYP9PxwASXEfXHHZ0FdkxWFJcLqlsSopfruksP4XwG
- G/V/uUBVRXTuCEgUYp1u6tlQ5/bFGKfIQNsEayFDVwCbmyhv/iLwViREcaIZf56rrNXH
- AYBl/sV2KPZclNryehaBsdmC3/wfW9Te/w0AgeqmvuHw9TOHUj8uI+CV46o9hEZ+/yaP
- JVfdtMZFcf5H5nwff2FjzE0aqptt9rNOGcK4zuYAv8QDNCMSQOoV6AUtxuBKaXYNe1eJ
- 5U8BEZiUHNUKUx/+Gr51xkbt/gOKVwrAGXMo7IIWAVjXMNO+lMPHyo/QB2zH0Hy+XW5Z
- 6vqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=cVi4SDW3zgmcQiv99H3YNyDW1Bmnvv1njWuQ2UJDy44=;
- b=A6LXfIBMOMuQK3+xQbq5Y3/HjzuT+hNEpwD5Z6GozKRirYohESsJSzqiP7fWVRxIy+
- UW4/bkaYKfiFENG8eyD3vRKYhvMczpXdUVwTLc16OJKabFuLaQSMxLas5ewAFw5bUDKP
- G2T/18xDqoU3we2iIYzoNXPnOuq50nEJIsGVyjv/1sncrY7+c3dd/9m+/FvOG10kCsAm
- nHmeO/bKiXWgg7qyZWsPGonW8D4+NEDT/gLfnrTmlGK9gNozX4B34N+7Xj7B4MOZgLbL
- p7Mw/F1ALF6xbYa88M+MBeuT3GcF5j9b7g4Enfzl03waHLR+I+MT3pa/fCqaSDlwJ1WE
- /2vA==
-X-Gm-Message-State: APjAAAUsp6AkdgweO/cRbSJUrR+9Sy19uIRxJe7KIqqYjlG0kmY597wc
- CRKAZktKQxCMSBlnJ6quICdz7YWiwbwcqEND2M0=
-X-Google-Smtp-Source: APXvYqxbAjy8braW6EKN+yOhCcMts2bGPjFjYO6ibBp6ef6LdmmaSn3gVaE6c3SMSRryKh8UWu8jV7KCP0Fsi9JZNn0=
-X-Received: by 2002:a17:90a:bf81:: with SMTP id
- d1mr7881709pjs.125.1574882036060; 
- Wed, 27 Nov 2019 11:13:56 -0800 (PST)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia2rU-0000TX-Rg
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:20:29 -0500
+Received: from relay.sw.ru ([185.231.240.75]:53452)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ia2rU-0000Px-K4
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:20:28 -0500
+Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ia2rR-0003hu-HJ; Wed, 27 Nov 2019 22:20:25 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6] hw/core/qdev: cleanup Error ** variables
+Date: Wed, 27 Nov 2019 22:20:25 +0300
+Message-Id: <20191127192025.21594-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20191126222607.25653-1-jcmvbkbc@gmail.com>
- <87tv6pf8bn.fsf@linaro.org>
-In-Reply-To: <87tv6pf8bn.fsf@linaro.org>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Wed, 27 Nov 2019 11:13:44 -0800
-Message-ID: <CAMo8Bf+ck39JZu=ZjfkT5XqTzUQK7QywMZVb09_8qiNuZZSB+w@mail.gmail.com>
-Subject: Re: [RFC] exec: flush CPU TB cache when breakpoint address
- translation fails
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::634
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,32 +59,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: vsementsov@virtuozzo.com, berrange@redhat.com, ehabkost@redhat.com,
+ marcandre.lureau@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 27, 2019 at 11:06 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
-> Max Filippov <jcmvbkbc@gmail.com> writes:
->
-> > When a breakpoint is inserted at location for which there's currently n=
-o
-> > virtual to physical translation no action is taken on CPU TB cache. If =
-a
-> > TB for that virtual address already exists but is not visible ATM the
-> > breakpoint won't be hit next time an instruction at that address will b=
-e
-> > executed.
->
-> So the userspace has run once but is currently paged out?
+Rename Error ** parameter in check_only_migratable to common errp.
 
-Yes, but not necessarily paged out, just not in the CPU TLB.
-Or it has run to completion and when you start it next time
-it gets loaded to the same physical pages.
+In device_set_realized:
 
---=20
-Thanks.
--- Max
+ - Move "if (local_err != NULL)" closer to error setters.
+
+ - Drop 'Error **local_errp': it doesn't save any LoCs, but it's very
+   unusual.
+
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+
+v6: enhance grammar in comment [Eric]
+    add r-b by Eric and Marc-André
+
+ hw/core/qdev.c | 28 +++++++++++++---------------
+ 1 file changed, 13 insertions(+), 15 deletions(-)
+
+diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+index cf1ba28fe3..82d3ee590a 100644
+--- a/hw/core/qdev.c
++++ b/hw/core/qdev.c
+@@ -820,12 +820,12 @@ static bool device_get_realized(Object *obj, Error **errp)
+     return dev->realized;
+ }
+ 
+-static bool check_only_migratable(Object *obj, Error **err)
++static bool check_only_migratable(Object *obj, Error **errp)
+ {
+     DeviceClass *dc = DEVICE_GET_CLASS(obj);
+ 
+     if (!vmstate_check_only_migratable(dc->vmsd)) {
+-        error_setg(err, "Device %s is not migratable, but "
++        error_setg(errp, "Device %s is not migratable, but "
+                    "--only-migratable was specified",
+                    object_get_typename(obj));
+         return false;
+@@ -874,10 +874,9 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+ 
+         if (dc->realize) {
+             dc->realize(dev, &local_err);
+-        }
+-
+-        if (local_err != NULL) {
+-            goto fail;
++            if (local_err != NULL) {
++                goto fail;
++            }
+         }
+ 
+         DEVICE_LISTENER_CALL(realize, Forward, dev);
+@@ -918,27 +917,26 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+        }
+ 
+     } else if (!value && dev->realized) {
+-        Error **local_errp = NULL;
++        /* We want local_err to track only the first error */
+         QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+-            local_errp = local_err ? NULL : &local_err;
+             object_property_set_bool(OBJECT(bus), false, "realized",
+-                                     local_errp);
++                                     local_err ? NULL : &local_err);
+         }
+         if (qdev_get_vmsd(dev)) {
+             vmstate_unregister(dev, qdev_get_vmsd(dev), dev);
+         }
+         if (dc->unrealize) {
+-            local_errp = local_err ? NULL : &local_err;
+-            dc->unrealize(dev, local_errp);
++            dc->unrealize(dev, local_err ? NULL : &local_err);
+         }
+         dev->pending_deleted_event = true;
+         DEVICE_LISTENER_CALL(unrealize, Reverse, dev);
+-    }
+ 
+-    if (local_err != NULL) {
+-        goto fail;
++        if (local_err != NULL) {
++            goto fail;
++        }
+     }
+ 
++    assert(local_err == NULL);
+     dev->realized = value;
+     return;
+ 
+@@ -976,7 +974,7 @@ static bool device_get_hotpluggable(Object *obj, Error **errp)
+                                 qbus_is_hotpluggable(dev->parent_bus));
+ }
+ 
+-static bool device_get_hotplugged(Object *obj, Error **err)
++static bool device_get_hotplugged(Object *obj, Error **errp)
+ {
+     DeviceState *dev = DEVICE(obj);
+ 
+-- 
+2.21.0
+
 
