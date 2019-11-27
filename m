@@ -2,88 +2,95 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 825C4C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 18:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A87C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 18:06:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 293CF20871
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 18:04:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPSN3Vt+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 293CF20871
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8DD6720874
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 18:06:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD6720874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia1gE-0001EI-U5
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 13:04:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48449)
+	id 1ia1hk-0002vW-45
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 13:06:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47048)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1ia1Vc-0002BH-Or
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:53:51 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1ia1TA-00089U-33
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:51:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1ia1Va-0006aq-ER
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:53:48 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35791)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ia1VZ-0006Yt-WF
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:53:46 -0500
-Received: by mail-wr1-x443.google.com with SMTP id s5so27729435wrw.2
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 09:53:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=kAhud8sddIA7MNZF3E3To08QyL9Kr5B5kglfeYkKJjI=;
- b=BPSN3Vt+4GgQXFJG41QeDmdfnbNMfU4aFxEVhjQKdmRVmp9l8/eJuAwcMYGMLM3ZAH
- a8vBpRv7n4Aipi6h6FLQyg+d8DStZlXF/vaJqYaHhGxYGxydPB/JANZvXof52qneauq1
- stgCPYOknDQSutkIYLOM6d5hEd+XFx5RiF39k81s5BSxtR5bdALJAA2Ixa28B5gMj6rr
- /FGROegoL/jymbcgrPF8iJqMOYsgozZrXNck81sFA6GtgQyAaY+V7aAXKLQ5pdzlp53i
- 1B46yL9HKYW95E971Dxryhel4uX5hs5+T5F2Mn0KDNdBWH/dnjbLDwZMomkkS5N9VsT1
- NimA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=kAhud8sddIA7MNZF3E3To08QyL9Kr5B5kglfeYkKJjI=;
- b=KV+C2ja+JU0sPTTM7ceKt2Hb63AmJg9xhMf9dlyFM0n44SRS7FQKWUIKQN0YO+gUa2
- z+rj0GcJreEv9rowLyVnCsRgv03HvcEfdnv6qPkpW6+1j70bofgv4EW3m3sULFqfYEon
- 7ucgi/vGkZDyFjlib7POj4IfrdbS3dSXsk7pvLHM1AJKGMd6Yl2dV16gZEZwqdBlScX+
- Vnxhf/4zq87bLVwrMKBQBOYtxlZHNsP81LTxzgCUy1l+rPDAtv9bn7MIUEYgJ9Mzt+XO
- 8SvZa3gQxsVkk4FIvl/cOUhediD16N08BON3k5819ldDX251ZcO2J9mWQVU1ZsuJ2TOP
- nU9w==
-X-Gm-Message-State: APjAAAX0LWmnh6QMdUfqmgwhOLSRSX+vKZqkrp63XhSjed17VNuNf7Hw
- IDqfFDeUOtG9/bScebgjQJQctYU1u50uBtP+
-X-Google-Smtp-Source: APXvYqxK1oW//5+dte7FT1jBgNmHR37EHe72UjosTqxdwFNUPE3ABvwz0fdQd2uHMNP61L3KgNIxQQ==
-X-Received: by 2002:adf:f343:: with SMTP id e3mr24131853wrp.55.1574877224063; 
- Wed, 27 Nov 2019 09:53:44 -0800 (PST)
-Received: from 8c859074c0ff.ant.amazon.com.com
- (bzq-79-178-2-87.red.bezeqint.net. [79.178.2.87])
- by smtp.gmail.com with ESMTPSA id b2sm20238295wrr.76.2019.11.27.09.53.42
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Wed, 27 Nov 2019 09:53:43 -0800 (PST)
-From: Michael Rolnik <mrolnik@gmail.com>
+ (envelope-from <frankja@linux.ibm.com>) id 1ia1T8-0003Pf-1n
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:51:15 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63942
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1ia1T6-0003Nv-1S
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 12:51:12 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xARHkW3u068028
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 12:51:11 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2whcy82ha9-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 12:51:10 -0500
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Wed, 27 Nov 2019 17:51:09 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 27 Nov 2019 17:51:06 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xARHp4rE17367212
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 27 Nov 2019 17:51:04 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B1D87A4053;
+ Wed, 27 Nov 2019 17:51:04 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 21FACA406D;
+ Wed, 27 Nov 2019 17:51:02 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.82.185])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 27 Nov 2019 17:51:01 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v37 06/17] target/avr: Add instruction translation - Branch
- Instructions
-Date: Wed, 27 Nov 2019 19:52:46 +0200
-Message-Id: <20191127175257.23480-7-mrolnik@gmail.com>
-X-Mailer: git-send-email 2.17.2 (Apple Git-113)
-In-Reply-To: <20191127175257.23480-1-mrolnik@gmail.com>
-References: <20191127175257.23480-1-mrolnik@gmail.com>
+Subject: [PATCH v4 5/6] s390x: Beautify diag308 handling
+Date: Wed, 27 Nov 2019 12:50:45 -0500
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191127175046.4911-1-frankja@linux.ibm.com>
+References: <20191127175046.4911-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-TM-AS-GCONF: 00
+x-cbid: 19112717-0016-0000-0000-000002CD1056
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112717-0017-0000-0000-0000332EF1A3
+Message-Id: <20191127175046.4911-6-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-27_04:2019-11-27,2019-11-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 bulkscore=0
+ spamscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0 adultscore=0
+ priorityscore=1501 phishscore=0 suspectscore=3 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911270145
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,603 +102,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Michael Rolnik <mrolnik@gmail.com>,
- me@xcancerberox.com.ar, richard.henderson@linaro.org, dovgaluk@ispras.ru,
- imammedo@redhat.com, philmd@redhat.com, aleksandar.m.mail@gmail.com
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-    - RJMP, IJMP, EIJMP, JMP
-    - RCALL, ICALL, EICALL, CALL
-    - RET, RETI
-    - CPSE, CP, CPC, CPI
-    - SBRC, SBRS, SBIC, SBIS
-    - BRBC, BRBS
+Let's improve readability by:
+* Using constants for the subcodes
+* Moving parameter checking into a function
+* Removing subcode > 6 check as the default case catches that
 
-Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 ---
- target/avr/translate.c | 549 ++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 546 insertions(+), 3 deletions(-)
+ target/s390x/diag.c | 54 +++++++++++++++++++++++++++------------------
+ 1 file changed, 32 insertions(+), 22 deletions(-)
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 76bfa651b6..48a42c984a 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -237,6 +237,86 @@ static void gen_ZNSf(TCGv R)
- }
+diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+index 53c2f81f2a..b5aec06d6b 100644
+--- a/target/s390x/diag.c
++++ b/target/s390x/diag.c
+@@ -53,6 +53,29 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
+ #define DIAG_308_RC_NO_CONF         0x0102
+ #define DIAG_308_RC_INVALID         0x0402
  
++#define DIAG308_RESET_MOD_CLR       0
++#define DIAG308_RESET_LOAD_NORM     1
++#define DIAG308_LOAD_CLEAR          3
++#define DIAG308_LOAD_NORMAL_DUMP    4
++#define DIAG308_SET                 5
++#define DIAG308_STORE               6
++
++static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t addr,
++                              uintptr_t ra, bool write)
++{
++    if ((r1 & 1) || (addr & ~TARGET_PAGE_MASK)) {
++        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
++        return -1;
++    }
++    if (!address_space_access_valid(&address_space_memory, addr,
++                                    sizeof(IplParameterBlock), write,
++                                    MEMTXATTRS_UNSPECIFIED)) {
++        s390_program_interrupt(env, PGM_ADDRESSING, ra);
++        return -1;
++    }
++    return 0;
++}
++
+ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+ {
+     CPUState *cs = env_cpu(env);
+@@ -65,30 +88,24 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+         return;
+     }
  
-+static void gen_push_ret(DisasContext *ctx, int ret)
-+{
-+    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
-+
-+        TCGv t0 = tcg_const_i32((ret & 0x0000ff));
-+
-+        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_UB);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(t0);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
-+
-+        TCGv t0 = tcg_const_i32((ret & 0x00ffff));
-+
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_st_tl(t0, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(t0);
-+
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
-+
-+        TCGv lo = tcg_const_i32((ret & 0x0000ff));
-+        TCGv hi = tcg_const_i32((ret & 0xffff00) >> 8);
-+
-+        tcg_gen_qemu_st_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 2);
-+        tcg_gen_qemu_st_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
-+
-+        tcg_temp_free_i32(lo);
-+        tcg_temp_free_i32(hi);
-+    }
-+}
-+
-+
-+static void gen_pop_ret(DisasContext *ctx, TCGv ret)
-+{
-+    if (avr_feature(ctx->env, AVR_FEATURE_1_BYTE_PC)) {
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_UB);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_2_BYTE_PC)) {
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(ret, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+    } else if (avr_feature(ctx->env, AVR_FEATURE_3_BYTE_PC)) {
-+        TCGv lo = tcg_temp_new_i32();
-+        TCGv hi = tcg_temp_new_i32();
-+
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
-+        tcg_gen_qemu_ld_tl(hi, cpu_sp, MMU_DATA_IDX, MO_BEUW);
-+
-+        tcg_gen_addi_tl(cpu_sp, cpu_sp, 2);
-+        tcg_gen_qemu_ld_tl(lo, cpu_sp, MMU_DATA_IDX, MO_UB);
-+
-+        tcg_gen_deposit_tl(ret, lo, hi, 8, 16);
-+
-+        tcg_temp_free_i32(lo);
-+        tcg_temp_free_i32(hi);
-+    }
-+}
-+
-+
-+static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-+{
-+    TranslationBlock *tb = ctx->tb;
-+
-+    if (ctx->singlestep == 0) {
-+        tcg_gen_goto_tb(n);
-+        tcg_gen_movi_i32(cpu_pc, dest);
-+        tcg_gen_exit_tb(tb, n);
-+    } else {
-+        tcg_gen_movi_i32(cpu_pc, dest);
-+        gen_helper_debug(cpu_env);
-+        tcg_gen_exit_tb(NULL, 0);
-+    }
-+    ctx->bstate = DISAS_NORETURN;
-+}
-+
-+
- /*
-  *  Adds two registers without the C Flag and places the result in the
-  *  destination register Rd.
-@@ -810,13 +890,14 @@ static bool trans_MULSU(DisasContext *ctx, arg_MULSU *a)
-     TCGv t0 = tcg_temp_new_i32();
+-    if ((subcode & ~0x0ffffULL) || (subcode > 6)) {
++    if (subcode & ~0x0ffffULL) {
+         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+         return;
+     }
  
-     tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
--    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd *Rr */
-+    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd * Rr */
-+    tcg_gen_andi_tl(R, R, 0xffff); /* make R 16 bits */
- 
-     tcg_gen_andi_tl(R0, R, 0xff);
-     tcg_gen_shri_tl(R1, R, 8);
- 
--    tcg_gen_shri_tl(cpu_Cf, R, 16); /* Cf = R(16) */
--    tcg_gen_mov_tl(cpu_Zf, R);
-+    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
- 
-     tcg_temp_free_i32(t0);
-     tcg_temp_free_i32(R);
-@@ -965,3 +1046,465 @@ static bool trans_DES(DisasContext *ctx, arg_DES *a)
- 
-     return true;
- }
-+
-+
-+/*
-+ *  Relative jump to an address within PC - 2K +1 and PC + 2K (words). For
-+ *  AVR microcontrollers with Program memory not exceeding 4K words (8KB) this
-+ *  instruction can address the entire memory from every address location. See
-+ *  also JMP.
-+ */
-+static bool trans_RJMP(DisasContext *ctx, arg_RJMP *a)
-+{
-+    int dst = ctx->npc + a->imm;
-+
-+    gen_goto_tb(ctx, 0, dst);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File. The Z-pointer Register is 16 bits wide and
-+ *  allows jump within the lowest 64K words (128KB) section of Program memory.
-+ *  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_IJMP(DisasContext *ctx, arg_IJMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
-+        return true;
-+    }
-+
-+    gen_jmp_z(ctx);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Indirect jump to the address pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File and the EIND Register in the I/O space. This
-+ *  instruction allows for indirect jumps to the entire 4M (words) Program
-+ *  memory space. See also IJMP.  This instruction is not available in all
-+ *  devices. Refer to the device specific instruction set summary.
-+ */
-+static bool trans_EIJMP(DisasContext *ctx, arg_EIJMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
-+        return true;
-+    }
-+
-+    gen_jmp_ez(ctx);
-+    return true;
-+}
-+
-+
-+/*
-+ *  Jump to an address within the entire 4M (words) Program memory. See also
-+ *  RJMP.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.0
-+ */
-+static bool trans_JMP(DisasContext *ctx, arg_JMP *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
-+        return true;
-+    }
-+
-+    gen_goto_tb(ctx, 0, a->imm);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Relative call to an address within PC - 2K + 1 and PC + 2K (words). The
-+ *  return address (the instruction after the RCALL) is stored onto the Stack.
-+ *  See also CALL. For AVR microcontrollers with Program memory not exceeding 4K
-+ *  words (8KB) this instruction can address the entire memory from every
-+ *  address location. The Stack Pointer uses a post-decrement scheme during
-+ *  RCALL.
-+ */
-+static bool trans_RCALL(DisasContext *ctx, arg_RCALL *a)
-+{
-+    int ret = ctx->npc;
-+    int dst = ctx->npc + a->imm;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_goto_tb(ctx, 0, dst);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Calls to a subroutine within the entire 4M (words) Program memory. The
-+ *  return address (to the instruction after the CALL) will be stored onto the
-+ *  Stack. See also RCALL. The Stack Pointer uses a post-decrement scheme during
-+ *  CALL.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_ICALL(DisasContext *ctx, arg_ICALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_IJMP_ICALL)) {
-+        return true;
-+    }
-+
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_jmp_z(ctx);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Indirect call of a subroutine pointed to by the Z (16 bits) Pointer
-+ *  Register in the Register File and the EIND Register in the I/O space. This
-+ *  instruction allows for indirect calls to the entire 4M (words) Program
-+ *  memory space. See also ICALL. The Stack Pointer uses a post-decrement scheme
-+ *  during EICALL.  This instruction is not available in all devices. Refer to
-+ *  the device specific instruction set summary.
-+ */
-+static bool trans_EICALL(DisasContext *ctx, arg_EICALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_EIJMP_EICALL)) {
-+        return true;
-+    }
-+
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_jmp_ez(ctx);
-+    return true;
-+}
-+
-+
-+/*
-+ *  Calls to a subroutine within the entire Program memory. The return
-+ *  address (to the instruction after the CALL) will be stored onto the Stack.
-+ *  (See also RCALL). The Stack Pointer uses a post-decrement scheme during
-+ *  CALL.  This instruction is not available in all devices. Refer to the device
-+ *  specific instruction set summary.
-+ */
-+static bool trans_CALL(DisasContext *ctx, arg_CALL *a)
-+{
-+    if (!avr_have_feature(ctx, AVR_FEATURE_JMP_CALL)) {
-+        return true;
-+    }
-+
-+    int Imm = a->imm;
-+    int ret = ctx->npc;
-+
-+    gen_push_ret(ctx, ret);
-+    gen_goto_tb(ctx, 0, Imm);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Returns from subroutine. The return address is loaded from the STACK.
-+ *  The Stack Pointer uses a preincrement scheme during RET.
-+ */
-+static bool trans_RET(DisasContext *ctx, arg_RET *a)
-+{
-+    gen_pop_ret(ctx, cpu_pc);
-+
-+    ctx->bstate = DISAS_LOOKUP;
-+    return true;
-+}
-+
-+
-+/*
-+ *  Returns from interrupt. The return address is loaded from the STACK and
-+ *  the Global Interrupt Flag is set.  Note that the Status Register is not
-+ *  automatically stored when entering an interrupt routine, and it is not
-+ *  restored when returning from an interrupt routine. This must be handled by
-+ *  the application program. The Stack Pointer uses a pre-increment scheme
-+ *  during RETI.
-+ */
-+static bool trans_RETI(DisasContext *ctx, arg_RETI *a)
-+{
-+    gen_pop_ret(ctx, cpu_pc);
-+    tcg_gen_movi_tl(cpu_If, 1);
-+
-+    /* Need to return to main loop to re-evaluate interrupts.  */
-+    ctx->bstate = DISAS_EXIT;
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr, and
-+ *  skips the next instruction if Rd = Rr.
-+ */
-+static bool trans_CPSE(DisasContext *ctx, arg_CPSE *a)
-+{
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = cpu_r[a->rd];
-+    ctx->skip_var1 = cpu_r[a->rr];
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr.
-+ *  None of the registers are changed. All conditional branches can be used
-+ *  after this instruction.
-+ */
-+static bool trans_CP(DisasContext *ctx, arg_CP *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs a compare between two registers Rd and Rr and
-+ *  also takes into account the previous carry. None of the registers are
-+ *  changed. All conditional branches can be used after this instruction.
-+ */
-+static bool trans_CPC(DisasContext *ctx, arg_CPC *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv Rr = cpu_r[a->rr];
-+    TCGv R = tcg_temp_new_i32();
-+    TCGv zero = tcg_const_i32(0);
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr - Cf */
-+    tcg_gen_sub_tl(R, R, cpu_Cf);
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_NSf(R);
-+
-+    /*
-+     * Previous value remains unchanged when the result is zero;
-+     * cleared otherwise.
-+     */
-+    tcg_gen_movcond_tl(TCG_COND_EQ, cpu_Zf, R, zero, cpu_Zf, zero);
-+
-+    tcg_temp_free_i32(zero);
-+    tcg_temp_free_i32(R);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction performs a compare between register Rd and a constant.
-+ *  The register is not changed. All conditional branches can be used after this
-+ *  instruction.
-+ */
-+static bool trans_CPI(DisasContext *ctx, arg_CPI *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    int Imm = a->imm;
-+    TCGv Rr = tcg_const_i32(Imm);
-+    TCGv R = tcg_temp_new_i32();
-+
-+    /* op */
-+    tcg_gen_sub_tl(R, Rd, Rr); /* R = Rd - Rr */
-+    tcg_gen_andi_tl(R, R, 0xff); /* make it 8 bits */
-+
-+    gen_sub_CHf(R, Rd, Rr);
-+    gen_sub_Vf(R, Rd, Rr);
-+    gen_ZNSf(R);
-+
-+    tcg_temp_free_i32(R);
-+    tcg_temp_free_i32(Rr);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction tests a single bit in a register and skips the next
-+ *  instruction if the bit is cleared.
-+ */
-+static bool trans_SBRC(DisasContext *ctx, arg_SBRC *a)
-+{
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = tcg_temp_new();
-+    ctx->free_skip_var0 = true;
-+
-+    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction tests a single bit in a register and skips the next
-+ *  instruction if the bit is set.
-+ */
-+static bool trans_SBRS(DisasContext *ctx, arg_SBRS *a)
-+{
-+    TCGv Rr = cpu_r[a->rr];
-+
-+    ctx->skip_cond = TCG_COND_NE;
-+    ctx->skip_var0 = tcg_temp_new();
-+    ctx->free_skip_var0 = true;
-+
-+    tcg_gen_andi_tl(ctx->skip_var0, Rr, 1 << a->bit);
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction tests a single bit in an I/O Register and skips the
-+ *  next instruction if the bit is cleared. This instruction operates on the
-+ *  lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBIC(DisasContext *ctx, arg_SBIC *a)
-+{
-+    TCGv temp = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(temp, cpu_env, temp);
-+    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
-+    ctx->skip_cond = TCG_COND_EQ;
-+    ctx->skip_var0 = temp;
-+    ctx->free_skip_var0 = true;
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  This instruction tests a single bit in an I/O Register and skips the
-+ *  next instruction if the bit is set. This instruction operates on the lower
-+ *  32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBIS(DisasContext *ctx, arg_SBIS *a)
-+{
-+    TCGv temp = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(temp, cpu_env, temp);
-+    tcg_gen_andi_tl(temp, temp, 1 << a->bit);
-+    ctx->skip_cond = TCG_COND_NE;
-+    ctx->skip_var0 = temp;
-+    ctx->free_skip_var0 = true;
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Conditional relative branch. Tests a single bit in SREG and branches
-+ *  relatively to PC if the bit is cleared. This instruction branches relatively
-+ *  to PC in either direction (PC - 63 < = destination <= PC + 64). The
-+ *  parameter k is the offset from PC and is represented in two's complement
-+ *  form.
-+ */
-+static bool trans_BRBC(DisasContext *ctx, arg_BRBC *a)
-+{
-+    TCGLabel *not_taken = gen_new_label();
-+
-+    TCGv var;
-+
-+    switch (a->bit) {
-+    case 0x00:
-+        var = cpu_Cf;
-+        break;
-+    case 0x01:
-+        var = cpu_Zf;
-+        break;
-+    case 0x02:
-+        var = cpu_Nf;
-+        break;
-+    case 0x03:
-+        var = cpu_Vf;
-+        break;
-+    case 0x04:
-+        var = cpu_Sf;
-+        break;
-+    case 0x05:
-+        var = cpu_Hf;
-+        break;
-+    case 0x06:
-+        var = cpu_Tf;
-+        break;
-+    case 0x07:
-+        var = cpu_If;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    tcg_gen_brcondi_i32(TCG_COND_NE, var, 0, not_taken);
-+    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
-+    gen_set_label(not_taken);
-+
-+    ctx->bstate = DISAS_CHAIN;
-+    return true;
-+}
-+
-+
-+/*
-+ *  Conditional relative branch. Tests a single bit in SREG and branches
-+ *  relatively to PC if the bit is set. This instruction branches relatively to
-+ *  PC in either direction (PC - 63 < = destination <= PC + 64). The parameter k
-+ *  is the offset from PC and is represented in two's complement form.
-+ */
-+static bool trans_BRBS(DisasContext *ctx, arg_BRBS *a)
-+{
-+    TCGLabel *not_taken = gen_new_label();
-+
-+    TCGv var;
-+
-+    switch (a->bit) {
-+    case 0x00:
-+        var = cpu_Cf;
-+        break;
-+    case 0x01:
-+        var = cpu_Zf;
-+        break;
-+    case 0x02:
-+        var = cpu_Nf;
-+        break;
-+    case 0x03:
-+        var = cpu_Vf;
-+        break;
-+    case 0x04:
-+        var = cpu_Sf;
-+        break;
-+    case 0x05:
-+        var = cpu_Hf;
-+        break;
-+    case 0x06:
-+        var = cpu_Tf;
-+        break;
-+    case 0x07:
-+        var = cpu_If;
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+
-+    tcg_gen_brcondi_i32(TCG_COND_EQ, var, 0, not_taken);
-+    gen_goto_tb(ctx, 0, ctx->npc + a->imm);
-+    gen_set_label(not_taken);
-+
-+    ctx->bstate = DISAS_CHAIN;
-+    return true;
-+}
-+
+     switch (subcode) {
+-    case 0:
++    case DIAG308_RESET_MOD_CLR:
+         s390_ipl_reset_request(cs, S390_RESET_MODIFIED_CLEAR);
+         break;
+-    case 1:
++    case DIAG308_RESET_LOAD_NORM:
+         s390_ipl_reset_request(cs, S390_RESET_LOAD_NORMAL);
+         break;
+-    case 3:
++    case DIAG308_LOAD_CLEAR:
++        /* Well we still lack the clearing bit... */
+         s390_ipl_reset_request(cs, S390_RESET_REIPL);
+         break;
+-    case 5:
+-        if ((r1 & 1) || (addr & 0x0fffULL)) {
+-            s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+-            return;
+-        }
+-        if (!address_space_access_valid(&address_space_memory, addr,
+-                                        sizeof(IplParameterBlock), false,
+-                                        MEMTXATTRS_UNSPECIFIED)) {
+-            s390_program_interrupt(env, PGM_ADDRESSING, ra);
++    case DIAG308_SET:
++        if (diag308_parm_check(env, r1, addr, ra, false)) {
+             return;
+         }
+         iplb = g_new0(IplParameterBlock, 1);
+@@ -110,15 +127,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
+ out:
+         g_free(iplb);
+         return;
+-    case 6:
+-        if ((r1 & 1) || (addr & 0x0fffULL)) {
+-            s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+-            return;
+-        }
+-        if (!address_space_access_valid(&address_space_memory, addr,
+-                                        sizeof(IplParameterBlock), true,
+-                                        MEMTXATTRS_UNSPECIFIED)) {
+-            s390_program_interrupt(env, PGM_ADDRESSING, ra);
++    case DIAG308_STORE:
++        if (diag308_parm_check(env, r1, addr, ra, true)) {
+             return;
+         }
+         iplb = s390_ipl_get_iplb();
 -- 
-2.17.2 (Apple Git-113)
+2.20.1
 
 
