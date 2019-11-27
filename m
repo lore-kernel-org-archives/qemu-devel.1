@@ -2,62 +2,56 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B04BC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 06:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08DF8C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 06:21:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C65120684
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 06:04:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cHwZ/Qgy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C65120684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id C0DAC2071E
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 06:21:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0DAC2071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZqQo-0002IH-7P
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 01:04:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43917)
+	id 1iZqhy-00065B-Uy
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 01:21:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46454)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iZqPy-0001As-2X
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 01:03:15 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1iZqhA-0005Zr-1E
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 01:21:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iZqPw-0003Vp-FH
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 01:03:13 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:52135 helo=ozlabs.org)
+ (envelope-from <pannengyuan@huawei.com>) id 1iZqh8-0004tN-RG
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 01:20:59 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:45104 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iZqPv-0003Iq-5T; Wed, 27 Nov 2019 01:03:12 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47N9DV71QDz9sSw; Wed, 27 Nov 2019 17:03:06 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1574834586;
- bh=sgcHE5ZixYgXaifxhnowhHGFrJYbvzsjfjBUkTPjnpA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=cHwZ/Qgyq0NufxEGktCjda+CyLe2Kma3zCDzHYShyWa73y8Im9vWLqEVLYSpLixgp
- Eqtb7pe4s6+vikxOk6EE9ziu2Lzz3sNypuNWKQ2nAQ9zsCwoeUPbuVbwn7tmI7CSJ7
- LXGGvmeozaAovSgGr0zdUgqr2pO6QaqoIr92aRFc=
-Date: Wed, 27 Nov 2019 16:41:50 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [for-5.0 PATCH v2 0/4] spapr: Use less XIVE HW resources in KVM
-Message-ID: <20191127054150.GT5582@umbus.fritz.box>
-References: <157478677206.67101.11965554900825793694.stgit@bahia.tlslab.ibm.com>
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1iZqh5-0004op-4F; Wed, 27 Nov 2019 01:20:55 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id CF1D7E05169AE6BD05E6;
+ Wed, 27 Nov 2019 14:20:49 +0800 (CST)
+Received: from HGHY2P002143101.china.huawei.com (10.184.39.213) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.439.0; Wed, 27 Nov 2019 14:20:41 +0800
+From: <pannengyuan@huawei.com>
+To: <berto@igalia.com>, <kwolf@redhat.com>, <mreitz@redhat.com>
+Subject: [PATCH V2] throttle-groups: fix memory leak in
+ throttle_group_set_limit:
+Date: Wed, 27 Nov 2019 14:20:14 +0800
+Message-ID: <1574835614-42028-1-git-send-email-pannengyuan@huawei.com>
+X-Mailer: git-send-email 2.7.2.windows.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="RWwYAm6PHzOoZjya"
-Content-Disposition: inline
-In-Reply-To: <157478677206.67101.11965554900825793694.stgit@bahia.tlslab.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,71 +63,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: liyiting@huawei.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ PanNengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org,
+ kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: PanNengyuan <pannengyuan@huawei.com>
 
---RWwYAm6PHzOoZjya
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This avoid a memory leak when qom-set is called to set throttle_group
+limits, here is an easy way to reproduce:
 
-On Tue, Nov 26, 2019 at 05:46:12PM +0100, Greg Kurz wrote:
-> On POWER9 systems, the XICS-on-XIVE and XIVE KVM devices currently
-> allocate a bunch of VPs in the XIVE HW to accomodate the highest
-> VCPU id that may be possibly used in a VM. This limits the number
-> of VMs that can run with an in-kernel interrupt controller to 63
-> per POWER9 chip, irrespectively of its number of HW threads, eg.
-> up to 96 on a POWER9 Nimbus socket. This is an unfortunate waste
-> of scarce HW resources since a typical VM doesn't need that much
-> VPs to run.
->=20
-> This series exploits new attributes of the XICS-on-XIVE and XIVE
-> KVM devices that allow userspace to tune the numbers of VPs it
-> really needs. Support for this attributes has just reached linux
-> mainline.
->=20
-> In combination with recent commit 29cb4187497d "spapr: Set VSMT to
-> smp_threads by default" which makes VCPU ids contiguous, it is
-> possible to start more than 200 VMs instead of 127 on an AC922
-> system (two sockets, 144 HW threads).
->=20
-> Changes in v2:
-> - add an nr_servers argument to the activate() handler instead of
->   a QOM property for XIVE and a XICSFabric method for XICS-on-XIVE.
-> - even if the last two patches haven't changed much, the code base
->   itself has, so I've deliberately dropped Cedric's R-b tags
+1. run qemu-iotests as follow and check the result with asan:
+       ./check -qcow2 184
 
-Applied to ppc-for-5.0, thanks.
+Following is the asan output backtrack:
+Direct leak of 912 byte(s) in 3 object(s) allocated from:
+    #0 0xffff8d7ab3c3 in __interceptor_calloc   (/lib64/libasan.so.4+0xd33c3)
+    #1 0xffff8d4c31cb in g_malloc0   (/lib64/libglib-2.0.so.0+0x571cb)
+    #2 0x190c857 in qobject_input_start_struct  /mnt/sdc/qemu-master/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:295
+    #3 0x19070df in visit_start_struct   /mnt/sdc/qemu-master/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:49
+    #4 0x1948b87 in visit_type_ThrottleLimits   qapi/qapi-visit-block-core.c:3759
+    #5 0x17e4aa3 in throttle_group_set_limits   /mnt/sdc/qemu-master/qemu-4.2.0-rc0/block/throttle-groups.c:900
+    #6 0x1650eff in object_property_set     /mnt/sdc/qemu-master/qemu-4.2.0-rc0/qom/object.c:1272
+    #7 0x1658517 in object_property_set_qobject   /mnt/sdc/qemu-master/qemu-4.2.0-rc0/qom/qom-qobject.c:26
+    #8 0x15880bb in qmp_qom_set  /mnt/sdc/qemu-master/qemu-4.2.0-rc0/qom/qom-qmp-cmds.c:74
+    #9 0x157e3e3 in qmp_marshal_qom_set  qapi/qapi-commands-qom.c:154
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
+---
+Changes v2 to v1:
+- remove unused var 'arg' (suggested by Alberto Garcia)
+---
+ block/throttle-groups.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---RWwYAm6PHzOoZjya
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index 77014c7..37695b0 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -893,8 +893,7 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+ {
+     ThrottleGroup *tg = THROTTLE_GROUP(obj);
+     ThrottleConfig cfg;
+-    ThrottleLimits arg = { 0 };
+-    ThrottleLimits *argp = &arg;
++    ThrottleLimits *argp;
+     Error *local_err = NULL;
+ 
+     visit_type_ThrottleLimits(v, name, &argp, &local_err);
+@@ -912,6 +911,7 @@ static void throttle_group_set_limits(Object *obj, Visitor *v,
+ unlock:
+     qemu_mutex_unlock(&tg->lock);
+ ret:
++    qapi_free_ThrottleLimits(argp);
+     error_propagate(errp, local_err);
+     return;
+ }
+-- 
+2.7.2.windows.1
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3eDJsACgkQbDjKyiDZ
-s5Ix4BAAlewqDT7GSyOO8JOM2Ace14C31doT+b9Qq4s5XTlWWFJEZMneIGMCN0O/
-Qw6xu+u5y7kQGNod6QhtEdZdaUNARZEzrBGUe7NiIS2u6uhLabeYIUklg5qC5ije
-M7dFe1wl/Q/Oj7d666kimcOMoZyvkCSerIGaBD47v2FkOgC1szLKpdZb2Gzpz604
-7+hHlpi6/KwsYcNOsc+Ij9rjsx1lbnBwle/u3TdeJTtVSi4+G40FZYFwkq1L9Wfa
-ids+hPmaSfkr4XGn1weqB3EpjlPuDFG2HgYrzopEkgq108QbfQTgQOeIYKwl2aky
-1ft2qjk//3y5gm3MVwVZnah0wUYA/81+uv95h55wUnctLWzRvkUArkvphI4chzWh
-B62RMyM4zyAG8gMy9y0jPCsHXfoyRNEzpIhat3m3Rm4oN1OkKmFXt5HapRfH2C7I
-ELZIAmrRmIXVIdOuwiaVrDItJU+bWYOBSgdlkWdBooSpjI1sQElW7Nzq6oPS2hkj
-f9KvKV7WL2+LsCEs9w4HOUjGDPG5FXfMqEe3vdO203SHlGN6FSGXtAmbxwDxJNI6
-gffByKxmYS7QVwGrfz77+JKnnJwK+Q0XUuALxTbmHXUHpWgXWorWW55CBNLoV3RN
-n0qqIgvX4d7dpHlNuZuWp1Pd2SO4pE2ogSFvbgK3gmBxWgfV3qs=
-=DpCL
------END PGP SIGNATURE-----
-
---RWwYAm6PHzOoZjya--
 
