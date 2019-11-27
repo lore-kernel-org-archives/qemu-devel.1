@@ -2,104 +2,84 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD1A0C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:53:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0321FC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:55:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8418620665
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:53:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B34FC20665
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:55:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DSbILYVt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8418620665
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mbu05iIH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B34FC20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia0ZB-0002bI-Ro
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 11:53:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33838)
+	id 1ia0b2-0004mM-NQ
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 11:55:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60432)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ia0Vj-0000tY-R5
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:49:52 -0500
+ (envelope-from <kraxel@redhat.com>) id 1ia0Kl-0002KH-S3
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:38:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ia0Vh-0006YZ-72
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:49:50 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40533
+ (envelope-from <kraxel@redhat.com>) id 1ia0Kk-0006WP-Qc
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:38:31 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:39597
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ia0Vh-0006YB-3V
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:49:49 -0500
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ia0Kk-0006W3-M6
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:38:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574873388;
+ s=mimecast20190719; t=1574872710;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=eR5hK0LW9HT9JsH4nTj9oQIaegcsR+8XdB2c7vENheY=;
- b=DSbILYVtCoVPSOFBy/W8/0FE9skP5oG9uAlJ8qIo/ZUp7ulH66hcKmHS1RLJs5CtkoYvLT
- vdgiSp0yn3adXurRQWys3iAjiz3Ij2+4s1lxzhLvbciECddl0aScVyiKTZhI6kE6zfqg4m
- epsz1CQRMPlQ9Sowke5lDyWjBAYnoxI=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=r7yNzDDk2GTk2YCs7lVj3e1j/hoyxiaD105Kq+L93H0=;
+ b=Mbu05iIH/hQ0ItOFJFdUQj3Ci7MEIkJyxALT9/N1Oipwc/72xh4uDF8sA69+e2nfItrcDs
+ MxLxdd3LF2G0bN0O/8DE8xqQh0NnnK3WoXxBGFQPMAyF82cfHFYKAhV3OuwHaB48IIUDgU
+ RXTuSmMWUwpmV9GfMgA9bNvVzTag2GA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-xAXLI-JBNVScgO8jkbu3bw-1; Wed, 27 Nov 2019 11:49:43 -0500
-X-MC-Unique: xAXLI-JBNVScgO8jkbu3bw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-269-cfSXTgSTNhugc9G20wDnvQ-1; Wed, 27 Nov 2019 11:38:27 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEA1B107BAAC;
- Wed, 27 Nov 2019 16:49:42 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-205-186.brq.redhat.com
- [10.40.205.186])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A20EB5D6D6;
- Wed, 27 Nov 2019 16:49:38 +0000 (UTC)
-Subject: Re: [PATCH v4 3/5] blockdev: unify qmp_blockdev_backup and
- blockdev-backup transaction paths
-To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
-References: <20191121135759.101655-1-slp@redhat.com>
- <20191121135759.101655-4-slp@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <24cd8940-4754-ff97-167b-44a236c539e8@redhat.com>
-Date: Wed, 27 Nov 2019 17:49:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DABF0803065;
+ Wed, 27 Nov 2019 16:38:25 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-67.ams2.redhat.com
+ [10.36.116.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A862C60C81;
+ Wed, 27 Nov 2019 16:38:24 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id A087B16E18; Wed, 27 Nov 2019 17:38:23 +0100 (CET)
+Date: Wed, 27 Nov 2019 17:38:23 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Subject: Re: [PATCH] usbredir: remove 'remote wake' capability from
+ configuration descriptor
+Message-ID: <20191127163823.cylqikhogdypxpyp@sirius.home.kraxel.org>
+References: <20191126212245.27735-1-yuri.benditovich@daynix.com>
+ <87a78hltbq.fsf@dusky.pond.sub.org>
+ <CAOEp5OdsYhxD4LE9Qu981uiB+33Xc81z8H=cuwTS6tbU9x_UkA@mail.gmail.com>
+ <20191127094012.vgpckaztez77dsgz@sirius.home.kraxel.org>
+ <CAOEp5Ocit+8tXxP1873YBD=mMQTeZNcr7pMezw_PU6vMFrg2bA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191121135759.101655-4-slp@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <CAOEp5Ocit+8tXxP1873YBD=mMQTeZNcr7pMezw_PU6vMFrg2bA@mail.gmail.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: cfSXTgSTNhugc9G20wDnvQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="J86pn1HWjfNMauCA9euc6SF6wwZ5tbU83"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -114,103 +94,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org
+Cc: Yan Vugenfirer <yan@daynix.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---J86pn1HWjfNMauCA9euc6SF6wwZ5tbU83
-Content-Type: multipart/mixed; boundary="dwuk35duwGVMhDVkRTK3YDVAmBY9Da8yO"
+  Hi,
 
---dwuk35duwGVMhDVkRTK3YDVAmBY9Da8yO
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 21.11.19 14:57, Sergio Lopez wrote:
-> Issuing a blockdev-backup from qmp_blockdev_backup takes a slightly
-> different path than when it's issued from a transaction. In the code,
-> this is manifested as some redundancy between do_blockdev_backup() and
-> blockdev_backup_prepare().
+> Indeed, it would be good to call usb_wakeup(), but ... there is no
+> trigger to do that.
 >=20
-> This change unifies both paths, merging do_blockdev_backup() and
-> blockdev_backup_prepare(), and changing qmp_blockdev_backup() to
-> create a transaction instead of calling do_backup_common() direcly.
->=20
-> As a side-effect, now qmp_blockdev_backup() is executed inside a
-> drained section, as it happens when creating a blockdev-backup
-> transaction. This change is visible from the user's perspective, as
-> the job gets paused and immediately resumed before starting the actual
-> work.
->=20
-> Signed-off-by: Sergio Lopez <slp@redhat.com>
-> ---
->  blockdev.c | 60 ++++++++++++------------------------------------------
->  1 file changed, 13 insertions(+), 47 deletions(-)
->=20
-> diff --git a/blockdev.c b/blockdev.c
-> index 5e85fc042e..152a0f7454 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
+> When the guest places the device to D2, it cancels all the urbs that
+> were pending, so there are no request that will be completed on spice
+> client side that can call usb_wakeup on qemu side.
+> The device on spice client side is powered up without any active
+> request so the device will not produce wake up event.
 
-[...]
+Well, the device will produce a wakeup event for sure (unless it is
+buggy), so the kernel will notice.  It might be that the kernel doesn't
+forward the event to userspace though.
 
->  static void blockdev_backup_prepare(BlkActionState *common, Error **errp=
-)
->  {
->      BlockdevBackupState *state =3D DO_UPCAST(BlockdevBackupState, common=
-, common);
->      BlockdevBackup *backup;
-> -    BlockDriverState *bs, *target;
-> +    BlockDriverState *bs;
-> +    BlockDriverState *target_bs;
+For "normal" usb applications the kernel can transparently handle
+suspend+wakeup and just re-submit pending urbs to the hardware after
+receiving a wakeup event, so powermanagement works automagically without
+the app doing anything special.
 
-The diff stat could have been a bit smaller by keeping this as it was,
-but either way:
+For qemu + spice-client that approach doesn't work though, we need
+explicit instead of automatic power management so we can properly
+forward any events to the guest and let the guest deal with it.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+Skimming the libusb docs it seems there is no support for that though.
+So no easy way out.  Guess patching the descriptor is the best thing we
+can do here.
 
->      AioContext *aio_context;
-> -    Error *local_err =3D NULL;
-> =20
->      assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_BLOCKDEV_=
-BACKUP);
->      backup =3D common->action->u.blockdev_backup.data;
-> @@ -1959,8 +1956,8 @@ static void blockdev_backup_prepare(BlkActionState =
-*common, Error **errp)
->          return;
->      }
-> =20
-> -    target =3D bdrv_lookup_bs(backup->target, backup->target, errp);
-> -    if (!target) {
-> +    target_bs =3D bdrv_lookup_bs(backup->target, backup->target, errp);
-> +    if (!target_bs) {
->          return;
->      }
-> =20
+> Similar problem happens with local redirection, BTW. But this is for
+> another patch.
 
+Can you make a small series for both?  I guess the actual descriptor
+checking and patching is pretty simliar and can be handled by a shared
+helper function.
 
---dwuk35duwGVMhDVkRTK3YDVAmBY9Da8yO--
-
---J86pn1HWjfNMauCA9euc6SF6wwZ5tbU83
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3eqSAACgkQ9AfbAGHV
-z0D6rAf/RDTMD3loWlODXYgFHHoNvyafKTNw+nlrtPtFu+p52tbm1q6+i+QaxRc8
-ze1+S3d1WjxxIe8MqqEzT+w1pcMIrgggT7frNxkFMuiJpSijP74UGGBx0XNF0jkT
-TuOa4yRstTlPr4Nun6GLG9WofFDc7HiUf/ln1XsuJB/rN4Dt22o/cGifvz4q+gKA
-UQuEL7QjOOBgMnDn9MZF7gpj68vXzDNG6Ff4157Uh38broeCPhn5j8zvae6toAuO
-JCNbSPD94M4CGvu+oekzNr/DooMhB3kg1QrKrMfq4cgFXVV5lY753e43iH57Pmhr
-d9132ups0rkRgKP4iBl3hYb/s9648A==
-=e1Tg
------END PGP SIGNATURE-----
-
---J86pn1HWjfNMauCA9euc6SF6wwZ5tbU83--
+thanks,
+  Gerd
 
 
