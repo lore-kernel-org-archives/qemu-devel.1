@@ -2,60 +2,106 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E90C8C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A36C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:32:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE6AD2075C
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:31:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE6AD2075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
+	by mail.kernel.org (Postfix) with ESMTPS id 2784B2075C
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 16:32:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eIldRlwT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2784B2075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia0E5-0006mq-1g
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 11:31:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58812)
+	id 1ia0F7-0007Ck-UK
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 11:32:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <balaton@eik.bme.hu>) id 1ia0As-0004ng-1w
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:28:20 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ia0Ab-0004P7-PY
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:28:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <balaton@eik.bme.hu>) id 1ia00W-0003em-Ik
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:17:37 -0500
-Received: from zero.eik.bme.hu ([152.66.115.2]:28642)
+ (envelope-from <mreitz@redhat.com>) id 1ia02O-0004U1-MO
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:19:33 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27004
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1ia00U-0003Zf-R5
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:17:36 -0500
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 704087456F8;
- Wed, 27 Nov 2019 17:17:32 +0100 (CET)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 453807456CD; Wed, 27 Nov 2019 17:17:32 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 43B7574568D;
- Wed, 27 Nov 2019 17:17:32 +0100 (CET)
-Date: Wed, 27 Nov 2019 17:17:32 +0100 (CET)
-From: BALATON Zoltan <balaton@eik.bme.hu>
-To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [RFC 00/10] R300 QEMU device V2
-In-Reply-To: <20191127150520.GG2131806@redhat.com>
-Message-ID: <alpine.BSF.2.21.99999.352.1911271708130.13941@zero.eik.bme.hu>
-References: <20191126124433.860-1-aaron.zakhrov@gmail.com>
- <20191126141924.GQ556568@redhat.com>
- <09273ecd-be76-ab61-304f-7ea0f1f0b107@redhat.com>
- <20191127150520.GG2131806@redhat.com>
-User-Agent: Alpine 2.21.99999 (BSF 352 2019-06-22)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ia02O-0004Tn-4m
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 11:19:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574871571;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=EYONfZOVsZlUlJpDJ3UkiNGE7l0I8hK+zSLk8cQNIn4=;
+ b=eIldRlwTWjBnCnPI0oRk0QXyRzL3hd7SoCTnakEy6Fy2vtwPU8sV+vA06wlW8UFPKJqza0
+ bSyFynYRsPleETSc+4aJLbxh37E65JKsvzxLcxFi9qpkguyZOMx1AiLSt2VPJdwNetcIIG
+ x2dGIG2N8rGsJ9YndaN/U6kiO1zXZ9U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-273-f1w3frhdOxaW106Oe3jFmA-1; Wed, 27 Nov 2019 11:19:29 -0500
+X-MC-Unique: f1w3frhdOxaW106Oe3jFmA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 64399800C7C;
+ Wed, 27 Nov 2019 16:19:28 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-205-186.brq.redhat.com
+ [10.40.205.186])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DC0A49AE;
+ Wed, 27 Nov 2019 16:19:14 +0000 (UTC)
+Subject: Re: [PATCH v4 5/5] iotests: fix 141 after qmp_drive_backup with
+ transactions
+To: Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+References: <20191121135759.101655-1-slp@redhat.com>
+ <20191121135759.101655-6-slp@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <5d8de395-880e-854d-dead-9b57c74ff7e5@redhat.com>
+Date: Wed, 27 Nov 2019 17:19:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-656289630-1574871452=:13941"
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 152.66.115.2
+In-Reply-To: <20191121135759.101655-6-slp@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="R4M9wWvxogqcWVS53UHLk69JGDiRGUspb"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,96 +113,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Aaron Dominick <aaron.zakhrov@gmail.com>,
- kraxel@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--R4M9wWvxogqcWVS53UHLk69JGDiRGUspb
+Content-Type: multipart/mixed; boundary="fC4du0VcGIArLI9RzDC4sFnsn8pdGMzgs"
 
---3866299591-656289630-1574871452=:13941
-Content-Type: text/plain; charset=utf-8; format=flowed
+--fC4du0VcGIArLI9RzDC4sFnsn8pdGMzgs
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 27 Nov 2019, Daniel P. Berrang=C3=A9 wrote:
-> On Wed, Nov 27, 2019 at 04:00:01PM +0100, Philippe Mathieu-Daud=C3=A9 w=
-rote:
->> Hi Daniel, Aaron.
->>
->> On 11/26/19 3:19 PM, Daniel P. Berrang=C3=A9 wrote:
->>> On Tue, Nov 26, 2019 at 06:14:27PM +0530, aaron.zakhrov@gmail.com wro=
-te:
->>>> From: Aaron Dominick <aaron.zakhrov@gmail.com>
->>>>
->>>> I have removed the botched patches and have got the code working upt=
-o the GART initialization.
->>>> I am not sure how to implement the GART. I am guessing it should be =
-an IOMMU device but I think that is a bit much for an emulated card.
->>>> The earlier problem of display probing seems to be resolved by using=
- an R300 bios I got from TechPowerUP's GPU database:
->>>>
->>>> 	https://www.techpowerup.com/vgabios/14509/14509
->>>> I am NOT sure if we can distribute it in the QEMU source tree. If it
->>>> does cause problems I can send a patch to remove it.
->>>
->>> That site seems to be a repository of BIOS uploaded by arbitrary user=
-s,
->>> with no information on what license terms might apply to the uploads.
->>>
->>> We have to therefore assume the worst and treat the BIOS images on th=
-at
->>> site as proprietary and not re-distributable, despite the fact that t=
-he
->>> site itself is acting as a 3rd party distributor.
->>
->> We can not redistribute this BIOS.
->>
->>> IOW, we can't have this in QEMU git I'm afraid, unless someone can fi=
-nd
->>> a trustworthy vendor source for the original image with accompanying
->>> license information.
->>
->> Daniel, I think there is no problem if Aaron contributes a model of th=
-e R300
->> device to QEMU, right? This doesn't involve redistributing any BIOS.
->
-> Having just the device impl doesn't cause any legal problems.
->
-> It does become a slight usability issue, as any users need to go and fi=
-nd
-> the suitable BIOS in order to use the device. No downstream OS vendors =
-are
-> going to be able to distribute this BIOS either
+On 21.11.19 14:57, Sergio Lopez wrote:
+> qmp_drive_backup now creates and starts a transactions, which implies
+> that the job will transition to pause and running twice. Fix test 141
+> to be aware of this change.
+>=20
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
+> ---
+>  tests/qemu-iotests/141.out | 2 ++
+>  1 file changed, 2 insertions(+)
 
-We may be able to avoid this problem if we identify what the driver needs=
-=20
-from the BIOS and implement that in our vgabios. Gerd has already added=20
-some tables that some drivers need in the latest vgabios version that's=20
-currently in git master (but those were for Rage128 and RV100 that ati-vg=
-a=20
-currently implements). Aaron, did you try with latest git master and does=
-=20
-that still need a BIOS from a real card or if so do you happen to know=20
-what the driver needs from the BIOS? (It may be some tables/structure or=20
-BIOS calls that the QEMU vgabios-ati does not implement yet.) If that's=20
-not too difficult to add it may be implemented in QEMU's vgabios to avoid=
-=20
-needing proprietary blobs. It could also be EDID access that may use=20
-different registers on R300 but I think that may be simple to fix if more=
-=20
-details are known.
+Test reference output adjustments belong in the patches that caused them
+so as not to break bisecting.  So this should be part of patch 2.
 
-> I don't know if we have hit this problem before & if we have any
-> general policies about it ?
+Furthermore, 185 fails of the very same reason, and 219 now runs into a
+timeout.
 
-I don't know but this may be similar to boards needing firmware ROMs or=20
-the firmware blobs needed by some Linux kernel drivers. How are those
-handled? Distros usually put them in a non-free repo I think.
+Max
 
-Regrads,
-BALATON Zoltan
---3866299591-656289630-1574871452=:13941--
+
+--fC4du0VcGIArLI9RzDC4sFnsn8pdGMzgs--
+
+--R4M9wWvxogqcWVS53UHLk69JGDiRGUspb
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3eogEACgkQ9AfbAGHV
+z0BjjQgAm60NLRYybttxReQf2bUL7MR5vW3kn5pAnXbeOHerAKz80y0ymXE+SSDv
+ArQ4RV/QiKO1ENo/tC35VZ9xL799eQzcok9QqEkhKxcgY/UyVQYSGJBmZ7frqJxp
+E1NAUX+aD0mJjUE7ggpbgW8x8mVsKCnt92AfEcalMgMhJ5lTtMx2L66zlqBLeUKJ
+l5F7A5ZVqO6ugkKqHYx46+e28Ncz1Es2BvSeNZC6NH1GPB4HF6ftMvsbCQGn8TOj
+r0raoWd9n+geUbio7492dRLOwtTNz3h+w7/51YmdN3DvVxR6HGHmG9Gr1aNSG1c+
+xh5ASF1zI5F+Z90BA8FQYZd0e0WnHw==
+=Lhdb
+-----END PGP SIGNATURE-----
+
+--R4M9wWvxogqcWVS53UHLk69JGDiRGUspb--
+
 
