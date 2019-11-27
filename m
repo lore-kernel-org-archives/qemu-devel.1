@@ -6,45 +6,44 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A55A2C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CD89C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:18:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A80F20835
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:17:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A80F20835
+	by mail.kernel.org (Postfix) with ESMTPS id E7CF220862
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:18:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7CF220862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia2on-0000ro-Hw
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:17:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33159)
+	id 1ia2pM-0001Rm-Nq
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:18:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33641)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ia2m2-0007uS-A5
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:14:51 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia2n6-0008Q6-KK
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:15:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ia2m1-0003F7-7R
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:14:50 -0500
-Received: from relay.sw.ru ([185.231.240.75]:53302)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia2n4-0004OK-6k
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:15:55 -0500
+Received: from relay.sw.ru ([185.231.240.75]:53328)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ia2m0-0003Bc-Vm; Wed, 27 Nov 2019 14:14:49 -0500
+ id 1ia2n3-0004Lw-9w
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:15:54 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1ia2lm-0003eZ-TT; Wed, 27 Nov 2019 22:14:35 +0300
+ id 1ia2mz-0003f3-85; Wed, 27 Nov 2019 22:15:49 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-ppc@nongnu.org
-Subject: [PATCH v6] ppc: well form kvmppc_hint_smt_possible error hint helper
-Date: Wed, 27 Nov 2019 22:14:34 +0300
-Message-Id: <20191127191434.20945-1-vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6] 9pfs: well form error hint helpers
+Date: Wed, 27 Nov 2019 22:15:49 +0300
+Message-Id: <20191127191549.21216-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
@@ -59,89 +58,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, vsementsov@virtuozzo.com,
- david@gibson.dropbear.id.au
+Cc: vsementsov@virtuozzo.com, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make kvmppc_hint_smt_possible hint append helper well formed:
+Make error_append_security_model_hint and
+error_append_socket_sockfd_hint hint append helpers well formed:
 rename errp to errp_in, as it is IN-parameter here (which is unusual
-for errp), rename function to be kvmppc_error_append_*_hint.
+for errp).
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Acked-by: Greg Kurz <groug@kaod.org>
 ---
 
-v6: keep kvmppc_ function prefix
-    add r-b by Marc-André
+v6: add Greg's a-b
 
- target/ppc/kvm_ppc.h | 4 ++--
- hw/ppc/spapr.c       | 2 +-
- target/ppc/kvm.c     | 6 +++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ hw/9pfs/9p-local.c | 4 ++--
+ hw/9pfs/9p-proxy.c | 5 +++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 98bd7d5da6..47b08a4030 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -28,7 +28,7 @@ void kvmppc_set_papr(PowerPCCPU *cpu);
- int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
- void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
- int kvmppc_smt_threads(void);
--void kvmppc_hint_smt_possible(Error **errp);
-+void kvmppc_error_append_smt_possible_hint(Error **errp_in);
- int kvmppc_set_smt_threads(int smt);
- int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
- int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
-@@ -164,7 +164,7 @@ static inline int kvmppc_smt_threads(void)
-     return 1;
+diff --git a/hw/9pfs/9p-local.c b/hw/9pfs/9p-local.c
+index 4708c0bd89..76fa1858b7 100644
+--- a/hw/9pfs/9p-local.c
++++ b/hw/9pfs/9p-local.c
+@@ -1473,9 +1473,9 @@ static void local_cleanup(FsContext *ctx)
+     g_free(data);
  }
  
--static inline void kvmppc_hint_smt_possible(Error **errp)
-+static inline void kvmppc_error_append_smt_possible_hint(Error **errp_in)
+-static void error_append_security_model_hint(Error **errp)
++static void error_append_security_model_hint(Error **errp_in)
  {
-     return;
- }
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index e076f6023c..1b87eb0ffd 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2564,7 +2564,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
-                                       " requires the use of VSMT mode %d.\n",
-                                       smp_threads, kvm_smt, spapr->vsmt);
-                 }
--                kvmppc_hint_smt_possible(&local_err);
-+                kvmppc_error_append_smt_possible_hint(&local_err);
-                 goto out;
-             }
-         }
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index c77f9848ec..7406d18945 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2076,7 +2076,7 @@ int kvmppc_set_smt_threads(int smt)
-     return ret;
+-    error_append_hint(errp, "Valid options are: security_model="
++    error_append_hint(errp_in, "Valid options are: security_model="
+                       "[passthrough|mapped-xattr|mapped-file|none]\n");
  }
  
--void kvmppc_hint_smt_possible(Error **errp)
-+void kvmppc_error_append_smt_possible_hint(Error **errp_in)
- {
-     int i;
-     GString *g;
-@@ -2091,10 +2091,10 @@ void kvmppc_hint_smt_possible(Error **errp)
-             }
-         }
-         s = g_string_free(g, false);
--        error_append_hint(errp, "%s.\n", s);
-+        error_append_hint(errp_in, "%s.\n", s);
-         g_free(s);
-     } else {
--        error_append_hint(errp,
-+        error_append_hint(errp_in,
-                           "This KVM seems to be too old to support VSMT.\n");
-     }
+diff --git a/hw/9pfs/9p-proxy.c b/hw/9pfs/9p-proxy.c
+index 97ab9c58a5..9e29abc3ef 100644
+--- a/hw/9pfs/9p-proxy.c
++++ b/hw/9pfs/9p-proxy.c
+@@ -1114,9 +1114,10 @@ static int connect_namedsocket(const char *path, Error **errp)
+     return sockfd;
  }
+ 
+-static void error_append_socket_sockfd_hint(Error **errp)
++static void error_append_socket_sockfd_hint(Error **errp_in)
+ {
+-    error_append_hint(errp, "Either specify socket=/some/path where /some/path"
++    error_append_hint(errp_in,
++                      "Either specify socket=/some/path where /some/path"
+                       " points to a listening AF_UNIX socket or sock_fd=fd"
+                       " where fd is a file descriptor to a connected AF_UNIX"
+                       " socket\n");
 -- 
 2.21.0
 
