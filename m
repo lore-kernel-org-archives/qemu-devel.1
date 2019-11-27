@@ -2,71 +2,58 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E432C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 14:34:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE57C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 14:44:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3133420674
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 14:34:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3133420674
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8ED9B20678
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 14:44:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ED9B20678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZyP5-0004vX-63
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 09:34:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44188)
+	id 1iZyYM-0007B7-Gh
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 09:44:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1iZyO4-0004Hq-Oj
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 09:33:57 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1iZyWe-0006ZM-2z
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 09:42:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert.uytterhoeven@gmail.com>) id 1iZyO3-00021o-1f
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 09:33:48 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:43001)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
- id 1iZyO2-00021L-T1
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 09:33:46 -0500
-Received: by mail-oi1-f194.google.com with SMTP id o12so20220861oic.9
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 06:33:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=p4HQ0sBvX9KwKME5QSEdWqGhxNVzafG2qhuy+QctP4M=;
- b=d1hob9Os11q9fccfNpUBbwdAlOwfPudnSXbQ/Z8iLIL2PeuopGuR0G5a8VaycWTgUh
- go7KXgzDI/LN9cJZRw4rgPv2lvxVrtz4M/u6aaVMk7RL7qQq7PGUZJTObO9UoGE8ckrI
- vMnndYEg9vIOPn/ufL8Ev5QkmXPtP3p4BMvbnrGEx9Tx+7mbKuI1Kkbac0INrye2AGQG
- P0HgCi/YPiay54OYh3Wst2xu71lyMztnlzr8xgcRA/UNUJBGGzI0/BQwoyRt6Vff2ZSN
- wvKU/EQSZqykIirSbSQN2St2QyM2a5dCfcg0j+73mkKblE54WB9TswrHW7QojYQl6mgl
- bORg==
-X-Gm-Message-State: APjAAAXHF7bKFsIGSn91/h0jKSaXQDLcsy35R8ScW+MtH+w3e6V2YvvB
- 9jxlacNd18V2hrmNsUqrWFQDV0EujIMmPY5jgGY=
-X-Google-Smtp-Source: APXvYqxCCNIKdr71l4+aem/37DJmvPbfkWnFnSlhjT3Aiy6bb+myMARYI5vlJfzw8lh/LBhhdEQ2bi0iWvwnKGpu9eY=
-X-Received: by 2002:a05:6808:b17:: with SMTP id
- s23mr4564212oij.102.1574865225731; 
- Wed, 27 Nov 2019 06:33:45 -0800 (PST)
+ (envelope-from <balaton@eik.bme.hu>) id 1iZyWc-0005xM-9S
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 09:42:39 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:52904)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1iZyWb-0005uc-K8
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 09:42:38 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id BCCD3745957;
+ Wed, 27 Nov 2019 15:42:28 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 9D6D474594E; Wed, 27 Nov 2019 15:42:28 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 9C17D745953;
+ Wed, 27 Nov 2019 15:42:28 +0100 (CET)
+Date: Wed, 27 Nov 2019 15:42:28 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: "aaron.zakhrov@gmail.com" <aaron.zakhrov@gmail.com>
+Subject: Re: [RFC 09/10] Clean up Radeon Header files
+In-Reply-To: <CAL1e-=hY5b73ocsG9xiUFVuJYL36ch4=AyqjPvmtaXRUi730pQ@mail.gmail.com>
+Message-ID: <alpine.BSF.2.21.99999.352.1911271505300.80933@zero.eik.bme.hu>
+References: <20191126124433.860-1-aaron.zakhrov@gmail.com>
+ <20191126124433.860-6-aaron.zakhrov@gmail.com>
+ <CAL1e-=hY5b73ocsG9xiUFVuJYL36ch4=AyqjPvmtaXRUi730pQ@mail.gmail.com>
+User-Agent: Alpine 2.21.99999 (BSF 352 2019-06-22)
 MIME-Version: 1.0
-References: <20191127084253.16356-1-geert+renesas@glider.be>
- <20191127084253.16356-6-geert+renesas@glider.be>
- <20191127141529.GA18189@vmlxhi-102.adit-jv.com>
-In-Reply-To: <20191127141529.GA18189@vmlxhi-102.adit-jv.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 27 Nov 2019 15:33:34 +0100
-Message-ID: <CAMuHMdVMoo0rJ-Ji1ek-DqHEkRqM5Fk5o9RzQV08Z8SSdS9APA@mail.gmail.com>
-Subject: Re: [PATCH v3 5/7] gpio: Add GPIO Aggregator/Repeater driver
-To: Eugeniu Rosca <erosca@de.adit-jv.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.167.194
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,110 +65,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Eugeniu Rosca <roscaeugeniu@gmail.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
- Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
- Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
- <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Harish Jenny K N <harish_kandiga@mentor.com>,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
- Phil Reid <preid@electromag.com.au>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ "kraxel@redhat.com" <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eugeniu,
-
-On Wed, Nov 27, 2019 at 3:15 PM Eugeniu Rosca <erosca@de.adit-jv.com> wrote=
-:
-> On Wed, Nov 27, 2019 at 09:42:51AM +0100, Geert Uytterhoeven wrote:
-> > +static bool isrange(const char *s)
-> > +{
-> > +     size_t n =3D strlen(s);
+On Wed, 27 Nov 2019, Aleksandar Markovic wrote:
+> On Tuesday, November 26, 2019, <aaron.zakhrov@gmail.com> wrote:
 >
-> Cppcheck 1.40-18521-ge6d692d96058:
-> drivers/gpio/gpio-aggregator.c:69:11: style: Variable 'n' is assigned a v=
-alue that is never used. [unreadVariable]
+>> From: Aaron Dominick <aaron.zakhrov@gmail.com>
+>>
+>> ---
 >
-> Smatch v0.5.0-6150-gc1ed13e4ee7b:
-> drivers/gpio/gpio-aggregator.c:69 isrange() warn: unused return: n =3D st=
-rlen()
-
-Correct, this is a remainder of code present temporarily during development=
-.
-Will drop.
-
-(where are the days gcc itself warned about that?)
-
-> > +     aggr->lookups->dev_id =3D kasprintf(GFP_KERNEL, "%s.%d", DRV_NAME=
-, id);
-> > +     if (!aggr->lookups) {
-> > +             res =3D -ENOMEM;
-> > +             goto remove_idr;
-> > +     }
 >
-> s/aggr->lookups/aggr->lookups->dev_id/ ?
+> Your commit message is poor. You should have clearly explained what do you
+> do in this cleanup, and why.
 
-Thanks, will fix.
+That the commit message is not helpful is the smallest problem. Clearly 
+there are more to improve in this series but please bear with new 
+contributors who may need to get used to the workflow with git and QEMU 
+patch submission and don't scare them away by criticising small problems 
+without helping them.
 
-> > +static int gpio_fwd_get_multiple(struct gpio_chip *chip, unsigned long=
- *mask,
-> > +                              unsigned long *bits)
-> > +{
-> > +     struct gpiochip_fwd *fwd =3D gpiochip_get_data(chip);
-> > +     unsigned long *values, flags;
->
-> gcc 9.2.1:
-> warning: =E2=80=98flags=E2=80=99 may be used uninitialized in this functi=
-on [-Wmaybe-uninitialized]
->
-> [..]
->
-> > +static void gpio_fwd_set_multiple(struct gpio_chip *chip, unsigned lon=
-g *mask,
-> > +                               unsigned long *bits)
-> > +{
-> > +     struct gpiochip_fwd *fwd =3D gpiochip_get_data(chip);
-> > +     unsigned long *values, flags;
->
-> gcc 9.2.1, same as above:
-> warning: =E2=80=98flags=E2=80=99 may be used uninitialized in this functi=
-on [-Wmaybe-uninitialized]
+This whole series is RFC and was stated in the original cover letter of 
+the v1 series that this is work in progress submitted for enquiring about 
+the direction taken not meant to be finished. That said it's still hard to 
+review in this state so some improvements are needed. This v1 was an 
+attempt for that but looks like it's not correct yet. I've found at least 
+these problems:
 
-So newer gcc is (again) no longer smart enough to notice the check is
-the same for initializer and user...
+- Series says it has 10 patches but I've only got 5-9 so it may have been 
+edited by hand instead of properly using git format-patch.
 
-> Should these be silenced like in 2bf593f101f3ca ("xilinx_uartps.c:
-> suppress "may be used uninitialised" warning") ?
+- Patch 9 added to remove unneded headers at the end but that does not 
+help to make Patch 5 more clear so this should be squashed into patch 5 
+instead (try git rebase -i and squash patches 5 and 9 so we end up with 
+only the necessary files added instead of one patch adding them and 
+another removing them later).
 
-TBH, I'm not a big fan of silencing false positives.
-But if people like to see flags preinitialized to zero, that can be done...
+- The resulting patch 5 (that should really be 1) should be split into 
+two: one copying existing files without modifying them and another patch 
+adding new headers to make it clear what changes are made that is hard to 
+find if copying and modifying files are done in the same patch.
 
-> I plan to do some runtime testing soon.
+As for the original question if this is the right direction I can't really 
+tell but I think it may be but to make it work we will need to implement 
+Microengine (aka. command processor/CCE/PM4) that reads packets from a 
+shared memory buffer and converts them to register accesses but it's not 
+documented so either we can get some info about it from somewhere (maybe 
+AMD) or manage to reverse engineer the microcode or just implement its 
+functionality not modeling the actual microengine the real card has but 
+only do packet parsing that it should do.
 
-Thanks, looking forward to the results!
+There was another question about GART which I can't answer not knowing 
+much about it but maybe we only need the addresses and then the device can 
+access system memory directly so we don't need to model the whole 
+IOMMU/DMA but I'm not sure what GART is used for so I may be wrong. 
+Comments from those who know more about ATI GPUs are welcome.
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+Regards,
+BALATON Zoltan
 
