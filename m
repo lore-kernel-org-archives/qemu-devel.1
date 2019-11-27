@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1284FC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F9CC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D88DB2068E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:35:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D88DB2068E
+	by mail.kernel.org (Postfix) with ESMTPS id AE3E62084D
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 19:37:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE3E62084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia36U-0004MM-TR
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:35:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41851)
+	id 1ia38D-0005de-W9
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 14:37:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43785)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ia32Z-0001yw-Ux
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:31:56 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia35y-0004PW-43
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ia32Y-0005YZ-Pn
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:31:55 -0500
-Received: from relay.sw.ru ([185.231.240.75]:54870)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ia35x-0001e2-3p
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 14:35:26 -0500
+Received: from relay.sw.ru ([185.231.240.75]:55034)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ia32T-0005NY-Cu; Wed, 27 Nov 2019 14:31:51 -0500
+ id 1ia35w-0001c7-Ai; Wed, 27 Nov 2019 14:35:24 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1ia32J-0004Ux-HX; Wed, 27 Nov 2019 22:31:39 +0300
+ id 1ia35u-0004XR-LV; Wed, 27 Nov 2019 22:35:22 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-s390x@nongnu.org
-Subject: [PATCH v6] hw/s390x: rename Error ** parameter to more common errp
-Date: Wed, 27 Nov 2019 22:31:38 +0300
-Message-Id: <20191127193138.22660-1-vsementsov@virtuozzo.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6] hw/sd: drop extra whitespace in sdhci_sysbus_realize()
+ header
+Date: Wed, 27 Nov 2019 22:35:22 +0300
+Message-Id: <20191127193522.23134-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -57,50 +58,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, david@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- rth@twiddle.net
+Cc: qemu-trivial@nongnu.org, vsementsov@virtuozzo.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
 
-v6: add Cornelia's r-b
+v6: improve patch subject
+ (was [RFC v5 016/126] hw/sd: rename Error ** parameter to more common errp)
+ add Eric's r-b
 
- hw/s390x/event-facility.c | 2 +-
- hw/s390x/s390-stattrib.c  | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ hw/sd/sdhci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
-index 66205697ae..dc733ee2af 100644
---- a/hw/s390x/event-facility.c
-+++ b/hw/s390x/event-facility.c
-@@ -439,7 +439,7 @@ static void sclp_event_set_allow_all_mask_sizes(Object *obj, bool value,
-     ef->allow_all_mask_sizes = value;
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 88404d0e9d..18c0c052ce 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1459,7 +1459,7 @@ static void sdhci_sysbus_finalize(Object *obj)
+     sdhci_uninitfn(s);
  }
  
--static bool sclp_event_get_allow_all_mask_sizes(Object *obj, Error **e)
-+static bool sclp_event_get_allow_all_mask_sizes(Object *obj, Error **errp)
+-static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
++static void sdhci_sysbus_realize(DeviceState *dev, Error **errp)
  {
-     SCLPEventFacility *ef = (SCLPEventFacility *)obj;
- 
-diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
-index bf5ac014c4..58121b9f68 100644
---- a/hw/s390x/s390-stattrib.c
-+++ b/hw/s390x/s390-stattrib.c
-@@ -352,7 +352,8 @@ static void s390_stattrib_class_init(ObjectClass *oc, void *data)
-     dc->realize = s390_stattrib_realize;
- }
- 
--static inline bool s390_stattrib_get_migration_enabled(Object *obj, Error **e)
-+static inline bool s390_stattrib_get_migration_enabled(Object *obj,
-+                                                       Error **errp)
- {
-     S390StAttribState *s = S390_STATTRIB(obj);
- 
+     SDHCIState *s = SYSBUS_SDHCI(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
 -- 
 2.21.0
 
