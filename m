@@ -2,46 +2,45 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 206EBC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 08:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD353C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 08:51:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB788204FD
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 08:51:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB788204FD
+	by mail.kernel.org (Postfix) with ESMTPS id 8C142204FD
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 08:51:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C142204FD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZt2M-0002hT-J3
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 03:51:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41840)
+	id 1iZt2g-0003DP-BD
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 03:51:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42153)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geert@linux-m68k.org>) id 1iZsx3-0005gm-Sx
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 03:45:39 -0500
+ (envelope-from <geert@linux-m68k.org>) id 1iZsx3-0005hs-Ol
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 03:45:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geert@linux-m68k.org>) id 1iZsum-0002nY-Gy
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 03:43:13 -0500
-Received: from xavier.telenet-ops.be ([2a02:1800:120:4::f00:14]:36340)
+ (envelope-from <geert@linux-m68k.org>) id 1iZsum-0002nr-IS
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 03:43:14 -0500
+Received: from andre.telenet-ops.be ([2a02:1800:120:4::f00:15]:45650)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <geert@linux-m68k.org>)
- id 1iZsum-0002lC-9U
+ id 1iZsum-0002lV-A9
  for qemu-devel@nongnu.org; Wed, 27 Nov 2019 03:43:12 -0500
-Received: from ramsan ([84.195.182.253]) by xavier.telenet-ops.be with bizsmtp
- id Wwiu2100X5USYZQ01wiuc6; Wed, 27 Nov 2019 09:43:07 +0100
+Received: from ramsan ([84.195.182.253]) by andre.telenet-ops.be with bizsmtp
+ id Wwiu2100b5USYZQ01wiuXS; Wed, 27 Nov 2019 09:43:07 +0100
 Received: from rox.of.borg ([192.168.97.57]) by ramsan with esmtp (Exim 4.90_1)
  (envelope-from <geert@linux-m68k.org>)
- id 1iZsuU-0000xl-Oj; Wed, 27 Nov 2019 09:42:54 +0100
+ id 1iZsuU-0000xd-K7; Wed, 27 Nov 2019 09:42:54 +0100
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
  (envelope-from <geert@linux-m68k.org>)
- id 1iZsuU-0004Or-Ld; Wed, 27 Nov 2019 09:42:54 +0100
+ id 1iZsuU-0004No-H4; Wed, 27 Nov 2019 09:42:54 +0100
 From: Geert Uytterhoeven <geert+renesas@glider.be>
 To: Linus Walleij <linus.walleij@linaro.org>,
  Bartosz Golaszewski <bgolaszewski@baylibre.com>,
@@ -49,14 +48,12 @@ To: Linus Walleij <linus.walleij@linaro.org>,
  Mark Rutland <mark.rutland@arm.com>,
  Harish Jenny K N <harish_kandiga@mentor.com>,
  Eugeniu Rosca <erosca@de.adit-jv.com>
-Subject: [PATCH v3 4/7] dt-bindings: gpio: Add gpio-repeater bindings
-Date: Wed, 27 Nov 2019 09:42:50 +0100
-Message-Id: <20191127084253.16356-5-geert+renesas@glider.be>
+Subject: [PATCH v3 0/7] gpio: Add GPIO Aggregator/Repeater
+Date: Wed, 27 Nov 2019 09:42:46 +0100
+Message-Id: <20191127084253.16356-1-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191127084253.16356-1-geert+renesas@glider.be>
-References: <20191127084253.16356-1-geert+renesas@glider.be>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
-X-Received-From: 2a02:1800:120:4::f00:14
+X-Received-From: 2a02:1800:120:4::f00:15
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,110 +76,143 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add Device Tree bindings for a GPIO repeater, with optional translation
-of physical signal properties.  This is useful for describing explicitly
-the presence of e.g. an inverter on a GPIO line, and was inspired by the
-non-YAML gpio-inverter bindings by Harish Jenny K N
-<harish_kandiga@mentor.com>[1].
+	Hi all,
 
-Note that this is different from a GPIO Nexus Node[2], which cannot do
-physical signal property translation.
+GPIO controllers are exported to userspace using /dev/gpiochip*
+character devices.  Access control to these devices is provided by
+standard UNIX file system permissions, on an all-or-nothing basis:
+either a GPIO controller is accessible for a user, or it is not.
+Currently no mechanism exists to control access to individual GPIOs.
 
-While an inverter can be described implicitly by exchanging the
-GPIO_ACTIVE_HIGH and GPIO_ACTIVE_LOW flags, this has its limitations.
-Each GPIO line has only a single GPIO_ACTIVE_* flag, but applies to both
-th provider and consumer sides:
-  1. The GPIO provider (controller) looks at the flags to know the
-     polarity, so it can translate between logical (active/not active)
-     and physical (high/low) signal levels.
-  2. While the signal polarity is usually fixed on the GPIO consumer
-     side (e.g. an LED is tied to either the supply voltage or GND),
-     it may be configurable on some devices, and both sides need to
-     agree.  Hence the GPIO_ACTIVE_* flag as seen by the consumer must
-     match the actual polarity.
-     There exists a similar issue with interrupt flags, where both the
-     interrupt controller and the device generating the interrupt need
-     to agree, which breaks in the presence of a physical inverter not
-     described in DT (see e.g. [3]).
+Hence this adds a GPIO driver to aggregate existing GPIOs, and expose
+them as a new gpiochip.  This is useful for implementing access control,
+and assigning a set of GPIOs to a specific user.  Furthermore, this
+simplifies and hardens exporting GPIOs to a virtual machine, as the VM
+can just grab the full GPIO controller, and no longer needs to care
+about which GPIOs to grab and which not, reducing the attack surface.
 
-[1] "[PATCH V4 2/2] gpio: inverter: document the inverter bindings"
-    https://lore.kernel.org/linux-gpio/1561699236-18620-3-git-send-email-harish_kandiga@mentor.com/
+Recently, other use cases have been discovered[1]:
+  - Describing GPIO inverters in DT, as a generic GPIO Repeater,
+  - Describing simple GPIO-operated devices in DT, and using the GPIO
+    Aggregator as a generic GPIO driver for userspace.
 
-[2] Devicetree Specification v0.3-rc2, Section 2.5
-    https://github.com/devicetree-org/devicetree-specification/releases/tag/v0.3-rc2
+Changes compared to v2[2] (more details in the individual patches):
+  - Integrate GPIO Repeater functionality,
+  - Absorb GPIO forwarder library, as the Aggregator and Repeater are
+    now a single driver,
+  - Use the aggregator parameters to create a GPIO lookup table instead
+    of an array of GPIO descriptors,
+  - Add documentation,
+  - New patches:
+      - "gpiolib: Add GPIOCHIP_NAME definition",
+      - "gpiolib: Add support for gpiochipN-based table lookup",
+      - "gpiolib: Add support for GPIO line table lookup",
+      - "dt-bindings: gpio: Add gpio-repeater bindings",
+      - "docs: gpio: Add GPIO Aggregator/Repeater documentation",
+      - "MAINTAINERS: Add GPIO Aggregator/Repeater section".
+  - Dropped patches:
+      - "gpio: Export gpiod_{request,free}() to modular GPIO code",
+      - "gpio: Export gpiochip_get_desc() to modular GPIO code",
+      - "gpio: Export gpio_name_to_desc() to modular GPIO code",
+      - "gpio: Add GPIO Forwarder Helper".
 
-[3] "[PATCH] wlcore/wl18xx: Add invert-irq OF property for physically
-    inverted IRQ"
-    https://lore.kernel.org/linux-renesas-soc/20190607172958.20745-1-erosca@de.adit-jv.com/
+Changes compared to v1[3]:
+  - Drop "virtual", rename to gpio-aggregator,
+  - Create and use new GPIO Forwarder Helper, to allow sharing code with
+    the GPIO inverter,
+  - Lift limit on the maximum number of GPIOs,
+  - Improve parsing of GPIO specifiers,
+  - Fix modular build.
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
-v3:
-  - New.
----
- .../bindings/gpio/gpio-repeater.yaml          | 53 +++++++++++++++++++
- 1 file changed, 53 insertions(+)
+Aggregating GPIOs and exposing them as a new gpiochip was suggested in
+response to my proof-of-concept for GPIO virtualization with QEMU[4][5].
+
+For the first use case, aggregated GPIO controllers are instantiated and
+destroyed by writing to atribute files in sysfs.
+Sample session on the Renesas Koelsch development board:
+
+  - Unbind LEDs from leds-gpio driver:
+
+        echo leds > /sys/bus/platform/drivers/leds-gpio/unbind
+
+  - Create aggregators:
+
+    $ echo e6052000.gpio 19,20 \
+        > /sys/bus/platform/drivers/gpio-aggregator/new_device
+
+    gpio-aggregator gpio-aggregator.0: gpio 0 => gpio-953 (gpio-aggregator.0)
+    gpio-aggregator gpio-aggregator.0: gpio 1 => gpio-954 (gpio-aggregator.0)
+    gpiochip_find_base: found new base at 778
+    gpio gpiochip8: (gpio-aggregator.0): added GPIO chardev (254:8)
+    gpiochip_setup_dev: registered GPIOs 778 to 779 on device: gpiochip8 (gpio-aggregator.0)
+
+    $ echo e6052000.gpio 21 e6050000.gpio 20-22 \
+        > /sys/bus/platform/drivers/gpio-aggregator/new_device
+
+    gpio-aggregator gpio-aggregator.1: gpio 0 => gpio-955 (gpio-aggregator.1)
+    gpio-aggregator gpio-aggregator.1: gpio 1 => gpio-1012 (gpio-aggregator.1)
+    gpio-aggregator gpio-aggregator.1: gpio 2 => gpio-1013 (gpio-aggregator.1)
+    gpio-aggregator gpio-aggregator.1: gpio 3 => gpio-1014 (gpio-aggregator.1)
+    gpiochip_find_base: found new base at 774
+    gpio gpiochip9: (gpio-aggregator.1): added GPIO chardev (254:9)
+    gpiochip_setup_dev: registered GPIOs 774 to 777 on device: gpiochip9 (gpio-aggregator.1)
+
+  - Adjust permissions on /dev/gpiochip[89] (optional)
+
+  - Control LEDs:
+
+    $ gpioset gpiochip8 0=0 1=1 # LED6 OFF, LED7 ON
+    $ gpioset gpiochip8 0=1 1=0 # LED6 ON, LED7 OFF
+    $ gpioset gpiochip9 0=0     # LED8 OFF
+    $ gpioset gpiochip9 0=1     # LED8 ON
+
+  - Destroy aggregators:
+
+    $ echo gpio-aggregator.0 \
+            > /sys/bus/platform/drivers/gpio-aggregator/delete_device
+    $ echo gpio-aggregator.1 \
+            > /sys/bus/platform/drivers/gpio-aggregator/delete_device
+
+Thanks for your comments!
+
+References:
+  [1] "[PATCH V4 2/2] gpio: inverter: document the inverter bindings"
+      (https://lore.kernel.org/linux-gpio/1561699236-18620-3-git-send-email-harish_kandiga@mentor.com/)
+  [2] "[PATCH/RFC v2 0/5] gpio: Add GPIO Aggregator Driver"
+      (https://lore.kernel.org/linux-gpio/20190911143858.13024-1-geert+renesas@glider.be/)
+  [3] "[PATCH RFC] gpio: Add Virtual Aggregator GPIO Driver"
+      (https://lore.kernel.org/lkml/20190705160536.12047-1-geert+renesas@glider.be/)
+  [4] "[PATCH QEMU POC] Add a GPIO backend"
+      (https://lore.kernel.org/linux-renesas-soc/20181003152521.23144-1-geert+renesas@glider.be/)
+  [5] "Getting To Blinky: Virt Edition / Making device pass-through
+       work on embedded ARM"
+      (https://fosdem.org/2019/schedule/event/vai_getting_to_blinky/)
+
+Geert Uytterhoeven (7):
+  gpiolib: Add GPIOCHIP_NAME definition
+  gpiolib: Add support for gpiochipN-based table lookup
+  gpiolib: Add support for GPIO line table lookup
+  dt-bindings: gpio: Add gpio-repeater bindings
+  gpio: Add GPIO Aggregator/Repeater driver
+  docs: gpio: Add GPIO Aggregator/Repeater documentation
+  MAINTAINERS: Add GPIO Aggregator/Repeater section
+
+ .../admin-guide/gpio/gpio-aggregator.rst      | 111 ++++
+ Documentation/admin-guide/gpio/index.rst      |   1 +
+ .../bindings/gpio/gpio-repeater.yaml          |  53 ++
+ MAINTAINERS                                   |   8 +
+ drivers/gpio/Kconfig                          |  13 +
+ drivers/gpio/Makefile                         |   1 +
+ drivers/gpio/gpio-aggregator.c                | 587 ++++++++++++++++++
+ drivers/gpio/gpiolib-sysfs.c                  |   7 +-
+ drivers/gpio/gpiolib.c                        |  38 +-
+ drivers/gpio/gpiolib.h                        |   2 +
+ include/linux/gpio/machine.h                  |   2 +-
+ 11 files changed, 815 insertions(+), 8 deletions(-)
+ create mode 100644 Documentation/admin-guide/gpio/gpio-aggregator.rst
  create mode 100644 Documentation/devicetree/bindings/gpio/gpio-repeater.yaml
+ create mode 100644 drivers/gpio/gpio-aggregator.c
 
-diff --git a/Documentation/devicetree/bindings/gpio/gpio-repeater.yaml b/Documentation/devicetree/bindings/gpio/gpio-repeater.yaml
-new file mode 100644
-index 0000000000000000..efdee0c3be43f731
---- /dev/null
-+++ b/Documentation/devicetree/bindings/gpio/gpio-repeater.yaml
-@@ -0,0 +1,53 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/gpio/gpio-repeater.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: GPIO Repeater
-+
-+maintainers:
-+  - Harish Jenny K N <harish_kandiga@mentor.com>
-+  - Geert Uytterhoeven <geert+renesas@glider.be>
-+
-+description:
-+  This represents a repeater for one or more GPIOs, possibly including physical
-+  signal property translation (e.g. polarity inversion).
-+
-+properties:
-+  compatible:
-+    const: gpio-repeater
-+
-+  "#gpio-cells":
-+    const: 2
-+
-+  gpio-controller: true
-+
-+  gpios:
-+    description:
-+      Phandle and specifier, one for each repeated GPIO.
-+
-+  gpio-line-names:
-+    description:
-+      Strings defining the names of the GPIO lines going out of the GPIO
-+      controller.
-+
-+required:
-+  - compatible
-+  - "#gpio-cells"
-+  - gpio-controller
-+  - gpios
-+
-+additionalProperties: false
-+
-+examples:
-+  # Device node describing a polarity inverter for a single GPIO
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+
-+    inverter: gpio-repeater {
-+        compatible = "gpio-repeater";
-+        #gpio-cells = <2>;
-+        gpio-controller;
-+        gpios = <&gpio 95 GPIO_ACTIVE_LOW>;
-+    };
 -- 
 2.17.1
 
