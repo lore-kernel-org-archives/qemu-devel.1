@@ -2,81 +2,94 @@ Return-Path: <SRS0=bFmd=ZT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7A9C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 121E4C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:09:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE2142068E
-	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:09:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0E2C2068E
+	for <qemu-devel@archiver.kernel.org>; Wed, 27 Nov 2019 12:09:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bahhfdlW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE2142068E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e47aSOYS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0E2C2068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iZw8O-0003B4-O3
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 07:09:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52318)
+	id 1iZw8k-0003rY-TC
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 07:09:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52418)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iZw5x-0001gv-Mg
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:06:58 -0500
+ (envelope-from <mlureau@redhat.com>) id 1iZw6i-0002Nr-7d
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:07:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iZw5w-0006UX-9d
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:06:57 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59543
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mlureau@redhat.com>) id 1iZw6g-00071X-5T
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:07:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54574
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iZw5w-0006UE-3x
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:06:56 -0500
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iZw6g-00070n-1T
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 07:07:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574856415;
+ s=mimecast20190719; t=1574856460;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SrILFCGHJnwMVvogxicaYHFqxItfgFN5vrkccrFPrL0=;
- b=bahhfdlWi5DpAImnqVgGvojxmygpUKAMVRGYVt87D6iYTaXVpPMohMk+i4aJUDjfNHAHmI
- SY/D7G8+eVj9Nups76z08JsMTQ/kIlz6gS3sndTIn1cLXQVXbKh6vJmugiw3e37bGYGvGR
- 94wzuxjSYi0vGZ/zOfAaDovpbzatzDc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-9wi4a9VHMLWnt_WPV3URJg-1; Wed, 27 Nov 2019 07:06:48 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23A7A800C78;
- Wed, 27 Nov 2019 12:06:46 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.46])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F120C3C1D;
- Wed, 27 Nov 2019 12:06:35 +0000 (UTC)
-Date: Wed, 27 Nov 2019 12:06:32 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH for-5.0 v11 18/20] virtio-iommu: Support migration
-Message-ID: <20191127120632.GH3016@work-vm>
-References: <20191122182943.4656-1-eric.auger@redhat.com>
- <20191122182943.4656-19-eric.auger@redhat.com>
+ bh=Ae7dhec3yI3ra2EH/YTDMxG6Gtfwzptkk8isLD2WRXs=;
+ b=e47aSOYSqfjfiFJ9Nr5im6izCabKqbjkxyG3LD4pM6RHdEqAbv0/voJoFKONQMcSrEZKgE
+ Y3ZLp4wt2tJibLbITU/3O9gTeIotIJHsFR7Fx9tfkcstO0ylRTjumJ5vGIN4vMgfqmQkOu
+ 3MdlAzQMuuKaV3qVtb1UjTvgx/owNtY=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-141-8jjOhsKXOmaC3YOmeJjsZQ-1; Wed, 27 Nov 2019 07:07:38 -0500
+Received: by mail-ot1-f71.google.com with SMTP id c9so6437762otm.20
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 04:07:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Ae7dhec3yI3ra2EH/YTDMxG6Gtfwzptkk8isLD2WRXs=;
+ b=J+Z7BPrTJsw4zV5wpf0zNMZOA9I2U6lyP8LHfgTWs08IID4u3SCHasB857MPlB57SY
+ clIVQYH6OflvTuNM6yw7laKuiKtLOqCwKSykYh/mnIm8pbYSEEKlkRTvpPQvylmn2pCS
+ Fj2Jj2o41KbyGuQFkt6ZoRwwds5HMdmGA/x9TGvfAbUOaasN1PcpJU/eapr4avY4vFh6
+ 6ERWzRO+s7FF4gPsuj4K7mbuS+OmECEB3r6inHDvC4tGFGLqEgr2SBzd4WVLGhsWS+46
+ s0wgSwmss3q9RDQxjUmoUl7yI3QbqR7bGhwLWOKWqL5RJIz/ZuPXgb85DhmIMSsYUD0f
+ aa+Q==
+X-Gm-Message-State: APjAAAXoU4TnFKbPaPVfs7adSWmI6El2V9R4OAlPVKoTnV6gPfqtCS7x
+ BSVq3VcCqO6wZfHu1I4mhcrYZILPgDx9oVpvxmipCVsQEQCNVEaHPDWW2t7DX+7RBx1D3ZyDs5G
+ CWuHSHOJQhVBlJPi18Xn/HWYnuBlXGXM=
+X-Received: by 2002:aca:52c4:: with SMTP id g187mr701316oib.76.1574856458045; 
+ Wed, 27 Nov 2019 04:07:38 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw4BYDtHZrO3Pb1SPHRsyjO9uUCrJNbHlgQuUmqZZnnqcfJ/KRUHXQb2Gy4uRA9odDd+EG0Uii48OblBPg2AJA=
+X-Received: by 2002:aca:52c4:: with SMTP id g187mr701291oib.76.1574856457789; 
+ Wed, 27 Nov 2019 04:07:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191122182943.4656-19-eric.auger@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 9wi4a9VHMLWnt_WPV3URJg-1
+References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
+ <20191120152442.26657-19-marcandre.lureau@redhat.com>
+ <CAL1e-=huXgGw-uXtNXqu111O8yE-Jw_+vHXqE7Wfw1efPZATSw@mail.gmail.com>
+ <CAMxuvawAL5wK31-BdGWNj4p8ZavMDAvtNgjJN7Yn6EhDyB-=uw@mail.gmail.com>
+ <58a5a515-2244-a927-9ca7-c0bb64ceca53@redhat.com>
+ <c61a0426-bf43-9afe-3110-51bb11d75bd1@redhat.com>
+ <8992c003-5d65-77e9-17eb-592449cf9fdc@redhat.com>
+In-Reply-To: <8992c003-5d65-77e9-17eb-592449cf9fdc@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 27 Nov 2019 16:07:26 +0400
+Message-ID: <CAMxuvazMYFLqamMw6s=7=fzhNB_6kqnvnAd2_d=2pZCjQwqL3Q@mail.gmail.com>
+Subject: Re: [PATCH v4 18/37] mips: baudbase is 115200 by default
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+X-MC-Unique: 8jjOhsKXOmaC3YOmeJjsZQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,191 +101,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
- tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
- quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
- armbru@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- eric.auger.pro@gmail.com
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Eric Auger (eric.auger@redhat.com) wrote:
-> Add Migration support. We rely on recently added gtree and qlist
-> migration. Besides, we have to fixup end point <-> domain link.
->=20
-> Indeed each domain has a list of endpoints attached to it. And each
-> endpoint has a pointer to its domain.
->=20
-> Raw gtree and qlist migration cannot handle this as it re-allocates
-> all the nodes while reconstructing the trees/lists.
->=20
-> So in post_load we re-construct the relationship between endpoints
-> and domains.
->=20
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Hi
 
-From the migration side of things,
+On Mon, Nov 25, 2019 at 5:04 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 11/25/19 1:54 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 11/25/19 12:26 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> >> On 11/25/19 11:12 AM, Marc-Andr=C3=A9 Lureau wrote:
+> >>> Hi
+> >>>
+> >>> On Mon, Nov 25, 2019 at 2:07 PM Aleksandar Markovic
+> >>> <aleksandar.m.mail@gmail.com> wrote:
+> >>>>
+> >>>>
+> >>>>
+> >>>> On Wednesday, November 20, 2019, Marc-Andr=C3=A9 Lureau
+> >>>> <marcandre.lureau@redhat.com> wrote:
+> >>>>>
+> >>>>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> >>>>> ---
+> >>>>>   hw/mips/mips_mipssim.c | 1 -
+> >>>>>   1 file changed, 1 deletion(-)
+> >>>>>
+> >>>>> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+> >>>>> index bfafa4d7e9..3cd0e6eb33 100644
+> >>>>> --- a/hw/mips/mips_mipssim.c
+> >>>>> +++ b/hw/mips/mips_mipssim.c
+> >>>>> @@ -223,7 +223,6 @@ mips_mipssim_init(MachineState *machine)
+> >>>>>       if (serial_hd(0)) {
+> >>>>>           DeviceState *dev =3D qdev_create(NULL, TYPE_SERIAL_IO);
+> >>>>>
+> >>>>> -        qdev_prop_set_uint32(DEVICE(dev), "baudbase", 115200);
+> >>>>>           qdev_prop_set_chr(dev, "chardev", serial_hd(0));
+> >>>>>           qdev_set_legacy_instance_id(dev, 0x3f8, 2);
+> >>>>>           qdev_init_nofail(dev);
+> >>>>> --
+> >>>>
+> >>>>
+> >>>> Please mention in your commit message where the default baudbase is
+> >>>> set.
+> >>>
+> >>> ok
+> >>>
+> >>>> Also, is there a guarantie that default value 115200 will never
+> >>>> change in future?
+> >>>
+> >>> The level of stability on properties in general is unclear to me.
+> >>>
+> >>> Given that 115200 is standard for serial, it is unlikely to change
+> >>> though.. We can have an assert there instead?
+> >>>
+> >>> Peter, what do you think? thanks
+>
+> IOW, until we merge Damien's "Clock framework API" series, I'd:
+>
+> - rename 'baudbase' -> 'input_frequency_hz'
+>
+> - set a 0 default value
+>
+>   DEFINE_PROP_UINT32("input-frequency-hz", SerialState,
+>                       input_frequency_hz, 0),
+>
+> - add a check in serial_realize()
+>
+>      if (s->input_frequency_hz =3D=3D 0) {
+>          error_setg(errp,
+>                "serial: input-frequency-hz property must be set");
+>          return;
+>      }
+>
+> [*] https://www.mail-archive.com/qemu-devel@nongnu.org/msg642174.html
+>
 
+This is getting further away from this series goal, and my initial
+goal. Let's add this to the backlog. I can drop a FIXME there.
 
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-> ---
->  hw/virtio/virtio-iommu.c | 127 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 117 insertions(+), 10 deletions(-)
->=20
-> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> index c5b202fab7..4e92fc0c95 100644
-> --- a/hw/virtio/virtio-iommu.c
-> +++ b/hw/virtio/virtio-iommu.c
-> @@ -692,16 +692,6 @@ static void virtio_iommu_set_features(VirtIODevice *=
-vdev, uint64_t val)
->      trace_virtio_iommu_set_features(dev->acked_features);
->  }
-> =20
-> -/*
-> - * Migration is not yet supported: most of the state consists
-> - * of balanced binary trees which are not yet ready for getting
-> - * migrated
-> - */
-> -static const VMStateDescription vmstate_virtio_iommu_device =3D {
-> -    .name =3D "virtio-iommu-device",
-> -    .unmigratable =3D 1,
-> -};
-> -
->  static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data=
-)
->  {
->      uint ua =3D GPOINTER_TO_UINT(a);
-> @@ -778,6 +768,123 @@ static void virtio_iommu_instance_init(Object *obj)
->  {
->  }
-> =20
-> +#define VMSTATE_INTERVAL                               \
-> +{                                                      \
-> +    .name =3D "interval",                                \
-> +    .version_id =3D 1,                                   \
-> +    .minimum_version_id =3D 1,                           \
-> +    .fields =3D (VMStateField[]) {                       \
-> +        VMSTATE_UINT64(low, viommu_interval),          \
-> +        VMSTATE_UINT64(high, viommu_interval),         \
-> +        VMSTATE_END_OF_LIST()                          \
-> +    }                                                  \
-> +}
-> +
-> +#define VMSTATE_MAPPING                               \
-> +{                                                     \
-> +    .name =3D "mapping",                                \
-> +    .version_id =3D 1,                                  \
-> +    .minimum_version_id =3D 1,                          \
-> +    .fields =3D (VMStateField[]) {                      \
-> +        VMSTATE_UINT64(phys_addr, viommu_mapping),    \
-> +        VMSTATE_UINT32(flags, viommu_mapping),        \
-> +        VMSTATE_END_OF_LIST()                         \
-> +    },                                                \
-> +}
-> +
-> +static const VMStateDescription vmstate_interval_mapping[2] =3D {
-> +    VMSTATE_MAPPING,   /* value */
-> +    VMSTATE_INTERVAL   /* key   */
-> +};
-> +
-> +static int domain_preload(void *opaque)
-> +{
-> +    viommu_domain *domain =3D opaque;
-> +
-> +    domain->mappings =3D g_tree_new_full((GCompareDataFunc)interval_cmp,
-> +                                       NULL, g_free, g_free);
-> +    return 0;
-> +}
-> +
-> +static const VMStateDescription vmstate_endpoint =3D {
-> +    .name =3D "endpoint",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT32(id, viommu_endpoint),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static const VMStateDescription vmstate_domain =3D {
-> +    .name =3D "domain",
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 1,
-> +    .pre_load =3D domain_preload,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_UINT32(id, viommu_domain),
-> +        VMSTATE_GTREE_V(mappings, viommu_domain, 1,
-> +                        vmstate_interval_mapping,
-> +                        viommu_interval, viommu_mapping),
-> +        VMSTATE_QLIST_V(endpoint_list, viommu_domain, 1,
-> +                        vmstate_endpoint, viommu_endpoint, next),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static gboolean reconstruct_ep_domain_link(gpointer key, gpointer value,
-> +                                           gpointer data)
-> +{
-> +    viommu_domain *d =3D (viommu_domain *)value;
-> +    viommu_endpoint *iter, *tmp;
-> +    viommu_endpoint *ep =3D (viommu_endpoint *)data;
-> +
-> +    QLIST_FOREACH_SAFE(iter, &d->endpoint_list, next, tmp) {
-> +        if (iter->id =3D=3D ep->id) {
-> +            /* remove the ep */
-> +            QLIST_REMOVE(iter, next);
-> +            g_free(iter);
-> +            /* replace it with the good one */
-> +            QLIST_INSERT_HEAD(&d->endpoint_list, ep, next);
-> +            /* update the domain */
-> +            ep->domain =3D d;
-> +            return true; /* stop the search */
-> +        }
-> +    }
-> +    return false; /* continue the traversal */
-> +}
-> +
-> +static gboolean fix_endpoint(gpointer key, gpointer value, gpointer data=
-)
-> +{
-> +    VirtIOIOMMU *s =3D (VirtIOIOMMU *)data;
-> +
-> +    g_tree_foreach(s->domains, reconstruct_ep_domain_link, value);
-> +    return false;
-> +}
-> +
-> +static int iommu_post_load(void *opaque, int version_id)
-> +{
-> +    VirtIOIOMMU *s =3D opaque;
-> +
-> +    g_tree_foreach(s->endpoints, fix_endpoint, s);
-> +    return 0;
-> +}
-> +
-> +static const VMStateDescription vmstate_virtio_iommu_device =3D {
-> +    .name =3D "virtio-iommu-device",
-> +    .minimum_version_id =3D 1,
-> +    .version_id =3D 1,
-> +    .post_load =3D iommu_post_load,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_GTREE_DIRECT_KEY_V(domains, VirtIOIOMMU, 1,
-> +                                   &vmstate_domain, viommu_domain),
-> +        VMSTATE_GTREE_DIRECT_KEY_V(endpoints, VirtIOIOMMU, 1,
-> +                                   &vmstate_endpoint, viommu_endpoint),
-> +        VMSTATE_END_OF_LIST()
-> +    },
-> +};
-> +
-> +
->  static const VMStateDescription vmstate_virtio_iommu =3D {
->      .name =3D "virtio-iommu",
->      .minimum_version_id =3D 1,
-> --=20
-> 2.20.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >> This property confused me by the past. It is _not_ the baudrate.
+> >> It is the input frequency clocking the UART ('XIN' pin, Xtal INput).
+> >>
+> >> Each board has its own frequency, and it can even be variable (the
+> >> clock domain tree can reconfigure it at a different rate).
+> >
+> > Laurent pointed me to the following commit which confirms my
+> > interpretation:
+> >
+> > $ git show 038eaf82c853
+> > commit 038eaf82c853f3bf8d4c106c0677bbf4adada7de
+> > Author: Stefan Weil <weil@mail.berlios.de>
+> > Date:   Sat Oct 31 11:28:11 2009 +0100
+> >
+> >      serial: Add interface to set reference oscillator frequency
+> >
+> >      Many (most?) serial interfaces have a programmable
+> >      clock which provides the reference frequency ("baudbase").
+> >      So a fixed baudbase which is only set once can be wrong.
+> >
+> >      omap1.c is an example which could use the new interface
+> >      to change baudbase when the programmable clock changes.
+> >      ar7 system emulation (still not part of standard QEMU)
+> >      is similar to omap and already uses serial_set_frequency.
+> >
+> >      Signed-off-by: Stefan Weil <weil@mail.berlios.de>
+> >      Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
+> >
+> > diff --git a/hw/pc.h b/hw/pc.h
+> > index 15fff8d103..03ffc91536 100644
+> > --- a/hw/pc.h
+> > +++ b/hw/pc.h
+> > @@ -13,6 +13,7 @@ SerialState *serial_mm_init (target_phys_addr_t base,
+> > int it_shift,
+> >                                qemu_irq irq, int baudbase,
+> >                                CharDriverState *chr, int ioregister);
+> >   SerialState *serial_isa_init(int index, CharDriverState *chr);
+> > +void serial_set_frequency(SerialState *s, uint32_t frequency);
+> >
+> >   /* parallel.c */
+> >
+> > diff --git a/hw/serial.c b/hw/serial.c
+> > index fa12dcc075..0063260569 100644
+> > --- a/hw/serial.c
+> > +++ b/hw/serial.c
+> > @@ -730,6 +730,13 @@ static void serial_init_core(SerialState *s)
+> >                             serial_event, s);
+> >   }
+> >
+> > +/* Change the main reference oscillator frequency. */
+> > +void serial_set_frequency(SerialState *s, uint32_t frequency)
+> > +{
+> > +    s->baudbase =3D frequency;
+> > +    serial_update_parameters(s);
+> > +}
+> > +
+>
 
 
