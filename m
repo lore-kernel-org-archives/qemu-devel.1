@@ -2,60 +2,75 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7787C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 16:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A14DC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 16:23:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56309217D6
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 16:22:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56309217D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 35E4721771
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 16:23:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aKmUYf/K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35E4721771
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaMYM-0002ej-Ol
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 11:22:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57337)
+	id 1iaMZt-0003kr-Ds
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 11:23:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maz@kernel.org>) id 1iaMUJ-0000lf-5V
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 11:17:52 -0500
+ (envelope-from <thuth@redhat.com>) id 1iaLpY-0002kU-5I
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 10:35:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maz@kernel.org>) id 1iaMUG-00056u-3G
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 11:17:49 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:48039)
+ (envelope-from <thuth@redhat.com>) id 1iaLpU-0005gD-Ru
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 10:35:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26205
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maz@kernel.org>) id 1iaMUE-0004yk-Ha
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 11:17:47 -0500
-Received: from 78.163-31-62.static.virginmediabusiness.co.uk ([62.31.163.78]
- helo=why.lan) by cheepnis.misterjones.org with esmtpsa
- (TLSv1.2:DHE-RSA-AES128-GCM-SHA256:128) (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1iaMU3-0002vd-Lt; Thu, 28 Nov 2019 17:17:35 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/3] target/arm: Handle trapping to EL2 of AArch32 VMRS
- instructions
-Date: Thu, 28 Nov 2019 16:17:18 +0000
-Message-Id: <20191128161718.24361-4-maz@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191128161718.24361-1-maz@kernel.org>
-References: <20191128161718.24361-1-maz@kernel.org>
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iaLpU-0005OH-MX
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 10:35:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574955337;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=MhvFNij/cGwxv14ogCZrZHKF5oi2NOeUu9hqfBSmqLQ=;
+ b=aKmUYf/KgbviL6lLloRMj4X9UpyuR2V8f8Vbr2mcYB2QQo2q4XkkEYR+S02IjQEUP4dH1F
+ M+BLs14v9myBWBFa5oKIQjPfp62BoLseCg8BH3Kcr6RSSR9L5gF/jXffiicTFACvrSwKz+
+ 8xz6yhboMvmvRadImTxGuZEDwqSEpm8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-4y5NH55nOwy4FZ_S5nbGjw-1; Thu, 28 Nov 2019 10:35:32 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15A78107B7DB;
+ Thu, 28 Nov 2019 15:35:31 +0000 (UTC)
+Received: from thuth.com (ovpn-116-114.ams2.redhat.com [10.36.116.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BC2FD131FE74;
+ Thu, 28 Nov 2019 15:35:29 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+Subject: [PATCH v2 0/2] Run tcg tests with tci on Travis
+Date: Thu, 28 Nov 2019 16:35:23 +0100
+Message-Id: <20191128153525.2646-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 62.31.163.78
-X-SA-Exim-Rcpt-To: qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu,
- peter.maydell@linaro.org, richard.henderson@linaro.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 213.251.177.50
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 4y5NH55nOwy4FZ_S5nbGjw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,123 +82,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, richard.henderson@linaro.org,
- kvmarm@lists.cs.columbia.edu
+Cc: Stefan Weil <sw@weilnetz.de>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-HCR_EL2.TID3 requires that AArch32 reads of MVFR[012] are trapped to
-EL2, and that HCR_EL2.TID0 does the same for reads of FPSID.
-In order to handle this, introduce a new TCG helper function that
-checks for these control bits before executing the VMRC instruction.
+It's now possible to run some TCG-based tests with our Tiny Code
+Generator Interpreter (TCI), too. These two patches enable the
+testing on Travis.
 
-Tested with a hacked-up version of KVM/arm64 that sets the control
-bits for 32bit guests.
+Alex Benn=C3=A9e (1):
+  configure: allow disable of cross compilation containers
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- target/arm/helper-a64.h        |  2 ++
- target/arm/internals.h         |  8 ++++++++
- target/arm/translate-vfp.inc.c | 12 +++++++++---
- target/arm/vfp_helper.c        | 27 +++++++++++++++++++++++++++
- 4 files changed, 46 insertions(+), 3 deletions(-)
+Thomas Huth (1):
+  travis.yml: Run tcg tests with tci
 
-diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
-index a915c1247f..311ced44e6 100644
---- a/target/arm/helper-a64.h
-+++ b/target/arm/helper-a64.h
-@@ -102,3 +102,5 @@ DEF_HELPER_FLAGS_3(autda, TCG_CALL_NO_WG, i64, env, i64, i64)
- DEF_HELPER_FLAGS_3(autdb, TCG_CALL_NO_WG, i64, env, i64, i64)
- DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
- DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
-+
-+DEF_HELPER_3(check_hcr_el2_trap, void, env, int, int)
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index f5313dd3d4..5a55e960de 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -430,6 +430,14 @@ static inline uint32_t syn_simd_access_trap(int cv, int cond, bool is_16bit)
-         | (cv << 24) | (cond << 20) | (1 << 5);
- }
- 
-+static inline uint32_t syn_vmrs_trap(int rt, int reg)
-+{
-+    return (EC_FPIDTRAP << ARM_EL_EC_SHIFT)
-+        | ARM_EL_IL
-+        | (1 << 24) | (0xe << 20) | (7 << 14)
-+        | (reg << 10) | (rt << 5) | 1;
-+}
-+
- static inline uint32_t syn_sve_access_trap(void)
- {
-     return EC_SVEACCESSTRAP << ARM_EL_EC_SHIFT;
-diff --git a/target/arm/translate-vfp.inc.c b/target/arm/translate-vfp.inc.c
-index 85c5ef897b..4c435b6c35 100644
---- a/target/arm/translate-vfp.inc.c
-+++ b/target/arm/translate-vfp.inc.c
-@@ -759,15 +759,21 @@ static bool trans_VMSR_VMRS(DisasContext *s, arg_VMSR_VMRS *a)
-     }
- 
-     if (a->l) {
-+        TCGv_i32 tcg_rt, tcg_reg;
-+
-         /* VMRS, move VFP special register to gp register */
-         switch (a->reg) {
-+        case ARM_VFP_MVFR0:
-+        case ARM_VFP_MVFR1:
-+        case ARM_VFP_MVFR2:
-         case ARM_VFP_FPSID:
-+            tcg_rt = tcg_const_i32(a->rt);
-+            tcg_reg = tcg_const_i32(a->reg);
-+            gen_helper_check_hcr_el2_trap(cpu_env, tcg_rt, tcg_reg);
-+            /* fall through */
-         case ARM_VFP_FPEXC:
-         case ARM_VFP_FPINST:
-         case ARM_VFP_FPINST2:
--        case ARM_VFP_MVFR0:
--        case ARM_VFP_MVFR1:
--        case ARM_VFP_MVFR2:
-             tmp = load_cpu_field(vfp.xregs[a->reg]);
-             break;
-         case ARM_VFP_FPSCR:
-diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
-index 9710ef1c3e..44e538e51c 100644
---- a/target/arm/vfp_helper.c
-+++ b/target/arm/vfp_helper.c
-@@ -1322,4 +1322,31 @@ float64 HELPER(frint64_d)(float64 f, void *fpst)
-     return frint_d(f, fpst, 64);
- }
- 
-+void HELPER(check_hcr_el2_trap)(CPUARMState *env, int rt, int reg)
-+{
-+    if (arm_current_el(env) != 1) {
-+        return;
-+    }
-+
-+    switch (reg) {
-+    case ARM_VFP_MVFR0:
-+    case ARM_VFP_MVFR1:
-+    case ARM_VFP_MVFR2:
-+        if (!(arm_hcr_el2_eff(env) & HCR_TID3)) {
-+            return;
-+        }
-+        break;
-+    case ARM_VFP_FPSID:
-+        if (!(arm_hcr_el2_eff(env) & HCR_TID0)) {
-+            return;
-+        }
-+        break;
-+    default:
-+        /* Shouldn't be here... */
-+        return;
-+    }
-+
-+    raise_exception(env, EXCP_HYP_TRAP, syn_vmrs_trap(rt, reg), 2);
-+}
-+
- #endif
--- 
-2.20.1
+ .travis.yml            | 7 ++++---
+ configure              | 8 +++++++-
+ tests/tcg/configure.sh | 6 ++++--
+ 3 files changed, 15 insertions(+), 6 deletions(-)
+
+--=20
+2.18.1
 
 
