@@ -2,121 +2,76 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F42C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 15:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 297D8C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 15:37:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85E1F217AB
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 15:34:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="dDrX13Dx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85E1F217AB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id F26F72084D
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 15:37:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F26F72084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaLof-00011i-6P
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 10:34:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38643)
+	id 1iaLqn-00036J-5j
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 10:37:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43314)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iaLC1-0006ye-Kq
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 09:54:57 -0500
+ (envelope-from <bounces@canonical.com>) id 1iaLD6-0007i7-CW
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 09:56:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iaLBp-0003yC-Ff
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 09:54:44 -0500
-Received: from mail-am5eur02on0713.outbound.protection.outlook.com
- ([2a01:111:f400:fe07::713]:40422
- helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iaLBo-0003ig-Aw
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 09:54:41 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A8PgsO3J54VV1/yL874C0F9wl+k1gPfzdWz0zDmA9cyJOhqcDddRDySkzgKc+tHBrH0MiX80uoDHCW+/8svfhWCrVdGRzS1Ip2nfIAER+BOJ5R41rL6FP6w5XJuMLSxnG/wKfkTT/dHgDsvJTs53sNVEcawaR3vYXvVswlOtQlHtD7HZcY6envW2L5fenORVWJrWlgyvc6aUIRmPBdqXr2XpW79XNkJMXNSyG1LV5/ONtCcJZXA1efYw/5ZZCGJAWAeZ0eh2Y1X5QoHMkNqewAMvt+EAte+I94zEHzzVxCiOsg76qSuQQ46FmlyEo5DaJBFs464SIu8t4u6fUl2QQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=61xb0tRaYMZoYckdkW+ryNzhXBaZOQnkA/eydX2gJeQ=;
- b=n2Xc55huG3WLRdAUC08lDVOHxmYsJ9hjTtOE5XrKGfDfVpO3OUkJf2miQuF+DZozHT0tq02hF1ap8nV2STPWcUZi9o5nprVaRPVE3cshW32+WccVa1am59V1dusHMnlZ50E9MzbItlQChkGngGSe2C/jp1j9WHS58M5NgFAqIfUZgzoDPHgPShzw/vrcBFrJYW7P6DoPETSTJnkcebAzrvlmqYYZBde/PDWjtmis6chfbUoPG6JcGRgU0wsgH+n8Ex+Y96YWt4GBMGdePQ25vLpMeY08obKNdkLvgPAMGzFi6uWo/R34C2NhHH8IpNcDeUbZ2/6dVfcN0YCaHl/pCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=61xb0tRaYMZoYckdkW+ryNzhXBaZOQnkA/eydX2gJeQ=;
- b=dDrX13DxZuYlrDar4+YP0CpMprJwhP0yvS4wZl5VLjYmAocI1UCX6XGC0hsqnsJwqN0rEJBWP/W7iBtYIgMXasyVs4/tGAEyFFLpON9U/gAi4QpNCLnXoke4ez2SCPolF8MER/tOK3tOybwDMjop81lh5kl1MZgXpakck3/4/wg=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3879.eurprd08.prod.outlook.com (20.178.90.216) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2474.19; Thu, 28 Nov 2019 14:54:36 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2474.023; Thu, 28 Nov 2019
- 14:54:36 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v6] error: rename errp to errp_in where it is IN-argument
-Thread-Topic: [PATCH v6] error: rename errp to errp_in where it is IN-argument
-Thread-Index: AQHVpVGz6p/zLL3Qt0SjF9DL93KD5KegpCn6gAAIsQA=
-Date: Thu, 28 Nov 2019 14:54:36 +0000
-Message-ID: <f901e0db-61df-898f-ce18-096bfeadf525@virtuozzo.com>
-References: <20191127183704.14825-1-vsementsov@virtuozzo.com>
- <878so05bca.fsf@dusky.pond.sub.org>
-In-Reply-To: <878so05bca.fsf@dusky.pond.sub.org>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P192CA0006.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::16)
- To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191128175434515
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2b235c0d-491f-4ad7-502d-08d77412e2e7
-x-ms-traffictypediagnostic: AM6PR08MB3879:
-x-microsoft-antispam-prvs: <AM6PR08MB3879286BBB7E069F183F9DF6C1470@AM6PR08MB3879.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-forefront-prvs: 0235CBE7D0
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39840400004)(136003)(396003)(366004)(346002)(376002)(199004)(189003)(6506007)(71200400001)(386003)(26005)(71190400001)(14454004)(31696002)(54906003)(86362001)(25786009)(6512007)(2906002)(446003)(6436002)(66476007)(66556008)(66446008)(6116002)(6486002)(102836004)(11346002)(64756008)(52116002)(66946007)(3846002)(99286004)(2616005)(6246003)(5660300002)(305945005)(66066001)(8936002)(31686004)(14444005)(256004)(6916009)(7736002)(186003)(81166006)(8676002)(36756003)(316002)(229853002)(81156014)(478600001)(76176011)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3879;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QIqg2Lolhw+ng6dyaUYnUSYtUz829a+YK/3/jgiMMbQOu4/xWEHH2GlO3fRaaF0A4F4F7DgGycqjl1oEOeXHqmBGGM3YSOLvHwinouFfEeY57POsWCm5YOI09OWl7csLAlbAQAf6i+HcYxj9RrLHZOZZ+s8SJG37a+xDcHdaGx0ud/wfnRNLDakbj+wEVpcNQTavQQfbS+s+8xMKCtIfM8lFwsg6Xs87kvRQXHqbaPEj3AjM2dYGJDcj7+yNoOX8UAWky8Lpr1pt5m+JTwmhA47NX8y9VOfmNsPtNgk0dNZWB8wmxvEegqoh8mJK7Ax/EY04bfnvtr1Dwqvydvq5S5BOusfinlGqp1tx02q6+84IPhamN6jLS+vhefuW246ZtlMzJt4LQCJt1moli55wDo5z9oXHWbN6jIWr27MPQOQ/1046Di55oMsT2GDO5LuC
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0AFF05E9A151A840965ECCFC5006F3FF@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <bounces@canonical.com>) id 1iaLD2-0000D5-Mt
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 09:55:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47852)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iaLCz-0008SG-1b
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 09:55:54 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iaLCt-0000eO-09
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 14:55:47 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id F19882E80CB
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 14:55:46 +0000 (UTC)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b235c0d-491f-4ad7-502d-08d77412e2e7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Nov 2019 14:54:36.2857 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /D1s2gqBsdy92YhbJcSCzRjG35lTyBENQzA7l7F4rxkefZIwxqzH6vfwcQFS72olDo56L4ruIIn6iD9aXB3bBE6I3ho/E4yPkVfZ2pcdUaU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3879
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe07::713
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 28 Nov 2019 14:45:45 -0000
+From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a-hashmi ajbennee carolineconcatto pmaydell
+X-Launchpad-Bug-Reporter: Caroline Concatto (carolineconcatto)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
+References: <157468002661.30952.10642264809488923382.malonedeb@wampee.canonical.com>
+Message-Id: <157495234520.6334.14255765476605514624.malone@gac.canonical.com>
+Subject: [Bug 1853826] Re: ELF loader fails to load shared object on ThunderX2
+ running RHEL7
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 291c1be91facdb69bde9bbfec18567d5595a9a62
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -125,179 +80,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>
+Reply-To: Bug 1853826 <1853826@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjguMTEuMjAxOSAxNzoyMywgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IFZsYWRpbWlyIFNl
-bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPiAN
-Cj4+IEVycm9yICoqZXJycCBpcyBhbG1vc3QgYWx3YXlzIE9VVC1hcmd1bWVudDogaXQncyBhc3N1
-bWVkIHRvIGJlIE5VTEwsIG9yDQo+PiBwb2ludGVyIHRvIE5VTEwtaW5pdGlhbGl6ZWQgcG9pbnRl
-ciwgb3IgcG9pbnRlciB0byBlcnJvcl9hYm9ydCBvcg0KPj4gZXJyb3JfZmF0YWwsIGZvciBjYWxs
-ZWUgdG8gcmVwb3J0IGVycm9yLg0KPj4NCj4+IEJ1dCB2ZXJ5IGZldyBmdW5jdGlvbnMgaW5zdGVh
-ZCBnZXQgRXJyb3IgKiplcnJwIGFzIElOLWFyZ3VtZW50Og0KPj4gaXQncyBhc3N1bWVkIHRvIGJl
-IHNldCAob3IsIG1heWJlLCBOVUxMKSwgYW5kIGNhbGxlZSBzaG91bGQgY2xlYW4gaXQsDQo+PiBv
-ciBhZGQgc29tZSBpbmZvcm1hdGlvbi4NCj4+DQo+PiBJbiBzdWNoIGNhc2VzLCByZW5hbWUgZXJy
-cCB0byBlcnJwX2luLg0KPiANCj4gTWlzc2luZzogd2h5IGlzIHRoZSByZW5hbWUgdXNlZnVsPw0K
-DQpUaGUgbWFpbiByZWFzb24gaXMgdG8gcHJlcGFyZSBmb3IgY29jY2luZWxsZSBwYXJ0Lg0KDQo+
-IA0KPiBJdCdzIHVzZWZ1bCBpZiBpdCBoZWxwcyByZWFkZXJzIHJlY29nbml6ZSB1bnVzdWFsIEVy
-cm9yICoqIHBhcmFtZXRlcnMsDQo+IGFuZCByZWNvZ25pemluZyB1bnVzdWFsIEVycm9yICoqIHBh
-cmFtZXRlcnMgaXMgYWN0dWFsbHkgYSBwcm9ibGVtLiAgSSdtDQo+IG5vdCBzdXJlIGl0IGlzLCBi
-dXQgbXkgZmFtaWxpYXJpdHkgd2l0aCB0aGUgRXJyb3IgaW50ZXJmYWNlIG1heSBibGluZA0KPiBt
-ZS4NCj4gDQo+IEhvdyBtYW55IGZ1bmN0aW9ucyBoYXZlIHVudXN1YWwgRXJyb3IgKipwYXJhbWV0
-ZXJzPyAgSG93IGFyZSB0aGV5IHVzZWQ/DQo+IEFueSBjYWxscyB0aGF0IGNvdWxkIGVhc2lseSBi
-ZSBtaXN0YWtlbiBhcyB0aGUgdXN1YWwgY2FzZT8gIFNlZSBbKl0NCj4gYmVsb3cuDQo+IA0KPiBZ
-b3UgZWZmZWN0aXZlbHkgcHJvcG9zZSBhIG5hbWluZyBjb252ZW50aW9uLiAgZXJyb3IuaCBzaG91
-bGQgc3BlbGwgaXQNCj4gb3V0LiAgTGV0IG1lIHRyeToNCj4gDQo+ICAgICAgQW55IEVycm9yICoq
-IHBhcmFtZXRlciBtZWFudCBmb3IgcGFzc2luZyBhbiBlcnJvciB0byB0aGUgY2FsbGVyIG11c3QN
-Cj4gICAgICBiZSBuYW1lZCBAZXJycC4gIE5vIG90aGVyIEVycm9yICoqIHBhcmFtZXRlciBtYXkg
-YmUgbmFtZWQgQGVycnAuDQoNCkdvb2QNCg0KPiANCj4gT2JzZXJ2ZToNCj4gDQo+ICogSSByZWZy
-YWluIGZyb20gc3RpcHVsYXRpbmcgaG93IG90aGVyIEVycm9yICoqIHBhcmFtZXRlcnMgYXJlIHRv
-IGJlDQo+ICAgIG5hbWVkLiAgWW91IHVzZSBAZXJycF9pbiwgYmVjYXVzZSB0aGUgb25lcyB5b3Ug
-cmVuYW1lIGFyZSBhY3R1YWxseQ0KPiAgICAiSU4tYXJndW1lbnRzIi4gIEhvd2V2ZXIsIGRpZmZl
-cmVudCB1c2VzIGFyZSBjb25jZWl2YWJsZSwgd2hlcmUNCj4gICAgQGVycnBfaW4gd291bGQgYmUg
-bWlzbGVhZGluZy4NCj4gDQo+ICogSWYgSSB1bmRlcnN0YW5kIHlvdXIgRVJSUF9BVVRPX1BST1BB
-R0FURSgpIGlkZWEgY29ycmVjdGx5LCBtYW55DQo+ICAgIGZ1bmN0aW9ucyB0aGF0IHRha2UgYW4g
-RXJyb3IgKiogdG8gcGFzcyBhbiBlcnJvciB0byB0aGUgY2FsbGVyIHdpbGwNCj4gICAgYWxzbyB1
-c2UgRVJSUF9BVVRPX1BST1BBR0FURSwgYnV0IG5vdCBhbGwuICBUaHVzLCBwcmVzZW5jZSBvZg0K
-PiAgICBFUlJQX0FVVE9fUFJPUEFHQVRFKCkgd29uJ3QgYmUgYSByZWxpYWJsZSBpbmRpY2F0b3Ig
-b2YgInRoZSBFcnJvciAqKg0KPiAgICBwYXJhbWV0ZXIgaXMgZm9yIHBhc3NpbmcgYW4gZXJyb3Ig
-dG8gdGhlIGNhbGxlciIuDQo+IA0KPiAqIEkgY2FuJ3Qgc2VlIG1hY2hpbmVyeSB0byBoZWxwIHVz
-IGNhdGNoIHZpb2xhdGlvbnMgb2YgdGhlIGNvbnZlbnRpb24uDQo+IA0KPj4gVGhpcyBwYXRjaCB1
-cGRhdGVzIG9ubHkgZXJyb3IgQVBJIGZ1bmN0aW9ucy4gVGhlcmUgc3RpbGwgYSBmZXcNCj4+IGZ1
-bmN0aW9ucyB3aXRoIGVycnAtaW4gc2VtYW50aWNzLCB0aGV5IHdpbGwgYmUgdXBkYXRlZCBpbiBm
-dXJ0aGVyDQo+PiBjb21taXRzLg0KPiANCj4gU3BsaXR0aW5nIHRoZSBzZXJpZXMgaW50byBpbmRp
-dmlkdWFsIHBhdGNoZXMgd2FzIGEgYmFkIGlkZWEgOikNCj4gDQo+IEZpcnN0LCBpdCByZWFsbHkg
-bmVlZHMgcmV2aWV3IGFzIGEgd2hvbGUuICBJJ2xsIGRvIHRoYXQsIGJ1dCBub3cgSSBoYXZlDQo+
-IHRvIGh1bnQgZG93biB0aGUgcGFydHMuICBGb3VuZCBzbyBmYXI6DQo+IA0KPiAgICAgIFtQQVRD
-SCB2Nl0gZXJyb3I6IHJlbmFtZSBlcnJwIHRvIGVycnBfaW4gd2hlcmUgaXQgaXMgSU4tYXJndW1l
-bnQNCj4gICAgICBbUEFUQ0ggdjZdIGhtcDogZHJvcCBFcnJvciBwb2ludGVyIGluZGlyZWN0aW9u
-IGluIGhtcF9oYW5kbGVfZXJyb3INCj4gICAgICBbUEFUQ0ggdjZdIHZuYzogZHJvcCBFcnJvciBw
-b2ludGVyIGluZGlyZWN0aW9uIGluIHZuY19jbGllbnRfaW9fZXJyb3INCj4gICAgICBbUEFUQ0gg
-djZdIHFkZXYtbW9uaXRvcjogd2VsbCBmb3JtIGVycm9yIGhpbnQgaGVscGVycw0KPiAgICAgIFtQ
-QVRDSCB2Nl0gbmJkOiB3ZWxsIGZvcm0gbmJkX2l0ZXJfY2hhbm5lbF9lcnJvciBlcnJwIGhhbmRs
-ZXINCj4gICAgICBbUEFUQ0ggdjZdIHBwYzogd2VsbCBmb3JtIGt2bXBwY19oaW50X3NtdF9wb3Nz
-aWJsZSBlcnJvciBoaW50IGhlbHBlcg0KPiAgICAgIFtQQVRDSCB2Nl0gOXBmczogd2VsbCBmb3Jt
-IGVycm9yIGhpbnQgaGVscGVycw0KPiAgICAgIFtQQVRDSCB2Nl0gaHcvY29yZS9xZGV2OiBjbGVh
-bnVwIEVycm9yICoqIHZhcmlhYmxlcw0KPiAgICAgIFtQQVRDSCB2Nl0gYmxvY2svc25hcHNob3Q6
-IHJlbmFtZSBFcnJvciAqKiBwYXJhbWV0ZXIgdG8gbW9yZSBjb21tb24gZXJycA0KPiAgICAgIFtQ
-QVRDSCB2Nl0gaHcvaTM4Ni9hbWRfaW9tbXU6IHJlbmFtZSBFcnJvciAqKiBwYXJhbWV0ZXIgdG8g
-bW9yZSBjb21tb24gZXJycA0KPiAgICAgIFtQQVRDSCB2Nl0gcWdhOiByZW5hbWUgRXJyb3IgKiog
-cGFyYW1ldGVyIHRvIG1vcmUgY29tbW9uIGVycnANCj4gICAgICBbUEFUQ0ggdjZdIG1vbml0b3Iv
-cW1wLWNtZHM6IHJlbmFtZSBFcnJvciAqKiBwYXJhbWV0ZXIgdG8gbW9yZSBjb21tb24gZXJycA0K
-PiAgICAgIFtQQVRDSCB2Nl0gaHcvczM5MHg6IHJlbmFtZSBFcnJvciAqKiBwYXJhbWV0ZXIgdG8g
-bW9yZSBjb21tb24gZXJycA0KPiAgICAgIFtQQVRDSCB2Nl0gaHcvc2Q6IGRyb3AgZXh0cmEgd2hp
-dGVzcGFjZSBpbiBzZGhjaV9zeXNidXNfcmVhbGl6ZSgpIGhlYWRlcg0KPiAgICAgIFtQQVRDSCB2
-Nl0gaHcvdHBtOiByZW5hbWUgRXJyb3IgKiogcGFyYW1ldGVyIHRvIG1vcmUgY29tbW9uIGVycnAN
-Cj4gICAgICBbUEFUQ0ggdjZdIGh3L3VzYjogcmVuYW1lIEVycm9yICoqIHBhcmFtZXRlciB0byBt
-b3JlIGNvbW1vbiBlcnJwDQo+ICAgICAgW1BBVENIIHY2XSBpbmNsdWRlL3FvbS9vYmplY3QuaDog
-cmVuYW1lIEVycm9yICoqIHBhcmFtZXRlciB0byBtb3JlIGNvbW1vbiBlcnJwDQo+ICAgICAgW1BB
-VENIIHY2XSBiYWNrZW5kcy9jcnlwdG9kZXY6IGRyb3AgbG9jYWxfZXJyIGZyb20gY3J5cHRvZGV2
-X2JhY2tlbmRfY29tcGxldGUoKQ0KPiAgICAgIFtQQVRDSCB2Nl0gaHcvdmZpby9hcDogZHJvcCBs
-b2NhbF9lcnIgZnJvbSB2ZmlvX2FwX3JlYWxpemUNCg0KLi4gMTkgcGF0Y2hlcy4uIHNob3VsZCBi
-ZSAyMS4NCg0KSXQncyByZWFsbHkgc2ltcGxlIGZvciBtZSB0byByZXNlbmQgdGhlbSBhbGwgaW4g
-b25lIHY3IHNlcmllcy4gU2hvdWxkIEk/DQoNCj4gDQo+IFsqXSBUaGUgaW5mb3JtYXRpb24gSSBh
-c2tlZCBmb3IgYWJvdmUgaXMgYnVyaWVkIGluIHRoZXNlIHBhdGNoZXMuICBJJ2xsDQo+IHRyeSB0
-byBkaWcgaXQgdXAgYXMgSSBnbyByZXZpZXdpbmcgdGhlbS4NCj4gDQo+IFNlY29uZCwgaXQgcmlz
-a3Mgc29tZSBvZiB0aGVzZSAiZnVydGhlciBwYXRjaGVzIiBvdmVydGFrZSB0aGlzIG9uZSwgYW5k
-DQo+IHRoZW4gaXRzIGNvbW1pdCBtZXNzYWdlIHdpbGwgYmUgbWlzbGVhZGluZy4gIE1vcmVvdmVy
-LCB0aGUgb3RoZXIgY29tbWl0cw0KPiB3aWxsIGxhY2sgY29udGV4dC4NCj4gDQo+PiBTaWduZWQt
-b2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6
-by5jb20+DQo+PiBSZXZpZXdlZC1ieTogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+DQo+
-PiAtLS0NCj4+DQo+PiB2NjogZml4IHMvZXJycC9lcnJwX2luLyBpbiBjb21tZW50cyBjb3JyZXNw
-b25kaW5nIHRvIGNoYW5nZWQgZnVuY3Rpb25zDQo+PiAgICAgIFtFcmljXQ0KPj4gICAgICBhZGQg
-RXJpYydzIHItYg0KPj4NCj4+ICAgaW5jbHVkZS9xYXBpL2Vycm9yLmggfCAxNiArKysrKysrKy0t
-LS0tLS0tDQo+PiAgIHV0aWwvZXJyb3IuYyAgICAgICAgIHwgMzAgKysrKysrKysrKysrKysrLS0t
-LS0tLS0tLS0tLS0tDQo+PiAgIDIgZmlsZXMgY2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKSwgMjMg
-ZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvcWFwaS9lcnJvci5oIGIv
-aW5jbHVkZS9xYXBpL2Vycm9yLmgNCj4+IGluZGV4IDNmOTUxNDFhMDEuLmRmNTE4NjQ0ZmMgMTAw
-NjQ0DQo+PiAtLS0gYS9pbmNsdWRlL3FhcGkvZXJyb3IuaA0KPj4gKysrIGIvaW5jbHVkZS9xYXBp
-L2Vycm9yLmgNCj4+IEBAIC0yMzAsMTYgKzIzMCwxNiBAQCB2b2lkIGVycm9yX3Byb3BhZ2F0ZV9w
-cmVwZW5kKEVycm9yICoqZHN0X2VycnAsIEVycm9yICpsb2NhbF9lcnIsDQo+PiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgY29uc3QgY2hhciAqZm10LCAuLi4pOw0KPj4gICANCj4+ICAg
-LyoNCj4+IC0gKiBQcmVwZW5kIHNvbWUgdGV4dCB0byBAZXJycCdzIGh1bWFuLXJlYWRhYmxlIGVy
-cm9yIG1lc3NhZ2UuDQo+PiArICogUHJlcGVuZCBzb21lIHRleHQgdG8gQGVycnBfaW4ncyBodW1h
-bi1yZWFkYWJsZSBlcnJvciBtZXNzYWdlLg0KPj4gICAgKiBUaGUgdGV4dCBpcyBtYWRlIGJ5IGZv
-cm1hdHRpbmcgQGZtdCwgQGFwIGxpa2UgdnByaW50ZigpLg0KPj4gICAgKi8NCj4+IC12b2lkIGVy
-cm9yX3ZwcmVwZW5kKEVycm9yICoqZXJycCwgY29uc3QgY2hhciAqZm10LCB2YV9saXN0IGFwKTsN
-Cj4+ICt2b2lkIGVycm9yX3ZwcmVwZW5kKEVycm9yICoqZXJycF9pbiwgY29uc3QgY2hhciAqZm10
-LCB2YV9saXN0IGFwKTsNCj4+ICAgDQo+PiAgIC8qDQo+PiAtICogUHJlcGVuZCBzb21lIHRleHQg
-dG8gQGVycnAncyBodW1hbi1yZWFkYWJsZSBlcnJvciBtZXNzYWdlLg0KPj4gKyAqIFByZXBlbmQg
-c29tZSB0ZXh0IHRvIEBlcnJwX2luJ3MgaHVtYW4tcmVhZGFibGUgZXJyb3IgbWVzc2FnZS4NCj4+
-ICAgICogVGhlIHRleHQgaXMgbWFkZSBieSBmb3JtYXR0aW5nIEBmbXQsIC4uLiBsaWtlIHByaW50
-ZigpLg0KPj4gICAgKi8NCj4+IC12b2lkIGVycm9yX3ByZXBlbmQoRXJyb3IgKiplcnJwLCBjb25z
-dCBjaGFyICpmbXQsIC4uLikNCj4+ICt2b2lkIGVycm9yX3ByZXBlbmQoRXJyb3IgKiplcnJwX2lu
-LCBjb25zdCBjaGFyICpmbXQsIC4uLikNCj4+ICAgICAgIEdDQ19GTVRfQVRUUigyLCAzKTsNCj4+
-ICAgDQo+PiAgIC8qDQo+PiBAQCAtMjUwLDEzICsyNTAsMTMgQEAgdm9pZCBlcnJvcl9wcmVwZW5k
-KEVycm9yICoqZXJycCwgY29uc3QgY2hhciAqZm10LCAuLi4pDQo+PiAgICAqIEludGVuZGVkIHVz
-ZSBpcyBhZGRpbmcgaGVscGZ1bCBoaW50cyBvbiB0aGUgaHVtYW4gdXNlciBpbnRlcmZhY2UsDQo+
-PiAgICAqIGUuZy4gYSBsaXN0IG9mIHZhbGlkIHZhbHVlcy4gIEl0J3Mgbm90IGZvciBjbGFyaWZ5
-aW5nIGEgY29uZnVzaW5nDQo+PiAgICAqIGVycm9yIG1lc3NhZ2UuDQo+PiAtICogQGVycnAgbWF5
-IGJlIE5VTEwsIGJ1dCBub3QgJmVycm9yX2ZhdGFsIG9yICZlcnJvcl9hYm9ydC4NCj4+ICsgKiBA
-ZXJycF9pbiBtYXkgYmUgTlVMTCwgYnV0IG5vdCAmZXJyb3JfZmF0YWwgb3IgJmVycm9yX2Fib3J0
-Lg0KPiANCj4gVGhhdCdzIGJlY2F1c2UgdGhlIGZ1bmN0aW9uIG1vZGlmaWVzIHRoZSBlcnJvciBv
-YmplY3QuDQo+IA0KPiBIbW0sIHNvIGRvIGVycm9yX3ByZXBlbmQoKSBhbmQgZXJyb3JfdnByZXBl
-bmQoKS4gIEkgZmlndXJlIHdlIGJldHRlcg0KPiB1cGRhdGUgdGhlaXIgY29udHJhY3QgYWNjb3Jk
-aW5nbHksIGFuZCBjb3B5IHRoZSAibm90ICZlcnJvcl9mYXRhbCBvcg0KPiAmZXJyb3JfYWJvcnQi
-IGFzc2VydGlvbi4gIE5vdCBpbiB0aGlzIHBhdGNoLiAgTWF5YmUgbm90IGV2ZW4gaW4gdGhpcw0K
-PiBzZXJpZXMuDQo+IA0KPj4gICAgKiBUcml2aWFsbHkgdGhlIGNhc2UgaWYgeW91IGNhbGwgaXQg
-b25seSBhZnRlciBlcnJvcl9zZXRnKCkgb3INCj4+ICAgICogZXJyb3JfcHJvcGFnYXRlKCkuDQo+
-PiAgICAqIE1heSBiZSBjYWxsZWQgbXVsdGlwbGUgdGltZXMuICBUaGUgcmVzdWx0aW5nIGhpbnQg
-c2hvdWxkIGVuZCB3aXRoIGENCj4+ICAgICogbmV3bGluZS4NCj4+ICAgICovDQo+PiAtdm9pZCBl
-cnJvcl9hcHBlbmRfaGludChFcnJvciAqKmVycnAsIGNvbnN0IGNoYXIgKmZtdCwgLi4uKQ0KPj4g
-K3ZvaWQgZXJyb3JfYXBwZW5kX2hpbnQoRXJyb3IgKiplcnJwX2luLCBjb25zdCBjaGFyICpmbXQs
-IC4uLikNCj4+ICAgICAgIEdDQ19GTVRfQVRUUigyLCAzKTsNCj4+ICAgDQo+PiAgIC8qDQo+PiBA
-QCAtMjgxLDkgKzI4MSw5IEBAIEVycm9yICplcnJvcl9jb3B5KGNvbnN0IEVycm9yICplcnIpOw0K
-Pj4gICB2b2lkIGVycm9yX2ZyZWUoRXJyb3IgKmVycik7DQo+PiAgIA0KPj4gICAvKg0KPj4gLSAq
-IENvbnZlbmllbmNlIGZ1bmN0aW9uIHRvIGFzc2VydCB0aGF0ICpAZXJycCBpcyBzZXQsIHRoZW4g
-c2lsZW50bHkgZnJlZSBpdC4NCj4+ICsgKiBDb252ZW5pZW5jZSBmdW5jdGlvbiB0byBhc3NlcnQg
-dGhhdCAqQGVycnBfaW4gaXMgc2V0LCB0aGVuIHNpbGVudGx5IGZyZWUgaXQuDQo+IExvbmcgbGlu
-ZS4gIFN1Z2dlc3Q6DQo+IA0KPiAgICAgICogQXNzZXJ0IHRoYXQgKkBlcnJwX2luIGlzIHNldCwg
-dGhlbiBzaWxlbnRseSBmcmVlIGl0Lg0KPiAgICAgICogVGhpcyBpcyBhIGNvbnZlbmllbmNlIGZ1
-bmN0aW9uIGZvciB1c2UgaW4gdGVzdHMuDQo+IA0KPj4gICAgKi8NCj4+IC12b2lkIGVycm9yX2Zy
-ZWVfb3JfYWJvcnQoRXJyb3IgKiplcnJwKTsNCj4+ICt2b2lkIGVycm9yX2ZyZWVfb3JfYWJvcnQo
-RXJyb3IgKiplcnJwX2luKTsNCj4+ICAgDQo+PiAgIC8qDQo+PiAgICAqIENvbnZlbmllbmNlIGZ1
-bmN0aW9uIHRvIHdhcm5fcmVwb3J0KCkgYW5kIGZyZWUgQGVyci4NCj4+IGRpZmYgLS1naXQgYS91
-dGlsL2Vycm9yLmMgYi91dGlsL2Vycm9yLmMNCj4+IGluZGV4IGQ0NTMyY2UzMTguLjI3NTU4NmZh
-YTggMTAwNjQ0DQo+PiAtLS0gYS91dGlsL2Vycm9yLmMNCj4+ICsrKyBiL3V0aWwvZXJyb3IuYw0K
-Pj4gQEAgLTEyMSw0MSArMTIxLDQxIEBAIHZvaWQgZXJyb3Jfc2V0Z19maWxlX29wZW5faW50ZXJu
-YWwoRXJyb3IgKiplcnJwLA0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiQ291
-bGQgbm90IG9wZW4gJyVzJyIsIGZpbGVuYW1lKTsNCj4+ICAgfQ0KPj4gICANCj4+IC12b2lkIGVy
-cm9yX3ZwcmVwZW5kKEVycm9yICoqZXJycCwgY29uc3QgY2hhciAqZm10LCB2YV9saXN0IGFwKQ0K
-Pj4gK3ZvaWQgZXJyb3JfdnByZXBlbmQoRXJyb3IgKiplcnJwX2luLCBjb25zdCBjaGFyICpmbXQs
-IHZhX2xpc3QgYXApDQo+PiAgIHsNCj4+ICAgICAgIEdTdHJpbmcgKm5ld21zZzsNCj4+ICAgDQo+
-PiAtICAgIGlmICghZXJycCkgew0KPj4gKyAgICBpZiAoIWVycnBfaW4pIHsNCj4+ICAgICAgICAg
-ICByZXR1cm47DQo+PiAgIA0KPj4gICAgICAgbmV3bXNnID0gZ19zdHJpbmdfbmV3KE5VTEwpOw0K
-Pj4gICAgICAgZ19zdHJpbmdfdnByaW50ZihuZXdtc2csIGZtdCwgYXApOw0KPj4gLSAgICBnX3N0
-cmluZ19hcHBlbmQobmV3bXNnLCAoKmVycnApLT5tc2cpOw0KPj4gLSAgICBnX2ZyZWUoKCplcnJw
-KS0+bXNnKTsNCj4+IC0gICAgKCplcnJwKS0+bXNnID0gZ19zdHJpbmdfZnJlZShuZXdtc2csIDAp
-Ow0KPj4gKyAgICBnX3N0cmluZ19hcHBlbmQobmV3bXNnLCAoKmVycnBfaW4pLT5tc2cpOw0KPj4g
-KyAgICBnX2ZyZWUoKCplcnJwX2luKS0+bXNnKTsNCj4+ICsgICAgKCplcnJwX2luKS0+bXNnID0g
-Z19zdHJpbmdfZnJlZShuZXdtc2csIDApOw0KPj4gICB9DQo+PiAgIA0KPj4gLXZvaWQgZXJyb3Jf
-cHJlcGVuZChFcnJvciAqKmVycnAsIGNvbnN0IGNoYXIgKmZtdCwgLi4uKQ0KPj4gK3ZvaWQgZXJy
-b3JfcHJlcGVuZChFcnJvciAqKmVycnBfaW4sIGNvbnN0IGNoYXIgKmZtdCwgLi4uKQ0KPj4gICB7
-DQo+PiAgICAgICB2YV9saXN0IGFwOw0KPj4gICANCj4+ICAgICAgIHZhX3N0YXJ0KGFwLCBmbXQp
-Ow0KPj4gLSAgICBlcnJvcl92cHJlcGVuZChlcnJwLCBmbXQsIGFwKTsNCj4+ICsgICAgZXJyb3Jf
-dnByZXBlbmQoZXJycF9pbiwgZm10LCBhcCk7DQo+PiAgICAgICB2YV9lbmQoYXApOw0KPj4gICB9
-DQo+PiAgIA0KPj4gLXZvaWQgZXJyb3JfYXBwZW5kX2hpbnQoRXJyb3IgKiplcnJwLCBjb25zdCBj
-aGFyICpmbXQsIC4uLikNCj4+ICt2b2lkIGVycm9yX2FwcGVuZF9oaW50KEVycm9yICoqZXJycF9p
-biwgY29uc3QgY2hhciAqZm10LCAuLi4pDQo+PiAgIHsNCj4+ICAgICAgIHZhX2xpc3QgYXA7DQo+
-PiAgICAgICBpbnQgc2F2ZWRfZXJybm8gPSBlcnJubzsNCj4+ICAgICAgIEVycm9yICplcnI7DQo+
-PiAgIA0KPj4gLSAgICBpZiAoIWVycnApIHsNCj4+ICsgICAgaWYgKCFlcnJwX2luKSB7DQo+PiAg
-ICAgICAgICAgcmV0dXJuOw0KPj4gICAgICAgfQ0KPj4gLSAgICBlcnIgPSAqZXJycDsNCj4+IC0g
-ICAgYXNzZXJ0KGVyciAmJiBlcnJwICE9ICZlcnJvcl9hYm9ydCAmJiBlcnJwICE9ICZlcnJvcl9m
-YXRhbCk7DQo+PiArICAgIGVyciA9ICplcnJwX2luOw0KPj4gKyAgICBhc3NlcnQoZXJyICYmIGVy
-cnBfaW4gIT0gJmVycm9yX2Fib3J0ICYmIGVycnBfaW4gIT0gJmVycm9yX2ZhdGFsKTsNCj4+ICAg
-DQo+PiAgICAgICBpZiAoIWVyci0+aGludCkgew0KPj4gICAgICAgICAgIGVyci0+aGludCA9IGdf
-c3RyaW5nX25ldyhOVUxMKTsNCj4+IEBAIC0yNzEsMTEgKzI3MSwxMSBAQCB2b2lkIGVycm9yX2Zy
-ZWUoRXJyb3IgKmVycikNCj4+ICAgICAgIH0NCj4+ICAgfQ0KPj4gICANCj4+IC12b2lkIGVycm9y
-X2ZyZWVfb3JfYWJvcnQoRXJyb3IgKiplcnJwKQ0KPj4gK3ZvaWQgZXJyb3JfZnJlZV9vcl9hYm9y
-dChFcnJvciAqKmVycnBfaW4pDQo+PiAgIHsNCj4+IC0gICAgYXNzZXJ0KGVycnAgJiYgKmVycnAp
-Ow0KPj4gLSAgICBlcnJvcl9mcmVlKCplcnJwKTsNCj4+IC0gICAgKmVycnAgPSBOVUxMOw0KPj4g
-KyAgICBhc3NlcnQoZXJycF9pbiAmJiAqZXJycF9pbik7DQo+PiArICAgIGVycm9yX2ZyZWUoKmVy
-cnBfaW4pOw0KPj4gKyAgICAqZXJycF9pbiA9IE5VTEw7DQo+PiAgIH0NCj4+ICAgDQo+PiAgIHZv
-aWQgZXJyb3JfcHJvcGFnYXRlKEVycm9yICoqZHN0X2VycnAsIEVycm9yICpsb2NhbF9lcnIpDQo+
-IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+FWIW -p 65536 doesn't trigger anything although I wouldn't trust -p too
+much:
+
+env LD_LIBRARY_PATH=3D/opt/arm/armpl-19.3.0_ThunderX2CN99_Ubuntu-16.04_arm-=
+hpc-compiler_19.3_aarch64-linux/lib/:/opt/arm/arm-hpc-compiler-19.3_Generic=
+-AArch64_Ubuntu-16.04_aarch64-linux/lib/ ~/lsrc/qemu.git/aarch64-linux-user=
+/qemu-aarch64 -p 65536 -d page ./hello-armpl
+host mmap_min_addr=3D0x8000
+Reserved 0x20000 bytes of guest address space
+Relocating guest address space from 0x0000000000400000 to 0x400000
+guest_base  0x0
+start            end              size             prot
+0000000000400000-0000000000403000 0000000000003000 r-x
+0000000000410000-0000000000413000 0000000000003000 rw-
+0000004000000000-0000004000001000 0000000000001000 ---
+0000004000001000-0000004000801000 0000000000800000 rw-
+0000004000810000-000000400082f000 000000000001f000 r-x
+000000400082f000-0000004000830000 0000000000001000 ---
+0000004000830000-000000400083f000 000000000000f000 rw-
+start_brk   0x0000000000000000
+end_code    0x00000000004009ec
+start_code  0x0000000000400000
+start_data  0x0000000000410d68
+end_data    0x0000000000411030
+start_stack 0x00000040007ff7b0
+brk         0x0000000000411038
+entry       0x00000040008111c0
+argv_start  0x00000040007ff7b8
+env_start   0x00000040007ff7c8
+auxv_start  0x00000040007ff9a0
+Hello World...
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1853826
+
+Title:
+  ELF loader fails to load shared object on ThunderX2 running RHEL7
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Simple test:
+  hello.c
+
+  include <stdio.h>
+
+  int main(int argc, char* argv[])
+  {
+    {
+      printf("Hello World... \n");
+    }
+    return 0;
+  }
+
+  when compiled with :
+  *Compiler =
+
+  https://developer.arm.com/tools-and-software/server-and-hpc/arm-architect=
+ure-tools/arm-allinea-studio/download
+  Arm-Compiler-for-HPC_19.3_RHEL_7_aarch64.tar	 =
+
+
+  *Running:
+  1) with -armpl
+       armclang -armpl hello.c
+       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
+  2) without flag
+      armclang hello.c
+       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
+
+  =E2=80=A2With Docker image:
+         CentOS Linux release 7.7.1908 (AltArch)
+
+  *Two different machines:
+         AArch64, Taishan. tsv110, Kunpeng 920, ARMv8.2-A
+         AArch64, Taishan 2280, Cortex-A72, ARMv8-A
+
+  *QEMU 4.0
+       qemu-aarch64 version 4.1.91 (v4.2.0-rc1)
+
+  =
+
+  Results:
+
+  =
+
+   ****Taishan 2280 Cortex-A72 =
+
+        Running =
+
+  1)with -armpl flag with and without the docker
+            WORKS-> Hello World...
+                 -> ldd a.out
+  ldd a.out =
+
+  linux-vdso.so.1 =3D>  (0x0000ffffbc6a2000) =
+
+  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
+_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
+0x0000ffffbc544000) =
+
+  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffbc493000) =
+
+  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
+64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
+so (0x0000ffffbc472000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
+3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffbbfd30=
+00) =
+
+  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
+rch64-linux/lib/libomp.so (0x0000ffffbbef5000) =
+
+  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffbbed4000) =
+
+  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffbbe9f000) =
+
+  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
+rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
+neric.so (0x0000ffffb3306000) =
+
+  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffb3180000) =
+
+  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
+ux/lib64/libstdc++.so.6 (0x0000ffffb2f30000) =
+
+  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
+x/lib64/libgcc_s.so.1 (0x0000ffffb2eff000) =
+
+  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffb2ede000) =
+
+  /lib/ld-linux-aarch64.so.1 (0x0000ffffbc674000)
+             =
+
+
+  Running =
+
+  2) without -armpl flag with and without the docker
+             WORKS -> Hello World...        =
+
+                   -> ldd a.out
+  ldd a.out
+   linux-vdso.so.1 =3D>  (0x0000ffffa6895000) =
+
+  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
+64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
+so (0x0000ffffa6846000) =
+
+  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa66c0000) =
+
+  /lib/ld-linux-aarch64.so.1 (0x0000ffffa6867000)
+      =
+
+
+  ****Taishan - tsv110  Kunpeng 920
+         For Running =
+
+
+  1)with -armpl flag with and without the docker
+             DOES NOT WORK -> with and without Docker
+                           -> It shows : qemu:handle_cpu_signal received si=
+gnal outside vCPU
+   context @ pc=3D0xffffaaa8844a
+                           -> ldd a.out =
+
+  ldd a.out =
+
+  linux-vdso.so.1 =3D>  (0x0000ffffad4b0000)
+  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
+_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
+0x0000ffffad370000) =
+
+  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffad2a0000) =
+
+  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
+64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
+so (0x0000ffffad270000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
+3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffacdd00=
+00) =
+
+  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
+rch64-linux/lib/libomp.so (0x0000ffffaccf0000) =
+
+  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffaccc0000) =
+
+  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffacc80000) =
+
+  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
+rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
+neric.so (0x0000ffffa40e0000) =
+
+  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa3f50000) =
+
+  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
+ux/lib64/libstdc++.so.6 (0x0000ffffa3d00000) =
+
+  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
+x/lib64/libgcc_s.so.1 (0x0000ffffa3cc0000)
+  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffa3c90000) =
+
+  /lib/ld-linux-aarch64.so.1 (0x0000ffffad4c0000)
+              =
+
+
+  Running =
+
+  2) without -armpl flag with and without the docker
+                 WORKS -> Hello World..
+                       -> ldd a.out
+  ldd a.out  =
+
+  linux-vdso.so.1 =3D>  (0x0000ffff880c0000) =
+
+  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
+64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
+so (0x0000ffff88080000) =
+
+  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffff87ee0000)
+  /lib/ld-linux-aarch64.so.1 (0x0000ffff880d0000)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1853826/+subscriptions
 
