@@ -2,84 +2,138 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D4CC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 12:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C93C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 12:32:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2DD32158A
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 12:26:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QtlmlFG9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2DD32158A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6E98D2176D
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 12:32:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E98D2176D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaIsQ-0005Bs-UF
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 07:26:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36343)
+	id 1iaIyX-0008EM-Ls
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 07:32:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38177)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iaIo6-0003Lk-Dr
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:22:04 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iaIui-0006kW-59
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:28:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iaIo1-0007kG-PQ
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:21:59 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38675
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iaIo1-0007er-9L
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:21:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574943716;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=08Nyj49dE5IDJWQrTCQ66QZcgZEC4k4vNpQuBS0d/I0=;
- b=QtlmlFG9pQgRWs+af6Oyuo/F4Jy+MNRj/GWsmKsqQYfXmeCypHB+aVpZQc8RH/aV6zYbJn
- zOZ/7a8y6yuyDsqW4RNkHlHPpk/2DicAeEr/VMe9LhAuEcYFM2Q3yEt2Ns4cmbWHVydVaU
- SgC7DdgIABax7UPfx/mgOenNweE3ox8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-x1qo6n9QNsebkJVM4M17ug-1; Thu, 28 Nov 2019 07:21:54 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 877B5DB20;
- Thu, 28 Nov 2019 12:21:50 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F0B1F5D9E1;
- Thu, 28 Nov 2019 12:21:21 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7B1B41138606; Thu, 28 Nov 2019 13:21:20 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [RFC v5 000/126] error: auto propagated local_err
-References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <87tv6opehz.fsf@dusky.pond.sub.org>
- <b000e0b0-b75c-c74e-244b-0b1bf270b6a6@virtuozzo.com>
-Date: Thu, 28 Nov 2019 13:21:20 +0100
-In-Reply-To: <b000e0b0-b75c-c74e-244b-0b1bf270b6a6@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Thu, 28 Nov 2019 09:20:01 +0000")
-Message-ID: <87mucgmbsv.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <frankja@linux.ibm.com>) id 1iaIud-0003sh-Bo
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:28:50 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1040
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iaIub-0003md-5y
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:28:47 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xASCQRwJ171318
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 07:28:36 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2whh5fk9sj-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 07:28:36 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Thu, 28 Nov 2019 12:28:34 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 28 Nov 2019 12:28:32 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xASCSUda11076028
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 28 Nov 2019 12:28:31 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E256D5204E;
+ Thu, 28 Nov 2019 12:28:30 +0000 (GMT)
+Received: from dyn-9-152-224-146.boeblingen.de.ibm.com (unknown
+ [9.152.224.146])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A16E952050;
+ Thu, 28 Nov 2019 12:28:30 +0000 (GMT)
+Subject: Re: [PATCH v1 0/1] s390x: protvirt: SCLP interpretation
+To: Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+References: <1574935984-16910-1-git-send-email-pmorel@linux.ibm.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Thu, 28 Nov 2019 13:28:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: x1qo6n9QNsebkJVM4M17ug-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <1574935984-16910-1-git-send-email-pmorel@linux.ibm.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="F6dAnvZMGDqvCDVaZzvOKbQmKfsP6xGGi"
+X-TM-AS-GCONF: 00
+x-cbid: 19112812-4275-0000-0000-000003877DC1
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112812-4276-0000-0000-0000389B0F89
+Message-Id: <7f2202c7-b9ed-d1c8-7b5c-e6b8871aa931@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-28_01:2019-11-28,2019-11-28 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999
+ priorityscore=1501 bulkscore=0 impostorscore=0 lowpriorityscore=0
+ adultscore=0 suspectscore=3 phishscore=0 malwarescore=0 mlxscore=0
+ clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911280109
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,237 +145,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <codyprime@gmail.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Alberto Garcia <berto@igalia.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Halil Pasic <pasic@linux.ibm.com>,
- =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Anthony Green <green@moxielogic.com>, Laurent Vivier <lvivier@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Andrew Jeffery <andrew@aj.id.au>, Chris Wulff <crwulff@gmail.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Walle <michael@walle.cc>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>,
- Peter Maydell <peter.maydell@linaro.org>,
- "sheepdog@lists.wpkg.org" <sheepdog@lists.wpkg.org>,
- Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Palmer Dabbelt <palmer@sifive.com>, Eric Farman <farman@linux.ibm.com>,
- Max Filippov <jcmvbkbc@gmail.com>, Hannes Reinecke <hare@suse.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, Liu Yuan <namei.unix@gmail.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Amit Shah <amit@kernel.org>, Stefan Weil <sw@weilnetz.de>,
- Greg Kurz <groug@kaod.org>, Yuval Shaia <yuval.shaia@oracle.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- Stafford Horne <shorne@gmail.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <pburton@wavecomp.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Paul Durrant <paul@xen.org>,
- Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, Ari Sundholm <ari@tuxera.com>,
- Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Joel Stanley <joel@jms.id.au>,
- Jason Dillaman <dillaman@redhat.com>, Antony Pavlov <antonynpavlov@gmail.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- "integration@gluster.org" <integration@gluster.org>,
- Laszlo Ersek <lersek@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, Max Reitz <mreitz@redhat.com>,
- Denis Lunev <den@virtuozzo.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>, Marek Vasut <marex@denx.de>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
- David Gibson <david@gibson.dropbear.id.au>,
- Tony Krowiak <akrowiak@linux.ibm.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Wen Congyang <wencongyang2@huawei.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--F6dAnvZMGDqvCDVaZzvOKbQmKfsP6xGGi
+Content-Type: multipart/mixed; boundary="YDNY3ub896yCttg0pQO4PYAlXBK0XejSK"
 
-> 28.11.2019 11:54, Markus Armbruster wrote:
->> Please accept my sincere apologies for taking so long to reply.  A few
->> thoughts before I dig deeper.
->>=20
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>=20
->>> Hi all!
->>>
->>> At the request of Markus: full version of errp propagation. Let's look
->>> at it. Cover as much as possible, except inserting macro invocation
->>> where it's not necessary.
->>>
->>> It's huge, and so it's an RFC.
->>=20
->> It's a monster.  Best to get it into full view before we commit to
->> fighting it.
->>=20
->>> In v5 I've added a lot more preparation cleanups:
->>> 01-23 are preparation cleanups
->>>    01: not changed, keep Eric's r-b
->>>    02: improve commit msg [Markus], keep Eric's r-b
->>>    03: changed, only error API here, drop r-b
->>> 24 is core macro
->>>    - improve cover letter, wording and macro code style
->>>    - keep Eric's r-b
->>> 25-26: automation scripts
->>>     - commit-per-subsystem changed a lot. it's a draft, don't bother to=
-o
->>>       much with it
->>>     - coccinelle: add support of error_propagate_prepend
->>>
->>> 27-126: generated patches
->>=20
->> Splitting up the monster can make fighting it easier.
->>=20
->> Your description suggests three high-level parts:
->>=20
->> Part 1: Preparation (makes sense by itself)
->
-> I already resent part 1 all patches (handling review comments) in separat=
-e as v6.
-> If it is convenient, I can resend them in one series as v7.
+--YDNY3ub896yCttg0pQO4PYAlXBK0XejSK
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Recommend to await review.  The more we can merge without another
-respin, the better.
+On 11/28/19 11:13 AM, Pierre Morel wrote:
+> A new proposition:
+> I think it would be wise to fork directly from handle_instruction
+> instead to accept per default all instructions with with secure
+> instruction interception code.
+> Just in case future firmware with older QEMU.
+>=20
+> How ever I let three dors open.
+>=20
+> 1) This patch accepts the all B2 instructions, mostly I/O.
+> Some of the instructions will not work correctly for PV until patched.
+> This should be fixed, and will be, in a separate patch.
+>=20
+> 2) The same is true for DIAG instructions.
+>=20
+> 3) Secure notifications are separated from secure instructions and
+> normal instructions interception because this case is completely new.
+> For B2 instructions we do not have to do anything this just informative=
+=2E
+> However, one information is of interrest, a notification that
+> SIGP(STOP) is sent to stop the CPUs and terminate QEMU.
 
->> Part 2: Error interface update (with rules what code should do now)
->
-> Note, that patch 21 is actually from part2, not part1.
-> So Part 2 is 21, 24, 25.
+Pierre, I told you this morning that I don't want this and that you
+should leave this untouched until I can explain my thoughts behind the
+initial patch in a f2f.
+Thomas' review of your change only confirmed my concerns about this patch=
+=2E
 
-Thanks for the heads-up.
+This is the wrong patch at the wrong time, which creates noise and work
+for other people. Please stop and work on something else.
 
-> So I wait for your comments and resend (if needed) as separate small seri=
-es.
->
-> And 26 is auto-patch-splitter, but we don't need it now, if we are going
-> to start from several big subsystems.
->
->> Part 3: Make the code obey the new rules everywhere
->>=20
->> I hope we can get part 1 out of the way quickly.  Diffstat:
->>=20
->>   backends/cryptodev.c       |  11 +---
->>   block/nbd.c                |  10 +--
->>   block/snapshot.c           |   4 +-
->>   dump/dump-hmp-cmds.c       |   4 +-
->>   hw/9pfs/9p-local.c         |   4 +-
->>   hw/9pfs/9p-proxy.c         |   5 +-
->>   hw/core/loader-fit.c       |   5 +-
->>   hw/core/machine-hmp-cmds.c |   6 +-
->>   hw/core/qdev.c             |  28 ++++----
->>   hw/i386/amd_iommu.c        |  14 ++--
->>   hw/ppc/spapr.c             |   2 +-
->>   hw/s390x/event-facility.c  |   2 +-
->>   hw/s390x/s390-stattrib.c   |   3 +-
->>   hw/sd/sdhci.c              |   2 +-
->>   hw/tpm/tpm_emulator.c      |   8 +--
->>   hw/usb/dev-network.c       |   2 +-
->>   hw/vfio/ap.c               |  16 +----
->>   include/block/snapshot.h   |   2 +-
->>   include/monitor/hmp.h      |   2 +-
->>   include/qapi/error.h       |  69 ++++++++++++++++++--
->>   include/qom/object.h       |   4 +-
->>   monitor/hmp-cmds.c         | 155 ++++++++++++++++++++++---------------=
---------
->>   monitor/qmp-cmds.c         |   2 +-
->>   net/net.c                  |  17 ++---
->>   qdev-monitor.c             |  28 ++++----
->>   qga/commands-posix.c       |   2 +-
->>   qga/commands-win32.c       |   2 +-
->>   qga/commands.c             |  12 ++--
->>   qom/qom-hmp-cmds.c         |   4 +-
->>   target/ppc/kvm.c           |   6 +-
->>   target/ppc/kvm_ppc.h       |   4 +-
->>   ui/vnc.c                   |  20 ++----
->>   ui/vnc.h                   |   2 +-
->>   util/error.c               |  30 ++++-----
->>   34 files changed, 261 insertions(+), 226 deletions(-)
->>=20
->> At first glance, I can see bug fixes, non-mechanical cleanups, and
->> mechanical cleanups.
->>=20
->> Within each of these three groups, we have related sub-groups.  For
->> instance, several patches clean up funny names for the common Error **
->> parameters.  Several more rename "uncommon" Error ** parameters, to
->> signal their uncommon role.  I doubt splitting up these subgroups of
->> related mechanical changes along subsystem lines is worthwhile.
->>=20
->> Part 2 needs careful interface review.  Having part 3 ready helps there,
->> because we can see rather than guess how the interface changes play out.
->> We really want to get this part right from the start, because if we
->> don't, we get to do part 3 again.
->>=20
->> Part 3 is what makes this a monster.  I understand it's mechanical.  We
->> can merge it incrementally, but we do want to merge it all, and sooner
->> rather than later, to avoid a mix of old and new error handling code.
->> Such mixes inevitably confuse developers, and lead to new instances of
->> the old patterns creeping in.
->>=20
->> I do have doubts about your automated split.
->>=20
->> I acknowledge maintainers of active subsystems may want to merge this on
->> their own terms, to minimize disruption.  Splitting off sub-monsters for
->> them makes sense.  Splitting off the long tail of less busy subsystems
->> not so much; it'll only drag out the merging.  Your list below shows 100
->> parts, and chasing their maintainers is not going to be a fun
->> experience.
->>=20
->> Moreover, using MAINTAINERS to guide an automatic split is a cute idea,
->> but it falls apart when MAINTAINERS attributes the same file to several
->> subsystems, which is fairly common.  A sane split requires human touch.
->>=20
->> Instead, I'd start with big subsystems with maintainers known to be
->> sympathetic to this effort.  Split off their sub-monsters, get them
->> merged.  Iterate until the remainder can be merged in one final push.
->
-> Do you mean to send them as separate per-subsystem series, or all in one,
-> but limited to some subsystems?
 
-Let's make it as easy as we can both for the subsystem maintainers and
-for the people trying to track all of it.
 
-When a subsystem takes multiple patches, I'd consider an independent
-series to save the maintainer the trouble of extracting multiple patches
-from a larger series.
+>=20
+>=20
+>=20
+> Pierre Morel (1):
+>   s390x: protvirt: SCLP interpretation
+>=20
+>  hw/s390x/sclp.c         | 18 +++++++++++++
+>  include/hw/s390x/sclp.h |  2 ++
+>  target/s390x/kvm.c      | 56 ++++++++++++++++++++++++++++++++++++++++-=
 
-For the ones that take just one patch, I'd consider an omnibus series.
-Extracting a single patch is no harder than applying a series, but
-tracking one omnibus is easier than a dozen lone patches.
+>  3 files changed, 75 insertions(+), 1 deletion(-)
+>=20
 
-There's no clear line between "busy" and "less busy" subsystem.  Just
-start with some obviously busy ones, then iterate.  Each iteration
-should be large enough to be worth the overhead, yet small enough not to
-scare off reviewers :)
 
-Trust your judgement!
 
-[...]
+--YDNY3ub896yCttg0pQO4PYAlXBK0XejSK--
+
+--F6dAnvZMGDqvCDVaZzvOKbQmKfsP6xGGi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3fvW4ACgkQ41TmuOI4
+ufgiyw//RWcaOE1xOdwCbIAB7ue7jKwWV25SXHhWwuskz8Xh5w6tLC80RKXzO0mW
+vumdlLP+GB1d2/lciTLFq/TK91yPMFYIShZUk7fwT+ommZ+Dnn2HG25hkcWvEx3d
+xijeSIv/ZgeSp6ps2L2Z8IpsA1x/mhnTTrnIufWZwBNBDCV07TmOQmFQjCt8DjqG
+RkqWlb/uGjBJpbEMv6yjBLRyfF/WkNJ8JI4IPWklI1WixMLEQYEngN636G4OliXx
+oZozI72XLF/h+jX3hZj96kBmNs/p8V6Jmn1ErD4yhqAYqB/K8yHubuPL//ISOx0e
+g+ZyF1TDavte4gD0fuyv2epsYqSIb8N77Ipd2tinsmt6duGYbaeJzZxIYRZI0IXd
+cNip7wyoNeiImbsXHmc6z3SYwKOZ5qDgseSD8YkJ2c5A5b9kM1nMWPVDfsqJaTbs
+NXkpfI1VxApmQYJoNJXbHUyrhmxKYY7CA6Ykn0hUVWwWqAloZ/E+5pjzd6e/Pv7M
+CXSuNINvWC9Y5nYqgUll3y3dHtot75LzDDSqkkuKlGmeAmJ6VXheIeSbHfI2r8gl
+LFf5OQBgjQ3/MaywPGF+gFlKgSZdF1+QDCOrGL5sc+apsngdobrF1ok6zirPU5fB
+ysGsGd8/rvsr8ddlgJFoz/71aa7HFwkrecVVLzuWhRUhEspTjjs=
+=6N3f
+-----END PGP SIGNATURE-----
+
+--F6dAnvZMGDqvCDVaZzvOKbQmKfsP6xGGi--
 
 
