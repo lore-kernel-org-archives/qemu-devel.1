@@ -2,111 +2,89 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD0D0C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 21:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD398C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 21:28:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DC7E21774
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 21:13:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DC7E21774
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id 916A421781
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 21:28:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aq5bJ/2t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 916A421781
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaR6F-000643-UM
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 16:13:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56652)
+	id 1iaRKm-0004PE-EJ
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 16:28:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49415)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sw@weilnetz.de>) id 1iaQzL-00049h-7r
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 16:06:13 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iaPpO-0005h1-8d
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 14:51:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sw@weilnetz.de>) id 1iaQzG-0000q9-UC
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 16:06:08 -0500
-Received: from mail.weilnetz.de ([37.120.169.71]:39370
- helo=v2201612906741603.powersrv.de)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1iaQzG-0000hz-II
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 16:06:06 -0500
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 7CD40DB9927;
- Thu, 28 Nov 2019 22:06:02 +0100 (CET)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id h0ok8RbIKEhL; Thu, 28 Nov 2019 22:06:01 +0100 (CET)
-Received: from edv-macbook-pro.fritz.box (p57B42DA4.dip0.t-ipconnect.de
- [87.180.45.164])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 6F1F6DB9926;
- Thu, 28 Nov 2019 22:06:01 +0100 (CET)
-Subject: Re: [PATCH v2 2/2] travis.yml: Run tcg tests with tci
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-References: <20191128153525.2646-1-thuth@redhat.com>
- <20191128153525.2646-3-thuth@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <672f7c1a-71d6-5dfa-101a-ed3070be0b05@weilnetz.de>
-Date: Thu, 28 Nov 2019 22:06:01 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.1
+ (envelope-from <alex.bennee@linaro.org>) id 1iaPkT-0006Wc-2V
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 14:46:47 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38497)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iaPjw-0004uS-R1
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 14:46:44 -0500
+Received: by mail-wm1-x343.google.com with SMTP id z19so12823187wmk.3
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 11:46:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=cHVkaylNoydLTY4nbj39jRtqYAY0ZylLt+xXhgtOIDo=;
+ b=aq5bJ/2tZo0aALMDdwz2F9WXwqSRrwAxd+JPToJf42+vwWV/v7XiEDIuau/L+SpIIx
+ R8N2zkgVL+IRJtg2xe96v6YPXIVIoenjIJL/MGDKBBr7k0kRRSSm9kk+5O/HnQL9Gsfm
+ ICcnJhEiWbbVCvRnsuxUf+Ga3c/F1NH/EXovxm5YmM5R3Cd+Zvus2+b5dTmmJJpJI5HR
+ EZXKy5v6bZnPQTv6uL1eJ0ZQnWMrk5P/PWa7LVW6Iil+DoSEztDPqjQFmQPJwtAEvrAN
+ Tga8AruCWC0r/RxZ5SHeNHrUFM2c/JPciRNaest/7P4GBnOJ8hTaD+S/+2eAQy3+tBtg
+ B/BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=cHVkaylNoydLTY4nbj39jRtqYAY0ZylLt+xXhgtOIDo=;
+ b=qgXXkRegy4V+oU/n7sgB0fkft+qgQnJhh1WbWK+1RMYUjWN3fplHl+/Cy/mKsYJwHD
+ w4jqml+Q7oVL/ccnR07WDkZ3PINZsCnwp1CiqYGjVFGYopv4Pax/zD4aYeGFpgHy5luG
+ Wtd4/vLuuZnObdkyErMMPpD+T0IOUxqhYKJf8jMXeJtyfYceO09/ZRercWjJccSnq0NH
+ sQWy2TQqKRwVVNFsrIAnYG+eEVP51rH4XozX0sbbI2d922QX88l3E5fDTF1nkM/eL9bZ
+ FRQooW7u/PT3mpCACg6NiB461fAHqqM+HBylBhT5dooaupIpLo2mqXVkV1rtoFnGuGF8
+ klvw==
+X-Gm-Message-State: APjAAAX05fGGi5o1DMM3mVSigSWeK22sXcDF11YX1bBAvFzQfJtuvIgG
+ 1Xb8HYUBvcH+6+BcUXYrHx1n8A==
+X-Google-Smtp-Source: APXvYqxgva5Fbsr15ZBZx/gLGLlrh0LNutneNJiwPoII/GI6nQzPk5fBOOo5bTq3WBNimIDU1oEBww==
+X-Received: by 2002:a7b:c055:: with SMTP id u21mr11456859wmc.55.1574970365731; 
+ Thu, 28 Nov 2019 11:46:05 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p9sm24335043wrs.55.2019.11.28.11.46.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 28 Nov 2019 11:46:04 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8D84A1FF8C;
+ Thu, 28 Nov 2019 19:46:03 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 1/5] linux-user: convert target_mprotect debug to tracepoint
+Date: Thu, 28 Nov 2019 19:45:59 +0000
+Message-Id: <20191128194603.24818-2-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191128194603.24818-1-alex.bennee@linaro.org>
+References: <20191128194603.24818-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191128153525.2646-3-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 37.120.169.71
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,69 +96,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 28.11.19 um 16:35 schrieb Thomas Huth:
+It is a pain to re-compile when you need to debug and tracepoints are
+a fairly low impact way to instrument QEMU.
 
-> So far we only have compile coverage for tci. But since commit
-> 2f160e0f9797c7522bfd0d09218d0c9340a5137c ("tci: Add implementation
-> for INDEX_op_ld16u_i64") has been included now, we can also run the
-> "tcg" and "qtest" tests with tci, so let's enable them in Travis now.
-> Since we don't gain much additional test coverage by compiling all
-> targets, and TCI is broken e.g. with the Sparc targets, we also limit
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ linux-user/mmap.c       | 17 +++++++++--------
+ linux-user/trace-events |  3 +++
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
-
-As far as I know it is broken with Sparc hosts (not Sparc targets).
-
-I tested without limiting the target list on an x86_64 host, and the
-tests passed.
-
-
-> the target list to a reasonable subset now (which should still get
-> us test coverage by tests/boot-serial-test for example).
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  .travis.yml | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/.travis.yml b/.travis.yml
-> index c09b6a0014..de7559e777 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -215,10 +215,11 @@ matrix:
->          - TEST_CMD=3D""
-> =20
-> =20
-> -    # We manually include builds which we disable "make check" for
-> +    # Check the TCG interpreter (TCI)
->      - env:
-> -        - CONFIG=3D"--enable-debug --enable-tcg-interpreter"
-> -        - TEST_CMD=3D""
-> +        - CONFIG=3D"--enable-debug --enable-tcg-interpreter --disable-=
-containers
-
-
-You could also --disable-kvm. It should not be needed, and disabling it
-might need less build resources.
-
-
-> +            --target-list=3Dalpha-softmmu,arm-softmmu,hppa-softmmu,m68=
-k-softmmu,microblaze-softmmu,moxie-softmmu,ppc-softmmu,s390x-softmmu,x86_=
-64-softmmu"
-> +        - TEST_CMD=3D"make check-qtest check-tcg V=3D1"
-> =20
-> =20
->      # We don't need to exercise every backend with every front-end
-
-
-Thank you for adding these tests.
-
-Tested-by: Stefan Weil <sw@weilnetz.de>
-
-
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index 46a6e3a761a..66868762519 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -17,7 +17,7 @@
+  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+  */
+ #include "qemu/osdep.h"
+-
++#include "trace.h"
+ #include "qemu.h"
+ 
+ //#define DEBUG_MMAP
+@@ -66,13 +66,14 @@ int target_mprotect(abi_ulong start, abi_ulong len, int prot)
+     abi_ulong end, host_start, host_end, addr;
+     int prot1, ret;
+ 
+-#ifdef DEBUG_MMAP
+-    printf("mprotect: start=0x" TARGET_ABI_FMT_lx
+-           "len=0x" TARGET_ABI_FMT_lx " prot=%c%c%c\n", start, len,
+-           prot & PROT_READ ? 'r' : '-',
+-           prot & PROT_WRITE ? 'w' : '-',
+-           prot & PROT_EXEC ? 'x' : '-');
+-#endif
++    if (TRACE_TARGET_MPROTECT_ENABLED) {
++        char prot_str[4];
++        prot_str[0] = prot & PROT_READ ? 'r' : '-';
++        prot_str[1] = prot & PROT_WRITE ? 'w' : '-';
++        prot_str[2] = prot & PROT_EXEC ? 'x' : '-';
++        prot_str[3] = 0;
++        trace_target_mprotect(start, len, prot_str);
++    }
+ 
+     if ((start & ~TARGET_PAGE_MASK) != 0)
+         return -TARGET_EINVAL;
+diff --git a/linux-user/trace-events b/linux-user/trace-events
+index 6df234bbb67..41d72e61abb 100644
+--- a/linux-user/trace-events
++++ b/linux-user/trace-events
+@@ -11,3 +11,6 @@ user_handle_signal(void *env, int target_sig) "env=%p signal %d"
+ user_host_signal(void *env, int host_sig, int target_sig) "env=%p signal %d (target %d("
+ user_queue_signal(void *env, int target_sig) "env=%p signal %d"
+ user_s390x_restore_sigregs(void *env, uint64_t sc_psw_addr, uint64_t env_psw_addr) "env=%p frame psw.addr 0x%"PRIx64 " current psw.addr 0x%"PRIx64
++
++# mmap.c
++target_mprotect(uint64_t start, uint64_t len, char *flags) "start=0x%"PRIx64 " len=0x%"PRIx64 " prot=%s"
+-- 
+2.20.1
 
 
