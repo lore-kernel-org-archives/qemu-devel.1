@@ -2,87 +2,91 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55215C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 01:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93735C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 01:52:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28DA2215A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 01:45:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28DA2215A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5C22221569
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 01:52:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HkmagZ0t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C22221569
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia8sO-00049f-9R
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 20:45:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52504)
+	id 1ia8ya-0007Qi-4B
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 20:52:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51878)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1ia8qH-00024y-0Z
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:43:38 -0500
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ia8x4-0005zl-2R
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:50:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1ia8aG-0003vl-Os
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:27:05 -0500
-Received: from mga14.intel.com ([192.55.52.115]:63169)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1ia8aG-0003ko-FJ
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:27:04 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 27 Nov 2019 17:26:57 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,251,1571727600"; d="scan'208";a="211859490"
-Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
- by orsmga003.jf.intel.com with ESMTP; 27 Nov 2019 17:26:57 -0800
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 27 Nov 2019 17:26:53 -0800
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 27 Nov 2019 17:26:52 -0800
-Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
- via Frontend Transport; Wed, 27 Nov 2019 17:26:52 -0800
-Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.108]) by
- SHSMSX103.ccr.corp.intel.com ([169.254.4.60]) with mapi id 14.03.0439.000;
- Thu, 28 Nov 2019 09:26:50 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Daniel Cho
- <danielcho@qnap.com>, "lukasstraub2@web.de" <lukasstraub2@web.de>
-Subject: RE: Network connection with COLO VM
-Thread-Topic: Network connection with COLO VM
-Thread-Index: AQHVpNpTPcqw102+1EeSLCuWtdaGTKeeUWSAgACH4yA=
-Date: Thu, 28 Nov 2019 01:26:50 +0000
-Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D780631A02A@shsmsx102.ccr.corp.intel.com>
-References: <CA+XQNE4eP8tfHB5eV8813bqaE+L5yooBDFCdbMWJPysvev4UKg@mail.gmail.com>
- <20191127105121.GA3017@work-vm>
-In-Reply-To: <20191127105121.GA3017@work-vm>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYzI3MmY1NzQtNmJjNy00OGI4LWJhMTUtNTJiY2M1NmZjOWM1IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoieWhqVFlMcHMzNWVQVTVFUThXNWZINHhXaWhJZVZGb2xPTyszUlAzRUd4MEh4ZFF3T2srYVdwSG4yeEtZcFwvSWcifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ia8x2-00047m-Td
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:50:37 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55370)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1ia8x2-00044l-KD
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:50:36 -0500
+Received: by mail-wm1-x341.google.com with SMTP id a131so4939939wme.5
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 17:50:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=xrRSWLQNVTbtusHhRaP5D+CbJqxAFGT8ZkvcmL+Ufpk=;
+ b=HkmagZ0t+W4beS0j/E/+Ss0p1P6BCyuKahwNMIF2i8FZYZyIaOWN9AvyZGYS5x1Puz
+ vOL6K7rAZa5sY+EwNygtBG2Zetlr6XmgqLg9fV40PM6C8FmOBBsstIMWIHDcdCz0yq0T
+ g4kqCUbP75Znx9gc507WPmuu8tjnmcY1LUWmVQUGNK5KXwuhI8vdL6V10dFIUwq+nSno
+ pyK+aDT72M8fmESKB7f6nduYuDcmp/k/utv6u35S9xxY/Q23ml6seQhIWCfhALBXSltX
+ GOnNJmZdOh1/NFyCn8vG1IE7SL+V1L5o1iux0rDRWCtdGd/utY7SsD+xLHi07v3QuivF
+ LhwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=xrRSWLQNVTbtusHhRaP5D+CbJqxAFGT8ZkvcmL+Ufpk=;
+ b=D+I3Itnrhdbn7uvq9c4LSxEa8PTapcrxDua0A4MPPUMQ9dAjD8wF/shwRLlTcXQMBz
+ zJ0SErXIJ9LoVSqmL/dkTTr09AZ254GAE5i3iMFilIbIEf9XRj4XFR2TBtJxvbMBBJhI
+ jB+phqtow4KMf/NDyoNQ2zOXUW0QHCz9eG2SxG/p9vPxgETHSW2Ag943sOBNe1v7h86r
+ G47byyNUkeOEN52hjbF3nxiCDkKc54ILDc4nikLYG5ZFiOq+2GOkcN1Yz19GzxKgmo4/
+ Pg7X2/wJHbcVvjhx7dYA5QF18K5I5L1ccRZrF/HTgjEdjszZl6jIMePJIJn07K96IqiX
+ 5ONQ==
+X-Gm-Message-State: APjAAAUdC7vSqHBkGPEr5BSHD8QN8uyAad9qAoLIzuKctUtMyL3KkBgK
+ joNGhbUvlR6a3bjxfsroMQDAMg0n
+X-Google-Smtp-Source: APXvYqwL4VLoeJKvhiI6zGa25OKaF0uHG+2nKuwlhIAZSptFcOKOjyb/THc3htxoXSScWs7v0DhdlA==
+X-Received: by 2002:a1c:b1c3:: with SMTP id a186mr7184688wmf.10.1574905834936; 
+ Wed, 27 Nov 2019 17:50:34 -0800 (PST)
+Received: from x1w.redhat.com (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id k16sm8738061wru.0.2019.11.27.17.50.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 27 Nov 2019 17:50:34 -0800 (PST)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org,
+	Michael Rolnik <mrolnik@gmail.com>
+Subject: [NOTFORMERGE PATCH 01/10] hw/avr: Kludge to fix build failure
+Date: Thu, 28 Nov 2019 02:50:21 +0100
+Message-Id: <20191128015030.27543-2-f4bug@amsat.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191128015030.27543-1-f4bug@amsat.org>
+References: <20191128015030.27543-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.115
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,66 +98,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Sarah Harris <S.E.Harris@kent.ac.uk>, Igor Mammedov <imammedo@redhat.com>,
+ Thomas Huth <huth@tuxfamily.org>, Joaquin de Andres <me@xcancerberox.com.ar>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Incomplete rename between Michael v36/v37
 
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ include/hw/char/avr_usart.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> -----Original Message-----
-> From: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Sent: Wednesday, November 27, 2019 6:51 PM
-> To: Daniel Cho <danielcho@qnap.com>; Zhang, Chen
-> <chen.zhang@intel.com>; lukasstraub2@web.de
-> Cc: qemu-devel@nongnu.org
-> Subject: Re: Network connection with COLO VM
->=20
-> * Daniel Cho (danielcho@qnap.com) wrote:
-> > Hello everyone,
-> >
-> > Could we ssh to colo VM (means PVM & SVM are starting)?
-> >
->=20
-> Lets cc in Zhang Chen and Lukas Straub.
-
-Thanks Dave.
-
->=20
-> > SSH will connect to colo VM for a while, but it will disconnect with
-> > error
-> > *client_loop: send disconnect: Broken pipe*
-> >
-> > It seems to colo VM could not keep network session.
-> >
-> > Does it be a known issue?
->=20
-> That sounds like the COLO proxy is getting upset; it's supposed to compar=
-e
-> packets sent by the primary and secondary and only send one to the outsid=
-e
-> - you shouldn't be talking directly to the guest, but always via the prox=
-y.  See
-> docs/colo-proxy.txt
->=20
-
-Hi Daniel,
-
-I have try ssh to COLO guest with 8 hours, not occurred this issue.
-Please check your network/qemu configuration.
-But I found another problem maybe related this issue, if no network communi=
-cation for a period of time(maybe 10min), the first message send to guest h=
-ave a chance with delay(maybe 1-5 sec), I will try to fix it when I have ti=
-me.
-
-Thanks
-Zhang Chen
-
-> Dave
->=20
-> > Best Regard,
-> > Daniel Cho
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/include/hw/char/avr_usart.h b/include/hw/char/avr_usart.h
+index 8e9ee88bbd..87f3f54cf8 100644
+--- a/include/hw/char/avr_usart.h
++++ b/include/hw/char/avr_usart.h
+@@ -94,4 +94,6 @@ typedef struct {
+     qemu_irq dre_irq;
+ } AVRUsartState;
+ 
++typedef AVRUsartState AvrUsartState;
++
+ #endif /* HW_AVR_USART_H */
+-- 
+2.21.0
 
 
