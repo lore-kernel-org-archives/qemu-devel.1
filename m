@@ -2,128 +2,55 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E751C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 08:40:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C6EC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 08:47:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 588CF216F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 08:40:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eWKNcNRL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 588CF216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D64482158A
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 08:47:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D64482158A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaFLg-0001MW-Dj
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 03:40:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50369)
+	id 1iaFSV-0004TZ-5b
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 03:47:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36264)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iaFKO-0000Uk-KR
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:39:09 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1iaFR0-0003pg-DF
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:45:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iaFKM-0004ty-GV
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:39:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51589
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1iaFQz-0004Is-2P
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:45:58 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2269 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iaFKL-0004rs-3A
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:39:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574930344;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=Xijwoi/Iw4XE4PoXxuepCi0khvHJDUAXYixE8OGRSjk=;
- b=eWKNcNRLFW3tWllQ14ROXRo/aJdmpzLG50IXn/k821ylCqm90hIYU2WGc2749KMHxnrZi6
- /pR+6lIXLqUu6TvskfRkeGRM9xbpfI20xdDxw9WriLqA1lX/w08M6FUvj6F40Vgkk3zN4B
- hXiBYslp0hADt7Vvi57J13GB6byTT4o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-Oqxcoxv3PsuHyVv3DBH4uw-1; Thu, 28 Nov 2019 03:38:39 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81BBD801E55;
- Thu, 28 Nov 2019 08:38:37 +0000 (UTC)
-Received: from [10.36.117.212] (ovpn-117-212.ams2.redhat.com [10.36.117.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B66E85D6D2;
- Thu, 28 Nov 2019 08:38:35 +0000 (UTC)
-Subject: Re: [PATCH v4 4/6] s390x: Move clear reset
-To: Janosch Frank <frankja@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191127175046.4911-1-frankja@linux.ibm.com>
- <20191127175046.4911-5-frankja@linux.ibm.com>
- <09cf076b-f554-8694-0331-077b452ca3be@redhat.com>
- <caa0bd0d-b034-157e-aa46-e11c1778c2f9@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <0cf5e42f-ae2b-6cd0-0dc5-19f59ef42b96@redhat.com>
-Date: Thu, 28 Nov 2019 09:38:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1iaFM5-0008P6-Ho; Thu, 28 Nov 2019 03:40:53 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 685EEA3C9EBAACD49D55;
+ Thu, 28 Nov 2019 16:40:43 +0800 (CST)
+Received: from HGHY2P002143101.china.huawei.com (10.184.39.213) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 28 Nov 2019 16:40:34 +0800
+From: <pannengyuan@huawei.com>
+To: <eblake@redhat.com>, <kwolf@redhat.com>, <mreitz@redhat.com>
+Subject: [PATCH] block/nbd: fix memory leak in nbd_open()
+Date: Thu, 28 Nov 2019 16:40:10 +0800
+Message-ID: <1574930410-43468-1-git-send-email-pannengyuan@huawei.com>
+X-Mailer: git-send-email 2.7.2.windows.1
 MIME-Version: 1.0
-In-Reply-To: <caa0bd0d-b034-157e-aa46-e11c1778c2f9@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Oqxcoxv3PsuHyVv3DBH4uw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,39 +62,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, cohuck@redhat.com,
- mihajlov@linux.ibm.com, pmorel@linux.ibm.com
+Cc: liyiting@huawei.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ PanNengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org,
+ kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28.11.19 09:35, Janosch Frank wrote:
-> On 11/28/19 8:09 AM, Thomas Huth wrote:
->> On 27/11/2019 18.50, Janosch Frank wrote:
->>> Let's also move the clear reset function into the reset handler.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>   target/s390x/cpu-qom.h |  1 +
->>>   target/s390x/cpu.c     | 58 +++++++++++++-----------------------------
->>>   2 files changed, 18 insertions(+), 41 deletions(-)
->>
->> I really wonder why we had so much duplicated code here before and 
->> nobody dared to clean it up in all those years... Thanks for doing that now!
-> 
-> Looking back at my old patch series, I most often start with a cleanup
-> before I change or add anything...
-> 
-> I'd guess that QEMU hasn't seen some love for a longer time.
+From: PanNengyuan <pannengyuan@huawei.com>
 
-Oh, I give QEMU some love quite often ... I just can't love every part
-of it equally well ;)
+In currently implementation there will be a memory leak when
+nbd_client_connect() returns error status. Here is an easy way to reproduce:
 
-I'd like to second the "thanks" for doing this cleanup :)
+1. run qemu-iotests as follow and check the result with asan:
+    ./check -raw 143
 
+Following is the asan output backtrack:
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x7f629688a560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
+    #1 0x7f6295e7e015 in g_malloc0  (/usr/lib64/libglib-2.0.so.0+0x50015)
+    #2 0x56281dab4642 in qobject_input_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:295
+    #3 0x56281dab1a04 in visit_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:49
+    #4 0x56281dad1827 in visit_type_SocketAddress  qapi/qapi-visit-sockets.c:386
+    #5 0x56281da8062f in nbd_config  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
+    #6 0x56281da8062f in nbd_process_options  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
+    #7 0x56281da8062f in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
+
+Direct leak of 15 byte(s) in 1 object(s) allocated from:
+    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
+    #1 0x7f6295e7dfbd in g_malloc  (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
+    #2 0x7f6295e96ace in g_strdup  (/usr/lib64/libglib-2.0.so.0+0x68ace)
+    #3 0x56281da804ac in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1834
+    #4 0x56281da804ac in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
+
+Indirect leak of 24 byte(s) in 1 object(s) allocated from:
+    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
+    #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
+    #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
+    #3 0x56281dab41a3 in qobject_input_type_str_keyval   /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:536
+    #4 0x56281dab2ee9 in visit_type_str   /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:297
+    #5 0x56281dad0fa1 in visit_type_UnixSocketAddress_members  qapi/qapi-visit-sockets.c:141
+    #6 0x56281dad17b6 in visit_type_SocketAddress_members      qapi/qapi-visit-sockets.c:366
+    #7 0x56281dad186a in visit_type_SocketAddress     qapi/qapi-visit-sockets.c:393
+    #8 0x56281da8062f in nbd_config   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
+    #9 0x56281da8062f in nbd_process_options   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
+    #10 0x56281da8062f in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
+
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
+---
+ block/nbd.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/block/nbd.c b/block/nbd.c
+index 1239761..bc40a25 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -1881,6 +1881,11 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
+ 
+     ret = nbd_client_connect(bs, errp);
+     if (ret < 0) {
++        object_unref(OBJECT(s->tlscreds));
++        qapi_free_SocketAddress(s->saddr);
++        g_free(s->export);
++        g_free(s->tlscredsid);
++        g_free(s->x_dirty_bitmap);
+         return ret;
+     }
+     /* successfully connected */
 -- 
-Thanks,
+2.7.2.windows.1
 
-David / dhildenb
 
 
