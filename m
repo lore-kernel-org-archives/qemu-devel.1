@@ -2,81 +2,85 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A60EC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 06:34:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D8DCC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 06:45:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 219B1215E5
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 06:34:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5725E215A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 06:45:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CjrIill5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219B1215E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NN9+ABRv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5725E215A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaDNn-000673-MR
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 01:34:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57230)
+	id 1iaDYH-0000zo-Gp
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 01:45:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38245)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iaDMT-0005C9-Oi
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 01:33:10 -0500
+ (envelope-from <aaron.zakhrov@gmail.com>) id 1iaDXK-0000Z9-Dn
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 01:44:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iaDMQ-0000KD-Ci
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 01:33:07 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23535
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iaDMP-0000Fz-Ru
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 01:33:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574922784;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qBOvEE6ErMdQmvmw21OYOuStt+ZSIsZ35WWBpABSIH0=;
- b=CjrIill5j8dGttQ+gJz3w5oV46bOaYX2B2R/5eEPvtxO6kgUaQwcilIa6ox4VZG7wGaWra
- zG8/knVquqmXgcruc73ez7jCUMXyCaOj1gUOYygR0VLUKzGHhOxivOd77Jyq88d0cAUhjJ
- k1G+XUVo8zOTz7XUKPLiCG4b87nlsaE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-eoLpYFL3O2CPn2gAuOWWwA-1; Thu, 28 Nov 2019 01:33:01 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DE2B10866E3;
- Thu, 28 Nov 2019 06:33:00 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-114.ams2.redhat.com [10.36.116.114])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B2E0760BE1;
- Thu, 28 Nov 2019 06:32:55 +0000 (UTC)
-Subject: Re: [PATCH v4 2/6] s390x: Move reset normal to shared reset handler
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20191127175046.4911-1-frankja@linux.ibm.com>
- <20191127175046.4911-3-frankja@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <66f79294-ab07-356c-ad69-addb591dbd82@redhat.com>
-Date: Thu, 28 Nov 2019 07:32:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <aaron.zakhrov@gmail.com>) id 1iaDXJ-0001ox-3c
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 01:44:22 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:44886)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aaron.zakhrov@gmail.com>)
+ id 1iaDXC-0001kG-Ch
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 01:44:17 -0500
+Received: by mail-pl1-x643.google.com with SMTP id az9so11153699plb.11
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 22:44:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=enD17KNqKFqdGR/HbKfm813rRuaLLnUpfCwauvTeL1c=;
+ b=NN9+ABRvfHyUl5S2xa9aWZxGSwXBlHLq+QyE0K92yb/huolzx6jdAvFRI2uvcW6VSZ
+ rjjn6qtvuHos00/cM4dCBySYDMBe50HfATbXhcn+DsDwsUfHdQEdyiQIRLVq7unIXgK3
+ hek+tiGkYX2nGpnaUCk0d3fXhXcPXLFilA96OrbwSdLszOefZXhjgvuPcYEHqfpMvp+9
+ gqslHqirmjbWhh+K4rP53eK1gu7vX86ohj6vK73wOLikL/XUTZhVXItFuGx7k3c7Ytlf
+ VCkBB6Q8D3Bg1TrHI5661yXEYkzzVQOhYtvqBFTKAIyQz8Ul7Ri3jogMknix34PR7ScQ
+ WAmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=enD17KNqKFqdGR/HbKfm813rRuaLLnUpfCwauvTeL1c=;
+ b=TEi4BC+4dHyjoIRSBWimmwnErJdGRERv1/YXUBHM7J6SBvN/RYgpO7p8HLj21o0AL6
+ D48b85xtFdQ7QzPbJci4avKQPr1Ab1Bgb3byD9aTUF0FeTJ4b0f0qiV8LUpE4EOwoUIW
+ GenYnSqFkmfUX5XXXn9KJIAw0VIkgVma6oUKX8wAXc/JU1kUmr1eVj8u1fnS2EF9tHj/
+ Ea+nvOwBVJIq29MEz4wQaC7dSDreN9Km9lMF5ZpEEIY477D1oKVzLMG29JZJ21rIi8v/
+ PrVosnQIInUmTLzsZhDw0Cx8G55JDm2MDNQYF39K8posqdO6Nxu8QPqO66p96ijgunlt
+ jp/A==
+X-Gm-Message-State: APjAAAX/jCmLy9W2YyAJsYs+78iS2mU91D3CpLONg0QcOvx3Up5BfGLX
+ oVGnMjvbCQuqqNWMvOqfZcjXE4Trtu1hwg==
+X-Google-Smtp-Source: APXvYqx7dXeVlMAXxpjhdEaGo3hsFvwJGJvYlda6bsdQ0XWW1A3nsmBHAeG22hGhFQwet51qGOlB4w==
+X-Received: by 2002:a17:902:a707:: with SMTP id
+ w7mr5868606plq.242.1574923451597; 
+ Wed, 27 Nov 2019 22:44:11 -0800 (PST)
+Received: from localhost.localdomain ([2406:7400:73:186d:af79:94fc:29ef:77e6])
+ by smtp.gmail.com with ESMTPSA id
+ u7sm18366891pfh.84.2019.11.27.22.44.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 27 Nov 2019 22:44:10 -0800 (PST)
+From: aaron.zakhrov@gmail.com
+To: qemu-devel@nongnu.org
+Subject: [RFC 0/1] ATI R300 emulated grpahics card V2
+Date: Thu, 28 Nov 2019 12:13:49 +0530
+Message-Id: <20191128064350.20727-1-aaron.zakhrov@gmail.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-In-Reply-To: <20191127175046.4911-3-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: eoLpYFL3O2CPn2gAuOWWwA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,35 +92,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: kraxel@redhat.com, Aaron Dominick <aaron.zakhrov@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/11/2019 18.50, Janosch Frank wrote:
-> Let's start moving the cpu reset functions into a single function with
-> a switch/case, so we can use fallthroughs and share more code between
-> resets.
+From: Aaron Dominick <aaron.zakhrov@gmail.com>
 
-Nit: I'd add a "later" in above sentence, since you don't use 
-fallthroughs yet.
+This is the cleaned up patchset to my previous RFC patch set.
+I could not reliably clean up my previous commits so I deleted my fork and started from scratch.
+The patch looks like a lot of changes but most of it is just register definitions copied from the kernel radeon DRM tree.
+What I have implemented so far seems to get a Linux guest to load the DRM and KMS drivers but it cannot find any CRTCs.
+dmesg also says that while the GART is allocated, it cannot bind any pages to it.
 
-> This patch introduces the reset function by renaming cpu_reset() and
-> cleaning up leftovers.
 
-Hmm, which leftovers? I can mainly see the renaming here...
+Aaron Dominick (1):
+  Cleaned up Work tree. The radeon_reg.h r300_reg.h and r500_reg.h files
+    are from the kernel drm tree. They contain the register definitions
+    for the R300 GPU
 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> ---
->   target/s390x/cpu-qom.h |  6 +++++-
->   target/s390x/cpu.c     | 19 +++++++++++++------
->   target/s390x/cpu.h     |  2 +-
->   target/s390x/sigp.c    |  2 +-
->   4 files changed, 20 insertions(+), 9 deletions(-)
+ hw/display/Kconfig       |    9 +-
+ hw/display/Makefile.objs |    2 +
+ hw/display/r100d.h       |  869 +++++++++
+ hw/display/r300.c        | 1087 +++++++++++
+ hw/display/r300.h        |  269 +++
+ hw/display/r300_2d.c     |  190 ++
+ hw/display/r300_debug.c  |  272 +++
+ hw/display/r300_reg.h    | 1789 ++++++++++++++++++
+ hw/display/r300d.h       |  343 ++++
+ hw/display/r500_reg.h    |  801 ++++++++
+ hw/display/radeon_reg.h  | 3725 ++++++++++++++++++++++++++++++++++++++
+ 11 files changed, 9355 insertions(+), 1 deletion(-)
+ create mode 100644 hw/display/r100d.h
+ create mode 100644 hw/display/r300.c
+ create mode 100644 hw/display/r300.h
+ create mode 100644 hw/display/r300_2d.c
+ create mode 100644 hw/display/r300_debug.c
+ create mode 100644 hw/display/r300_reg.h
+ create mode 100644 hw/display/r300d.h
+ create mode 100644 hw/display/r500_reg.h
+ create mode 100644 hw/display/radeon_reg.h
 
-Anyway,
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-
+--
+2.24.0
 
