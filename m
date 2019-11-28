@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84E3C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 01:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63875C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 01:54:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B23F3215F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 01:54:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F338215E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 01:54:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hmJ5sNJu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B23F3215F1
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QTbovwGU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F338215E5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44669 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ia90w-00021e-O2
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 20:54:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51957)
+	id 1ia913-0002Ba-8z
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 20:54:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52058)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ia8x4-0005zn-PI
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:50:39 -0500
+ id 1ia8x6-000604-0h
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:50:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ia8x3-00049h-Sv
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:50:38 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34539)
+ id 1ia8x5-0004Cs-2o
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:50:39 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:34283)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1ia8x3-00047N-Ko
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:50:37 -0500
-Received: by mail-wr1-x443.google.com with SMTP id t2so29058042wrr.1
- for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 17:50:37 -0800 (PST)
+ id 1ia8x4-0004Ah-T3
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 20:50:39 -0500
+Received: by mail-wm1-x342.google.com with SMTP id j18so6198824wmk.1
+ for <qemu-devel@nongnu.org>; Wed, 27 Nov 2019 17:50:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GKaacMsIgIZwUgHU10AvimUPTS2QfclWgoTlYWP2G6A=;
- b=hmJ5sNJuZPNrr8BRnDEOaZrwmMkmZQtFROSchLJ+7IIuIXJUvJ166jrxR3TBAFzSv7
- sJw2Djfqhtma/noBB8ztMgKTWyKBcUsDF3qmbtmKQ/X7nZAvPyWDrUHYYCxhbtKlk4tu
- cy8BrA8Iaf8qSo0VjNNPkZcqNyejVnvlyQZVj9PUjOgQvtKTLOPgGsS0519m43PW3bUG
- L+Bg3TUDH0RUUpWnNOTWN10RRkm3cOcvYRMoc11bFJcCnyZ+J2H0IWE3P3mRVVGRQQMa
- uc9BQSIcXks2gGpyuuJALvhyN9s9JO8vOV1tEONJ0oTJkDFKb8It6ypVTPfeS7E2NnG0
- 5rEg==
+ bh=nkiNRcAB3EX8YKP0tQWkOyykB73B9upJcB4fmS8DPoY=;
+ b=QTbovwGUVf6V5BMmh853yEY9NnGOtjoK+iVN5Vj+m9Cx/2LWgF2Bzt2vXJ//o3BtPu
+ 9vD2FU5CWaB8cuB5TFOI+EgMn8XK8/A8XgFLeZQIJn9ZhFD0HNJbU0vhsZCv3QVlMevP
+ Fjx950nB9QDaotwWn7SusSQ81bgTFrKVOnDXUPTtwbRkJXz3+v3wqAwGHumk62Y7iLtP
+ 9s/KlCBfu0gLKWe5J4m3pMFEQnuSiHyqcGn/T70K056gmWvgTcYMN0kABb6/2fsP19bf
+ 30HoMBjmViqdmGMvWK7wlGJfT8x7M/5ErOqnbCgDipyYs1tb2aBZqrZ7fRfAc5YgXK3G
+ 20WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=GKaacMsIgIZwUgHU10AvimUPTS2QfclWgoTlYWP2G6A=;
- b=Z4uZGcBG7Xvkfa1/trBV9EROlwJWGQ+vsJhZs9caae44XTqw2feSB7vy6w39RnE/KA
- +bUKOGvxdkWNRHukwcpyxqOwyjVXbR161KYFFDPRbfcpkPpQzQQshbc8EMDhh/Prku9U
- I84j4OwDAPgc2VM5tw8IrImEHn9K8U7pPjGNL8Y2wFZ39W71tYkuQJE+HGGL7pu3gIL2
- JTcXAUPBCvxMueI4VGChjdaL3q3l75KTTpGzAihHKPRIyUSFGw1XOyn1QtTM0ylS48ds
- MX3wsYKksgDiOI6O23HbLK93Wi1OXcapBHkzbN0WmpDMavsZXn3H20qNyRcNVHIaOIjS
- H4eg==
-X-Gm-Message-State: APjAAAXSnPPeiUt11O/DTxBLVMBD43GqCRLkg6ymBlV76aKUv4ZJ2gKw
- fzgcDZJZvI8mzDAuvjrzA+7KMQ1c
-X-Google-Smtp-Source: APXvYqz6ZivBr/uTRyWnd7xmmQlMRJIov0mOQWhuUMvxZFOAUqb2rBwAMW/JNpGtRhXB0bPvAJEKBA==
-X-Received: by 2002:a5d:60c5:: with SMTP id x5mr47770804wrt.189.1574905836296; 
- Wed, 27 Nov 2019 17:50:36 -0800 (PST)
+ bh=nkiNRcAB3EX8YKP0tQWkOyykB73B9upJcB4fmS8DPoY=;
+ b=KUrblnanumX6G66o4p3trXI9TrNj7Z2J1qDWfcYlZ5O/3YudrsC24jaSGorliYHkVa
+ QOigCGyLqCOzOlXwwwAsOkhsWPWFYodGr6OWKAvhXQp6P+lHhjI9+FCpjEzOXmkYpICr
+ R440tEocKZnvlT7xweoTeHOVnkn9PSqYBfILj3m5CIFtDSSF0yC7Ow8NxYCNdKMBYwV5
+ nlLNNlmwIhZMuDGv4s/T5av11TDdl3CNCZgKuAFNXr/f7lMHTs5uRrTq67N3wFtit47Z
+ /4gnhzTVC3k5tOPD3GUDJM7KM6OGSAMY+f8i6j/3yqywQE+xelzP2vtliRJdZMfWMZAy
+ w3NA==
+X-Gm-Message-State: APjAAAWdMRRmiRUP14HXQrin//6CVyXUlAfiFY3lV0udhL/HvJ44y2kf
+ gyc7mE/krJziJdxx4F5rMprwi5qj
+X-Google-Smtp-Source: APXvYqyzPkZ7OeQaxO22F3HKGwFNm+0WCCsdpTHgf9jGgPueBRm8YE/Tj/Y1nZu6g+nxz47yD+7dhQ==
+X-Received: by 2002:a1c:984f:: with SMTP id a76mr7405710wme.64.1574905837637; 
+ Wed, 27 Nov 2019 17:50:37 -0800 (PST)
 Received: from x1w.redhat.com (182.red-88-21-103.staticip.rima-tde.net.
  [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id k16sm8738061wru.0.2019.11.27.17.50.35
+ by smtp.gmail.com with ESMTPSA id k16sm8738061wru.0.2019.11.27.17.50.36
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 27 Nov 2019 17:50:35 -0800 (PST)
+ Wed, 27 Nov 2019 17:50:37 -0800 (PST)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Michael Rolnik <mrolnik@gmail.com>
-Subject: [PATCH 02/10] target/avr: Remove unused include
-Date: Thu, 28 Nov 2019 02:50:22 +0100
-Message-Id: <20191128015030.27543-3-f4bug@amsat.org>
+Subject: [PATCH 03/10] target/avr: Add missing definitions
+Date: Thu, 28 Nov 2019 02:50:23 +0100
+Message-Id: <20191128015030.27543-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191128015030.27543-1-f4bug@amsat.org>
 References: <20191128015030.27543-1-f4bug@amsat.org>
@@ -86,7 +86,7 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,21 +111,22 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/avr/helper.c | 1 -
- 1 file changed, 1 deletion(-)
+ target/avr/cpu.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/avr/helper.c b/target/avr/helper.c
-index f1939bd5a7..75946209b8 100644
---- a/target/avr/helper.c
-+++ b/target/avr/helper.c
-@@ -21,7 +21,6 @@
- #include "qemu/osdep.h"
+diff --git a/target/avr/cpu.h b/target/avr/cpu.h
+index a3e615a1eb..c1448a865f 100644
+--- a/target/avr/cpu.h
++++ b/target/avr/cpu.h
+@@ -26,6 +26,8 @@
  
- #include "cpu.h"
--#include "hw/irq.h"
- #include "hw/sysbus.h"
- #include "sysemu/sysemu.h"
- #include "exec/exec-all.h"
+ #define TCG_GUEST_DEFAULT_MO 0
+ 
++#define AVR_CPU_TYPE_SUFFIX "-" TYPE_AVR_CPU
++#define AVR_CPU_TYPE_NAME(name) (name AVR_CPU_TYPE_SUFFIX)
+ #define CPU_RESOLVING_TYPE TYPE_AVR_CPU
+ 
+ /*
 -- 
 2.21.0
 
