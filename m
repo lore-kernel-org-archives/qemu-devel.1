@@ -2,83 +2,83 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB1BCC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 03:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24615C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 03:45:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4DA9206E0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 03:44:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E23532166E
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 03:45:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YNrhUU2J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4DA9206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=fpond.eu header.i=@fpond.eu header.b="EbDoDEIH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E23532166E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fpond.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaAjH-0002tW-Uz
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 22:44:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44297)
+	id 1iaAjm-00033m-0j
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 22:45:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37645)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1iaAhe-0001GO-Ip
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 22:42:52 -0500
+ (envelope-from <uli@fpond.eu>) id 1iaAg3-0007tp-HD
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 22:41:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1iaAhb-0000ZT-16
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 22:42:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49361
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iaAha-0000Wc-Ei
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 22:42:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574912565;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oNpXXUPzEf7y4T1D/GmnsHSNzKOeTG0HJ+r3KP23ESE=;
- b=YNrhUU2J2GyX6jKGmmnIZqj8dOvtrEuKkjTxXDz3XbAqHFQhG50GUPAnVBOsG2k4KQyhic
- v+Pt+7AOMLxIWwtJlrdhmDBIZz8jJOQ56PDZBYSJqRxecYbEm2TWFzqxox6N+2reuUfdAy
- FRWuuafKlsuHvv9Sx/6eCoC56+xMLjE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-hKnZHYPxOGS8eP4RC3ZEfg-1; Wed, 27 Nov 2019 22:42:43 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B324410054E3;
- Thu, 28 Nov 2019 03:42:41 +0000 (UTC)
-Received: from [10.72.12.231] (ovpn-12-231.pek2.redhat.com [10.72.12.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 460A15D6D0;
- Thu, 28 Nov 2019 03:41:59 +0000 (UTC)
-Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
-To: Jakub Kicinski <jakub.kicinski@netronome.com>
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
- <20191126123514.3bdf6d6f@cakuba.netronome.com>
- <48cec928-871f-3f50-e99f-c6a6d124cf4c@redhat.com>
- <20191127114913.0363a0e8@cakuba.netronome.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <285af7e2-6a4d-b20c-0aeb-165e3cd4309d@redhat.com>
-Date: Thu, 28 Nov 2019 11:41:52 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <uli@fpond.eu>) id 1iaAg1-0006bu-40
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 22:41:11 -0500
+Received: from mo6-p03-ob.smtp.rzone.de ([2a01:238:20a:202:5303::2]:19913)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <uli@fpond.eu>) id 1iaAfx-0006Yl-63
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 22:41:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1574912463;
+ s=strato-dkim-0002; d=fpond.eu;
+ h=Subject:References:In-Reply-To:Message-ID:Cc:To:From:Date:
+ X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+ bh=YdruPdKAoK6txPA5JOxDAj/vTUfByn2ONRopUgEmExs=;
+ b=EbDoDEIHSJuTPoiC6wax6JkBHAFOc6FHqhCmR69V6Z41s8XygDQ8/Ox3uiFYVYX/e/
+ VVejnJGzPE43QBWV0eSC8oJSjuawdwDlX+7klqHJIwQUkSYwtnAI8T5ndhq64mxjcYzh
+ GKKsZNzjXESnduQGPLupVeXThuVR2HQIEVjy2hcQK8fJXb4Mt1ntRD8wvabgzbQ6+ZYi
+ HlmsyvLSSeQQen2Ii8I+MX5gzvnf3U6B0LdSVpSzrzpXclb0OqVBkruQHPdfxhOsCFnS
+ 0mBqKuznU/HDohtgBCNMmACDmzpa21mCs1gmF6PBLVmAFDcXKplAtBfuLbso5lNIc37C
+ VeuQ==
+X-RZG-AUTH: ":OWANVUa4dPFUgKR/3dpvnYP0Np73amq+g13rqGzmt2bYDnKIKaws6YXTsc4="
+X-RZG-CLASS-ID: mo00
+Received: from oxapp04-01.back.ox.d0m.de by smtp-ox.front (RZmta 46.0.0 AUTH)
+ with ESMTPSA id 604beevAS3f32J3
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve X9_62_prime256v1
+ with 256 ECDH bits, eq. 3072 bits RSA))
+ (Client did not present a certificate);
+ Thu, 28 Nov 2019 04:41:03 +0100 (CET)
+Date: Thu, 28 Nov 2019 04:41:02 +0100 (CET)
+From: Ulrich Hecht <uli@fpond.eu>
+To: Geert Uytterhoeven <geert+renesas@glider.be>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ Jonathan Corbet <corbet@lwn.net>, Rob Herring <robh+dt@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
+Message-ID: <761320534.1467709.1574912462950@webmail.strato.com>
+In-Reply-To: <20191127084253.16356-7-geert+renesas@glider.be>
+References: <20191127084253.16356-1-geert+renesas@glider.be>
+ <20191127084253.16356-7-geert+renesas@glider.be>
+Subject: Re: [PATCH v3 6/7] docs: gpio: Add GPIO Aggregator/Repeater
+ documentation
 MIME-Version: 1.0
-In-Reply-To: <20191127114913.0363a0e8@cakuba.netronome.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: hKnZHYPxOGS8eP4RC3ZEfg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Normal
+X-Mailer: Open-Xchange Mailer v7.10.1-Rev22
+X-Originating-IP: 112.198.74.215
+X-Originating-Client: open-xchange-appsuite
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 2a01:238:20a:202:5303::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,210 +90,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Song Liu <songliubraving@fb.com>, Martin KaFai Lau <kafai@fb.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "Michael S . Tsirkin" <mst@redhat.com>,
- netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>,
- qemu-devel@nongnu.org, Alexei Starovoitov <ast@kernel.org>,
- Prashant Bhole <prashantbhole.linux@gmail.com>, kvm@vger.kernel.org,
- Yonghong Song <yhs@fb.com>, Andrii Nakryiko <andriin@fb.com>,
- "David S . Miller" <davem@davemloft.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ linux-doc@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
+ devicetree@vger.kernel.org, Alexander Graf <graf@amazon.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Phil Reid <preid@electromag.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2019/11/28 =E4=B8=8A=E5=8D=883:49, Jakub Kicinski wrote:
-> On Wed, 27 Nov 2019 10:59:37 +0800, Jason Wang wrote:
->> On 2019/11/27 =E4=B8=8A=E5=8D=884:35, Jakub Kicinski wrote:
->>> On Tue, 26 Nov 2019 19:07:26 +0900, Prashant Bhole wrote:
->>>> Note: This RFC has been sent to netdev as well as qemu-devel lists
->>>>
->>>> This series introduces XDP offloading from virtio_net. It is based on
->>>> the following work by Jason Wang:
->>>> https://netdevconf.info/0x13/session.html?xdp-offload-with-virtio-net
->>>>
->>>> Current XDP performance in virtio-net is far from what we can achieve
->>>> on host. Several major factors cause the difference:
->>>> - Cost of virtualization
->>>> - Cost of virtio (populating virtqueue and context switching)
->>>> - Cost of vhost, it needs more optimization
->>>> - Cost of data copy
->>>> Because of above reasons there is a need of offloading XDP program to
->>>> host. This set is an attempt to implement XDP offload from the guest.
->>> This turns the guest kernel into a uAPI proxy.
->>>
->>> BPF uAPI calls related to the "offloaded" BPF objects are forwarded
->>> to the hypervisor, they pop up in QEMU which makes the requested call
->>> to the hypervisor kernel. Today it's the Linux kernel tomorrow it may
->>> be someone's proprietary "SmartNIC" implementation.
->>>
->>> Why can't those calls be forwarded at the higher layer? Why do they
->>> have to go through the guest kernel?
->>
->> I think doing forwarding at higher layer have the following issues:
->>
->> - Need a dedicated library (probably libbpf) but application may choose
->>    to do eBPF syscall directly
->> - Depends on guest agent to work
-> This can be said about any user space functionality.
-
-
-Yes but the feature may have too much unnecessary dependencies:=20
-dedicated library, guest agent, host agent etc. This can only work for=20
-some specific setups and will lead vendor specific implementations.
-
-
->
->> - Can't work for virtio-net hardware, since it still requires a hardware
->> interface for carrying=C2=A0 offloading information
-> The HW virtio-net presumably still has a PF and hopefully reprs for
-> VFs, so why can't it attach the program there?
-
-
-Then you still need a interface for carrying such information? It will=20
-work like assuming we had a virtio-net VF with reprs:
-
-libbpf(guest) -> guest agent -> host agent -> libbpf(host) -> BPF=20
-syscall -> VF reprs/PF drvier -> VF/PF reprs -> virtio-net VF
-
-Still need a vendor specific way for passing eBPF commands from driver=20
-to reprs/PF, and possibility, it could still be a virtio interface there.
-
-In this proposal it will work out of box as simple as:
-
-libbpf(guest) -> guest kernel -> virtio-net driver -> virtio-net VF
-
-If the request comes from host (e.g flow offloading, configuration etc),=20
-VF reprs make perfect fit. But if the request comes from guest, having=20
-much longer journey looks quite like a burden (dependencies, bugs etc) .
-
-What's more important, we can not assume the how virtio-net HW is=20
-structured, it could even not a SRIOV or PCI card.
-
-
->
->> - Implement at the level of kernel may help for future extension like
->>    BPF object pinning and eBPF helper etc.
-> No idea what you mean by this.
-
-
-My understanding is, we should narrow the gap between non-offloaded eBPF=20
-program and offloaded eBPF program. Making maps or progs to be visible=20
-to kernel may help to persist a unified API e.g object pinning through=20
-sysfs, tracepoint, debug etc.
-
-
->
->> Basically, this series is trying to have an implementation of
->> transporting eBPF through virtio, so it's not necessarily a guest to
->> host but driver and device. For device, it could be either a virtual one
->> (as done in qemu) or a real hardware.
-> SmartNIC with a multi-core 64bit ARM CPUs is as much of a host as
-> is the x86 hypervisor side. This set turns the kernel into a uAPI
-> forwarder.
-
-
-Not necessarily, as what has been done by NFP, driver filter out the=20
-features that is not supported, and the bpf object is still visible in=20
-the kernel (and see above comment).
-
-
->
-> 3 years ago my answer to this proposal would have been very different.
-> Today after all the CPU bugs it seems like the SmartNICs (which are
-> just another CPU running proprietary code) may just take off..
->
-
-That's interesting but vendor may choose to use FPGA other than SoC in=20
-this case. Anyhow discussion like this is somehow out of the scope of=20
-the series.
-
-
->>> If kernel performs no significant work (or "adds value", pardon the
->>> expression), and problem can easily be solved otherwise we shouldn't
->>> do the work of maintaining the mechanism.
->> My understanding is that it should not be much difference compared to
->> other offloading technology.
-> I presume you mean TC offloads? In virtualization there is inherently a
-> hypervisor which will receive the request, be it an IO hub/SmartNIC or
-> the traditional hypervisor on the same CPU.
->
-> The ACL/routing offloads differ significantly, because it's either the
-> driver that does all the HW register poking directly or the complexity
-> of programming a rule into a HW table is quite low.
->
-> Same is true for the NFP BPF offload, BTW, the driver does all the
-> heavy lifting and compiles the final machine code image.
-
-
-Yes and this series benefit from the infrastructure invented from NFP.=20
-But I'm not sure this is a good point since, technically the machine=20
-code could be generated by smart NIC as well.
-
-
->
-> You can't say verifying and JITing BPF code into machine code entirely
-> in the hypervisor is similarly simple.
-
-
-Yes and that's why we choose to do in on the device (host) to simplify=20
-things.
-
-
->
-> So no, there is a huge difference.
->
-
->>> The approach of kernel generating actual machine code which is then
->>> loaded into a sandbox on the hypervisor/SmartNIC is another story.
->> We've considered such way, but actual machine code is not as portable as
->> eBPF bytecode consider we may want:
->>
->> - Support migration
->> - Further offload the program to smart NIC (e.g through macvtap
->>    passthrough mode etc).
-> You can re-JIT or JIT for SmartNIC..? Having the BPF bytecode does not
-> guarantee migration either,
-
-
-Yes, but it's more portable than machine code.
-
-
-> if the environment is expected to be
-> running different version of HW and SW.
-
-
-Right, we plan to have feature negotiation.
-
-
-> But yes, JITing in the guest
-> kernel when you don't know what to JIT for may be hard,
-
-
-Yes.
-
-
-> I was just
-> saying that I don't mean to discourage people from implementing
-> sandboxes which run JITed code on SmartNICs. My criticism is (as
-> always?) against turning the kernel into a one-to-one uAPI forwarder
-> into unknown platform code.
-
-
-We have FUSE and I think it's not only the forwarder, and we may do much=20
-more work on top in the future. For unknown platform code, I'm not sure=20
-why we need care about that. There's no way for us to prevent such=20
-implementation and if we try to formalize it through a specification=20
-(virtio spec and probably eBPF spec), it may help actually.
-
-
->
-> For cloud use cases I believe the higher layer should solve this.
+> On November 27, 2019 at 9:42 AM Geert Uytterhoeven <geert+renesas@glider.be> wrote:
+> 
+> 
+> Document the GPIO Aggregator/Repeater, and the three typical use-cases.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+> v3:
+>   - New.
+> ---
+>  .../admin-guide/gpio/gpio-aggregator.rst      | 111 ++++++++++++++++++
+>  Documentation/admin-guide/gpio/index.rst      |   1 +
+>  2 files changed, 112 insertions(+)
+>  create mode 100644 Documentation/admin-guide/gpio/gpio-aggregator.rst
+> 
+> diff --git a/Documentation/admin-guide/gpio/gpio-aggregator.rst b/Documentation/admin-guide/gpio/gpio-aggregator.rst
+> new file mode 100644
+> index 0000000000000000..826146e260253299
+> --- /dev/null
+> +++ b/Documentation/admin-guide/gpio/gpio-aggregator.rst
+> @@ -0,0 +1,111 @@
+> +.. SPDX-License-Identifier: GPL-2.0-only
+> +
+> +GPIO Aggregator/Repeater
+> +========================
+> +
+> +The GPIO Aggregator/Repeater allows to aggregate GPIOs, and expose them as a
+> +new gpio_chip.  This supports the following use cases.
+> +
+> +
+> +Aggregating GPIOs using Sysfs
+> +-----------------------------
+> +
+> +GPIO controllers are exported to userspace using /dev/gpiochip* character
+> +devices.  Access control to these devices is provided by standard UNIX file
+> +system permissions, on an all-or-nothing basis: either a GPIO controller is
+> +accessible for a user, or it is not.
+> +
+> +The GPIO Aggregator allows access control for individual GPIOs, by aggregating
+> +them into a new gpio_chip, which can be assigned to a group or user using
+> +standard UNIX file ownership and permissions.  Furthermore, this simplifies and
+> +hardens exporting GPIOs to a virtual machine, as the VM can just grab the full
+> +GPIO controller, and no longer needs to care about which GPIOs to grab and
+> +which not, reducing the attack surface.
+> +
+> +Aggregated GPIO controllers are instantiated and destroyed by writing to
+> +write-only attribute files in sysfs.
+> +
+> +    /sys/bus/platform/drivers/gpio-aggregator/
+> +
+> +	"new_device" ...
+> +		Userspace may ask the kernel to instantiate an aggregated GPIO
+> +		controller by writing a string describing the GPIOs to
+> +		aggregate to the "new_device" file, using the format
+> +
+> +		.. code-block:: none
+> +
+> +		    [<gpioA>] [<gpiochipB> <offsets>] ...
+> +
+> +		Where:
+> +
+> +		    "<gpioA>" ...
+> +			    is a GPIO line name,
+> +
+> +		    "<gpiochipB>" ...
+> +			    is a GPIO chip label or name, and
+> +
+> +		    "<offsets>" ...
+> +			    is a comma-separated list of GPIO offsets and/or
+> +			    GPIO offset ranges denoted by dashes.
+> +
+> +		Example: Instantiate a new GPIO aggregator by aggregating GPIO
+> +		19 of "e6052000.gpio" and GPIOs 20-21 of "gpiochip2" into a new
+> +		gpio_chip:
+> +
+> +		.. code-block:: bash
+> +
+> +		    echo 'e6052000.gpio 19 gpiochip2 20-21' > new_device
+> +
+> +	"delete_device" ...
+> +		Userspace may ask the kernel to destroy an aggregated GPIO
+> +		controller after use by writing its device name to the
+> +		"delete_device" file.
+> +
+> +		Example: Destroy the previously-created aggregated GPIO
+> +		controller "gpio-aggregator.0":
+> +
+> +		.. code-block:: bash
+> +
+> +		    echo gpio-aggregator.0 > delete_device
+> +
+> +
+> +GPIO Repeater in Device Tree
+> +----------------------------
+> +
+> +A GPIO Repeater is a node in a Device Tree representing a repeater for one or
+> +more GPIOs, possibly including physical signal property translation (e.g.
+> +polarity inversion).  This allows to model e.g. inverters in DT.
+> +
+> +See Documentation/devicetree/bindings/gpio/gpio-repeater.yaml
+> +
+> +
+> +Generic GPIO Driver
+> +-------------------
+> +
+> +The GPIO Aggregator can also be used as a generic driver for a simple
+> +GPIO-operated device described in DT, without a dedicated in-kernel driver.
+> +This is not unlike e.g. spidev, which allows to communicated with an SPI device
+> +from userspace.
+> +
+> +Binding a device to the GPIO Aggregator is performed either by modifying the
+> +gpio-aggregator driver, or by writing to the "driver_override" file in Sysfs.
+> +
+> +Example: If "frobnicator" is a GPIO-operated device described in DT, using its
+> +own compatible value::
+> +
+> +        frobnicator {
+> +                compatible = "myvendor,frobnicator";
+> +
+> +                gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>,
+> +                        <&gpio2 20 GPIO_ACTIVE_LOW>;
+> +        };
+> +
+> +it can be bound to the GPIO Aggregator by either:
+> +
+> +1. Adding its compatible value to ``gpio_aggregator_dt_ids[]``,
+> +2. Binding manually using "driver_override":
+> +
+> +.. code-block:: bash
+> +
+> +    echo gpio-aggregator > /sys/bus/platform/devices/frobnicator/driver_override
+> +    echo frobnicator > /sys/bus/platform/drivers/gpio-aggregator/bind
+> diff --git a/Documentation/admin-guide/gpio/index.rst b/Documentation/admin-guide/gpio/index.rst
+> index a244ba4e87d5398a..ef2838638e967777 100644
+> --- a/Documentation/admin-guide/gpio/index.rst
+> +++ b/Documentation/admin-guide/gpio/index.rst
+> @@ -7,6 +7,7 @@ gpio
+>  .. toctree::
+>      :maxdepth: 1
+>  
+> +    gpio-aggregator
+>      sysfs
+>  
+>  .. only::  subproject and html
+> -- 
+> 2.17.1
 >
 
-Technically possible, but have lots of drawbacks.
+Reviewed-by: Ulrich Hecht <uli+renesas@fpond.eu>
 
-Thanks
-
+CU
+Uli
 
