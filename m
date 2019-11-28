@@ -2,83 +2,83 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF8AC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83791C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:58:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6EF821789
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:55:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02F582176D
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:58:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYcKvwKo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6EF821789
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SZToRSrn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02F582176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaIOj-0005jJ-Tf
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 06:55:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53689)
+	id 1iaIRI-0007LS-L6
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 06:58:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52289)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iaI0V-00047z-Ot
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:30:49 -0500
+ (envelope-from <thuth@redhat.com>) id 1iaIMi-000568-JM
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:53:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iaI0Q-0001rS-Tw
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:30:45 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46341
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1iaIMc-0002dF-Dk
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:53:40 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24774
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iaI0P-0001nL-GN
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:30:41 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iaIMc-0002OJ-4j
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:53:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574940637;
+ s=mimecast20190719; t=1574942015;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Kfo2fE9iiEDRp7+mq/qNcsEdSe0jZED3P9/5jUO5Y/A=;
- b=CYcKvwKomU1KYFGaR6BUFeTTAJZM4xJ+/rJxztPr1ZA9Ymu0fO8EVIFm4DRAtgTKsxVgBP
- 9sy5zD9l49bUS8R9bijzzqSbR1lUDrcGq6AN/KfVFqt/0Pjs4qR+maCUiZZBswqxIsDqnK
- 7XFygLAOTW5TZ50GYadHOM9X/pYsLio=
+ bh=CKNyJyxqMCJZ6tXQZfEdGoDAnFa/vTjzlVjmZ87v7WE=;
+ b=SZToRSrnhYlKOHitc8bcDd1uA2km1Btbd/I6mNuW8A98MtFrjw1VELX4kNzBU8qkomtIsJ
+ gW47EOpk+zToUwprBA8uaNZCPl6bDqU3cEl2v4Mi0ViWSgX0VvyKUeQ8mZRKb4zBnASyBF
+ lnErWTVFvKsKPn9TtVTPo8uZQb15Z7o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-xRJ1FGEEPwa68Y-lwoZ_FQ-1; Thu, 28 Nov 2019 06:30:25 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-333-0rvC_2U4M7iBYRM2sYzi4w-1; Thu, 28 Nov 2019 06:53:31 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 96953911E8;
- Thu, 28 Nov 2019 11:30:24 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-67.ams2.redhat.com
- [10.36.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 54DE35D6C8;
- Thu, 28 Nov 2019 11:30:24 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 8B905A1E0; Thu, 28 Nov 2019 12:30:23 +0100 (CET)
-Date: Thu, 28 Nov 2019 12:30:23 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: aaron.zakhrov@gmail.com
-Subject: Re: [RFC 0/1] ATI R300 emulated grpahics card V2
-Message-ID: <20191128113023.gdw63adoooqlider@sirius.home.kraxel.org>
-References: <20191128064350.20727-1-aaron.zakhrov@gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 502E380183D;
+ Thu, 28 Nov 2019 11:53:29 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-114.ams2.redhat.com [10.36.116.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C550819C6A;
+ Thu, 28 Nov 2019 11:53:23 +0000 (UTC)
+Subject: Re: [PATCH v19 7/8] tests/numa: Add case for QMP build HMAT
+To: Markus Armbruster <armbru@redhat.com>, Tao Xu <tao3.xu@intel.com>
+References: <20191128082109.30081-1-tao3.xu@intel.com>
+ <20191128082109.30081-8-tao3.xu@intel.com>
+ <87pnhcnru9.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <09bb1d3f-222a-e84e-ab6a-55496bba1d9a@redhat.com>
+Date: Thu, 28 Nov 2019 12:53:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191128064350.20727-1-aaron.zakhrov@gmail.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: xRJ1FGEEPwa68Y-lwoZ_FQ-1
+In-Reply-To: <87pnhcnru9.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 0rvC_2U4M7iBYRM2sYzi4w-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,55 +90,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, ehabkost@redhat.com, mst@redhat.com,
+ jonathan.cameron@huawei.com, sw@weilnetz.de, fan.du@intel.com,
+ mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org, jingqi.liu@intel.com,
+ imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 28, 2019 at 12:13:49PM +0530, aaron.zakhrov@gmail.com wrote:
-> From: Aaron Dominick <aaron.zakhrov@gmail.com>
->=20
-> This is the cleaned up patchset to my previous RFC patch set.
-> I could not reliably clean up my previous commits so I deleted my fork an=
-d started from scratch.
-> The patch looks like a lot of changes but most of it is just register def=
-initions copied from the kernel radeon DRM tree.
+On 28/11/2019 12.49, Markus Armbruster wrote:
+> Tao Xu <tao3.xu@intel.com> writes:
+> 
+>> Check configuring HMAT usecase
+>>
+>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>> ---
+>>
+>> Changes in v19:
+>>      - Add some fail cases for hmat-cache when level=0
+>>
+>> Changes in v18:
+>>      - Rewrite the lines over 80 characters
+>>
+>> Chenges in v17:
+>>      - Add some fail test cases (Igor)
+>> ---
+>>   tests/numa-test.c | 213 ++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 213 insertions(+)
+>>
+>> diff --git a/tests/numa-test.c b/tests/numa-test.c
+>> index 8de8581231..aed7b2f31b 100644
+>> --- a/tests/numa-test.c
+>> +++ b/tests/numa-test.c
+>> @@ -327,6 +327,216 @@ static void pc_dynamic_cpu_cfg(const void *data)
+>>       qtest_quit(qs);
+>>   }
+>>   
+>> +static void pc_hmat_build_cfg(const void *data)
+>> +{
+>> +    QTestState *qs = qtest_initf("%s -nodefaults --preconfig -machine hmat=on "
+>> +                     "-smp 2,sockets=2 "
+>> +                     "-m 128M,slots=2,maxmem=1G "
+>> +                     "-object memory-backend-ram,size=64M,id=m0 "
+>> +                     "-object memory-backend-ram,size=64M,id=m1 "
+>> +                     "-numa node,nodeid=0,memdev=m0 "
+>> +                     "-numa node,nodeid=1,memdev=m1,initiator=0 "
+>> +                     "-numa cpu,node-id=0,socket-id=0 "
+>> +                     "-numa cpu,node-id=0,socket-id=1",
+>> +                     data ? (char *)data : "");
+>> +
+>> +    /* Fail: Initiator should be less than the number of nodes */
+>> +    g_assert(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
+>> +        " 'arguments': { 'type': 'hmat-lb', 'initiator': 2, 'target': 0,"
+>> +        " 'hierarchy': \"memory\", 'data-type': \"access-latency\" } }")));
+> 
+> Code smell: side effect within assert().
+> 
+> Harmless here, because compiling tests with NDEBUG is pointless.  Still,
+> it sets a bad example.  Not your idea, the pattern seems to go back to
+> commit c35665e1ee3 and fb1e58f72ba.
 
-Adding headers should be a separate patch.
+... maybe best to use g_assert_true() which can't be disabled and thus 
+should be used in tests. See:
 
-Qemu has some infrastructure to sync files with the linux kernel tree
-(see scripts/update-linux-headers.sh).  It's intended for uapi include
-files though, so it might not work for you.  Also the register specs are
-not going to change, so future updates are unlikely, so doing a one-time
-manual copy wouldn't be too bad maintenance-wise.
+  https://developer.gnome.org/glib/unstable/glib-Testing.html#g-assert-true
 
-The code should probably be integrated with the existing ati-vga instead
-of just copying the code, i.e. it'll be "-device ati-vga,model=3Dr300".
-As far I know crtc programming doesn't change much across models, so
-there should be a good chunk of shareable code.
-
-The infrastructure to branch into model-specific code is pretty rough
-right now, we might refine that, for example with some helper functions
-(ati_get_model() returning an enum, or ati_is_$model() functions
-returning bool, or both).
-
-Patches usually should pass scripts/checkpatch.pl codestyle checking.
-We can make exceptions when reasonable (headers copied from elsewhere
-for example).
-
-> What I have implemented so far seems to get a Linux guest to load the
-> DRM and KMS drivers but it cannot find any CRTCs.
-
-Might be the vgabios tables are lacking information,
-see https://git.seabios.org/cgit/seabios.git/tree/vgasrc/ati-tables.S
-
-Might be i2c emulation needs tweaks (so EDID fetch works).
-
-Trouble-shooting linux guests shouldn't be too hard, you have the source
-code so you can check what the driver tries to do and you can add debug
-printk's to trace where exactly things are failing ;)
-
-HTH,
-  Gerd
+  Thomas
 
 
