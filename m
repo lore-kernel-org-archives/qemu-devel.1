@@ -2,60 +2,75 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B348C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 10:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5561C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 10:45:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FEAA21741
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 10:36:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FEAA21741
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8F4EA21775
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 10:45:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b9bOyDdH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F4EA21775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaHA1-0001MJ-LW
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 05:36:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59457)
+	id 1iaHIn-0005Eo-N7
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 05:45:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51685)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1iaH6o-0008Js-4l
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:33:15 -0500
+ (envelope-from <slp@redhat.com>) id 1iaHF3-0003P8-QE
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:41:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1iaH6l-0006qD-Jn
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:33:12 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58056 helo=huawei.com)
+ (envelope-from <slp@redhat.com>) id 1iaHF1-0006Iy-8F
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:41:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39607
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1iaH6e-0006CL-9I; Thu, 28 Nov 2019 05:33:04 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 0350542F7CC22A7DB578;
- Thu, 28 Nov 2019 18:32:58 +0800 (CST)
-Received: from [127.0.0.1] (10.120.177.99) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Thu, 28 Nov 2019
- 18:32:52 +0800
-Subject: Re: [PATCH] block/nbd: fix memory leak in nbd_open()
-To: Stefano Garzarella <sgarzare@redhat.com>
-References: <1574930410-43468-1-git-send-email-pannengyuan@huawei.com>
- <20191128090149.it5w2gijbqaw3tpg@steredhat>
-From: pannengyuan <pannengyuan@huawei.com>
-Message-ID: <52fe4ac4-25a8-827d-6c09-42d73ff7858b@huawei.com>
-Date: Thu, 28 Nov 2019 18:32:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iaHEz-000663-Tg
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:41:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574937697;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=YE1wgm36UjBnc7W+itfuj7auVKN4+i+4B6cDxiZh+us=;
+ b=b9bOyDdHhuCnSl9etDpagVqFoUO6MqhQvleYndyK8MO3NfLaL6pAWIdUsMllIaNULonR2P
+ 3OQ4n63agybjEfMNUz2skx5gtmt23Xml8kBZqvI6kCGXAu9TZXdCUyEaFedbujKegy8gWA
+ yjskhDh47SVKL9+82xUL1WCUJbd0HKo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-HgH-4zEwMuGcSy8J6JGeMA-1; Thu, 28 Nov 2019 05:41:36 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 203DE1883521;
+ Thu, 28 Nov 2019 10:41:35 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.152])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EB33610013A7;
+ Thu, 28 Nov 2019 10:41:30 +0000 (UTC)
+From: Sergio Lopez <slp@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 0/4] blockdev: avoid acquiring AioContext lock twice at
+ do_drive_backup and do_blockdev_backup
+Date: Thu, 28 Nov 2019 11:41:25 +0100
+Message-Id: <20191128104129.250206-1-slp@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191128090149.it5w2gijbqaw3tpg@steredhat>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.120.177.99]
-X-CFilter-Loop: Reflected
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: HgH-4zEwMuGcSy8J6JGeMA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,97 +82,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, liyiting@huawei.com, zhang.zhanghailiang@huawei.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- kuhn.chenqun@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
-I think it's a better way, you can implement this new function before
-this patch.
+do_drive_backup() acquires the AioContext lock of the corresponding
+BlockDriverState. This is not a problem when it's called from
+qmp_drive_backup(), but drive_backup_prepare() also acquires the lock
+before calling it. The same things happens with do_blockdev_backup()
+and blockdev_backup_prepare().
 
-Thanks.
+This patch series merges do_drive_backup() with drive_backup_prepare()
+and do_blockdev_backup() with blockdev_backup_prepare(), and ensures
+they're only getting called from a transaction context. This way,
+there's a single code path for both transaction requests and qmp
+commands, as suggested by Kevin Wolf.
 
-On 2019/11/28 17:01, Stefano Garzarella wrote:
-> On Thu, Nov 28, 2019 at 04:40:10PM +0800, pannengyuan@huawei.com wrote:
-> 
-> Hi,
-> I don't know nbd code very well, the patch LGTM, but just a comment
-> below:
-> 
->> From: PanNengyuan <pannengyuan@huawei.com>
->>
->> In currently implementation there will be a memory leak when
->> nbd_client_connect() returns error status. Here is an easy way to reproduce:
->>
->> 1. run qemu-iotests as follow and check the result with asan:
->>     ./check -raw 143
->>
->> Following is the asan output backtrack:
->> Direct leak of 40 byte(s) in 1 object(s) allocated from:
->>     #0 0x7f629688a560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
->>     #1 0x7f6295e7e015 in g_malloc0  (/usr/lib64/libglib-2.0.so.0+0x50015)
->>     #2 0x56281dab4642 in qobject_input_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:295
->>     #3 0x56281dab1a04 in visit_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:49
->>     #4 0x56281dad1827 in visit_type_SocketAddress  qapi/qapi-visit-sockets.c:386
->>     #5 0x56281da8062f in nbd_config  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
->>     #6 0x56281da8062f in nbd_process_options  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
->>     #7 0x56281da8062f in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
->>
->> Direct leak of 15 byte(s) in 1 object(s) allocated from:
->>     #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
->>     #1 0x7f6295e7dfbd in g_malloc  (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
->>     #2 0x7f6295e96ace in g_strdup  (/usr/lib64/libglib-2.0.so.0+0x68ace)
->>     #3 0x56281da804ac in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1834
->>     #4 0x56281da804ac in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
->>
->> Indirect leak of 24 byte(s) in 1 object(s) allocated from:
->>     #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
->>     #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
->>     #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
->>     #3 0x56281dab41a3 in qobject_input_type_str_keyval   /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:536
->>     #4 0x56281dab2ee9 in visit_type_str   /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:297
->>     #5 0x56281dad0fa1 in visit_type_UnixSocketAddress_members  qapi/qapi-visit-sockets.c:141
->>     #6 0x56281dad17b6 in visit_type_SocketAddress_members      qapi/qapi-visit-sockets.c:366
->>     #7 0x56281dad186a in visit_type_SocketAddress     qapi/qapi-visit-sockets.c:393
->>     #8 0x56281da8062f in nbd_config   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
->>     #9 0x56281da8062f in nbd_process_options   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
->>     #10 0x56281da8062f in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
->>
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
->> ---
->>  block/nbd.c | 5 +++++
->>  1 file changed, 5 insertions(+)
->>
->> diff --git a/block/nbd.c b/block/nbd.c
->> index 1239761..bc40a25 100644
->> --- a/block/nbd.c
->> +++ b/block/nbd.c
->> @@ -1881,6 +1881,11 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
->>  
->>      ret = nbd_client_connect(bs, errp);
->>      if (ret < 0) {
->> +        object_unref(OBJECT(s->tlscreds));
->> +        qapi_free_SocketAddress(s->saddr);
->> +        g_free(s->export);
->> +        g_free(s->tlscredsid);
->> +        g_free(s->x_dirty_bitmap);
-> 
-> Since with this patch we are doing these cleanups in 3 places (here,
-> nbd_close(), and nbd_process_options()), should be better to add a new
-> function to do these cleanups?
-> 
-> Maybe I'd create a series adding a patch before this one, implementing this
-> new function, and change this patch calling it.
-> 
-> Thanks,
-> Stefano
-> 
-> 
-> .
-> 
+We also take this opportunity to ensure we're honoring the context
+acquisition semantics required by bdrv_try_set_aio_context, as
+suggested by Max Reitz.
+
+---
+Changelog:
+
+v5:
+ - Include fix for iotest 141 in patch 2. (thanks Max Reitz)
+ - Also fix iotest 185 and 219 in patch 2. (thanks Max Reitz)
+ - Move error block after context acquisition/release, to we can use
+   goto to bail out and release resources. (thanks Max Reitz)
+ - Properly release old_context in qmp_blockdev_mirror. (thanks Max
+   Reitz)
+
+v4:
+ - Unify patches 1-4 and 5-7 to avoid producing broken interim
+   states. (thanks Max Reitz)
+ - Include a fix for iotest 141. (thanks Kevin Wolf)
+
+v3:
+ - Rework the whole patch series to fix the issue by consolidating all
+   operations in the transaction model. (thanks Kevin Wolf)
+
+v2:
+ - Honor bdrv_try_set_aio_context() context acquisition requirements
+   (thanks Max Reitz).
+ - Release the context at drive_backup_prepare() instead of avoiding
+   re-acquiring it at do_drive_baclup(). (thanks Max Reitz)
+ - Convert a single patch into a two-patch series.
+---
+
+Sergio Lopez (4):
+  blockdev: fix coding style issues in drive_backup_prepare
+  blockdev: unify qmp_drive_backup and drive-backup transaction paths
+  blockdev: unify qmp_blockdev_backup and blockdev-backup transaction
+    paths
+  blockdev: honor bdrv_try_set_aio_context() context requirements
+
+ blockdev.c                 | 354 ++++++++++++++++++-------------------
+ tests/qemu-iotests/141.out |   2 +
+ tests/qemu-iotests/185.out |   2 +
+ tests/qemu-iotests/219     |   7 +-
+ tests/qemu-iotests/219.out |   8 +
+ 5 files changed, 192 insertions(+), 181 deletions(-)
+
+--=20
+2.23.0
 
 
