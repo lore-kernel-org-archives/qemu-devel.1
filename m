@@ -2,83 +2,66 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF3DFC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 04:19:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6E1C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 04:50:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8D8F215F1
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 04:19:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AAXwqhLG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8D8F215F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E1F322154A
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 04:50:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1F322154A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45298 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaBHU-0006wo-QG
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 23:19:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38672)
+	id 1iaBl0-0005yx-0m
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 23:50:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1iaBGS-0006Cd-Lk
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 23:18:50 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iaBkL-0005Zo-1V
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 23:49:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1iaBGP-0007Ao-QU
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 23:18:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24772
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <tao3.xu@intel.com>) id 1iaBkJ-0002pc-42
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 23:49:40 -0500
+Received: from mga18.intel.com ([134.134.136.126]:48872)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iaBGP-000792-Bg
- for qemu-devel@nongnu.org; Wed, 27 Nov 2019 23:18:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574914724;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VZHfnpUHMVQfOJML2Ic3SHu+PaQ/ZeBlsp9ffMkTs9Y=;
- b=AAXwqhLG/0/IFUx+xHPdH0jQK3kErsj9rL48Etk6vXa8jaLGVpzfIk0Q4ZdaQ7nDX7E5ay
- W0siSLKLQV519yNYTO5yNe5GfdjTUPuez+zu8C1IemT1c0631wPwXILLMSCWvyv8EMBeHx
- BRU+fOMY2zV4/9svyIS6Nt3uPVSt8Vw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-phLk_qt-Pc6H7_DN1poGOw-1; Wed, 27 Nov 2019 23:18:41 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04631184CAA1;
- Thu, 28 Nov 2019 04:18:39 +0000 (UTC)
-Received: from [10.72.12.231] (ovpn-12-231.pek2.redhat.com [10.72.12.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 114B1100164D;
- Thu, 28 Nov 2019 04:18:22 +0000 (UTC)
-Subject: Re: [RFC net-next 00/18] virtio_net XDP offload
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Jakub Kicinski <jakub.kicinski@netronome.com>
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
- <20191126123514.3bdf6d6f@cakuba.netronome.com>
- <20191128033255.r66d4zedmhudeaa6@ast-mbp.dhcp.thefacebook.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <c6c6ca98-8793-5510-ad24-583e25403e35@redhat.com>
-Date: Thu, 28 Nov 2019 12:18:15 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iaBkI-0002kf-SE
+ for qemu-devel@nongnu.org; Wed, 27 Nov 2019 23:49:39 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 27 Nov 2019 20:49:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,252,1571727600"; d="scan'208";a="234324242"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.197.13])
+ ([10.239.197.13])
+ by fmsmga004.fm.intel.com with ESMTP; 27 Nov 2019 20:49:30 -0800
+Subject: Re: [PATCH v18 3/8] numa: Extend CLI to provide memory side cache
+ information
+From: Tao Xu <tao3.xu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+References: <20191127082613.22903-1-tao3.xu@intel.com>
+ <20191127082613.22903-4-tao3.xu@intel.com>
+ <871rttfxsc.fsf@dusky.pond.sub.org>
+ <de826b02-34df-c3b4-2cf2-e6d813156f52@intel.com>
+Message-ID: <1198abe5-0e81-dd9b-1a74-21ccaea60d19@intel.com>
+Date: Thu, 28 Nov 2019 12:49:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-In-Reply-To: <20191128033255.r66d4zedmhudeaa6@ast-mbp.dhcp.thefacebook.com>
+In-Reply-To: <de826b02-34df-c3b4-2cf2-e6d813156f52@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: phLk_qt-Pc6H7_DN1poGOw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,109 +73,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Song Liu <songliubraving@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "Michael S . Tsirkin" <mst@redhat.com>,
- netdev@vger.kernel.org, John Fastabend <john.fastabend@gmail.com>,
- qemu-devel@nongnu.org, Alexei Starovoitov <ast@kernel.org>,
- "David S . Miller" <davem@davemloft.net>,
- Prashant Bhole <prashantbhole.linux@gmail.com>, kvm@vger.kernel.org,
- Yonghong Song <yhs@fb.com>, Andrii Nakryiko <andriin@fb.com>,
- Martin KaFai Lau <kafai@fb.com>
+Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
+ "thuth@redhat.com" <thuth@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
+ "sw@weilnetz.de" <sw@weilnetz.de>, "Du, Fan" <fan.du@intel.com>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ Daniel Black <daniel@linux.ibm.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
+ Jingqi" <jingqi.liu@intel.com>, "imammedo@redhat.com" <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 11/28/2019 10:46 AM, Tao Xu wrote:
+> On 11/27/2019 5:56 PM, Markus Armbruster wrote:
+>> Tao Xu <tao3.xu@intel.com> writes:
+>>
+>>> From: Liu Jingqi <jingqi.liu@intel.com>
+>>>
+>>> Add -numa hmat-cache option to provide Memory Side Cache Information.
+>>> These memory attributes help to build Memory Side Cache Information
+>>> Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
+>>
+>> Please mention this requires -machine hmat=on.
+> 
+> OK I will add these for 3 related patches.
+>>
+>>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>>> Reviewed-by: Daniel Black <daniel@linux.ibm.com>
+>>> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+>>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>> [...]
+>>> diff --git a/qapi/machine.json b/qapi/machine.json
+>>> index c741649d7b..3d0ba226a9 100644
+>>> --- a/qapi/machine.json
+>>> +++ b/qapi/machine.json
+>>> @@ -428,10 +428,12 @@
+>>>   #
+>>>   # @hmat-lb: memory latency and bandwidth information (Since: 5.0)
+>>>   #
+>>> +# @hmat-cache: memory side cache information (Since: 5.0)
+>>> +#
+>>>   # Since: 2.1
+>>>   ##
+>>>   { 'enum': 'NumaOptionsType',
+>>> -  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
+>>> +  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
+>>>   ##
+>>>   # @NumaOptions:
+>>> @@ -447,7 +449,8 @@
+>>>       'node': 'NumaNodeOptions',
+>>>       'dist': 'NumaDistOptions',
+>>>       'cpu': 'NumaCpuOptions',
+>>> -    'hmat-lb': 'NumaHmatLBOptions' }}
+>>> +    'hmat-lb': 'NumaHmatLBOptions',
+>>> +    'hmat-cache': 'NumaHmatCacheOptions' }}
+>>>   ##
+>>>   # @NumaNodeOptions:
+>>> @@ -647,6 +650,77 @@
+>>>       '*latency': 'uint64',
+>>>       '*bandwidth': 'size' }}
+>>> +##
+>>> +# @HmatCacheAssociativity:
+>>> +#
+>>> +# Cache associativity in the Memory Side Cache
+>>> +# Information Structure of HMAT
+>>> +#
+>>> +# For more information of @HmatCacheAssociativity see
+>>> +# the chapter 5.2.27.5: Table 5-147 of ACPI 6.3 spec.
+>>
+>>    # Cache associativity in the Memory Side Cache Information Structure
+>>    # of HMAT
+>>    #
+>>    # For more information of @HmatCacheAssociativity, see chapter
+>>    # 5.2.27.5: Table 5-147 of ACPI 6.3 spec.
+>>
+>>> +#
+>>> +# @none: None
+>>
+>> What does cache associativity @none mean?  A none-associative cache?  I
+>> guess it makes sense to people familiar with the ACPI spec...
+>>
+> 
+> This means this proximity domain has no memory cache, thus none for 
+> Cache associativity, I will add more description about this.
 
-On 2019/11/28 =E4=B8=8A=E5=8D=8811:32, Alexei Starovoitov wrote:
-> On Tue, Nov 26, 2019 at 12:35:14PM -0800, Jakub Kicinski wrote:
->> I'd appreciate if others could chime in.
-> The performance improvements are quite appealing.
-> In general offloading from higher layers into lower layers is necessary l=
-ong term.
->
-> But the approach taken by patches 15 and 17 is a dead end. I don't see ho=
-w it
-> can ever catch up with the pace of bpf development.
-
-
-This applies for any hardware offloading features, isn't it?
-
-
->   As presented this approach
-> works for the most basic programs and simple maps. No line info, no BTF, =
-no
-> debuggability. There are no tail_calls either.
-
-
-If I understand correctly, neither of above were implemented in NFP. We=20
-can collaborate to find solution for all of those.
-
-
->   I don't think I've seen a single
-> production XDP program that doesn't use tail calls.
-
-
-It looks to me we can manage to add this support.
-
-
-> Static and dynamic linking
-> is coming. Wraping one bpf feature at a time with virtio api is never goi=
-ng to
-> be complete.
-
-
-It's a common problem for hardware that want to implement eBPF=20
-offloading, not a virtio specific one.
-
-
-> How FDs are going to be passed back? OBJ_GET_INFO_BY_FD ?
-> OBJ_PIN/GET ? Where bpffs is going to live ?
-
-
-If we want pinning work in the case of virt, it should live in both host=20
-and guest probably.
-
-
->   Any realistic XDP application will
-> be using a lot more than single self contained XDP prog with hash and arr=
-ay
-> maps.
-
-
-It's possible if we want to use XDP offloading to accelerate VNF which=20
-often has simple logic.
-
-
-> It feels that the whole sys_bpf needs to be forwarded as a whole from
-> guest into host. In case of true hw offload the host is managing HW. So i=
-t
-> doesn't forward syscalls into the driver. The offload from guest into hos=
-t is
-> different. BPF can be seen as a resource that host provides and guest ker=
-nel
-> plus qemu would be forwarding requests between guest user space and host
-> kernel. Like sys_bpf(BPF_MAP_CREATE) can passthrough into the host direct=
-ly.
-> The FD that hosts sees would need a corresponding mirror FD in the guest.=
- There
-> are still questions about bpffs paths, but the main issue of
-> one-feature-at-a-time will be addressed in such approach.
-
-
-We try to follow what NFP did by starting from a fraction of the whole=20
-eBPF features. It would be very hard to have all eBPF features=20
-implemented from the start.=C2=A0 It would be helpful to clarify what's the=
-=20
-minimal set of features that you want to have from the start.
-
-
-> There could be other
-> solutions, of course.
->
->
-
-Suggestions are welcomed.
-
-Thanks
-
+Read again about ACPI spec, there is no description about 'none'. In
+linux kernel HMAT code, this is handle as "other", maybe means not 
+provided. I will also add a check when level is none, the associativity, 
+policy and line_size should be none or 0.
 
