@@ -2,115 +2,51 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D6AC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 09:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE21C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 09:46:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30906216F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 09:23:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="G/RhV9ht"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30906216F4
+	by mail.kernel.org (Postfix) with ESMTPS id A1D4221741
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 09:46:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1D4221741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaG1R-0002cH-CP
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 04:23:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57683)
+	id 1iaGNB-0000wh-Oa
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 04:46:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59897)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iaFyV-0001fR-Jm
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 04:20:37 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iaGKO-0007RC-G6
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 04:43:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iaFyS-00088X-MQ
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 04:20:34 -0500
-Received: from mail-eopbgr140118.outbound.protection.outlook.com
- ([40.107.14.118]:47341 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iaFy3-0006U1-E9; Thu, 28 Nov 2019 04:20:08 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VMnmjM3FYt2D7DJYapGBj8gU44DzYthCWpTL5pLkaujsu/GC5/eSKDBSNHkXGzlRPyWjlM3YvxEZLc0rb6SqUbUNzQJQVQQQjTi5SLf9fyA2BJX8NbYDfYU4p7jlNYYqiFg7dAlFzGuZ+NvRDe7q+zndQjR5R1mzvw4iU/DWzd12MkSru4FqlNlqijjZj0IJviVvgB9VLfE67u/fsLqrO1vzo9P0N+20hpmlvLaAr0ZoAcevJasDKO6FPRAaiIjsSV1hAe57Jn1CGHCzsPZOD+9cHLFfSn18peMP/u1fEowC3/2fTpn5imQBVxvcqjyISpXkrUk9zF1hFgL6Sql2pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4w4RrRWOk3kYGyih9WXOG01frLBfQmRUDjBKcfz3Ys8=;
- b=HtvQ5dykKB9s0/y51/MhIAFNkAIosLL7d3c007NO5vBfgQnGhmCKpEJmOCX/F+kfsANVoTg1D3cvA2VEfBoCyhRXTLiBiFHHmBgVl93wWjAzj4GtDYs2czdKPoNArt7en5GmzC4rf5XXWyfvQiUk01CWiDV/Oov7pEpauWIF27QuVbtk3Sz1+GVyVObK6OP4MFW5zEeG5MP1NtoAWTjGsQfR90GXYCFj9BEI3C0SMsBup0xymm8AH1qD1WT5SYD8ltMalidJRT1VdVfzYABFV25YFY+FI/a6c54/buzVcClw3ZFQEiM9wRM8vwLLhKvtTCPXUPPCBCoYJbQt99oKvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4w4RrRWOk3kYGyih9WXOG01frLBfQmRUDjBKcfz3Ys8=;
- b=G/RhV9htMWK3PDEJPMH+yp35gS3oBqsVERV75QCSpzdQ6MhiIrdprnx9TkydQ64+bD7ZFmi7IpJOw5sTxqWVDg3hCwEH3um4B776ERUtn1vaf3VM5IC7Te0KtHKhrwl9sSI01Vp3Bs3PPC34tNt2xxS/FEqnMdFtts4zsYZ116o=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4788.eurprd08.prod.outlook.com (10.255.96.208) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2474.16; Thu, 28 Nov 2019 09:20:01 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2474.023; Thu, 28 Nov 2019
- 09:20:01 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [RFC v5 000/126] error: auto propagated local_err
-Thread-Topic: [RFC v5 000/126] error: auto propagated local_err
-Thread-Index: AQHVgE3dlsNxBDOk202dFu/C5nZLkaegko9JgAAG0YA=
-Date: Thu, 28 Nov 2019 09:20:01 +0000
-Message-ID: <b000e0b0-b75c-c74e-244b-0b1bf270b6a6@virtuozzo.com>
-References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <87tv6opehz.fsf@dusky.pond.sub.org>
-In-Reply-To: <87tv6opehz.fsf@dusky.pond.sub.org>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR09CA0052.eurprd09.prod.outlook.com
- (2603:10a6:7:3c::20) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191128121953572
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d8aade60-5525-4065-ce80-08d773e4258b
-x-ms-traffictypediagnostic: AM6PR08MB4788:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB478837BBC944242C53F2A240C1470@AM6PR08MB4788.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0235CBE7D0
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39840400004)(136003)(396003)(376002)(346002)(366004)(199004)(189003)(53754006)(8676002)(256004)(66066001)(8936002)(54906003)(102836004)(3846002)(26005)(2906002)(31686004)(6512007)(229853002)(66476007)(66556008)(36756003)(11346002)(52116002)(66446008)(64756008)(4326008)(446003)(5660300002)(186003)(76176011)(6506007)(6246003)(66946007)(386003)(6116002)(14444005)(7366002)(7736002)(71200400001)(71190400001)(99286004)(31696002)(561944003)(316002)(7416002)(6436002)(305945005)(6916009)(6486002)(14454004)(25786009)(86362001)(81156014)(81166006)(7406005)(478600001)(7336002)(2616005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4788;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cn+5lWAoIstiqsLIY2S+oXFQaq1xVL634ut7G7Z7UGxg8pqYxLrgx7E4k+nlSA6nuzb0N1b/cRlr/Au/vlo0n3rC+oEmhkyOnOfXu69dxdL7tVCtq7uJzRNXUJmxDU8pSFw+3dvp0qSAMXELx5AiuIMA1GDKI4K9Jczq/aVIICHt2NIiLsFFCTN6qHyT/reQ+CvOJebKyELH7rJfkQBjw+I49zf6mtacSmhuKSccLXZosWTBRG5EHZkiqNqit7/HqWmlZwPpuhF4rLeWXyDB63jSl3zJL6gEu+yC12ciUSbI7eiovFYYxKdIZ/oLybRupq4kIST41lf2szVehO4rhA6nDOnONoTS/pMo+tILNs+KwRzlw78SMd42llZ/ciFrOqMG9Jus4ZJ8l4+zsQz+358kUBZM8PjMo4HBjrEMERYKyZ4e9wdMr18Nnh955ngJ
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B1A89D7E2F9BC44181FBD70EC14B11F8@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8aade60-5525-4065-ce80-08d773e4258b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Nov 2019 09:20:01.7680 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: oqI0OzEi6rW2mS98S836vzljPIZnFboNHuRKAwu6vwOouPRCG+rpRBLEoQ+BjrrHU6f9EXMeEk68PZVfTdepMpoSEEZJmXZr0vkG7bhtQWA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4788
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.14.118
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iaGDk-0006mU-Nw
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 04:36:23 -0500
+Received: from relay.sw.ru ([185.231.240.75]:46676)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iaGDk-0006aU-EZ; Thu, 28 Nov 2019 04:36:20 -0500
+Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iaGDd-0001D9-OT; Thu, 28 Nov 2019 12:36:13 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Subject: [PATCH v10 1/3] block: introduce compress filter driver
+Date: Thu, 28 Nov 2019 12:36:11 +0300
+Message-Id: <1574933773-293866-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1574933773-293866-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1574933773-293866-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,197 +58,244 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Jeff Cody <codyprime@gmail.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Alberto Garcia <berto@igalia.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Halil Pasic <pasic@linux.ibm.com>,
- =?utf-8?B?SGVydsOpIFBvdXNzaW5lYXU=?= <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Laszlo Ersek <lersek@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Andrew Jeffery <andrew@aj.id.au>, Chris Wulff <crwulff@gmail.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Walle <michael@walle.cc>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>,
- Peter Maydell <peter.maydell@linaro.org>,
- "sheepdog@lists.wpkg.org" <sheepdog@lists.wpkg.org>,
- Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Palmer Dabbelt <palmer@sifive.com>, Eric Farman <farman@linux.ibm.com>,
- Max Filippov <jcmvbkbc@gmail.com>, Hannes Reinecke <hare@suse.com>,
- Stefano Stabellini <sstabellini@kernel.org>, "Gonglei
- \(Arei\)" <arei.gonglei@huawei.com>, Liu Yuan <namei.unix@gmail.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Amit Shah <amit@kernel.org>, Stefan Weil <sw@weilnetz.de>,
- Greg Kurz <groug@kaod.org>, Yuval Shaia <yuval.shaia@oracle.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?utf-8?B?Q8OpZHJpYyBMZSBHb2F0ZXI=?= <clg@kaod.org>,
- Stafford Horne <shorne@gmail.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <pburton@wavecomp.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Paul Durrant <paul@xen.org>,
- Anthony Green <green@moxielogic.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar
- E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>,
- Ari Sundholm <ari@tuxera.com>, Juan Quintela <quintela@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Joel Stanley <joel@jms.id.au>,
- Jason Dillaman <dillaman@redhat.com>, Antony Pavlov <antonynpavlov@gmail.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- "integration@gluster.org" <integration@gluster.org>,
- =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- "Richard W.M. Jones" <rjones@redhat.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, Max Reitz <mreitz@redhat.com>,
- Denis Lunev <den@virtuozzo.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>, Marek Vasut <marex@denx.de>,
- =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
- David Gibson <david@gibson.dropbear.id.au>,
- Tony Krowiak <akrowiak@linux.ibm.com>,
- =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Wen Congyang <wencongyang2@huawei.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
+ mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjguMTEuMjAxOSAxMTo1NCwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IFBsZWFzZSBhY2Nl
-cHQgbXkgc2luY2VyZSBhcG9sb2dpZXMgZm9yIHRha2luZyBzbyBsb25nIHRvIHJlcGx5LiAgQSBm
-ZXcNCj4gdGhvdWdodHMgYmVmb3JlIEkgZGlnIGRlZXBlci4NCj4gDQo+IFZsYWRpbWlyIFNlbWVu
-dHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPiANCj4+
-IEhpIGFsbCENCj4+DQo+PiBBdCB0aGUgcmVxdWVzdCBvZiBNYXJrdXM6IGZ1bGwgdmVyc2lvbiBv
-ZiBlcnJwIHByb3BhZ2F0aW9uLiBMZXQncyBsb29rDQo+PiBhdCBpdC4gQ292ZXIgYXMgbXVjaCBh
-cyBwb3NzaWJsZSwgZXhjZXB0IGluc2VydGluZyBtYWNybyBpbnZvY2F0aW9uDQo+PiB3aGVyZSBp
-dCdzIG5vdCBuZWNlc3NhcnkuDQo+Pg0KPj4gSXQncyBodWdlLCBhbmQgc28gaXQncyBhbiBSRkMu
-DQo+IA0KPiBJdCdzIGEgbW9uc3Rlci4gIEJlc3QgdG8gZ2V0IGl0IGludG8gZnVsbCB2aWV3IGJl
-Zm9yZSB3ZSBjb21taXQgdG8NCj4gZmlnaHRpbmcgaXQuDQo+IA0KPj4gSW4gdjUgSSd2ZSBhZGRl
-ZCBhIGxvdCBtb3JlIHByZXBhcmF0aW9uIGNsZWFudXBzOg0KPj4gMDEtMjMgYXJlIHByZXBhcmF0
-aW9uIGNsZWFudXBzDQo+PiAgICAwMTogbm90IGNoYW5nZWQsIGtlZXAgRXJpYydzIHItYg0KPj4g
-ICAgMDI6IGltcHJvdmUgY29tbWl0IG1zZyBbTWFya3VzXSwga2VlcCBFcmljJ3Mgci1iDQo+PiAg
-ICAwMzogY2hhbmdlZCwgb25seSBlcnJvciBBUEkgaGVyZSwgZHJvcCByLWINCj4+IDI0IGlzIGNv
-cmUgbWFjcm8NCj4+ICAgIC0gaW1wcm92ZSBjb3ZlciBsZXR0ZXIsIHdvcmRpbmcgYW5kIG1hY3Jv
-IGNvZGUgc3R5bGUNCj4+ICAgIC0ga2VlcCBFcmljJ3Mgci1iDQo+PiAyNS0yNjogYXV0b21hdGlv
-biBzY3JpcHRzDQo+PiAgICAgLSBjb21taXQtcGVyLXN1YnN5c3RlbSBjaGFuZ2VkIGEgbG90LiBp
-dCdzIGEgZHJhZnQsIGRvbid0IGJvdGhlciB0b28NCj4+ICAgICAgIG11Y2ggd2l0aCBpdA0KPj4g
-ICAgIC0gY29jY2luZWxsZTogYWRkIHN1cHBvcnQgb2YgZXJyb3JfcHJvcGFnYXRlX3ByZXBlbmQN
-Cj4+DQo+PiAyNy0xMjY6IGdlbmVyYXRlZCBwYXRjaGVzDQo+IA0KPiBTcGxpdHRpbmcgdXAgdGhl
-IG1vbnN0ZXIgY2FuIG1ha2UgZmlnaHRpbmcgaXQgZWFzaWVyLg0KPiANCj4gWW91ciBkZXNjcmlw
-dGlvbiBzdWdnZXN0cyB0aHJlZSBoaWdoLWxldmVsIHBhcnRzOg0KPiANCj4gUGFydCAxOiBQcmVw
-YXJhdGlvbiAobWFrZXMgc2Vuc2UgYnkgaXRzZWxmKQ0KDQpJIGFscmVhZHkgcmVzZW50IHBhcnQg
-MSBhbGwgcGF0Y2hlcyAoaGFuZGxpbmcgcmV2aWV3IGNvbW1lbnRzKSBpbiBzZXBhcmF0ZSBhcyB2
-Ni4NCklmIGl0IGlzIGNvbnZlbmllbnQsIEkgY2FuIHJlc2VuZCB0aGVtIGluIG9uZSBzZXJpZXMg
-YXMgdjcuDQoNCj4gUGFydCAyOiBFcnJvciBpbnRlcmZhY2UgdXBkYXRlICh3aXRoIHJ1bGVzIHdo
-YXQgY29kZSBzaG91bGQgZG8gbm93KQ0KDQpOb3RlLCB0aGF0IHBhdGNoIDIxIGlzIGFjdHVhbGx5
-IGZyb20gcGFydDIsIG5vdCBwYXJ0MS4NClNvIFBhcnQgMiBpcyAyMSwgMjQsIDI1Lg0KU28gSSB3
-YWl0IGZvciB5b3VyIGNvbW1lbnRzIGFuZCByZXNlbmQgKGlmIG5lZWRlZCkgYXMgc2VwYXJhdGUg
-c21hbGwgc2VyaWVzLg0KDQpBbmQgMjYgaXMgYXV0by1wYXRjaC1zcGxpdHRlciwgYnV0IHdlIGRv
-bid0IG5lZWQgaXQgbm93LCBpZiB3ZSBhcmUgZ29pbmcNCnRvIHN0YXJ0IGZyb20gc2V2ZXJhbCBi
-aWcgc3Vic3lzdGVtcy4NCg0KPiBQYXJ0IDM6IE1ha2UgdGhlIGNvZGUgb2JleSB0aGUgbmV3IHJ1
-bGVzIGV2ZXJ5d2hlcmUNCj4gDQo+IEkgaG9wZSB3ZSBjYW4gZ2V0IHBhcnQgMSBvdXQgb2YgdGhl
-IHdheSBxdWlja2x5LiAgRGlmZnN0YXQ6DQo+IA0KPiAgIGJhY2tlbmRzL2NyeXB0b2Rldi5jICAg
-ICAgIHwgIDExICstLS0NCj4gICBibG9jay9uYmQuYyAgICAgICAgICAgICAgICB8ICAxMCArLS0N
-Cj4gICBibG9jay9zbmFwc2hvdC5jICAgICAgICAgICB8ICAgNCArLQ0KPiAgIGR1bXAvZHVtcC1o
-bXAtY21kcy5jICAgICAgIHwgICA0ICstDQo+ICAgaHcvOXBmcy85cC1sb2NhbC5jICAgICAgICAg
-fCAgIDQgKy0NCj4gICBody85cGZzLzlwLXByb3h5LmMgICAgICAgICB8ICAgNSArLQ0KPiAgIGh3
-L2NvcmUvbG9hZGVyLWZpdC5jICAgICAgIHwgICA1ICstDQo+ICAgaHcvY29yZS9tYWNoaW5lLWht
-cC1jbWRzLmMgfCAgIDYgKy0NCj4gICBody9jb3JlL3FkZXYuYyAgICAgICAgICAgICB8ICAyOCAr
-KysrLS0tLQ0KPiAgIGh3L2kzODYvYW1kX2lvbW11LmMgICAgICAgIHwgIDE0ICsrLS0NCj4gICBo
-dy9wcGMvc3BhcHIuYyAgICAgICAgICAgICB8ICAgMiArLQ0KPiAgIGh3L3MzOTB4L2V2ZW50LWZh
-Y2lsaXR5LmMgIHwgICAyICstDQo+ICAgaHcvczM5MHgvczM5MC1zdGF0dHJpYi5jICAgfCAgIDMg
-Ky0NCj4gICBody9zZC9zZGhjaS5jICAgICAgICAgICAgICB8ICAgMiArLQ0KPiAgIGh3L3RwbS90
-cG1fZW11bGF0b3IuYyAgICAgIHwgICA4ICstLQ0KPiAgIGh3L3VzYi9kZXYtbmV0d29yay5jICAg
-ICAgIHwgICAyICstDQo+ICAgaHcvdmZpby9hcC5jICAgICAgICAgICAgICAgfCAgMTYgKy0tLS0N
-Cj4gICBpbmNsdWRlL2Jsb2NrL3NuYXBzaG90LmggICB8ICAgMiArLQ0KPiAgIGluY2x1ZGUvbW9u
-aXRvci9obXAuaCAgICAgIHwgICAyICstDQo+ICAgaW5jbHVkZS9xYXBpL2Vycm9yLmggICAgICAg
-fCAgNjkgKysrKysrKysrKysrKysrKysrLS0NCj4gICBpbmNsdWRlL3FvbS9vYmplY3QuaCAgICAg
-ICB8ICAgNCArLQ0KPiAgIG1vbml0b3IvaG1wLWNtZHMuYyAgICAgICAgIHwgMTU1ICsrKysrKysr
-KysrKysrKysrKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAgIG1vbml0b3IvcW1wLWNt
-ZHMuYyAgICAgICAgIHwgICAyICstDQo+ICAgbmV0L25ldC5jICAgICAgICAgICAgICAgICAgfCAg
-MTcgKystLS0NCj4gICBxZGV2LW1vbml0b3IuYyAgICAgICAgICAgICB8ICAyOCArKysrLS0tLQ0K
-PiAgIHFnYS9jb21tYW5kcy1wb3NpeC5jICAgICAgIHwgICAyICstDQo+ICAgcWdhL2NvbW1hbmRz
-LXdpbjMyLmMgICAgICAgfCAgIDIgKy0NCj4gICBxZ2EvY29tbWFuZHMuYyAgICAgICAgICAgICB8
-ICAxMiArKy0tDQo+ICAgcW9tL3FvbS1obXAtY21kcy5jICAgICAgICAgfCAgIDQgKy0NCj4gICB0
-YXJnZXQvcHBjL2t2bS5jICAgICAgICAgICB8ICAgNiArLQ0KPiAgIHRhcmdldC9wcGMva3ZtX3Bw
-Yy5oICAgICAgIHwgICA0ICstDQo+ICAgdWkvdm5jLmMgICAgICAgICAgICAgICAgICAgfCAgMjAg
-KystLS0tDQo+ICAgdWkvdm5jLmggICAgICAgICAgICAgICAgICAgfCAgIDIgKy0NCj4gICB1dGls
-L2Vycm9yLmMgICAgICAgICAgICAgICB8ICAzMCArKysrLS0tLS0NCj4gICAzNCBmaWxlcyBjaGFu
-Z2VkLCAyNjEgaW5zZXJ0aW9ucygrKSwgMjI2IGRlbGV0aW9ucygtKQ0KPiANCj4gQXQgZmlyc3Qg
-Z2xhbmNlLCBJIGNhbiBzZWUgYnVnIGZpeGVzLCBub24tbWVjaGFuaWNhbCBjbGVhbnVwcywgYW5k
-DQo+IG1lY2hhbmljYWwgY2xlYW51cHMuDQo+IA0KPiBXaXRoaW4gZWFjaCBvZiB0aGVzZSB0aHJl
-ZSBncm91cHMsIHdlIGhhdmUgcmVsYXRlZCBzdWItZ3JvdXBzLiAgRm9yDQo+IGluc3RhbmNlLCBz
-ZXZlcmFsIHBhdGNoZXMgY2xlYW4gdXAgZnVubnkgbmFtZXMgZm9yIHRoZSBjb21tb24gRXJyb3Ig
-KioNCj4gcGFyYW1ldGVycy4gIFNldmVyYWwgbW9yZSByZW5hbWUgInVuY29tbW9uIiBFcnJvciAq
-KiBwYXJhbWV0ZXJzLCB0bw0KPiBzaWduYWwgdGhlaXIgdW5jb21tb24gcm9sZS4gIEkgZG91YnQg
-c3BsaXR0aW5nIHVwIHRoZXNlIHN1Ymdyb3VwcyBvZg0KPiByZWxhdGVkIG1lY2hhbmljYWwgY2hh
-bmdlcyBhbG9uZyBzdWJzeXN0ZW0gbGluZXMgaXMgd29ydGh3aGlsZS4NCj4gDQo+IFBhcnQgMiBu
-ZWVkcyBjYXJlZnVsIGludGVyZmFjZSByZXZpZXcuICBIYXZpbmcgcGFydCAzIHJlYWR5IGhlbHBz
-IHRoZXJlLA0KPiBiZWNhdXNlIHdlIGNhbiBzZWUgcmF0aGVyIHRoYW4gZ3Vlc3MgaG93IHRoZSBp
-bnRlcmZhY2UgY2hhbmdlcyBwbGF5IG91dC4NCj4gV2UgcmVhbGx5IHdhbnQgdG8gZ2V0IHRoaXMg
-cGFydCByaWdodCBmcm9tIHRoZSBzdGFydCwgYmVjYXVzZSBpZiB3ZQ0KPiBkb24ndCwgd2UgZ2V0
-IHRvIGRvIHBhcnQgMyBhZ2Fpbi4NCj4gDQo+IFBhcnQgMyBpcyB3aGF0IG1ha2VzIHRoaXMgYSBt
-b25zdGVyLiAgSSB1bmRlcnN0YW5kIGl0J3MgbWVjaGFuaWNhbC4gIFdlDQo+IGNhbiBtZXJnZSBp
-dCBpbmNyZW1lbnRhbGx5LCBidXQgd2UgZG8gd2FudCB0byBtZXJnZSBpdCBhbGwsIGFuZCBzb29u
-ZXINCj4gcmF0aGVyIHRoYW4gbGF0ZXIsIHRvIGF2b2lkIGEgbWl4IG9mIG9sZCBhbmQgbmV3IGVy
-cm9yIGhhbmRsaW5nIGNvZGUuDQo+IFN1Y2ggbWl4ZXMgaW5ldml0YWJseSBjb25mdXNlIGRldmVs
-b3BlcnMsIGFuZCBsZWFkIHRvIG5ldyBpbnN0YW5jZXMgb2YNCj4gdGhlIG9sZCBwYXR0ZXJucyBj
-cmVlcGluZyBpbi4NCj4gDQo+IEkgZG8gaGF2ZSBkb3VidHMgYWJvdXQgeW91ciBhdXRvbWF0ZWQg
-c3BsaXQuDQo+IA0KPiBJIGFja25vd2xlZGdlIG1haW50YWluZXJzIG9mIGFjdGl2ZSBzdWJzeXN0
-ZW1zIG1heSB3YW50IHRvIG1lcmdlIHRoaXMgb24NCj4gdGhlaXIgb3duIHRlcm1zLCB0byBtaW5p
-bWl6ZSBkaXNydXB0aW9uLiAgU3BsaXR0aW5nIG9mZiBzdWItbW9uc3RlcnMgZm9yDQo+IHRoZW0g
-bWFrZXMgc2Vuc2UuICBTcGxpdHRpbmcgb2ZmIHRoZSBsb25nIHRhaWwgb2YgbGVzcyBidXN5IHN1
-YnN5c3RlbXMNCj4gbm90IHNvIG11Y2g7IGl0J2xsIG9ubHkgZHJhZyBvdXQgdGhlIG1lcmdpbmcu
-ICBZb3VyIGxpc3QgYmVsb3cgc2hvd3MgMTAwDQo+IHBhcnRzLCBhbmQgY2hhc2luZyB0aGVpciBt
-YWludGFpbmVycyBpcyBub3QgZ29pbmcgdG8gYmUgYSBmdW4NCj4gZXhwZXJpZW5jZS4NCj4gDQo+
-IE1vcmVvdmVyLCB1c2luZyBNQUlOVEFJTkVSUyB0byBndWlkZSBhbiBhdXRvbWF0aWMgc3BsaXQg
-aXMgYSBjdXRlIGlkZWEsDQo+IGJ1dCBpdCBmYWxscyBhcGFydCB3aGVuIE1BSU5UQUlORVJTIGF0
-dHJpYnV0ZXMgdGhlIHNhbWUgZmlsZSB0byBzZXZlcmFsDQo+IHN1YnN5c3RlbXMsIHdoaWNoIGlz
-IGZhaXJseSBjb21tb24uICBBIHNhbmUgc3BsaXQgcmVxdWlyZXMgaHVtYW4gdG91Y2guDQo+IA0K
-PiBJbnN0ZWFkLCBJJ2Qgc3RhcnQgd2l0aCBiaWcgc3Vic3lzdGVtcyB3aXRoIG1haW50YWluZXJz
-IGtub3duIHRvIGJlDQo+IHN5bXBhdGhldGljIHRvIHRoaXMgZWZmb3J0LiAgU3BsaXQgb2ZmIHRo
-ZWlyIHN1Yi1tb25zdGVycywgZ2V0IHRoZW0NCj4gbWVyZ2VkLiAgSXRlcmF0ZSB1bnRpbCB0aGUg
-cmVtYWluZGVyIGNhbiBiZSBtZXJnZWQgaW4gb25lIGZpbmFsIHB1c2guDQoNCkRvIHlvdSBtZWFu
-IHRvIHNlbmQgdGhlbSBhcyBzZXBhcmF0ZSBwZXItc3Vic3lzdGVtIHNlcmllcywgb3IgYWxsIGlu
-IG9uZSwNCmJ1dCBsaW1pdGVkIHRvIHNvbWUgc3Vic3lzdGVtcz8NCg0KPiANCj4+ID09PT0NCj4+
-DQo+PiBIZXJlIGlzIGEgcHJvcG9zYWwgb2YgYXV0byBwcm9wYWdhdGlvbiBmb3IgbG9jYWxfZXJy
-LCB0byBub3QgY2FsbA0KPj4gZXJyb3JfcHJvcGFnYXRlIG9uIGV2ZXJ5IGV4aXQgcG9pbnQsIHdo
-ZW4gd2UgZGVhbCB3aXRoIGxvY2FsX2Vyci4NCj4gDQo+IE1vcmUgY2xldmVybmVzcywgbGVzcyBj
-b2RlLCBhdm9pZHMgb25lIGtpbmQgb2YgZXJyb3IgKGZvcmdldHRpbmcgbWFudWFsDQo+IHByb3Bh
-Z2F0ZSB3aGVuIHdlIHNob3VsZCksIHJpc2tzIGFub3RoZXIga2luZCBvZiBlcnJvciAoYXV0b21h
-dGljDQo+IHByb3BhZ2F0ZSB3aGVuIHdlIHNob3VsZG4ndCkuICBUcmFkZW9mZnMsIGJ1dCB0aGUg
-Z2VuZXJhbCBmZWVsaW5nIGFtb25nDQo+IHJldmlld2VycyBhcHBlYXJzIHRvIGJlIHBvc2l0aXZl
-Lg0KPiANCj4+IFRoZXJlIGFyZSBhbHNvIHR3byBpc3N1ZXMgd2l0aCBlcnJwOg0KPj4NCj4+IDEu
-IGVycm9yX2ZhdGFsICYgZXJyb3JfYXBwZW5kX2hpbnQvZXJyb3JfcHJlcGVuZDogdXNlciBjYW4n
-dCBzZWUgdGhpcw0KPj4gYWRkaXRpb25hbCBpbmZvLCBiZWNhdXNlIGV4aXQoKSBoYXBwZW5zIGlu
-IGVycm9yX3NldGcgZWFybGllciB0aGFuIGluZm8NCj4+IGlzIGFkZGVkLiBbUmVwb3J0ZWQgYnkg
-R3JlZyBLdXJ6XQ0KPiANCj4gWWVzLCBicm9rZW4gYnkgZGVzaWduLCBodXJ0cyB1c2Vycy4NCj4g
-DQo+PiAyLiBlcnJvcl9hYm9ydCAmIGVycm9yX3Byb3BhZ2F0ZTogd2hlbiB3ZSB3cmFwDQo+PiBl
-cnJvcl9hYm9ydCBieSBsb2NhbF9lcnIrZXJyb3JfcHJvcGFnYXRlLCByZXN1bHRpbmcgY29yZWR1
-bXAgd2lsbA0KPj4gcmVmZXIgdG8gZXJyb3JfcHJvcGFnYXRlIGFuZCBub3QgdG8gdGhlIHBsYWNl
-IHdoZXJlIGVycm9yIGhhcHBlbmVkLg0KPj4gKHRoZSBtYWNybyBpdHNlbGYgZG9uJ3QgZml4IHRo
-ZSBpc3N1ZSwgYnV0IGl0IGFsbG93cyB0byBbMy5dIGRyb3AgYWxsDQo+PiBsb2NhbF9lcnIrZXJy
-b3JfcHJvcGFnYXRlIHBhdHRlcm4sIHdoaWNoIHdpbGwgZGVmaW5pdGVseSBmaXggdGhlIGlzc3Vl
-KQ0KPj4gW1JlcG9ydGVkIGJ5IEtldmluIFdvbGZdDQo+IA0KPiBZZXMsIGJyb2tlbiBieSBkZXNp
-Z24sIGluY29udmVuaWVuY2VzIGRldmVsb3BlcnMuDQo+IA0KPj4gPT09PQ0KPj4NCj4+IEdlbmVy
-YXRlZCBwYXRjaGVzIHNwbGl0Og0KPj4NCj4+IG1pc2MNCj4+ICAgICBody9taXNjL2l2c2htZW0u
-Yw0KPj4gICAgIGh3L21pc2MvdG1wMTA1LmMNCj4+ICAgICBody9taXNjL3RtcDQyMS5jDQo+IFs5
-OSBtb3JlLi4uXQ0KPiANCg0KVGhhbmtzIQ0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWly
-DQo=
+Allow writing all the data compressed through the filter driver.
+The written data will be aligned by the cluster size.
+Based on the QEMU current implementation, that data can be written to
+unallocated clusters only. May be used for a backup job.
+
+Suggested-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ block/Makefile.objs     |   1 +
+ block/filter-compress.c | 166 ++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/block-core.json    |  10 +--
+ 3 files changed, 173 insertions(+), 4 deletions(-)
+ create mode 100644 block/filter-compress.c
+
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index e394fe0..330529b 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -43,6 +43,7 @@ block-obj-y += crypto.o
+ 
+ block-obj-y += aio_task.o
+ block-obj-y += backup-top.o
++block-obj-y += filter-compress.o
+ 
+ common-obj-y += stream.o
+ 
+diff --git a/block/filter-compress.c b/block/filter-compress.c
+new file mode 100644
+index 0000000..4aa189b
+--- /dev/null
++++ b/block/filter-compress.c
+@@ -0,0 +1,166 @@
++/*
++ * Compress filter block driver
++ *
++ * Copyright (c) 2019 Virtuozzo International GmbH
++ *
++ * Author:
++ *   Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
++ *   (based on block/copy-on-read.c by Max Reitz)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) any later version of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block_int.h"
++#include "qemu/module.h"
++#include "qapi/error.h"
++
++
++static int compress_open(BlockDriverState *bs, QDict *options, int flags,
++                         Error **errp)
++{
++    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
++                               errp);
++    if (!bs->file) {
++        return -EINVAL;
++    }
++
++    if (!bs->file->bs->drv || !block_driver_can_compress(bs->file->bs->drv)) {
++        error_setg(errp, "Compression is not supported with this drive %s",
++                   bdrv_get_device_name(bs->file->bs));
++        return -ENOTSUP;
++    }
++
++    bs->supported_write_flags = BDRV_REQ_WRITE_UNCHANGED |
++        (BDRV_REQ_FUA & bs->file->bs->supported_write_flags);
++
++    bs->supported_zero_flags = BDRV_REQ_WRITE_UNCHANGED |
++        ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
++            bs->file->bs->supported_zero_flags);
++
++    return 0;
++}
++
++
++static int64_t compress_getlength(BlockDriverState *bs)
++{
++    return bdrv_getlength(bs->file->bs);
++}
++
++
++static int coroutine_fn compress_co_preadv_part(BlockDriverState *bs,
++                                                uint64_t offset, uint64_t bytes,
++                                                QEMUIOVector *qiov,
++                                                size_t qiov_offset,
++                                                int flags)
++{
++    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
++                               flags);
++}
++
++
++static int coroutine_fn compress_co_pwritev_part(BlockDriverState *bs,
++                                                 uint64_t offset,
++                                                 uint64_t bytes,
++                                                 QEMUIOVector *qiov,
++                                                 size_t qiov_offset, int flags)
++{
++    return bdrv_co_pwritev_part(bs->file, offset, bytes, qiov, qiov_offset,
++                                flags | BDRV_REQ_WRITE_COMPRESSED);
++}
++
++
++static int coroutine_fn compress_co_pwrite_zeroes(BlockDriverState *bs,
++                                                  int64_t offset, int bytes,
++                                                  BdrvRequestFlags flags)
++{
++    return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
++}
++
++
++static int coroutine_fn compress_co_pdiscard(BlockDriverState *bs,
++                                             int64_t offset, int bytes)
++{
++    return bdrv_co_pdiscard(bs->file, offset, bytes);
++}
++
++
++static void compress_refresh_limits(BlockDriverState *bs, Error **errp)
++{
++    BlockDriverInfo bdi;
++    int ret;
++
++    if (!bs->file) {
++        return;
++    }
++
++    ret = bdrv_get_info(bs->file->bs, &bdi);
++    if (ret < 0 || bdi.cluster_size == 0) {
++        return;
++    }
++
++    bs->bl.request_alignment = bdi.cluster_size;
++}
++
++
++static void compress_eject(BlockDriverState *bs, bool eject_flag)
++{
++    bdrv_eject(bs->file->bs, eject_flag);
++}
++
++
++static void compress_lock_medium(BlockDriverState *bs, bool locked)
++{
++    bdrv_lock_medium(bs->file->bs, locked);
++}
++
++
++static bool compress_recurse_is_first_non_filter(BlockDriverState *bs,
++                                                 BlockDriverState *candidate)
++{
++    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
++}
++
++
++static BlockDriver bdrv_compress = {
++    .format_name                        = "compress",
++
++    .bdrv_open                          = compress_open,
++    .bdrv_child_perm                    = bdrv_filter_default_perms,
++
++    .bdrv_getlength                     = compress_getlength,
++
++    .bdrv_co_preadv_part                = compress_co_preadv_part,
++    .bdrv_co_pwritev_part               = compress_co_pwritev_part,
++    .bdrv_co_pwrite_zeroes              = compress_co_pwrite_zeroes,
++    .bdrv_co_pdiscard                   = compress_co_pdiscard,
++    .bdrv_refresh_limits                = compress_refresh_limits,
++
++    .bdrv_eject                         = compress_eject,
++    .bdrv_lock_medium                   = compress_lock_medium,
++
++    .bdrv_co_block_status               = bdrv_co_block_status_from_backing,
++
++    .bdrv_recurse_is_first_non_filter   = compress_recurse_is_first_non_filter,
++
++    .has_variable_length                = true,
++    .is_filter                          = true,
++};
++
++static void bdrv_compress_init(void)
++{
++    bdrv_register(&bdrv_compress);
++}
++
++block_init(bdrv_compress_init);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0cf68fe..93ee04e 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2884,15 +2884,16 @@
+ # @copy-on-read: Since 3.0
+ # @blklogwrites: Since 3.0
+ # @blkreplay: Since 4.2
++# @compress: Since 5.0
+ #
+ # Since: 2.9
+ ##
+ { 'enum': 'BlockdevDriver',
+   'data': [ 'blkdebug', 'blklogwrites', 'blkreplay', 'blkverify', 'bochs',
+-            'cloop', 'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
+-            'host_cdrom', 'host_device', 'http', 'https', 'iscsi', 'luks',
+-            'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels', 'qcow',
+-            'qcow2', 'qed', 'quorum', 'raw', 'rbd',
++            'cloop', 'compress', 'copy-on-read', 'dmg', 'file', 'ftp', 'ftps',
++            'gluster', 'host_cdrom', 'host_device', 'http', 'https', 'iscsi',
++            'luks', 'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels',
++            'qcow', 'qcow2', 'qed', 'quorum', 'raw', 'rbd',
+             { 'name': 'replication', 'if': 'defined(CONFIG_REPLICATION)' },
+             'sheepdog',
+             'ssh', 'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
+@@ -4044,6 +4045,7 @@
+       'blkreplay':  'BlockdevOptionsBlkreplay',
+       'bochs':      'BlockdevOptionsGenericFormat',
+       'cloop':      'BlockdevOptionsGenericFormat',
++      'compress':   'BlockdevOptionsGenericFormat',
+       'copy-on-read':'BlockdevOptionsGenericFormat',
+       'dmg':        'BlockdevOptionsGenericFormat',
+       'file':       'BlockdevOptionsFile',
+-- 
+1.8.3.1
+
 
