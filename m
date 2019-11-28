@@ -2,55 +2,64 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C6EC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 08:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B88E6C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 08:50:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D64482158A
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 08:47:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D64482158A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 891EA216F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 08:50:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 891EA216F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaFSV-0004TZ-5b
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 03:47:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36264)
+	id 1iaFUq-00067d-Or
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 03:49:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1iaFR0-0003pg-DF
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:45:59 -0500
+ (envelope-from <clg@kaod.org>) id 1iaFSz-0004yK-Vz
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:48:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1iaFQz-0004Is-2P
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:45:58 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2269 helo=huawei.com)
+ (envelope-from <clg@kaod.org>) id 1iaFSw-0008IL-Ls
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:48:00 -0500
+Received: from 3.mo1.mail-out.ovh.net ([46.105.60.232]:48228)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1iaFM5-0008P6-Ho; Thu, 28 Nov 2019 03:40:53 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 685EEA3C9EBAACD49D55;
- Thu, 28 Nov 2019 16:40:43 +0800 (CST)
-Received: from HGHY2P002143101.china.huawei.com (10.184.39.213) by
- DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 28 Nov 2019 16:40:34 +0800
-From: <pannengyuan@huawei.com>
-To: <eblake@redhat.com>, <kwolf@redhat.com>, <mreitz@redhat.com>
-Subject: [PATCH] block/nbd: fix memory leak in nbd_open()
-Date: Thu, 28 Nov 2019 16:40:10 +0800
-Message-ID: <1574930410-43468-1-git-send-email-pannengyuan@huawei.com>
-X-Mailer: git-send-email 2.7.2.windows.1
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iaFSu-0008EJ-Lz
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 03:47:57 -0500
+Received: from player711.ha.ovh.net (unknown [10.108.35.110])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 395BA19DE8E
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 09:47:53 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player711.ha.ovh.net (Postfix) with ESMTPSA id 39B5DC86E684;
+ Thu, 28 Nov 2019 08:47:48 +0000 (UTC)
+Subject: Re: [PATCH 4/4] ast2600: Configure CNTFRQ at 1125MHz
+To: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org
+References: <20191128054527.25450-1-andrew@aj.id.au>
+ <20191128054527.25450-5-andrew@aj.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a63f07ca-8d20-5c72-196e-15ac38855936@kaod.org>
+Date: Thu, 28 Nov 2019 09:47:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20191128054527.25450-5-andrew@aj.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 9923681779062508352
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeiiedguddviecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgepud
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.191
+X-Received-From: 46.105.60.232
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,76 +71,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liyiting@huawei.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
- PanNengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org,
- kuhn.chenqun@huawei.com
+Cc: peter.maydell@linaro.org, joel@jms.id.au, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: PanNengyuan <pannengyuan@huawei.com>
+On 28/11/2019 06:45, Andrew Jeffery wrote:
+> This matches the configuration set by u-boot on the AST2600.
+>=20
+> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
 
-In currently implementation there will be a memory leak when
-nbd_client_connect() returns error status. Here is an easy way to reproduce:
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-1. run qemu-iotests as follow and check the result with asan:
-    ./check -raw 143
-
-Following is the asan output backtrack:
-Direct leak of 40 byte(s) in 1 object(s) allocated from:
-    #0 0x7f629688a560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
-    #1 0x7f6295e7e015 in g_malloc0  (/usr/lib64/libglib-2.0.so.0+0x50015)
-    #2 0x56281dab4642 in qobject_input_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:295
-    #3 0x56281dab1a04 in visit_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:49
-    #4 0x56281dad1827 in visit_type_SocketAddress  qapi/qapi-visit-sockets.c:386
-    #5 0x56281da8062f in nbd_config  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
-    #6 0x56281da8062f in nbd_process_options  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
-    #7 0x56281da8062f in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
-
-Direct leak of 15 byte(s) in 1 object(s) allocated from:
-    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
-    #1 0x7f6295e7dfbd in g_malloc  (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
-    #2 0x7f6295e96ace in g_strdup  (/usr/lib64/libglib-2.0.so.0+0x68ace)
-    #3 0x56281da804ac in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1834
-    #4 0x56281da804ac in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
-
-Indirect leak of 24 byte(s) in 1 object(s) allocated from:
-    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
-    #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
-    #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
-    #3 0x56281dab41a3 in qobject_input_type_str_keyval   /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:536
-    #4 0x56281dab2ee9 in visit_type_str   /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:297
-    #5 0x56281dad0fa1 in visit_type_UnixSocketAddress_members  qapi/qapi-visit-sockets.c:141
-    #6 0x56281dad17b6 in visit_type_SocketAddress_members      qapi/qapi-visit-sockets.c:366
-    #7 0x56281dad186a in visit_type_SocketAddress     qapi/qapi-visit-sockets.c:393
-    #8 0x56281da8062f in nbd_config   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
-    #9 0x56281da8062f in nbd_process_options   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
-    #10 0x56281da8062f in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
-
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
----
- block/nbd.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/block/nbd.c b/block/nbd.c
-index 1239761..bc40a25 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1881,6 +1881,11 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
- 
-     ret = nbd_client_connect(bs, errp);
-     if (ret < 0) {
-+        object_unref(OBJECT(s->tlscreds));
-+        qapi_free_SocketAddress(s->saddr);
-+        g_free(s->export);
-+        g_free(s->tlscredsid);
-+        g_free(s->x_dirty_bitmap);
-         return ret;
-     }
-     /* successfully connected */
--- 
-2.7.2.windows.1
-
+> ---
+>  hw/arm/aspeed_ast2600.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+> index 931887ac681f..5aecc3b3caec 100644
+> --- a/hw/arm/aspeed_ast2600.c
+> +++ b/hw/arm/aspeed_ast2600.c
+> @@ -259,6 +259,9 @@ static void aspeed_soc_ast2600_realize(DeviceState =
+*dev, Error **errp)
+>          object_property_set_int(OBJECT(&s->cpu[i]), aspeed_calc_affini=
+ty(i),
+>                                  "mp-affinity", &error_abort);
+> =20
+> +        object_property_set_int(OBJECT(&s->cpu[i]), 1125000000, "cntfr=
+q",
+> +                                &error_abort);
+> +
+>          /*
+>           * TODO: the secondary CPUs are started and a boot helper
+>           * is needed when using -kernel
+>=20
 
 
