@@ -2,90 +2,85 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D0EC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 20:13:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB178C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 20:17:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D34421771
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 20:13:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B739B21774
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 20:17:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RKUcZCZo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D34421771
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VkoXyy2B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B739B21774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaQAD-00073U-Je
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 15:13:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36397)
+	id 1iaQEB-0000Bv-Pb
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 15:17:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iaOEe-0001F0-Sh
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 13:09:51 -0500
+ (envelope-from <thuth@redhat.com>) id 1iaQ6I-0005aG-RF
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 15:09:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iaOEZ-0003Ww-Lz
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 13:09:44 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34884)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iaOEZ-0003FH-B1
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 13:09:43 -0500
-Received: by mail-ot1-x344.google.com with SMTP id o9so1763997ote.2
- for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 10:09:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=3E+G+ws0+hVbrLtQKe6P6rq2UNQNqe4ABFsvkwzP4Bs=;
- b=RKUcZCZodZx4Smy5mUnP6JQzV/kYIblIoCQWViJgtpwqk0CFgQdI+V+OdR5s0Pgmn8
- fk0qSJPb2gfoAm03bwUt/5HEBkVjhoVsBsWtAUDGHqjHl/LEPAulYj4tB6hAgnjf0cFy
- eRqqohYhDEuOdnw8Wfg8WKRtI8argnIXc4izeU0KeGfo18JONFEdjGa+2fg+2pM1sIrl
- S9jajHqo3QMfFxbB0V+0hwpJd3cEgQgvnv7liL42UDIdMXBcrc40Vs+yo+Thh3/vxw9y
- wYHz0yA7HIeWqFWzo8sawJD1D6ksRNmTpRdxKFAc+iN7O7OuFxPXgSOj65/ClOmdV3eB
- /VdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=3E+G+ws0+hVbrLtQKe6P6rq2UNQNqe4ABFsvkwzP4Bs=;
- b=hAvUgGqRtBqGo5e+mtMz+bJ7GObcSROEdJFqXEfpGOtv4gyaykhTfemYAN/KvpH6+Y
- 4XrgmRhK+PR3Hdy1/GUYksRwu7AqD1zL5IbSsqp/+p8CrS9/IIY+yUXyvaTSsxYF7GDU
- c6kDgUzeermEsiuK0xTtFwhdyzTt3kWrA3lgMv/sXoAqmMqogVHvFbHZVnlDJOft7WIj
- DRTRm4uexDfWygjTG+aYr+bkdUh+T1SgmZvLCCVaKIYGXEmmobS8Ah5eJrKxycZmwgSf
- FmXyOTIpcQWZzQTlJDOeooen80rU4QgutZOvdRGMcImlXCFc/fO8IkU6GLCpOeFXrH87
- ttDQ==
-X-Gm-Message-State: APjAAAXUlVMeg+YysU3HTJ6/IWGeRKnxs5427jAoa/MpL2PCzHP9lmhY
- 5896leIXYdKDzG9qaBvt0FDihn+yfMemDeny/JU=
-X-Google-Smtp-Source: APXvYqxTPBe2g/33fwnib+M42ihLIH/fNVqXNdPQPNYwqhhrOxEP13rpFZQgI4XsQ0rmUtp1Dcetel/LFFd0ZEnrQNY=
-X-Received: by 2002:a05:6830:1383:: with SMTP id
- d3mr8220102otq.306.1574964579486; 
- Thu, 28 Nov 2019 10:09:39 -0800 (PST)
+ (envelope-from <thuth@redhat.com>) id 1iaQ65-00081r-JR
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 15:09:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40930
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iaQ65-0007pf-Cu
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 15:09:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574971742;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=bNl6agWHIgwCJ6Hb0jGAA40xKpKz9cUfHQxbNXaQq7k=;
+ b=VkoXyy2BfYBwxYj0PSnGLmGtnTBK2vcjkYa0aBx66DtaGPWf7UaRpwYKIuvG+2NXDufVSl
+ +x+13YCk4nidsWOCObVQ4IkI2MooPLSvIFLGys+CKlLiix0YKpOwFC4AYTsdIFUpT5Wlsp
+ gCfNDuvSxUwaZyLOzdizYwXaNB+TNaM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-100-UUojAlNSOuK1sZB-2J-Wew-1; Thu, 28 Nov 2019 15:08:59 -0500
+X-MC-Unique: UUojAlNSOuK1sZB-2J-Wew-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0634B1883521;
+ Thu, 28 Nov 2019 20:08:58 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-105.ams2.redhat.com [10.36.116.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DBEE5D6D0;
+ Thu, 28 Nov 2019 20:08:52 +0000 (UTC)
+Subject: Re: [PATCH 14/15] s390x: protvirt: Disable address checks for PV
+ guest IO emulation
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
+ <20191120114334.2287-15-frankja@linux.ibm.com>
+ <db581b32-2b84-683c-0e7e-b6ee908eb701@redhat.com>
+ <be2aece1-8879-d3d3-81ff-7bbbb8052548@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <28289bed-0dab-53f6-ed78-8c36498b1b5e@redhat.com>
+Date: Thu, 28 Nov 2019 21:08:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Thu, 28 Nov 2019 10:09:39
- -0800 (PST)
-In-Reply-To: <2540f517-5662-2afb-fb2f-4720fddd7eb5@redhat.com>
-References: <20191127175257.23480-1-mrolnik@gmail.com>
- <CAL1e-=isp_-zF71STK-v5D8r5sGYiZbRFmSzjfQtR2FC5YknHQ@mail.gmail.com>
- <CAK4993iniaLhSYCe9hfuNpujpEdqPtZqqsJirBwYG9HqUVx6dA@mail.gmail.com>
- <CAL1e-=h+ZHM9qOOMj2KASuN2J4rSYcn1KP1hOzTWp+EpBY3=5A@mail.gmail.com>
- <CAK4993jDe+c7XsNn=fBwMu6TLuF8KgxNvUziXkwAUuOVArjrsA@mail.gmail.com>
- <5a784557-f322-dc3a-4ff1-a7d9a0409448@redhat.com>
- <CAL1e-=jJ5uNvYq7yNQYFhMJ0k94-d6mrybs-NyVjVi9Agb4Aeg@mail.gmail.com>
- <CAK4993i8zPyYH2hGxx0hP4qQKr9oTJV2T5JDtQmKHZe2EpAsvw@mail.gmail.com>
- <2540f517-5662-2afb-fb2f-4720fddd7eb5@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 28 Nov 2019 19:09:39 +0100
-Message-ID: <CAL1e-=jnMvZBsGvAn7cU+jUUwiORaGBkoAyhmQErgQaU8iiRKA@mail.gmail.com>
-Subject: Re: [PATCH v37 00/17] QEMU AVR 8 bit cores
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000004b529005986c042e"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <be2aece1-8879-d3d3-81ff-7bbbb8052548@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="FjuCAAuNR6rsTEln09rnE72ME0c4I53kB"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,126 +92,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Joaquin de Andres <me@xcancerberox.com.ar>,
- Richard Henderson <richard.henderson@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, QEMU Developers <qemu-devel@nongnu.org>,
- Michael Rolnik <mrolnik@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004b529005986c042e
-Content-Type: text/plain; charset="UTF-8"
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FjuCAAuNR6rsTEln09rnE72ME0c4I53kB
+Content-Type: multipart/mixed; boundary="F2chkxQt4qB7f2N6lmeGhgq3qD98Kpqh3";
+ protected-headers="v1"
+From: Thomas Huth <thuth@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: david@redhat.com, borntraeger@de.ibm.com, mihajlov@linux.ibm.com,
+ cohuck@redhat.com, qemu-s390x@nongnu.org, pmorel@linux.ibm.com
+Message-ID: <28289bed-0dab-53f6-ed78-8c36498b1b5e@redhat.com>
+Subject: Re: [PATCH 14/15] s390x: protvirt: Disable address checks for PV
+ guest IO emulation
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
+ <20191120114334.2287-15-frankja@linux.ibm.com>
+ <db581b32-2b84-683c-0e7e-b6ee908eb701@redhat.com>
+ <be2aece1-8879-d3d3-81ff-7bbbb8052548@linux.ibm.com>
+In-Reply-To: <be2aece1-8879-d3d3-81ff-7bbbb8052548@linux.ibm.com>
+
+--F2chkxQt4qB7f2N6lmeGhgq3qD98Kpqh3
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Thursday, November 28, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-wrote:
+On 28/11/2019 17.10, Janosch Frank wrote:
+> On 11/28/19 4:28 PM, Thomas Huth wrote:
+>> On 20/11/2019 12.43, Janosch Frank wrote:
+>>> IO instruction data is routed through SIDAD for protected guests, so
+>>> adresses do not need to be checked, as this is kernel memory.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> ---
+>>>  target/s390x/ioinst.c | 46 +++++++++++++++++++++++++++----------------
+>>>  1 file changed, 29 insertions(+), 17 deletions(-)
+>>>
+>>> diff --git a/target/s390x/ioinst.c b/target/s390x/ioinst.c
+>>> index c437a1d8c6..d3bd422ddd 100644
+>>> --- a/target/s390x/ioinst.c
+>>> +++ b/target/s390x/ioinst.c
+>>> @@ -110,11 +110,13 @@ void ioinst_handle_msch(S390CPU *cpu, uint64_t re=
+g1, uint32_t ipb, uintptr_t ra)
+>>>      int cssid, ssid, schid, m;
+>>>      SubchDev *sch;
+>>>      SCHIB schib;
+>>> -    uint64_t addr;
+>>> +    uint64_t addr =3D 0;
+>>>      CPUS390XState *env =3D &cpu->env;
+>>> -    uint8_t ar;
+>>> +    uint8_t ar =3D 0;
+>>> =20
+>>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    if (!env->pv) {
+>>> +        addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    }
+>>>      if (addr & 3) {
+>>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>>>          return;
+>>> @@ -167,11 +169,13 @@ void ioinst_handle_ssch(S390CPU *cpu, uint64_t re=
+g1, uint32_t ipb, uintptr_t ra)
+>>>      int cssid, ssid, schid, m;
+>>>      SubchDev *sch;
+>>>      ORB orig_orb, orb;
+>>> -    uint64_t addr;
+>>> +    uint64_t addr =3D 0;
+>>>      CPUS390XState *env =3D &cpu->env;
+>>> -    uint8_t ar;
+>>> +    uint8_t ar =3D 0;
+>>> =20
+>>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    if (!env->pv) {
+>>> +        addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    }
+>>>      if (addr & 3) {
+>>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>>>          return;
+>>> @@ -198,12 +202,14 @@ void ioinst_handle_ssch(S390CPU *cpu, uint64_t re=
+g1, uint32_t ipb, uintptr_t ra)
+>>>  void ioinst_handle_stcrw(S390CPU *cpu, uint32_t ipb, uintptr_t ra)
+>>>  {
+>>>      CRW crw;
+>>> -    uint64_t addr;
+>>> +    uint64_t addr =3D 0;
+>>>      int cc;
+>>>      CPUS390XState *env =3D &cpu->env;
+>>> -    uint8_t ar;
+>>> +    uint8_t ar =3D 0;
+>>> =20
+>>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    if (!env->pv) {
+>>> +        addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    }
+>>>      if (addr & 3) {
+>>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>>>          return;
+>>> @@ -228,13 +234,15 @@ void ioinst_handle_stsch(S390CPU *cpu, uint64_t r=
+eg1, uint32_t ipb,
+>>>  {
+>>>      int cssid, ssid, schid, m;
+>>>      SubchDev *sch;
+>>> -    uint64_t addr;
+>>> +    uint64_t addr =3D 0;
+>>>      int cc;
+>>>      SCHIB schib;
+>>>      CPUS390XState *env =3D &cpu->env;
+>>> -    uint8_t ar;
+>>> +    uint8_t ar =3D 0;
+>>> =20
+>>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    if (!env->pv) {
+>>> +        addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    }
+>>>      if (addr & 3) {
+>>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>>>          return;
+>>> @@ -294,16 +302,18 @@ int ioinst_handle_tsch(S390CPU *cpu, uint64_t reg=
+1, uint32_t ipb, uintptr_t ra)
+>>>      int cssid, ssid, schid, m;
+>>>      SubchDev *sch;
+>>>      IRB irb;
+>>> -    uint64_t addr;
+>>> +    uint64_t addr =3D 0;
+>>>      int cc, irb_len;
+>>> -    uint8_t ar;
+>>> +    uint8_t ar =3D 0;
+>>> =20
+>>>      if (ioinst_disassemble_sch_ident(reg1, &m, &cssid, &ssid, &schid))=
+ {
+>>>          s390_program_interrupt(env, PGM_OPERAND, ra);
+>>>          return -EIO;
+>>>      }
+>>>      trace_ioinst_sch_id("tsch", cssid, ssid, schid);
+>>> -    addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    if (!env->pv) {
+>>> +        addr =3D decode_basedisp_s(env, ipb, &ar);
+>>> +    }
+>>>      if (addr & 3) {
+>>>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>>>          return -EIO;
+>>
+>> Would it make sense to hide all these changes in decode_basedisp_s()
+>> instead? ... so that decode_basedisp_s() returns 0 if env->pv =3D=3D tru=
+e ?
+>> ... or are there still cases where we need real values from
+>> decode_basedisp_s() in case of env->pv=3D=3Dtrue?
+>=20
+> I'd like to keep decode_basedisp_s() as is, but how about a static
+> function in ioinst.c called something like get_address_from_regs()?
+>=20
+> It'll call decode_basedisp_s() or return 0.
 
-> On 11/28/19 2:46 PM, Michael Rolnik wrote:
->
->> I will rename them.
->>
->
-> Please wait comments from Richard before a version respin.
->
->
-Everything went well last 10 or so days, Michael and Sarah were responsive,
-the code and series got slowly improved more and more, but there was this
-disruption by your idea to "take over" the series with implementation of
-"real boards", rather than leave Michael doing improvements by himself,
-based on our feedback, like in a regular process of review... There are
-some pending quite reasonable and simple review items from me, Michael
-should continue working on them... But now he is told to wait... Shouldn't
-it be some better way?
+Sounds fine for me, too!
+
+ Thomas
 
 
-On Thu, Nov 28, 2019 at 3:41 PM Aleksandar Markovic <
->> aleksandar.m.mail@gmail.com <mailto:aleksandar.m.mail@gmail.com>> wrote:
->>
-> [...]
->
->>
->>
->>         If I understand Aleksandar correctly, the naming is incorrect
->>         because too generic to AVR family, why Sarah only modeled the
->>         Atmel implementation.
->>
->>         Renaming devices such hw/char/avr_usart.c ->
->>         hw/char/atmel_usart.c (similarly with the macros) would be
->>         enough Aleksandar?
->>
->>
->>
->>     Some renaming could help, perhaps not quite like the one above, but
->>     my point (which I find hard to believe I can't explain to you) is
->>     that peripherals inside the chip evolved over time, as starkly
->>     opposed to external peripherals that are set in stone...
->>
->
->
+--F2chkxQt4qB7f2N6lmeGhgq3qD98Kpqh3--
 
---0000000000004b529005986c042e
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+--FjuCAAuNR6rsTEln09rnE72ME0c4I53kB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-<br><br>On Thursday, November 28, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a =
-href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
-c solid;padding-left:1ex">On 11/28/19 2:46 PM, Michael Rolnik wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-I will rename them.<br>
-</blockquote>
-<br>
-Please wait comments from Richard before a version respin.<br>
-<br></blockquote><div><br></div><div>Everything went well last 10 or so day=
-s, Michael and Sarah were responsive, the code and series got slowly improv=
-ed more and more, but there was this disruption by your idea to &quot;take =
-over&quot; the series with implementation of &quot;real boards&quot;, rathe=
-r than leave Michael doing improvements by himself, based on our feedback, =
-like in a regular process of review... There are some pending quite reasona=
-ble and simple review items from me, Michael should continue working on the=
-m... But now he is told to wait... Shouldn&#39;t it be some better way?</di=
-v><div><br></div><div><br></div><blockquote class=3D"gmail_quote" style=3D"=
-margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-On Thu, Nov 28, 2019 at 3:41 PM Aleksandar Markovic &lt;<a href=3D"mailto:a=
-leksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</=
-a> &lt;mailto:<a href=3D"mailto:aleksandar.m.mail@gmail.com" target=3D"_bla=
-nk">aleksandar.m.mail@<wbr>gmail.com</a>&gt;&gt; wrote:<br>
-</blockquote>
-[...]<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 If I understand Aleksandar correctly, the namin=
-g is incorrect<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 because too generic to AVR family, why Sarah on=
-ly modeled the<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Atmel implementation.<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Renaming devices such hw/char/avr_usart.c -&gt;=
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 hw/char/atmel_usart.c (similarly with the macro=
-s) would be<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 enough Aleksandar?<br>
-<br>
-<br>
-<br>
-=C2=A0 =C2=A0 Some renaming could help, perhaps not quite like the one abov=
-e, but<br>
-=C2=A0 =C2=A0 my point (which I find hard to believe I can&#39;t explain to=
- you) is<br>
-=C2=A0 =C2=A0 that peripherals inside the chip evolved over time, as starkl=
-y<br>
-=C2=A0 =C2=A0 opposed to external peripherals that are set in stone...<br>
-</blockquote>
-<br>
-</blockquote>
+-----BEGIN PGP SIGNATURE-----
 
---0000000000004b529005986c042e--
+iQIzBAEBCAAdFiEEJ7iIR+7gJQEY8+q5LtnXdP5wLbUFAl3gKVIACgkQLtnXdP5w
+LbXPDA//QJKI4gKqKwtWPfydUmqgKA5AcW/kDALcnyq30opNuOKvD9UByH6IDunr
+2qijR7+iEE3oXUO96ZiHAOKpt2oZ0Z9L4u+Q3Ycm3UPnPGYyELjOY/FmEvmIX66M
+at3Rrb6ySb2d2OjWyyD9yDgrmB7863BdZpmL6zqu4nnFzQrvK3DpIP9RWA8v5x+L
+dA8ru81BBIXvWspKoHDGv9M1oQSwYrs6u1oC21hHUycMNqZLqAzhN2phbZowWgf0
+DTrqK44WrM9uywbxxZ1YYdgG4gHvWQjXb1BXhMnURjHjmyqOa/a5LHbpdRlEdDov
+pw1mGOvZRZidKMJgwqIzVeXwE2ooIhOEkAA5+GWS8WI4TcrdEjy2VMy/Q4JBix1k
+VK6XuGC5RSXShtx7VXwB5PPbM43Z/+zMk7fqf8n+rV178y+HOyQln6mGlz9vAGoZ
+9suYCoe+MEx2ufOyjTYNRTI7Qi3SNNhrxuTGHIsfTR2oSxHfOya+mWOpMlYMfFiL
+B839PkreVngSVacEy8HgCwG61vj7nID7d1JgM/+MeGxN6t+s/ONg3M4RnmPoBhah
+wlthhFSpTBfnHkIAUkYxj5v7UMw8wNff4RZGi4w1fmaSOa2oF5QP3Pi4bRWW8v5T
+ez73IA/qsVe+vEHoxMtl480CdyO3f+MnuWqooThuiM95KzRzhak=
+=yUhl
+-----END PGP SIGNATURE-----
+
+--FjuCAAuNR6rsTEln09rnE72ME0c4I53kB--
+
 
