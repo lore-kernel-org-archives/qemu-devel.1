@@ -2,104 +2,81 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0357C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 05:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A60EC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 06:34:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A980A208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 05:59:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 219B1215E5
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 06:34:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="D4+F/DM3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A980A208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CjrIill5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219B1215E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaCpe-0006AD-T6
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 00:59:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33501)
+	id 1iaDNn-000673-MR
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 01:34:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57230)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty@apple.com>) id 1iaCoa-0005gV-ID
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 00:58:09 -0500
+ (envelope-from <thuth@redhat.com>) id 1iaDMT-0005C9-Oi
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 01:33:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty@apple.com>) id 1iaCoY-0003p8-F1
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 00:58:08 -0500
-Received: from ma1-aaemail-dr-lapp03.apple.com ([17.171.2.72]:39860)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dirty@apple.com>) id 1iaCoW-0003mB-CP
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 00:58:04 -0500
-Received: from pps.filterd (ma1-aaemail-dr-lapp03.apple.com [127.0.0.1])
- by ma1-aaemail-dr-lapp03.apple.com (8.16.0.27/8.16.0.27) with SMTP id
- xAS5qD3L031284; Wed, 27 Nov 2019 21:58:01 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
- h=sender : content-type
- : mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=20180706;
- bh=RQO/zO3qgoUpIwqQUBwfPO7J+2Ti+xjEWPNRuUk//aw=;
- b=D4+F/DM3fKegHQQZ9RXuvWBeoD8uhz9AcIDPDOPUW8aJpssqlYS63KURtuTDdQyuCi00
- JnfAP/+nTRqL9/jFvPpUEsKJOCgOUwGo/Uw4EgbvrDrZd7/HNlkk/Psm9SL+mfwwlzdN
- dieViV7bmO6kp7G8O84CTh19lYUjm1p2gEnt8nXXt0Uq1KbNJz9qkkHiUEDMOKBaPTx7
- cIDtmneLoBCrZkD1EVj8Qd+jG8rzFNwNzza4Aw35dsrpdBwhTDhayWqWj6sogW/Lb+Ww
- Q22KkGmxc+YtWn98srefE2/V2CNDNOyQMpF2G/Mp01Tz4vSe9AJSNEx2+OeVzuuf33CJ VQ== 
-Received: from ma1-mtap-s03.corp.apple.com (ma1-mtap-s03.corp.apple.com
- [17.40.76.7])
- by ma1-aaemail-dr-lapp03.apple.com with ESMTP id 2wf4n89x0c-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
- Wed, 27 Nov 2019 21:58:01 -0800
-Received: from nwk-mmpp-sz11.apple.com
- (nwk-mmpp-sz11.apple.com [17.128.115.155]) by ma1-mtap-s03.corp.apple.com
- (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
- 2019)) with ESMTPS id <0Q1O009P70KOXZ50@ma1-mtap-s03.corp.apple.com>; Wed,
- 27 Nov 2019 21:58:01 -0800 (PST)
-Received: from process_milters-daemon.nwk-mmpp-sz11.apple.com by
- nwk-mmpp-sz11.apple.com
- (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
- 2019)) id <0Q1O00I00092GX00@nwk-mmpp-sz11.apple.com>; Wed,
- 27 Nov 2019 21:58:00 -0800 (PST)
-X-Va-A: 
-X-Va-T-CD: 07468e1da2f6e987d649ff6cb4055ea6
-X-Va-E-CD: 41404d9c28fbc215bab670c20d826187
-X-Va-R-CD: eb29b0577443ea815658bc1e1be1b1f2
-X-Va-CD: 0
-X-Va-ID: ae3096fb-6ecc-4156-b25a-7ec69f9c8718
-X-V-A: 
-X-V-T-CD: 07468e1da2f6e987d649ff6cb4055ea6
-X-V-E-CD: 41404d9c28fbc215bab670c20d826187
-X-V-R-CD: eb29b0577443ea815658bc1e1be1b1f2
-X-V-CD: 0
-X-V-ID: 5dacfd3d-d8f6-4776-9a08-736b7b3218fe
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,,
- definitions=2019-11-27_07:,, signatures=0
-Received: from [17.234.102.11] (unknown [17.234.102.11])
- by nwk-mmpp-sz11.apple.com
- (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
- 2019)) with ESMTPSA id <0Q1O00J8E0KNYE10@nwk-mmpp-sz11.apple.com>; Wed,
- 27 Nov 2019 21:58:00 -0800 (PST)
-Content-type: text/plain; charset=us-ascii
-MIME-version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v2 5/5] hvf: save away type as well as vector so we can
- reinject them
-In-reply-to: <5F8C8B54-3653-4417-9A08-E724032294F9@apple.com>
-Date: Wed, 27 Nov 2019 21:57:58 -0800
-Cc: qemu-devel@nongnu.org
-Content-transfer-encoding: quoted-printable
-Message-id: <524CCF5D-EED6-4710-A561-6AD634015F5F@apple.com>
-References: <cover.1574625592.git.dirty@apple.com>
- <e07e6085d8ab9054e58f85ae58e112df6adc024d.1574625592.git.dirty@apple.com>
- <eb3a2de7-fcfe-f0d5-8534-1c59ff40f61e@redhat.com>
- <5F8C8B54-3653-4417-9A08-E724032294F9@apple.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-X-Mailer: Apple Mail (2.3445.104.11)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-11-27_07:, , signatures=0
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 17.171.2.72
+ (envelope-from <thuth@redhat.com>) id 1iaDMQ-0000KD-Ci
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 01:33:07 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:23535
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iaDMP-0000Fz-Ru
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 01:33:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574922784;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qBOvEE6ErMdQmvmw21OYOuStt+ZSIsZ35WWBpABSIH0=;
+ b=CjrIill5j8dGttQ+gJz3w5oV46bOaYX2B2R/5eEPvtxO6kgUaQwcilIa6ox4VZG7wGaWra
+ zG8/knVquqmXgcruc73ez7jCUMXyCaOj1gUOYygR0VLUKzGHhOxivOd77Jyq88d0cAUhjJ
+ k1G+XUVo8zOTz7XUKPLiCG4b87nlsaE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-410-eoLpYFL3O2CPn2gAuOWWwA-1; Thu, 28 Nov 2019 01:33:01 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DE2B10866E3;
+ Thu, 28 Nov 2019 06:33:00 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-114.ams2.redhat.com [10.36.116.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B2E0760BE1;
+ Thu, 28 Nov 2019 06:32:55 +0000 (UTC)
+Subject: Re: [PATCH v4 2/6] s390x: Move reset normal to shared reset handler
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191127175046.4911-1-frankja@linux.ibm.com>
+ <20191127175046.4911-3-frankja@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <66f79294-ab07-356c-ad69-addb591dbd82@redhat.com>
+Date: Thu, 28 Nov 2019 07:32:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+MIME-Version: 1.0
+In-Reply-To: <20191127175046.4911-3-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: eoLpYFL3O2CPn2gAuOWWwA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,97 +88,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Cameron Esfahani <dirty@apple.com>
-From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-I added some asserts to our internal version of QEMU.  It's a few months =
-off of master and, specifically, doesn't have =
-fd13f23b8c95311eff74426921557eee592b0ed3.
+On 27/11/2019 18.50, Janosch Frank wrote:
+> Let's start moving the cpu reset functions into a single function with
+> a switch/case, so we can use fallthroughs and share more code between
+> resets.
 
-With the previous version of hvf_inject_interrupts(), before our fix, =
-the code looked like the following:
+Nit: I'd add a "later" in above sentence, since you don't use 
+fallthroughs yet.
 
->     if (env->interrupt_injected !=3D -1) {
->         vector =3D env->interrupt_injected;
->         intr_type =3D VMCS_INTR_T_SWINTR;
->     } else if (env->exception_injected !=3D -1) {
+> This patch introduces the reset function by renaming cpu_reset() and
+> cleaning up leftovers.
 
+Hmm, which leftovers? I can mainly see the renaming here...
 
-What we were seeing was, under heavy loads, running many concurrent =
-macOS VMs, that we would get spurious interrupts.  Tracking it down, we =
-discovered that VMCS_INTR_T_SWINTR was getting injected when =
-VMCS_INTR_T_HWINTR was expected.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+> ---
+>   target/s390x/cpu-qom.h |  6 +++++-
+>   target/s390x/cpu.c     | 19 +++++++++++++------
+>   target/s390x/cpu.h     |  2 +-
+>   target/s390x/sigp.c    |  2 +-
+>   4 files changed, 20 insertions(+), 9 deletions(-)
 
-If I take our proposed patch code, which built on top of master from a =
-few days ago, and has fd13f23b8c95311eff74426921557eee592b0ed3,  and add =
-an assert, like the following:
-
->     if (env->interrupt_injected !=3D -1) {
->         /* Type and vector are both saved in interrupt_injected. */
->         vector =3D env->interrupt_injected & VMCS_IDT_VEC_VECNUM;
->         intr_type =3D env->interrupt_injected & VMCS_IDT_VEC_TYPE;
->         if (VMCS_INTR_T_SWINTR !=3D intr_type) {
->             printf("VMCS_INTR_T_SWINTR (%x) !=3D intr_type (%llx)\n", =
-VMCS_INTR_T_SWINTR, intr_type);
->             assert(VMCS_INTR_T_SWINTR =3D=3D intr_type);
->         }
->     } else if (env->exception_nr !=3D -1) {
-
-
-Then we will see the assert trigger and get the following output:
-
-> VMCS_INTR_T_SWINTR (400) !=3D intr_type (0)
-> Assertion failed: (VMCS_INTR_T_SWINTR =3D=3D intr_type), function =
-hvf_inject_interrupts, file qemu_upstream/target/i386/hvf/x86hvf.c, line =
-362.
-
-
-So, as far as I can see, the proposed changes are still necessary.
-
-Cameron Esfahani
-dirty@apple.com
-
-"Americans are very skilled at creating a custom meaning from something =
-that's mass-produced."
-
-Ann Powers
-
-
-> On Nov 26, 2019, at 12:04 PM, Cameron Esfahani via =
-<qemu-devel@nongnu.org> wrote:
->=20
-> Our test case was booting many concurrent macOS VMs under heavy system =
-load.  I don't know if I could create one to replicate that.
->=20
-> Cameron Esfahani
-> dirty@apple.com
->=20
-> "In the elder days of Art, Builders wrought with greatest care each =
-minute and unseen part; For the gods see everywhere."
->=20
-> "The Builders", H. W. Longfellow
->=20
->=20
->=20
->> On Nov 25, 2019, at 2:26 AM, Paolo Bonzini <pbonzini@redhat.com> =
-wrote:
->>=20
->> On 24/11/19 21:05, Cameron Esfahani wrote:
->>> Save away type as well as vector in hvf_store_events() so we can
->>> correctly reinject both in hvf_inject_interrupts().
->>>=20
->>> Make sure to clear ins_len and has_error_code when ins_len isn't
->>> valid and error_code isn't set.
->>=20
->> Do you have a testcase for this?  (I could guess it's about the INT1
->> instruction).
->>=20
->> Paolo
->>=20
->=20
->=20
+Anyway,
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
