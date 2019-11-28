@@ -2,87 +2,61 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.2 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MIME_BOUND_DIGITS_15,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F328C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53ACAC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:08:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54DB221741
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:06:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g4GhwQuk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54DB221741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2289921741
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:08:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2289921741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaKRG-0005j1-Cy
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 09:06:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52727)
+	id 1iaKSc-0006uL-8r
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 09:07:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45056)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iaK33-0001QL-9Y
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:41:35 -0500
+ (envelope-from <clg@kaod.org>) id 1iaK8w-00040K-5p
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:47:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iaK30-0003Tp-7P
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:41:32 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:34294)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iaK2z-0003LS-U9
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:41:30 -0500
-Received: by mail-oi1-x243.google.com with SMTP id l136so7731565oig.1
- for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 05:41:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=+inF66LjEHWI2B2mTOJRPDtD049iz9QXEVBTMe22vIM=;
- b=g4GhwQukUjGzxLjf8NqbHwN1oKjOfV4rYuvS8l5mSDlv8/Lb7Jlqm2VxkPXpDwAgBL
- By2EVqEOlSnUVj7T+97CN5DM1PBD3RdItJgTmnn/2MAPNx/kuPYT//PDGoXTAV17/Hx5
- 9BxaRXu7nSXGrDD/i09uGhzsjrco3hY05em2LILnP4pxrWpp0Yu1Y7hi8w1L6jjfPdIs
- Hr+m3yLc8J6cBbMSHmhEiYuLvFPpsbOaxHlZSvg/bQK1KGAyotRBJlQWPKesGuRNOGEe
- SobcWf2jlgz0ZpmuzGjROVfbsY4yWKKwd4NmyYAxgSrr5eZscPLO/su5GXuuROlNITb7
- Ts9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=+inF66LjEHWI2B2mTOJRPDtD049iz9QXEVBTMe22vIM=;
- b=FaxwQEIDax1qlB5g4JZiDPgoSFQbp9A5V10qtZlzaz7BsW+uJvwu67peOsPPbNgHDC
- AebF1AVqY/9NGrWhtgWzDVL5bS3RDDSFqD3C7SeK6hHlL380sWj4dxYL7g5CQqVyn86W
- p/vCAVMgJbg0pajkJSf2AlKJq5cSKYPny+mtEC1BTKEKiwhVQdreFJL89M2F1N+zOiHS
- etiKAio52SqrEGOqJaNhyW/Kp8/69dHfu+nkBTZ78OTKDfiuqxyy753gGgyV17yYegsX
- eQumxMFlkZT5dnUq0aFVsH7l+G4XcPsyAMRvdgV/0PWL4s+qPNsNaimMV8KQ2YUQjxcO
- INYA==
-X-Gm-Message-State: APjAAAUQYcezqv1odiLdEw4jSrR+mIrfP7iy2B76BBwQ+UIK0dv2g0w5
- UBz/EyozSdt6GHUDI+PuSGVt9IX+cMGq3AxSzUQ=
-X-Google-Smtp-Source: APXvYqx/BkB2aS93zQmB84QDOAe4Bslk40qcE3+LTllp6yxPP63X3TYc3YANTFKwOdNgnmUZ2/2xOVqYlEKzfAR0opo=
-X-Received: by 2002:aca:d17:: with SMTP id 23mr8617893oin.136.1574948486386;
- Thu, 28 Nov 2019 05:41:26 -0800 (PST)
+ (envelope-from <clg@kaod.org>) id 1iaK8r-0005fx-F8
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:47:36 -0500
+Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:51982)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iaK8o-0005Wm-Ia
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:47:31 -0500
+Received: from player688.ha.ovh.net (unknown [10.108.57.141])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 726B8115E91
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 14:47:25 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player688.ha.ovh.net (Postfix) with ESMTPSA id DA29BC94B2BE;
+ Thu, 28 Nov 2019 13:47:17 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH 2/7] target/ppc: Work [S]PURR implementation and add HV support
+Date: Thu, 28 Nov 2019 14:46:55 +0100
+Message-Id: <20191128134700.16091-3-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191128134700.16091-1-clg@kaod.org>
+References: <20191128134700.16091-1-clg@kaod.org>
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Thu, 28 Nov 2019 05:41:25
- -0800 (PST)
-In-Reply-To: <5a784557-f322-dc3a-4ff1-a7d9a0409448@redhat.com>
-References: <20191127175257.23480-1-mrolnik@gmail.com>
- <CAL1e-=isp_-zF71STK-v5D8r5sGYiZbRFmSzjfQtR2FC5YknHQ@mail.gmail.com>
- <CAK4993iniaLhSYCe9hfuNpujpEdqPtZqqsJirBwYG9HqUVx6dA@mail.gmail.com>
- <CAL1e-=h+ZHM9qOOMj2KASuN2J4rSYcn1KP1hOzTWp+EpBY3=5A@mail.gmail.com>
- <CAK4993jDe+c7XsNn=fBwMu6TLuF8KgxNvUziXkwAUuOVArjrsA@mail.gmail.com>
- <5a784557-f322-dc3a-4ff1-a7d9a0409448@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 28 Nov 2019 14:41:25 +0100
-Message-ID: <CAL1e-=jJ5uNvYq7yNQYFhMJ0k94-d6mrybs-NyVjVi9Agb4Aeg@mail.gmail.com>
-Subject: Re: [PATCH v37 00/17] QEMU AVR 8 bit cores
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000001218550598684564"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 14982350063184874470
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeijedgheegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucffohhmrghinhepohiilhgrsghsrdhorhhgnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieekkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.72.238
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,340 +68,198 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Joaquin de Andres <me@xcancerberox.com.ar>,
- Richard Henderson <richard.henderson@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, QEMU Developers <qemu-devel@nongnu.org>,
- Michael Rolnik <mrolnik@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, Suraj Jitindar Singh <sjitindarsingh@gmail.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001218550598684564
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
 
-On Thursday, November 28, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-wrote:
+The Processor Utilisation of Resources Register (PURR) and Scaled
+Processor Utilisation of Resources Register (SPURR) provide an estimate
+of the resources used by the thread, present on POWER7 and later
+processors.
 
-> On 11/28/19 2:25 PM, Michael Rolnik wrote:
->
->> I don't see why you say that the peripherals are inside the chip, there
->> is CPU within target/avr directory and then there are some peripherals i=
-n
->> hw directory, CPU does not depend on them. what am I missing?
->>
->> On Thu, Nov 28, 2019 at 3:22 PM Aleksandar Markovic <
->> aleksandar.m.mail@gmail.com <mailto:aleksandar.m.mail@gmail.com>> wrote:
->>
->>
->>
->>     On Thursday, November 28, 2019, Michael Rolnik <mrolnik@gmail.com
->>     <mailto:mrolnik@gmail.com>> wrote:
->>
->>
->>
->>         On Wed, Nov 27, 2019 at 11:06 PM Aleksandar Markovic
->>         <aleksandar.m.mail@gmail.com
->>         <mailto:aleksandar.m.mail@gmail.com>> wrote:
->>
->>             On Wed, Nov 27, 2019 at 6:53 PM Michael Rolnik
->>             <mrolnik@gmail.com <mailto:mrolnik@gmail.com>> wrote:
->>              >
->>              > This series of patches adds 8bit AVR cores to QEMU.
->>              > All instruction, except BREAK/DES/SPM/SPMX, are
->>             implemented. Not fully tested yet.
->>              > However I was able to execute simple code with functions.
->>             e.g fibonacci calculation.
->>              > This series of patches include a non real, sample board.
->>              > No fuses support yet. PC is set to 0 at reset.
->>              >
->>
->>             I have a couple of general remarks, so I am responding to
->>             the cover
->>             letter, not individual patches.
->>
->>             1) The licenses for Sarah devices differ than the rest -
->>             shouldn't all
->>             licenses be harmonized?
->>
->>         Sarah,
->>         do you mind if use the same license I use for my code?
->>
->>
->>             2) There is an architectural problem with peripherals. It is
->>             possible
->>             that they evolve over time, so, for example, USART could not
->>             be the
->>             same for older and newer CPUs (in principle, newer periphera=
-l
->> is
->>             expected to be o sort of "superset" of the older). How do
->>             you solve
->>             that problem? Right now, it may not looks serious to you,
->>             but if you
->>             don;t think about that right now, from the outset, soon the
->>             code will
->>             become so entangled, ti woudl be almost very difficult to
->>             fix it.
->>             Please think about that, how would you solve it, is there a
->>             way to
->>             pass the information on the currently emulated CPU to the co=
-de
->>             covering a peripheral, and provide a different behaviour?
->>
->>         Hi Aleksandar,
->>
->>         Please explain.
->>
->>
->>     My concern is about peripherals inside the chip, together with the
->> core.
->>
->>     If one models, let's say an external (in the sense, it is a separate
->>     chip) ADC (analog-to-digital converter), one looks at specs,
->>     implement what is resonable possible in QEMU, plug it in in one of
->>     machines thst contains it, and that's it. That ADC remains the same,
->>     of course, whatever the surrounding system is.
->>
->>     In AVR case, I think we have a phenomenon likes of which we didn't
->>     see before (at least I don't know about). Number of AVR
->>     microcontrollers is very large, and both cores and peripherals
->> evolved.
->>
->>     For cores, you handle differences with all these AVR_FEATURE macros,
->>     and this seems to be working, no significant objection from my side,
->>     and btw that was not an easy task to execute, all admiration from me=
-.
->>
->>     But what about peripherals inside the chip? A peripheral with the
->>     same name and the same general area of functionality may be
->>     differently specified for microcontrollers from 2010 and 2018. By
->>     the difference I don't mean starting address, but the difference in
->>     behavior. I don't have time right now to spell many examples, but I
->>     read three different specs, and there are differences in USART
->>     specifications.
->>
->>     I am not clear what is your envisioned solution for these cases.
->>     Would you such close, but not the same, flabors of a peripheral
->>     treat as if they are two completely separate cases of a peripheral?
->>     Or would you have a single peripheral that would somehow configure
->>     itself depending on the core it is attached to?
->>
->>     I hope I was clearer this time.
->>
->>     Aleksandar
->>
->>
->>
->>
->>         I don't see any problem from CPU's perspective.
->>         as for the sample board is just a sample, I hope other people
->>         will create real models or real hw.
->>         there was no way I could provide a CPU alone, that's why there
->>         is sample.
->>
->
-> If I understand Aleksandar correctly, the naming is incorrect because too
-> generic to AVR family, why Sarah only modeled the Atmel implementation.
->
-> Renaming devices such hw/char/avr_usart.c -> hw/char/atmel_usart.c
-> (similarly with the macros) would be enough Aleksandar?
->
->
+Currently the [S]PURR registers simply count at the rate of the
+timebase.
 
-Some renaming could help, perhaps not quite like the one above, but my
-point (which I find hard to believe I can't explain to you) is that
-peripherals inside the chip evolved over time, as starkly opposed to
-external peripherals that are set in stone...
+Preserve this behaviour but rework the implementation to store an offset
+like the timebase rather than doing the calculation manually. Also allow
+hypervisor write access to the register along with the currently
+available read access.
 
---0000000000001218550598684564
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Suraj Jitindar Singh <sjitindarsingh@gmail.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+[ clg: rebased on current ppc tree ]
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
 
-<br><br>On Thursday, November 28, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a =
-href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
-c solid;padding-left:1ex">On 11/28/19 2:25 PM, Michael Rolnik wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-I don&#39;t see why you say that the peripherals are inside the chip, there=
- is CPU within target/avr directory and then there are some peripherals=C2=
-=A0in hw directory, CPU does not depend on them. what am I missing?<br>
-<br>
-On Thu, Nov 28, 2019 at 3:22 PM Aleksandar Markovic &lt;<a href=3D"mailto:a=
-leksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</=
-a> &lt;mailto:<a href=3D"mailto:aleksandar.m.mail@gmail.com" target=3D"_bla=
-nk">aleksandar.m.mail@<wbr>gmail.com</a>&gt;&gt; wrote:<br>
-<br>
-<br>
-<br>
-=C2=A0 =C2=A0 On Thursday, November 28, 2019, Michael Rolnik &lt;<a href=3D=
-"mailto:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a><br>
-=C2=A0 =C2=A0 &lt;mailto:<a href=3D"mailto:mrolnik@gmail.com" target=3D"_bl=
-ank">mrolnik@gmail.com</a>&gt;&gt; wrote:<br>
-<br>
-<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 On Wed, Nov 27, 2019 at 11:06 PM Aleksandar Mar=
-kovic<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.c=
-om" target=3D"_blank">aleksandar.m.mail@gmail.com</a><br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 &lt;mailto:<a href=3D"mailto:aleksandar.m.mail@=
-gmail.com" target=3D"_blank">aleksandar.m.mail@<wbr>gmail.com</a>&gt;&gt; w=
-rote:<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 On Wed, Nov 27, 2019 at 6:53 PM M=
-ichael Rolnik<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &lt;<a href=3D"mailto:mrolnik@gma=
-il.com" target=3D"_blank">mrolnik@gmail.com</a> &lt;mailto:<a href=3D"mailt=
-o:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt;&gt; wrote:=
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; This series of patches=
- adds 8bit AVR cores to QEMU.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; All instruction, excep=
-t BREAK/DES/SPM/SPMX, are<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 implemented. Not fully tested yet=
-.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; However I was able to =
-execute simple code with functions.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 e.g fibonacci calculation.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; This series of patches=
- include a non real, sample board.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; No fuses support yet. =
-PC is set to 0 at reset.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 I have a couple of general remark=
-s, so I am responding to<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 the cover<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 letter, not individual patches.<b=
-r>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1) The licenses for Sarah devices=
- differ than the rest -<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 shouldn&#39;t all<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 licenses be harmonized?<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Sarah,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 do you mind if use the same license I use for m=
-y code?<br>
-<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 2) There is an architectural prob=
-lem with peripherals. It is<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 possible<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 that they evolve over time, so, f=
-or example, USART could not<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 be the<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 same for older and newer CPUs (in=
- principle, newer peripheral is<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 expected to be o sort of &quot;su=
-perset&quot; of the older). How do<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 you solve<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 that problem? Right now, it may n=
-ot looks serious to you,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 but if you<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 don;t think about that right now,=
- from the outset, soon the<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 code will<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 become so entangled, ti woudl be =
-almost very difficult to<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 fix it.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Please think about that, how woul=
-d you solve it, is there a<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 way to<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pass the information on the curre=
-ntly emulated CPU to the code<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 covering a peripheral, and provid=
-e a different behaviour?<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Hi Aleksandar,<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Please explain.<br>
-<br>
-<br>
-=C2=A0 =C2=A0 My concern is about peripherals inside the chip, together wit=
-h the core.<br>
-<br>
-=C2=A0 =C2=A0 If one models, let&#39;s say an external (in the sense, it is=
- a separate<br>
-=C2=A0 =C2=A0 chip) ADC (analog-to-digital converter), one looks at specs,<=
-br>
-=C2=A0 =C2=A0 implement what is resonable possible in QEMU, plug it in in o=
-ne of<br>
-=C2=A0 =C2=A0 machines thst contains it, and that&#39;s it. That ADC remain=
-s the same,<br>
-=C2=A0 =C2=A0 of course, whatever the surrounding system is.<br>
-<br>
-=C2=A0 =C2=A0 In AVR case, I think we have a phenomenon likes of which we d=
-idn&#39;t<br>
-=C2=A0 =C2=A0 see before (at least I don&#39;t know about). Number of AVR<b=
-r>
-=C2=A0 =C2=A0 microcontrollers is very large, and both cores and peripheral=
-s evolved.<br>
-<br>
-=C2=A0 =C2=A0 For cores, you handle differences with all these AVR_FEATURE =
-macros,<br>
-=C2=A0 =C2=A0 and this seems to be working, no significant objection from m=
-y side,<br>
-=C2=A0 =C2=A0 and btw that was not an easy task to execute, all admiration =
-from me.<br>
-<br>
-=C2=A0 =C2=A0 But what about peripherals inside the chip? A peripheral with=
- the<br>
-=C2=A0 =C2=A0 same name and the same general area of functionality may be<b=
-r>
-=C2=A0 =C2=A0 differently specified for microcontrollers from 2010 and 2018=
-. By<br>
-=C2=A0 =C2=A0 the difference I don&#39;t mean starting address, but the dif=
-ference in<br>
-=C2=A0 =C2=A0 behavior. I don&#39;t have time right now to spell many examp=
-les, but I<br>
-=C2=A0 =C2=A0 read three different specs, and there are differences in USAR=
-T<br>
-=C2=A0 =C2=A0 specifications.<br>
-<br>
-=C2=A0 =C2=A0 I am not clear what is your envisioned solution for these cas=
-es.<br>
-=C2=A0 =C2=A0 Would you such close, but not the same, flabors of a peripher=
-al<br>
-=C2=A0 =C2=A0 treat as if they are two completely separate cases of a perip=
-heral?<br>
-=C2=A0 =C2=A0 Or would you have a single peripheral that would somehow conf=
-igure<br>
-=C2=A0 =C2=A0 itself depending on the core it is attached to?<br>
-<br>
-=C2=A0 =C2=A0 I hope I was clearer this time.<br>
-<br>
-=C2=A0 =C2=A0 Aleksandar<br>
-<br>
-<br>
-<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 I don&#39;t see any problem from CPU&#39;s pers=
-pective.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 as for the sample board is just a sample, I hop=
-e other people<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 will create real models or real hw.<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 there was no way I could provide a CPU alone, t=
-hat&#39;s why there<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 is sample.<br>
-</blockquote>
-<br>
-If I understand Aleksandar correctly, the naming is incorrect because too g=
-eneric to AVR family, why Sarah only modeled the Atmel implementation.<br>
-<br>
-Renaming devices such hw/char/avr_usart.c -&gt; hw/char/atmel_usart.c (simi=
-larly with the macros) would be enough Aleksandar?<br>
-<br>
-</blockquote><div><br></div><div><br></div><div>Some renaming could help, p=
-erhaps not quite like the one above, but my point (which I find hard to bel=
-ieve I can&#39;t explain to you) is that peripherals inside the chip evolve=
-d over time, as starkly opposed to external peripherals that are set in sto=
-ne...</div>
+ David,
 
---0000000000001218550598684564--
+ In the initial discussion, PURR and VTB still needed to be added to
+ the migration stream. The patch is changing the representation indeed
+ but that seems OK. AFAICT, all the SPRs are migrated. I didn't quite
+ understand that part. See http://patchwork.ozlabs.org/patch/1094662
+ for more info.
+
+ Nevertheless, you added your Reviewed-by.
+
+ include/hw/ppc/ppc.h            |  3 +--
+ target/ppc/cpu.h                |  1 +
+ target/ppc/helper.h             |  1 +
+ hw/ppc/ppc.c                    | 17 +++++++----------
+ target/ppc/timebase_helper.c    |  5 +++++
+ target/ppc/translate_init.inc.c | 23 +++++++++++++++--------
+ 6 files changed, 30 insertions(+), 20 deletions(-)
+
+diff --git a/include/hw/ppc/ppc.h b/include/hw/ppc/ppc.h
+index 02481cd27c36..27bef85ca869 100644
+--- a/include/hw/ppc/ppc.h
++++ b/include/hw/ppc/ppc.h
+@@ -33,8 +33,7 @@ struct ppc_tb_t {
+     /* Hypervisor decrementer management */
+     uint64_t hdecr_next;    /* Tick for next hdecr interrupt  */
+     QEMUTimer *hdecr_timer;
+-    uint64_t purr_load;
+-    uint64_t purr_start;
++    int64_t purr_offset;
+     void *opaque;
+     uint32_t flags;
+ };
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 19d6e724bb5a..9128dbefbdb0 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1313,6 +1313,7 @@ void cpu_ppc_store_decr(CPUPPCState *env, target_ul=
+ong value);
+ target_ulong cpu_ppc_load_hdecr(CPUPPCState *env);
+ void cpu_ppc_store_hdecr(CPUPPCState *env, target_ulong value);
+ uint64_t cpu_ppc_load_purr(CPUPPCState *env);
++void cpu_ppc_store_purr(CPUPPCState *env, uint64_t value);
+ uint32_t cpu_ppc601_load_rtcl(CPUPPCState *env);
+ uint32_t cpu_ppc601_load_rtcu(CPUPPCState *env);
+ #if !defined(CONFIG_USER_ONLY)
+diff --git a/target/ppc/helper.h b/target/ppc/helper.h
+index a5f53bb421a7..356a14d8a639 100644
+--- a/target/ppc/helper.h
++++ b/target/ppc/helper.h
+@@ -655,6 +655,7 @@ DEF_HELPER_FLAGS_1(load_601_rtcu, TCG_CALL_NO_RWG, tl=
+, env)
+ #if !defined(CONFIG_USER_ONLY)
+ #if defined(TARGET_PPC64)
+ DEF_HELPER_FLAGS_1(load_purr, TCG_CALL_NO_RWG, tl, env)
++DEF_HELPER_FLAGS_2(store_purr, TCG_CALL_NO_RWG, void, env, tl)
+ DEF_HELPER_2(store_ptcr, void, env, tl)
+ #endif
+ DEF_HELPER_2(store_sdr1, void, env, tl)
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index 263922052536..353f11b91d40 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -821,12 +821,9 @@ target_ulong cpu_ppc_load_hdecr(CPUPPCState *env)
+ uint64_t cpu_ppc_load_purr (CPUPPCState *env)
+ {
+     ppc_tb_t *tb_env =3D env->tb_env;
+-    uint64_t diff;
+=20
+-    diff =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - tb_env->purr_start;
+-
+-    return tb_env->purr_load +
+-        muldiv64(diff, tb_env->tb_freq, NANOSECONDS_PER_SECOND);
++    return cpu_ppc_get_tb(tb_env, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
++                          tb_env->purr_offset);
+ }
+=20
+ /* When decrementer expires,
+@@ -985,12 +982,12 @@ static void cpu_ppc_hdecr_cb(void *opaque)
+     cpu_ppc_hdecr_excp(cpu);
+ }
+=20
+-static void cpu_ppc_store_purr(PowerPCCPU *cpu, uint64_t value)
++void cpu_ppc_store_purr(CPUPPCState *env, uint64_t value)
+ {
+-    ppc_tb_t *tb_env =3D cpu->env.tb_env;
++    ppc_tb_t *tb_env =3D env->tb_env;
+=20
+-    tb_env->purr_load =3D value;
+-    tb_env->purr_start =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    cpu_ppc_store_tb(tb_env, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
++                     &tb_env->purr_offset, value);
+ }
+=20
+ static void cpu_ppc_set_tb_clk (void *opaque, uint32_t freq)
+@@ -1007,7 +1004,7 @@ static void cpu_ppc_set_tb_clk (void *opaque, uint3=
+2_t freq)
+      */
+     _cpu_ppc_store_decr(cpu, 0xFFFFFFFF, 0xFFFFFFFF, 32);
+     _cpu_ppc_store_hdecr(cpu, 0xFFFFFFFF, 0xFFFFFFFF, 32);
+-    cpu_ppc_store_purr(cpu, 0x0000000000000000ULL);
++    cpu_ppc_store_purr(env, 0x0000000000000000ULL);
+ }
+=20
+ static void timebase_save(PPCTimebase *tb)
+diff --git a/target/ppc/timebase_helper.c b/target/ppc/timebase_helper.c
+index 8c3c2fe67c2c..2395295b778c 100644
+--- a/target/ppc/timebase_helper.c
++++ b/target/ppc/timebase_helper.c
+@@ -55,6 +55,11 @@ target_ulong helper_load_purr(CPUPPCState *env)
+ {
+     return (target_ulong)cpu_ppc_load_purr(env);
+ }
++
++void helper_store_purr(CPUPPCState *env, target_ulong val)
++{
++    cpu_ppc_store_purr(env, val);
++}
+ #endif
+=20
+ target_ulong helper_load_601_rtcl(CPUPPCState *env)
+diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+index 5a560164d4a4..6105e74e9dc6 100644
+--- a/target/ppc/translate_init.inc.c
++++ b/target/ppc/translate_init.inc.c
+@@ -287,6 +287,11 @@ static void spr_read_purr(DisasContext *ctx, int gpr=
+n, int sprn)
+     gen_helper_load_purr(cpu_gpr[gprn], cpu_env);
+ }
+=20
++static void spr_write_purr(DisasContext *ctx, int sprn, int gprn)
++{
++    gen_helper_store_purr(cpu_env, cpu_gpr[gprn]);
++}
++
+ /* HDECR */
+ static void spr_read_hdecr(DisasContext *ctx, int gprn, int sprn)
+ {
+@@ -8008,14 +8013,16 @@ static void gen_spr_book3s_purr(CPUPPCState *env)
+ {
+ #if !defined(CONFIG_USER_ONLY)
+     /* PURR & SPURR: Hack - treat these as aliases for the TB for now */
+-    spr_register_kvm(env, SPR_PURR,   "PURR",
+-                     &spr_read_purr, SPR_NOACCESS,
+-                     &spr_read_purr, SPR_NOACCESS,
+-                     KVM_REG_PPC_PURR, 0x00000000);
+-    spr_register_kvm(env, SPR_SPURR,   "SPURR",
+-                     &spr_read_purr, SPR_NOACCESS,
+-                     &spr_read_purr, SPR_NOACCESS,
+-                     KVM_REG_PPC_SPURR, 0x00000000);
++    spr_register_kvm_hv(env, SPR_PURR,   "PURR",
++                        &spr_read_purr, SPR_NOACCESS,
++                        &spr_read_purr, SPR_NOACCESS,
++                        &spr_read_purr, &spr_write_purr,
++                        KVM_REG_PPC_PURR, 0x00000000);
++    spr_register_kvm_hv(env, SPR_SPURR,   "SPURR",
++                        &spr_read_purr, SPR_NOACCESS,
++                        &spr_read_purr, SPR_NOACCESS,
++                        &spr_read_purr, &spr_write_purr,
++                        KVM_REG_PPC_SPURR, 0x00000000);
+ #endif
+ }
+=20
+--=20
+2.21.0
+
 
