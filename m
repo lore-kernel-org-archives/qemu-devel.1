@@ -2,76 +2,105 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6819AC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC1BC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:40:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39AF62071F
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:35:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39AF62071F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 430F02071F
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:40:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hRu1ZMlh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 430F02071F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaKsy-0004Xa-D5
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 09:35:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49741)
+	id 1iaKyA-0007cL-Cj
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 09:40:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53077)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iaKGx-0000Wx-Md
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:55:58 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iaKHo-0000wH-I7
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:56:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iaKGt-0001iJ-22
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:55:53 -0500
-Received: from indium.canonical.com ([91.189.90.7]:37606)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iaKGs-0001d0-Pk
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:55:50 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iaKGr-0001gw-Gs
- for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 13:55:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 7DAB92E80C0
- for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 13:55:49 +0000 (UTC)
+ (envelope-from <pbonzini@redhat.com>) id 1iaKHf-0005Np-MM
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:56:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21315
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iaKHe-00056P-FQ
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:56:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574949395;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=h+U3ENo6Nxs9oMrIK43N88tQQZGmJePHCZejmxXN16I=;
+ b=hRu1ZMlh12BqhE6iA+lcXHD4K2sL0Xa53qON0+v+8QNRQFkKBctBkcC2iqhIvEvPsmBs6w
+ uagz4/CNad24Kbd4MpjWIVnPlv+NqZQdyWxOumtXuKFCV1z7Hd/I7w5+jIHlEuS62P5k2y
+ Ni+19Zhj/Ykoq7r6HJEzwOkjzOjgBnU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-INMJyQgMPluAWgaymi6JrQ-1; Thu, 28 Nov 2019 08:56:33 -0500
+Received: by mail-wm1-f70.google.com with SMTP id z3so3606248wmk.1
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 05:56:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=h+U3ENo6Nxs9oMrIK43N88tQQZGmJePHCZejmxXN16I=;
+ b=l2guzvk9thq+LXiqwZaq/tOEm6cPc5dQTeyODn7H2Mskr56XWIJG4jH0L94Cd7UGaW
+ XC7rVFkIDCjl1iJBWlnehnDtjh7xV1KdWnKdG7tnS0iz/uwcUg4A3QED/QUSNvhCNwv/
+ YxQh8og2pUclQbEwmymVC+86HpyOQZdwegSuwHyv3Ib7wK/6CvpG8YktD95CVy4bgu0K
+ n8BEvUMDQtlV8z1LjsxU2S0nwzQOup0jACM1aXbrZPi8uqlzZ7SYUsl+8vqw1lHUKNsg
+ +4KOe6qq8UFsRzFQTWvTeSkDekKoVtgllF1+VuzpljpZY96APYNWBOivRukQ4UDEaPxM
+ QKyQ==
+X-Gm-Message-State: APjAAAVl3WeCkGmu1EZolBhHEnFt9He5U29xzkdKMLzok0o0E3KZEaEh
+ vuRttrLmyi7OhrmSCIAYswi0aoSE1ANHhUUBuSR1O+76I290ru+kUISd0JXl3cWEGH6uAxDk1zu
+ afHlMBE7D99MDtRE=
+X-Received: by 2002:adf:eecc:: with SMTP id a12mr36568238wrp.363.1574949392112; 
+ Thu, 28 Nov 2019 05:56:32 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzDlXDLMtvS2ddKdsDWTpXa4+tMMzW3C+CJVYGQovQ1fgo6ZuVFC8A9l/GF0dV9mxgeJGapQQ==
+X-Received: by 2002:adf:eecc:: with SMTP id a12mr36568220wrp.363.1574949391867; 
+ Thu, 28 Nov 2019 05:56:31 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:459f:99a9:39f1:65ba?
+ ([2001:b07:6468:f312:459f:99a9:39f1:65ba])
+ by smtp.gmail.com with ESMTPSA id u14sm23771982wrm.51.2019.11.28.05.56.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 28 Nov 2019 05:56:31 -0800 (PST)
+Subject: Re: [PATCH v2 5/5] hvf: save away type as well as vector so we can
+ reinject them
+To: Cameron Esfahani <dirty@apple.com>
+References: <cover.1574625592.git.dirty@apple.com>
+ <e07e6085d8ab9054e58f85ae58e112df6adc024d.1574625592.git.dirty@apple.com>
+ <eb3a2de7-fcfe-f0d5-8534-1c59ff40f61e@redhat.com>
+ <5F8C8B54-3653-4417-9A08-E724032294F9@apple.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cdc4958b-6ef5-aee2-1cf2-8cb59ca031fe@redhat.com>
+Date: Thu, 28 Nov 2019 14:56:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 28 Nov 2019 13:46:01 -0000
-From: =?utf-8?q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: arm linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a-hashmi ajbennee carolineconcatto pmaydell
-X-Launchpad-Bug-Reporter: Caroline Concatto (carolineconcatto)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Alex_Benn=C3=A9e_=28ajbennee=29?=
-References: <157468002661.30952.10642264809488923382.malonedeb@wampee.canonical.com>
-Message-Id: <157494876136.31987.12216119309834437373.malone@wampee.canonical.com>
-Subject: [Bug 1853826] Re: ELF loader fails to load shared object on ThunderX2
- running RHEL7
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 72ac01850baf2222ddba9732eccbaddb5b00b891
+In-Reply-To: <5F8C8B54-3653-4417-9A08-E724032294F9@apple.com>
+Content-Language: en-US
+X-MC-Unique: INMJyQgMPluAWgaymi6JrQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,206 +109,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1853826 <1853826@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I do have a ARM HPC compiler license which I assume includes the armpl
-blobs that came with it. You can email me directly at my Linaro email
-(alex.bennee@linaro.org) if you don't want to upload the test case here.
+On 26/11/19 21:04, Cameron Esfahani wrote:
+> Our test case was booting many concurrent macOS VMs under heavy
+> system load.  I don't know if I could create one to replicate that.
 
--- =
+Does this work?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1853826
+diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
+index 1485b95776..26c6c3a49f 100644
+--- a/target/i386/hvf/x86hvf.c
++++ b/target/i386/hvf/x86hvf.c
+@@ -357,7 +357,11 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
+     bool have_event = true;
+     if (env->interrupt_injected != -1) {
+         vector = env->interrupt_injected;
+-        intr_type = VMCS_INTR_T_SWINTR;
++        if (env->ins_len) {
++            intr_type = VMCS_INTR_T_SWINTR;
++        } else {
++            intr_type = VMCS_INTR_T_HWINTR;
++        }
+     } else if (env->exception_nr != -1) {
+         vector = env->exception_nr;
+         if (vector == EXCP03_INT3 || vector == EXCP04_INTO) {
 
-Title:
-  ELF loader fails to load shared object on ThunderX2 running RHEL7
+Thanks,
 
-Status in QEMU:
-  Incomplete
+Paolo
 
-Bug description:
-  Simple test:
-  hello.c
-
-  include <stdio.h>
-
-  int main(int argc, char* argv[])
-  {
-    {
-      printf("Hello World... \n");
-    }
-    return 0;
-  }
-
-  when compiled with :
-  *Compiler =
-
-  https://developer.arm.com/tools-and-software/server-and-hpc/arm-architect=
-ure-tools/arm-allinea-studio/download
-  Arm-Compiler-for-HPC_19.3_RHEL_7_aarch64.tar	 =
-
-
-  *Running:
-  1) with -armpl
-       armclang -armpl hello.c
-       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
-  2) without flag
-      armclang hello.c
-       ./qemu/build/aarch64-linux-user/qemu-aarch64 a.out
-
-  =E2=80=A2With Docker image:
-         CentOS Linux release 7.7.1908 (AltArch)
-
-  *Two different machines:
-         AArch64, Taishan. tsv110, Kunpeng 920, ARMv8.2-A
-         AArch64, Taishan 2280, Cortex-A72, ARMv8-A
-
-  *QEMU 4.0
-       qemu-aarch64 version 4.1.91 (v4.2.0-rc1)
-
-  =
-
-  Results:
-
-  =
-
-   ****Taishan 2280 Cortex-A72 =
-
-        Running =
-
-  1)with -armpl flag with and without the docker
-            WORKS-> Hello World...
-                 -> ldd a.out
-  ldd a.out =
-
-  linux-vdso.so.1 =3D>  (0x0000ffffbc6a2000) =
-
-  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
-_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
-0x0000ffffbc544000) =
-
-  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffbc493000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffbc472000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
-3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffbbfd30=
-00) =
-
-  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
-rch64-linux/lib/libomp.so (0x0000ffffbbef5000) =
-
-  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffbbed4000) =
-
-  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffbbe9f000) =
-
-  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
-rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
-neric.so (0x0000ffffb3306000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffb3180000) =
-
-  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
-ux/lib64/libstdc++.so.6 (0x0000ffffb2f30000) =
-
-  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
-x/lib64/libgcc_s.so.1 (0x0000ffffb2eff000) =
-
-  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffb2ede000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffbc674000)
-             =
-
-
-  Running =
-
-  2) without -armpl flag with and without the docker
-             WORKS -> Hello World...        =
-
-                   -> ldd a.out
-  ldd a.out
-   linux-vdso.so.1 =3D>  (0x0000ffffa6895000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffa6846000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa66c0000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffa6867000)
-      =
-
-
-  ****Taishan - tsv110  Kunpeng 920
-         For Running =
-
-
-  1)with -armpl flag with and without the docker
-             DOES NOT WORK -> with and without Docker
-                           -> It shows : qemu:handle_cpu_signal received si=
-gnal outside vCPU
-   context @ pc=3D0xffffaaa8844a
-                           -> ldd a.out =
-
-  ldd a.out =
-
-  linux-vdso.so.1 =3D>  (0x0000ffffad4b0000)
-  libamath_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64=
-_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libamath_generic.so (=
-0x0000ffffad370000) =
-
-  libm.so.6 =3D> /lib64/libm.so.6 (0x0000ffffad2a0000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffffad270000) libarmflang.so =3D> /scratch/arm-linux-compiler-19.=
-3_Generic-AArch64_RHEL-8_aarch64-linux/lib/libarmflang.so (0x0000ffffacdd00=
-00) =
-
-  libomp.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch64_RHEL-8_aa=
-rch64-linux/lib/libomp.so (0x0000ffffaccf0000) =
-
-  librt.so.1 =3D> /lib64/librt.so.1 (0x0000ffffaccc0000) =
-
-  libpthread.so.0 =3D> /lib64/libpthread.so.0 (0x0000ffffacc80000) =
-
-  libarmpl_lp64_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AA=
-rch64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libarmpl_lp64_ge=
-neric.so (0x0000ffffa40e0000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffffa3f50000) =
-
-  libstdc++.so.6 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-lin=
-ux/lib64/libstdc++.so.6 (0x0000ffffa3d00000) =
-
-  libgcc_s.so.1 =3D> /scratch/gcc-9.2.0_Generic-AArch64_RHEL-8_aarch64-linu=
-x/lib64/libgcc_s.so.1 (0x0000ffffa3cc0000)
-  libdl.so.2 =3D> /lib64/libdl.so.2 (0x0000ffffa3c90000) =
-
-  /lib/ld-linux-aarch64.so.1 (0x0000ffffad4c0000)
-              =
-
-
-  Running =
-
-  2) without -armpl flag with and without the docker
-                 WORKS -> Hello World..
-                       -> ldd a.out
-  ldd a.out  =
-
-  linux-vdso.so.1 =3D>  (0x0000ffff880c0000) =
-
-  libastring_generic.so =3D> /scratch/arm-linux-compiler-19.3_Generic-AArch=
-64_RHEL-8_aarch64-linux/lib/clang/9.0.1/armpl_links/lib/libastring_generic.=
-so (0x0000ffff88080000) =
-
-  libc.so.6 =3D> /lib64/libc.so.6 (0x0000ffff87ee0000)
-  /lib/ld-linux-aarch64.so.1 (0x0000ffff880d0000)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1853826/+subscriptions
 
