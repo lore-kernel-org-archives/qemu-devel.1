@@ -2,92 +2,62 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A7BC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2077C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF0B321781
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:30:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF0B321781
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4B6E21741
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:35:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4B6E21741
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zte.com.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaI06-00037L-Tm
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 06:30:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56721)
+	id 1iaI58-0005ly-Qw
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 06:35:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41115)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pmorel@linux.ibm.com>) id 1iaHjc-0001K1-Hg
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:13:25 -0500
+ (envelope-from <ning.bo9@zte.com.cn>) id 1iaHxk-00019L-KQ
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:27:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pmorel@linux.ibm.com>) id 1iaHXU-000450-VE
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:00:52 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25222)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
- id 1iaHXS-00041I-VK
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:00:48 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xASAvCn6003984
- for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 06:00:46 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2whmt0j8mq-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 06:00:45 -0500
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
- Thu, 28 Nov 2019 11:00:43 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 28 Nov 2019 11:00:41 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xASB0ddv50659456
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 28 Nov 2019 11:00:39 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9A99D4C05E;
- Thu, 28 Nov 2019 11:00:39 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 3C8B04C04A;
- Thu, 28 Nov 2019 11:00:39 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.145.185.119])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 28 Nov 2019 11:00:39 +0000 (GMT)
-From: Pierre Morel <pmorel@linux.ibm.com>
-To: qemu-s390x@nongnu.org
-Subject: [PATCH v2 1/1] s390x: css: pong, channel subsystem test device
-Date: Thu, 28 Nov 2019 12:00:37 +0100
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1574938837-21078-1-git-send-email-pmorel@linux.ibm.com>
-References: <1574938837-21078-1-git-send-email-pmorel@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19112811-4275-0000-0000-000003877545
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112811-4276-0000-0000-0000389B06C7
-Message-Id: <1574938837-21078-2-git-send-email-pmorel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-28_01:2019-11-28,2019-11-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 bulkscore=0
- malwarescore=0 priorityscore=1501 lowpriorityscore=0 impostorscore=0
- spamscore=0 suspectscore=3 mlxscore=0 clxscore=1015 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911280095
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <ning.bo9@zte.com.cn>) id 1iaHxi-0002YQ-3r
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:27:55 -0500
+Received: from mxhk.zte.com.cn ([63.217.80.70]:26908)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ning.bo9@zte.com.cn>) id 1iaHxh-0001nQ-LL
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 06:27:54 -0500
+Received: from mse-fl1.zte.com.cn (unknown [10.30.14.238])
+ by Forcepoint Email with ESMTPS id 258394830638078F26E1;
+ Thu, 28 Nov 2019 19:27:44 +0800 (CST)
+Received: from kjyxapp04.zte.com.cn ([10.30.12.203])
+ by mse-fl1.zte.com.cn with SMTP id xASBQl3C034180;
+ Thu, 28 Nov 2019 19:26:47 +0800 (GMT-8)
+ (envelope-from ning.bo9@zte.com.cn)
+Received: from mapi (kjyxapp03[null]) by mapi (Zmail) with MAPI id mid14;
+ Thu, 28 Nov 2019 19:26:47 +0800 (CST)
+Date: Thu, 28 Nov 2019 19:26:47 +0800 (CST)
+X-Zmail-TransId: 2b055ddfaef79ae9d416
+X-Mailer: Zmail v1.0
+Message-ID: <201911281926474453744@zte.com.cn>
+In-Reply-To: <20190809134134.GA8594@stefanha-x1.localdomain>
+References: 1564975951-29263-1-git-send-email-ning.bo9@zte.com.cn,
+ 20190809134134.GA8594@stefanha-x1.localdomain
+Mime-Version: 1.0
+From: <ning.bo9@zte.com.cn>
+To: <stefanha@gmail.com>
+Subject: =?UTF-8?B?UmU6W1FlbXUtZGV2ZWxdIFtQQVRDSCB2Ml0gdmhvc3QtdnNvY2s6IHJlcG9ydCBRTVAgZXZlbnQgd2hlbiBzZXRydW5uaW5n?=
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
+X-MAIL: mse-fl1.zte.com.cn xASBQl3C034180
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 63.217.80.70
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,260 +69,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
- cohuck@redhat.com, qemu-devel@nongnu.org, pasic@linux.ibm.com
+Cc: mst@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a test device for channel subsystem.
-Most of the CSS instructions are handled by the common code.
 
-The PONG_READ and PONG_WRITE CCW commands allow to test the
-SSCH instruction with both read and write commands.
 
-It is also possible to define the Control Unit type
-with the cu_type property.
-Currently only the kvm-unit-test css test uses the PONG device.
+--=====_001_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- default-configs/s390x-softmmu.mak |   1 +
- hw/s390x/Kconfig                  |   3 +
- hw/s390x/Makefile.objs            |   1 +
- hw/s390x/ccw-pong.c               | 134 ++++++++++++++++++++++++++++++
- include/hw/s390x/pong.h           |  48 +++++++++++
- 5 files changed, 187 insertions(+)
- create mode 100644 hw/s390x/ccw-pong.c
- create mode 100644 include/hw/s390x/pong.h
 
-diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
-index f2287a133f..72711912cd 100644
---- a/default-configs/s390x-softmmu.mak
-+++ b/default-configs/s390x-softmmu.mak
-@@ -7,6 +7,7 @@
- #CONFIG_VFIO_CCW=n
- #CONFIG_VIRTIO_PCI=n
- #CONFIG_WDT_DIAG288=n
-+#CONFIG_CCW_TESTDEV=n
- 
- # Boards:
- #
-diff --git a/hw/s390x/Kconfig b/hw/s390x/Kconfig
-index 5e7d8a2bae..041ede333e 100644
---- a/hw/s390x/Kconfig
-+++ b/hw/s390x/Kconfig
-@@ -10,3 +10,6 @@ config S390_CCW_VIRTIO
-     select SCLPCONSOLE
-     select VIRTIO_CCW
-     select MSI_NONBROKEN
-+
-+config CCW_TESTDEV
-+    default y if TEST_DEVICES
-diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index e02ed80b68..e74d0efd9d 100644
---- a/hw/s390x/Makefile.objs
-+++ b/hw/s390x/Makefile.objs
-@@ -34,3 +34,4 @@ obj-$(CONFIG_KVM) += s390-stattrib-kvm.o
- obj-y += s390-ccw.o
- obj-y += ap-device.o
- obj-y += ap-bridge.o
-+obj-y += ccw-pong.o
-diff --git a/hw/s390x/ccw-pong.c b/hw/s390x/ccw-pong.c
-new file mode 100644
-index 0000000000..ae09357f72
---- /dev/null
-+++ b/hw/s390x/ccw-pong.c
-@@ -0,0 +1,134 @@
-+/*
-+ * CCW PING-PONG
-+ *
-+ * Copyright 2019 IBM Corp.
-+ * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/module.h"
-+#include "cpu.h"
-+#include "exec/address-spaces.h"
-+#include "hw/s390x/css.h"
-+#include "hw/s390x/css-bridge.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/s390x/pong.h"
-+
-+#define PONG_BUF_SIZE 0x1000
-+static char buf[PONG_BUF_SIZE];
-+
-+static int pong_ccw_cb(SubchDev *sch, CCW1 ccw)
-+{
-+    int rc = 0;
-+    static int value;
-+    int len;
-+
-+    len = (ccw.count > PONG_BUF_SIZE) ? PONG_BUF_SIZE : ccw.count;
-+    switch (ccw.cmd_code) {
-+    case PONG_WRITE:
-+        rc = ccw_dstream_read_buf(&sch->cds, buf, len);
-+        value = atol(buf);
-+        break;
-+    case PONG_READ:
-+        sprintf(buf, "%08x", value + 1);
-+        rc = ccw_dstream_write_buf(&sch->cds, buf, len);
-+        break;
-+    default:
-+        rc = -ENOSYS;
-+        break;
-+    }
-+
-+    sch->curr_status.scsw.count = ccw_dstream_residual_count(&sch->cds);
-+
-+    if (rc == -EIO) {
-+        /* I/O error, specific devices generate specific conditions */
-+        SCHIB *schib = &sch->curr_status;
-+
-+        sch->curr_status.scsw.dstat = SCSW_DSTAT_UNIT_CHECK;
-+        sch->sense_data[0] = 0x40;    /* intervention-req */
-+        schib->scsw.ctrl &= ~SCSW_ACTL_START_PEND;
-+        schib->scsw.ctrl &= ~SCSW_CTRL_MASK_STCTL;
-+        schib->scsw.ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
-+                   SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
-+    }
-+    return rc;
-+}
-+
-+static void pong_ccw_realize(DeviceState *ds, Error **errp)
-+{
-+    uint16_t chpid;
-+    CcwPONGDevice *dev = CCW_PONG(ds);
-+    CcwDevice *cdev = CCW_DEVICE(ds);
-+    CCWDeviceClass *cdk = CCW_DEVICE_GET_CLASS(cdev);
-+    SubchDev *sch;
-+    Error *err = NULL;
-+
-+    sch = css_create_sch(cdev->devno, errp);
-+    if (!sch) {
-+        return;
-+    }
-+
-+    sch->driver_data = dev;
-+    cdev->sch = sch;
-+    chpid = css_find_free_chpid(sch->cssid);
-+
-+    if (chpid > MAX_CHPID) {
-+        error_setg(&err, "No available chpid to use.");
-+        goto out_err;
-+    }
-+
-+    sch->id.reserved = 0xff;
-+    sch->id.cu_type = dev->cu_type;
-+    css_sch_build_virtual_schib(sch, (uint8_t)chpid, CCW_PONG_CHPID_TYPE);
-+    sch->do_subchannel_work = do_subchannel_work_virtual;
-+    sch->ccw_cb = pong_ccw_cb;
-+
-+    cdk->realize(cdev, &err);
-+    if (err) {
-+        goto out_err;
-+    }
-+
-+    css_reset_sch(sch);
-+    return;
-+
-+out_err:
-+    error_propagate(errp, err);
-+    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
-+    cdev->sch = NULL;
-+    g_free(sch);
-+}
-+
-+static Property pong_ccw_properties[] = {
-+    DEFINE_PROP_UINT16("cu_type", CcwPONGDevice, cu_type, CCW_PONG_CU_TYPE),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void pong_ccw_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = pong_ccw_properties;
-+    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
-+    dc->realize = pong_ccw_realize;
-+    dc->hotpluggable = false;
-+}
-+
-+static const TypeInfo pong_ccw_info = {
-+    .name = TYPE_CCW_PONG,
-+    .parent = TYPE_CCW_DEVICE,
-+    .instance_size = sizeof(CcwPONGDevice),
-+    .class_init = pong_ccw_class_init,
-+    .class_size = sizeof(CcwPONGClass),
-+};
-+
-+static void pong_ccw_register(void)
-+{
-+    type_register_static(&pong_ccw_info);
-+}
-+
-+type_init(pong_ccw_register)
-diff --git a/include/hw/s390x/pong.h b/include/hw/s390x/pong.h
-new file mode 100644
-index 0000000000..b14af7ca86
---- /dev/null
-+++ b/include/hw/s390x/pong.h
-@@ -0,0 +1,48 @@
-+/*
-+ *  ccw-attached PONG definitions
-+ *
-+ * Copyright 2019 IBM Corp.
-+ * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef HW_S390X_PONG_CCW_H
-+#define HW_S390X_PONG_CCW_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/s390x/css.h"
-+#include "hw/s390x/ccw-device.h"
-+
-+#define CCW_PONG_CU_TYPE    0xc0ca
-+#define CCW_PONG_CHPID_TYPE 0xd0
-+
-+#define TYPE_CCW_PONG "ccw-pong"
-+
-+/* Local Channel Commands */
-+#define PONG_WRITE 0x21         /* Write */
-+#define PONG_READ  0x22         /* Read buffer */
-+
-+#define CCW_PONG(obj) \
-+     OBJECT_CHECK(CcwPONGDevice, (obj), TYPE_CCW_PONG)
-+#define CCW_PONG_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(CcwPONGClass, (klass), TYPE_CCW_PONG)
-+#define CCW_PONG_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(CcwPONGClass, (obj), TYPE_CCW_PONG)
-+
-+typedef struct CcwPONGDevice {
-+    CcwDevice parent_obj;
-+    uint16_t cu_type;
-+} CcwPONGDevice;
-+
-+typedef struct CcwPONGClass {
-+    CCWDeviceClass parent_class;
-+
-+    void (*init)(CcwPONGDevice *, Error **);
-+    int (*read_payload)(CcwPONGDevice *);
-+    int (*write_payload)(CcwPONGDevice *, uint8_t);
-+} CcwPONGClass;
-+
-+#endif
--- 
-2.17.0
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+TGV0IG1lIGRlc2NyaWJlIHRoZSBpc3N1ZSB3aXRoIGFuIGV4YW1wbGUgdmlhIGBuYy12c29ja2A6
+CgpMZXQncyBhc3N1bWUgdGhlIEd1ZXN0IGNpZCBpcyAzLgpleGVjdXRlICdybW1vZCB2bXdfdnNv
+Y2tfdmlydGlvX3RyYW5zcG9ydCcgaW4gR3Vlc3QsCnRoZW4gZXhlY3V0ZSAnd2hpbGUgdHJ1ZTsg
+ZG8gbmMtdnNvY2sgMyAxMjM0JyBpbiBIb3N0LgoKSG9zdCAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgR3Vlc3QKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIyBybW1vZCB2bXdf
+dnNvY2tfdmlydGlvX3RyYW5zcG9ydAoKIyB3aGlsZSB0cnVlOyBkbyAuL25jLXZzb2NrIDMgMTIz
+NDsgZG9uZQooYWZ0ZXIgMiBzZWNvbmQpCmNvbm5lY3Q6IENvbm5lY3Rpb24gdGltZWQgb3V0Cihh
+ZnRlciAyIHNlY29uZCkKY29ubmVjdDogQ29ubmVjdGlvbiB0aW1lZCBvdXQKLi4uCgogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAjIG1vZHByb2JlIHZtd192c29ja192aXJ0aW9fdHJh
+bnNwb3J0Cgpjb25uZWN0OiBDb25uZWN0aW9uIHJlc2V0IGJ5IHBlZXIKY29ubmVjdDogQ29ubmVj
+dGlvbiByZXNldCBieSBwZWVyCmNvbm5lY3Q6IENvbm5lY3Rpb24gcmVzZXQgYnkgcGVlcgouLi4K
+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICMgbmMtdnNvY2sgLWwgMTIzNAogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBDb25uZXRpb24gZnJvbSBjaWQgMiBwb3J0ICoq
+Ki4uLgooc3RvcCBwcmludGluZykKCgpUaGUgYWJvdmUgcHJvY2VzcyBzaW11bGF0ZXMgdGhlIGNv
+bW11bmljYXRpb24gcHJvY2VzcyBiZXR3ZWVuCnRoZSBga2F0YS1ydW50aW1lYCBhbmQgYGthdGEt
+YWdlbnRgIGFmdGVyIHN0YXJ0aW5nIHRoZSBHdWVzdC4KSW4gb3JkZXIgdG8gY29ubmVjdCB0byBg
+a2F0YS1hZ2VudGAgYXMgc29vbiBhcyBwb3NzaWJsZSwgCmBrYXRhLXJ1bnRpbWVgIHdpbGwgY29u
+dGludW91c2x5IHRyeSB0byBjb25uZWN0IHRvIGBrYXRhLWFnZW50YCBpbiBhIGxvb3AuCnNlZSBo
+dHRwczovL2dpdGh1Yi5jb20va2F0YS1jb250YWluZXJzL3J1bnRpbWUvYmxvYi9kMDU0NTU2ZjYw
+ZjA5MjMzNWEyMmEyODgwMTFmYTI5NTM5YWQ0Y2NjL3ZlbmRvci9naXRodWIuY29tL2thdGEtY29u
+dGFpbmVycy9hZ2VudC9wcm90b2NvbHMvY2xpZW50L2NsaWVudC5nbyNMMzI3CkJ1dCB3aGVuIHRo
+ZSB2c29jayBkZXZpY2UgaW4gdGhlIEd1ZXN0IGlzIG5vdCByZWFkeSwgdGhlIGNvbm5lY3Rpb24K
+d2lsbCBibG9jayBmb3IgMiBzZWNvbmRzLiBUaGlzIHNpdHVhdGlvbiBhY3R1YWxseSBzbG93cyBk
+b3duCnRoZSBlbnRpcmUgc3RhcnR1cCB0aW1lIG9mIGBrYXRhLXJ1bnRpbWVgLgoKCj4gSSB0aGlu
+ayB0aGF0IGFkZGluZyBhIFFNUCBldmVudCBpcyB3b3JraW5nIGFyb3VuZCB0aGUgaXNzdWUgcmF0
+aGVyIHRoYW4KPiBmaXhpbmcgdGhlIHJvb3QgY2F1c2UuICBUaGlzIGlzIHByb2JhYmx5IGEgdmhv
+c3RfdnNvY2sua28gcHJvYmxlbSBhbmQKPiBzaG91bGQgYmUgZml4ZWQgdGhlcmUuCgpBZnRlciBs
+b29raW5nIGF0IHRoZSBzb3VyY2UgY29kZSBvZiB2aG9zdF92c29jay5rbywgCkkgdGhpbmsgaXQg
+aXMgcG9zc2libGUgdG8gb3B0aW1pemUgdGhlIGxvZ2ljIGhlcmUgdG9vLgpUaGUgc2ltcGxlIHBh
+dGNoIGlzIGFzIGZvbGxvd3MuIERvIHlvdSB0aGluayB0aGUgbW9kaWZpY2F0aW9uIGlzIGFwcHJv
+cHJpYXRlPwoKZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmhvc3QvdnNvY2suYyBiL2RyaXZlcnMvdmhv
+c3QvdnNvY2suYwppbmRleCA5ZjU3NzM2Zi4uOGZhZDY3YmUgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMv
+dmhvc3QvdnNvY2suYworKysgYi9kcml2ZXJzL3Zob3N0L3Zzb2NrLmMKQEAgLTUxLDYgKzUxLDcg
+QEAgc3RydWN0IHZob3N0X3Zzb2NrIHsKIAlhdG9taWNfdCBxdWV1ZWRfcmVwbGllczsKCiAJdTMy
+IGd1ZXN0X2NpZDsKKwl1MzIgc3RhdGU7CiB9OwoKIHN0YXRpYyB1MzIgdmhvc3RfdHJhbnNwb3J0
+X2dldF9sb2NhbF9jaWQodm9pZCkKQEAgLTQ5Nyw2ICs1NDEsNyBAQCBzdGF0aWMgaW50IHZob3N0
+X3Zzb2NrX3N0YXJ0KHN0cnVjdCB2aG9zdF92c29jayAqdnNvY2spCgogCQltdXRleF91bmxvY2so
+JnZxLT5tdXRleCk7CiAJfQorCXZzb2NrLT5zdGF0ZSA9IDE7CgogCW11dGV4X3VubG9jaygmdnNv
+Y2stPmRldi5tdXRleCk7CiAJcmV0dXJuIDA7CkBAIC01MzUsNiArNTgwLDcgQEAgc3RhdGljIGlu
+dCB2aG9zdF92c29ja19zdG9wKHN0cnVjdCB2aG9zdF92c29jayAqdnNvY2spCiAJCXZxLT5wcml2
+YXRlX2RhdGEgPSBOVUxMOwogCQltdXRleF91bmxvY2soJnZxLT5tdXRleCk7CiAJfQorCXZzb2Nr
+LT5zdGF0ZSA9IDA7CgogZXJyOgogCW11dGV4X3VubG9jaygmdnNvY2stPmRldi5tdXRleCk7CkBA
+IC03ODYsNiArODMyLDI3IEBAIHN0YXRpYyBzdHJ1Y3QgbWlzY2RldmljZSB2aG9zdF92c29ja19t
+aXNjID0gewogCS5mb3BzID0gJnZob3N0X3Zzb2NrX2ZvcHMsCiB9OwoKK2ludCB2aG9zdF90cmFu
+c3BvcnRfY29ubmVjdChzdHJ1Y3QgdnNvY2tfc29jayAqdnNrKSB7CisJc3RydWN0IHZob3N0X3Zz
+b2NrICp2c29jazsKKworCXJjdV9yZWFkX2xvY2soKTsKKworCS8qIEZpbmQgdGhlIHZob3N0X3Zz
+b2NrIGFjY29yZGluZyB0byBndWVzdCBjb250ZXh0IGlkICAqLworCXZzb2NrID0gdmhvc3RfdnNv
+Y2tfZ2V0KHZzay0+cmVtb3RlX2FkZHIuc3ZtX2NpZCk7CisJaWYgKCF2c29jaykgeworCQlyY3Vf
+cmVhZF91bmxvY2soKTsKKwkJcmV0dXJuIC1FTk9ERVY7CisJfQorCisJcmN1X3JlYWRfdW5sb2Nr
+KCk7CisKKwlpZiAodnNvY2stPnN0YXRlID09IDEpIHsKKwkJcmV0dXJuIHZpcnRpb190cmFuc3Bv
+cnRfY29ubmVjdCh2c2spOworCX0gZWxzZSB7CisJCXJldHVybiAtRUNPTk5SRVNFVDsKKwl9Cit9
+CisKIHN0YXRpYyBzdHJ1Y3QgdmlydGlvX3RyYW5zcG9ydCB2aG9zdF90cmFuc3BvcnQgPSB7CiAJ
+LnRyYW5zcG9ydCA9IHsKIAkJLmdldF9sb2NhbF9jaWQgICAgICAgICAgICA9IHZob3N0X3RyYW5z
+cG9ydF9nZXRfbG9jYWxfY2lkLApAQCAtNzkzLDcgKzg2MCw3IEBAIHN0YXRpYyBzdHJ1Y3Qgdmly
+dGlvX3RyYW5zcG9ydCB2aG9zdF90cmFuc3BvcnQgPSB7CiAJCS5pbml0ICAgICAgICAgICAgICAg
+ICAgICAgPSB2aXJ0aW9fdHJhbnNwb3J0X2RvX3NvY2tldF9pbml0LAogCQkuZGVzdHJ1Y3QgICAg
+ICAgICAgICAgICAgID0gdmlydGlvX3RyYW5zcG9ydF9kZXN0cnVjdCwKIAkJLnJlbGVhc2UgICAg
+ICAgICAgICAgICAgICA9IHZpcnRpb190cmFuc3BvcnRfcmVsZWFzZSwKLQkJLmNvbm5lY3QgICAg
+ICAgICAgICAgICAgICA9IHZpcnRpb190cmFuc3BvcnRfY29ubmVjdCwKKwkJLmNvbm5lY3QgICAg
+ICAgICAgICAgICAgICA9IHZob3N0X3RyYW5zcG9ydF9jb25uZWN0LAogCQkuc2h1dGRvd24gICAg
+ICAgICAgICAgICAgID0gdmlydGlvX3RyYW5zcG9ydF9zaHV0ZG93biwKIAkJLmNhbmNlbF9wa3Qg
+ICAgICAgICAgICAgICA9IHZob3N0X3RyYW5zcG9ydF9jYW5jZWxfcGt0LA==
+
+
+--=====_003_next=====--
+
+--=====_001_next=====--
 
 
