@@ -2,62 +2,108 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22577C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9103C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF49B20880
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:02:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF49B20880
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7C33821774
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 11:08:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OmRUlyTC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C33821774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaHZJ-0006kb-4W
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 06:02:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38973)
+	id 1iaHfF-0000Cc-O2
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 06:08:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59189)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1iaHMq-0000Ta-T9
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:49:50 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iaHPw-0001qw-6I
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:53:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1iaHMm-0003zy-Hk
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:49:45 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:47932 helo=huawei.com)
+ (envelope-from <mreitz@redhat.com>) id 1iaHPn-0005WP-R8
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:52:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47644
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1iaHMe-00032P-C4; Thu, 28 Nov 2019 05:49:36 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 8539554C9F6F9286BB90;
- Thu, 28 Nov 2019 18:49:27 +0800 (CST)
-Received: from [127.0.0.1] (10.120.177.99) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Thu, 28 Nov 2019
- 18:49:19 +0800
-Subject: Re: [PATCH] block/nbd: fix memory leak in nbd_open()
-To: Stefano Garzarella <sgarzare@redhat.com>
-References: <1574930410-43468-1-git-send-email-pannengyuan@huawei.com>
- <20191128090149.it5w2gijbqaw3tpg@steredhat>
- <52fe4ac4-25a8-827d-6c09-42d73ff7858b@huawei.com>
- <20191128104130.a2sycwcvevuajb3o@steredhat>
-From: pannengyuan <pannengyuan@huawei.com>
-Message-ID: <67b2ba9c-170e-cd81-18f8-ecbae970ceed@huawei.com>
-Date: Thu, 28 Nov 2019 18:49:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iaHPm-0005I7-MS
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:52:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574938367;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=wvfFcTbMlAJzsY5K0UOrFsuqceY3jNUR+OIvCtBCfQE=;
+ b=OmRUlyTCuuqhu8lh73rktWldmhDAcBwsz1iAPWW5mmxN6HQJnEUJZo/dZ7psa5rMGvSgk1
+ 3OlBIqnMkQ8qzncAOyWXsmq5G8MC/6RIzmlGNDa1rh71JNAjgQ1zKrwiJbCiReuqsvk2uT
+ ODbTcAJyIisH7toj8zyVgDAWMy6fGhc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48-qcjco_kyNW6VCjyj260CUw-1; Thu, 28 Nov 2019 05:52:44 -0500
+X-MC-Unique: qcjco_kyNW6VCjyj260CUw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DE5010054E3;
+ Thu, 28 Nov 2019 10:52:43 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-204-182.brq.redhat.com
+ [10.40.204.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 29DA919C4F;
+ Thu, 28 Nov 2019 10:52:41 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 02/31] block: Add BdrvChildRole
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20191127131624.1062403-1-mreitz@redhat.com>
+ <20191127131624.1062403-3-mreitz@redhat.com>
+ <9d6e35ea-eed6-716a-75aa-e8f47f35b6b7@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <02c29aee-6f92-0648-c60a-875a3d8ca305@redhat.com>
+Date: Thu, 28 Nov 2019 11:52:40 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191128104130.a2sycwcvevuajb3o@steredhat>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.120.177.99]
-X-CFilter-Loop: Reflected
+In-Reply-To: <9d6e35ea-eed6-716a-75aa-e8f47f35b6b7@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ginbLrbjvucMajG9njnm1N7GWO4PsKZvD"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,115 +115,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, liyiting@huawei.com, zhang.zhanghailiang@huawei.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- kuhn.chenqun@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thanks for you suggestion, I'd be glad to do it, I will send a new
-version later.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ginbLrbjvucMajG9njnm1N7GWO4PsKZvD
+Content-Type: multipart/mixed; boundary="6fonzDlmCjeiPJB9m2uF5OAlPDObHKneD"
 
-Cheers.
+--6fonzDlmCjeiPJB9m2uF5OAlPDObHKneD
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-On 2019/11/28 18:41, Stefano Garzarella wrote:
-> On Thu, Nov 28, 2019 at 06:32:49PM +0800, pannengyuan wrote:
->> Hi,
->> I think it's a better way, you can implement this new function before
->> this patch.
-> 
-> If you want to do it, so you can send everything together, for me there's
-> no problem, it was just a suggestion.
-> 
-> If you don't have time, I can do it.
-> 
-> Cheers,
-> Stefano
-> 
+On 28.11.19 10:31, Vladimir Sementsov-Ogievskiy wrote:
+> 27.11.2019 16:15, Max Reitz wrote:
+>> This enum will supplement BdrvChildClass when it comes to what role (or
+>> combination of roles) a child takes for its parent.
 >>
->> Thanks.
+>> Because empty enums are not allowed, let us just start with it filled.
 >>
->> On 2019/11/28 17:01, Stefano Garzarella wrote:
->>> On Thu, Nov 28, 2019 at 04:40:10PM +0800, pannengyuan@huawei.com wrote:
->>>
->>> Hi,
->>> I don't know nbd code very well, the patch LGTM, but just a comment
->>> below:
->>>
->>>> From: PanNengyuan <pannengyuan@huawei.com>
->>>>
->>>> In currently implementation there will be a memory leak when
->>>> nbd_client_connect() returns error status. Here is an easy way to reproduce:
->>>>
->>>> 1. run qemu-iotests as follow and check the result with asan:
->>>>     ./check -raw 143
->>>>
->>>> Following is the asan output backtrack:
->>>> Direct leak of 40 byte(s) in 1 object(s) allocated from:
->>>>     #0 0x7f629688a560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
->>>>     #1 0x7f6295e7e015 in g_malloc0  (/usr/lib64/libglib-2.0.so.0+0x50015)
->>>>     #2 0x56281dab4642 in qobject_input_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:295
->>>>     #3 0x56281dab1a04 in visit_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:49
->>>>     #4 0x56281dad1827 in visit_type_SocketAddress  qapi/qapi-visit-sockets.c:386
->>>>     #5 0x56281da8062f in nbd_config  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
->>>>     #6 0x56281da8062f in nbd_process_options  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
->>>>     #7 0x56281da8062f in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
->>>>
->>>> Direct leak of 15 byte(s) in 1 object(s) allocated from:
->>>>     #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
->>>>     #1 0x7f6295e7dfbd in g_malloc  (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
->>>>     #2 0x7f6295e96ace in g_strdup  (/usr/lib64/libglib-2.0.so.0+0x68ace)
->>>>     #3 0x56281da804ac in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1834
->>>>     #4 0x56281da804ac in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
->>>>
->>>> Indirect leak of 24 byte(s) in 1 object(s) allocated from:
->>>>     #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
->>>>     #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
->>>>     #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
->>>>     #3 0x56281dab41a3 in qobject_input_type_str_keyval   /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:536
->>>>     #4 0x56281dab2ee9 in visit_type_str   /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:297
->>>>     #5 0x56281dad0fa1 in visit_type_UnixSocketAddress_members  qapi/qapi-visit-sockets.c:141
->>>>     #6 0x56281dad17b6 in visit_type_SocketAddress_members      qapi/qapi-visit-sockets.c:366
->>>>     #7 0x56281dad186a in visit_type_SocketAddress     qapi/qapi-visit-sockets.c:393
->>>>     #8 0x56281da8062f in nbd_config   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
->>>>     #9 0x56281da8062f in nbd_process_options   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
->>>>     #10 0x56281da8062f in nbd_open  /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
->>>>
->>>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>>> Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
->>>> ---
->>>>  block/nbd.c | 5 +++++
->>>>  1 file changed, 5 insertions(+)
->>>>
->>>> diff --git a/block/nbd.c b/block/nbd.c
->>>> index 1239761..bc40a25 100644
->>>> --- a/block/nbd.c
->>>> +++ b/block/nbd.c
->>>> @@ -1881,6 +1881,11 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
->>>>  
->>>>      ret = nbd_client_connect(bs, errp);
->>>>      if (ret < 0) {
->>>> +        object_unref(OBJECT(s->tlscreds));
->>>> +        qapi_free_SocketAddress(s->saddr);
->>>> +        g_free(s->export);
->>>> +        g_free(s->tlscredsid);
->>>> +        g_free(s->x_dirty_bitmap);
->>>
->>> Since with this patch we are doing these cleanups in 3 places (here,
->>> nbd_close(), and nbd_process_options()), should be better to add a new
->>> function to do these cleanups?
->>>
->>> Maybe I'd create a series adding a patch before this one, implementing this
->>> new function, and change this patch calling it.
->>>
->>> Thanks,
->>> Stefano
->>>
->>>
->>> .
->>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>   include/block/block.h | 38 ++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 38 insertions(+)
 >>
-> 
+>> diff --git a/include/block/block.h b/include/block/block.h
+>> index 38963ef203..36817d5689 100644
+>> --- a/include/block/block.h
+>> +++ b/include/block/block.h
+>> @@ -279,6 +279,44 @@ enum {
+>>       DEFAULT_PERM_UNCHANGED      =3D BLK_PERM_ALL & ~DEFAULT_PERM_PASST=
+HROUGH,
+>>   };
+>>  =20
+>> +typedef enum BdrvChildRole {
+>=20
+> Don't you want to call it just BdrvChildFlags ?
+> Benefits:
+>=20
+> 1. Do not intersect with old BdrvChildRole.
+
+Well, that doesn=E2=80=99t change the fact that the old BdrvChildRole just
+doesn=E2=80=99t describe a role.
+
+> 2. I think, BDRV_CHILD_STAY_AT_NODE is not a role, but just a property or=
+ flag..
+
+I can be convinced to let STAY_AT_NODE stay a property of
+BdrvChildClass. :-)
+
+What I don=E2=80=99t like about =E2=80=9CBdrvChildFlags=E2=80=9D is that =
+=E2=80=9Cflags=E2=80=9D doesn=E2=80=99t express
+anything.  The permissions are flags, too.
+
+Max
+
+
+--6fonzDlmCjeiPJB9m2uF5OAlPDObHKneD--
+
+--ginbLrbjvucMajG9njnm1N7GWO4PsKZvD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3fpvgACgkQ9AfbAGHV
+z0DD5AgAlBS8dNO/rQt54DqGr6icrQwnFtkASGdbUsEPzxCbG0ZyKhF4VmtD3Kzq
+75KuJqxM7OmT6dVCoWtuS/TcPjq850GLMUpAJEdq8Dhew0xqPgg1IhEPFfmBIX5Q
+83Yg3/BXRr3acuQMMA4hOAQwKnHayJQ1zufzH8kk2PcoTDEXxA2j+6zFU1/hWJs9
+gXhst9bZTtP0cybtxpM5fMWZwJD+YsMjN51LwxjhCW1FZZ0hr9nT71k4rd5fxoyr
+NwEmVX6NbztnKAUOYu17HXLbwC/yTPAMnjPrbJLLEwwutC/dUqtAO9So2drvDDS5
+ex2dhMXxaJ+CQBIJnzgLnG27F1KCWQ==
+=a+zJ
+-----END PGP SIGNATURE-----
+
+--ginbLrbjvucMajG9njnm1N7GWO4PsKZvD--
 
 
