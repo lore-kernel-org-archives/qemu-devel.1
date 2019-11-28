@@ -2,96 +2,74 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD35BC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 19:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0F5C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 19:38:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8825D21739
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 19:35:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8825D21739
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9273A2176D
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 19:38:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9273A2176D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mentor.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaPZG-00068C-Kz
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 14:35:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49471)
+	id 1iaPc4-0007h6-Qd
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 14:38:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49389)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pasic@linux.ibm.com>) id 1iaMxi-0002J5-Qk
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 11:48:16 -0500
+ (envelope-from <Bilal_Wasim@mentor.com>) id 1iaNhA-0000oP-T7
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 12:35:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pasic@linux.ibm.com>) id 1iaMxf-0001Zz-KH
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 11:48:13 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54266)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1iaMxf-0001UN-Cm
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 11:48:11 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xASGlOtF158989
- for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 11:48:08 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wjar8q4nr-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 11:48:08 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
- Thu, 28 Nov 2019 16:48:05 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 28 Nov 2019 16:48:03 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xASGm1r249217646
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 28 Nov 2019 16:48:01 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 85545AE053;
- Thu, 28 Nov 2019 16:48:01 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 437FDAE04D;
- Thu, 28 Nov 2019 16:48:01 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.152.224.151])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 28 Nov 2019 16:48:01 +0000 (GMT)
-Date: Thu, 28 Nov 2019 17:48:00 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2] virtio-pci: disable vring processing when
- bus-mastering is disabled
-In-Reply-To: <20191120005003.27035-1-mdroth@linux.vnet.ibm.com>
-References: <20191120005003.27035-1-mdroth@linux.vnet.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (envelope-from <Bilal_Wasim@mentor.com>) id 1iaNgx-0004Gd-In
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 12:35:03 -0500
+Received: from esa3.mentor.iphmx.com ([68.232.137.180]:29068)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Bilal_Wasim@mentor.com>)
+ id 1iaNgx-0003u4-7Y; Thu, 28 Nov 2019 12:34:59 -0500
+IronPort-SDR: 18WT71BmfIRhfauOWChApTv/xUVgZwB7PjrlKeNWeXmFx5vnUtIs8wppXz85Ze59PZd7qzJZPb
+ ThXsNPePYu2rcizaweYddnBjKE8TSf4xrU9yuhVTt0Vym+hIUdEz5Eum/MdebqVhhKDezZd4zL
+ u9Ritt4QngY8fxXH0bDuKxbMX8c1mCJoP1PiREX7BCCDFiAup03XPe5jlsrUKcYIl1zVBNd283
+ 5L5g985anjeFF6gTDUbnJrTAzOSn47ijijGpZrOKasTs/8nKctiBPXnxebbyB1fWNdWVWZSRoC
+ rVI=
+X-IronPort-AV: E=Sophos;i="5.69,253,1571731200"; d="scan'208";a="43608530"
+Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
+ by esa3.mentor.iphmx.com with ESMTP; 28 Nov 2019 09:34:49 -0800
+IronPort-SDR: wyPPMdGKIwNy8p6ThmiMNVV/I3oa3zzm7j6E1DsHxVjX5NhVmfUBwENpufWx+loNXmRB3EuoV4
+ 8MsCFdKwu9gdCe/uXEtNIe4RhNUT5WD321gWeSNkz/rG/AG3eHGfhF3cvVNrY/94DuWctSeILl
+ wqmopUbp40t5P6asWRXHCWPaPFyHrRdPhx60EiUGy0+hScEfmbM8WislNd5NNA81ByLXEAoIrd
+ NPC7A9mXfIjqAagQeLKssKCm8164+YDYY5AdtqBBa4g+J0Tdu3sfvin2CC2dk1JpQKHYbq/2NQ
+ QZ8=
+From: "Wasim, Bilal" <Bilal_Wasim@mentor.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Subject: RE: [PATCH] Updating the GEM MAC IP to properly filter out the
+ multicast addresses
+Thread-Topic: [PATCH] Updating the GEM MAC IP to properly filter out the
+ multicast addresses
+Thread-Index: AdWl/aPyGC40ldXeTIuqOxj9pJGCcwABzzoAAAIbwuAAARoxAAAAFd1A
+Date: Thu, 28 Nov 2019 17:34:44 +0000
+Message-ID: <ef4adfa40b5543fba4b8e673e36cbd9e@SVR-IES-MBX-03.mgc.mentorg.com>
+References: <2632212d4c8a40bead72ffdcf288e600@SVR-IES-MBX-03.mgc.mentorg.com>
+ <20191128155956.GB29312@toto>
+ <2b7a42487a5d4a258062bd209a0d13fa@SVR-IES-MBX-03.mgc.mentorg.com>
+ <20191128173152.GC29312@toto>
+In-Reply-To: <20191128173152.GC29312@toto>
+Accept-Language: en-GB, en-IE, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [137.202.0.90]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19112816-0008-0000-0000-000003397A79
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112816-0009-0000-0000-00004A588781
-Message-Id: <20191128174800.2d4a2cc2.pasic@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-28_05:2019-11-28,2019-11-28 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0 mlxscore=0
- phishscore=0 impostorscore=0 clxscore=1015 suspectscore=0 mlxlogscore=999
- adultscore=0 malwarescore=0 spamscore=0 bulkscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
- definitions=main-1911280142
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 68.232.137.180
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,118 +81,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Janosch Frank <frankja@linux.ibm.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "alistair@alistair23.me" <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 19 Nov 2019 18:50:03 -0600
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+Thanks for the pointers.. I will incorporate all these changes and post an =
+updated thread asap..=20
 
-[..]
-> I.e. the calling code is only scheduling a one-shot BH for
-> virtio_blk_data_plane_stop_bh, but somehow we end up trying to process
-> an additional virtqueue entry before we get there. This is likely due
-> to the following check in virtio_queue_host_notifier_aio_poll:
-> 
->   static bool virtio_queue_host_notifier_aio_poll(void *opaque)
->   {
->       EventNotifier *n = opaque;
->       VirtQueue *vq = container_of(n, VirtQueue, host_notifier);
->       bool progress;
-> 
->       if (!vq->vring.desc || virtio_queue_empty(vq)) {
->           return false;
->       }
-> 
->       progress = virtio_queue_notify_aio_vq(vq);
-> 
-> namely the call to virtio_queue_empty(). In this case, since no new
-> requests have actually been issued, shadow_avail_idx == last_avail_idx,
-> so we actually try to access the vring via vring_avail_idx() to get
-> the latest non-shadowed idx:
-> 
->   int virtio_queue_empty(VirtQueue *vq)
->   {
->       bool empty;
->       ...
-> 
->       if (vq->shadow_avail_idx != vq->last_avail_idx) {
->           return 0;
->       }
-> 
->       rcu_read_lock();
->       empty = vring_avail_idx(vq) == vq->last_avail_idx;
->       rcu_read_unlock();
->       return empty;
-> 
-> but since the IOMMU region has been disabled we get a bogus value (0
-> usually), which causes virtio_queue_empty() to falsely report that
-> there are entries to be processed, which causes errors such as:
-> 
->   "virtio: zero sized buffers are not allowed"
-> 
-> or
-> 
->   "virtio-blk missing headers"
-> 
-> and puts the device in an error state.
-> 
+-----Original Message-----
+From: Edgar E. Iglesias [mailto:edgar.iglesias@gmail.com]=20
+Sent: Thursday, November 28, 2019 10:32 PM
+To: Wasim, Bilal <Bilal_Wasim@mentor.com>
+Cc: qemu-devel@nongnu.org; alistair@alistair23.me; peter.maydell@linaro.org=
+; qemu-arm@nongnu.org
+Subject: Re: [PATCH] Updating the GEM MAC IP to properly filter out the mul=
+ticast addresses
 
-I've seen something similar on s390x with virtio-ccw-blk under
-protected virtualization, that made me wonder about how virtio-blk in
-particular but also virtio in general handles shutdown and reset.
+On Thu, Nov 28, 2019 at 05:02:00PM +0000, Wasim, Bilal wrote:
+> This was one of my first attempts, and so I was sure to miss something.. =
+I've incorporated all the updates in this patch.. Let me know what you thin=
+k about this..=20
+>=20
+> net/cadence_gem: Updating the GEM MAC IP to properly filter out the multi=
+cast addresses.
+>=20
+> The current code makes a bad assumption that the most-significant byte=20
+> of the MAC address is used to determine if the address is multicast or=20
+> unicast, but in reality only a single bit is used to determine this.
+> This caused IPv6 to not work.. Fix is now in place and has been tested=20
+> with ZCU102-A53 / IPv6 on a TAP interface. Works well..
 
-This makes me wonder if bus-mastering disabled is the only scenario when
-a something like vdev->disabled should be used.
+Thanks Bilal,
 
-In particular I have the following mechanism in mind 
+This looks better but not quite there yet.
 
-qemu_system_reset() --> ... --> qemu_devices_reset() --> ... --> 
---> virtio_[transport]_reset() --> ... --> virtio_bus_stop_ioeventfd()
---> virtio_blk_data_plane_stop()
+* You don't seem to be using git-send-email to post patches, try it, it wil=
+l make life easier wrt to formatting. The patch should be in a separate ema=
+il. The subject line should be the subject of the email.
+git-format-patch and git-send-email will take care of that for you.
 
-which in turn triggesrs the following cascade:
-virtio_blk_data_plane_stop_bh --> virtio_queue_aio_set_host_notifier_handler() -->
---> virtio_queue_host_notifier_aio_read() 
-which however calls 
-virtio_queue_notify_aio_vq() if the notifier tests as
-positive. 
+* You don't need to define IS_MULTICAST, you can directly use is_multicast_=
+ether_addr() and friends.
 
-Since we still have vq->handle_aio_output that means we may
-call virtqueue_pop() during the reset procedure.
+* The patch still has long lines (longer than 80 chars) You can run scripts=
+/checkpatch.pl on your commit before posting the patch.
 
-This was a problem for us, because (due to a bug) the shared pages that
-constitute the virtio ring weren't shared any more. And thus we got
-the infamous  
-virtio_error(vdev, "virtio: zero sized buffers are not allowed").
+Cheers,
+Edgar
 
-Now the bug is no more, and we can tolerate that somewhat late access
-to the virtio ring.
 
-But it keeps nagging me, is it really OK for the device to access the
-virtio ring during reset? My intuition tells me that the device should
-not look for new requests after it has been told to reset.
 
-Opinions? (Michael, Connie)
-
-Regards,
-Halil
-
-> This patch works around the issue by introducing virtio_set_disabled(),
-> which sets a 'disabled' flag to bypass checks like virtio_queue_empty()
-> when bus-mastering is disabled. Since we'd check this flag at all the
-> same sites as vdev->broken, we replace those checks with an inline
-> function which checks for either vdev->broken or vdev->disabled.
-> 
-> The 'disabled' flag is only migrated when set, which should be fairly
-> rare, but to maintain migration compatibility we disable it's use for
-> older machine types. Users requiring the use of the flag in conjunction
-> with older machine types can set it explicitly as a virtio-device
-> option.
-> 
-
+>=20
+> Signed-off-by: Bilal Wasim <bilal_wasim@mentor.com>
+> ---
+>  hw/net/cadence_gem.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c index=20
+> b8be73dc55..98efb93f8a 100644
+> --- a/hw/net/cadence_gem.c
+> +++ b/hw/net/cadence_gem.c
+> @@ -34,6 +34,7 @@
+>  #include "qemu/module.h"
+>  #include "sysemu/dma.h"
+>  #include "net/checksum.h"
+> +#include "net/eth.h"
+> =20
+>  #ifdef CADENCE_GEM_ERR_DEBUG
+>  #define DB_PRINT(...) do { \
+> @@ -315,6 +316,12 @@
+> =20
+>  #define GEM_MODID_VALUE 0x00020118
+> =20
+> +/* IEEE has specified that the most significant bit of the most=20
+> +significant byte be used for
+> + * distinguishing between Unicast and Multicast addresses.
+> + * If its a 1, that means multicast, 0 means unicast.   */
+> +#define IS_MULTICAST(address)           is_multicast_ether_addr(address)
+> +#define IS_UNICAST(address)             is_unicast_ether_addr(address)
+> +
+>  static inline uint64_t tx_desc_get_buffer(CadenceGEMState *s,=20
+> uint32_t *desc)  {
+>      uint64_t ret =3D desc[0];
+> @@ -601,7 +608,7 @@ static void gem_receive_updatestats(CadenceGEMState *=
+s, const uint8_t *packet,
+>      }
+> =20
+>      /* Error-free Multicast Frames counter */
+> -    if (packet[0] =3D=3D 0x01) {
+> +    if (IS_MULTICAST(packet)) {
+>          s->regs[GEM_RXMULTICNT]++;
+>      }
+> =20
+> @@ -690,21 +697,21 @@ static int gem_mac_address_filter(CadenceGEMState *=
+s, const uint8_t *packet)
+>      }
+> =20
+>      /* Accept packets -w- hash match? */
+> -    if ((packet[0] =3D=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_=
+HASH)) ||
+> -        (packet[0] !=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_HA=
+SH))) {
+> +    if ((IS_MULTICAST(packet) && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_H=
+ASH)) ||
+> +        (IS_UNICAST(packet)   && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_H=
+ASH))) {
+>          unsigned hash_index;
+> =20
+>          hash_index =3D calc_mac_hash(packet);
+>          if (hash_index < 32) {
+>              if (s->regs[GEM_HASHLO] & (1<<hash_index)) {
+> -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_ACC=
+EPT :
+> -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_ACCE=
+PT :
+> +                                             =20
+> + GEM_RX_UNICAST_HASH_ACCEPT;
+>              }
+>          } else {
+>              hash_index -=3D 32;
+>              if (s->regs[GEM_HASHHI] & (1<<hash_index)) {
+> -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_ACC=
+EPT :
+> -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_ACCE=
+PT :
+> +                                             =20
+> + GEM_RX_UNICAST_HASH_ACCEPT;
+>              }
+>          }
+>      }
+> --
+> 2.19.1.windows.1
+>=20
+> ----------------------------------------------------------------------
+> --------------------------------------------------------
+> -----Original Message-----
+> From: Edgar E. Iglesias [mailto:edgar.iglesias@gmail.com]
+> Sent: Thursday, November 28, 2019 9:00 PM
+> To: Wasim, Bilal <Bilal_Wasim@mentor.com>
+> Cc: qemu-devel@nongnu.org; alistair@alistair23.me;=20
+> peter.maydell@linaro.org; qemu-arm@nongnu.org
+> Subject: Re: [PATCH] Updating the GEM MAC IP to properly filter out=20
+> the multicast addresses
+>=20
+> On Thu, Nov 28, 2019 at 03:10:16PM +0000, Wasim, Bilal wrote:
+> > [PATCH] Updating the GEM MAC IP to properly filter out the multicast=20
+> > addresses. The current code makes a bad assumption that the=20
+> > most-significant byte of the MAC address is used to determine if the=20
+> > address is multicast or unicast, but in reality only a single bit is=20
+> > used to determine this. This caused IPv6 to not work.. Fix is now in=20
+> > place and has been tested with
+> > ZCU102-A53 / IPv6 on a TAP interface. Works well..
+>=20
+> Hi Bilal,
+>=20
+> The fix looks right to me but I have a few comments.
+>=20
+> * Your patch seems a little wrongly formated.
+> [PATCH] goes into the Subject line for example and you're missing path pr=
+efixes.
+>=20
+> Do a git log -- hw/net/cadence_gem.c to see examples on how it should loo=
+k.
+>=20
+> * The patch will probably not pass checkpatch since you seem to have long=
+ lines.
+>=20
+> * We also need to update gem_receive_updatestats() to use the corrected m=
+acros.
+>=20
+> More inline:
+>=20
+> >=20
+> > Signed-off-by: Bilal Wasim <bilal_wasim@mentor.com>
+> > ---
+> > hw/net/cadence_gem.c | 18 ++++++++++++------
+> > 1 file changed, 12 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c index
+> > b8be73d..f8bcbb3 100644
+> > --- a/hw/net/cadence_gem.c
+> > +++ b/hw/net/cadence_gem.c
+> > @@ -315,6 +315,12 @@
+> >  #define GEM_MODID_VALUE 0x00020118
+> > +/* IEEE has specified that the most significant bit of the most=20
+> > +significant byte be used for
+> > + * distinguishing between Unicast and Multicast addresses.
+> > + * If its a 1, that means multicast, 0 means unicast.   */
+> > +#define IS_MULTICAST(address)           (((address[0] & 0x01) =3D=3D 0=
+x01) ? 1 : 0)
+>=20
+>=20
+>=20
+> This can be simplified:
+> #define IS_MULTICAST(address) (address[0] & 1)
+>=20
+> Actually, looking closer, we already have functions to do these checks in=
+:
+> include/net/eth.h
+>=20
+> static inline int is_multicast_ether_addr(const uint8_t *addr) static=20
+> inline int is_broadcast_ether_addr(const uint8_t *addr) static inline=20
+> int is_unicast_ether_addr(const uint8_t *addr)
+>=20
+>=20
+>=20
+> > +#define IS_UNICAST(address)             (!IS_MULTICAST(address))
+> > +
+> > static inline uint64_t tx_desc_get_buffer(CadenceGEMState *s,=20
+> > uint32_t
+> > *desc) {
+> >      uint64_t ret =3D desc[0];
+> > @@ -690,21 +696,21 @@ static int gem_mac_address_filter(CadenceGEMState=
+ *s, const uint8_t *packet)
+> >      }
+> >      /* Accept packets -w- hash match? */
+> > -    if ((packet[0] =3D=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAS=
+T_HASH)) ||
+> > -        (packet[0] !=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_=
+HASH))) {
+> > +    if ((IS_MULTICAST(packet) && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST=
+_HASH)) ||
+> > +        (IS_UNICAST(packet)   && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST=
+_HASH))) {
+> >          unsigned hash_index;
+> >          hash_index =3D calc_mac_hash(packet);
+> >          if (hash_index < 32) {
+> >              if (s->regs[GEM_HASHLO] & (1<<hash_index)) {
+> > -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_A=
+CCEPT :
+> > -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> > +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_AC=
+CEPT :
+> > +                                             =20
+> > + GEM_RX_UNICAST_HASH_ACCEPT;
+> >              }
+> >          } else {
+> >              hash_index -=3D 32;
+> >              if (s->regs[GEM_HASHHI] & (1<<hash_index)) {
+> > -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_A=
+CCEPT :
+> > -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> > +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_AC=
+CEPT :
+> > +                                             =20
+> > + GEM_RX_UNICAST_HASH_ACCEPT;
+> >              }
+> >          }
+> >      }
+> > --
+> > 2.9.3
+> >=20
 
