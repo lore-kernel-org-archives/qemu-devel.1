@@ -7,56 +7,58 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BC4C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 04:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FEAAC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 04:03:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7EF4208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 04:03:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A61A208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 04:03:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="cPHTx+WL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7EF4208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CzgPuix4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A61A208E4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaB1S-0007mw-UD
-	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 23:03:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54892)
+	id 1iaB1Y-0007ra-9Q
+	for qemu-devel@archiver.kernel.org; Wed, 27 Nov 2019 23:03:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54882)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iaB02-0006JO-Am
+ (envelope-from <dgibson@ozlabs.org>) id 1iaB02-0006JL-Bh
  for qemu-devel@nongnu.org; Wed, 27 Nov 2019 23:01:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iaAzy-0001Tj-AF
+ (envelope-from <dgibson@ozlabs.org>) id 1iaAzy-0001Tk-9e
  for qemu-devel@nongnu.org; Wed, 27 Nov 2019 23:01:48 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:37511 helo=ozlabs.org)
+Received: from ozlabs.org ([203.11.71.1]:39371)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iaAzs-0001Jo-Ft; Wed, 27 Nov 2019 23:01:45 -0500
+ id 1iaAzs-0001Jn-Fr; Wed, 27 Nov 2019 23:01:45 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47NkTr1kPXz9sPZ; Thu, 28 Nov 2019 15:01:35 +1100 (AEDT)
+ id 47NkTq5pngz9sPc; Thu, 28 Nov 2019 15:01:35 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1574913696;
- bh=JNWdlQ0cUc0HXy/Wm2vQcAcLe8JbepOiaNl5eFQstPg=;
+ d=gibson.dropbear.id.au; s=201602; t=1574913695;
+ bh=+/8PUNHuEuGsWwy96B4j9Ft2HYXfZfG7gfrvt4XmooU=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=cPHTx+WLv1l5Hv7RO4RmESyczdjw6ByEcAuZu/34Bl/qzQuKFSx2+CeCGw88Pil0D
- UvLoqa6FiugrbJyQVL8zVGYZjTQjGFs8lGA9RssJp+NLnl1qVis/dEEvWNbBnu5zDt
- R/A10VAkqiB6POMUYG+uz+9Celn0wgnXPOvpdrps=
-Date: Thu, 28 Nov 2019 12:32:40 +1100
+ b=CzgPuix4WQTNzT7BTWY8iVT+hB1qsMrmagWQ8EVUfvtyAX1bUsKxz8g28fnLwqdx/
+ zuNMieSRSfgkPXGtINLH3GVqLGZJjipbuPyIj4eve91x/MwoJOKFj9t2Xw0eKSv6Yr
+ CFTJ+h1PuS/QL8kttqkK8mGM/grMNLp2zb0Pb9z8=
+Date: Thu, 28 Nov 2019 12:30:24 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH v6 15/20] ppc/xive: Remove the get_tctx() XiveRouter
- handler
-Message-ID: <20191128013240.GB4765@umbus.fritz.box>
+Subject: Re: [PATCH v6 13/20] ppc/pnv: Clarify how the TIMA is accessed on a
+ multichip system
+Message-ID: <20191128013024.GA4765@umbus.fritz.box>
 References: <20191125065820.927-1-clg@kaod.org>
- <20191125065820.927-16-clg@kaod.org>
+ <20191125065820.927-14-clg@kaod.org>
+ <20191127052353.GR5582@umbus.fritz.box>
+ <49a23d16-596f-9345-f734-b06443704dfa@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="St7VIuEGZ6dlpu13"
+ protocol="application/pgp-signature"; boundary="cNdxnHkX5QqsyA0e"
 Content-Disposition: inline
-In-Reply-To: <20191125065820.927-16-clg@kaod.org>
+In-Reply-To: <49a23d16-596f-9345-f734-b06443704dfa@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -78,128 +80,117 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---St7VIuEGZ6dlpu13
+--cNdxnHkX5QqsyA0e
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 25, 2019 at 07:58:15AM +0100, C=E9dric Le Goater wrote:
-> It is now unused.
+On Wed, Nov 27, 2019 at 07:57:31AM +0100, C=E9dric Le Goater wrote:
+> On 27/11/2019 06:23, David Gibson wrote:
+> > On Mon, Nov 25, 2019 at 07:58:13AM +0100, C=E9dric Le Goater wrote:
+> >> The TIMA region gives access to the thread interrupt context registers
+> >> of a CPU. It is mapped at the same address on all chips and can be
+> >> accessed by any CPU of the system. To identify the chip from which the
+> >> access is being done, the PowerBUS uses a 'chip' field in the
+> >> load/store messages. QEMU does not model these messages, instead, we
+> >> extract the chip id from the CPU PIR and do a lookup at the machine
+> >> level to fetch the targeted interrupt controller.
+> >>
+> >> Introduce pnv_get_chip() and pnv_xive_tm_get_xive() helpers to clarify
+> >> this process in pnv_xive_get_tctx(). The latter will be removed in the
+> >> subsequent patches but the same principle will be kept.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  include/hw/ppc/pnv.h |  3 +++
+> >>  hw/intc/pnv_xive.c   | 40 +++++++++++++++++++++++-----------------
+> >>  hw/ppc/pnv.c         | 14 ++++++++++++++
+> >>  3 files changed, 40 insertions(+), 17 deletions(-)
+> >>
+> >> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> >> index a58cfea3f2fd..3a7bc3c57e0d 100644
+> >> --- a/include/hw/ppc/pnv.h
+> >> +++ b/include/hw/ppc/pnv.h
+> >> @@ -103,6 +103,7 @@ typedef struct Pnv9Chip {
+> >>   * A SMT8 fused core is a pair of SMT4 cores.
+> >>   */
+> >>  #define PNV9_PIR2FUSEDCORE(pir) (((pir) >> 3) & 0xf)
+> >> +#define PNV9_PIR2CHIP(pir)      (((pir) >> 8) & 0x7f)
+> >> =20
+> >>  typedef struct PnvChipClass {
+> >>      /*< private >*/
+> >> @@ -197,6 +198,8 @@ static inline bool pnv_is_power9(PnvMachineState *=
+pnv)
+> >>      return pnv_chip_is_power9(pnv->chips[0]);
+> >>  }
+> >> =20
+> >> +PnvChip *pnv_get_chip(uint32_t chip_id);
+> >> +
+> >>  #define PNV_FDT_ADDR          0x01000000
+> >>  #define PNV_TIMEBASE_FREQ     512000000ULL
+> >> =20
+> >> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+> >> index 95e9de312cd9..db9d9c11a8f4 100644
+> >> --- a/hw/intc/pnv_xive.c
+> >> +++ b/hw/intc/pnv_xive.c
+> >> @@ -439,31 +439,37 @@ static int pnv_xive_match_nvt(XivePresenter *xpt=
+r, uint8_t format,
+> >>      return count;
+> >>  }
+> >> =20
+> >> +/*
+> >> + * The TIMA MMIO space is shared among the chips and to identify the
+> >> + * chip from which the access is being done, we extract the chip id
+> >> + * from the PIR.
+> >> + */
+> >> +static PnvXive *pnv_xive_tm_get_xive(PowerPCCPU *cpu)
+> >> +{
+> >> +    int pir =3D ppc_cpu_pir(cpu);
+> >> +    PnvChip *chip;
+> >> +    PnvXive *xive;
+> >> +
+> >> +    chip =3D pnv_get_chip(PNV9_PIR2CHIP(pir));
+> >> +    assert(chip);
+> >> +    xive =3D &PNV9_CHIP(chip)->xive;
+> >> +
+> >> +    if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
+> >> +        xive_error(xive, "IC: CPU %x is not enabled", pir);
+> >> +    }
+> >> +    return xive;
+> >> +}
+> >> +
+> >>  static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+> >>  {
+> >>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> >> -    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+> >> -    PnvXive *xive =3D NULL;
+> >> -    CPUPPCState *env =3D &cpu->env;
+> >> -    int pir =3D env->spr_cb[SPR_PIR].default_value;
+> >> +    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
+> >> =20
+> >> -    /*
+> >> -     * Perform an extra check on the HW thread enablement.
+> >> -     *
+> >> -     * The TIMA is shared among the chips and to identify the chip
+> >> -     * from which the access is being done, we extract the chip id
+> >> -     * from the PIR.
+> >> -     */
+> >> -    xive =3D pnv_xive_get_ic((pir >> 8) & 0xf);
+> >>      if (!xive) {
+> >>          return NULL;
+> >>      }
+> >> =20
+> >> -    if (!(xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(pir & 0x3f))) {
+> >=20
+> > I'm not seeing any code which will replace this check on the thread
+> > enabled register.  Is that really what you intend?
 >=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> it is calling pnv_xive_tm_get_xive() which calls pnv_xive_is_cpu_enabled()
+> which does the same check in better.
 
-14..15 applied to ppc-for-5.0.
+Ah, yes of course, thanks.
 
-> ---
->  include/hw/ppc/xive.h |  2 --
->  hw/intc/pnv_xive.c    | 13 -------------
->  hw/intc/spapr_xive.c  |  8 --------
->  hw/intc/xive.c        |  7 -------
->  4 files changed, 30 deletions(-)
->=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index dcf897451589..24315480e7c2 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -351,7 +351,6 @@ typedef struct XiveRouterClass {
->                     XiveNVT *nvt);
->      int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
->                       XiveNVT *nvt, uint8_t word_number);
-> -    XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
->  } XiveRouterClass;
-> =20
->  int xive_router_get_eas(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_=
-idx,
-> @@ -364,7 +363,6 @@ int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt=
-_blk, uint32_t nvt_idx,
->                          XiveNVT *nvt);
->  int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nv=
-t_idx,
->                            XiveNVT *nvt, uint8_t word_number);
-> -XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs);
->  void xive_router_notify(XiveNotifier *xn, uint32_t lisn);
-> =20
->  /*
-> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-> index c14a2d186960..216ebc150a41 100644
-> --- a/hw/intc/pnv_xive.c
-> +++ b/hw/intc/pnv_xive.c
-> @@ -460,18 +460,6 @@ static PnvXive *pnv_xive_tm_get_xive(PowerPCCPU *cpu)
->      return xive;
->  }
-> =20
-> -static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
-> -{
-> -    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> -    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
-> -
-> -    if (!xive) {
-> -        return NULL;
-> -    }
-> -
-> -    return XIVE_TCTX(pnv_cpu_state(cpu)->intc);
-> -}
-> -
->  /*
->   * The internal sources (IPIs) of the interrupt controller have no
->   * knowledge of the XIVE chip on which they reside. Encode the block
-> @@ -1900,7 +1888,6 @@ static void pnv_xive_class_init(ObjectClass *klass,=
- void *data)
->      xrc->write_end =3D pnv_xive_write_end;
->      xrc->get_nvt =3D pnv_xive_get_nvt;
->      xrc->write_nvt =3D pnv_xive_write_nvt;
-> -    xrc->get_tctx =3D pnv_xive_get_tctx;
-> =20
->      xnc->notify =3D pnv_xive_notify;
->      xpc->match_nvt  =3D pnv_xive_match_nvt;
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 6292da58f62c..1542cef91878 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -427,13 +427,6 @@ static int spapr_xive_write_nvt(XiveRouter *xrtr, ui=
-nt8_t nvt_blk,
->      g_assert_not_reached();
->  }
-> =20
-> -static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
-> -{
-> -    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
-> -
-> -    return spapr_cpu_state(cpu)->tctx;
-> -}
-> -
->  static int spapr_xive_match_nvt(XivePresenter *xptr, uint8_t format,
->                                  uint8_t nvt_blk, uint32_t nvt_idx,
->                                  bool cam_ignore, uint8_t priority,
-> @@ -771,7 +764,6 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
->      xrc->write_end =3D spapr_xive_write_end;
->      xrc->get_nvt =3D spapr_xive_get_nvt;
->      xrc->write_nvt =3D spapr_xive_write_nvt;
-> -    xrc->get_tctx =3D spapr_xive_get_tctx;
-> =20
->      sicc->activate =3D spapr_xive_activate;
->      sicc->deactivate =3D spapr_xive_deactivate;
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 0ca7099f4e55..4bff3abdc3eb 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -1317,13 +1317,6 @@ int xive_router_write_nvt(XiveRouter *xrtr, uint8_=
-t nvt_blk, uint32_t nvt_idx,
->     return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
->  }
-> =20
-> -XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs)
-> -{
-> -    XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
-> -
-> -    return xrc->get_tctx(xrtr, cs);
-> -}
-> -
->  /*
->   * Encode the HW CAM line in the block group mode format :
->   *
+Applied to ppc-for-5.0.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -207,25 +198,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---St7VIuEGZ6dlpu13
+--cNdxnHkX5QqsyA0e
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3fI7gACgkQbDjKyiDZ
-s5Js8RAAiLOUWHYsU5vV+O83udEO4WKXiq2cJF8z0OyzbdtWSI9aenxSP/vSrp2y
-C4phB6quZO/7Vnuzg/VmDvfFtQ+JjBPD0eTCqElQyyV8SPelk+3n+Cv7hxOgEYrx
-R+YNOW17HckjvFZqXhzyQu5/UmHOrPw3DLp59oYyL5HPcxXOoc+cdb/t9WaYZ9CR
-2uJLZHBksZsUy9sr0QAm27t7w4EWZ7y//NtHIJl0EdZRCHyc9so6XSFZc7Dq8kBe
-w05OcHPu8f7xthekEkVLTtM5M3nbsd0OoVfvQDNMZDIEsSTCWxg6ievju0ZSgGzf
-zKWYtnJ2pU+p8X/rNO0CeoRe1/6Ta7Q/Oc8/UIEQnx7/SLhrZcKVwMAUjdaedQPq
-weYiCMod9/FVQ4hoQoELhbDBdYHNjlX42mbRQI12VSdFBRVxABDyPx+HpW+1kVfF
-NgTJvdhhios2TPfIltRclhceWo7b95tDI3z1iCrChOMfSgIFA84JFMhE9Giy9EYM
-P0tU2I4AWKBgIwRd6H8rvF9lz1W7hywefHNdhGGUxZ39ocgFN8AngDkgDIm69qya
-PQNVYVDhk2JqXODjsYEGncpcllivXfK6+8YwSfiorhjeRZm9Ms0I19d6uEu4TFo0
-LS6r7pWuahAQ19tMKJdCCGacb6kolwnvIbMuhVED/a/P8WjMkC4=
-=9DS9
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3fIy0ACgkQbDjKyiDZ
+s5KKlA//ZOjecSkoUpaABob54W+f8yP6dZ1wXAlFGHsoXGJ2D10kP2CxHy/AXjIN
+oWJ3Z4T+FSRiKeMfvnX8caXE34eJ3I5JbBmqIC2uTyavFm7TK853tT/em5UwVFM0
+lJvcbH6OF2uzf8Rixi7mL1+09+44wjkSw6anBMvqShyuPIKvvhE5uNCFTIf5hoSh
+iT3NjdFyBCgT2MTZMBKe0/ykHy3ZqYcWogyVDfBmJ3T95prIOxfk6tIwpz/P3kRQ
+CDsyvMB++IZm0jxBpaOsJ5INlfPskZ12pCdwITvDGdKupTdwNWKZZ5BPTyMTD5C8
+JHSq2m+Durx5pz9n9ZlqXyfD92KQmzMrfmr9ylScduwCQBh15DbbJa6n5d6feiNe
+J6nyKwNMaPjjzmo9RvjY3WoKP7kMEPfRjCW2o83aI/4K/S2j1TF41aDKRGPVTSr5
+G7GJ4D2fwF9zyGsSG+WCItR5qgYadLPWEVyThdQo+Q20K/KP/PnRjEGPqn+FYQzI
+uWqxgSeqrO5TQOLx1OaJouOQd3JcpgCub1m7HdEvGHcV+S0ngvZfVSBIm5ca8pP/
+s0xN39OcTEAVom7ttUVbBVPkcs8Fa6Jt4B9ok9JkMMpDZh09ji6yQqjD81pjKTmK
+XPMFmpz03LPIbiw3k4xYOZcaoPLvJxMWk3xMII+/au51RE1ZBiQ=
+=3uNe
 -----END PGP SIGNATURE-----
 
---St7VIuEGZ6dlpu13--
+--cNdxnHkX5QqsyA0e--
 
