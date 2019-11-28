@@ -2,110 +2,85 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5950C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:29:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B8CC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:29:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACB112071F
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:29:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6FAA21741
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 14:29:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CvzJxl5z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACB112071F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Aa5yEt8M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6FAA21741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaKnF-0001Ar-Tj
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 09:29:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37961)
+	id 1iaKng-0001SI-VW
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 09:29:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iaKMD-00040S-Vf
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 09:01:24 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1iaK9U-0004NS-QY
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:48:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iaKM8-0001p3-3v
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 09:01:18 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53725
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iaKM4-0001i7-J3
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 09:01:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574949665;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=imKrZIDAcl0nebVmsApMWpj6CWOw1uCyO5++70aPho0=;
- b=CvzJxl5zg0jIQBURBzUIsJbJD5gByyGfj2MtPfNIuM7jfya4aIgeyxaXPJMzv5OZd4Dm5+
- O5wg6sqJJE+nS611u54Gry71ucRc8UgPWgQrXjOavgsvo+hRgyFWcWqjyQwv6dj3oYs9VF
- od5lUo0bKiXVzneFCjdCLnRu7UW5smU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-3D96Tgx5P4CV3FL5VjOnmg-1; Thu, 28 Nov 2019 09:01:00 -0500
-X-MC-Unique: 3D96Tgx5P4CV3FL5VjOnmg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53AEF800D41;
- Thu, 28 Nov 2019 14:00:59 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-204-182.brq.redhat.com
- [10.40.204.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C74C600C8;
- Thu, 28 Nov 2019 14:00:57 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 02/31] block: Add BdrvChildRole
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191127131624.1062403-1-mreitz@redhat.com>
- <20191127131624.1062403-3-mreitz@redhat.com>
- <9d6e35ea-eed6-716a-75aa-e8f47f35b6b7@virtuozzo.com>
- <02c29aee-6f92-0648-c60a-875a3d8ca305@redhat.com>
- <7ca7fa9d-b464-7ff1-cb28-3ffb52efedb0@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <cab438c9-3630-c236-e5a6-ccc30a606fed@redhat.com>
-Date: Thu, 28 Nov 2019 15:00:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <mrolnik@gmail.com>) id 1iaK9O-0008G9-UG
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:48:10 -0500
+Received: from mail-qv1-xf32.google.com ([2607:f8b0:4864:20::f32]:46163)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iaK9N-0007vz-Ph
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 08:48:06 -0500
+Received: by mail-qv1-xf32.google.com with SMTP id t9so253950qvh.13
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 05:48:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=T2wn9cklqee2U2Z0NqjwUV/+20RCBNB7HYANQt375L4=;
+ b=Aa5yEt8Mo0HU5LWgLkDLvUOkNjaymP1ZUKj+rc5Tx2ePeG+IBZay3duoyGlZgIrqs9
+ EfXSUjfv4jYDtnDr+F+sxoSiTVIEdK9AHiLwNv2T6Uki4WsEuaLY27rvQJTA6biyvZi3
+ P5ODoYjikXNP7XHdmscJBIFbqu8aTfXr6+TALoxioDnq0vcbAQ2mped7i01LKghXlGoi
+ G0vks9JKPlaaN7pBicMk2ifBMThZY0XSsSJQdFIOrzo6+e+rMGbCYRvChh5k+d/uelM9
+ UsA4lhgltAJ2YW7xjTd7Sv4qdaKP6ve6KWSNigjQPBrGojoZ2sC7IOd8W4yIm3M4mI1N
+ 8Lew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=T2wn9cklqee2U2Z0NqjwUV/+20RCBNB7HYANQt375L4=;
+ b=RxlClBuIzLLLDgIPSgc5DBGEEvIdsCZavkWnUEdiizcdJr1RNJvRxJ+bX8zmvrQyMB
+ isJiVKtlKWNS6e9Tajq6RWi2+FkDJeV1RlKaJFv+HV7FENZY8PVG3M9UAo9hHiIbxZQV
+ scsYleW74dFow3RoSvbaypRXcLSzibk/FnBshGjrqXR9VvsRvDM2hAy+A2xc3luH4itT
+ gqGzyqYjs//sZN5JUr9/BTvqFD8akvRXEf7ZzWxrcFgHaKwOAFTumkn9yfkcSPF6qFxu
+ xmO4rVZMSKGMDFSb8j4BEx+0U29uO5WDvNsi2ZN5ILpLZ9O16MHiWBXAENLdsm5AwYlY
+ Nqsg==
+X-Gm-Message-State: APjAAAVlKCJH70yxEm6b+SwV5cjkh3YDUh9wz8LVZuUm4i3wSD3biySY
+ CawhoaQfnP5YJA0ZDUnkWliIMSSgBKpmAgVvitQ=
+X-Google-Smtp-Source: APXvYqzh8R4GaxJPmG9mqPplSqAX9VoO94iLt9PJwziJxrBerw3NS+Ggtn0Y2KuutSkeqVBAZIkdOurX/Y+cXKzO18U=
+X-Received: by 2002:a05:6214:8e5:: with SMTP id
+ dr5mr10576569qvb.79.1574948881353; 
+ Thu, 28 Nov 2019 05:48:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <7ca7fa9d-b464-7ff1-cb28-3ffb52efedb0@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="JOrfAI5HptpgXkAJtSZ57ar3JK8cjL8Qx"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191127175257.23480-1-mrolnik@gmail.com>
+ <CAL1e-=isp_-zF71STK-v5D8r5sGYiZbRFmSzjfQtR2FC5YknHQ@mail.gmail.com>
+ <CAK4993iniaLhSYCe9hfuNpujpEdqPtZqqsJirBwYG9HqUVx6dA@mail.gmail.com>
+ <CAL1e-=h+ZHM9qOOMj2KASuN2J4rSYcn1KP1hOzTWp+EpBY3=5A@mail.gmail.com>
+ <CAK4993jDe+c7XsNn=fBwMu6TLuF8KgxNvUziXkwAUuOVArjrsA@mail.gmail.com>
+ <5a784557-f322-dc3a-4ff1-a7d9a0409448@redhat.com>
+ <CAL1e-=jJ5uNvYq7yNQYFhMJ0k94-d6mrybs-NyVjVi9Agb4Aeg@mail.gmail.com>
+In-Reply-To: <CAL1e-=jJ5uNvYq7yNQYFhMJ0k94-d6mrybs-NyVjVi9Agb4Aeg@mail.gmail.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Thu, 28 Nov 2019 15:46:53 +0200
+Message-ID: <CAK4993i8zPyYH2hGxx0hP4qQKr9oTJV2T5JDtQmKHZe2EpAsvw@mail.gmail.com>
+Subject: Re: [PATCH v37 00/17] QEMU AVR 8 bit cores
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Content-Type: multipart/alternative; boundary="0000000000009ccf630598685ce5"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,90 +92,369 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, Joaquin de Andres <me@xcancerberox.com.ar>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, QEMU Developers <qemu-devel@nongnu.org>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JOrfAI5HptpgXkAJtSZ57ar3JK8cjL8Qx
-Content-Type: multipart/mixed; boundary="ckbYbiZPGxYJS9ypxybWHQaKYVi9IxgSS"
-
---ckbYbiZPGxYJS9ypxybWHQaKYVi9IxgSS
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--0000000000009ccf630598685ce5
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 28.11.19 12:24, Vladimir Sementsov-Ogievskiy wrote:
-> 28.11.2019 13:52, Max Reitz wrote:
->> On 28.11.19 10:31, Vladimir Sementsov-Ogievskiy wrote:
->>> 27.11.2019 16:15, Max Reitz wrote:
->>>> This enum will supplement BdrvChildClass when it comes to what role (o=
-r
->>>> combination of roles) a child takes for its parent.
->>>>
->>>> Because empty enums are not allowed, let us just start with it filled.
->>>>
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>    include/block/block.h | 38 ++++++++++++++++++++++++++++++++++++++
->>>>    1 file changed, 38 insertions(+)
->>>>
->>>> diff --git a/include/block/block.h b/include/block/block.h
->>>> index 38963ef203..36817d5689 100644
->>>> --- a/include/block/block.h
->>>> +++ b/include/block/block.h
->>>> @@ -279,6 +279,44 @@ enum {
->>>>        DEFAULT_PERM_UNCHANGED      =3D BLK_PERM_ALL & ~DEFAULT_PERM_PA=
-SSTHROUGH,
->>>>    };
->>>>   =20
->>>> +typedef enum BdrvChildRole {
+I will rename them.
+
+On Thu, Nov 28, 2019 at 3:41 PM Aleksandar Markovic <
+aleksandar.m.mail@gmail.com> wrote:
+
+>
+>
+> On Thursday, November 28, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redha=
+t.com>
+> wrote:
+>
+>> On 11/28/19 2:25 PM, Michael Rolnik wrote:
+>>
+>>> I don't see why you say that the peripherals are inside the chip, there
+>>> is CPU within target/avr directory and then there are some peripherals =
+in
+>>> hw directory, CPU does not depend on them. what am I missing?
 >>>
->>> Don't you want to call it just BdrvChildFlags ?
->>> Benefits:
+>>> On Thu, Nov 28, 2019 at 3:22 PM Aleksandar Markovic <
+>>> aleksandar.m.mail@gmail.com <mailto:aleksandar.m.mail@gmail.com>> wrote=
+:
 >>>
->>> 1. Do not intersect with old BdrvChildRole.
+>>>
+>>>
+>>>     On Thursday, November 28, 2019, Michael Rolnik <mrolnik@gmail.com
+>>>     <mailto:mrolnik@gmail.com>> wrote:
+>>>
+>>>
+>>>
+>>>         On Wed, Nov 27, 2019 at 11:06 PM Aleksandar Markovic
+>>>         <aleksandar.m.mail@gmail.com
+>>>         <mailto:aleksandar.m.mail@gmail.com>> wrote:
+>>>
+>>>             On Wed, Nov 27, 2019 at 6:53 PM Michael Rolnik
+>>>             <mrolnik@gmail.com <mailto:mrolnik@gmail.com>> wrote:
+>>>              >
+>>>              > This series of patches adds 8bit AVR cores to QEMU.
+>>>              > All instruction, except BREAK/DES/SPM/SPMX, are
+>>>             implemented. Not fully tested yet.
+>>>              > However I was able to execute simple code with functions=
+.
+>>>             e.g fibonacci calculation.
+>>>              > This series of patches include a non real, sample board.
+>>>              > No fuses support yet. PC is set to 0 at reset.
+>>>              >
+>>>
+>>>             I have a couple of general remarks, so I am responding to
+>>>             the cover
+>>>             letter, not individual patches.
+>>>
+>>>             1) The licenses for Sarah devices differ than the rest -
+>>>             shouldn't all
+>>>             licenses be harmonized?
+>>>
+>>>         Sarah,
+>>>         do you mind if use the same license I use for my code?
+>>>
+>>>
+>>>             2) There is an architectural problem with peripherals. It i=
+s
+>>>             possible
+>>>             that they evolve over time, so, for example, USART could no=
+t
+>>>             be the
+>>>             same for older and newer CPUs (in principle, newer
+>>> peripheral is
+>>>             expected to be o sort of "superset" of the older). How do
+>>>             you solve
+>>>             that problem? Right now, it may not looks serious to you,
+>>>             but if you
+>>>             don;t think about that right now, from the outset, soon the
+>>>             code will
+>>>             become so entangled, ti woudl be almost very difficult to
+>>>             fix it.
+>>>             Please think about that, how would you solve it, is there a
+>>>             way to
+>>>             pass the information on the currently emulated CPU to the
+>>> code
+>>>             covering a peripheral, and provide a different behaviour?
+>>>
+>>>         Hi Aleksandar,
+>>>
+>>>         Please explain.
+>>>
+>>>
+>>>     My concern is about peripherals inside the chip, together with the
+>>> core.
+>>>
+>>>     If one models, let's say an external (in the sense, it is a separat=
+e
+>>>     chip) ADC (analog-to-digital converter), one looks at specs,
+>>>     implement what is resonable possible in QEMU, plug it in in one of
+>>>     machines thst contains it, and that's it. That ADC remains the same=
+,
+>>>     of course, whatever the surrounding system is.
+>>>
+>>>     In AVR case, I think we have a phenomenon likes of which we didn't
+>>>     see before (at least I don't know about). Number of AVR
+>>>     microcontrollers is very large, and both cores and peripherals
+>>> evolved.
+>>>
+>>>     For cores, you handle differences with all these AVR_FEATURE macros=
+,
+>>>     and this seems to be working, no significant objection from my side=
+,
+>>>     and btw that was not an easy task to execute, all admiration from m=
+e.
+>>>
+>>>     But what about peripherals inside the chip? A peripheral with the
+>>>     same name and the same general area of functionality may be
+>>>     differently specified for microcontrollers from 2010 and 2018. By
+>>>     the difference I don't mean starting address, but the difference in
+>>>     behavior. I don't have time right now to spell many examples, but I
+>>>     read three different specs, and there are differences in USART
+>>>     specifications.
+>>>
+>>>     I am not clear what is your envisioned solution for these cases.
+>>>     Would you such close, but not the same, flabors of a peripheral
+>>>     treat as if they are two completely separate cases of a peripheral?
+>>>     Or would you have a single peripheral that would somehow configure
+>>>     itself depending on the core it is attached to?
+>>>
+>>>     I hope I was clearer this time.
+>>>
+>>>     Aleksandar
+>>>
+>>>
+>>>
+>>>
+>>>         I don't see any problem from CPU's perspective.
+>>>         as for the sample board is just a sample, I hope other people
+>>>         will create real models or real hw.
+>>>         there was no way I could provide a CPU alone, that's why there
+>>>         is sample.
+>>>
 >>
->> Well, that doesn=E2=80=99t change the fact that the old BdrvChildRole ju=
-st
->> doesn=E2=80=99t describe a role.
+>> If I understand Aleksandar correctly, the naming is incorrect because to=
+o
+>> generic to AVR family, why Sarah only modeled the Atmel implementation.
 >>
->>> 2. I think, BDRV_CHILD_STAY_AT_NODE is not a role, but just a property =
-or flag..
+>> Renaming devices such hw/char/avr_usart.c -> hw/char/atmel_usart.c
+>> (similarly with the macros) would be enough Aleksandar?
 >>
->> I can be convinced to let STAY_AT_NODE stay a property of
->> BdrvChildClass. :-)
->=20
-> or BdrvChild if we want it to be property of object, not class.
-
-Sure, but that would then no longer concern this series, I think.  (That
-is, either I make STAY_AT_NODE a BdrvChildRole in this series, or I just
-don=E2=80=99t.)
-
-Max
+>>
+>
+> Some renaming could help, perhaps not quite like the one above, but my
+> point (which I find hard to believe I can't explain to you) is that
+> peripherals inside the chip evolved over time, as starkly opposed to
+> external peripherals that are set in stone...
+>
 
 
---ckbYbiZPGxYJS9ypxybWHQaKYVi9IxgSS--
+--=20
+Best Regards,
+Michael Rolnik
 
---JOrfAI5HptpgXkAJtSZ57ar3JK8cjL8Qx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+--0000000000009ccf630598685ce5
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
------BEGIN PGP SIGNATURE-----
+<div dir=3D"ltr">I will rename them.</div><br><div class=3D"gmail_quote"><d=
+iv dir=3D"ltr" class=3D"gmail_attr">On Thu, Nov 28, 2019 at 3:41 PM Aleksan=
+dar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com">aleksandar.=
+m.mail@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" =
+style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pa=
+dding-left:1ex"><br><br>On Thursday, November 28, 2019, Philippe Mathieu-Da=
+ud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd@=
+redhat.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quote" style=3D"mar=
+gin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1=
+ex">On 11/28/19 2:25 PM, Michael Rolnik wrote:<br>
+<blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-=
+left:1px solid rgb(204,204,204);padding-left:1ex">
+I don&#39;t see why you say that the peripherals are inside the chip, there=
+ is CPU within target/avr directory and then there are some peripherals=C2=
+=A0in hw directory, CPU does not depend on them. what am I missing?<br>
+<br>
+On Thu, Nov 28, 2019 at 3:22 PM Aleksandar Markovic &lt;<a href=3D"mailto:a=
+leksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</=
+a> &lt;mailto:<a href=3D"mailto:aleksandar.m.mail@gmail.com" target=3D"_bla=
+nk">aleksandar.m.mail@gmail.com</a>&gt;&gt; wrote:<br>
+<br>
+<br>
+<br>
+=C2=A0 =C2=A0 On Thursday, November 28, 2019, Michael Rolnik &lt;<a href=3D=
+"mailto:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a><br>
+=C2=A0 =C2=A0 &lt;mailto:<a href=3D"mailto:mrolnik@gmail.com" target=3D"_bl=
+ank">mrolnik@gmail.com</a>&gt;&gt; wrote:<br>
+<br>
+<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 On Wed, Nov 27, 2019 at 11:06 PM Aleksandar Mar=
+kovic<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.c=
+om" target=3D"_blank">aleksandar.m.mail@gmail.com</a><br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 &lt;mailto:<a href=3D"mailto:aleksandar.m.mail@=
+gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt;&gt; wrote:=
+<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 On Wed, Nov 27, 2019 at 6:53 PM M=
+ichael Rolnik<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &lt;<a href=3D"mailto:mrolnik@gma=
+il.com" target=3D"_blank">mrolnik@gmail.com</a> &lt;mailto:<a href=3D"mailt=
+o:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt;&gt; wrote:=
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; This series of patches=
+ adds 8bit AVR cores to QEMU.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; All instruction, excep=
+t BREAK/DES/SPM/SPMX, are<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 implemented. Not fully tested yet=
+.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; However I was able to =
+execute simple code with functions.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 e.g fibonacci calculation.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; This series of patches=
+ include a non real, sample board.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt; No fuses support yet. =
+PC is set to 0 at reset.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&gt;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 I have a couple of general remark=
+s, so I am responding to<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 the cover<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 letter, not individual patches.<b=
+r>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1) The licenses for Sarah devices=
+ differ than the rest -<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 shouldn&#39;t all<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 licenses be harmonized?<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 Sarah,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 do you mind if use the same license I use for m=
+y code?<br>
+<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 2) There is an architectural prob=
+lem with peripherals. It is<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 possible<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 that they evolve over time, so, f=
+or example, USART could not<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 be the<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 same for older and newer CPUs (in=
+ principle, newer peripheral is<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 expected to be o sort of &quot;su=
+perset&quot; of the older). How do<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 you solve<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 that problem? Right now, it may n=
+ot looks serious to you,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 but if you<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 don;t think about that right now,=
+ from the outset, soon the<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 code will<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 become so entangled, ti woudl be =
+almost very difficult to<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 fix it.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Please think about that, how woul=
+d you solve it, is there a<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 way to<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pass the information on the curre=
+ntly emulated CPU to the code<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 covering a peripheral, and provid=
+e a different behaviour?<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 Hi Aleksandar,<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 Please explain.<br>
+<br>
+<br>
+=C2=A0 =C2=A0 My concern is about peripherals inside the chip, together wit=
+h the core.<br>
+<br>
+=C2=A0 =C2=A0 If one models, let&#39;s say an external (in the sense, it is=
+ a separate<br>
+=C2=A0 =C2=A0 chip) ADC (analog-to-digital converter), one looks at specs,<=
+br>
+=C2=A0 =C2=A0 implement what is resonable possible in QEMU, plug it in in o=
+ne of<br>
+=C2=A0 =C2=A0 machines thst contains it, and that&#39;s it. That ADC remain=
+s the same,<br>
+=C2=A0 =C2=A0 of course, whatever the surrounding system is.<br>
+<br>
+=C2=A0 =C2=A0 In AVR case, I think we have a phenomenon likes of which we d=
+idn&#39;t<br>
+=C2=A0 =C2=A0 see before (at least I don&#39;t know about). Number of AVR<b=
+r>
+=C2=A0 =C2=A0 microcontrollers is very large, and both cores and peripheral=
+s evolved.<br>
+<br>
+=C2=A0 =C2=A0 For cores, you handle differences with all these AVR_FEATURE =
+macros,<br>
+=C2=A0 =C2=A0 and this seems to be working, no significant objection from m=
+y side,<br>
+=C2=A0 =C2=A0 and btw that was not an easy task to execute, all admiration =
+from me.<br>
+<br>
+=C2=A0 =C2=A0 But what about peripherals inside the chip? A peripheral with=
+ the<br>
+=C2=A0 =C2=A0 same name and the same general area of functionality may be<b=
+r>
+=C2=A0 =C2=A0 differently specified for microcontrollers from 2010 and 2018=
+. By<br>
+=C2=A0 =C2=A0 the difference I don&#39;t mean starting address, but the dif=
+ference in<br>
+=C2=A0 =C2=A0 behavior. I don&#39;t have time right now to spell many examp=
+les, but I<br>
+=C2=A0 =C2=A0 read three different specs, and there are differences in USAR=
+T<br>
+=C2=A0 =C2=A0 specifications.<br>
+<br>
+=C2=A0 =C2=A0 I am not clear what is your envisioned solution for these cas=
+es.<br>
+=C2=A0 =C2=A0 Would you such close, but not the same, flabors of a peripher=
+al<br>
+=C2=A0 =C2=A0 treat as if they are two completely separate cases of a perip=
+heral?<br>
+=C2=A0 =C2=A0 Or would you have a single peripheral that would somehow conf=
+igure<br>
+=C2=A0 =C2=A0 itself depending on the core it is attached to?<br>
+<br>
+=C2=A0 =C2=A0 I hope I was clearer this time.<br>
+<br>
+=C2=A0 =C2=A0 Aleksandar<br>
+<br>
+<br>
+<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 I don&#39;t see any problem from CPU&#39;s pers=
+pective.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 as for the sample board is just a sample, I hop=
+e other people<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 will create real models or real hw.<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 there was no way I could provide a CPU alone, t=
+hat&#39;s why there<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 is sample.<br>
+</blockquote>
+<br>
+If I understand Aleksandar correctly, the naming is incorrect because too g=
+eneric to AVR family, why Sarah only modeled the Atmel implementation.<br>
+<br>
+Renaming devices such hw/char/avr_usart.c -&gt; hw/char/atmel_usart.c (simi=
+larly with the macros) would be enough Aleksandar?<br>
+<br>
+</blockquote><div><br></div><div><br></div><div>Some renaming could help, p=
+erhaps not quite like the one above, but my point (which I find hard to bel=
+ieve I can&#39;t explain to you) is that peripherals inside the chip evolve=
+d over time, as starkly opposed to external peripherals that are set in sto=
+ne...</div>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">Best Regards,<br>Michael Rolnik</div>
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3f0xgACgkQ9AfbAGHV
-z0CfIAf+Im5powytEOzpofCiPZ/ONhc1mwwcbyGR2cOvciQOA0hdrOYlyvIzMiW4
-eMhbUlafGRMVfqKPUj40QNIcpQbiWmHxEUrNqXWxcv4zbVwFJj7RbEfBcLLt8uGL
-fXIv8puEL4FiFKhbmYJDGaDD1oDtGIh3VeKTaee4Ib5Md9woH4xRHGe2Jqdvvvyt
-8x1xhiDCklmbyqVfJHyfn2bwk+ccVin4IZ1GWsKZfVipsOuka0E0Qtf3r6BrbMpU
-8hzm4iEyw6Iz8KXTEHpEUKES5nfqtIaVNis28LqZmkFy9gRX08+ybbSXfyFy/bbx
-6f9VES7qe0LTIYYnPAquSnmmKH/AAQ==
-=qJLT
------END PGP SIGNATURE-----
-
---JOrfAI5HptpgXkAJtSZ57ar3JK8cjL8Qx--
-
+--0000000000009ccf630598685ce5--
 
