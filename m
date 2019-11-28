@@ -2,81 +2,93 @@ Return-Path: <SRS0=bTwh=ZU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B9F1C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 12:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 935C3C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 12:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54DB8208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 12:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DDFF2176D
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 12:52:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hlr27X9M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54DB8208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZpm81Hy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DDFF2176D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaJFb-0000sl-Ht
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 07:50:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53953)
+	id 1iaJHE-00028i-AM
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 07:52:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iaJB8-00079E-Od
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:45:53 -0500
+ (envelope-from <tgolembi@redhat.com>) id 1iaJCT-00080F-3x
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:47:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iaJB4-0004Hh-Ac
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:45:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51794
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <tgolembi@redhat.com>) id 1iaJCO-00073O-1y
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:47:09 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38172
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iaJB4-0004BL-4L
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:45:46 -0500
+ (Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1iaJCM-0006uC-Qa
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 07:47:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574945144;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hFYk46yR4pubyIuF4vfzAO4EN9UVTzlSg0yarn5xADI=;
- b=Hlr27X9MseQpq5iE3WXwTNnZy0RvtfHUn8ua4yq/wZUiguPUgicxdjNllAZn44HcJcZU/O
- HvcdrjniFruiZ771+jqirIFIJ9GPLxjeW+vJ0JbE72d5LBC/TnXgm1wUYMlK356IQ7LBL6
- aynM7Rb6DPYu//PDGDWLgULrY4tx+l4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-30-qs8wqYC9Poi-rtBJOK3xww-1; Thu, 28 Nov 2019 07:45:36 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31474800D41;
- Thu, 28 Nov 2019 12:45:35 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6664A100164D;
- Thu, 28 Nov 2019 12:45:34 +0000 (UTC)
-Date: Thu, 28 Nov 2019 12:45:32 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH RFC] qga: fence guest-set-time if hwclock not available
-Message-ID: <20191128124532.GF248361@redhat.com>
-References: <20191128123658.28351-1-cohuck@redhat.com>
+ s=mimecast20190719; t=1574945225;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=xl/NbZCRB7raDXUP6BxFMXlt3KhCYtk31l4deuW7dtE=;
+ b=fZpm81Hy01lP0g40P8fB7OTtr0r49ImlxWH0fBurU5zFGP3k1OnMkCOt3HowTaaGLakPfX
+ McLph+K8I8ARgf9ccRmFIT/2DxLyHDVR2u/4UUb9mxX970eFZqLPAOBQRpv8i96/TbxmBP
+ xskRL5B+wfWWk9XJodOE5ckV7n/LSHY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-C75QvDQxMCKAUFCDVRdG1g-1; Thu, 28 Nov 2019 07:45:17 -0500
+Received: by mail-wr1-f70.google.com with SMTP id u12so3700444wrt.15
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 04:45:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=CR3WWRt1BDaEJjWT5V5xIJIvH04oQ/RE4l4/AhmRVX0=;
+ b=nqf4EYwBLOSZWIRiH8Bn/h9vv8qHfJ3yDPx4TJ9lWqK3cx7mn419bX/YHyXWHewQYD
+ gBbMbV2HXa0/ISzWtXou/sAFJNMpn0+5u4xQOLAf99wCedPoVpVAkWgp+fb3CgK0/xWk
+ LBVuJP8s0UYMNVgVkb4WpD13utMUqWNBSx09tZ0S2PgNRHhjFfuv05iC/KOuwHxDKPKJ
+ ua2CNCJR26wGEEtDzMSSufJtwLzKAdlLo+Q8VGNkY4awJ4Y1IVL5T8EnsThh7dgFvf17
+ rh0D2fBZGn0rptbOT1Pfrf8+aZRDxvJGHILy4kcPZUWKGwc35CRj4cpsILzKx8sAlQ6S
+ ug/Q==
+X-Gm-Message-State: APjAAAXKGiLHONbELxNVJBncBhMyG0XK3YPrxSJ2FoFAIOuvEZx+2BPx
+ oF4sLUBYt4Al2pwr2cSo7e3rSaTqHhR3bLwvHWLUugYFma+ORkpr32MufB/GhkXQPQJWesaQ237
+ yUb0OQN2tA5mhCAk=
+X-Received: by 2002:adf:da4d:: with SMTP id r13mr30585707wrl.307.1574945115579; 
+ Thu, 28 Nov 2019 04:45:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxpSTHijB0PNY/3Va1sBsMO9+klAFnn7n83L7JodFtZs1rzXspvAOQO7VOpvRZCSAugkiwEZA==
+X-Received: by 2002:adf:da4d:: with SMTP id r13mr30585666wrl.307.1574945115112; 
+ Thu, 28 Nov 2019 04:45:15 -0800 (PST)
+Received: from auriga.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+ by smtp.gmail.com with ESMTPSA id
+ z2sm8093984wmf.47.2019.11.28.04.45.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 28 Nov 2019 04:45:14 -0800 (PST)
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5] qga: add command guest-get-devices for reporting VirtIO
+ devices
+Date: Thu, 28 Nov 2019 13:45:13 +0100
+Message-Id: <a1a2954706a269e61786da061f6f3d073582e1ac.1574938630.git.tgolembi@redhat.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-In-Reply-To: <20191128123658.28351-1-cohuck@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: qs8wqYC9Poi-rtBJOK3xww-1
+X-MC-Unique: C75QvDQxMCKAUFCDVRdG1g-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,110 +100,342 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 28, 2019 at 01:36:58PM +0100, Cornelia Huck wrote:
-> The Posix implementation of guest-set-time invokes hwclock to
-> set/retrieve the time to/from the hardware clock. If hwclock
-> is not available, the user is currently informed that "hwclock
-> failed to set hardware clock to system time", which is quite
-> misleading. This may happen e.g. on s390x, which has a different
-> timekeeping concept anyway.
->=20
-> Let's check for the availability of the hwclock command and
-> return QERR_UNSUPPORTED for guest-set-time if it is not available.
->=20
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->=20
-> Not sure if that is the correct approach, but the current error
-> message is really quite confusing.
+Add command for reporting devices on Windows guest. The intent is not so
+much to report the devices but more importantly the driver (and its
+version) that is assigned to the device. This gives caller the
+information whether VirtIO drivers are installed and/or whether
+inadequate driver is used on a device (e.g. QXL device with base VGA
+driver).
 
-I guess the alternative is to just #ifndef __s390x__ the whole
-impl of the qmp_guest_set_time  method, but I don't have a
-strong opinion on which is best.
+Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+---
 
->=20
-> Gave it a quick test with an s390x and an x86_64 guest; invoking
-> 'virsh domtime <value>' now fails with 'not currently supported'
-> on s390x and continues to work as before on x86_64.
->=20
-> ---
->  qga/commands-posix.c | 20 +++++++++++++++++++-
->  1 file changed, 19 insertions(+), 1 deletion(-)
->=20
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 1c1a165daed8..bd298a38b716 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -149,6 +149,13 @@ int64_t qmp_guest_get_time(Error **errp)
->     return tq.tv_sec * 1000000000LL + tq.tv_usec * 1000;
->  }
-> =20
-> +static int check_hwclock_available(const char *path)
-> +{
-> +    struct stat st;
-> +
-> +    return (stat(path, &st) < 0) ? 0 : 1;
-> +}
-> +
->  void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
->  {
->      int ret;
-> @@ -156,6 +163,17 @@ void qmp_guest_set_time(bool has_time, int64_t time_=
-ns, Error **errp)
->      pid_t pid;
->      Error *local_err =3D NULL;
->      struct timeval tv;
-> +    const char *hwclock_path =3D "/sbin/hwclock";
-> +    static int hwclock_available =3D -1;
-> +
-> +    if (hwclock_available < 0) {
-> +        hwclock_available =3D check_hwclock_available(hwclock_path);
+changes in v5:
+- updated version in schema
 
-Could do this inline with:
+changes in v4:
+- making check-patch happy
 
-    hwclock_available =3D (access(hwclock_available, X_OK) =3D=3D 0);
+ qga/commands-posix.c |   9 ++
+ qga/commands-win32.c | 204 ++++++++++++++++++++++++++++++++++++++++++-
+ qga/qapi-schema.json |  32 +++++++
+ 3 files changed, 244 insertions(+), 1 deletion(-)
 
-getting a slightly better result as this check for it being
-executable as well as existing.
-
-> +    }
-> +
-> +    if (!hwclock_available) {
-> +        error_setg(errp, QERR_UNSUPPORTED);
-> +        return;
-> +    }
-> =20
->      /* If user has passed a time, validate and set it. */
->      if (has_time) {
-> @@ -195,7 +213,7 @@ void qmp_guest_set_time(bool has_time, int64_t time_n=
-s, Error **errp)
-> =20
->          /* Use '/sbin/hwclock -w' to set RTC from the system time,
->           * or '/sbin/hwclock -s' to set the system time from RTC. */
-> -        execle("/sbin/hwclock", "hwclock", has_time ? "-w" : "-s",
-> +        execle(hwclock_path, "hwclock", has_time ? "-w" : "-s",
->                 NULL, environ);
->          _exit(EXIT_FAILURE);
->      } else if (pid < 0) {
-> --=20
-> 2.21.0
->=20
->=20
-
-Regards,
-Daniel
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index 1c1a165dae..efcd9174a8 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -2758,6 +2758,8 @@ GList *ga_command_blacklist_init(GList *blacklist)
+     blacklist =3D g_list_append(blacklist, g_strdup("guest-fstrim"));
+ #endif
+=20
++    blacklist =3D g_list_append(blacklist, g_strdup("guest-get-devices"));
++
+     return blacklist;
+ }
+=20
+@@ -2978,3 +2980,10 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+=20
+     return info;
+ }
++
++GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
++{
++    error_setg(errp, QERR_UNSUPPORTED);
++
++    return NULL;
++}
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 55ba5b263a..cd942b3fb3 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -21,10 +21,11 @@
+ #ifdef CONFIG_QGA_NTDDSCSI
+ #include <winioctl.h>
+ #include <ntddscsi.h>
++#endif
+ #include <setupapi.h>
+ #include <cfgmgr32.h>
+ #include <initguid.h>
+-#endif
++#include <devpropdef.h>
+ #include <lm.h>
+ #include <wtsapi32.h>
+ #include <wininet.h>
+@@ -38,6 +39,36 @@
+ #include "qemu/host-utils.h"
+ #include "qemu/base64.h"
+=20
++/*
++ * The following should be in devpkey.h, but it isn't. The key names were
++ * prefixed to avoid (future) name clashes. Once the definitions get into
++ * mingw the following lines can be removed.
++ */
++DEFINE_DEVPROPKEY(qga_DEVPKEY_NAME, 0xb725f130, 0x47ef, 0x101a, 0xa5,
++    0xf1, 0x02, 0x60, 0x8c, 0x9e, 0xeb, 0xac, 10);
++    /* DEVPROP_TYPE_STRING */
++DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_HardwareIds, 0xa45c254e, 0xdf1c,
++    0x4efd, 0x80, 0x20, 0x67, 0xd1, 0x46, 0xa8, 0x50, 0xe0, 3);
++    /* DEVPROP_TYPE_STRING_LIST */
++DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverDate, 0xa8b865dd, 0x2e3d,
++    0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 2);
++    /* DEVPROP_TYPE_FILETIME */
++DEFINE_DEVPROPKEY(qga_DEVPKEY_Device_DriverVersion, 0xa8b865dd, 0x2e3d,
++    0x4094, 0xad, 0x97, 0xe5, 0x93, 0xa7, 0xc, 0x75, 0xd6, 3);
++    /* DEVPROP_TYPE_STRING */
++/* The following shoud be in cfgmgr32.h, but it isn't */
++#ifndef CM_Get_DevNode_Property
++CMAPI CONFIGRET WINAPI CM_Get_DevNode_PropertyW(
++    DEVINST          dnDevInst,
++    CONST DEVPROPKEY * PropertyKey,
++    DEVPROPTYPE      * PropertyType,
++    PBYTE            PropertyBuffer,
++    PULONG           PropertyBufferSize,
++    ULONG            ulFlags
++);
++#define CM_Get_DevNode_Property CM_Get_DevNode_PropertyW
++#endif
++
+ #ifndef SHTDN_REASON_FLAG_PLANNED
+ #define SHTDN_REASON_FLAG_PLANNED 0x80000000
+ #endif
+@@ -92,6 +123,8 @@ static OpenFlags guest_file_open_modes[] =3D {
+     g_free(suffix); \
+ } while (0)
+=20
++G_DEFINE_AUTOPTR_CLEANUP_FUNC(GuestDeviceInfo, qapi_free_GuestDeviceInfo)
++
+ static OpenFlags *find_open_flag(const char *mode_str)
+ {
+     int mode;
+@@ -2234,3 +2267,172 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
+=20
+     return info;
+ }
++
++/*
++ * Safely get device property. Returned strings are using wide characters.
++ * Caller is responsible for freeing the buffer.
++ */
++static LPBYTE cm_get_property(DEVINST devInst, const DEVPROPKEY *propName,
++    PDEVPROPTYPE propType)
++{
++    CONFIGRET cr;
++    g_autofree LPBYTE buffer =3D NULL;
++    ULONG buffer_len =3D 0;
++
++    /* First query for needed space */
++    cr =3D CM_Get_DevNode_PropertyW(devInst, propName, propType,
++        buffer, &buffer_len, 0);
++    if (cr !=3D CR_SUCCESS && cr !=3D CR_BUFFER_SMALL) {
++
++        slog("failed to get property size, error=3D0x%lx", cr);
++        return NULL;
++    }
++    buffer =3D g_new0(BYTE, buffer_len + 1);
++    cr =3D CM_Get_DevNode_PropertyW(devInst, propName, propType,
++        buffer, &buffer_len, 0);
++    if (cr !=3D CR_SUCCESS) {
++        slog("failed to get device property, error=3D0x%lx", cr);
++        return NULL;
++    }
++    return g_steal_pointer(&buffer);
++}
++
++static GStrv ga_get_hardware_ids(DEVINST devInstance)
++{
++    GStrv hw_ids =3D NULL;
++    GArray *values =3D NULL;
++    DEVPROPTYPE cm_type;
++    LPWSTR id;
++    g_autofree LPWSTR property =3D (LPWSTR)cm_get_property(devInstance,
++        &qga_DEVPKEY_Device_HardwareIds, &cm_type);
++    if (property =3D=3D NULL) {
++        slog("failed to get hardware IDs");
++        return NULL;
++    }
++    if (*property =3D=3D '\0') {
++        /* empty list */
++        return NULL;
++    }
++    values =3D g_array_new(TRUE, TRUE, sizeof(gchar *));
++    for (id =3D property; '\0' !=3D *id; id +=3D lstrlenW(id) + 1) {
++        gchar *id8 =3D g_utf16_to_utf8(id, -1, NULL, NULL, NULL);
++        g_array_append_val(values, id8);
++    }
++    hw_ids =3D (GStrv)g_array_free(values, FALSE);
++    values =3D NULL;
++    return hw_ids;
++}
++
++/*
++ * https://docs.microsoft.com/en-us/windows-hardware/drivers/install/ident=
+ifiers-for-pci-devices
++ */
++#define DEVICE_PCI_RE "PCI\\\\VEN_(1AF4|1B36)&DEV_([0-9A-B]{4})(&|$)"
++
++GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
++{
++    GuestDeviceInfoList *head =3D NULL, *cur_item =3D NULL, *item =3D NULL=
+;
++    HDEVINFO dev_info =3D INVALID_HANDLE_VALUE;
++    SP_DEVINFO_DATA dev_info_data;
++    int i, j;
++    GError *gerr =3D NULL;
++    g_autoptr(GRegex) device_pci_re =3D NULL;
++    DEVPROPTYPE cm_type;
++
++    device_pci_re =3D g_regex_new(DEVICE_PCI_RE,
++        G_REGEX_ANCHORED | G_REGEX_OPTIMIZE, 0,
++        &gerr);
++    g_assert(device_pci_re !=3D NULL);
++
++    dev_info_data.cbSize =3D sizeof(SP_DEVINFO_DATA);
++    dev_info =3D SetupDiGetClassDevs(0, 0, 0, DIGCF_PRESENT | DIGCF_ALLCLA=
+SSES);
++    if (dev_info =3D=3D INVALID_HANDLE_VALUE) {
++        error_setg(errp, "failed to get device tree");
++        return NULL;
++    }
++
++    slog("enumerating devices");
++    for (i =3D 0; SetupDiEnumDeviceInfo(dev_info, i, &dev_info_data); i++)=
+ {
++        bool skip =3D true;
++        SYSTEMTIME utc_date;
++        g_autofree LPWSTR name =3D NULL;
++        g_autofree LPFILETIME date =3D NULL;
++        g_autofree LPWSTR version =3D NULL;
++        g_auto(GStrv) hw_ids =3D NULL;
++        g_autoptr(GuestDeviceInfo) device =3D g_new0(GuestDeviceInfo, 1);
++        g_autofree char *vendor_id =3D NULL;
++        g_autofree char *device_id =3D NULL;
++
++        name =3D (LPWSTR)cm_get_property(dev_info_data.DevInst,
++            &qga_DEVPKEY_NAME, &cm_type);
++        if (name =3D=3D NULL) {
++            slog("failed to get device description");
++            continue;
++        }
++        device->driver_name =3D g_utf16_to_utf8(name, -1, NULL, NULL, NULL=
+);
++        if (device->driver_name =3D=3D NULL) {
++            error_setg(errp, "conversion to utf8 failed (driver name)");
++            goto out;
++        }
++        slog("querying device: %s", device->driver_name);
++        hw_ids =3D ga_get_hardware_ids(dev_info_data.DevInst);
++        if (hw_ids =3D=3D NULL) {
++            continue;
++        }
++        for (j =3D 0; hw_ids[j] !=3D NULL; j++) {
++            GMatchInfo *match_info;
++            if (!g_regex_match(device_pci_re, hw_ids[j], 0, &match_info)) =
+{
++                continue;
++            }
++            skip =3D false;
++            vendor_id =3D g_match_info_fetch(match_info, 1);
++            device_id =3D g_match_info_fetch(match_info, 2);
++            device->vendor_id =3D g_ascii_strtoull(vendor_id, NULL, 16);
++            device->device_id =3D g_ascii_strtoull(device_id, NULL, 16);
++            g_match_info_free(match_info);
++        }
++        if (skip) {
++            continue;
++        }
++
++        version =3D (LPWSTR)cm_get_property(dev_info_data.DevInst,
++            &qga_DEVPKEY_Device_DriverVersion, &cm_type);
++        if (version =3D=3D NULL) {
++            slog("failed to get driver version");
++            continue;
++        }
++        device->driver_version =3D g_utf16_to_utf8(version, -1, NULL,
++            NULL, NULL);
++        if (device->driver_version =3D=3D NULL) {
++            error_setg(errp, "conversion to utf8 failed (driver version)")=
+;
++            goto out;
++        }
++
++        date =3D (LPFILETIME)cm_get_property(dev_info_data.DevInst,
++            &qga_DEVPKEY_Device_DriverDate, &cm_type);
++        if (date =3D=3D NULL) {
++            slog("failed to get driver date");
++            continue;
++        }
++        FileTimeToSystemTime(date, &utc_date);
++        device->driver_date =3D g_strdup_printf("%04d-%02d-%02d",
++            utc_date.wYear, utc_date.wMonth, utc_date.wDay);
++
++        slog("driver: %s\ndriver version: %s,%s\n", device->driver_name,
++            device->driver_date, device->driver_version);
++        item =3D g_new0(GuestDeviceInfoList, 1);
++        item->value =3D g_steal_pointer(&device);
++        if (!cur_item) {
++            head =3D cur_item =3D item;
++        } else {
++            cur_item->next =3D item;
++            cur_item =3D item;
++        }
++        continue;
++    }
++
++out:
++    if (dev_info !=3D INVALID_HANDLE_VALUE) {
++        SetupDiDestroyDeviceInfoList(dev_info);
++    }
++    return head;
++}
+diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
+index fb4605cc19..2edc9728db 100644
+--- a/qga/qapi-schema.json
++++ b/qga/qapi-schema.json
+@@ -1242,3 +1242,35 @@
+ ##
+ { 'command': 'guest-get-osinfo',
+   'returns': 'GuestOSInfo' }
++
++##
++# @GuestDeviceInfo:
++#
++# @vendor-id: vendor ID
++# @device-id: device ID
++# @driver-name: name of the associated driver
++# @driver-date: driver release date in format YYYY-MM-DD
++# @driver-version: driver version
++#
++# Since: 4.3
++##
++{ 'struct': 'GuestDeviceInfo',
++  'data': {
++      'vendor-id': 'uint16',
++      'device-id': 'uint16',
++      'driver-name': 'str',
++      'driver-date': 'str',
++      'driver-version': 'str'
++      } }
++
++##
++# @guest-get-devices:
++#
++# Retrieve information about device drivers in Windows guest
++#
++# Returns: @GuestDeviceInfo
++#
++# Since: 4.3
++##
++{ 'command': 'guest-get-devices',
++  'returns': ['GuestDeviceInfo'] }
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+2.24.0
 
 
