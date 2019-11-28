@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B17DC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 10:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E45DC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 10:46:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43D9A21741
-	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 10:46:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2756321741
+	for <qemu-devel@archiver.kernel.org>; Thu, 28 Nov 2019 10:46:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WElqqkQE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43D9A21741
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pa/1l7bA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2756321741
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaHJL-0005Xi-Bq
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 05:46:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52175)
+	id 1iaHJQ-0005gV-C0
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 05:46:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52282)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iaHF6-0003Rl-OF
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:41:50 -0500
+ (envelope-from <slp@redhat.com>) id 1iaHFC-0003Tm-GR
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:41:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iaHF4-0006XH-2a
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:41:47 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24207
+ (envelope-from <slp@redhat.com>) id 1iaHF4-0006ZA-Mk
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:41:50 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34162
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iaHF3-0006Tw-PB
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:41:45 -0500
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iaHF4-0006DL-Ck
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 05:41:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574937705;
+ s=mimecast20190719; t=1574937701;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5D/pkDJCK2cS43Bw1M9Bu1vuuXBxNgDOLQ+LuhjnYnQ=;
- b=WElqqkQEvC77OrILEkDw/7SvoHvZNccF1I5nKbiJPVHmIkJvDhTiVT5pfbLVNtQL13lE1Q
- SYt/c5S9b3Q8V9lD7Uz1SHnSywlrXIHJHFfxzrsztHKUFDQJuBByuHd31CGNIoWVIbQVmR
- NjVCv2rD+0OhJQC1zDGzrw+LvGLEVLo=
+ bh=xrc62H8Yh+n9+WZDp5F87BSECNGvDkYp1VhFxEcnwNA=;
+ b=Pa/1l7bAKzwf+0GqGrD5CsRmNGxV6ECIqC5pA2f5oByj5yTdVqWRp4wiFL2ZwO3XVyiYMa
+ EjWThKOx82Ps3Pxco+BjU7oajKFrpuJT+hb9uL6hAzU4lyp9ecqg12BS5I6mOSuf5o0HK9
+ qipX3ktDTwFXAESAKzdkxt3BNMzi1q0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-LSB13DW3NACDaYCq0Zi-Zw-1; Thu, 28 Nov 2019 05:41:44 -0500
+ us-mta-153-3LCPv94DO6CX4BrtdPEmRg-1; Thu, 28 Nov 2019 05:41:40 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28907800D41;
- Thu, 28 Nov 2019 10:41:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D63910054E3;
+ Thu, 28 Nov 2019 10:41:39 +0000 (UTC)
 Received: from dritchie.redhat.com (unknown [10.33.36.152])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8C73010013A7;
- Thu, 28 Nov 2019 10:41:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7247010013A7;
+ Thu, 28 Nov 2019 10:41:37 +0000 (UTC)
 From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 4/4] blockdev: honor bdrv_try_set_aio_context() context
- requirements
-Date: Thu, 28 Nov 2019 11:41:29 +0100
-Message-Id: <20191128104129.250206-5-slp@redhat.com>
+Subject: [PATCH v5 2/4] blockdev: unify qmp_drive_backup and drive-backup
+ transaction paths
+Date: Thu, 28 Nov 2019 11:41:27 +0100
+Message-Id: <20191128104129.250206-3-slp@redhat.com>
 In-Reply-To: <20191128104129.250206-1-slp@redhat.com>
 References: <20191128104129.250206-1-slp@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: LSB13DW3NACDaYCq0Zi-Zw-1
+X-MC-Unique: 3LCPv94DO6CX4BrtdPEmRg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,218 +92,449 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-bdrv_try_set_aio_context() requires that the old context is held, and
-the new context is not held. Fix all the occurrences where it's not
-done this way.
+Issuing a drive-backup from qmp_drive_backup takes a slightly
+different path than when it's issued from a transaction. In the code,
+this is manifested as some redundancy between do_drive_backup() and
+drive_backup_prepare().
 
-Suggested-by: Max Reitz <mreitz@redhat.com>
+This change unifies both paths, merging do_drive_backup() and
+drive_backup_prepare(), and changing qmp_drive_backup() to create a
+transaction instead of calling do_backup_common() direcly.
+
+As a side-effect, now qmp_drive_backup() is executed inside a drained
+section, as it happens when creating a drive-backup transaction. This
+change is visible from the user's perspective, as the job gets paused
+and immediately resumed before starting the actual work.
+
+Also fix tests 141, 185 and 219 to cope with the extra
+JOB_STATUS_CHANGE lines.
+
 Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
- blockdev.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 62 insertions(+), 10 deletions(-)
+ blockdev.c                 | 224 +++++++++++++++++--------------------
+ tests/qemu-iotests/141.out |   2 +
+ tests/qemu-iotests/185.out |   2 +
+ tests/qemu-iotests/219     |   7 +-
+ tests/qemu-iotests/219.out |   8 ++
+ 5 files changed, 117 insertions(+), 126 deletions(-)
 
 diff --git a/blockdev.c b/blockdev.c
-index 152a0f7454..e33abd7fd2 100644
+index 553e315972..5e85fc042e 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -1535,6 +1535,7 @@ static void external_snapshot_prepare(BlkActionState =
-*common,
-                              DO_UPCAST(ExternalSnapshotState, common, comm=
-on);
-     TransactionAction *action =3D common->action;
-     AioContext *aio_context;
-+    AioContext *old_context;
-     int ret;
+@@ -1761,39 +1761,128 @@ typedef struct DriveBackupState {
+     BlockJob *job;
+ } DriveBackupState;
 =20
-     /* 'blockdev-snapshot' and 'blockdev-snapshot-sync' have similar
-@@ -1675,7 +1676,16 @@ static void external_snapshot_prepare(BlkActionState=
- *common,
-         goto out;
-     }
+-static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+-                            Error **errp);
++static BlockJob *do_backup_common(BackupCommon *backup,
++                                  BlockDriverState *bs,
++                                  BlockDriverState *target_bs,
++                                  AioContext *aio_context,
++                                  JobTxn *txn, Error **errp);
 =20
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-+    old_context =3D bdrv_get_aio_context(state->new_bs);
-+    aio_context_release(aio_context);
-+    aio_context_acquire(old_context);
-+
-     ret =3D bdrv_try_set_aio_context(state->new_bs, aio_context, errp);
-+
-+    aio_context_release(old_context);
-+    aio_context_acquire(aio_context);
-+
-     if (ret < 0) {
-         goto out;
-     }
-@@ -1775,11 +1785,13 @@ static void drive_backup_prepare(BlkActionState *co=
-mmon, Error **errp)
-     BlockDriverState *target_bs;
-     BlockDriverState *source =3D NULL;
+ static void drive_backup_prepare(BlkActionState *common, Error **errp)
+ {
+     DriveBackupState *state =3D DO_UPCAST(DriveBackupState, common, common=
+);
+-    BlockDriverState *bs;
+     DriveBackup *backup;
++    BlockDriverState *bs;
++    BlockDriverState *target_bs;
++    BlockDriverState *source =3D NULL;
      AioContext *aio_context;
-+    AioContext *old_context;
-     QDict *options;
++    QDict *options;
      Error *local_err =3D NULL;
-     int flags;
-     int64_t size;
-     bool set_backing_hd =3D false;
-+    int ret;
++    int flags;
++    int64_t size;
++    bool set_backing_hd =3D false;
 =20
      assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_DRIVE_BACKU=
 P);
      backup =3D common->action->u.drive_backup.data;
-@@ -1868,6 +1880,20 @@ static void drive_backup_prepare(BlkActionState *com=
-mon, Error **errp)
-         goto out;
-     }
 =20
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-+    old_context =3D bdrv_get_aio_context(target_bs);
-+    aio_context_release(aio_context);
-+    aio_context_acquire(old_context);
-+
-+    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
-+
-+    aio_context_release(old_context);
-+    aio_context_acquire(aio_context);
-+
-+    if (ret < 0) {
-+        goto out;
++    if (!backup->has_mode) {
++        backup->mode =3D NEW_IMAGE_MODE_ABSOLUTE_PATHS;
 +    }
 +
-     if (set_backing_hd) {
-         bdrv_set_backing_hd(target_bs, source, &local_err);
-         if (local_err) {
-@@ -1947,6 +1973,8 @@ static void blockdev_backup_prepare(BlkActionState *c=
-ommon, Error **errp)
-     BlockDriverState *bs;
-     BlockDriverState *target_bs;
-     AioContext *aio_context;
-+    AioContext *old_context;
-+    int ret;
-=20
-     assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_BLOCKDEV_BA=
-CKUP);
-     backup =3D common->action->u.blockdev_backup.data;
-@@ -1961,7 +1989,18 @@ static void blockdev_backup_prepare(BlkActionState *=
-common, Error **errp)
+     bs =3D bdrv_lookup_bs(backup->device, backup->device, errp);
+     if (!bs) {
          return;
      }
 =20
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-     aio_context =3D bdrv_get_aio_context(bs);
-+    old_context =3D bdrv_get_aio_context(target_bs);
-+    aio_context_acquire(old_context);
-+
-+    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
-+    if (ret < 0) {
-+        aio_context_release(old_context);
++    if (!bs->drv) {
++        error_setg(errp, "Device has no medium");
 +        return;
 +    }
 +
-+    aio_context_release(old_context);
+     aio_context =3D bdrv_get_aio_context(bs);
      aio_context_acquire(aio_context);
-     state->bs =3D bs;
 =20
-@@ -3562,7 +3601,6 @@ static BlockJob *do_backup_common(BackupCommon *backu=
-p,
-     BlockJob *job =3D NULL;
-     BdrvDirtyBitmap *bmap =3D NULL;
-     int job_flags =3D JOB_DEFAULT;
--    int ret;
+     /* Paired with .clean() */
+     bdrv_drained_begin(bs);
 =20
-     if (!backup->has_speed) {
-         backup->speed =3D 0;
-@@ -3586,11 +3624,6 @@ static BlockJob *do_backup_common(BackupCommon *back=
-up,
-         backup->compress =3D false;
+-    state->bs =3D bs;
++    if (!backup->has_format) {
++        backup->format =3D backup->mode =3D=3D NEW_IMAGE_MODE_EXISTING ?
++                         NULL : (char *) bs->drv->format_name;
++    }
++
++    /* Early check to avoid creating target */
++    if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_BACKUP_SOURCE, errp)) {
++        goto out;
++    }
++
++    flags =3D bs->open_flags | BDRV_O_RDWR;
++
++    /*
++     * See if we have a backing HD we can use to create our new image
++     * on top of.
++     */
++    if (backup->sync =3D=3D MIRROR_SYNC_MODE_TOP) {
++        source =3D backing_bs(bs);
++        if (!source) {
++            backup->sync =3D MIRROR_SYNC_MODE_FULL;
++        }
++    }
++    if (backup->sync =3D=3D MIRROR_SYNC_MODE_NONE) {
++        source =3D bs;
++        flags |=3D BDRV_O_NO_BACKING;
++        set_backing_hd =3D true;
++    }
++
++    size =3D bdrv_getlength(bs);
++    if (size < 0) {
++        error_setg_errno(errp, -size, "bdrv_getlength failed");
++        goto out;
++    }
++
++    if (backup->mode !=3D NEW_IMAGE_MODE_EXISTING) {
++        assert(backup->format);
++        if (source) {
++            bdrv_refresh_filename(source);
++            bdrv_img_create(backup->target, backup->format, source->filena=
+me,
++                            source->drv->format_name, NULL,
++                            size, flags, false, &local_err);
++        } else {
++            bdrv_img_create(backup->target, backup->format, NULL, NULL, NU=
+LL,
++                            size, flags, false, &local_err);
++        }
++    }
+=20
+-    state->job =3D do_drive_backup(backup, common->block_job_txn, &local_e=
+rr);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         goto out;
      }
 =20
--    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
--    if (ret < 0) {
--        return NULL;
--    }
--
-     if ((backup->sync =3D=3D MIRROR_SYNC_MODE_BITMAP) ||
-         (backup->sync =3D=3D MIRROR_SYNC_MODE_INCREMENTAL)) {
-         /* done before desugaring 'incremental' to print the right message=
- */
-@@ -3825,6 +3858,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-     BlockDriverState *bs;
-     BlockDriverState *source, *target_bs;
-     AioContext *aio_context;
-+    AioContext *old_context;
-     BlockMirrorBackingMode backing_mode;
-     Error *local_err =3D NULL;
-     QDict *options =3D NULL;
-@@ -3937,10 +3971,19 @@ void qmp_drive_mirror(DriveMirror *arg, Error **err=
-p)
-                    (arg->mode =3D=3D NEW_IMAGE_MODE_EXISTING ||
-                     !bdrv_has_zero_init(target_bs)));
-=20
++    options =3D qdict_new();
++    qdict_put_str(options, "discard", "unmap");
++    qdict_put_str(options, "detect-zeroes", "unmap");
++    if (backup->format) {
++        qdict_put_str(options, "driver", backup->format);
++    }
 +
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-+    old_context =3D bdrv_get_aio_context(target_bs);
-+    aio_context_release(aio_context);
-+    aio_context_acquire(old_context);
++    target_bs =3D bdrv_open(backup->target, NULL, options, flags, errp);
++    if (!target_bs) {
++        goto out;
++    }
 +
-     ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
++    if (set_backing_hd) {
++        bdrv_set_backing_hd(target_bs, source, &local_err);
++        if (local_err) {
++            goto unref;
++        }
++    }
 +
-+    aio_context_release(old_context);
-+    aio_context_acquire(aio_context);
++    state->bs =3D bs;
 +
-     if (ret < 0) {
--        bdrv_unref(target_bs);
--        goto out;
-+        goto unref;
-     }
-=20
-     blockdev_mirror_common(arg->has_job_id ? arg->job_id : NULL, bs, targe=
-t_bs,
-@@ -3957,8 +4000,10 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp=
-)
-                            arg->has_auto_finalize, arg->auto_finalize,
-                            arg->has_auto_dismiss, arg->auto_dismiss,
-                            &local_err);
--    bdrv_unref(target_bs);
-     error_propagate(errp, local_err);
++    state->job =3D do_backup_common(qapi_DriveBackup_base(backup),
++                                  bs, target_bs, aio_context,
++                                  common->block_job_txn, errp);
 +
 +unref:
 +    bdrv_unref(target_bs);
  out:
      aio_context_release(aio_context);
  }
-@@ -3984,6 +4029,7 @@ void qmp_blockdev_mirror(bool has_job_id, const char =
-*job_id,
-     BlockDriverState *bs;
-     BlockDriverState *target_bs;
-     AioContext *aio_context;
-+    AioContext *old_context;
-     BlockMirrorBackingMode backing_mode =3D MIRROR_LEAVE_BACKING_CHAIN;
-     Error *local_err =3D NULL;
-     bool zero_target;
-@@ -4001,10 +4047,16 @@ void qmp_blockdev_mirror(bool has_job_id, const cha=
-r *job_id,
+@@ -3587,126 +3676,13 @@ static BlockJob *do_backup_common(BackupCommon *ba=
+ckup,
+     return job;
+ }
 =20
-     zero_target =3D (sync =3D=3D MIRROR_SYNC_MODE_FULL);
-=20
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-+    old_context =3D bdrv_get_aio_context(target_bs);
-     aio_context =3D bdrv_get_aio_context(bs);
+-static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
+-                                 Error **errp)
+-{
+-    BlockDriverState *bs;
+-    BlockDriverState *target_bs;
+-    BlockDriverState *source =3D NULL;
+-    BlockJob *job =3D NULL;
+-    AioContext *aio_context;
+-    QDict *options;
+-    Error *local_err =3D NULL;
+-    int flags;
+-    int64_t size;
+-    bool set_backing_hd =3D false;
+-
+-    if (!backup->has_mode) {
+-        backup->mode =3D NEW_IMAGE_MODE_ABSOLUTE_PATHS;
+-    }
+-
+-    bs =3D bdrv_lookup_bs(backup->device, backup->device, errp);
+-    if (!bs) {
+-        return NULL;
+-    }
+-
+-    if (!bs->drv) {
+-        error_setg(errp, "Device has no medium");
+-        return NULL;
+-    }
+-
+-    aio_context =3D bdrv_get_aio_context(bs);
 -    aio_context_acquire(aio_context);
-+    aio_context_acquire(old_context);
+-
+-    if (!backup->has_format) {
+-        backup->format =3D backup->mode =3D=3D NEW_IMAGE_MODE_EXISTING ?
+-                         NULL : (char *) bs->drv->format_name;
+-    }
+-
+-    /* Early check to avoid creating target */
+-    if (bdrv_op_is_blocked(bs, BLOCK_OP_TYPE_BACKUP_SOURCE, errp)) {
+-        goto out;
+-    }
+-
+-    flags =3D bs->open_flags | BDRV_O_RDWR;
+-
+-    /*
+-     * See if we have a backing HD we can use to create our new image
+-     * on top of.
+-     */
+-    if (backup->sync =3D=3D MIRROR_SYNC_MODE_TOP) {
+-        source =3D backing_bs(bs);
+-        if (!source) {
+-            backup->sync =3D MIRROR_SYNC_MODE_FULL;
+-        }
+-    }
+-    if (backup->sync =3D=3D MIRROR_SYNC_MODE_NONE) {
+-        source =3D bs;
+-        flags |=3D BDRV_O_NO_BACKING;
+-        set_backing_hd =3D true;
+-    }
+-
+-    size =3D bdrv_getlength(bs);
+-    if (size < 0) {
+-        error_setg_errno(errp, -size, "bdrv_getlength failed");
+-        goto out;
+-    }
+-
+-    if (backup->mode !=3D NEW_IMAGE_MODE_EXISTING) {
+-        assert(backup->format);
+-        if (source) {
+-            bdrv_refresh_filename(source);
+-            bdrv_img_create(backup->target, backup->format, source->filena=
+me,
+-                            source->drv->format_name, NULL,
+-                            size, flags, false, &local_err);
+-        } else {
+-            bdrv_img_create(backup->target, backup->format, NULL, NULL, NU=
+LL,
+-                            size, flags, false, &local_err);
+-        }
+-    }
+-
+-    if (local_err) {
+-        error_propagate(errp, local_err);
+-        goto out;
+-    }
+-
+-    options =3D qdict_new();
+-    qdict_put_str(options, "discard", "unmap");
+-    qdict_put_str(options, "detect-zeroes", "unmap");
+-    if (backup->format) {
+-        qdict_put_str(options, "driver", backup->format);
+-    }
+-
+-    target_bs =3D bdrv_open(backup->target, NULL, options, flags, errp);
+-    if (!target_bs) {
+-        goto out;
+-    }
+-
+-    if (set_backing_hd) {
+-        bdrv_set_backing_hd(target_bs, source, &local_err);
+-        if (local_err) {
+-            goto unref;
+-        }
+-    }
+-
+-    job =3D do_backup_common(qapi_DriveBackup_base(backup),
+-                           bs, target_bs, aio_context, txn, errp);
+-
+-unref:
+-    bdrv_unref(target_bs);
+-out:
+-    aio_context_release(aio_context);
+-    return job;
+-}
+-
+-void qmp_drive_backup(DriveBackup *arg, Error **errp)
++void qmp_drive_backup(DriveBackup *backup, Error **errp)
+ {
+-
+-    BlockJob *job;
+-    job =3D do_drive_backup(arg, NULL, errp);
+-    if (job) {
+-        job_start(&job->job);
+-    }
++    TransactionAction action =3D {
++        .type =3D TRANSACTION_ACTION_KIND_DRIVE_BACKUP,
++        .u.drive_backup.data =3D backup,
++    };
++    blockdev_do_action(&action, errp);
+ }
 =20
-     ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
-+
-+    aio_context_release(old_context);
-+    aio_context_acquire(aio_context);
-+
-     if (ret < 0) {
-         goto out;
-     }
+ BlockDeviceInfoList *qmp_query_named_block_nodes(Error **errp)
+diff --git a/tests/qemu-iotests/141.out b/tests/qemu-iotests/141.out
+index 3645675ce8..263b680bdf 100644
+--- a/tests/qemu-iotests/141.out
++++ b/tests/qemu-iotests/141.out
+@@ -13,6 +13,8 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D10485=
+76 backing_file=3DTEST_DIR/m.
+ Formatting 'TEST_DIR/o.IMGFMT', fmt=3DIMGFMT size=3D1048576 backing_file=
+=3DTEST_DIR/t.IMGFMT backing_fmt=3DIMGFMT
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "job0"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}}
+ {'execute': 'blockdev-del', 'arguments': {'node-name': 'drv0'}}
+ {"error": {"class": "GenericError", "desc": "Node 'drv0' is busy: node is =
+used as backing hd of 'NODE_NAME'"}}
+ {'execute': 'block-job-cancel', 'arguments': {'device': 'job0'}}
+diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
+index 8379ac5854..9a3b65782b 100644
+--- a/tests/qemu-iotests/185.out
++++ b/tests/qemu-iotests/185.out
+@@ -65,6 +65,8 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=3Dqcow2 size=3D67=
+108864 cluster_size=3D65536 l
+ Formatting 'TEST_DIR/t.qcow2.copy', fmt=3Dqcow2 size=3D67108864 cluster_si=
+ze=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "disk"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
+: "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
+ {"return": {}}
+ { 'execute': 'quit' }
+ {"return": {}}
+diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
+index e0c51662c0..655f54d881 100755
+--- a/tests/qemu-iotests/219
++++ b/tests/qemu-iotests/219
+@@ -63,7 +63,7 @@ def test_pause_resume(vm):
+                 # logged immediately
+                 iotests.log(vm.qmp('query-jobs'))
+=20
+-def test_job_lifecycle(vm, job, job_args, has_ready=3DFalse):
++def test_job_lifecycle(vm, job, job_args, has_ready=3DFalse, is_mirror=3DF=
+alse):
+     global img_size
+=20
+     iotests.log('')
+@@ -135,6 +135,9 @@ def test_job_lifecycle(vm, job, job_args, has_ready=3DF=
+alse):
+     iotests.log('Waiting for PENDING state...')
+     iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE'=
+)))
+     iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHANGE'=
+)))
++    if is_mirror:
++        iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHA=
+NGE')))
++        iotests.log(iotests.filter_qmp_event(vm.event_wait('JOB_STATUS_CHA=
+NGE')))
+=20
+     if not job_args.get('auto-finalize', True):
+         # PENDING state:
+@@ -218,7 +221,7 @@ with iotests.FilePath('disk.img') as disk_path, \
+=20
+     for auto_finalize in [True, False]:
+         for auto_dismiss in [True, False]:
+-            test_job_lifecycle(vm, 'drive-backup', job_args=3D{
++            test_job_lifecycle(vm, 'drive-backup', is_mirror=3DTrue, job_a=
+rgs=3D{
+                 'device': 'drive0-node',
+                 'target': copy_path,
+                 'sync': 'full',
+diff --git a/tests/qemu-iotests/219.out b/tests/qemu-iotests/219.out
+index 8ebd3fee60..0ea5d0b9d5 100644
+--- a/tests/qemu-iotests/219.out
++++ b/tests/qemu-iotests/219.out
+@@ -135,6 +135,8 @@ Pause/resume in RUNNING
+ {"return": {}}
+=20
+ Waiting for PENDING state...
++{"data": {"id": "job0", "status": "paused"}, "event": "JOB_STATUS_CHANGE",=
+ "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "job0", "status": "running"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "waiting"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "pending"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "concluded"}, "event": "JOB_STATUS_CHANG=
+E", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+@@ -186,6 +188,8 @@ Pause/resume in RUNNING
+ {"return": {}}
+=20
+ Waiting for PENDING state...
++{"data": {"id": "job0", "status": "paused"}, "event": "JOB_STATUS_CHANGE",=
+ "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "job0", "status": "running"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "waiting"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "pending"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "concluded"}, "event": "JOB_STATUS_CHANG=
+E", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+@@ -245,6 +249,8 @@ Pause/resume in RUNNING
+ {"return": {}}
+=20
+ Waiting for PENDING state...
++{"data": {"id": "job0", "status": "paused"}, "event": "JOB_STATUS_CHANGE",=
+ "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "job0", "status": "running"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "waiting"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "pending"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"return": [{"current-progress": 4194304, "id": "job0", "status": "pending=
+", "total-progress": 4194304, "type": "backup"}]}
+@@ -304,6 +310,8 @@ Pause/resume in RUNNING
+ {"return": {}}
+=20
+ Waiting for PENDING state...
++{"data": {"id": "job0", "status": "paused"}, "event": "JOB_STATUS_CHANGE",=
+ "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
++{"data": {"id": "job0", "status": "running"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "waiting"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"data": {"id": "job0", "status": "pending"}, "event": "JOB_STATUS_CHANGE"=
+, "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
+ {"return": [{"current-progress": 4194304, "id": "job0", "status": "pending=
+", "total-progress": 4194304, "type": "backup"}]}
 --=20
 2.23.0
 
