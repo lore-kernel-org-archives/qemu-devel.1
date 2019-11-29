@@ -2,87 +2,128 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 651DEC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E33F0C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:50:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BA542075C
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:44:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF3F921736
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:50:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ME4+vDLo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BA542075C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BCbWxC63"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF3F921736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaiRZ-0005nU-22
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 10:44:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35275)
+	id 1iaiXE-0002Wr-Rh
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 10:50:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iahMx-0001Dd-8m
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:35:40 -0500
+ (envelope-from <david@redhat.com>) id 1iahNV-0001io-Cl
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:36:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iahMr-0002R7-GO
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:35:35 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:20843
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1iahNS-0004Cx-0P
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:36:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41048
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iahMm-0002Kr-Ue
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:35:31 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iahNR-0004Ac-QR
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:36:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575038126;
+ s=mimecast20190719; t=1575038169;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HGIbBd7nAnHa+FQGMtvp5Nq5cKWWmwwclo860d8Ww0I=;
- b=ME4+vDLoYDpTYsUadQvdxyU0wQZAiGhXL5kIkhik6q93kAY35BdtVjYN0QTlQnbxCpmFwT
- gtesTbvperlXc9cM9VeX4KJDhmbousdhwd0Jt4fJ7FOfsV+lc8Rsnr5qQVJrdJSUapVEVW
- s/92q4DW1hSpCGlJT5eT/WJ/NfRIODk=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=2mTkRzXJ3qz2wWypLXK7WHLqjGGms6qurvHbRZwA7mc=;
+ b=BCbWxC63Hq01MOUW5fAL+x2yAuOj3becLqETcIH+YQfQPyIhHeXoTL9uGzEnw2DAA3mK3c
+ VDcyfeq5cNmWUcf7RZ5Uk8EHNJaqD71z4oSLxDOljPW0MfsH8dsgcubqPLqKregpGQ28/M
+ cmrqLepF4TO1IO875u2FVtiP1lW4D1g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-KmJDLW95Oaulbixuk9lb3w-1; Fri, 29 Nov 2019 09:35:22 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-216-N3fiQXDONc-dG-5m2bqFDw-1; Fri, 29 Nov 2019 09:36:05 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94FB6184CAA2;
- Fri, 29 Nov 2019 14:35:21 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FF5460BF1;
- Fri, 29 Nov 2019 14:35:21 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 9401B1138606; Fri, 29 Nov 2019 15:35:19 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v6] error: rename errp to errp_in where it is IN-argument
-References: <20191127183704.14825-1-vsementsov@virtuozzo.com>
- <878so05bca.fsf@dusky.pond.sub.org>
- <f901e0db-61df-898f-ce18-096bfeadf525@virtuozzo.com>
- <87mucf218w.fsf@dusky.pond.sub.org>
- <80e563ee-31fb-da43-ddde-c8666e4b92c6@virtuozzo.com>
-Date: Fri, 29 Nov 2019 15:35:19 +0100
-In-Reply-To: <80e563ee-31fb-da43-ddde-c8666e4b92c6@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Fri, 29 Nov 2019 08:28:41 +0000")
-Message-ID: <87eexqda3c.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09C76100E398;
+ Fri, 29 Nov 2019 14:36:04 +0000 (UTC)
+Received: from [10.36.118.44] (unknown [10.36.118.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 72EAD5D9C9;
+ Fri, 29 Nov 2019 14:36:02 +0000 (UTC)
+Subject: Re: [PATCH 3/3] s390x: protvirt: Add new VCPU reset functions
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191129142025.21453-1-frankja@linux.ibm.com>
+ <20191129142025.21453-4-frankja@linux.ibm.com>
+ <1b6b2cc3-cd28-7bfe-655c-cc3e7c084848@redhat.com>
+ <a3e2f13d-9ffb-eb55-60ff-99b8f3921f83@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <2e1d8e9e-b0fd-f854-b76b-d6c26906a721@redhat.com>
+Date: Fri, 29 Nov 2019 15:36:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: KmJDLW95Oaulbixuk9lb3w-1
+In-Reply-To: <a3e2f13d-9ffb-eb55-60ff-99b8f3921f83@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: N3fiQXDONc-dG-5m2bqFDw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,182 +135,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, mihajlov@linux.ibm.com,
+ qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
-
-> 28.11.2019 23:29, Markus Armbruster wrote:
->> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>=20
->>> 28.11.2019 17:23, Markus Armbruster wrote:
->>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>>>
->>>>> Error **errp is almost always OUT-argument: it's assumed to be NULL, =
-or
->>>>> pointer to NULL-initialized pointer, or pointer to error_abort or
->>>>> error_fatal, for callee to report error.
->>>>>
->>>>> But very few functions instead get Error **errp as IN-argument:
->>>>> it's assumed to be set (or, maybe, NULL), and callee should clean it,
->>>>> or add some information.
->>>>>
->>>>> In such cases, rename errp to errp_in.
->>>>
->>>> Missing: why is the rename useful?
+On 29.11.19 15:34, Janosch Frank wrote:
+> On 11/29/19 3:24 PM, David Hildenbrand wrote:
+>> On 29.11.19 15:20, Janosch Frank wrote:
+>>> CPU resets for protected guests need to be done via Ultravisor
+>>> calls. Hence we need a way to issue these calls for each reset.
 >>>
->>> The main reason is to prepare for coccinelle part.
->>=20
->> It's not a prerequisite for applying the patches Coccinelle produces,
->> only a prerequisite for running Coccinelle.
->>=20
->>>> It's useful if it helps readers recognize unusual Error ** parameters,
->>>> and recognizing unusual Error ** parameters is actually a problem.  I'=
-m
->>>> not sure it is, but my familiarity with the Error interface may blind
->>>> me.
->>>>
->>>> How many functions have unusual Error **parameters?  How are they used=
-?
->>>> Any calls that could easily be mistaken as the usual case?  See [*]
->>>> below.
-[...]
->>>> [*] The information I asked for above is buried in these patches.  I'l=
-l
->>>> try to dig it up as I go reviewing them.
->>>>
->>>> Second, it risks some of these "further patches" overtake this one, an=
-d
->>>> then its commit message will be misleading.  Moreover, the other commi=
-ts
->>>> will lack context.
-[...]
->>>>> diff --git a/util/error.c b/util/error.c
->>>>> index d4532ce318..275586faa8 100644
->>>>> --- a/util/error.c
->>>>> +++ b/util/error.c
-[...]
->>>>> @@ -271,11 +271,11 @@ void error_free(Error *err)
->>>>>        }
->>>>>    }
->>>>>   =20
->>>>> -void error_free_or_abort(Error **errp)
->>>>> +void error_free_or_abort(Error **errp_in)
->>>>>    {
->>>>> -    assert(errp && *errp);
->>>>> -    error_free(*errp);
->>>>> -    *errp =3D NULL;
->>>>> +    assert(errp_in && *errp_in);
->>>>> +    error_free(*errp_in);
->>>>> +    *errp_in =3D NULL;
->>=20
->> This one is actually in/out.
->>=20
->> To make the compiler check errp_in is truly an in-argument, we can
->> declare it as Error *const *errp_in.
->>=20
->> But we can save ourselves the trouble of renaming it; the const should
->> suffice to tell both human readers and Coccinelle that this is not your
->> common out-argument.  I think I like this better than relying on a
->> naming convention.  What about you?
->
-> I think it's good idea... But what to do with error_free_or_abort, and ot=
-her functions
-> which get filled errp, and want to set it to NULL? Patch 21 adds three su=
-ch functions..
->
-> Maybe, add assert(errp) at start of such functions, and catch it by cocci=
-nelle (not sure
-> that it is possible)?
+>>> As we formerly had only one reset function and it was called for
+>>> initial, as well as for the clear reset, we now need a new interface.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> ---
+>>>  target/s390x/cpu.c       | 14 ++++++++++++--
+>>>  target/s390x/kvm-stub.c  | 10 +++++++++-
+>>>  target/s390x/kvm.c       | 38 ++++++++++++++++++++++++++++++++------
+>>>  target/s390x/kvm_s390x.h |  4 +++-
+>>>  4 files changed, 56 insertions(+), 10 deletions(-)
+>>>
+>>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+>>> index 829ce6ad54..906285888e 100644
+>>> --- a/target/s390x/cpu.c
+>>> +++ b/target/s390x/cpu.c
+>>> @@ -139,8 +139,18 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
+>>>      }
+>>>  
+>>>      /* Reset state inside the kernel that we cannot access yet from QEMU. */
+>>> -    if (kvm_enabled() && type != S390_CPU_RESET_NORMAL) {
+>>> -        kvm_s390_reset_vcpu(cpu);
+>>> +    if (kvm_enabled()) {
+>>> +        switch (type) {
+>>> +        case S390_CPU_RESET_CLEAR:
+>>> +            kvm_s390_reset_vcpu_clear(cpu);
+>>> +            break;
+>>> +        case S390_CPU_RESET_INITIAL:
+>>> +            kvm_s390_reset_vcpu_initial(cpu);
+>>> +            break;
+>>> +        case S390_CPU_RESET_NORMAL:
+>>> +            kvm_s390_reset_vcpu_normal(cpu);
+>>> +            break;
+>>> +        }
+>>>      }
+>>>  }
+>>>  
+>>> diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
+>>> index 5152e2bdf1..c4cd497f85 100644
+>>> --- a/target/s390x/kvm-stub.c
+>>> +++ b/target/s390x/kvm-stub.c
+>>> @@ -83,7 +83,15 @@ void kvm_s390_cmma_reset(void)
+>>>  {
+>>>  }
+>>>  
+>>> -void kvm_s390_reset_vcpu(S390CPU *cpu)
+>>> +void kvm_s390_reset_vcpu_initial(S390CPU *cpu)
+>>> +{
+>>> +}
+>>> +
+>>> +void kvm_s390_reset_vcpu_clear(S390CPU *cpu)
+>>> +{
+>>> +}
+>>> +
+>>> +void kvm_s390_reset_vcpu_normal(S390CPU *cpu)
+>>>  {
+>>>  }
+>>>  
+>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>>> index ad6e38c876..502fc71664 100644
+>>> --- a/target/s390x/kvm.c
+>>> +++ b/target/s390x/kvm.c
+>>> @@ -151,6 +151,7 @@ static int cap_s390_irq;
+>>>  static int cap_ri;
+>>>  static int cap_gs;
+>>>  static int cap_hpage_1m;
+>>> +static int cap_vcpu_resets;
+>>>  
+>>>  static int active_cmma;
+>>>  
+>>> @@ -342,6 +343,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>>>      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+>>>      cap_mem_op = kvm_check_extension(s, KVM_CAP_S390_MEM_OP);
+>>>      cap_s390_irq = kvm_check_extension(s, KVM_CAP_S390_INJECT_IRQ);
+>>> +    cap_vcpu_resets = kvm_check_extension(s, KVM_CAP_S390_VCPU_RESETS);
+>>>  
+>>>      if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
+>>>          || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
+>>> @@ -403,20 +405,44 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+>>>      return 0;
+>>>  }
+>>>  
+>>> -void kvm_s390_reset_vcpu(S390CPU *cpu)
+>>> +static void kvm_s390_reset_vcpu(S390CPU *cpu, unsigned long type)
+>>>  {
+>>>      CPUState *cs = CPU(cpu);
+>>>  
+>>> -    /* The initial reset call is needed here to reset in-kernel
+>>> -     * vcpu data that we can't access directly from QEMU
+>>> -     * (i.e. with older kernels which don't support sync_regs/ONE_REG).
+>>> -     * Before this ioctl cpu_synchronize_state() is called in common kvm
+>>> -     * code (kvm-all) */
+>>> +    /*
+>>> +     * The reset call is needed here to reset in-kernel vcpu data that
+>>> +     * we can't access directly from QEMU (i.e. with older kernels
+>>> +     * which don't support sync_regs/ONE_REG).  Before this ioctl
+>>> +     * cpu_synchronize_state() is called in common kvm code
+>>> +     * (kvm-all).
+>>> +     */
+>>> +    if (cap_vcpu_resets) {
+>>> +        if (kvm_vcpu_ioctl(cs, KVM_S390_VCPU_RESET, type)) {
+>>> +            error_report("CPU reset type %ld failed on CPU %i",
+>>> +                         type, cs->cpu_index);
+>>> +        }
+>>> +        return;
+>>> +    }
+>>>      if (kvm_vcpu_ioctl(cs, KVM_S390_INITIAL_RESET, NULL)) {
+>>>          error_report("Initial CPU reset failed on CPU %i", cs->cpu_index);
+>>>      }
+>>>  }
+>>
+>> I think I commented this already: The issue is that without
+>> cap_vcpu_requests, you would no do a KVM_S390_INITIAL_RESET for type ==
+>> S390_CPU_RESET_NORMAL. You have to fence that.
+> 
+> I did fix that, but not on this branch -_-
 
-I went through the git branch you provided.
+You can avoid that completely once you switch to two new separate ioctls ;)
 
-These get rid of unusual Error ** parameters:
 
-    01e10667d1 hmp: drop Error pointer indirection in hmp_handle_error
-    606bfb7520 vnc: drop Error pointer indirection in vnc_client_io_error
+-- 
+Thanks,
 
-    Get rid of them by peeling off an indirection.
-
-These try to make unusual Error ** parameters stand out:
-
-    51e73b3305 error: rename errp to errp_in where it is IN-argument
-
-    Four renames.
-
-    Three functions modify the error, name @errp_in is okay, my const
-    proposal works.
-
-    error_free_or_abort() clears *errp_in, name @errp_in is misleading,
-    const doesn't work.
-
-    f7bdfd42da qdev-monitor: well form error hint helpers
-
-    Two renames.  Both functions modify the error, rename is okay, const
-    works.
-
-    9d4aac7299 nbd: well form nbd_iter_channel_error errp handler
-
-    One rename, from @local_err.  nbd_iter_channel_error() clears *errp_in,
-    name @errp_in is misleading, const doesn't work.
-
-    fb1bd83c40 ppc: well form kvmppc_hint_smt_possible error hint helper
-
-    One rename.  The function modify the error, rename is okay, const works=
-.
-
-    e024e89b10 9pfs: well form error hint helpers
-
-    Two renames.  Both functions modify the error, rename is okay, const
-    works.
-
-These make usual Error ** parameters look, well, more usual:
-
-    c01649d999 hw/core/qdev: cleanup Error ** variables
-    a5f6424163 block/snapshot: rename Error ** parameter to more common err=
-p
-    ae200ca21e hw/i386/amd_iommu: rename Error ** parameter to more common =
-errp
-    561f73e681 qga: rename Error ** parameter to more common errp
-    12589a96cd monitor/qmp-cmds: rename Error ** parameter to more common e=
-rrp
-    f608fc5999 hw/s390x: rename Error ** parameter to more common errp
-    747a90d044 hw/tpm: rename Error ** parameter to more common errp
-    3d19e66610 hw/usb: rename Error ** parameter to more common errp
-    07366648ef include/qom/object.h: rename Error ** parameter to more comm=
-on errp
-
-These don't touch Error ** parameter declarations:
-
-    f6e4fffc16 hw/core/loader-fit: fix freeing errp in fit_load_fdt
-    b5bba880ae net/net: Clean up variable shadowing in net_client_init()
-    4a4462ce4c hw/sd: drop extra whitespace in sdhci_sysbus_realize() heade=
-r
-    d52d44e822 backends/cryptodev: drop local_err from cryptodev_backend_co=
-mplete()
-    7e95d30766 hw/vfio/ap: drop local_err from vfio_ap_realize
-
-Unusual Error ** parameters that can be made Error *const *errp should
-not also need a rename, neither to avoid confusion about @errp's role,
-nor to help Coccinelle.
-
-Unusual Error ** parameters that can't be made Error *const *errp:
-
-    nbd_iter_channel_error(): parameter is called @local_err.  Confusion
-    seems as unlikely without the rename as with it.  Coccinelle should
-    not need the rename.  No need to touch.  I'm willing to accept your
-    assertion change.
-
-    error_free_or_abort(): parameter is called @errp.  Confusion seems
-    as unlikely without the rename as with it.  Coccinelle should not
-    need the rename.  I'm willing to accept a rename to @local_err
-    regardless.
-
-I pushed my fixups to git://repo.or.cz/qemu/armbru.git branch error-prep
-for your convenience.  The commit messages of the fixed up commits need
-rephrasing, of course.
+David / dhildenb
 
 
