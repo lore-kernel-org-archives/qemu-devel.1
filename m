@@ -2,78 +2,86 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCFEC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 07:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14ED9C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 07:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A849721736
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 07:36:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3B7121736
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 07:43:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H6d4dUyI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A849721736
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="anNf7qzW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3B7121736
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaapX-0000BM-OJ
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 02:36:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46317)
+	id 1iaawA-0003aP-Up
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 02:43:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48667)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iaaij-000558-1f
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:29:42 -0500
+ (envelope-from <mlureau@redhat.com>) id 1iaakA-0005rm-LS
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:31:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iaaih-0003fx-O3
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:29:40 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52602
+ (envelope-from <mlureau@redhat.com>) id 1iaak8-0007iw-LN
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:31:09 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59542
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iaaih-0003XA-JG
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:29:39 -0500
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iaak8-0007Um-Gq
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:31:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575012577;
+ s=mimecast20190719; t=1575012665;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=myiM2jB3BAAt+97hTTYInGs4H8+sWsiz2awia6JDoGY=;
- b=H6d4dUyI9EpSoo5OWSvlfc2P9x4k9n3kYk+Ty6b5UDgsngRS3VbzgwzBhx9kTOjC3Hf9SP
- EgMdVolruRYsQLXT4B8/A/bur+BQZz5zgnVt3/BvVFjNqzFm5v/Xe3Q6jtEzRaswb4/WlP
- UlXAZzYk7nXBDReit2/N29J1e+vhWCU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-7QyO11nNObmT_7vW29Bs_Q-1; Fri, 29 Nov 2019 02:29:33 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46010800D41;
- Fri, 29 Nov 2019 07:29:31 +0000 (UTC)
-Received: from gondolin (ovpn-116-140.ams2.redhat.com [10.36.116.140])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E1B6860900;
- Fri, 29 Nov 2019 07:29:25 +0000 (UTC)
-Date: Fri, 29 Nov 2019 08:29:23 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH] hw: add compat machines for 5.0
-Message-ID: <20191129082923.1c4d72fc.cohuck@redhat.com>
-In-Reply-To: <20191128203811.GD14595@habkost.net>
-References: <20191112104811.30323-1-cohuck@redhat.com>
- <20191128183706.21b1fe0e.cohuck@redhat.com>
- <20191128203811.GD14595@habkost.net>
-Organization: Red Hat GmbH
+ bh=pRCKGbY4P/zHgbYamS/LOrlSPsKZAx1h+lCbJDxur34=;
+ b=anNf7qzWvpfEoSyu0dbD8WZQE5cf8JCeB7xo3dgE8RZMS1XYCC1jE4O2gd0YDERacuwoEU
+ +Y9rPdjAqxTBQpB8vyyDKD/Uewzas17fqwFbBwKWeZIHtKZgQQ6nXDxp7C2wkshZkOHb+f
+ lSb2cuOKm0wIgwkBY4eJflkdIB4dl24=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-z8tkAhU-ON6lEaeHSrvPdA-1; Fri, 29 Nov 2019 02:31:04 -0500
+Received: by mail-ot1-f72.google.com with SMTP id o14so2955842otp.4
+ for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 23:31:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=pRCKGbY4P/zHgbYamS/LOrlSPsKZAx1h+lCbJDxur34=;
+ b=VVTJW8bsZ+hLpn9pxBQu/lx8RKVpB5OTLAw9eJXbRgd1rMk+BwfY4rZ3y+d5yVCRGo
+ Iwlwzuj33pWN9VYGfmJ1uM0AJHFvAWboOviSm9iSSXL+GgfKMnjNbJqSeh/pH2thfD1h
+ h1NLyFJWdVfRue6/P7zsdeuLTDr0nN0BvKjsg6NcfJjDqZoMrF56ei8sW+Pse85Mbz+A
+ 1ZHaUwPS0Eypc27rWkv1WKbQyPg0pWghtqVfY+iWB4tv7tKcGNc+WebnbSd+ulSLBobO
+ 6Exgiu2iaS7UjNt28WFGgq1VstZC20AtmOaGZ5N1lF4rSOkRWBBvVlzajKGufQWcB1uS
+ SgvQ==
+X-Gm-Message-State: APjAAAUzELlEFKnZwbrn7SoasdvZBGeO2VaS66+jMIgHtgWB88d1VTKs
+ G8DidGe4oPQREyg97TWLU80R0G/ho21z/N8D/qDv1f7TgD9Ydw6ylqPPxAZgVoy3Mp+e9wJxyyZ
+ siwEJs9rs6WYLM/abBcow7OnmaidlgaU=
+X-Received: by 2002:aca:cc87:: with SMTP id c129mr6881723oig.13.1575012663601; 
+ Thu, 28 Nov 2019 23:31:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwyJygAsEQgf4My4EosaS830cYVy1+z7TQoGDDZPVhd/f8G4Z77AB4ctmwnas5CRjoD3Iscej0Kd+iC1EAURfA=
+X-Received: by 2002:aca:cc87:: with SMTP id c129mr6881703oig.13.1575012663350; 
+ Thu, 28 Nov 2019 23:31:03 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 7QyO11nNObmT_7vW29Bs_Q-1
+References: <20191128141518.628245-1-marcandre.lureau@redhat.com>
+ <20191129070253.5hwksjrapomk434x@sirius.home.kraxel.org>
+In-Reply-To: <20191129070253.5hwksjrapomk434x@sirius.home.kraxel.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Fri, 29 Nov 2019 11:30:51 +0400
+Message-ID: <CAMxuvawieN7JQZkRku19v5X-o6q664Wz1Rtx3+Wz3d33m-7Tug@mail.gmail.com>
+Subject: Re: [PATCH 0/2] RFC: add -mem-shared option
+To: Gerd Hoffmann <kraxel@redhat.com>
+X-MC-Unique: z8tkAhU-ON6lEaeHSrvPdA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -88,49 +96,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 28 Nov 2019 17:38:11 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+Hi
 
-> On Thu, Nov 28, 2019 at 06:37:06PM +0100, Cornelia Huck wrote:
-> > On Tue, 12 Nov 2019 11:48:11 +0100
-> > Cornelia Huck <cohuck@redhat.com> wrote:
-> >   
-> > > Add 5.0 machine types for arm/i440fx/q35/s390x/spapr.
-> > > 
-> > > For i440fx and q35, unversioned cpu models are still translated
-> > > to -v1; I'll leave changing this (if desired) to the respective
-> > > maintainers.
-> > > 
-> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > > ---
-> > > 
-> > > also pushed out to https://github.com/cohuck/qemu machine-5.0
-> > > 
-> > > x86 folks: if you want to change the cpu model versioning, I
-> > > can do it in this patch, or just do it on top yourselves  
-> > 
-> > So, do we have a final verdict yet (keep it at v1)?
-> > 
-> > If yes, I'll queue this via the s390 tree, unless someone else beats me
-> > to it.  
-> 
-> We won't change default_cpu_version in 5.0, so:
-> 
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-> 
+On Fri, Nov 29, 2019 at 11:03 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> On Thu, Nov 28, 2019 at 06:15:16PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > Hi,
+> >
+> > Setting up shared memory for vhost-user is a bit complicated from
+> > command line, as it requires NUMA setup such as: m 4G -object
+> > memory-backend-file,id=3Dmem,size=3D4G,mem-path=3D/dev/shm,share=3Don -=
+numa
+> > node,memdev=3Dmem.
+> >
+> > Instead, I suggest to add a -mem-shared option for non-numa setups,
+> > that will make the -mem-path or anonymouse memory shareable.
+>
+> Is it an option to just use memfd by default (if available)?
 
-Thanks!
-
-Will queue through the s390 tree.
+Yes, with a fallback path currently using a temporary file under /tmp
+(we may want to use shm_open() instead, or a different location such
+as XDG_RUNTIME_DIR? - and use O_TMPFILE)
 
 
