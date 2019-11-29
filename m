@@ -6,74 +6,77 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D2FFC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 19:23:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C376C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 19:43:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46D9321721
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 19:23:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F06DA216F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 19:43:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d2aGixWd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46D9321721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HQZUPcQ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F06DA216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ialrZ-0001HF-Gn
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 14:23:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53851)
+	id 1iamAO-0002Sf-5p
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 14:43:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35660)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ialc2-00015N-5M
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 14:07:32 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1iam1G-0006wH-4K
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 14:33:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ialby-0002ko-OR
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 14:07:29 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:32781)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ialbq-00025A-Qi
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 14:07:25 -0500
-Received: by mail-ot1-x342.google.com with SMTP id d17so2049143otc.0
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 11:07:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=+FtFsuQtq3eVlLtLusxL2dw9FGxIT8kWy5OnLveth6I=;
- b=d2aGixWd7g5bE3+AyqaOyriJ/3AMKr+cfuMkOT24yV/t3bg3VDL9KI9z/Jji5pD7CI
- FWZsy7kpuiVyQiCRCYyYsoNGppsjvQ+ZFswedEakglw6ma66mHdvSy5Rr5QRqy7f1oQW
- Ze6Xz7GdJvNa6eeC8jGbPj6PqUBMO5tAG/O9dyAtABsXvVEyVcA/H6VIVb+zIgoG+no7
- OHgFp5T92/j8q5k7hs58H0m6dF8crUHzbrfGj4rOTfjKUjYLRSg6Hnht4SgSJEe1VUY+
- YM1MAyQVJS08iY0/lLhL7ol5SUPck+qY1bZP2FS0ARFm7e7VhjBequn/PXU6jwewdsCi
- uw9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=+FtFsuQtq3eVlLtLusxL2dw9FGxIT8kWy5OnLveth6I=;
- b=Z+38wLwtaMYOSqfN7DWE6DXlH+vkCIBidPQJnMaUraTq+eIAERN1LhCU+sYcZV0ETd
- vXZetsUGGa4IWQV8JYVDjPKvvLBIdamOsD7xwQL6BV5g+UvMnEAvTxO7bAV1BIobAFZK
- yO84LqY4Q9nx3OPVYOMTWfW68JO1NNaPWWXNHsIEVA1rH0NH8E1hP1yPh6NBizigOEf6
- q4U7RZ3hN9NlPaQdn81pLxF3J47uHxZXRVSTq6i4T7WyJ16/sIgSSRX6W17yxdYznyJc
- kw4w77NONbImVgXAlBKPDTQlQMFK+fZbtxvEWE6n9pYWx7iX8VtpcnZ1NyVPums7BLOr
- E1Zg==
-X-Gm-Message-State: APjAAAUB/AtoZpZXRQWFaL9oXgdHMpntyMwWf55evyq2HvTnZLLFgnFA
- ST1LMuWLod7hcyglZIfS+TmGOxCdW4bhfiwp78QycQ==
-X-Google-Smtp-Source: APXvYqwFFgtbZ55HnxPHaKhrFgSMWYNN3KTl86rSIJxhph8nzoCcUpwBqeHUrsAPZtTeOPkaABd0OHdYbz0/OqPw0xI=
-X-Received: by 2002:a9d:6357:: with SMTP id y23mr12375124otk.91.1575054432823; 
- Fri, 29 Nov 2019 11:07:12 -0800 (PST)
+ (envelope-from <ehabkost@redhat.com>) id 1iam1B-0004iv-7p
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 14:33:30 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45099
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iam1A-0004bn-MQ
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 14:33:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575056007;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QkXV3D+DA5MpXFbhmJwyqaew9poY86ocjGREEzPuPbA=;
+ b=HQZUPcQ4Th6RMa6PDbXgZ3vMXzQyPmw5Wz6zBtSAyriWMJYnxXOXD9TyRrT+YOBfcv1uY0
+ 4lP5DS+2iznZl1R0NmW/f93SoA8Pzj2EtsCtLv85E3Cr/BO3IXsX+T15nGUGzQRrM7hgFj
+ wTGeRbPTT8zEf029w5fklh7usxFdxFU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-120-I0Qm5lcyPjSpLAa3e7b_iA-1; Fri, 29 Nov 2019 14:33:23 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99CA980183D;
+ Fri, 29 Nov 2019 19:33:22 +0000 (UTC)
+Received: from localhost (ovpn-116-90.gru2.redhat.com [10.97.116.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DD94A600C4;
+ Fri, 29 Nov 2019 19:33:19 +0000 (UTC)
+Date: Fri, 29 Nov 2019 16:33:17 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v2 2/2] s390x/cpumodel: Introduce dynamic feature groups
+Message-ID: <20191129193317.GE14595@habkost.net>
+References: <b062f580-d664-f68c-2364-1f65df6ee265@de.ibm.com>
+ <C829F458-099D-4E95-B835-67F008E60B13@redhat.com>
+ <b4f4546d-b620-0428-40bf-59f4584a80f3@de.ibm.com>
+ <b4ee8526-b1e3-21ee-5e1e-b22520e29339@redhat.com>
 MIME-Version: 1.0
-References: <20191018150630.31099-1-damien.hedde@greensocs.com>
-In-Reply-To: <20191018150630.31099-1-damien.hedde@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Nov 2019 19:07:02 +0000
-Message-ID: <CAFEAcA8yMWyXyP08HWWkAo72KUQgN4JwbaSHA-Y8msiCLLrvzQ@mail.gmail.com>
-Subject: Re: [PATCH v5 00/13] Multi-phase reset mechanism
-To: Damien Hedde <damien.hedde@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+In-Reply-To: <b4ee8526-b1e3-21ee-5e1e-b22520e29339@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: I0Qm5lcyPjSpLAa3e7b_iA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,48 +88,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>,
+ Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Jiri Denemark <jdenemar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 at 16:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
->
-> Hi all,
->
-> The purpose of this series is to split the current reset procedure
-> into multiple phases. This will help to solve some ordering
-> difficulties we have during reset. Previous version can be found here:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg04359.html
->
-> This series adds resettable interface and transitions base Device and
-> Bus classes (sysbus subclasses are ok too). It provides new reset
-> functions but does not switch anymore the old functions
-> (device_reset() and qdev/qbus_reset_all()) to resettable interface.
-> These functions keep the exact same behavior as before.
->
-> The series also transition the main reset handlers registration which
-> has no impact until devices and buses are transitioned.
->
-> I think this version is way better regarding the transition from the
-> legacy to the resettable interface than the previous one.
-> After this series, the plan is then to transition devices, buses and
-> legacy reset call sites. Devices and buses have to be transitioned
-> from mother class to daughter classes order but until the final
-> (daughter) class is transitioned, old monolitic reset behavior will
-> be kept for this class.
+On Tue, Nov 26, 2019 at 03:07:32PM +0100, David Hildenbrand wrote:
+> On 26.11.19 13:59, Christian Borntraeger wrote:
+> > re-adding ccs from the cover-letter
+> >=20
+> >>>> On 25.11.19 18:20, David Hildenbrand wrote:
+> >>>>
+> >>>> As soon as dynamic feature groups are used, the CPU model becomes
+> >>>> migration-unsafe. Upper layers can expand these models to migration-=
+safe
+> >>>> and static variants, allowing them to be migrated.
+> >>>
+> >>> I really dislike that. I am trying to get rid of the unsafe variants =
+(e.g. now
+> >>> defaulting to host-model instead of host-passthrough). I do not want =
+to give
+> >>> users new ways of hurting themselves.
+> >>>
+> >>
+> >> Please note that this is just on the bare command line. Libvirt and fr=
+iends will expand the model and have proper migration in place. What exactl=
+y is your concern in that regard?
+> >=20
+> > What is then the value? libvirt can also use host-model or  baselining =
+if necessary.
+> > And for the command line this will just add more opportunity to shot yo=
+urself in the
+> > foot, no?
+>=20
+> I don't think so. It's in no way more dangerous than "-cpu host" or
+> "-cpu max". And it is in no way more dangerous than the discussed CPU
+> versions, where even a "-cpu z13" would no longer be migration-safe.
+>=20
+> You could - in theory - baseline(z13, host), but it could suddenly
+> fallback to a, say, zEC12 - and that's not what you asked for. And you
+> should not simply mask of deprecated features when baselining. Sure, we
+> could eventually add config knobs for that , but ...
+>=20
+> ... I really do like the part where you can specify on the command line
+> to have specific CPU definition, but including all available/recommended
+> features (e.g., nested virtualization).
+>=20
+> >=20
+> > Let me put it this way, I might have misunderstood what you are trying =
+to do here,
+> > but if I do not get, then others (e.g. users) will also not get it.
+>=20
+> I remember you participated in the relevant discussions. That's where we
+> also agreed that versioned CPU models on s390x don't make any sense. But
+> I can refine what's included in this patch description
+>=20
+> "There is the demand from higher levels in the stack to "have the
+> best CPU model possible on a given accelerator, firmware and HW"" - the
+> best CPU model for a specific *CPU definition*.
+>=20
+> Say the user has the option to select a model (zEC12, z13, z14), upper
+> layers always want to have a model that includes all backported security
+> features. While the host model can do that, CPU definitions can't. You
+> can't change default models within a QEMU release, or for older releases
+> (e.g., a z13).
+>=20
 
-Hi; I finally got back to reviewing this patchset, and I've
-left comments on various patches (minor stuff only). I didn't
-bother to comment on a few patches that I was happy with and
-somebody else had already reviewed.
+This is a good description of the main use case we're worried
+about in x86 too, and the main reason we have added versioned CPU
+models.
 
-thanks
--- PMM
+I remember I was planning to use `query-cpu-model-expansion` for
+"please give me the best configuration for this specific CPU
+model" (which would be very similar to the approach used in this
+series).  Now, I need to refresh my memory and try to remember
+why I concluded this approach wouldn't work for x86.
+
+
+> >=20
+> > Maybe its just the interface or the name. But I find this very non-intu=
+itive
+>=20
+> I'm open for suggestions.
+>=20
+> >=20
+> > e.g. you wrote
+> >=20
+> >     Get the maximum possible feature set (e.g., including deprecated
+> >     features) for a CPU definition in the configuration ("everything th=
+at
+> >     could be enabled"):
+> >         -cpu z14,all-features=3Doff,available-features=3Don
+> >=20
+> >     Get all valid features for a CPU definition:
+> >         -cpu z14,all-features=3Don
+> >=20
+> > What is the point of this? It is either the same as the one before, or =
+it wont
+> > be able to start.=20
+>=20
+> valid !=3D available, all !=3D available. Yes, the model won't run unless
+> you are on pretty good HW :)
+>=20
+> Maybe I should just have dropped the last example, as it seems to
+> confuse people - it's mostly only relevant for introspection via CPU
+> model expansion.
+>=20
+> I am open for better names. e.g. all-features -> valid-features.
+
+"all" is not a meaningful name to me.  It surely doesn't mean
+"all features in the universe", so it means a more specific set
+of features.  How is that set defined?
+
+"valid" seems clearer, but we still need a description of what
+"valid" means exactly.
+
+--=20
+Eduardo
+
 
