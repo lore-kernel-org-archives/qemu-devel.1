@@ -2,79 +2,102 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DBBC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 11:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E89C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 11:37:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAE1420833
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 11:35:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6051208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 11:37:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sg0nnz31"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAE1420833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AZEGhcVV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6051208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaeYz-0000fS-MD
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 06:35:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33159)
+	id 1iaeaK-0001oc-5o
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 06:37:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39742)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iadnG-0001ds-FM
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 05:46:44 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iaeLi-0000NG-Oe
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:22:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iadn7-0007ZY-Tz
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 05:46:29 -0500
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:35010)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iadn0-0006yJ-6j
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 05:46:25 -0500
-Received: by mail-oi1-x22c.google.com with SMTP id k196so9328920oib.2
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 02:46:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=B1LwMbr9n02E/EfYVgYavivi596k0uwJehitpfUuLqE=;
- b=Sg0nnz31MTNP9UFZ6gvj2xI4GwPpDecjh5AIhiqmaY93IVAAwEhaHmtaVisUGdRlbj
- Pz6aV/dl5dEeUGVWT9dkExI/shBKX82M0LD1cimgeJh/3ERdgKvLEIEKgIejIU0QtxCF
- PrsN2HPtOuZYkmd+LYfCNBmELWQdINms/b+mNVrg1jTPnfYe1hYsW2PaklZgklXF0cc7
- z11ClB4K3uqZqgW+QRJMTNw26hKuojyQ30X7OwgwK8znCWitpNhvzF18vtxrsd5xERyI
- 3QlU62LPIQmNKCAhEAVAqCJB9BYNFA6785iHiKueIZ/05bh6KvgfjuE9dc/CJMorhLmv
- pO3A==
+ (envelope-from <pbonzini@redhat.com>) id 1iaeLf-0001vw-67
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:22:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52084
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iaeLc-0001mY-Pz
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:22:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575026521;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=EqDsADfm3pPrGTWw3Pms9NNuRE1y9pUmzpW5YJGWdco=;
+ b=AZEGhcVVMpsfaT4KQngHmDeo0sds73yVSqY5C5a1dgfr/Sxmv3fAL9nqmuSg+3JgIV6jmI
+ m7n6HPFsSMHDSR/u5xVxa/aPMsgLMmm5tgrP1k5xQkq9NBh7aOt+XZphb5haMxsiEoqzha
+ f+rf9t9l8kPCHc5wvbkjpW/ZxgBRX2g=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-275-aNVBdZIiMBuhR3rOcfbmFA-1; Fri, 29 Nov 2019 06:21:57 -0500
+Received: by mail-wr1-f71.google.com with SMTP id w6so3678332wrm.16
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 03:21:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=B1LwMbr9n02E/EfYVgYavivi596k0uwJehitpfUuLqE=;
- b=Z7Yz4UzFPo71Cz8XVay+NIrQbY3oIDk6cSMQZbjhwbYlk46MotzJfab61LhzdXbYgh
- sPGZLYmScVu5Q4Y70915NCkr9xvG8uj6xZq9Rjfdkbj6Nfu7MN7xdhdKqw+BRQ36zzyz
- tbF/cfywJ96y0EJXAKGcByRFjz16ZOrTyGl9BEqWry0FdNLTFQFOYKmvSH0LvQNQOQrl
- rPPU0Io8BorXTBKWEuVc/ZTIQOxdKUCc6hfraVJDaarxEOaJHn5kYCBDDV9VMnavX+g7
- FAbGF8oH+erZDKI058oMY0/9wJGXr80OYkLs5cTAmlhMyOYzVdFQ5sICvjcXViHdL++6
- hsPQ==
-X-Gm-Message-State: APjAAAWV3Vs4nPOxdQ+FBWFYZYb0UC0gGU8Ts0ilXVNfAV1l5nsmnU3a
- UOz5juvA8wM751K7io1eNrAvsi+GdpDgVZyZEpzMpA==
-X-Google-Smtp-Source: APXvYqxdGvZTx/0yMM1tk/PrQsOMYcbllt5fORMHMM3bsL7H+vqJbkd+ivr2+8hb17z1vj7qN7OpjfeX7yA29dokpYw=
-X-Received: by 2002:aca:f5cc:: with SMTP id t195mr8753004oih.163.1575024371741; 
- Fri, 29 Nov 2019 02:46:11 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=EqDsADfm3pPrGTWw3Pms9NNuRE1y9pUmzpW5YJGWdco=;
+ b=VaSclDK5HpEaOLnD69tC7BEZj0prjM+difOe+7hOAeTyEDyg+I/MXa0EZC94Suk18T
+ znmEEoRb9INbZNg4NuyqaGBLDjWKAVk7HfV2dmqlU4Sw/J0Vmr429d88AnU4dyH81MI0
+ FiC16RSvQbbNLLDpUxX/Aqs9AWLtmCJOais1wgY3Qt41+z6SoLUiUdR3ZbkRAQLhkt+f
+ 8PcIhSWwV7dTmJy/BQoFxtRjNR6NiB7XO/UpuHbZQ6SkBzqznGth6TBVGTQ1z1Ese47y
+ i2GsD6VXB72QY4vPVkn5R1UxtlNYxk+fWT28wLa+j05QrO/m+cCWCnJzYUKUQNSAHh6p
+ V5rA==
+X-Gm-Message-State: APjAAAUy2e5LqU+d/aQG+ES9Ple9rizfQWdgeT4Bz09L6g1Dc+y1dSI6
+ 2EFcITuji6+I2Js4+AyxEF5yroWXWznBNHU15xtTexQGvFljF2WQuK+A8jYGV+9wtufaKCutAyR
+ aIP10VSaX1VCut5E=
+X-Received: by 2002:a05:6000:cf:: with SMTP id
+ q15mr13010821wrx.393.1575026516337; 
+ Fri, 29 Nov 2019 03:21:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxw4u/ShBJc7RODxFgTKpr+vN3TCVdMB6D90hOnFGJhhg0YnBOGtuFz+e8pEzLqIt6VO0moDg==
+X-Received: by 2002:a05:6000:cf:: with SMTP id
+ q15mr13010797wrx.393.1575026516062; 
+ Fri, 29 Nov 2019 03:21:56 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:459f:99a9:39f1:65ba?
+ ([2001:b07:6468:f312:459f:99a9:39f1:65ba])
+ by smtp.gmail.com with ESMTPSA id e18sm5553433wrr.95.2019.11.29.03.21.54
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 29 Nov 2019 03:21:55 -0800 (PST)
+Subject: Re: [PATCH 0/2] RFC: add -mem-shared option
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20191128141518.628245-1-marcandre.lureau@redhat.com>
+ <20191128161021.GA14595@habkost.net>
+ <fb122bbe-3fc4-e3cd-899a-c3538237203a@redhat.com>
+ <20191129112329.336582b7@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <9a6ff03b-6a94-d476-c5c3-f531ecccdb09@redhat.com>
+Date: Fri, 29 Nov 2019 12:21:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20191129100835.21734-1-thuth@redhat.com>
-In-Reply-To: <20191129100835.21734-1-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Nov 2019 10:46:00 +0000
-Message-ID: <CAFEAcA8J4tJfa3-m_Lf4TUs6yvycp5v4umo8zp6-Cck6ACk=MA@mail.gmail.com>
-Subject: Re: [PULL 0/2] Fix for the s390-ccw bios
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
+In-Reply-To: <20191129112329.336582b7@redhat.com>
+Content-Language: en-US
+X-MC-Unique: aNVBdZIiMBuhR3rOcfbmFA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,45 +109,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Marc Hartmayer <mhartmay@linux.ibm.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ stefanha@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 29 Nov 2019 at 10:08, Thomas Huth <thuth@redhat.com> wrote:
->
->  Hi Peter,
->
-> the following changes since commit 1a61a081ac33ae6cb7dd2e38d119a572f416c7f7:
->
->   Update version for v4.2.0-rc3 release (2019-11-26 21:52:26 +0000)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2019-11-29
->
-> for you to fetch changes up to bf876a688c9319b506d5ff1175ba7189cd933d91:
->
->   pc-bios/s390: Update firmware image with the "fix sclp_get_loadparm_ascii" patch (2019-11-29 10:12:33 +0100)
->
-> ----------------------------------------------------------------
-> A fix for regression in the s390-ccw bios
-> ----------------------------------------------------------------
->
-> ... it would be good to still get this into 4.2 if possible!
+On 29/11/19 11:23, Igor Mammedov wrote:
+> [...]
+>> Therefore, I think instead of -mem-shared we should add a "-m
+>> memdev=..." option.  This option:
+>>
+>> * would be mutually exclusive with both -mem-path
+>>
+>> * would be handled from allocate_system_memory_nonnuma.
+>>
+>> * could be mutually exclusive "-numa node", or could just be mutually
+>> exclusive with "-numa node,memdev=..." (the logical conclusion of that
+>> however would be an undeprecation of "-numa node,mem=...", so that has
+>> to be taken into account as well).
+> the plan was/still is to have memdev for main ram and deprecate
+> "-numa node,mem=..." for new machine types (can't be done for
+> old ones due to migration breakages and old libvirt which uses
+> it). So new machines will be forced to use "-numa memdev"
+> For old machines '-m memdev' provided memory region will used to
+> keep "-numa node,mem=..." working as it's now (however broken it is).
 
-Well, it's possible, but this is currently the only thing
-that would need an rc4, so the question is how important
-is the regression and how safe is the fix? If it's just
-a minor corner case then it's tempting to not have an rc4
-unless we need it for some other reason.
+Ok, then "-m memdev=..." would only be mutually exclusive with
+"-mem-path" and "-numa node,memdev=...".
 
-Summary: it can go into 4.2 but you need to provide some
-rationale in the pullreq cover letter to make the case for it :-)
+Thanks!
 
-thanks
--- PMM
+Paolo
+
 
