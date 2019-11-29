@@ -2,64 +2,82 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F54AC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D05F6C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:36:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2147521774
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:35:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2147521774
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 99D4821774
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:36:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XrlINNi7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99D4821774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iacgi-0001Uc-W2
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 04:35:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40119)
+	id 1iacgy-0001Zq-ON
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 04:36:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maz@kernel.org>) id 1iacW6-0003bk-Rr
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:24:50 -0500
+ (envelope-from <berrange@redhat.com>) id 1iacYv-0005b1-D5
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:27:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maz@kernel.org>) id 1iacW2-0004BG-OA
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:24:44 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:34832)
+ (envelope-from <berrange@redhat.com>) id 1iacYn-0003y4-Q4
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:27:35 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45684
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maz@kernel.org>) id 1iacW2-00045y-GQ
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:24:42 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1iacVy-0005Ch-9O; Fri, 29 Nov 2019 10:24:38 +0100
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Subject: Re: [PATCH 3/3] target/arm: Handle trapping to EL2 of AArch32 VMRS
- instructions
-X-PHP-Originating-Script: 0:main.inc
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iacYn-0003j1-JY
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:27:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575019650;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vvwYi3qeNOYuPB96TaEF9Y2knAvGAJvAxt6qO8ovC3Q=;
+ b=XrlINNi7Pzlyfm4d/sKr2edGdwjZ3EitVTKi4TdnrBX0kDVLVpISQmiNTTurNilCMuNJtn
+ SSCo0Z2/5NtG45oKSOKEyaKGX99hbQ+141II2zPqT0P82VvV19MuExeHjGaADfJHMAuFVZ
+ lGZAy9excLoeoEz+ehYrLOUTFkGHzI0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-1--xiIzvHSNIKlWgdjl2ABcw-1; Fri, 29 Nov 2019 04:27:28 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4004A107ACC4;
+ Fri, 29 Nov 2019 09:27:27 +0000 (UTC)
+Received: from redhat.com (ovpn-112-31.ams2.redhat.com [10.36.112.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4FAF35D9C5;
+ Fri, 29 Nov 2019 09:27:16 +0000 (UTC)
+Date: Fri, 29 Nov 2019 09:27:13 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Subject: Re: [PATCH 0/2] RFC: add -mem-shared option
+Message-ID: <20191129092713.GA2260471@redhat.com>
+References: <20191128141518.628245-1-marcandre.lureau@redhat.com>
+ <20191129070253.5hwksjrapomk434x@sirius.home.kraxel.org>
+ <CAMxuvawieN7JQZkRku19v5X-o6q664Wz1Rtx3+Wz3d33m-7Tug@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Fri, 29 Nov 2019 09:24:37 +0000
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <20191129082806.GF29312@toto>
-References: <20191128161718.24361-1-maz@kernel.org>
- <20191128161718.24361-4-maz@kernel.org> <20191129082806.GF29312@toto>
-Message-ID: <3a53b096bd101f9627d4c61ecfd742de@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: edgar.iglesias@gmail.com, qemu-devel@nongnu.org,
- peter.maydell@linaro.org, richard.henderson@linaro.org,
- kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 213.251.177.50
+In-Reply-To: <CAMxuvawieN7JQZkRku19v5X-o6q664Wz1Rtx3+Wz3d33m-7Tug@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: -xiIzvHSNIKlWgdjl2ABcw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,124 +89,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-11-29 08:28, Edgar E. Iglesias wrote:
-> On Thu, Nov 28, 2019 at 04:17:18PM +0000, Marc Zyngier wrote:
->> HCR_EL2.TID3 requires that AArch32 reads of MVFR[012] are trapped to
->> EL2, and that HCR_EL2.TID0 does the same for reads of FPSID.
->> In order to handle this, introduce a new TCG helper function that
->> checks for these control bits before executing the VMRC instruction.
->>
->> Tested with a hacked-up version of KVM/arm64 that sets the control
->> bits for 32bit guests.
->>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  target/arm/helper-a64.h        |  2 ++
->>  target/arm/internals.h         |  8 ++++++++
->>  target/arm/translate-vfp.inc.c | 12 +++++++++---
->>  target/arm/vfp_helper.c        | 27 +++++++++++++++++++++++++++
->>  4 files changed, 46 insertions(+), 3 deletions(-)
->>
->> diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
->> index a915c1247f..311ced44e6 100644
->> --- a/target/arm/helper-a64.h
->> +++ b/target/arm/helper-a64.h
->> @@ -102,3 +102,5 @@ DEF_HELPER_FLAGS_3(autda, TCG_CALL_NO_WG, i64, 
->> env, i64, i64)
->>  DEF_HELPER_FLAGS_3(autdb, TCG_CALL_NO_WG, i64, env, i64, i64)
->>  DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
->>  DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
->> +
->> +DEF_HELPER_3(check_hcr_el2_trap, void, env, int, int)
->> diff --git a/target/arm/internals.h b/target/arm/internals.h
->> index f5313dd3d4..5a55e960de 100644
->> --- a/target/arm/internals.h
->> +++ b/target/arm/internals.h
->> @@ -430,6 +430,14 @@ static inline uint32_t syn_simd_access_trap(int 
->> cv, int cond, bool is_16bit)
->>          | (cv << 24) | (cond << 20) | (1 << 5);
->>  }
->>
->> +static inline uint32_t syn_vmrs_trap(int rt, int reg)
->> +{
->> +    return (EC_FPIDTRAP << ARM_EL_EC_SHIFT)
->> +        | ARM_EL_IL
->> +        | (1 << 24) | (0xe << 20) | (7 << 14)
->> +        | (reg << 10) | (rt << 5) | 1;
->> +}
->> +
->>  static inline uint32_t syn_sve_access_trap(void)
->>  {
->>      return EC_SVEACCESSTRAP << ARM_EL_EC_SHIFT;
->> diff --git a/target/arm/translate-vfp.inc.c 
->> b/target/arm/translate-vfp.inc.c
->> index 85c5ef897b..4c435b6c35 100644
->> --- a/target/arm/translate-vfp.inc.c
->> +++ b/target/arm/translate-vfp.inc.c
->> @@ -759,15 +759,21 @@ static bool trans_VMSR_VMRS(DisasContext *s, 
->> arg_VMSR_VMRS *a)
->>      }
->>
->>      if (a->l) {
->> +        TCGv_i32 tcg_rt, tcg_reg;
->> +
->>          /* VMRS, move VFP special register to gp register */
->>          switch (a->reg) {
->> +        case ARM_VFP_MVFR0:
->> +        case ARM_VFP_MVFR1:
->> +        case ARM_VFP_MVFR2:
->>          case ARM_VFP_FPSID:
->> +            tcg_rt = tcg_const_i32(a->rt);
->> +            tcg_reg = tcg_const_i32(a->reg);
->> +            gen_helper_check_hcr_el2_trap(cpu_env, tcg_rt, 
->> tcg_reg);
->> +            /* fall through */
->>          case ARM_VFP_FPEXC:
->>          case ARM_VFP_FPINST:
->>          case ARM_VFP_FPINST2:
->> -        case ARM_VFP_MVFR0:
->> -        case ARM_VFP_MVFR1:
->> -        case ARM_VFP_MVFR2:
->>              tmp = load_cpu_field(vfp.xregs[a->reg]);
->>              break;
->>          case ARM_VFP_FPSCR:
->> diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
->> index 9710ef1c3e..44e538e51c 100644
->> --- a/target/arm/vfp_helper.c
->> +++ b/target/arm/vfp_helper.c
->> @@ -1322,4 +1322,31 @@ float64 HELPER(frint64_d)(float64 f, void 
->> *fpst)
->>      return frint_d(f, fpst, 64);
->>  }
->>
->> +void HELPER(check_hcr_el2_trap)(CPUARMState *env, int rt, int reg)
->> +{
->> +    if (arm_current_el(env) != 1) {
->> +        return;
->> +    }
->
-> I think we could move the EL1 check to translation time, couldn't we?
+On Fri, Nov 29, 2019 at 11:30:51AM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Hi
+>=20
+> On Fri, Nov 29, 2019 at 11:03 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >
+> > On Thu, Nov 28, 2019 at 06:15:16PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > > Hi,
+> > >
+> > > Setting up shared memory for vhost-user is a bit complicated from
+> > > command line, as it requires NUMA setup such as: m 4G -object
+> > > memory-backend-file,id=3Dmem,size=3D4G,mem-path=3D/dev/shm,share=3Don=
+ -numa
+> > > node,memdev=3Dmem.
+> > >
+> > > Instead, I suggest to add a -mem-shared option for non-numa setups,
+> > > that will make the -mem-path or anonymouse memory shareable.
+> >
+> > Is it an option to just use memfd by default (if available)?
+>=20
+> Yes, with a fallback path currently using a temporary file under /tmp
+> (we may want to use shm_open() instead, or a different location such
+> as XDG_RUNTIME_DIR? - and use O_TMPFILE)
 
-I think that depends whether the translated code is tagged by EL
-or not, or if an exception entry (and exception return) invalidates
-the JIT-ed code (and it this case it would have to be CPU-private).
+We can't assume either /tmp or XDG_RUNTIME_DIR is on tmpfs as that is no
+where near standard across all OS distros, and even if on tmpfs these
+dirs can be size limited to a significant subset of available RAM. IOW
+we can't safely use them unless explicitly told to.
 
-I can perfectly imagine the same piece of code being executed both
-at EL0 and EL1, and this would fail if it was executed using the
-same JIT-ed code.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
-So if QEMU gives us the above as a guarantee, we're good. Otherwise,
-we need this check. How can I find out?
-
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
 
