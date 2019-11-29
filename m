@@ -6,68 +6,71 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9E15C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 10:59:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3CDDC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 11:01:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5E1A208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 10:59:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D5B8217BA
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 11:01:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MJTbzUqJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5E1A208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nx4Gaduf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D5B8217BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iae08-0001fV-Sp
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 05:59:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59478)
+	id 1iae1B-0002Io-Pj
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 06:00:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44327)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iadm8-0000qH-SV
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 05:45:27 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iad7t-0004up-I0
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 05:03:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iadm2-0003nR-J5
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 05:45:20 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:36151
+ (envelope-from <cohuck@redhat.com>) id 1iad7q-0006hd-NE
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 05:03:47 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27544
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iadm2-0003XG-F1
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 05:45:18 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iad7q-0006dd-Is
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 05:03:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575024313;
+ s=mimecast20190719; t=1575021825;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=UgtVFDXucTfJvos37+lmqDN2c5cl43F3OlQXoONDYFk=;
- b=MJTbzUqJIz4uRS1QUSoRj+2V46gF41nM29d+8hJXltSAQ9d356tt8CGByVE5Sd8OmzU0op
- YqkJtmLBog+VCAJQ0XNyDEsNWuqjVNCnOmCTppkNCUnO0RFq2hYtNI50JjPGHE5Mqwca+Y
- 7v76C27qRijpWJ3VZrhF2uSQgf4Pphg=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=IXBNm0HSp69OMqi6Tlq8zF+viFigWeD9q9ZOr8OK09s=;
+ b=Nx4Gaduf0jITqELOnBDJc+UP89jDPaZyYmhQ6TLDUTJKgbvZQewBpoFewExCWaN30LviJN
+ 4ZOvTYE7xkVzuqJL344nWuG+++H7AYtfcnayc8Zmf+kK1W3wtcaNV3xDby8iwsg5b75xK9
+ IucI9jFrqWds9ZSrfR7XXb7KCGDloeU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-269-cV9K70h6NQy04pJoi9rVfw-1; Fri, 29 Nov 2019 05:45:12 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-73-Uhpch9PzPEi8-iiq2ij6Ig-1; Fri, 29 Nov 2019 05:03:42 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 790B280183C;
- Fri, 29 Nov 2019 10:45:10 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-255.brq.redhat.com [10.40.204.255])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 266D95D9E1;
- Fri, 29 Nov 2019 10:45:02 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-4.2? 0/1] roms/edk2: update submodule to edk2-stable201911,
- fixing low severity CVEs
-Date: Fri, 29 Nov 2019 11:44:56 +0100
-Message-Id: <20191129104457.1991-1-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06BD118557C0;
+ Fri, 29 Nov 2019 10:03:41 +0000 (UTC)
+Received: from gondolin (ovpn-116-140.ams2.redhat.com [10.36.116.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BCB5C5D6D2;
+ Fri, 29 Nov 2019 10:03:36 +0000 (UTC)
+Date: Fri, 29 Nov 2019 11:03:34 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v4 0/6] s390x: Cleanup
+Message-ID: <20191129110334.0846206b.cohuck@redhat.com>
+In-Reply-To: <20191127175046.4911-1-frankja@linux.ibm.com>
+References: <20191127175046.4911-1-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: cV9K70h6NQy04pJoi9rVfw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: Uhpch9PzPEi8-iiq2ij6Ig-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -82,36 +85,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Prasad J Pandit <pjp@fedoraproject.org>, Laszlo Ersek <lersek@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Bruce Rogers <brogers@suse.com>,
- Cole Robinson <crobinso@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I had this commit ready for when the next EDK2 release were go out,
-which just happened: https://edk2.groups.io/g/devel/message/51502
+On Wed, 27 Nov 2019 12:50:40 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Laszlo doesn't think it's worth the churn to rush to get this update
-into into 4.2-rc4: https://bugs.launchpad.net/qemu/+bug/1852196/comments/2
+> Adding comments and reordering code for better readability in the
+> diag308 and machine reset functions. Also making the kvm sclp function
+> void and refactoring it.
+> 
+> v4
+> 	* Added sclp cleanup
+> 	* Renamed ccpu reset wrapper
+> 	* Added assert to cpu reset function
+> 
+> Janosch Frank (6):
+>   s390x: Don't do a normal reset on the initial cpu
+>   s390x: Move reset normal to shared reset handler
+>   s390x: Move initial reset
+>   s390x: Move clear reset
+>   s390x: Beautify diag308 handling
+>   s390x: kvm: Make kvm_sclp_service_call void
+> 
+>  hw/s390x/s390-virtio-ccw.c |   3 ++
+>  target/s390x/cpu-qom.h     |   9 +++-
+>  target/s390x/cpu.c         | 107 ++++++++++++++-----------------------
+>  target/s390x/cpu.h         |   4 +-
+>  target/s390x/diag.c        |  54 +++++++++++--------
+>  target/s390x/kvm.c         |  12 ++---
+>  target/s390x/sigp.c        |   4 +-
+>  7 files changed, 91 insertions(+), 102 deletions(-)
+> 
 
-I agree with Laszlo, users shouldn't use the EDK2 bundled within QEMU
-in production, and should rather build it from source. However some
-distributions seem to rely on this convenience way to package EDK2,
-and few CVEs are fixed in this new release. So it might be worthwhile
-to get this into 4.2-rc4. Anyhow distributions don't use QEMU stable
-tag directly and backport patches, so if there is no other rc4 patch,
-we could skip this for after 4.2, as Laszlo originally planned.
-
-Philippe Mathieu-Daud=C3=A9 (1):
-  roms/edk2: update submodule from edk2-stable201905 to
-    edk2-stable201911
-
- roms/edk2 | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---=20
-2.21.0
+Thanks, applied.
 
 
