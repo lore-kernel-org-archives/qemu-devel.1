@@ -7,93 +7,94 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E336C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F4FC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:03:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC1E9216F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:57:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C0FA216F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:03:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F1m4/cL1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC1E9216F4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1ET0Uqs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C0FA216F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaieB-0007hN-2q
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 10:57:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43275)
+	id 1iaijb-0003Hv-9L
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 11:03:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iaiYB-0003rz-Ix
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 10:51:20 -0500
+ (envelope-from <philmd@redhat.com>) id 1iaiaa-0004B7-CQ
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 10:53:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iaiY8-0004ci-4y
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 10:51:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27707
+ (envelope-from <philmd@redhat.com>) id 1iaiYR-0005SV-3n
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 10:51:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24186
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iaiY7-0004Vi-Td
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 10:51:16 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iaiYQ-0005P4-Vb
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 10:51:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575042673;
+ s=mimecast20190719; t=1575042693;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
  bh=+XJxQxMMVOlGRd7VcDUfkaDTkTsObMIZmGCHSto/32k=;
- b=F1m4/cL1fuROWvMttA2vilht+96PuL9gwfEXT0XRHXS/fgg4OL81eajz8ZfZ5NXVD5L9IG
- xmHhwHrK8wCAcn6POqLH1NtZr45VNpsqzzbo5XpZcRXI2qNHx5lThGE9LtyELHJj5mXqS6
- pq9rTCRvptD/H9LEpCUbyAjNgqwJmmQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-73-qFvFcXCkMVm-Jbe8pWONgA-1; Fri, 29 Nov 2019 10:51:10 -0500
-Received: by mail-wr1-f71.google.com with SMTP id t3so3048493wrm.23
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 07:51:10 -0800 (PST)
+ b=e1ET0UqsHG40jiN516Be1U8J/bs9uygDhru6NH0lhCPxcYmzKKU/Sbep5zpPKV37dtSk/f
+ WD0DlUpmWL5yzVVUfsaHciqkDagHB2HBBxgrTQi+iP79Z6SbtkoFItJjyxY+jw96upqozh
+ mNxyS/cFATWR9+c6167Qp5eEVEA+D3U=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-54-jqYH_cEcN6--stTKIkWGUQ-1; Fri, 29 Nov 2019 10:51:31 -0500
+Received: by mail-wr1-f70.google.com with SMTP id e3so15727501wrs.17
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 07:51:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
  bh=P5MaXAGOEtqCjQSFhr61tNxB779w5vvW5JZg9oLQQik=;
- b=LP3HTcf98H7ZWrtdXFBcOlg6M98SLOnYEKo03gOSDzU3sp9Sr9Q3WCanAxkqLCIpn5
- My2q325w6ODGmHMCf3Z10GX9aF5kITj7+5Zd/tETN6+XCa4lJ/qDvX8ppMyh4adqAYoc
- qnCIhyWnpBuvOES98SrP17w5aerOqntcp4x77B66ZdBdSSPYMYHe7F+wwdbes9mmPq+t
- hod3T7AIh5NcmN1vMMLKPUNZUdz68K2dYqa2wZJ2dpIbfhnWEtTTSNria7+rLn4RusgR
- bmNgftX6Od1C7xqknWm2k9F5uaSgQfiyc90CQZuM4oNos0vTDx+TVxiOHzK1H6qfDuqw
- 0Pnw==
-X-Gm-Message-State: APjAAAW0LkORRK2ZxJDuMlMKj6Nyt7O0GcAclFCT0YU1M2BtAlDWNiwu
- p6CAzHG8njLU9wI/eud7+RkO2mjjl7YSdFJCoO0UxR9tD7tA6K5uQMB6ux7i7S0oITNbqwVxAaa
- nIxyvx8pKZMYOobc=
-X-Received: by 2002:a1c:152:: with SMTP id 79mr14945499wmb.70.1575042669585;
- Fri, 29 Nov 2019 07:51:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwNpSLGurGkg6kUM5yS+PqHi7l7C9yEd+SwpgXgz4LQa7tFSiiFYWZuPd8jkzBVah0pdr/TeA==
-X-Received: by 2002:a1c:152:: with SMTP id 79mr14945476wmb.70.1575042669382;
- Fri, 29 Nov 2019 07:51:09 -0800 (PST)
+ b=LK/KXhcm10X0J51poQuWAOWMejCekV2pQHhqEjqvziZKw/J/v/K0Q5R4CKUbt6Lg5F
+ LfH9WLZPdyLMe5dafsxZZUPRKKbXqW8YhteLqiCrT1Qaxt8hs1BI3yJwdq2d/3gkbm/C
+ 3uMww3IDjEbVkJZ9Y2W3xX/PZ3rq3FcgEXnwgvodgneg/8RmiU6BckL3Bg3rj0l59qjn
+ aKkvtpbx+Vqb3J71H1eeHZ9lJtXcI/qw7IHZ292v6yglcvYgeAK1uHyzozkDlXeRrB3v
+ U4jtIPbV6fFtuPBDxHsCQwhXlpFm1szXx8V9GUsyFE+ItrTDH3cF4zXGZ7ZRryjVJkid
+ AlqA==
+X-Gm-Message-State: APjAAAXYaRe1kilVjD2LSPA+WsvBdgH2TjOb999hOqUgfbUBOeHaFWD1
+ vL86MCl8XxpfyTqhrnnyQtM+Ss4s4+B1zU9PQga7zhBYiV57HOWjbrgUWBM6V34ttnP36rBc8x3
+ ZgVEIzGzx2Nh9j0A=
+X-Received: by 2002:a1c:2745:: with SMTP id n66mr15216851wmn.171.1575042690840; 
+ Fri, 29 Nov 2019 07:51:30 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxOd/qxYO+iE8UFAFf4xVqtpdnTdKjcuE0mDhnMQEBPNan5CZAGNFCITnSTe/FoyaSbLdxhVw==
+X-Received: by 2002:a1c:2745:: with SMTP id n66mr15216833wmn.171.1575042690618; 
+ Fri, 29 Nov 2019 07:51:30 -0800 (PST)
 Received: from [192.168.1.74] (67.23.27.109.rev.sfr.net. [109.27.23.67])
- by smtp.gmail.com with ESMTPSA id e19sm14014011wme.6.2019.11.29.07.51.08
+ by smtp.gmail.com with ESMTPSA id i9sm26977398wrb.2.2019.11.29.07.51.29
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 29 Nov 2019 07:51:08 -0800 (PST)
+ Fri, 29 Nov 2019 07:51:30 -0800 (PST)
 Subject: Re: [PATCH] ci: Use libcap-ng
 To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, thuth@redhat.com, pbonzini@redhat.com
+ qemu-devel@nongnu.org, thuth@redhat.com, pbonzini@redhat.com,
+ Greg Kurz <groug@kaod.org>
 References: <20191129142126.32967-1-dgilbert@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <47dadf72-dc93-afa7-0535-6c4ec7e85e36@redhat.com>
-Date: Fri, 29 Nov 2019 16:51:07 +0100
+Message-ID: <3297c897-69ab-c30f-98dd-dd3138e6325b@redhat.com>
+Date: Fri, 29 Nov 2019 16:51:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
 In-Reply-To: <20191129142126.32967-1-dgilbert@redhat.com>
 Content-Language: en-US
-X-MC-Unique: qFvFcXCkMVm-Jbe8pWONgA-1
+X-MC-Unique: jqYH_cEcN6--stTKIkWGUQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
