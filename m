@@ -2,102 +2,80 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64BDFC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 18:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE588C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 18:37:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F32A2176D
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 18:31:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9216D216F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 18:37:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e9PD3GL2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F32A2176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IVk/sSHR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9216D216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33596 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ial3Q-000744-Ai
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 13:31:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47537)
+	id 1ial8l-0001FG-Lb
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 13:37:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iakzZ-0005Vi-L0
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:27:47 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ial4j-0007vv-3t
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:33:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iakzV-0006L0-DY
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:27:42 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37661
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iakzU-0006Ee-TS
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:27:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575052059;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8ajtSm/6Xh6jI6hCMKGqELWItIu4HcFCdsxL5TjdOio=;
- b=e9PD3GL2FI2gqKaB/KopY4eggsiXnyRKJ1hribsaT/vhq+MhhYMTc7Gm9ypBLD+/8KrCeD
- rtHtPN8d3tEIW5tBRlfmNZQ8eO/j8tLJFGPdT/TuHQDKmUa9OxoTw5r1HlXmgEn+/cmiBP
- pwkxQ9E4cuLeOXC/5iMOl2S93VWzWYQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-RStfoyO-Nw-jJDumBqSStA-1; Fri, 29 Nov 2019 13:27:35 -0500
-Received: by mail-wr1-f72.google.com with SMTP id c6so15900659wrm.18
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 10:27:35 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1ial4e-0003Ya-St
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:33:03 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39228)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ial4d-0003EU-MT
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:33:00 -0500
+Received: by mail-ot1-x344.google.com with SMTP id 77so4337067oty.6
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 10:32:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=DBtTUmrLfUsY7qLVywVtzqUoA7i+kSBot4vgWq//N+k=;
+ b=IVk/sSHRFxt0Pvp1cDKNmjzYm8rPZlPE7ppxneW3by/AlHdlAWVU+nzmvJpj4yOUmI
+ 7nmQvsh7hR0l5hEA7kXDBNn6Q7oZK3SMhngX9EoDcootLMKfPznb4e43vEAcyoqXPT46
+ QO3H35XhvlbM8fPfCl8gqv8qkkRckyCTYWFmacyS8m1JEt5UX5Q9Ma6xfvEEh+7xmW9u
+ Uegg/c7YqjJiLCBlNfTXNg3xm6Ox7VU5iQtIk/MxfQN4OJO08Q0YThhEhf6LIHH/jow2
+ tgeeYl+CNLZv+nLxX2uKEfpn7d3obRr2GQMukisIhR33d5ep7UvCcbXRK6mIQIKMwLsW
+ DjJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=8ajtSm/6Xh6jI6hCMKGqELWItIu4HcFCdsxL5TjdOio=;
- b=HaC99N0smMCB78S7e+u4Jjp/lLMUkKGpmpYckYCbVINmCo5PTzK3l9ynk6efBgUiba
- bTYJeDt5NL5wpYh48yPwRjjBFxIlgbmz5wbgA6y7PodhMxTcFl4o+JuvfXjVsnORvo/r
- VxOVvXs9mBLsyw+6UZ8n7Rn6ovzmlA3g53H6r6V4tW+tTi2s9R+kPlUAg0Dpya0AXIW+
- hukuAwu0kFwIT9TMfDTd4KcCr2TKSamRas9P8Zy4JdmzKVEdc0Tn/PwnyBz3cEVEDT4M
- P304A2f3hv7DBRq2WE04Yar+0v+Fc9BOQ6+NTUy6xGyAm2UGsfjebaE4M45DTjLtEMkq
- ajfA==
-X-Gm-Message-State: APjAAAWVrJyCBsdutlTprEVXO6FFl1u2+mV5dht7ANe0J6CYJ+OVDsnY
- xJcHmilTeNdkpDUJy99MdpAEWhDek6SGtR2QlH+3xgT5HMDiwCkZy64JhVrpkvRpb5zPRIltwvf
- kTQUxkegYhLtZwcg=
-X-Received: by 2002:a5d:4692:: with SMTP id u18mr19502107wrq.206.1575052054461; 
- Fri, 29 Nov 2019 10:27:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzGp3oI0kSTqkIiLLpTWP/LtGFc+wxj8uaVoAM9WFhtG3x9rI18HF28fjsEmjAHHJbB5f91nw==
-X-Received: by 2002:a5d:4692:: with SMTP id u18mr19502083wrq.206.1575052054154; 
- Fri, 29 Nov 2019 10:27:34 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:56e1:adff:fed9:caf0?
- ([2001:b07:6468:f312:56e1:adff:fed9:caf0])
- by smtp.gmail.com with ESMTPSA id 205sm17357857wmb.3.2019.11.29.10.27.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 29 Nov 2019 10:27:33 -0800 (PST)
-Subject: Re: libcap vs libcap-ng mess
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20191128190408.GC3294@work-vm>
- <20191129093409.GB2260471@redhat.com>
- <98520a07-cf5d-a2a9-cfa4-944839b94c7c@redhat.com>
- <20191129180103.GA2840@work-vm>
- <1e59f880-1a62-3230-c56a-533f2b797525@redhat.com>
- <20191129182021.GD2837@work-vm>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c024ad69-2b94-cdd0-e9d3-617188d82bc3@redhat.com>
-Date: Fri, 29 Nov 2019 19:27:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=DBtTUmrLfUsY7qLVywVtzqUoA7i+kSBot4vgWq//N+k=;
+ b=WsslGnH1/gRVqwWuDBjmtbvfpxRnknJJUUfdKprDXatLzj99iOVRT4Dx5WU/LeclXA
+ M4gTeG401Gy/CkEVihx7HA5TJVqz2Zk6b8oi0gIbTv1isGUSJCKUgPbS7/cK1JPvTQTm
+ RVJ+mptV5ay2lSqrMMt9orFkMajL6/d7IWsFPpWzUj3R5vEuyk2OefwxUywr41nsYaCA
+ hi4DCoDCFbmaUkKCOQOQ/g6E1ohQ2nmBCXbNarCkiQzoJbbO9ZlBj+5dOw+jkuhTF7n9
+ sESBWFyy/WBkkIaP2btO1N7IepEWhXnOQqYORq+/Hkn1NcRGaTBpWwgZqdNyQEUnaVxe
+ qnpw==
+X-Gm-Message-State: APjAAAXy1QSsIQNeScj65sN2wbvq/xC2OM+vZoOuq8yz/ZKbV7cNWooy
+ NquK1wfyQet1IOzdg3GUY62q4mqyG/PyBJg5ojQLag==
+X-Google-Smtp-Source: APXvYqwoGAk53ON/OEJevofp9pCBfprDc4fnNU7OunbDuF7BZGzK84Tx2vKDoGep9ugoOX6s8XdjIgfI58mt4cIiGnc=
+X-Received: by 2002:a05:6830:1583:: with SMTP id
+ i3mr11305711otr.221.1575052375364; 
+ Fri, 29 Nov 2019 10:32:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191129182021.GD2837@work-vm>
-Content-Language: en-US
-X-MC-Unique: RStfoyO-Nw-jJDumBqSStA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191018150630.31099-1-damien.hedde@greensocs.com>
+ <20191018150630.31099-4-damien.hedde@greensocs.com>
+In-Reply-To: <20191018150630.31099-4-damien.hedde@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 29 Nov 2019 18:32:44 +0000
+Message-ID: <CAFEAcA9kc1-=DkYSqL6DOrLCNKt5uuxnf6-XYJ97g15T--1NvA@mail.gmail.com>
+Subject: Re: [PATCH v5 03/13] hw/core: create Resettable QOM interface
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,54 +87,352 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, vgoyal@redhat.com
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/11/19 19:20, Dr. David Alan Gilbert wrote:
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->> On 29/11/19 19:01, Dr. David Alan Gilbert wrote:
->>>> It's not entirely trivial because fsdev-proxy-helper wants to keep the
->>>> effective set and clear the permitted set; in libcap-ng you can only
->>                      ^^^^^
->>
->> (Wrong, this is "modify" the permitted set.  The permitted set is
->> already cleared by setresuid/setresgid).
->>
->>>> apply both sets at once, and you cannot choose only one of them in
->>>> capng_clear/capng_get_caps_process.  But it's doable, I'll take a look.
->>> I'm having some difficulties making the same conversion for virtiofsd;
->>> all it wants to do is drop (and later recover) CAP_FSETID
->>> from it's effective set;  so I'm calling capng_get_caps_process
->>> (it used to be cap_get_proc).  While libcap survives just using the
->>> capget syscall, libcap-ng wants to read /proc/<TID>/status - and
->>> that's a problem because we're in a sandbox without /proc mounted
->>> at that point.
->>
->> The state of libcap-ng persists after capng_apply.  So you can just call
->> capng_update({CAP_ADD,CAP_DROP}) followed by capng_apply.
-> 
-> But the internal state needs initialising doesn't it? So that when you
-> capng_update it tweaks a set that was originally read from somewhere?
-> (and that's per-thread?)
+On Fri, 18 Oct 2019 at 16:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+> This commit defines an interface allowing multi-phase reset. This aims
+> to solve a problem of the actual single-phase reset (built in
+> DeviceClass and BusClass): reset behavior is dependent on the order
+> in which reset handlers are called. In particular doing external
+> side-effect (like setting an qemu_irq) is problematic because receiving
+> object may not be reset yet.
+>
+> The Resettable interface divides the reset in 3 well defined phases.
+> To reset an object tree, all 1st phases are executed then all 2nd then
+> all 3rd. See the comments in include/hw/resettable.h for a more complete
+> description. The interface defines 3 phases to let the future
+> possibility of holding an object into reset for some time.
+>
+> The qdev/qbus reset in DeviceClass and BusClass will be modified in
+> following commits to use this interface. A mechanism is provided
+> to allow executing a transitional reset handler in place of the 2nd
+> phase which is executed in children-then-parent order inside a tree.
+> This will allow to transition devices and buses smoothly while
+> keeping the exact current qdev/qbus reset behavior for now.
+>
+> Documentation will be added in a following commit.
+>
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> ---
+>
+> In this patch only a single reset type is supported, but the interface
+> allows for more to be defined.
+>
+> I had some thought about problems which may arise when having multiple
+> reset types:
 
-Yes, it's per thread.  The state can be built from
-capng_clear/capng_get_caps_process + capng_update, and left in there
-forever.  There is also capng_save_state/capng_restore_state which, as
-far as I can see from the sources, can be used across threads.
+[snip]
 
->> Does virtiofsd have to do uid/gid dances like virtfs-proxy-helper?
-> 
-> It looks like it; I can see setresuid calls to save and restore
-> euid/egid.
+Yeah, these all seem right. We clearly need to think a bit
+more before we add multiple reset types. Let's get this basic
+just-cold-reset in for now and come back to the rest later.
 
-Ok, then perhaps you can take a look at my virtfs-proxy-helper patch.
-The important part is that after setresuid/setresgid PERM=EFF if
-uid=0/gid=0 and PERM=0 otherwise.
 
-Paolo
+Almost all of my comments below are just grammar/typo fixes
+for comments. The only substantives are:
+ * globals
+ * copyright/licensing comment needed in the .h file
+and they're pretty minor items.
 
+> +/**
+> + * enter_phase_in_progress:
+> + * Flag telling whether we are currently in an enter phase where side
+> + * effects are forbidden. This flag allows us to catch if reset is called
+> + * again during during this phase.
+> + */
+> +static bool enter_phase_in_progress;
+
+This looks weird -- I don't think a global for this works,
+because you might have several distinct subtrees of
+devices, and be doing reset on them both at once.
+I think that we only use this for an assert, though -- is
+that right? If so, we could just drop this.
+
+> +void resettable_assert_reset(Object *obj, ResetType type)
+> +{
+> +    assert(!enter_phase_in_progress);
+> +    /* TODO: change that assert when adding support for other reset types */
+
+I'm not sure which assert this is referring to -- the one above
+the comment, or the one below ?
+
+> +    assert(type == RESET_TYPE_COLD);
+> +    trace_resettable_reset_assert_begin(obj, type);
+> +    enter_phase_in_progress = true;
+> +    resettable_phase_enter(obj, NULL, type);
+> +    enter_phase_in_progress = false;
+> +    resettable_phase_hold(obj, NULL, type);
+> +    trace_resettable_reset_assert_end(obj);
+> +}
+> +
+> +void resettable_release_reset(Object *obj, ResetType type)
+> +{
+> +    assert(!enter_phase_in_progress);
+> +    /* TODO: change that assert when adding support for other reset types */
+
+Ditto.
+
+> +    assert(type == RESET_TYPE_COLD);
+> +    trace_resettable_reset_release_begin(obj, type);
+> +    resettable_phase_exit(obj, NULL, type);
+> +    trace_resettable_reset_release_end(obj);
+> +}
+> +
+
+> +static void resettable_phase_enter(Object *obj, void *opaque, ResetType type)
+> +{
+> +    ResettableClass *rc = RESETTABLE_GET_CLASS(obj);
+> +    ResettableState *s = rc->get_state(obj);
+> +    const char *obj_typename = object_get_typename(obj);
+> +    bool action_needed = false;
+> +
+> +    /* exit phase has to finish properly before entering back in reset */
+> +    assert(!s->exit_phase_in_progress);
+> +
+> +    trace_resettable_phase_enter_begin(obj, obj_typename, s->count, type);
+> +
+> +    /* Only take action if we really enter reset for the 1st time. */
+> +    /*
+> +     * TODO: if adding more ResetType support, some additional checks
+> +     * are probably needed here.
+> +     */
+> +    if (s->count++ == 0) {
+> +        action_needed = true;
+> +    }
+> +    /*
+> +     * We limit the count to an arbitrary "big" value. The value is big
+> +     * enough not to be triggered nominally.
+
+"normally"
+
+> +     * The assert will stop an infinite loop if there is a cycle in the
+> +     * reset tree. The loop goes through resettable_foreach_child below
+> +     * which at some point will call us again.
+> +     */
+> +    assert(s->count <= 50);
+> +
+> +    /*
+> +     * handle the children even if action_needed is at false so that
+> +     * children counts are incremented too
+
+"child counts"
+
+> +     */
+> +    resettable_child_foreach(rc, obj, resettable_phase_enter, NULL, type);
+> +
+> +    /* execute enter phase for the object if needed */
+> +    if (action_needed) {
+> +        trace_resettable_phase_enter_exec(obj, obj_typename, type,
+> +                                          !!rc->phases.enter);
+> +        if (rc->phases.enter && !resettable_get_tr_func(rc, obj)) {
+> +            rc->phases.enter(obj, type);
+> +        }
+> +        s->hold_phase_pending = true;
+> +    }
+> +    trace_resettable_phase_enter_end(obj, obj_typename, s->count);
+> +}
+> +
+
+> +static void resettable_phase_exit(Object *obj, void *opaque, ResetType type)
+> +{
+> +    ResettableClass *rc = RESETTABLE_GET_CLASS(obj);
+> +    ResettableState *s = rc->get_state(obj);
+> +    const char *obj_typename = object_get_typename(obj);
+> +
+> +    assert(!s->exit_phase_in_progress);
+> +    trace_resettable_phase_exit_begin(obj, obj_typename, s->count, type);
+> +
+> +    /* exit_phase_in_progress ensure this phase is 'atomic' */
+
+"ensures"
+
+> +    s->exit_phase_in_progress = true;
+> +    resettable_child_foreach(rc, obj, resettable_phase_exit, NULL, type);
+> +
+> +    assert(s->count > 0);
+> +    if (s->count == 1) {
+> +        trace_resettable_phase_exit_exec(obj, obj_typename, !!rc->phases.exit);
+> +        if (rc->phases.exit && !resettable_get_tr_func(rc, obj)) {
+> +            rc->phases.exit(obj);
+> +        }
+> +        s->count = 0;
+> +    }
+> +    s->exit_phase_in_progress = false;
+> +    trace_resettable_phase_exit_end(obj, obj_typename, s->count);
+> +}
+
+
+> --- /dev/null
+> +++ b/include/hw/resettable.h
+> @@ -0,0 +1,199 @@
+> +#ifndef HW_RESETTABLE_H
+> +#define HW_RESETTABLE_H
+> +
+
+All new files, including even small header files, should have
+the usual copyright-and-license comment at the top. (Can you
+check also whether this needs adding for any other new files the
+patchset creates, please?)
+
+> +#include "qom/object.h"
+> +
+> +#define TYPE_RESETTABLE_INTERFACE "resettable"
+> +
+> +#define RESETTABLE_CLASS(class) \
+> +    OBJECT_CLASS_CHECK(ResettableClass, (class), TYPE_RESETTABLE_INTERFACE)
+> +
+> +#define RESETTABLE_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(ResettableClass, (obj), TYPE_RESETTABLE_INTERFACE)
+> +
+> +typedef struct ResettableState ResettableState;
+> +
+> +/**
+> + * ResetType:
+> + * Types of reset.
+> + *
+> + * + Cold: reset resulting from a power cycle of the object.
+> + *
+> + * TODO: Support has to be added to handle more types. In particular,
+> + * ResettableState structure needs to be expanded.
+> + */
+> +typedef enum ResetType {
+> +    RESET_TYPE_COLD,
+> +} ResetType;
+
+> + * @get_transitional_function: transitional method to handle Resettable objects
+> + * not yet fully moved to this interface. It will be removed as soon as is not
+
+"as soon as it is"
+
+> + * needed anymore. This method is optional and may return a pointer to a
+> + * function to be used instead of the phases. In case the method exists and
+
+"If the method exists"
+
+> + * returns a non-NULL function pointer; it is executed as a replacement of the
+
+"pointer then that function is"
+
+> + * 'hold' phase method taking the object as argument. The two other phase
+> + * methods are not executed.
+> + *
+> + * @child_foreach: Executes a given callback on every Resettable child. Child
+> + * in this context means a child in the qbus tree, so the children of a qbus
+> + * are the devices on it, and the children of a device are all the buses it
+> + * owns. This is not the same as the QOM object hierarchy. The function takes
+> + * additional opaque and ResetType arguments which must be passed unmodified to
+> + * the callback.
+> + */
+
+> +    /* Transitional method for legacy reset compatibility */
+> +    ResettableGetTrFunction get_transitional_function;
+> +
+> +    /* Hiearchy handling method */
+
+"Hierarchy"
+
+> +    ResettableChildForeach child_foreach;
+> +} ResettableClass;
+> +typedef struct ResettablePhases ResettablePhases;
+> +
+> +/**
+> + * ResettableState:
+> + * Structure holding reset related state. The fields should not be accessed
+> + * directly, the definition is here to allow further inclusion into other
+
+"directly; the definition"
+
+
+> + * objects.
+> + *
+> + * @count: Number of reset level the object is into. It is incremented when
+> + * the reset operation starts and decremented when it finishes.
+> + * @hold_phase_pending: flag which indicates that we need to invoke the 'hold'
+> + * phase handler for this object.
+> + * @exit_phase_in_progress: flag telling if currently in exit phase
+
+"@exit_phase_in_progress: true if we are currently in the exit phase"
+
+> + */
+> +struct ResettableState {
+> +    uint32_t count;
+> +    bool hold_phase_pending;
+> +    bool exit_phase_in_progress;
+> +};
+> +
+> +/**
+> + * resettable_reset:
+> + * Trigger a reset on a object @obj of type @type. @obj must implement
+
+"an object"
+
+> + * Resettable interface.
+> + *
+> + * Calling this function is equivalent to calling @resettable_assert_reset()
+> + * then @resettable_release_reset().
+> + */
+> +void resettable_reset(Object *obj, ResetType type);
+> +
+> +/**
+> + * resettable_assert_reset:
+> + * Put an object @obj into reset. @obj must implement Resettable interface.
+> + *
+> + * @resettable_release_reset() must eventually be called after this call.
+> + * There must be one call to @resettable_release_reset() per call of
+> + * @resettable_assert_reset(), with the same type argument.
+> + *
+> + * NOTE: Until support for migration is added, the @resettable_release_reset()
+> + * must not be delayed. It have to occur just after @resettable_assert_reset()
+
+"It must occur"
+
+> + * so that migration cannot be triggered in between. Prefer using
+> + * @resettable_reset() for now.
+> + */
+> +void resettable_assert_reset(Object *obj, ResetType type);
+> +
+> +/**
+> + * resettable_release_reset:
+> + * Release the object @obj from reset. @obj must implement Resettable interface.
+> + *
+> + * See @resettable_assert_reset() description for details.
+> + */
+> +void resettable_release_reset(Object *obj, ResetType type);
+> +
+> +/**
+> + * resettable_is_in_reset:
+> + * Return true if @obj is under reset.
+> + *
+> + * @obj must implement Resettable interface.
+> + */
+> +bool resettable_is_in_reset(Object *obj);
+> +
+> +/**
+> + * resettable_class_set_parent_phases:
+> + *
+> + * Save @rc current reset phases into @parent_phases and override @rc phases
+> + * by the given new methods (@enter, @hold and @exit).
+> + * Each phase is overridden only if the new one is not NULL allowing to
+> + * override a subset of phases.
+> + */
+> +void resettable_class_set_parent_phases(ResettableClass *rc,
+> +                                        ResettableEnterPhase enter,
+> +                                        ResettableHoldPhase hold,
+> +                                        ResettableExitPhase exit,
+> +                                        ResettablePhases *parent_phases);
+> +
+> +#endif
+
+thanks
+-- PMM
 
