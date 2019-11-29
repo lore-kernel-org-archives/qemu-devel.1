@@ -2,108 +2,61 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EC2C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 13:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4067AC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 13:20:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC277216F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 13:13:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cBvGyKdd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC277216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0D0B120833
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 13:20:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D0B120833
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iag5D-0002PI-4C
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 08:13:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50004)
+	id 1iagBq-0006Ug-5o
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 08:20:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iag1A-0007rp-PJ
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 08:09:06 -0500
+ (envelope-from <groug@kaod.org>) id 1iafSD-000183-1I
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 07:32:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iag16-0003oj-GP
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 08:09:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31136
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1iafS7-00058x-LT
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 07:32:54 -0500
+Received: from 8.mo4.mail-out.ovh.net ([188.165.33.112]:60650)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iag16-0003fn-Bh
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 08:09:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575032937;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=rLWQ88AMKx0tyuojlx9owh5L5OoZuA5DX166HOw9HPw=;
- b=cBvGyKddJwYFdNBbRmc3EBpCUIfmFSZ3dtaxYJvV0LXHSl+3QwHkckaO2qnixKnp66Omk4
- GlHMy0N3k2GmQC4Znz34QUjC6+6jjXlDV3XWJHHtK9cOeBl+97uJe1VtAOrsKD89o7KrQT
- GgqRbqg9BAVUL+weJgTaT1ICqPNVVBY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-VLWOAPczMJyiDA1Ow7EpPg-1; Fri, 29 Nov 2019 08:08:53 -0500
-X-MC-Unique: VLWOAPczMJyiDA1Ow7EpPg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4E4A107ACC4;
- Fri, 29 Nov 2019 13:08:52 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-206-40.brq.redhat.com
- [10.40.206.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A37E60BE2;
- Fri, 29 Nov 2019 13:08:51 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v2 00/23] block: Fix check_to_replace_node()
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191111160216.197086-1-mreitz@redhat.com>
- <a134c8a6-17c1-34bc-79f6-76062ff0c668@virtuozzo.com>
- <2fd76d27-d60e-a9d1-f42a-89b9bd0d5dcb@redhat.com>
- <e1d9f786-1849-2b6b-a585-09a779dbc29f@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <ece4dd12-340a-619b-f7e6-a661995f744c@redhat.com>
-Date: Fri, 29 Nov 2019 14:08:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iafS6-00050B-Lu
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 07:32:51 -0500
+Received: from player714.ha.ovh.net (unknown [10.109.146.213])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id 900F621587B
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 13:32:47 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player714.ha.ovh.net (Postfix) with ESMTPSA id 65FC9CA4DA19;
+ Fri, 29 Nov 2019 12:32:42 +0000 (UTC)
+Date: Fri, 29 Nov 2019 13:32:41 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] virtfs-proxy-helper: switch from libcap to libcap-ng
+Message-ID: <20191129133241.738b70ed@bahia.w3ibm.bluemix.net>
+In-Reply-To: <20191129111632.22840-2-pbonzini@redhat.com>
+References: <20191129111632.22840-2-pbonzini@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <e1d9f786-1849-2b6b-a585-09a779dbc29f@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="vXytOiDr4AGyy1eQHgEW8z6kKHipxRRPR"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 1148136431425722830
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeiledgfeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedugedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 188.165.33.112
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,66 +68,241 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, berrange@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vXytOiDr4AGyy1eQHgEW8z6kKHipxRRPR
-Content-Type: multipart/mixed; boundary="HD4yPoNHdLBbsZyOEEztF9daQFic4iz67"
+On Fri, 29 Nov 2019 12:16:32 +0100
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
---HD4yPoNHdLBbsZyOEEztF9daQFic4iz67
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+> virtfs-proxy-helper is the only user of libcap; everyone else is using
+> the simpler libcap-ng API.  Switch and remove the configure code to
+> detect libcap.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-On 29.11.19 13:55, Vladimir Sementsov-Ogievskiy wrote:
-> 29.11.2019 15:49, Max Reitz wrote:
->> On 29.11.19 13:24, Vladimir Sementsov-Ogievskiy wrote:
->>> 3 last iotests patches don't apply now.. Do you have a branch pushed so=
-mewhere?
->>
->> Hm, it=E2=80=99s based on =E2=80=9Ciotests: Test failing mirror complete=
-=E2=80=9D, maybe because
->> of that.
->>
->> Does this work?
->>
->> https://git.xanclic.moe/XanClic/qemu.git fix-can-replace-v2
->>
->=20
-> Hmm, I remember in past, fetching from this repo always hang for me.
-> But now it works, thanks.
+Nice. :)
 
-Possibly because I disabled Gravatar fetching. :-)
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-(No idea why that would affect git, but I do know it made the normal
-browser representation quicker.)
+Paolo,
 
-Max
+I can take this through my 9p tree if you want. Otherwise,
+
+Acked-by: Greg Kurz <groug@kaod.org>
 
 
---HD4yPoNHdLBbsZyOEEztF9daQFic4iz67--
 
---vXytOiDr4AGyy1eQHgEW8z6kKHipxRRPR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Also, this calls for some extra cleanup in travis.yml and gitlab-ci.yml
+which were recently amended by Thomas to install libcap-dev.
 
------BEGIN PGP SIGNATURE-----
+commit c269447f78b7cfb0e85d14bc7bb8cb0d25d19781
+Author: Thomas Huth <thuth@redhat.com>
+Date:   Thu Sep 5 13:33:46 2019 +0200
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3hGGIACgkQ9AfbAGHV
-z0Cm3QgAiX4v4Vcm+PuVaN4dO9q4S47GDJvEHS1S9gwDB6TWhadNxcZEhcIcHyPc
-G+c1+PT+I96MmZNxmz7DdjHHeim/qQEhsAVUapA7g5RfR3JxAfQa6adNAiZJgVgv
-Ex8HRId8pvf/xGnBw1jm7z+nmTXyH9OZv/PkvbSFNND4AqJmnI2qLQlqx34GieTP
-29g8IwFMcyLd57oWkouIbBy76mIOaPRc3LnqmqTaActbmMFIVBXS2LYSF4xEHFQ+
-rxNVuLfh96pqgcN6XlsRfgxG0z5BEnY21UZ0Pzm6ciU5cJavufH9dqfzdINyFCtG
-VyPnZKYNwGPa1EMJehwwgsl8IlBQbw==
-=gOLb
------END PGP SIGNATURE-----
+    travis.yml: Install libcap-dev for testing virito-9p
 
---vXytOiDr4AGyy1eQHgEW8z6kKHipxRRPR--
+and
+
+commit e7dc804ef0d7cac9ac8b4a1324ab7dbfafb55704
+Author: Thomas Huth <thuth@redhat.com>
+Date:   Thu Sep 5 12:36:50 2019 +0200
+
+    gitlab-ci.yml: Install libattr-devel and libcap-devel to test virtio-9p
+
+
+
+>  configure                   |  18 +------
+>  fsdev/virtfs-proxy-helper.c | 100 ++++++++++++++++--------------------
+>  2 files changed, 46 insertions(+), 72 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index afe9393f04..2216662bf6 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3863,22 +3863,6 @@ else
+>    mpathpersist=no
+>  fi
+>  
+> -##########################################
+> -# libcap probe
+> -
+> -if test "$cap" != "no" ; then
+> -  cat > $TMPC <<EOF
+> -#include <stdio.h>
+> -#include <sys/capability.h>
+> -int main(void) { cap_t caps; caps = cap_init(); return caps != NULL; }
+> -EOF
+> -  if compile_prog "" "-lcap" ; then
+> -    cap=yes
+> -  else
+> -    cap=no
+> -  fi
+> -fi
+> -
+>  ##########################################
+>  # pthread probe
+>  PTHREADLIBS_LIST="-pthread -lpthread -lpthreadGC2"
+> @@ -6204,7 +6188,7 @@ if test "$want_tools" = "yes" ; then
+>  fi
+>  if test "$softmmu" = yes ; then
+>    if test "$linux" = yes; then
+> -    if test "$virtfs" != no && test "$cap" = yes && test "$attr" = yes ; then
+> +    if test "$virtfs" != no && test "$cap_ng" = yes && test "$attr" = yes ; then
+>        virtfs=yes
+>        tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
+>      else
+> diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
+> index 6f132c5ff1..0d4de49dcf 100644
+> --- a/fsdev/virtfs-proxy-helper.c
+> +++ b/fsdev/virtfs-proxy-helper.c
+> @@ -13,7 +13,6 @@
+>  #include <sys/resource.h>
+>  #include <getopt.h>
+>  #include <syslog.h>
+> -#include <sys/capability.h>
+>  #include <sys/fsuid.h>
+>  #include <sys/vfs.h>
+>  #include <sys/ioctl.h>
+> @@ -21,6 +20,7 @@
+>  #ifdef CONFIG_LINUX_MAGIC_H
+>  #include <linux/magic.h>
+>  #endif
+> +#include <cap-ng.h>
+>  #include "qemu-common.h"
+>  #include "qemu/sockets.h"
+>  #include "qemu/xattr.h"
+> @@ -79,49 +79,10 @@ static void do_perror(const char *string)
+>      }
+>  }
+>  
+> -static int do_cap_set(cap_value_t *cap_value, int size, int reset)
+> -{
+> -    cap_t caps;
+> -    if (reset) {
+> -        /*
+> -         * Start with an empty set and set permitted and effective
+> -         */
+> -        caps = cap_init();
+> -        if (caps == NULL) {
+> -            do_perror("cap_init");
+> -            return -1;
+> -        }
+> -        if (cap_set_flag(caps, CAP_PERMITTED, size, cap_value, CAP_SET) < 0) {
+> -            do_perror("cap_set_flag");
+> -            goto error;
+> -        }
+> -    } else {
+> -        caps = cap_get_proc();
+> -        if (!caps) {
+> -            do_perror("cap_get_proc");
+> -            return -1;
+> -        }
+> -    }
+> -    if (cap_set_flag(caps, CAP_EFFECTIVE, size, cap_value, CAP_SET) < 0) {
+> -        do_perror("cap_set_flag");
+> -        goto error;
+> -    }
+> -    if (cap_set_proc(caps) < 0) {
+> -        do_perror("cap_set_proc");
+> -        goto error;
+> -    }
+> -    cap_free(caps);
+> -    return 0;
+> -
+> -error:
+> -    cap_free(caps);
+> -    return -1;
+> -}
+> -
+>  static int init_capabilities(void)
+>  {
+>      /* helper needs following capabilities only */
+> -    cap_value_t cap_list[] = {
+> +    int cap_list[] = {
+>          CAP_CHOWN,
+>          CAP_DAC_OVERRIDE,
+>          CAP_FOWNER,
+> @@ -130,7 +91,34 @@ static int init_capabilities(void)
+>          CAP_MKNOD,
+>          CAP_SETUID,
+>      };
+> -    return do_cap_set(cap_list, ARRAY_SIZE(cap_list), 1);
+> +    int i;
+> +
+> +    capng_clear(CAPNG_SELECT_BOTH);
+> +    for (i = 0; i < ARRAY_SIZE(cap_list); i++) {
+> +        if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
+> +                         cap_list[i]) < 0) {
+> +            do_perror("capng_update");
+> +            return -1;
+> +        }
+> +    }
+> +    if (capng_apply(CAPNG_SELECT_BOTH) < 0) {
+> +        do_perror("capng_apply");
+> +        return -1;
+> +    }
+> +
+> +    /* Prepare effective set for setugid.  */
+> +    for (i = 0; i < ARRAY_SIZE(cap_list); i++) {
+> +        if (cap_list[i] == CAP_DAC_OVERRIDE) {
+> +            continue;
+> +        }
+> +
+> +        if (capng_update(CAPNG_DROP, CAPNG_EFFECTIVE,
+> +                         cap_list[i]) < 0) {
+> +            do_perror("capng_update");
+> +            return -1;
+> +        }
+> +    }
+> +    return 0;
+>  }
+>  
+>  static int socket_read(int sockfd, void *buff, ssize_t size)
+> @@ -295,14 +283,6 @@ static int setugid(int uid, int gid, int *suid, int *sgid)
+>  {
+>      int retval;
+>  
+> -    /*
+> -     * We still need DAC_OVERRIDE because we don't change
+> -     * supplementary group ids, and hence may be subjected DAC rules
+> -     */
+> -    cap_value_t cap_list[] = {
+> -        CAP_DAC_OVERRIDE,
+> -    };
+> -
+>      *suid = geteuid();
+>      *sgid = getegid();
+>  
+> @@ -316,11 +296,21 @@ static int setugid(int uid, int gid, int *suid, int *sgid)
+>          goto err_sgid;
+>      }
+>  
+> -    if (uid != 0 || gid != 0) {
+> -        if (do_cap_set(cap_list, ARRAY_SIZE(cap_list), 0) < 0) {
+> -            retval = -errno;
+> -            goto err_suid;
+> -        }
+> +    if (uid == 0 && gid == 0) {
+> +        /* Linux has already copied the permitted set to the effective set.  */
+> +        return 0;
+> +    }
+> +
+> +    /*
+> +     * All capabilities have been cleared from the effective set.  However
+> +     * we still need DAC_OVERRIDE because we don't change supplementary
+> +     * group ids, and hence may be subject to DAC rules.  init_capabilities
+> +     * left the set of capabilities that we want in libcap-ng's state.
+> +     */
+> +    if (capng_apply(CAPNG_SELECT_CAPS) < 0) {
+> +        retval = -errno;
+> +        do_perror("capng_apply");
+> +        goto err_suid;
+>      }
+>      return 0;
+>  
 
 
