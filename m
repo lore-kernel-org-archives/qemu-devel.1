@@ -2,89 +2,62 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B4BC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 07:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B45C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 07:59:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2403521721
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 07:58:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d9UYstAa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2403521721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5857121721
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 07:59:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5857121721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iabAS-0000W8-5H
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 02:58:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60776)
+	id 1iabBi-00022U-Jd
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 02:59:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38315)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iab6B-0007kE-2n
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:53:56 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iab96-0000Xr-Ba
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:56:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iab67-0007ub-QW
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:53:52 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:34362)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1iab67-0007mH-GA
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:53:51 -0500
-Received: by mail-wm1-x344.google.com with SMTP id j18so9082204wmk.1
- for <qemu-devel@nongnu.org>; Thu, 28 Nov 2019 23:53:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=f1gpxuNh24lQFcttp3T24kzfWn/kvbMTIewYEDBYMKY=;
- b=d9UYstAaUZn4HQta3frKN/Y613skfSz1RKjxccxpdwlsyUgQuUkvlC0k1JDptRt9NI
- e198Oc1b8rLDxAWV4ABkPVlgolFmMbZnVwlS0AmmCsl5bL0Cxco1ShpcsZ0FpMKKsvE9
- axXKLRx4BJh59c086Gio87DrPL/AjVFsoaGEeVGqsy2xXynI8o4o/P7uBVzjvGu9WXM4
- IpkirL5ijgz0MRWySoVR+/9wfxmHCfaqzPEboIjsf036KQVsp+eaEpRq5qvP/C8wV06m
- IjJKQhdSHqrO7DDLSb3uYVMN9LqnBEyTBswZLxUoVUK1H4KiaRmXBv+S4XJ4K418B/gu
- 5MMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=f1gpxuNh24lQFcttp3T24kzfWn/kvbMTIewYEDBYMKY=;
- b=EFX0HJMReaCQjNb3nmYxP3V0XvwulPhVZ6P6L+64oTvQViMN2OcBqqbHZClYdjgWWf
- sdijvXDD6betTIG74Kkn9qj04VTbofoGWRhN2P0sC/GaXTT79cOiZY3vV/YieIR8zGcQ
- 5+AMrkX9/zqPNH30HJXt/o6W0OQvXpZFfTqwA4nVab6z+WAkm1tne+PaMYrp0zv23S54
- F6eIvUv7soMmbhoorPOnZ6iNcfNoL4jbhQsyWajKbdvtZLbYfKwxYea3jOIhH1lUaFLX
- UUfv/1MuCtndOOFdJvhkNVIeQQdwrKWvqRZYluQuVCTtzNeuJwAVVf97PMf2KR1bC7ZQ
- Af8w==
-X-Gm-Message-State: APjAAAWQ0HQIhNW1UxsY7iprMuYxelIaTkjcfGyVwtsJtTIyJOnO/GBo
- SDFsdcmd8eGh2zDhaUaYezk=
-X-Google-Smtp-Source: APXvYqxZjuTyCyxmGl5/ynsNL/fOmqdRm2nIq6H1hDDO5Sru1NWfNBGqDJSQR4EpWb0Fc7MUMBdi0Q==
-X-Received: by 2002:a1c:4b03:: with SMTP id y3mr2158247wma.91.1575014029542;
- Thu, 28 Nov 2019 23:53:49 -0800 (PST)
-Received: from localhost (ec2-34-244-242-0.eu-west-1.compute.amazonaws.com.
- [34.244.242.0])
- by smtp.gmail.com with ESMTPSA id h2sm27425159wrt.45.2019.11.28.23.53.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 28 Nov 2019 23:53:48 -0800 (PST)
-Date: Fri, 29 Nov 2019 08:53:51 +0100
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: Marc Zyngier <maz@kernel.org>
-Subject: Re: [PATCH 1/3] target/arm: Honor HCR_EL2.TID2 trapping requirements
-Message-ID: <20191129075351.GD29312@toto>
-References: <20191128161718.24361-1-maz@kernel.org>
- <20191128161718.24361-2-maz@kernel.org>
+ (envelope-from <tao3.xu@intel.com>) id 1iab90-0001Bu-9N
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:56:53 -0500
+Received: from mga17.intel.com ([192.55.52.151]:7634)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iab8z-0000gL-Vm
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 02:56:50 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 28 Nov 2019 23:56:46 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,256,1571727600"; d="scan'208";a="207273348"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
+ by fmsmga008.fm.intel.com with ESMTP; 28 Nov 2019 23:56:43 -0800
+From: Tao Xu <tao3.xu@intel.com>
+To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
+ ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
+ sw@weilnetz.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com,
+ lvivier@redhat.com
+Subject: [PATCH v20 3/8] numa: Extend CLI to provide memory side cache
+ information
+Date: Fri, 29 Nov 2019 15:56:29 +0800
+Message-Id: <20191129075634.682-4-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191129075634.682-1-tao3.xu@intel.com>
+References: <20191129075634.682-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191128161718.24361-2-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 192.55.52.151
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,104 +69,337 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, kvmarm@lists.cs.columbia.edu
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 28, 2019 at 04:17:16PM +0000, Marc Zyngier wrote:
-> HCR_EL2.TID2 mandates that access from EL1 to CTR_EL0, CCSIDR_EL1,
-> CCSIDR2_EL1, CLIDR_EL1, CSSELR_EL1 are trapped to EL2, and QEMU
-> completely ignores it, making impossible for hypervisors to
+From: Liu Jingqi <jingqi.liu@intel.com>
 
-Nit: "making it impossible"
+Add -numa hmat-cache option to provide Memory Side Cache Information.
+These memory attributes help to build Memory Side Cache Information
+Structure(s) in ACPI Heterogeneous Memory Attribute Table (HMAT).
+Before using hmat-cache option, enable HMAT with -machine hmat=on.
 
+Acked-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+---
 
-> virtualize the cache hierarchy.
-> 
-> Do the right thing by trapping to EL2 if HCR_EL2.TID2 is set.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  target/arm/helper.c | 28 +++++++++++++++++++++++++---
->  1 file changed, 25 insertions(+), 3 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 0bf8f53d4b..0b6887b100 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -1910,6 +1910,17 @@ static void scr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
->      raw_write(env, ri, value);
->  }
->  
-> +static CPAccessResult access_aa64_tid2(CPUARMState *env,
-> +                                       const ARMCPRegInfo *ri,
-> +                                       bool isread)
-> +{
-> +    if (arm_current_el(env) == 1 && (arm_hcr_el2_eff(env) & HCR_TID2)) {
-> +        return CP_ACCESS_TRAP_EL2;
-> +    }
-> +
-> +    return CP_ACCESS_OK;
-> +}
-> +
->  static uint64_t ccsidr_read(CPUARMState *env, const ARMCPRegInfo *ri)
->  {
->      ARMCPU *cpu = env_archcpu(env);
-> @@ -2110,10 +2121,14 @@ static const ARMCPRegInfo v7_cp_reginfo[] = {
->        .writefn = pmintenclr_write },
->      { .name = "CCSIDR", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 0,
-> -      .access = PL1_R, .readfn = ccsidr_read, .type = ARM_CP_NO_RAW },
-> +      .access = PL1_R,
-> +      .accessfn = access_aa64_tid2,
-> +      .readfn = ccsidr_read, .type = ARM_CP_NO_RAW },
->      { .name = "CSSELR", .state = ARM_CP_STATE_BOTH,
->        .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 2, .opc2 = 0,
-> -      .access = PL1_RW, .writefn = csselr_write, .resetvalue = 0,
-> +      .access = PL1_RW,
-> +      .accessfn = access_aa64_tid2,
-> +      .writefn = csselr_write, .resetvalue = 0,
->        .bank_fieldoffsets = { offsetof(CPUARMState, cp15.csselr_s),
->                               offsetof(CPUARMState, cp15.csselr_ns) } },
->      /* Auxiliary ID register: this actually has an IMPDEF value but for now
-> @@ -5204,6 +5219,11 @@ static CPAccessResult ctr_el0_access(CPUARMState *env, const ARMCPRegInfo *ri,
->      if (arm_current_el(env) == 0 && !(env->cp15.sctlr_el[1] & SCTLR_UCT)) {
->          return CP_ACCESS_TRAP;
->      }
-> +
-> +    if (arm_hcr_el2_eff(env) & HCR_TID2) {
-> +        return CP_ACCESS_TRAP_EL2;
-> +    }
+Changes in v20:
+    - Disable cache level 0 in hmat-cache option (Igor)
+    - Update the QAPI description (Markus)
 
+Changes in v19:
+    - Add description about the machine property 'hmat' in commit
+      message (Markus)
+    - Update the QAPI comments
+    - Add a check for no memory side cache
 
-Shouldn't we also be checking that we're in EL < 2 when trapping?
+Changes in v18:
+    - Update the error message (Igor)
 
-Also, I think we need to somehow hook in access_aa64_tid2() for the AArch32
-view of CTR, don't we?
+Changes in v17:
+    - Use NumaHmatCacheOptions to replace HMAT_Cache_Info (Igor)
+    - Add check for unordered cache level input (Igor)
 
-Cheers,
-Edgar
+Changes in v16:
+    - Add cross check with hmat_lb data (Igor)
+    - Drop total_levels in struct HMAT_Cache_Info (Igor)
+    - Correct the error table number (Igor)
+---
+ hw/core/numa.c        | 80 ++++++++++++++++++++++++++++++++++++++++++
+ include/sysemu/numa.h |  5 +++
+ qapi/machine.json     | 81 +++++++++++++++++++++++++++++++++++++++++--
+ qemu-options.hx       | 17 +++++++--
+ 4 files changed, 179 insertions(+), 4 deletions(-)
 
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index 34eb413f5d..33fda31a4c 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -379,6 +379,73 @@ void parse_numa_hmat_lb(NumaState *numa_state, NumaHmatLBOptions *node,
+     g_array_append_val(hmat_lb->list, lb_data);
+ }
+ 
++void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
++                           Error **errp)
++{
++    int nb_numa_nodes = ms->numa_state->num_nodes;
++    NodeInfo *numa_info = ms->numa_state->nodes;
++    NumaHmatCacheOptions *hmat_cache = NULL;
++
++    if (node->node_id >= nb_numa_nodes) {
++        error_setg(errp, "Invalid node-id=%" PRIu32 ", it should be less "
++                   "than %d", node->node_id, nb_numa_nodes);
++        return;
++    }
++
++    if (numa_info[node->node_id].lb_info_provided != (BIT(0) | BIT(1))) {
++        error_setg(errp, "The latency and bandwidth information of "
++                   "node-id=%" PRIu32 " should be provided before memory side "
++                   "cache attributes", node->node_id);
++        return;
++    }
++
++    if (node->level < 1 || node->level >= HMAT_LB_LEVELS) {
++        error_setg(errp, "Invalid level=%" PRIu8 ", it should be larger than 0 "
++                   "and less than or equal to %d", node->level,
++                   HMAT_LB_LEVELS - 1);
++        return;
++    }
++
++    assert(node->associativity < HMAT_CACHE_ASSOCIATIVITY__MAX);
++    assert(node->policy < HMAT_CACHE_WRITE_POLICY__MAX);
++    if (ms->numa_state->hmat_cache[node->node_id][node->level]) {
++        error_setg(errp, "Duplicate configuration of the side cache for "
++                   "node-id=%" PRIu32 " and level=%" PRIu8,
++                   node->node_id, node->level);
++        return;
++    }
++
++    if ((node->level > 1) &&
++        ms->numa_state->hmat_cache[node->node_id][node->level - 1] &&
++        (node->size >=
++            ms->numa_state->hmat_cache[node->node_id][node->level - 1]->size)) {
++        error_setg(errp, "Invalid size=%" PRIu64 ", the size of level=%" PRIu8
++                   " should be less than the size(%" PRIu64 ") of "
++                   "level=%" PRIu8, node->size, node->level,
++                   ms->numa_state->hmat_cache[node->node_id]
++                                             [node->level - 1]->size,
++                   node->level - 1);
++        return;
++    }
++
++    if ((node->level < HMAT_LB_LEVELS - 1) &&
++        ms->numa_state->hmat_cache[node->node_id][node->level + 1] &&
++        (node->size <=
++            ms->numa_state->hmat_cache[node->node_id][node->level + 1]->size)) {
++        error_setg(errp, "Invalid size=%" PRIu64 ", the size of level=%" PRIu8
++                   " should be larger than the size(%" PRIu64 ") of "
++                   "level=%" PRIu8, node->size, node->level,
++                   ms->numa_state->hmat_cache[node->node_id]
++                                             [node->level + 1]->size,
++                   node->level + 1);
++        return;
++    }
++
++    hmat_cache = g_malloc0(sizeof(*hmat_cache));
++    memcpy(hmat_cache, node, sizeof(*hmat_cache));
++    ms->numa_state->hmat_cache[node->node_id][node->level] = hmat_cache;
++}
++
+ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+ {
+     Error *err = NULL;
+@@ -430,6 +497,19 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp)
+             goto end;
+         }
+         break;
++    case NUMA_OPTIONS_TYPE_HMAT_CACHE:
++        if (!ms->numa_state->hmat_enabled) {
++            error_setg(errp, "ACPI Heterogeneous Memory Attribute Table "
++                       "(HMAT) is disabled, enable it with -machine hmat=on "
++                       "before using any of hmat specific options");
++            return;
++        }
++
++        parse_numa_hmat_cache(ms, &object->u.hmat_cache, &err);
++        if (err) {
++            goto end;
++        }
++        break;
+     default:
+         abort();
+     }
+diff --git a/include/sysemu/numa.h b/include/sysemu/numa.h
+index 70f93c83d7..ba693cc80b 100644
+--- a/include/sysemu/numa.h
++++ b/include/sysemu/numa.h
+@@ -91,6 +91,9 @@ struct NumaState {
+ 
+     /* NUMA nodes HMAT Locality Latency and Bandwidth Information */
+     HMAT_LB_Info *hmat_lb[HMAT_LB_LEVELS][HMAT_LB_TYPES];
++
++    /* Memory Side Cache Information Structure */
++    NumaHmatCacheOptions *hmat_cache[MAX_NODES][HMAT_LB_LEVELS];
+ };
+ typedef struct NumaState NumaState;
+ 
+@@ -98,6 +101,8 @@ void set_numa_options(MachineState *ms, NumaOptions *object, Error **errp);
+ void parse_numa_opts(MachineState *ms);
+ void parse_numa_hmat_lb(NumaState *numa_state, NumaHmatLBOptions *node,
+                         Error **errp);
++void parse_numa_hmat_cache(MachineState *ms, NumaHmatCacheOptions *node,
++                           Error **errp);
+ void numa_complete_configuration(MachineState *ms);
+ void query_numa_node_mem(NumaNodeMem node_mem[], MachineState *ms);
+ extern QemuOptsList qemu_numa_opts;
+diff --git a/qapi/machine.json b/qapi/machine.json
+index cf8faf5a2a..b3d30bc816 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -428,10 +428,12 @@
+ #
+ # @hmat-lb: memory latency and bandwidth information (Since: 5.0)
+ #
++# @hmat-cache: memory side cache information (Since: 5.0)
++#
+ # Since: 2.1
+ ##
+ { 'enum': 'NumaOptionsType',
+-  'data': [ 'node', 'dist', 'cpu', 'hmat-lb' ] }
++  'data': [ 'node', 'dist', 'cpu', 'hmat-lb', 'hmat-cache' ] }
+ 
+ ##
+ # @NumaOptions:
+@@ -447,7 +449,8 @@
+     'node': 'NumaNodeOptions',
+     'dist': 'NumaDistOptions',
+     'cpu': 'NumaCpuOptions',
+-    'hmat-lb': 'NumaHmatLBOptions' }}
++    'hmat-lb': 'NumaHmatLBOptions',
++    'hmat-cache': 'NumaHmatCacheOptions' }}
+ 
+ ##
+ # @NumaNodeOptions:
+@@ -646,6 +649,80 @@
+     '*latency': 'uint64',
+     '*bandwidth': 'size' }}
+ 
++##
++# @HmatCacheAssociativity:
++#
++# Cache associativity in the Memory Side Cache Information Structure
++# of HMAT
++#
++# For more information of @HmatCacheAssociativity, see chapter
++# 5.2.27.5: Table 5-147 of ACPI 6.3 spec.
++#
++# @none: None (no memory side cache in this proximity domain,
++#              or cache associativity unknown)
++#
++# @direct: Direct Mapped
++#
++# @complex: Complex Cache Indexing (implementation specific)
++#
++# Since: 5.0
++##
++{ 'enum': 'HmatCacheAssociativity',
++  'data': [ 'none', 'direct', 'complex' ] }
++
++##
++# @HmatCacheWritePolicy:
++#
++# Cache write policy in the Memory Side Cache Information Structure
++# of HMAT
++#
++# For more information of @HmatCacheWritePolicy, see chapter
++# 5.2.27.5: Table 5-147: Field "Cache Attributes" of ACPI 6.3 spec.
++#
++# @none: None (no memory side cache in this proximity domain,
++#              or cache write policy unknown)
++#
++# @write-back: Write Back (WB)
++#
++# @write-through: Write Through (WT)
++#
++# Since: 5.0
++##
++{ 'enum': 'HmatCacheWritePolicy',
++  'data': [ 'none', 'write-back', 'write-through' ] }
++
++##
++# @NumaHmatCacheOptions:
++#
++# Set the memory side cache information for a given memory domain.
++#
++# For more information of @NumaHmatCacheOptions, see chapter
++# 5.2.27.5: Table 5-147: Field "Cache Attributes" of ACPI 6.3 spec.
++#
++# @node-id: the memory proximity domain to which the memory belongs.
++#
++# @size: the size of memory side cache in bytes.
++#
++# @level: the cache level described in this structure.
++#
++# @associativity: the cache associativity,
++#         none/direct-mapped/complex(complex cache indexing).
++#
++# @policy: the write policy, none/write-back/write-through.
++#
++# @line: the cache Line size in bytes.
++#
++# Since: 5.0
++##
++{ 'struct': 'NumaHmatCacheOptions',
++  'data': {
++   'node-id': 'uint32',
++   'size': 'size',
++   'level': 'uint8',
++   'associativity': 'HmatCacheAssociativity',
++   'policy': 'HmatCacheWritePolicy',
++   'line': 'uint16' }}
++
+ ##
+ # @HostMemPolicy:
+ #
+diff --git a/qemu-options.hx b/qemu-options.hx
+index c45e2ae513..16e8888fcc 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -169,7 +169,8 @@ DEF("numa", HAS_ARG, QEMU_OPTION_numa,
+     "-numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=node]\n"
+     "-numa dist,src=source,dst=destination,val=distance\n"
+     "-numa cpu,node-id=node[,socket-id=x][,core-id=y][,thread-id=z]\n"
+-    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,latency=lat][,bandwidth=bw]\n",
++    "-numa hmat-lb,initiator=node,target=node,hierarchy=memory|first-level|second-level|third-level,data-type=access-latency|read-latency|write-latency[,latency=lat][,bandwidth=bw]\n"
++    "-numa hmat-cache,node-id=node,size=size,level=level[,associativity=none|direct|complex][,policy=none|write-back|write-through][,line=size]\n",
+     QEMU_ARCH_ALL)
+ STEXI
+ @item -numa node[,mem=@var{size}][,cpus=@var{firstcpu}[-@var{lastcpu}]][,nodeid=@var{node}][,initiator=@var{initiator}]
+@@ -177,6 +178,7 @@ STEXI
+ @itemx -numa dist,src=@var{source},dst=@var{destination},val=@var{distance}
+ @itemx -numa cpu,node-id=@var{node}[,socket-id=@var{x}][,core-id=@var{y}][,thread-id=@var{z}]
+ @itemx -numa hmat-lb,initiator=@var{node},target=@var{node},hierarchy=@var{hierarchy},data-type=@var{tpye}[,latency=@var{lat}][,bandwidth=@var{bw}]
++@itemx -numa hmat-cache,node-id=@var{node},size=@var{size},level=@var{level}[,associativity=@var{str}][,policy=@var{str}][,line=@var{size}]
+ @findex -numa
+ Define a NUMA node and assign RAM and VCPUs to it.
+ Set the NUMA distance from a source node to a destination node.
+@@ -280,11 +282,20 @@ NUM byte per second (or MB/s, GB/s or TB/s depending on used suffix).
+ Note that if latency or bandwidth value is 0, means the corresponding latency or
+ bandwidth information is not provided.
+ 
++In @samp{hmat-cache} option, @var{node-id} is the NUMA-id of the memory belongs.
++@var{size} is the size of memory side cache in bytes. @var{level} is the cache
++level described in this structure, note that the cache level 0 should not be used
++with @samp{hmat-cache} option. @var{associativity} is the cache associativity,
++the possible value is 'none/direct(direct-mapped)/complex(complex cache indexing)'.
++@var{policy} is the write policy. @var{line} is the cache Line size in bytes.
++
+ For example, the following options describe 2 NUMA nodes. Node 0 has 2 cpus and
+ a ram, node 1 has only a ram. The processors in node 0 access memory in node
+ 0 with access-latency 5 nanoseconds, access-bandwidth is 200 MB/s;
+ The processors in NUMA node 0 access memory in NUMA node 1 with access-latency 10
+ nanoseconds, access-bandwidth is 100 MB/s.
++And for memory side cache information, NUMA node 0 and 1 both have 1 level memory
++cache, size is 10KB, policy is write-back, the cache Line size is 8 bytes:
+ @example
+ -machine hmat=on \
+ -m 2G \
+@@ -298,7 +309,9 @@ nanoseconds, access-bandwidth is 100 MB/s.
+ -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-latency,latency=5 \
+ -numa hmat-lb,initiator=0,target=0,hierarchy=memory,data-type=access-bandwidth,bandwidth=200M \
+ -numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-latency,latency=10 \
+--numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,bandwidth=100M
++-numa hmat-lb,initiator=0,target=1,hierarchy=memory,data-type=access-bandwidth,bandwidth=100M \
++-numa hmat-cache,node-id=0,size=10K,level=1,associativity=direct,policy=write-back,line=8 \
++-numa hmat-cache,node-id=1,size=10K,level=1,associativity=direct,policy=write-back,line=8
+ @end example
+ 
+ ETEXI
+-- 
+2.20.1
 
-> +
->      return CP_ACCESS_OK;
->  }
->  
-> @@ -6184,7 +6204,9 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->          ARMCPRegInfo clidr = {
->              .name = "CLIDR", .state = ARM_CP_STATE_BOTH,
->              .opc0 = 3, .crn = 0, .crm = 0, .opc1 = 1, .opc2 = 1,
-> -            .access = PL1_R, .type = ARM_CP_CONST, .resetvalue = cpu->clidr
-> +            .access = PL1_R, .type = ARM_CP_CONST,
-> +            .accessfn = access_aa64_tid2,
-> +            .resetvalue = cpu->clidr
->          };
->          define_one_arm_cp_reg(cpu, &clidr);
->          define_arm_cp_regs(cpu, v7_cp_reginfo);
-> -- 
-> 2.20.1
-> 
-> 
 
