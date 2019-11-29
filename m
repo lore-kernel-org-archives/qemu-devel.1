@@ -2,63 +2,69 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E666C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 05:50:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D4AC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 05:53:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 797D220833
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 05:50:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bA1yiETX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 797D220833
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id B67FC2077B
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 05:53:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B67FC2077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaZAf-0001hs-DW
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 00:50:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55653)
+	id 1iaZDE-0003iK-UQ
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 00:53:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34554)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iaYuy-0002gu-Bs
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 00:34:14 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iaYz4-0005Fn-Pq
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 00:38:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iaYut-0002nc-5x
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 00:34:10 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:33515)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iaYus-0002Lv-6k; Fri, 29 Nov 2019 00:34:07 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47PNTz5B8Fz9sPj; Fri, 29 Nov 2019 16:33:59 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1575005639;
- bh=gkJR1uYIZjQwGcO4AthiZKM0GvBR19MZhgvCP1GHfdU=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=bA1yiETXRs4JRRX34AuLOJO25rpIvMjje9cFkaS2VjnFIjPKlLaVT9h2tksS5V20W
- S0j8JPvEmMjKtd9eEF3zsz7IcVVAFd3gSUX2uD9+ARW/qjNb828iKeeKyW95BFJPSP
- LgL0OXL2Dd7DWmVhX2chWFkWkHzI8oHzzZnJNrtU=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: groug@kaod.org,
-	clg@kaod.org
-Subject: [for-5.0 1/4] spapr: Don't trigger a CAS reboot for XICS/XIVE mode
- changeover
-Date: Fri, 29 Nov 2019 16:33:53 +1100
-Message-Id: <20191129053356.232413-2-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20191129053356.232413-1-david@gibson.dropbear.id.au>
-References: <20191129053356.232413-1-david@gibson.dropbear.id.au>
+ (envelope-from <no-reply@patchew.org>) id 1iaYyz-0007J2-HL
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 00:38:23 -0500
+Resent-Date: Fri, 29 Nov 2019 00:38:22 -0500
+Resent-Message-Id: <E1iaYyz-0007J2-HL@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21122)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iaYyz-000759-4h
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 00:38:21 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1575005699; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=RH4b1LVMr33IEambYAnaiV44/AyARSESdWAPPT1pARDhL/VOwLTZvfYkHpH/GJOA4ESGyhSXLPX3Q7NhD5RWVr0odhmKgJoOr1sUpxf5lR5oRQym5OEk7j0FtwTJrXtil7aiE+LKudVJHZ84KTBiOR0n9rFJZqCZ2Z5/m1pnEME=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1575005699;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=JzMwrCibrqf+WP1NqDjagy3DJz3LE0wNpKto0FMBjts=; 
+ b=D/RU/3D6rgbSLsjxmYek0n8JuvmVgx5JOs3bXRsB4KF+AxyvQaQGScYSfNTtHE3oeEpGk/L0+8ySWa/vRNjaEtbeQeA7TMr6VkzFWXoyUiW7M+XrMuNmLKUgPN8x2uIqEtFRITkWwas6XpvuJdwnPEHvmZQLMJ+ndvVykTDY/KQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1575005697887233.08838934653045;
+ Thu, 28 Nov 2019 21:34:57 -0800 (PST)
+In-Reply-To: <20191128141518.628245-1-marcandre.lureau@redhat.com>
+Subject: Re: [PATCH 0/2] RFC: add -mem-shared option
+Message-ID: <157500569655.16987.1064228686679092901@37313f22b938>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: marcandre.lureau@redhat.com
+Date: Thu, 28 Nov 2019 21:34:57 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,108 +76,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, David Gibson <david@gibson.dropbear.id.au>,
- qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ pbonzini@redhat.com, marcandre.lureau@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PAPR allows the interrupt controller used on a POWER9 machine (XICS or
-XIVE) to be selected by the guest operating system, by using the
-ibm,client-architecture-support (CAS) feature negotiation call.
-
-Currently, if the guest selects an interrupt controller different from th=
-e
-one selected at initial boot, this causes the system to be reset with the
-new model and the boot starts again.  This means we run through the SLOF
-boot process twice, as well as any other bootloader (e.g. grub) in use
-before the OS calls CAS.  This can be confusing and/or inconvenient for
-users.
-
-Thanks to two fairly recent changes, we no longer need this reboot.  1) w=
-e
-now completely regenerate the device tree when CAS is called (meaning we
-don't need special case updates for all the device tree changes caused by
-the interrupt controller mode change),  2) we now have explicit code path=
-s
-to activate and deactivate the different interrupt controllers, rather th=
-an
-just implicitly calling those at machine reset time.
-
-We can therefore eliminate the reboot for changing irq mode, simply by
-putting a called to spapr_irq_update_active_intc() before we call
-spapr_h_cas_compose_response() (which gives the updated device tree to th=
-e
-guest firmware and OS).
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_hcall.c | 33 +++++++++++++--------------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
-
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 140f05c1c6..05a7ca275b 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1767,21 +1767,10 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
-     }
-     spapr->cas_pre_isa3_guest =3D !spapr_ovec_test(ov1_guest, OV1_PPC_3_=
-00);
-     spapr_ovec_cleanup(ov1_guest);
--    if (!spapr->cas_reboot) {
--        /* If spapr_machine_reset() did not set up a HPT but one is nece=
-ssary
--         * (because the guest isn't going to use radix) then set it up h=
-ere. */
--        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
--            /* legacy hash or new hash: */
--            spapr_setup_hpt_and_vrma(spapr);
--        }
--        spapr->cas_reboot =3D
--            (spapr_h_cas_compose_response(spapr, args[1], args[2],
--                                          ov5_updates) !=3D 0);
--    }
-=20
-     /*
--     * Ensure the guest asks for an interrupt mode we support; otherwise
--     * terminate the boot.
-+     * Ensure the guest asks for an interrupt mode we support;
-+     * otherwise terminate the boot.
-      */
-     if (guest_xive) {
-         if (!spapr->irq->xive) {
-@@ -1797,14 +1786,18 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
-         }
-     }
-=20
--    /*
--     * Generate a machine reset when we have an update of the
--     * interrupt mode. Only required when the machine supports both
--     * modes.
--     */
-+    spapr_irq_update_active_intc(spapr);
-+
-     if (!spapr->cas_reboot) {
--        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_EXPL=
-OIT)
--            && spapr->irq->xics && spapr->irq->xive;
-+        /* If spapr_machine_reset() did not set up a HPT but one is nece=
-ssary
-+         * (because the guest isn't going to use radix) then set it up h=
-ere. */
-+        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
-+            /* legacy hash or new hash: */
-+            spapr_setup_hpt_and_vrma(spapr);
-+        }
-+        spapr->cas_reboot =3D
-+            (spapr_h_cas_compose_response(spapr, args[1], args[2],
-+                                          ov5_updates) !=3D 0);
-     }
-=20
-     spapr_ovec_cleanup(ov5_updates);
---=20
-2.23.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyODE0MTUxOC42Mjgy
+NDUtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwLzJdIFJGQzogYWRkIC1tZW0t
+c2hhcmVkIG9wdGlvbgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTExMjgxNDE1MTguNjI4
+MjQ1LTEtbWFyY2FuZHJlLmx1cmVhdUByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
+Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmUyNTM3ZGEgQWRkIC1tZW0t
+c2hhcmVkIG9wdGlvbgo2MjNkMDQ0IG1lbWZkOiBhZGQgcWVtdV9tZW1mZF9vcGVuKCkKCj09PSBP
+VVRQVVQgQkVHSU4gPT09CjEvMiBDaGVja2luZyBjb21taXQgNjIzZDA0NDAyM2QxIChtZW1mZDog
+YWRkIHFlbXVfbWVtZmRfb3BlbigpKQoyLzIgQ2hlY2tpbmcgY29tbWl0IGUyNTM3ZGEzNDY2MyAo
+QWRkIC1tZW0tc2hhcmVkIG9wdGlvbikKRVJST1I6IGRvIG5vdCBpbml0aWFsaXNlIGdsb2JhbHMg
+dG8gMCBvciBOVUxMCiMxMjM6IEZJTEU6IHZsLmM6MTQ2OgoraW50IG1lbV9zaGFyZWQgPSAwOwoK
+dG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA5MCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIg
+aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
+cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
+Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
+YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
+dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMTI4MTQxNTE4LjYyODI0NS0xLW1hcmNhbmRyZS5s
+dXJlYXVAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVt
+YWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5v
+cmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5j
+b20=
 
 
