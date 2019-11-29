@@ -2,81 +2,75 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3156C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 08:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 112B1C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:03:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 306DF217BC
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 08:53:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qumFi1qs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 306DF217BC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BFF83217BC
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:03:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFF83217BC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mentor.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iac1V-0005VM-BY
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 03:53:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37125)
+	id 1iacBt-0002iO-TH
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 04:03:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iabwH-0003Jt-MI
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 03:47:47 -0500
+ (envelope-from <Bilal_Wasim@mentor.com>) id 1iac3A-00071j-Eo
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 03:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iabwA-0001zC-1X
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 03:47:39 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51725)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iabw9-0001p4-MX
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 03:47:37 -0500
-Received: by mail-wm1-x341.google.com with SMTP id g206so13307362wme.1
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 00:47:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=UVBQLEKfaFdSn/e7USK+YLFra3tFxKPS/6RQ/2cEfBI=;
- b=qumFi1qsfujYyoyQJBvrLhNGqOvQccAOl3vpJm6jlS18hzTl5R6seiL6CoXBn/wuR/
- /OWiZg17I6X1rMQHA2juuGIBUcgzF5yb8Qoub9THowLhqqQnOE4xXEKzA8aeP2hAWzS9
- HnOWZrQeu3MlqpgepNTc3LHysMiyYOJuuWgwITIvS2cAPrurHYhoBPICfZqMzkunPYCd
- c/5goQMe54LJv8jr2YU9/Bm2f3mUa2KPbIty954OnOuzFb5UkabL1PJP7d6iffNTBFib
- rB/Jy3COVBr/QeBQC1VM00Q3LXIIw8mZbO5T+CNpb9FaQLVP+10q1Rog8wRiR4XiuhLs
- EWLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=UVBQLEKfaFdSn/e7USK+YLFra3tFxKPS/6RQ/2cEfBI=;
- b=l8ZSmf/iHmT89rQ324SgtD0tN3D3XAN5v+jhSEOkKU0EsBaLS/qqK9o83TjUsImf/x
- nhs46qH5SRmuaZxCTZbD9exyuh+oHdgvSWmgARzREauCWCN7CFnsXzZI6+hNjgh+IdW8
- N4rn2LAeuKFPjd6DOxA5ceVbrBKf8EuE2lbhfMke8JKK3f9aDrgdBXJ58K9AmQ5f/Sm1
- +yov4pox1um3NqOEuunXjUCgq4Bkw4mp7POFSluKrlbZPLdiWODOY9eTRZhnBKvrxnVe
- hXTAzLnXm+GyivOpayaAcTM0M9Jx8tUffaC5JE7BweHrwkctRyigTHKzcBkqlvYvx1K9
- q8Qw==
-X-Gm-Message-State: APjAAAUbe7Mw9HW+u78k33kbrq5RjxAJxvMebBUFXUpwb7cF00FDtvrN
- f3ik+MfTKWMEO38rrWWc8VY/DtVlJ5Fn3sjQSk0T9gZ1
-X-Google-Smtp-Source: APXvYqy1lRvIwPRnOIgdHbyl37CyxOBVxOc0lbqb5+yipjk/kscQwWFzlLjtKjhP2+Trd3sEg5rOJpabEIk6FzNeSS8=
-X-Received: by 2002:a7b:cc0c:: with SMTP id f12mr13280396wmh.5.1575017254145; 
- Fri, 29 Nov 2019 00:47:34 -0800 (PST)
-MIME-Version: 1.0
-References: <20191004102051.19738-1-marcandre.lureau@redhat.com>
-In-Reply-To: <20191004102051.19738-1-marcandre.lureau@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Fri, 29 Nov 2019 12:47:21 +0400
-Message-ID: <CAJ+F1C+Fq3WE7a=9XeOrifjRj3DzxXsGJ7mwVatDqMmd91FuKg@mail.gmail.com>
-Subject: Re: [PATCH v5 0/8] Add dbus-vmstate
-To: QEMU <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
+ (envelope-from <Bilal_Wasim@mentor.com>) id 1iac30-00080X-QV
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 03:54:44 -0500
+Received: from esa2.mentor.iphmx.com ([68.232.141.98]:20890)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Bilal_Wasim@mentor.com>)
+ id 1iac30-0007YU-H0; Fri, 29 Nov 2019 03:54:42 -0500
+IronPort-SDR: kFnqDZaQu70W3Xm7rwh0M8bJtuwCoq6dMil+uB/IYuhQbJGYa6mqKKt6RTvyGuKEOqQUvldLH6
+ uviLNSx2ArIQ3DBzk5/yd4elSJBBYq7IQ8mynW/emwKuEV06uQt4dHJuIuyKBpzanLth/zfyOK
+ 4+uowywLFSJq6cWklZIfZXGaQo7ct+kbfmc75ezdZS1fg9EPzbSNSmbTnuadBaMWtZsJp0fPS3
+ 6qGcV0yFypSMv8peCsPqmRto2TVBHP/2MsRxqHzHT4o7D/wHFgzzOLWlA3j75hGhn5OULyCD5F
+ nK8=
+X-IronPort-AV: E=Sophos;i="5.69,256,1571731200"; d="scan'208";a="43559764"
+Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
+ by esa2.mentor.iphmx.com with ESMTP; 29 Nov 2019 00:54:34 -0800
+IronPort-SDR: j5tEU0mc7h35MshJacf+Akn28EprdNRT5DU8srTbqrDkONbEKs8Kj1gT67Rv8/JHoOklicsJ/2
+ 3tKhEx6PU1m2chM/FAugsxJByLjk55gVr/SpndIt9Bt+somfiaxISfBrVCPyuv1QcAh8w50L27
+ pJVuUJQykgvpleDW8S+ndNHdn0pLFQ6ydYGHpqd6DT9e3tEHC/z/PkqOIPD8roWcF3w2AwhWml
+ ySkhv7GHFPfUBd6KZpmkWFYnKGPnTPe+m2qTi80zsG36A6oQpwy2ELybvXNA/ZRxCA/V8bPofD
+ vnU=
+From: "Wasim, Bilal" <Bilal_Wasim@mentor.com>
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Subject: RE: [PATCH] Updating the GEM MAC IP to properly filter out the
+ multicast addresses
+Thread-Topic: [PATCH] Updating the GEM MAC IP to properly filter out the
+ multicast addresses
+Thread-Index: AdWl/aPyGC40ldXeTIuqOxj9pJGCcwABzzoAAAIbwuAAARoxAAAAFd1AACAZLEA=
+Date: Fri, 29 Nov 2019 08:54:29 +0000
+Message-ID: <103588e5aa0c43858123d77131ff136f@SVR-IES-MBX-03.mgc.mentorg.com>
+References: <2632212d4c8a40bead72ffdcf288e600@SVR-IES-MBX-03.mgc.mentorg.com>
+ <20191128155956.GB29312@toto>
+ <2b7a42487a5d4a258062bd209a0d13fa@SVR-IES-MBX-03.mgc.mentorg.com>
+ <20191128173152.GC29312@toto>
+ <ef4adfa40b5543fba4b8e673e36cbd9e@SVR-IES-MBX-03.mgc.mentorg.com>
+In-Reply-To: <ef4adfa40b5543fba4b8e673e36cbd9e@SVR-IES-MBX-03.mgc.mentorg.com>
+Accept-Language: en-GB, en-IE, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [137.202.0.90]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 68.232.141.98
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,163 +82,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michal Privoznik <mprivozn@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "alistair@alistair23.me" <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+git "send-email" doesn't really work well with my work account because the =
+server considers it "less secure" and does NOT provide a way around it.. I'=
+ve had to re-submit the patch from my secondary email...=20
 
-On Fri, Oct 4, 2019 at 3:23 PM Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Hi,
->
-> With external processes or helpers participating to the VM support, it
-> becomes necessary to handle their migration. Various options exist to
-> transfer their state:
-> 1) as the VM memory, RAM or devices (we could say that's how
->    vhost-user devices can be handled today, they are expected to
->    restore from ring state)
-> 2) other "vmstate" (as with TPM emulator state blobs)
-> 3) left to be handled by management layer
->
-> 1) is not practical, since an external processes may legitimatelly
-> need arbitrary state date to back a device or a service, or may not
-> even have an associated device.
->
-> 2) needs ad-hoc code for each helper, but is simple and working
->
-> 3) is complicated for management layer, QEMU has the migration timing
->
-> The proposed "dbus-vmstate" object will connect to a given D-Bus
-> address, and save/load from org.qemu.VMState1 owners on migration.
->
-> Thus helpers can easily have their state migrated with QEMU, without
-> implementing ad-hoc support (such as done for TPM emulation)
->
-> D-Bus is ubiquitous on Linux (it is systemd IPC), and can be made to
-> work on various other OSes. There are several implementations and good
-> bindings for various languages.  (the tests/dbus-vmstate-test.c is a
-> good example of how simple the implementation of services can be, even
-> in C)
->
-> dbus-vmstate is put into use by the libvirt series "[PATCH 00/23] Use
-> a slirp helper process".
->
+-----Original Message-----
+From: Qemu-arm [mailto:qemu-arm-bounces+bilal_wasim=3Dmentor.com@nongnu.org=
+] On Behalf Of Wasim, Bilal
+Sent: Thursday, November 28, 2019 10:35 PM
+To: Edgar E. Iglesias <edgar.iglesias@gmail.com>
+Cc: peter.maydell@linaro.org; alistair@alistair23.me; qemu-devel@nongnu.org=
+; qemu-arm@nongnu.org
+Subject: RE: [PATCH] Updating the GEM MAC IP to properly filter out the mul=
+ticast addresses
 
-ping
+Thanks for the pointers.. I will incorporate all these changes and post an =
+updated thread asap..=20
 
-(there is a minor vmstate_register() change required in patch 2 for
-the next rebase)
+-----Original Message-----
+From: Edgar E. Iglesias [mailto:edgar.iglesias@gmail.com]
+Sent: Thursday, November 28, 2019 10:32 PM
+To: Wasim, Bilal <Bilal_Wasim@mentor.com>
+Cc: qemu-devel@nongnu.org; alistair@alistair23.me; peter.maydell@linaro.org=
+; qemu-arm@nongnu.org
+Subject: Re: [PATCH] Updating the GEM MAC IP to properly filter out the mul=
+ticast addresses
+
+On Thu, Nov 28, 2019 at 05:02:00PM +0000, Wasim, Bilal wrote:
+> This was one of my first attempts, and so I was sure to miss something.. =
+I've incorporated all the updates in this patch.. Let me know what you thin=
+k about this..=20
+>=20
+> net/cadence_gem: Updating the GEM MAC IP to properly filter out the multi=
+cast addresses.
+>=20
+> The current code makes a bad assumption that the most-significant byte=20
+> of the MAC address is used to determine if the address is multicast or=20
+> unicast, but in reality only a single bit is used to determine this.
+> This caused IPv6 to not work.. Fix is now in place and has been tested=20
+> with ZCU102-A53 / IPv6 on a TAP interface. Works well..
+
+Thanks Bilal,
+
+This looks better but not quite there yet.
+
+* You don't seem to be using git-send-email to post patches, try it, it wil=
+l make life easier wrt to formatting. The patch should be in a separate ema=
+il. The subject line should be the subject of the email.
+git-format-patch and git-send-email will take care of that for you.
+
+* You don't need to define IS_MULTICAST, you can directly use is_multicast_=
+ether_addr() and friends.
+
+* The patch still has long lines (longer than 80 chars) You can run scripts=
+/checkpatch.pl on your commit before posting the patch.
+
+Cheers,
+Edgar
 
 
-> v5:
-> - trying to fix patchew/ci: install dbus-daemon in containers, skip
->   test if unavailable
->
-> v4:
-> - add Daniel security scenarios to the D-Bus document
-> - misc doc improvements
-> - add "util: add dbus helper unit" patch, with
->   qemu_dbus_get_queued_owners()
-> - add "configure: add GDBUS_CODEGEN", explaining why gio-unix is
->   required when available
-> - silence the expected failing tests
-> - update copyright headers, MAINTAINERS
-> - add r-b/a-b tags
-> - rebased
->
-> (Note: patchew dbus test fails for unclear reasons, but I can't
-> reproduce locally nor on travis)
->
-> v3:
-> - after various discussions on helper processes, we settled on a
->   preference for having a bus for communications. This version is
->   actually v1 updated.
-> - added a dbus.rst document to describe D-Bus recommendations for QEMU
-> - added dbus-vmstate-daemon.sh to play with the dbus-daemon configuration
->   (although it is not very useful in the context of a single UID)
-> - added a new vmstate interface, so that any object can implement
->   VMStateDescription, and converted dbus-vmstate
-> - added "migration: fix vmdesc leak on vmstate_save() error"
-> - convert to g_auto
->
-> v2:
-> - D-Bus is most common and practical through a bus, but it requires a
->   daemon to be running. I argue that the benefits outweight the cost
->   of running an extra daemon in v1 in the context of multi-process
->   qemu, but it is also possible to connect in p2p mode as done in this
->   new version.
->
-> Marc-Andr=C3=A9 Lureau (8):
->   vmstate: add qom interface to get id
->   vmstate: replace DeviceState with VMStateIf
->   docs: start a document to describe D-Bus usage
->   util: add dbus helper unit
->   Add dbus-vmstate object
->   configure: add GDBUS_CODEGEN
->   dockerfiles: add dbus-daemon to some of latest distributions
->   tests: add dbus-vmstate-test
->
->  MAINTAINERS                              |  12 +
->  backends/Makefile.objs                   |   4 +
->  backends/dbus-vmstate.c                  | 496 +++++++++++++++++++++++
->  configure                                |   7 +
->  docs/interop/dbus-vmstate.rst            |  74 ++++
->  docs/interop/dbus.rst                    | 104 +++++
->  docs/interop/index.rst                   |   2 +
->  hw/block/onenand.c                       |   2 +-
->  hw/core/Makefile.objs                    |   1 +
->  hw/core/qdev.c                           |  21 +-
->  hw/core/vmstate-if.c                     |  23 ++
->  hw/ide/cmd646.c                          |   2 +-
->  hw/ide/isa.c                             |   2 +-
->  hw/ide/piix.c                            |   2 +-
->  hw/ide/via.c                             |   2 +-
->  hw/misc/max111x.c                        |   2 +-
->  hw/net/eepro100.c                        |   4 +-
->  hw/nvram/eeprom93xx.c                    |   4 +-
->  hw/ppc/spapr_drc.c                       |   9 +-
->  hw/ppc/spapr_iommu.c                     |   4 +-
->  hw/s390x/s390-skeys.c                    |   2 +-
->  include/hw/vmstate-if.h                  |  40 ++
->  include/migration/register.h             |   4 +-
->  include/migration/vmstate.h              |  10 +-
->  include/qemu/dbus.h                      |  18 +
->  migration/savevm.c                       |  20 +-
->  stubs/vmstate.c                          |   4 +-
->  tests/Makefile.include                   |  23 +-
->  tests/dbus-vmstate-daemon.sh             |  95 +++++
->  tests/dbus-vmstate-test.c                | 399 ++++++++++++++++++
->  tests/dbus-vmstate1.xml                  |  12 +
->  tests/docker/dockerfiles/centos7.docker  |   1 +
->  tests/docker/dockerfiles/debian10.docker |   1 +
->  tests/docker/dockerfiles/fedora.docker   |   1 +
->  tests/docker/dockerfiles/ubuntu.docker   |   1 +
->  util/Makefile.objs                       |   3 +
->  util/dbus.c                              |  55 +++
->  37 files changed, 1428 insertions(+), 38 deletions(-)
->  create mode 100644 backends/dbus-vmstate.c
->  create mode 100644 docs/interop/dbus-vmstate.rst
->  create mode 100644 docs/interop/dbus.rst
->  create mode 100644 hw/core/vmstate-if.c
->  create mode 100644 include/hw/vmstate-if.h
->  create mode 100644 include/qemu/dbus.h
->  create mode 100755 tests/dbus-vmstate-daemon.sh
->  create mode 100644 tests/dbus-vmstate-test.c
->  create mode 100644 tests/dbus-vmstate1.xml
->  create mode 100644 util/dbus.c
->
+
+>=20
+> Signed-off-by: Bilal Wasim <bilal_wasim@mentor.com>
+> ---
+>  hw/net/cadence_gem.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c index=20
+> b8be73dc55..98efb93f8a 100644
+> --- a/hw/net/cadence_gem.c
+> +++ b/hw/net/cadence_gem.c
+> @@ -34,6 +34,7 @@
+>  #include "qemu/module.h"
+>  #include "sysemu/dma.h"
+>  #include "net/checksum.h"
+> +#include "net/eth.h"
+> =20
+>  #ifdef CADENCE_GEM_ERR_DEBUG
+>  #define DB_PRINT(...) do { \
+> @@ -315,6 +316,12 @@
+> =20
+>  #define GEM_MODID_VALUE 0x00020118
+> =20
+> +/* IEEE has specified that the most significant bit of the most=20
+> +significant byte be used for
+> + * distinguishing between Unicast and Multicast addresses.
+> + * If its a 1, that means multicast, 0 means unicast.   */
+> +#define IS_MULTICAST(address)           is_multicast_ether_addr(address)
+> +#define IS_UNICAST(address)             is_unicast_ether_addr(address)
+> +
+>  static inline uint64_t tx_desc_get_buffer(CadenceGEMState *s,=20
+> uint32_t *desc)  {
+>      uint64_t ret =3D desc[0];
+> @@ -601,7 +608,7 @@ static void gem_receive_updatestats(CadenceGEMState *=
+s, const uint8_t *packet,
+>      }
+> =20
+>      /* Error-free Multicast Frames counter */
+> -    if (packet[0] =3D=3D 0x01) {
+> +    if (IS_MULTICAST(packet)) {
+>          s->regs[GEM_RXMULTICNT]++;
+>      }
+> =20
+> @@ -690,21 +697,21 @@ static int gem_mac_address_filter(CadenceGEMState *=
+s, const uint8_t *packet)
+>      }
+> =20
+>      /* Accept packets -w- hash match? */
+> -    if ((packet[0] =3D=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_=
+HASH)) ||
+> -        (packet[0] !=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_HA=
+SH))) {
+> +    if ((IS_MULTICAST(packet) && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_H=
+ASH)) ||
+> +        (IS_UNICAST(packet)   && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_H=
+ASH))) {
+>          unsigned hash_index;
+> =20
+>          hash_index =3D calc_mac_hash(packet);
+>          if (hash_index < 32) {
+>              if (s->regs[GEM_HASHLO] & (1<<hash_index)) {
+> -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_ACC=
+EPT :
+> -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_ACCE=
+PT :
+> +                                             =20
+> + GEM_RX_UNICAST_HASH_ACCEPT;
+>              }
+>          } else {
+>              hash_index -=3D 32;
+>              if (s->regs[GEM_HASHHI] & (1<<hash_index)) {
+> -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_ACC=
+EPT :
+> -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_ACCE=
+PT :
+> +                                             =20
+> + GEM_RX_UNICAST_HASH_ACCEPT;
+>              }
+>          }
+>      }
 > --
-> 2.23.0
->
->
+> 2.19.1.windows.1
+>=20
+> ----------------------------------------------------------------------
+> --------------------------------------------------------
+> -----Original Message-----
+> From: Edgar E. Iglesias [mailto:edgar.iglesias@gmail.com]
+> Sent: Thursday, November 28, 2019 9:00 PM
+> To: Wasim, Bilal <Bilal_Wasim@mentor.com>
+> Cc: qemu-devel@nongnu.org; alistair@alistair23.me;=20
+> peter.maydell@linaro.org; qemu-arm@nongnu.org
+> Subject: Re: [PATCH] Updating the GEM MAC IP to properly filter out=20
+> the multicast addresses
+>=20
+> On Thu, Nov 28, 2019 at 03:10:16PM +0000, Wasim, Bilal wrote:
+> > [PATCH] Updating the GEM MAC IP to properly filter out the multicast=20
+> > addresses. The current code makes a bad assumption that the=20
+> > most-significant byte of the MAC address is used to determine if the=20
+> > address is multicast or unicast, but in reality only a single bit is=20
+> > used to determine this. This caused IPv6 to not work.. Fix is now in=20
+> > place and has been tested with
+> > ZCU102-A53 / IPv6 on a TAP interface. Works well..
+>=20
+> Hi Bilal,
+>=20
+> The fix looks right to me but I have a few comments.
+>=20
+> * Your patch seems a little wrongly formated.
+> [PATCH] goes into the Subject line for example and you're missing path pr=
+efixes.
+>=20
+> Do a git log -- hw/net/cadence_gem.c to see examples on how it should loo=
+k.
+>=20
+> * The patch will probably not pass checkpatch since you seem to have long=
+ lines.
+>=20
+> * We also need to update gem_receive_updatestats() to use the corrected m=
+acros.
+>=20
+> More inline:
+>=20
+> >=20
+> > Signed-off-by: Bilal Wasim <bilal_wasim@mentor.com>
+> > ---
+> > hw/net/cadence_gem.c | 18 ++++++++++++------
+> > 1 file changed, 12 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c index
+> > b8be73d..f8bcbb3 100644
+> > --- a/hw/net/cadence_gem.c
+> > +++ b/hw/net/cadence_gem.c
+> > @@ -315,6 +315,12 @@
+> >  #define GEM_MODID_VALUE 0x00020118
+> > +/* IEEE has specified that the most significant bit of the most=20
+> > +significant byte be used for
+> > + * distinguishing between Unicast and Multicast addresses.
+> > + * If its a 1, that means multicast, 0 means unicast.   */
+> > +#define IS_MULTICAST(address)           (((address[0] & 0x01) =3D=3D 0=
+x01) ? 1 : 0)
+>=20
+>=20
+>=20
+> This can be simplified:
+> #define IS_MULTICAST(address) (address[0] & 1)
+>=20
+> Actually, looking closer, we already have functions to do these checks in=
+:
+> include/net/eth.h
+>=20
+> static inline int is_multicast_ether_addr(const uint8_t *addr) static=20
+> inline int is_broadcast_ether_addr(const uint8_t *addr) static inline=20
+> int is_unicast_ether_addr(const uint8_t *addr)
+>=20
+>=20
+>=20
+> > +#define IS_UNICAST(address)             (!IS_MULTICAST(address))
+> > +
+> > static inline uint64_t tx_desc_get_buffer(CadenceGEMState *s,=20
+> > uint32_t
+> > *desc) {
+> >      uint64_t ret =3D desc[0];
+> > @@ -690,21 +696,21 @@ static int gem_mac_address_filter(CadenceGEMState=
+ *s, const uint8_t *packet)
+> >      }
+> >      /* Accept packets -w- hash match? */
+> > -    if ((packet[0] =3D=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAS=
+T_HASH)) ||
+> > -        (packet[0] !=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_=
+HASH))) {
+> > +    if ((IS_MULTICAST(packet) && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST=
+_HASH)) ||
+> > +        (IS_UNICAST(packet)   && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST=
+_HASH))) {
+> >          unsigned hash_index;
+> >          hash_index =3D calc_mac_hash(packet);
+> >          if (hash_index < 32) {
+> >              if (s->regs[GEM_HASHLO] & (1<<hash_index)) {
+> > -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_A=
+CCEPT :
+> > -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> > +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_AC=
+CEPT :
+> > +                                             =20
+> > + GEM_RX_UNICAST_HASH_ACCEPT;
+> >              }
+> >          } else {
+> >              hash_index -=3D 32;
+> >              if (s->regs[GEM_HASHHI] & (1<<hash_index)) {
+> > -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_A=
+CCEPT :
+> > -                                           GEM_RX_UNICAST_HASH_ACCEPT;
+> > +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_AC=
+CEPT :
+> > +                                             =20
+> > + GEM_RX_UNICAST_HASH_ACCEPT;
+> >              }
+> >          }
+> >      }
+> > --
+> > 2.9.3
+> >=20
 
-
---=20
-Marc-Andr=C3=A9 Lureau
 
