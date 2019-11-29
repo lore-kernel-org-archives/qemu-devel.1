@@ -2,102 +2,92 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 120C0C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 10:12:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F112C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 10:13:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83A7320833
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 10:12:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Du0Qysq6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83A7320833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0286B20833
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 10:13:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0286B20833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iadGB-0002D7-Ei
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 05:12:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55793)
+	id 1iadHJ-0002xw-VR
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 05:13:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47603)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iacxd-0005qC-Nh
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:53:14 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iactK-0002oY-IO
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:48:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iacxW-0000fG-7u
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:53:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43675
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iacxV-0000Rp-QU
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:53:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575021182;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=G9vurAtotf8R/71XQlmxYgExuHEcLajFRppiFZySOoU=;
- b=Du0Qysq6ha2Z/JKngkET+ydJPKMFJQT8gogJ76Uc23vh6rMGOCGEgiTNcjNi3/TWDW6G6s
- gn4DMCPqF6lTyN7E10Q1HkjElSfVEiEIi+GDUobcdG8C5zh0HUKyOcF/4Eoo8c7UbOs7W4
- vSzOPjaElInvE3iKIgaI17AwURrpU+0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-vxzAkzwTPGWGsL7g302UZA-1; Fri, 29 Nov 2019 04:53:00 -0500
-Received: by mail-wr1-f71.google.com with SMTP id q12so15369022wrr.3
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 01:53:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=uwHvZtXS7dRyGmv2nIlunqWCOnSZBeS8uZMDrsfda/M=;
- b=nMvHQVIht0PVAmBYQXwakA2h7wa1uEGG0QRBmmXJxS8UEJGJ3XZmI3hG7rBoOSmFEd
- /F0Y6n2zWotbsF9BYcKYmqzuO8H6eM/WPv1+1r2GeTKuIIo/vzrJUKtppL6PtLExyPK1
- jkCVc+6j7rc9WnXvgA6mgY44LaRPSktnX8CI/RFV8Ao9Cjd4iEvq6HTg9HM7Q6zXQpjh
- re2MUJiLh8RYK94Lx/LPJte0TSGqYw4KOscI2U8HuOiqSDE3mBXOOeXjbGd+XMTvXcSN
- BYM5gDVpYQM2+75rEt095NTXuH4EE9ZZEARADFkTL/8Y5QZOV0w9+OorfoZLx2NVMuyQ
- 4J7Q==
-X-Gm-Message-State: APjAAAXxJefwj4dmHwfFriI8txxKqPhOy9xPIHVlut/f5bPOcNiuJTe2
- i92LfJI81bSH4NQmbnHlbZF+iaIit5W+o5mpvFRzscMLu/+5TTPMXw7V2BxibrB62F6XAiPfaNX
- O9mcj6pg/1mSMDfI=
-X-Received: by 2002:a1c:4e03:: with SMTP id g3mr110110wmh.22.1575021179180;
- Fri, 29 Nov 2019 01:52:59 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxNgjiypjC4rsoN/C6tzA40X+v6zGfe/AObWpq7XBqWZqXmOOQFqtytryyvaAST46v4Cd316g==
-X-Received: by 2002:a1c:4e03:: with SMTP id g3mr110086wmh.22.1575021178877;
- Fri, 29 Nov 2019 01:52:58 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:459f:99a9:39f1:65ba?
- ([2001:b07:6468:f312:459f:99a9:39f1:65ba])
- by smtp.gmail.com with ESMTPSA id h17sm1446198wrs.18.2019.11.29.01.52.58
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 29 Nov 2019 01:52:58 -0800 (PST)
-Subject: Re: [PATCH 0/2] RFC: add -mem-shared option
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20191128141518.628245-1-marcandre.lureau@redhat.com>
- <20191129070253.5hwksjrapomk434x@sirius.home.kraxel.org>
- <CAMxuvawieN7JQZkRku19v5X-o6q664Wz1Rtx3+Wz3d33m-7Tug@mail.gmail.com>
- <20191129092713.GA2260471@redhat.com>
- <6b441014-1852-3257-2bc5-897cc51d08dc@redhat.com>
- <20191129093941.GD2260471@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <49e9c7b6-bd0b-655b-0f19-174382ed763b@redhat.com>
-Date: Fri, 29 Nov 2019 10:52:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <frankja@linux.ibm.com>) id 1iactG-0003li-7m
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:48:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32604)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iactF-0003XD-Uj
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:48:42 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAT9mbcP095402
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 04:48:39 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wje2jh0md-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 04:48:38 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Fri, 29 Nov 2019 09:48:23 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 29 Nov 2019 09:48:20 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAT9mJxX50921574
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 29 Nov 2019 09:48:19 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 62C9BA4040;
+ Fri, 29 Nov 2019 09:48:19 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5CD2DA404D;
+ Fri, 29 Nov 2019 09:48:17 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.188.128])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 29 Nov 2019 09:48:17 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/13] s390x: Protected Virtualization support
+Date: Fri, 29 Nov 2019 04:47:56 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20191129093941.GD2260471@redhat.com>
-Content-Language: en-US
-X-MC-Unique: vxzAkzwTPGWGsL7g302UZA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19112909-0028-0000-0000-000003C18C15
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112909-0029-0000-0000-000024849A0F
+Message-Id: <20191129094809.26684-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-29_02:2019-11-29,2019-11-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ suspectscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 priorityscore=1501 impostorscore=0
+ phishscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911290086
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,36 +99,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/11/19 10:39, Daniel P. Berrang=C3=A9 wrote:
-> On Fri, Nov 29, 2019 at 10:33:39AM +0100, Paolo Bonzini wrote:
->> On 29/11/19 10:27, Daniel P. Berrang=C3=A9 wrote:
->>>> Yes, with a fallback path currently using a temporary file under /tmp
->>>> (we may want to use shm_open() instead, or a different location such
->>>> as XDG_RUNTIME_DIR? - and use O_TMPFILE)
->>> We can't assume either /tmp or XDG_RUNTIME_DIR is on tmpfs as that is n=
-o
->>> where near standard across all OS distros, and even if on tmpfs these
->>> dirs can be size limited to a significant subset of available RAM. IOW
->>> we can't safely use them unless explicitly told to.
->>
->> Agreed, mkstemp+shm_open seems better.  Perhaps this could be done in
->> hostmem-memfd.c though, basically as a fallback option?  In principle
->> one could even use getmntent to search for a hugetlbfs mount.
->=20
-> With mkstemp you still need to pick a location, and I don't think it
-> is clear there is a reliable choice that will always work.
+Most of the QEMU changes for PV are related to the new IPL type with
+subcodes 8 - 10 and the execution of the necessary Ultravisor calls to
+IPL secure guests. Note that we can only boot into secure mode from
+normal mode, i.e. stfle 161 is not active in secure mode.
 
-Sorry, I meant mktemp (which is almost never the right choice so my
-brain fat-fingered it...) + shm_open(O_CREAT|O_EXCL).
+The other changes related to data gathering for emulation and
+disabling addressing checks in secure mode, as well as CPU resets.
 
-Paolo
+https://github.com/frankjaa/qemu/tree/protvirt
+
+v2:
+	* Split out cleanups
+	* Internal PV state tracking
+	* Review feedback
+
+
+Janosch Frank (13):
+  s390x: protvirt: Add diag308 subcodes 8 - 10
+  Header sync protvirt
+  s390x: protvirt: Support unpack facility
+  s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
+  s390x: protvirt: Add pv state to cpu env
+  s390x: protvirt: KVM intercept changes
+  s390x: protvirt: SCLP interpretation
+  s390x: protvirt: Add new VCPU reset functions
+  s390x: Exit on vcpu reset error
+  s390x: protvirt: Set guest IPL PSW
+  s390x: protvirt: Move diag 308 data over SIDAD
+  s390x: protvirt: Disable address checks for PV guest IO emulation
+  s390x: protvirt: Handle SIGP store status correctly
+
+ hw/s390x/Makefile.objs              |   1 +
+ hw/s390x/ipl.c                      |  81 +++++++++++++++++-
+ hw/s390x/ipl.h                      |  35 ++++++++
+ hw/s390x/pv.c                       | 123 ++++++++++++++++++++++++++++
+ hw/s390x/pv.h                       |  27 ++++++
+ hw/s390x/s390-virtio-ccw.c          |  59 ++++++++++++-
+ hw/s390x/sclp.c                     |  17 ++++
+ include/hw/s390x/sclp.h             |   2 +
+ linux-headers/linux/kvm.h           |  43 ++++++++++
+ target/s390x/cpu.c                  |  23 +++++-
+ target/s390x/cpu.h                  |   1 +
+ target/s390x/cpu_features_def.inc.h |   1 +
+ target/s390x/diag.c                 |  56 +++++++++++--
+ target/s390x/helper.c               |   4 +
+ target/s390x/ioinst.c               |  26 ++++--
+ target/s390x/kvm-stub.c             |  10 ++-
+ target/s390x/kvm.c                  |  51 ++++++++++--
+ target/s390x/kvm_s390x.h            |   4 +-
+ target/s390x/sigp.c                 |   1 +
+ 19 files changed, 536 insertions(+), 29 deletions(-)
+ create mode 100644 hw/s390x/pv.c
+ create mode 100644 hw/s390x/pv.h
+
+-- 
+2.20.1
 
 
