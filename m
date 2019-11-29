@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5B8C432C0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F05B8C432C3
 	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 11:43:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67DC9208E4
+	by mail.kernel.org (Postfix) with ESMTPS id BE240208E4
 	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 11:43:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fQHVxmif"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67DC9208E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RDiei/9Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE240208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaegi-00073M-Kd
+	id 1iaegi-00071c-VW
 	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 06:43:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44681)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51341)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iaeOO-00024o-EE
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:24:57 -0500
+ (envelope-from <david@redhat.com>) id 1iaeEA-0002vP-ME
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:14:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iaeOG-0001Q0-OO
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:24:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58337
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1iae8n-0005BI-2H
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:08:54 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54835
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iaeOG-0001JY-IY
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:24:48 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iae8m-00055h-TC
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:08:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575026685;
+ s=mimecast20190719; t=1575025727;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=5yIXKSyQ/FKbBbCArULtrnpx96uJjC+vSwjFKP+hzu0=;
- b=fQHVxmif/bnNZBaNpoy85tSTp3hCwUpZEbQ43YPS2ykAAJVxAC+bjgMg7wf61AVEaowSah
- HQrBGMS9NgUqpBp5+or5yLTmDRNm5PjtNB5JOaswQMbTqB1NqjnS4TLcXnmobYvseBxH7D
- YpwfdqSKzxjfMtk9YGpmHyxWBwqlNnQ=
+ bh=4WBe+X2B4OKR/Kn2b9xb2jeeS07n1W2rnGtiYfw+v4o=;
+ b=RDiei/9YrV2jHqG4cTORGz0hi35mP7HU/h6FAc6fqAM5DhUygSnjek1HjADPgESD+OdQka
+ vmgiCmJOWjR0YM74kpPj+K1rv6yBNlmfGrH2O+o0NTWhEmPfFNCyyDLoB5V/AV20/clQ3Q
+ KqFKWCkZvD4ZtboVy4dJadBDHUJge6Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-BiAjB1eePWqe3OcHXaA2Iw-1; Fri, 29 Nov 2019 06:24:44 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-410-jGtsT4OCM8OKbfXKC1vSgQ-1; Fri, 29 Nov 2019 06:08:43 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C80D3DB60;
- Fri, 29 Nov 2019 11:24:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9AD110054E3;
+ Fri, 29 Nov 2019 11:08:41 +0000 (UTC)
 Received: from [10.36.118.44] (unknown [10.36.118.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 17039600C8;
- Fri, 29 Nov 2019 11:24:40 +0000 (UTC)
-Subject: Re: [PATCH v2 08/13] s390x: protvirt: Add new VCPU reset functions
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F15455D9E1;
+ Fri, 29 Nov 2019 11:08:39 +0000 (UTC)
+Subject: Re: [PATCH v2 13/13] s390x: protvirt: Handle SIGP store status
+ correctly
+To: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ qemu-devel@nongnu.org
 References: <20191129094809.26684-1-frankja@linux.ibm.com>
- <20191129094809.26684-9-frankja@linux.ibm.com>
- <e399a2ea-f011-9716-f878-36d021733573@redhat.com>
- <069361ba-8ae0-d7fb-b155-d5005f4024cf@linux.ibm.com>
+ <20191129094809.26684-14-frankja@linux.ibm.com>
+ <95062d3b-425f-1df4-8e33-1db0b883bd2f@redhat.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -109,21 +110,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <6b9e43f2-c9e1-98c3-fbcf-c5e12e982f37@redhat.com>
-Date: Fri, 29 Nov 2019 12:24:40 +0100
+Message-ID: <db904e08-ee27-68eb-66b0-15af328c72bc@redhat.com>
+Date: Fri, 29 Nov 2019 12:08:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <069361ba-8ae0-d7fb-b155-d5005f4024cf@linux.ibm.com>
+In-Reply-To: <95062d3b-425f-1df4-8e33-1db0b883bd2f@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: BiAjB1eePWqe3OcHXaA2Iw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: jGtsT4OCM8OKbfXKC1vSgQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -135,60 +136,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com,
+ pmorel@linux.ibm.com, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29.11.19 12:21, Janosch Frank wrote:
-> On 11/29/19 11:47 AM, David Hildenbrand wrote:
->> On 29.11.19 10:48, Janosch Frank wrote:
->>> CPU resets for protected guests need to be done via Ultravisor
->>> calls. Hence we need a way to issue these calls for each reset.
->>>
->>> As we formerly had only one reset function and it was called for
->>> initial, as well as for the clear reset, we now need a new interface.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>  target/s390x/cpu.c       | 14 ++++++++++++--
->>>  target/s390x/kvm-stub.c  | 10 +++++++++-
->>>  target/s390x/kvm.c       | 38 ++++++++++++++++++++++++++++++++------
->>>  target/s390x/kvm_s390x.h |  4 +++-
->>>  4 files changed, 56 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
->>> index bd39cb54b7..52fefa1586 100644
->>> --- a/target/s390x/cpu.c
->>> +++ b/target/s390x/cpu.c
->>> @@ -131,8 +131,18 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
->>>      }
->>>  
->>>      /* Reset state inside the kernel that we cannot access yet from QEMU. */
->>> -    if (kvm_enabled() && type != S390_CPU_RESET_NORMAL) {
->>> -        kvm_s390_reset_vcpu(cpu);
->>> +    if (kvm_enabled()) {
->>> +        switch (type) {
->>> +        case S390_CPU_RESET_CLEAR:
->>> +            kvm_s390_reset_vcpu_clear(cpu);
->>> +            break;
->>> +        case S390_CPU_RESET_INITIAL:
->>> +            kvm_s390_reset_vcpu_initial(cpu);
->>> +            break;
->>> +        case S390_CPU_RESET_NORMAL:
->>> +            kvm_s390_reset_vcpu_normal(cpu);
->>> +            break;
->>> +        }
+On 29.11.19 12:04, Thomas Huth wrote:
+> On 29/11/2019 10.48, Janosch Frank wrote:
+>> Status storing is obviously not done by qemu anymore.
 >>
->> I would have assumed you only have to do that for pv? For ordinary
->> guests we can avoid unnecessary ioctls IMHO.
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  target/s390x/helper.c | 4 ++++
+>>  target/s390x/sigp.c   | 1 +
+>>  2 files changed, 5 insertions(+)
+>>
+>> diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+>> index a3a49164e4..3800c4b395 100644
+>> --- a/target/s390x/helper.c
+>> +++ b/target/s390x/helper.c
+>> @@ -246,6 +246,10 @@ int s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
+>>      hwaddr len = sizeof(*sa);
+>>      int i;
+>>  
+>> +    if (cpu->env.pv) {
+>> +        return 0;
+>> +    }
+>> +
+>>      sa = cpu_physical_memory_map(addr, &len, 1);
+>>      if (!sa) {
+>>          return -EFAULT;
+>> diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+>> index 727875bb4a..2007946299 100644
+>> --- a/target/s390x/sigp.c
+>> +++ b/target/s390x/sigp.c
+>> @@ -497,6 +497,7 @@ void do_stop_interrupt(CPUS390XState *env)
+>>      if (s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu) == 0) {
+>>          qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+>>      }
+>> +    /* Storing will occur on next SIE entry for fmt 4 */
+>>      if (cpu->env.sigp_order == SIGP_STOP_STORE_STATUS) {
+>>          s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
+>>      }
+>>
 > 
-> Remember the reset normal IRQ fix in KVM?
-> Without it we're not architecture compliant.
+> I'd suggest to move the comment to the if-statement in helper.c, too.
+> 
 
-Please spell that out somewhere. People reviewing this have no idea
-what's going on under the hood :)
++1
+
+>  Thomas
+> 
 
 
 -- 
