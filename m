@@ -2,78 +2,88 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46893C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0001FC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:07:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E625A20672
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEC8921774
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:07:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X+GsFNlj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E625A20672
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EqQNTK2N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEC8921774
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iailm-0004Yr-2a
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 11:05:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40768)
+	id 1iaioG-0007Rz-RY
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 11:07:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iahg7-0000VJ-7S
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:55:29 -0500
+ (envelope-from <pmathieu@redhat.com>) id 1iailN-0004vO-7h
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:04:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iahg2-0007cw-Dd
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:55:25 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54254
+ (envelope-from <pmathieu@redhat.com>) id 1iailJ-0008Fn-PU
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:04:55 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23116
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iahg1-0007VH-Ms
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:55:21 -0500
+ (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1iailJ-00084u-LY
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:04:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575039318;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1575043489;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OUnAYlhSWMjzS0fx2/8Ax8szUdBbalsKBKs5r9jABBg=;
- b=X+GsFNljIk1z/HAE6cIC3EO5QMx5KAWcvOO+Mz4HAyWemUTsQ9sLgBg0P3I3en/roKTzRp
- 2EzgtGO3md1SPeRH1DOBU/gw5V/Cnwk7Eh/88dLdXM3K6modygnldeBDcHJvwRDoNjuGue
- lEaG9DIDYgxFih1bxjiQMzcQSAx//kE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-2FWHJCOxMC68hkqAhblbpQ-1; Fri, 29 Nov 2019 09:55:15 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 91D2C10054E3;
- Fri, 29 Nov 2019 14:55:14 +0000 (UTC)
-Received: from redhat.com (ovpn-112-31.ams2.redhat.com [10.36.112.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C571A60BF1;
- Fri, 29 Nov 2019 14:55:12 +0000 (UTC)
-Date: Fri, 29 Nov 2019 14:55:10 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] virtfs-proxy-helper: switch from libcap to libcap-ng
-Message-ID: <20191129145510.GK2260471@redhat.com>
-References: <20191129111632.22840-2-pbonzini@redhat.com>
+ bh=zg8HBt8/v556Px1AquN+KYHYk63ghRTuJn/glDQ/6mE=;
+ b=EqQNTK2NsenAVGHUY1pA4HimCWIXQD77str7Z2X9hVEsslJkzS5L37xmzgJVuecAvCaPsy
+ wiGW+tZafR0vojB5dpbarDL620HUBcW/x1tP3tSgLyl7+Db9Fj5klFsSh5lZVKF7SfRjQY
+ ZZlnQhHY+oVhQU3BsIFz4Q2rOQGt2So=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-b5rV32YROuKUG5lR_Miw9Q-1; Fri, 29 Nov 2019 11:04:48 -0500
+Received: by mail-wr1-f69.google.com with SMTP id b2so14438930wrj.9
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 08:04:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=zg8HBt8/v556Px1AquN+KYHYk63ghRTuJn/glDQ/6mE=;
+ b=AF6/3kRIEoEYF+dRoshZuThv3wUS9L+IKAYc4f2gbAkT/nJoeH5bYntlFLZlh+2FMC
+ ZrCxHvypwuytWFCLx6p0ECBryy8LNCS2QC5yR6/sZYdCfMoCsPaMPGsY+79L5Y9oTrMa
+ KlgHccm1EXvM8pmBIsWiuDgmjBuPzYifXs8DIc437COO7zO9YWTtvTBcF7a/CB2nLIYS
+ LV5xLp6d9kAjX8tr5u2F1gDRjWZuT885dO5H05FiTqt9kxt2iKLUwJ50Dq/T8uamTQ2y
+ GE0yNQ0gan5K7mMoPt1Xu2DZP6V5gabW6gheLu3Hbyu4IFD+y5A5A9u0rvG+iDhbVpW7
+ LnBg==
+X-Gm-Message-State: APjAAAWpicN7yeJWHB5BUTANH9puW/hUN4/qKxx57xqobGtiXjVoVV3D
+ vXsTFaTz+e1FgAukUuqR2dyZ8lspKOi9axiM7rRWceEwVQ/Tr9ErJ1QTfBicH6jFWCUr336Ft96
+ 9GhTOAXa48yU9aMP9iRUE35flZnCtA0Y=
+X-Received: by 2002:a1c:46:: with SMTP id 67mr16423588wma.51.1575043485987;
+ Fri, 29 Nov 2019 08:04:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwJfyEo75CcdjKOhLyA64OptdO2Y3mpTLn8pYTxxAyitO8V3zyZ5m1FWbTx/f5I1lCXQwKT9LDEsgqUA/knxRE=
+X-Received: by 2002:a1c:46:: with SMTP id 67mr16423551wma.51.1575043485738;
+ Fri, 29 Nov 2019 08:04:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191129111632.22840-2-pbonzini@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 2FWHJCOxMC68hkqAhblbpQ-1
+References: <20191129150508.24404-1-bilalwasim676@gmail.com>
+ <afe9efde-7ac1-8607-446a-8fbf10accece@redhat.com>
+ <8c956ae31e8f44a2b831a5030b2448b4@SVR-IES-MBX-03.mgc.mentorg.com>
+In-Reply-To: <8c956ae31e8f44a2b831a5030b2448b4@SVR-IES-MBX-03.mgc.mentorg.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Fri, 29 Nov 2019 17:04:34 +0100
+Message-ID: <CAP+75-X_POJfTO=gOUu1zCPtcfnQ5yemQo0hqB_s3jy_C17o9g@mail.gmail.com>
+Subject: Re: [PATCH] net/imx_fec: Updating the IMX_FEC IP to support loopback
+ mode.
+To: "Wasim, Bilal" <Bilal_Wasim@mentor.com>
+X-MC-Unique: b5rV32YROuKUG5lR_Miw9Q-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -88,233 +98,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: groug@kaod.org, qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "aa1ronham@gmail.com" <aa1ronham@gmail.com>,
+ "jcd@tribudubois.net" <jcd@tribudubois.net>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "bilalwasim676@gmail.com" <bilalwasim676@gmail.com>,
+ "linux@roeck-us.net" <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 29, 2019 at 12:16:32PM +0100, Paolo Bonzini wrote:
-> virtfs-proxy-helper is the only user of libcap; everyone else is using
-> the simpler libcap-ng API.  Switch and remove the configure code to
-> detect libcap.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  configure                   |  18 +------
->  fsdev/virtfs-proxy-helper.c | 100 ++++++++++++++++--------------------
->  2 files changed, 46 insertions(+), 72 deletions(-)
+On Fri, Nov 29, 2019 at 4:59 PM Wasim, Bilal <Bilal_Wasim@mentor.com> wrote=
+:
+>
+> Thanks for the pointers philippe.. Is the patch okay to be merged without=
+ it or do I need to do a re-submission with the updated username ?
 
-The dockerfiles can also be updated to remove libcap-dev/devel
+If there are no review comments on your patch, I think the maintainer
+taking your patch can fix this details directly, no need to resend.
 
->=20
-> diff --git a/configure b/configure
-> index afe9393f04..2216662bf6 100755
-> --- a/configure
-> +++ b/configure
-> @@ -3863,22 +3863,6 @@ else
->    mpathpersist=3Dno
->  fi
-> =20
-> -##########################################
-> -# libcap probe
-> -
-> -if test "$cap" !=3D "no" ; then
-> -  cat > $TMPC <<EOF
-> -#include <stdio.h>
-> -#include <sys/capability.h>
-> -int main(void) { cap_t caps; caps =3D cap_init(); return caps !=3D NULL;=
- }
-> -EOF
-> -  if compile_prog "" "-lcap" ; then
-> -    cap=3Dyes
-> -  else
-> -    cap=3Dno
-> -  fi
-> -fi
-> -
->  ##########################################
->  # pthread probe
->  PTHREADLIBS_LIST=3D"-pthread -lpthread -lpthreadGC2"
-> @@ -6204,7 +6188,7 @@ if test "$want_tools" =3D "yes" ; then
->  fi
->  if test "$softmmu" =3D yes ; then
->    if test "$linux" =3D yes; then
-> -    if test "$virtfs" !=3D no && test "$cap" =3D yes && test "$attr" =3D=
- yes ; then
-> +    if test "$virtfs" !=3D no && test "$cap_ng" =3D yes && test "$attr" =
-=3D yes ; then
->        virtfs=3Dyes
->        tools=3D"$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
->      else
-> diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
-> index 6f132c5ff1..0d4de49dcf 100644
-> --- a/fsdev/virtfs-proxy-helper.c
-> +++ b/fsdev/virtfs-proxy-helper.c
-> @@ -13,7 +13,6 @@
->  #include <sys/resource.h>
->  #include <getopt.h>
->  #include <syslog.h>
-> -#include <sys/capability.h>
->  #include <sys/fsuid.h>
->  #include <sys/vfs.h>
->  #include <sys/ioctl.h>
-> @@ -21,6 +20,7 @@
->  #ifdef CONFIG_LINUX_MAGIC_H
->  #include <linux/magic.h>
->  #endif
-> +#include <cap-ng.h>
->  #include "qemu-common.h"
->  #include "qemu/sockets.h"
->  #include "qemu/xattr.h"
-> @@ -79,49 +79,10 @@ static void do_perror(const char *string)
->      }
->  }
-> =20
-> -static int do_cap_set(cap_value_t *cap_value, int size, int reset)
-> -{
-> -    cap_t caps;
-> -    if (reset) {
-> -        /*
-> -         * Start with an empty set and set permitted and effective
-> -         */
-> -        caps =3D cap_init();
-> -        if (caps =3D=3D NULL) {
-> -            do_perror("cap_init");
-> -            return -1;
-> -        }
-> -        if (cap_set_flag(caps, CAP_PERMITTED, size, cap_value, CAP_SET) =
-< 0) {
-> -            do_perror("cap_set_flag");
-> -            goto error;
-> -        }
-> -    } else {
-> -        caps =3D cap_get_proc();
-> -        if (!caps) {
-> -            do_perror("cap_get_proc");
-> -            return -1;
-> -        }
-> -    }
-> -    if (cap_set_flag(caps, CAP_EFFECTIVE, size, cap_value, CAP_SET) < 0)=
- {
-> -        do_perror("cap_set_flag");
-> -        goto error;
-> -    }
-> -    if (cap_set_proc(caps) < 0) {
-> -        do_perror("cap_set_proc");
-> -        goto error;
-> -    }
-> -    cap_free(caps);
-> -    return 0;
-> -
-> -error:
-> -    cap_free(caps);
-> -    return -1;
-> -}
-> -
->  static int init_capabilities(void)
->  {
->      /* helper needs following capabilities only */
-> -    cap_value_t cap_list[] =3D {
-> +    int cap_list[] =3D {
->          CAP_CHOWN,
->          CAP_DAC_OVERRIDE,
->          CAP_FOWNER,
-> @@ -130,7 +91,34 @@ static int init_capabilities(void)
->          CAP_MKNOD,
->          CAP_SETUID,
->      };
-> -    return do_cap_set(cap_list, ARRAY_SIZE(cap_list), 1);
-> +    int i;
-> +
-> +    capng_clear(CAPNG_SELECT_BOTH);
-> +    for (i =3D 0; i < ARRAY_SIZE(cap_list); i++) {
-> +        if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
-> +                         cap_list[i]) < 0) {
-> +            do_perror("capng_update");
-> +            return -1;
-> +        }
-> +    }
-> +    if (capng_apply(CAPNG_SELECT_BOTH) < 0) {
-> +        do_perror("capng_apply");
-> +        return -1;
-> +    }
-> +
-> +    /* Prepare effective set for setugid.  */
-> +    for (i =3D 0; i < ARRAY_SIZE(cap_list); i++) {
-> +        if (cap_list[i] =3D=3D CAP_DAC_OVERRIDE) {
-> +            continue;
-> +        }
-> +
-> +        if (capng_update(CAPNG_DROP, CAPNG_EFFECTIVE,
-> +                         cap_list[i]) < 0) {
-> +            do_perror("capng_update");
-> +            return -1;
-> +        }
-> +    }
-> +    return 0;
->  }
-> =20
->  static int socket_read(int sockfd, void *buff, ssize_t size)
-> @@ -295,14 +283,6 @@ static int setugid(int uid, int gid, int *suid, int =
-*sgid)
->  {
->      int retval;
-> =20
-> -    /*
-> -     * We still need DAC_OVERRIDE because we don't change
-> -     * supplementary group ids, and hence may be subjected DAC rules
-> -     */
-> -    cap_value_t cap_list[] =3D {
-> -        CAP_DAC_OVERRIDE,
-> -    };
-> -
->      *suid =3D geteuid();
->      *sgid =3D getegid();
-> =20
-> @@ -316,11 +296,21 @@ static int setugid(int uid, int gid, int *suid, int=
- *sgid)
->          goto err_sgid;
->      }
-> =20
-> -    if (uid !=3D 0 || gid !=3D 0) {
-> -        if (do_cap_set(cap_list, ARRAY_SIZE(cap_list), 0) < 0) {
-> -            retval =3D -errno;
-> -            goto err_suid;
-> -        }
-> +    if (uid =3D=3D 0 && gid =3D=3D 0) {
-> +        /* Linux has already copied the permitted set to the effective s=
-et.  */
-> +        return 0;
-> +    }
-> +
-> +    /*
-> +     * All capabilities have been cleared from the effective set.  Howev=
-er
-> +     * we still need DAC_OVERRIDE because we don't change supplementary
-> +     * group ids, and hence may be subject to DAC rules.  init_capabilit=
-ies
-> +     * left the set of capabilities that we want in libcap-ng's state.
-> +     */
-> +    if (capng_apply(CAPNG_SELECT_CAPS) < 0) {
-> +        retval =3D -errno;
-> +        do_perror("capng_apply");
-> +        goto err_suid;
->      }
->      return 0;
-> =20
-> --=20
-> 2.21.0
->=20
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+> -----Original Message-----
+> From: Philippe Mathieu-Daud=C3=A9 [mailto:philmd@redhat.com]
+> Sent: Friday, November 29, 2019 8:38 PM
+> To: bilalwasim676@gmail.com; qemu-devel@nongnu.org
+> Cc: peter.maydell@linaro.org; aa1ronham@gmail.com; jcd@tribudubois.net; q=
+emu-arm@nongnu.org; Wasim, Bilal <Bilal_Wasim@mentor.com>; linux@roeck-us.n=
+et; Jason Wang <jasowang@redhat.com>
+> Subject: Re: [PATCH] net/imx_fec: Updating the IMX_FEC IP to support loop=
+back mode.
+>
+> Hi Bilal,
+>
+> Cc'ing Jason, the maintainer of network devices.
+>
+> On 11/29/19 4:05 PM, bilalwasim676@gmail.com wrote:
+> > From: bwasim <bilal_wasim@mentor.com>
+>
+> Your git setup misses your 'user.name', you could fix it running:
+>
+>    git config user.name "Bilal Wasim"
+>
+> (eventually with the --global option).
+>
+> The patch looks good otherwise.
+>
+> Thanks!
+>
+> > Loopback mode only works when specific conditions (as dictated by the
+> > IP guide) are met, i.e. the MII_MODE is set and the RMII_MODE is
+> > cleared. If not, we simply send the packet on the output queue (for TX
+> > to the host network). Tested by running a custom RTOS and TXing a ton
+> > of packets. The same packets were received on the RX side..
+> >
+> > Signed-off-by: Bilal Wasim <bilal_wasim@mentor.com>
+> > ---
+> >   hw/net/imx_fec.c | 27 +++++++++++++++++++++++++--
+> >   1 file changed, 25 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c index
+> > bd99236864..c51e7f7363 100644
+> > --- a/hw/net/imx_fec.c
+> > +++ b/hw/net/imx_fec.c
+> > @@ -256,6 +256,29 @@ static const VMStateDescription vmstate_imx_eth =
+=3D
+> > {
+> >
+> >   static void imx_eth_update(IMXFECState *s);
+> >
+> > +/*
+> > + * Function to check if the MAC is configured to run in loopback mode.
+> > + * If so, invoke the "receive" routine.
+> > + * Else write to the output.
+> > + * */
+> > +static void send_pkt(IMXFECState *s, uint8_t *frame, int frame_size)
+> > +{
+> > +    NetClientState *nc =3D qemu_get_queue(s->nic);
+> > +
+> > +    /*
+> > +     * Loopback or Normal mode ?
+> > +     * Per the FEC Manual: If loopback is enabled, the MII_MODE
+> > +     * should be SET and the RMII_MODE should be cleared. Loopback
+> > +     * will only work if this criterion is met. If not met,
+> > +     * we will send the frame on the output queue. */
+> > +    if ((s->regs[ENET_RCR] & ENET_RCR_LOOP) && (s->regs[ENET_RCR] & EN=
+ET_RCR_MII_MODE)
+> > +            && !(s->regs[ENET_RCR] & ENET_RCR_RMII_MODE)) {
+> > +        nc->info->receive(nc, frame, frame_size);
+> > +    } else {
+> > +        qemu_send_packet(nc, frame, frame_size);
+> > +    }
+> > +}
+> > +
+> >   /*
+> >    * The MII phy could raise a GPIO to the processor which in turn
+> >    * could be handled as an interrpt by the OS.
+> > @@ -488,7 +511,7 @@ static void imx_fec_do_tx(IMXFECState *s)
+> >           frame_size +=3D len;
+> >           if (bd.flags & ENET_BD_L) {
+> >               /* Last buffer in frame.  */
+> > -            qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_s=
+ize);
+> > +            send_pkt(s, (uint8_t *)&s->frame, frame_size);
+> >               ptr =3D s->frame;
+> >               frame_size =3D 0;
+> >               s->regs[ENET_EIR] |=3D ENET_INT_TXF; @@ -586,7 +609,7 @@
+> > static void imx_enet_do_tx(IMXFECState *s, uint32_t index)
+> >               }
+> >               /* Last buffer in frame.  */
+> >
+> > -            qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_s=
+ize);
+> > +            send_pkt(s, (uint8_t *)&s->frame, frame_size);
+> >               ptr =3D s->frame;
+> >
+> >               frame_size =3D 0;
+> >
+>
 
 
