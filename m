@@ -2,81 +2,72 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45EA0C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C64C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 17:16:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 104DE208E4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:47:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sUDWv0sm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 104DE208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BDBD8216F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 17:16:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDBD8216F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iajQi-000496-3Y
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 11:47:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40563)
+	id 1iajsb-0007XP-Ru
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 12:16:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52704)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iaj6a-0000PN-2g
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:26:53 -0500
+ (envelope-from <emacsray@gmail.com>) id 1iajp1-000711-Tl
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 12:12:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iaj6X-0000Pm-Od
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:26:50 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39041)
+ (envelope-from <emacsray@gmail.com>) id 1iajoz-0003zK-UB
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 12:12:47 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:34790)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iaj6X-0000Gm-I0
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:26:49 -0500
-Received: by mail-ot1-x341.google.com with SMTP id 77so4059637oty.6
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 08:26:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Z1hrNlxhG3/CT2CKsfxZWWikkXq7jsv0gPXS7BSZZsM=;
- b=sUDWv0smmBB9rB84ErwldnHcDUeeR5d9YSrSQ6lD4PAJV7BQK5FID/U48+FyOqEe4M
- icQhw2lS4VRUkk8H80ZkgjtTNOJWFtYrP1Ajifj8b+QCSVccBotP+Va7HUsXOCIQaXPb
- N9tojxlSmGXBMvRXnXRQnSbOtFlD8JzHLTYJR8DC6v4rUDtkVd69y6711YplcaPfJUGS
- aiIgRxa0SJ689LIFo+MUVmWypkL2kryVrY7HzcDh8dLe/CCvzIihHgxN7c1HFxFTYSHI
- pWd5sgN2CapxF4cVgoMrs3YvJ9f+1EMwyGxA7s7TOzHcW0U4Uy9NN1d8fhhdjXrojve7
- x8Lg==
+ (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1iajoz-0003ob-JD
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 12:12:45 -0500
+Received: by mail-pf1-f194.google.com with SMTP id n13so14873690pff.1
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 09:12:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Z1hrNlxhG3/CT2CKsfxZWWikkXq7jsv0gPXS7BSZZsM=;
- b=cFYMxhm5H+S0BNoHm1BJX401suPL5S+2VxyS2htco6e/EeEer2jfU7OPyM7WWV3+Ap
- EtznQf9oIbgt9f+z5m+OVNClvu29pXWlOmIEv/AsBEtpp1lVRDwyCZRGdsp9pkVtRQLo
- 3ppTgZeai8rMsVp/a7urQweCbJLDRc4aVIsfDZLC854GWDrJVcQt64dNiiXUuHx4V77k
- gEr6oqYqpJ6HHNKrAyPYhnSgmrg08Yro0Boa6a3kxyrynKBM3/rwhug6X17XZWWznv/c
- i80f28oasEnwSXlN9LeFQOQYQkMdQxCC+2AmFfcFXogn0e7f87ey4uN0c7f8CxHIFiA4
- JejA==
-X-Gm-Message-State: APjAAAVSvrTuhfxPu597rL8MLgCCKGqettWKXYjhqQ4EG6s4V+P5D2XM
- yaLjRFBsBEYIjKzkskIXUzOYYcpRxRuxyfgBZMQH7g==
-X-Google-Smtp-Source: APXvYqy3or4/PakF7C1Ad9rQCKyVOMz2N28gcsmIm8lIE7mYqzlVJAEwAS2mLlk4D43FBoctlXaShuobB7oe1m83P60=
-X-Received: by 2002:a9d:6357:: with SMTP id y23mr11900898otk.91.1575044806521; 
- Fri, 29 Nov 2019 08:26:46 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition:content-transfer-encoding;
+ bh=TM/d60k9a3O7qFVSgOboxkwTZv4uOmk6CcsiWnP3rl8=;
+ b=tFEqQ3mQKs1nuAkDujsol8f02uOYHuyt14q9V5oHGjkIDbJ4lbIyVajDzghLCsyhtB
+ tx0tLjMn5Lpze6MvhEeWKU+16D7Z0irIOoT8R6K2yqPNYJ7JE0g0W5mylSq10xuhETdw
+ 9+/97uBM7OwQFzZVdO7IPSnT9bkSOyXI/GSz8gPenKvmIyN6Pzqr7FMhBIa+xFQ76Oi4
+ mmVoLF80MukhUuvf4LU1ZqMkzipnmSNqzkyVkiJmi43MsgWBBEVt6jxB3mNOBQAMqUNd
+ lsntKMl5IlEKkGfdJq/k6qCfe+BZJmDC+wnTXSBdXvPlXBPVOJySGF4QfQ8AGofKum+Y
+ 7YFw==
+X-Gm-Message-State: APjAAAWPj0QGXpZ//Z71ELToagQNWxfEZP3fSGr8+0OubBy/xhc8BNM9
+ iP4Ti4KMUGz2ZEWWBV74Oik=
+X-Google-Smtp-Source: APXvYqw13EZkVMrC+hgtdectxb/Y1/i/W68cqhvWDnkjKyVxaN7y+kloyRzTwXHs74rESmo8wyQc+Q==
+X-Received: by 2002:aa7:8207:: with SMTP id k7mr60450994pfi.130.1575047562584; 
+ Fri, 29 Nov 2019 09:12:42 -0800 (PST)
+Received: from localhost (c-71-204-169-238.hsd1.ca.comcast.net.
+ [71.204.169.238])
+ by smtp.gmail.com with ESMTPSA id i10sm24705920pgd.73.2019.11.29.09.12.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 29 Nov 2019 09:12:41 -0800 (PST)
+Date: Fri, 29 Nov 2019 09:12:40 -0800
+From: Fangrui Song <i@maskray.me>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v2] configure: Use lld --image-base for --disable-pie user
+ mode binaries
+Message-ID: <20191129171240.logglzt4emzw46cd@google.com>
 MIME-Version: 1.0
-References: <20191127132430.3681-1-alex.bennee@linaro.org>
- <38416b79-0068-6703-759b-2015b271801d@redhat.com>
-In-Reply-To: <38416b79-0068-6703-759b-2015b271801d@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Nov 2019 16:26:34 +0000
-Message-ID: <CAFEAcA9+Lr2KPANu4Fz_LQK-P0YMu9+qKhUsqOme-AsxSGVQYg@mail.gmail.com>
-Subject: Re: [PATCH for 4.2?] .travis.yml: drop xcode9.4 from build matrix
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+Content-Type: multipart/mixed; boundary="suelptnay3holjim"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.210.194
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,58 +79,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 29 Nov 2019 at 13:52, Thomas Huth <thuth@redhat.com> wrote:
->
-> On 27/11/2019 14.24, Alex Benn=C3=A9e wrote:
-> > It's broken so it's no longer helping. The latest Xcode is covered by
-> > Cirrus.
-> >
-> > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> > ---
-> >  .travis.yml | 8 +-------
-> >  1 file changed, 1 insertion(+), 7 deletions(-)
-> >
-> > diff --git a/.travis.yml b/.travis.yml
-> > index c09b6a00143..445b0646c18 100644
-> > --- a/.travis.yml
-> > +++ b/.travis.yml
-> > @@ -237,13 +237,7 @@ matrix:
-> >          - TEST_CMD=3D""
-> >
-> >
-> > -    # MacOSX builds
-> > -    - env:
-> > -        - CONFIG=3D"--target-list=3D${MAIN_SOFTMMU_TARGETS}"
-> > -      os: osx
-> > -      osx_image: xcode9.4
-> > -      compiler: clang
-> > -
-> > +    # MacOSX builds - cirrus.yml also tests some MacOS builds includin=
-g latest Xcode
->
-> Ack for removing xcode9.4, it's also constantly failing for me, which is
-> quite annoying.
->
-> Additionally, the xcode9.4 runs on macOS 10.13, which we do not
-> officially support anymore in QEMU (we only support the latest two
-> releases).
->
-> But maybe instead of removing the entry completely, you could replace it
-> with "xcode11.2" instead if that works? See:
 
-For purposes of 4.2 I've applied this patch-as is (since we're
-going to get an rc4 anyway, and this is a simple change which
-will stop travis complaining about the 4.2 stable branch in
-future). We can look at xcode11.2 for 5.0.
+--suelptnay3holjim
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-thanks
--- PMM
+
+On 2019-11-27, Alex Bennée wrote:
+>
+>Fangrui Song <i@maskray.me> writes:
+>
+>> For lld, --image-base is the preferred way to set the base address.
+>> lld does not actually implement -Ttext-segment, but treats it as an alias for
+>> -Ttext. -Ttext-segment=0x60000000 combined with --no-rosegment can
+>> create a 1.6GB executable.
+>>
+>> Fix the problem by using --image-base for lld. GNU ld and gold will
+>> still get -Ttext-segment. Also delete the ld --verbose fallback introduced
+>> in 2013, which is no longer relevant or correct (the default linker
+>> script has changed).
+>>
+>> Signed-off-by: Fangrui Song <i@maskray.me>
+>
+>This patch no longer applies cleanly to configure so I couldn't test it.
+
+configure was touched twice last week, but git still works.
+Anyway, I am uploading a new patch without In-Reply-To.
+
+>> ---
+>>   configure | 33 ++++++++++++---------------------
+>>   1 file changed, 12 insertions(+), 21 deletions(-)
+>>
+>> diff --git a/configure b/configure
+>> index 6099be1d84..2d45af0d09 100755
+>> --- a/configure
+>> +++ b/configure
+>> @@ -6336,43 +6336,34 @@ fi
+>>
+>>   # Probe for the need for relocating the user-only binary.
+>>   if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ]; then
+>> -  textseg_addr=
+>> +  image_base=
+>>     case "$cpu" in
+>>       arm | i386 | ppc* | s390* | sparc* | x86_64 | x32)
+>> -      # ??? Rationale for choosing this address
+>> -      textseg_addr=0x60000000
+>> +      # An arbitrary address that makes it unlikely to collide with user
+>> +      # programs.
+>> +      image_base=0x60000000
+>
+>The comment probably belongs up above when we define the empty variable
+>unless it really is specifically about these targets.
+
+Moved the comment.
+
+>Renaming textseg_addr seems like unnecessary churn for this patch.
+
+Renaming is necessary. "Text segment" is no more an appropriate term
+even with GNU ld due to the prevalence of -z separate-code
+(--enable-separate-code is the default on Linux x86-64 in recent
+binutils releases). There is a PF_R PT_LOAD before PF_R|PF_X PT_LOAD
+(text segment). One may argue that we can name the two PT_LOAD
+collectively as "text segment but I don't think that is appropriate.
+
+>
+>>         ;;
+>>       mips)
+>>         # A 256M aligned address, high in the address space, with enough
+>>         # room for the code_gen_buffer above it before the stack.
+>> -      textseg_addr=0x60000000
+>> +      image_base=0x60000000
+>>         ;;
+>>     esac
+>> -  if [ -n "$textseg_addr" ]; then
+>> +  if [ -n "$image_base" ]; then
+>>       cat > $TMPC <<EOF
+>>       int main(void) { return 0; }
+>>   EOF
+>> -    textseg_ldflags="-Wl,-Ttext-segment=$textseg_addr"
+>> -    if ! compile_prog "" "$textseg_ldflags"; then
+>> -      # In case ld does not support -Ttext-segment, edit the default linker
+>> -      # script via sed to set the .text start addr.  This is needed on FreeBSD
+>> -      # at least.
+>> -      if ! $ld --verbose >/dev/null 2>&1; then
+>> +    image_base_ldflags="-Wl,--image-base=$image_base"
+>> +    if ! compile_prog "" "$image_base_ldflags"; then
+>> +      image_base_ldflags="-Wl,-Ttext-segment=$image_base"
+>> +      if ! compile_prog "" "$image_base_ldflags"; then
+>>           error_exit \
+>>               "We need to link the QEMU user mode binaries at a" \
+>>               "specific text address. Unfortunately your linker" \
+>> -            "doesn't support either the -Ttext-segment option or" \
+>> -            "printing the default linker script with --verbose." \
+>> +            "supports neither --image-base nor -Ttext-segment. " \
+>>               "If you don't want the user mode binaries, pass the" \
+>>               "--disable-user option to configure."
+>>         fi
+>> -
+>> -      $ld --verbose | sed \
+>> -        -e '1,/==================================================/d' \
+>> -        -e '/==================================================/,$d' \
+>> -        -e "s/[.] = [0-9a-fx]* [+] SIZEOF_HEADERS/. = $textseg_addr + SIZEOF_HEADERS/" \
+>> -        -e "s/__executable_start = [0-9a-fx]*/__executable_start = $textseg_addr/" > config-host.ld
+>> -      textseg_ldflags="-Wl,-T../config-host.ld"
+>>       fi
+>>     fi
+>>   fi
+>> @@ -7945,7 +7936,7 @@ if test "$gprof" = "yes" ; then
+>>   fi
+>>
+>>   if test "$target_linux_user" = "yes" || test "$target_bsd_user" = "yes" ; then
+>> -  ldflags="$ldflags $textseg_ldflags"
+>> +  ldflags="$ldflags $image_base_ldflags"
+>>   fi
+>>
+>>   # Newer kernels on s390 check for an S390_PGSTE program header and
+
+(I'm not subscribed to the list, so please CC me.
+I made this reply by downloading
+https://lists.gnu.org/archive/mbox/qemu-devel/2019-11)
+
+--suelptnay3holjim
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="qemu-image-base.patch"
+
+From fea2e6a09234d13402dd6e6dce9300bc6d08efe1 Mon Sep 17 00:00:00 2001
+From: Fangrui Song <i@maskray.me>
+Date: Fri, 15 Nov 2019 20:42:40 -0800
+Subject: [PATCH] configure: Use lld --image-base for --disable-pie user mode
+ binaries
+To: qemu-devel@nongnu.org
+
+For lld, --image-base is the preferred way to set the base address.
+lld does not actually implement -Ttext-segment, but treats it as an alias for
+-Ttext. -Ttext-segment=0x60000000 combined with --no-rosegment can
+create a 1.6GB executable.
+
+Fix the problem by using --image-base for lld. GNU ld and gold will
+still get -Ttext-segment. Also delete the ld --verbose fallback introduced
+in 2013, which is no longer relevant or correct (the default linker
+script has changed).
+---
+ configure | 33 ++++++++++++---------------------
+ 1 file changed, 12 insertions(+), 21 deletions(-)
+
+diff --git a/configure b/configure
+index 6099be1d84..33e5344194 100755
+--- a/configure
++++ b/configure
+@@ -6336,43 +6336,34 @@ fi
+ 
+ # Probe for the need for relocating the user-only binary.
+ if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ]; then
+-  textseg_addr=
++  # An arbitrary address that makes it unlikely to collide with user
++  # programs.
++  image_base=
+   case "$cpu" in
+     arm | i386 | ppc* | s390* | sparc* | x86_64 | x32)
+-      # ??? Rationale for choosing this address
+-      textseg_addr=0x60000000
++      image_base=0x60000000
+       ;;
+     mips)
+       # A 256M aligned address, high in the address space, with enough
+       # room for the code_gen_buffer above it before the stack.
+-      textseg_addr=0x60000000
++      image_base=0x60000000
+       ;;
+   esac
+-  if [ -n "$textseg_addr" ]; then
++  if [ -n "$image_base" ]; then
+     cat > $TMPC <<EOF
+     int main(void) { return 0; }
+ EOF
+-    textseg_ldflags="-Wl,-Ttext-segment=$textseg_addr"
+-    if ! compile_prog "" "$textseg_ldflags"; then
+-      # In case ld does not support -Ttext-segment, edit the default linker
+-      # script via sed to set the .text start addr.  This is needed on FreeBSD
+-      # at least.
+-      if ! $ld --verbose >/dev/null 2>&1; then
++    image_base_ldflags="-Wl,--image-base=$image_base"
++    if ! compile_prog "" "$image_base_ldflags"; then
++      image_base_ldflags="-Wl,-Ttext-segment=$image_base"
++      if ! compile_prog "" "$image_base_ldflags"; then
+         error_exit \
+             "We need to link the QEMU user mode binaries at a" \
+             "specific text address. Unfortunately your linker" \
+-            "doesn't support either the -Ttext-segment option or" \
+-            "printing the default linker script with --verbose." \
++            "supports neither --image-base nor -Ttext-segment. " \
+             "If you don't want the user mode binaries, pass the" \
+             "--disable-user option to configure."
+       fi
+-
+-      $ld --verbose | sed \
+-        -e '1,/==================================================/d' \
+-        -e '/==================================================/,$d' \
+-        -e "s/[.] = [0-9a-fx]* [+] SIZEOF_HEADERS/. = $textseg_addr + SIZEOF_HEADERS/" \
+-        -e "s/__executable_start = [0-9a-fx]*/__executable_start = $textseg_addr/" > config-host.ld
+-      textseg_ldflags="-Wl,-T../config-host.ld"
+     fi
+   fi
+ fi
+@@ -7945,7 +7936,7 @@ if test "$gprof" = "yes" ; then
+ fi
+ 
+ if test "$target_linux_user" = "yes" || test "$target_bsd_user" = "yes" ; then
+-  ldflags="$ldflags $textseg_ldflags"
++  ldflags="$ldflags $image_base_ldflags"
+ fi
+ 
+ # Newer kernels on s390 check for an S390_PGSTE program header and
+-- 
+2.24.0
+
+
+--suelptnay3holjim--
 
