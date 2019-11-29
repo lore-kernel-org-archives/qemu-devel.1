@@ -2,118 +2,108 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1CAC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 13:07:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EC2C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 13:13:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BF35216F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 13:07:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC277216F4
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 13:13:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="g5J9Rlrm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BF35216F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cBvGyKdd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC277216F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iafzs-0006X5-1V
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 08:07:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57403)
+	id 1iag5D-0002PI-4C
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 08:13:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50004)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iafnv-0007tB-Al
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 07:55:25 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iag1A-0007rp-PJ
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 08:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iafnp-0000Dd-RY
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 07:55:19 -0500
-Received: from mail-he1eur01on070e.outbound.protection.outlook.com
- ([2a01:111:f400:fe1e::70e]:33019
- helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iafnp-0008PD-IJ; Fri, 29 Nov 2019 07:55:17 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DrebWi/6UoTCt18S0H2IHBJ+wWx+rJCLeS9NRm8ahMdn+LJ/9Akmh00cKCpdzP8ZoL5a0FwgpH5uLVzY1n5oqL2dEahk8XazzG2rbWwyOkhdHJWwAJ9uGFmsYgxxUIkTZTgq+9vNnI7alhJ9b6v5qYBNIJwqPJa8AuF2YltLngpJqoAY/YOVb19D4m3BddVEecXF02wNyFYmT0SGvLIgumwrQKWTUoK1qB6gPdua+SmPN0efRlyfJ37/hwGqBpBNM2MYAsNW5EMjV4D6UjGqMxxherEPbTxP94OZzjZimDqU/rvKv4c0IyH1HFGsH8h4xC5sTuCO5k8sgmotCoPr4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TCGv5DxmTKnCKhmG9T5AbcAFVLcqAWsiPUitrq/lbaw=;
- b=WaKye70JmlVsbg7ijo+Lw2gif5jdKwYFqmVOCo18KCllmH0sMkMfjCYdqSoj51oMky9Su9jt/X5Y/dyeZbrpzki0xbf6yuWSZkMBkUPYW2Qr9wAT3GmibgdP9GNc5rZ9FmpzbnQBnW94ZkGIyN0FxGjeI45RMYqk6wjQ0ko2otKXO6at+3yn6MnCSYJzTtBCGJkepJ3Wk9yGJJJSy1Ay/Rt1w2JYXJTFxGtf6zujCtlTR2yUJTF1DT5a1iG4snGLoxsoC7/KuN7sX9//l08VVmVaDpLgM7Jx4Gv1Q7NlXH7W2DPQBzLyBlGOpY2gWxUOvPBNL32R9LhR3HQM5Rp4GQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TCGv5DxmTKnCKhmG9T5AbcAFVLcqAWsiPUitrq/lbaw=;
- b=g5J9RlrmUF8TTjSU7nNouHb6EtijAx+EYPZIEFXgYdI1exTadIti+UC2nFT5fMPQFA4ftPEEyaMpqTcTYhrEy0JCkzkDyqpGvd+Pjwm3AfV4FXVAvmlVJLWdycaXouFKd1ewuub8WY0IO9AycU5+b34Rlh+aP6o9G8XINd8XXtc=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4213.eurprd08.prod.outlook.com (20.178.91.90) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.17; Fri, 29 Nov 2019 12:55:04 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2495.014; Fri, 29 Nov 2019
- 12:55:04 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
+ (envelope-from <mreitz@redhat.com>) id 1iag16-0003oj-GP
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 08:09:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31136
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iag16-0003fn-Bh
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 08:09:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575032937;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=rLWQ88AMKx0tyuojlx9owh5L5OoZuA5DX166HOw9HPw=;
+ b=cBvGyKddJwYFdNBbRmc3EBpCUIfmFSZ3dtaxYJvV0LXHSl+3QwHkckaO2qnixKnp66Omk4
+ GlHMy0N3k2GmQC4Znz34QUjC6+6jjXlDV3XWJHHtK9cOeBl+97uJe1VtAOrsKD89o7KrQT
+ GgqRbqg9BAVUL+weJgTaT1ICqPNVVBY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-164-VLWOAPczMJyiDA1Ow7EpPg-1; Fri, 29 Nov 2019 08:08:53 -0500
+X-MC-Unique: VLWOAPczMJyiDA1Ow7EpPg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4E4A107ACC4;
+ Fri, 29 Nov 2019 13:08:52 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-206-40.brq.redhat.com
+ [10.40.206.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A37E60BE2;
+ Fri, 29 Nov 2019 13:08:51 +0000 (UTC)
 Subject: Re: [PATCH for-5.0 v2 00/23] block: Fix check_to_replace_node()
-Thread-Topic: [PATCH for-5.0 v2 00/23] block: Fix check_to_replace_node()
-Thread-Index: AQHVmKlpfvOoU/F0/UCS/QjP1du9qqeiYNKA///UqQCAAAGegA==
-Date: Fri, 29 Nov 2019 12:55:04 +0000
-Message-ID: <e1d9f786-1849-2b6b-a585-09a779dbc29f@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
 References: <20191111160216.197086-1-mreitz@redhat.com>
  <a134c8a6-17c1-34bc-79f6-76062ff0c668@virtuozzo.com>
  <2fd76d27-d60e-a9d1-f42a-89b9bd0d5dcb@redhat.com>
-In-Reply-To: <2fd76d27-d60e-a9d1-f42a-89b9bd0d5dcb@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR07CA0014.eurprd07.prod.outlook.com
- (2603:10a6:7:67::24) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191129155501807
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 08fdc04b-bf58-401d-3bc3-08d774cb5a77
-x-ms-traffictypediagnostic: AM6PR08MB4213:
-x-microsoft-antispam-prvs: <AM6PR08MB42132C1B7395739C633C0F8DC1460@AM6PR08MB4213.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
-x-forefront-prvs: 0236114672
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(39840400004)(396003)(376002)(136003)(346002)(189003)(199004)(25786009)(66946007)(229853002)(66556008)(66476007)(66446008)(14454004)(64756008)(7736002)(8676002)(6306002)(36756003)(2906002)(71200400001)(305945005)(478600001)(71190400001)(26005)(186003)(446003)(66066001)(4744005)(6512007)(53546011)(256004)(81156014)(81166006)(6486002)(52116002)(8936002)(2616005)(11346002)(102836004)(54906003)(76176011)(86362001)(110136005)(99286004)(5660300002)(2501003)(316002)(31696002)(6246003)(6116002)(6436002)(966005)(31686004)(386003)(6506007)(3846002)(4326008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4213;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: hH/rA8T+8rTcts0LBNan7t7IuIzHwKauzqdAcF7L7qyZr5f4e0aqo2nZn6j85WuioBJ8UMQecZliGmhWeCmzKNYxl9FJZq4qBOeFkoTOIW8tBr2JwOANQm7hwg9eL23QsQJAvVUN6HWvWtsAjPbA8/B2ATlqCU+bKLYlWh/+Sc7DkFKzoq5vzY/VcNpYkLyju7eFFif0ufpWN5iwKrqNoJpntuhlzM+bBcDFJl2PDdM/31+kpry9d+TTvixJHSDOrO7nd6d80AEj1x491AyRcFB0z358H4Fls3kIqTWIKIghQbXWuZ4pr/8iwpfPCeyVulmoPPAcZD7DRPXMxHpCC1uKUejrf86cQzto3Yho2rLtZcIC+qf1nBQ7Q7hp8pjaPHWnxBHQGUp9sY7ZtcLgcBrrRoPe2yKwjJEbrPRZS7Z6zNDYNPY1UDGInKXK7yK7z42A4biCFftXLn2/LlHiF0hA2pvqvvTMsdMmNpQRV/w=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <48B135EC45FA1C408EBF16ACF094BA85@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ <e1d9f786-1849-2b6b-a585-09a779dbc29f@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ece4dd12-340a-619b-f7e6-a661995f744c@redhat.com>
+Date: Fri, 29 Nov 2019 14:08:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08fdc04b-bf58-401d-3bc3-08d774cb5a77
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Nov 2019 12:55:04.3289 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bQT+MgFts/3G8zDlazIqvODmOFmBZg0hIVQFZdXywLgrZaftmqKiQGHkVvnG3+VsFaqBTOZBw1qlJmv3GQoKEb6sDDT/QzWxd+PjQnLu1Qw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4213
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe1e::70e
+In-Reply-To: <e1d9f786-1849-2b6b-a585-09a779dbc29f@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="vXytOiDr4AGyy1eQHgEW8z6kKHipxRRPR"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,13 +121,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjkuMTEuMjAxOSAxNTo0OSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4xMS4xOSAxMzoyNCwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDMgbGFzdCBpb3Rlc3RzIHBh
-dGNoZXMgZG9uJ3QgYXBwbHkgbm93Li4gRG8geW91IGhhdmUgYSBicmFuY2ggcHVzaGVkIHNvbWV3
-aGVyZT8NCj4gDQo+IEhtLCBpdOKAmXMgYmFzZWQgb24g4oCcaW90ZXN0czogVGVzdCBmYWlsaW5n
-IG1pcnJvciBjb21wbGV0ZeKAnSwgbWF5YmUgYmVjYXVzZQ0KPiBvZiB0aGF0Lg0KPiANCj4gRG9l
-cyB0aGlzIHdvcms/DQo+IA0KPiBodHRwczovL2dpdC54YW5jbGljLm1vZS9YYW5DbGljL3FlbXUu
-Z2l0IGZpeC1jYW4tcmVwbGFjZS12Mg0KPiANCg0KSG1tLCBJIHJlbWVtYmVyIGluIHBhc3QsIGZl
-dGNoaW5nIGZyb20gdGhpcyByZXBvIGFsd2F5cyBoYW5nIGZvciBtZS4NCkJ1dCBub3cgaXQgd29y
-a3MsIHRoYW5rcy4NCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vXytOiDr4AGyy1eQHgEW8z6kKHipxRRPR
+Content-Type: multipart/mixed; boundary="HD4yPoNHdLBbsZyOEEztF9daQFic4iz67"
+
+--HD4yPoNHdLBbsZyOEEztF9daQFic4iz67
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 29.11.19 13:55, Vladimir Sementsov-Ogievskiy wrote:
+> 29.11.2019 15:49, Max Reitz wrote:
+>> On 29.11.19 13:24, Vladimir Sementsov-Ogievskiy wrote:
+>>> 3 last iotests patches don't apply now.. Do you have a branch pushed so=
+mewhere?
+>>
+>> Hm, it=E2=80=99s based on =E2=80=9Ciotests: Test failing mirror complete=
+=E2=80=9D, maybe because
+>> of that.
+>>
+>> Does this work?
+>>
+>> https://git.xanclic.moe/XanClic/qemu.git fix-can-replace-v2
+>>
+>=20
+> Hmm, I remember in past, fetching from this repo always hang for me.
+> But now it works, thanks.
+
+Possibly because I disabled Gravatar fetching. :-)
+
+(No idea why that would affect git, but I do know it made the normal
+browser representation quicker.)
+
+Max
+
+
+--HD4yPoNHdLBbsZyOEEztF9daQFic4iz67--
+
+--vXytOiDr4AGyy1eQHgEW8z6kKHipxRRPR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3hGGIACgkQ9AfbAGHV
+z0Cm3QgAiX4v4Vcm+PuVaN4dO9q4S47GDJvEHS1S9gwDB6TWhadNxcZEhcIcHyPc
+G+c1+PT+I96MmZNxmz7DdjHHeim/qQEhsAVUapA7g5RfR3JxAfQa6adNAiZJgVgv
+Ex8HRId8pvf/xGnBw1jm7z+nmTXyH9OZv/PkvbSFNND4AqJmnI2qLQlqx34GieTP
+29g8IwFMcyLd57oWkouIbBy76mIOaPRc3LnqmqTaActbmMFIVBXS2LYSF4xEHFQ+
+rxNVuLfh96pqgcN6XlsRfgxG0z5BEnY21UZ0Pzm6ciU5cJavufH9dqfzdINyFCtG
+VyPnZKYNwGPa1EMJehwwgsl8IlBQbw==
+=gOLb
+-----END PGP SIGNATURE-----
+
+--vXytOiDr4AGyy1eQHgEW8z6kKHipxRRPR--
+
 
