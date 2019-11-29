@@ -2,84 +2,126 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74CD3C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 12:03:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF51C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 12:06:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 407C020869
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 12:03:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 020FB20869
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 12:06:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOPRyXAc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407C020869
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NVLM+jM4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020FB20869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaf04-0004Fu-AL
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 07:03:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57204)
+	id 1iaf2N-0005kX-W3
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 07:06:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48807)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iaeGS-00056H-Kh
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:16:48 -0500
+ (envelope-from <david@redhat.com>) id 1iaefc-0007AU-W3
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:42:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iaeGN-0001wx-96
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:16:40 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43507)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iaeGM-0001iN-2B
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:16:39 -0500
-Received: by mail-wr1-x443.google.com with SMTP id n1so34713627wra.10
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 03:16:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=y+JITu/sXR0tEv1HQ2+1vlvrpnR0cdQPnZCIBN6cwjA=;
- b=OOPRyXAc3Ro9oA6WLST4+OOQgDtD4dwsCAxWZp0AhRM1lVNXATlWG8vjdABp9ewPYJ
- JIlcqjudnUNSFXaGxnPYqkOYi8w4NChvIxEwrqJo1AAPUh6jyiz0S4JS49NwtVC9R/bM
- XqdTUkCbbjCcqgTHtxEUUF05ZFGJLkagAPdBogWObijGv/N707HrKj1zFgbuH85mi9au
- ANuckbEDS3ExXbk8kNhoIQVTbrnfplovaraWQdtChsUvL4ZZiny3FTvAt69LhGnFhp6i
- 1MtO4KD8gXoO8BOTKBUwMcYG+Y4Gs9MqhFokEmmcI7l8hthhgVsABGSd0X/nTdujJEhi
- vmaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=y+JITu/sXR0tEv1HQ2+1vlvrpnR0cdQPnZCIBN6cwjA=;
- b=b0xe8nkVWBW1h6/xQw7aP8A7nLqrU6eSJnGzReXtl2GZvdj5SRxrzWSZuuXJhfL5Zx
- xOoRbP2D2hCrESzWDKBnRHcoYKDJrPR3iJjNFnqjM2pW/J8Uy3bGBjgBFz4GilNgKqd9
- Dy3pvqon+I2GqHcN9x3YE35MEMqPx8VJTfqX/J49Zx7h/eHRzCvAqoosCemrpuNTG9BW
- J272Whg9WYkuAMnqxoCkKk4ZpZM/GH4DeTST1KGd5bWVXTHX+DYaJH+E05ME50+zOHzk
- 5fUxXQyfjUHYZg0hw9uHVxsQZEA52+LIoBMPmXAdFOQN7SGNJjLU5eL2vYuq+JZNnvTm
- CKMQ==
-X-Gm-Message-State: APjAAAXrN+p/v/OV7OMdswLkbrxkVpR6V/KQmHpBUVmfd3BE9o5DTL+i
- 2nEflinPqgX/41D/yl0tTyZLOAmx
-X-Google-Smtp-Source: APXvYqw9CvgSU9VxwILc34y0kBf8LcoD5JYSStQc+C8JFLTlvPR73eOtm6dbWmSzdtvHgZZrMdXZMw==
-X-Received: by 2002:adf:8044:: with SMTP id 62mr53030115wrk.244.1575026194602; 
- Fri, 29 Nov 2019 03:16:34 -0800 (PST)
-Received: from donizetti.redhat.com ([2001:b07:6468:f312:459f:99a9:39f1:65ba])
- by smtp.gmail.com with ESMTPSA id
- i71sm29752969wri.68.2019.11.29.03.16.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 29 Nov 2019 03:16:34 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] virtfs-proxy-helper: switch from libcap to libcap-ng
-Date: Fri, 29 Nov 2019 12:16:32 +0100
-Message-Id: <20191129111632.22840-2-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <david@redhat.com>) id 1iaefa-0002ln-NU
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:42:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:60997
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iaefZ-0002em-2H
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 06:42:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575027758;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=0ozx4NaRhnaMq/vC5GdAuGEnLntHIe9W2dK5UMerzLo=;
+ b=NVLM+jM4KnxmSAERzDmu7PauYxrERGKHRkO15qdO3sPFE4nsP/uGOAVKDzEweLGLA+pwr6
+ Pv1k3HbQ6//mO5gXs70cP3P9XnfIayROwyb9EU0625DWqoufYM7tZoQSvyHue5AN+aCaRr
+ uLC9yEkEa/Z8WucaVbqnQxblPtxs0DU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-85-9PfmNpOpMgayfp4SjC64TA-1; Fri, 29 Nov 2019 06:42:35 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1D6B1800D42;
+ Fri, 29 Nov 2019 11:42:33 +0000 (UTC)
+Received: from [10.36.118.44] (unknown [10.36.118.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 447011001F43;
+ Fri, 29 Nov 2019 11:42:32 +0000 (UTC)
+Subject: Re: [PATCH v2 12/13] s390x: protvirt: Disable address checks for PV
+ guest IO emulation
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191129094809.26684-1-frankja@linux.ibm.com>
+ <20191129094809.26684-13-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <dca12928-99dd-49a5-5ea3-afa48caaf760@redhat.com>
+Date: Fri, 29 Nov 2019 12:42:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+In-Reply-To: <20191129094809.26684-13-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 9PfmNpOpMgayfp4SjC64TA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,207 +133,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, dgilbert@redhat.com, groug@kaod.org
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-virtfs-proxy-helper is the only user of libcap; everyone else is using
-the simpler libcap-ng API.  Switch and remove the configure code to
-detect libcap.
+On 29.11.19 10:48, Janosch Frank wrote:
+> IO instruction data is routed through SIDAD for protected guests, so
+> adresses do not need to be checked, as this is kernel memory.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- configure                   |  18 +------
- fsdev/virtfs-proxy-helper.c | 100 ++++++++++++++++--------------------
- 2 files changed, 46 insertions(+), 72 deletions(-)
+"do not need" - is it actually evil to check? I would have assumed the
+kernel checks and these checks are just superfluous but not dangerous?
 
-diff --git a/configure b/configure
-index afe9393f04..2216662bf6 100755
---- a/configure
-+++ b/configure
-@@ -3863,22 +3863,6 @@ else
-   mpathpersist=no
- fi
- 
--##########################################
--# libcap probe
--
--if test "$cap" != "no" ; then
--  cat > $TMPC <<EOF
--#include <stdio.h>
--#include <sys/capability.h>
--int main(void) { cap_t caps; caps = cap_init(); return caps != NULL; }
--EOF
--  if compile_prog "" "-lcap" ; then
--    cap=yes
--  else
--    cap=no
--  fi
--fi
--
- ##########################################
- # pthread probe
- PTHREADLIBS_LIST="-pthread -lpthread -lpthreadGC2"
-@@ -6204,7 +6188,7 @@ if test "$want_tools" = "yes" ; then
- fi
- if test "$softmmu" = yes ; then
-   if test "$linux" = yes; then
--    if test "$virtfs" != no && test "$cap" = yes && test "$attr" = yes ; then
-+    if test "$virtfs" != no && test "$cap_ng" = yes && test "$attr" = yes ; then
-       virtfs=yes
-       tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
-     else
-diff --git a/fsdev/virtfs-proxy-helper.c b/fsdev/virtfs-proxy-helper.c
-index 6f132c5ff1..0d4de49dcf 100644
---- a/fsdev/virtfs-proxy-helper.c
-+++ b/fsdev/virtfs-proxy-helper.c
-@@ -13,7 +13,6 @@
- #include <sys/resource.h>
- #include <getopt.h>
- #include <syslog.h>
--#include <sys/capability.h>
- #include <sys/fsuid.h>
- #include <sys/vfs.h>
- #include <sys/ioctl.h>
-@@ -21,6 +20,7 @@
- #ifdef CONFIG_LINUX_MAGIC_H
- #include <linux/magic.h>
- #endif
-+#include <cap-ng.h>
- #include "qemu-common.h"
- #include "qemu/sockets.h"
- #include "qemu/xattr.h"
-@@ -79,49 +79,10 @@ static void do_perror(const char *string)
-     }
- }
- 
--static int do_cap_set(cap_value_t *cap_value, int size, int reset)
--{
--    cap_t caps;
--    if (reset) {
--        /*
--         * Start with an empty set and set permitted and effective
--         */
--        caps = cap_init();
--        if (caps == NULL) {
--            do_perror("cap_init");
--            return -1;
--        }
--        if (cap_set_flag(caps, CAP_PERMITTED, size, cap_value, CAP_SET) < 0) {
--            do_perror("cap_set_flag");
--            goto error;
--        }
--    } else {
--        caps = cap_get_proc();
--        if (!caps) {
--            do_perror("cap_get_proc");
--            return -1;
--        }
--    }
--    if (cap_set_flag(caps, CAP_EFFECTIVE, size, cap_value, CAP_SET) < 0) {
--        do_perror("cap_set_flag");
--        goto error;
--    }
--    if (cap_set_proc(caps) < 0) {
--        do_perror("cap_set_proc");
--        goto error;
--    }
--    cap_free(caps);
--    return 0;
--
--error:
--    cap_free(caps);
--    return -1;
--}
--
- static int init_capabilities(void)
- {
-     /* helper needs following capabilities only */
--    cap_value_t cap_list[] = {
-+    int cap_list[] = {
-         CAP_CHOWN,
-         CAP_DAC_OVERRIDE,
-         CAP_FOWNER,
-@@ -130,7 +91,34 @@ static int init_capabilities(void)
-         CAP_MKNOD,
-         CAP_SETUID,
-     };
--    return do_cap_set(cap_list, ARRAY_SIZE(cap_list), 1);
-+    int i;
-+
-+    capng_clear(CAPNG_SELECT_BOTH);
-+    for (i = 0; i < ARRAY_SIZE(cap_list); i++) {
-+        if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
-+                         cap_list[i]) < 0) {
-+            do_perror("capng_update");
-+            return -1;
-+        }
-+    }
-+    if (capng_apply(CAPNG_SELECT_BOTH) < 0) {
-+        do_perror("capng_apply");
-+        return -1;
-+    }
-+
-+    /* Prepare effective set for setugid.  */
-+    for (i = 0; i < ARRAY_SIZE(cap_list); i++) {
-+        if (cap_list[i] == CAP_DAC_OVERRIDE) {
-+            continue;
-+        }
-+
-+        if (capng_update(CAPNG_DROP, CAPNG_EFFECTIVE,
-+                         cap_list[i]) < 0) {
-+            do_perror("capng_update");
-+            return -1;
-+        }
-+    }
-+    return 0;
- }
- 
- static int socket_read(int sockfd, void *buff, ssize_t size)
-@@ -295,14 +283,6 @@ static int setugid(int uid, int gid, int *suid, int *sgid)
- {
-     int retval;
- 
--    /*
--     * We still need DAC_OVERRIDE because we don't change
--     * supplementary group ids, and hence may be subjected DAC rules
--     */
--    cap_value_t cap_list[] = {
--        CAP_DAC_OVERRIDE,
--    };
--
-     *suid = geteuid();
-     *sgid = getegid();
- 
-@@ -316,11 +296,21 @@ static int setugid(int uid, int gid, int *suid, int *sgid)
-         goto err_sgid;
-     }
- 
--    if (uid != 0 || gid != 0) {
--        if (do_cap_set(cap_list, ARRAY_SIZE(cap_list), 0) < 0) {
--            retval = -errno;
--            goto err_suid;
--        }
-+    if (uid == 0 && gid == 0) {
-+        /* Linux has already copied the permitted set to the effective set.  */
-+        return 0;
-+    }
-+
-+    /*
-+     * All capabilities have been cleared from the effective set.  However
-+     * we still need DAC_OVERRIDE because we don't change supplementary
-+     * group ids, and hence may be subject to DAC rules.  init_capabilities
-+     * left the set of capabilities that we want in libcap-ng's state.
-+     */
-+    if (capng_apply(CAPNG_SELECT_CAPS) < 0) {
-+        retval = -errno;
-+        do_perror("capng_apply");
-+        goto err_suid;
-     }
-     return 0;
- 
+IOW, some overhead we can ignore for now easily.
+
+Same comment regarding doing the SIDAD access differently ...
+
 -- 
-2.21.0
+Thanks,
+
+David / dhildenb
 
 
