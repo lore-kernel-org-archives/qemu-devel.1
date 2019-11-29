@@ -2,85 +2,142 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7F3C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A875BC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:40:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C6C5217C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:28:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N8dnFAfc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C6C5217C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6E0B12075C
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 15:40:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E0B12075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaiC8-0005NB-Ed
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 10:28:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58169)
+	id 1iaiNp-0003KI-Hk
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 10:40:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33856)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iai8D-0002pa-Fg
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 10:24:31 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iahLu-0000UY-Qh
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:34:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iai7d-0004Oj-1d
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 10:23:55 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30731
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iai7c-0004CQ-L2
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 10:23:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575041028;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RqXKKlcebZ5t3dJVIJaUtkW51liOE/EhFs/yV+fG0Cw=;
- b=N8dnFAfc5/uVU4hU3+inFDGnBazriMd6v0XVd6Kx104N+QDFPlpg5dWfoHZTh/4MbdpBlI
- fJ7xEl2wz69MyXUpqZpOdYXYAURHffTpuG7oomkkwk7OceIEBeFO2Ir7ZxizUqhiV0CwT0
- yaOIPe8e9f32GU28if1iB3PXfrhhYvo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-xkiqddR3O5eqD5mo4jcjHA-1; Fri, 29 Nov 2019 10:23:45 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F11780183C;
- Fri, 29 Nov 2019 15:23:44 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CF64B5D6D4;
- Fri, 29 Nov 2019 15:23:43 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 44D591138606; Fri, 29 Nov 2019 16:23:42 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v6] hw/core/loader-fit: fix freeing errp in fit_load_fdt
-References: <20191127183016.13852-1-vsementsov@virtuozzo.com>
- <87muceeq5l.fsf@dusky.pond.sub.org>
- <4fcd8245-790e-220d-366b-ce25743dddc8@virtuozzo.com>
- <48c23c62-59ed-3da7-4803-cafd14b8fe49@virtuozzo.com>
-Date: Fri, 29 Nov 2019 16:23:42 +0100
-In-Reply-To: <48c23c62-59ed-3da7-4803-cafd14b8fe49@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Fri, 29 Nov 2019 14:12:33 +0000")
-Message-ID: <87tv6mbta9.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <frankja@linux.ibm.com>) id 1iahLr-00006V-7o
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:34:32 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:13978
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iahLr-0008WN-1s
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:34:31 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xATEXKAn082358
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 09:34:30 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wjxayedsq-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 09:34:30 -0500
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Fri, 29 Nov 2019 14:34:28 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 29 Nov 2019 14:34:24 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xATEYNoF55246886
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 29 Nov 2019 14:34:23 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3F0F4A4053;
+ Fri, 29 Nov 2019 14:34:23 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C93D2A4051;
+ Fri, 29 Nov 2019 14:34:22 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.188.128])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 29 Nov 2019 14:34:22 +0000 (GMT)
+Subject: Re: [PATCH 3/3] s390x: protvirt: Add new VCPU reset functions
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20191129142025.21453-1-frankja@linux.ibm.com>
+ <20191129142025.21453-4-frankja@linux.ibm.com>
+ <1b6b2cc3-cd28-7bfe-655c-cc3e7c084848@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Fri, 29 Nov 2019 15:34:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: xkiqddR3O5eqD5mo4jcjHA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+In-Reply-To: <1b6b2cc3-cd28-7bfe-655c-cc3e7c084848@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Kyk2XR5Fj7lcFsehfeTmZ1iTvaxfWuCx2"
+X-TM-AS-GCONF: 00
+x-cbid: 19112914-0012-0000-0000-0000036DF359
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112914-0013-0000-0000-000021A9A4B5
+Message-Id: <a3e2f13d-9ffb-eb55-60ff-99b8f3921f83@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-29_04:2019-11-29,2019-11-29 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 bulkscore=0
+ phishscore=0 adultscore=0 malwarescore=0 spamscore=0 lowpriorityscore=0
+ suspectscore=0 impostorscore=0 priorityscore=1501 mlxlogscore=999
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911290126
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,90 +149,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pburton@wavecomp.com" <pburton@wavecomp.com>,
- "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, mihajlov@linux.ibm.com,
+ qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Kyk2XR5Fj7lcFsehfeTmZ1iTvaxfWuCx2
+Content-Type: multipart/mixed; boundary="6jKUumAVmENWRC15i76gsKyZsjRngEVuh"
 
-> 29.11.2019 17:11, Vladimir Sementsov-Ogievskiy wrote:
->> 29.11.2019 17:03, Markus Armbruster wrote:
->>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
->>>
->>>> fit_load_fdt forget to check that errp is not NULL and to zero it afte=
-r
->>>> freeing. Fix it.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> Reviewed-by: Eric Blake <eblake@redhat.com>
->>>> ---
->>>> =C2=A0 hw/core/loader-fit.c | 5 ++++-
->>>> =C2=A0 1 file changed, 4 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
->>>> index 953b16bc82..3ee9fb2f2e 100644
->>>> --- a/hw/core/loader-fit.c
->>>> +++ b/hw/core/loader-fit.c
->>>> @@ -200,7 +200,10 @@ static int fit_load_fdt(const struct fit_loader *=
-ldr, const void *itb,
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 err =3D fit_image_addr(itb, img_off, "l=
-oad", &load_addr, errp);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (err =3D=3D -ENOENT) {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 load_addr =3D R=
-OUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
->>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_free(*errp);
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (errp) {
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 er=
-ror_free(*errp);
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *e=
-rrp =3D NULL;
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else if (err) {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_prepend(e=
-rrp, "unable to read FDT load address from FIT: ");
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D err;
->>>
->>> This fixes latent bugs when fit_image_addr() fails with ENOENT:
->>>
->>> * If a caller passes a null @errp, we crash dereferencing it
->>>
->>> * Else, we pass a dangling Error * to the caller, and return success.
->>> =C2=A0=C2=A0 If a caller dereferences the Error * regardless, we have a
->>> =C2=A0=C2=A0 use-after-free.
->>>
->>> Not fixed:
->>>
->>> * If a caller passes &error_abort or &error_fatal, we die instead of
->>> =C2=A0=C2=A0 taking the recovery path.
->>=20
->> No, if it is error_abort or error_fatal, we will not reach this point, t=
-he execution
->> finished before, when error was set.
->
-> Ah, that is what you mention.. Hmm. Is it bad? At least crashing on
-> error_abort without any recovery should not be bad..
+--6jKUumAVmENWRC15i76gsKyZsjRngEVuh
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Latent bugs aren't bad, but they could possibly become bad :)
+On 11/29/19 3:24 PM, David Hildenbrand wrote:
+> On 29.11.19 15:20, Janosch Frank wrote:
+>> CPU resets for protected guests need to be done via Ultravisor
+>> calls. Hence we need a way to issue these calls for each reset.
+>>
+>> As we formerly had only one reset function and it was called for
+>> initial, as well as for the clear reset, we now need a new interface.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  target/s390x/cpu.c       | 14 ++++++++++++--
+>>  target/s390x/kvm-stub.c  | 10 +++++++++-
+>>  target/s390x/kvm.c       | 38 ++++++++++++++++++++++++++++++++------
+>>  target/s390x/kvm_s390x.h |  4 +++-
+>>  4 files changed, 56 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+>> index 829ce6ad54..906285888e 100644
+>> --- a/target/s390x/cpu.c
+>> +++ b/target/s390x/cpu.c
+>> @@ -139,8 +139,18 @@ static void s390_cpu_reset(CPUState *s, cpu_reset=
+_type type)
+>>      }
+>> =20
+>>      /* Reset state inside the kernel that we cannot access yet from Q=
+EMU. */
+>> -    if (kvm_enabled() && type !=3D S390_CPU_RESET_NORMAL) {
+>> -        kvm_s390_reset_vcpu(cpu);
+>> +    if (kvm_enabled()) {
+>> +        switch (type) {
+>> +        case S390_CPU_RESET_CLEAR:
+>> +            kvm_s390_reset_vcpu_clear(cpu);
+>> +            break;
+>> +        case S390_CPU_RESET_INITIAL:
+>> +            kvm_s390_reset_vcpu_initial(cpu);
+>> +            break;
+>> +        case S390_CPU_RESET_NORMAL:
+>> +            kvm_s390_reset_vcpu_normal(cpu);
+>> +            break;
+>> +        }
+>>      }
+>>  }
+>> =20
+>> diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
+>> index 5152e2bdf1..c4cd497f85 100644
+>> --- a/target/s390x/kvm-stub.c
+>> +++ b/target/s390x/kvm-stub.c
+>> @@ -83,7 +83,15 @@ void kvm_s390_cmma_reset(void)
+>>  {
+>>  }
+>> =20
+>> -void kvm_s390_reset_vcpu(S390CPU *cpu)
+>> +void kvm_s390_reset_vcpu_initial(S390CPU *cpu)
+>> +{
+>> +}
+>> +
+>> +void kvm_s390_reset_vcpu_clear(S390CPU *cpu)
+>> +{
+>> +}
+>> +
+>> +void kvm_s390_reset_vcpu_normal(S390CPU *cpu)
+>>  {
+>>  }
+>> =20
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index ad6e38c876..502fc71664 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -151,6 +151,7 @@ static int cap_s390_irq;
+>>  static int cap_ri;
+>>  static int cap_gs;
+>>  static int cap_hpage_1m;
+>> +static int cap_vcpu_resets;
+>> =20
+>>  static int active_cmma;
+>> =20
+>> @@ -342,6 +343,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>>      cap_async_pf =3D kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+>>      cap_mem_op =3D kvm_check_extension(s, KVM_CAP_S390_MEM_OP);
+>>      cap_s390_irq =3D kvm_check_extension(s, KVM_CAP_S390_INJECT_IRQ);=
 
-When you pass &err to fit_load_fdt(), where @err is a local variable,
-the ENOENT case is not actually an error; fit_load_fdt() recovers fine
-and succeeds.
+>> +    cap_vcpu_resets =3D kvm_check_extension(s, KVM_CAP_S390_VCPU_RESE=
+TS);
+>> =20
+>>      if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
+>>          || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
+>> @@ -403,20 +405,44 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+>>      return 0;
+>>  }
+>> =20
+>> -void kvm_s390_reset_vcpu(S390CPU *cpu)
+>> +static void kvm_s390_reset_vcpu(S390CPU *cpu, unsigned long type)
+>>  {
+>>      CPUState *cs =3D CPU(cpu);
+>> =20
+>> -    /* The initial reset call is needed here to reset in-kernel
+>> -     * vcpu data that we can't access directly from QEMU
+>> -     * (i.e. with older kernels which don't support sync_regs/ONE_REG=
+).
+>> -     * Before this ioctl cpu_synchronize_state() is called in common =
+kvm
+>> -     * code (kvm-all) */
+>> +    /*
+>> +     * The reset call is needed here to reset in-kernel vcpu data tha=
+t
+>> +     * we can't access directly from QEMU (i.e. with older kernels
+>> +     * which don't support sync_regs/ONE_REG).  Before this ioctl
+>> +     * cpu_synchronize_state() is called in common kvm code
+>> +     * (kvm-all).
+>> +     */
+>> +    if (cap_vcpu_resets) {
+>> +        if (kvm_vcpu_ioctl(cs, KVM_S390_VCPU_RESET, type)) {
+>> +            error_report("CPU reset type %ld failed on CPU %i",
+>> +                         type, cs->cpu_index);
+>> +        }
+>> +        return;
+>> +    }
+>>      if (kvm_vcpu_ioctl(cs, KVM_S390_INITIAL_RESET, NULL)) {
+>>          error_report("Initial CPU reset failed on CPU %i", cs->cpu_in=
+dex);
+>>      }
+>>  }
+>=20
+> I think I commented this already: The issue is that without
+> cap_vcpu_requests, you would no do a KVM_S390_INITIAL_RESET for type =3D=
+=3D
+> S390_CPU_RESET_NORMAL. You have to fence that.
 
-When you pass &error_fatal or &error_abort, it should likewise not be an
-error.
+I did fix that, but not on this branch -_-
 
-General rule: when you want to handle some (or all) of a function's
-errors yourself, you must not pass your own @errp argument.  Instead,
-pass &err and propagate the errors you don't handle yourself with
-error_propagate(errp, err).
+>=20
+>=20
+> if (type !=3D S390_CPU_RESET_NORMAL &&
+>     kvm_vcpu_ioctl(cs, KVM_S390_INITIAL_RESET, NULL)) {
+> 	...
+> }
+>=20
 
->>> We need to use a local_err here.
->>>
->>> I'll search for the pattern, and post fix(es).
 
-Found several bugs already...
+
+--6jKUumAVmENWRC15i76gsKyZsjRngEVuh--
+
+--Kyk2XR5Fj7lcFsehfeTmZ1iTvaxfWuCx2
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3hLG4ACgkQ41TmuOI4
+ufh9NBAAp1gjGBnrj1L3RaNHAJcxS6s2Okw9R4CbfZdum2y7d924Lt5K35ACofwP
+ZhAM4+AI5PIH63UPCdeaWsUsFrUkknABHQTISMc/lqc1QlP9xlT4a8HLcmvklfkV
+6VZhsK8Z0SuRxkARR8HGjmAFVuzAfCyEDfqLVqGwG6CAmHEMTbQdKSEEDGyUrmBJ
+RLfLXIAgQP58ycuI1FZuLi5HmJ+C2RhgeLQRM8thezrvaDF2ZakTJSQnJyyqkTrn
+dPkA1A1JW3uDDQlmCRnaY/7xlBMQkcFsUXnBmwNmQRBhJZqgtXs2ToeMQ8I9TuFC
+tw7H+FantdOiuTUmXSbCFwtHLb6vPXVhRkb/kr5O/5H4//7v4hdImODkWPtGQTdV
+rAvMjqifhlEzroCiziIALH+NnZdTBoYTrlqJw3fM1Fjq3Jf70gB8rIw6SL/44HhT
+r8w35b7A5zTaol6mAF2XXX+d+GZ+UmO07OlkIYsmpF7WP+zIA7SnyIQVJeTGhhl0
+xdfzCIAw+/ZVl4aPpdpMJ4/1ttuWqHyIbUhexQ9ILoA5xNWkk8rKLPF1+m4LF5Zq
+HzORIX2PAzi+1PsghMnvVIfPtlgHt6ij0l3Rt99QHGsauVERPYwxjkenkoWmFNFA
+uByn3ZgOi+Vvhk4uH+v+SEnfYfvyP3hHZgAIMC0pNZJtI6qu8yM=
+=AC+4
+-----END PGP SIGNATURE-----
+
+--Kyk2XR5Fj7lcFsehfeTmZ1iTvaxfWuCx2--
 
 
