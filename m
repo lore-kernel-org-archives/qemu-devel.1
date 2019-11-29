@@ -2,75 +2,83 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 112B1C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:03:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB4DC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:07:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFF83217BC
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:03:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFF83217BC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mentor.com
+	by mail.kernel.org (Postfix) with ESMTPS id 978C3215F1
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 09:07:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YkZDZLHA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 978C3215F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iacBt-0002iO-TH
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 04:03:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48927)
+	id 1iacF6-0003xo-Kh
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 04:07:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33029)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Bilal_Wasim@mentor.com>) id 1iac3A-00071j-Eo
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 03:54:55 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iacAb-0002ap-8y
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:02:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Bilal_Wasim@mentor.com>) id 1iac30-00080X-QV
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 03:54:44 -0500
-Received: from esa2.mentor.iphmx.com ([68.232.141.98]:20890)
+ (envelope-from <cohuck@redhat.com>) id 1iacAO-0005K1-2h
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:02:25 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28784
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Bilal_Wasim@mentor.com>)
- id 1iac30-0007YU-H0; Fri, 29 Nov 2019 03:54:42 -0500
-IronPort-SDR: kFnqDZaQu70W3Xm7rwh0M8bJtuwCoq6dMil+uB/IYuhQbJGYa6mqKKt6RTvyGuKEOqQUvldLH6
- uviLNSx2ArIQ3DBzk5/yd4elSJBBYq7IQ8mynW/emwKuEV06uQt4dHJuIuyKBpzanLth/zfyOK
- 4+uowywLFSJq6cWklZIfZXGaQo7ct+kbfmc75ezdZS1fg9EPzbSNSmbTnuadBaMWtZsJp0fPS3
- 6qGcV0yFypSMv8peCsPqmRto2TVBHP/2MsRxqHzHT4o7D/wHFgzzOLWlA3j75hGhn5OULyCD5F
- nK8=
-X-IronPort-AV: E=Sophos;i="5.69,256,1571731200"; d="scan'208";a="43559764"
-Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
- by esa2.mentor.iphmx.com with ESMTP; 29 Nov 2019 00:54:34 -0800
-IronPort-SDR: j5tEU0mc7h35MshJacf+Akn28EprdNRT5DU8srTbqrDkONbEKs8Kj1gT67Rv8/JHoOklicsJ/2
- 3tKhEx6PU1m2chM/FAugsxJByLjk55gVr/SpndIt9Bt+somfiaxISfBrVCPyuv1QcAh8w50L27
- pJVuUJQykgvpleDW8S+ndNHdn0pLFQ6ydYGHpqd6DT9e3tEHC/z/PkqOIPD8roWcF3w2AwhWml
- ySkhv7GHFPfUBd6KZpmkWFYnKGPnTPe+m2qTi80zsG36A6oQpwy2ELybvXNA/ZRxCA/V8bPofD
- vnU=
-From: "Wasim, Bilal" <Bilal_Wasim@mentor.com>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Subject: RE: [PATCH] Updating the GEM MAC IP to properly filter out the
- multicast addresses
-Thread-Topic: [PATCH] Updating the GEM MAC IP to properly filter out the
- multicast addresses
-Thread-Index: AdWl/aPyGC40ldXeTIuqOxj9pJGCcwABzzoAAAIbwuAAARoxAAAAFd1AACAZLEA=
-Date: Fri, 29 Nov 2019 08:54:29 +0000
-Message-ID: <103588e5aa0c43858123d77131ff136f@SVR-IES-MBX-03.mgc.mentorg.com>
-References: <2632212d4c8a40bead72ffdcf288e600@SVR-IES-MBX-03.mgc.mentorg.com>
- <20191128155956.GB29312@toto>
- <2b7a42487a5d4a258062bd209a0d13fa@SVR-IES-MBX-03.mgc.mentorg.com>
- <20191128173152.GC29312@toto>
- <ef4adfa40b5543fba4b8e673e36cbd9e@SVR-IES-MBX-03.mgc.mentorg.com>
-In-Reply-To: <ef4adfa40b5543fba4b8e673e36cbd9e@SVR-IES-MBX-03.mgc.mentorg.com>
-Accept-Language: en-GB, en-IE, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [137.202.0.90]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iacAN-0005CI-Fk
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 04:02:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575018138;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=guDMH0NaPZqDk2jpXf1dCrsyfcgH+cI0XUterk1YwvA=;
+ b=YkZDZLHAeLU07zGK2WECGVWXB0u4KbNZsfSS5dBIPaHh8c7+gyYSXm23EesrqEnIzPMmKS
+ m4Zc2aUwzhVqVwvIOwyxN3ymlGXJZFe5M8VtFuKSEWd8QcSZZlUXMk/TltW2n6C4g8WQPx
+ +X18q5OuAvRxignDHh7vxAc+52buGNY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-kpPTuW_OPQ66wY8Kcq8ZJg-1; Fri, 29 Nov 2019 04:02:14 -0500
+X-MC-Unique: kpPTuW_OPQ66wY8Kcq8ZJg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 214DE10054E3;
+ Fri, 29 Nov 2019 09:02:13 +0000 (UTC)
+Received: from gondolin (ovpn-116-140.ams2.redhat.com [10.36.116.140])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 800C4608FD;
+ Fri, 29 Nov 2019 09:02:08 +0000 (UTC)
+Date: Fri, 29 Nov 2019 10:01:55 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v4 6/6] s390x: kvm: Make kvm_sclp_service_call void
+Message-ID: <20191129100155.331ae2f0.cohuck@redhat.com>
+In-Reply-To: <346131a4-4dfe-897c-0ddd-a81f8f3f4d6f@linux.ibm.com>
+References: <20191127175046.4911-1-frankja@linux.ibm.com>
+ <20191127175046.4911-7-frankja@linux.ibm.com>
+ <c3b81ef7-860d-8cee-df34-0c6f103a1757@redhat.com>
+ <76627b69-5c0a-a9d6-f20e-f7ce61858774@linux.ibm.com>
+ <452fc85c-17b7-76d3-8ed8-fb76d50b37a6@linux.ibm.com>
+ <20191128183409.4a91ea1c.cohuck@redhat.com>
+ <346131a4-4dfe-897c-0ddd-a81f8f3f4d6f@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 68.232.141.98
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; boundary="Sig_/LCzTfL/5s+AaeWNyj3+3=4E";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,276 +90,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "alistair@alistair23.me" <alistair@alistair23.me>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+Cc: thuth@redhat.com, pmorel@linux.ibm.com,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-git "send-email" doesn't really work well with my work account because the =
-server considers it "less secure" and does NOT provide a way around it.. I'=
-ve had to re-submit the patch from my secondary email...=20
+--Sig_/LCzTfL/5s+AaeWNyj3+3=4E
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
------Original Message-----
-From: Qemu-arm [mailto:qemu-arm-bounces+bilal_wasim=3Dmentor.com@nongnu.org=
-] On Behalf Of Wasim, Bilal
-Sent: Thursday, November 28, 2019 10:35 PM
-To: Edgar E. Iglesias <edgar.iglesias@gmail.com>
-Cc: peter.maydell@linaro.org; alistair@alistair23.me; qemu-devel@nongnu.org=
-; qemu-arm@nongnu.org
-Subject: RE: [PATCH] Updating the GEM MAC IP to properly filter out the mul=
-ticast addresses
+On Fri, 29 Nov 2019 09:16:21 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Thanks for the pointers.. I will incorporate all these changes and post an =
-updated thread asap..=20
-
------Original Message-----
-From: Edgar E. Iglesias [mailto:edgar.iglesias@gmail.com]
-Sent: Thursday, November 28, 2019 10:32 PM
-To: Wasim, Bilal <Bilal_Wasim@mentor.com>
-Cc: qemu-devel@nongnu.org; alistair@alistair23.me; peter.maydell@linaro.org=
-; qemu-arm@nongnu.org
-Subject: Re: [PATCH] Updating the GEM MAC IP to properly filter out the mul=
-ticast addresses
-
-On Thu, Nov 28, 2019 at 05:02:00PM +0000, Wasim, Bilal wrote:
-> This was one of my first attempts, and so I was sure to miss something.. =
-I've incorporated all the updates in this patch.. Let me know what you thin=
-k about this..=20
->=20
-> net/cadence_gem: Updating the GEM MAC IP to properly filter out the multi=
-cast addresses.
->=20
-> The current code makes a bad assumption that the most-significant byte=20
-> of the MAC address is used to determine if the address is multicast or=20
-> unicast, but in reality only a single bit is used to determine this.
-> This caused IPv6 to not work.. Fix is now in place and has been tested=20
-> with ZCU102-A53 / IPv6 on a TAP interface. Works well..
-
-Thanks Bilal,
-
-This looks better but not quite there yet.
-
-* You don't seem to be using git-send-email to post patches, try it, it wil=
-l make life easier wrt to formatting. The patch should be in a separate ema=
-il. The subject line should be the subject of the email.
-git-format-patch and git-send-email will take care of that for you.
-
-* You don't need to define IS_MULTICAST, you can directly use is_multicast_=
-ether_addr() and friends.
-
-* The patch still has long lines (longer than 80 chars) You can run scripts=
-/checkpatch.pl on your commit before posting the patch.
-
-Cheers,
-Edgar
-
-
-
->=20
-> Signed-off-by: Bilal Wasim <bilal_wasim@mentor.com>
-> ---
->  hw/net/cadence_gem.c | 21 ++++++++++++++-------
->  1 file changed, 14 insertions(+), 7 deletions(-)
->=20
-> diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c index=20
-> b8be73dc55..98efb93f8a 100644
-> --- a/hw/net/cadence_gem.c
-> +++ b/hw/net/cadence_gem.c
-> @@ -34,6 +34,7 @@
->  #include "qemu/module.h"
->  #include "sysemu/dma.h"
->  #include "net/checksum.h"
-> +#include "net/eth.h"
-> =20
->  #ifdef CADENCE_GEM_ERR_DEBUG
->  #define DB_PRINT(...) do { \
-> @@ -315,6 +316,12 @@
-> =20
->  #define GEM_MODID_VALUE 0x00020118
-> =20
-> +/* IEEE has specified that the most significant bit of the most=20
-> +significant byte be used for
-> + * distinguishing between Unicast and Multicast addresses.
-> + * If its a 1, that means multicast, 0 means unicast.   */
-> +#define IS_MULTICAST(address)           is_multicast_ether_addr(address)
-> +#define IS_UNICAST(address)             is_unicast_ether_addr(address)
-> +
->  static inline uint64_t tx_desc_get_buffer(CadenceGEMState *s,=20
-> uint32_t *desc)  {
->      uint64_t ret =3D desc[0];
-> @@ -601,7 +608,7 @@ static void gem_receive_updatestats(CadenceGEMState *=
-s, const uint8_t *packet,
->      }
-> =20
->      /* Error-free Multicast Frames counter */
-> -    if (packet[0] =3D=3D 0x01) {
-> +    if (IS_MULTICAST(packet)) {
->          s->regs[GEM_RXMULTICNT]++;
->      }
-> =20
-> @@ -690,21 +697,21 @@ static int gem_mac_address_filter(CadenceGEMState *=
-s, const uint8_t *packet)
->      }
-> =20
->      /* Accept packets -w- hash match? */
-> -    if ((packet[0] =3D=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_=
-HASH)) ||
-> -        (packet[0] !=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_HA=
-SH))) {
-> +    if ((IS_MULTICAST(packet) && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST_H=
-ASH)) ||
-> +        (IS_UNICAST(packet)   && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_H=
-ASH))) {
->          unsigned hash_index;
-> =20
->          hash_index =3D calc_mac_hash(packet);
->          if (hash_index < 32) {
->              if (s->regs[GEM_HASHLO] & (1<<hash_index)) {
-> -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_ACC=
-EPT :
-> -                                           GEM_RX_UNICAST_HASH_ACCEPT;
-> +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_ACCE=
-PT :
-> +                                             =20
-> + GEM_RX_UNICAST_HASH_ACCEPT;
->              }
->          } else {
->              hash_index -=3D 32;
->              if (s->regs[GEM_HASHHI] & (1<<hash_index)) {
-> -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_ACC=
-EPT :
-> -                                           GEM_RX_UNICAST_HASH_ACCEPT;
-> +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_ACCE=
-PT :
-> +                                             =20
-> + GEM_RX_UNICAST_HASH_ACCEPT;
->              }
->          }
->      }
-> --
-> 2.19.1.windows.1
->=20
-> ----------------------------------------------------------------------
-> --------------------------------------------------------
-> -----Original Message-----
-> From: Edgar E. Iglesias [mailto:edgar.iglesias@gmail.com]
-> Sent: Thursday, November 28, 2019 9:00 PM
-> To: Wasim, Bilal <Bilal_Wasim@mentor.com>
-> Cc: qemu-devel@nongnu.org; alistair@alistair23.me;=20
-> peter.maydell@linaro.org; qemu-arm@nongnu.org
-> Subject: Re: [PATCH] Updating the GEM MAC IP to properly filter out=20
-> the multicast addresses
->=20
-> On Thu, Nov 28, 2019 at 03:10:16PM +0000, Wasim, Bilal wrote:
-> > [PATCH] Updating the GEM MAC IP to properly filter out the multicast=20
-> > addresses. The current code makes a bad assumption that the=20
-> > most-significant byte of the MAC address is used to determine if the=20
-> > address is multicast or unicast, but in reality only a single bit is=20
-> > used to determine this. This caused IPv6 to not work.. Fix is now in=20
-> > place and has been tested with
-> > ZCU102-A53 / IPv6 on a TAP interface. Works well..
->=20
-> Hi Bilal,
->=20
-> The fix looks right to me but I have a few comments.
->=20
-> * Your patch seems a little wrongly formated.
-> [PATCH] goes into the Subject line for example and you're missing path pr=
-efixes.
->=20
-> Do a git log -- hw/net/cadence_gem.c to see examples on how it should loo=
-k.
->=20
-> * The patch will probably not pass checkpatch since you seem to have long=
- lines.
->=20
-> * We also need to update gem_receive_updatestats() to use the corrected m=
-acros.
->=20
-> More inline:
->=20
+> On 11/28/19 6:34 PM, Cornelia Huck wrote:
+> > On Wed, 27 Nov 2019 19:38:06 +0100
+> > Janosch Frank <frankja@linux.ibm.com> wrote:
+> >  =20
+> >> On 11/27/19 7:25 PM, Janosch Frank wrote: =20
+> >>>
+> >>> There's 0 (initiated), busy and operational and as far as I know we
+> >>> implement neither.   =20
+> >>
+> >> That came out wrong...
+> >> s/operational/not operational/
+> >>
+> >> We only implement "command initiated" / cc =3D 0
+> >> We can never have busy, because we handle sclp calls synchronously.
+> >> The spec does not give any indication when we could return "not
+> >> operational". I guess that's just a free pass for hypervisors. =20
 > >=20
-> > Signed-off-by: Bilal Wasim <bilal_wasim@mentor.com>
-> > ---
-> > hw/net/cadence_gem.c | 18 ++++++++++++------
-> > 1 file changed, 12 insertions(+), 6 deletions(-)
-> >=20
-> > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c index
-> > b8be73d..f8bcbb3 100644
-> > --- a/hw/net/cadence_gem.c
-> > +++ b/hw/net/cadence_gem.c
-> > @@ -315,6 +315,12 @@
-> >  #define GEM_MODID_VALUE 0x00020118
-> > +/* IEEE has specified that the most significant bit of the most=20
-> > +significant byte be used for
-> > + * distinguishing between Unicast and Multicast addresses.
-> > + * If its a 1, that means multicast, 0 means unicast.   */
-> > +#define IS_MULTICAST(address)           (((address[0] & 0x01) =3D=3D 0=
-x01) ? 1 : 0)
+> > Regardless, setcc(cpu, r) also feels a bit cleaner to me... =20
 >=20
->=20
->=20
-> This can be simplified:
-> #define IS_MULTICAST(address) (address[0] & 1)
->=20
-> Actually, looking closer, we already have functions to do these checks in=
-:
-> include/net/eth.h
->=20
-> static inline int is_multicast_ether_addr(const uint8_t *addr) static=20
-> inline int is_broadcast_ether_addr(const uint8_t *addr) static inline=20
-> int is_unicast_ether_addr(const uint8_t *addr)
->=20
->=20
->=20
-> > +#define IS_UNICAST(address)             (!IS_MULTICAST(address))
-> > +
-> > static inline uint64_t tx_desc_get_buffer(CadenceGEMState *s,=20
-> > uint32_t
-> > *desc) {
-> >      uint64_t ret =3D desc[0];
-> > @@ -690,21 +696,21 @@ static int gem_mac_address_filter(CadenceGEMState=
- *s, const uint8_t *packet)
-> >      }
-> >      /* Accept packets -w- hash match? */
-> > -    if ((packet[0] =3D=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAS=
-T_HASH)) ||
-> > -        (packet[0] !=3D 0x01 && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST_=
-HASH))) {
-> > +    if ((IS_MULTICAST(packet) && (s->regs[GEM_NWCFG] & GEM_NWCFG_MCAST=
-_HASH)) ||
-> > +        (IS_UNICAST(packet)   && (s->regs[GEM_NWCFG] & GEM_NWCFG_UCAST=
-_HASH))) {
-> >          unsigned hash_index;
-> >          hash_index =3D calc_mac_hash(packet);
-> >          if (hash_index < 32) {
-> >              if (s->regs[GEM_HASHLO] & (1<<hash_index)) {
-> > -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_A=
-CCEPT :
-> > -                                           GEM_RX_UNICAST_HASH_ACCEPT;
-> > +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_AC=
-CEPT :
-> > +                                             =20
-> > + GEM_RX_UNICAST_HASH_ACCEPT;
-> >              }
-> >          } else {
-> >              hash_index -=3D 32;
-> >              if (s->regs[GEM_HASHHI] & (1<<hash_index)) {
-> > -                return packet[0] =3D=3D 0x01 ? GEM_RX_MULTICAST_HASH_A=
-CCEPT :
-> > -                                           GEM_RX_UNICAST_HASH_ACCEPT;
-> > +                return IS_MULTICAST(packet) ? GEM_RX_MULTICAST_HASH_AC=
-CEPT :
-> > +                                             =20
-> > + GEM_RX_UNICAST_HASH_ACCEPT;
-> >              }
-> >          }
-> >      }
-> > --
-> > 2.9.3
-> >=20
+> Ok, do you want to change that while picking the patches up or shall I
+> send a new version?
+
+New version (of this patch), please :) Easier for me...
+
+--Sig_/LCzTfL/5s+AaeWNyj3+3=4E
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3g3oMACgkQ3s9rk8bw
+L68OeQ//QFWqJ2L2NtTeMssvPVkIKLWW1zpXIyilTKOWv8l9ClFKa3NdRQadfgBR
+q4KKDQyw894v99kQt5jEJXnnMT7lC8IGNeymWHJzXlF830EhWmVXDprWjucb7kPC
+OvnkTSv01tYoUK1nBJQwMgv4gTzA4b2uYiWSdvP2S4UrwY8oNvw5XecQB9lx2j3F
+npIq8/gZUvGqUBgfzZW5kJqdzSrR81hOXrmCjYTxfteM30Dl+x6IORMqyyyVEEx8
+OYHX3rWe7ciWfGt1n+slM4y+vTk7ZZThWn2kj4JFDR56auHuwwveSWXXNrGMEZuM
+n0KmRfj+J7x8FHN0Q4FNx5CGLqIFT/LLnulylayDING+8fz2F0NdRIdeDKY4/Bow
+BnWUNMC7svd1SHU5IQP74qOCgjUDvBIPadZYtBJpd9qxO4rn0x2no4T39FkpQLkC
+/YXMWAMY5K0he1SCpHx0W1Nq0513Bl8vB58mXjK1EpGp7/SH3UPGTVJ8meg4KlO8
+Re/wuHs1Qvzu1lh3KYCw0+8GCnXL8bgKKqLhO1LOX/WfAHiW6xUG/rVT5SAGEADx
+Axh7YbFqK3f6XuzN750dbyCUsqJfkMl1x9fY53oQOfz5EVwWjaD6yA6HmnzObfOg
+JK8EXMPqsp+FExobPGCpIbNKSFex2eEocqbArRQNi7m1e71yUew=
+=oy8J
+-----END PGP SIGNATURE-----
+
+--Sig_/LCzTfL/5s+AaeWNyj3+3=4E--
 
 
