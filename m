@@ -2,91 +2,89 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0001FC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B106C43215
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:09:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEC8921774
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:07:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 18D25215A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 16:09:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EqQNTK2N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEC8921774
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lv0ICVjP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18D25215A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaioG-0007Rz-RY
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 11:07:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35666)
+	id 1iaipX-0008Jz-8X
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 11:09:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34343)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pmathieu@redhat.com>) id 1iailN-0004vO-7h
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:04:58 -0500
+ (envelope-from <armbru@redhat.com>) id 1iaikg-0004Uf-J8
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:04:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pmathieu@redhat.com>) id 1iailJ-0008Fn-PU
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:04:55 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23116
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1iaikd-0005xz-1Z
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:04:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46333
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pmathieu@redhat.com>) id 1iailJ-00084u-LY
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:04:53 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iaikZ-0005sj-O9
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 11:04:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575043489;
+ s=mimecast20190719; t=1575043444;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zg8HBt8/v556Px1AquN+KYHYk63ghRTuJn/glDQ/6mE=;
- b=EqQNTK2NsenAVGHUY1pA4HimCWIXQD77str7Z2X9hVEsslJkzS5L37xmzgJVuecAvCaPsy
- wiGW+tZafR0vojB5dpbarDL620HUBcW/x1tP3tSgLyl7+Db9Fj5klFsSh5lZVKF7SfRjQY
- ZZlnQhHY+oVhQU3BsIFz4Q2rOQGt2So=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-b5rV32YROuKUG5lR_Miw9Q-1; Fri, 29 Nov 2019 11:04:48 -0500
-Received: by mail-wr1-f69.google.com with SMTP id b2so14438930wrj.9
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 08:04:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=zg8HBt8/v556Px1AquN+KYHYk63ghRTuJn/glDQ/6mE=;
- b=AF6/3kRIEoEYF+dRoshZuThv3wUS9L+IKAYc4f2gbAkT/nJoeH5bYntlFLZlh+2FMC
- ZrCxHvypwuytWFCLx6p0ECBryy8LNCS2QC5yR6/sZYdCfMoCsPaMPGsY+79L5Y9oTrMa
- KlgHccm1EXvM8pmBIsWiuDgmjBuPzYifXs8DIc437COO7zO9YWTtvTBcF7a/CB2nLIYS
- LV5xLp6d9kAjX8tr5u2F1gDRjWZuT885dO5H05FiTqt9kxt2iKLUwJ50Dq/T8uamTQ2y
- GE0yNQ0gan5K7mMoPt1Xu2DZP6V5gabW6gheLu3Hbyu4IFD+y5A5A9u0rvG+iDhbVpW7
- LnBg==
-X-Gm-Message-State: APjAAAWpicN7yeJWHB5BUTANH9puW/hUN4/qKxx57xqobGtiXjVoVV3D
- vXsTFaTz+e1FgAukUuqR2dyZ8lspKOi9axiM7rRWceEwVQ/Tr9ErJ1QTfBicH6jFWCUr336Ft96
- 9GhTOAXa48yU9aMP9iRUE35flZnCtA0Y=
-X-Received: by 2002:a1c:46:: with SMTP id 67mr16423588wma.51.1575043485987;
- Fri, 29 Nov 2019 08:04:45 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwJfyEo75CcdjKOhLyA64OptdO2Y3mpTLn8pYTxxAyitO8V3zyZ5m1FWbTx/f5I1lCXQwKT9LDEsgqUA/knxRE=
-X-Received: by 2002:a1c:46:: with SMTP id 67mr16423551wma.51.1575043485738;
- Fri, 29 Nov 2019 08:04:45 -0800 (PST)
+ bh=anOpDiA6emSbWzFeH6+g4YSXSysyxwQIb0TLIecJ5tE=;
+ b=Lv0ICVjP0tIvQdsUNEZ6vao9oi3kWqQz820sP5poXBmjuERDCmj6GYOWykfUJOh8d150GH
+ GydQHOpoj7xiXyV+tdGKAmRq6T51fdtiR83zqEyN+ACuTaq2gboi5rguorSl7msLuOeYss
+ LaS3W9vYZYiqFf/IjC1DslQ8IiFyjt8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-186-pvhifRcCMxy1Qvb_qvuqTg-1; Fri, 29 Nov 2019 11:04:00 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE77CDBB2;
+ Fri, 29 Nov 2019 16:03:59 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E0B25C57C;
+ Fri, 29 Nov 2019 16:03:58 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 8CD9A1138606; Fri, 29 Nov 2019 17:03:56 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v6] error: rename errp to errp_in where it is IN-argument
+References: <20191127183704.14825-1-vsementsov@virtuozzo.com>
+ <878so05bca.fsf@dusky.pond.sub.org>
+ <f901e0db-61df-898f-ce18-096bfeadf525@virtuozzo.com>
+ <87mucf218w.fsf@dusky.pond.sub.org>
+ <80e563ee-31fb-da43-ddde-c8666e4b92c6@virtuozzo.com>
+ <87eexqda3c.fsf@dusky.pond.sub.org>
+ <41f32448-f2b8-1822-25df-f02c61df9bc4@virtuozzo.com>
+Date: Fri, 29 Nov 2019 17:03:56 +0100
+In-Reply-To: <41f32448-f2b8-1822-25df-f02c61df9bc4@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Fri, 29 Nov 2019 15:09:07 +0000")
+Message-ID: <878snybrf7.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-References: <20191129150508.24404-1-bilalwasim676@gmail.com>
- <afe9efde-7ac1-8607-446a-8fbf10accece@redhat.com>
- <8c956ae31e8f44a2b831a5030b2448b4@SVR-IES-MBX-03.mgc.mentorg.com>
-In-Reply-To: <8c956ae31e8f44a2b831a5030b2448b4@SVR-IES-MBX-03.mgc.mentorg.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Date: Fri, 29 Nov 2019 17:04:34 +0100
-Message-ID: <CAP+75-X_POJfTO=gOUu1zCPtcfnQ5yemQo0hqB_s3jy_C17o9g@mail.gmail.com>
-Subject: Re: [PATCH] net/imx_fec: Updating the IMX_FEC IP to support loopback
- mode.
-To: "Wasim, Bilal" <Bilal_Wasim@mentor.com>
-X-MC-Unique: b5rV32YROuKUG5lR_Miw9Q-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: pvhifRcCMxy1Qvb_qvuqTg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,123 +96,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "aa1ronham@gmail.com" <aa1ronham@gmail.com>,
- "jcd@tribudubois.net" <jcd@tribudubois.net>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "bilalwasim676@gmail.com" <bilalwasim676@gmail.com>,
- "linux@roeck-us.net" <linux@roeck-us.net>
+Cc: "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 29, 2019 at 4:59 PM Wasim, Bilal <Bilal_Wasim@mentor.com> wrote=
-:
->
-> Thanks for the pointers philippe.. Is the patch okay to be merged without=
- it or do I need to do a re-submission with the updated username ?
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-If there are no review comments on your patch, I think the maintainer
-taking your patch can fix this details directly, no need to resend.
+> 29.11.2019 17:35, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>=20
+>>> 28.11.2019 23:29, Markus Armbruster wrote:
+>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>>
+>>>>> 28.11.2019 17:23, Markus Armbruster wrote:
+>>>>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>>>>
+>>>>>>> Error **errp is almost always OUT-argument: it's assumed to be NULL=
+, or
+>>>>>>> pointer to NULL-initialized pointer, or pointer to error_abort or
+>>>>>>> error_fatal, for callee to report error.
+>>>>>>>
+>>>>>>> But very few functions instead get Error **errp as IN-argument:
+>>>>>>> it's assumed to be set (or, maybe, NULL), and callee should clean i=
+t,
+>>>>>>> or add some information.
+>>>>>>>
+>>>>>>> In such cases, rename errp to errp_in.
+>>>>>>
+>>>>>> Missing: why is the rename useful?
+>>>>>
+>>>>> The main reason is to prepare for coccinelle part.
+>>>>
+>>>> It's not a prerequisite for applying the patches Coccinelle produces,
+>>>> only a prerequisite for running Coccinelle.
+>>>>
+>>>>>> It's useful if it helps readers recognize unusual Error ** parameter=
+s,
+>>>>>> and recognizing unusual Error ** parameters is actually a problem.  =
+I'm
+>>>>>> not sure it is, but my familiarity with the Error interface may blin=
+d
+>>>>>> me.
+>>>>>>
+>>>>>> How many functions have unusual Error **parameters?  How are they us=
+ed?
+>>>>>> Any calls that could easily be mistaken as the usual case?  See [*]
+>>>>>> below.
+>> [...]
+>>>>>> [*] The information I asked for above is buried in these patches.  I=
+'ll
+>>>>>> try to dig it up as I go reviewing them.
+>>>>>>
+>>>>>> Second, it risks some of these "further patches" overtake this one, =
+and
+>>>>>> then its commit message will be misleading.  Moreover, the other com=
+mits
+>>>>>> will lack context.
+>> [...]
+>>>>>>> diff --git a/util/error.c b/util/error.c
+>>>>>>> index d4532ce318..275586faa8 100644
+>>>>>>> --- a/util/error.c
+>>>>>>> +++ b/util/error.c
+>> [...]
+>>>>>>> @@ -271,11 +271,11 @@ void error_free(Error *err)
+>>>>>>>         }
+>>>>>>>     }
+>>>>>>>    =20
+>>>>>>> -void error_free_or_abort(Error **errp)
+>>>>>>> +void error_free_or_abort(Error **errp_in)
+>>>>>>>     {
+>>>>>>> -    assert(errp && *errp);
+>>>>>>> -    error_free(*errp);
+>>>>>>> -    *errp =3D NULL;
+>>>>>>> +    assert(errp_in && *errp_in);
+>>>>>>> +    error_free(*errp_in);
+>>>>>>> +    *errp_in =3D NULL;
+>>>>
+>>>> This one is actually in/out.
+>>>>
+>>>> To make the compiler check errp_in is truly an in-argument, we can
+>>>> declare it as Error *const *errp_in.
+>>>>
+>>>> But we can save ourselves the trouble of renaming it; the const should
+>>>> suffice to tell both human readers and Coccinelle that this is not you=
+r
+>>>> common out-argument.  I think I like this better than relying on a
+>>>> naming convention.  What about you?
+>>>
+>>> I think it's good idea... But what to do with error_free_or_abort, and =
+other functions
+>>> which get filled errp, and want to set it to NULL? Patch 21 adds three =
+such functions..
+>>>
+>>> Maybe, add assert(errp) at start of such functions, and catch it by coc=
+cinelle (not sure
+>>> that it is possible)?
+>>=20
+>> I went through the git branch you provided.
+>>=20
+>> These get rid of unusual Error ** parameters:
+>>=20
+>>      01e10667d1 hmp: drop Error pointer indirection in hmp_handle_error
+>>      606bfb7520 vnc: drop Error pointer indirection in vnc_client_io_err=
+or
+>>=20
+>>      Get rid of them by peeling off an indirection.
+>>=20
+>> These try to make unusual Error ** parameters stand out:
+>>=20
+>>      51e73b3305 error: rename errp to errp_in where it is IN-argument
+>>=20
+>>      Four renames.
+>>=20
+>>      Three functions modify the error, name @errp_in is okay, my const
+>>      proposal works.
+>>=20
+>>      error_free_or_abort() clears *errp_in, name @errp_in is misleading,
+>>      const doesn't work.
+>>=20
+>>      f7bdfd42da qdev-monitor: well form error hint helpers
+>>=20
+>>      Two renames.  Both functions modify the error, rename is okay, cons=
+t
+>>      works.
+>>=20
+>>      9d4aac7299 nbd: well form nbd_iter_channel_error errp handler
+>>=20
+>>      One rename, from @local_err.  nbd_iter_channel_error() clears *errp=
+_in,
+>>      name @errp_in is misleading, const doesn't work.
+>>=20
+>>      fb1bd83c40 ppc: well form kvmppc_hint_smt_possible error hint helpe=
+r
+>>=20
+>>      One rename.  The function modify the error, rename is okay, const w=
+orks.
+>>=20
+>>      e024e89b10 9pfs: well form error hint helpers
+>>=20
+>>      Two renames.  Both functions modify the error, rename is okay, cons=
+t
+>>      works.
+>>=20
+>> These make usual Error ** parameters look, well, more usual:
+>>=20
+>>      c01649d999 hw/core/qdev: cleanup Error ** variables
+>>      a5f6424163 block/snapshot: rename Error ** parameter to more common=
+ errp
+>>      ae200ca21e hw/i386/amd_iommu: rename Error ** parameter to more com=
+mon errp
+>>      561f73e681 qga: rename Error ** parameter to more common errp
+>>      12589a96cd monitor/qmp-cmds: rename Error ** parameter to more comm=
+on errp
+>>      f608fc5999 hw/s390x: rename Error ** parameter to more common errp
+>>      747a90d044 hw/tpm: rename Error ** parameter to more common errp
+>>      3d19e66610 hw/usb: rename Error ** parameter to more common errp
+>>      07366648ef include/qom/object.h: rename Error ** parameter to more =
+common errp
+>>=20
+>> These don't touch Error ** parameter declarations:
+>>=20
+>>      f6e4fffc16 hw/core/loader-fit: fix freeing errp in fit_load_fdt
+>>      b5bba880ae net/net: Clean up variable shadowing in net_client_init(=
+)
+>>      4a4462ce4c hw/sd: drop extra whitespace in sdhci_sysbus_realize() h=
+eader
+>>      d52d44e822 backends/cryptodev: drop local_err from cryptodev_backen=
+d_complete()
+>>      7e95d30766 hw/vfio/ap: drop local_err from vfio_ap_realize
+>>=20
+>> Unusual Error ** parameters that can be made Error *const *errp should
+>> not also need a rename, neither to avoid confusion about @errp's role,
+>> nor to help Coccinelle.
+>>=20
+>> Unusual Error ** parameters that can't be made Error *const *errp:
+>>=20
+>>      nbd_iter_channel_error(): parameter is called @local_err.  Confusio=
+n
+>>      seems as unlikely without the rename as with it.  Coccinelle should
+>>      not need the rename.  No need to touch.  I'm willing to accept your
+>>      assertion change.
+>
+> Hmm but you reverted it.. Will you keep an assertion?
 
-> -----Original Message-----
-> From: Philippe Mathieu-Daud=C3=A9 [mailto:philmd@redhat.com]
-> Sent: Friday, November 29, 2019 8:38 PM
-> To: bilalwasim676@gmail.com; qemu-devel@nongnu.org
-> Cc: peter.maydell@linaro.org; aa1ronham@gmail.com; jcd@tribudubois.net; q=
-emu-arm@nongnu.org; Wasim, Bilal <Bilal_Wasim@mentor.com>; linux@roeck-us.n=
-et; Jason Wang <jasowang@redhat.com>
-> Subject: Re: [PATCH] net/imx_fec: Updating the IMX_FEC IP to support loop=
-back mode.
+You decide whether to change the assertion in v7.
+
+>>      error_free_or_abort(): parameter is called @errp.  Confusion seems
+>>      as unlikely without the rename as with it.  Coccinelle should not
+>>      need the rename.  I'm willing to accept a rename to @local_err
+>>      regardless.
 >
-> Hi Bilal,
+> So, either we rename it to local_err, or coccinelle should distinguish it
+> by assertion at the top.
+
+Yes.
+
+I'm also willing to consider a rename to a name other than @local_err,
+if you can come up with a good, non-misleading one.
+
+>> I pushed my fixups to git://repo.or.cz/qemu/armbru.git branch error-prep
+>> for your convenience.  The commit messages of the fixed up commits need
+>> rephrasing, of course.
+>>=20
 >
-> Cc'ing Jason, the maintainer of network devices.
->
-> On 11/29/19 4:05 PM, bilalwasim676@gmail.com wrote:
-> > From: bwasim <bilal_wasim@mentor.com>
->
-> Your git setup misses your 'user.name', you could fix it running:
->
->    git config user.name "Bilal Wasim"
->
-> (eventually with the --global option).
->
-> The patch looks good otherwise.
->
-> Thanks!
->
-> > Loopback mode only works when specific conditions (as dictated by the
-> > IP guide) are met, i.e. the MII_MODE is set and the RMII_MODE is
-> > cleared. If not, we simply send the packet on the output queue (for TX
-> > to the host network). Tested by running a custom RTOS and TXing a ton
-> > of packets. The same packets were received on the RX side..
-> >
-> > Signed-off-by: Bilal Wasim <bilal_wasim@mentor.com>
-> > ---
-> >   hw/net/imx_fec.c | 27 +++++++++++++++++++++++++--
-> >   1 file changed, 25 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c index
-> > bd99236864..c51e7f7363 100644
-> > --- a/hw/net/imx_fec.c
-> > +++ b/hw/net/imx_fec.c
-> > @@ -256,6 +256,29 @@ static const VMStateDescription vmstate_imx_eth =
-=3D
-> > {
-> >
-> >   static void imx_eth_update(IMXFECState *s);
-> >
-> > +/*
-> > + * Function to check if the MAC is configured to run in loopback mode.
-> > + * If so, invoke the "receive" routine.
-> > + * Else write to the output.
-> > + * */
-> > +static void send_pkt(IMXFECState *s, uint8_t *frame, int frame_size)
-> > +{
-> > +    NetClientState *nc =3D qemu_get_queue(s->nic);
-> > +
-> > +    /*
-> > +     * Loopback or Normal mode ?
-> > +     * Per the FEC Manual: If loopback is enabled, the MII_MODE
-> > +     * should be SET and the RMII_MODE should be cleared. Loopback
-> > +     * will only work if this criterion is met. If not met,
-> > +     * we will send the frame on the output queue. */
-> > +    if ((s->regs[ENET_RCR] & ENET_RCR_LOOP) && (s->regs[ENET_RCR] & EN=
-ET_RCR_MII_MODE)
-> > +            && !(s->regs[ENET_RCR] & ENET_RCR_RMII_MODE)) {
-> > +        nc->info->receive(nc, frame, frame_size);
-> > +    } else {
-> > +        qemu_send_packet(nc, frame, frame_size);
-> > +    }
-> > +}
-> > +
-> >   /*
-> >    * The MII phy could raise a GPIO to the processor which in turn
-> >    * could be handled as an interrpt by the OS.
-> > @@ -488,7 +511,7 @@ static void imx_fec_do_tx(IMXFECState *s)
-> >           frame_size +=3D len;
-> >           if (bd.flags & ENET_BD_L) {
-> >               /* Last buffer in frame.  */
-> > -            qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_s=
-ize);
-> > +            send_pkt(s, (uint8_t *)&s->frame, frame_size);
-> >               ptr =3D s->frame;
-> >               frame_size =3D 0;
-> >               s->regs[ENET_EIR] |=3D ENET_INT_TXF; @@ -586,7 +609,7 @@
-> > static void imx_enet_do_tx(IMXFECState *s, uint32_t index)
-> >               }
-> >               /* Last buffer in frame.  */
-> >
-> > -            qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_s=
-ize);
-> > +            send_pkt(s, (uint8_t *)&s->frame, frame_size);
-> >               ptr =3D s->frame;
-> >
-> >               frame_size =3D 0;
-> >
->
+> Looked through fixups, looks OK for me, thanks! What next?
+
+Let me finish my fixing incorrect dereferences of errp, and then we
+figure out what to include in v7.
 
 
