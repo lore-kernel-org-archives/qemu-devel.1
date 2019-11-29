@@ -2,80 +2,57 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD18C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 18:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA379C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 18:50:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4783121736
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 18:47:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GxP5Bnpf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4783121736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8C1EA21736
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 18:50:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C1EA21736
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ialIP-0008CU-FM
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 13:47:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46147)
+	id 1ialLC-00013s-Cq
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 13:50:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ialEK-000633-Io
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:43:03 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1ialDR-0005OI-A6
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:42:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ialEE-0004as-WD
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:42:57 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33419)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ialED-0004Fj-MH
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:42:54 -0500
-Received: by mail-oi1-x244.google.com with SMTP id x21so19730968oic.0
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 10:42:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hir47yhQPKRg9uBcGPhzpCqfbh2WTx7BBtpOVbhG8cY=;
- b=GxP5Bnpf9WlXqOpFyh9MPZZVj1aSQKym71N2kswkkfpBIqLm2NCLh+A7W3svvaF/pI
- uZDsfVDfwjBpslELCZlT9miubNos2lLopDWppZ8UJb0bGEkN2BJrZoNs70+XvAHyAvm+
- Qyu+doUA42/TTmkLQl7QdL0AVT/H23wPwysd7a5ZlnoU/ocpdX+rJINdky5XUcyAcKnK
- fKXj7srWJ0KnWtCuRevOKWS/OL6LuSCZzAZi77naGRK7RO0uHc2h23FMCxR4pg82p2EQ
- 6FbHA2Chv3usMP1/tpEAEaQLvL72epbtwI4oU3vdU6T3HcMyEs0e+4SbT4AZTx6sJgl2
- 6/8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hir47yhQPKRg9uBcGPhzpCqfbh2WTx7BBtpOVbhG8cY=;
- b=iM8/m3ggbcrK4bjDLlEDqoic7IvtLVR3cyVmmAZeVt78syn0nnn+KYGlGi9YEwJY53
- A8RS11SKI2MpZNtw/skvoQ4EWA0HU9YtVnr/xFzDRYcdof7R8i63IMS9SuaqYWoT0S1o
- tXcW3lmWyEIXwE5yKwxTReeiAsNwjoFAobQvfqwEkHU7agX92CJ8G9BXDfceWCSMjVJI
- kXqDTjlRDKhy17ar1sskbSbk60Fnwm+ipBECQXymX4IIpRJaL+sSX5sb8OyAXzBChYjO
- ya40FYNPCDxvLnHOhXDbfbDH2/Jt/369Y6PenyXgUkNywFSM18DC5w1BWoTktWy6/HZg
- 0t5g==
-X-Gm-Message-State: APjAAAXTGtEzTj6HvOsb4E/iX0z/MZ5CKAfzTpw7RqTtwgJFf6HkBSKe
- tW0rNctGy3OJ1ssFBBQ7d77vYIwhNYoX0lwivOx7LA==
-X-Google-Smtp-Source: APXvYqyZ5iTnoEwOD4YWaBj+aK39iysEl/HYD1V20oNwZ8espKaKrjbEXRgkE1wXqU3J9BNny1fscORdmHZYg2fv7AU=
-X-Received: by 2002:aca:1a0a:: with SMTP id a10mr11120249oia.146.1575052969960; 
- Fri, 29 Nov 2019 10:42:49 -0800 (PST)
+ (envelope-from <balaton@eik.bme.hu>) id 1ialDO-0002BN-Gg
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:42:04 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:49133)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1ialDM-00022H-96
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 13:42:00 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id C9AB07456F8;
+ Fri, 29 Nov 2019 19:41:57 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id ABBB47456ED; Fri, 29 Nov 2019 19:41:57 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id AA99D7456CD;
+ Fri, 29 Nov 2019 19:41:57 +0100 (CET)
+Date: Fri, 29 Nov 2019 19:41:57 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [RFC 0/1] ATI R300 emulated grpahics card V2
+In-Reply-To: <20191128113023.gdw63adoooqlider@sirius.home.kraxel.org>
+Message-ID: <alpine.BSF.2.21.99999.352.1911291908110.15049@zero.eik.bme.hu>
+References: <20191128064350.20727-1-aaron.zakhrov@gmail.com>
+ <20191128113023.gdw63adoooqlider@sirius.home.kraxel.org>
+User-Agent: Alpine 2.21.99999 (BSF 352 2019-06-22)
 MIME-Version: 1.0
-References: <20191018150630.31099-1-damien.hedde@greensocs.com>
- <20191018150630.31099-9-damien.hedde@greensocs.com>
-In-Reply-To: <20191018150630.31099-9-damien.hedde@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 29 Nov 2019 18:42:39 +0000
-Message-ID: <CAFEAcA9D7UUkNJyWAiO_EM6OQ8JPH3J1Ko+6q8C+3ZKNg-SuxQ@mail.gmail.com>
-Subject: Re: [PATCH v5 08/13] hw/core: deprecate old reset functions and
- introduce new ones
-To: Damien Hedde <damien.hedde@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,59 +64,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, aaron.zakhrov@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 18 Oct 2019 at 16:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
->
-> Deprecate device_legacy_reset(), qdev_reset_all() and
-> qbus_reset_all() to be replaced by new functions
-> device_cold_reset() and bus_cold_reset() which uses resettable API.
->
-> Also introduce resettable_cold_reset_fn() which may be used as a
-> replacement for qdev_reset_all_fn and qbus_reset_all_fn().
->
-> Following patches will be needed to look at legacy reset call sites
-> and switch to resettable api. The legacy functions will be removed
-> when unused.
->
-> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-> ---
->
-> I've removed the general helpers
-> + device_reset(DeviceState *dev, ResetType type)
-> + bus_reset(BusState *dev, ResetType type)
-> because with several reset types, all devices and buses will not
-> implement all of them. I think it is preferable to define a
-> type-specific helper every time it is needed for base classes
-> implementing the reset type (eg a device_pci_reset(PciDev*) for the
-> pci reset type if add that).
->
-> So device_reset()/bus_reset() symbol names are not taken anymore. I
-> don't have a strong opinion of what names should have the
-> device_cold_reset() and bus_cold_reset() function added in this
-> patch. It could be device/bus_hard_reset() (the current
-> qbus_reset_all() comment mention we do a "hard" reset) or simply
-> device/bus_reset() or anything else.
-> What do you think ? Any better idea ? It should be consistent with
-> the reset type name but we can change it also if cold is not what we
-> want.
->
-> Note that if we don't settle for device/bus_reset(). We can drop
-> the first patch that renames device_reset() to device_legacy_reset()
+On Thu, 28 Nov 2019, Gerd Hoffmann wrote:
+> The infrastructure to branch into model-specific code is pretty rough
+> right now, we might refine that, for example with some helper functions
+> (ati_get_model() returning an enum, or ati_is_$model() functions
+> returning bool, or both).
 
-I think we're good the way you have things in this patchset.
+Maybe we could define ATI_IS_$MODEL macros to save some typing but I 
+thought it's not much better than the current if() and also model specific 
+functions could be grouped into separate ati_$model files so we don't need 
+too many branches in the main file.
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Trouble-shooting linux guests shouldn't be too hard, you have the source
+> code so you can check what the driver tries to do and you can add debug
+> printk's to trace where exactly things are failing ;)
 
-thanks
--- PMM
+I think the main difficulties are to find out how the card works then once 
+one gets that the next question is how to implement that in QEMU: e.g. how 
+can we make the micro engine emulation run in a separate thread. I think 
+it probably can be done with existing qemu thread and locking functions. 
+The synchronisation between CPU and GPU should be solved by the protocol 
+between them (after all in real hardware they also run parallel so this 
+should have been solved). If so, the micro engine thread may only have to 
+read memory packets then generate register accesses. For this to work the 
+register access FIFO may also need to be added which is now missing as in 
+current version register writes are executed immediately but once we have 
+both the CPU and micro engine that can access registers we either need to 
+implement the FIFO or have some synchronisation between the two. This 
+needs some thought. (If we have the register write FIFO then the actual 
+drawing can also be done in a separate thread which is more like what the 
+real GPU does but to make it simple I did not try that in first version.)
+
+If the microcode of the microengine/CCE could be reversed or is documented 
+somewhere it may be easier to implement emulation of that instead of doing 
+the packet parsing for all possible command packets of which there are 
+quite a lot, but in the real GPU all those are handled by the small 
+microcode. The ME/CCE is probably some VLIW processor with 40 bit 
+instructions which likely have ops to read and write memory and access 
+registers and maybe some branching and synchronisation but I have no idea 
+how to find out which opcode means what. This microengine is probably very 
+similar throughout the early Radeons, only the microcode changes so if we 
+could implement that it might work for several cards (also even for 
+Rage128Pro).
+
+Regards,
+BALATON Zoltan
 
