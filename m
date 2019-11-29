@@ -2,65 +2,69 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB75AC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 03:21:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21A7DC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 04:38:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACACE21736
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 03:21:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACACE21736
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DE6372158A
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 04:38:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE6372158A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaWqe-0004W3-Pm
-	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 22:21:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56101)
+	id 1iaY3I-0004u0-2m
+	for qemu-devel@archiver.kernel.org; Thu, 28 Nov 2019 23:38:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43688)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iaWnQ-0003dg-RW
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 22:18:18 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iaY2e-0004Sn-NH
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 23:38:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iaWnF-0007J5-SR
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 22:18:08 -0500
-Received: from mga09.intel.com ([134.134.136.24]:32171)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iaWnF-0006MS-JO
- for qemu-devel@nongnu.org; Thu, 28 Nov 2019 22:18:05 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Nov 2019 19:17:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,255,1571727600"; d="scan'208";a="199682105"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.197.115])
- ([10.239.197.115])
- by orsmga007.jf.intel.com with ESMTP; 28 Nov 2019 19:17:45 -0800
-Subject: Re: [PATCH v19 7/8] tests/numa: Add case for QMP build HMAT
-To: Thomas Huth <thuth@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <20191128082109.30081-1-tao3.xu@intel.com>
- <20191128082109.30081-8-tao3.xu@intel.com>
- <87pnhcnru9.fsf@dusky.pond.sub.org>
- <09bb1d3f-222a-e84e-ab6a-55496bba1d9a@redhat.com>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <0ad066d9-c5cc-1ec3-4f03-175977536caf@intel.com>
-Date: Fri, 29 Nov 2019 11:17:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+ (envelope-from <no-reply@patchew.org>) id 1iaY2a-0002v3-7r
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 23:38:02 -0500
+Resent-Date: Thu, 28 Nov 2019 23:38:01 -0500
+Resent-Message-Id: <E1iaY2a-0002v3-7r@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21175)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iaY2Z-0002hb-Ma
+ for qemu-devel@nongnu.org; Thu, 28 Nov 2019 23:37:59 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1575002258; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=jViyRLeWt5nVJa7eL7h0ClgopD3BRJEZXn1eeP1xZP8Kpi+KgmrcY1+T7o7hF6xtMmT9bFAp9wKcp+zM2RCmDOAQgggXQCDucsBZP5PVyEENZBAQh+job38t3wwFornE8IYOC2m69QROIsAes5B8TyNn8ReeuCdp3tkEWyYa3mg=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1575002258;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=p/0oc9X3DXd5K4F8GlXTpLkN3DnCZTdrDoVWnJ2VHUc=; 
+ b=miGipheqSgt/9Ch3y5sx8jM9mMEggMkHBBKvidQKv/lNdlDhgzKMAfQxW3Rl/KSf059TSZrvVZ5QXSbmKmlH5w/Yqjdl7V5jdkgEXv3vTqT6qdaj9wMI9dXI5m8OFfZP79EPJxnBMBixtxrtzFQalUIJcAPKKmQg75KSzmj3+7o=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1575002256850747.5863864048574;
+ Thu, 28 Nov 2019 20:37:36 -0800 (PST)
+In-Reply-To: <20191128141518.628245-1-marcandre.lureau@redhat.com>
+Subject: Re: [PATCH 0/2] RFC: add -mem-shared option
+Message-ID: <157500225553.16987.12940073507274968397@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <09bb1d3f-222a-e84e-ab6a-55496bba1d9a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.24
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: marcandre.lureau@redhat.com
+Date: Thu, 28 Nov 2019 20:37:36 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,79 +76,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "sw@weilnetz.de" <sw@weilnetz.de>, "Du, Fan" <fan.du@intel.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
- Jingqi" <jingqi.liu@intel.com>, "imammedo@redhat.com" <imammedo@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ pbonzini@redhat.com, marcandre.lureau@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/28/2019 7:53 PM, Thomas Huth wrote:
-> On 28/11/2019 12.49, Markus Armbruster wrote:
->> Tao Xu <tao3.xu@intel.com> writes:
->>
->>> Check configuring HMAT usecase
->>>
->>> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
->>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->>> ---
->>>
->>> Changes in v19:
->>>       - Add some fail cases for hmat-cache when level=0
->>>
->>> Changes in v18:
->>>       - Rewrite the lines over 80 characters
->>>
->>> Chenges in v17:
->>>       - Add some fail test cases (Igor)
->>> ---
->>>    tests/numa-test.c | 213 ++++++++++++++++++++++++++++++++++++++++++++++
->>>    1 file changed, 213 insertions(+)
->>>
->>> diff --git a/tests/numa-test.c b/tests/numa-test.c
->>> index 8de8581231..aed7b2f31b 100644
->>> --- a/tests/numa-test.c
->>> +++ b/tests/numa-test.c
->>> @@ -327,6 +327,216 @@ static void pc_dynamic_cpu_cfg(const void *data)
->>>        qtest_quit(qs);
->>>    }
->>>    
->>> +static void pc_hmat_build_cfg(const void *data)
->>> +{
->>> +    QTestState *qs = qtest_initf("%s -nodefaults --preconfig -machine hmat=on "
->>> +                     "-smp 2,sockets=2 "
->>> +                     "-m 128M,slots=2,maxmem=1G "
->>> +                     "-object memory-backend-ram,size=64M,id=m0 "
->>> +                     "-object memory-backend-ram,size=64M,id=m1 "
->>> +                     "-numa node,nodeid=0,memdev=m0 "
->>> +                     "-numa node,nodeid=1,memdev=m1,initiator=0 "
->>> +                     "-numa cpu,node-id=0,socket-id=0 "
->>> +                     "-numa cpu,node-id=0,socket-id=1",
->>> +                     data ? (char *)data : "");
->>> +
->>> +    /* Fail: Initiator should be less than the number of nodes */
->>> +    g_assert(qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
->>> +        " 'arguments': { 'type': 'hmat-lb', 'initiator': 2, 'target': 0,"
->>> +        " 'hierarchy': \"memory\", 'data-type': \"access-latency\" } }")));
->>
->> Code smell: side effect within assert().
->>
->> Harmless here, because compiling tests with NDEBUG is pointless.  Still,
->> it sets a bad example.  Not your idea, the pattern seems to go back to
->> commit c35665e1ee3 and fb1e58f72ba.
-> 
-> ... maybe best to use g_assert_true() which can't be disabled and thus
-> should be used in tests. See:
-> 
->    https://developer.gnome.org/glib/unstable/glib-Testing.html#g-assert-true
-> 
->    Thomas
-> 
-Thank you for your suggestion. I will use g_assert_true and 
-g_assert_false to replace g_assert
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyODE0MTUxOC42Mjgy
+NDUtMS1tYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFp
+bGVkIHRoZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUg
+dGVzdGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2Nr
+ZXIgaW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09
+IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50
+b3M3IFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hP
+V19FTlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBDQyAgICAg
+IHg4Nl82NC1zb2Z0bW11L2FjY2VsL3RjZy90Y2ctcnVudGltZS1ndmVjLm8KICBDQyAgICAgIHg4
+Nl82NC1zb2Z0bW11L2FjY2VsL3RjZy9jcHUtZXhlYy5vCi90bXAvcWVtdS10ZXN0L3NyYy9leGVj
+LmM6IEluIGZ1bmN0aW9uICdxZW11X3JhbV9hbGxvY19mcm9tX2ZpbGUnOgovdG1wL3FlbXUtdGVz
+dC9zcmMvZXhlYy5jOjIzNjY6MTI6IGVycm9yOiAnY3JlYXRlZCcgbWF5IGJlIHVzZWQgdW5pbml0
+aWFsaXplZCBpbiB0aGlzIGZ1bmN0aW9uIFstV2Vycm9yPW1heWJlLXVuaW5pdGlhbGl6ZWRdCiAg
+ICAgICAgIGlmIChjcmVhdGVkKSB7CiAgICAgICAgICAgIF4KY2MxOiBhbGwgd2FybmluZ3MgYmVp
+bmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtleGVjLm9dIEVycm9yIDEKbWFrZVsx
+XTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KICBDQyAgICAgIGFhcmNoNjQt
+c29mdG1tdS9kaXNhcy5vCiAgR0VOICAgICBhYXJjaDY0LXNvZnRtbXUvZ2Ric3R1Yi14bWwuYwov
+dG1wL3FlbXUtdGVzdC9zcmMvZXhlYy5jOiBJbiBmdW5jdGlvbiAncWVtdV9yYW1fYWxsb2NfZnJv
+bV9maWxlJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2V4ZWMuYzoyMzY2OjEyOiBlcnJvcjogJ2NyZWF0
+ZWQnIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQgaW4gdGhpcyBmdW5jdGlvbiBbLVdlcnJvcj1t
+YXliZS11bmluaXRpYWxpemVkXQogICAgICAgICBpZiAoY3JlYXRlZCkgewogICAgICAgICAgICBe
+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBb
+ZXhlYy5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMu
+Li4uCm1ha2U6ICoqKiBbeDg2XzY0LXNvZnRtbXUvYWxsXSBFcnJvciAyCm1ha2U6ICoqKiBXYWl0
+aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbYWFyY2g2NC1zb2Z0bW11L2Fs
+bF0gRXJyb3IgMgpUcmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90
+ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhp
+dChtYWluKCkpCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkK
+c3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdk
+b2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1jZTM0ODk0
+MmNjMTQ0MjE4YWI2NjUyNjJiNWUyYmYzNCcsICctdScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0
+JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICct
+ZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICct
+ZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIv
+dG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2Nh
+Y2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRt
+cC1mdHMybXVrcC9zcmMvZG9ja2VyLXNyYy4yMDE5LTExLTI4LTIzLjM1LjA4LjE1NTE0Oi92YXIv
+dG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVz
+dC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0
+ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1jZTM0ODk0MmNjMTQ0MjE4YWI2NjUyNjJi
+NWUyYmYzNAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmlu
+ZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1mdHMybXVrcC9zcmMnCm1h
+a2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAg
+Mm0yNy42MTVzCnVzZXIgICAgMG04LjE0NnMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
+Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMTI4MTQxNTE4LjYyODI0NS0xLW1hcmNhbmRy
+ZS5sdXJlYXVAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1l
+c3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRw
+czovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1k
+ZXZlbEByZWRoYXQuY29t
+
 
