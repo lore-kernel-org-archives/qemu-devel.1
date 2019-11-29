@@ -2,81 +2,81 @@ Return-Path: <SRS0=xfvu=ZV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E84A2C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 14:50:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12784C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 14:53:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF78621736
-	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 14:50:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2884217AB
+	for <qemu-devel@archiver.kernel.org>; Fri, 29 Nov 2019 14:53:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OtkAgJHx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF78621736
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C+ZHFF29"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2884217AB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iahbL-0003Zz-S5
-	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 09:50:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38469)
+	id 1iahdm-0005hK-Tc
+	for qemu-devel@archiver.kernel.org; Fri, 29 Nov 2019 09:53:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iagrd-0002h0-Hw
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:03:18 -0500
+ (envelope-from <berrange@redhat.com>) id 1iahXM-0001Fm-Cg
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:46:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iagrV-00054i-UB
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:03:14 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52794)
+ (envelope-from <berrange@redhat.com>) id 1iahXC-0008F1-QU
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:46:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47641
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iagrV-00052W-Pa
- for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:03:09 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iahXC-00081G-Bm
+ for qemu-devel@nongnu.org; Fri, 29 Nov 2019 09:46:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575036187;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1575038771;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CJ+c0+VjGVfiepa7uGqLbpKLXtzxd0RS5GOPmGSIg3Q=;
- b=OtkAgJHxGKntV1yKavdAz1+RothqNiDzDUgJ2mZLWC3YddSfeCDXODiiupma/C8Dg0+KlM
- DFc3ykNNoxPjV5YdgNx+SGKA6FPFVDB0Ofdy0yfU+0iDtFKB6Gn9458kFL7GKbqJWmE5JG
- zFjhg05qrtnIF43FHq5RebiabfW7W8k=
+ bh=0Di7uQA2HHyg73uxLQJ8zPwLIciX+YCP4JngFAPEOks=;
+ b=C+ZHFF29M4UQj5rHRGaQCmQ6Vf58VMtw+u+C3v+YhnUVri2sCYzZh4mYkz+/nZC4xCApas
+ nUDa3pJ7sCBNh8IHDyLdG3IMSYc4i9/G1zzHgpzMcinJyGuZ5bhta4PcIcbSIOsn1IcEmY
+ QxE9WhuWbq+5Z1dBc3yU9z8ym7aRonU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-7-FPdScMU4OLa-qpKda29VHw-1; Fri, 29 Nov 2019 09:03:06 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-148-eGsKxySJMQepwR6SVusXeQ-1; Fri, 29 Nov 2019 09:46:07 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D357D80183D;
- Fri, 29 Nov 2019 14:03:04 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 546F210013A7;
- Fri, 29 Nov 2019 14:03:04 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id ED5631138606; Fri, 29 Nov 2019 15:03:02 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v6] hw/core/loader-fit: fix freeing errp in fit_load_fdt
-References: <20191127183016.13852-1-vsementsov@virtuozzo.com>
-Date: Fri, 29 Nov 2019 15:03:02 +0100
-In-Reply-To: <20191127183016.13852-1-vsementsov@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Wed, 27 Nov 2019 21:30:16 +0300")
-Message-ID: <87muceeq5l.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C6E5800D41
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 14:46:07 +0000 (UTC)
+Received: from redhat.com (ovpn-112-31.ams2.redhat.com [10.36.112.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 47F6F5D6D2;
+ Fri, 29 Nov 2019 14:46:05 +0000 (UTC)
+Date: Fri, 29 Nov 2019 14:46:02 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH] ci: Use libcap-ng
+Message-ID: <20191129144602.GJ2260471@redhat.com>
+References: <20191129142126.32967-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: FPdScMU4OLa-qpKda29VHw-1
+In-Reply-To: <20191129142126.32967-1-dgilbert@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: eGsKxySJMQepwR6SVusXeQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,56 +88,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: pbonzini@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
-
-> fit_load_fdt forget to check that errp is not NULL and to zero it after
-> freeing. Fix it.
->
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
+On Fri, Nov 29, 2019 at 02:21:26PM +0000, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> We currently enable libcap-dev in build-clang to pick up the 9p proxy
+> helper.  Paolo's patch changes that to use libcap-ng, so switch to using
+> it.  This also means we'll be testing the scsi pr manager and the bridge
+> helper.
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  hw/core/loader-fit.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-> index 953b16bc82..3ee9fb2f2e 100644
-> --- a/hw/core/loader-fit.c
-> +++ b/hw/core/loader-fit.c
-> @@ -200,7 +200,10 @@ static int fit_load_fdt(const struct fit_loader *ldr=
-, const void *itb,
->      err =3D fit_image_addr(itb, img_off, "load", &load_addr, errp);
->      if (err =3D=3D -ENOENT) {
->          load_addr =3D ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
-> -        error_free(*errp);
-> +        if (errp) {
-> +            error_free(*errp);
-> +            *errp =3D NULL;
-> +        }
->      } else if (err) {
->          error_prepend(errp, "unable to read FDT load address from FIT: "=
-);
->          ret =3D err;
+>  .gitlab-ci.yml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> index be57c6a454..62a9609798 100644
+> --- a/.gitlab-ci.yml
+> +++ b/.gitlab-ci.yml
+> @@ -59,7 +59,7 @@ build-user:
+> =20
+>  build-clang:
+>   script:
+> - - apt-get install -y -qq clang libsdl2-dev libattr1-dev libcap-dev
+> + - apt-get install -y -qq clang libsdl2-dev libattr1-dev libcap-ng-dev
+>        xfslibs-dev libiscsi-dev libnfs-dev libseccomp-dev gnutls-dev libr=
+bd-dev
+>   - ./configure --cc=3Dclang --cxx=3Dclang++ --enable-werror
+>        --target-list=3D"alpha-softmmu arm-softmmu m68k-softmmu mips64-sof=
+tmmu
 
-This fixes latent bugs when fit_image_addr() fails with ENOENT:
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-* If a caller passes a null @errp, we crash dereferencing it
 
-* Else, we pass a dangling Error * to the caller, and return success.
-  If a caller dereferences the Error * regardless, we have a
-  use-after-free.
-
-Not fixed:
-
-* If a caller passes &error_abort or &error_fatal, we die instead of
-  taking the recovery path.
-
-We need to use a local_err here.
-
-I'll search for the pattern, and post fix(es).
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
