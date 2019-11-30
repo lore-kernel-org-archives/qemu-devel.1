@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D2AC432C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 08:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30180C432C0
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 08:52:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6FAC20732
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 08:48:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8AC62075C
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 08:52:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TuzMsLVY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6FAC20732
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V3dAg1W8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8AC62075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iayQl-0005Ia-S3
-	for qemu-devel@archiver.kernel.org; Sat, 30 Nov 2019 03:48:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57684)
+	id 1iayUN-00019E-Vw
+	for qemu-devel@archiver.kernel.org; Sat, 30 Nov 2019 03:52:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57642)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iayON-0002yg-FE
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 03:46:17 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iayOJ-0002xo-Uw
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 03:46:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iayOK-0003HE-SL
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 03:46:15 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:56144)
+ (envelope-from <alex.bennee@linaro.org>) id 1iayOH-0003DT-0H
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 03:46:11 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33301)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iayOJ-0003EC-To
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 03:46:12 -0500
-Received: by mail-wm1-x344.google.com with SMTP id a131so11960076wme.5
- for <qemu-devel@nongnu.org>; Sat, 30 Nov 2019 00:46:11 -0800 (PST)
+ id 1iayOG-0003Cu-QE
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 03:46:08 -0500
+Received: by mail-wr1-x442.google.com with SMTP id b6so8150633wrq.0
+ for <qemu-devel@nongnu.org>; Sat, 30 Nov 2019 00:46:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=rHj2j7xox6z2Hd6taabLlbo0WOoPYGk8d+QWB+Ni1Gg=;
- b=TuzMsLVYeoyD+wtZD6T405dYsN1bkuRuPoPQY4xbMcGgsGstiyZSGOcWUdeVPfY4MM
- ywOFILwRb8nd57ZQJ443s6T1uhUdrKqEviOtJk+U1LuxbflD1tWBxr4MmL1ZKysLGn3S
- JEToaIk3v4mcphJuOJY3R6uPIePVc2XuArCVVCM7VT5EYIZ1lJZfHU2hP+0Q9h4ON7AX
- hDXNzGl/hEVlxmxU0fLNApU1HRyoV5UDtpm84J+qylonq8WS7gQ3pMVYf27iCj14HVs4
- +05WAotdauPDTYCnYGHoAUTqkatg2nhDyDS6wy9GJGSQqqYMb9Vyz7LC5uH9KhfVmYr2
- KOxQ==
+ bh=cVLoNyrOG/MAL6mzJFsBL4SblyEDJESFcoquktiFLt0=;
+ b=V3dAg1W88O85xwdAfOEKiMcJdkmn4U0WgrhOF8gCkGuRulVMdBE7Ygm39j3igLTsQW
+ HtzZvsIA2mKv25IQdLNhfQ3poJS67IuStMy2hpHaAh0RzA1bgv1Zt7dz20/q8JrpEhIN
+ mID545Y0K5/MTpqLf1Dqrel+vG6H8535xDtKbGhLAX4dbJsoyj6Xb2V+yqaV+YkNka/p
+ yulnqFYftJMTpAWMRlL/ZZjlrFa3UNlDxAFobe/7Vo/LAAd3NjWFBS3tZNDu7fSogm9a
+ wsr1Uf/rZab5ArzTJ2IFuuDzHEQ3a+HUaEcE1OMlgyXU+EhNn1GbAaXrp9SedmrE42yh
+ i+lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rHj2j7xox6z2Hd6taabLlbo0WOoPYGk8d+QWB+Ni1Gg=;
- b=KAJ7PsDig3OSiSSACMnfVq/Kyj3XlgOyml4qMiKZrJDiXis8akosusbmZ8O3pLsv4Z
- qQUrnOeFXJ8a061S6fZ9cz4SHQnIY1Y4nENnVqGKVEmc9w5kPpZ8smeBMf2Hj/cBeXTm
- lV4rg0Q1o5UT0otyjGKsf0y5k+HWIrHouZ6Ii7il42lx1pkRnOtp2KUaiHJUTK8CQb0D
- 1XXaSj033uwyynw/vOkqsKgXs4Cnv0hqA/7SoOLL4QwvQqnXY0CAKvGOKPcwZZYwqSN9
- 3fItaPXGpbyWNkKJUJFzKc22NQ1nlth3Z8MKoZmhSt0Ep67XWTien+raa2iXiLwOvtVb
- ZiLA==
-X-Gm-Message-State: APjAAAWY9lrhOSqaupbK6atETxXOkXpobQDg7u2k2s6v4xcsduHWmPDT
- CUfv8gLvZG9wQqubBqboOySkarxMoWI=
-X-Google-Smtp-Source: APXvYqx48cpLqV8LCE2MNonr9ObyfHmSLqpte4MdpVBScfLjEMmmvlAlX96NEbkAGZzExDlBiDx8Dw==
-X-Received: by 2002:a05:600c:2295:: with SMTP id
- 21mr17819451wmf.85.1575103570351; 
- Sat, 30 Nov 2019 00:46:10 -0800 (PST)
+ bh=cVLoNyrOG/MAL6mzJFsBL4SblyEDJESFcoquktiFLt0=;
+ b=FRGk7Tg240L+lInJYSeC+nnnz93iB7blEVBEgH2kiUp2FbHuatykN8EnI86VnOwlQo
+ G4xvoUMDbaORikDcSlw3JIppv43itexT1LnguV15XQV9Hyd9ARCuebHI7TfKYrAFatjs
+ DCvUtUd/brvqHJviPpWXpQiPTANTP+1tDa7Q1pxWkAIA8k+uEI+juveTHI+IIMCqg7f8
+ m7dvJPo/0bpNCkBMMxrbrI+yl1IDT4TU3M0Wst+u6Z3u8/MLB3yzYj1yCdmSIt9AJw7e
+ RcV2q9ECbmqYynRLbRYOtsV76ZOF8BY1tCFPPPDfA4qpKtnf6kFQAwbmpUa05xYWAD+p
+ pGEQ==
+X-Gm-Message-State: APjAAAXF9eBVj9ZbphOC7DHNGzGHorbAJrjq8QKfdrkLvoVrjyGKdM3P
+ ikYua7eKx/LGJUnnkSqxW7BOhA==
+X-Google-Smtp-Source: APXvYqyJVpRqT19/rLlrUj4LoMg+aiyEY0ez8Ff1XO83ZMt4Cs78JwfHjeK1zg3xOW9HS/NVJeQcTQ==
+X-Received: by 2002:a5d:5391:: with SMTP id d17mr63020823wrv.382.1575103567647; 
+ Sat, 30 Nov 2019 00:46:07 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id e19sm16247898wme.6.2019.11.30.00.46.03
+ by smtp.gmail.com with ESMTPSA id l17sm9239999wme.45.2019.11.30.00.46.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Sat, 30 Nov 2019 00:46:06 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 597DD1FF90;
+ by zen.linaroharston (Postfix) with ESMTP id 8640A1FF91;
  Sat, 30 Nov 2019 08:46:03 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 03/14] gdbstub: move str_buf to GDBState and use GString
-Date: Sat, 30 Nov 2019 08:45:51 +0000
-Message-Id: <20191130084602.10818-4-alex.bennee@linaro.org>
+Subject: [PATCH v2 04/14] gdbstub: move mem_buf to GDBState and use GByteArray
+Date: Sat, 30 Nov 2019 08:45:52 +0000
+Message-Id: <20191130084602.10818-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191130084602.10818-1-alex.bennee@linaro.org>
 References: <20191130084602.10818-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,474 +104,217 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rather than having a static buffer replace str_buf with a GString
-which we know can grow on demand. Convert the internal functions to
-take a GString instead of a char * and length.
+This is in preparation for further re-factoring of the register API
+with the rest of the code. Theoretically the read register function
+could overwrite the MAX_PACKET_LENGTH buffer although currently all
+registers are well within the size range.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
 ---
-v2
-  - fix conflict from status gdbserver_state
-  - add put_strbuf helper
----
- gdbstub.c | 195 +++++++++++++++++++++++++-----------------------------
- 1 file changed, 90 insertions(+), 105 deletions(-)
+ gdbstub.c | 62 ++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 38 insertions(+), 24 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 23f513f709e..dc8a6f2c7e2 100644
+index dc8a6f2c7e2..265157282f2 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -366,6 +366,7 @@ typedef struct GDBState {
-     int process_num;
+@@ -367,6 +367,7 @@ typedef struct GDBState {
      char syscall_buf[256];
      gdb_syscall_complete_cb current_syscall_cb;
-+    GString *str_buf;
+     GString *str_buf;
++    GByteArray *mem_buf;
  } GDBState;
  
  /* By default use no IRQs and no timers while single stepping so as to
-@@ -380,6 +381,7 @@ static void init_gdbserver_state(void)
-     g_assert(!gdbserver_state.init);
+@@ -382,6 +383,7 @@ static void init_gdbserver_state(void)
      memset(&gdbserver_state, 0, sizeof(GDBState));
      gdbserver_state.init = true;
-+    gdbserver_state.str_buf = g_string_new(NULL);
+     gdbserver_state.str_buf = g_string_new(NULL);
++    gdbserver_state.mem_buf = g_byte_array_sized_new(MAX_PACKET_LENGTH);
  }
  
  #ifndef CONFIG_USER_ONLY
-@@ -563,17 +565,15 @@ static inline int tohex(int v)
+@@ -576,12 +578,13 @@ static void memtohex(GString *buf, const uint8_t *mem, int len)
+     g_string_append_c(buf, '\0');
  }
  
- /* writes 2*len+1 bytes in buf */
--static void memtohex(char *buf, const uint8_t *mem, int len)
-+static void memtohex(GString *buf, const uint8_t *mem, int len)
+-static void hextomem(uint8_t *mem, const char *buf, int len)
++static void hextomem(GByteArray *mem, const char *buf, int len)
  {
-     int i, c;
--    char *q;
--    q = buf;
+     int i;
+ 
      for(i = 0; i < len; i++) {
-         c = mem[i];
--        *q++ = tohex(c >> 4);
--        *q++ = tohex(c & 0xf);
-+        g_string_append_c(buf, tohex(c >> 4));
-+        g_string_append_c(buf, tohex(c & 0xf));
+-        mem[i] = (fromhex(buf[0]) << 4) | fromhex(buf[1]);
++        guint8 byte = fromhex(buf[0]) << 4 | fromhex(buf[1]);
++        g_byte_array_append(mem, &byte, 1);
+         buf += 2;
      }
--    *q = '\0';
-+    g_string_append_c(buf, '\0');
  }
- 
- static void hextomem(uint8_t *mem, const char *buf, int len)
-@@ -667,25 +667,28 @@ static int put_packet(const char *buf)
-     return put_packet_binary(buf, strlen(buf), false);
- }
- 
-+static void put_strbuf(void)
-+{
-+    put_packet(gdbserver_state.str_buf->str);
-+}
-+
- /* Encode data using the encoding for 'x' packets.  */
--static int memtox(char *buf, const char *mem, int len)
-+static void memtox(GString *buf, const char *mem, int len)
- {
--    char *p = buf;
-     char c;
- 
-     while (len--) {
-         c = *(mem++);
-         switch (c) {
-         case '#': case '$': case '*': case '}':
--            *(p++) = '}';
--            *(p++) = c ^ 0x20;
-+            g_string_append_c(buf, '}');
-+            g_string_append_c(buf, c ^ 0x20);
-             break;
-         default:
--            *(p++) = c;
-+            g_string_append_c(buf, c);
-             break;
-         }
-     }
--    return p - buf;
- }
- 
- static uint32_t gdb_get_cpu_pid(CPUState *cpu)
-@@ -1109,16 +1112,14 @@ static void gdb_set_cpu_pc(target_ulong pc)
-     cpu_set_pc(cpu, pc);
- }
- 
--static char *gdb_fmt_thread_id(CPUState *cpu, char *buf, size_t buf_size)
-+static void gdb_append_thread_id(CPUState *cpu, GString *buf)
- {
-     if (gdbserver_state.multiprocess) {
--        snprintf(buf, buf_size, "p%02x.%02x",
--                 gdb_get_cpu_pid(cpu), cpu_gdb_index(cpu));
-+        g_string_append_printf(buf, "p%02x.%02x",
-+                               gdb_get_cpu_pid(cpu), cpu_gdb_index(cpu));
-     } else {
--        snprintf(buf, buf_size, "%02x", cpu_gdb_index(cpu));
-+        g_string_append_printf(buf, "%02x", cpu_gdb_index(cpu));
-     }
--
--    return buf;
- }
- 
- typedef enum GDBThreadIdKind {
-@@ -1412,7 +1413,6 @@ typedef struct GdbCmdContext {
+@@ -1412,7 +1415,6 @@ static int cmd_parse_params(const char *data, const char *schema,
+ typedef struct GdbCmdContext {
      GdbCmdVariant *params;
      int num_params;
-     uint8_t mem_buf[MAX_PACKET_LENGTH];
--    char str_buf[MAX_PACKET_LENGTH + 1];
+-    uint8_t mem_buf[MAX_PACKET_LENGTH];
  } GdbCmdContext;
  
  typedef void (*GdbCmdHandler)(GdbCmdContext *gdb_ctx, void *user_ctx);
-@@ -1503,6 +1503,8 @@ static void run_cmd_parser(GDBState *s, const char *data,
-         return;
+@@ -1504,6 +1506,7 @@ static void run_cmd_parser(GDBState *s, const char *data,
      }
  
-+    g_string_set_size(gdbserver_state.str_buf, 0);
-+
+     g_string_set_size(gdbserver_state.str_buf, 0);
++    g_byte_array_set_size(gdbserver_state.mem_buf, 0);
+ 
      /* In case there was an error during the command parsing we must
      * send a NULL packet to indicate the command is not supported */
-     if (process_string_cmd(NULL, data, cmd, 1)) {
-@@ -1741,8 +1743,8 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -1716,8 +1719,8 @@ static void handle_set_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
+     }
+ 
+     reg_size = strlen(gdb_ctx->params[1].data) / 2;
+-    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[1].data, reg_size);
+-    gdb_write_register(gdbserver_state.g_cpu, gdb_ctx->mem_buf,
++    hextomem(gdbserver_state.mem_buf, gdb_ctx->params[1].data, reg_size);
++    gdb_write_register(gdbserver_state.g_cpu, gdbserver_state.mem_buf->data,
+                        gdb_ctx->params[0].val_ull);
+     put_packet("OK");
+ }
+@@ -1736,14 +1739,17 @@ static void handle_get_reg(GdbCmdContext *gdb_ctx, void *user_ctx)
          return;
      }
  
--    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, reg_size);
--    put_packet(gdb_ctx->str_buf);
-+    memtohex(gdbserver_state.str_buf, gdb_ctx->mem_buf, reg_size);
-+    put_strbuf();
+-    reg_size = gdb_read_register(gdbserver_state.g_cpu, gdb_ctx->mem_buf,
++    reg_size = gdb_read_register(gdbserver_state.g_cpu,
++                                 gdbserver_state.mem_buf->data,
+                                  gdb_ctx->params[0].val_ull);
+     if (!reg_size) {
+         put_packet("E14");
+         return;
++    } else {
++        g_byte_array_set_size(gdbserver_state.mem_buf, reg_size);
+     }
+ 
+-    memtohex(gdbserver_state.str_buf, gdb_ctx->mem_buf, reg_size);
++    memtohex(gdbserver_state.str_buf, gdbserver_state.mem_buf->data, reg_size);
+     put_strbuf();
  }
  
- static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
-@@ -1790,8 +1792,8 @@ static void handle_read_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -1760,11 +1766,11 @@ static void handle_write_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
          return;
      }
  
--    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, gdb_ctx->params[1].val_ull);
--    put_packet(gdb_ctx->str_buf);
-+    memtohex(gdbserver_state.str_buf, gdb_ctx->mem_buf, gdb_ctx->params[1].val_ull);
-+    put_strbuf();
+-    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[2].data,
++    hextomem(gdbserver_state.mem_buf, gdb_ctx->params[2].data,
+              gdb_ctx->params[1].val_ull);
+     if (target_memory_rw_debug(gdbserver_state.g_cpu, gdb_ctx->params[0].val_ull,
+-                               gdb_ctx->mem_buf,
+-                               gdb_ctx->params[1].val_ull, true)) {
++                               gdbserver_state.mem_buf->data,
++                               gdbserver_state.mem_buf->len, true)) {
+         put_packet("E14");
+         return;
+     }
+@@ -1785,14 +1791,17 @@ static void handle_read_mem(GdbCmdContext *gdb_ctx, void *user_ctx)
+         return;
+     }
+ 
++    g_byte_array_set_size(gdbserver_state.mem_buf, gdb_ctx->params[1].val_ull);
++
+     if (target_memory_rw_debug(gdbserver_state.g_cpu, gdb_ctx->params[0].val_ull,
+-                               gdb_ctx->mem_buf,
+-                               gdb_ctx->params[1].val_ull, false)) {
++                               gdbserver_state.mem_buf->data,
++                               gdbserver_state.mem_buf->len, false)) {
+         put_packet("E14");
+         return;
+     }
+ 
+-    memtohex(gdbserver_state.str_buf, gdb_ctx->mem_buf, gdb_ctx->params[1].val_ull);
++    memtohex(gdbserver_state.str_buf, gdbserver_state.mem_buf->data,
++             gdbserver_state.mem_buf->len);
+     put_strbuf();
  }
  
- static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
-@@ -1828,8 +1830,8 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+@@ -1807,9 +1816,9 @@ static void handle_write_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+     }
+ 
+     cpu_synchronize_state(gdbserver_state.g_cpu);
+-    registers = gdb_ctx->mem_buf;
+     len = strlen(gdb_ctx->params[0].data) / 2;
+-    hextomem(registers, gdb_ctx->params[0].data, len);
++    hextomem(gdbserver_state.mem_buf, gdb_ctx->params[0].data, len);
++    registers = gdbserver_state.mem_buf->data;
+     for (addr = 0; addr < gdbserver_state.g_cpu->gdb_num_g_regs && len > 0;
+          addr++) {
+         reg_size = gdb_write_register(gdbserver_state.g_cpu, registers, addr);
+@@ -1826,11 +1835,14 @@ static void handle_read_all_regs(GdbCmdContext *gdb_ctx, void *user_ctx)
+     cpu_synchronize_state(gdbserver_state.g_cpu);
+     len = 0;
+     for (addr = 0; addr < gdbserver_state.g_cpu->gdb_num_g_regs; addr++) {
+-        len += gdb_read_register(gdbserver_state.g_cpu, gdb_ctx->mem_buf + len,
++        len += gdb_read_register(gdbserver_state.g_cpu,
++                                 gdbserver_state.mem_buf->data + len,
                                   addr);
      }
++    /* FIXME: This is after the fact sizing */
++    g_byte_array_set_size(gdbserver_state.mem_buf, len);
  
--    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
--    put_packet(gdb_ctx->str_buf);
-+    memtohex(gdbserver_state.str_buf, gdb_ctx->mem_buf, len);
-+    put_strbuf();
+-    memtohex(gdbserver_state.str_buf, gdb_ctx->mem_buf, len);
++    memtohex(gdbserver_state.str_buf, gdbserver_state.mem_buf->data, len);
+     put_strbuf();
  }
  
- static void handle_file_io(GdbCmdContext *gdb_ctx, void *user_ctx)
-@@ -1890,9 +1892,8 @@ static void handle_v_attach(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
-     GDBProcess *process;
-     CPUState *cpu;
--    char thread_id[16];
- 
--    pstrcpy(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "E22");
-+    g_string_assign(gdbserver_state.str_buf, "E22");
-     if (!gdb_ctx->num_params) {
-         goto cleanup;
-     }
-@@ -1911,11 +1912,11 @@ static void handle_v_attach(GdbCmdContext *gdb_ctx, void *user_ctx)
-     gdbserver_state.g_cpu = cpu;
-     gdbserver_state.c_cpu = cpu;
- 
--    gdb_fmt_thread_id(cpu, thread_id, sizeof(thread_id));
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s;",
--             GDB_SIGNAL_TRAP, thread_id);
-+    g_string_printf(gdbserver_state.str_buf, "T%02xthread:", GDB_SIGNAL_TRAP);
-+    gdb_append_thread_id(cpu, gdbserver_state.str_buf);
-+    g_string_append_c(gdbserver_state.str_buf, ';');
- cleanup:
--    put_packet(gdb_ctx->str_buf);
-+    put_strbuf();
- }
- 
- static void handle_v_kill(GdbCmdContext *gdb_ctx, void *user_ctx)
-@@ -1967,10 +1968,9 @@ static void handle_v_commands(GdbCmdContext *gdb_ctx, void *user_ctx)
- 
- static void handle_query_qemu_sstepbits(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
--             "ENABLE=%x,NOIRQ=%x,NOTIMER=%x", SSTEP_ENABLE,
--             SSTEP_NOIRQ, SSTEP_NOTIMER);
--    put_packet(gdb_ctx->str_buf);
-+    g_string_printf(gdbserver_state.str_buf, "ENABLE=%x,NOIRQ=%x,NOTIMER=%x",
-+                    SSTEP_ENABLE, SSTEP_NOIRQ, SSTEP_NOTIMER);
-+    put_strbuf();
- }
- 
- static void handle_set_qemu_sstep(GdbCmdContext *gdb_ctx, void *user_ctx)
-@@ -1985,15 +1985,14 @@ static void handle_set_qemu_sstep(GdbCmdContext *gdb_ctx, void *user_ctx)
- 
- static void handle_query_qemu_sstep(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "0x%x", sstep_flags);
--    put_packet(gdb_ctx->str_buf);
-+    g_string_printf(gdbserver_state.str_buf, "0x%x", sstep_flags);
-+    put_strbuf();;
- }
- 
- static void handle_query_curr_tid(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
-     CPUState *cpu;
-     GDBProcess *process;
--    char thread_id[16];
- 
-     /*
-      * "Current thread" remains vague in the spec, so always return
-@@ -2002,24 +2001,21 @@ static void handle_query_curr_tid(GdbCmdContext *gdb_ctx, void *user_ctx)
-      */
-     process = gdb_get_cpu_process(gdbserver_state.g_cpu);
+@@ -2003,7 +2015,7 @@ static void handle_query_curr_tid(GdbCmdContext *gdb_ctx, void *user_ctx)
      cpu = get_first_cpu_in_process(process);
--    gdb_fmt_thread_id(cpu, thread_id, sizeof(thread_id));
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "QC%s", thread_id);
--    put_packet(gdb_ctx->str_buf);
-+    g_string_assign(gdbserver_state.str_buf, "QC");
-+    gdb_append_thread_id(cpu, gdbserver_state.str_buf);
-+    put_strbuf();;
+     g_string_assign(gdbserver_state.str_buf, "QC");
+     gdb_append_thread_id(cpu, gdbserver_state.str_buf);
+-    put_strbuf();;
++    put_strbuf();
  }
  
  static void handle_query_threads(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
--    char thread_id[16];
--
-     if (!gdbserver_state.query_cpu) {
-         put_packet("l");
-         return;
-     }
+@@ -2015,7 +2027,7 @@ static void handle_query_threads(GdbCmdContext *gdb_ctx, void *user_ctx)
  
--    gdb_fmt_thread_id(gdbserver_state.query_cpu, thread_id,
--                      sizeof(thread_id));
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "m%s", thread_id);
--    put_packet(gdb_ctx->str_buf);
-+    g_string_assign(gdbserver_state.str_buf, "m");
-+    gdb_append_thread_id(gdbserver_state.query_cpu, gdbserver_state.str_buf);
-+    put_strbuf();;
+     g_string_assign(gdbserver_state.str_buf, "m");
+     gdb_append_thread_id(gdbserver_state.query_cpu, gdbserver_state.str_buf);
+-    put_strbuf();;
++    put_strbuf();
      gdbserver_state.query_cpu = gdb_next_attached_cpu(gdbserver_state.query_cpu);
  }
  
-@@ -2031,8 +2027,8 @@ static void handle_query_first_threads(GdbCmdContext *gdb_ctx, void *user_ctx)
- 
- static void handle_query_thread_extra(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
-+    g_autoptr(GString) rs = g_string_new(NULL);
-     CPUState *cpu;
--    int len;
- 
-     if (!gdb_ctx->num_params ||
-         gdb_ctx->params[0].thread_id.kind == GDB_READ_THREAD_ERR) {
-@@ -2052,20 +2048,17 @@ static void handle_query_thread_extra(GdbCmdContext *gdb_ctx, void *user_ctx)
-         /* Print the CPU model and name in multiprocess mode */
-         ObjectClass *oc = object_get_class(OBJECT(cpu));
-         const char *cpu_model = object_class_get_name(oc);
--        char *cpu_name = object_get_canonical_path_component(OBJECT(cpu));
--        len = snprintf((char *)gdb_ctx->mem_buf, sizeof(gdb_ctx->str_buf) / 2,
--                       "%s %s [%s]", cpu_model, cpu_name,
--                       cpu->halted ? "halted " : "running");
--        g_free(cpu_name);
-+        g_autofree char *cpu_name;
-+        cpu_name  = object_get_canonical_path_component(OBJECT(cpu));
-+        g_string_printf(rs, "%s %s [%s]", cpu_model, cpu_name,
-+                        cpu->halted ? "halted " : "running");
-     } else {
--        /* memtohex() doubles the required space */
--        len = snprintf((char *)gdb_ctx->mem_buf, sizeof(gdb_ctx->str_buf) / 2,
--                        "CPU#%d [%s]", cpu->cpu_index,
-+        g_string_printf(rs, "CPU#%d [%s]", cpu->cpu_index,
-                         cpu->halted ? "halted " : "running");
+@@ -2058,7 +2070,7 @@ static void handle_query_thread_extra(GdbCmdContext *gdb_ctx, void *user_ctx)
      }
--    trace_gdbstub_op_extra_info((char *)gdb_ctx->mem_buf);
--    memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
--    put_packet(gdb_ctx->str_buf);
-+    trace_gdbstub_op_extra_info(rs->str);
-+    memtohex(gdbserver_state.str_buf, (uint8_t *)rs->str, rs->len);
-+    put_strbuf();;
+     trace_gdbstub_op_extra_info(rs->str);
+     memtohex(gdbserver_state.str_buf, (uint8_t *)rs->str, rs->len);
+-    put_strbuf();;
++    put_strbuf();
  }
  
  #ifdef CONFIG_USER_ONLY
-@@ -2074,13 +2067,14 @@ static void handle_query_offsets(GdbCmdContext *gdb_ctx, void *user_ctx)
-     TaskState *ts;
- 
-     ts = gdbserver_state.c_cpu->opaque;
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
--             "Text=" TARGET_ABI_FMT_lx ";Data=" TARGET_ABI_FMT_lx
--             ";Bss=" TARGET_ABI_FMT_lx,
--             ts->info->code_offset,
--             ts->info->data_offset,
--             ts->info->data_offset);
--    put_packet(gdb_ctx->str_buf);
-+    g_string_printf(gdbserver_state.str_buf,
-+                    "Text=" TARGET_ABI_FMT_lx
-+                    ";Data=" TARGET_ABI_FMT_lx
-+                    ";Bss=" TARGET_ABI_FMT_lx,
-+                    ts->info->code_offset,
-+                    ts->info->data_offset,
-+                    ts->info->data_offset);
-+    put_strbuf();
- }
+@@ -2079,6 +2091,7 @@ static void handle_query_offsets(GdbCmdContext *gdb_ctx, void *user_ctx)
  #else
  static void handle_query_rcmd(GdbCmdContext *gdb_ctx, void *user_ctx)
-@@ -2111,12 +2105,10 @@ static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
  {
-     CPUClass *cc;
++    const guint8 zero = 0;
+     int len;
  
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "PacketSize=%x",
--             MAX_PACKET_LENGTH);
-+    g_string_printf(gdbserver_state.str_buf, "PacketSize=%x", MAX_PACKET_LENGTH);
-     cc = CPU_GET_CLASS(first_cpu);
-     if (cc->gdb_core_xml_file) {
--        pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf),
--                ";qXfer:features:read+");
-+        g_string_append(gdbserver_state.str_buf, ";qXfer:features:read+");
+     if (!gdb_ctx->num_params) {
+@@ -2093,11 +2106,12 @@ static void handle_query_rcmd(GdbCmdContext *gdb_ctx, void *user_ctx)
      }
  
-     if (gdb_ctx->num_params &&
-@@ -2124,8 +2116,8 @@ static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
-         gdbserver_state.multiprocess = true;
-     }
- 
--    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";multiprocess+");
--    put_packet(gdb_ctx->str_buf);
-+    g_string_append(gdbserver_state.str_buf, ";multiprocess+");
-+    put_strbuf();
+     len = len / 2;
+-    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[0].data, len);
+-    gdb_ctx->mem_buf[len++] = 0;
+-    qemu_chr_be_write(gdbserver_state.mon_chr, gdb_ctx->mem_buf, len);
++    g_byte_array_set_size(gdbserver_state.mem_buf, len);
++    hextomem(gdbserver_state.mem_buf, gdb_ctx->params[0].data, len);
++    g_byte_array_append(gdbserver_state.mem_buf, &zero, 1);
++    qemu_chr_be_write(gdbserver_state.mon_chr, gdbserver_state.mem_buf->data,
++                      gdbserver_state.mem_buf->len);
+     put_packet("OK");
+-
  }
- 
- static void handle_query_xfer_features(GdbCmdContext *gdb_ctx, void *user_ctx)
-@@ -2169,14 +2161,15 @@ static void handle_query_xfer_features(GdbCmdContext *gdb_ctx, void *user_ctx)
-     }
- 
-     if (len < total_len - addr) {
--        gdb_ctx->str_buf[0] = 'm';
--        len = memtox(gdb_ctx->str_buf + 1, xml + addr, len);
-+        g_string_assign(gdbserver_state.str_buf, "m");
-+        memtox(gdbserver_state.str_buf, xml + addr, len);
-     } else {
--        gdb_ctx->str_buf[0] = 'l';
--        len = memtox(gdb_ctx->str_buf + 1, xml + addr, total_len - addr);
-+        g_string_assign(gdbserver_state.str_buf, "l");
-+        memtox(gdbserver_state.str_buf, xml + addr, total_len - addr);
-     }
- 
--    put_packet_binary(gdb_ctx->str_buf, len + 1, true);
-+    put_packet_binary(gdbserver_state.str_buf->str,
-+                      gdbserver_state.str_buf->len, true);
- }
- 
- static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
-@@ -2186,19 +2179,19 @@ static void handle_query_attached(GdbCmdContext *gdb_ctx, void *user_ctx)
- 
- static void handle_query_qemu_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "sstepbits;sstep");
-+    g_string_printf(gdbserver_state.str_buf, "sstepbits;sstep");
- #ifndef CONFIG_USER_ONLY
--    pstrcat(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), ";PhyMemMode");
-+    g_string_append(gdbserver_state.str_buf, ";PhyMemMode");
  #endif
--    put_packet(gdb_ctx->str_buf);
-+    put_strbuf();
- }
  
- #ifndef CONFIG_USER_ONLY
- static void handle_query_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx,
-                                            void *user_ctx)
- {
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "%d", phy_memory_mode);
--    put_packet(gdb_ctx->str_buf);
-+    g_string_printf(gdbserver_state.str_buf, "%d", phy_memory_mode);
-+    put_strbuf();
- }
- 
- static void handle_set_qemu_phy_mem_mode(GdbCmdContext *gdb_ctx, void *user_ctx)
-@@ -2363,13 +2356,10 @@ static void handle_gen_set(GdbCmdContext *gdb_ctx, void *user_ctx)
- 
- static void handle_target_halt(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
--    char thread_id[16];
--
--    gdb_fmt_thread_id(gdbserver_state.c_cpu, thread_id,
--                      sizeof(thread_id));
--    snprintf(gdb_ctx->str_buf, sizeof(gdb_ctx->str_buf), "T%02xthread:%s;",
--             GDB_SIGNAL_TRAP, thread_id);
--    put_packet(gdb_ctx->str_buf);
-+    g_string_printf(gdbserver_state.str_buf, "T%02xthread:", GDB_SIGNAL_TRAP);
-+    gdb_append_thread_id(gdbserver_state.c_cpu, gdbserver_state.str_buf);
-+    g_string_append_c(gdbserver_state.str_buf, ';');
-+    put_strbuf();
-     /*
-      * Remove all the breakpoints when this query is issued,
-      * because gdb is doing an initial connect and the state
-@@ -2632,8 +2622,8 @@ void gdb_set_stop_cpu(CPUState *cpu)
- static void gdb_vm_state_change(void *opaque, int running, RunState state)
- {
-     CPUState *cpu = gdbserver_state.c_cpu;
--    char buf[256];
--    char thread_id[16];
-+    g_autoptr(GString) buf = g_string_new(NULL);
-+    g_autoptr(GString) tid = g_string_new(NULL);
-     const char *type;
-     int ret;
- 
-@@ -2651,7 +2641,7 @@ static void gdb_vm_state_change(void *opaque, int running, RunState state)
-         return;
-     }
- 
--    gdb_fmt_thread_id(cpu, thread_id, sizeof(thread_id));
-+    gdb_append_thread_id(cpu, tid);
- 
-     switch (state) {
-     case RUN_STATE_DEBUG:
-@@ -2669,10 +2659,9 @@ static void gdb_vm_state_change(void *opaque, int running, RunState state)
-             }
-             trace_gdbstub_hit_watchpoint(type, cpu_gdb_index(cpu),
-                     (target_ulong)cpu->watchpoint_hit->vaddr);
--            snprintf(buf, sizeof(buf),
--                     "T%02xthread:%s;%swatch:" TARGET_FMT_lx ";",
--                     GDB_SIGNAL_TRAP, thread_id, type,
--                     (target_ulong)cpu->watchpoint_hit->vaddr);
-+            g_string_printf(buf, "T%02xthread:%s;%swatch:" TARGET_FMT_lx ";",
-+                            GDB_SIGNAL_TRAP, tid->str, type,
-+                            (target_ulong)cpu->watchpoint_hit->vaddr);
-             cpu->watchpoint_hit = NULL;
-             goto send_packet;
-         } else {
-@@ -2713,10 +2702,10 @@ static void gdb_vm_state_change(void *opaque, int running, RunState state)
-         break;
-     }
-     gdb_set_stop_cpu(cpu);
--    snprintf(buf, sizeof(buf), "T%02xthread:%s;", ret, thread_id);
-+    g_string_printf(buf, "T%02xthread:%s;", ret, tid->str);
- 
- send_packet:
--    put_packet(buf);
-+    put_packet(buf->str);
- 
-     /* disable single step if it was enabled */
-     cpu_single_step(cpu, 0);
-@@ -3196,13 +3185,9 @@ static void gdb_chr_event(void *opaque, int event)
- 
- static void gdb_monitor_output(GDBState *s, const char *msg, int len)
- {
--    char buf[MAX_PACKET_LENGTH];
--
--    buf[0] = 'O';
--    if (len > (MAX_PACKET_LENGTH/2) - 1)
--        len = (MAX_PACKET_LENGTH/2) - 1;
--    memtohex(buf + 1, (uint8_t *)msg, len);
--    put_packet(buf);
-+    g_autoptr(GString) buf = g_string_new("O");
-+    memtohex(buf, (uint8_t *)msg, len);
-+    put_packet(buf->str);
- }
- 
- static int gdb_monitor_write(Chardev *chr, const uint8_t *buf, int len)
 -- 
 2.20.1
 
