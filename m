@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F34FC432C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 07:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2591C432C0
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 07:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23CC820732
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 07:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAD8320732
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 07:53:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S5i44htS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23CC820732
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cn4hHtww"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAD8320732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaxYE-0001lN-9O
-	for qemu-devel@archiver.kernel.org; Sat, 30 Nov 2019 02:52:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49700)
+	id 1iaxZQ-0003Ks-VX
+	for qemu-devel@archiver.kernel.org; Sat, 30 Nov 2019 02:53:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49841)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iaxXE-0000gi-BC
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 02:51:21 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iaxYT-00027Y-5Y
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 02:52:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iaxXD-00014V-6V
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 02:51:20 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35229)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iaxYS-0001yc-3u
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 02:52:37 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40193)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iaxXD-00014E-0d
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 02:51:19 -0500
-Received: by mail-wm1-x342.google.com with SMTP id u8so1787899wmu.0
- for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 23:51:18 -0800 (PST)
+ id 1iaxYR-0001yF-U2
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 02:52:36 -0500
+Received: by mail-wm1-x341.google.com with SMTP id y5so17323037wmi.5
+ for <qemu-devel@nongnu.org>; Fri, 29 Nov 2019 23:52:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=jTVGgo+dJuyqSobNUSePHKWmo8yex4/soowUkUSeHl8=;
- b=S5i44htS1PIi1uyQGwajIx7gC4oRoyCJWqHuTNBJBt28b6uky5ee5xB+RMJNG6fqBm
- UGKRezWzOivMXz2lUYq2/0nClcx9pWOoi7JKOrTfcMhSI8wB6Kwia9aizSMLipvVj19a
- I70y9AYKfMGz6M9Cc/2a1M+XbPv3y1YCT0758KjtMjt2IdaIJyuxZoJE/EwkJ/zu+bTN
- rXxO3MicgSy74eAPYSFOv21YaC8yASJAmmdULB+/Clv/nkAPdWlMeNzvB/HBb1z5t22P
- lDY1gR4oz0/nLNQzvbONzyUjpViAISz8OYRkGAUfD/jOPkyIT/iq26f9M7GT33Jt2TUC
- MnQg==
+ bh=67rCHtSPHo/0ald1lYl365LzhnR9aoEOZWyZr0wOsoA=;
+ b=Cn4hHtwwKwEztaYIYgXs23MnTk9u/Zdola00Xp/C9xvjgoD92LWmQ0zbIeyzhLB63V
+ G+JB/X09vvp0z7TqxEhlQGEsphDvsgSD6QNTUCSLvPhprVytiknuXMdzggSTbT1LFH1I
+ ic1SiOAuhgI5hejgAMsK2vPUcPni1LzVaRFW8RhNrlj03bievfW6pKhS6sKVMzJCpKwc
+ jbXmEzrK9sx1+mKP6h9EXuIgjQqS8wrJgohuVgbhx8E9yuhwJm1zwIn4tay98Q/c+AxY
+ haAlw6Gty2RebRAEiBp8El7WskErN9hCcUClyk+T9oIWOhS+5C71avhpwZeX3w1EcoGe
+ 8yyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=jTVGgo+dJuyqSobNUSePHKWmo8yex4/soowUkUSeHl8=;
- b=Qb41gejr4VxaVAAdwsuSCGjkfCac+RuP01k4ZMzTBcQ5K/51vvNG8Bb1XwMF8Tnk1I
- wrTrHi+yw6zoF/SjcVvK554t/O+HaPYq0eRl1XBtjS3tqKuroIP35dYONw+xXQIBKPYe
- rjo8vJniu2CLQw2LFrMtwY7+RHeFw4eFpXZpKdIAK5Q/qVqJd2i1axmQyorvA38+vjOq
- BEbKLMfY6Utwt1evqCnnzEGj3c4U/Qx/GERGiTc9/9BtJY4lep6la1AEwvlpxR9uUlMA
- 3qWwhpAJ/zQewRCrCHA5Ra5OKV91buX3UiuaVVeFc6WFXuczLaaIj3e9d/9JQm40aIAJ
- wV9Q==
-X-Gm-Message-State: APjAAAVmkPDrSFFEGCdmgPPGjBFesWKGQ2L5y8U2mEg4b7BgomUfYUPP
- 3aGZ/7lruWNKErg7ATMcfplWuTemcZ5tYA7FwWskjbEVeHQ=
-X-Google-Smtp-Source: APXvYqz/Qg2DqxoiVPxERaCNiNncjs0u/6OhdPuMWP+6ZaJgKtu+wavD5nsTpu5sXM5ehqe6o2nVnyKRxwGoGtlDqiE=
-X-Received: by 2002:a1c:4b03:: with SMTP id y3mr7570019wma.91.1575100277888;
- Fri, 29 Nov 2019 23:51:17 -0800 (PST)
+ bh=67rCHtSPHo/0ald1lYl365LzhnR9aoEOZWyZr0wOsoA=;
+ b=Md0k9Y4JvO8Q0v9CI/tphY1BCjagCTCjKcpesJUkbKyMH0HFjS7cMd63vHHMcUQc8a
+ FrwZTnR8+6thi7+hVBVK9NKc4gdASFn77M2ZgEnXvmtrxrYKmVcsT4uaq/lf1uVL0D3z
+ P03H6EsN219P8/3JFe2Bgg/pODRCz8NFCkQacSvRlRmp2iP/11bqwNxRU9/6LarEVLZT
+ wvqSXesJT1apYGuLnzRqpZYPrRHocxp6pTo8yapxds1Adf9pMuz8lYBPYis/u8gJIhMq
+ L/VPFxSh5VwTp+rJMgp5ZdkCOVghLwvjLtQz9YRv6+shXF2jVUCoBchESGkTxtFRAlhW
+ sofA==
+X-Gm-Message-State: APjAAAWD7M/KO5PLJ06+yWwemprus/1qAA72rvnVSPgYPGz7kwQCSdjc
+ P1szhO6k08TTQNlQcQNotCGdvKKPTEfQpSfPjOo=
+X-Google-Smtp-Source: APXvYqxoyb60w7Ylcw22AqHTMrYWPX5Q96DHjUoeRJBMPWyO9VgWVG1+Vvr/jmpvx7s1mEewY6lAlF7bjdEb2oDU3bE=
+X-Received: by 2002:a7b:cc0c:: with SMTP id f12mr18429276wmh.5.1575100354767; 
+ Fri, 29 Nov 2019 23:52:34 -0800 (PST)
 MIME-Version: 1.0
 References: <20191129174630.6922-1-felipe@nutanix.com>
- <20191129174630.6922-3-felipe@nutanix.com>
-In-Reply-To: <20191129174630.6922-3-felipe@nutanix.com>
+ <20191129174630.6922-4-felipe@nutanix.com>
+In-Reply-To: <20191129174630.6922-4-felipe@nutanix.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 30 Nov 2019 11:51:05 +0400
-Message-ID: <CAJ+F1CJ8AhGBL_+8BXQFbkc-2=ycru1z=aWw-Gcv2u=2WSw13Q@mail.gmail.com>
-Subject: Re: [PATCH v3 2/4] ich9: fix getter type for sci_int property
+Date: Sat, 30 Nov 2019 11:52:22 +0400
+Message-ID: <CAJ+F1C+9Nj-JzS8oqToY1LzYj+4w_emmUtUt5OYUvexdiR1w4w@mail.gmail.com>
+Subject: Re: [PATCH v3 3/4] ich9: Simplify ich9_lpc_initfn
 To: Felipe Franciosi <felipe@nutanix.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,44 +101,61 @@ Sender: "Qemu-devel"
 On Fri, Nov 29, 2019 at 9:46 PM Felipe Franciosi <felipe@nutanix.com> wrote=
 :
 >
-> When QOM APIs were added to ich9 in 6f1426ab, the getter for sci_int was
-> written using uint32_t. However, the object property is uint8_t. This
-> fixes the getter for correctness.
+> Currently, ich9_lpc_initfn simply serves as a caller to
+> ich9_lpc_add_properties. This simplifies the code a bit by eliminating
+> ich9_lpc_add_properties altogether and executing its logic in the parent
+> object initialiser function.
 >
 > Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
->  hw/isa/lpc_ich9.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+> ---
+>  hw/isa/lpc_ich9.c | 15 +++++----------
+>  1 file changed, 5 insertions(+), 10 deletions(-)
 >
 > diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-> index 99517c3946..9f4e00dddd 100644
+> index 9f4e00dddd..c40bb3c420 100644
 > --- a/hw/isa/lpc_ich9.c
 > +++ b/hw/isa/lpc_ich9.c
-> @@ -631,9 +631,7 @@ static void ich9_lpc_get_sci_int(Object *obj, Visitor=
- *v, const char *name,
->                                   void *opaque, Error **errp)
->  {
->      ICH9LPCState *lpc =3D ICH9_LPC_DEVICE(obj);
-> -    uint32_t value =3D lpc->sci_gsi;
-> -
-> -    visit_type_uint32(v, name, &value, errp);
-> +    visit_type_uint8(v, name, &lpc->sci_gsi, errp);
+> @@ -634,12 +634,14 @@ static void ich9_lpc_get_sci_int(Object *obj, Visit=
+or *v, const char *name,
+>      visit_type_uint8(v, name, &lpc->sci_gsi, errp);
 >  }
 >
->  static void ich9_lpc_add_properties(ICH9LPCState *lpc)
-> @@ -641,7 +639,7 @@ static void ich9_lpc_add_properties(ICH9LPCState *lpc=
-)
+> -static void ich9_lpc_add_properties(ICH9LPCState *lpc)
+> +static void ich9_lpc_initfn(Object *obj)
+>  {
+> +    ICH9LPCState *lpc =3D ICH9_LPC_DEVICE(obj);
+> +
 >      static const uint8_t acpi_enable_cmd =3D ICH9_APM_ACPI_ENABLE;
 >      static const uint8_t acpi_disable_cmd =3D ICH9_APM_ACPI_DISABLE;
 >
-> -    object_property_add(OBJECT(lpc), ACPI_PM_PROP_SCI_INT, "uint32",
-> +    object_property_add(OBJECT(lpc), ACPI_PM_PROP_SCI_INT, "uint8",
+> -    object_property_add(OBJECT(lpc), ACPI_PM_PROP_SCI_INT, "uint8",
+> +    object_property_add(obj, ACPI_PM_PROP_SCI_INT, "uint8",
 >                          ich9_lpc_get_sci_int,
 >                          NULL, NULL, NULL, NULL);
 >      object_property_add_uint8_ptr(OBJECT(lpc), ACPI_PM_PROP_ACPI_ENABLE_=
 CMD,
+> @@ -647,14 +649,7 @@ static void ich9_lpc_add_properties(ICH9LPCState *lp=
+c)
+>      object_property_add_uint8_ptr(OBJECT(lpc), ACPI_PM_PROP_ACPI_DISABLE=
+_CMD,
+>                                    &acpi_disable_cmd, OBJ_PROP_FLAG_READ,=
+ NULL);
+>
+> -    ich9_pm_add_properties(OBJECT(lpc), &lpc->pm, NULL);
+> -}
+> -
+> -static void ich9_lpc_initfn(Object *obj)
+> -{
+> -    ICH9LPCState *lpc =3D ICH9_LPC_DEVICE(obj);
+> -
+> -    ich9_lpc_add_properties(lpc);
+> +    ich9_pm_add_properties(obj, &lpc->pm, NULL);
+>  }
+>
+>  static void ich9_lpc_realize(PCIDevice *d, Error **errp)
 > --
 > 2.20.1
 >
