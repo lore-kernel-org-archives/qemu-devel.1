@@ -2,69 +2,124 @@ Return-Path: <SRS0=cUpU=ZW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AB1C432C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 09:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71756C432C3
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 10:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCFD820732
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 09:34:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCFD820732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2C3762075C
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 10:06:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C3762075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iaz9B-0007U3-UZ
-	for qemu-devel@archiver.kernel.org; Sat, 30 Nov 2019 04:34:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34932)
+	id 1iazdx-0007hw-Tv
+	for qemu-devel@archiver.kernel.org; Sat, 30 Nov 2019 05:06:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38017)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iaz8K-00072Y-O8
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 04:33:46 -0500
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1iazcf-0006tW-0P
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 05:05:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iaz8I-0000Eh-GS
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 04:33:44 -0500
-Resent-Date: Sat, 30 Nov 2019 04:33:44 -0500
-Resent-Message-Id: <E1iaz8I-0000Eh-GS@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21139)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iaz8I-0000EM-88
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 04:33:42 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1575106405; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=cATGDcHrXddiwJ1YvIV14j4H6XVe+MM4uOQZ0CrSXdwkF/QIRSBDfdPun4+/rdGS3ZAvTWUgO4AtP921R5ddvismBVG5M4bA8wRNyiikWCPfJ4ZlpBReKhLfDkaOwi4FD83aXqPRLUBMR5PPObeSsxuX8lBoXR0f3EtMqPO9EaM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1575106405;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=KzEixORK8Vg8ajKMaS1qh2e2wKaN+lut4ms54Hibh04=; 
- b=bJSTjpHl6GERg46e2wL1ZeFIXFqmoeOd0BzDmxfG1eLymDrhpzb1Q3s1fXG8QL01KrNlO+sUUmJyYYU3264fvwRWaoJuvorsi0XTgZNprdhEsFa4H0cI0cvcmHQuN7usAPeMlZMS1nAmCSRMYPQIfqzxGjrqROG8SXFKSOiYESM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1575106404003217.45478913888564;
- Sat, 30 Nov 2019 01:33:24 -0800 (PST)
-In-Reply-To: <20191130084602.10818-1-alex.bennee@linaro.org>
-Subject: Re: [PATCH  v2 00/14] gdbstub refactor and SVE support
-Message-ID: <157510640268.29127.18154781063496710224@37313f22b938>
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1iazcc-0002BQ-AH
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 05:05:04 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:41662)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <a13xp0p0v88@gmail.com>)
+ id 1iazcX-00024A-Ay; Sat, 30 Nov 2019 05:04:57 -0500
+Received: by mail-lf1-f67.google.com with SMTP id m30so22463012lfp.8;
+ Sat, 30 Nov 2019 02:04:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:reply-to:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=iC10XA6B8Wvw8Ud9BZWTOyn5shxMYd+dnZup3O3qxII=;
+ b=MfTx2WeX74GzUm8ITOvuiO0P8uYNDzSRCWGRNp6bmxJwUaaCYgsQXPVNyoIlp6jjD+
+ 3Ea8S+AFS18boFeDiVtXx5SSHauTyuIJSWNv7NTJq44n+7WfENokuETy5V6a8o8t5WLt
+ CWbwz9nzcvmankWlXtyUx0Ea8j4B625ME4bu99j8ySV49h1+BE2gFHO0fSRWmwgzaKce
+ 3L4yqdROe8KIIQi0WJAiRKWnaOLhoZ7Us0nIkJr+MpyacYh7lAc3zgmUpUkE538rx/7G
+ nZryscCQfVKWTfj429fgjba+17A1v+JKDAo5In9knAmXpvjJPMN3nY0x/Frwc9VVu24I
+ Ntag==
+X-Gm-Message-State: APjAAAWC7y/a2QfkvINfiBgnO8DnaR/9Vpn072uSVBiE00+UKl43YR+a
+ R7m8WyR6JxDikh/WGpl5Zrg=
+X-Google-Smtp-Source: APXvYqxssNY0tby6bPldjYG6PVEgKApsV/wVlOlNDdwSPOicCerRlUs5nSc5dBrbeGO6aZW4uzupag==
+X-Received: by 2002:ac2:5216:: with SMTP id a22mr37304153lfl.18.1575108295214; 
+ Sat, 30 Nov 2019 02:04:55 -0800 (PST)
+Received: from [192.168.1.183] (128-68-70-109.broadband.corbina.ru.
+ [128.68.70.109])
+ by smtp.gmail.com with ESMTPSA id q8sm3617904lfk.33.2019.11.30.02.04.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 30 Nov 2019 02:04:53 -0800 (PST)
+Subject: Re: [PATCH v2 1/1] ide: check DMA transfer size in ide_dma_cb() to
+ prevent qemu DoS from quests
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20191114172531.10644-1-alex.popov@linux.com>
+ <20191121150352.GH6007@linux.fritz.box>
+ <214785dc-d4b3-598f-4c48-c5703a28b8c4@linux.com>
+ <20191126220936.GF5889@linux.fritz.box>
+From: Alexander Popov <alex.popov@linux.com>
+Autocrypt: addr=alex.popov@linux.com; prefer-encrypt=mutual; keydata=
+ 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
+ j3lCqPk=
+Message-ID: <27638c9e-a63c-b7e0-dfad-b2e463be61d0@linux.com>
+Date: Sat, 30 Nov 2019 13:04:51 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alex.bennee@linaro.org
-Date: Sat, 30 Nov 2019 01:33:24 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20191126220936.GF5889@linux.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 209.85.167.67
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,172 +131,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: damien.hedde@greensocs.com, luis.machado@linaro.org,
- richard.henderson@linaro.org, qemu-devel@nongnu.org, alan.hayward@arm.com,
- alex.bennee@linaro.org
+Reply-To: alex.popov@linux.com
+Cc: Andrea Arcangeli <aarcange@redhat.com>,
+ Darren Kenny <darren.kenny@oracle.com>, sstabellini@kernel.org,
+ pmatouse@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org, Kashyap Chamarthy <kashyap.cv@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ pjp@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEzMDA4NDYwMi4xMDgx
-OC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCAgdjIgMDAvMTRdIGdkYnN0dWIgcmVmYWN0
-b3IgYW5kIFNWRSBzdXBwb3J0ClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MTEzMDA4NDYw
-Mi4xMDgxOC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjM0MDllYyB0ZXN0cy90Y2c6
-IGFkZCBhIGdkYnN0dWIgdGVzdGNhc2UgZm9yIFNWRSByZWdpc3RlcnMKZDM5YjI5NiB0ZXN0cy9n
-dWVzdC1kZWJ1ZzogYWRkIGEgc2ltcGxlIHRlc3QgcnVubmVyCjBhMzZjMDYgdGFyZ2V0L2FybTog
-Z2VuZXJhdGUgeG1sIGRlc2NyaXB0aW9uIG9mIG91ciBTVkUgcmVnaXN0ZXJzCjA1MzZmMDcgdGFy
-Z2V0L2FybTogZGVmYXVsdCBTVkUgbGVuZ3RoIHRvIDY0IGJ5dGVzIGZvciBsaW51eC11c2VyCjI0
-ZmM3ZjUgdGFyZ2V0L2FybTogZXhwbGljaXRseSBlbmNvZGUgcmVnbnVtIGluIG91ciBYTUwKNDFh
-MjVjNiB0YXJnZXQvYXJtOiBwcmVwYXJlIGZvciBtdWx0aXBsZSBkeW5hbWljIFhNTHMKN2MxZTRj
-ZCBnZGJzdHViOiBleHRlbmQgR0J5dGVBcnJheSB0byByZWFkIHJlZ2lzdGVyIGhlbHBlcnMKMDkx
-OGE1OSB0YXJnZXQvbTY4azogdXNlIGdkYl9nZXRfcmVnIGhlbHBlcnMKZmQ1NDljYiB0YXJnZXQv
-YXJtOiB1c2UgZ2RiX2dldF9yZWcgaGVscGVycwo1ODg1OTBkIGdkYnN0dWI6IGFkZCBoZWxwZXIg
-Zm9yIDEyOCBiaXQgcmVnaXN0ZXJzCjczNjg3NDMgZ2Ric3R1YjogbW92ZSBtZW1fYnVmIHRvIEdE
-QlN0YXRlIGFuZCB1c2UgR0J5dGVBcnJheQo5ZmQwMmQ3IGdkYnN0dWI6IG1vdmUgc3RyX2J1ZiB0
-byBHREJTdGF0ZSBhbmQgdXNlIEdTdHJpbmcKMjdhNjNlZSBnZGJzdHViOiBzdG9wIHBhc3Npbmcg
-R0RCU3RhdGUgKiBhcm91bmQgYW5kIHVzZSBnbG9iYWwKOGJmNTQ1NyBnZGJzdHViOiBtYWtlIEdE
-QlN0YXRlIHN0YXRpYyBhbmQgaGF2ZSBjb21tb24gaW5pdCBmdW5jdGlvbgoKPT09IE9VVFBVVCBC
-RUdJTiA9PT0KMS8xNCBDaGVja2luZyBjb21taXQgOGJmNTQ1NzVmMmIwIChnZGJzdHViOiBtYWtl
-IEdEQlN0YXRlIHN0YXRpYyBhbmQgaGF2ZSBjb21tb24gaW5pdCBmdW5jdGlvbikKRVJST1I6IGJy
-YWNlcyB7fSBhcmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTI4
-OiBGSUxFOiBnZGJzdHViLmM6Mjc0MzoKKyAgICBpZiAoIWdkYnNlcnZlcl9zdGF0ZS5pbml0KQpb
-Li4uXQoKRVJST1I6IHN1c3BlY3QgY29kZSBpbmRlbnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVu
-dHMgKDIsIDYpCiMxNzg6IEZJTEU6IGdkYnN0dWIuYzoyOTYyOgorICBpZiAoIWdkYnNlcnZlcl9z
-dGF0ZS5pbml0KSB7CiAgICAgICByZXR1cm47CgpFUlJPUjogc3VzcGVjdCBjb2RlIGluZGVudCBm
-b3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoMiwgNikKIzE4MzogRklMRTogZ2Ric3R1Yi5jOjI5
-NjY6CisgIGlmIChnZGJzZXJ2ZXJfZmQgPCAwIHx8IGdkYnNlcnZlcl9zdGF0ZS5mZCA8IDApIHsK
-ICAgICAgIHJldHVybjsKCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgMzg0IGxpbmVzIGNo
-ZWNrZWQKClBhdGNoIDEvMTQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjIvMTQgQ2hlY2tp
-bmcgY29tbWl0IDI3YTYzZWU1ZjEyZCAoZ2Ric3R1Yjogc3RvcCBwYXNzaW5nIEdEQlN0YXRlICog
-YXJvdW5kIGFuZCB1c2UgZ2xvYmFsKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-NzQyOiBGSUxFOiBnZGJzdHViLmM6MTc2MzoKKyAgICBpZiAodGFyZ2V0X21lbW9yeV9yd19kZWJ1
-ZyhnZGJzZXJ2ZXJfc3RhdGUuZ19jcHUsIGdkYl9jdHgtPnBhcmFtc1swXS52YWxfdWxsLAoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc3MDogRklMRTogZ2Ric3R1Yi5jOjE3ODY6
-CisgICAgaWYgKHRhcmdldF9tZW1vcnlfcndfZGVidWcoZ2Ric2VydmVyX3N0YXRlLmdfY3B1LCBn
-ZGJfY3R4LT5wYXJhbXNbMF0udmFsX3VsbCwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiM5OTc6IEZJTEU6IGdkYnN0dWIuYzoyMDIzOgorICAgIGdkYnNlcnZlcl9zdGF0ZS5xdWVy
-eV9jcHUgPSBnZGJfbmV4dF9hdHRhY2hlZF9jcHUoZ2Ric2VydmVyX3N0YXRlLnF1ZXJ5X2NwdSk7
-CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzEzMjY6IEZJTEU6IGdkYnN0dWIuYzoy
-ODE3OgorICAgICAgICAgICAgcHV0X2J1ZmZlcigodWludDhfdCAqKWdkYnNlcnZlcl9zdGF0ZS5s
-YXN0X3BhY2tldCwgZ2Ric2VydmVyX3N0YXRlLmxhc3RfcGFja2V0X2xlbik7CgpFUlJPUjogc3Bh
-Y2UgcmVxdWlyZWQgYmVmb3JlIHRoZSBvcGVuIHBhcmVudGhlc2lzICcoJwojMTM0NDogRklMRTog
-Z2Ric3R1Yi5jOjI4MzY6CisgICAgICAgIHN3aXRjaChnZGJzZXJ2ZXJfc3RhdGUuc3RhdGUpIHsK
-CkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTM3NjogRklMRTogZ2Ric3R1Yi5jOjI4
-NTk6CisgICAgICAgICAgICB9IGVsc2UgaWYgKGdkYnNlcnZlcl9zdGF0ZS5saW5lX2J1Zl9pbmRl
-eCA+PSBzaXplb2YoZ2Ric2VydmVyX3N0YXRlLmxpbmVfYnVmKSAtIDEpIHsKCkVSUk9SOiBsaW5l
-IG92ZXIgOTAgY2hhcmFjdGVycwojMTM5NDogRklMRTogZ2Ric3R1Yi5jOjI4NzI6CisgICAgICAg
-ICAgICB9IGVsc2UgaWYgKGdkYnNlcnZlcl9zdGF0ZS5saW5lX2J1Zl9pbmRleCA+PSBzaXplb2Yo
-Z2Ric2VydmVyX3N0YXRlLmxpbmVfYnVmKSAtIDEpIHsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiMxNDA0OiBGSUxFOiBnZGJzdHViLmM6Mjg3ODoKKyAgICAgICAgICAgICAgICBn
-ZGJzZXJ2ZXJfc3RhdGUubGluZV9idWZbZ2Ric2VydmVyX3N0YXRlLmxpbmVfYnVmX2luZGV4Kytd
-ID0gY2ggXiAweDIwOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNDIwOiBGSUxF
-OiBnZGJzdHViLmM6Mjg5NToKKyAgICAgICAgICAgICAgICBpZiAoZ2Ric2VydmVyX3N0YXRlLmxp
-bmVfYnVmX2luZGV4ICsgcmVwZWF0ID49IHNpemVvZihnZGJzZXJ2ZXJfc3RhdGUubGluZV9idWYp
-IC0gMSkgewoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE0Mzg6IEZJTEU6IGdk
-YnN0dWIuYzoyOTA1OgorICAgICAgICAgICAgICAgICAgICBtZW1zZXQoZ2Ric2VydmVyX3N0YXRl
-LmxpbmVfYnVmICsgZ2Ric2VydmVyX3N0YXRlLmxpbmVfYnVmX2luZGV4LAoKRVJST1I6IGxpbmUg
-b3ZlciA5MCBjaGFyYWN0ZXJzCiMxNDM5OiBGSUxFOiBnZGJzdHViLmM6MjkwNjoKKyAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGdkYnNlcnZlcl9zdGF0ZS5saW5lX2J1ZltnZGJzZXJ2ZXJfc3Rh
-dGUubGluZV9idWZfaW5kZXggLSAxXSwgcmVwZWF0KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiMxNDc0OiBGSUxFOiBnZGJzdHViLmM6MjkzMzoKKyAgICAgICAgICAgIGlmIChn
-ZGJzZXJ2ZXJfc3RhdGUubGluZV9jc3VtICE9IChnZGJzZXJ2ZXJfc3RhdGUubGluZV9zdW0gJiAw
-eGZmKSkgewoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNDc1OiBGSUxFOiBnZGJz
-dHViLmM6MjkzNDoKKyAgICAgICAgICAgICAgICB0cmFjZV9nZGJzdHViX2Vycl9jaGVja3N1bV9p
-bmNvcnJlY3QoZ2Ric2VydmVyX3N0YXRlLmxpbmVfc3VtLCBnZGJzZXJ2ZXJfc3RhdGUubGluZV9j
-c3VtKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNDg4OiBGSUxFOiBnZGJz
-dHViLmM6Mjk0MzoKKyAgICAgICAgICAgICAgICBnZGJzZXJ2ZXJfc3RhdGUuc3RhdGUgPSBnZGJf
-aGFuZGxlX3BhY2tldChzLCBnZGJzZXJ2ZXJfc3RhdGUubGluZV9idWYpOwoKRVJST1I6IGxpbmUg
-b3ZlciA5MCBjaGFyYWN0ZXJzCiMxNTYzOiBGSUxFOiBnZGJzdHViLmM6MzMwNToKKyAgICAgICAg
-cXNvcnQoZ2Ric2VydmVyX3N0YXRlLnByb2Nlc3NlcywgZ2Ric2VydmVyX3N0YXRlLnByb2Nlc3Nf
-bnVtLCBzaXplb2YoZ2Ric2VydmVyX3N0YXRlLnByb2Nlc3Nlc1swXSksIHBpZF9vcmRlcik7Cgp0
-b3RhbDogOCBlcnJvcnMsIDcgd2FybmluZ3MsIDE0NzggbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8x
-NCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
-b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
-ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMy8xNCBDaGVja2luZyBjb21taXQgOWZkMDJk
-N2ViYTFlIChnZGJzdHViOiBtb3ZlIHN0cl9idWYgdG8gR0RCU3RhdGUgYW5kIHVzZSBHU3RyaW5n
-KQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTQ5OiBGSUxFOiBnZGJzdHViLmM6
-MTc5NToKKyAgICBtZW10b2hleChnZGJzZXJ2ZXJfc3RhdGUuc3RyX2J1ZiwgZ2RiX2N0eC0+bWVt
-X2J1ZiwgZ2RiX2N0eC0+cGFyYW1zWzFdLnZhbF91bGwpOwoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzMyMjogRklMRTogZ2Ric3R1Yi5jOjIxMDg6CisgICAgZ19zdHJpbmdfcHJp
-bnRmKGdkYnNlcnZlcl9zdGF0ZS5zdHJfYnVmLCAiUGFja2V0U2l6ZT0leCIsIE1BWF9QQUNLRVRf
-TEVOR1RIKTsKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgNDIyIGxpbmVzIGNoZWNrZWQK
-ClBhdGNoIDMvMTQgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC8xNCBDaGVja2luZyBjb21t
-aXQgNzM2ODc0M2I0YTkyIChnZGJzdHViOiBtb3ZlIG1lbV9idWYgdG8gR0RCU3RhdGUgYW5kIHVz
-ZSBHQnl0ZUFycmF5KQo1LzE0IENoZWNraW5nIGNvbW1pdCA1ODg1OTBkNmE0ZWEgKGdkYnN0dWI6
-IGFkZCBoZWxwZXIgZm9yIDEyOCBiaXQgcmVnaXN0ZXJzKQo2LzE0IENoZWNraW5nIGNvbW1pdCBm
-ZDU0OWNiODMzYWYgKHRhcmdldC9hcm06IHVzZSBnZGJfZ2V0X3JlZyBoZWxwZXJzKQpFUlJPUjog
-c3BhY2UgcmVxdWlyZWQgYWZ0ZXIgdGhhdCAnLCcgKGN0eDpWeFYpCiM0MzogRklMRTogdGFyZ2V0
-L2FybS9oZWxwZXIuYzoxMTg6CisgICAgICAgIHJldHVybiBnZGJfZ2V0X3JlZzMyKGJ1Zix2ZnBf
-Z2V0X2ZwY3IoZW52KSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFs
-OiAxIGVycm9ycywgMCB3YXJuaW5ncywgMjggbGluZXMgY2hlY2tlZAoKUGF0Y2ggNi8xNCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKNy8xNCBDaGVja2luZyBjb21taXQgMDkxOGE1OWU3Y2Mw
-ICh0YXJnZXQvbTY4azogdXNlIGdkYl9nZXRfcmVnIGhlbHBlcnMpCjgvMTQgQ2hlY2tpbmcgY29t
-bWl0IDdjMWU0Y2RhNzU1YyAoZ2Ric3R1YjogZXh0ZW5kIEdCeXRlQXJyYXkgdG8gcmVhZCByZWdp
-c3RlciBoZWxwZXJzKQo5LzE0IENoZWNraW5nIGNvbW1pdCA0MWEyNWM2M2I1YzcgKHRhcmdldC9h
-cm06IHByZXBhcmUgZm9yIG11bHRpcGxlIGR5bmFtaWMgWE1McykKRVJST1I6IGxpbmUgb3ZlciA5
-MCBjaGFyYWN0ZXJzCiMxMjc6IEZJTEU6IHRhcmdldC9hcm0vZ2Ric3R1Yi5jOjE1OToKKyAgICBj
-cHUtPmR5bl9zeXNyZWdfeG1sLmRhdGEuY3ByZWdzLmtleXMgPSBnX25ldyh1aW50MzJfdCwgZ19o
-YXNoX3RhYmxlX3NpemUoY3B1LT5jcF9yZWdzKSk7Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fybmlu
-Z3MsIDEzNiBsaW5lcyBjaGVja2VkCgpQYXRjaCA5LzE0IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
-YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
-ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgoxMC8xNCBDaGVja2luZyBjb21taXQgMjRmYzdmNWNhZTkxICh0YXJnZXQvYXJtOiBleHBs
-aWNpdGx5IGVuY29kZSByZWdudW0gaW4gb3VyIFhNTCkKMTEvMTQgQ2hlY2tpbmcgY29tbWl0IDA1
-MzZmMDc3ZTQzZiAodGFyZ2V0L2FybTogZGVmYXVsdCBTVkUgbGVuZ3RoIHRvIDY0IGJ5dGVzIGZv
-ciBsaW51eC11c2VyKQoxMi8xNCBDaGVja2luZyBjb21taXQgMGEzNmMwNjg2YWZiICh0YXJnZXQv
-YXJtOiBnZW5lcmF0ZSB4bWwgZGVzY3JpcHRpb24gb2Ygb3VyIFNWRSByZWdpc3RlcnMpCkVSUk9S
-OiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy8nIChjdHg6VnhWKQojMTEzOiBGSUxFOiB0
-YXJnZXQvYXJtL2dkYnN0dWIuYzoyMjk6CisgICAgZm9yIChiaXRzID0gMTI4OyBiaXRzID49IDg7
-IGJpdHMgPSBiaXRzLzIpIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE4OiBGSUxFOiB0YXJn
-ZXQvYXJtL2dkYnN0dWIuYzoyMzQ6CisgICAgICAgICAgICAgICAgZ19zdHJpbmdfYXBwZW5kX3By
-aW50ZihzLCAiPGZpZWxkIG5hbWU9XCIlY1wiIHR5cGU9XCJ2cSVkJWMlY1wiLz4iLAoKRVJST1I6
-IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLycgKGN0eDpWeFYpCiMxMjg6IEZJTEU6IHRh
-cmdldC9hcm0vZ2Ric3R1Yi5jOjI0NDoKKyAgICBmb3IgKGJpdHMgPSAxMjg7IGJpdHMgPj0gODsg
-Yml0cyA9IGJpdHMvMikgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIF4KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMTk6IEZJTEU6IHRhcmdl
-dC9hcm0vaGVscGVyLmM6NzA4MToKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBhcm1fZ2VuX2R5bmFtaWNfc3ZlcmVnX3htbChjcywgY3MtPmdkYl9udW1fcmVncyksCgp0b3Rh
-bDogMiBlcnJvcnMsIDIgd2FybmluZ3MsIDMwNiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMi8xNCBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTMvMTQgQ2hlY2tpbmcgY29tbWl0IGQzOWIyOTYw
-MzI4OCAodGVzdHMvZ3Vlc3QtZGVidWc6IGFkZCBhIHNpbXBsZSB0ZXN0IHJ1bm5lcikKV0FSTklO
-RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
-IHVwZGF0aW5nPwojMTU6IApuZXcgZmlsZSBtb2RlIDEwMDc1NQoKRVJST1I6IGxpbmUgb3ZlciA5
-MCBjaGFyYWN0ZXJzCiM3MjogRklMRTogdGVzdHMvZ3Vlc3QtZGVidWcvcnVuLXRlc3QucHk6NTM6
-CisgICAgZ2RiX2NtZCA9ICIlcyAlcyAtZXggJ3RhcmdldCByZW1vdGUgbG9jYWxob3N0OjEyMzQn
-IC14ICVzIiAlIChhcmdzLmdkYiwgYXJncy5iaW5hcnksIGFyZ3MudGVzdCkKCnRvdGFsOiAxIGVy
-cm9ycywgMSB3YXJuaW5ncywgNTcgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTMvMTQgaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCjE0LzE0IENoZWNraW5nIGNvbW1pdCBiMzQwOWVjM2Y5MTkgKHRl
-c3RzL3RjZzogYWRkIGEgZ2Ric3R1YiB0ZXN0Y2FzZSBmb3IgU1ZFIHJlZ2lzdGVycykKV0FSTklO
-RzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVk
-IHVwZGF0aW5nPwojMzU6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAx
-IHdhcm5pbmdzLCA4MiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxNC8xNCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
-bG9ncy8yMDE5MTEzMDA4NDYwMi4xMDgxOC0xLWFsZXguYmVubmVlQGxpbmFyby5vcmcvdGVzdGlu
-Zy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
-YWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIg
-ZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 27.11.2019 01:09, Kevin Wolf wrote:
+> Am 26.11.2019 um 22:24 hat Alexander Popov geschrieben:
+>> Hello Kevin,
+>>
+>> Thanks for your review,
+>>
+>> On 21.11.2019 18:03, Kevin Wolf wrote:
+>>> Am 14.11.2019 um 18:25 hat Alexander Popov geschrieben:
+>>>> The commit a718978ed58a from July 2015 introduced the assertion which
+>>>> implies that the size of successful DMA transfers handled in ide_dma_cb()
+>>>> should be multiple of 512 (the size of a sector). But guest systems can
+>>>> initiate DMA transfers that don't fit this requirement.
+>>>>
+>>>> PoC for Linux that uses SCSI_IOCTL_SEND_COMMAND to perform such an ATA
+>>>> command and crash qemu:
+>> ...
+>>>
+>>> It would be nicer to turn the reproducer into a test case for
+>>> tests/ide-test.c.
+>>
+>> Yes, I can do that.
+>>
+>>>> For fixing that let's check the number of bytes prepared for the transfer
+>>>> by the prepare_buf() handler. If it is not a multiple of 512 then end
+>>>> the DMA transfer with an error.
+>>>>
+>>>> That also fixes the I/O stall in guests after a DMA transfer request
+>>>> for less than the size of a sector.
+>>>>
+>>>> Signed-off-by: Alexander Popov <alex.popov@linux.com>
+>>>
+>>> This patch makes ide-test fail:
+>>>
+>>>   TEST    check-qtest-x86_64: tests/ide-test
+>>> **
+>>> ERROR:tests/ide-test.c:469:test_bmdma_short_prdt: assertion failed (status == 0): (0x00000004 == 0x00000000)
+>>> ERROR - Bail out! ERROR:tests/ide-test.c:469:test_bmdma_short_prdt: assertion failed (status == 0): (0x00000004 == 0x00000000)
+>>
+>> Thanks for the notice.
+>> Yes, I can reproduce it too with `make check-qtest-i386`.
+>>
+>>>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>>>> index 754ff4dc34..85aac614f0 100644
+>>>> --- a/hw/ide/core.c
+>>>> +++ b/hw/ide/core.c
+>>>> @@ -849,6 +849,7 @@ static void ide_dma_cb(void *opaque, int ret)
+>>>>      int64_t sector_num;
+>>>>      uint64_t offset;
+>>>>      bool stay_active = false;
+>>>> +    int32_t prepared = 0;
+>>>>  
+>>>>      if (ret == -EINVAL) {
+>>>>          ide_dma_error(s);
+>>>> @@ -892,12 +893,10 @@ static void ide_dma_cb(void *opaque, int ret)
+>>>>      n = s->nsector;
+>>>>      s->io_buffer_index = 0;
+>>>>      s->io_buffer_size = n * 512;
+>>>> -    if (s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) < 512) {
+>>>> -        /* The PRDs were too short. Reset the Active bit, but don't raise an
+>>>> -         * interrupt. */
+>>>> -        s->status = READY_STAT | SEEK_STAT;
+>>>> -        dma_buf_commit(s, 0);
+>>>> -        goto eot;
+>>>> +    prepared = s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size);
+>>>> +    if (prepared % 512) {
+>>>> +        ide_dma_error(s);
+>>>
+>>> Which I assume is because you changed the error mode here compared to
+>>> the old version.
+>>
+>> Yes, you are right.
+>>
+>>> I'm not sure offhand what the correct behaviour is for non-aligned
+>>> values > 512. I think we actually have two cases here: Either a short or
+>>> a long PRD. The commit message should explain this with spec references
+>>> and a test case should be added for both cases.
+>>
+>> I've found the "Programming Interface for Bus Master IDE Controller" (revision
+>> 1.0 5/16/94). The chapter 3.1 (Status Bit Interpretation) provides some answers.
+> 
+> Yes, I think that's the same that I've used before. I assume it's the
+> relevant spec.
+> 
+>> It says that:
+>>   1. If PRD's specified a smaller size than the IDE transfer size, then the
+>> Interrupt and Active bits in the Controller status register are not set.
+> 
+>>   2. If the size of the physical memory regions was larger than the IDE device
+>> transfer size, the Interrupt and Active bits in the Controller status register
+>> are both set to 1.
+>>
+>> So my changing of the error mode in short PRD's case was wrong, and the
+>> test_bmdma_short_prdt() is correct.
+> 
+> Yes, I think 1. is implemented correctly for PRDs that are too small and
+> smaller than a sector.
+> 
+> I think the assumption may have been that if the PRDT contains at least
+> one more full sector, we'll do that one sector before coming back to the
+> same place and hitting the code path for a too short PRDT.
+> 
+> However, the code neglects to actually use the return value of
+> .prepare_buf() to limit the number of sectors accessed. So if we ask for
+> a scatter/gather list for 5 sectors and we get 3 sectors, we still
+> assume we can write to all 5. This is obviously wrong.
+> 
+>> Now let's think about the proper fix of the qemu crash.
+>>
+>> Currently I don't really understand how ide_dma_cb() emulates the logic
+>> described in Status Bit Interpretation chapter. I don't see any comparison
+>> between the DMA transfer size and PRD's size.
+>>
+>> We only have this check against the size of a sector (512 bytes), which doesn't
+>> catch all short PRD's cases (PRD in my PoC is 1337 bytes).
+> 
+> I think for making the above assumption work, we'd have to check the
+> return value, which gets us something like:
+> 
+>     ret = s->bus->dma->ops->prepare_buf()
+>     if (ret < 512) {
+>         ... short PRDT code ...
+>     } else if (ret < n * 512) {
+>         n = ret / 512;
+>     }
+> 
+> Instead of doing the extra iteration and executing I/O for the first
+> part of the request, maybe this would work, too:
+> 
+>     ret = s->bus->dma->ops->prepare_buf()
+>     if (ret < n * 512) {
+>         ... short PRDT code ...
+>     }
+> 
+> We need to check in the spec whether we're supposed to actually do
+> partial I/O for short PRDTs. I couldn't find a clear answer with a quick
+> look, but I'm leaning towards doing the partial I/O (i.e. implementing
+> the first pseudo-code piece above).
+> 
+> 
+> As for handling long PRDTs, we have code that looks like it's meant to
+> handle the case:
+> 
+>     n = s->io_buffer_size >> 9;
+>     if (n > s->nsector) {
+>         /* The PRDs were longer than needed for this request. Shorten them so
+>          * we don't get a negative remainder. The Active bit must remain set
+>          * after the request completes. */
+>         n = s->nsector;
+>         stay_active = true;
+>     }
+> 
+> bmdma_prepare_buf() does potentially set s->io_buffer_size to a value
+> larger than the passed limit, so maybe this is already correct. We have
+> a basic test for it in test_bmdma_long_prdt(), but I can't rule out that
+> there are more complicated cases where it fails.
+> 
+> I'm pretty sure we must handle the long PRDT case only after doing I/O
+> (like we currently do) because the operation is supposed to have
+> completed by the time we signal that the PRDT was long, so the guest can
+> trust that a read has actually read something and a write has reached
+> the disk. The spec says "This is a valid completion case".
+> 
+> 
+> Does this make sense to you?
 
+Thanks a lot, Kevin!
+
+First of all I'll improve the unit-tests to cover all cases.
+
+Then I'll try both approaches you described and return with the results.
+
+I'll also try to find more info about partial I/O behavior in other datasheets.
+
+Best regards,
+Alexander
 
