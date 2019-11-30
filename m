@@ -2,86 +2,84 @@ Return-Path: <SRS0=cUpU=ZW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E67EC432C0
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 23:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC919C432C0
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 23:47:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CCEF520725
-	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 23:12:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81E992075C
+	for <qemu-devel@archiver.kernel.org>; Sat, 30 Nov 2019 23:47:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o5CDT/XO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCEF520725
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M24Hm80L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81E992075C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibBuR-0005Wo-Uq
-	for qemu-devel@archiver.kernel.org; Sat, 30 Nov 2019 18:12:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47602)
+	id 1ibCSJ-0008A5-LS
+	for qemu-devel@archiver.kernel.org; Sat, 30 Nov 2019 18:47:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ibBtW-0004gr-Be
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 18:11:19 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ibCRN-0007Yg-5l
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 18:46:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ibBtU-0004p2-Tm
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 18:11:18 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43234)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ibCRK-0000kD-Np
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 18:46:17 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40403)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ibBtU-0004l2-KD
- for qemu-devel@nongnu.org; Sat, 30 Nov 2019 18:11:16 -0500
-Received: by mail-ot1-x341.google.com with SMTP id l14so27809239oti.10
- for <qemu-devel@nongnu.org>; Sat, 30 Nov 2019 15:11:15 -0800 (PST)
+ id 1ibCRK-0000jo-G7
+ for qemu-devel@nongnu.org; Sat, 30 Nov 2019 18:46:14 -0500
+Received: by mail-oi1-x243.google.com with SMTP id 6so3963600oix.7
+ for <qemu-devel@nongnu.org>; Sat, 30 Nov 2019 15:46:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=qksgmx4kXeHyR4rq7zOb2n8ALnn8N5LN8fkASJjEryo=;
- b=o5CDT/XOuAccnKE+VUllSFGSF3z6tFrpYNwB6UsPQQrFXU21G63KdOk8OwWNAvD6OF
- tCi01tKJHqm1B9SrhzGtIPaTTtfHPYaFh3YDkbHFaYI2TpFTzAyfqNRpSYgU561S34cS
- AUJF6YcwkgkI+ENg21uH6eq0XZRpTirQT1YlqyYCax9CJEsWaAQEEzctXUV54OLEd9cr
- NMh9m/WMgFuIAKTB61BZi8FooAV85IqqiviBHnIURqTEAA4ZZnFqnEY/mdSYNEUwzgnH
- 5a4O4+h31YNdS0Y0pOChvUyCpTxzS+m6XoeaR6kIFrXEaWGvOLCuVDhtkvto/D82Jm1G
- t25w==
+ :cc; bh=kDIZGzME0paJpfLNXjJUYP5Oremr5UVC59Ye3H3vcFE=;
+ b=M24Hm80LYIRLUCLDARUp5AJRWOKwFX7W1a9g0Oa2MraEgdVdV6g7yfpZNxv94W2y2b
+ 0B4VaF6/SQlPyxRdq4KhWzjjusuh9j3mOCfmMjyMtZVu1RS50OnJYvtIAj/ahcX+Fc2M
+ AAVMXDW7W0Y+V8uLr9JwSoL2OWOo/vtJbHtlTGgxUVrtRdUFRy1yhpyQ13T5bcFrwkrp
+ spDZb1CRkEveJnE0ImIrAOHa4cDfI/nbhxhhymqMk6JGV3iNqRNMv/O3yuNZerWcBx8z
+ 6EPtAMi6gP9g1x5PgfL/JfV7nm1bvnf0wy0hvoS74wDA+xPYxYODmpUteMs5okc3Gh1E
+ NVtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=qksgmx4kXeHyR4rq7zOb2n8ALnn8N5LN8fkASJjEryo=;
- b=HngHqAKgLJ/+aXjJixn0vMD/2iSTjw5ciQHF5YlKKQ8QImJVrz1SX0MArxcbb2CqUg
- VGujjV+yoX1/OyuYC0fr2A7NlJgzWBYxkk8tbuL++Nk04SGtBX3pSwEJKlrxlPBqMArd
- TYzbZDEvPGmoWKIGdieyRtBAs52bwmLp5mKFGt18Ul92gO7PlVofExsUvPI+h3YBVZk0
- gbJJ1FyG3bVpZS/k2bfzyzC9y71XU5JfzSz7SE0naohKdh6uynywQEaNAD8+91AJFErA
- y8H2/3P8XlqQvebAAjzTQBJM/vS0qTcevaSJKaZcjuRDTdrQxjw3jobiBnFvxd6YIc/t
- VmOg==
-X-Gm-Message-State: APjAAAVSaLBwFi4DCE5o8IBKB1LsO2N/yNodAYxSS1xlwk8HLtaxKZj4
- mzAWzzrxGpB+fcd9K3Whgjpe+huiaWKWw3tuBB0=
-X-Google-Smtp-Source: APXvYqwHx6nK0DTqKdn/eC+IbJW6sRSLH9T10gKkSJjbyApZPA6T6HcsFHgxaWmy0G8XJnYUB2P/oU51qXBQaMCOgf4=
-X-Received: by 2002:a9d:58c9:: with SMTP id s9mr10924720oth.121.1575155474754; 
- Sat, 30 Nov 2019 15:11:14 -0800 (PST)
+ bh=kDIZGzME0paJpfLNXjJUYP5Oremr5UVC59Ye3H3vcFE=;
+ b=kSrqJWJ0gIVNZ8eF2BbHIzGCPZS8J1T5Lozxno57ruXBwEqd+gM9wbJpdKSVeBCKz5
+ ZIlPkPq+wSm1iMtzbd7jpOzMChPB6Udz0QL1yhquA/EIzQjO9s93quEdjUprIlGf11tV
+ YwgadUdgb2mHgS7P06yXfZ/wY/LQaqdtsYI0fbNn6Yzedk6lhOvMuGEpC9NKsiQ5/aQX
+ OTfXe9NFC2ZqDaDV1BiM8ynJI5GxMh5050NUgVVr7ADr3NgwNxq+0DIgNAjE05KvW1a8
+ OAXvrM+G02Qsj/mj9AGTwXmtIwwRioBVdJmTAIGDvbhvlRN35HLJuJVuipUcASL5HHBP
+ QncQ==
+X-Gm-Message-State: APjAAAVczwW4pck9ZeV4kIooo+ezLqf5S7KODMWk0q6dTSrkD8CXkn95
+ BVjsSYTt9uXTPbThdYR2ToAuB/39SSql/ethaSs=
+X-Google-Smtp-Source: APXvYqwMZAdIzIjjEmXqnOMGBNyv//KAoOPYJv/jJhgNh3Qgkqbslb3qEkNK0SgDupH4Q6HG06Z6RM0+8aifsp+UuPc=
+X-Received: by 2002:aca:1817:: with SMTP id h23mr10903385oih.53.1575157573341; 
+ Sat, 30 Nov 2019 15:46:13 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Sat, 30 Nov 2019 15:11:13
+Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Sat, 30 Nov 2019 15:46:12
  -0800 (PST)
-In-Reply-To: <CAK4993gztHpfAViSboHQAio7oHMOoJk3gDr_T9w4e9mjA9avBA@mail.gmail.com>
-References: <20191127175257.23480-1-mrolnik@gmail.com>
- <20191127175257.23480-6-mrolnik@gmail.com>
- <CAL1e-=jzJ3XAEqHOr4Z4UwyRZcfNs_nbKjvvUiX+BSKv6sPH5g@mail.gmail.com>
- <CAL1e-=i9ft-Py65fjuNt=TBFqw+EOerp9JBUsZa2i0wN8mAPJw@mail.gmail.com>
- <CAK4993gztHpfAViSboHQAio7oHMOoJk3gDr_T9w4e9mjA9avBA@mail.gmail.com>
+In-Reply-To: <1574687098-26689-3-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
+ <1574687098-26689-3-git-send-email-Filip.Bozuta@rt-rk.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sun, 1 Dec 2019 00:11:13 +0100
-Message-ID: <CAL1e-=gNsZeX8zdYO0Cjo8eYaRo-=MReR4u3UDcppPxV-bs+WQ@mail.gmail.com>
-Subject: Re: [PATCH v37 05/17] target/avr: Add instruction translation -
- Arithmetic and Logic Instructions
-To: Michael Rolnik <mrolnik@gmail.com>
-Content-Type: multipart/alternative; boundary="00000000000089f17d0598987674"
+Date: Sun, 1 Dec 2019 00:46:12 +0100
+Message-ID: <CAL1e-=jeECJRjOR+Mo79D5VA8q0gSZsf__MOtRhiU0fgDF1DRA@mail.gmail.com>
+Subject: Re: [PATCH 2/5] mips: malta: Renovate coding style
+To: Filip Bozuta <Filip.Bozuta@rt-rk.com>, Cleber Rosa <crosa@redhat.com>, 
+ Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000009fd643059898f3b9"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,230 +91,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+Cc: "pburton@wavecomp.com" <pburton@wavecomp.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>
+ "hpoussin@reactos.org" <hpoussin@reactos.org>,
+ "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>,
+ "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000089f17d0598987674
+--0000000000009fd643059898f3b9
 Content-Type: text/plain; charset="UTF-8"
 
-On Saturday, November 30, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
+On Monday, November 25, 2019, Filip Bozuta <Filip.Bozuta@rt-rk.com> wrote:
 
-> Hi Aleksandar.
+> The script checkpatch.pl located in scripts folder was
+> used to detect all errors and warrnings in files:
+>     hw/mips/mips_malta.c
+>     hw/mips/gt64xxx_pci.c
+>     tests/acceptance/linux_ssh_mips_malta.py
 >
-> thanks for pointing that out I was not aware of that.
-> I can fix it.
+> All these mips malta machine files were edited and
+> all the errors and warrings generated by the checkpatch.pl
+> script were corrected and then the script was
+> ran again to make sure there are no more errors and warnings.
+>
+> Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+> ---
+>  hw/mips/mips_malta.c                     | 139
+> ++++++++++++++++---------------
+>  tests/acceptance/linux_ssh_mips_malta.py |   6 +-
+>  2 files changed, 75 insertions(+), 70 deletions(-)
 >
 >
-Hey, Michael,
+Very good cleanup!
 
-Please take alook at this:
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-https://en.m.wikipedia.org/wiki/ATtiny_microcontroller_comparison_chart
-
-It looks that all cases of AVR 16-gpr-registers cores belong to the
-group "avrtiny10",
-that actually you may want to add to your solution. Just a hint.
-
-Best regards,
-Aleksandar
+I think this snippet is good, but I am just in case cc-ing Cleber and
+Eduardo to check if it is in accordance with any applicable guidelines of
+our test framework:
 
 
-
-Regards,
-> Michael Rolnik
->
-> On Sat, Nov 30, 2019 at 6:29 PM Aleksandar Markovic <
-> aleksandar.m.mail@gmail.com> wrote:
->
->>
->>
->> On Saturday, November 30, 2019, Aleksandar Markovic <
->> aleksandar.m.mail@gmail.com> wrote:
->>
->>>
->>>
->>> On Wednesday, November 27, 2019, Michael Rolnik <mrolnik@gmail.com>
->>> wrote:
->>>
->>> +
->>>> +
->>>> +/*
->>>> + *  Performs the logical AND between the contents of register Rd and
->>>> register
->>>> + *  Rr and places the result in the destination register Rd.
->>>> + */
->>>> +static bool trans_AND(DisasContext *ctx, arg_AND *a)
->>>> +{
->>>> +    TCGv Rd = cpu_r[a->rd];
->>>> +    TCGv Rr = cpu_r[a->rr];
->>>> +    TCGv R = tcg_temp_new_i32();
->>>> +
->>>> +    /* op */
->>>> +    tcg_gen_and_tl(R, Rd, Rr); /* Rd = Rd and Rr */
->>>> +
->>>> +    /* Vf */
->>>> +    tcg_gen_movi_tl(cpu_Vf, 0); /* Vf = 0 */
->>>> +
->>>> +    /* Zf */
->>>> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
->>>> +
->>>> +    gen_ZNSf(R);
->>>> +
->>>> +    /* R */
->>>> +    tcg_gen_mov_tl(Rd, R);
->>>> +
->>>> +    tcg_temp_free_i32(R);
->>>> +
->>>> +    return true;
->>>> +}
->>>> +
->>>> +
->>>>
->>>
->>> According to specs:
->>>
->>> http://ww1.microchip.com/downloads/en/devicedoc/atmel-42505-8-bit-avr-
->>> microcontrollers-attiny102-attiny104_datasheet.pdf
->>>
->>> ... the chips in question have cores with 16 GPRs (that correspond to
->>> GPRs R16-R31 of more common AVR cores with 32 GPRs).
->>>
->>>
->> There are more examples;
->>
->> http://ww1.microchip.com/downloads/en/DeviceDoc/atmel-8127-avr-8-bit-
->> microcontroller-attiny4-attiny5-attiny9-attiny10_datasheet.pdf
->>
->> Also ATtiny20, ATtiny40.
->>
->> How do you handle such cores?
->>>
->>> I don't see here anything preventing usage of all 32 GPRs, resulting, of
->>> course, in an inaccurate emulation.
->>>
->>> Thanks,
->>> Aleksandar
->>>
->>
->
+> diff --git a/tests/acceptance/linux_ssh_mips_malta.py
+> b/tests/acceptance/linux_ssh_mips_malta.py
+> index fc13f9e..44e1118 100644
+> --- a/tests/acceptance/linux_ssh_mips_malta.py
+> +++ b/tests/acceptance/linux_ssh_mips_malta.py
+> @@ -99,10 +99,12 @@ class LinuxSSH(Test):
+>      def ssh_command(self, command, is_root=True):
+>          self.ssh_logger.info(command)
+>          result = self.ssh_session.cmd(command)
+> -        stdout_lines = [line.rstrip() for line in
+> result.stdout_text.splitlines()]
+> +        stdout_lines = [line.rstrip() for line
+> +        in result.stdout_text.splitlines()]
+>          for line in stdout_lines:
+>              self.ssh_logger.info(line)
+> -        stderr_lines = [line.rstrip() for line in
+> result.stderr_text.splitlines()]
+> +        stderr_lines = [line.rstrip() for line
+> +        in result.stderr_text.splitlines()]
+>          for line in stderr_lines:
+>              self.ssh_logger.warning(line)
+>          return stdout_lines, stderr_lines
 > --
-> Best Regards,
-> Michael Rolnik
+> 2.7.4
+>
+>
 >
 
---00000000000089f17d0598987674
+--0000000000009fd643059898f3b9
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<br><br>On Saturday, November 30, 2019, Michael Rolnik &lt;<a href=3D"mailt=
-o:mrolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex"><div dir=3D"ltr">Hi Aleksandar.<div><br></div><div>thanks for=
- pointing that out I was not aware=C2=A0of that.</div><div>I can fix it.</d=
-iv><div><br></div></div></blockquote><div><br></div><div>Hey, Michael,</div=
-><div><br></div><div>Please take alook at this:</div><div><br></div><div><a=
- href=3D"https://en.m.wikipedia.org/wiki/ATtiny_microcontroller_comparison_=
-chart">https://en.m.wikipedia.org/wiki/ATtiny_microcontroller_comparison_ch=
-art</a></div><div><br></div><div>It looks that all cases of AVR 16-gpr-regi=
-sters cores belong to the group &quot;<span style=3D"color:rgb(34,34,34);fo=
-nt-family:-apple-system,BlinkMacSystemFont,&#39;Segoe UI&#39;,Roboto,Lato,H=
-elvetica,Arial,sans-serif;font-size:16px;line-height:26.3999996185303px">av=
-rtiny10&quot;, that actually you may want to add to your solution. Just a h=
-int.</span></div><div><span style=3D"color:rgb(34,34,34);font-family:-apple=
--system,BlinkMacSystemFont,&#39;Segoe UI&#39;,Roboto,Lato,Helvetica,Arial,s=
-ans-serif;font-size:16px;line-height:26.3999996185303px"><br></span></div><=
-div><span style=3D"color:rgb(34,34,34);font-family:-apple-system,BlinkMacSy=
-stemFont,&#39;Segoe UI&#39;,Roboto,Lato,Helvetica,Arial,sans-serif;font-siz=
-e:16px;line-height:26.3999996185303px">Best regards,</span></div><div>Aleks=
-andar</div><div><span style=3D"color:rgb(34,34,34);font-family:-apple-syste=
-m,BlinkMacSystemFont,&#39;Segoe UI&#39;,Roboto,Lato,Helvetica,Arial,sans-se=
-rif;font-size:16px;line-height:26.3999996185303px"><br></span></div><div><s=
-pan style=3D"color:rgb(34,34,34);font-family:-apple-system,BlinkMacSystemFo=
-nt,&#39;Segoe UI&#39;,Roboto,Lato,Helvetica,Arial,sans-serif;font-size:16px=
-;line-height:26.3999996185303px"><br></span></div><div><span style=3D"color=
-:rgb(34,34,34);font-family:-apple-system,BlinkMacSystemFont,&#39;Segoe UI&#=
-39;,Roboto,Lato,Helvetica,Arial,sans-serif;font-size:16px;line-height:26.39=
-99996185303px"><br></span></div><blockquote class=3D"gmail_quote" style=3D"=
-margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div dir=3D"=
-ltr"><div>Regards,</div><div>Michael Rolnik</div></div><br><div class=3D"gm=
-ail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Sat, Nov 30, 2019 at 6:=
-29 PM Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com=
-" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br></div><bl=
-ockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-lef=
-t:1px solid rgb(204,204,204);padding-left:1ex"><br><br>On Saturday, Novembe=
-r 30, 2019, Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@gma=
-il.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br><bl=
-ockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-lef=
-t:1px solid rgb(204,204,204);padding-left:1ex"><br><br>On Wednesday, Novemb=
-er 27, 2019, Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" target=
-=3D"_blank">mrolnik@gmail.com</a>&gt; wrote:<div><br><blockquote class=3D"g=
-mail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204=
-,204,204);padding-left:1ex">
-+<br>
-+<br>
-+/*<br>
-+ *=C2=A0 Performs the logical AND between the contents of register Rd and =
-register<br>
-+ *=C2=A0 Rr and places the result in the destination register Rd.<br>
-+ */<br>
-+static bool trans_AND(DisasContext *ctx, arg_AND *a)<br>
-+{<br>
-+=C2=A0 =C2=A0 TCGv Rd =3D cpu_r[a-&gt;rd];<br>
-+=C2=A0 =C2=A0 TCGv Rr =3D cpu_r[a-&gt;rr];<br>
-+=C2=A0 =C2=A0 TCGv R =3D tcg_temp_new_i32();<br>
-+<br>
-+=C2=A0 =C2=A0 /* op */<br>
-+=C2=A0 =C2=A0 tcg_gen_and_tl(R, Rd, Rr); /* Rd =3D Rd and Rr */<br>
-+<br>
-+=C2=A0 =C2=A0 /* Vf */<br>
-+=C2=A0 =C2=A0 tcg_gen_movi_tl(cpu_Vf, 0); /* Vf =3D 0 */<br>
-+<br>
-+=C2=A0 =C2=A0 /* Zf */<br>
-+=C2=A0 =C2=A0 tcg_gen_setcondi_tl(TCG_COND_<wbr>EQ, cpu_Zf, R, 0); /* Zf =
-=3D R =3D=3D 0 */<br>
-+<br>
-+=C2=A0 =C2=A0 gen_ZNSf(R);<br>
-+<br>
-+=C2=A0 =C2=A0 /* R */<br>
-+=C2=A0 =C2=A0 tcg_gen_mov_tl(Rd, R);<br>
-+<br>
-+=C2=A0 =C2=A0 tcg_temp_free_i32(R);<br>
-+<br>
-+=C2=A0 =C2=A0 return true;<br>
-+}<br>
-+<br>
-+<br>
-</blockquote><div><br></div><div>According to specs:</div><div><br></div><d=
-iv><a href=3D"http://ww1.microchip.com/downloads/en/devicedoc/atmel-42505-8=
--bit-avr-microcontrollers-attiny102-attiny104_datasheet.pdf" target=3D"_bla=
-nk">http://ww1.microchip.com/<wbr>downloads/en/devicedoc/atmel-<wbr>42505-8=
--bit-avr-<wbr>microcontrollers-attiny102-<wbr>attiny104_datasheet.pdf</a><b=
-r></div></div><div><br></div><div>... the chips in question have cores with=
- 16 GPRs (that correspond to GPRs R16-R31 of more common AVR cores with 32 =
-GPRs).</div><div><br></div></blockquote><div><br></div><div>There are more =
-examples;</div><div><br></div><div><a href=3D"http://ww1.microchip.com/down=
-loads/en/DeviceDoc/atmel-8127-avr-8-bit-microcontroller-attiny4-attiny5-att=
-iny9-attiny10_datasheet.pdf" target=3D"_blank">http://ww1.microchip.com/<wb=
-r>downloads/en/DeviceDoc/atmel-<wbr>8127-avr-8-bit-<wbr>microcontroller-att=
-iny4-<wbr>attiny5-attiny9-attiny10_<wbr>datasheet.pdf</a><br></div><div><br=
-></div><div>Also ATtiny20, ATtiny40.</div><div><br></div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
-b(204,204,204);padding-left:1ex"><div>How do you handle such cores?</div><d=
-iv><br></div><div>I don&#39;t see here anything preventing usage of all 32 =
-GPRs, resulting, of course, in an inaccurate emulation.</div><div><br></div=
-><div>Thanks,</div><div>Aleksandar</div>
-</blockquote>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
->Best Regards,<br>Michael Rolnik</div>
+<br><br>On Monday, November 25, 2019, Filip Bozuta &lt;<a href=3D"mailto:Fi=
+lip.Bozuta@rt-rk.com">Filip.Bozuta@rt-rk.com</a>&gt; wrote:<br><blockquote =
+class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid=
+;padding-left:1ex">The script <a href=3D"http://checkpatch.pl" target=3D"_b=
+lank">checkpatch.pl</a> located in scripts folder was<br>
+used to detect all errors and warrnings in files:<br>
+=C2=A0 =C2=A0 hw/mips/mips_malta.c<br>
+=C2=A0 =C2=A0 hw/mips/gt64xxx_pci.c<br>
+=C2=A0 =C2=A0 tests/acceptance/linux_ssh_<wbr>mips_malta.py<br>
+<br>
+All these mips malta machine files were edited and<br>
+all the errors and warrings generated by the <a href=3D"http://checkpatch.p=
+l" target=3D"_blank">checkpatch.pl</a><br>
+script were corrected and then the script was<br>
+ran again to make sure there are no more errors and warnings.<br>
+<br>
+Signed-off-by: Filip Bozuta &lt;<a href=3D"mailto:Filip.Bozuta@rt-rk.com">F=
+ilip.Bozuta@rt-rk.com</a>&gt;<br>
+---<br>
+=C2=A0hw/mips/mips_malta.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0| 139 ++++++++++++++++--------------<wbr>-<br>
+=C2=A0tests/acceptance/linux_ssh_<wbr>mips_malta.py |=C2=A0 =C2=A06 +-<br>
+=C2=A02 files changed, 75 insertions(+), 70 deletions(-)<br>
+<br></blockquote><div><br></div><div>Very good cleanup!</div><div><br></div=
+><div><span style=3D"color:rgb(34,34,34);font-size:14px;line-height:22.1200=
+008392334px">Reviewed-by: Aleksandar Markovic &lt;</span><a href=3D"mailto:=
+amarkovic@wavecomp.com" style=3D"font-size:14px;line-height:22.120000839233=
+4px">amarkovic@wavecomp.com</a><span style=3D"color:rgb(34,34,34);font-size=
+:14px;line-height:22.1200008392334px">&gt;</span></div><div><span style=3D"=
+color:rgb(34,34,34);font-size:14px;line-height:22.1200008392334px"><br></sp=
+an></div><div><span style=3D"color:rgb(34,34,34);font-size:14px;line-height=
+:22.1200008392334px">I think this snippet is good, but I am just in case cc=
+-ing Cleber and Eduardo to check if it is in accordance with any applicable=
+ guidelines of our test framework:</span></div><div><br></div><blockquote c=
+lass=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;=
+padding-left:1ex">
+<br>
+diff --git a/tests/acceptance/linux_ssh_<wbr>mips_malta.py b/tests/acceptan=
+ce/linux_ssh_<wbr>mips_malta.py<br>
+index fc13f9e..44e1118 100644<br>
+--- a/tests/acceptance/linux_ssh_<wbr>mips_malta.py<br>
++++ b/tests/acceptance/linux_ssh_<wbr>mips_malta.py<br>
+@@ -99,10 +99,12 @@ class LinuxSSH(Test):<br>
+=C2=A0 =C2=A0 =C2=A0def ssh_command(self, command, is_root=3DTrue):<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<a href=3D"http://self.ssh_logger.info" t=
+arget=3D"_blank">self.ssh_logger.info</a>(command)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0result =3D self.ssh_session.cmd(command)<=
+br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 stdout_lines =3D [line.rstrip() for line in re=
+sult.stdout_text.splitlines(<wbr>)]<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 stdout_lines =3D [line.rstrip() for line<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 in result.stdout_text.splitlines(<wbr>)]<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0for line in stdout_lines:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<a href=3D"http://self.ssh_=
+logger.info" target=3D"_blank">self.ssh_logger.info</a>(line)<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 stderr_lines =3D [line.rstrip() for line in re=
+sult.stderr_text.splitlines(<wbr>)]<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 stderr_lines =3D [line.rstrip() for line<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 in result.stderr_text.splitlines(<wbr>)]<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0for line in stderr_lines:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0self.ssh_logger.warning(lin=
+e)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return stdout_lines, stderr_lines<br>
+-- <br>
+2.7.4<br>
+<br>
+<br>
 </blockquote>
 
---00000000000089f17d0598987674--
+--0000000000009fd643059898f3b9--
 
