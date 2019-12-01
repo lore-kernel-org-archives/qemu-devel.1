@@ -2,127 +2,94 @@ Return-Path: <SRS0=Jz4r=ZX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1E7C432C3
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 14:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80FCCC432C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 14:46:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D9AD206E4
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 14:26:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 400CD20867
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 14:46:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YTxux0Gs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D9AD206E4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OF7eFUaL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 400CD20867
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibQBV-0000Fy-70
-	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 09:26:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55288)
+	id 1ibQUl-0005x8-M4
+	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 09:46:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57210)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1ibQAr-0007QE-2G
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:26:10 -0500
+ (envelope-from <mst@redhat.com>) id 1ibQTA-0005K4-FQ
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:45:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1ibQAp-0000Vn-3j
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:26:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60011
+ (envelope-from <mst@redhat.com>) id 1ibQT5-0000UF-SR
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:45:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54547
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1ibQAo-0000U9-G9
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:26:07 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ibQT5-0000SP-Bz
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:44:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575210365;
+ s=mimecast20190719; t=1575211498;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=27I2EfSPd5tZNNnKEfVwVm7X29o4uCdjP6qFSeeZ1w8=;
- b=YTxux0GsrboYHQjWDflJlA1WTyq2yCoNPADMJDS6RWZYwbMM9CnSapmzYXXpCQIPn7OWkG
- qrCpQtOASNT0NGuZsw2L+StGoaDcbDZyVTcodDBI16lmzgoPAtOlNH818reZXrwhhmPRTV
- FsWuLh57+u30EP1LcNN13MMwn9NGCA0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-4IIvCwOlNFqKTJPPv8zAPA-1; Sun, 01 Dec 2019 09:26:01 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B83E7DB20;
- Sun,  1 Dec 2019 14:26:00 +0000 (UTC)
-Received: from [10.36.116.114] (ovpn-116-114.ams2.redhat.com [10.36.116.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7A9736764D;
- Sun,  1 Dec 2019 14:25:59 +0000 (UTC)
-Subject: Re: [PATCH 16/21] s390/cpu_modules: Fix latent realize() error
- handling bugs
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+ in-reply-to:in-reply-to:references:references;
+ bh=+fezVymmgMynEg185gbpYNZ8g4CgMcPsnxexyVBPdjQ=;
+ b=OF7eFUaL5P92cvrQKSuXYfpzhgf7VN/H9khyKDt9p3+WT0rSaY7MtvCgwGJ6A8FzRgJYCG
+ pFjggF+X4T6wt55o+KXYinZwf3u+LaCOKz/pvo3tFC3NigT+vg1o2QJ2sFV6Bk2CsaGJ0K
+ SkwICAkyRmq8y6K+ZmwlECqOSQulE3s=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-116-GPvtviOBMdaXuNVByHyy4w-1; Sun, 01 Dec 2019 09:44:55 -0500
+Received: by mail-qt1-f197.google.com with SMTP id e37so8305597qtk.7
+ for <qemu-devel@nongnu.org>; Sun, 01 Dec 2019 06:44:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=Xr5toL4MnJEaBP0pyxaqVUMAf6P8R3pGs7GSsgdNaHA=;
+ b=FlWCTRNDLTBfbO+CKP+yC5ePdW6FC8FHe9+pZgVTxiiQ2YhIR8yoVf8mGWygIGAz/e
+ 36oQWhX07bCY7ps+TwBLQODFmm455lrQc/0+oRiDD9TcgBovuetZWA4F64gW4lou8wkN
+ Y+r03Gy5v3Vn6P2IAgBgbn+ThmmiQtAgyPG0zB1GToA2i5DKIb6fLqAnJ/SYd8WMg06S
+ Cgt5iXzfqKbiXPAPOJlGLRUqT2xkBeObQ3/KG1CkFuFvXYOhtTAGt7BoMlDce+9fXVyL
+ 2HMyWuMT/RWKho0sCp3GvGuXH5H27ZLoGGwg0t/Ef0A1yxTUFBNSFIuhHl/6tqSPkTLw
+ P5Bg==
+X-Gm-Message-State: APjAAAVKu50ldXDPXYxPmn/j4VxtgeG5uQmcAEURddxxLIukWQv7eWoB
+ g9NYypkc+CK4muhqhU1EGppldb0A1fSVR0ySJEz5EQYs0vcxnrFzk52Y2/vYFe2P1SGiRJKsjcW
+ YeUpl4blGm4ZFZHQ=
+X-Received: by 2002:a0c:804c:: with SMTP id 70mr28912624qva.81.1575211494629; 
+ Sun, 01 Dec 2019 06:44:54 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxrp5Oth7ZLHhxm0o1MP5WjnFL3w7hsrpXKWbz6qEJ6in88m/A77SF3+j13QECozi6aZs5gdQ==
+X-Received: by 2002:a0c:804c:: with SMTP id 70mr28912592qva.81.1575211494397; 
+ Sun, 01 Dec 2019 06:44:54 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+ by smtp.gmail.com with ESMTPSA id 184sm12905124qke.73.2019.12.01.06.44.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 01 Dec 2019 06:44:53 -0800 (PST)
+Date: Sun, 1 Dec 2019 09:44:47 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 00/21] Error handling fixes, may contain 4.2 material
+Message-ID: <20191201094354-mutt-send-email-mst@kernel.org>
 References: <20191130194240.10517-1-armbru@redhat.com>
- <20191130194240.10517-17-armbru@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <357b5595-23bf-3884-5527-c22012483396@redhat.com>
-Date: Sun, 1 Dec 2019 15:25:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191130194240.10517-17-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 4IIvCwOlNFqKTJPPv8zAPA-1
+In-Reply-To: <20191130194240.10517-1-armbru@redhat.com>
+X-MC-Unique: GPvtviOBMdaXuNVByHyy4w-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,40 +101,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, Cornelia Huck <cohuck@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Corey Minyard <cminyard@mvista.com>,
+ vsementsov@virtuozzo.com,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ David Hildenbrand <david@redhat.com>,
+ Nishanth Aravamudan <naravamudan@digitalocean.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Jens Freimann <jfreimann@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30.11.19 20:42, Markus Armbruster wrote:
-> get_max_cpu_model() crashes when kvm_s390_get_host_cpu_model() fails
-> and its @errp argument is null.
-> 
-> apply_cpu_model() crashes when kvm_s390_apply_cpu_model() fails and
-> its @errp argument is null.
-> 
-> s390_realize_cpu_model() crashes when get_max_cpu_model() or
-> check_compatibility() fail, and its @errp argument is null.
-> 
-> All three messed up in commit 80560137cf "s390x/cpumodel: check and
-> apply the CPU model".
-> 
-> The bugs can't bite as no caller actually passes null.  Fix them
-> anyway.
-> 
+On Sat, Nov 30, 2019 at 08:42:19PM +0100, Markus Armbruster wrote:
+> PATCH 2-4 fix crash bugs.  Including them would be a no-brainer at
+> -rc0.  But we're post -rc3, and even for crash bugs we require a
+> certain likelihood of users getting bitten.
+>=20
+> Jens, please assess impact of PATCH 2's crash bug.
+>=20
+> Kevin, please do the same for PATCH 3.
+>=20
+> Daniel, please do the same for PATCH 4.
 
-Subject is wrong, should e.g., start with "s390x/cpumodels". (I am not
-aware of CPU modules :) )
+virtio things:
 
-[...]
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Same comment regarding "local_err" and "BUG".
+Jason do you want to pick these?
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-Thanks,
-
-David / dhildenb
+> The remainder is definitely not 4.2 material.
+>=20
+> Cc: "Daniel P. Berrang=E9" <berrange@redhat.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Corey Minyard <cminyard@mvista.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Jens Freimann <jfreimann@redhat.com>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Nishanth Aravamudan <naravamudan@digitalocean.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+>=20
+> Markus Armbruster (21):
+>   net/virtio: Drop useless n->primary_dev not null checks
+>   net/virtio: Fix failover error handling crash bugs
+>   block/file-posix: Fix laio_init() error handling crash bug
+>   crypto: Fix certificate file error handling crash bug
+>   crypto: Fix typo in QCryptoTLSSession's <example> comment
+>   io: Fix Error usage in a comment <example>
+>   tests: Clean up initialization of Error *err variables
+>   exec: Fix latent file_ram_alloc() error handling bug
+>   hw/acpi: Fix latent legacy CPU plug error handling bug
+>   hw/core: Fix latent fit_load_fdt() error handling bug
+>   hw/ipmi: Fix latent realize() error handling bugs
+>   qga: Fix latent guest-get-fsinfo error handling bug
+>   memory-device: Fix latent memory pre-plug error handling bugs
+>   s390x/event-facility: Fix latent realize() error handling bug
+>   s390x/cpu_models: Fix latent feature property error handling bugs
+>   s390/cpu_modules: Fix latent realize() error handling bugs
+>   s390x: Fix latent query-cpu-model-FOO error handling bugs
+>   s390x: Fix latent query-cpu-definitions error handling bug
+>   error: Clean up unusual names of Error * variables
+>   hw/intc/s390: Simplify error handling in kvm_s390_flic_realize()
+>   tests-blockjob: Use error_free_or_abort()
+>=20
+>  include/crypto/tlssession.h         |  2 +-
+>  include/io/task.h                   |  2 +-
+>  block/file-posix.c                  |  2 +-
+>  crypto/tlscredsx509.c               |  2 +-
+>  exec.c                              |  6 +-
+>  hw/acpi/cpu_hotplug.c               | 10 +--
+>  hw/core/loader-fit.c                | 15 ++---
+>  hw/intc/s390_flic_kvm.c             | 16 +++--
+>  hw/ipmi/isa_ipmi_bt.c               |  7 ++-
+>  hw/ipmi/isa_ipmi_kcs.c              |  7 ++-
+>  hw/ipmi/pci_ipmi_bt.c               |  6 +-
+>  hw/ipmi/pci_ipmi_kcs.c              |  6 +-
+>  hw/mem/memory-device.c              |  6 +-
+>  hw/net/virtio-net.c                 | 27 ++++----
+>  hw/ppc/spapr_pci.c                  | 16 ++---
+>  hw/ppc/spapr_pci_nvlink2.c          | 10 +--
+>  hw/s390x/event-facility.c           |  6 +-
+>  qga/commands-posix.c                |  6 +-
+>  target/s390x/cpu_models.c           | 98 +++++++++++++++++------------
+>  tests/test-blockjob.c               | 15 +++--
+>  tests/test-qobject-output-visitor.c |  8 +--
+>  tests/test-string-output-visitor.c  |  4 +-
+>  22 files changed, 154 insertions(+), 123 deletions(-)
+>=20
+> --=20
+> 2.21.0
 
 
