@@ -2,67 +2,67 @@ Return-Path: <SRS0=Jz4r=ZX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DF1C432C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 14:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1E7C432C3
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 14:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FB202071F
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 14:16:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D9AD206E4
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 14:26:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZvEThASi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FB202071F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YTxux0Gs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D9AD206E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibQ1v-0003iu-5K
-	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 09:16:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54383)
+	id 1ibQBV-0000Fy-70
+	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 09:26:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1ibQ0i-0003Bi-Ta
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:15:42 -0500
+ (envelope-from <david@redhat.com>) id 1ibQAr-0007QE-2G
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:26:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1ibQ0h-0001N7-Gy
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:15:40 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46853
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1ibQAp-0000Vn-3j
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:26:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60011
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1ibQ0h-0001Ln-A6
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:15:39 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1ibQAo-0000U9-G9
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 09:26:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575209738;
+ s=mimecast20190719; t=1575210365;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=cU7tFu5jtBI9xrwd1+1y80FbvwOx0RIAVC/lTJWOxuU=;
- b=ZvEThASiYezfsKG9fFeUXHY1NjPIQn3RY2LXykH8fFWVBJBA6V/Me2QPUnmMMHo9n0472/
- pJI9qZ4xcg9qqFrT2aSLMmU7jBGPUOsYtNyke2XTneYXasiFMmRQz1aqkAJCmvrf29RTIR
- v2J35vqtUoepUKYEmE45ka9/tW7zO6g=
+ bh=27I2EfSPd5tZNNnKEfVwVm7X29o4uCdjP6qFSeeZ1w8=;
+ b=YTxux0GsrboYHQjWDflJlA1WTyq2yCoNPADMJDS6RWZYwbMM9CnSapmzYXXpCQIPn7OWkG
+ qrCpQtOASNT0NGuZsw2L+StGoaDcbDZyVTcodDBI16lmzgoPAtOlNH818reZXrwhhmPRTV
+ FsWuLh57+u30EP1LcNN13MMwn9NGCA0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-WNCzgtR0NxSigKuscg1v-Q-1; Sun, 01 Dec 2019 09:15:36 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-369-4IIvCwOlNFqKTJPPv8zAPA-1; Sun, 01 Dec 2019 09:26:01 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E038FDB20;
- Sun,  1 Dec 2019 14:15:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B83E7DB20;
+ Sun,  1 Dec 2019 14:26:00 +0000 (UTC)
 Received: from [10.36.116.114] (ovpn-116-114.ams2.redhat.com [10.36.116.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A21AA5C28C;
- Sun,  1 Dec 2019 14:15:34 +0000 (UTC)
-Subject: Re: [PATCH 13/21] memory-device: Fix latent memory pre-plug error
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7A9736764D;
+ Sun,  1 Dec 2019 14:25:59 +0000 (UTC)
+Subject: Re: [PATCH 16/21] s390/cpu_modules: Fix latent realize() error
  handling bugs
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20191130194240.10517-1-armbru@redhat.com>
- <20191130194240.10517-14-armbru@redhat.com>
+ <20191130194240.10517-17-armbru@redhat.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -108,21 +108,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <5306b8e8-fea3-c482-badb-9b78891d7e27@redhat.com>
-Date: Sun, 1 Dec 2019 15:15:33 +0100
+Message-ID: <357b5595-23bf-3884-5527-c22012483396@redhat.com>
+Date: Sun, 1 Dec 2019 15:25:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191130194240.10517-14-armbru@redhat.com>
+In-Reply-To: <20191130194240.10517-17-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: WNCzgtR0NxSigKuscg1v-Q-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 4IIvCwOlNFqKTJPPv8zAPA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,58 +134,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com
+Cc: vsementsov@virtuozzo.com, Cornelia Huck <cohuck@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 30.11.19 20:42, Markus Armbruster wrote:
-> memory_device_get_free_addr() crashes when
-> memory_device_check_addable() fails and its @errp argument is null.
-> Messed up in commit 1b6d6af21b "pc-dimm: factor out capacity and slot
-> checks into MemoryDevice".
+> get_max_cpu_model() crashes when kvm_s390_get_host_cpu_model() fails
+> and its @errp argument is null.
 > 
-> The bug can't bite as no caller actually passes null.  Fix it anyway.
+> apply_cpu_model() crashes when kvm_s390_apply_cpu_model() fails and
+> its @errp argument is null.
 > 
-> Cc: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/mem/memory-device.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+> s390_realize_cpu_model() crashes when get_max_cpu_model() or
+> check_compatibility() fail, and its @errp argument is null.
 > 
-> diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
-> index aef148c1d7..4bc9cf0917 100644
-> --- a/hw/mem/memory-device.c
-> +++ b/hw/mem/memory-device.c
-> @@ -99,6 +99,7 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->                                              uint64_t align, uint64_t size,
->                                              Error **errp)
->  {
-> +    Error *err = NULL;
->      GSList *list = NULL, *item;
->      Range as, new = range_empty;
->  
-> @@ -123,8 +124,9 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
->          return 0;
->      }
->  
-> -    memory_device_check_addable(ms, size, errp);
-> -    if (*errp) {
-> +    memory_device_check_addable(ms, size, &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
->          return 0;
->      }
+> All three messed up in commit 80560137cf "s390x/cpumodel: check and
+> apply the CPU model".
+> 
+> The bugs can't bite as no caller actually passes null.  Fix them
+> anyway.
+> 
 
-I remember that some time ago, the best practice was to use "local_err",
-what is the latest state of that?
+Subject is wrong, should e.g., start with "s390x/cpumodels". (I am not
+aware of CPU modules :) )
 
-I still disagree that these are BUGs or even latent BUGs. If somebody
-things these are BUGs and not cleanups, then we should probably have
-proper "Fixes: " tags instead.
+[...]
+
+Same comment regarding "local_err" and "BUG".
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
-
 
 -- 
 Thanks,
