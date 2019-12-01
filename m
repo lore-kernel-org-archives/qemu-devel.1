@@ -2,96 +2,92 @@ Return-Path: <SRS0=Jz4r=ZX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F33EC432C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 21:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE25C432C3
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 21:49:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58B472146E
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 21:41:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85E77215E5
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 21:49:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AyFso0rN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58B472146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bcy2e/Hi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85E77215E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibWy4-0004XS-Gx
-	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 16:41:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56013)
+	id 1ibX5f-00074z-Ix
+	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 16:49:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56762)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ibWxL-00044Z-0O
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 16:40:39 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ibX4h-0006YG-Kj
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 16:48:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ibWxH-00019Y-H8
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 16:40:36 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:50067
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ibWxH-00016W-8i
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 16:40:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575236434;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=tG5TIZfLOA8xt1lh5rIij2KaaBjofpenlumD9fhRM3E=;
- b=AyFso0rNVXN6qyAcTA6x1rXijuJjzSp9wBkyWV/TJBRE0qLJySQSm2fNLSpIZOR3eA9v0A
- ZLFVa2EieH7MMzFap4pajmlIknUjcjb89oLZnYeeeehsnuu+Q9N9+cousk13/gfXJqO48/
- sFaBuQ/LFeoElggtJzqNVzE2McR8TyM=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-cUhebpeKNG-L_HV5gdkfbA-1; Sun, 01 Dec 2019 16:40:31 -0500
-Received: by mail-qt1-f197.google.com with SMTP id f14so23264363qto.2
- for <qemu-devel@nongnu.org>; Sun, 01 Dec 2019 13:40:30 -0800 (PST)
+ (envelope-from <richard.henderson@linaro.org>) id 1ibX4g-0000Sp-4y
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 16:48:15 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39800)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ibX4e-0000RH-GP
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 16:48:13 -0500
+Received: by mail-pg1-x543.google.com with SMTP id b137so15022856pga.6
+ for <qemu-devel@nongnu.org>; Sun, 01 Dec 2019 13:48:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Z1YBpPGsXlTAyNWuYDZ+Qy6PHTfRyN2DEWkmpIOR4Ow=;
+ b=Bcy2e/HiWT+2wqaXFfxxYYaVxBA2EmHY8jsQgPFmFL//XHLH9ThifwGEsITZ9BVUiG
+ iu6czaR/HUBQutBFTL1euV86TNlRnHrXqiO4nrnbTARcxqjwbEPYtMwBf6P0TyDLgSRR
+ 9f0bGjCoJIVNya/W/zhGCnDeLuKSbv+LnKIKkEORaQinGbORVTjPG2nn7wp7plhJbkDN
+ SLrE3OV8M54wYMjE4H5518yZVAN3e5egIpIEJE0s+/9B2VFI9aQvCs8viz3y1JsdYBV7
+ Wet1QRs8f0Fy8qJMQqG121+ANJscNBsXqExB/SyEfCWySaTBFLXyAzn8Z1oLwiIlDXvD
+ wT1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=JTGzgGPMZkAos2frxTFOW4GGlQLGb9Frjb4++KqTi/M=;
- b=Q4x7y+EbyJ2HFTj6u5ODw45mkNVt4F0x3YNF0ZyubFB8dI3+hpnLWA4G9a9ndotWE+
- CaZD5WLwRs3KPlhEkxpqMzoPXnlPxiEgsDpMRSpwwuSFtNn6l8Sn0dWveBdiaiyZutt0
- hmqjk7j74/3ZuejLA7JDx5DNUrw++/6pNZVSXd63Ik20ks0vU8lQN7+dHuq10Y4pivPK
- ct2y1p9gxs2q9osyO2YjdXbMVZHkQyIug029y7j0Kv6b0Lt7EcpPJ5ujUVh/Z56P7eG3
- jpZ/+YkXD0s8C+mMJM6XLMzov5LzhsKuJGtQAqV+u3rPRIKJ9dgXe9A3831T3tnYiDlT
- QRjQ==
-X-Gm-Message-State: APjAAAWpsg4Ak3iqJ/yrfRoOPfap4Jo5YVk4SWqLMUJzws3egw//UH9H
- cxMuR0HsvJ5SXMtaPxNN24dfXlwdThMOyID4itnojQXNpygbOkTA8oxdtrKswJh919k0Jkb/Yck
- uYhlcjbC/mgX3qqg=
-X-Received: by 2002:a0c:9304:: with SMTP id d4mr20056119qvd.12.1575236430597; 
- Sun, 01 Dec 2019 13:40:30 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwJvP9j5S9q3Ge/KOdZS8vWQSybrc86pCylj6ImGZeLhx1dUelTS/voklZcfzNpx7tuR/qMng==
-X-Received: by 2002:a0c:9304:: with SMTP id d4mr20056096qvd.12.1575236430400; 
- Sun, 01 Dec 2019 13:40:30 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id r48sm15329424qte.49.2019.12.01.13.40.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 01 Dec 2019 13:40:29 -0800 (PST)
-Date: Sun, 1 Dec 2019 16:40:22 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: David Miller <davem@davemloft.net>
-Subject: Re: [RFC net-next 08/18] tun: run offloaded XDP program in Tx path
-Message-ID: <20191201163730-mutt-send-email-mst@kernel.org>
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
- <20191126100744.5083-9-prashantbhole.linux@gmail.com>
- <f39536e4-1492-04e6-1293-302cc75e81bf@gmail.com>
- <20191201.125621.1568040486743628333.davem@davemloft.net>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Z1YBpPGsXlTAyNWuYDZ+Qy6PHTfRyN2DEWkmpIOR4Ow=;
+ b=VNW34o/pl9K03Bs/3QZBDxS9QkYgWt5DJjJ6QHF12viHQpZj8KkMgrGq+M5Ss/Pyqw
+ IXtnMT0pFrkZr2AV62SU4+hxfV0/riMtCYJuBz/iNeo/sWNY20C0S+Xbnuz+mhbTLDaV
+ YM9BCWkfIH0GpEBbnYbk2sWp3jh7v1RCf8O1+8bPNZHtQ8r+AA0pH0K3H0Y323jYvwue
+ ADmNf63xVvK1U215KSgZ/hyZggIWT3baFYSthF2Vlpu32YW97l2F8RwoysD1HqGJPe83
+ lPdW55ii7CYWpr4qqsBpPpO3n8zuW2u/IFKjZLdHvHrcemT4cBQ/YBGwZkP5HIjCFkkT
+ 3dLw==
+X-Gm-Message-State: APjAAAXcEx9R3WBDgQSctrzT7IlvVMwWVDnzDumpk8RHs0MF47NT6+Bq
+ d0lHeBqVi1mhDk1LG67d+hLCaQ==
+X-Google-Smtp-Source: APXvYqwEC2Xkw7K5SrShv2yNWBnHa5b++VqvZqIE+bGbaeaxWubixqGxAJq8A1K//vqQfSWtuX9ykQ==
+X-Received: by 2002:a63:c141:: with SMTP id p1mr2038249pgi.326.1575236891073; 
+ Sun, 01 Dec 2019 13:48:11 -0800 (PST)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id a6sm28507568pgg.25.2019.12.01.13.48.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 01 Dec 2019 13:48:10 -0800 (PST)
+Subject: Re: [PATCH] configure: Use lld --image-base for --disable-pie user
+ mode binaries
+To: Fangrui Song <i@maskray.me>, qemu-devel@nongnu.org
+References: <20191116052815.nop3xkmd4umqsdsb@google.com>
+ <20191120210200.hvwlfuzo2vy5d5n4@gmail.com>
+ <20191127183631.n3kfz7k5szri27b3@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e5bf2584-bae2-8dda-a2b2-8930ee17ea86@linaro.org>
+Date: Sun, 1 Dec 2019 13:48:08 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <20191201.125621.1568040486743628333.davem@davemloft.net>
-X-MC-Unique: cUhebpeKNG-L_HV5gdkfbA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20191127183631.n3kfz7k5szri27b3@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,39 +99,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: songliubraving@fb.com, jakub.kicinski@netronome.com, hawk@kernel.org,
- daniel@iogearbox.net, netdev@vger.kernel.org, jasowang@redhat.com,
- john.fastabend@gmail.com, ast@kernel.org, qemu-devel@nongnu.org,
- prashantbhole.linux@gmail.com, kvm@vger.kernel.org, dsahern@gmail.com,
- yhs@fb.com, andriin@fb.com, kafai@fb.com
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Dec 01, 2019 at 12:56:21PM -0800, David Miller wrote:
-> From: David Ahern <dsahern@gmail.com>
-> Date: Sun, 1 Dec 2019 09:39:54 -0700
->=20
-> > Below you just drop the packet which is going to be a bad user
-> > experience. A better user experience is to detect XDP return codes a
-> > program uses, catch those that are not supported for this use case and
-> > fail the install of the program.
->=20
-> This is not universally possible.
->=20
-> Return codes can be calculated dynamically, come from maps potentially
-> shared with other bpf programs, etc.
->=20
-> So unfortunately this suggestion is not tenable.
+On 11/27/19 6:36 PM, Fangrui Song wrote:
+> On 2019-11-20, Fangrui Song wrote:
+>> On 2019-11-15, Fangrui Song wrote:
+>>> For lld, --image-base is the preferred way to set the base address.
+>>> lld does not actually implement -Ttext-segment, but treats it as an alias for
+>>> -Ttext. -Ttext-segment=0x60000000 combined with --no-rosegment can
+>>> create a 1.6GB executable.
+>>>
+>>> Fix the problem by using --image-base for lld. GNU ld and gold will
+>>> still get -Ttext-segment. Also delete the ld --verbose fallback introduced
+>>> in 2013, which is no longer relevant or correct (the default linker
+>>> script has changed).
+>>>
+>>> Signed-off-by: Fangrui Song <i@maskray.me>
+>>> ---
+>>> configure | 33 ++++++++++++---------------------
+>>> 1 file changed, 12 insertions(+), 21 deletions(-)
+>>>
+>>> diff --git a/configure b/configure
+>>> index 6099be1d84..2d45af0d09 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -6336,43 +6336,34 @@ fi
+>>>
+>>> # Probe for the need for relocating the user-only binary.
+>>> if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ];
+>>> then
+>>> -  textseg_addr=
+>>> +  image_base=
+>>>   case "$cpu" in
+>>>     arm | i386 | ppc* | s390* | sparc* | x86_64 | x32)
+>>> -      # ??? Rationale for choosing this address
+>>> -      textseg_addr=0x60000000
+>>> +      # An arbitrary address that makes it unlikely to collide with user
+>>> +      # programs.
 
-Right. But it is helpful to expose the supported functionality
-to guest in some way, if nothing else then so that
-guests can be moved between different hosts.
+Please don't replace this ??? with an arbitrary rationale, which clearly
+doesn't apply to all of these hosts.
 
-Also, we need a way to report this kind of event to guest
-so it's possible to figure out what went wrong.
+>>> +      image_base=0x60000000
+>>>       ;;
+>>>     mips)
+>>>       # A 256M aligned address, high in the address space, with enough
+>>>       # room for the code_gen_buffer above it before the stack.
 
---=20
-MST
+This is the only one with a proper rationale.
 
+That said, I'm not sure that the proper way to handle this issue with lld is to
+drop this code entirely.
+
+The best way to handle the underlying issue -- address conflict between
+interpreter and guest binary -- is PIE, for which this code is skipped.
+
+After that, we go to some pain to choose a guest_base address that allows the
+guest binary to load around the interpreter's reserved addresses.
+
+So what's left that this messing about with link addresses buys us?
+
+
+r~
 
