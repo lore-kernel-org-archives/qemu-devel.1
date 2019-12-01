@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6379FC432C0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFAF9C432C3
 	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 11:26:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22DBA20725
+	by mail.kernel.org (Postfix) with ESMTPS id AD40A20725
 	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 11:26:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="btUKoCBO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22DBA20725
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dcf9Aoal"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD40A20725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibNNL-00038R-Kg
-	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 06:26:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37725)
+	id 1ibNNM-00039x-2j
+	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 06:26:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37635)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ibNDw-0001fH-NB
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:17:09 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ibNDV-0001Oj-K5
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:16:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ibNDv-0000G6-Hn
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:17:08 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48650
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ibNDO-0008OA-8o
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:16:36 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41244
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1ibNDv-0000FX-Dn
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:17:07 -0500
+ id 1ibNDM-0008NM-UK
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:16:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575199026;
+ s=mimecast20190719; t=1575198992;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=b5dSVQLjVail4scWe0BcLaOGlLN2baG+Nh8SgHef6BU=;
- b=btUKoCBOXVgP1EzFDgERdJRa0xiVrD//s0HtBZpG6wq056GXKn2rZoF2/xfV46mjxlTXHC
- EiAgU1J109OjyeIdYUp/LgOFw4lT59KjCwZxbw9WKbpTOo0ANkQfp/R2zsNEDyUQ5mYSA+
- r3ROBDl/EwouyTI/0747qEZ8XsKHP08=
+ bh=ZF2NCOPuyjVU1ZJiB3EBr3etJoOFfzGwItPjXJNJ7Rw=;
+ b=dcf9Aoaly09gu5/QWDhB9XqsAzW0eO9y+hCRS4UNVNvGzfA7UTuvnWOPqoDAow2c4nXBif
+ 275ZP7Qap77pvGqSTymSyisCKxRjFeuWp6RZW0PgIF+CmOof3hgDXpL2m2yVKmiuBNFyY7
+ tEWBtQHz81kZ6YCddD2ty0FHAiMBy/4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-yk_XX_vnMfuJn23LGqJ01A-1; Sun, 01 Dec 2019 06:17:05 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-85-VywniazEOs2ZmY6k6LLJyg-1; Sun, 01 Dec 2019 06:16:29 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18E7D10054E3
- for <qemu-devel@nongnu.org>; Sun,  1 Dec 2019 11:17:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 745E380183C
+ for <qemu-devel@nongnu.org>; Sun,  1 Dec 2019 11:16:28 +0000 (UTC)
 Received: from localhost (unknown [10.36.112.15])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 97BC260BF7;
- Sun,  1 Dec 2019 11:16:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 447B75D6A0;
+ Sun,  1 Dec 2019 11:16:23 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/26] qstring: add qstring_free()
-Date: Sun,  1 Dec 2019 15:15:14 +0400
-Message-Id: <20191201111531.1136947-10-marcandre.lureau@redhat.com>
+Subject: [PATCH 05/26] object: avoid extra class property key duplication
+Date: Sun,  1 Dec 2019 15:15:10 +0400
+Message-Id: <20191201111531.1136947-6-marcandre.lureau@redhat.com>
 In-Reply-To: <20191201111531.1136947-1-marcandre.lureau@redhat.com>
 References: <20191201111531.1136947-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: yk_XX_vnMfuJn23LGqJ01A-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: VywniazEOs2ZmY6k6LLJyg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,69 +91,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similar to g_string_free(), optionally return the underlying char*.
+Like object properties, no need to duplicate property name, as it is
+owned already by ObjectProperty value.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/qstring.h |  1 +
- qobject/qstring.c          | 27 ++++++++++++++++++++++-----
- 2 files changed, 23 insertions(+), 5 deletions(-)
+ qom/object.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/qapi/qmp/qstring.h b/include/qapi/qmp/qstring.h
-index 3e83e3a95d..e2e356e5e7 100644
---- a/include/qapi/qmp/qstring.h
-+++ b/include/qapi/qmp/qstring.h
-@@ -33,6 +33,7 @@ void qstring_append_int(QString *qstring, int64_t value);
- void qstring_append(QString *qstring, const char *str);
- void qstring_append_chr(QString *qstring, int c);
- bool qstring_is_equal(const QObject *x, const QObject *y);
-+char *qstring_free(QString *qstring, bool return_str);
- void qstring_destroy_obj(QObject *obj);
+diff --git a/qom/object.c b/qom/object.c
+index 935491d334..f1e1e0947b 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -307,7 +307,7 @@ static void type_initialize(TypeImpl *ti)
+         memcpy(ti->class, parent->class, parent->class_size);
+         ti->class->interfaces =3D NULL;
+         ti->class->properties =3D g_hash_table_new_full(
+-            g_str_hash, g_str_equal, g_free, object_property_free);
++            g_str_hash, g_str_equal, NULL, object_property_free);
 =20
- #endif /* QSTRING_H */
-diff --git a/qobject/qstring.c b/qobject/qstring.c
-index 1c6897df00..b66a2c35f2 100644
---- a/qobject/qstring.c
-+++ b/qobject/qstring.c
-@@ -149,16 +149,33 @@ bool qstring_is_equal(const QObject *x, const QObject=
- *y)
-                    qobject_to(QString, y)->string);
- }
+         for (e =3D parent->class->interfaces; e; e =3D e->next) {
+             InterfaceClass *iface =3D e->data;
+@@ -334,7 +334,7 @@ static void type_initialize(TypeImpl *ti)
+         }
+     } else {
+         ti->class->properties =3D g_hash_table_new_full(
+-            g_str_hash, g_str_equal, g_free, object_property_free);
++            g_str_hash, g_str_equal, NULL, object_property_free);
+     }
 =20
-+/**
-+ * qstring_free(): Free the memory allocated by a QString object
-+ *
-+ * Return: if @return_str, return the underlying string, to be
-+ * g_free(), otherwise NULL is returned.
-+ */
-+char *qstring_free(QString *qstring, bool return_str)
-+{
-+    char *rv =3D NULL;
-+
-+    if (return_str) {
-+        rv =3D qstring->string;
-+    } else {
-+        g_free(qstring->string);
-+    }
-+
-+    g_free(qstring);
-+
-+    return rv;
-+}
-+
- /**
-  * qstring_destroy_obj(): Free all memory allocated by a QString
-  * object
-  */
- void qstring_destroy_obj(QObject *obj)
- {
--    QString *qs;
--
-     assert(obj !=3D NULL);
--    qs =3D qobject_to(QString, obj);
--    g_free(qs->string);
--    g_free(qs);
-+    qstring_free(qobject_to(QString, obj), FALSE);
+     ti->class->type =3D ti;
+@@ -1154,7 +1154,7 @@ object_class_property_add(ObjectClass *klass,
+     prop->release =3D release;
+     prop->opaque =3D opaque;
+=20
+-    g_hash_table_insert(klass->properties, g_strdup(name), prop);
++    g_hash_table_insert(klass->properties, prop->name, prop);
+=20
+     return prop;
  }
 --=20
 2.24.0
