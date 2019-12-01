@@ -2,84 +2,88 @@ Return-Path: <SRS0=Jz4r=ZX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1963C432C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 18:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3222EC432C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 18:23:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 937742082E
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 18:11:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 004E820716
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 18:23:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n/UDRgvP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 937742082E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="Fb3kBtlE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 004E820716
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibTgg-00019u-6A
-	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 13:11:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54023)
+	id 1ibTsd-0006ko-3S
+	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 13:23:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ibTfw-0000Og-La
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 13:10:29 -0500
+ (envelope-from <cminyard@mvista.com>) id 1ibTrn-0006IF-Jp
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 13:22:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ibTfv-0005uL-D3
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 13:10:28 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46875)
+ (envelope-from <cminyard@mvista.com>) id 1ibTrl-0005Ug-Mo
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 13:22:42 -0500
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:44006)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ibTfv-0005td-7G
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 13:10:27 -0500
-Received: by mail-ot1-x344.google.com with SMTP id g18so1903360otj.13
- for <qemu-devel@nongnu.org>; Sun, 01 Dec 2019 10:10:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=NxQmc6i9SKqyT46GvFo+rJByHzQnfvacuhJg7nhcVS0=;
- b=n/UDRgvPmyoNrnn2LSaYTgIsYrMGHSMx4XteoNTJRCFv0yeX9bwLxdrYFusQt180bN
- N+q4gZiGs8b01RAYQZrxnzYY2PRJfaBGYUDVljzbnQC31J9PvZT9tRghK5WyxfOuitYd
- SJkCDcSVP5mVs2hQmUN9lX+AxFLhHDLh5qDU3R1tAkYyyZ6ZsWVPiDTzC9VkArmlG5S2
- PyjXqSuD+tnELNC4cBgaphq1x93kwZvMotBvwd4I1B4X8RzSZxa/zD9HwR1Tx3kbss+i
- vYQWCMtF9PVk7PEP1XC/D2taSg03sVkLEZdAHTAZv0ot7qWJksTqG3qopve2eIEJSHMl
- D40Q==
+ (Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1ibTrl-0005QS-Ai
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 13:22:41 -0500
+Received: by mail-yb1-xb41.google.com with SMTP id r201so13559127ybc.10
+ for <qemu-devel@nongnu.org>; Sun, 01 Dec 2019 10:22:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mvista-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=8QfZ+VHkLC681gwzKj8avS3dfY0eBHB1p3xC65/UmSc=;
+ b=Fb3kBtlE9T28qq8Bf/8WsORm8lN7AxUrAHoyKWMEnm8lWPY7uCjhjrCMQ95yGMBzfu
+ pLyr9rZfTUDqxjm6+sbVuoY1t5lIMyQg7horjItb7Vh1Zd/PzAIQkZow/xPbROC3x0GB
+ dU0mIs+vmkhXyPjrgS9ImC5rW/7cTAcHeQQbQZCD+/SVAZyt75jDlgqCwApN3yrp9dyb
+ 1t0P9z+pAvr90RdmPnR7xZkiYB+VNJ8M6U7243/VxEq/6pymqz3e5NoBLlgUIlF7x8FI
+ 8Vn6RtglfAIPpKtrFszyGW2FNua14GqzTlGuo5FycD/uF2glJs2rnEGC2mxB/PHjFfFm
+ 3tBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=NxQmc6i9SKqyT46GvFo+rJByHzQnfvacuhJg7nhcVS0=;
- b=U7hEFWtSVFNNERRrwzfF0tM47BW32Wa7pIAcxnOdCQ3How6x4zvJU9Ispthz2LC2ce
- E6JftPIkUz6EpJVf8MFvsFqAKaFi/VDsStnu24l0Reizd7JPmdCHU7VyXA3arGvDh3iu
- 2oN8JXlRlkiPN45Jt4djcjEiWL2cnjE9IF3AfMKFRrH7wNcsRkOD3z8L1nLO35NxoCB5
- s1H9bcfYJnVSq1/RvoSHhG+vtf/neK12MCI7gg+f3PFwAs0nQv4KqrgNNRlD/CwSm+wb
- jowJr4yYcPJhKHpDufNasPFW+QetVZJSBg4Nkdw4p8NWObHuXQ/t6XZgcTSiScg01GgO
- yDXw==
-X-Gm-Message-State: APjAAAUGKux7jPqOLKPfKRqWN1w257npkbSG3hmDsSNWsbDJRPrE+RiH
- tazOT0hK5HuevjnBdmTERnkiuDlwtPJFhUllt9n1MA==
-X-Google-Smtp-Source: APXvYqzAgeEvhuhDq83Yt5N4ciT/qHbHWfVVG7GL0d3mVXKr5pPisce1tWOVdzAY4azmeE1YHFogjIdzUYD9qxX5qiw=
-X-Received: by 2002:a9d:6745:: with SMTP id w5mr1212678otm.221.1575223826480; 
- Sun, 01 Dec 2019 10:10:26 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=8QfZ+VHkLC681gwzKj8avS3dfY0eBHB1p3xC65/UmSc=;
+ b=Y2MFYim/jEuktW7pbDE5oxuJC7Zik//W552qJpB/w71JWebhhqgzhGeY7AeZ+Prd8v
+ r0ud3gAIl32uicu0bRnvXIUqzMcd7t7BxAVCL+CarQhEkbumYzXWqyEfdlgt/V9vAJBj
+ a6j2yimGsVvQDDr16loNIoNSEMlDZCVu9RkX8ETj0d5l4zZE+u1wtA3PKj9XBhZ1PcB7
+ F1uIOZTfebjP+05wcZhnOoI+TJjH513XvzsK3EmUn+aDcAsMK8lkxuVMTHtchcZCriN+
+ zYws7hJd5Ynl9Yae1xqu6vHIHeyqPABECpgWJSEc3D/OeAZGVDs0U/cj2V8H0eobmcxW
+ 6ieg==
+X-Gm-Message-State: APjAAAXBGD8xN3KdVPatYCFacMrOfczFfjPya5SiRf6t3qL9nFna/ZRR
+ WsEXL2GWQyTHYqdQ1rljwOll2w==
+X-Google-Smtp-Source: APXvYqxWFmMq4GshjCSrjn9b5LMXEXxcowrR++cJ+zv7mfYmKEIUi1THVsmAP59Lx/POeRqF0jrBMA==
+X-Received: by 2002:a25:6789:: with SMTP id
+ b131mr48651468ybc.429.1575224557888; 
+ Sun, 01 Dec 2019 10:22:37 -0800 (PST)
+Received: from minyard.net ([47.184.136.59])
+ by smtp.gmail.com with ESMTPSA id m16sm8138621ywa.90.2019.12.01.10.22.36
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Sun, 01 Dec 2019 10:22:36 -0800 (PST)
+Date: Sun, 1 Dec 2019 12:22:34 -0600
+From: Corey Minyard <cminyard@mvista.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 11/21] hw/ipmi: Fix latent realize() error handling bugs
+Message-ID: <20191201182234.GA18195@minyard.net>
+References: <20191130194240.10517-1-armbru@redhat.com>
+ <20191130194240.10517-12-armbru@redhat.com>
 MIME-Version: 1.0
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <CAJ+F1CLV_JRhXX=tB7ZXYxa1En4LzYgJr+7egKzVRNBOLY2nSA@mail.gmail.com>
- <CAFEAcA82wRy0U-DzPr64s5QiKo6XmZM96O88c4-AY4zP926GPw@mail.gmail.com>
- <CAJ+F1CKwZJnJMFzc4Z1zsY3dZAsXL1SLaXYu8y0G7=u319DWDg@mail.gmail.com>
-In-Reply-To: <CAJ+F1CKwZJnJMFzc4Z1zsY3dZAsXL1SLaXYu8y0G7=u319DWDg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 1 Dec 2019 18:10:15 +0000
-Message-ID: <CAFEAcA8nSVe2kGU9kuBxb+5BGs7GRVUHf4aHR2kUwvRNF-9-EA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/37] Clean-ups: qom-ify serial and remove
- QDEV_PROP_PTR
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191130194240.10517-12-armbru@redhat.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::b41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,63 +95,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: cminyard@mvista.com
+Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 1 Dec 2019 at 17:27, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
-> Hi
->
-> On Sun, Dec 1, 2019 at 9:18 PM Peter Maydell <peter.maydell@linaro.org> w=
-rote:
-> >
-> > On Sun, 1 Dec 2019 at 10:19, Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@gmail.com> wrote:
-> > >
-> > > - "serial: register vmsd with DeviceClass"
-> > >
-> > > This is standard qdev-ification, however it breaks backward migration=
-,
-> > > but that's just how qdev_set_legacy_instance_id() works.
-> >
-> > I don't understand this part. Surely the whole point
-> > of setting a legacy instance ID is exactly to preserve
-> > migration compatibility? If it doesn't do that then what
-> > does setting legacy ID value do?
-> >
->
-> It works in old->new direction only, because new code can match the
-> legacy instance id.
->
-> But when going from new->old, the legacy instance id is lost, as it
-> uses new 0-based instance_id.
+On Sat, Nov 30, 2019 at 08:42:30PM +0100, Markus Armbruster wrote:
+> isa_ipmi_bt_realize(), ipmi_isa_realize(), pci_ipmi_bt_realize(), and
+> pci_ipmi_kcs_realize() crash when IPMIInterfaceClass method init()
+> fails and their @errp argument is null.  First messed up in commit
+> 0719029c47 "ipmi: Add an ISA KCS low-level interface", then imitated
+> in commit a9b74079cb "ipmi: Add a BT low-level interface" and commit
+> 12f983c6aa "ipmi: Add PCI IPMI interfaces".
+> 
+> The bug can't bite as no caller actually passes null, and none of the
+> init() methods can actually fail.  Fix it anyway.
 
-I still don't understand. My mental model of the situation is:
+Well, whatever.  It looks correct and is better style.  I've added this
+to my tree.
 
- * in the old (current) version of the code, the instance ID
-   is some random thing resulting from what the old code does
- * in the new version of the code, we use qdev_set_legacy_instance_id,
-   and so instead of using the ID you'd naturally get as a
-   written-from-scratch qdev device, it uses the legacy value
-   you pass in
- * thus the device/board in both old and new versions of QEMU
-   uses the same value and migration in both directions works
+-corey
 
-I don't understand why we would ever be using a "new 0-based
-instance_id" -- it seems to me that the whole point of setting
-a legacy ID value is that we will use it always, and I don't
-understand how the board code can know that it's going to be
-the target of an old->new migration as opposed to being the
-source of a new->old migration such that it can end up with
-a different ID value in the latter case.
-
-If qdev_set_legacy_instance_id() doesn't work the way I
-think it does above, what *does* it do ?
-
-thanks
--- PMM
+> 
+> Cc: Corey Minyard <cminyard@mvista.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/ipmi/isa_ipmi_bt.c  | 7 +++++--
+>  hw/ipmi/isa_ipmi_kcs.c | 7 +++++--
+>  hw/ipmi/pci_ipmi_bt.c  | 6 ++++--
+>  hw/ipmi/pci_ipmi_kcs.c | 6 ++++--
+>  4 files changed, 18 insertions(+), 8 deletions(-)
+> 
+> diff --git a/hw/ipmi/isa_ipmi_bt.c b/hw/ipmi/isa_ipmi_bt.c
+> index 9a87ffd3f0..9fba5ed383 100644
+> --- a/hw/ipmi/isa_ipmi_bt.c
+> +++ b/hw/ipmi/isa_ipmi_bt.c
+> @@ -70,6 +70,7 @@ static void isa_ipmi_bt_lower_irq(IPMIBT *ib)
+>  
+>  static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
+>  {
+> +    Error *err = NULL;
+>      ISADevice *isadev = ISA_DEVICE(dev);
+>      ISAIPMIBTDevice *iib = ISA_IPMI_BT(dev);
+>      IPMIInterface *ii = IPMI_INTERFACE(dev);
+> @@ -85,9 +86,11 @@ static void isa_ipmi_bt_realize(DeviceState *dev, Error **errp)
+>      iib->bt.bmc->intf = ii;
+>      iib->bt.opaque = iib;
+>  
+> -    iic->init(ii, 0, errp);
+> -    if (*errp)
+> +    iic->init(ii, 0, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+>          return;
+> +    }
+>  
+>      if (iib->isairq > 0) {
+>          isa_init_irq(isadev, &iib->irq, iib->isairq);
+> diff --git a/hw/ipmi/isa_ipmi_kcs.c b/hw/ipmi/isa_ipmi_kcs.c
+> index ca3ea36a3f..cc6bd817f2 100644
+> --- a/hw/ipmi/isa_ipmi_kcs.c
+> +++ b/hw/ipmi/isa_ipmi_kcs.c
+> @@ -69,6 +69,7 @@ static void isa_ipmi_kcs_lower_irq(IPMIKCS *ik)
+>  
+>  static void ipmi_isa_realize(DeviceState *dev, Error **errp)
+>  {
+> +    Error *err = NULL;
+>      ISADevice *isadev = ISA_DEVICE(dev);
+>      ISAIPMIKCSDevice *iik = ISA_IPMI_KCS(dev);
+>      IPMIInterface *ii = IPMI_INTERFACE(dev);
+> @@ -84,9 +85,11 @@ static void ipmi_isa_realize(DeviceState *dev, Error **errp)
+>      iik->kcs.bmc->intf = ii;
+>      iik->kcs.opaque = iik;
+>  
+> -    iic->init(ii, 0, errp);
+> -    if (*errp)
+> +    iic->init(ii, 0, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+>          return;
+> +    }
+>  
+>      if (iik->isairq > 0) {
+>          isa_init_irq(isadev, &iik->irq, iik->isairq);
+> diff --git a/hw/ipmi/pci_ipmi_bt.c b/hw/ipmi/pci_ipmi_bt.c
+> index 6ed925a665..ba9cf016b5 100644
+> --- a/hw/ipmi/pci_ipmi_bt.c
+> +++ b/hw/ipmi/pci_ipmi_bt.c
+> @@ -54,6 +54,7 @@ static void pci_ipmi_lower_irq(IPMIBT *ik)
+>  
+>  static void pci_ipmi_bt_realize(PCIDevice *pd, Error **errp)
+>  {
+> +    Error *err = NULL;
+>      PCIIPMIBTDevice *pik = PCI_IPMI_BT(pd);
+>      IPMIInterface *ii = IPMI_INTERFACE(pd);
+>      IPMIInterfaceClass *iic = IPMI_INTERFACE_GET_CLASS(ii);
+> @@ -74,8 +75,9 @@ static void pci_ipmi_bt_realize(PCIDevice *pd, Error **errp)
+>      pik->bt.raise_irq = pci_ipmi_raise_irq;
+>      pik->bt.lower_irq = pci_ipmi_lower_irq;
+>  
+> -    iic->init(ii, 8, errp);
+> -    if (*errp) {
+> +    iic->init(ii, 8, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+>          return;
+>      }
+>      pci_register_bar(pd, 0, PCI_BASE_ADDRESS_SPACE_IO, &pik->bt.io);
+> diff --git a/hw/ipmi/pci_ipmi_kcs.c b/hw/ipmi/pci_ipmi_kcs.c
+> index eeba63baa4..99f46152f4 100644
+> --- a/hw/ipmi/pci_ipmi_kcs.c
+> +++ b/hw/ipmi/pci_ipmi_kcs.c
+> @@ -54,6 +54,7 @@ static void pci_ipmi_lower_irq(IPMIKCS *ik)
+>  
+>  static void pci_ipmi_kcs_realize(PCIDevice *pd, Error **errp)
+>  {
+> +    Error *err = NULL;
+>      PCIIPMIKCSDevice *pik = PCI_IPMI_KCS(pd);
+>      IPMIInterface *ii = IPMI_INTERFACE(pd);
+>      IPMIInterfaceClass *iic = IPMI_INTERFACE_GET_CLASS(ii);
+> @@ -74,8 +75,9 @@ static void pci_ipmi_kcs_realize(PCIDevice *pd, Error **errp)
+>      pik->kcs.raise_irq = pci_ipmi_raise_irq;
+>      pik->kcs.lower_irq = pci_ipmi_lower_irq;
+>  
+> -    iic->init(ii, 8, errp);
+> -    if (*errp) {
+> +    iic->init(ii, 8, &err);
+> +    if (err) {
+> +        error_propagate(errp, err);
+>          return;
+>      }
+>      pci_register_bar(pd, 0, PCI_BASE_ADDRESS_SPACE_IO, &pik->kcs.io);
+> -- 
+> 2.21.0
+> 
 
