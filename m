@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9EABC432C0
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 11:29:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BF4C432C0
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 11:31:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B890B20725
-	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 11:29:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B67320725
+	for <qemu-devel@archiver.kernel.org>; Sun,  1 Dec 2019 11:31:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iOjdVY79"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B890B20725
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OOi5hwoB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B67320725
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibNQ5-00071B-KZ
-	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 06:29:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37870)
+	id 1ibNRY-0000LU-0y
+	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 06:31:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ibNEl-0002K2-5r
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:18:02 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ibNFH-0002Sd-7N
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:18:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1ibNEj-0000lp-NS
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:17:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21054
+ (envelope-from <marcandre.lureau@redhat.com>) id 1ibNFB-00012P-Co
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:18:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33323
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1ibNEd-0000gf-Qh
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:17:53 -0500
+ id 1ibNEz-0000wR-E3
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 06:18:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575199070;
+ s=mimecast20190719; t=1575199089;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ev+bQalxs/tol+0dmO0s4H62SybMOPjWr/afkfJUajA=;
- b=iOjdVY79kBbbHhZbGzh3ofe0V9qWXuVxxMQa4ghtan9Jb89G9MOBvUjHXG1g4jOVLeifVl
- oSOLitBjt8Wgs2v30994LNIPwV8qaFBKkucJ5ZZh3HZLJ3kHqg2J7lGedS2pOESqLWcS5r
- 9cEQLoesPEnK1261n/BTIEw9Hx9dsOU=
+ bh=ZSBpW6ce3yEYzYeWYEOTKB5zeO3HPhiloHWq9bYkp08=;
+ b=OOi5hwoBxeA5gShstmnO7dBLeDa10K6xuthDEUv3bsK/UV51yfe5kTGq3snW8ESL412ic4
+ P91nhrmpWDJXwXEem/v09yBHjBqwXDesK/Vu7HSq+Q0mdIdpM4GsB7S8GD9E09A9ZhPPNo
+ RcxqgxdBIE5c6pnESPHAKMCb+x6KZkQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-cgVObFmKPrSQzcSQxO9RjQ-1; Sun, 01 Dec 2019 06:17:47 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-260-V8ursnZ_M_a3U_CZyFptoA-1; Sun, 01 Dec 2019 06:18:08 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BE8F184CAC8
- for <qemu-devel@nongnu.org>; Sun,  1 Dec 2019 11:17:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B59F184CABB
+ for <qemu-devel@nongnu.org>; Sun,  1 Dec 2019 11:18:07 +0000 (UTC)
 Received: from localhost (unknown [10.36.112.15])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E883660BF7;
- Sun,  1 Dec 2019 11:17:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A8E525D9E1;
+ Sun,  1 Dec 2019 11:18:03 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 13/26] object: rename link "child" to "target"
-Date: Sun,  1 Dec 2019 15:15:18 +0400
-Message-Id: <20191201111531.1136947-14-marcandre.lureau@redhat.com>
+Subject: [PATCH 15/26] object: express const link with link property
+Date: Sun,  1 Dec 2019 15:15:20 +0400
+Message-Id: <20191201111531.1136947-16-marcandre.lureau@redhat.com>
 In-Reply-To: <20191201111531.1136947-1-marcandre.lureau@redhat.com>
 References: <20191201111531.1136947-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: cgVObFmKPrSQzcSQxO9RjQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: V8ursnZ_M_a3U_CZyFptoA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -91,131 +91,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A child property is a different kind of property. Let's use "target"
-for the link target.
+Let's not mix child property and link property callbacks, as this is
+confusing, use LinkProperty with DIRECT flag to hold the target pointer.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qom/object.h |  4 ++--
- qom/object.c         | 24 ++++++++++++------------
- 2 files changed, 14 insertions(+), 14 deletions(-)
+ qom/object.c | 41 +++++++++++++++++++++++------------------
+ 1 file changed, 23 insertions(+), 18 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 03574473cd..0ac1a9acca 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -1526,7 +1526,7 @@ void object_property_allow_set_link(const Object *, c=
-onst char *,
-  * @obj: the object to add a property to
-  * @name: the name of the property
-  * @type: the qobj type of the link
-- * @child: a pointer to where the link object reference is stored
-+ * @targetp: a pointer to where the link object reference is stored
-  * @check: callback to veto setting or NULL if the property is read-only
-  * @flags: additional options for the link
-  * @errp: if an error occurs, a pointer to an area to store the error
-@@ -1551,7 +1551,7 @@ void object_property_allow_set_link(const Object *, c=
-onst char *,
-  * modified.
-  */
- void object_property_add_link(Object *obj, const char *name,
--                              const char *type, Object **child,
-+                              const char *type, Object **targetp,
-                               void (*check)(const Object *obj, const char =
-*name,
-                                             Object *val, Error **errp),
-                               ObjectPropertyLinkFlags flags,
 diff --git a/qom/object.c b/qom/object.c
-index 7e42fa0d99..6f3800c693 100644
+index d9fc71c284..b73fe66dc9 100644
 --- a/qom/object.c
 +++ b/qom/object.c
-@@ -1696,7 +1696,7 @@ void object_property_allow_set_link(const Object *obj=
-, const char *name,
- }
-=20
- typedef struct {
--    Object **child;
-+    Object **targetp;
-     void (*check)(const Object *, const char *, Object *, Error **);
-     ObjectPropertyLinkFlags flags;
- } LinkProperty;
-@@ -1706,11 +1706,11 @@ static void object_get_link_property(Object *obj, V=
-isitor *v,
-                                      Error **errp)
- {
-     LinkProperty *lprop =3D opaque;
--    Object **child =3D lprop->child;
-+    Object **targetp =3D lprop->targetp;
-     gchar *path;
-=20
--    if (*child) {
--        path =3D object_get_canonical_path(*child);
-+    if (*targetp) {
-+        path =3D object_get_canonical_path(*targetp);
-         visit_type_str(v, name, &path, errp);
-         g_free(path);
-     } else {
-@@ -1765,8 +1765,8 @@ static void object_set_link_property(Object *obj, Vis=
-itor *v,
- {
-     Error *local_err =3D NULL;
-     LinkProperty *prop =3D opaque;
--    Object **child =3D prop->child;
--    Object *old_target =3D *child;
-+    Object **targetp =3D prop->targetp;
-+    Object *old_target =3D *targetp;
-     Object *new_target =3D NULL;
-     char *path =3D NULL;
-=20
-@@ -1788,7 +1788,7 @@ static void object_set_link_property(Object *obj, Vis=
-itor *v,
-         return;
-     }
-=20
--    *child =3D new_target;
-+    *targetp =3D new_target;
-     if (prop->flags & OBJ_PROP_LINK_STRONG) {
-         object_ref(new_target);
-         object_unref(old_target);
-@@ -1799,7 +1799,7 @@ static Object *object_resolve_link_property(Object *p=
-arent, void *opaque, const
- {
-     LinkProperty *lprop =3D opaque;
-=20
--    return *lprop->child;
-+    return *lprop->targetp;
- }
-=20
- static void object_release_link_property(Object *obj, const char *name,
-@@ -1807,14 +1807,14 @@ static void object_release_link_property(Object *ob=
+@@ -1827,19 +1827,23 @@ static void object_release_link_property(Object *ob=
 j, const char *name,
- {
-     LinkProperty *prop =3D opaque;
-=20
--    if ((prop->flags & OBJ_PROP_LINK_STRONG) && *prop->child) {
--        object_unref(*prop->child);
-+    if ((prop->flags & OBJ_PROP_LINK_STRONG) && *prop->targetp) {
-+        object_unref(*prop->targetp);
-     }
      g_free(prop);
  }
 =20
- void object_property_add_link(Object *obj, const char *name,
--                              const char *type, Object **child,
-+                              const char *type, Object **targetp,
-                               void (*check)(const Object *, const char *,
-                                             Object *, Error **),
-                               ObjectPropertyLinkFlags flags,
-@@ -1825,7 +1825,7 @@ void object_property_add_link(Object *obj, const char=
- *name,
+-void object_property_add_link(Object *obj, const char *name,
+-                              const char *type, Object **targetp,
+-                              void (*check)(const Object *, const char *,
+-                                            Object *, Error **),
+-                              ObjectPropertyLinkFlags flags,
+-                              Error **errp)
++static void object_add_link_prop(Object *obj, const char *name,
++                                 const char *type, void *ptr,
++                                 void (*check)(const Object *, const char =
+*,
++                                               Object *, Error **),
++                                 ObjectPropertyLinkFlags flags,
++                                 Error **errp)
+ {
+     Error *local_err =3D NULL;
+     LinkProperty *prop =3D g_malloc(sizeof(*prop));
      gchar *full_type;
      ObjectProperty *op;
 =20
--    prop->child =3D child;
-+    prop->targetp =3D targetp;
+-    prop->targetp =3D targetp;
++    if (flags & OBJ_PROP_LINK_DIRECT) {
++        prop->target =3D ptr;
++    } else {
++        prop->targetp =3D ptr;
++    }
      prop->check =3D check;
      prop->flags =3D flags;
 =20
+@@ -1863,20 +1867,21 @@ out:
+     g_free(full_type);
+ }
+=20
++void object_property_add_link(Object *obj, const char *name,
++                              const char *type, Object **targetp,
++                              void (*check)(const Object *, const char *,
++                                            Object *, Error **),
++                              ObjectPropertyLinkFlags flags,
++                              Error **errp)
++{
++    object_add_link_prop(obj, name, type, targetp, check, flags, errp);
++}
++
+ void object_property_add_const_link(Object *obj, const char *name,
+                                     Object *target, Error **errp)
+ {
+-    char *link_type;
+-    ObjectProperty *op;
+-
+-    link_type =3D g_strdup_printf("link<%s>", object_get_typename(target))=
+;
+-    op =3D object_property_add(obj, name, link_type,
+-                             object_get_child_property, NULL,
+-                             NULL, target, errp);
+-    if (op !=3D NULL) {
+-        op->resolve =3D object_resolve_child_property;
+-    }
+-    g_free(link_type);
++    object_add_link_prop(obj, name, object_get_typename(target), target,
++                         NULL, OBJ_PROP_LINK_DIRECT, errp);
+ }
+=20
+ gchar *object_get_canonical_path_component(Object *obj)
 --=20
 2.24.0
 
