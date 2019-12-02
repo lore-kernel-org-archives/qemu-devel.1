@@ -2,78 +2,63 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F393C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:47:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DB3C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:51:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEEC8215E5
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:47:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iGG9TALK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEEC8215E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A9B12215E5
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:51:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9B12215E5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibgQs-0003fb-0a
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 02:47:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39235)
+	id 1ibgUQ-0005Rf-Qe
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 02:51:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ibgPk-0002kM-Tj
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:46:38 -0500
+ (envelope-from <groug@kaod.org>) id 1ibgTV-0004u3-IE
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:50:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ibgPi-0004Jf-Km
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:46:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33656
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1ibgTU-0006DX-83
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:50:29 -0500
+Received: from 2.mo4.mail-out.ovh.net ([46.105.72.36]:54340)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ibgPb-0004Hb-Sq
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:46:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575272786;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qChoThaaM6POp2A+iZeS/1OdMR4Zdx4WdlEk7IO24Pc=;
- b=iGG9TALKYV48urdjiGtocvIR7ii1fwqtry0DvtQgtnGfHu27cuSyCepQmBymlt3tMoFH8k
- aqKlK69MPFl//W/Y55LTjETBBE7dBGYoGhboLVVV6XlMmNHOq83RpXUkCkjsSCec7sV1GH
- JECRFfRPJKqaRd+ujhlbv2VtC9HYE7A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-1JTYDThKOMSRqCqkpBqDOQ-1; Mon, 02 Dec 2019 02:46:25 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC008800D4E;
- Mon,  2 Dec 2019 07:46:24 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E7B5F5C545;
- Mon,  2 Dec 2019 07:46:23 +0000 (UTC)
-Date: Mon, 2 Dec 2019 08:46:22 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 08/21] exec: Fix latent file_ram_alloc() error handling bug
-Message-ID: <20191202084622.614b0f6a@redhat.com>
-In-Reply-To: <20191130194240.10517-9-armbru@redhat.com>
-References: <20191130194240.10517-1-armbru@redhat.com>
- <20191130194240.10517-9-armbru@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ibgTU-00069Y-1k
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:50:28 -0500
+Received: from player714.ha.ovh.net (unknown [10.108.54.67])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id AA66021418D
+ for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 08:50:18 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player714.ha.ovh.net (Postfix) with ESMTPSA id B45AACB4C370;
+ Mon,  2 Dec 2019 07:50:10 +0000 (UTC)
+Date: Mon, 2 Dec 2019 08:50:09 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [for-5.0 1/4] spapr: Don't trigger a CAS reboot for XICS/XIVE
+ mode changeover
+Message-ID: <20191202085009.44f3909f@bahia.w3ibm.bluemix.net>
+In-Reply-To: <20191129053356.232413-2-david@gibson.dropbear.id.au>
+References: <20191129053356.232413-1-david@gibson.dropbear.id.au>
+ <20191129053356.232413-2-david@gibson.dropbear.id.au>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 1JTYDThKOMSRqCqkpBqDOQ-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 13995498795052079590
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudejgedgudduhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejudegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.72.36
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,54 +70,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ clg@kaod.org, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 30 Nov 2019 20:42:27 +0100
-Markus Armbruster <armbru@redhat.com> wrote:
+On Fri, 29 Nov 2019 16:33:53 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> When os_mem_prealloc() fails, file_ram_alloc() calls qemu_ram_munmap()
-> and returns null.  Except it doesn't when its @errp argument is null,
-> because it checks for failure with (errp && *errp).  Messed up in
-> commit 056b68af77 "fix qemu exit on memory hotplug when allocation
-> fails at prealloc time".
+> PAPR allows the interrupt controller used on a POWER9 machine (XICS or
+> XIVE) to be selected by the guest operating system, by using the
+> ibm,client-architecture-support (CAS) feature negotiation call.
 > 
-> The bug can't bite as no caller actually passes null.  Fix it anyway.
+> Currently, if the guest selects an interrupt controller different from the
+> one selected at initial boot, this causes the system to be reset with the
+> new model and the boot starts again.  This means we run through the SLOF
+> boot process twice, as well as any other bootloader (e.g. grub) in use
+> before the OS calls CAS.  This can be confusing and/or inconvenient for
+> users.
 > 
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Thanks to two fairly recent changes, we no longer need this reboot.  1) we
+> now completely regenerate the device tree when CAS is called (meaning we
+> don't need special case updates for all the device tree changes caused by
+> the interrupt controller mode change),  2) we now have explicit code paths
+> to activate and deactivate the different interrupt controllers, rather than
+> just implicitly calling those at machine reset time.
+> 
+> We can therefore eliminate the reboot for changing irq mode, simply by
+> putting a called to spapr_irq_update_active_intc() before we call
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+putting a call
 
+> spapr_h_cas_compose_response() (which gives the updated device tree to the
+> guest firmware and OS).
+> 
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  exec.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+
+Convenient indeed ! :)
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/spapr_hcall.c | 33 +++++++++++++--------------------
+>  1 file changed, 13 insertions(+), 20 deletions(-)
 > 
-> diff --git a/exec.c b/exec.c
-> index ffdb518535..45695a5f2d 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -1841,6 +1841,7 @@ static void *file_ram_alloc(RAMBlock *block,
->                              bool truncate,
->                              Error **errp)
->  {
-> +    Error *err = NULL;
->      MachineState *ms = MACHINE(qdev_get_machine());
->      void *area;
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 140f05c1c6..05a7ca275b 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1767,21 +1767,10 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>      }
+>      spapr->cas_pre_isa3_guest = !spapr_ovec_test(ov1_guest, OV1_PPC_3_00);
+>      spapr_ovec_cleanup(ov1_guest);
+> -    if (!spapr->cas_reboot) {
+> -        /* If spapr_machine_reset() did not set up a HPT but one is necessary
+> -         * (because the guest isn't going to use radix) then set it up here. */
+> -        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
+> -            /* legacy hash or new hash: */
+> -            spapr_setup_hpt_and_vrma(spapr);
+> -        }
+> -        spapr->cas_reboot =
+> -            (spapr_h_cas_compose_response(spapr, args[1], args[2],
+> -                                          ov5_updates) != 0);
+> -    }
 >  
-> @@ -1898,8 +1899,9 @@ static void *file_ram_alloc(RAMBlock *block,
+>      /*
+> -     * Ensure the guest asks for an interrupt mode we support; otherwise
+> -     * terminate the boot.
+> +     * Ensure the guest asks for an interrupt mode we support;
+> +     * otherwise terminate the boot.
+>       */
+>      if (guest_xive) {
+>          if (!spapr->irq->xive) {
+> @@ -1797,14 +1786,18 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>          }
 >      }
 >  
->      if (mem_prealloc) {
-> -        os_mem_prealloc(fd, area, memory, ms->smp.cpus, errp);
-> -        if (errp && *errp) {
-> +        os_mem_prealloc(fd, area, memory, ms->smp.cpus, &err);
-> +        if (err) {
-> +            error_propagate(errp, err);
->              qemu_ram_munmap(fd, area, memory);
->              return NULL;
->          }
+> -    /*
+> -     * Generate a machine reset when we have an update of the
+> -     * interrupt mode. Only required when the machine supports both
+> -     * modes.
+> -     */
+> +    spapr_irq_update_active_intc(spapr);
+> +
+>      if (!spapr->cas_reboot) {
+> -        spapr->cas_reboot = spapr_ovec_test(ov5_updates, OV5_XIVE_EXPLOIT)
+> -            && spapr->irq->xics && spapr->irq->xive;
+> +        /* If spapr_machine_reset() did not set up a HPT but one is necessary
+> +         * (because the guest isn't going to use radix) then set it up here. */
+> +        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
+> +            /* legacy hash or new hash: */
+> +            spapr_setup_hpt_and_vrma(spapr);
+> +        }
+> +        spapr->cas_reboot =
+> +            (spapr_h_cas_compose_response(spapr, args[1], args[2],
+> +                                          ov5_updates) != 0);
+>      }
+>  
+>      spapr_ovec_cleanup(ov5_updates);
 
 
