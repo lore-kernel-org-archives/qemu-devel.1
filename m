@@ -2,80 +2,65 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A82BC432C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 16:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8DFC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 16:47:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34B9620748
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 16:45:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bz6gR7Ns"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34B9620748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 837382071F
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 16:47:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 837382071F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibopA-0000Yn-BR
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 11:45:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59409)
+	id 1iboqv-0001hX-40
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 11:47:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59537)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ibooT-0008V0-Pd
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 11:44:42 -0500
+ (envelope-from <maz@kernel.org>) id 1ibopR-0000wD-C0
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 11:45:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ibooR-0007kj-Sy
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 11:44:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42810
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <maz@kernel.org>) id 1ibopP-0008G2-60
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 11:45:41 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:59842)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ibooR-0007kZ-Oa
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 11:44:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575305078;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=T64rpJTHeo8rSiad/sU89XMpHXDwaTgTtBLA7bbtrfA=;
- b=Bz6gR7NsFemHTJM38nzsNvuS+fRBNsa/EmsZPddPvqoaTJHkRCegaYsKZySxYyoIs1TMDE
- MpeX7TbUrLQlpLGlGeWXUN1TewgCplDyLXFQaEsoYe7Rj5eGj2ujNkoR7dXwjS9fR2GQLl
- OIWtx/QM6iENscH8wh+kLqMoNHtFyWs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-WIW5NgPKOESGBaMX3U5Sww-1; Mon, 02 Dec 2019 11:44:35 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0558A10054E3
- for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 16:44:35 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.18])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6597319C68;
- Mon,  2 Dec 2019 16:44:25 +0000 (UTC)
-Date: Mon, 2 Dec 2019 16:44:23 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: virtiofsd: Where should it live?
-Message-ID: <20191202164423.GE2904@work-vm>
-References: <20191125185021.GB3767@work-vm>
- <20191202043040-mutt-send-email-mst@kernel.org>
+ (Exim 4.71) (envelope-from <maz@kernel.org>) id 1ibopO-0008FP-Vd
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 11:45:39 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1ibopK-00047L-V0; Mon, 02 Dec 2019 17:45:34 +0100
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 3/5] target/arm: Handle trapping to EL2 of AArch32 VMRS
+ instructions
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-In-Reply-To: <20191202043040-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: WIW5NgPKOESGBaMX3U5Sww-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Mon, 02 Dec 2019 16:45:34 +0000
+From: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <0bc7c461-6b92-2782-4aec-2f649f5bc8cf@linaro.org>
+References: <20191201122018.25808-1-maz@kernel.org>
+ <20191201122018.25808-4-maz@kernel.org>
+ <0bc7c461-6b92-2782-4aec-2f649f5bc8cf@linaro.org>
+Message-ID: <d2875338d734fca3e5263b94eaf52c18@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ kvmarm@lists.cs.columbia.edu, peter.maydell@linaro.org,
+ edgar.iglesias@xilinx.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 213.251.177.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,71 +72,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mszeredi@redhat.com, berrange@redhat.com, qemu-devel@nongnu.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, vgoyal@redhat.com
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Mon, Nov 25, 2019 at 06:50:21PM +0000, Dr. David Alan Gilbert wrote:
-> > Hi,
-> >   There's been quite a bit of discussion about where virtiofsd, our
-> > implemenation of a virtiofs daemon, should live.  I'd like to get
-> > this settled now, because I'd like to tidy it up for the next
-> > qemu cycle.
-> >=20
-> > For reference it's based on qemu's livhost-user+chunks of libfuse.
-> > It can't live in libfuse because we change enough of the library
-> > to break their ABI.
->=20
-> Generally there could be some ifdefs that allow one to
-> build libfuse-host or whatever from the same source.
-> I am guessing the big reason this doesn't fly is that
-> libfuse is not actively developed anymore.
+On 2019-12-02 15:35, Richard Henderson wrote:
+> On 12/1/19 12:20 PM, Marc Zyngier wrote:
+>> HCR_EL2.TID3 requires that AArch32 reads of MVFR[012] are trapped to
+>> EL2, and HCR_EL2.TID0 does the same for reads of FPSID.
+>> In order to handle this, introduce a new TCG helper function that
+>> checks for these control bits before executing the VMRC instruction.
+>>
+>> Tested with a hacked-up version of KVM/arm64 that sets the control
+>> bits for 32bit guests.
+>>
+>> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>> Signed-off-by: Marc Zyngier <maz@kernel.org>
+>> ---
+>>  target/arm/helper-a64.h        |  2 ++
+>>  target/arm/translate-vfp.inc.c | 18 +++++++++++++++---
+>>  target/arm/vfp_helper.c        | 29 +++++++++++++++++++++++++++++
+>>  3 files changed, 46 insertions(+), 3 deletions(-)
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>
+> Annoying that there's a bug in the manual -- FPSID is listed as group 
+> 0 in
+> plenty of places, except in the pseudo-code for Accessing the FPSID
+> which uses TID3.
 
-libfuse is certainly taking patches; so it's not dead.
-However, the changes for the transport are quite invasive,
-and it doesn't feel right to impose them on it.
-We've pushed up small fixes/changes etc - but not things
-that are big intrusive lumps for our use.
+Are you sure? I'm looking at DDI0487E_a, and the pseudo-code for
+AArch32.CheckAdvSIMDOrFPRegisterTraps has this check:
 
-> Given that, the main remaining part is libvhost-user,
-> and it's less work to use than to duplicate that.
-> That kind of dictates being in qemu.
->=20
-> >  It's C, and we've got ~100 patches - which
-> > we can split into about 3 chunks.
-> >=20
-> > Some suggestions so far:
-> >   a) In contrib
-> >      This is my current working assumption; the main objection is it's
-> >      a bit big and pulls in a chunk of libfuse.
-> >   b) In a submodule
-> >=20
-> >   c) Just separate
-> >=20
-> > Your suggestions/ideas please.  My preference is (a).
-> >=20
-> > Dave
->=20
->=20
-> My preference is close to a, and maybe to avoid confusion we should have
-> a new top-level directory for "separate daemons qemu invokes, and need
-> to be built together with qemu". libvhost-user would have to move there,
-> too. "modules"?
+<quote>
+if (tid0 == '1' && reg == '0000')                           // FPSID
+   || (tid3 == '1' && reg IN {'0101', '0110', '0111'}) then  // MVFRx
+     if ELUsingAArch32(EL2) then
+       AArch32.SystemAccessTrap(M32_Hyp, 0x8);    // 
+Exception_AdvSIMDFPAccessTrap
+     else
+       AArch64.AArch32SystemAccessTrap(EL2, 0x8); // 
+Exception_AdvSIMDFPAccessTrap
+</quote>
 
-"modules" feels too close to "plugins" to my mind.
+which seems to do the right thing. Or have you spotted a discrepancy
+somewhere else (which would be oh-so-surprising...)?
 
-Dave
+Thanks,
 
->=20
-> >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 
