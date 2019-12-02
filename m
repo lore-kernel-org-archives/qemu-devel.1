@@ -2,78 +2,87 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 415F8C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 13:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 483AEC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 13:07:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C51820833
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 13:03:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 13833205ED
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 13:07:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NpyNpmkM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C51820833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="2U/sAm8R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13833205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iblMS-0007Xc-1p
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 08:03:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55115)
+	id 1iblQh-0000sm-5j
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 08:07:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55619)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iblKy-0006r6-Ee
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 08:02:01 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1iblO1-00088f-45
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 08:05:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iblKw-0000HE-2Q
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 08:01:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43335
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1iblNz-0002Ci-RX
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 08:05:09 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:53804)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iblKv-0000F3-Lw
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 08:01:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575291714;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1iblNw-0002B4-DE; Mon, 02 Dec 2019 08:05:04 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 9D34D96EF2;
+ Mon,  2 Dec 2019 13:05:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1575291902;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GzPSrbbnRQzS8PE/34E97Ue/tvVZvt4K2cDgx0sRg7g=;
- b=NpyNpmkMGlcBP98NjqmRxrlQ68LK/Xkw9GZNUkaBwlGFgh5qBHoT86zLhOatuN/AbcPX4O
- Mw/G/w1G9T7BKdFHIRZUOceT0eAgVl8+z3rRgpd36oueKftM80RgM10lUyEEmMpIi+ILqf
- 7n93h+GBLu6QlQhv7oTIY01eY/UHpZ4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-rO62Vu6pPee6W8BVLb3XrA-1; Mon, 02 Dec 2019 08:01:52 -0500
-X-MC-Unique: rO62Vu6pPee6W8BVLb3XrA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70EF2801E72;
- Mon,  2 Dec 2019 13:01:51 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.23])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C9E0B6764D;
- Mon,  2 Dec 2019 13:01:47 +0000 (UTC)
-References: <20191018105315.27511-1-slp@redhat.com>
- <87imn58gyd.fsf@dusky.pond.sub.org>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v11 00/15] Introduce the microvm machine type
-In-reply-to: <87imn58gyd.fsf@dusky.pond.sub.org>
-Date: Mon, 02 Dec 2019 14:01:42 +0100
-Message-ID: <87k17e3mq1.fsf@redhat.com>
+ bh=59jHss8An0NYZMESND1tXJ7A23ua1uMaUfpnpEIm3Lc=;
+ b=2U/sAm8R++nNlTJEguc4NZCONBgfkiDK6JAsfwSupYjapVY1h/tEPVFCFkOrVe8ZTS5srj
+ ohXsJoG1MDz/AHUzwebMb6sp7LRU4HMEIce4ZOy+ef5b8Pf0qaNSiQ69aCJcgsbP+1Mc5u
+ E4V7BjXdxzj31vV2k+sUKjMcLJ/ttXk=
+Subject: Re: [PATCH v5 12/13] hw/gpio/bcm2835_gpio: Isolate sdbus reparenting
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191018150630.31099-1-damien.hedde@greensocs.com>
+ <20191018150630.31099-13-damien.hedde@greensocs.com>
+ <CAFEAcA-YiD6B1wMTrOvj5=QbYY3uuqdbJbSP57zg3S86nU=k-Q@mail.gmail.com>
+ <1ae3a4d3-26e6-fe6d-87a3-d5dcce1fd64c@greensocs.com>
+ <CAFEAcA89bbvd0Zi44GZrCDc8e-AEKqGkJ3SA3e=Sz6xVHNbfEw@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <8bd421d9-d0a9-853d-1ab2-09467df64e05@greensocs.com>
+Date: Mon, 2 Dec 2019 14:05:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+In-Reply-To: <CAFEAcA89bbvd0Zi44GZrCDc8e-AEKqGkJ3SA3e=Sz6xVHNbfEw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1575291902;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=59jHss8An0NYZMESND1tXJ7A23ua1uMaUfpnpEIm3Lc=;
+ b=yg/C5QnGwUNCtTZ+3miMKD56lDWZdT4Sa+ZbMfcvm/Bwcci0xDSa5c0OsRY2X+4eFyZ0Dy
+ HD/rY473Bl0Dpqs1KacjHuS6qCbtVcSiudXP7LwuAYFqDNR65ETyTGoPxM0+a0j5wjxSzL
+ sNW1G12qUsaJbgqlbK1XGitwoQ6LmpQ=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575291902; a=rsa-sha256; cv=none;
+ b=kbN66ivQO5obHOCsPHk/7oA9GN/c85XcrufnEaunsnOzC9dwiGvlV7bWMRYxoSvBZ8baLO
+ ZiezTVC2ywOCnKXSF7lWvbzMD2jPSrX+IjVU9DkFn9mPe7J2vm29WwojHTZ1J/O82mHnQN
+ 6rURIxNVnK03oioRFjmDTN1lqXu9MtU=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,148 +94,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com, philmd@redhat.com,
- groug@kaod.org, qemu-devel@nongnu.org, marcandre.lureau@gmail.com,
- kraxel@redhat.com, imammedo@redhat.com, pbonzini@redhat.com, rth@twiddle.net,
- lersek@redhat.com, sgarzare@redhat.com
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Edgar Iglesias <edgari@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
 
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Sergio Lopez <slp@redhat.com> writes:
->
->> microvm is a machine type inspired by Firecracker and constructed
->> after its machine model.
+On 12/2/19 1:33 PM, Peter Maydell wrote:
+> On Mon, 2 Dec 2019 at 12:27, Damien Hedde <damien.hedde@greensocs.com> wrote:
 >>
->> It's a minimalist machine type without PCI nor ACPI support, designed
->> for short-lived guests. microvm also establishes a baseline for
->> benchmarking and optimizing both QEMU and guest operating systems,
->> since it is optimized for both boot time and footprint.
->
-> I know this has been merged, but I ask anyway: got some boot time and
-> memory footprint measurements?
+>>
+>>
+>> On 11/29/19 8:05 PM, Peter Maydell wrote:
+>>> On Fri, 18 Oct 2019 at 16:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>>>> @@ -97,6 +101,7 @@ static void gpfsel_set(BCM2835GpioState *s, uint8_t reg, uint32_t value)
+>>>>              && (s->fsel[53] == 4) /* SD_DATA3_R */
+>>>>              ) {
+>>>>          /* SDHost controller selected */
+>>>> +        sdbus_reparent_card(&s->sdbus, s->sdbus_sdhost);
+>>>>          sdbus_reparent_card(s->sdbus_sdhci, s->sdbus_sdhost);
+>>>
+>>> The commit message says it's just splitting the function in two,
+>>> but these two hunks are adding extra calls to sdbus_reparent_card().
+>>> Why do we need to call it twice ?
+>>
+>> You're right. I forgot to update the commit message. The patch also
+>> refactor a little the reset procedure and move the call to
+>> sdbus_reparent_card(&s->sdbus, s->sdbus_sdhci)
+>> which was in there to this part of the code.
+>>
+>> raspi machines create the sd in &s->sdbus. So there is need for a first
+>> reparenting from this bus.
+>>
+>> With this addition "gpfsel_update_sdbus" always do the expected effect
+>> of putting the sd card onto the right bus.
+>>
+>> sdbus_reparent_card(src,dst) only do something if the _src_ bus has a
+>> card. So only one of the 2 sdbus_reparent_card will have an effect. If
+>> the card is already onto the _dst_, both calls will be nop-op
+> 
+> The intention of sdbus_reparent_card() is that it moves
+> something from the 'src' bus to the 'dst' bus. So one
+> call is supposed to do the whole job of the move. If
+> it doesn't, then that's a bug.
+> 
+> I thought the raspi machines had an sd card that could
+> either be connected to one of the controllers, or the
+> other. Why would the sd card ever be somewhere else
+> than on one of those two buses? If the machine creation
+> puts the sdcard somewhere wrong then we should probably
+> just fix that.
+> 
 
-It's been a while since I ran an instrumented kernel, but I've been
-playing a bit with OSv (thanks to a question in qemu-discuss), which is
-aggressively optimized for boot time, and I have some numbers.
+I don't know why it has been implemented like this but right now the
+raspi_init() does the following during machine creation:
+| bus = qdev_get_child_bus(DEVICE(&s->soc), "sd-bus");
+| [...]
+| carddev = qdev_create(bus, TYPE_SD_CARD);
+which put the sd in the BCM2835GpioState.sdbus .
 
-This is using a QEMU build with some patches to be able to do a
-microvm-only build that "I have not yet submitted but shouldn't be
-controversial" (TM) [1]. The Q35 binary was also built having only the
-Q35 machine type enabled.
+Then the reset procedure of the BCM2835Gpio move the sd card
+to one of the two usable controllers and the sd card can never go back
+to the initial BCM2835GpioState.sdbus.
+As far as I understand, it is theorically possible to have the sd card
+on no controller at all (it's maybe the reason for the .sdbus "useless"
+bus) (for example if the BCM2835Gpio is badly configured) but this is
+not implemented in qemu.
 
-In this test, OSv runs to userspace and then shuts down. OSv gives us
-its boot time (from entry point to userspace), and I also get the
-execution totals with "time". Variation between runs is +-2%:
+Anyway I can add some plumbing to only call sdbus_reparent_card() when
+really needed by:
++ not duplicating the sdbus_reparent_card() in gpfsel_update_sdbus()
++ adding needed test in reset() method to only do the initial
+  sdbus_reparent_card() if needed (first time we call reset).
 
-------------
-| qemu-q35 |
-------------
-
-Boot time
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-time ./x86_64-softmmu/qemu-system-x86_64 -M q35 -enable-kvm \
- -cpu host -m 64m -kernel ~/osv/build/release/loader-stripped.elf \
- -append "/hello" -serial stdio -nodefaults -no-user-config \
- -nographic -no-reboot -device virtio-blk,id=3Dblk0,drive=3Dhd0,scsi=3Doff =
-\
- -drive file=3D~/osv/build/release/usr.img,if=3Dnone,id=3Dhd0,cache=3Dnone =
-\
- -global virtio-mmio.force-legacy=3Doff -no-reboot
-
-SeaBIOS (version rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org)
-Booting from ROM..OSv v0.54.0-26-gcccc7d40
-Booted up in 11.77 ms
-Cmdline: /hello
-Hello from C code
-
-real    0m0.073s
-user    0m0.034s
-sys     0m0.029s
-
-
-Size
-=3D=3D=3D=3D
-
-# ls -l x86_64-softmmu/qemu-system-x86_64*
--rwxr-xr-x. 1 root root 13400680 Dec  2 07:31 x86_64-softmmu/qemu-system-x8=
-6_64
--rwxr-xr-x. 1 root root 11707344 Dec  2 07:51 x86_64-softmmu/qemu-system-x8=
-6_64.stripped
-
-
-----------------
-| qemu-microvm |
-----------------
-
-Boot time
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-time ./x86_64-softmmu/qemu-system-x86_64 -M microvm -enable-kvm \
- -cpu host -m 64m -smp 1 \
- -kernel ~/osv/build/release/loader-stripped.elf \
- -append "--nopci /hello" -serial stdio -nodefaults -no-user-config \
- -nographic -no-reboot \
- -device virtio-blk-device,id=3Dblk0,drive=3Dhd0,scsi=3Doff \
- -drive file=3D~/osv/build/release/usr.img,if=3Dnone,id=3Dhd0 \
- -global virtio-mmio.force-legacy=3Doff=20
-
-OSv v0.54.0-26-gcccc7d40
-Booted up in 3.64 ms
-Cmdline: /hello=20
-Hello from C code
-
-real=090m0.020s
-user=090m0.009s
-sys     0m0.011s
-
-
-Size
-=3D=3D=3D=3D
-
-# ls -l x86_64-softmmu/qemu-system-x86_64*
--rwxr-xr-x. 1 root root 7823344 Dec  2 07:35 x86_64-softmmu/qemu-system-x86=
-_64
--rwxr-xr-x. 1 root root 6486992 Dec  2 07:55 x86_64-softmmu/qemu-system-x86=
-_64.stripped
-
-
-I don't have numbers for memory footprint. It'd be nice coming up with
-some reasonable methodology for getting them, as there a significant
-amount of moving parts there that can have an impact on memory
-consumption.
-
-Sergio.
-
-[1] https://github.com/slp/qemu/tree/microvm_only
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl3lCzYACgkQ9GknjS8M
-AjVF5A//T6Sz6kbUVznpxcx2V/HX3DARKY9V2ho57u8otHpEYhHh9DBIXXWEe7QT
-eYkmzVobFFk/44QHtrXiljra9ZChAEwz16AxC139Mf3gUfVP8YR5+hxbZg9d6UC6
-3bqjfrG/h/jXuT+jU2ci0BSLzmj5CY2SO0SVhSL01XKcwAFxqx3g6XOtML0Id4Ng
-9xNDyAlr5PRlxSJdnJFmM8vHJZ91roODlj3zNQbV/JNtYFyIIday0ViMMdZXbvk5
-/qF+yRKqIkhYHMr/pC52Jc1UXmgKd8BYA/Lo5ksOez4x7z/RiIEpyWrxDRKverqd
-31NlYazwsA9KPB76cIHT7sLnAlcudYpD1v7DMBPABPQoyCrjek8WzjhyyYb6IyCg
-1IGoa5qJHe3qKZANR4YRONLTIiSWe6A5Hd6mjbxRrN68SE5Q5Zd8Go94LNSj1n7d
-8q8xfSJs5fwwxtcW7DMPjZMm1UFqWoDGlH6dvBW25/1Ubm8esjMPGUwMbkp07Dbv
-EfC6FXoFmgqkVwPZ0By9a+uWmlxBt8NVOPFYPCy9rew6sxKBP5jPB28lW7uomLT1
-hCF/2KSVlotVh/qFufWU6VtGLJXVe2BwAx3VgIkLELOu5ZV0yJXsSEAJLz76clwo
-N1XjzplB4nJGihSjwIFdaWG27wQDqGbj8qF3Sh7iKE71kpTvUr0=
-=uy3q
------END PGP SIGNATURE-----
---=-=-=--
+--
+Damien
 
 
