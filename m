@@ -2,61 +2,52 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64096C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 10:50:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A631C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 10:58:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 351C7206F0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 10:50:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 351C7206F0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id D23F1214AF
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 10:58:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D23F1214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibjI7-00054Y-Ct
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 05:50:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37436)
+	id 1ibjPI-0000WK-Mg
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 05:58:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38315)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ibjHQ-0004Za-2C
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 05:50:13 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ibjOB-0007ew-57
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 05:57:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ibjHN-0007j4-Us
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 05:50:11 -0500
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:35712)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ibjO9-0001WW-SW
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 05:57:11 -0500
+Received: from relay.sw.ru ([185.231.240.75]:40856)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ibjHM-0007i9-JB
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 05:50:08 -0500
-Received: from player718.ha.ovh.net (unknown [10.108.16.187])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 35CB91B7A41
- for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 11:50:05 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player718.ha.ovh.net (Postfix) with ESMTPSA id EF757CB4B828;
- Mon,  2 Dec 2019 10:49:59 +0000 (UTC)
-Date: Mon, 2 Dec 2019 11:49:58 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] docker: remove libcap development packages
-Message-ID: <20191202114958.606de16f@bahia.w3ibm.bluemix.net>
-In-Reply-To: <20191129150801.26654-1-pbonzini@redhat.com>
-References: <20191129150801.26654-1-pbonzini@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 17031769367489321422
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudejhedgvddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedukedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 87.98.181.248
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1ibjO9-0001Vn-Kq; Mon, 02 Dec 2019 05:57:09 -0500
+Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1ibjO2-0003e4-MT; Mon, 02 Dec 2019 13:57:02 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Subject: [PATCH v11 2/3] qcow2: Allow writing compressed data of multiple
+ clusters
+Date: Mon,  2 Dec 2019 13:57:01 +0300
+Message-Id: <1575284222-548831-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1575284222-548831-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1575284222-548831-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,70 +59,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <famz@redhat.com>,
- Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>, berrange@redhat.com,
- qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
+ mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 29 Nov 2019 16:08:01 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+QEMU currently supports writing compressed data of the size equal to
+one cluster. This patch allows writing QCOW2 compressed data that
+exceed one cluster. Now, we split buffered data into separate clusters
+and write them compressed using the block/aio_task API.
 
-> Libcap was dropped from virtio-9p, so remove it from the dockerfiles as well.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
+Suggested-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ block/qcow2.c | 102 ++++++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 75 insertions(+), 27 deletions(-)
 
-Similarly to what was discussed in these threads:
-
-20191129111632.22840-2-pbonzini@redhat.com
-
-20191129142126.32967-1-dgilbert@redhat.com
-
-I'm ok to take this one in my tree as well if I get an ack from Alex
-or Fam.
-
->  tests/docker/dockerfiles/fedora.docker     | 1 -
->  tests/docker/dockerfiles/ubuntu.docker     | 1 -
->  tests/docker/dockerfiles/ubuntu1804.docker | 1 -
->  3 files changed, 3 deletions(-)
-> 
-> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-> index 4ddc7dd112..47732fc5d5 100644
-> --- a/tests/docker/dockerfiles/fedora.docker
-> +++ b/tests/docker/dockerfiles/fedora.docker
-> @@ -25,7 +25,6 @@ ENV PACKAGES \
->      libasan \
->      libattr-devel \
->      libblockdev-mpath-devel \
-> -    libcap-devel \
->      libcap-ng-devel \
->      libcurl-devel \
->      libfdt-devel \
-> diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-> index f486492224..ecea155646 100644
-> --- a/tests/docker/dockerfiles/ubuntu.docker
-> +++ b/tests/docker/dockerfiles/ubuntu.docker
-> @@ -23,7 +23,6 @@ ENV PACKAGES flex bison \
->      libbrlapi-dev \
->      libbz2-dev \
->      libcacard-dev \
-> -    libcap-dev \
->      libcap-ng-dev \
->      libcurl4-gnutls-dev \
->      libdrm-dev \
-> diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
-> index 3cc4f492c4..32a607471a 100644
-> --- a/tests/docker/dockerfiles/ubuntu1804.docker
-> +++ b/tests/docker/dockerfiles/ubuntu1804.docker
-> @@ -12,7 +12,6 @@ ENV PACKAGES flex bison \
->      libbrlapi-dev \
->      libbz2-dev \
->      libcacard-dev \
-> -    libcap-dev \
->      libcap-ng-dev \
->      libcurl4-gnutls-dev \
->      libdrm-dev \
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 7c18721..0e03a1a 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -4222,10 +4222,8 @@ fail:
+     return ret;
+ }
+ 
+-/* XXX: put compressed sectors first, then all the cluster aligned
+-   tables to avoid losing bytes in alignment */
+ static coroutine_fn int
+-qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
++qcow2_co_pwritev_compressed_task(BlockDriverState *bs,
+                                  uint64_t offset, uint64_t bytes,
+                                  QEMUIOVector *qiov, size_t qiov_offset)
+ {
+@@ -4235,32 +4233,11 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
+     uint8_t *buf, *out_buf;
+     uint64_t cluster_offset;
+ 
+-    if (has_data_file(bs)) {
+-        return -ENOTSUP;
+-    }
+-
+-    if (bytes == 0) {
+-        /* align end of file to a sector boundary to ease reading with
+-           sector based I/Os */
+-        int64_t len = bdrv_getlength(bs->file->bs);
+-        if (len < 0) {
+-            return len;
+-        }
+-        return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF, NULL);
+-    }
+-
+-    if (offset_into_cluster(s, offset)) {
+-        return -EINVAL;
+-    }
++    assert(bytes == s->cluster_size || (bytes < s->cluster_size &&
++           (offset + bytes == bs->total_sectors << BDRV_SECTOR_BITS)));
+ 
+     buf = qemu_blockalign(bs, s->cluster_size);
+-    if (bytes != s->cluster_size) {
+-        if (bytes > s->cluster_size ||
+-            offset + bytes != bs->total_sectors << BDRV_SECTOR_BITS)
+-        {
+-            qemu_vfree(buf);
+-            return -EINVAL;
+-        }
++    if (bytes < s->cluster_size) {
+         /* Zero-pad last write if image size is not cluster aligned */
+         memset(buf + bytes, 0, s->cluster_size - bytes);
+     }
+@@ -4309,6 +4286,77 @@ fail:
+     return ret;
+ }
+ 
++static coroutine_fn int qcow2_co_pwritev_compressed_task_entry(AioTask *task)
++{
++    Qcow2AioTask *t = container_of(task, Qcow2AioTask, task);
++
++    assert(!t->cluster_type && !t->l2meta);
++
++    return qcow2_co_pwritev_compressed_task(t->bs, t->offset, t->bytes, t->qiov,
++                                            t->qiov_offset);
++}
++
++/*
++ * XXX: put compressed sectors first, then all the cluster aligned
++ * tables to avoid losing bytes in alignment
++ */
++static coroutine_fn int
++qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
++                                 uint64_t offset, uint64_t bytes,
++                                 QEMUIOVector *qiov, size_t qiov_offset)
++{
++    BDRVQcow2State *s = bs->opaque;
++    AioTaskPool *aio = NULL;
++    int ret = 0;
++
++    if (has_data_file(bs)) {
++        return -ENOTSUP;
++    }
++
++    if (bytes == 0) {
++        /*
++         * align end of file to a sector boundary to ease reading with
++         * sector based I/Os
++         */
++        int64_t len = bdrv_getlength(bs->file->bs);
++        if (len < 0) {
++            return len;
++        }
++        return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF, NULL);
++    }
++
++    if (offset_into_cluster(s, offset)) {
++        return -EINVAL;
++    }
++
++    while (bytes && aio_task_pool_status(aio) == 0) {
++        uint64_t chunk_size = MIN(bytes, s->cluster_size);
++
++        if (!aio && chunk_size != bytes) {
++            aio = aio_task_pool_new(QCOW2_MAX_WORKERS);
++        }
++
++        ret = qcow2_add_task(bs, aio, qcow2_co_pwritev_compressed_task_entry,
++                             0, 0, offset, chunk_size, qiov, qiov_offset, NULL);
++        if (ret < 0) {
++            break;
++        }
++        qiov_offset += chunk_size;
++        offset += chunk_size;
++        bytes -= chunk_size;
++    }
++
++    if (aio) {
++        aio_task_pool_wait_all(aio);
++        if (ret == 0) {
++            ret = aio_task_pool_status(aio);
++        }
++        g_free(aio);
++    }
++
++    return ret;
++}
++
+ static int coroutine_fn
+ qcow2_co_preadv_compressed(BlockDriverState *bs,
+                            uint64_t file_cluster_offset,
+-- 
+1.8.3.1
 
 
