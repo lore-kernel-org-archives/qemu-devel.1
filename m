@@ -6,60 +6,61 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45038C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE3F2C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:09:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19BDD2146E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:08:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19BDD2146E
+	by mail.kernel.org (Postfix) with ESMTPS id A2FF42146E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:09:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2FF42146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibfoY-00057h-1c
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 02:08:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35366)
+	id 1ibfpT-0006P1-02
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 02:09:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35338)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ibfl0-0002HS-71
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:32 -0500
+ (envelope-from <clg@kaod.org>) id 1ibfkw-0002FV-2W
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ibfky-0000lq-7B
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:30 -0500
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:41542)
+ (envelope-from <clg@kaod.org>) id 1ibfku-0000jP-Bc
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:25 -0500
+Received: from 3.mo178.mail-out.ovh.net ([46.105.44.197]:56707)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ibfkx-0000kV-VE
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:28 -0500
-Received: from player728.ha.ovh.net (unknown [10.108.42.5])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 86F591B76FD
- for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 08:04:25 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ibfkp-0000cW-Io
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:21 -0500
+Received: from player726.ha.ovh.net (unknown [10.108.16.46])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id 4DAB982D9A
+ for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 08:04:16 +0100 (CET)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player728.ha.ovh.net (Postfix) with ESMTPSA id 8583ECB02A25;
- Mon,  2 Dec 2019 07:04:17 +0000 (UTC)
-Subject: Re: [for-5.0 2/4] spapr: Improve handling of fdt buffer size
+ by player726.ha.ovh.net (Postfix) with ESMTPSA id 66F4CCB2A324;
+ Mon,  2 Dec 2019 07:04:08 +0000 (UTC)
+Subject: Re: [for-5.0 3/4] spapr: Fold h_cas_compose_response() into
+ h_client_architecture_support()
 To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org
 References: <20191129053356.232413-1-david@gibson.dropbear.id.au>
- <20191129053356.232413-3-david@gibson.dropbear.id.au>
+ <20191129053356.232413-4-david@gibson.dropbear.id.au>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <246281b5-805f-b75d-b565-1c5b3793b2ac@kaod.org>
-Date: Mon, 2 Dec 2019 08:04:16 +0100
+Message-ID: <b0a972a1-df7c-475c-aa48-3adc85744dbe@kaod.org>
+Date: Mon, 2 Dec 2019 08:04:07 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191129053356.232413-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20191129053356.232413-4-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13220598184504232768
+X-Ovh-Tracer-Id: 13218064908697897792
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudejgedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedvkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgepge
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudejgedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedviedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgepud
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.52.147
+X-Received-From: 46.105.44.197
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,111 +79,229 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 29/11/2019 06:33, David Gibson wrote:
-> Previously, spapr_build_fdt() constructed the device tree in a fixed
-> buffer of size FDT_MAX_SIZE.  This is a bit inflexible, but more
-> importantly it's awkward for the case where we use it during CAS.  In
-> that case the guest firmware supplies a buffer and we have to
-> awkwardly check that what we generated fits into it afterwards, after
-> doing a lot of size checks during spapr_build_fdt().
+> spapr_h_cas_compose_response() handles the last piece of the PAPR feature
+> negotiation process invoked via the ibm,client-architecture-support OF
+> call.  Its only caller is h_client_architecture_support() which handles
+> most of the rest of that process.
 > 
-> Simplify this by having spapr_build_fdt() take a 'space' parameter.
-> For the CAS case, we pass in the buffer size provided by SLOF, for the
-> machine init case, we continue to pass FDT_MAX_SIZE.
+> I believe it was place in a separate file originally to handle some fiddly
+> dependencies between functions, but mostly it's just confusing to have
+> the CAS process split into two pieces like this.  Now that compose response
+> is simplified (by just generating the whole device tree anew), it's cleaner
+> to just fold it into h_client_architecture_support().
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
 Reviewed-by: Cedric Le Goater <clg@fr.ibm.com>
 
-
 > ---
->  hw/ppc/spapr.c | 33 +++++++++++----------------------
->  1 file changed, 11 insertions(+), 22 deletions(-)
+>  hw/ppc/spapr.c         | 61 +-----------------------------------------
+>  hw/ppc/spapr_hcall.c   | 55 ++++++++++++++++++++++++++++++++++---
+>  include/hw/ppc/spapr.h |  4 +--
+>  3 files changed, 54 insertions(+), 66 deletions(-)
 > 
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d9c9a2bcee..d34e317f48 100644
+> index d34e317f48..5187f5b0a5 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -917,7 +917,8 @@ static bool spapr_hotplugged_dev_before_cas(void)
->      return false;
+> @@ -76,7 +76,6 @@
+>  #include "hw/nmi.h"
+>  #include "hw/intc/intc.h"
+>  
+> -#include "qemu/cutils.h"
+>  #include "hw/ppc/spapr_cpu_core.h"
+>  #include "hw/mem/memory-device.h"
+>  #include "hw/ppc/spapr_tpm_proxy.h"
+> @@ -897,63 +896,6 @@ out:
+>      return ret;
 >  }
 >  
-> -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset);
-> +static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
-> +                             size_t space);
->  
->  int spapr_h_cas_compose_response(SpaprMachineState *spapr,
->                                   target_ulong addr, target_ulong size,
-> @@ -930,24 +931,17 @@ int spapr_h_cas_compose_response(SpaprMachineState *spapr,
->          return 1;
->      }
->  
-> -    if (size < sizeof(hdr) || size > FW_MAX_SIZE) {
-> -        error_report("SLOF provided an unexpected CAS buffer size "
-> -                     TARGET_FMT_lu " (min: %zu, max: %u)",
-> -                     size, sizeof(hdr), FW_MAX_SIZE);
-> +    if (size < sizeof(hdr)) {
-> +        error_report("SLOF provided insufficient CAS buffer "
-> +                     TARGET_FMT_lu " (min: %zu)", size, sizeof(hdr));
->          exit(EXIT_FAILURE);
->      }
->  
->      size -= sizeof(hdr);
->  
-> -    fdt = spapr_build_fdt(spapr, false);
-> +    fdt = spapr_build_fdt(spapr, false, size);
->      _FDT((fdt_pack(fdt)));
->  
-> -    if (fdt_totalsize(fdt) + sizeof(hdr) > size) {
-> -        g_free(fdt);
-> -        trace_spapr_cas_failed(size);
-> -        return -1;
+> -static bool spapr_hotplugged_dev_before_cas(void)
+> -{
+> -    Object *drc_container, *obj;
+> -    ObjectProperty *prop;
+> -    ObjectPropertyIterator iter;
+> -
+> -    drc_container = container_get(object_get_root(), "/dr-connector");
+> -    object_property_iter_init(&iter, drc_container);
+> -    while ((prop = object_property_iter_next(&iter))) {
+> -        if (!strstart(prop->type, "link<", NULL)) {
+> -            continue;
+> -        }
+> -        obj = object_property_get_link(drc_container, prop->name, NULL);
+> -        if (spapr_drc_needed(obj)) {
+> -            return true;
+> -        }
+> -    }
+> -    return false;
+> -}
+> -
+> -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
+> -                             size_t space);
+> -
+> -int spapr_h_cas_compose_response(SpaprMachineState *spapr,
+> -                                 target_ulong addr, target_ulong size,
+> -                                 SpaprOptionVector *ov5_updates)
+> -{
+> -    void *fdt;
+> -    SpaprDeviceTreeUpdateHeader hdr = { .version_id = 1 };
+> -
+> -    if (spapr_hotplugged_dev_before_cas()) {
+> -        return 1;
 > -    }
 > -
->      cpu_physical_memory_write(addr, &hdr, sizeof(hdr));
->      cpu_physical_memory_write(addr + sizeof(hdr), fdt, fdt_totalsize(fdt));
->      trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
-> @@ -1197,7 +1191,8 @@ static void spapr_dt_hypervisor(SpaprMachineState *spapr, void *fdt)
+> -    if (size < sizeof(hdr)) {
+> -        error_report("SLOF provided insufficient CAS buffer "
+> -                     TARGET_FMT_lu " (min: %zu)", size, sizeof(hdr));
+> -        exit(EXIT_FAILURE);
+> -    }
+> -
+> -    size -= sizeof(hdr);
+> -
+> -    fdt = spapr_build_fdt(spapr, false, size);
+> -    _FDT((fdt_pack(fdt)));
+> -
+> -    cpu_physical_memory_write(addr, &hdr, sizeof(hdr));
+> -    cpu_physical_memory_write(addr + sizeof(hdr), fdt, fdt_totalsize(fdt));
+> -    trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
+> -
+> -    g_free(spapr->fdt_blob);
+> -    spapr->fdt_size = fdt_totalsize(fdt);
+> -    spapr->fdt_initial_size = spapr->fdt_size;
+> -    spapr->fdt_blob = fdt;
+> -
+> -    return 0;
+> -}
+> -
+>  static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+>  {
+>      MachineState *ms = MACHINE(spapr);
+> @@ -1191,8 +1133,7 @@ static void spapr_dt_hypervisor(SpaprMachineState *spapr, void *fdt)
 >      }
 >  }
 >  
-> -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset)
-> +static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
-> +                             size_t space)
+> -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
+> -                             size_t space)
+> +void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t space)
 >  {
 >      MachineState *machine = MACHINE(spapr);
 >      MachineClass *mc = MACHINE_GET_CLASS(machine);
-> @@ -1207,8 +1202,8 @@ static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset)
->      SpaprPhbState *phb;
->      char *buf;
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 05a7ca275b..0f19be794c 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1,4 +1,5 @@
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  #include "qapi/error.h"
+>  #include "sysemu/hw_accel.h"
+>  #include "sysemu/runstate.h"
+> @@ -15,6 +16,7 @@
+>  #include "cpu-models.h"
+>  #include "trace.h"
+>  #include "kvm_ppc.h"
+> +#include "hw/ppc/fdt.h"
+>  #include "hw/ppc/spapr_ovec.h"
+>  #include "mmu-book3s-v3.h"
+>  #include "hw/mem/memory-device.h"
+> @@ -1638,6 +1640,26 @@ static uint32_t cas_check_pvr(SpaprMachineState *spapr, PowerPCCPU *cpu,
+>      return best_compat;
+>  }
 >  
-> -    fdt = g_malloc0(FDT_MAX_SIZE);
-> -    _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
-> +    fdt = g_malloc0(space);
-> +    _FDT((fdt_create_empty_tree(fdt, space)));
+> +static bool spapr_hotplugged_dev_before_cas(void)
+> +{
+> +    Object *drc_container, *obj;
+> +    ObjectProperty *prop;
+> +    ObjectPropertyIterator iter;
+> +
+> +    drc_container = container_get(object_get_root(), "/dr-connector");
+> +    object_property_iter_init(&iter, drc_container);
+> +    while ((prop = object_property_iter_next(&iter))) {
+> +        if (!strstart(prop->type, "link<", NULL)) {
+> +            continue;
+> +        }
+> +        obj = object_property_get_link(drc_container, prop->name, NULL);
+> +        if (spapr_drc_needed(obj)) {
+> +            return true;
+> +        }
+> +    }
+> +    return false;
+> +}
+> +
+>  static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>                                                    SpaprMachineState *spapr,
+>                                                    target_ulong opcode,
+> @@ -1645,6 +1667,8 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>  {
+>      /* Working address in data buffer */
+>      target_ulong addr = ppc64_phys_to_real(args[0]);
+> +    target_ulong fdt_buf = args[1];
+> +    target_ulong fdt_bufsize = args[2];
+>      target_ulong ov_table;
+>      uint32_t cas_pvr;
+>      SpaprOptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
+> @@ -1788,16 +1812,41 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
 >  
->      /* Root node */
->      _FDT(fdt_setprop_string(fdt, 0, "device_type", "chrp"));
-> @@ -1723,19 +1718,13 @@ static void spapr_machine_reset(MachineState *machine)
->       */
->      fdt_addr = MIN(spapr->rma_size, RTAS_MAX_ADDR) - FDT_MAX_SIZE;
+>      spapr_irq_update_active_intc(spapr);
 >  
-> -    fdt = spapr_build_fdt(spapr, true);
-> +    fdt = spapr_build_fdt(spapr, true, FDT_MAX_SIZE);
+> +    if (spapr_hotplugged_dev_before_cas()) {
+> +        spapr->cas_reboot = true;
+> +    }
+> +
+>      if (!spapr->cas_reboot) {
+> +        void *fdt;
+> +        SpaprDeviceTreeUpdateHeader hdr = { .version_id = 1 };
+> +
+>          /* If spapr_machine_reset() did not set up a HPT but one is necessary
+>           * (because the guest isn't going to use radix) then set it up here. */
+>          if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
+>              /* legacy hash or new hash: */
+>              spapr_setup_hpt_and_vrma(spapr);
+>          }
+> -        spapr->cas_reboot =
+> -            (spapr_h_cas_compose_response(spapr, args[1], args[2],
+> -                                          ov5_updates) != 0);
+> +
+> +        if (fdt_bufsize < sizeof(hdr)) {
+> +            error_report("SLOF provided insufficient CAS buffer "
+> +                         TARGET_FMT_lu " (min: %zu)", fdt_bufsize, sizeof(hdr));
+> +            exit(EXIT_FAILURE);
+> +        }
+> +
+> +        fdt_bufsize -= sizeof(hdr);
+> +
+> +        fdt = spapr_build_fdt(spapr, false, fdt_bufsize);
+> +        _FDT((fdt_pack(fdt)));
+> +
+> +        cpu_physical_memory_write(fdt_buf, &hdr, sizeof(hdr));
+> +        cpu_physical_memory_write(fdt_buf + sizeof(hdr), fdt,
+> +                                  fdt_totalsize(fdt));
+> +        trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
+> +
+> +        g_free(spapr->fdt_blob);
+> +        spapr->fdt_size = fdt_totalsize(fdt);
+> +        spapr->fdt_initial_size = spapr->fdt_size;
+> +        spapr->fdt_blob = fdt;
+>      }
 >  
->      rc = fdt_pack(fdt);
+>      spapr_ovec_cleanup(ov5_updates);
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index d5ab5ea7b2..61f005c6f6 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -766,11 +766,9 @@ struct SpaprEventLogEntry {
+>      QTAILQ_ENTRY(SpaprEventLogEntry) next;
+>  };
 >  
->      /* Should only fail if we've built a corrupted tree */
->      assert(rc == 0);
->  
-> -    if (fdt_totalsize(fdt) > FDT_MAX_SIZE) {
-> -        error_report("FDT too big ! 0x%x bytes (max is 0x%x)",
-> -                     fdt_totalsize(fdt), FDT_MAX_SIZE);
-> -        exit(1);
-> -    }
-> -
->      /* Load the fdt */
->      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
->      cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
+> +void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t space);
+>  void spapr_events_init(SpaprMachineState *sm);
+>  void spapr_dt_events(SpaprMachineState *sm, void *fdt);
+> -int spapr_h_cas_compose_response(SpaprMachineState *sm,
+> -                                 target_ulong addr, target_ulong size,
+> -                                 SpaprOptionVector *ov5_updates);
+>  void close_htab_fd(SpaprMachineState *spapr);
+>  void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr);
+>  void spapr_free_hpt(SpaprMachineState *spapr);
 > 
 
 
