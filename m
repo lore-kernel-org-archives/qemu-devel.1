@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 189ABC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF257C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:57:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6B1320833
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:56:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A64220833
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:57:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C/s2Ryv4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6B1320833
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DKmKGrcK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A64220833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibiRs-00082a-2j
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 04:56:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57579)
+	id 1ibiSW-0000er-R4
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 04:57:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57689)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1ibiQb-00071r-Hr
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:55:38 -0500
+ (envelope-from <david@redhat.com>) id 1ibiRZ-00084N-PM
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:56:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1ibiQa-0007oG-38
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:55:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37932
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1ibiRY-00087v-Ps
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:56:37 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25641
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1ibiQZ-0007mZ-UQ
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:55:36 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1ibiRY-00087n-Lm
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:56:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575280535;
+ s=mimecast20190719; t=1575280596;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=no8l2TnUMDUAX65cSnOPMo51yPrtO8iqH2H1B0OSz9I=;
- b=C/s2Ryv4iCYGBc6o1pQj7vwQyH1hpkhXo/vqVJt6KJEp+iEFVkiZ34tKq46+8MDT/P02oH
- roP5sHzG4sDV6t21p9Xv7/7tgVt0hCzZdlTm60+E/p1cazIyeUNtlavZZXTwUMq+leLtSP
- CdHR5HaebPccTMSEMrYR4MYfksOLQRM=
+ bh=yeEeNK3W5ccT7yDhHYMxCSO6pPWdSmAjhee52SG31Cg=;
+ b=DKmKGrcKhK67D8ksXb4I1E7pZkoBFZ3faKhoXHUZ5Nr+oaOvdglHw8/dqWw21sXP3vZfh7
+ lZjJ2vL8BCXphl9tYh7laOxtKnoP+RDehp2KC6Ae0ityGh7mSFZYsMOp8Kx4H5f9epiNjC
+ FQfSCP0bB+satVavIlbBVaGYIVWPGFY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-N_lnFeLsNu-3xRkXohl9Rw-1; Mon, 02 Dec 2019 04:55:34 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-227-NjhBThwGMZaJjBO9JnC2gg-1; Mon, 02 Dec 2019 04:56:35 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 430C38017DF;
- Mon,  2 Dec 2019 09:55:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEA608017DF;
+ Mon,  2 Dec 2019 09:56:33 +0000 (UTC)
 Received: from [10.36.117.49] (ovpn-117-49.ams2.redhat.com [10.36.117.49])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 380BE6609C;
- Mon,  2 Dec 2019 09:55:32 +0000 (UTC)
-Subject: Re: [PATCH 18/21] s390x: Fix latent query-cpu-definitions error
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A3EB619C68;
+ Mon,  2 Dec 2019 09:56:32 +0000 (UTC)
+Subject: Re: [PATCH 14/21] s390x/event-facility: Fix latent realize() error
  handling bug
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20191130194240.10517-1-armbru@redhat.com>
- <20191130194240.10517-19-armbru@redhat.com>
+ <20191130194240.10517-15-armbru@redhat.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -108,21 +108,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  +8Umfre0Xt4713VxMygW0PnQt5aSQdMD58jHFxTk092mU+yIHj5LeYgvwSgZN4airXk5yRXl
  SE+xAvmumFBY
 Organization: Red Hat GmbH
-Message-ID: <7d56a543-4f8c-07e9-6b77-2389c0b6bffe@redhat.com>
-Date: Mon, 2 Dec 2019 10:55:31 +0100
+Message-ID: <b915c6f6-8f2a-7ceb-6652-90ab52ac7488@redhat.com>
+Date: Mon, 2 Dec 2019 10:56:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191130194240.10517-19-armbru@redhat.com>
+In-Reply-To: <20191130194240.10517-15-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: N_lnFeLsNu-3xRkXohl9Rw-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: NjhBThwGMZaJjBO9JnC2gg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -140,44 +140,48 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 30.11.19 20:42, Markus Armbruster wrote:
-> qmp_query_cpu_definitions() tries to ignore get_max_cpu_model()'s
-> errors.  However, it crashes when its @errp argument is null or
-> &error_abort, and exit(1)s when it's &error_fatal.  Messed up in
-> commit 38cba1f4d8 "s390x: return unavailable features via
-> query-cpu-definitions".
+> sclp_events_bus_realize() crashes when object_property_set_bool()
+> fails and its @errp argument is null.  Messed up in commit f6102c329c
+> "s390/sclp: rework sclp event facility initialization + device
+> realization".
+> 
 
-s/crashes .../would crash .../ etc.
+s/crashes .../would crash .../ ...
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
-> 
-> The bug can't bite as no caller actually passes such @errp values.
-> Fix it anyway.
+> The bug can't bite as no caller actually passes null.  Fix it anyway.
 > 
 > Cc: David Hildenbrand <david@redhat.com>
 > Cc: Cornelia Huck <cohuck@redhat.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  target/s390x/cpu_models.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
+>  hw/s390x/event-facility.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index 3ed301b5e5..547bab8ac3 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -462,11 +462,7 @@ CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
->          .list = NULL,
->      };
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 66205697ae..cdcf9154c4 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -339,14 +339,16 @@ out:
 >  
-> -    list_data.model = get_max_cpu_model(errp);
-> -    if (*errp) {
-> -        error_free(*errp);
-> -        *errp = NULL;
-> -    }
-> +    list_data.model = get_max_cpu_model(NULL);
+>  static void sclp_events_bus_realize(BusState *bus, Error **errp)
+>  {
+> +    Error *err = NULL;
+>      BusChild *kid;
 >  
->      object_class_foreach(create_cpu_model_list, TYPE_S390_CPU, false,
->                           &list_data);
+>      /* TODO: recursive realization has to be done in common code */
+>      QTAILQ_FOREACH(kid, &bus->children, sibling) {
+>          DeviceState *dev = kid->child;
+>  
+> -        object_property_set_bool(OBJECT(dev), true, "realized", errp);
+> -        if (*errp) {
+> +        object_property_set_bool(OBJECT(dev), true, "realized", &err);
+> +        if (errp) {
+> +            error_propagate(errp, err);
+>              return;
+>          }
+>      }
 > 
 
 
