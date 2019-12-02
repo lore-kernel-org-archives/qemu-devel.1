@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D03FAC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:12:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D717DC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:13:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1DBF20748
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:12:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1DBF20748
+	by mail.kernel.org (Postfix) with ESMTPS id 6B0CC20748
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:13:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0CC20748
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibjdK-0000yq-QF
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:12:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40460)
+	id 1ibjdc-000180-5k
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:13:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40471)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ibjcH-0008Uc-FH
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:11:46 -0500
+ (envelope-from <bounces@canonical.com>) id 1ibjcK-0008W2-CM
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:11:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ibjcG-0006jU-89
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:11:45 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49234)
+ (envelope-from <bounces@canonical.com>) id 1ibjcF-0006iy-5T
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:11:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49092)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ibjcG-0006j7-2P
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:11:44 -0500
+ id 1ibjcE-0006hf-W3
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:11:43 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ibjcE-0007f6-Oy
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 11:11:42 +0000
+ id 1ibjcC-0007YZ-DK
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 11:11:40 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A37672E807D
- for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 11:11:42 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 6348B2E8085
+ for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 11:11:40 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Dec 2019 11:02:37 -0000
-From: =?utf-8?q?=C5=81ukasz_Zemczak?= <1848556@bugs.launchpad.net>
+Date: Mon, 02 Dec 2019 11:02:22 -0000
+From: Launchpad Bug Tracker <1848556@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
@@ -65,17 +65,17 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: janitor paelzer rodsmith sil2100 tjaalton
  ubuntu-sru-bot xanclic
 X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
-X-Launchpad-Bug-Modifier: =?utf-8?q?=C5=81ukasz_Zemczak_=28sil2100=29?=
+X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
 References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
-Message-Id: <157528455763.31064.9878508832412079040.malone@wampee.canonical.com>
-Subject: [Bug 1848556] Update Released
+Message-Id: <157528454888.8939.495514277184391841.malone@ackee.canonical.com>
+Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="c597c3229eb023b1e626162d5947141bf7befb13";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 5f0fee578669e266c005f746b26f2e93abc8fa87
+X-Launchpad-Hash: 13923c14c74c5c02fcf11b062189158bf969e833
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -94,13 +94,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The verification of the Stable Release Update for qemu has completed
-successfully and the package is now being released to -updates.
-Subsequently, the Ubuntu Stable Release Updates Team is being
-unsubscribed and will not receive messages about this bug report.  In
-the event that you encounter a regression using the package from
--updates please report a new bug using ubuntu-bug and tag the bug report
-regression-update so we can easily find any regressions.
+This bug was fixed in the package qemu - 1:4.0+dfsg-0ubuntu9.2
+
+---------------
+qemu (1:4.0+dfsg-0ubuntu9.2) eoan; urgency=3Dmedium
+
+  * d/p/ubuntu/lp-1848556-curl-Handle-success-in-multi_check_completion.pat=
+ch:
+    fix a potential hang when qemu or qemu-img where accessing http backed
+    disks via libcurl (LP: #1848556)
+  * d/p/u/lp-1848497-virtio-balloon-fix-QEMU-4.0-config-size-migration-in.p=
+atch:
+    fix migration issue from qemu <4.0 when using virtio-balloon (LP: #1848=
+497)
+
+ -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Mon, 21 Oct
+2019 14:51:45 +0200
+
+** Changed in: qemu (Ubuntu Eoan)
+       Status: Fix Committed =3D> Fix Released
 
 -- =
 
