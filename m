@@ -2,80 +2,86 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6339DC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:25:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A24E4C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:41:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26108206F0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:25:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A2082084F
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:41:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QHoi8jEe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26108206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="3qnXKbgn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A2082084F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibjpt-0001L5-Ak
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:25:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42640)
+	id 1ibk4y-0007Et-Cl
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:41:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44590)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1ibjok-0000cR-8W
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:24:39 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1ibk2C-0006Kp-UF
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:38:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1ibjoj-0007Hx-9G
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:24:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35557
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1ibk2B-0004Qz-3g
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:38:32 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:51086)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1ibjoj-0007HX-5I
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:24:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575285876;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1ibk27-0004PE-FE; Mon, 02 Dec 2019 06:38:28 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 82F8696EF0;
+ Mon,  2 Dec 2019 11:38:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1575286701;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GS+23DaqC3qG/4/nQ76tpqB0JqbHQ+rqtKp1zwW49yA=;
- b=QHoi8jEeJEj7QcbB/wP4prWtU8PLO89ygZdbYYh97hyzceQDXsLY81UZ5MJfQJFW3SFNG3
- 8X9QLg4QSe7wOltwe9hqzIqeqlpgr0UzZs7jOwNf7SLqiMMQ/w7jOIv8m4MxUkpM3KxCEg
- H/uta/vlNZ56Sc92Z1yRxDDyuaq9Uqo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-ba1fABGxNuif4wxiIkf9ZA-1; Mon, 02 Dec 2019 06:24:33 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB314800D53;
- Mon,  2 Dec 2019 11:24:31 +0000 (UTC)
-Received: from localhost (dhcp-192-223.str.redhat.com [10.33.192.223])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A947A4B86;
- Mon,  2 Dec 2019 11:24:22 +0000 (UTC)
-Date: Mon, 2 Dec 2019 12:24:21 +0100
-From: Jens Freimann <jfreimann@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH 00/21] Error handling fixes, may contain 4.2 material
-Message-ID: <20191202112421.nqwj4bycswnqjdym@jenstp.localdomain>
-References: <20191130194240.10517-1-armbru@redhat.com>
+ bh=kc4rOJaJAYsNyCWNjPbW9WW8Alz48HOG756F5zrMF0A=;
+ b=3qnXKbgngrLys298wuE/JEhUm0wVSEaZ89fMLWV4Cb34aYF/4myeg4+4+XSagbqI3LafXk
+ IhRQHAqQYfQfC3GP97klTyipM93omHoIP2Mq6fqQefl7XCghoBMbNGmrXnO7AmXlh6WwY8
+ qYu2RljaoW3ebaC1K2uAmgcxphur5uQ=
+Subject: Re: [PATCH v5 04/13] hw/core: add Resettable support to BusClass and
+ DeviceClass
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191018150630.31099-1-damien.hedde@greensocs.com>
+ <20191018150630.31099-5-damien.hedde@greensocs.com>
+ <CAFEAcA9z_Tu3jEABbRVgoZfw=_6RDm8MOQNOYh4qwmQzJjBAgQ@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <0befd5d7-dde3-9a41-6c60-1bc372f7fd28@greensocs.com>
+Date: Mon, 2 Dec 2019 12:38:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191130194240.10517-1-armbru@redhat.com>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: ba1fABGxNuif4wxiIkf9ZA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+In-Reply-To: <CAFEAcA9z_Tu3jEABbRVgoZfw=_6RDm8MOQNOYh4qwmQzJjBAgQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1575286701;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kc4rOJaJAYsNyCWNjPbW9WW8Alz48HOG756F5zrMF0A=;
+ b=Wi4oqgutqhzNbKcEtiG4+L4eiPJCFAsdD4tm4s9izLCm1Ju2q41Lv7sAOnTuh8Pm6Rfo2F
+ JCNDiq6dDsKhlrgZteDGN3NWCfjUzRJPhTfJZ05H77uYoC4VoUpW1E7Zi+R4j3PmtkR36A
+ UIpLYX8uNZvuektGCsFrIPCoPyUoYls=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575286701; a=rsa-sha256; cv=none;
+ b=a5+O9S4I9dxfA+Rnf7LutTBtMjnLdCtsP1Uiv3LCOVrc80pTRx1i+NPR4ofgLPefyvngrv
+ H65jPJ2pdBO/uL5Rqr6K2HqSzL/j0eA0rFbJzkGgtOgHQG+pxcqx0ji9M47acfIZPTPrTv
+ Gs7YpitOBwpWbXPIM6JRKXWl/gpu2Uo=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,37 +93,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Corey Minyard <cminyard@mvista.com>,
- vsementsov@virtuozzo.com,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Nishanth Aravamudan <naravamudan@digitalocean.com>,
- Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>,
- qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Nov 30, 2019 at 08:42:19PM +0100, Markus Armbruster wrote:
->PATCH 2-4 fix crash bugs.  Including them would be a no-brainer at
->-rc0.  But we're post -rc3, and even for crash bugs we require a
->certain likelihood of users getting bitten.
->
->Jens, please assess impact of PATCH 2's crash bug.
 
-Guest can't use it to trigger a qemu crash because the hotplug_handler
-called after the pre-plug doesn't do anything with errp.
 
-qemu_opt_set_bool() is also unlikely to trigger the bug because both
-reasons for why it would set errp are not true in this path.
+On 11/29/19 7:36 PM, Peter Maydell wrote:
+> On Fri, 18 Oct 2019 at 16:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>>
+>> This commit adds support of Resettable interface to buses and devices:
+>> + ResettableState structure is added in the Bus/Device state
+>> + Resettable methods are implemented.
+>> + device/bus_is_in_reset function defined
+>>
+>> This commit allows to transition the objects to the new
+>> multi-phase interface without changing the reset behavior at all.
+>> Object single reset method can be split into the 3 different phases
+>> but the 3 phases are still executed in a row for a given object.
+>> From the qdev/qbus reset api point of view, nothing is changed.
+>> qdev_reset_all() and qbus_reset_all() are not modified as well as
+>> device_legacy_reset().
+>>
+>> Transition of an object must be done from mother class to daughter
+>> classes.
+> 
+> The standard terminology here is "parent class" and "child class".
+> 
+> I notice you've used mother/daughter in a bunch of other comments
+> in various patches -- could you change that to the more usual
+> terms, please?
+Yes. Sorry for that.
 
-I would prefer for this fix to go into 4.2 but if it is the only one
-and triggers a large amount of work then don't do it.
+> 
+>> Care has been taken to allow the transition of a mother class
+>> without requiring the daughter classes to be transitioned at the same
+>> time. Note that SysBus and SysBusDevice class do not need any transition
+>> because they do not override the legacy reset method.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> 
+> Otherwise
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> 
+> thanks
+> -- PMM
+> 
 
-regards
-Jens
-
+--
+Damien
 
