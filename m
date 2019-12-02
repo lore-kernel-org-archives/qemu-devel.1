@@ -2,90 +2,82 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7492EC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA57C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:54:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32C5920717
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:53:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54DF420717
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:54:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pq92iD6j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32C5920717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpfTEPeh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54DF420717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibo1A-0000QP-9S
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 10:53:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50848)
+	id 1ibo1P-0000nw-Cm
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 10:53:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50886)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ibo0A-0007k6-Be
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:52:43 -0500
+ (envelope-from <berrange@redhat.com>) id 1ibo0W-00089U-AH
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:53:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ibo09-0005rK-4m
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:52:42 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:46169)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ibo08-0005qV-TM
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:52:41 -0500
-Received: by mail-pf1-x441.google.com with SMTP id y10so2735779pfm.13
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 07:52:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=gqxsmiAV7JV1SONG7XrgAI1qIjgS9GyeEQFLfkiVFD4=;
- b=Pq92iD6jSYY+Ddpfv6Dp5gg9SJCEnRLUPS/7ajDa44KmJyecfS+x5TfeL0on5o0Lwm
- zwzTjOSIB7OZsF+OA4+WPsaL0FEvikO/O28zSNB5JAyGCiNXhIw2Zq2NhrBUZPRWacfv
- jTOAYx9vZh3m/OTCYSls3KNvpKcUiHjmE2+lalTeRUt5QH8lhbXIJhe041ROhTFU4Sfz
- 2oTO4y9yWpde03wDwWg8EYE0bJeFQ+5Paya0+LcGHIsya6BCP3JbXF+qd/mv6D6ktB20
- PhBbj9uW9j7vh/yUAKzEeh+CmP6SJW4Z02muxIYGE0Z9O96JNFQsG0CGEomZwaWFALPm
- y8oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=gqxsmiAV7JV1SONG7XrgAI1qIjgS9GyeEQFLfkiVFD4=;
- b=Js1SB5bQqFY1cZqJ+azTxkUXSsoRrVJNPqKMgLluRnRQVnS+8dC8/WlS88orHfrG5M
- eF3fLdmvYy/Cm6yBUAccUnEBkUJ/TJLIBqrBKlc67Tsnx5stXczmScuOv6Szu0JA/vSD
- uCCxGcFEQ23L/FFrBTDVixpabL+JwtjoTFZSgnWltZGNPXYbhm6J5KpuT36javNBAfGz
- 1aKcEBCtc9EO7Bc5kiRQvu8W8MCL8RnKqmY7I7Gy2Oc2oxxx5kcGGIrGZ5FSsKNAGa6m
- bRLMLBqW20ZMtxFYL2KRy3s6Y08Fwcv95njZZ3Y2kVnqr21sJ8IOycxoDi91h5N8u0+s
- 2nvA==
-X-Gm-Message-State: APjAAAXMlFNko7sN23UwpjzHkqTanRPFK33zaxS1iac+hvBUD8oL2GxL
- YQYwPv7BtsweVBz1lXzHjhs5dA==
-X-Google-Smtp-Source: APXvYqxxWz256voFtzIHZgU8EratAp/k2RNw2W/RSW4y9Und1CdhZvQjCmdQlDoVfX8eKNj8bdDasA==
-X-Received: by 2002:a63:364d:: with SMTP id d74mr32507600pga.408.1575301959004; 
- Mon, 02 Dec 2019 07:52:39 -0800 (PST)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id o23sm35484257pgj.90.2019.12.02.07.52.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Dec 2019 07:52:38 -0800 (PST)
-Subject: Re: [PATCH v2 4/5] target/arm: Handle AArch32 CP15 trapping via
- HSTR_EL2
-To: Marc Zyngier <maz@kernel.org>, qemu-devel@nongnu.org
-References: <20191201122018.25808-1-maz@kernel.org>
- <20191201122018.25808-5-maz@kernel.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <be437b20-20d7-ebbe-b3b2-8db45774fbbf@linaro.org>
-Date: Mon, 2 Dec 2019 07:52:36 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ (envelope-from <berrange@redhat.com>) id 1ibo0U-00067o-SM
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:53:04 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54628
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ibo0U-00067V-OZ
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:53:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575301982;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=P2IMzEz3qIz851v4twhsY+tYOzVNmPCyL+i/hYDZ3s0=;
+ b=dpfTEPehRhvF/KF2NTpDL1mlCSjmTqoYO3B/l4Dw1migtTT41m0HN8DvHInvn4EhVABYHd
+ 6hZGZA3ko0bhPz4i0UTc+3tDwFbceE50g54IcjsOyFHRh5HEafp6mlY4hPA9IUy+YGSpYX
+ m1dGtEJB4oJ8LhWcpO7tTtWMovI/NsI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-JmruyA85PDCrttuX4lf3GQ-1; Mon, 02 Dec 2019 10:52:59 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05C3B18766F3;
+ Mon,  2 Dec 2019 15:52:58 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 293525DA76;
+ Mon,  2 Dec 2019 15:52:57 +0000 (UTC)
+Date: Mon, 2 Dec 2019 15:52:54 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Yu-Chen Lin <npes87184@gmail.com>
+Subject: Re: [PATCH] io/channel-websock: treat 'binary' and no sub-protocol
+ as the same
+Message-ID: <20191202155254.GN4184266@redhat.com>
+References: <20191123034306.6139-1-npes87184@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191201122018.25808-5-maz@kernel.org>
+In-Reply-To: <20191123034306.6139-1-npes87184@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: JmruyA85PDCrttuX4lf3GQ-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,33 +89,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>, kvmarm@lists.cs.columbia.edu
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/1/19 12:20 PM, Marc Zyngier wrote:
-> +    /* Check for an EL2 trap due to HSTR_EL2. We expect EL0 accesses
-> +     * to sysregs non accessible at EL0 to have UNDEF-ed already.
-> +     */
+On Sat, Nov 23, 2019 at 11:43:06AM +0800, Yu-Chen Lin wrote:
+> noVNC doesn't use 'binary' protocol by default after
+> commit c912230309806aacbae4295faf7ad6406da97617.
+>=20
+> It will cause qemu return 400 when handshaking.
+>=20
+> To overcome this problem and remain compatibility of
+> older noVNC client.
+>=20
+> We treat 'binary' and no sub-protocol as the same
+> so that we can support different version of noVNC
+> client.
+>=20
+> Tested on noVNC before c912230 and after c912230.
+>=20
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1849644
+>=20
+> Signed-off-by: Yu-Chen Lin <npes87184@gmail.com>
+> ---
+>  io/channel-websock.c | 35 +++++++++++++++++++++++------------
+>  1 file changed, 23 insertions(+), 12 deletions(-)
 
-We're enforcing
+Thank you, I have queued this for 5.0.
 
-    /*
-     * Multi-line comment
-     */
+  Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-for qemu now; checkpatch should be reporting on that.
+Also CC'ing stable for the first 4.2 bug fix release.
 
-> +    if (!env->aarch64 && arm_current_el(env) < 2 && ri->cp == 15 &&
-> +        (arm_hcr_el2_eff(env) & (HCR_E2H | HCR_TGE)) != (HCR_E2H | HCR_TGE)) {
+>=20
+> diff --git a/io/channel-websock.c b/io/channel-websock.c
+> index fc36d44eba..918e09ea3f 100644
+> --- a/io/channel-websock.c
+> +++ b/io/channel-websock.c
+> @@ -49,13 +49,20 @@
+>      "Server: QEMU VNC\r\n"                       \
+>      "Date: %s\r\n"
+> =20
+> +#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_WITH_PROTO_RES_OK \
+> +    "HTTP/1.1 101 Switching Protocols\r\n"              \
+> +    QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON            \
+> +    "Upgrade: websocket\r\n"                            \
+> +    "Connection: Upgrade\r\n"                           \
+> +    "Sec-WebSocket-Accept: %s\r\n"                      \
+> +    "Sec-WebSocket-Protocol: binary\r\n"                \
+> +    "\r\n"
+>  #define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_OK    \
+>      "HTTP/1.1 101 Switching Protocols\r\n"      \
+>      QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON    \
+>      "Upgrade: websocket\r\n"                    \
+>      "Connection: Upgrade\r\n"                   \
+>      "Sec-WebSocket-Accept: %s\r\n"              \
+> -    "Sec-WebSocket-Protocol: binary\r\n"        \
+>      "\r\n"
+>  #define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_NOT_FOUND \
+>      "HTTP/1.1 404 Not Found\r\n"                    \
+> @@ -336,6 +343,7 @@ qio_channel_websock_find_header(QIOChannelWebsockHTTP=
+Header *hdrs,
+> =20
+>  static void qio_channel_websock_handshake_send_res_ok(QIOChannelWebsock =
+*ioc,
+>                                                        const char *key,
+> +                                                      const bool use_pro=
+tocols,
+>                                                        Error **errp)
+>  {
+>      char combined_key[QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN +
+> @@ -361,8 +369,13 @@ static void qio_channel_websock_handshake_send_res_o=
+k(QIOChannelWebsock *ioc,
+>      }
+> =20
+>      date =3D qio_channel_websock_date_str();
+> -    qio_channel_websock_handshake_send_res(
+> -        ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_OK, date, accept);
+> +    if (use_protocols) {
+> +            qio_channel_websock_handshake_send_res(
+> +                ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_WITH_PROTO_RES_OK, da=
+te, accept);
+> +    } else {
+> +            qio_channel_websock_handshake_send_res(
+> +                ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_OK, date, accept)=
+;
+> +    }
+> =20
+>      g_free(date);
+>      g_free(accept);
+> @@ -387,10 +400,6 @@ static void qio_channel_websock_handshake_process(QI=
+OChannelWebsock *ioc,
+> =20
+>      protocols =3D qio_channel_websock_find_header(
+>          hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL);
+> -    if (!protocols) {
+> -        error_setg(errp, "Missing websocket protocol header data");
+> -        goto bad_request;
+> -    }
+> =20
+>      version =3D qio_channel_websock_find_header(
+>          hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_VERSION);
+> @@ -430,10 +439,12 @@ static void qio_channel_websock_handshake_process(Q=
+IOChannelWebsock *ioc,
+>      trace_qio_channel_websock_http_request(ioc, protocols, version,
+>                                             host, connection, upgrade, ke=
+y);
+> =20
+> -    if (!g_strrstr(protocols, QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY)) {
+> -        error_setg(errp, "No '%s' protocol is supported by client '%s'",
+> -                   QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY, protocols);
+> -        goto bad_request;
+> +    if (protocols) {
+> +            if (!g_strrstr(protocols, QIO_CHANNEL_WEBSOCK_PROTOCOL_BINAR=
+Y)) {
+> +                error_setg(errp, "No '%s' protocol is supported by clien=
+t '%s'",
+> +                           QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY, protocol=
+s);
+> +                goto bad_request;
+> +            }
+>      }
+> =20
+>      if (!g_str_equal(version, QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION)) {
+> @@ -467,7 +478,7 @@ static void qio_channel_websock_handshake_process(QIO=
+ChannelWebsock *ioc,
+>          goto bad_request;
+>      }
+> =20
+> -    qio_channel_websock_handshake_send_res_ok(ioc, key, errp);
+> +    qio_channel_websock_handshake_send_res_ok(ioc, key, !!protocols, err=
+p);
+>      return;
+> =20
+>   bad_request:
+> --=20
+> 2.17.1
+>=20
 
-Use is_a64(env) not env->aarch64 directly.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
-Otherwise,
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
 
