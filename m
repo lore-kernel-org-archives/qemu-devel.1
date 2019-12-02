@@ -2,79 +2,69 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B29EEC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 18:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FC2C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 18:23:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EE4F2071F
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 18:23:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gX4AoLyX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EE4F2071F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 38F6920718
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 18:23:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38F6920718
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibqLy-0002Sv-FB
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 13:23:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60072)
+	id 1ibqMK-0002qi-3k
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 13:23:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60114)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ibqKy-0001JK-Rh
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:22:22 -0500
+ (envelope-from <no-reply@patchew.org>) id 1ibqLG-0001nk-B1
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:22:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ibqKx-0006aK-PG
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:22:20 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42086)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ibqKx-0006ZF-BY
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:22:19 -0500
-Received: by mail-oi1-x244.google.com with SMTP id j22so541430oij.9
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 10:22:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Mt0ebUCDlDgmkudTT+9hpvbvHuHkrX1tE7sw2iHLAt8=;
- b=gX4AoLyXiyO1zwgoVhMLAVZUSrYejSWLpTUCSkiBTM8KIGfGghefVqaLWftqvuy6Pj
- 4cuuh7ZuMbET9+Psx6/a854XuTdb/FIimeOv+hyIlMgKru2Z+gmys48h3M6bpd7qoo9S
- ofXdaDOv6K9Q7aqJGX5dIVqwOB1BkpeOLnfajgNaAq1lWHNwWHsbeX+qxUNwQrkaw7IV
- l0OBLF0KkTk+meKSgsBIoP0zg7mpiUegHM17p6gMhQsXdFTLCF/wxtN3J6eKS2ec8jk2
- 4TBtpVV9N/go9/UjgELqSmmQAQ9rNqyRMUgByISLZIzK99yXgFdKnM4GqV1aZa/UWhH4
- j7Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Mt0ebUCDlDgmkudTT+9hpvbvHuHkrX1tE7sw2iHLAt8=;
- b=MgvcOMmFL2KTRhUF4tPFbqLiHMQHXaj7LoZsBaL+jkpkpHvqij8pxtcPdXs1dh6WIv
- St68H0R4w2JBhRRsUCB/P4AYUWcZePquxJn43BEo2cCs7fm8yzBb9P9B6/GrLz8iJh/4
- wgXXGBri+R2S76Zuv3myEhpkDMN9LwAq9pmA/nNG5x0TU2MQ1yySyHn+Dw64RdO9M438
- ahJmiv/hQ34dhMse+WsT4ucgY0P/A6I8seUA2iFjIU8sLhIqqW1+v2qtPtLeGh2q59Zz
- 9nUiGbUIElsgoR08m3eTp4DxGkWyfatYcHtnV2EpldlvrRvpLkUmAWr3z+kAk5AeZqqJ
- eaug==
-X-Gm-Message-State: APjAAAWHEL3/JHQWSLGoU65NyktEo8aB1oXVEUdelNDKSNQAenFMzcVE
- 2YDnY9KqZvzRfm1Jh1uxtHIOpDZPqgCiaImyfhiABQ==
-X-Google-Smtp-Source: APXvYqyf9UhXEkFzj9oRHoU3UbqvOfk+HCMVWPzXh2Pv1uoa+7cfVmqFdqUILIrrmurrCqbtkC4dtlXxj6WLaa0+9Hc=
-X-Received: by 2002:aca:1a0a:: with SMTP id a10mr315133oia.146.1575310938470; 
- Mon, 02 Dec 2019 10:22:18 -0800 (PST)
+ (envelope-from <no-reply@patchew.org>) id 1ibqLE-0006rU-OA
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:22:37 -0500
+Resent-Date: Mon, 02 Dec 2019 13:22:37 -0500
+Resent-Message-Id: <E1ibqLE-0006rU-OA@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21187)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1ibqLE-0006pz-GF
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:22:36 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1575310952; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=UEGSv3dhtte2zEm0W77ZXLZHNPxqqvsu6ShKZ5zhhj3R9J0OueZHqTm6PNPw1QNRe5tfF0AozW/1flpjuNFyZKYsxNZggIZJdZ0EDB30vsqYDRIx/fP7viFhIwMLqyhrXaXrydrtMXg7W0Qur5xUAvW2cB15PaTQAkVnvtVXBg0=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1575310952;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=CWP0cIfWI/AE17V8wNcsH48rzdhVq6LIa7txQjYrTJE=; 
+ b=Rcd5l0svpfMX6+GI9v+Id5Cp2AfzU8skIBcAu/Nt3ha/oQgvFwDorjwUYHLbXMmQrheEKjmaZmsszRntkzUCt1bQv2bF7acUzpPw9Gik7r1ZKWCbqmC2FOuG+vw1qhS6JTFu1OBr+8VVMpzSFTCgtYIQJrUXPEijSrW1dTgD4NI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1575310949751765.8117299806026;
+ Mon, 2 Dec 2019 10:22:29 -0800 (PST)
+In-Reply-To: <20191202152746.32292-1-armbru@redhat.com>
+Subject: Re: [PULL for-4.2 0/3] Error reporting patches for 2019-12-02
+Message-ID: <157531094882.11577.6287471121319964887@37313f22b938>
 MIME-Version: 1.0
-References: <20191111014048.21296-1-zhengxiang9@huawei.com>
- <20191111014048.21296-2-zhengxiang9@huawei.com>
-In-Reply-To: <20191111014048.21296-2-zhengxiang9@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Dec 2019 18:22:07 +0000
-Message-ID: <CAFEAcA8fkc+0RhOH7780sREPUOaCvE-rpUkwFN0-hwsVD7RiMg@mail.gmail.com>
-Subject: Re: [RESEND PATCH v21 1/6] hw/arm/virt: Introduce a RAS machine option
-To: Xiang Zheng <zhengxiang9@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: armbru@redhat.com
+Date: Mon, 2 Dec 2019 10:22:29 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,82 +76,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
- Marcelo Tosatti <mtosatti@redhat.com>, Linuxarm <linuxarm@huawei.com>,
- QEMU Developers <qemu-devel@nongnu.org>, gengdongjiu <gengdongjiu@huawei.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- James Morse <james.morse@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 11 Nov 2019 at 01:44, Xiang Zheng <zhengxiang9@huawei.com> wrote:
->
-> From: Dongjiu Geng <gengdongjiu@huawei.com>
->
-> RAS Virtualization feature is not supported now, so add a RAS machine
-> option and disable it by default.
->
-> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
-> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
-> ---
->  hw/arm/virt.c         | 23 +++++++++++++++++++++++
->  include/hw/arm/virt.h |  1 +
->  2 files changed, 24 insertions(+)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index d4bedc2607..ea0fbf82be 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -1819,6 +1819,20 @@ static void virt_set_its(Object *obj, bool value, Error **errp)
->      vms->its = value;
->  }
->
-> +static bool virt_get_ras(Object *obj, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(obj);
-> +
-> +    return vms->ras;
-> +}
-> +
-> +static void virt_set_ras(Object *obj, bool value, Error **errp)
-> +{
-> +    VirtMachineState *vms = VIRT_MACHINE(obj);
-> +
-> +    vms->ras = value;
-> +}
-> +
->  static char *virt_get_gic_version(Object *obj, Error **errp)
->  {
->      VirtMachineState *vms = VIRT_MACHINE(obj);
-> @@ -2122,6 +2136,15 @@ static void virt_instance_init(Object *obj)
->                                      "Valid values are none and smmuv3",
->                                      NULL);
->
-> +    /* Default disallows RAS instantiation */
-> +    vms->ras = false;
-> +    object_property_add_bool(obj, "ras", virt_get_ras,
-> +                             virt_set_ras, NULL);
-> +    object_property_set_description(obj, "ras",
-> +                                    "Set on/off to enable/disable "
-> +                                    "RAS instantiation",
-> +                                    NULL);
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTIwMjE1Mjc0Ni4zMjI5
+Mi0xLWFybWJydUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUFVMTCBmb3ItNC4yIDAvM10gRXJyb3IgcmVwb3J0aW5nIHBh
+dGNoZXMgZm9yIDIwMTktMTItMDIKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkxMjAyMTUy
+NzQ2LjMyMjkyLTEtYXJtYnJ1QHJlZGhhdC5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0K
+IyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFt
+Ci4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQ
+VCBFTkQgPT09CgpGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQog
+ICBmYjIyNDY4Li4zOTAzMjk4ICBtYXN0ZXIgICAgIC0+IG1hc3RlcgpGcm9tIGh0dHBzOi8vZ2l0
+aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3
+LzIwMTkxMjAyMTUyNzQ2LjMyMjkyLTEtYXJtYnJ1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE5
+MTIwMjE1Mjc0Ni4zMjI5Mi0xLWFybWJydUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKCj09PSBPVVRQVVQgQkVHSU4gPT09CmNoZWNrcGF0Y2gucGw6IG5vIHJldmlz
+aW9ucyByZXR1cm5lZCBmb3IgcmV2bGlzdCAnMScKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
+bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMjU1CgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
+dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTIwMjE1Mjc0Ni4zMjI5Mi0xLWFybWJydUBy
+ZWRoYXQuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-I think we could make the user-facing description of
-the option a little clearer: something like
-"Set on/off to enable/disable reporting host memory errors
-to a KVM guest using ACPI and guest external abort exceptions"
-
-?
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-thanks
--- PMM
 
