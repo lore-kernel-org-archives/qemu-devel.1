@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA42AC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 23:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22367C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 23:58:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9D8120678
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 23:58:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E26B220684
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 23:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="JsN1yuR8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9D8120678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="WSsFoc2Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E26B220684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibvaB-0008U6-D0
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 18:58:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46419)
+	id 1ibvaF-0000A7-U1
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 18:58:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty@apple.com>) id 1ibvXf-0006fh-GS
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 18:55:48 -0500
+ (envelope-from <dirty@apple.com>) id 1ibvXf-0006fl-VA
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 18:55:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty@apple.com>) id 1ibvXd-0008SP-7A
+ (envelope-from <dirty@apple.com>) id 1ibvXd-0008TF-H3
  for qemu-devel@nongnu.org; Mon, 02 Dec 2019 18:55:47 -0500
-Received: from nwk-aaemail-lapp01.apple.com ([17.151.62.66]:37118)
+Received: from nwk-aaemail-lapp01.apple.com ([17.151.62.66]:37134)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dirty@apple.com>) id 1ibvXc-0008PS-U4
+ (Exim 4.71) (envelope-from <dirty@apple.com>) id 1ibvXd-0008QE-6i
  for qemu-devel@nongnu.org; Mon, 02 Dec 2019 18:55:45 -0500
 Received: from pps.filterd (nwk-aaemail-lapp01.apple.com [127.0.0.1])
  by nwk-aaemail-lapp01.apple.com (8.16.0.27/8.16.0.27) with SMTP id
- xB2Nq6Lw044435; Mon, 2 Dec 2019 15:55:44 -0800
+ xB2Nq6Lx044435; Mon, 2 Dec 2019 15:55:44 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
  h=sender : from : to :
  cc : subject : date : message-id : in-reply-to : references : mime-version
  : content-transfer-encoding; s=20180706;
- bh=ee7/7Ngklg3ShuDiqM1OyHxaWCHXtBSBarKuirDBevs=;
- b=JsN1yuR8DbdR6AAAktaUpvXZ3NyP771eqL0MniXpwFuXFodp+WfUjvSAJOXOkjqxHFJT
- Pr+SXCAdR1aEnEfYAK++qMlcoZHDZ30VpFFfL1a2GreZbXFAFMhdmbAwo7TvWLCC6qaD
- ltak1ho2qvSRJBqAY7DzPQJjRM7ISRGrA/Vwia3CoV4CFjxSDhx46nAP2lz4MsALUYg1
- /b2HES+fxKfr89gIa9MAf+IRymI22oaZ6RKFwH/I3sJBbZvT4ghU3Va0nnmf72OO6FHe
- lBfqHYbyNZ5DIEW7SNbOU8NxWObHbK9yJpS3EsEzNtsB+4ZbRhcEPq1PGlJgdnHmMnJ5 GA== 
+ bh=M6Amdn5tTnG0+MiIbSoHQ+Q5fB9Zaizyl4VxdLmO/kM=;
+ b=WSsFoc2QN+FRvFnnaFf9wNSRpt83JFp5LRorxfI690Lrr2oorXypbCMG0XER0J0enOhp
+ T6oFK04qrqzQ63FT1fe0SP86bugzhBEJXqRpnIrF44uN7foQ9Mb2Gab10yU28e37KwOy
+ YjRaetdmKd4MWL3YHL5+LPtWJNNJ9xqVuB9tC22Ne5WZ/tvvQPj9VMJ3fbVpMT37Z3nP
+ HAAeLi3lZykTtgwGdsmlR+k1eBYEW5xui1RAZ25xsbh5AOBMH5GsupQbqkWhhqCaN8MF
+ u4n10T5SbmQPP6GqfsRrVZ6bi7pl4CzQ4gjn0aYiB6Iv6lF2Lf8c860CNpQXT6OrHjVT FQ== 
 Received: from ma1-mtap-s03.corp.apple.com (ma1-mtap-s03.corp.apple.com
  [17.40.76.7])
- by nwk-aaemail-lapp01.apple.com with ESMTP id 2wkr83ys1h-4
+ by nwk-aaemail-lapp01.apple.com with ESMTP id 2wkr83ys1h-5
  (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
  Mon, 02 Dec 2019 15:55:44 -0800
 Received: from nwk-mmpp-sz12.apple.com
@@ -65,16 +65,16 @@ Received: from process_milters-daemon.nwk-mmpp-sz12.apple.com by
  02 Dec 2019 15:55:42 -0800 (PST)
 X-Va-A: 
 X-Va-T-CD: c56cc4374afe9162bf6a337f3d661529
-X-Va-E-CD: 263ce0a3bfc93a533d48b3d0f711ae8c
-X-Va-R-CD: 4f855c1c806c43b90c8de5dcdc6f0780
+X-Va-E-CD: e901bae79aabc4d8f90935e818db0bf1
+X-Va-R-CD: 717efc5767b68d0267f4c572528f496b
 X-Va-CD: 0
-X-Va-ID: 9b16ca19-295a-4906-9e71-268c6a03dab1
+X-Va-ID: 5dcc9b38-72a6-4400-9259-6c6f6ae2f8c4
 X-V-A: 
 X-V-T-CD: c56cc4374afe9162bf6a337f3d661529
-X-V-E-CD: 263ce0a3bfc93a533d48b3d0f711ae8c
-X-V-R-CD: 4f855c1c806c43b90c8de5dcdc6f0780
+X-V-E-CD: e901bae79aabc4d8f90935e818db0bf1
+X-V-R-CD: 717efc5767b68d0267f4c572528f496b
 X-V-CD: 0
-X-V-ID: ad9ef32c-9d87-4ef6-9c48-586f54af0cd5
+X-V-ID: d94293ff-4d4d-4fb9-b533-5ed91a6a0d7a
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,,
  definitions=2019-12-02_06:,, signatures=0
 Received: from pontoon.com (unknown [17.193.42.217]) by nwk-mmpp-sz12.apple.com
@@ -83,10 +83,10 @@ Received: from pontoon.com (unknown [17.193.42.217]) by nwk-mmpp-sz12.apple.com
  02 Dec 2019 15:55:42 -0800 (PST)
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com
-Subject: [PATCH v3 4/5] hvf: more accurately match SDM when setting CR0 and
- PDPTE registers
-Date: Mon, 02 Dec 2019 15:55:40 -0800
-Message-id: <cdf0b1b6bd00e2ae8c635feaab39871c173ab0ed.1575330463.git.dirty@apple.com>
+Subject: [PATCH v3 5/5] hvf: correctly inject VMCS_INTR_T_HWINTR versus
+ VMCS_INTR_T_SWINTR.
+Date: Mon, 02 Dec 2019 15:55:41 -0800
+Message-id: <bf8d945ea1b423786d7802bbcf769517d1fd01f8.1575330463.git.dirty@apple.com>
 X-Mailer: git-send-email 2.24.0
 In-reply-to: <cover.1575330463.git.dirty@apple.com>
 References: <cover.1575330463.git.dirty@apple.com>
@@ -113,89 +113,95 @@ Sender: "Qemu-devel"
 Reply-to: Cameron Esfahani <dirty@apple.com>
 From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-More accurately match SDM when setting CR0 and PDPTE registers.
+Previous implementation in hvf_inject_interrupts() would always inject
+VMCS_INTR_T_SWINTR even when VMCS_INTR_T_HWINTR was required.  Now
+correctly determine when VMCS_INTR_T_HWINTR is appropriate versus
+VMCS_INTR_T_SWINTR.
 
-Clear PDPTE registers when resetting vcpus.
+Make sure to clear ins_len and has_error_code when ins_len isn't
+valid and error_code isn't set.
 
 Signed-off-by: Cameron Esfahani <dirty@apple.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/hvf/hvf.c |  8 ++++++++
- target/i386/hvf/vmx.h | 18 ++++++++++--------
- 2 files changed, 18 insertions(+), 8 deletions(-)
+ target/i386/hvf/hvf.c    |  4 +++-
+ target/i386/hvf/x86hvf.c | 14 +++++++++-----
+ 2 files changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index 90fd50acfc..784e67d77e 100644
+index 784e67d77e..d72543dc31 100644
 --- a/target/i386/hvf/hvf.c
 +++ b/target/i386/hvf/hvf.c
-@@ -441,12 +441,20 @@ static MemoryListener hvf_memory_listener = {
- };
- 
- void hvf_reset_vcpu(CPUState *cpu) {
-+    uint64_t pdpte[4] = {0, 0, 0, 0};
-+    int i;
- 
-     /* TODO: this shouldn't be needed; there is already a call to
-      * cpu_synchronize_all_post_reset in vl.c
-      */
-     wvmcs(cpu->hvf_fd, VMCS_ENTRY_CTLS, 0);
-     wvmcs(cpu->hvf_fd, VMCS_GUEST_IA32_EFER, 0);
-+
-+    /* Initialize PDPTE */
-+    for (i = 0; i < 4; i++) {
-+        wvmcs(cpu->hvf_fd, VMCS_GUEST_PDPTE0 + i * 2, pdpte[i]);
-+    }
-+
-     macvm_set_cr0(cpu->hvf_fd, 0x60000010);
- 
-     wvmcs(cpu->hvf_fd, VMCS_CR4_MASK, CR4_VMXE_MASK);
-diff --git a/target/i386/hvf/vmx.h b/target/i386/hvf/vmx.h
-index 5dc52ecad6..eb8894cd58 100644
---- a/target/i386/hvf/vmx.h
-+++ b/target/i386/hvf/vmx.h
-@@ -121,6 +121,7 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
-     uint64_t pdpte[4] = {0, 0, 0, 0};
-     uint64_t efer = rvmcs(vcpu, VMCS_GUEST_IA32_EFER);
-     uint64_t old_cr0 = rvmcs(vcpu, VMCS_GUEST_CR0);
-+    uint64_t mask = CR0_PG | CR0_CD | CR0_NW | CR0_NE | CR0_ET;
- 
-     if ((cr0 & CR0_PG) && (rvmcs(vcpu, VMCS_GUEST_CR4) & CR4_PAE) &&
-         !(efer & MSR_EFER_LME)) {
-@@ -128,18 +129,15 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
-                          rvmcs(vcpu, VMCS_GUEST_CR3) & ~0x1f,
-                          MEMTXATTRS_UNSPECIFIED,
-                          (uint8_t *)pdpte, 32, 0);
-+        /* Only set PDPTE when appropriate. */
-+        for (i = 0; i < 4; i++) {
-+            wvmcs(vcpu, VMCS_GUEST_PDPTE0 + i * 2, pdpte[i]);
-+        }
-     }
- 
--    for (i = 0; i < 4; i++) {
--        wvmcs(vcpu, VMCS_GUEST_PDPTE0 + i * 2, pdpte[i]);
--    }
--
--    wvmcs(vcpu, VMCS_CR0_MASK, CR0_CD | CR0_NE | CR0_PG);
-+    wvmcs(vcpu, VMCS_CR0_MASK, mask);
-     wvmcs(vcpu, VMCS_CR0_SHADOW, cr0);
- 
--    cr0 &= ~CR0_CD;
--    wvmcs(vcpu, VMCS_GUEST_CR0, cr0 | CR0_NE | CR0_ET);
--
-     if (efer & MSR_EFER_LME) {
-         if (!(old_cr0 & CR0_PG) && (cr0 & CR0_PG)) {
-             enter_long_mode(vcpu, cr0, efer);
-@@ -149,6 +147,10 @@ static inline void macvm_set_cr0(hv_vcpuid_t vcpu, uint64_t cr0)
+@@ -637,6 +637,8 @@ static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_in
+     env->exception_injected = 0;
+     env->interrupt_injected = -1;
+     env->nmi_injected = false;
++    env->ins_len = 0;
++    env->has_error_code = false;
+     if (idtvec_info & VMCS_IDT_VEC_VALID) {
+         switch (idtvec_info & VMCS_IDT_VEC_TYPE) {
+         case VMCS_IDT_VEC_HWINTR:
+@@ -659,7 +661,7 @@ static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_in
+             (idtvec_info & VMCS_IDT_VEC_TYPE) == VMCS_IDT_VEC_SWINTR) {
+             env->ins_len = ins_len;
          }
-     }
- 
-+    /* Filter new CR0 after we are finished examining it above. */
-+    cr0 = (cr0 & ~(mask & ~CR0_PG));
-+    wvmcs(vcpu, VMCS_GUEST_CR0, cr0 | CR0_NE | CR0_ET);
-+
-     hv_vcpu_invalidate_tlb(vcpu);
-     hv_vcpu_flush(vcpu);
+-        if (idtvec_info & VMCS_INTR_DEL_ERRCODE) {
++        if (idtvec_info & VMCS_IDT_VEC_ERRCODE_VALID) {
+             env->has_error_code = true;
+             env->error_code = rvmcs(cpu->hvf_fd, VMCS_IDT_VECTORING_ERROR);
+         }
+diff --git a/target/i386/hvf/x86hvf.c b/target/i386/hvf/x86hvf.c
+index 1485b95776..edefe5319a 100644
+--- a/target/i386/hvf/x86hvf.c
++++ b/target/i386/hvf/x86hvf.c
+@@ -345,8 +345,6 @@ void vmx_clear_int_window_exiting(CPUState *cpu)
+              ~VMCS_PRI_PROC_BASED_CTLS_INT_WINDOW_EXITING);
  }
+ 
+-#define NMI_VEC 2
+-
+ bool hvf_inject_interrupts(CPUState *cpu_state)
+ {
+     X86CPU *x86cpu = X86_CPU(cpu_state);
+@@ -357,7 +355,11 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
+     bool have_event = true;
+     if (env->interrupt_injected != -1) {
+         vector = env->interrupt_injected;
+-        intr_type = VMCS_INTR_T_SWINTR;
++        if (env->ins_len) {
++            intr_type = VMCS_INTR_T_SWINTR;
++        } else {
++            intr_type = VMCS_INTR_T_HWINTR;
++        }
+     } else if (env->exception_nr != -1) {
+         vector = env->exception_nr;
+         if (vector == EXCP03_INT3 || vector == EXCP04_INTO) {
+@@ -366,7 +368,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
+             intr_type = VMCS_INTR_T_HWEXCEPTION;
+         }
+     } else if (env->nmi_injected) {
+-        vector = NMI_VEC;
++        vector = EXCP02_NMI;
+         intr_type = VMCS_INTR_T_NMI;
+     } else {
+         have_event = false;
+@@ -390,6 +392,8 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
+             if (env->has_error_code) {
+                 wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_EXCEPTION_ERROR,
+                       env->error_code);
++                /* Indicate that VMCS_ENTRY_EXCEPTION_ERROR is valid */
++                info |= VMCS_INTR_DEL_ERRCODE;
+             }
+             /*printf("reinject  %lx err %d\n", info, err);*/
+             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
+@@ -399,7 +403,7 @@ bool hvf_inject_interrupts(CPUState *cpu_state)
+     if (cpu_state->interrupt_request & CPU_INTERRUPT_NMI) {
+         if (!(env->hflags2 & HF2_NMI_MASK) && !(info & VMCS_INTR_VALID)) {
+             cpu_state->interrupt_request &= ~CPU_INTERRUPT_NMI;
+-            info = VMCS_INTR_VALID | VMCS_INTR_T_NMI | NMI_VEC;
++            info = VMCS_INTR_VALID | VMCS_INTR_T_NMI | EXCP02_NMI;
+             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
+         } else {
+             vmx_set_nmi_window_exiting(cpu_state);
 -- 
 2.24.0
 
