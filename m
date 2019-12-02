@@ -2,79 +2,86 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3281C432C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 04:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C69BAC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 05:02:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB3C520705
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 04:07:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB3C520705
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
+	by mail.kernel.org (Postfix) with ESMTPS id 7AFAA20659
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 05:02:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPlORvzw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AFAA20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibczJ-0005D7-17
-	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 23:07:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43439)
+	id 1ibdrN-0005Dz-HI
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 00:02:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50290)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <emacsray@gmail.com>) id 1ibcyf-0004lt-4G
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 23:06:26 -0500
+ (envelope-from <armbru@redhat.com>) id 1ibdqS-0004NN-Qv
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 00:02:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <emacsray@gmail.com>) id 1ibcyd-00081U-OJ
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 23:06:25 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:39915)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1ibcyd-00080h-Hk
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 23:06:23 -0500
-Received: by mail-pl1-f194.google.com with SMTP id o9so15638893plk.6
- for <qemu-devel@nongnu.org>; Sun, 01 Dec 2019 20:06:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=77KoAChz5sNRM11zjyyKeVHT3lMwEXBIK823mXgURlM=;
- b=M33ayqkIUWmg2MUpPYrH+bAMAYBylugxhMaRFb4htfqqPTlcd5cqR2p9Uh84eiYoXT
- s8C8ruiZrHOHf9c2p1GyGyGGGG8+OFT0LgfcdK7yJ4PvWFzffTx/hovpuFjjEQ1stCIB
- 2YIkCDZeQ4HX2rjf28EjItJeiTyDvmkPmNw5MAbOf4oMeJ6cxEPFtPX6QDu5c8fYZic+
- Dn4dcHpe4/LQPgPoxgj/zHxyUbZDnRFWsCGoYNDoNzdkCYTCJv9xDqFW+yM68Sbb0QVj
- 6jgIQyXePm8bLTnXIlE7E7vZznxGF+2IO0Xkq6nos81HDENMpUZFRNl6fczYVL3Rd029
- nSFQ==
-X-Gm-Message-State: APjAAAW1KWmrcfDWBc6EwkqiqWIWyjMOZEmW06Mitt5QjsI2gIcYiRP1
- 1xsT2ZetzIeSE/xhQKHJmyg=
-X-Google-Smtp-Source: APXvYqzxVEh+HPjooQT0uGQBbIxzONHyl29FNkWLMDunncjgxKOrbFsye743K3BppO91OaVoXCusIQ==
-X-Received: by 2002:a17:90a:77c9:: with SMTP id
- e9mr33568416pjs.70.1575259582174; 
- Sun, 01 Dec 2019 20:06:22 -0800 (PST)
-Received: from localhost (c-71-204-169-238.hsd1.ca.comcast.net.
- [71.204.169.238])
- by smtp.gmail.com with ESMTPSA id k10sm8840287pjp.12.2019.12.01.20.06.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 01 Dec 2019 20:06:21 -0800 (PST)
-Date: Sun, 1 Dec 2019 20:06:20 -0800
-From: Fangrui Song <i@maskray.me>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH] configure: Use lld --image-base for --disable-pie user
- mode binaries
-Message-ID: <20191202040103.p5ywvxixglmt6oqx@google.com>
-References: <20191116052815.nop3xkmd4umqsdsb@google.com>
- <20191120210200.hvwlfuzo2vy5d5n4@gmail.com>
- <20191127183631.n3kfz7k5szri27b3@gmail.com>
- <e5bf2584-bae2-8dda-a2b2-8930ee17ea86@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1ibdqP-0007aj-NY
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 00:01:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37787
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ibdqP-0007aR-Ce
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 00:01:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575262916;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aRYaAy650yiSRqFk5USZXKnuS8A+Yj/qPpOFf6yDWoY=;
+ b=MPlORvzwMiSpZIJ6NQUfQ/jojxIcutEoFko7nVJlDZ7O+ugohAfW24m150AL6isncBCLPu
+ WYRdXlq+gr+dKWvTAiOVSI/5HBDJToeZVH3Wpd22ZHd0DSETFAa6NNG95cmqhcfePL1Nzy
+ P+3f19vEQhW8oYVH0HmHr3NFAtvT8Ms=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-qeuefDKbNlKrZx6jm882nA-1; Mon, 02 Dec 2019 00:01:52 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 665F91852E20;
+ Mon,  2 Dec 2019 05:01:51 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 055715C883;
+ Mon,  2 Dec 2019 05:01:48 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 8BE591138606; Mon,  2 Dec 2019 06:01:46 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 17/21] s390x: Fix latent query-cpu-model-FOO error
+ handling bugs
+References: <20191130194240.10517-18-armbru@redhat.com>
+ <9C97FEE6-D390-4CEB-9B00-50AE00AEA4D2@redhat.com>
+ <CAL1e-=jst9hGBXy0zm-975QDvW0F0xBNJAypqM4KooWEUvJfjQ@mail.gmail.com>
+ <d9eb5b70-8396-7537-aac5-24c4d872d553@redhat.com>
+Date: Mon, 02 Dec 2019 06:01:46 +0100
+In-Reply-To: <d9eb5b70-8396-7537-aac5-24c4d872d553@redhat.com> (David
+ Hildenbrand's message of "Sun, 1 Dec 2019 15:09:04 +0100")
+Message-ID: <87sgm3nww5.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e5bf2584-bae2-8dda-a2b2-8930ee17ea86@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: qeuefDKbNlKrZx6jm882nA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.214.194
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,97 +93,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <dhildenb@redhat.com>,
+ "vsementsov@virtuozzo.com" <vsementsov@virtuozzo.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+David Hildenbrand <david@redhat.com> writes:
 
-Thanks for reviewing this patch!
-
-On 2019-12-01, Richard Henderson wrote:
->On 11/27/19 6:36 PM, Fangrui Song wrote:
->> On 2019-11-20, Fangrui Song wrote:
->>> On 2019-11-15, Fangrui Song wrote:
->>>> For lld, --image-base is the preferred way to set the base address.
->>>> lld does not actually implement -Ttext-segment, but treats it as an alias for
->>>> -Ttext. -Ttext-segment=0x60000000 combined with --no-rosegment can
->>>> create a 1.6GB executable.
->>>>
->>>> Fix the problem by using --image-base for lld. GNU ld and gold will
->>>> still get -Ttext-segment. Also delete the ld --verbose fallback introduced
->>>> in 2013, which is no longer relevant or correct (the default linker
->>>> script has changed).
->>>>
->>>> Signed-off-by: Fangrui Song <i@maskray.me>
->>>> ---
->>>> configure | 33 ++++++++++++---------------------
->>>> 1 file changed, 12 insertions(+), 21 deletions(-)
->>>>
->>>> diff --git a/configure b/configure
->>>> index 6099be1d84..2d45af0d09 100755
->>>> --- a/configure
->>>> +++ b/configure
->>>> @@ -6336,43 +6336,34 @@ fi
->>>>
->>>> # Probe for the need for relocating the user-only binary.
->>>> if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ];
->>>> then
->>>> -  textseg_addr=
->>>> +  image_base=
->>>>   case "$cpu" in
->>>>     arm | i386 | ppc* | s390* | sparc* | x86_64 | x32)
->>>> -      # ??? Rationale for choosing this address
->>>> -      textseg_addr=0x60000000
->>>> +      # An arbitrary address that makes it unlikely to collide with user
->>>> +      # programs.
+> On 01.12.19 14:46, Aleksandar Markovic wrote:
+>>=20
+>>=20
+>> On Saturday, November 30, 2019, David Hildenbrand <dhildenb@redhat.com
+>> <mailto:dhildenb@redhat.com>> wrote:
+>>=20
+>>=20
+>>=20
+>>     > Am 30.11.2019 um 20:42 schrieb Markus Armbruster
+>>     <armbru@redhat.com <mailto:armbru@redhat.com>>:
+>>     >
+>>     > =EF=BB=BFcpu_model_from_info() is a helper for
+>>     qmp_query_cpu_model_expansion(),
+>>     > qmp_query_cpu_model_comparison(), qmp_query_cpu_model_baseline().=
+=C2=A0 It
+>>     > crashes when the visitor or the QOM setter fails, and its @errp
+>>     > argument is null.=C2=A0 Messed up in commit 137974cea3 's390x/cpum=
+odel:
+>>     > implement QMP interface "query-cpu-model-expansion"'.
+>>     >
+>>     > Its three callers have the same bug.=C2=A0 Messed up in commit 4e8=
+2ef0502
+>>     > 's390x/cpumodel: implement QMP interface "query-cpu-model-comparis=
+on"'
+>>     > and commit f1a47d08ef 's390x/cpumodel: implement QMP interface
+>>     > "query-cpu-model-baseline"'.
+>>     >
+>>     > The bugs can't bite as no caller actually passes null.=C2=A0 Fix t=
+hem
+>>     > anyway.
+>>=20
+>>     https://en.m.wikipedia.org/wiki/Software_bug
+>>     <https://en.m.wikipedia.org/wiki/Software_bug>
+>>=20
+>>     =C2=A0 =E2=80=9E A software bug is an error, flaw or fault in a comp=
+uter program
+>>     or system that causes it to produce an incorrect or unexpected
+>>     result, or to behave in unintended ways. =E2=80=9E
+>>=20
+>>     Please make it clear in the descriptions that these are cleanups and
+>>     not bugfixes. It might be very confusing for people looking out for
+>>     real bugs.
+>>=20
+>>=20
+>>=20
+>> Disclaimer: I am not entirely familiar with the code in question, so
+>> take my opinion with reasonablereservation.
+>>=20
+>> It looks that we here deal with latent bugs. As you probably know from
+>> experience, a latent bugs, when they are activated with some ostensibly
+>> unrelated code change, can be much more difficult to diagnose and fix
+>> than regular bugs.
 >
->Please don't replace this ??? with an arbitrary rationale, which clearly
->doesn't apply to all of these hosts.
-
-In
-https://lists.nongnu.org/archive/html/qemu-devel/2019-11/msg04646.html
-it was suggested to move the comment around a bit.
-I am not puzzled where and what I should say in the comment.
-Can you (or other maintainers) kindly edit the comment for me?
-I do not know enough about qemu to provide a good rationale here.
-
->>>> +      image_base=0x60000000
->>>>       ;;
->>>>     mips)
->>>>       # A 256M aligned address, high in the address space, with enough
->>>>       # room for the code_gen_buffer above it before the stack.
+> "https://economictimes.indiatimes.com/definition/latent-bug
 >
->This is the only one with a proper rationale.
+> "Definition: An uncovered or unidentified bug which exists in the system
+> over a period of time is known as the Latent Bug. The bug may persist in
+> the system in one or more versions of the software."
 >
->That said, I'm not sure that the proper way to handle this issue with lld is to
->drop this code entirely.
+> AFAIK, a latent BUG can be triggered, it simply was never triggered.
 
-The patch changes a feature that lld does not support: -Ttext-segment,
-to use --image-base instead.
+First search hit.  Here's my second one:
 
-Due to the prevalence of -z separate-code in GNU ld, -Ttext-segment is
-no longer appropriate. I suggested that GNU linkers implement the
-feature https://sourceware.org/bugzilla/show_bug.cgi?id=25207 .
+    Q: What are latent bugs?
 
-What gets deleted is the sed script. As I explained in the commit
-message, it is no longer relevant. It probably applies to an old GNU ld
-that FreeBSD used. FreeBSD has switched to lld now.
+    A: These bugs do not cause problems today. However, they are lurking
+    just waiting to reveal themselves later.  The Ariane 5 rocket
+    failure was caused by a float->int conversion error that lay dormant
+    when previous rockets were slower; but the faster Ariane 5 triggered
+    the problem.  The Millennium bug is another example of a latent bug
+    that came to light when circumstances changed.  Latent bugs are much
+    harder to test using conventional testing techniques, and finding
+    them requires someone with foresight to ask.
 
->The best way to handle the underlying issue -- address conflict between
->interpreter and guest binary -- is PIE, for which this code is skipped.
+http://www.geekinterview.com/question_details/36689
+
+My point is: common usage of the term is not as clear-cut as your quote
+makes it seem.
+
+> Do you think the following code is buggy?
 >
->After that, we go to some pain to choose a guest_base address that allows the
->guest binary to load around the interpreter's reserved addresses.
+> static int get_val(int *ptr)
+> {
+> =09return *ptr;
+> }
 >
->So what's left that this messing about with link addresses buys us?
+> int main()
+> {
+> =09int a =3D 0;
+>
+> =09return get_val(&a);
+> }
+>
+> I claim, no, although we could access a NULL pointer if ever reworked.
+> There is no invalid system state possible.
 
-I agree that --enable-pie will be a better solution, but dropping the
-support now will break at least FreeBSD. Its kernel supports running an
-ET_DYN executable but it does not perform address randomization.
---disable-pie also appears to be used by ChromeOS developers who
-reported https://bugs.llvm.org/show_bug.cgi?id=43997 . I can communicate
-to them that migrating to --enable-pie is the way going forward.
+get_val() is silent on how it wants to be used.  error.h is anything
+but: it spells out how it wantes to be used in quite some detail.  In
+particular:
+
+ * Receive an error and pass it on to the caller:
+ *     Error *err =3D NULL;
+ *     foo(arg, &err);
+ *     if (err) {
+ *         handle the error...
+ *         error_propagate(errp, err);
+ *     }
+ * where Error **errp is a parameter, by convention the last one.
+ *
+ * Do *not* "optimize" this to
+ *     foo(arg, errp);
+ *     if (*errp) { // WRONG!
+ *         handle the error...
+ *     }
+ * because errp may be NULL!
+
+My patch fixes this exact misuse of the interface.
+
+>> In that light, this change is not a clean up. It is a fix of a latent
+>> bugs, and Markus' aproach to treat it as a bug fix looks right to me. I
+>> would just add a word "latent" or similar, which would even more
+>> distance the patch from "cleanup" meaning.
+>
+> I agree iff there is some way to trigger it. Otherwise, to me it is a
+> cleanup.If it's a BUG, it deserves proper Fixes tags and some
+> description how it can be triggered.
+
+Yes, a bug that can bite deserves a reproducer and a formal Fixes: tag.
+
+The thing we're discussing (however we may want to call it) does not
+have a reproducer, and I think we're in agreement that it doesn't need a
+Fixes: tag.
+
+However, my patch is not cleaning up something that's dirty, it's fixing
+something that's unequivocally wrong: a violation of a stated interface
+contract.
+
+The violation happens to have no ill effects at this time due to the way
+the violating code is being used.
+
+I call that a "latent bug".  git-log has quite a few occurences of
+"latent bug", by Richard Henderson, Daniel Berrang=C3=A9, Paolo, ...
+
+Your point that the commit message should not confuse people looking for
+real bugs is well taken.  I think "latent bug" is clear enough, and also
+concise.  I'm of course open to better phrasings.
+
+   s390x: Fix currently harmless query-cpu-model-FOO error API violations
+
+feels no clearer to me than
+
+   s390x: Fix latent query-cpu-model-FOO error handling bugs
+
+It's also too long.
+
+I tried.  Your turn :)
+
 
