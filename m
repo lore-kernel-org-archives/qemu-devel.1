@@ -2,52 +2,81 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4984EC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 12:19:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87906C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 12:20:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F9BB2073C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 12:19:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F9BB2073C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 50F9A20833
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 12:20:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bw3KXNwW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50F9A20833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibkfq-0003dt-9R
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 07:19:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49141)
+	id 1ibkgR-0004D3-EU
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 07:20:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49621)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ibkbm-00086I-Bm
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:15:23 -0500
+ (envelope-from <kraxel@redhat.com>) id 1ibkfR-0003HB-GU
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:19:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1ibkbl-0005q0-03
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:15:18 -0500
-Received: from relay.sw.ru ([185.231.240.75]:45006)
+ (envelope-from <kraxel@redhat.com>) id 1ibkfO-00076B-Dc
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:19:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43670
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1ibkbk-0005o0-NM; Mon, 02 Dec 2019 07:15:16 -0500
-Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1ibkba-0005N6-UN; Mon, 02 Dec 2019 15:15:06 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Subject: [PATCH v12 2/3] qcow2: Allow writing compressed data of multiple
- clusters
-Date: Mon,  2 Dec 2019 15:15:05 +0300
-Message-Id: <1575288906-551879-3-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1575288906-551879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1575288906-551879-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ibkfO-00075f-9R
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:19:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575289141;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lXI6FVHSSTkGPDVpkIsTnkCCtFb+jaXFpCDz8AIyH+0=;
+ b=bw3KXNwWABhsKxGzKCELyKjyy713b4FWFPA9H6KV3F7iavlVEARYCg2z3hOd4V1Z8t5a0W
+ V+b7QJrK1JuIa94uQtualRle4c1Rp2WFZI9DLzfYYMyYWoLxGLaGu+kvJDTjRbUVRIH2V/
+ gqAj4zsMMPdLyGsyfse1XgRKojRyzyQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-371-2aTf_Q_iOJWuI3pl9wh0MQ-1; Mon, 02 Dec 2019 07:18:57 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E96CD8017CC
+ for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 12:18:56 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-67.ams2.redhat.com
+ [10.36.116.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1B24B19C6A;
+ Mon,  2 Dec 2019 12:18:53 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 3D92F16E05; Mon,  2 Dec 2019 13:18:53 +0100 (CET)
+Date: Mon, 2 Dec 2019 13:18:53 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: iPXE: update submodule
+Message-ID: <20191202121853.shigtyrko725vmmg@sirius.home.kraxel.org>
+References: <d33644db-ec7e-0b51-b6e6-b5fc15f37665@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <d33644db-ec7e-0b51-b6e6-b5fc15f37665@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 2aTf_Q_iOJWuI3pl9wh0MQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,157 +88,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
- mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QEMU currently supports writing compressed data of the size equal to
-one cluster. This patch allows writing QCOW2 compressed data that
-exceed one cluster. Now, we split buffered data into separate clusters
-and write them compressed using the block/aio_task API.
+On Mon, Dec 02, 2019 at 12:19:50PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Hi Gerd,
+>=20
+> 'make -C roms efirom' is failing on Fedora 30.
+>=20
+> Can you update the iPXE submodule so we get these buildsys commits:
+>=20
+> c742c576 [build] Move predefined all-drivers build shortcut to Makefile
+> a4f8c6e3 [build] Do not apply WORKAROUND_CFLAGS for host compiler
+> 1dd56dbd [build] Workaround compilation error with gcc 9.1
+> 412acd78 [build] Fix "'%s' directive argument is null" error
 
-Suggested-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/qcow2.c | 102 ++++++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 75 insertions(+), 27 deletions(-)
+Hmm.  Sure, can do that, but the question is for 4.2 or 5.0.  Updating
+ipxe that close to the release makes me nervous, but shipping a ipxe
+version which doesn't build with recent compilers in the release tarball
+isn't great either.
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 7c18721..0e03a1a 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4222,10 +4222,8 @@ fail:
-     return ret;
- }
- 
--/* XXX: put compressed sectors first, then all the cluster aligned
--   tables to avoid losing bytes in alignment */
- static coroutine_fn int
--qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
-+qcow2_co_pwritev_compressed_task(BlockDriverState *bs,
-                                  uint64_t offset, uint64_t bytes,
-                                  QEMUIOVector *qiov, size_t qiov_offset)
- {
-@@ -4235,32 +4233,11 @@ qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
-     uint8_t *buf, *out_buf;
-     uint64_t cluster_offset;
- 
--    if (has_data_file(bs)) {
--        return -ENOTSUP;
--    }
--
--    if (bytes == 0) {
--        /* align end of file to a sector boundary to ease reading with
--           sector based I/Os */
--        int64_t len = bdrv_getlength(bs->file->bs);
--        if (len < 0) {
--            return len;
--        }
--        return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF, NULL);
--    }
--
--    if (offset_into_cluster(s, offset)) {
--        return -EINVAL;
--    }
-+    assert(bytes == s->cluster_size || (bytes < s->cluster_size &&
-+           (offset + bytes == bs->total_sectors << BDRV_SECTOR_BITS)));
- 
-     buf = qemu_blockalign(bs, s->cluster_size);
--    if (bytes != s->cluster_size) {
--        if (bytes > s->cluster_size ||
--            offset + bytes != bs->total_sectors << BDRV_SECTOR_BITS)
--        {
--            qemu_vfree(buf);
--            return -EINVAL;
--        }
-+    if (bytes < s->cluster_size) {
-         /* Zero-pad last write if image size is not cluster aligned */
-         memset(buf + bytes, 0, s->cluster_size - bytes);
-     }
-@@ -4309,6 +4286,77 @@ fail:
-     return ret;
- }
- 
-+static coroutine_fn int qcow2_co_pwritev_compressed_task_entry(AioTask *task)
-+{
-+    Qcow2AioTask *t = container_of(task, Qcow2AioTask, task);
-+
-+    assert(!t->cluster_type && !t->l2meta);
-+
-+    return qcow2_co_pwritev_compressed_task(t->bs, t->offset, t->bytes, t->qiov,
-+                                            t->qiov_offset);
-+}
-+
-+/*
-+ * XXX: put compressed sectors first, then all the cluster aligned
-+ * tables to avoid losing bytes in alignment
-+ */
-+static coroutine_fn int
-+qcow2_co_pwritev_compressed_part(BlockDriverState *bs,
-+                                 uint64_t offset, uint64_t bytes,
-+                                 QEMUIOVector *qiov, size_t qiov_offset)
-+{
-+    BDRVQcow2State *s = bs->opaque;
-+    AioTaskPool *aio = NULL;
-+    int ret = 0;
-+
-+    if (has_data_file(bs)) {
-+        return -ENOTSUP;
-+    }
-+
-+    if (bytes == 0) {
-+        /*
-+         * align end of file to a sector boundary to ease reading with
-+         * sector based I/Os
-+         */
-+        int64_t len = bdrv_getlength(bs->file->bs);
-+        if (len < 0) {
-+            return len;
-+        }
-+        return bdrv_co_truncate(bs->file, len, false, PREALLOC_MODE_OFF, NULL);
-+    }
-+
-+    if (offset_into_cluster(s, offset)) {
-+        return -EINVAL;
-+    }
-+
-+    while (bytes && aio_task_pool_status(aio) == 0) {
-+        uint64_t chunk_size = MIN(bytes, s->cluster_size);
-+
-+        if (!aio && chunk_size != bytes) {
-+            aio = aio_task_pool_new(QCOW2_MAX_WORKERS);
-+        }
-+
-+        ret = qcow2_add_task(bs, aio, qcow2_co_pwritev_compressed_task_entry,
-+                             0, 0, offset, chunk_size, qiov, qiov_offset, NULL);
-+        if (ret < 0) {
-+            break;
-+        }
-+        qiov_offset += chunk_size;
-+        offset += chunk_size;
-+        bytes -= chunk_size;
-+    }
-+
-+    if (aio) {
-+        aio_task_pool_wait_all(aio);
-+        if (ret == 0) {
-+            ret = aio_task_pool_status(aio);
-+        }
-+        g_free(aio);
-+    }
-+
-+    return ret;
-+}
-+
- static int coroutine_fn
- qcow2_co_preadv_compressed(BlockDriverState *bs,
-                            uint64_t file_cluster_offset,
--- 
-1.8.3.1
+I'd tend to go the 5.0 route.
+Comments?
+Suggestions?
+
+cheers,
+  Gerd
 
 
