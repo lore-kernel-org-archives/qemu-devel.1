@@ -2,86 +2,94 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BCABC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FB0C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:21:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0595920833
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:19:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D68F20833
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:21:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uYtHm5Qq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0595920833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aagHF/O0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D68F20833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibjjL-0005F2-6u
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:19:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41467)
+	id 1ibjlK-0006oE-9B
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:21:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1ibjhp-00040k-IS
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:17:30 -0500
+ (envelope-from <philmd@redhat.com>) id 1ibjkG-00062U-Ku
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:20:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1ibjho-0001AQ-D0
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:17:29 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41641)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1ibjho-00018P-6K
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:17:28 -0500
-Received: by mail-wr1-x443.google.com with SMTP id b18so43729972wrj.8
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 03:17:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=eQi9yiL1SgJE1ivljlkViky/PBxqJ9TBB8DmrLRuJUA=;
- b=uYtHm5Qq1gRQ2xxXA1g9P/ogcE/FGiwZEnRJyBWhPLdPXBTv/QqIPOL1NoTSU/bq4/
- nf/YLxHVVQSmZnkFQBQ/5zVkhS/ML2C2dyMJS7sByvu1OAAdLh4NlgAoxzTudODZgh+b
- 2CZ46WO/357sV3luu/cxHuOkCpN/w5ukD4jwNCbriOIagJXESqlu6HW1Sti83+5zAMek
- m2YCCfeK6XVnR57PZCh94km4uxR5sngv0cn/3Z5R+MKkFdMc+hmBWEtcP+N3+pBCAuPt
- lj9sA/+w+TAY6tV3zyH4h3dtQ1Zyc8ByDyXHKxV58Wo2uvWeOb8a9lgl6rfknCz/7GXp
- g3qg==
+ (envelope-from <philmd@redhat.com>) id 1ibjkD-00035L-Gn
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:19:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56797
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ibjkD-0002zT-5p
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:19:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575285595;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=kSV1+41FnEe3A1jTZkiiLsSMjrLrkZwGrvL9iWVu7ok=;
+ b=aagHF/O0RXI5ZrXt6LxCRkDrAGbJvSNZ4++FIr+GsuerE91Dwl4IoTpqZjJZYqQcww20+R
+ EN/286q/ySiBMgfUAhoUzd/M1ldqbNfewInanIdBhzEflOW+8wO6rmF9/8rSQE4hA5QdPp
+ t3nrfA+yFp478vNksL8GQ36/pPoNje8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-wKGId1-WMSaHcI8mf6NQWw-1; Mon, 02 Dec 2019 06:19:53 -0500
+Received: by mail-wr1-f72.google.com with SMTP id z15so1470372wrw.0
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 03:19:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=eQi9yiL1SgJE1ivljlkViky/PBxqJ9TBB8DmrLRuJUA=;
- b=U5P8cy0tbWN1ob4X3fD/KpTQHeFEo4lBRgW0TDcpcuJpHFcWOuDm2D3j+QOHjMGGaL
- NbT9P96QEdtlrQ5SEmTCNyqM7oDPtjjRNx5U2bws9jZs+6x8vxCWQIkUgnq6WCaAe4SN
- 9aBMtAQOC6NshgaelgTp6KNRdWVuN0QhXONm8TjPAZPrMhXzWh5b0maYOvAbH9rPh1qA
- /uBlwpv+94q9t+4KwnBD3Tu1q1ewx1k56mORqyj+z6m5AtLjReW3jldhkLnQXA2+EXkU
- FmyC7wQicK/4fqpu+Rg0Ba5szD33lSPseM/tXCewgcrU051v6h7PQvRRTwYXhSK062qg
- idZw==
-X-Gm-Message-State: APjAAAXZx0vZBWUgyCGFwrg7SKyLy7bOlMSaYzZaDlHCHTGwaPSJ58dm
- R7zoBpqaGCegaZ90vMILdIe+Ls55AXNNO+WsgL4=
-X-Google-Smtp-Source: APXvYqwjW51aSW7MzVJn3sujSwdLhxXiNNg6Y1ff8GIduOmojmIyDi7NXc9SEl3OIccdcKJ/HLMURiLp9MxMZJPHPHw=
-X-Received: by 2002:a5d:6350:: with SMTP id b16mr4847000wrw.132.1575285445089; 
- Mon, 02 Dec 2019 03:17:25 -0800 (PST)
+ h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+ :mime-version:content-language:content-transfer-encoding;
+ bh=kSV1+41FnEe3A1jTZkiiLsSMjrLrkZwGrvL9iWVu7ok=;
+ b=EZkgkQ+npYcz1kGXmnVQX0LbOvtPOLkSzI4NZJiXWEGXwh1k1Ch4i6FBkiCE0eAB2l
+ oYvfZROeDJKJYm4ml8G9JGbkviNuCH5hPCrovYM5nw8t5762YmnvsTqkSIUIfND/iz4D
+ XuHQxQ2A78dK645eE7xbtPJcn6taVTiLqjrhQx/ZM37vdsPSlPQ4sYmvdX26DhAiSarA
+ UY8dOvUE9mg0QrnKRiIgBzFn0MhQ4HMXEONwN1F8Fv5GNPcbqSV4biy82EKSUUk46JAD
+ UKdAVIrw2Ljx/Ehjsr33wBjSMOa1rjzgHric5e+gpUdAHKH9k14dSPpkDKLetF/bwRe4
+ UGkQ==
+X-Gm-Message-State: APjAAAXCcuVH4TvFni75y+FQ/AJi8aiOGpL18y2uuLTAfOg07zC+BfFs
+ sYmTaBBVXUISXawzoenb6zDfmeYgAEQ2+8UX5gPQaY/9/HoMJbRn3HDPpKAV5GWKtXp1qARMbYs
+ rjEyHUPq2+WMzejM=
+X-Received: by 2002:a7b:cb54:: with SMTP id v20mr27071688wmj.11.1575285592357; 
+ Mon, 02 Dec 2019 03:19:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzHp81Nbu9dSWBGs9v/z/22j+jyFwifIKNlnMukttNAyxZWR0xLa5IRO871Mew0QF/f7WpR4Q==
+X-Received: by 2002:a7b:cb54:: with SMTP id v20mr27071674wmj.11.1575285592194; 
+ Mon, 02 Dec 2019 03:19:52 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id c1sm8769208wmk.22.2019.12.02.03.19.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Dec 2019 03:19:51 -0800 (PST)
+To: Gerd Hoffmann <kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Subject: iPXE: update submodule
+Message-ID: <d33644db-ec7e-0b51-b6e6-b5fc15f37665@redhat.com>
+Date: Mon, 2 Dec 2019 12:19:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <CAJ+F1CLV_JRhXX=tB7ZXYxa1En4LzYgJr+7egKzVRNBOLY2nSA@mail.gmail.com>
- <CAFEAcA82wRy0U-DzPr64s5QiKo6XmZM96O88c4-AY4zP926GPw@mail.gmail.com>
- <CAJ+F1CKwZJnJMFzc4Z1zsY3dZAsXL1SLaXYu8y0G7=u319DWDg@mail.gmail.com>
- <CAFEAcA8nSVe2kGU9kuBxb+5BGs7GRVUHf4aHR2kUwvRNF-9-EA@mail.gmail.com>
-In-Reply-To: <CAFEAcA8nSVe2kGU9kuBxb+5BGs7GRVUHf4aHR2kUwvRNF-9-EA@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 2 Dec 2019 15:17:12 +0400
-Message-ID: <CAJ+F1CL6i05tt7LmY1opSTdKq6tdJomF20MU0btBwqW-FvRGYg@mail.gmail.com>
-Subject: Re: [PATCH v4 00/37] Clean-ups: qom-ify serial and remove
- QDEV_PROP_PTR
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+Content-Language: en-US
+X-MC-Unique: wKGId1-WMSaHcI8mf6NQWw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,92 +101,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Hi Gerd,
 
-On Sun, Dec 1, 2019 at 10:10 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
->
-> On Sun, 1 Dec 2019 at 17:27, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@gmail.com> wrote:
-> >
-> > Hi
-> >
-> > On Sun, Dec 1, 2019 at 9:18 PM Peter Maydell <peter.maydell@linaro.org>=
- wrote:
-> > >
-> > > On Sun, 1 Dec 2019 at 10:19, Marc-Andr=C3=A9 Lureau
-> > > <marcandre.lureau@gmail.com> wrote:
-> > > >
-> > > > - "serial: register vmsd with DeviceClass"
-> > > >
-> > > > This is standard qdev-ification, however it breaks backward migrati=
-on,
-> > > > but that's just how qdev_set_legacy_instance_id() works.
-> > >
-> > > I don't understand this part. Surely the whole point
-> > > of setting a legacy instance ID is exactly to preserve
-> > > migration compatibility? If it doesn't do that then what
-> > > does setting legacy ID value do?
-> > >
-> >
-> > It works in old->new direction only, because new code can match the
-> > legacy instance id.
-> >
-> > But when going from new->old, the legacy instance id is lost, as it
-> > uses new 0-based instance_id.
->
-> I still don't understand. My mental model of the situation is:
->
->  * in the old (current) version of the code, the instance ID
->    is some random thing resulting from what the old code does
+'make -C roms efirom' is failing on Fedora 30.
 
-right
+Can you update the iPXE submodule so we get these buildsys commits:
 
->  * in the new version of the code, we use qdev_set_legacy_instance_id,
->    and so instead of using the ID you'd naturally get as a
->    written-from-scratch qdev device, it uses the legacy value
->    you pass in
+c742c576 [build] Move predefined all-drivers build shortcut to Makefile
+a4f8c6e3 [build] Do not apply WORKAROUND_CFLAGS for host compiler
+1dd56dbd [build] Workaround compilation error with gcc 9.1
+412acd78 [build] Fix "'%s' directive argument is null" error
 
-no, it only sets the SaveStateEntry.alias_id, which is only used
-during incoming migration in find_se().
+Thanks,
 
-Iow, it only works old->new.
+Phil.
 
->  * thus the device/board in both old and new versions of QEMU
->    uses the same value and migration in both directions works
-
-sadly no
-
->
-> I don't understand why we would ever be using a "new 0-based
-> instance_id" -- it seems to me that the whole point of setting
-> a legacy ID value is that we will use it always, and I don't
-> understand how the board code can know that it's going to be
-> the target of an old->new migration as opposed to being the
-> source of a new->old migration such that it can end up with
-> a different ID value in the latter case.
-
-The target will find the "legacy" alias with find_se() on incoming
-migration, but any new outgoing migration will use the new 0-based
-instance_id
-
->
-> If qdev_set_legacy_instance_id() doesn't work the way I
-> think it does above, what *does* it do ?
-
-just set the old alias_id for incoming migration.
-
-David, is that correct?
-
-thanks
-
-
---=20
-Marc-Andr=C3=A9 Lureau
 
