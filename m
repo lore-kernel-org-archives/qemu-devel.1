@@ -2,81 +2,86 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7A4C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25775C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:31:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46D432073C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:29:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7F7220881
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:31:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NNkLy9qD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46D432073C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="saZrTluP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7F7220881
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37445 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibndK-00082q-BE
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 10:29:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46283)
+	id 1ibnfn-0001F2-0C
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 10:31:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46153)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ibncJ-0006cy-Mb
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:28:05 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1ibnbD-0005zF-Ux
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:26:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ibncH-0002Hc-Ky
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:28:03 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60924
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1ibnbC-0001pB-Qt
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:26:55 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:58364)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ibncF-0002Ex-Of
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:27:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575300477;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1ibnbC-0001oV-Kv
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:26:54 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 6DFF996EF0;
+ Mon,  2 Dec 2019 15:26:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1575300412;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fNuI1Lg6PUcU0g7g48qRrIfBTSi72AXKORyODJL3r7w=;
- b=NNkLy9qDz8gYvbY/Z8CPR3BJUPQutvpuEwbiAb5wRE545DOX7qBZTcwZWu3hLSZt3zEvLM
- Gt0joCSgHFVmREeebX6rsOcCz6T/ITWSQHtKO2ViGexbBlOpIZvxt4SXtf/55xUqmndCho
- Sp9muESskKFPJaN6b/LMYnFu4KenDI0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342-zJoXIhVWPNe4VFAjnwyjZg-1; Mon, 02 Dec 2019 10:27:54 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C16B100F607;
- Mon,  2 Dec 2019 15:27:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 96DA35DA32;
- Mon,  2 Dec 2019 15:27:47 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 279EC11366CF; Mon,  2 Dec 2019 16:27:46 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL for-4.2 3/3] block/file-posix: Fix laio_init() error handling
- crash bug
-Date: Mon,  2 Dec 2019 16:27:46 +0100
-Message-Id: <20191202152746.32292-4-armbru@redhat.com>
-In-Reply-To: <20191202152746.32292-1-armbru@redhat.com>
-References: <20191202152746.32292-1-armbru@redhat.com>
+ bh=BsAO0TXNx3/Ne29sFkbPePTSRB3HY1L/JUQ7joKU74w=;
+ b=saZrTluPqrp4xjct6a8MJe/haNrmVvFId2U7OvvIe002GsXMICnqrWvn95WYA8QPKTGAdL
+ DMx9ZvkoWjbzvSkVWOoIxRbpg+tHSqyfLsvdOX1Q/jrsZMNfxaGmXOUr/r6oTkTrLnPYT3
+ cqwp+/+CYa/FLW4WVNAp3yh5RbYEoUo=
+Subject: Re: [PATCH v2 03/14] gdbstub: move str_buf to GDBState and use GString
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20191130084602.10818-1-alex.bennee@linaro.org>
+ <20191130084602.10818-4-alex.bennee@linaro.org>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <2950506f-5441-6924-9625-70c631366723@greensocs.com>
+Date: Mon, 2 Dec 2019 16:26:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: zJoXIhVWPNe4VFAjnwyjZg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20191130084602.10818-4-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1575300412;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=BsAO0TXNx3/Ne29sFkbPePTSRB3HY1L/JUQ7joKU74w=;
+ b=aPwgX9sfF6L7mCYpy5pbjQXGAafsJn99DZhDWCrRwn0XmZYYhoZhQrYqqRuWB38AJf9lng
+ o/suTwtSYqGTYP+KJl2Y3UdS7lu5z/0JSng8pU+2qhH+ZTbxgF9e2lWQHmIXIXqVGwKIo/
+ J+rzMYRLQJb/eIoe9/CBL6TivREy6h0=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575300412; a=rsa-sha256; cv=none;
+ b=KjByxLCzu9lZ5BRj0C7li1oRJpAoKJ18SqMbi0R5iQz5S4OLL8myieez4WaoEStXzcHj7c
+ peNXkCHDXB/qExs7DEmUYD/bpePWE4/PBf8Ft3G53in0JbWl9jnWvjoURl1YfLPEVR7+ks
+ Nx9BdzeAqsqqgJOcKNfkoBESy8FA+zI=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,47 +93,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Nishanth Aravamudan <naravamudan@digitalocean.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: luis.machado@linaro.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, alan.hayward@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-raw_aio_attach_aio_context() passes uninitialized Error *local_err by
-reference to laio_init() via aio_setup_linux_aio().  When laio_init()
-fails, it passes it on to error_setg_errno(), tripping error_setv()'s
-assertion unless @local_err is null by dumb luck.
 
-Fix by initializing @local_err properly.
 
-Fixes: ed6e2161715c527330f936d44af4c547f25f687e
-Cc: Nishanth Aravamudan <naravamudan@digitalocean.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20191130194240.10517-4-armbru@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
----
- block/file-posix.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 11/30/19 9:45 AM, Alex Benn=C3=A9e wrote:
+> Rather than having a static buffer replace str_buf with a GString
+> which we know can grow on demand. Convert the internal functions to
+> take a GString instead of a char * and length.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>=20
+> ---
+> v2
+>   - fix conflict from status gdbserver_state
+>   - add put_strbuf helper
+> ---
+>  gdbstub.c | 195 +++++++++++++++++++++++++-----------------------------
+>  1 file changed, 90 insertions(+), 105 deletions(-)
+>=20
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 1f0f61a02b..1b805bd938 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1973,7 +1973,7 @@ static void raw_aio_attach_aio_context(BlockDriverSta=
-te *bs,
- #ifdef CONFIG_LINUX_AIO
-     BDRVRawState *s =3D bs->opaque;
-     if (s->use_linux_aio) {
--        Error *local_err;
-+        Error *local_err =3D NULL;
-         if (!aio_setup_linux_aio(new_context, &local_err)) {
-             error_reportf_err(local_err, "Unable to use native AIO, "
-                                          "falling back to thread pool: ");
---=20
-2.21.0
+Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
 
+--
+Damien
 
