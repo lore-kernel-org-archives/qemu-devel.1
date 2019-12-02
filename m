@@ -6,82 +6,77 @@ X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A24E4C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:41:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DFC9C33C99
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:41:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A2082084F
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:41:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BF102084F
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:41:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="3qnXKbgn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A2082084F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DvsEmO3O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BF102084F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibk4y-0007Et-Cl
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:41:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44590)
+	id 1ibk5U-0007yZ-8U
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:41:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44828)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1ibk2C-0006Kp-UF
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:38:33 -0500
+ (envelope-from <berrange@redhat.com>) id 1ibk4k-0007O0-L0
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:41:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1ibk2B-0004Qz-3g
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:38:32 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:51086)
+ (envelope-from <berrange@redhat.com>) id 1ibk4h-0005kU-Qn
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:41:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20094
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1ibk27-0004PE-FE; Mon, 02 Dec 2019 06:38:28 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 82F8696EF0;
- Mon,  2 Dec 2019 11:38:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1575286701;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ibk4h-0005jG-MO
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:41:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575286866;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kc4rOJaJAYsNyCWNjPbW9WW8Alz48HOG756F5zrMF0A=;
- b=3qnXKbgngrLys298wuE/JEhUm0wVSEaZ89fMLWV4Cb34aYF/4myeg4+4+XSagbqI3LafXk
- IhRQHAqQYfQfC3GP97klTyipM93omHoIP2Mq6fqQefl7XCghoBMbNGmrXnO7AmXlh6WwY8
- qYu2RljaoW3ebaC1K2uAmgcxphur5uQ=
-Subject: Re: [PATCH v5 04/13] hw/core: add Resettable support to BusClass and
- DeviceClass
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191018150630.31099-1-damien.hedde@greensocs.com>
- <20191018150630.31099-5-damien.hedde@greensocs.com>
- <CAFEAcA9z_Tu3jEABbRVgoZfw=_6RDm8MOQNOYh4qwmQzJjBAgQ@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <0befd5d7-dde3-9a41-6c60-1bc372f7fd28@greensocs.com>
-Date: Mon, 2 Dec 2019 12:38:20 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ bh=N7tN1ljshIaWvj3z15o+HZC9RxnlV3ttBlasVpXYbOs=;
+ b=DvsEmO3Oau1wap0LpZtFb8/WR3nfSuw/TpnVtdmkoq5pYjcnm5Tp8vUZvgDbmd5/HynS4L
+ kMVedsAhXhKgYNOjw1/684kuTx7wfQoQuEJ6OzslCPDP7Uo1AGyJs5JmaIwFPoQDCuQXF3
+ EuIBPjd7Em6agqV1Wi1fKasaDwsu48U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-303-iR8JQxnbOReXUia8_RGj6Q-1; Mon, 02 Dec 2019 06:41:04 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C82688FDD24
+ for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 11:41:01 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 84DE41001281;
+ Mon,  2 Dec 2019 11:40:56 +0000 (UTC)
+Date: Mon, 2 Dec 2019 11:40:54 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Subject: Re: [PATCH 2/7] ppm-save: pass opened fd
+Message-ID: <20191202114054.GD4184266@redhat.com>
+References: <20191127115202.375107-1-marcandre.lureau@redhat.com>
+ <20191127115202.375107-3-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9z_Tu3jEABbRVgoZfw=_6RDm8MOQNOYh4qwmQzJjBAgQ@mail.gmail.com>
+In-Reply-To: <20191127115202.375107-3-marcandre.lureau@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: iR8JQxnbOReXUia8_RGj6Q-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1575286701;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kc4rOJaJAYsNyCWNjPbW9WW8Alz48HOG756F5zrMF0A=;
- b=Wi4oqgutqhzNbKcEtiG4+L4eiPJCFAsdD4tm4s9izLCm1Ju2q41Lv7sAOnTuh8Pm6Rfo2F
- JCNDiq6dDsKhlrgZteDGN3NWCfjUzRJPhTfJZ05H77uYoC4VoUpW1E7Zi+R4j3PmtkR36A
- UIpLYX8uNZvuektGCsFrIPCoPyUoYls=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575286701; a=rsa-sha256; cv=none;
- b=a5+O9S4I9dxfA+Rnf7LutTBtMjnLdCtsP1Uiv3LCOVrc80pTRx1i+NPR4ofgLPefyvngrv
- H65jPJ2pdBO/uL5Rqr6K2HqSzL/j0eA0rFbJzkGgtOgHQG+pxcqx0ji9M47acfIZPTPrTv
- Gs7YpitOBwpWbXPIM6JRKXWl/gpu2Uo=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,60 +88,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Nov 27, 2019 at 03:51:57PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> This will allow to pre-open the file before running the async finish
+> handler and avoid potential monitor fdset races.
+>=20
+> (note: this is preliminary work for asynchronous screendump support)
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  ui/console.c    | 45 ++++++++++++++++++++++-----------------------
+>  ui/trace-events |  2 +-
+>  2 files changed, 23 insertions(+), 24 deletions(-)
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
 
-On 11/29/19 7:36 PM, Peter Maydell wrote:
-> On Fri, 18 Oct 2019 at 16:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
->>
->> This commit adds support of Resettable interface to buses and devices:
->> + ResettableState structure is added in the Bus/Device state
->> + Resettable methods are implemented.
->> + device/bus_is_in_reset function defined
->>
->> This commit allows to transition the objects to the new
->> multi-phase interface without changing the reset behavior at all.
->> Object single reset method can be split into the 3 different phases
->> but the 3 phases are still executed in a row for a given object.
->> From the qdev/qbus reset api point of view, nothing is changed.
->> qdev_reset_all() and qbus_reset_all() are not modified as well as
->> device_legacy_reset().
->>
->> Transition of an object must be done from mother class to daughter
->> classes.
-> 
-> The standard terminology here is "parent class" and "child class".
-> 
-> I notice you've used mother/daughter in a bunch of other comments
-> in various patches -- could you change that to the more usual
-> terms, please?
-Yes. Sorry for that.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
-> 
->> Care has been taken to allow the transition of a mother class
->> without requiring the daughter classes to be transitioned at the same
->> time. Note that SysBus and SysBusDevice class do not need any transition
->> because they do not override the legacy reset method.
->>
->> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-> 
-> Otherwise
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> thanks
-> -- PMM
-> 
-
---
-Damien
 
