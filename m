@@ -2,78 +2,88 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C164C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 18:07:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E9C4C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 18:10:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0854520705
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 18:07:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3AADC20715
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 18:10:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="znXt7UH6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0854520705
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QkJA3Wi3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AADC20715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibq6p-00055j-6k
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 13:07:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58030)
+	id 1ibq9i-000814-El
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 13:10:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ibq60-00046r-CM
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:06:53 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ibq8I-0007Fg-OT
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:09:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ibq5z-0001D9-Bm
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:06:52 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43664)
+ (envelope-from <richard.henderson@linaro.org>) id 1ibq8H-0002J0-Mr
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:09:14 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42000)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ibq5z-0001Cm-6M
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:06:51 -0500
-Received: by mail-ot1-x342.google.com with SMTP id p8so274783oth.10
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 10:06:50 -0800 (PST)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ibq8H-0002Im-Gt
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 13:09:13 -0500
+Received: by mail-pf1-x444.google.com with SMTP id l22so28782pff.9
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 10:09:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=F65E2ZvVQvZg6ukj5sksAtp+NBuwOuNR4qhlZjfRqBE=;
- b=znXt7UH6VAyP3o4nGqCEVels6KwRivCn2reviSsXQ7JK1LwYLcHFWfP1+4VIj3PBwd
- HJZkr9t2MKl9gKx6wAbyMDlhlydAWJMe7meSdkYfAO7FZ2ILnIoBrgtYhbY3ssKgcXLp
- 2WFSxZ/GmM2z159cQ3wID0TQ8WIqZumLn3xRWFMdLM7S2YlIM0mmgP57gZSESm/Naubs
- 7AB8IVLCrEMuIsRvx5/VJR/SIHx9qWX7HmcSDWTMRlkphrKItVjcZQMj8Qy1qM9OS+eG
- e/M3tPBTb3ko0N0ssCGDDVzQBl9MswrHUomv4WPtMgs4OExYLf9vuMS3Yz5ZFHKYllOR
- JErw==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=3i0gqRIZR7MOB9y3SV/8qk3Dk62rM1kFev6OWDH78cM=;
+ b=QkJA3Wi3kkcLfdbzcYxgjfXrzEFTN9ytWm/VKpj/4nKOPvT7yFXiWYn+PhQSMW+zvC
+ ouUAAtOkF5+DlHQETtgagHTp/uTFdCZcxbbzZiwqoT8zB9vErcWz8lzc0PBGDCl1fMU7
+ wIeh3jAcl7M972vWyDalsRso8qCMMZCvvksTGaKKRRg427I6Eg5h/pwkmdmso/xF9tbs
+ JCRiYQyaqmv24HaLIpMgZAiVAaj5M5Ij7WX1j+hdPWPJj0cwQUTiyjPuSUwIJqucSWhG
+ bcVijfTahx0x57HZkaTq1rB4Ykq7IC1io/dJBvpThUrkzHJWp2qW5CLiw1Z0TFFXGLfc
+ CrdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=F65E2ZvVQvZg6ukj5sksAtp+NBuwOuNR4qhlZjfRqBE=;
- b=B8JsJ2PCtASMfihGu009gqkhP2004c9603bjpaDgXQAKzyWV499Rh2xHXmG3Zs+aHC
- iGx/eNEMmZJBs0QqH+Tj9pSDnkcgXC/ZEJNvv/T8jwL+nCiZ8AH95AEnW7K0sLPoddIB
- B5+Et75iYbr/gnsfhuy2Uvysr/srVjfjL9Tv+8wzrujSXqqdgBjzGLjS4tFXX11whEx5
- Z9SwZxq8GgnJ1sZYVwO4EWYJBmLwUCUpDsTHUpYLBH1x98N1WVlWEnG2qsj3He/lCzKJ
- NRgLyqu2SLQJprT7WLE2GbRWmEuZxcMo/xgc+noq8sRufSjVEgcZg+FXi/PlzHnyZeV9
- fy5A==
-X-Gm-Message-State: APjAAAXGS3QWgnV6aV0jU0tN+qG/CAgvGlJt4QiiOKWlUINKE6MkCqdw
- LUALBwG7cTkSWepQKMv8mN2hNehlR8g3PVLjO5o4FQ==
-X-Google-Smtp-Source: APXvYqz/qTzdZG4Cea+hicDimhC8oVNzXrbe4JCsOGmoL/J+JRmI4ZcGIRSnXBhWk8DkPzrai0Kbv3LX1S66nL0TtwU=
-X-Received: by 2002:a9d:6357:: with SMTP id y23mr249592otk.91.1575310010134;
- Mon, 02 Dec 2019 10:06:50 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3i0gqRIZR7MOB9y3SV/8qk3Dk62rM1kFev6OWDH78cM=;
+ b=I8SER39dz2+kwaKhKFpmF1lXHnhLg8BX8a6EicyEHv77Wjb/wOUJCUMBqyOwsRf2yW
+ 6jZxxtnLPr13MT41E8ECIrkLRxJiElEhSsqsACGMRwHltCLRoMqgHvs6vKyqVyoi2ml1
+ VDix1oYWCnkM6xnnjV8Co7p5XeHMKfNE3BHmdp5My9uqTjoTHjGEom+zZKi+BXEMniwo
+ BToBKLwfGNpml+c4o18G2YhejetYpXWr41LbnPHWmes9HCygl4oHCI2HMjAaBU6yGtN4
+ lM1uPvuqjx7gOXoGk7hryUWGv2FQIdiqJfEJwhl13JL/nSBoC8QbQROLhbzdyW5jXPn1
+ oP5w==
+X-Gm-Message-State: APjAAAXAjk/CeGjLsa3P2jrFPOg1CuVTn5yH63Y2w82Grf9Pb37g0oni
+ xFQdf1jsyblhI9bq89HnZHH0mw==
+X-Google-Smtp-Source: APXvYqy8Lj5cOKGdaj4sYpeGH16BvGUTd8c6FTDR25i5Y6KRcAcCMeLfdDPvQQ91Fn3PS2ey1rMzbQ==
+X-Received: by 2002:a63:4946:: with SMTP id y6mr278236pgk.377.1575310152321;
+ Mon, 02 Dec 2019 10:09:12 -0800 (PST)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d85sm128126pfd.146.2019.12.02.10.09.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Dec 2019 10:09:11 -0800 (PST)
+Subject: Re: [PATCH 0/4] Expose GT CNTFRQ as a CPU property to support AST2600
+To: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org
+References: <20191128054527.25450-1-andrew@aj.id.au>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7aed21dd-a0f9-baf3-70e8-023dcd16ce6f@linaro.org>
+Date: Mon, 2 Dec 2019 10:09:09 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-References: <20191129140217.17797-1-pbonzini@redhat.com>
-In-Reply-To: <20191129140217.17797-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Dec 2019 18:06:39 +0000
-Message-ID: <CAFEAcA9RsC-5Bxm33hQjNJ-wzEGCFDgUAUooZggRFmo2WdEsyQ@mail.gmail.com>
-Subject: Re: [PATCH for-5.0 0/8] docs: integrate doc comments with Sphinx build
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191128054527.25450-1-andrew@aj.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,34 +95,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, joel@jms.id.au, qemu-devel@nongnu.org,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 29 Nov 2019 at 14:02, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> This merges my series and Peter's into one.  Both the memory API and bitwise
-> operation APIs are covered.
->
-> Paolo Bonzini (4):
->   docs: import Linux kernel-doc script and extension
->   docs: tweak kernel-doc for QEMU coding standards
->   memory.h: Silence kernel-doc complaints
->   docs: add memory API reference
->
-> Peter Maydell (4):
->   docs/conf.py: Enable use of kerneldoc sphinx extension
->   Makefile: disable Sphinx nitpicking
->   bitops.h: Silence kernel-doc complaints
->   docs: Create bitops.rst as example of kernel-docs
+On 11/27/19 5:45 AM, Andrew Jeffery wrote:
+> Andrew Jeffery (4):
+>   target/arm: Remove redundant scaling of nexttick
+>   target/arm: Abstract the generic timer frequency
+>   target/arm: Prepare generic timer for per-platform CNTFRQ
+>   ast2600: Configure CNTFRQ at 1125MHz
 
-Thanks for folding those two series together; I've left
-review comments on the parts I didn't write.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Do you have a URL of a rendered version of the docs
-somewhere handy to save me applying the series locally ?
 
-thanks
--- PMM
+r~
 
