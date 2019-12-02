@@ -2,114 +2,79 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9233CC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 14:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9409C432C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 14:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D6472146E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 14:31:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81A4821774
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 14:35:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="g99mvX7+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D6472146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AixxexQ6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81A4821774
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibmj6-00078i-Hc
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 09:31:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38473)
+	id 1ibmnW-00005H-JZ
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 09:35:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39045)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ibmi7-0006bQ-0h
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:30:00 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ibmmq-000818-C2
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:34:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ibmi5-0006iN-LT
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:29:58 -0500
-Received: from mail-eopbgr150120.outbound.protection.outlook.com
- ([40.107.15.120]:5095 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ibmi5-0006i9-0T; Mon, 02 Dec 2019 09:29:57 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mfoFfZi25NnUHj4EJ0wI49PLmqdceS/JCvxhOYGiW2A2ibrs4Q/8ajUZyCvEZ4sl9FaQiu9dvIqbzV1vw9fjhl9Wcl3/ahl3Q6GNeIqgU7RloJwllaM/CLy4q2oiY6PB/B4oe20vtAd5KrzOmf/OJa/SCYvFL2OiI6nYTVpdFkQQfKnKa2zzKtYE6ieduho4dEh9vkVYDjsEB7w63q+0id+BFOMrZ5bNtW03Gcz+w2YHAk3s8mWRhvnhtS6NYLH/RnkFxkDUZNMqj+S5Ayh8fl8RCW55TUthnU67YNGacMlvmT4I6LUZ9aMgXRHF0WRDMhup3XIsynQbUW/PjTX4mw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5mwZO9aeLPCGJkGV4vCQamXTvyvOcsWwuNYSvCxOnTk=;
- b=SdUuuModuvZRhbpnb8CWE1GOXukvP4cWiyY2xIdcWjj2FwrciXV8QT2uDZcQlNMfRGqUEBCuWIPtAx2YnYBHi68otUhoT9Cgue4Elw2YZrHGy+M0+6P6fwDcE7qATx72/36HLU3vBrdyn/+U/xyjtrybmOJaE7Qe+eONbitudfhL5qOwIHW/YYS2IRh2LRKSJ1hKC0TRw8vd51FeFtzfCNYoj3C9CGULf6LNf25aU6Kob70AsYHZHafhOOfOXh3wrPxVGb779SDwuuNENodakM9066Z2mCgEQz8NJrBVIp8GW6XY8B4MK6CMQqrU7Kp2uXOX0jrXs4Gy3v8p2Wz4ow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5mwZO9aeLPCGJkGV4vCQamXTvyvOcsWwuNYSvCxOnTk=;
- b=g99mvX7+/reIuybKSeA37zEu6PNNIR0vrVHcw0EJPTmFHuvaOhtC99dQTkwk5Jfbq+XJE4YCK1Y8DH/dKgob+nM6r0wItYB4LlO8zfXtdX4sGDgTQHxpXxm4mz3/GHfjaTlJK8OIP0glQ7I64NLUlo5ZXEbmVrKrRxiHzezGaLc=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4739.eurprd08.prod.outlook.com (10.255.97.78) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.20; Mon, 2 Dec 2019 14:29:54 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2495.014; Mon, 2 Dec 2019
- 14:29:54 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Subject: Re: [PATCH 0/5] fix migration with bitmaps and mirror
-Thread-Topic: [PATCH 0/5] fix migration with bitmaps and mirror
-Thread-Index: AQHVessC0060zPak00+qTjXkhg9qSaenRFQA
-Date: Mon, 2 Dec 2019 14:29:54 +0000
-Message-ID: <e4cc9d3d-ca5c-424d-468e-515783094c49@virtuozzo.com>
-References: <20191004154701.3202-1-vsementsov@virtuozzo.com>
-In-Reply-To: <20191004154701.3202-1-vsementsov@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0501CA0016.eurprd05.prod.outlook.com
- (2603:10a6:3:1a::26) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191202172952118
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2c53104a-7766-474d-8b59-08d77734195c
-x-ms-traffictypediagnostic: AM6PR08MB4739:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB4739721E8FE3A2F9152D8FAFC1430@AM6PR08MB4739.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:59;
-x-forefront-prvs: 0239D46DB6
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(366004)(396003)(346002)(39840400004)(136003)(53754006)(189003)(199004)(6486002)(8936002)(2501003)(11346002)(14454004)(36756003)(52116002)(229853002)(66066001)(66946007)(71200400001)(6246003)(6306002)(31686004)(478600001)(966005)(31696002)(5660300002)(99286004)(446003)(6512007)(86362001)(76176011)(305945005)(7736002)(256004)(316002)(102836004)(2906002)(6916009)(186003)(6436002)(2616005)(71190400001)(5640700003)(26005)(2351001)(107886003)(25786009)(4326008)(6116002)(54906003)(386003)(66476007)(6506007)(8676002)(81156014)(81166006)(3846002)(66556008)(64756008)(66446008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4739;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: a+YXSldoTKyKDv1xlx6eb+SKq3Ym9hOD39Ty9yFOV5CbVhOGB1M6o68KDUki4Hj3On2oAOanZeRDa+j838JvJzADzhZVsCySuvqj2XnRl5XVxVnSLN7NMOGZGMDNmVKeRPu3tHuS3fdREzb0lK6vKWGtqlARIAHwfyKd1udZ9KUmtORpNir1JnlJdrzXURAhlKTXhXFnLtVVxYAzlIWUDGAXH7jkCwCiA4OuXA4XrsXNA6z8LrYxC6lkHbvw1ESE+N6ns6d0veRPG6xQGUsSinSxcOKXNYvRrhzo5KhVbeeqkUK6B0D8F6Uv18jROYycdhwPxwk7gPuwHLMrEYK/sbHOzMhcjiaGz82DztW/amRDim2B7W6NwQXk/6nsokyldjpPTQehkNmuwGlXL8iV3XhBRaqR7zo49Ws3soMGFROza5AjwbhAiVnF1blXgi7vVQ4bj09btfbjTQ+3mXXqVui/kT8ggEWPVUVSNyqNW+k=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BA7298D6A4901842B210BE2313FB6371@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <peter.maydell@linaro.org>) id 1ibmmo-00086K-Fm
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:34:52 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:37071)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ibmmo-000867-8g
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:34:50 -0500
+Received: by mail-ot1-x342.google.com with SMTP id k14so15570394otn.4
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 06:34:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=OOx/U42IwCgVTBRpxJArTPlYznxoXFOGHOWbSCNf3W0=;
+ b=AixxexQ6NC6ix+9Y/G6mMoBv8oToordZIDm9iTjHK/NuaqLFlE+SJF0xWbD9Jp+jHD
+ lRZDytoHgV2TRX6Lz1YUFn1w0n+jt7Nw/b5tTXd01Hgxzx+FVnr4dN6veJEH5FOibRdF
+ vp7UUGZcWeMrswboob5fEMMDUzjSiJsgcp8Or63Y2B5jxxr+alTpR6Xv78MJaC2hCFhK
+ pj7mzRPSjFvekMQftUSefI1hl+ySCjf2XJhktOeQXbZTh+LZaLJqfTEphmrvvTpcUUyh
+ TNzWzSD2y5Olli2o/br/1H680YdLirHieiWrfED5+jYiUEHOweJIt4ueLzTnQMuTBM6X
+ r0wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=OOx/U42IwCgVTBRpxJArTPlYznxoXFOGHOWbSCNf3W0=;
+ b=Q823TM87GxuxZQMBvPd6mDZc+O1saJJmsKBbKFkrJNFJ1mGP5yMX42lmWMtRAEcGbm
+ hOAFV6wtww0I8DjsxJjQpOloTdG6XcO8/TZQyNJcQhtfE2CUm6ukMzSVLxMfdc5tav2z
+ 2EDT9WWasTDHBcNvWZu2HZ8rBUXU2XYuq+4GfUI760tevI0FYeOjoKDmwDoatuN5UpHG
+ kHw2SBapbpLJ4L3ShHPzS9WnDWDNHKjqnoehan7yKfeaFlWRYYXJ3XCPGxAzL4XTc+5n
+ RDxIt8QXhXbDUlqLgnjTJYrwOY2NbO3qtzx93vio3eXssQ1AbyDBcU0XEMJeMUI4bMda
+ rWbA==
+X-Gm-Message-State: APjAAAVkqIBW8vnKeU9u9SD7LOlfw87pUBadZ/ZNezuEWKQJWBqexyIs
+ e0nffaj9RVo8AbYkCcu4PO+vHzp3mn/K1FGnVaktlQ==
+X-Google-Smtp-Source: APXvYqxbEvify2wKC5QA+Sk8C6vxS+H1KevVgESZEHs+P0D4n8PkjtHbW1p4L+9iM5azzAMgb0nsowM1CCED19svHuY=
+X-Received: by 2002:a9d:6357:: with SMTP id y23mr21860696otk.91.1575297288933; 
+ Mon, 02 Dec 2019 06:34:48 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2c53104a-7766-474d-8b59-08d77734195c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2019 14:29:54.6802 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8F9oM+MCPWzEwapmuvY+VaaeU8u/LCbf/vy27fUmNNur32QLxv5MAXPWh47DWVliX0STG9spEDXOtlXltsESuUfmAMhzqDf7+Q2lPWUh4cE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4739
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.15.120
+References: <20190904125531.27545-1-damien.hedde@greensocs.com>
+ <20190904125531.27545-4-damien.hedde@greensocs.com>
+In-Reply-To: <20190904125531.27545-4-damien.hedde@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Dec 2019 14:34:37 +0000
+Message-ID: <CAFEAcA9M4qR89wykURrUxqxeWoNqYHxuJSwC5Mum6GfmWSG=nA@mail.gmail.com>
+Subject: Re: [PATCH v6 3/9] qdev: add clock input&output support to devices.
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,42 +86,314 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- Denis Lunev <den@virtuozzo.com>, "quintela@redhat.com" <quintela@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cGluZw0KDQowNC4xMC4yMDE5IDE4OjQ2LCBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdy
-b3RlOg0KPiBIaSBhbGwhDQo+IA0KPiBJdCdzIGEgY29udGludWF0aW9uIGZvcg0KPiAiYml0bWFw
-IG1pZ3JhdGlvbiBidWcgd2l0aCAtZHJpdmUgd2hpbGUgYmxvY2sgbWlycm9yIHJ1bnMiDQo+IDwz
-MTVjZmY3OC1kY2RiLWEzY2UtMjc0Mi1kYTNjYzlmMGNhOTdAcmVkaGF0LmNvbT4NCj4gaHR0cHM6
-Ly9saXN0cy5nbnUub3JnL2FyY2hpdmUvaHRtbC9xZW11LWRldmVsLzIwMTktMDkvbXNnMDcyNDEu
-aHRtbA0KPiANCj4gVGhlIHByb2JsZW0gaXMgdGhhdCBiaXRtYXBzIG1pZ3JhdGVkIHRvIG5vZGUg
-d2l0aCBzYW1lIG5vZGUtbmFtZSBvcg0KPiBibGstcGFyZW50IG5hbWUuIEFuZCBjdXJyZW50bHkg
-b25seSB0aGUgbGF0dGVyIGFjdHVhbGx5IHdvcmsgaW4gbGlidmlydC4NCj4gQW5kIHdpdGggbWly
-cm9yLXRvcCBmaWx0ZXIgaXQgZG9lc24ndCB3b3JrLCBiZWNhdXNlDQo+IGJkcnZfZ2V0X2Rldmlj
-ZV9vcl9ub2RlX25hbWUgZG9uJ3QgZ28gdGhyb3VnaCBmaWx0ZXJzLg0KPiANCj4gRml4IHRoaXMg
-YnkgaGFuZGxpbmcgZmlsdGVyZWQgY2hpbGRyZW4gb2YgYmxvY2sgYmFja2VuZHMgaW4gc2VwYXJh
-dGUuDQo+IA0KPiBNYXggUmVpdHogKDEpOg0KPiAgICBibG9jazogTWFyayBjb21taXQgYW5kIG1p
-cnJvciBhcyBmaWx0ZXIgZHJpdmVycw0KPiANCj4gVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tp
-eSAoNCk6DQo+ICAgIG1pZ3JldGlvbi9ibG9jay1kaXJ0eS1iaXRtYXA6IHJlZmFjdG9yIGluaXRf
-ZGlydHlfYml0bWFwX21pZ3JhdGlvbg0KPiAgICBibG9jay9kaXJ0eS1iaXRtYXA6IGFkZCBiZHJ2
-X2hhc19uYW1lZF9iaXRtYXBzIGhlbHBlcg0KPiAgICBtaWdyYXRpb24vYmxvY2stZGlydHktYml0
-bWFwOiBmaXggYml0bWFwcyBtaWdyYXRpb24gZHVyaW5nIG1pcnJvciBqb2INCj4gICAgaW90ZXN0
-czogMTk0OiB0ZXN0IGFsc28gbWlncmF0aW9uIG9mIGRpcnR5IGJpdG1hcA0KPiANCj4gICBpbmNs
-dWRlL2Jsb2NrL2Jsb2NrX2ludC5oICAgICAgfCAgIDggKystDQo+ICAgaW5jbHVkZS9ibG9jay9k
-aXJ0eS1iaXRtYXAuaCAgIHwgICAxICsNCj4gICBibG9jay9jb21taXQuYyAgICAgICAgICAgICAg
-ICAgfCAgIDIgKw0KPiAgIGJsb2NrL2RpcnR5LWJpdG1hcC5jICAgICAgICAgICB8ICAxMyArKysr
-DQo+ICAgYmxvY2svbWlycm9yLmMgICAgICAgICAgICAgICAgIHwgICAyICsNCj4gICBtaWdyYXRp
-b24vYmxvY2stZGlydHktYml0bWFwLmMgfCAxMTggKysrKysrKysrKysrKysrKysrKysrKystLS0t
-LS0tLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzE5NCAgICAgICAgIHwgIDE0ICsrLS0NCj4g
-ICB0ZXN0cy9xZW11LWlvdGVzdHMvMTk0Lm91dCAgICAgfCAgIDYgKysNCj4gICA4IGZpbGVzIGNo
-YW5nZWQsIDEyMSBpbnNlcnRpb25zKCspLCA0MyBkZWxldGlvbnMoLSkNCj4gDQoNCg0KLS0gDQpC
-ZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+On Wed, 4 Sep 2019 at 13:56, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+> Add functions to easily add input or output clocks to a device.
+> A clock objects is added as a child of the device.
+
+"object"
+
+> The api is very similar the gpio's one.
+
+"API"; "to the GPIO API".
+
+>
+> This is based on the original work of Frederic Konrad.
+>
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>
+
+> +static NamedClockList *qdev_init_clocklist(DeviceState *dev, const char *name,
+> +        bool forward)
+> +{
+> +    NamedClockList *ncl;
+> +
+> +    /*
+> +     * The clock path will be computed by the device's realize function call.
+> +     * This is required to ensure the clock's canonical path is right and log
+> +     * messages are meaningfull.
+
+"meaningful"
+
+> +     */
+> +    assert(name);
+> +    assert(!dev->realized);
+> +
+> +    /* The ncl structure will be freed in device's finalize function call */
+
+Do you mean "in device_finalize()", or "in the finalize method
+of the device" ?  If you mean a specific function, then it's
+good to name it, so the reader can go and check that code if
+they need to confirm that there's a matching free()/deref/etc.
+
+> +    ncl = g_malloc0(sizeof(*ncl));
+
+Prefer g_new0(NamedClockList, 1).
+
+> +    ncl->name = g_strdup(name);
+> +    ncl->forward = forward;
+> +
+> +    QLIST_INSERT_HEAD(&dev->clocks, ncl, node);
+> +    return ncl;
+> +}
+> +
+> +ClockOut *qdev_init_clock_out(DeviceState *dev, const char *name)
+> +{
+> +    NamedClockList *ncl;
+> +    Object *clk;
+> +
+> +    ncl = qdev_init_clocklist(dev, name, false);
+> +
+> +    clk = object_new(TYPE_CLOCK_OUT);
+> +
+> +    /* will fail if name already exists */
+
+This is true but it would be more helpful to say
+ /*
+  * Trying to create a clock whose name clashes with some other
+  * clock or property is a bug in the caller and we will abort().
+  */
+
+(assuming that's what's going on here).
+
+> +    object_property_add_child(OBJECT(dev), name, clk, &error_abort);
+> +    object_unref(clk); /* remove the initial ref made by object_new */
+> +
+> +    ncl->out = CLOCK_OUT(clk);
+> +    return ncl->out;
+> +}
+> +
+> +ClockIn *qdev_init_clock_in(DeviceState *dev, const char *name,
+> +                        ClockCallback *callback, void *opaque)
+> +{
+> +    NamedClockList *ncl;
+> +    Object *clk;
+> +
+> +    ncl = qdev_init_clocklist(dev, name, false);
+> +
+> +    clk = object_new(TYPE_CLOCK_IN);
+> +    /*
+> +     * the ref initialized by object_new will be cleared during dev finalize.
+
+This means "in device_finalize()", I think from reading later patches ?
+
+> +     * It allows us to safely remove the callback.
+> +     */
+> +
+> +    /* will fail if name already exists */
+
+Similar remark as for earlier comment.
+
+> +    object_property_add_child(OBJECT(dev), name, clk, &error_abort);
+> +
+> +    ncl->in = CLOCK_IN(clk);
+> +    if (callback) {
+> +        clock_set_callback(ncl->in, callback, opaque);
+> +    }
+> +    return ncl->in;
+> +}
+
+> +ClockIn *qdev_get_clock_in(DeviceState *dev, const char *name)
+> +{
+> +    NamedClockList *ncl;
+> +
+> +    assert(dev && name);
+> +
+> +    ncl = qdev_get_clocklist(dev, name);
+> +    return ncl ? ncl->in : NULL;
+> +}
+
+Do we expect to want to be able to pass in the name of
+a clock that doesn't exist ? Should that be an error
+rather than returning NULL ?
+
+> +
+> +static ClockOut *qdev_get_clock_out(DeviceState *dev, const char *name)
+> +{
+> +    NamedClockList *ncl;
+> +
+> +    assert(dev && name);
+> +
+> +    ncl = qdev_get_clocklist(dev, name);
+> +    return ncl ? ncl->out : NULL;
+
+Ditto.
+
+> +}
+> +
+> +void qdev_connect_clock_out(DeviceState *dev, const char *name, ClockIn *clk,
+> +                            Error **errp)
+> +{
+> +    ClockOut *clkout = qdev_get_clock_out(dev, name);
+> +
+> +    if (!clk) {
+> +        error_setg(errp, "NULL input clock");
+> +        return;
+> +    }
+> +
+> +    if (!clkout) {
+> +        error_setg(errp, "no output clock '%s' in device", name);
+> +        return;
+> +    }
+> +
+> +    clock_connect(clk, clkout);
+
+Do we need to support returning an error here, or would it
+always be a programming bug to try to connect a non-existent clock?
+
+> --- /dev/null
+> +++ b/include/hw/qdev-clock.h
+> @@ -0,0 +1,67 @@
+> +#ifndef QDEV_CLOCK_H
+> +#define QDEV_CLOCK_H
+
+Another missing copyright/license comment.
+
+> +
+> +#include "hw/clock.h"
+> +
+> +/**
+> + * qdev_init_clock_in:
+> + * @dev: the device in which to add a clock
+
+"the device to add a clock input to"
+
+> + * @name: the name of the clock (can't be NULL).
+> + * @callback: optional callback to be called on update or NULL.
+> + * @opaque:   argument for the callback
+> + * @returns: a pointer to the newly added clock
+> + *
+> + * Add a input clock to device @dev as a clock named @name.
+> + * This adds a child<> property.
+> + * The callback will be called with @dev as opaque parameter.
+
+Isn't it called with @opaque, not @dev ?
+
+> + */
+> +ClockIn *qdev_init_clock_in(DeviceState *dev, const char *name,
+> +                            ClockCallback *callback, void *opaque);
+> +
+> +/**
+> + * qdev_init_clock_out:
+> + * @dev: the device to add a clock to
+
+"the device to add a clock output to"
+
+> + * @name: the name of the clock (can't be NULL).
+> + * @callback: optional callback to be called on update or NULL.
+> + * @returns: a pointer to the newly added clock
+> + *
+> + * Add a output clock to device @dev as a clock named @name.
+> + * This adds a child<> property.
+> + */
+> +ClockOut *qdev_init_clock_out(DeviceState *dev, const char *name);
+> +
+> +/**
+> + * qdev_get_clock_in:
+> + * @dev: the device which has the clock
+> + * @name: the name of the clock (can't be NULL).
+> + * @returns: a pointer to the clock
+> + *
+> + * Get the clock @name from @dev or NULL if does not exists.
+
+"if it does not exist"
+
+> + */
+> +ClockIn *qdev_get_clock_in(DeviceState *dev, const char *name);
+> +
+> +/**
+> + * qdev_connect_clock_out:
+> + * @dev: the device which has the clock
+> + * @name: the name of the clock (can't be NULL).
+> + * @errp: error report
+> + *
+> + * Connect @clk to the output clock @name of @dev.
+> + * Reports an error if clk is NULL or @name does not exists in @dev.
+
+"or if @name does not exist in @dev"
+
+> + */
+> +void qdev_connect_clock_out(DeviceState *dev, const char *name, ClockIn *clk,
+> +                            Error **errp);
+> +
+> +/**
+> + * qdev_pass_clock:
+> + * @dev: the device to forward the clock to
+> + * @name: the name of the clock to be added (can't be NULL)
+> + * @container: the device which already has the clock
+> + * @cont_name: the name of the clock in the container device
+> + *
+> + * Add a clock @name to @dev which forward to the clock @cont_name in @container
+> + */
+
+'container' seems odd terminology here, because I would expect
+the usual use of this function to be when a 'container' object
+like an SoC wants to forward a clock to one of its components;
+in that case the 'container' SoC would be @dev, wouldn't it?
+We should get this to be the same way round as qdev_pass_gpios(),
+which takes "DeviceState *dev, DeviceState *container", and
+passes the gpios that exist on 'dev' over to 'container' so that
+'container' now has gpios which it did not before.
+
+Also, your use of 'forward to' is inconsistent: in the 'dev'
+documentation you say we're forwarding the clock to 'dev',
+but in the body of the documentation you say we're forwarding
+the clock to the clock in 'container'.
+
+I think the way to resolve this is to stick to the terminology
+in the function name itself:
+ @dev: the device which has the clock
+ @name: the name of the clock on @dev
+ @container: the name of the device which the clock should
+  be passed to
+ @cont_name: the name to use for the clock on @container
+
+Q: if you pass a clock to another device with this function,
+does it still exist to be used directly on the original
+device? For qdev_pass_gpios it does not (I think), but
+this is more accident of implementation than anything else.
+
+> +void qdev_pass_clock(DeviceState *dev, const char *name,
+> +                     DeviceState *container, const char *cont_name);
+> +
+> +#endif /* QDEV_CLOCK_H */
+> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+> index eb11f0f801..60a65f6142 100644
+> --- a/include/hw/qdev-core.h
+> +++ b/include/hw/qdev-core.h
+> @@ -131,6 +131,19 @@ struct NamedGPIOList {
+>      QLIST_ENTRY(NamedGPIOList) node;
+>  };
+>
+> +typedef struct NamedClockList NamedClockList;
+> +
+> +typedef struct ClockIn ClockIn;
+> +typedef struct ClockOut ClockOut;
+> +
+> +struct NamedClockList {
+> +    char *name;
+
+Could this be 'const char*' ?
+
+> +    bool forward;
+> +    ClockIn *in;
+> +    ClockOut *out;
+> +    QLIST_ENTRY(NamedClockList) node;
+> +};
+
+thanks
+-- PMM
 
