@@ -6,61 +6,60 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2068C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45038C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B904A215F1
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:07:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B904A215F1
+	by mail.kernel.org (Postfix) with ESMTPS id 19BDD2146E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 07:08:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19BDD2146E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibfnl-0003lU-Uz
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 02:07:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35305)
+	id 1ibfoY-00057h-1c
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 02:08:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35366)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ibfkk-00029R-2G
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:15 -0500
+ (envelope-from <clg@kaod.org>) id 1ibfl0-0002HS-71
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ibfki-0000Xs-Fv
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:13 -0500
-Received: from 19.mo5.mail-out.ovh.net ([46.105.35.78]:38930)
+ (envelope-from <clg@kaod.org>) id 1ibfky-0000lq-7B
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:30 -0500
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:41542)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ibfki-0000R1-6W
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:12 -0500
-Received: from player697.ha.ovh.net (unknown [10.108.16.63])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id F340A25CC13
- for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 08:04:02 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ibfkx-0000kV-VE
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 02:04:28 -0500
+Received: from player728.ha.ovh.net (unknown [10.108.42.5])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 86F591B76FD
+ for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 08:04:25 +0100 (CET)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player697.ha.ovh.net (Postfix) with ESMTPSA id DFC23CC8B98F;
- Mon,  2 Dec 2019 07:03:53 +0000 (UTC)
-Subject: Re: [for-5.0 1/4] spapr: Don't trigger a CAS reboot for XICS/XIVE
- mode changeover
+ by player728.ha.ovh.net (Postfix) with ESMTPSA id 8583ECB02A25;
+ Mon,  2 Dec 2019 07:04:17 +0000 (UTC)
+Subject: Re: [for-5.0 2/4] spapr: Improve handling of fdt buffer size
 To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org
 References: <20191129053356.232413-1-david@gibson.dropbear.id.au>
- <20191129053356.232413-2-david@gibson.dropbear.id.au>
+ <20191129053356.232413-3-david@gibson.dropbear.id.au>
 From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <5a1c5f4a-c4b9-1673-6378-778fc9ab92e7@kaod.org>
-Date: Mon, 2 Dec 2019 08:03:53 +0100
+Message-ID: <246281b5-805f-b75d-b565-1c5b3793b2ac@kaod.org>
+Date: Mon, 2 Dec 2019 08:04:16 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191129053356.232413-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20191129053356.232413-3-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 13214124257490733888
+X-Ovh-Tracer-Id: 13220598184504232768
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudejgedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeljedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudejgedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedvkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgepge
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.35.78
+X-Received-From: 188.165.52.147
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,92 +78,111 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 29/11/2019 06:33, David Gibson wrote:
-> PAPR allows the interrupt controller used on a POWER9 machine (XICS or
-> XIVE) to be selected by the guest operating system, by using the
-> ibm,client-architecture-support (CAS) feature negotiation call.
+> Previously, spapr_build_fdt() constructed the device tree in a fixed
+> buffer of size FDT_MAX_SIZE.  This is a bit inflexible, but more
+> importantly it's awkward for the case where we use it during CAS.  In
+> that case the guest firmware supplies a buffer and we have to
+> awkwardly check that what we generated fits into it afterwards, after
+> doing a lot of size checks during spapr_build_fdt().
 > 
-> Currently, if the guest selects an interrupt controller different from the
-> one selected at initial boot, this causes the system to be reset with the
-> new model and the boot starts again.  This means we run through the SLOF
-> boot process twice, as well as any other bootloader (e.g. grub) in use
-> before the OS calls CAS.  This can be confusing and/or inconvenient for
-> users.
-> 
-> Thanks to two fairly recent changes, we no longer need this reboot.  1) we
-> now completely regenerate the device tree when CAS is called (meaning we
-> don't need special case updates for all the device tree changes caused by
-> the interrupt controller mode change),  2) we now have explicit code paths
-> to activate and deactivate the different interrupt controllers, rather than
-> just implicitly calling those at machine reset time.
-> 
-> We can therefore eliminate the reboot for changing irq mode, simply by
-> putting a called to spapr_irq_update_active_intc() before we call
-> spapr_h_cas_compose_response() (which gives the updated device tree to the
-> guest firmware and OS).
+> Simplify this by having spapr_build_fdt() take a 'space' parameter.
+> For the CAS case, we pass in the buffer size provided by SLOF, for the
+> machine init case, we continue to pass FDT_MAX_SIZE.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-
 Reviewed-by: Cedric Le Goater <clg@fr.ibm.com>
 
+
 > ---
->  hw/ppc/spapr_hcall.c | 33 +++++++++++++--------------------
->  1 file changed, 13 insertions(+), 20 deletions(-)
+>  hw/ppc/spapr.c | 33 +++++++++++----------------------
+>  1 file changed, 11 insertions(+), 22 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 140f05c1c6..05a7ca275b 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1767,21 +1767,10 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index d9c9a2bcee..d34e317f48 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -917,7 +917,8 @@ static bool spapr_hotplugged_dev_before_cas(void)
+>      return false;
+>  }
+>  
+> -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset);
+> +static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
+> +                             size_t space);
+>  
+>  int spapr_h_cas_compose_response(SpaprMachineState *spapr,
+>                                   target_ulong addr, target_ulong size,
+> @@ -930,24 +931,17 @@ int spapr_h_cas_compose_response(SpaprMachineState *spapr,
+>          return 1;
 >      }
->      spapr->cas_pre_isa3_guest = !spapr_ovec_test(ov1_guest, OV1_PPC_3_00);
->      spapr_ovec_cleanup(ov1_guest);
-> -    if (!spapr->cas_reboot) {
-> -        /* If spapr_machine_reset() did not set up a HPT but one is necessary
-> -         * (because the guest isn't going to use radix) then set it up here. */
-> -        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
-> -            /* legacy hash or new hash: */
-> -            spapr_setup_hpt_and_vrma(spapr);
-> -        }
-> -        spapr->cas_reboot =
-> -            (spapr_h_cas_compose_response(spapr, args[1], args[2],
-> -                                          ov5_updates) != 0);
+>  
+> -    if (size < sizeof(hdr) || size > FW_MAX_SIZE) {
+> -        error_report("SLOF provided an unexpected CAS buffer size "
+> -                     TARGET_FMT_lu " (min: %zu, max: %u)",
+> -                     size, sizeof(hdr), FW_MAX_SIZE);
+> +    if (size < sizeof(hdr)) {
+> +        error_report("SLOF provided insufficient CAS buffer "
+> +                     TARGET_FMT_lu " (min: %zu)", size, sizeof(hdr));
+>          exit(EXIT_FAILURE);
+>      }
+>  
+>      size -= sizeof(hdr);
+>  
+> -    fdt = spapr_build_fdt(spapr, false);
+> +    fdt = spapr_build_fdt(spapr, false, size);
+>      _FDT((fdt_pack(fdt)));
+>  
+> -    if (fdt_totalsize(fdt) + sizeof(hdr) > size) {
+> -        g_free(fdt);
+> -        trace_spapr_cas_failed(size);
+> -        return -1;
 > -    }
+> -
+>      cpu_physical_memory_write(addr, &hdr, sizeof(hdr));
+>      cpu_physical_memory_write(addr + sizeof(hdr), fdt, fdt_totalsize(fdt));
+>      trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
+> @@ -1197,7 +1191,8 @@ static void spapr_dt_hypervisor(SpaprMachineState *spapr, void *fdt)
+>      }
+>  }
 >  
->      /*
-> -     * Ensure the guest asks for an interrupt mode we support; otherwise
-> -     * terminate the boot.
-> +     * Ensure the guest asks for an interrupt mode we support;
-> +     * otherwise terminate the boot.
+> -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset)
+> +static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
+> +                             size_t space)
+>  {
+>      MachineState *machine = MACHINE(spapr);
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+> @@ -1207,8 +1202,8 @@ static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset)
+>      SpaprPhbState *phb;
+>      char *buf;
+>  
+> -    fdt = g_malloc0(FDT_MAX_SIZE);
+> -    _FDT((fdt_create_empty_tree(fdt, FDT_MAX_SIZE)));
+> +    fdt = g_malloc0(space);
+> +    _FDT((fdt_create_empty_tree(fdt, space)));
+>  
+>      /* Root node */
+>      _FDT(fdt_setprop_string(fdt, 0, "device_type", "chrp"));
+> @@ -1723,19 +1718,13 @@ static void spapr_machine_reset(MachineState *machine)
 >       */
->      if (guest_xive) {
->          if (!spapr->irq->xive) {
-> @@ -1797,14 +1786,18 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->          }
->      }
+>      fdt_addr = MIN(spapr->rma_size, RTAS_MAX_ADDR) - FDT_MAX_SIZE;
 >  
-> -    /*
-> -     * Generate a machine reset when we have an update of the
-> -     * interrupt mode. Only required when the machine supports both
-> -     * modes.
-> -     */
-> +    spapr_irq_update_active_intc(spapr);
-> +
->      if (!spapr->cas_reboot) {
-> -        spapr->cas_reboot = spapr_ovec_test(ov5_updates, OV5_XIVE_EXPLOIT)
-> -            && spapr->irq->xics && spapr->irq->xive;
-> +        /* If spapr_machine_reset() did not set up a HPT but one is necessary
-> +         * (because the guest isn't going to use radix) then set it up here. */
-> +        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
-> +            /* legacy hash or new hash: */
-> +            spapr_setup_hpt_and_vrma(spapr);
-> +        }
-> +        spapr->cas_reboot =
-> +            (spapr_h_cas_compose_response(spapr, args[1], args[2],
-> +                                          ov5_updates) != 0);
->      }
+> -    fdt = spapr_build_fdt(spapr, true);
+> +    fdt = spapr_build_fdt(spapr, true, FDT_MAX_SIZE);
 >  
->      spapr_ovec_cleanup(ov5_updates);
+>      rc = fdt_pack(fdt);
+>  
+>      /* Should only fail if we've built a corrupted tree */
+>      assert(rc == 0);
+>  
+> -    if (fdt_totalsize(fdt) > FDT_MAX_SIZE) {
+> -        error_report("FDT too big ! 0x%x bytes (max is 0x%x)",
+> -                     fdt_totalsize(fdt), FDT_MAX_SIZE);
+> -        exit(1);
+> -    }
+> -
+>      /* Load the fdt */
+>      qemu_fdt_dumpdtb(fdt, fdt_totalsize(fdt));
+>      cpu_physical_memory_write(fdt_addr, fdt, fdt_totalsize(fdt));
 > 
 
 
