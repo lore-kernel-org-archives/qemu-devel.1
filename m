@@ -2,86 +2,84 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EDCC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 12:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B6C8C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 12:57:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30A0420705
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 12:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6623820717
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 12:57:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20150623.gappssmtp.com header.i=@daynix-com.20150623.gappssmtp.com header.b="grv1X8Mx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30A0420705
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hbs3BHqw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6623820717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibkxl-0007AA-DS
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 07:38:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51966)
+	id 1iblGR-00055t-GQ
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 07:57:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yuri.benditovich@daynix.com>) id 1ibkua-0003mG-IV
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:34:45 -0500
+ (envelope-from <armbru@redhat.com>) id 1iblFk-0004f0-4O
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:56:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yuri.benditovich@daynix.com>) id 1ibkuZ-0004gl-7p
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:34:44 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35084)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <yuri.benditovich@daynix.com>)
- id 1ibkuY-0004dX-Sz
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:34:43 -0500
-Received: by mail-wr1-x442.google.com with SMTP id g17so11991245wro.2
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 04:34:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=daynix-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=TjZliZhEsVF0vv2Qzf2ABh+Szj2+Cht1CR4qLXA8WKs=;
- b=grv1X8MxVimO/Q+FdZ0YDA+bnXbd2HE1haSmWTq70yIUhTiHkKoQJPMf8wzP7PLhO2
- u3n6Y87x374NmY967CeXgXyFusBZfq8lSUS6GRvKKwcF2fKo8JAJ5O16mxvaF5O+bYLa
- WFt1F2yei46k5N3qx+1e6mMGSLCmedTgtMAzcWC7zqMHZMZ/Fd2Wirkt9kucb72Y/ou2
- S4uXbh1gcJEr1kfEkOlU0inAcK+ieelSO0irGrRUgZKRJZnjGkdU38cegtEV0U+QTznz
- 6B7NDEwVpKy3HNulL8p4XiXZFVarlFwhRmERU2rs6kGsBxYmF/0Q/p8JKKS5eDUuBhVp
- DR9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=TjZliZhEsVF0vv2Qzf2ABh+Szj2+Cht1CR4qLXA8WKs=;
- b=Lr7yAhzvL36eJ3YNfPCzjzJudvahVQY8Liuh8hX+mNnunpZLcFrouX8hJ0aUm+JpKn
- uhhoMxe0QpTqqXPJ0DREa/FgnJz+8sT7ses85pMyX9cwfuh7pib2DuqzVrDOx0svQYpu
- PWO4jf4zEkRCG7qDBB9JIpTU/n5aw909JcDbjBNbDLd6HykMg3Y3MZqDIKVPWB3rpOMU
- hGKa/yiEw9nttRzYOrU+gdbvzHA3vdTNoIHdSpQYthNYw4UpsuiXPy6WaGQ315lyt73a
- wOmYSv4h+WrGX7DQVsoMR62U74v2+fRQLDVgupPPq27ogXzlZ/+awA6iUkqrgCCAobnO
- 2OeQ==
-X-Gm-Message-State: APjAAAWg3G5cEb4X34KJqbuzuBwf31+DKf5g1vHupdahClSjmMqK7m2K
- vjOXAdm8XPaipVWdNQXdCLNIUA==
-X-Google-Smtp-Source: APXvYqxtIcgrBiDKLeASvf8gn0lOXPTTmaDcm7OTaoZzAxinWkAmEe+ADlHRDANovxJgHzTiYp0XOQ==
-X-Received: by 2002:a5d:6652:: with SMTP id f18mr28426278wrw.246.1575290080160; 
- Mon, 02 Dec 2019 04:34:40 -0800 (PST)
-Received: from f2.redhat.com (bzq-79-182-78-197.red.bezeqint.net.
- [79.182.78.197])
- by smtp.gmail.com with ESMTPSA id k8sm17134658wrl.3.2019.12.02.04.34.38
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 02 Dec 2019 04:34:39 -0800 (PST)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, kraxel@redhat.com,
- qemu-devel@nongnu.org
-Subject: [PATCH 1/2] usb-host: remove 'remote wakeup' flag from configuration
- descriptor
-Date: Mon,  2 Dec 2019 14:34:29 +0200
-Message-Id: <20191202123430.7125-2-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191202123430.7125-1-yuri.benditovich@daynix.com>
-References: <20191202123430.7125-1-yuri.benditovich@daynix.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+ (envelope-from <armbru@redhat.com>) id 1iblFh-0006Og-3f
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:56:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58896
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iblFg-0006Ny-Ci
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 07:56:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575291391;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=i1sPX+QrhBFOPkP94paUM31L2cSiYdIkfBteOwr4yiI=;
+ b=Hbs3BHqwywJ/Ns4UXw5KbGxzfnd0rqlBsId9DJ1WGPOcm5pQUZLsfBV+fgCTehJPfkWMTC
+ ZsUNRSsnGQeUv+/iES8reydBVT37FseQG1OrtLxX5qrK/IpGLXU6DYf6P8GSa3bvCaXgJD
+ UCeJLdOWMxBQxi9gLrIyK9i7FVY10qk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-4QHx0zJBOaS_2QxiV_GwvQ-1; Mon, 02 Dec 2019 07:56:30 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21762800D53;
+ Mon,  2 Dec 2019 12:56:29 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CBE25D6A0;
+ Mon,  2 Dec 2019 12:56:24 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D3B9A1138606; Mon,  2 Dec 2019 13:56:22 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: virtiofsd: Where should it live?
+References: <20191125185021.GB3767@work-vm>
+ <20191126102600.GG556568@redhat.com> <20191126121416.GE2928@work-vm>
+ <CAFEAcA9Ln2uwg4f4s8oS6VeQk83W3BErmH9cHeyDJy7v-4gNxw@mail.gmail.com>
+Date: Mon, 02 Dec 2019 13:56:22 +0100
+In-Reply-To: <CAFEAcA9Ln2uwg4f4s8oS6VeQk83W3BErmH9cHeyDJy7v-4gNxw@mail.gmail.com>
+ (Peter Maydell's message of "Mon, 2 Dec 2019 10:12:33 +0000")
+Message-ID: <87k17ekhs9.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 4QHx0zJBOaS_2QxiV_GwvQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,100 +91,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yan@daynix.com
+Cc: mszeredi@redhat.com,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the redirected device has this capability, Windows guest may
-place the device into D2 and expect it to wake when the device
-becomes active, but this will never happen. For example, when
-internal Bluetooth adapter is redirected, keyboards and mice
-connected to it do not work. Current commit removes this
-capability (starting from machine 4.2)
-Set 'usb-host.suppress-remote-wake' property to 'off' to keep
-'remote wake' as is or to 'on' to remove 'remote wake' on
-4.1 or earlier.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- hw/core/machine.c    |  1 +
- hw/usb/host-libusb.c | 18 ++++++++++++++++++
- hw/usb/trace-events  |  1 +
- 3 files changed, 20 insertions(+)
+> On Tue, 26 Nov 2019 at 12:15, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+>>
+>> * Daniel P. Berrang=C3=A9 (berrange@redhat.com) wrote:
+>> > My main objection to 'contrib/' is actually the perceived notions
+>> > about what the contrib directory is for. When I see 'contrib/'
+>> > code in either QEMU, or other open source projects, my general
+>> > impression is that this is largely unsupported code which is just
+>> > there as it might be interesting to someone, and doesn't typically
+>> > get much ongoing dev attention.
+>
+>> > virtiofsd is definitely different as it is intended to be a
+>> > fully production quality supported tool with active dev into
+>> > the future IIUC.
+>> >
+>> > IOW, if we did decide we want it in QEMU, then instead of
+>> > '$GIT/contrib/virtiofsd', I'd prefer to see '$GIT/virtiofsd'.
+>>
+>> I'm not sure it deserves a new top level for such a specific tool.
+>
+> Maybe, but I think I agree with Daniel that 'contrib/' is
+> probably not the right place for it if it's something that
+> we care about supporting. 'contrib' to me is "bucket of stuff
+> that we didn't really feel strongly we wanted to reject but
+> which is probably random special-cases or other obscure
+> stuff, don't bother looking in here and don't assume it's
+> going to work either".
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 1689ad3bf8..8c0eaad091 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -29,6 +29,7 @@
- 
- GlobalProperty hw_compat_4_1[] = {
-     { "virtio-pci", "x-pcie-flr-init", "off" },
-+    { "usb-host", "suppress-remote-wake", "off" },
- };
- const size_t hw_compat_4_1_len = G_N_ELEMENTS(hw_compat_4_1);
- 
-diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-index fcf48c0193..77c2720ec6 100644
---- a/hw/usb/host-libusb.c
-+++ b/hw/usb/host-libusb.c
-@@ -88,6 +88,7 @@ struct USBHostDevice {
-     bool                             needs_autoscan;
-     bool                             allow_one_guest_reset;
-     bool                             allow_all_guest_resets;
-+    bool                             suppress_remote_wake;
- 
-     /* state */
-     QTAILQ_ENTRY(USBHostDevice)      next;
-@@ -386,6 +387,8 @@ static void LIBUSB_CALL usb_host_req_complete_ctrl(struct libusb_transfer *xfer)
-     r->p->status = status_map[xfer->status];
-     r->p->actual_length = xfer->actual_length;
-     if (r->in && xfer->actual_length) {
-+        USBDevice *udev = USB_DEVICE(s);
-+        struct libusb_config_descriptor *conf = (void *)r->cbuf;
-         memcpy(r->cbuf, r->buffer + 8, xfer->actual_length);
- 
-         /* Fix up USB-3 ep0 maxpacket size to allow superspeed connected devices
-@@ -394,6 +397,20 @@ static void LIBUSB_CALL usb_host_req_complete_ctrl(struct libusb_transfer *xfer)
-             r->cbuf[7] == 9) {
-             r->cbuf[7] = 64;
-         }
-+        /* If this is GET_DESCRIPTOR request for configuration descriptor,
-+         * remove 'remote wakeup' flag from it to prevent idle power down
-+         * in Windows guest */
-+        if (s->suppress_remote_wake &&
-+            udev->setup_buf[0] == USB_DIR_IN &&
-+            udev->setup_buf[1] == USB_REQ_GET_DESCRIPTOR &&
-+            udev->setup_buf[3] == USB_DT_CONFIG && udev->setup_buf[2] == 0 &&
-+            xfer->actual_length > offsetof(struct libusb_config_descriptor, bmAttributes) &&
-+            (conf->bmAttributes & USB_CFG_ATT_WAKEUP)) {
-+                struct libusb_device_descriptor desc;
-+                libusb_get_device_descriptor(s->dev, &desc);
-+                trace_usb_host_remote_wakeup_removed(desc.idVendor, desc.idProduct);
-+                conf->bmAttributes &= ~USB_CFG_ATT_WAKEUP;
-+        }
-     }
-     trace_usb_host_req_complete(s->bus_num, s->addr, r->p,
-                                 r->p->status, r->p->actual_length);
-@@ -1596,6 +1613,7 @@ static Property usb_host_dev_properties[] = {
-                        LIBUSB_LOG_LEVEL_WARNING),
-     DEFINE_PROP_BIT("pipeline",    USBHostDevice, options,
-                     USB_HOST_OPT_PIPELINE, true),
-+    DEFINE_PROP_BOOL("suppress-remote-wake", USBHostDevice, suppress_remote_wake, true),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/usb/trace-events b/hw/usb/trace-events
-index 2d3713351c..6f87b5262a 100644
---- a/hw/usb/trace-events
-+++ b/hw/usb/trace-events
-@@ -266,3 +266,4 @@ usb_host_parse_config(int bus, int addr, int value, int active) "dev %d:%d, valu
- usb_host_parse_interface(int bus, int addr, int num, int alt, int active) "dev %d:%d, num %d, alt %d, active %d"
- usb_host_parse_endpoint(int bus, int addr, int ep, const char *dir, const char *type, int active) "dev %d:%d, ep %d, %s, %s, active %d"
- usb_host_parse_error(int bus, int addr, const char *errmsg) "dev %d:%d, msg %s"
-+usb_host_remote_wakeup_removed(uint16_t vid, uint16_t pid) "dev %04x:%04x"
--- 
-2.17.1
+Agree.
+
+We have source for several separate programs in the root directory
+already: qemu-bridge-helper, qemu-edid, qemu-img, qemu-io, qemu-nbd,
+qemu-keymap, qemu-seccomp, qemu-ga.  Just a .c file when that suffixes,
+else a subdirectory, except for qemu-io, which is two .c files in the
+root, plus include/qemu-io.h.  Putting virtiofsd/ there follows
+qemu-ga's precedence.
+
+There's also precedence for putting such programs into their subsystem's
+sub-directory: fsdev/virtfs-proxy-helper, scsi/pr-manager-helper.
 
 
