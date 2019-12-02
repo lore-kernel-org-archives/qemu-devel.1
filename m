@@ -2,118 +2,84 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D335C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:34:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97EF0C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:36:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB1D12070B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:34:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4317420748
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:36:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Qd2AP/rT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB1D12070B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pfmsdjlq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4317420748
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32885 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibi5t-0003I9-4Q
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 04:34:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54953)
+	id 1ibi8K-0005TX-C6
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 04:36:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55481)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ibi4J-00025w-C8
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:32:41 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ibi7T-0004mA-29
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:35:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ibi4H-0006Ir-UL
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:32:35 -0500
-Received: from mail-eopbgr130111.outbound.protection.outlook.com
- ([40.107.13.111]:43687 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ibi4D-0006Gd-4A; Mon, 02 Dec 2019 04:32:29 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BYmaFx49rISWUPmaWa9GYs784CayQStmOKHZ96MPCDtxytXxMAqwMeXQeDWZSnz50o9GPHMJf2LZTD13cTUaZbrLbwNR85JHQwa01Vn4W6F0k6ezob7smEDri755MpTAS/xM0crWEizTvfTz8SrBUqRneUddt8seJOD2Rd60wsDionteAyOcA1uDkBFSx31KfI+QHWj/xb8qQjMBkn6jsq/hXl3bIm2g9i0dUEwnVa6lsm8kGpxD8xJuSLR2y14MSfcdnuZqM3cKOK/CDkRLuFosLmumFvHnfToMoAnh9lMythRTrJuMPeerLPSp9rhFBWR74RPbfY1TpQddVhj3bg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QtvqszLAvyC3JK6h+AThjE8qJhi1nyi/m9h2g7At70c=;
- b=Cj/kjXr5YEGEIP4Jh40PbN8rQZe+qMVYoVM0lORhjG6JSh+xL59PVUdprfVqL97+E4fA+0RFCKkRWLYkSkBjun7Om8YpK6bUBLYNdPawVy8X4tYlx5Ydwwp6yTjf+mw64ZvNUh1he4ngpebaBGuDiLH/ZsuuQh5ol7tCT1dXkYVD9U5PY723GU3BLwFaD688EsPB3TC3pp+oLaKacuk7RK+ZiYJEHyAh+bcSydHMFnArQLsBwfjfGN74ooBAikGi/6eY6raUmyoX/ha64+RNxjMfqv8N48WfLemm3weBKX0yYLiJqpkJDi4gVcS9Ua7nSNKfaxvF27RumEtowGh6ow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QtvqszLAvyC3JK6h+AThjE8qJhi1nyi/m9h2g7At70c=;
- b=Qd2AP/rTHpskVo6fufqQ7A1bI1Ezx7E1EI7TIR27ZV+nmJ36baoFuJezwsWBtShYdqgd8qGkxXJqqPndyx46hZxq8EoPLWFwXeKY+vgzhu3ABUYG2zZLnVT7pKElCcc335ctpqLP4lDhYxpeRv0prZ47wg5284ZZ1gIYqbdifJk=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4771.eurprd08.prod.outlook.com (10.255.97.202) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.17; Mon, 2 Dec 2019 09:32:24 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2495.014; Mon, 2 Dec 2019
- 09:32:24 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v6] ppc: well form kvmppc_hint_smt_possible error hint
- helper
-Thread-Topic: [PATCH v6] ppc: well form kvmppc_hint_smt_possible error hint
- helper
-Thread-Index: AQHVpVbzYaXD3zDfU0OJp/JZN5cGD6emKNeAgABzRwA=
-Date: Mon, 2 Dec 2019 09:32:24 +0000
-Message-ID: <ac1a560b-5132-86e0-ac34-04c375724d32@virtuozzo.com>
-References: <20191127191434.20945-1-vsementsov@virtuozzo.com>
- <20191202023947.GA37909@umbus.fritz.box>
-In-Reply-To: <20191202023947.GA37909@umbus.fritz.box>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR09CA0079.eurprd09.prod.outlook.com
- (2603:10a6:7:3d::23) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191202123222255
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 1d08248c-4e56-45b0-7c5c-08d7770a89b6
-x-ms-traffictypediagnostic: AM6PR08MB4771:
-x-microsoft-antispam-prvs: <AM6PR08MB47717757C176DBDAFCB68D2CC1430@AM6PR08MB4771.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2201;
-x-forefront-prvs: 0239D46DB6
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(346002)(136003)(39840400004)(396003)(366004)(189003)(199004)(2906002)(66066001)(54906003)(2616005)(305945005)(7736002)(99286004)(14444005)(256004)(52116002)(14454004)(76176011)(386003)(6506007)(4326008)(8936002)(446003)(11346002)(71200400001)(71190400001)(36756003)(31696002)(86362001)(31686004)(25786009)(6306002)(6116002)(3846002)(6436002)(186003)(102836004)(26005)(6512007)(229853002)(316002)(6486002)(66556008)(64756008)(66946007)(66446008)(66476007)(5660300002)(478600001)(966005)(6916009)(81156014)(81166006)(6246003)(8676002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4771;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: UBH+cWwit24EKGEF5JzqBoy5x1kxcCyS8XNVv59qZnaMgNLiQWbLJ5ghLhIGaANtHM/EzalGUh2UAF11cgQtuhjGNTN4pEsXx+tDOyP8fZJxMxU+wqw385q2pvAdnBUC8A5N6Yx8F/pZzbGhHrE+WhG6n8diDEbniOf7Wg/T/LX7LfaQNQnNKxltj9vaQbZ0lvbiHxFbFftCFh3i7VE6lU+K1ZGE93ooQeQacpyLnfK7J9tPzX9NNMlT03KnwG91AJQxf++bV5Vf9w09LNNBXz8Yn8b0t3tSmnrpgz9GhokhoupJl8SKOncbsCAcfe54SH03oFNOIUezSOdOH5Vr8LDcKlz8usts1OcMjdYnVHSXjQbn23mQu8wuodLVKaY13q7gQjlDmeZ/qIZEevfWMR8DtTSqZ1M2sK1LCPi6xIhNkfTrT2j17pA9zYQ2ilANuDjWti2BPoYNqHBN1cH58K88XknSvBvyWio8OvQssMY=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <4C0609BAAE70DA43B8C7A1E66F5D34E6@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ibi7P-0007wX-Ej
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:35:50 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38009)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ibi7P-0007v2-5Q
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:35:47 -0500
+Received: by mail-oi1-x243.google.com with SMTP id b8so2556625oiy.5
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 01:35:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=C2UsJp1iITXkl/RusERRFYOUlNM6raPGBX7InOMJ+HI=;
+ b=Pfmsdjlqp5144hpnOXmLEhDQ/dqclkDAqJlDsAMGfaU83o/6SqcnAlc/pele4vYI+A
+ gCFyc3yanq5MKLNF051GMjQqtLm1W8REF1A7gHTHul+NX+kt7P7UQdKJpORPTTMSle9G
+ zpoNGSuqT6CMaFseInkWRJqQtsUZEXnLaHrKl+QKZmp4/h1pUxZM+VyWJhfCaYd/mmh2
+ vFeAogGF5iI0d1vqPkWjN1BNV8N3QAo+kBRNBvZ1Cp7NZnKJlWB6knhWR4TYnmP5BvAu
+ G/WbNkaqsWCi8nCzx0qEB8aQIafUb7y4oaWzBLSNWAaJEVucMG1rbDZG7a1BUOOAZn9j
+ wj8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=C2UsJp1iITXkl/RusERRFYOUlNM6raPGBX7InOMJ+HI=;
+ b=ADsZhLqd3SbiF66/Z6TYs6qylTGco2aB8jo5SETDX+Xgrl1mMjeg/nkjV3bS6YQ7Qu
+ +ROvDbRfkxrzdYotfMiBRg93ARvgly9yzIjUnI9Jy0RbBqkwXDe+ML9fOFvpVA95esXY
+ w+ijOSI8u5xMWGG0a90KQNQZu3x1P9FVyes42SqixlZd1n9DNoYirjSCReIpaeTKIwJj
+ JhlU5Fu/Wp/QhUlO7hiZ+oyvlX4nt49pig8B4PZe29gXKLkFcxaREjmUNkBYDKD2iaD/
+ s5PzN5zhtX+PMcdBN0WUYpxe+EivNDM8mtDigT24Gu7AI4KfcPABFtm8BwlUyCD5zrc+
+ H/Tw==
+X-Gm-Message-State: APjAAAVCIXjnSLPGEQraBLdm6ml447y8jQmcsGUDUezGTJVlOExD6g8S
+ g8NEv3vuEVVKQs+hFMAxHooltiixMB/Xu0jOj8A=
+X-Google-Smtp-Source: APXvYqwAz2AMHN5k/FNxeXCAOz9ZMKFjW+mNQXUBel4UMNB25+osBshGuBr8yGwnqMva7Bkg3qj3RVwCuzYNyf5o3EA=
+X-Received: by 2002:aca:bd85:: with SMTP id
+ n127mr14435412oif.136.1575279344967; 
+ Mon, 02 Dec 2019 01:35:44 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1d08248c-4e56-45b0-7c5c-08d7770a89b6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2019 09:32:24.1320 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: oDWz+qWYXhx6acrxc3/+cowNPxMGefF04i0rp8YxGI6k66dCp2SfubuUOPYaUwfTWN8v9jFyvmEdp+n7ATvCiaSg4c+0VVPYz9HfoZH/F5E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4771
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.13.111
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Mon, 2 Dec 2019 01:35:44 -0800 (PST)
+In-Reply-To: <CAK4993gcVLrj08s20wG94WMa7sLEJNeJpW=b18xVFctc3icx3g@mail.gmail.com>
+References: <20191127175257.23480-1-mrolnik@gmail.com>
+ <CAL1e-=jNaLAm2D0pq1fQjOV8VNvgQK=hDFQhRttPK=XGciBGiw@mail.gmail.com>
+ <CAK4993gcVLrj08s20wG94WMa7sLEJNeJpW=b18xVFctc3icx3g@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 2 Dec 2019 10:35:44 +0100
+Message-ID: <CAL1e-=ieOQMPBbRL-jWmYfkxvhJp018P36tA53S4+jHu7GVKqQ@mail.gmail.com>
+Subject: Re: [PATCH v37 00/17] QEMU AVR 8 bit cores
+To: Michael Rolnik <mrolnik@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000c764c50598b54de2"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,121 +91,959 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-02.12.2019 5:39, David Gibson wrote:
-> On Wed, Nov 27, 2019 at 10:14:34PM +0300, Vladimir Sementsov-Ogievskiy wr=
-ote:
->> Make kvmppc_hint_smt_possible hint append helper well formed:
->> rename errp to errp_in, as it is IN-parameter here (which is unusual
->> for errp), rename function to be kvmppc_error_append_*_hint.
->=20
-> I'm not entirely convinced by the errp_in name, since it's actually
-> both an in and out parameter.  Nonetheless, I've applied this to
-> ppc-for-5.0.
+--000000000000c764c50598b54de2
+Content-Type: text/plain; charset="UTF-8"
 
-Markus doesn't like it too.
+On Saturday, November 30, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
 
-So, seems there would be v7, the current version is here:
-git://repo.or.cz/qemu/armbru.git branch error-prep
+> There is *-cpu *option where you can specify what CPU you want, if this
+> option is not specified avr6 (avr6-avr-cpu) is chosen.
+>
+> *./avr-softmmu/qemu-system-avr -cpu help*
+> avr1-avr-cpu
+> avr2-avr-cpu
+> avr25-avr-cpu
+> avr3-avr-cpu
+> avr31-avr-cpu
+> avr35-avr-cpu
+> avr4-avr-cpu
+> avr5-avr-cpu
+> avr51-avr-cpu
+> avr6-avr-cpu
+> xmega2-avr-cpu
+> xmega4-avr-cpu
+> xmega5-avr-cpu
+> xmega6-avr-cpu
+> xmega7-avr-cpu
+>
+>
+What happens if you specify a core via -cpu, and supply elf file compiled
+for another core?
 
-Discussion is here:
-https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg04633.html
-and here:
-https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg04636.html
-
-Sorry, for sent v6 in separate :\
-
-
->=20
->=20
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
->> ---
->>
->> v6: keep kvmppc_ function prefix
->>      add r-b by Marc-Andr=E9
->>
->>   target/ppc/kvm_ppc.h | 4 ++--
->>   hw/ppc/spapr.c       | 2 +-
->>   target/ppc/kvm.c     | 6 +++---
->>   3 files changed, 6 insertions(+), 6 deletions(-)
->>
->> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
->> index 98bd7d5da6..47b08a4030 100644
->> --- a/target/ppc/kvm_ppc.h
->> +++ b/target/ppc/kvm_ppc.h
->> @@ -28,7 +28,7 @@ void kvmppc_set_papr(PowerPCCPU *cpu);
->>   int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
->>   void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
->>   int kvmppc_smt_threads(void);
->> -void kvmppc_hint_smt_possible(Error **errp);
->> +void kvmppc_error_append_smt_possible_hint(Error **errp_in);
->>   int kvmppc_set_smt_threads(int smt);
->>   int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
->>   int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
->> @@ -164,7 +164,7 @@ static inline int kvmppc_smt_threads(void)
->>       return 1;
->>   }
->>  =20
->> -static inline void kvmppc_hint_smt_possible(Error **errp)
->> +static inline void kvmppc_error_append_smt_possible_hint(Error **errp_i=
-n)
->>   {
->>       return;
->>   }
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index e076f6023c..1b87eb0ffd 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -2564,7 +2564,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState =
-*spapr, Error **errp)
->>                                         " requires the use of VSMT mode =
-%d.\n",
->>                                         smp_threads, kvm_smt, spapr->vsm=
-t);
->>                   }
->> -                kvmppc_hint_smt_possible(&local_err);
->> +                kvmppc_error_append_smt_possible_hint(&local_err);
->>                   goto out;
->>               }
->>           }
->> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
->> index c77f9848ec..7406d18945 100644
->> --- a/target/ppc/kvm.c
->> +++ b/target/ppc/kvm.c
->> @@ -2076,7 +2076,7 @@ int kvmppc_set_smt_threads(int smt)
->>       return ret;
->>   }
->>  =20
->> -void kvmppc_hint_smt_possible(Error **errp)
->> +void kvmppc_error_append_smt_possible_hint(Error **errp_in)
->>   {
->>       int i;
->>       GString *g;
->> @@ -2091,10 +2091,10 @@ void kvmppc_hint_smt_possible(Error **errp)
->>               }
->>           }
->>           s =3D g_string_free(g, false);
->> -        error_append_hint(errp, "%s.\n", s);
->> +        error_append_hint(errp_in, "%s.\n", s);
->>           g_free(s);
->>       } else {
->> -        error_append_hint(errp,
->> +        error_append_hint(errp_in,
->>                             "This KVM seems to be too old to support VSM=
-T.\n");
->>       }
->>   }
->=20
-
-
---=20
 Best regards,
-Vladimir
+Akeksandar
+
+
+
+
+> Regards,
+> Michael Rolnik
+>
+>
+>
+> On Sat, Nov 30, 2019 at 1:28 PM Aleksandar Markovic <
+> aleksandar.m.mail@gmail.com> wrote:
+>
+>>
+>>
+>> On Wednesday, November 27, 2019, Michael Rolnik <mrolnik@gmail.com>
+>> wrote:
+>>
+>>> This series of patches adds 8bit AVR cores to QEMU.
+>>> All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully
+>>> tested yet.
+>>> However I was able to execute simple code with functions. e.g fibonacci
+>>> calculation.
+>>> This series of patches include a non real, sample board.
+>>> No fuses support yet. PC is set to 0 at reset.
+>>>
+>>> Following are examples of possible usages, assuming program.elf is
+>>> compiled for AVR cpu
+>>> 1.  Continious non interrupted execution
+>>>     run `qemu-system-avr -kernel program.elf`
+>>> 2.  Continious non interrupted execution with serial output into telnet
+>>> window
+>>>     run `qemu-system-avr -kernel program.elf -serial
+>>> tcp::5678,server,nowait -nographic `
+>>>     run `telent localhost 5678`
+>>> 3.  Continious non interrupted execution with serial output into stdout
+>>>     run `qemu-system-avr -kernel program.elf -serial stdio`
+>>> 4.  Debugging wit GDB debugger
+>>>     run `qemu-system-avr -kernel program.elf -s -S`
+>>>     run `avr-gdb program.elf` and then within GDB shell `target remote
+>>> :1234`
+>>> 5.  Print out executed instructions
+>>>     run `qemu-system-avr -kernel program.elf -d in_asm`
+>>>
+>>>
+>> Hi, Michael.
+>>
+>> Can you explain to me the mechanisms of recognition of what
+>> core/microcontroller QEMU is supposed to emulate in the examples above?
+>>
+>> Yours, Aleksandar
+>>
+>>
+>>
+>>> the patches include the following
+>>> 1. just a basic 8bit AVR CPU, without instruction decoding or translation
+>>> 2. CPU features which allow define the following 8bit AVR cores
+>>>      avr1
+>>>      avr2 avr25
+>>>      avr3 avr31 avr35
+>>>      avr4
+>>>      avr5 avr51
+>>>      avr6
+>>>      xmega2 xmega4 xmega5 xmega6 xmega7
+>>> 3. a definition of sample machine with SRAM, FLASH and CPU which allows
+>>> to execute simple code
+>>> 4. encoding for all AVR instructions
+>>> 5. interrupt handling
+>>> 6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
+>>> 7. a decoder which given an opcode decides what istruction it is
+>>> 8. translation of AVR instruction into TCG
+>>> 9. all features together
+>>>
+>>> changes since v3
+>>> 1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of
+>>> 0x000000ff) for faster address manipulaton
+>>> 2. ffs changed to ctz32
+>>> 3. duplicate code removed at avr_cpu_do_interrupt
+>>> 4. using andc instead of not + and
+>>> 5. fixing V flag calculation in varios instructions
+>>> 6. freeing local variables in PUSH
+>>> 7. tcg_const_local_i32 -> tcg_const_i32
+>>> 8. using sextract32 instead of my implementation
+>>> 9. fixing BLD instruction
+>>> 10.xor(r) instead of 0xff - r at COM
+>>> 11.fixing MULS/MULSU not to modify inputs' content
+>>> 12.using SUB for NEG
+>>> 13.fixing tcg_gen_qemu_ld/st call in XCH
+>>>
+>>> changes since v4
+>>> 1. target is now defined as big endian in order to optimize
+>>> push_ret/pop_ret
+>>> 2. all style warnings are fixed
+>>> 3. adding cpu_set/get_sreg functions
+>>> 4. simplifying gen_goto_tb as there is no real paging
+>>> 5. env->pc -> env->pc_w
+>>> 6. making flag dump more compact
+>>> 7. more spacing
+>>> 8. renaming CODE/DATA_INDEX -> MMU_CODE/DATA_IDX
+>>> 9. removing avr_set_feature
+>>> 10. SPL/SPH set bug fix
+>>> 11. switching stb_phys to cpu_stb_data
+>>> 12. cleaning up avr_decode
+>>> 13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)
+>>> 14. saving CPU features (savevm)
+>>>
+>>> changes since v5
+>>> 1. BLD bug fix
+>>> 2. decoder generator is added
+>>>
+>>> chages since v6
+>>> 1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_
+>>> cpu_gdb_write_register
+>>> 2. configure the target as little endian because otherwise GDB does not
+>>> work
+>>> 3. fixing and testing gen_push_ret/gen_pop_ret
+>>>
+>>> changes since v7
+>>> 1. folding back v6
+>>> 2. logging at helper_outb and helper_inb are done for non supported yet
+>>> registers only
+>>> 3. MAINTAINERS updated
+>>>
+>>> changes since v8
+>>> 1. removing hw/avr from hw/Makefile.obj as it should not be built for all
+>>> 2. making linux compilable
+>>> 3. testing on
+>>>     a. Mac, Apple LLVM version 7.0.0
+>>>     b. Ubuntu 12.04, gcc 4.9.2
+>>>     c. Fedora 23, gcc 5.3.1
+>>> 4. folding back some patches
+>>> 5. translation bug fixes for ORI, CPI, XOR instructions
+>>> 6. propper handling of cpu register writes though memory
+>>>
+>>> changes since v9
+>>> 1. removing forward declarations of static functions
+>>> 2. disabling debug prints
+>>> 3. switching to case range instead of if else if ...
+>>> 4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to
+>>> any device
+>>> 5. commenst about sample board and sample IO device added
+>>> 6. sample board description is more descriptive now
+>>> 7. memory_region_allocate_system_memory is used to create RAM
+>>> 8. now there are helper_fullrd & helper_fullwr when LD/ST try to access
+>>> registers
+>>>
+>>> changes since v10
+>>> 1. movig back fullwr & fullrd into the commit where outb and inb were
+>>> introduced
+>>> 2. changing tlb_fill function signature
+>>> 3. adding empty line between functions
+>>> 4. adding newline on the last line of the file
+>>> 5. using tb->flags to generae full access ST/LD instructions
+>>> 6. fixing SBRC bug
+>>> 7. folding back 10th commit
+>>> 8. whenever a new file is introduced it's added to Makefile.objs
+>>>
+>>> changes since v11
+>>> 1. updating to v2.7.0-rc
+>>> 2. removing assignment to env->fullacc from gen_intermediate_code
+>>>
+>>> changes since v12
+>>> 1. fixing spacing
+>>> 2. fixing get/put_segment functions
+>>> 3. removing target-avr/machine.h file
+>>> 4. VMSTATE_SINGLE_TEST -> VMSTATE_SINGLE
+>>> 5. comment spelling
+>>> 6. removing hw/avr/sample_io.c
+>>> 7. char const* -> const char*
+>>> 8. proper ram allocation
+>>> 9. fixing breakpoint functionality.
+>>> 10.env1 -> env
+>>> 11.fixing avr_cpu_gdb_write_register & avr_cpu_gdb_read_register
+>>> functions
+>>> 12.any cpu is removed
+>>> 12.feature bits are not saved into vm state
+>>>
+>>> changes since v13
+>>> 1. rebasing to v2.7.0-rc1
+>>>
+>>> changes since v14
+>>> 1. I made self review with git gui tool. (I did not know such a thing
+>>> exists)
+>>> 2. removing all double/tripple spaces
+>>> 3. removing comment reference to SampleIO
+>>> 4. folding back some changes, so there is not deleted lines in my code
+>>> 5. moving avr configuration, within configure file, before chris
+>>>
+>>> changes since v15
+>>> 1. removing IO registers cache from CPU
+>>> 2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)
+>>> 3. implementing CBIC/SBIC as read(helper_inb), check, branch
+>>> 4. adding missing tcg_temp_free_i32 for tcg_const_i32
+>>>
+>>> changes since v16
+>>> 1. removing EXT IO registers knoledge from CPU. These registers are
+>>> accessible
+>>>    by LD/ST only. CPU has no interest in them
+>>>
+>>> changes since v17 (by Richard Henderson)
+>>> This is Michael's v17, with some adjustments of my own:
+>>>
+>>> 1. Fix the whitespace errors reported by "git am",
+>>> 2. Replace the utf-8 characters with normal ascii,
+>>> 3. Ditch the separate compilation of translate.c.
+>>>
+>>> I retained the two separate files that could be regenerated
+>>> from the included cpugen program, but merged in translate-insn.c.
+>>> Not that it matters, but the code generated is about 3k smaller.
+>>>
+>>> changes since v18
+>>> 1.  moving target-avr into target/avr
+>>> 2.  do not call cpu_exec_initfn function from avr_cpu_initfn
+>>> 3.  call cpu_exec_realizefn avr_cpu_realizefn
+>>> 4.  do not fail sample machine creation if no rom is suplied
+>>> 5.  add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code
+>>> 6.  fix a register getters/setters in machine.c
+>>> 7.  changing QEMU_ARCH_AVR from 1<<17 to 1<<18
+>>>
+>>> changes since v19
+>>> 1.  use decodetree.py tool to decode instructions
+>>> 2.  adding USART
+>>> 3.  adding 16 bit timer peripherals
+>>> 4.  changing QEMU_ARCH_AVR from 1<<18 to 1<<20
+>>> 5.  renaming tlb_fill to avr_cpu_tlb_fill
+>>>
+>>> changes since v20
+>>> 1.  use one CPU naming convention
+>>> 2.  merging insn16.decode & insn32.decode files
+>>> 3.  modifying skip next instruction mechanizm
+>>> 4.  translate BREAK as NOP for now
+>>>
+>>> changes since v21
+>>> 1.  Reorganize bstate.
+>>>     This will make transition to <exec/translator.h> easier, and fixes a
+>>> couple of bugs wrt single stepping
+>>>     by richard.henderson@linaro.org
+>>> 2.  Drop cpc and fix page cross condition.
+>>>     by richard.henderson@linaro.org
+>>> 3.  Refactor checking supported/unsupported instructions
+>>> 4.  Add gdb-xml/avr-cpu.xml
+>>>
+>>> changes since v22
+>>> 1.  Rebase
+>>> 2.  Split long comment
+>>>
+>>> changes since v23
+>>> 1.  remove avr_cpu_list_compare function
+>>> 2.  modify avr_cpu_class_by_name function
+>>> 3.  modify avr_cpu_list_entry function
+>>> 4.  modify avr_cpu_list function
+>>>
+>>> changes since v24
+>>> 1.  remove AVR_CPU_TYPE_NAME macro
+>>>
+>>> changes since v25
+>>> 1.  fix patches. every file belong to one patch only
+>>> 2.  change copyright year from 2016 to 2019
+>>> 3.  create mask device to emulate prr0/prr1
+>>>
+>>> changes since v26
+>>> 1.  add avocado acceptence test
+>>> 2.  add boot serial test
+>>>
+>>> changes since v27
+>>> 1.  list atmel2560 devices as unimplemented
+>>> 2.  fix sram base/size
+>>>
+>>> changes since v28
+>>> 1.  rebase
+>>> 2.  fix includes & build
+>>>
+>>> changes since v29
+>>> 1.  fixing ownership
+>>> 2.  using 'since' instread of 'added in'
+>>>
+>>> changes since v30
+>>> 1.  rebase
+>>>
+>>> changes since v31
+>>> 1.  splitting 'Add instruction translation' commit
+>>> 2.  fixing typo in qapi/machine.json sicne -> since
+>>> 3.  removing unintended changes in configure file
+>>> 4.  adding Richard Henderson as a co developer to 'Add instruction
+>>> translation - CPU main translation funcions' commit
+>>>
+>>> changes since v32
+>>> 1.  modify cpu_get_sreg to treat sreg C as other flags, except sreg Z
+>>>
+>>> changes since v33
+>>> 1.  ensure flag C is always calculated as one bit
+>>> 2.  calculate flag Z as one bit, without using inverse logic
+>>>
+>>> changes since v34
+>>> 1.  rebase
+>>>
+>>> changes since v35
+>>> 1.  rebase
+>>> 2.  use NANOSECONDS_PER_SECOND instead of 1000000000 in avr_timer16.c
+>>> 3.  split "target/avr: Register AVR support with the rest of QEMU" into
+>>> three patches
+>>>     1.  "target/avr: Register AVR support with the rest of QEMU"
+>>>     2.  "target/avr: Update build system"
+>>>     3.  "target/avr: Update MAINTAINERS file"
+>>> 4.  split "target/avr: Add tests" patch into two patches
+>>>     1.  "target/avr: Add Avocado test"
+>>>     2.  "target/avr: Add boot serial test"
+>>> 5.  Add instruction disassembly function
+>>> 6.  change "since 4.2" to "since 5.0"
+>>>
+>>> changes since v36
+>>> 1.  rebase
+>>> 2.  tename
+>>>     1.  NO_CPU_REGISTERS    -> NUMBER_OF_CPU_REGISTERS
+>>>     2.  NO_IO_REGISTERS     -> NUMBER_OF_IO_REGISTERS
+>>>     3.  to_A                -> to_regs_16_31_by_one
+>>>     4.  to_B                -> to_regs_16_23_by_one
+>>>     5.  to_C                -> to_regs_24_30_by_two
+>>>     6.  to_D                -> to_regs_00_30_by_two
+>>> 3.  add missing licences
+>>> 4.  add usage example (see above)
+>>> 5.  ass Sarah Harris <S.E.Harris@kent.ac.uk> as a reviewer to
+>>> MAINTAINERS
+>>> 7.  use git commit sha1 instead of `master`` in avocado test
+>>>
+>>> Michael Rolnik (16):
+>>>   target/avr: Add outward facing interfaces and core CPU logic
+>>>   target/avr: Add instruction helpers
+>>>   target/avr: Add instruction decoding
+>>>   target/avr: Add instruction translation - Registers definition
+>>>   target/avr: Add instruction translation - Arithmetic and Logic
+>>>     Instructions
+>>>   target/avr: Add instruction translation - Branch Instructions
+>>>   target/avr: Add instruction translation - Bit and Bit-test
+>>>     Instructions
+>>>   target/avr: Add instruction translation - MCU Control Instructions
+>>>   target/avr: Add instruction translation - CPU main translation
+>>>     function
+>>>   target/avr: Add instruction disassembly function
+>>>   target/avr: Add example board configuration
+>>>   target/avr: Register AVR support with the rest of QEMU
+>>>   target/avr: Update build system
+>>>   target/avr: Add boot serial test
+>>>   target/avr: Add Avocado test
+>>>   target/avr: Update MAINTAINERS file
+>>>
+>>> Sarah Harris (1):
+>>>   target/avr: Add limited support for USART and 16 bit timer peripherals
+>>>
+>>>  configure                        |    7 +
+>>>  default-configs/avr-softmmu.mak  |    5 +
+>>>  qapi/machine.json                |    3 +-
+>>>  include/disas/dis-asm.h          |    6 +
+>>>  include/hw/char/avr_usart.h      |   97 +
+>>>  include/hw/misc/avr_mask.h       |   47 +
+>>>  include/hw/timer/avr_timer16.h   |   97 +
+>>>  include/sysemu/arch_init.h       |    1 +
+>>>  target/avr/cpu-param.h           |   37 +
+>>>  target/avr/cpu-qom.h             |   54 +
+>>>  target/avr/cpu.h                 |  254 +++
+>>>  target/avr/helper.h              |   29 +
+>>>  arch_init.c                      |    2 +
+>>>  hw/avr/sample.c                  |  282 +++
+>>>  hw/char/avr_usart.c              |  324 ++++
+>>>  hw/misc/avr_mask.c               |  112 ++
+>>>  hw/timer/avr_timer16.c           |  605 ++++++
+>>>  target/avr/cpu.c                 |  576 ++++++
+>>>  target/avr/disas.c               |  228 +++
+>>>  target/avr/gdbstub.c             |   85 +
+>>>  target/avr/helper.c              |  354 ++++
+>>>  target/avr/machine.c             |  121 ++
+>>>  target/avr/translate.c           | 3052 ++++++++++++++++++++++++++++++
+>>>  tests/boot-serial-test.c         |   10 +
+>>>  tests/machine-none-test.c        |    1 +
+>>>  MAINTAINERS                      |   11 +
+>>>  gdb-xml/avr-cpu.xml              |   49 +
+>>>  hw/Kconfig                       |    1 +
+>>>  hw/avr/Kconfig                   |    6 +
+>>>  hw/avr/Makefile.objs             |    1 +
+>>>  hw/char/Kconfig                  |    3 +
+>>>  hw/char/Makefile.objs            |    1 +
+>>>  hw/misc/Kconfig                  |    3 +
+>>>  hw/misc/Makefile.objs            |    2 +
+>>>  hw/timer/Kconfig                 |    3 +
+>>>  hw/timer/Makefile.objs           |    2 +
+>>>  target/avr/Makefile.objs         |   34 +
+>>>  target/avr/insn.decode           |  194 ++
+>>>  tests/Makefile.include           |    2 +
+>>>  tests/acceptance/machine_avr6.py |   56 +
+>>>  40 files changed, 6756 insertions(+), 1 deletion(-)
+>>>  create mode 100644 default-configs/avr-softmmu.mak
+>>>  create mode 100644 include/hw/char/avr_usart.h
+>>>  create mode 100644 include/hw/misc/avr_mask.h
+>>>  create mode 100644 include/hw/timer/avr_timer16.h
+>>>  create mode 100644 target/avr/cpu-param.h
+>>>  create mode 100644 target/avr/cpu-qom.h
+>>>  create mode 100644 target/avr/cpu.h
+>>>  create mode 100644 target/avr/helper.h
+>>>  create mode 100644 hw/avr/sample.c
+>>>  create mode 100644 hw/char/avr_usart.c
+>>>  create mode 100644 hw/misc/avr_mask.c
+>>>  create mode 100644 hw/timer/avr_timer16.c
+>>>  create mode 100644 target/avr/cpu.c
+>>>  create mode 100644 target/avr/disas.c
+>>>  create mode 100644 target/avr/gdbstub.c
+>>>  create mode 100644 target/avr/helper.c
+>>>  create mode 100644 target/avr/machine.c
+>>>  create mode 100644 target/avr/translate.c
+>>>  create mode 100644 gdb-xml/avr-cpu.xml
+>>>  create mode 100644 hw/avr/Kconfig
+>>>  create mode 100644 hw/avr/Makefile.objs
+>>>  create mode 100644 target/avr/Makefile.objs
+>>>  create mode 100644 target/avr/insn.decode
+>>>  create mode 100644 tests/acceptance/machine_avr6.py
+>>>
+>>> --
+>>> 2.17.2 (Apple Git-113)
+>>>
+>>>
+>
+> --
+> Best Regards,
+> Michael Rolnik
+>
+
+--000000000000c764c50598b54de2
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Saturday, November 30, 2019, Michael Rolnik &lt;<a href=3D"mailt=
+o:mrolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex"><div dir=3D"ltr">There is <font face=3D"monospace"><b>-cpu </=
+b></font>option where you can specify what CPU you want, if this option is =
+not specified avr6 (<font face=3D"monospace">avr6-avr-cpu</font>) is chosen=
+.=C2=A0<div><br></div><div><font face=3D"monospace"><b>./avr-softmmu/qemu-s=
+ystem-avr -cpu help</b><br>avr1-avr-cpu<br>avr2-avr-cpu<br>avr25-avr-cpu<br=
+>avr3-avr-cpu<br>avr31-avr-cpu<br>avr35-avr-cpu<br>avr4-avr-cpu<br>avr5-avr=
+-cpu<br>avr51-avr-cpu<br>avr6-avr-cpu<br>xmega2-avr-cpu<br>xmega4-avr-cpu<b=
+r>xmega5-avr-cpu<br>xmega6-avr-cpu<br>xmega7-avr-cpu</font><br></div><div><=
+font face=3D"monospace"><br></font></div><div></div></div></blockquote><div=
+><br></div><div>What happens if you specify a core via -cpu, and supply elf=
+ file compiled for another core?</div><div><br></div><div>Best regards,</di=
+v><div>Akeksandar</div><div><br></div><div><br></div><div>=C2=A0</div><bloc=
+kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
+c solid;padding-left:1ex"><div dir=3D"ltr"><div></div><div><font face=3D"ar=
+ial, sans-serif">Regards,</font></div><div><font face=3D"arial, sans-serif"=
+>Michael Rolnik</font></div><div><font face=3D"monospace"><br></font></div>=
+<div><br></div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
+=3D"gmail_attr">On Sat, Nov 30, 2019 at 1:28 PM Aleksandar Markovic &lt;<a =
+href=3D"mailto:aleksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.=
+mail@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" st=
+yle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padd=
+ing-left:1ex"><br><br>On Wednesday, November 27, 2019, Michael Rolnik &lt;<=
+a href=3D"mailto:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>=
+&gt; wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0p=
+x 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">This serie=
+s of patches adds 8bit AVR cores to QEMU.<br>
+All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully test=
+ed yet.<br>
+However I was able to execute simple code with functions. e.g fibonacci cal=
+culation.<br>
+This series of patches include a non real, sample board.<br>
+No fuses support yet. PC is set to 0 at reset.<br>
+<br>
+Following are examples of possible usages, assuming program.elf is compiled=
+ for AVR cpu<br>
+1.=C2=A0 Continious non interrupted execution<br>
+=C2=A0 =C2=A0 run `qemu-system-avr -kernel program.elf` <br>
+2.=C2=A0 Continious non interrupted execution with serial output into telne=
+t window<br>
+=C2=A0 =C2=A0 run `qemu-system-avr -kernel program.elf -serial tcp::5678,se=
+rver,nowait -nographic `<br>
+=C2=A0 =C2=A0 run `telent localhost 5678`<br>
+3.=C2=A0 Continious non interrupted execution with serial output into stdou=
+t<br>
+=C2=A0 =C2=A0 run `qemu-system-avr -kernel program.elf -serial stdio`<br>
+4.=C2=A0 Debugging wit GDB debugger<br>
+=C2=A0 =C2=A0 run `qemu-system-avr -kernel program.elf -s -S`<br>
+=C2=A0 =C2=A0 run `avr-gdb program.elf` and then within GDB shell `target r=
+emote :1234`<br>
+5.=C2=A0 Print out executed instructions<br>
+=C2=A0 =C2=A0 run `qemu-system-avr -kernel program.elf -d in_asm` <br>
+<br></blockquote><div><br></div><div>Hi, Michael.</div><div><br></div><div>=
+Can you explain to me the mechanisms of recognition of what core/microcontr=
+oller QEMU is supposed to emulate in the examples above?</div><div><br></di=
+v><div>Yours, Aleksandar</div><div><br></div><div><br></div><blockquote cla=
+ss=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid =
+rgb(204,204,204);padding-left:1ex">
+<br>
+the patches include the following<br>
+1. just a basic 8bit AVR CPU, without instruction decoding or translation<b=
+r>
+2. CPU features which allow define the following 8bit AVR cores<br>
+=C2=A0 =C2=A0 =C2=A0avr1<br>
+=C2=A0 =C2=A0 =C2=A0avr2 avr25<br>
+=C2=A0 =C2=A0 =C2=A0avr3 avr31 avr35<br>
+=C2=A0 =C2=A0 =C2=A0avr4<br>
+=C2=A0 =C2=A0 =C2=A0avr5 avr51<br>
+=C2=A0 =C2=A0 =C2=A0avr6<br>
+=C2=A0 =C2=A0 =C2=A0xmega2 xmega4 xmega5 xmega6 xmega7<br>
+3. a definition of sample machine with SRAM, FLASH and CPU which allows to =
+execute simple code<br>
+4. encoding for all AVR instructions<br>
+5. interrupt handling<br>
+6. helpers for IN, OUT, SLEEP, WBR &amp; unsupported instructions<br>
+7. a decoder which given an opcode decides what istruction it is<br>
+8. translation of AVR instruction into TCG<br>
+9. all features together<br>
+<br>
+changes since v3<br>
+1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff) =
+for faster address manipulaton<br>
+2. ffs changed to ctz32<br>
+3. duplicate code removed at avr_cpu_do_interrupt<br>
+4. using andc instead of not + and<br>
+5. fixing V flag calculation in varios instructions<br>
+6. freeing local variables in PUSH<br>
+7. tcg_const_local_i32 -&gt; tcg_const_i32<br>
+8. using sextract32 instead of my implementation<br>
+9. fixing BLD instruction<br>
+10.xor(r) instead of 0xff - r at COM<br>
+11.fixing MULS/MULSU not to modify inputs&#39; content<br>
+12.using SUB for NEG<br>
+13.fixing tcg_gen_qemu_ld/st call in XCH<br>
+<br>
+changes since v4<br>
+1. target is now defined as big endian in order to optimize push_ret/pop_re=
+t<br>
+2. all style warnings are fixed<br>
+3. adding cpu_set/get_sreg functions<br>
+4. simplifying gen_goto_tb as there is no real paging<br>
+5. env-&gt;pc -&gt; env-&gt;pc_w<br>
+6. making flag dump more compact<br>
+7. more spacing<br>
+8. renaming CODE/DATA_INDEX -&gt; MMU_CODE/DATA_IDX<br>
+9. removing avr_set_feature<br>
+10. SPL/SPH set bug fix<br>
+11. switching stb_phys to cpu_stb_data<br>
+12. cleaning up avr_decode<br>
+13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)<br>
+14. saving CPU features (savevm)<br>
+<br>
+changes since v5<br>
+1. BLD bug fix<br>
+2. decoder generator is added<br>
+<br>
+chages since v6<br>
+1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_<wbr>cp=
+u_gdb_write_register<br>
+2. configure the target as little endian because otherwise GDB does not wor=
+k<br>
+3. fixing and testing gen_push_ret/gen_pop_ret<br>
+<br>
+changes since v7<br>
+1. folding back v6<br>
+2. logging at helper_outb and helper_inb are done for non supported yet reg=
+isters only<br>
+3. MAINTAINERS updated<br>
+<br>
+changes since v8<br>
+1. removing hw/avr from hw/Makefile.obj as it should not be built for all<b=
+r>
+2. making linux compilable<br>
+3. testing on<br>
+=C2=A0 =C2=A0 a. Mac, Apple LLVM version 7.0.0<br>
+=C2=A0 =C2=A0 b. Ubuntu 12.04, gcc 4.9.2<br>
+=C2=A0 =C2=A0 c. Fedora 23, gcc 5.3.1<br>
+4. folding back some patches<br>
+5. translation bug fixes for ORI, CPI, XOR instructions<br>
+6. propper handling of cpu register writes though memory<br>
+<br>
+changes since v9<br>
+1. removing forward declarations of static functions<br>
+2. disabling debug prints<br>
+3. switching to case range instead of if else if ...<br>
+4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any d=
+evice<br>
+5. commenst about sample board and sample IO device added<br>
+6. sample board description is more descriptive now<br>
+7. memory_region_allocate_system_<wbr>memory is used to create RAM<br>
+8. now there are helper_fullrd &amp; helper_fullwr when LD/ST try to access=
+ registers<br>
+<br>
+changes since v10<br>
+1. movig back fullwr &amp; fullrd into the commit where outb and inb were i=
+ntroduced<br>
+2. changing tlb_fill function signature<br>
+3. adding empty line between functions<br>
+4. adding newline on the last line of the file<br>
+5. using tb-&gt;flags to generae full access ST/LD instructions<br>
+6. fixing SBRC bug<br>
+7. folding back 10th commit<br>
+8. whenever a new file is introduced it&#39;s added to Makefile.objs<br>
+<br>
+changes since v11<br>
+1. updating to v2.7.0-rc<br>
+2. removing assignment to env-&gt;fullacc from gen_intermediate_code<br>
+<br>
+changes since v12<br>
+1. fixing spacing<br>
+2. fixing get/put_segment functions<br>
+3. removing target-avr/machine.h file<br>
+4. VMSTATE_SINGLE_TEST -&gt; VMSTATE_SINGLE<br>
+5. comment spelling<br>
+6. removing hw/avr/sample_io.c<br>
+7. char const* -&gt; const char*<br>
+8. proper ram allocation<br>
+9. fixing breakpoint functionality.<br>
+10.env1 -&gt; env<br>
+11.fixing avr_cpu_gdb_write_register &amp; avr_cpu_gdb_read_register functi=
+ons<br>
+12.any cpu is removed<br>
+12.feature bits are not saved into vm state<br>
+<br>
+changes since v13<br>
+1. rebasing to v2.7.0-rc1<br>
+<br>
+changes since v14<br>
+1. I made self review with git gui tool. (I did not know such a thing exist=
+s)<br>
+2. removing all double/tripple spaces<br>
+3. removing comment reference to SampleIO<br>
+4. folding back some changes, so there is not deleted lines in my code<br>
+5. moving avr configuration, within configure file, before chris<br>
+<br>
+changes since v15<br>
+1. removing IO registers cache from CPU<br>
+2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)<br>
+3. implementing CBIC/SBIC as read(helper_inb), check, branch<br>
+4. adding missing tcg_temp_free_i32 for tcg_const_i32<br>
+<br>
+changes since v16<br>
+1. removing EXT IO registers knoledge from CPU. These registers are accessi=
+ble<br>
+=C2=A0 =C2=A0by LD/ST only. CPU has no interest in them<br>
+<br>
+changes since v17 (by Richard Henderson)<br>
+This is Michael&#39;s v17, with some adjustments of my own:<br>
+<br>
+1. Fix the whitespace errors reported by &quot;git am&quot;,<br>
+2. Replace the utf-8 characters with normal ascii,<br>
+3. Ditch the separate compilation of translate.c.<br>
+<br>
+I retained the two separate files that could be regenerated<br>
+from the included cpugen program, but merged in translate-insn.c.<br>
+Not that it matters, but the code generated is about 3k smaller.<br>
+<br>
+changes since v18<br>
+1.=C2=A0 moving target-avr into target/avr<br>
+2.=C2=A0 do not call cpu_exec_initfn function from avr_cpu_initfn<br>
+3.=C2=A0 call cpu_exec_realizefn avr_cpu_realizefn<br>
+4.=C2=A0 do not fail sample machine creation if no rom is suplied<br>
+5.=C2=A0 add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code<br>
+6.=C2=A0 fix a register getters/setters in machine.c<br>
+7.=C2=A0 changing QEMU_ARCH_AVR from 1&lt;&lt;17 to 1&lt;&lt;18<br>
+<br>
+changes since v19<br>
+1.=C2=A0 use decodetree.py tool to decode instructions<br>
+2.=C2=A0 adding USART<br>
+3.=C2=A0 adding 16 bit timer peripherals<br>
+4.=C2=A0 changing QEMU_ARCH_AVR from 1&lt;&lt;18 to 1&lt;&lt;20<br>
+5.=C2=A0 renaming tlb_fill to avr_cpu_tlb_fill<br>
+<br>
+changes since v20<br>
+1.=C2=A0 use one CPU naming convention<br>
+2.=C2=A0 merging insn16.decode &amp; insn32.decode files<br>
+3.=C2=A0 modifying skip next instruction mechanizm<br>
+4.=C2=A0 translate BREAK as NOP for now<br>
+<br>
+changes since v21<br>
+1.=C2=A0 Reorganize bstate.<br>
+=C2=A0 =C2=A0 This will make transition to &lt;exec/translator.h&gt; easier=
+, and fixes a couple of bugs wrt single stepping<br>
+=C2=A0 =C2=A0 by <a href=3D"mailto:richard.henderson@linaro.org" target=3D"=
+_blank">richard.henderson@linaro.org</a><br>
+2.=C2=A0 Drop cpc and fix page cross condition.<br>
+=C2=A0 =C2=A0 by <a href=3D"mailto:richard.henderson@linaro.org" target=3D"=
+_blank">richard.henderson@linaro.org</a><br>
+3.=C2=A0 Refactor checking supported/unsupported instructions<br>
+4.=C2=A0 Add gdb-xml/avr-cpu.xml<br>
+<br>
+changes since v22<br>
+1.=C2=A0 Rebase<br>
+2.=C2=A0 Split long comment<br>
+<br>
+changes since v23<br>
+1.=C2=A0 remove avr_cpu_list_compare function<br>
+2.=C2=A0 modify avr_cpu_class_by_name function<br>
+3.=C2=A0 modify avr_cpu_list_entry function<br>
+4.=C2=A0 modify avr_cpu_list function<br>
+<br>
+changes since v24<br>
+1.=C2=A0 remove AVR_CPU_TYPE_NAME macro<br>
+<br>
+changes since v25<br>
+1.=C2=A0 fix patches. every file belong to one patch only<br>
+2.=C2=A0 change copyright year from 2016 to 2019<br>
+3.=C2=A0 create mask device to emulate prr0/prr1<br>
+<br>
+changes since v26<br>
+1.=C2=A0 add avocado acceptence test<br>
+2.=C2=A0 add boot serial test<br>
+<br>
+changes since v27<br>
+1.=C2=A0 list atmel2560 devices as unimplemented<br>
+2.=C2=A0 fix sram base/size<br>
+<br>
+changes since v28<br>
+1.=C2=A0 rebase<br>
+2.=C2=A0 fix includes &amp; build<br>
+<br>
+changes since v29<br>
+1.=C2=A0 fixing ownership<br>
+2.=C2=A0 using &#39;since&#39; instread of &#39;added in&#39;<br>
+<br>
+changes since v30<br>
+1.=C2=A0 rebase<br>
+<br>
+changes since v31<br>
+1.=C2=A0 splitting &#39;Add instruction translation&#39; commit<br>
+2.=C2=A0 fixing typo in qapi/machine.json sicne -&gt; since<br>
+3.=C2=A0 removing unintended changes in configure file<br>
+4.=C2=A0 adding Richard Henderson as a co developer to &#39;Add instruction=
+ translation - CPU main translation funcions&#39; commit<br>
+<br>
+changes since v32<br>
+1.=C2=A0 modify cpu_get_sreg to treat sreg C as other flags, except sreg Z<=
+br>
+<br>
+changes since v33<br>
+1.=C2=A0 ensure flag C is always calculated as one bit<br>
+2.=C2=A0 calculate flag Z as one bit, without using inverse logic<br>
+<br>
+changes since v34<br>
+1.=C2=A0 rebase<br>
+<br>
+changes since v35<br>
+1.=C2=A0 rebase<br>
+2.=C2=A0 use NANOSECONDS_PER_SECOND instead of 1000000000 in avr_timer16.c<=
+br>
+3.=C2=A0 split &quot;target/avr: Register AVR support with the rest of QEMU=
+&quot; into three patches<br>
+=C2=A0 =C2=A0 1.=C2=A0 &quot;target/avr: Register AVR support with the rest=
+ of QEMU&quot;<br>
+=C2=A0 =C2=A0 2.=C2=A0 &quot;target/avr: Update build system&quot;<br>
+=C2=A0 =C2=A0 3.=C2=A0 &quot;target/avr: Update MAINTAINERS file&quot;<br>
+4.=C2=A0 split &quot;target/avr: Add tests&quot; patch into two patches<br>
+=C2=A0 =C2=A0 1.=C2=A0 &quot;target/avr: Add Avocado test&quot;<br>
+=C2=A0 =C2=A0 2.=C2=A0 &quot;target/avr: Add boot serial test&quot;<br>
+5.=C2=A0 Add instruction disassembly function<br>
+6.=C2=A0 change &quot;since 4.2&quot; to &quot;since 5.0&quot;<br>
+<br>
+changes since v36<br>
+1.=C2=A0 rebase<br>
+2.=C2=A0 tename<br>
+=C2=A0 =C2=A0 1.=C2=A0 NO_CPU_REGISTERS=C2=A0 =C2=A0 -&gt; NUMBER_OF_CPU_RE=
+GISTERS<br>
+=C2=A0 =C2=A0 2.=C2=A0 NO_IO_REGISTERS=C2=A0 =C2=A0 =C2=A0-&gt; NUMBER_OF_I=
+O_REGISTERS<br>
+=C2=A0 =C2=A0 3.=C2=A0 to_A=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 -&gt; to_regs_16_31_by_one<br>
+=C2=A0 =C2=A0 4.=C2=A0 to_B=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 -&gt; to_regs_16_23_by_one<br>
+=C2=A0 =C2=A0 5.=C2=A0 to_C=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 -&gt; to_regs_24_30_by_two<br>
+=C2=A0 =C2=A0 6.=C2=A0 to_D=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 -&gt; to_regs_00_30_by_two<br>
+3.=C2=A0 add missing licences<br>
+4.=C2=A0 add usage example (see above)<br>
+5.=C2=A0 ass Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk" targ=
+et=3D"_blank">S.E.Harris@kent.ac.uk</a>&gt; as a reviewer to MAINTAINERS<br=
+>
+7.=C2=A0 use git commit sha1 instead of `master`` in avocado test<br>
+<br>
+Michael Rolnik (16):<br>
+=C2=A0 target/avr: Add outward facing interfaces and core CPU logic<br>
+=C2=A0 target/avr: Add instruction helpers<br>
+=C2=A0 target/avr: Add instruction decoding<br>
+=C2=A0 target/avr: Add instruction translation - Registers definition<br>
+=C2=A0 target/avr: Add instruction translation - Arithmetic and Logic<br>
+=C2=A0 =C2=A0 Instructions<br>
+=C2=A0 target/avr: Add instruction translation - Branch Instructions<br>
+=C2=A0 target/avr: Add instruction translation - Bit and Bit-test<br>
+=C2=A0 =C2=A0 Instructions<br>
+=C2=A0 target/avr: Add instruction translation - MCU Control Instructions<b=
+r>
+=C2=A0 target/avr: Add instruction translation - CPU main translation<br>
+=C2=A0 =C2=A0 function<br>
+=C2=A0 target/avr: Add instruction disassembly function<br>
+=C2=A0 target/avr: Add example board configuration<br>
+=C2=A0 target/avr: Register AVR support with the rest of QEMU<br>
+=C2=A0 target/avr: Update build system<br>
+=C2=A0 target/avr: Add boot serial test<br>
+=C2=A0 target/avr: Add Avocado test<br>
+=C2=A0 target/avr: Update MAINTAINERS file<br>
+<br>
+Sarah Harris (1):<br>
+=C2=A0 target/avr: Add limited support for USART and 16 bit timer periphera=
+ls<br>
+<br>
+=C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 7 +<br>
+=C2=A0default-configs/avr-softmmu.<wbr>mak=C2=A0 |=C2=A0 =C2=A0 5 +<br>
+=C2=A0qapi/machine.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 =C2=A0 3 +-<br>
+=C2=A0include/disas/dis-asm.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=
+=A0 6 +<br>
+=C2=A0include/hw/char/avr_usart.h=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A097 +<br=
+>
+=C2=A0include/hw/misc/avr_mask.h=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A047=
+ +<br>
+=C2=A0include/hw/timer/avr_timer16.<wbr>h=C2=A0 =C2=A0|=C2=A0 =C2=A097 +<br=
+>
+=C2=A0include/sysemu/arch_init.h=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A0 1=
+ +<br>
+=C2=A0target/avr/cpu-param.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 =C2=A037 +<br>
+=C2=A0target/avr/cpu-qom.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A054 +<br>
+=C2=A0target/avr/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0|=C2=A0 254 +++<br>
+=C2=A0target/avr/helper.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 =C2=A029 +<br>
+=C2=A0arch_init.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 2 +<br>
+=C2=A0hw/avr/sample.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 282 +++<br>
+=C2=A0hw/char/avr_usart.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 324 ++++<br>
+=C2=A0hw/misc/avr_mask.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0|=C2=A0 112 ++<br>
+=C2=A0hw/timer/avr_timer16.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 605 ++++++<br>
+=C2=A0target/avr/cpu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0|=C2=A0 576 ++++++<br>
+=C2=A0target/avr/disas.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0|=C2=A0 228 +++<br>
+=C2=A0target/avr/gdbstub.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A085 +<br>
+=C2=A0target/avr/helper.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 354 ++++<br>
+=C2=A0target/avr/machine.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 121 ++<br>
+=C2=A0target/avr/translate.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 3052=
+ ++++++++++++++++++++++++++++++<br>
+=C2=A0tests/boot-serial-test.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=
+=A010 +<br>
+=C2=A0tests/machine-none-test.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 1=
+ +<br>
+=C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A011 +<br>
+=C2=A0gdb-xml/avr-cpu.xml=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 =C2=A049 +<br>
+=C2=A0hw/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A0 1 +<br>
+=C2=A0hw/avr/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0|=C2=A0 =C2=A0 6 +<br>
+=C2=A0hw/avr/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A0 1 +<br>
+=C2=A0hw/char/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 =C2=A0 3 +<br>
+=C2=A0hw/char/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A0 1 +<br>
+=C2=A0hw/misc/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 =C2=A0 3 +<br>
+=C2=A0hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A0 2 +<br>
+=C2=A0hw/timer/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0|=C2=A0 =C2=A0 3 +<br>
+=C2=A0hw/timer/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 =C2=A0 2 +<br>
+=C2=A0target/avr/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=
+=A034 +<br>
+=C2=A0target/avr/insn.decode=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 194 ++<br>
+=C2=A0tests/Makefile.include=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
+=A0 =C2=A0 2 +<br>
+=C2=A0tests/acceptance/machine_<wbr>avr6.py |=C2=A0 =C2=A056 +<br>
+=C2=A040 files changed, 6756 insertions(+), 1 deletion(-)<br>
+=C2=A0create mode 100644 default-configs/avr-softmmu.<wbr>mak<br>
+=C2=A0create mode 100644 include/hw/char/avr_usart.h<br>
+=C2=A0create mode 100644 include/hw/misc/avr_mask.h<br>
+=C2=A0create mode 100644 include/hw/timer/avr_timer16.h<br>
+=C2=A0create mode 100644 target/avr/cpu-param.h<br>
+=C2=A0create mode 100644 target/avr/cpu-qom.h<br>
+=C2=A0create mode 100644 target/avr/cpu.h<br>
+=C2=A0create mode 100644 target/avr/helper.h<br>
+=C2=A0create mode 100644 hw/avr/sample.c<br>
+=C2=A0create mode 100644 hw/char/avr_usart.c<br>
+=C2=A0create mode 100644 hw/misc/avr_mask.c<br>
+=C2=A0create mode 100644 hw/timer/avr_timer16.c<br>
+=C2=A0create mode 100644 target/avr/cpu.c<br>
+=C2=A0create mode 100644 target/avr/disas.c<br>
+=C2=A0create mode 100644 target/avr/gdbstub.c<br>
+=C2=A0create mode 100644 target/avr/helper.c<br>
+=C2=A0create mode 100644 target/avr/machine.c<br>
+=C2=A0create mode 100644 target/avr/translate.c<br>
+=C2=A0create mode 100644 gdb-xml/avr-cpu.xml<br>
+=C2=A0create mode 100644 hw/avr/Kconfig<br>
+=C2=A0create mode 100644 hw/avr/Makefile.objs<br>
+=C2=A0create mode 100644 target/avr/Makefile.objs<br>
+=C2=A0create mode 100644 target/avr/insn.decode<br>
+=C2=A0create mode 100644 tests/acceptance/machine_avr6.<wbr>py<br>
+<br>
+-- <br>
+2.17.2 (Apple Git-113)<br>
+<br>
+</blockquote>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+>Best Regards,<br>Michael Rolnik</div>
+</blockquote>
+
+--000000000000c764c50598b54de2--
 
