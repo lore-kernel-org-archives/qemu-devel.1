@@ -2,87 +2,81 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F20F4C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B7A4C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:29:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7ABC2073C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:28:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46D432073C
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:29:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="jyCgI2KQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7ABC2073C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NNkLy9qD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46D432073C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37445 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibncx-0006R4-HE
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 10:28:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45913)
+	id 1ibndK-00082q-BE
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 10:29:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46283)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1ibnZn-0004oB-MF
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:25:28 -0500
+ (envelope-from <armbru@redhat.com>) id 1ibncJ-0006cy-Mb
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:28:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1ibnZm-0001DN-C5
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:25:27 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:58282)
+ (envelope-from <armbru@redhat.com>) id 1ibncH-0002Hc-Ky
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:28:03 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60924
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1ibnZl-0001CW-Sj
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:25:26 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 7F6F896EF0;
- Mon,  2 Dec 2019 15:25:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1575300323;
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ibncF-0002Ex-Of
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:27:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575300477;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9aeO8O8KhQQaq5X4MYaBmu9UJye5UuaXRanZt/dtU5U=;
- b=jyCgI2KQ/VvR3p6qQXuChLhIcfDWGokOfDlYL/roxfeNjsBBIauUjMVaR2dQ7zJUb7Uq0I
- MD+XkehThOyzy9AkaFL0NYpVgscJpZSMlXn05twwavFeILzouqp4yYz649AXIuTJTs0DoV
- e43NMziC3awSA3GouxrfbRqcSwAKJmo=
-Subject: Re: [PATCH v2 02/14] gdbstub: stop passing GDBState * around and use
- global
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191130084602.10818-1-alex.bennee@linaro.org>
- <20191130084602.10818-3-alex.bennee@linaro.org>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <5b13ffc4-9097-98ec-abe3-214f4303b708@greensocs.com>
-Date: Mon, 2 Dec 2019 16:25:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ bh=fNuI1Lg6PUcU0g7g48qRrIfBTSi72AXKORyODJL3r7w=;
+ b=NNkLy9qDz8gYvbY/Z8CPR3BJUPQutvpuEwbiAb5wRE545DOX7qBZTcwZWu3hLSZt3zEvLM
+ Gt0joCSgHFVmREeebX6rsOcCz6T/ITWSQHtKO2ViGexbBlOpIZvxt4SXtf/55xUqmndCho
+ Sp9muESskKFPJaN6b/LMYnFu4KenDI0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-342-zJoXIhVWPNe4VFAjnwyjZg-1; Mon, 02 Dec 2019 10:27:54 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C16B100F607;
+ Mon,  2 Dec 2019 15:27:52 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 96DA35DA32;
+ Mon,  2 Dec 2019 15:27:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 279EC11366CF; Mon,  2 Dec 2019 16:27:46 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL for-4.2 3/3] block/file-posix: Fix laio_init() error handling
+ crash bug
+Date: Mon,  2 Dec 2019 16:27:46 +0100
+Message-Id: <20191202152746.32292-4-armbru@redhat.com>
+In-Reply-To: <20191202152746.32292-1-armbru@redhat.com>
+References: <20191202152746.32292-1-armbru@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191130084602.10818-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1575300323;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9aeO8O8KhQQaq5X4MYaBmu9UJye5UuaXRanZt/dtU5U=;
- b=cw7gTCl8mak3PDO5lPy8CZ1U0791DVQfXj/ltBtFrOOOIVXnA8TLg3YglMDoGdMCesMXrx
- YjX4pJzgmlOGUgAUl+rURE4XxW6no2E5/tkP3eSnr5V7Cfn78QMmDszQakBggUGFTskdoN
- VbRLAH1JeJ4lkTrZ/fk7E5K/qgFtDVA=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575300323; a=rsa-sha256; cv=none;
- b=ntXr5zRChPBYnnIP+pwkbn06RufzrCGhJwUnLXOvj+u6xxK7jq2jqncDb8YaHDhrtXbdqs
- EOXYhzHZ9VOlJz3MNrzxGEGvzuBYhZOOeYcsXqgcMrQZZopSgqD05VrerstRJOxhy+xu/6
- hW9iG6WYvWFBJIaHVizD6mYHAAC4neQ=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: zJoXIhVWPNe4VFAjnwyjZg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,49 +88,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: luis.machado@linaro.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, alan.hayward@arm.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Nishanth Aravamudan <naravamudan@digitalocean.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+raw_aio_attach_aio_context() passes uninitialized Error *local_err by
+reference to laio_init() via aio_setup_linux_aio().  When laio_init()
+fails, it passes it on to error_setg_errno(), tripping error_setv()'s
+assertion unless @local_err is null by dumb luck.
 
+Fix by initializing @local_err properly.
 
-On 11/30/19 9:45 AM, Alex Benn=C3=A9e wrote:
-> We only have one GDBState which should be allocated at the time we
-> process any commands. This will make further clean-up a bit easier.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  gdbstub.c | 539 +++++++++++++++++++++++++++---------------------------
->  1 file changed, 267 insertions(+), 272 deletions(-)
->=20
+Fixes: ed6e2161715c527330f936d44af4c547f25f687e
+Cc: Nishanth Aravamudan <naravamudan@digitalocean.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20191130194240.10517-4-armbru@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+---
+ block/file-posix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> @@ -2919,33 +2914,33 @@ static void gdb_read_byte(GDBState *s, uint8_t =
-ch)> [...]
->              } else {
->                  /* send ACK reply */
->                  reply =3D '+';
-> -                put_buffer(s, &reply, 1);
-> -                s->state =3D gdb_handle_packet(s, s->line_buf);
-> +                put_buffer(&reply, 1);
-> +                gdbserver_state.state =3D gdb_handle_packet(s, gdbserv=
-er_state.line_buf);
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 1f0f61a02b..1b805bd938 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1973,7 +1973,7 @@ static void raw_aio_attach_aio_context(BlockDriverSta=
+te *bs,
+ #ifdef CONFIG_LINUX_AIO
+     BDRVRawState *s =3D bs->opaque;
+     if (s->use_linux_aio) {
+-        Error *local_err;
++        Error *local_err =3D NULL;
+         if (!aio_setup_linux_aio(new_context, &local_err)) {
+             error_reportf_err(local_err, "Unable to use native AIO, "
+                                          "falling back to thread pool: ");
+--=20
+2.21.0
 
-Is there a reason to keep the GDBState* first parameter in
-gdb_handle_packet() ?
-
-There is a few remaining functions still taking GDBState* parameter
-+ gdb_handle_packet
-+ run_cmd_parser
-+ gdb_monitor_output
-+ create_default_processes
-+ create_processes
-+ gdb_read_byte
-
-We should probably clean them too, but otherwise it looks good.
-
---
-Damien
 
