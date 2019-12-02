@@ -2,112 +2,81 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F8BC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 20:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD04C432C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 20:51:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F517205ED
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 20:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 245392071E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 20:51:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="J6/f7ZGQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F517205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+L5EVq5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 245392071E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibsZf-0007Nr-6b
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 15:45:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46789)
+	id 1ibsfE-0001ss-1t
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 15:51:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47262)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1ibsYZ-0006tw-68
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 15:44:32 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1ibse7-0000hu-9s
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 15:50:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1ibsYX-0007Gs-SB
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 15:44:31 -0500
-Received: from mail-eopbgr720079.outbound.protection.outlook.com
- ([40.107.72.79]:35136 helo=NAM05-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1ibsYX-0007EV-Jy
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 15:44:29 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DACxwtn53kGJIguCRU1XnE0ixJ32Os5xs8/zQ1Is88yyGm2G0jrD4W56aTSDY+C353T0QPgkSBg2QPyYwnuXHa2oXg8QN5Y1iHg81G/RgKTgPgp5QLmBvHigIWNExKGoYaHNQfnHqgY28UC2gOHHjJqAka8vF9jGf46LL5g2ea2tSJuifvoKKz2XPOWyFNKOW2SU3VxHKF1q6Glz5sDHpWgG77btXlkMxnEiExacTDJv0DE7/kYWzvsq28jDrmnBhBylYIxqqm0HcFTPL6LXgHuV+Bu1MOZAUXhffwoarWbLNZ+C+xbhfw9mGmKe3NAgOQJm5+qrG7vJoV4ffREbdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K8SV3LmhdCdNSnVO/VMeQcygohDbf58aUAR9BXJQkM4=;
- b=I3g8HOIpv0y5pqYPsCJOJay7uUtdf+Bqel4ogAb7oq0aW4AD/OTeywiMyItBQW1flKnJCBeJDoaFX+vjA5904hDOA0dCgejjqHGs/9jPdeKLhWT3LHKQ5oJjTSqIlP0STH8zVJiGhzG4J1v01fRpn3wLssxrFTpBXZumiHTwFvmc2WX93wD1kU1pD4sXobZury9yhdFrJYSTe4lBDkAWBnm+sedZnwFJnTJsl9r9P5uu6tid1EveTydnNLXvlUOktmzde87/5rMFqV/bmOkvRHbLKY/Yk3IsBGc9GPy5BQV6kKFbE0rjTJsZMd0cYEhqjXwAl9fJRI3EDGveU83kDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K8SV3LmhdCdNSnVO/VMeQcygohDbf58aUAR9BXJQkM4=;
- b=J6/f7ZGQ/41N+dQLfoUA+hd8Dc1z7gbauaeJ8D9NQGrbJY4irkX8wnId87Y/nHpNO5z7GwxZ268Bo7Ubf03nhXo1muJ5w/yMVoJNYGfIhUW+RQYfNtENi6fuYsc0XZJ544OkiP4R3tl2SgHyZI6TKNHP1D19VRrxr4ORBv1mhZo=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Babu.Moger@amd.com; 
-Received: from DM5PR12MB2471.namprd12.prod.outlook.com (52.132.141.138) by
- DM5PR12MB1274.namprd12.prod.outlook.com (10.168.239.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.20; Mon, 2 Dec 2019 20:44:26 +0000
-Received: from DM5PR12MB2471.namprd12.prod.outlook.com
- ([fe80::d0f5:b875:7b5c:46c3]) by DM5PR12MB2471.namprd12.prod.outlook.com
- ([fe80::d0f5:b875:7b5c:46c3%6]) with mapi id 15.20.2495.014; Mon, 2 Dec 2019
- 20:44:26 +0000
-Subject: Re: [Qemu-devel] [RFC 2 PATCH 16/16] hw/core: Fix up the
- machine_set_cpu_numa_node for epyc
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <156779689013.21957.1631551572950676212.stgit@localhost.localdomain>
- <156779720803.21957.8389712174989601936.stgit@localhost.localdomain>
- <20191011041057.GJ29387@habkost.net>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <255ae191-c477-de25-3e46-205d0797a67e@amd.com>
-Date: Mon, 2 Dec 2019 14:44:24 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
-In-Reply-To: <20191011041057.GJ29387@habkost.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN6PR08CA0004.namprd08.prod.outlook.com
- (2603:10b6:805:66::17) To DM5PR12MB2471.namprd12.prod.outlook.com
- (2603:10b6:4:b5::10)
+ (envelope-from <ehabkost@redhat.com>) id 1ibse4-0000zf-Eq
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 15:50:15 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50900
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1ibse4-0000wx-9D
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 15:50:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575319810;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8TeX0Z5aUgA1I+bsdE7QnCaU3O19MJYx4eBf1qVcjTQ=;
+ b=i+L5EVq5zN8L5cafe0wXnOViHjUO1LlsphY+R1WLieM1mS29Z9gek6/XTX0k5si+lzif7S
+ EI9cjJVj7oRfqMdzPRhY2gIsdQiFezwWwYS8zrzPuok0Ueb1ooiv6/kLxyXCos3ir7AuKE
+ yI194kXrZaUFt/pelMgWgVg9QGvL+gE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-MlQflNJCMguCQ8O3-8-_Jg-1; Mon, 02 Dec 2019 15:50:05 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E04E486A067;
+ Mon,  2 Dec 2019 20:50:01 +0000 (UTC)
+Received: from localhost (ovpn-116-90.gru2.redhat.com [10.97.116.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6F5E65D6AE;
+ Mon,  2 Dec 2019 20:50:00 +0000 (UTC)
+Date: Mon, 2 Dec 2019 17:49:58 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Subject: Re: [PATCH 2/5] mips: malta: Renovate coding style
+Message-ID: <20191202204958.GP14595@habkost.net>
+References: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
+ <1574687098-26689-3-git-send-email-Filip.Bozuta@rt-rk.com>
+ <CAL1e-=jeECJRjOR+Mo79D5VA8q0gSZsf__MOtRhiU0fgDF1DRA@mail.gmail.com>
 MIME-Version: 1.0
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 46113804-0ab7-48a6-2091-08d777686bba
-X-MS-TrafficTypeDiagnostic: DM5PR12MB1274:
-X-Microsoft-Antispam-PRVS: <DM5PR12MB1274BD91D72BE8A8C7832FF495430@DM5PR12MB1274.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-Forefront-PRVS: 0239D46DB6
-X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10009020)(4636009)(396003)(376002)(39860400002)(346002)(366004)(136003)(189003)(199004)(50466002)(2906002)(99286004)(6512007)(6436002)(6486002)(478600001)(5660300002)(14454004)(8676002)(66066001)(81166006)(186003)(66946007)(26005)(2616005)(11346002)(446003)(44832011)(31686004)(229853002)(4326008)(6246003)(81156014)(53546011)(6506007)(386003)(2486003)(23676004)(76176011)(52116002)(305945005)(7736002)(65806001)(65956001)(25786009)(36756003)(6916009)(66556008)(66476007)(8936002)(58126008)(316002)(6116002)(3846002)(14444005)(54906003)(230700001)(31696002)(47776003)(86362001);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DM5PR12MB1274;
- H:DM5PR12MB2471.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tzAELxw4dT8oKEfK3JCQ5ZJ4DcJN37Uw6B2YT1ojAzNdpvqf6HHdAvFBai7hBjkBkKCd0FeQb3jd5GAGBRZkqmvAs7olj/1Qq25WpPvV+Gt0yJFcM7kcjR4z/+eL+mMJttmPlMdlh/dtXlll6UgCzStpnyq4xi5bc/rhzuCQcpxl9MejTsPai5ESX87aJGpTxVnRcl7vh0LlkueaNA5j0WSUZ4CqcGtwixr36FgX1qEmQLoyr5COrVG/09lIJCPo9QWV/c9FFZ/ORndcfBtS/XLwAepCg+fQG12QpiwELRbN9YNwgs030i7ixuVUik6GwSnhmLS95DlAXIgiu5hIRH6VFcDezFjOep58u/QnF9s/goUKoZERKuuosgfkJBk55D7C5zajFIh3ECxpQHdsMANta4gvPrt3YfdsSZe0JZV85nd+0A4xQvwACyzMQMbF
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46113804-0ab7-48a6-2091-08d777686bba
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2019 20:44:26.5717 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FzYNBF/hM0nhcSJwyf5l7C8fQdH8D1g/9W2fEUpbm5u+d3iwg5pgTGVNWM5ZUSsy
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1274
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.72.79
+In-Reply-To: <CAL1e-=jeECJRjOR+Mo79D5VA8q0gSZsf__MOtRhiU0fgDF1DRA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: MlQflNJCMguCQ8O3-8-_Jg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,118 +88,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "mst@redhat.com" <mst@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
+Cc: "pburton@wavecomp.com" <pburton@wavecomp.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+ Filip Bozuta <Filip.Bozuta@rt-rk.com>,
+ "hpoussin@reactos.org" <hpoussin@reactos.org>,
+ "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Sun, Dec 01, 2019 at 12:46:12AM +0100, Aleksandar Markovic wrote:
+> On Monday, November 25, 2019, Filip Bozuta <Filip.Bozuta@rt-rk.com> wrote=
+:
+>=20
+> > The script checkpatch.pl located in scripts folder was
+> > used to detect all errors and warrnings in files:
+> >     hw/mips/mips_malta.c
+> >     hw/mips/gt64xxx_pci.c
+> >     tests/acceptance/linux_ssh_mips_malta.py
+> >
+> > All these mips malta machine files were edited and
+> > all the errors and warrings generated by the checkpatch.pl
+> > script were corrected and then the script was
+> > ran again to make sure there are no more errors and warnings.
+> >
+> > Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+> > ---
+> >  hw/mips/mips_malta.c                     | 139
+> > ++++++++++++++++---------------
+> >  tests/acceptance/linux_ssh_mips_malta.py |   6 +-
+> >  2 files changed, 75 insertions(+), 70 deletions(-)
+> >
+> >
+> Very good cleanup!
+>=20
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+>=20
+> I think this snippet is good, but I am just in case cc-ing Cleber and
+> Eduardo to check if it is in accordance with any applicable guidelines of
+> our test framework:
 
+Thanks for CCing us.
 
-On 10/10/19 11:10 PM, Eduardo Habkost wrote:
-> On Fri, Sep 06, 2019 at 07:13:29PM +0000, Moger, Babu wrote:
->> Current topology id match will not work for epyc mode when setting
->> the node id. In epyc mode, ids like smt_id, thread_id, core_id,
->> ccx_id, socket_id can be same for more than one CPUs with across
->> two numa nodes.
->>
->> For example, we can have two CPUs with following ids on two different node.
->> 1. smt_id=0, thread_id=0, core_id=0, ccx_id=0, socket_id=0, node_id=0
->> 2. smt_id=0, thread_id=0, core_id=0, ccx_id=0, socket_id=0, node_id=1
-> 
-> I don't understand how that could happen.  If all IDs are the
-> same, how is it possible that those two cases should match two
-> different CPUs?
-> 
-> cpu_index_to_instance_props() must always return an unique
-> identifier for a single CPU.
+>=20
+>=20
+> > diff --git a/tests/acceptance/linux_ssh_mips_malta.py
+> > b/tests/acceptance/linux_ssh_mips_malta.py
+> > index fc13f9e..44e1118 100644
+> > --- a/tests/acceptance/linux_ssh_mips_malta.py
+> > +++ b/tests/acceptance/linux_ssh_mips_malta.py
+> > @@ -99,10 +99,12 @@ class LinuxSSH(Test):
+> >      def ssh_command(self, command, is_root=3DTrue):
+> >          self.ssh_logger.info(command)
+> >          result =3D self.ssh_session.cmd(command)
+> > -        stdout_lines =3D [line.rstrip() for line in
+> > result.stdout_text.splitlines()]
+> > +        stdout_lines =3D [line.rstrip() for line
+> > +        in result.stdout_text.splitlines()]
+> >          for line in stdout_lines:
+> >              self.ssh_logger.info(line)
+> > -        stderr_lines =3D [line.rstrip() for line in
+> > result.stderr_text.splitlines()]
+> > +        stderr_lines =3D [line.rstrip() for line
+> > +        in result.stderr_text.splitlines()]
 
-Simplified apic id decoding in v3 version. We don't need these changes
-anymore.
+If you really want to split those lines, please indent them
+properly.  e.g.:
 
-> 
->>
->> The function machine_set_cpu_numa_node will fail to find a match to assign
->> the node. Added new function machine_set_cpu_numa_node_epyc to set the node_id
->> directly in epyc mode.
->>
->> Signed-off-by: Babu Moger <babu.moger@amd.com>
->> ---
->>  hw/core/machine.c   |   24 ++++++++++++++++++++++++
->>  hw/core/numa.c      |    6 +++++-
->>  include/hw/boards.h |    4 ++++
->>  3 files changed, 33 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/core/machine.c b/hw/core/machine.c
->> index 9a8586cf30..6bceefc6f3 100644
->> --- a/hw/core/machine.c
->> +++ b/hw/core/machine.c
->> @@ -741,6 +741,30 @@ void machine_set_cpu_numa_node(MachineState *machine,
->>      }
->>  }
->>  
->> +void machine_set_cpu_numa_node_epyc(MachineState *machine,
->> +                                    const CpuInstanceProperties *props,
->> +                                    unsigned index,
->> +                                    Error **errp)
->> +{
->> +    MachineClass *mc = MACHINE_GET_CLASS(machine);
->> +    CPUArchId *slot;
->> +
->> +    if (!mc->possible_cpu_arch_ids) {
->> +        error_setg(errp, "mapping of CPUs to NUMA node is not supported");
->> +        return;
->> +    }
->> +
->> +    /* disabling node mapping is not supported, forbid it */
->> +    assert(props->has_node_id);
->> +
->> +    /* force board to initialize possible_cpus if it hasn't been done yet */
->> +    mc->possible_cpu_arch_ids(machine);
->> +
->> +    slot = &machine->possible_cpus->cpus[index];
->> +    slot->props.node_id = props->node_id;
->> +    slot->props.has_node_id = props->has_node_id;
->> +}
->> +
->>  static void smp_parse(MachineState *ms, QemuOpts *opts)
->>  {
->>      if (opts) {
->> diff --git a/hw/core/numa.c b/hw/core/numa.c
->> index 27fa6b5e1d..a9e835aea6 100644
->> --- a/hw/core/numa.c
->> +++ b/hw/core/numa.c
->> @@ -247,7 +247,11 @@ void set_numa_node_options(MachineState *ms, NumaOptions *object, Error **errp)
->>           props = mc->cpu_index_to_instance_props(ms, cpus->value);
->>           props.node_id = nodenr;
->>           props.has_node_id = true;
->> -         machine_set_cpu_numa_node(ms, &props, &err);
->> +         if (ms->epyc) {
->> +             machine_set_cpu_numa_node_epyc(ms, &props, cpus->value, &err);
->> +         } else {
->> +             machine_set_cpu_numa_node(ms, &props, &err);
->> +         }
->>           if (err) {
->>              error_propagate(errp, err);
->>              return;
->> diff --git a/include/hw/boards.h b/include/hw/boards.h
->> index 0001d42e50..ec1b1c5a85 100644
->> --- a/include/hw/boards.h
->> +++ b/include/hw/boards.h
->> @@ -74,6 +74,10 @@ HotpluggableCPUList *machine_query_hotpluggable_cpus(MachineState *machine);
->>  void machine_set_cpu_numa_node(MachineState *machine,
->>                                 const CpuInstanceProperties *props,
->>                                 Error **errp);
->> +void machine_set_cpu_numa_node_epyc(MachineState *machine,
->> +                                    const CpuInstanceProperties *props,
->> +                                    unsigned index,
->> +                                    Error **errp);
->>  
->>  void machine_class_allow_dynamic_sysbus_dev(MachineClass *mc, const char *type);
->>  
->>
-> 
+        stdout_lines =3D [line.rstrip() for line
+                        in result.stdout_text.splitlines()]
+
+See PEP 8 [1] for additional examples.
+
+Personally, I would just keep the existing
+linux_ssh_mips_malta.py code as is.  I don't think splitting
+those lines improves readability.
+
+[1] https://www.python.org/dev/peps/pep-0008/#indentation
+
+--=20
+Eduardo
+
 
