@@ -2,62 +2,78 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F71C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:57:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E42ACC432C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:58:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DEA02231B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:57:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DEA02231B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id AE06520833
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:58:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T62K/5jw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE06520833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibhW4-0004Jj-HN
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 03:57:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50153)
+	id 1ibhXF-0005Z9-UL
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 03:58:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50320)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ibhV5-0003Di-40
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:56:12 -0500
+ (envelope-from <cohuck@redhat.com>) id 1ibhWZ-00050V-AU
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:57:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ibhV3-0003CM-Ph
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:56:11 -0500
-Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:46744)
+ (envelope-from <cohuck@redhat.com>) id 1ibhWX-0003gb-SI
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:57:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56145
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ibhV3-0003BY-Jq
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:56:09 -0500
-Received: from player735.ha.ovh.net (unknown [10.108.1.162])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id A012084424
- for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 09:56:06 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player735.ha.ovh.net (Postfix) with ESMTPSA id 77131CB35FA3;
- Mon,  2 Dec 2019 08:55:57 +0000 (UTC)
-Date: Mon, 2 Dec 2019 09:55:51 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [for-5.0 1/4] spapr,ppc: Simplify signature of kvmppc_rma_size()
-Message-ID: <20191202095551.2ca7beb7@bahia.w3ibm.bluemix.net>
-In-Reply-To: <20191129013504.145455-2-david@gibson.dropbear.id.au>
-References: <20191129013504.145455-1-david@gibson.dropbear.id.au>
- <20191129013504.145455-2-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ibhWX-0003gA-PB
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:57:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575277061;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ngT8rFyrxr9URc+BmHmjBXHpxNko3sg7tBGuivjsohY=;
+ b=T62K/5jw1FzCg2QXiT56q/1twGo2lRUDiL7C2cjj1Q+J8OavRQtkafCeDN0+Dyq9Qg2BHo
+ woVQJo7dSb+HmO9wkGcFwmLABkmc5pK6czhQSLIZgF68+thQpurKe7SgsTwIb4X+1i732f
+ ftO1q6s2V8t/Mqp1fBCNd6DQ/OtKFfA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-JhgNXvNdO_OiD6czMIXbIQ-1; Mon, 02 Dec 2019 03:57:38 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F04191005502;
+ Mon,  2 Dec 2019 08:57:36 +0000 (UTC)
+Received: from gondolin (ovpn-116-41.ams2.redhat.com [10.36.116.41])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9F02F5C548;
+ Mon,  2 Dec 2019 08:57:32 +0000 (UTC)
+Date: Mon, 2 Dec 2019 09:57:29 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 0/3] s390x: Increase architectural compliance
+Message-ID: <20191202095729.64cfbcc2.cohuck@redhat.com>
+In-Reply-To: <20191129142025.21453-1-frankja@linux.ibm.com>
+References: <20191129142025.21453-1-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: JhgNXvNdO_OiD6czMIXbIQ-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 15106762001723529702
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudejgedguddvkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.74.227
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,107 +85,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, lvivier@redhat.com, qemu-ppc@nongnu.org, clg@kaod.org,
- qemu-devel@nongnu.org
+Cc: thuth@redhat.com, david@redhat.com, qemu-devel@nongnu.org,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 29 Nov 2019 12:35:01 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+On Fri, 29 Nov 2019 09:20:22 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> This function calculates the maximum size of the RMA as implied by the
-> host's page size of structure of the VRMA (there are a number of other
-> constraints on the RMA size which will supersede this one in many
-> circumstances).
+> On a diag 308 subcode 0 and 1 we need to load the whole reset PSW and
+> not just the address.
 > 
-> The current interface takes the current RMA size estimate, and clamps it
-> to the VRMA derived size.  The only current caller passes in an arguably
-> wrong value (it will match the current RMA estimate in some but not all
-> cases).
+> On a cpu reset normal, we need to clear local cpus. Unfortunately we
+> need a new API for that, since KVM only exposes one of the three
+> resets.
 > 
-> We want to fix that, but for now just keep concerns separated by having the
-> KVM helper function just return the VRMA derived limit, and let the caller
-> combine it with other constraints.  We call the new function
-> kvmppc_vrma_limit() to more clearly indicate its limited responsibility.
+> Patches are also in my cleanup branch.
 > 
-> The helper should only ever be called in the KVM enabled case, so replace
-> its !CONFIG_KVM stub with an assert() rather than a dummy value.
+> Janosch Frank (3):
+>   s390x: Properly fetch and test the short psw on diag308 subc 0/1
+>   Sync reset
+>   s390x: protvirt: Add new VCPU reset functions
 > 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+>  linux-headers/linux/kvm.h |  7 +++++++
+>  target/s390x/cpu.c        | 26 ++++++++++++++++++++++----
+>  target/s390x/cpu.h        |  1 +
+>  target/s390x/kvm-stub.c   | 10 +++++++++-
+>  target/s390x/kvm.c        | 38 ++++++++++++++++++++++++++++++++------
+>  target/s390x/kvm_s390x.h  |  4 +++-
+>  6 files changed, 74 insertions(+), 12 deletions(-)
+> 
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
->  hw/ppc/spapr.c       | 5 +++--
->  target/ppc/kvm.c     | 5 ++---
->  target/ppc/kvm_ppc.h | 7 +++----
->  3 files changed, 8 insertions(+), 9 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d9c9a2bcee..069bd04a8d 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -1635,8 +1635,9 @@ void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr)
->      spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
->  
->      if (spapr->vrma_adjust) {
-> -        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(MACHINE(spapr)),
-> -                                          spapr->htab_shift);
-> +        hwaddr vrma_limit = kvmppc_vrma_limit(spapr->htab_shift);
-> +
-> +        spapr->rma_size = MIN(spapr_node0_size(MACHINE(spapr)), vrma_limit);
->      }
->  }
->  
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index c77f9848ec..09b3bd6443 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2101,7 +2101,7 @@ void kvmppc_hint_smt_possible(Error **errp)
->  
->  
->  #ifdef TARGET_PPC64
-> -uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
-> +uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
->  {
->      struct kvm_ppc_smmu_info info;
->      long rampagesize, best_page_shift;
-> @@ -2128,8 +2128,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
->          }
->      }
->  
-> -    return MIN(current_size,
-> -               1ULL << (best_page_shift + hash_shift - 7));
-> +    return 1ULL << (best_page_shift + hash_shift - 7));
->  }
->  #endif
->  
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 98bd7d5da6..4f0eec4c1b 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -45,7 +45,7 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
->                                int *pfd, bool need_vfio);
->  int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
->  int kvmppc_reset_htab(int shift_hint);
-> -uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
-> +uint64_t kvmppc_vrma_limit(unsigned int hash_shift);
->  bool kvmppc_has_cap_spapr_vfio(void);
->  #endif /* !CONFIG_USER_ONLY */
->  bool kvmppc_has_cap_epr(void);
-> @@ -241,10 +241,9 @@ static inline int kvmppc_reset_htab(int shift_hint)
->      return 0;
->  }
->  
-> -static inline uint64_t kvmppc_rma_size(uint64_t current_size,
-> -                                       unsigned int hash_shift)
-> +static inline uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
->  {
-> -    return ram_size;
-> +    g_assert_not_reached();
->  }
->  
->  static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
+Ok, it seems I should just go ahead and pick patch 1, and defer the
+remainder until after we agree on the interface, right?
 
 
