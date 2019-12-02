@@ -2,173 +2,82 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A01B7C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 13:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA612C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 13:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 545FA2070B
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 13:40:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABA0F2053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 13:44:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="s+oD/9cs";
-	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="s+oD/9cs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 545FA2070B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yba2toiY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABA0F2053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iblwP-0004zx-8S
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 08:40:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59258)
+	id 1iblzd-0006nF-QI
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 08:44:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59992)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Alan.Hayward@arm.com>) id 1ibiaf-000791-Mo
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 05:06:02 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iblyZ-0005xQ-Uf
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 08:42:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Alan.Hayward@arm.com>) id 1ibiad-0003DD-1G
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 05:06:00 -0500
-Received: from mail-eopbgr60083.outbound.protection.outlook.com
- ([40.107.6.83]:16118 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Alan.Hayward@arm.com>)
- id 1ibiac-0003CP-JF; Mon, 02 Dec 2019 05:05:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WbpXiavto7WlF+PW20qrrUoF0nbKX5dh+9AB32r0UNU=;
- b=s+oD/9cssuc/hfm2m/B6O3TBM7+rIP46mMD15PZzeWKYR5HmRTRucuOPgDQZbi7DD3hp48ywTR8YItfv+O4xOVm4NTafKJjqMgKyRZNGDA6sAYVU0xYC4uatS/5akjk2NxBJFfywxbpdxGlJJwbr0iMaSdEr6WhWQ2C02x36pxY=
-Received: from VI1PR08CA0214.eurprd08.prod.outlook.com (2603:10a6:802:15::23)
- by DB8PR08MB5017.eurprd08.prod.outlook.com (2603:10a6:10:ef::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2495.17; Mon, 2 Dec
- 2019 10:05:54 +0000
-Received: from VE1EUR03FT034.eop-EUR03.prod.protection.outlook.com
- (2a01:111:f400:7e09::203) by VI1PR08CA0214.outlook.office365.com
- (2603:10a6:802:15::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2495.20 via Frontend
- Transport; Mon, 2 Dec 2019 10:05:54 +0000
-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
- smtp.mailfrom=arm.com; nongnu.org; dkim=pass (signature was verified)
- header.d=armh.onmicrosoft.com;nongnu.org; dmarc=bestguesspass action=none
- header.from=arm.com;
-Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
- 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
- client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
-Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- VE1EUR03FT034.mail.protection.outlook.com (10.152.18.85) with
- Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.18 via Frontend Transport; Mon, 2 Dec 2019 10:05:54 +0000
-Received: ("Tessian outbound 54081306375c:v37");
- Mon, 02 Dec 2019 10:05:52 +0000
-X-CheckRecipientChecked: true
-X-CR-MTA-CID: 489143afd3908e66
-X-CR-MTA-TID: 64aa7808
-Received: from 705f231e3107.1
- by 64aa7808-outbound-1.mta.getcheckrecipient.com id
- 65C77B36-9D6A-44D4-98D2-359C7D694CFE.1; 
- Mon, 02 Dec 2019 10:05:46 +0000
-Received: from EUR02-HE1-obe.outbound.protection.outlook.com
- by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 705f231e3107.1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
- Mon, 02 Dec 2019 10:05:46 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XlV3xwoV7L+wXv/rH3jucTz+kBTY5vWpAWQHEC6gbMOLNK5HsSx+mwohMvP+CZrVA4nC1Z2IG38rw3gHo3bNT4HddxEBafcIH1aN2GaJn7lIExAwQw+x59WoNUw5S0X8pe2G/k8KXgTlw2GrXewBFjzq8RaG1IWcmh4NcSTUpe5ikybbQWr8Qb27bCzV48WhBsjTk3bv/1gHqjAn9cR7dvVYoKHI6KVJEirgTUNswTSYxkZy4dz5fdHEti6K/Sljsy2Gx//1fPRFx6eZX02XGu3LnFwnjPRoFGJwMjONI9XHYtvg4bbg/oJWiDtWok4IsV8HGqHKiI7we0faGpzYtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WbpXiavto7WlF+PW20qrrUoF0nbKX5dh+9AB32r0UNU=;
- b=Lfh4PwXClU+CS1Yy+ZQDpDEuJAI08xzfKTdYG1jnACkC+IGgZkCbraQHNe6w1sy8Y9mCbajk5uhiDas5H8yRGL02978BtfYywLOhW961NWeFcYgGFOr689tXX3sFky2bfbdU77i1sxDq/quwcF7Tn8PdCjgai2V38gLjtyUHmx8Kn6Ru+f/ogywCHuRNte4WDay7A2fx4cUJI9d/nEKPz8nD79lKXfeHKhWZoRwZyGCfD1Je+S4ZDOFqYZcLtyVUxGFlDfhy1ZHZaOjJym5sNlMcYtxW1OSTxSNb7icHisgp+IS/uee7cKJdPL3fA95hjF0ahdZt/2Y6R8cjIxnlFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
- header.d=arm.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com; 
- s=selector2-armh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WbpXiavto7WlF+PW20qrrUoF0nbKX5dh+9AB32r0UNU=;
- b=s+oD/9cssuc/hfm2m/B6O3TBM7+rIP46mMD15PZzeWKYR5HmRTRucuOPgDQZbi7DD3hp48ywTR8YItfv+O4xOVm4NTafKJjqMgKyRZNGDA6sAYVU0xYC4uatS/5akjk2NxBJFfywxbpdxGlJJwbr0iMaSdEr6WhWQ2C02x36pxY=
-Received: from DB8PR08MB5004.eurprd08.prod.outlook.com (10.255.19.224) by
- DB8PR08MB4025.eurprd08.prod.outlook.com (20.179.10.90) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.18; Mon, 2 Dec 2019 10:05:44 +0000
-Received: from DB8PR08MB5004.eurprd08.prod.outlook.com
- ([fe80::ad17:d322:720e:3ac0]) by DB8PR08MB5004.eurprd08.prod.outlook.com
- ([fe80::ad17:d322:720e:3ac0%4]) with mapi id 15.20.2495.014; Mon, 2 Dec 2019
- 10:05:44 +0000
-From: Alan Hayward <Alan.Hayward@arm.com>
-To: =?utf-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Subject: Re: [PATCH v2 06/14] target/arm: use gdb_get_reg helpers
-Thread-Topic: [PATCH v2 06/14] target/arm: use gdb_get_reg helpers
-Thread-Index: AQHVqIKv65Q7cbxEuk+QAo74emkk/6emnxkA
-Date: Mon, 2 Dec 2019 10:05:44 +0000
-Message-ID: <42017B4E-E961-494C-A505-FCDA74EFB265@arm.com>
-References: <20191130084602.10818-1-alex.bennee@linaro.org>
- <20191130084602.10818-7-alex.bennee@linaro.org>
- <987465d3-3b13-e675-9622-c13e2d5205c2@redhat.com>
-In-Reply-To: <987465d3-3b13-e675-9622-c13e2d5205c2@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3601.0.10)
-Authentication-Results-Original: spf=none (sender IP is )
- smtp.mailfrom=Alan.Hayward@arm.com; 
-x-originating-ip: [213.86.15.71]
-x-ms-publictraffictype: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 1759ba6b-3b06-4151-e4db-08d7770f37fe
-X-MS-TrafficTypeDiagnostic: DB8PR08MB4025:|DB8PR08MB5017:
-X-Microsoft-Antispam-PRVS: <DB8PR08MB50179DE7AA397F7EC765BC4D97430@DB8PR08MB5017.eurprd08.prod.outlook.com>
-x-checkrecipientrouted: true
-x-ms-oob-tlc-oobclassifiers: OLM:5516;OLM:5516;
-x-forefront-prvs: 0239D46DB6
-X-Forefront-Antispam-Report-Untrusted: SFV:NSPM;
- SFS:(10009020)(4636009)(366004)(346002)(376002)(39860400002)(136003)(396003)(199004)(189003)(14444005)(14454004)(66574012)(8936002)(256004)(6486002)(305945005)(33656002)(50226002)(7736002)(966005)(6916009)(6436002)(478600001)(25786009)(99286004)(3846002)(6116002)(6246003)(316002)(8676002)(71190400001)(6512007)(6306002)(54906003)(186003)(5660300002)(66066001)(4326008)(2906002)(66946007)(229853002)(66446008)(71200400001)(66556008)(64756008)(2616005)(26005)(91956017)(76116006)(11346002)(446003)(76176011)(102836004)(66476007)(36756003)(6506007)(55236004)(53546011)(86362001)(81166006)(81156014);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DB8PR08MB4025;
- H:DB8PR08MB5004.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: arm.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: wgYeFrYpxdOMj6rmPMWBMWKJLV/xf4HhpD/XMWPuxWywW04YYbVB6L3dwELW7LMTK+TaIqTw5xXdxIyO5rnmvQx5WWkL0zodGmjz0Rst7Gh+Ch9NWhLoow7oxEeeDzEJkyeV/yhGgUqwxLb3n4esF6Ff8jrE3xn39Eyzce+eK6qQQJRPt7nb+vjl1kWcrMKztGc6SxLepewnuNfOTUZIAD8b6cBs4BID9xyiLoK4o/fEdrMeMntYKshhB6NFFrZrMhyt+CCVvRQH+QqxqP5No8+1y1JNMDyPoEfaMvtiOh6TFLb/R9b3Q5qpSSHbHQfTxiu0JPAPNZAAFpSM5Eqp8IGcOlRhHCa8X1DvkdGBsqBIHnpvbmJNi84fu7cA36Inn+mYWHXTDmYWyFzi3Unw4kxfQfLRrpU3FzG3sYLkBxxkgFMkoUztVKnD6liowkhGZoh2+JSl9SjvUy/R26EKXi70Bk9AoE16Mxybmh3jdbk=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8A5533DF681C394798C0330437CA4B49@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <peter.maydell@linaro.org>) id 1iblyY-0001Cz-85
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 08:42:55 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35601)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iblyY-0001CU-27
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 08:42:54 -0500
+Received: by mail-oi1-x243.google.com with SMTP id k196so16058585oib.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 05:42:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=VZX6lBHSz0FQNHjiAsYon2lwI6dwOqr/6nqKVc9ThqE=;
+ b=Yba2toiYPk6rL0kRll0oHDiISouSWrtXErfJ7yVUciQ6NEArLMRlsKfRm1zgbZHycC
+ dMlT+aUrvs68rXktUUmysGFUyRBKp/BNB3Vv7UOnwwc0L9IqTglNY82e1Ib9TuBEdP7J
+ +7I5pEHNdxIL/fAlBsn0KSIPFLPSy8cs4vGv4DaFMbvFtvpRStB9ff9wwBe3pQLE23S1
+ qdV6yRbbMqN3wM9gv5fLa4K7nXpfUA60Mn6vA3NJg37qpZHO5q/BFsrLWKfDmOc2SGPQ
+ 5bEHvHVm5td898ZQxxJQ41QYR9TdudC0Fr/D45lGrTdjSLBlBqpJB4DRyOXnnCp2n3Wq
+ GB2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=VZX6lBHSz0FQNHjiAsYon2lwI6dwOqr/6nqKVc9ThqE=;
+ b=ZbRkIGpg1q9UoBXuzPosfYQAk8TL1yVSyDYGziV32cMbZin65CyRc8CiLvUvZteLAF
+ Bhb7rm9tI+4IAW3R0NaBLOND+CjC2Q5as1Jcxy2g8WU5/qBYM5IkJIjZWgIdTMnEoh/F
+ +a/c4nutJAy+BQ4zrm/SUvkU18NJAZ7z9nwjJJCoDT7vsfWSCrktblJE2av/i2uO22+X
+ 9MO0l8z8JzXlEC7Dd7qhVrnc2ghFlt9ePz2BZN5C33yFAd6I5R+GbbYOyfwBbSCgrqLe
+ uswnsKJMoBCTS56jQ5jgNhc5ntqQ6Je8AB9PoK0v3vnTo9BwIJCOsZNmSDu7sJa+n1mm
+ 4M1g==
+X-Gm-Message-State: APjAAAUVcRK3/5GrOFdpVlzaFLuFCzDEIip2SJmei4DyvM8yh9VhN+i+
+ 5c925TtLSZG5rCkxyuW64c/EOJdLIW3T2SvjAioTdg==
+X-Google-Smtp-Source: APXvYqxgi7SIi4bUEgJdtAl4rpjWd+RBE3NW34UdDA6aCgrvYTyGLo7iA7lKp1GJC1KWQMxUb5mg6+UoGFG8E+doumo=
+X-Received: by 2002:aca:3182:: with SMTP id
+ x124mr13381262oix.170.1575294172927; 
+ Mon, 02 Dec 2019 05:42:52 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB4025
-Original-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Alan.Hayward@arm.com; 
-X-EOPAttributedMessage: 0
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: VE1EUR03FT034.eop-EUR03.prod.protection.outlook.com
-X-Forefront-Antispam-Report: CIP:63.35.35.123; IPV:CAL; SCL:-1; CTRY:IE;
- EFV:NLI; SFV:NSPM;
- SFS:(10009020)(4636009)(346002)(376002)(136003)(39860400002)(396003)(199004)(189003)(6862004)(2906002)(25786009)(70586007)(6116002)(86362001)(47776003)(70206006)(5660300002)(3846002)(50466002)(450100002)(7736002)(26005)(36756003)(186003)(4326008)(478600001)(6246003)(14454004)(356004)(966005)(305945005)(26826003)(33656002)(336012)(2616005)(229853002)(6512007)(6306002)(14444005)(36906005)(106002)(6486002)(99286004)(316002)(54906003)(11346002)(446003)(22756006)(81166006)(66574012)(102836004)(2486003)(6506007)(66066001)(76130400001)(8936002)(81156014)(8676002)(76176011)(53546011)(23676004)(50226002)(436003);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DB8PR08MB5017;
- H:64aa7808-outbound-1.mta.getcheckrecipient.com; FPR:; SPF:Pass; LANG:en;
- PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com; A:1; MX:1; 
-X-MS-Office365-Filtering-Correlation-Id-Prvs: f878f1cf-acd0-4e42-caf2-08d7770f3246
-NoDisclaimer: True
-X-Forefront-PRVS: 0239D46DB6
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: E5ex586ftKmNs09hIeV0oqAwomntLTZ6IXcNLfkU2XPQlzuVmO+sGcsU9/EHWx++2LP1Oh1oRxpCTcF/U2Ub6/WKGpGMcYl3dj6VpTCQwhOQXsZFfmfwgKbCL4s3OsjRTtMLUj/EBnfJ1zqQcZwZaQxVbspQ2kIfmkoVM+l/KfF/Q2pgzcXlcqR6lP8KvWyPobvwu4xpjiH20Xta+BVuSqFMXZWpFm6gI8DoyoPhbiYwbmh/2xQxJVZ3OOBt3pL5S3/eNL8/0hcXzu0BfiR887Lyvm664hylaaSc3zsc0iyacqVWAxG2sWEvXnZTKX3RBZ5fUw/KfxHQH9jYfxL9HUP0lxnVZSgOwCdZPXLq/wcDFm9C8Dedi+OlyeZCI199o5UiJs59tga6FezvQTnLcYXKz9Patug71K5JbjQqOAPjsfKCktxHWu8GkU99AWxJ1FzycN5pd1F2WfL97ZI/IKjnZKJGmXw1EYdQjtEPVD4=
-X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2019 10:05:54.2348 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1759ba6b-3b06-4151-e4db-08d7770f37fe
-X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d; Ip=[63.35.35.123];
- Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5017
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.6.83
-X-Mailman-Approved-At: Mon, 02 Dec 2019 08:36:39 -0500
+References: <20190904125531.27545-1-damien.hedde@greensocs.com>
+ <20190904125531.27545-2-damien.hedde@greensocs.com>
+In-Reply-To: <20190904125531.27545-2-damien.hedde@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Dec 2019 13:42:41 +0000
+Message-ID: <CAFEAcA99wzV9-dQ6oWxs7OPjxZ4vQWD_FXRLnBg7H-N1W2BMLA@mail.gmail.com>
+Subject: Re: [PATCH v6 1/9] hw/core/clock: introduce clock objects
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -180,49 +89,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "damien.hedde@greensocs.com" <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Luis Machado <luis.machado@linaro.org>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "open list:ARM
- TCG CPUs" <qemu-arm@nongnu.org>, nd <nd@arm.com>,
- =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gT24gMSBEZWMgMjAxOSwgYXQgMjA6MDUsIFBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIDxw
-aGlsbWRAcmVkaGF0LmNvbT4gd3JvdGU6DQo+IA0KPiBPbiAxMS8zMC8xOSA5OjQ1IEFNLCBBbGV4
-IEJlbm7DqWUgd3JvdGU6DQo+PiBUaGlzIGlzIGNsZWFuZXIgdGhhbiBwb2tpbmcgbWVtb3J5IGRp
-cmVjdGx5IGFuZCB3aWxsIG1ha2UgbGF0ZXINCj4+IGNsZWFuLXVwcyBlYXNpZXIuDQo+PiBTaWdu
-ZWQtb2ZmLWJ5OiBBbGV4IEJlbm7DqWUgPGFsZXguYmVubmVlQGxpbmFyby5vcmc+DQo+PiAtLS0N
-Cj4+IHYyDQo+PiAgIC0gbWFrZSBzdXJlIHdlIHBhc3MgaGkvbG8gY29ycmVjdGx5IGFzIHF1YWRz
-IGFyZSBzdG9yZWQgaW4gTEUgb3JkZXINCj4+IC0tLQ0KPj4gIHRhcmdldC9hcm0vaGVscGVyLmMg
-fCAxOCArKysrKysrLS0tLS0tLS0tLS0NCj4+ICAxIGZpbGUgY2hhbmdlZCwgNyBpbnNlcnRpb25z
-KCspLCAxMSBkZWxldGlvbnMoLSkNCj4+IGRpZmYgLS1naXQgYS90YXJnZXQvYXJtL2hlbHBlci5j
-IGIvdGFyZ2V0L2FybS9oZWxwZXIuYw0KPj4gaW5kZXggMGJmOGY1M2Q0YjguLjBhYzk1MGQ2Yzcx
-IDEwMDY0NA0KPj4gLS0tIGEvdGFyZ2V0L2FybS9oZWxwZXIuYw0KPj4gKysrIGIvdGFyZ2V0L2Fy
-bS9oZWxwZXIuYw0KPj4gQEAgLTEwNSwyMSArMTA1LDE3IEBAIHN0YXRpYyBpbnQgYWFyY2g2NF9m
-cHVfZ2RiX2dldF9yZWcoQ1BVQVJNU3RhdGUgKmVudiwgdWludDhfdCAqYnVmLCBpbnQgcmVnKQ0K
-Pj4gIHsNCj4+ICAgICAgc3dpdGNoIChyZWcpIHsNCj4+ICAgICAgY2FzZSAwIC4uLiAzMToNCj4+
-IC0gICAgICAgIC8qIDEyOCBiaXQgRlAgcmVnaXN0ZXIgKi8NCj4+IC0gICAgICAgIHsNCj4+IC0g
-ICAgICAgICAgICB1aW50NjRfdCAqcSA9IGFhNjRfdmZwX3FyZWcoZW52LCByZWcpOw0KPj4gLSAg
-ICAgICAgICAgIHN0cV9sZV9wKGJ1ZiwgcVswXSk7DQo+PiAtICAgICAgICAgICAgc3RxX2xlX3Ao
-YnVmICsgOCwgcVsxXSk7DQo+PiAtICAgICAgICAgICAgcmV0dXJuIDE2Ow0KPj4gLSAgICAgICAg
-fQ0KPj4gKyAgICB7DQo+PiArICAgICAgICAvKiAxMjggYml0IEZQIHJlZ2lzdGVyIC0gcXVhZHMg
-YXJlIGluIExFIG9yZGVyICovDQo+IA0KPiBPaCwgdGhpcyB3YXMgYWx3YXlzIHdyb25nIG9uIEJF
-IDooDQoNCkFtIEkgcmlnaHQgaW4gdGhpbmtpbmcgdGhpcyBwYXRjaCBjb3JyZWN0bHkgbWF0Y2hl
-cyB0aGUgU1ZFIEJFIGNoYW5nZXMgZnJvbSBKdW5lPw0KDQpTcGVjaWZpY2FsbHksIHRoaXMgcGF0
-Y2g6DQpodHRwOi8vbGlzdHMuaW5mcmFkZWFkLm9yZy9waXBlcm1haWwvbGludXgtYXJtLWtlcm5l
-bC8yMDE5LUp1bmUvNjU3ODI2Lmh0bWwNCg0KDQpBbGFuLg0KDQo+IA0KPiBSZXZpZXdlZC1ieTog
-UGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEByZWRoYXQuY29tPg0KPiANCj4+ICsgICAg
-ICAgIHVpbnQ2NF90ICpxID0gYWE2NF92ZnBfcXJlZyhlbnYsIHJlZyk7DQo+PiArICAgICAgICBy
-ZXR1cm4gZ2RiX2dldF9yZWcxMjgoYnVmLCBxWzFdLCBxWzBdKTsNCj4+ICsgICAgfQ0KPj4gICAg
-ICBjYXNlIDMyOg0KPj4gICAgICAgICAgLyogRlBTUiAqLw0KPj4gLSAgICAgICAgc3RsX3AoYnVm
-LCB2ZnBfZ2V0X2Zwc3IoZW52KSk7DQo+PiAtICAgICAgICByZXR1cm4gNDsNCj4+ICsgICAgICAg
-IHJldHVybiBnZGJfZ2V0X3JlZzMyKGJ1ZiwgdmZwX2dldF9mcHNyKGVudikpOw0KPj4gICAgICBj
-YXNlIDMzOg0KPj4gICAgICAgICAgLyogRlBDUiAqLw0KPj4gLSAgICAgICAgc3RsX3AoYnVmLCB2
-ZnBfZ2V0X2ZwY3IoZW52KSk7DQo+PiAtICAgICAgICByZXR1cm4gNDsNCj4+ICsgICAgICAgIHJl
-dHVybiBnZGJfZ2V0X3JlZzMyKGJ1Zix2ZnBfZ2V0X2ZwY3IoZW52KSk7DQo+PiAgICAgIGRlZmF1
-bHQ6DQo+PiAgICAgICAgICByZXR1cm4gMDsNCj4+ICAgICAgfQ0KDQo=
+On Wed, 4 Sep 2019 at 13:56, Damien Hedde <damien.hedde@greensocs.com> wrot=
+e:
+>
+> Introduce clock objects: ClockIn and ClockOut.
+>
+> These objects may be used to distribute clocks from an object to several
+> other objects. Each ClockIn object contains the current state of the
+> clock: the frequency; it allows an object to migrate its input clock stat=
+e
+> independently of other objects.
+>
+> A ClockIn may be connected to a ClockOut so that it receives update,
+
+"updates" (or "an update")
+
+> through a callback, whenever the Clockout is updated using the
+> ClockOut's set function.
+>
+> This is based on the original work of Frederic Konrad.
+>
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+>  Makefile.objs         |   1 +
+>  hw/core/Makefile.objs |   1 +
+>  hw/core/clock.c       | 144 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/core/trace-events  |   6 ++
+>  include/hw/clock.h    | 124 ++++++++++++++++++++++++++++++++++++
+>  5 files changed, 276 insertions(+)
+>  create mode 100644 hw/core/clock.c
+>  create mode 100644 include/hw/clock.h
+>
+> diff --git a/Makefile.objs b/Makefile.objs
+> index a723a47e14..4da623c759 100644
+> --- a/Makefile.objs
+> +++ b/Makefile.objs
+> @@ -153,6 +153,7 @@ trace-events-subdirs +=3D hw/audio
+>  trace-events-subdirs +=3D hw/block
+>  trace-events-subdirs +=3D hw/block/dataplane
+>  trace-events-subdirs +=3D hw/char
+> +trace-events-subdirs +=3D hw/core
+>  trace-events-subdirs +=3D hw/dma
+>  trace-events-subdirs +=3D hw/hppa
+>  trace-events-subdirs +=3D hw/i2c
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index 69b408ad1c..c66a5b2c6b 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -7,6 +7,7 @@ common-obj-$(CONFIG_SOFTMMU) +=3D fw-path-provider.o
+>  # irq.o needed for qdev GPIO handling:
+>  common-obj-y +=3D irq.o
+>  common-obj-y +=3D hotplug.o
+> +common-obj-y +=3D clock.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D nmi.o
+>  common-obj-$(CONFIG_SOFTMMU) +=3D vm-change-state-handler.o
+>
+> diff --git a/hw/core/clock.c b/hw/core/clock.c
+> new file mode 100644
+> index 0000000000..888f247f2a
+> --- /dev/null
+> +++ b/hw/core/clock.c
+> @@ -0,0 +1,144 @@
+> +/*
+> + * Clock inputs and outputs
+> + *
+> + * Copyright GreenSocs 2016-2018
+> + *
+> + * Authors:
+> + *  Frederic Konrad <fred.konrad@greensocs.com>
+> + *  Damien Hedde <damien.hedde@greensocs.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "hw/clock.h"
+> +#include "trace.h"
+> +
+> +#define CLOCK_PATH(_clk) (_clk->canonical_path)
+
+Don't use leading underscores in identifiers, please.
+
+> +
+> +void clock_out_setup_canonical_path(ClockOut *clk)
+> +{
+> +    g_free(clk->canonical_path);
+> +    clk->canonical_path =3D object_get_canonical_path(OBJECT(clk));
+> +}
+> +
+> +void clock_in_setup_canonical_path(ClockIn *clk)
+> +{
+> +    g_free(clk->canonical_path);
+> +    clk->canonical_path =3D object_get_canonical_path(OBJECT(clk));
+> +}
+> +
+> +void clock_set_callback(ClockIn *clk, ClockCallback *cb, void *opaque)
+> +{
+> +    assert(clk);
+> +
+> +    clk->callback =3D cb;
+> +    clk->callback_opaque =3D opaque;
+> +}
+> +
+> +void clock_init_frequency(ClockIn *clk, uint64_t freq)
+> +{
+> +    assert(clk);
+
+This sort of assert isn't necessary. Asserts are good
+when they help to make a bug visible sooner and more
+obviously -- when they avoid "something goes wrong
+much later on and further from the site of the actual
+error". In this case, if the assert was not present
+then the code would just segfault on the next line:
+
+> +
+> +    clk->frequency =3D freq;
+
+which is already a very easy bug to diagnose and
+where the offending caller will be in the backtrace.
+
+If the parameter isn't supposed to be NULL, and the
+method doesn't actually do anything that would
+dereference it, that might be a good candidate to
+assert on.
+
+The same kind of unnecessary assert is also in some of
+the other functions here (and probably in other patches).
+
+
+> diff --git a/hw/core/trace-events b/hw/core/trace-events
+> index ecf966c314..aa940e268b 100644
+> --- a/hw/core/trace-events
+> +++ b/hw/core/trace-events
+> @@ -34,3 +34,9 @@ resettable_phase_hold_end(void *obj, int needed) "obj=
+=3D%p needed=3D%d"
+>  resettable_phase_exit(void *obj, const char *type) "obj=3D%p(%s)"
+>  resettable_phase_exit_end(void *obj, uint32_t count) "obj=3D%p count=3D%=
+" PRIu32
+>  resettable_count_underflow(void *obj) "obj=3D%p"
+> +
+> +# hw/core/clock-port.c
+> +clock_connect(const char *clk, const char *driver) "'%s' drived-by '%s'"
+
+"driven-by"
+
+> +clock_disconnect(const char *clk) "'%s'"
+> +clock_set_frequency(const char *clk, uint64_t freq) "'%s' freq_hz=3D%" P=
+RIu64
+> +clock_propagate(const char *clko, const char *clki) "'%s' =3D> '%s'"
+> diff --git a/include/hw/clock.h b/include/hw/clock.h
+> new file mode 100644
+> index 0000000000..fd11202ba4
+> --- /dev/null
+> +++ b/include/hw/clock.h
+> @@ -0,0 +1,124 @@
+> +#ifndef QEMU_HW_CLOCK_H
+> +#define QEMU_HW_CLOCK_H
+
+All new files need a copyright-and-license comment header (could
+you check the rest of the patchset for this, please?).
+
+> +
+
+> +/**
+> + * clock_get_frequency:
+> + * @clk: the clk to fetch the clock
+> + *
+> + * @return: the current frequency of @clk in Hz. If @clk is NULL, return=
+ 0.
+> + */
+> +static inline uint64_t clock_get_frequency(const ClockIn *clk)
+> +{
+> +    return clk ? clk->frequency : 0;
+> +}
+
+Is there a use case where we want to support "pass in NULL"
+rather than just making it a programming error for the caller
+to try that ?
+
+> +
+> +/**
+> + * clock_is_enabled:
+> + * @clk: a clock state
+> + *
+> + * @return: true if the clock is running. If @clk is NULL return false.
+> + */
+> +static inline bool clock_is_enabled(const ClockIn *clk)
+> +{
+> +    return clock_get_frequency(clk) !=3D 0;
+> +}
+
+Ditto here.
+
+thanks
+-- PMM
 
