@@ -2,63 +2,129 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EEA3C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A7EC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:35:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04E32215E5
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:24:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04E32215E5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 80619215E5
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:35:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YxCWt5is"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80619215E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60391 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibh0Y-0007B2-6F
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 03:24:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43820)
+	id 1ibhB2-0002O2-K1
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 03:35:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ibgzl-0006PM-Rx
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:23:51 -0500
+ (envelope-from <david@redhat.com>) id 1ibhAB-0001YT-H2
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:34:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ibgzj-0004FB-OS
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:23:49 -0500
-Received: from 2.mo7.mail-out.ovh.net ([87.98.143.68]:40709)
+ (envelope-from <david@redhat.com>) id 1ibhA8-0000DW-4n
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:34:33 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23427
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ibgzj-0004EO-H4
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:23:47 -0500
-Received: from player730.ha.ovh.net (unknown [10.109.143.246])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id EEDB51418EB
- for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 09:23:44 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player730.ha.ovh.net (Postfix) with ESMTPSA id CC369CA34049;
- Mon,  2 Dec 2019 08:23:36 +0000 (UTC)
-Date: Mon, 2 Dec 2019 09:23:35 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [for-5.0 3/4] spapr: Fold h_cas_compose_response() into
- h_client_architecture_support()
-Message-ID: <20191202092335.5f474f06@bahia.w3ibm.bluemix.net>
-In-Reply-To: <20191129053356.232413-4-david@gibson.dropbear.id.au>
-References: <20191129053356.232413-1-david@gibson.dropbear.id.au>
- <20191129053356.232413-4-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1ibhA7-0000Cj-OE
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:34:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575275670;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=bKxobMFRPTtoBOEkQIUWmCVhYal3HDWGlkCgvYaoHLE=;
+ b=YxCWt5is4Vpan6qeDz1tZw59LccBbIEI1CeOLwIzSk3gwMbNnAgLkJdUkKsdoi4rnijNZg
+ ysTs9D+/ZO26WJRAnQLZtpiqlxtyGBo9u2iu/5kV8qP1OUbjleBzcAZj3Lx9Ii9bYJ4kvL
+ uwCqiNga8hOu+qhS92wMX/jzV2HNmJQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-354-8NTIDi4hNyiU0DYjnki3Qw-1; Mon, 02 Dec 2019 03:34:26 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D898018A8C82;
+ Mon,  2 Dec 2019 08:34:25 +0000 (UTC)
+Received: from [10.36.117.49] (ovpn-117-49.ams2.redhat.com [10.36.117.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 82FAF60BF7;
+ Mon,  2 Dec 2019 08:34:24 +0000 (UTC)
+Subject: Re: [PATCH 17/21] s390x: Fix latent query-cpu-model-FOO error
+ handling bugs
+To: Markus Armbruster <armbru@redhat.com>
+References: <20191130194240.10517-18-armbru@redhat.com>
+ <9C97FEE6-D390-4CEB-9B00-50AE00AEA4D2@redhat.com>
+ <CAL1e-=jst9hGBXy0zm-975QDvW0F0xBNJAypqM4KooWEUvJfjQ@mail.gmail.com>
+ <d9eb5b70-8396-7537-aac5-24c4d872d553@redhat.com>
+ <87sgm3nww5.fsf@dusky.pond.sub.org>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <631941d9-0e30-330b-e50e-4c9d99824e73@redhat.com>
+Date: Mon, 2 Dec 2019 09:34:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 14560137595893815782
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudejgedguddvudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfedtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+In-Reply-To: <87sgm3nww5.fsf@dusky.pond.sub.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 8NTIDi4hNyiU0DYjnki3Qw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.143.68
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,240 +136,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- clg@kaod.org, mdroth@linux.vnet.ibm.com
+Cc: Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <dhildenb@redhat.com>,
+ "vsementsov@virtuozzo.com" <vsementsov@virtuozzo.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 29 Nov 2019 16:33:55 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+[...]
 
-> spapr_h_cas_compose_response() handles the last piece of the PAPR feature
-> negotiation process invoked via the ibm,client-architecture-support OF
-> call.  Its only caller is h_client_architecture_support() which handles
-> most of the rest of that process.
-> 
-> I believe it was place in a separate file originally to handle some fiddly
+> First search hit.  Here's my second one:
+>=20
+>     Q: What are latent bugs?
+>=20
+>     A: These bugs do not cause problems today. However, they are lurking
+>     just waiting to reveal themselves later.  The Ariane 5 rocket
+>     failure was caused by a float->int conversion error that lay dormant
+>     when previous rockets were slower; but the faster Ariane 5 triggered
+>     the problem.  The Millennium bug is another example of a latent bug
+>     that came to light when circumstances changed.  Latent bugs are much
+>     harder to test using conventional testing techniques, and finding
+>     them requires someone with foresight to ask.
+>=20
+> http://www.geekinterview.com/question_details/36689
 
-it was placed
+Google search "latent software BUG"
 
-> dependencies between functions, but mostly it's just confusing to have
-> the CAS process split into two pieces like this.  Now that compose response
-> is simplified (by just generating the whole device tree anew), it's cleaner
-> to just fold it into h_client_architecture_support().
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
+Hit 1: What I posted
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
 
->  hw/ppc/spapr.c         | 61 +-----------------------------------------
->  hw/ppc/spapr_hcall.c   | 55 ++++++++++++++++++++++++++++++++++---
->  include/hw/ppc/spapr.h |  4 +--
->  3 files changed, 54 insertions(+), 66 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d34e317f48..5187f5b0a5 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -76,7 +76,6 @@
->  #include "hw/nmi.h"
->  #include "hw/intc/intc.h"
->  
-> -#include "qemu/cutils.h"
->  #include "hw/ppc/spapr_cpu_core.h"
->  #include "hw/mem/memory-device.h"
->  #include "hw/ppc/spapr_tpm_proxy.h"
-> @@ -897,63 +896,6 @@ out:
->      return ret;
->  }
->  
-> -static bool spapr_hotplugged_dev_before_cas(void)
-> -{
-> -    Object *drc_container, *obj;
-> -    ObjectProperty *prop;
-> -    ObjectPropertyIterator iter;
-> -
-> -    drc_container = container_get(object_get_root(), "/dr-connector");
-> -    object_property_iter_init(&iter, drc_container);
-> -    while ((prop = object_property_iter_next(&iter))) {
-> -        if (!strstart(prop->type, "link<", NULL)) {
-> -            continue;
-> -        }
-> -        obj = object_property_get_link(drc_container, prop->name, NULL);
-> -        if (spapr_drc_needed(obj)) {
-> -            return true;
-> -        }
-> -    }
-> -    return false;
-> -}
-> -
-> -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
-> -                             size_t space);
-> -
-> -int spapr_h_cas_compose_response(SpaprMachineState *spapr,
-> -                                 target_ulong addr, target_ulong size,
-> -                                 SpaprOptionVector *ov5_updates)
-> -{
-> -    void *fdt;
-> -    SpaprDeviceTreeUpdateHeader hdr = { .version_id = 1 };
-> -
-> -    if (spapr_hotplugged_dev_before_cas()) {
-> -        return 1;
-> -    }
-> -
-> -    if (size < sizeof(hdr)) {
-> -        error_report("SLOF provided insufficient CAS buffer "
-> -                     TARGET_FMT_lu " (min: %zu)", size, sizeof(hdr));
-> -        exit(EXIT_FAILURE);
-> -    }
-> -
-> -    size -= sizeof(hdr);
-> -
-> -    fdt = spapr_build_fdt(spapr, false, size);
-> -    _FDT((fdt_pack(fdt)));
-> -
-> -    cpu_physical_memory_write(addr, &hdr, sizeof(hdr));
-> -    cpu_physical_memory_write(addr + sizeof(hdr), fdt, fdt_totalsize(fdt));
-> -    trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
-> -
-> -    g_free(spapr->fdt_blob);
-> -    spapr->fdt_size = fdt_totalsize(fdt);
-> -    spapr->fdt_initial_size = spapr->fdt_size;
-> -    spapr->fdt_blob = fdt;
-> -
-> -    return 0;
-> -}
-> -
->  static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
->  {
->      MachineState *ms = MACHINE(spapr);
-> @@ -1191,8 +1133,7 @@ static void spapr_dt_hypervisor(SpaprMachineState *spapr, void *fdt)
->      }
->  }
->  
-> -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
-> -                             size_t space)
-> +void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t space)
->  {
->      MachineState *machine = MACHINE(spapr);
->      MachineClass *mc = MACHINE_GET_CLASS(machine);
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 05a7ca275b..0f19be794c 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1,4 +1,5 @@
->  #include "qemu/osdep.h"
-> +#include "qemu/cutils.h"
->  #include "qapi/error.h"
->  #include "sysemu/hw_accel.h"
->  #include "sysemu/runstate.h"
-> @@ -15,6 +16,7 @@
->  #include "cpu-models.h"
->  #include "trace.h"
->  #include "kvm_ppc.h"
-> +#include "hw/ppc/fdt.h"
->  #include "hw/ppc/spapr_ovec.h"
->  #include "mmu-book3s-v3.h"
->  #include "hw/mem/memory-device.h"
-> @@ -1638,6 +1640,26 @@ static uint32_t cas_check_pvr(SpaprMachineState *spapr, PowerPCCPU *cpu,
->      return best_compat;
->  }
->  
-> +static bool spapr_hotplugged_dev_before_cas(void)
-> +{
-> +    Object *drc_container, *obj;
-> +    ObjectProperty *prop;
-> +    ObjectPropertyIterator iter;
-> +
-> +    drc_container = container_get(object_get_root(), "/dr-connector");
-> +    object_property_iter_init(&iter, drc_container);
-> +    while ((prop = object_property_iter_next(&iter))) {
-> +        if (!strstart(prop->type, "link<", NULL)) {
-> +            continue;
-> +        }
-> +        obj = object_property_get_link(drc_container, prop->name, NULL);
-> +        if (spapr_drc_needed(obj)) {
-> +            return true;
-> +        }
-> +    }
-> +    return false;
-> +}
-> +
->  static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->                                                    SpaprMachineState *spapr,
->                                                    target_ulong opcode,
-> @@ -1645,6 +1667,8 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->  {
->      /* Working address in data buffer */
->      target_ulong addr = ppc64_phys_to_real(args[0]);
-> +    target_ulong fdt_buf = args[1];
-> +    target_ulong fdt_bufsize = args[2];
->      target_ulong ov_table;
->      uint32_t cas_pvr;
->      SpaprOptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-> @@ -1788,16 +1812,41 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
->  
->      spapr_irq_update_active_intc(spapr);
->  
-> +    if (spapr_hotplugged_dev_before_cas()) {
-> +        spapr->cas_reboot = true;
-> +    }
-> +
->      if (!spapr->cas_reboot) {
-> +        void *fdt;
-> +        SpaprDeviceTreeUpdateHeader hdr = { .version_id = 1 };
-> +
->          /* If spapr_machine_reset() did not set up a HPT but one is necessary
->           * (because the guest isn't going to use radix) then set it up here. */
->          if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
->              /* legacy hash or new hash: */
->              spapr_setup_hpt_and_vrma(spapr);
->          }
-> -        spapr->cas_reboot =
-> -            (spapr_h_cas_compose_response(spapr, args[1], args[2],
-> -                                          ov5_updates) != 0);
-> +
-> +        if (fdt_bufsize < sizeof(hdr)) {
-> +            error_report("SLOF provided insufficient CAS buffer "
-> +                         TARGET_FMT_lu " (min: %zu)", fdt_bufsize, sizeof(hdr));
-> +            exit(EXIT_FAILURE);
-> +        }
-> +
-> +        fdt_bufsize -= sizeof(hdr);
-> +
-> +        fdt = spapr_build_fdt(spapr, false, fdt_bufsize);
-> +        _FDT((fdt_pack(fdt)));
-> +
-> +        cpu_physical_memory_write(fdt_buf, &hdr, sizeof(hdr));
-> +        cpu_physical_memory_write(fdt_buf + sizeof(hdr), fdt,
-> +                                  fdt_totalsize(fdt));
-> +        trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
-> +
-> +        g_free(spapr->fdt_blob);
-> +        spapr->fdt_size = fdt_totalsize(fdt);
-> +        spapr->fdt_initial_size = spapr->fdt_size;
-> +        spapr->fdt_blob = fdt;
->      }
->  
->      spapr_ovec_cleanup(ov5_updates);
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index d5ab5ea7b2..61f005c6f6 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -766,11 +766,9 @@ struct SpaprEventLogEntry {
->      QTAILQ_ENTRY(SpaprEventLogEntry) next;
->  };
->  
-> +void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t space);
->  void spapr_events_init(SpaprMachineState *sm);
->  void spapr_dt_events(SpaprMachineState *sm, void *fdt);
-> -int spapr_h_cas_compose_response(SpaprMachineState *sm,
-> -                                 target_ulong addr, target_ulong size,
-> -                                 SpaprOptionVector *ov5_updates);
->  void close_htab_fd(SpaprMachineState *spapr);
->  void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr);
->  void spapr_free_hpt(SpaprMachineState *spapr);
+Hit 2:
+https://www.quora.com/What-are-some-examples-for-a-latent-defect-in-softwar=
+e-testing
+
+"The problems will not cause the damage currently, but wait to reveal
+themselves at a later time. ... E.g. February has 28 days. ... These
+defects do not cause damage to the system immediately but wait for a
+particular event sometime to cause damage and show their presence."
+
+"Mostly, these types of bugs are unexpected outcome of any corner/edge
+case scenarios which was executed with some specific set of test data."
+
+
+Hit 3: https://sqa.stackexchange.com/questions/9170/what-is-a-latent-bug
+
+"Latent bugs are bugs which exist, but have not yet been discovered.
+
+They are bugs waiting to be found."
+
+"In Software Quality Assurance:
+
+Latent defects are the those which arises in the field, and unknown
+until they reported by the field staff."
+
+
+Hit 4:
+https://sqa.stackexchange.com/questions/13980/what-is-the-difference-betwee=
+n-gold-bug-and-latent-bug
+
+"A latent bug is a bug which is present in the system from previous
+iterations or release (in your scenario Sprint 1). They are either low
+priority bugs, which either went undetected or were not reported."
+
+
+Same at least for Hit 5, 6, 7 (then I got tired ;) )
+
+https://blog.qatestlab.com/2011/10/21/latent-and-masked-software-bugs-what-=
+is-the-difference/
+https://www.testing-whiz.com/blog/3-types-of-unusual-software-defects-you-s=
+hould-not-miss
+https://www.360logica.com/blog/latent-defect-hide-n-seek-defect-software-te=
+sting/
+
+Which contain perfect examples and descriptions for latent bugs :)
+
+e.g.,
+
+"Let=E2=80=99s imagine that an application is able to print a document eith=
+er by
+laser printer or by dot matrix printer. To reach this, the application
+first searches for the laser printer. In this case if it finds a laser
+printer (used by default) it uses this one and prints. In case if it
+does not find a laser printer, the application searches for dot matrix
+printer. And if the application finds a dot matrix printer, it  gives an
+error message. This unleashes a latent defect. Therefore this
+application will never search for the dot matrix printer. And the
+application never got tested for the dot matrix printer. That means the
+accurate conditions were never met for the dot matrix printer. This is
+what we call a latent software bug."
+
+[...]
+
+>=20
+>>> In that light, this change is not a clean up. It is a fix of a latent
+>>> bugs, and Markus' aproach to treat it as a bug fix looks right to me. I
+>>> would just add a word "latent" or similar, which would even more
+>>> distance the patch from "cleanup" meaning.
+>>
+>> I agree iff there is some way to trigger it. Otherwise, to me it is a
+>> cleanup.If it's a BUG, it deserves proper Fixes tags and some
+>> description how it can be triggered.
+>=20
+> Yes, a bug that can bite deserves a reproducer and a formal Fixes: tag.
+
+A "BUG that cannot be triggered" is an oxymoron. :)
+
+The code might be "error prone", it might "violate API guidelines", it
+might "not obey coding practices". If it can't be triggered, it's - by
+definition - not a (latent) BUG.
+
+>=20
+> The thing we're discussing (however we may want to call it) does not
+> have a reproducer, and I think we're in agreement that it doesn't need a
+> Fixes: tag.
+>=20
+> However, my patch is not cleaning up something that's dirty, it's fixing
+> something that's unequivocally wrong: a violation of a stated interface
+> contract.
+
+In general, I don't care about these minor details, but if somebody
+literally tells the world for all eternity in a handful of patch
+descriptions "David messed up the code by introducing a (latent) BUG
+(that cannot be triggered)" I get suspicious. Something nicer (IMHO)
+would be "Commit X introduced error prone code, let's rework that to
+make it more stable in the future and obey the "error API" guidelines. I
+hope you see the difference ;)
+
+>=20
+> Your point that the commit message should not confuse people looking for
+> real bugs is well taken.  I think "latent bug" is clear enough, and also
+> concise.  I'm of course open to better phrasings.
+>=20
+>    s390x: Fix currently harmless query-cpu-model-FOO error API violations
+>=20
+> feels no clearer to me than
+>=20
+>    s390x: Fix latent query-cpu-model-FOO error handling bugs
+>=20
+> It's also too long.
+>=20
+> I tried.  Your turn :)
+
+
+s390x: Fix query-cpu-model-FOO error API violations
+
+s390x: Make query-cpu-model-FOO error handling less error prone
+
+s390x: Cleanup error handling in query-cpu-model-FOO
+
+s390x: Rework error handling in query-cpu-model-FOO
+
+...
+
+but, enough time spent on this, feel free to continue with this however
+you want.
+
+--=20
+Thanks,
+
+David / dhildenb
 
 
