@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8349C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC517C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:51:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71B90214AF
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:37:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7768721774
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 08:51:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="JcA5Rdu9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71B90214AF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="kl0Cjf5p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7768721774
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibhCa-0003nG-GH
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 03:37:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46989)
+	id 1ibhQW-0000Ku-Jt
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 03:51:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48999)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ibhBl-0003IQ-51
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:36:15 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ibhPB-0007Ia-TP
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:50:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ibhBj-00015u-8B
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:36:12 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:41851 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ibhP6-00008p-8k
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:50:05 -0500
+Received: from ozlabs.org ([203.11.71.1]:40539)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ibhBi-00011X-1j; Mon, 02 Dec 2019 03:36:11 -0500
+ id 1ibhP5-000070-9R; Mon, 02 Dec 2019 03:50:00 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47RJNk6SDbz9sPJ; Mon,  2 Dec 2019 19:36:06 +1100 (AEDT)
+ id 47RJhf1Rs4z9sPJ; Mon,  2 Dec 2019 19:49:53 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1575275766;
- bh=Ksi/zmdsykppnpkbUPvSkLwldt9ZBwwXXRbwXlWD9NM=;
+ d=gibson.dropbear.id.au; s=201602; t=1575276594;
+ bh=+BxqYyPKrJzPOeYJ40TpuMyQmzM71R2L8yeX5gZNzmA=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=JcA5Rdu9tjL4DTVX2ARax8sFsfp48ygGi6DVYa+vKDc7G1SlBqOb8D5KflBoM/CxU
- OLER+EygOHRC9Rw/NJy24tJR7PmIlAW5GCNQoOQPK7/yQ4n+K//xvBbPeK9btjXeRt
- V6NP3mVf1MKO9KxtCbEKNw2Szeue8TKMcTR94YcM=
-Date: Mon, 2 Dec 2019 18:59:43 +1100
+ b=kl0Cjf5pK/Ocks2SKHQDlWZ5PjOSUJoYoC51jRLiORTZEkeG7T+sb0/I7CsCubgeh
+ LzmLlCbOio1gE6kiXlsKUbIXuV63IpaH3PCLQ4WLtWvcErgI7VxjpRJp594mT4Pb6m
+ 2cVOf6DCsaltE4u3AdUpQ+DIp1yteOxVKHaqS9O8=
+Date: Mon, 2 Dec 2019 19:40:13 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Greg Kurz <groug@kaod.org>
-Subject: Re: [for-5.0 1/4] spapr: Don't trigger a CAS reboot for XICS/XIVE
- mode changeover
-Message-ID: <20191202075943.GB37909@umbus.fritz.box>
+Subject: Re: [for-5.0 3/4] spapr: Fold h_cas_compose_response() into
+ h_client_architecture_support()
+Message-ID: <20191202084013.GC37909@umbus.fritz.box>
 References: <20191129053356.232413-1-david@gibson.dropbear.id.au>
- <20191129053356.232413-2-david@gibson.dropbear.id.au>
- <20191202085009.44f3909f@bahia.w3ibm.bluemix.net>
+ <20191129053356.232413-4-david@gibson.dropbear.id.au>
+ <20191202092335.5f474f06@bahia.w3ibm.bluemix.net>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BwCQnh7xodEAoBMC"
+ protocol="application/pgp-signature"; boundary="ZwgA9U+XZDXt4+m+"
 Content-Disposition: inline
-In-Reply-To: <20191202085009.44f3909f@bahia.w3ibm.bluemix.net>
+In-Reply-To: <20191202092335.5f474f06@bahia.w3ibm.bluemix.net>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -80,123 +80,264 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---BwCQnh7xodEAoBMC
+--ZwgA9U+XZDXt4+m+
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 02, 2019 at 08:50:09AM +0100, Greg Kurz wrote:
-> On Fri, 29 Nov 2019 16:33:53 +1100
+On Mon, Dec 02, 2019 at 09:23:35AM +0100, Greg Kurz wrote:
+> On Fri, 29 Nov 2019 16:33:55 +1100
 > David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> > PAPR allows the interrupt controller used on a POWER9 machine (XICS or
-> > XIVE) to be selected by the guest operating system, by using the
-> > ibm,client-architecture-support (CAS) feature negotiation call.
+> > spapr_h_cas_compose_response() handles the last piece of the PAPR featu=
+re
+> > negotiation process invoked via the ibm,client-architecture-support OF
+> > call.  Its only caller is h_client_architecture_support() which handles
+> > most of the rest of that process.
 > >=20
-> > Currently, if the guest selects an interrupt controller different from =
-the
-> > one selected at initial boot, this causes the system to be reset with t=
-he
-> > new model and the boot starts again.  This means we run through the SLOF
-> > boot process twice, as well as any other bootloader (e.g. grub) in use
-> > before the OS calls CAS.  This can be confusing and/or inconvenient for
-> > users.
-> >=20
-> > Thanks to two fairly recent changes, we no longer need this reboot.  1)=
- we
-> > now completely regenerate the device tree when CAS is called (meaning we
-> > don't need special case updates for all the device tree changes caused =
-by
-> > the interrupt controller mode change),  2) we now have explicit code pa=
-ths
-> > to activate and deactivate the different interrupt controllers, rather =
-than
-> > just implicitly calling those at machine reset time.
-> >=20
-> > We can therefore eliminate the reboot for changing irq mode, simply by
-> > putting a called to spapr_irq_update_active_intc() before we call
+> > I believe it was place in a separate file originally to handle some fid=
+dly
 >=20
-> putting a call
+> it was placed
 
-Fixed, thanks.
+fixed, thanks.
 
-> > spapr_h_cas_compose_response() (which gives the updated device tree to =
-the
-> > guest firmware and OS).
+>=20
+> > dependencies between functions, but mostly it's just confusing to have
+> > the CAS process split into two pieces like this.  Now that compose resp=
+onse
+> > is simplified (by just generating the whole device tree anew), it's cle=
+aner
+> > to just fold it into h_client_architecture_support().
 > >=20
 > > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > > ---
 >=20
-> Convenient indeed ! :)
->=20
 > Reviewed-by: Greg Kurz <groug@kaod.org>
 >=20
-> >  hw/ppc/spapr_hcall.c | 33 +++++++++++++--------------------
-> >  1 file changed, 13 insertions(+), 20 deletions(-)
+> >  hw/ppc/spapr.c         | 61 +-----------------------------------------
+> >  hw/ppc/spapr_hcall.c   | 55 ++++++++++++++++++++++++++++++++++---
+> >  include/hw/ppc/spapr.h |  4 +--
+> >  3 files changed, 54 insertions(+), 66 deletions(-)
 > >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index d34e317f48..5187f5b0a5 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -76,7 +76,6 @@
+> >  #include "hw/nmi.h"
+> >  #include "hw/intc/intc.h"
+> > =20
+> > -#include "qemu/cutils.h"
+> >  #include "hw/ppc/spapr_cpu_core.h"
+> >  #include "hw/mem/memory-device.h"
+> >  #include "hw/ppc/spapr_tpm_proxy.h"
+> > @@ -897,63 +896,6 @@ out:
+> >      return ret;
+> >  }
+> > =20
+> > -static bool spapr_hotplugged_dev_before_cas(void)
+> > -{
+> > -    Object *drc_container, *obj;
+> > -    ObjectProperty *prop;
+> > -    ObjectPropertyIterator iter;
+> > -
+> > -    drc_container =3D container_get(object_get_root(), "/dr-connector"=
+);
+> > -    object_property_iter_init(&iter, drc_container);
+> > -    while ((prop =3D object_property_iter_next(&iter))) {
+> > -        if (!strstart(prop->type, "link<", NULL)) {
+> > -            continue;
+> > -        }
+> > -        obj =3D object_property_get_link(drc_container, prop->name, NU=
+LL);
+> > -        if (spapr_drc_needed(obj)) {
+> > -            return true;
+> > -        }
+> > -    }
+> > -    return false;
+> > -}
+> > -
+> > -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
+> > -                             size_t space);
+> > -
+> > -int spapr_h_cas_compose_response(SpaprMachineState *spapr,
+> > -                                 target_ulong addr, target_ulong size,
+> > -                                 SpaprOptionVector *ov5_updates)
+> > -{
+> > -    void *fdt;
+> > -    SpaprDeviceTreeUpdateHeader hdr =3D { .version_id =3D 1 };
+> > -
+> > -    if (spapr_hotplugged_dev_before_cas()) {
+> > -        return 1;
+> > -    }
+> > -
+> > -    if (size < sizeof(hdr)) {
+> > -        error_report("SLOF provided insufficient CAS buffer "
+> > -                     TARGET_FMT_lu " (min: %zu)", size, sizeof(hdr));
+> > -        exit(EXIT_FAILURE);
+> > -    }
+> > -
+> > -    size -=3D sizeof(hdr);
+> > -
+> > -    fdt =3D spapr_build_fdt(spapr, false, size);
+> > -    _FDT((fdt_pack(fdt)));
+> > -
+> > -    cpu_physical_memory_write(addr, &hdr, sizeof(hdr));
+> > -    cpu_physical_memory_write(addr + sizeof(hdr), fdt, fdt_totalsize(f=
+dt));
+> > -    trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
+> > -
+> > -    g_free(spapr->fdt_blob);
+> > -    spapr->fdt_size =3D fdt_totalsize(fdt);
+> > -    spapr->fdt_initial_size =3D spapr->fdt_size;
+> > -    spapr->fdt_blob =3D fdt;
+> > -
+> > -    return 0;
+> > -}
+> > -
+> >  static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+> >  {
+> >      MachineState *ms =3D MACHINE(spapr);
+> > @@ -1191,8 +1133,7 @@ static void spapr_dt_hypervisor(SpaprMachineState=
+ *spapr, void *fdt)
+> >      }
+> >  }
+> > =20
+> > -static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset,
+> > -                             size_t space)
+> > +void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t spa=
+ce)
+> >  {
+> >      MachineState *machine =3D MACHINE(spapr);
+> >      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
 > > diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> > index 140f05c1c6..05a7ca275b 100644
+> > index 05a7ca275b..0f19be794c 100644
 > > --- a/hw/ppc/spapr_hcall.c
 > > +++ b/hw/ppc/spapr_hcall.c
-> > @@ -1767,21 +1767,10 @@ static target_ulong h_client_architecture_suppo=
+> > @@ -1,4 +1,5 @@
+> >  #include "qemu/osdep.h"
+> > +#include "qemu/cutils.h"
+> >  #include "qapi/error.h"
+> >  #include "sysemu/hw_accel.h"
+> >  #include "sysemu/runstate.h"
+> > @@ -15,6 +16,7 @@
+> >  #include "cpu-models.h"
+> >  #include "trace.h"
+> >  #include "kvm_ppc.h"
+> > +#include "hw/ppc/fdt.h"
+> >  #include "hw/ppc/spapr_ovec.h"
+> >  #include "mmu-book3s-v3.h"
+> >  #include "hw/mem/memory-device.h"
+> > @@ -1638,6 +1640,26 @@ static uint32_t cas_check_pvr(SpaprMachineState =
+*spapr, PowerPCCPU *cpu,
+> >      return best_compat;
+> >  }
+> > =20
+> > +static bool spapr_hotplugged_dev_before_cas(void)
+> > +{
+> > +    Object *drc_container, *obj;
+> > +    ObjectProperty *prop;
+> > +    ObjectPropertyIterator iter;
+> > +
+> > +    drc_container =3D container_get(object_get_root(), "/dr-connector"=
+);
+> > +    object_property_iter_init(&iter, drc_container);
+> > +    while ((prop =3D object_property_iter_next(&iter))) {
+> > +        if (!strstart(prop->type, "link<", NULL)) {
+> > +            continue;
+> > +        }
+> > +        obj =3D object_property_get_link(drc_container, prop->name, NU=
+LL);
+> > +        if (spapr_drc_needed(obj)) {
+> > +            return true;
+> > +        }
+> > +    }
+> > +    return false;
+> > +}
+> > +
+> >  static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+> >                                                    SpaprMachineState *s=
+papr,
+> >                                                    target_ulong opcode,
+> > @@ -1645,6 +1667,8 @@ static target_ulong h_client_architecture_support=
+(PowerPCCPU *cpu,
+> >  {
+> >      /* Working address in data buffer */
+> >      target_ulong addr =3D ppc64_phys_to_real(args[0]);
+> > +    target_ulong fdt_buf =3D args[1];
+> > +    target_ulong fdt_bufsize =3D args[2];
+> >      target_ulong ov_table;
+> >      uint32_t cas_pvr;
+> >      SpaprOptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updat=
+es;
+> > @@ -1788,16 +1812,41 @@ static target_ulong h_client_architecture_suppo=
 rt(PowerPCCPU *cpu,
-> >      }
-> >      spapr->cas_pre_isa3_guest =3D !spapr_ovec_test(ov1_guest, OV1_PPC_=
-3_00);
-> >      spapr_ovec_cleanup(ov1_guest);
-> > -    if (!spapr->cas_reboot) {
-> > -        /* If spapr_machine_reset() did not set up a HPT but one is ne=
+> > =20
+> >      spapr_irq_update_active_intc(spapr);
+> > =20
+> > +    if (spapr_hotplugged_dev_before_cas()) {
+> > +        spapr->cas_reboot =3D true;
+> > +    }
+> > +
+> >      if (!spapr->cas_reboot) {
+> > +        void *fdt;
+> > +        SpaprDeviceTreeUpdateHeader hdr =3D { .version_id =3D 1 };
+> > +
+> >          /* If spapr_machine_reset() did not set up a HPT but one is ne=
 cessary
-> > -         * (because the guest isn't going to use radix) then set it up=
+> >           * (because the guest isn't going to use radix) then set it up=
  here. */
-> > -        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
-> > -            /* legacy hash or new hash: */
-> > -            spapr_setup_hpt_and_vrma(spapr);
-> > -        }
+> >          if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
+> >              /* legacy hash or new hash: */
+> >              spapr_setup_hpt_and_vrma(spapr);
+> >          }
 > > -        spapr->cas_reboot =3D
 > > -            (spapr_h_cas_compose_response(spapr, args[1], args[2],
 > > -                                          ov5_updates) !=3D 0);
-> > -    }
-> > =20
-> >      /*
-> > -     * Ensure the guest asks for an interrupt mode we support; otherwi=
-se
-> > -     * terminate the boot.
-> > +     * Ensure the guest asks for an interrupt mode we support;
-> > +     * otherwise terminate the boot.
-> >       */
-> >      if (guest_xive) {
-> >          if (!spapr->irq->xive) {
-> > @@ -1797,14 +1786,18 @@ static target_ulong h_client_architecture_suppo=
-rt(PowerPCCPU *cpu,
-> >          }
-> >      }
-> > =20
-> > -    /*
-> > -     * Generate a machine reset when we have an update of the
-> > -     * interrupt mode. Only required when the machine supports both
-> > -     * modes.
-> > -     */
-> > +    spapr_irq_update_active_intc(spapr);
 > > +
-> >      if (!spapr->cas_reboot) {
-> > -        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_EX=
-PLOIT)
-> > -            && spapr->irq->xics && spapr->irq->xive;
-> > +        /* If spapr_machine_reset() did not set up a HPT but one is ne=
-cessary
-> > +         * (because the guest isn't going to use radix) then set it up=
- here. */
-> > +        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
-> > +            /* legacy hash or new hash: */
-> > +            spapr_setup_hpt_and_vrma(spapr);
+> > +        if (fdt_bufsize < sizeof(hdr)) {
+> > +            error_report("SLOF provided insufficient CAS buffer "
+> > +                         TARGET_FMT_lu " (min: %zu)", fdt_bufsize, siz=
+eof(hdr));
+> > +            exit(EXIT_FAILURE);
 > > +        }
-> > +        spapr->cas_reboot =3D
-> > +            (spapr_h_cas_compose_response(spapr, args[1], args[2],
-> > +                                          ov5_updates) !=3D 0);
+> > +
+> > +        fdt_bufsize -=3D sizeof(hdr);
+> > +
+> > +        fdt =3D spapr_build_fdt(spapr, false, fdt_bufsize);
+> > +        _FDT((fdt_pack(fdt)));
+> > +
+> > +        cpu_physical_memory_write(fdt_buf, &hdr, sizeof(hdr));
+> > +        cpu_physical_memory_write(fdt_buf + sizeof(hdr), fdt,
+> > +                                  fdt_totalsize(fdt));
+> > +        trace_spapr_cas_continue(fdt_totalsize(fdt) + sizeof(hdr));
+> > +
+> > +        g_free(spapr->fdt_blob);
+> > +        spapr->fdt_size =3D fdt_totalsize(fdt);
+> > +        spapr->fdt_initial_size =3D spapr->fdt_size;
+> > +        spapr->fdt_blob =3D fdt;
 > >      }
 > > =20
 > >      spapr_ovec_cleanup(ov5_updates);
+> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> > index d5ab5ea7b2..61f005c6f6 100644
+> > --- a/include/hw/ppc/spapr.h
+> > +++ b/include/hw/ppc/spapr.h
+> > @@ -766,11 +766,9 @@ struct SpaprEventLogEntry {
+> >      QTAILQ_ENTRY(SpaprEventLogEntry) next;
+> >  };
+> > =20
+> > +void *spapr_build_fdt(SpaprMachineState *spapr, bool reset, size_t spa=
+ce);
+> >  void spapr_events_init(SpaprMachineState *sm);
+> >  void spapr_dt_events(SpaprMachineState *sm, void *fdt);
+> > -int spapr_h_cas_compose_response(SpaprMachineState *sm,
+> > -                                 target_ulong addr, target_ulong size,
+> > -                                 SpaprOptionVector *ov5_updates);
+> >  void close_htab_fd(SpaprMachineState *spapr);
+> >  void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr);
+> >  void spapr_free_hpt(SpaprMachineState *spapr);
 >=20
 
 --=20
@@ -205,25 +346,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---BwCQnh7xodEAoBMC
+--ZwgA9U+XZDXt4+m+
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3kxGwACgkQbDjKyiDZ
-s5J4Ug//TJ18tfHhi1QomHXuOzx+krhRCJ3v4+ay+34I8TKMOMfMW2Pp+114UBll
-lGWQ9FIdWweWpSCSTSH5OrLWuke7XxkcG4VNleHLbFuYgygi+ILE9aXdGVXimzWb
-Q7C6OQh6LieTEE8i2KYWhvpu0L0SqLVwI+3vOCnscEA1CiHpByS4bU+zhx0oZRBQ
-kUZuRMQtTJU1Cu3tN4qZVosTtJJvwCE8cpCCIpADMikH3AuWoVskp0/Y03+BhfXZ
-oXCK0XAAiWokM7bvrD/fNXhP2OcZY/O5ImVWdOIcG5nvvoh61QIHKtG24cjOsdO3
-xh+v+ye5DR5klBOPbijguHxHS755QafFdhTNOpbktJXAGrKu0FQc6KuhIVAnZ8ek
-cgZ31Qpzg/VebC4pAY6twwR55tscIfZ45Vsua0ZpiH/bJUxV4I+eYWGHjk4kIs3a
-XzPIyc6HtZhwPs4iNOS+KcIJzG0yAgGAAoWVsCtWk6//RHj9sNjn45B9gB91xqVC
-vjtLz2CzdxvW2d3u1YJCK7idygEBr2EEfhKQiL5Xu4nnc2wRW1wnWiBMS6jcd9nk
-1lfeGB48K+jsSI38XwrVdkXuPe2z9BLodn6mlTYceYkewbOROljWMKzzJ6PuIYTO
-mXx5JMoMTgg5a3+Om+vq1FEoDAPLUrRnl20AmY94u74f6q6+FVI=
-=z8ZF
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3kzesACgkQbDjKyiDZ
+s5LIIxAAvRAOrKKFOOcpFXXkrmaeGkzbluLbXr/POqLgREIR9HCx0FZAjZj3NEHR
+88TnErjcSUQy6IWSPoM5VKgbbCw9Iv1pkuTGifOY6XEXFPJCx4pmvjSgHxBbir7S
+6r05ewui5J90W6XRODEgUAHuczKDOii+wMxfX/XvQ+49IWwKKpH4+yIAGwS7tHUS
+8caGE2acvWVMub2ycFZRhZDBKVFv9jBGpzi3bnhyzspMufPsmc0gjRNFd/UJL2dj
+mLAiinYRXNXUpyeWYhFF4EDvhM+PKODt7t+G7Hc8qzAAGwP0ktfzmzokg6/+qatN
+9tvWUThGPICZQRfuarb+Tr/svxd26uEMkiZH8H6+XtteiM2TvRsuCcI6R3glAn/w
+Hk5g7RuyJ+6HssG55crGHey17hjOPvpMPFqvDhDeA4J1F+uxRQ9xH/+M5W8vzDEZ
+Yw2vPVcAQfjXrl9GEDe6SNCFojVs/yL9sLa9WP2iPT543BIDSp5PMICfDcRZfsGy
+bgc+ZkGhAUa5424YrRN0O03n9YzJhzM7VOfwZfl0cE7n3VFtxZfb9DRgj6zJU5aH
+yFQZ4xMhjsqfp2/Qcvy3izr/BbKUT5WnM2Edzjcu1BHw8nHkn1gL6uEA8B/hMBMn
+NK0NMvMs9wqv8TV0cjqddX/gpt0Dm9TR0peTrnBepQrD3vRn+us=
+=h5De
 -----END PGP SIGNATURE-----
 
---BwCQnh7xodEAoBMC--
+--ZwgA9U+XZDXt4+m+--
 
