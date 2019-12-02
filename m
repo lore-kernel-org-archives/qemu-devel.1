@@ -2,79 +2,87 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D0B8C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F20F4C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:28:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B1372073C
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:25:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7ABC2073C
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 15:28:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r9S8ttlO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B1372073C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="jyCgI2KQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7ABC2073C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibnaF-00059I-Gm
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 10:25:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45852)
+	id 1ibncx-0006R4-HE
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 10:28:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45913)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ibnZA-0004RW-Tg
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:24:49 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1ibnZn-0004oB-MF
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:25:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ibnZ8-0000wF-U1
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:24:48 -0500
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:35502)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ibnZ8-0000vK-Pz
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:24:46 -0500
-Received: by mail-io1-xd43.google.com with SMTP id v18so9972491iol.2
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 07:24:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QJOBjADfA+ccFaGnSH39XSvCu6Wstd7Jkr8Gx+Uryd8=;
- b=r9S8ttlOFu9FrNkNhafD22Ym2jqdHI7GqFoRxy0httgyf4nbuWCsksV0WtiKhZIjYx
- lB0mvqEv45ErC5LUI8zxMIEoyUtlQVXsnHmM4ZzkvnWjxefcvBshyWgNeK/B0z6FLbac
- fwtuAFo0TzHl81W54r+NjN/0G/2eLYMRxNZUDwqPGwnIBuP+TNxJXHEcA06kmXPBuvqJ
- P72NT+mFSDwBRctmy0+ZxYWSf76qdaNyOEGvFNXxMyiWz69iNpBXcnmqjbT2jp8AiplM
- 8fLaaWCqpbsl5u8ELyCVzGOfTdbPopLw/SnVnezQ5CVd1gqMzqbs7VxcXqD1RwFbvI/U
- nvyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QJOBjADfA+ccFaGnSH39XSvCu6Wstd7Jkr8Gx+Uryd8=;
- b=d0kv8qcwEGeCiwHr1SPPnCrpMzcr6Uoaz4rL7SVr5i9B62WiDoWkB3zptsumfwgll7
- LrK/kx+aGwczpgXZbzDOZbuzceCiN+UchkNhsX5Pl2Dca8/0FTyrJW/UqN869SFANLV+
- U1Q4mcBU0ALylWklGFGEVjmdHBCJ3hQJVPGIMfmNf+ADXnFEGLghIHbBmXsDqO8i62ki
- NCurpVbwM1iDUE2xdjMzpPqoaiLt7Oxxxsz9+KTOdBxaBmkclskaQBNrPf3SPIeRUsuu
- RRJDBEESMfp74g1Q4hqsaJD5JQkXWQXPQ9JD+nv93gbOB1k50aH5in+I6rBGbO5nRbhG
- lZeQ==
-X-Gm-Message-State: APjAAAVj1FEJ/FNIGfgo5+sxThRHiABO9rkCGxlMYWRgjLgjkCwXquRk
- DSyK5e+U/hf9ooL3R9AbD1Gts4nmNV6thRxYDuRFjA==
-X-Google-Smtp-Source: APXvYqzkuUkVr8fRB9we+E4pd5c/vS8aPDdLSHH0NksGaOdrLAMCkQ+geUqDgwt4zpyCP7oQdybke/iulnioqciO3wA=
-X-Received: by 2002:a5e:920a:: with SMTP id y10mr12339198iop.292.1575300285908; 
- Mon, 02 Dec 2019 07:24:45 -0800 (PST)
+ (envelope-from <damien.hedde@greensocs.com>) id 1ibnZm-0001DN-C5
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:25:27 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:58282)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1ibnZl-0001CW-Sj
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 10:25:26 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 7F6F896EF0;
+ Mon,  2 Dec 2019 15:25:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1575300323;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9aeO8O8KhQQaq5X4MYaBmu9UJye5UuaXRanZt/dtU5U=;
+ b=jyCgI2KQ/VvR3p6qQXuChLhIcfDWGokOfDlYL/roxfeNjsBBIauUjMVaR2dQ7zJUb7Uq0I
+ MD+XkehThOyzy9AkaFL0NYpVgscJpZSMlXn05twwavFeILzouqp4yYz649AXIuTJTs0DoV
+ e43NMziC3awSA3GouxrfbRqcSwAKJmo=
+Subject: Re: [PATCH v2 02/14] gdbstub: stop passing GDBState * around and use
+ global
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20191130084602.10818-1-alex.bennee@linaro.org>
+ <20191130084602.10818-3-alex.bennee@linaro.org>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <5b13ffc4-9097-98ec-abe3-214f4303b708@greensocs.com>
+Date: Mon, 2 Dec 2019 16:25:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20190904125531.27545-1-damien.hedde@greensocs.com>
- <20190904125531.27545-9-damien.hedde@greensocs.com>
-In-Reply-To: <20190904125531.27545-9-damien.hedde@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Dec 2019 15:24:34 +0000
-Message-ID: <CAFEAcA8=7yhQR4Gw2OYmiF0cFJDaVn2hnUrfnZGFJK6wyuB97Q@mail.gmail.com>
-Subject: Re: [PATCH v6 8/9] hw/char/cadence_uart: add clock support
-To: Damien Hedde <damien.hedde@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d43
+In-Reply-To: <20191130084602.10818-3-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1575300323;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9aeO8O8KhQQaq5X4MYaBmu9UJye5UuaXRanZt/dtU5U=;
+ b=cw7gTCl8mak3PDO5lPy8CZ1U0791DVQfXj/ltBtFrOOOIVXnA8TLg3YglMDoGdMCesMXrx
+ YjX4pJzgmlOGUgAUl+rURE4XxW6no2E5/tkP3eSnr5V7Cfn78QMmDszQakBggUGFTskdoN
+ VbRLAH1JeJ4lkTrZ/fk7E5K/qgFtDVA=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575300323; a=rsa-sha256; cv=none;
+ b=ntXr5zRChPBYnnIP+pwkbn06RufzrCGhJwUnLXOvj+u6xxK7jq2jqncDb8YaHDhrtXbdqs
+ EOXYhzHZ9VOlJz3MNrzxGEGvzuBYhZOOeYcsXqgcMrQZZopSgqD05VrerstRJOxhy+xu/6
+ hW9iG6WYvWFBJIaHVizD6mYHAAC4neQ=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,71 +94,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: luis.machado@linaro.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, alan.hayward@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 4 Sep 2019 at 13:56, Damien Hedde <damien.hedde@greensocs.com> wrote:
->
-> Switch the cadence uart to multi-phase reset and add the
-> reference clock input.
->
-> The input clock frequency is added to the migration structure.
->
-> The reference clock controls the baudrate generation. If it disabled,
-> any input characters and events are ignored.
->
-> If this clock remains unconnected, the uart behaves as before
-> (it default to a 50MHz ref clock).
->
-> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 
->  static void uart_parameters_setup(CadenceUARTState *s)
->  {
->      QEMUSerialSetParams ssp;
-> -    unsigned int baud_rate, packet_size;
-> +    unsigned int baud_rate, packet_size, input_clk;
-> +    input_clk = clock_get_frequency(s->refclk);
->
-> -    baud_rate = (s->r[R_MR] & UART_MR_CLKS) ?
-> -            UART_INPUT_CLK / 8 : UART_INPUT_CLK;
-> +    baud_rate = (s->r[R_MR] & UART_MR_CLKS) ? input_clk / 8 : input_clk;
-> +    baud_rate /= (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
-> +    trace_cadence_uart_baudrate(baud_rate);
-> +
-> +    ssp.speed = baud_rate;
->
-> -    ssp.speed = baud_rate / (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
->      packet_size = 1;
->
->      switch (s->r[R_MR] & UART_MR_PAR) {
-> @@ -215,6 +220,13 @@ static void uart_parameters_setup(CadenceUARTState *s)
->      }
->
->      packet_size += ssp.data_bits + ssp.stop_bits;
-> +    if (ssp.speed == 0) {
-> +        /*
-> +         * Avoid division-by-zero below.
-> +         * TODO: find something better
-> +         */
 
-Any ideas what might be better? :-)
+On 11/30/19 9:45 AM, Alex Benn=C3=A9e wrote:
+> We only have one GDBState which should be allocated at the time we
+> process any commands. This will make further clean-up a bit easier.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>  gdbstub.c | 539 +++++++++++++++++++++++++++---------------------------
+>  1 file changed, 267 insertions(+), 272 deletions(-)
+>=20
 
-> +        ssp.speed = 1;
-> +    }
->      s->char_tx_time = (NANOSECONDS_PER_SECOND / ssp.speed) * packet_size;
->      qemu_chr_fe_ioctl(&s->chr, CHR_IOCTL_SERIAL_SET_PARAMS, &ssp);
->  }
+> @@ -2919,33 +2914,33 @@ static void gdb_read_byte(GDBState *s, uint8_t =
+ch)> [...]
+>              } else {
+>                  /* send ACK reply */
+>                  reply =3D '+';
+> -                put_buffer(s, &reply, 1);
+> -                s->state =3D gdb_handle_packet(s, s->line_buf);
+> +                put_buffer(&reply, 1);
+> +                gdbserver_state.state =3D gdb_handle_packet(s, gdbserv=
+er_state.line_buf);
 
-thanks
--- PMM
+Is there a reason to keep the GDBState* first parameter in
+gdb_handle_packet() ?
+
+There is a few remaining functions still taking GDBState* parameter
++ gdb_handle_packet
++ run_cmd_parser
++ gdb_monitor_output
++ create_default_processes
++ create_processes
++ gdb_read_byte
+
+We should probably clean them too, but otherwise it looks good.
+
+--
+Damien
 
