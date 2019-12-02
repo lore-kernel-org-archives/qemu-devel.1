@@ -2,82 +2,87 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4C01C432C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:47:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9684C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:50:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8E3BD217D7
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:47:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8338F217D7
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:50:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JZ8CPHsP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E3BD217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="AORW9fsF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8338F217D7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibkAT-0004Ha-Ma
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:47:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45550)
+	id 1ibkDS-0005xe-CG
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:50:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1ibk9Y-0003jn-QL
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:46:10 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1ibk7M-0002IW-1l
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:43:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1ibk9W-0000vH-QJ
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:46:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35167
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1ibk7K-0008PV-Tv
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:43:51 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:51292)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ibk9W-0000ur-Ma
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:46:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575287165;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1ibk7I-0008NT-6Z; Mon, 02 Dec 2019 06:43:48 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id D5CAE96EF0;
+ Mon,  2 Dec 2019 11:43:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1575287022;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vASdXzw+GB0BgU5scJks69yzIzwOdYLMq3LWjHDhVhE=;
- b=JZ8CPHsPjpup7cNIWALOH+iW1dLGlIaT1YCJmdZ+1pjoFei/hspuJGx98pKveZrQxuZDWY
- FF+llAuxijACSP5+dPggO256CF6q+NjPxTVio+ndb4CyO3vdUwV0vEPDr0P7R8I1OvFZxH
- oodAelNeeHvOTnO4ns6mU/PrDrBEZRc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-373-orB-n4BSPRq09KS9ws9nEA-1; Mon, 02 Dec 2019 06:45:50 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D12BDB21
- for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 11:45:49 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E4D15D9E5;
- Mon,  2 Dec 2019 11:45:43 +0000 (UTC)
-Date: Mon, 2 Dec 2019 11:45:41 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Subject: Re: [PATCH 5/7] screendump: replace FILE with QIOChannel and fix
- close()/qemu_close()
-Message-ID: <20191202114541.GG4184266@redhat.com>
-References: <20191127115202.375107-1-marcandre.lureau@redhat.com>
- <20191127115202.375107-6-marcandre.lureau@redhat.com>
+ bh=hU90s+NFHEXRn3VjyWITYrFg1NmjzzO7O71eODyuVMw=;
+ b=AORW9fsFHNcLSiYHSAhDg3ykTt5o54RrTE6pWtKyaypd3oq4V5oT5DIEl4vYjc2RuyZbZY
+ XIgQbyII3NsrhXsE0qf8WqoXzatgs+vLjGJKRlXkAi37RzLoeuqNdW9KcI0tJF25CckRVT
+ t8vO/x57xHA7nnpS/oVmcc3lk9cooyo=
+Subject: Re: [PATCH v5 05/13] hw/core/resettable: add support for changing
+ parent
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191018150630.31099-1-damien.hedde@greensocs.com>
+ <20191018150630.31099-6-damien.hedde@greensocs.com>
+ <CAFEAcA-UV7rSL1mPD=NLyLtan60WNsc+MDjR6p2aDoz34bq8dg@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <02003f2e-38f5-2ff3-8160-e0bf6063839a@greensocs.com>
+Date: Mon, 2 Dec 2019 12:43:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191127115202.375107-6-marcandre.lureau@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: orB-n4BSPRq09KS9ws9nEA-1
-X-Mimecast-Spam-Score: 0
+In-Reply-To: <CAFEAcA-UV7rSL1mPD=NLyLtan60WNsc+MDjR6p2aDoz34bq8dg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1575287022;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hU90s+NFHEXRn3VjyWITYrFg1NmjzzO7O71eODyuVMw=;
+ b=Did3pQhHLza7i5pYC+rI0Gx3bb7g9TeE+DDv4mBgTLcnCNsmEn5+f4uBWFml/P9HGpNiCT
+ 12yMnL64LF0KDsVTOJX8loR3CrRjDwgERvarrnY97se+o+qsLf7OIJRjiI/xda8cjnlaUP
+ VTWrQt1+zOJ7+WngsrqRI/f2Vs+5rMQ=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575287022; a=rsa-sha256; cv=none;
+ b=P1O+eFriWFeGMbriDgzgaJYoTf0hrJebLLcJjOhGZZTXZOpMX7kE/qMCaMlilA5RXj4gXW
+ Qq2hHaWUcIHFF4rskJ6U8Fywa5ISsYUgtxsrhLc/rFUK9RuIM/wJ3xWK61/rcseXlAXXLQ
+ Cov7dmMkGJfdBcuw3pGWkja6jZgWEOA=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,41 +94,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 27, 2019 at 03:52:00PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> The file opened for ppm_save() may be a /dev/fdset, in which case a
-> dup fd is added to the fdset. It should be removed by calling
-> qemu_close(), instead of the implicit close() on fclose().
->=20
-> I don't see a convenient way to solve that with stdio streams, so I
-> switched the code to QIOChannel which uses qemu_close().
-
-The only way is to duplicate what qemu_close() does in the
-ppm_save method by calling  monitor_fdset_dup_fd_remove(fd).
-Using QIOChannel is fine too though.
-
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  ui/console.c | 38 +++++++++++++++++---------------------
->  1 file changed, 17 insertions(+), 21 deletions(-)
-
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+On 11/29/19 7:38 PM, Peter Maydell wrote:
+> On Fri, 18 Oct 2019 at 16:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>>
+>> Add a function resettable_change_parent() to do the required
+>> plumbing when changing the parent a of Resettable object.
+>>
+>> We need to make sure that the reset state of the object remains
+>> coherent with the reset state of the new parent.
+>>
+>> We make the 2 following hypothesis:
+>> + when an object is put in a parent under reset, the object goes in
+>> reset.
+>> + when an object is removed from a parent under reset, the object
+>> leaves reset.
+>>
+>> The added function avoid any glitch if both old and new parent are
+>> already in reset.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>> ---
+>>  hw/core/resettable.c    | 54 +++++++++++++++++++++++++++++++++++++++++
+>>  hw/core/trace-events    |  1 +
+>>  include/hw/resettable.h | 16 ++++++++++++
+>>  3 files changed, 71 insertions(+)
+>>
+>> diff --git a/hw/core/resettable.c b/hw/core/resettable.c
+>> index c5e11cff4f..60d4285fcc 100644
+>> --- a/hw/core/resettable.c
+>> +++ b/hw/core/resettable.c
+>> @@ -32,6 +32,14 @@ static void resettable_phase_exit(Object *obj, void *opaque, ResetType type);
+>>   */
+>>  static bool enter_phase_in_progress;
+>>
+>> +/**
+>> + * exit_phase_in_progress:
+>> + * Flag telling whether we are currently in an enter phase where side
+>> + * effects are forbidden. This flag allows us to catch if
+>> + * resettable_change_parent() is called during exit phase.
+>> + */
+>> +static unsigned exit_phase_in_progress;
+> 
+> This is another global that I don't think we should have.
+> Is it also just for asserts ?
+
+Yes. It's only to ensure we don't miss-use the api.
+
+--
+Damien
+
 
 
