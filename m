@@ -6,88 +6,86 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D54C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 01:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCEEFC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 01:12:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2175120748
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 01:06:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97E1C2146E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 01:12:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B5q++d7+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2175120748
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EUU2rUlL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97E1C2146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibaA5-00027S-93
-	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 20:06:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49072)
+	id 1ibaGP-0004u8-Q8
+	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 20:12:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iba8s-0001GQ-QU
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 20:04:48 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ibaFi-0004Rr-DL
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 20:11:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iba8q-0008Jo-Vo
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 20:04:46 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38960)
+ (envelope-from <richard.henderson@linaro.org>) id 1ibaFh-0004B3-7x
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 20:11:50 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:38481)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iba8q-0008Ih-HS
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 20:04:44 -0500
-Received: by mail-pl1-x642.google.com with SMTP id o9so15480314plk.6
- for <qemu-devel@nongnu.org>; Sun, 01 Dec 2019 17:04:44 -0800 (PST)
+ id 1ibaFh-00049o-1k
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 20:11:49 -0500
+Received: by mail-pg1-x544.google.com with SMTP id t3so17064934pgl.5
+ for <qemu-devel@nongnu.org>; Sun, 01 Dec 2019 17:11:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=SLiIwFApKyRJYQkbn+hGHHI5tvOXLagn6im2UeeaUxs=;
- b=B5q++d7+UayccE6vrtsTTCCNRB9JrfTQhRkw+e74HSQMdih5jiuGKodQDnBIk4LRiJ
- 6LZMN5fSD45nvT5oGH5vEND71WuEb63a3zfYN8GO6mM3JTXmlzBgcOlS69uBd05aaSo3
- HOicEnkVE//G6LlEVjWG3ZnFrJZ1EHKQdd5ozFRjaNrTYgOcj6CZp4huS2h7vi3ZiivE
- Lso0sLQA3x0eOs8+gCKnfEYMk5vEmwVtQD5OksQnpUFeVJ/WpjbaTGqRovuvaMvZf1my
- YU7oijrygmpXM3JWXt/FPTPhjDjmDJ5EJ6j7JviGik9cfC13cQJtk4vqbOeKoVMMbFhF
- oxPg==
+ bh=KbjuFww7zuB3fL/Fbz84eOXxjpPoBRs5MDedHKSbw8k=;
+ b=EUU2rUlLoAeaAb+/YYMuyfE4Cqv3AGJgn197qYGt6DUrXacuKb7nqx3qt226FteO1o
+ 2w77f60ZNSml5VrltHjhVf07C31J9OoAvnV/JjnEysgV9//Rot/OjaAxellv5s7g2y0N
+ V6Phneh7JzVu9Y4HJihnbjvpCMaL6tGJ/la0yxq0+qiOv1Klg2J9RSybyLnaD8YwMPJB
+ zWjocISgqukUmecpN3B56pznnOetAPNxdO8/QpBvjDOMvt1NVD0zCyx8AuTGx4wUGLsK
+ 1Mu7nXqMNF4IEumFwB8bhrOmcvVd6rMFigMuc4hxn/BP4i7K9VKrvWdDHY3ZLPnuU9cO
+ lJJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=SLiIwFApKyRJYQkbn+hGHHI5tvOXLagn6im2UeeaUxs=;
- b=c9b3uRCCLYrpXrqxtoDf+R+NIldeyMN+tqXM8otqICQNCevXW7vGK9CfniScXz3Sc0
- e2TDs6gVTlPdcdFQKCpvEs+N8g2ZYp5LRMO9sKjafgdbgcVBenNv1DDmx8Oqs/L8dCHZ
- 1P+wqXuJOn+GKBGx+TbvkjKpO7xuijxD12OEeLO8YgmkTgCY+QXaqNObpn7/1QElryey
- kr5PQHFrsOZ6BKd2s+Dz6TNXf9xcvniPChqFFoKqP8YNHSkOGtnbzZd+gHY5SyWTetiv
- zWc6hdSk7Ji6/ZbBsfKqNKaY8zR8iWzT23/rRoDm8u12INLF9uS9d46elnfcGx0a8BRv
- NI1g==
-X-Gm-Message-State: APjAAAUKcXwoaH2YKJz6upt2TrN3o5as+hEHpQf76m1o9mWmmLPVolR3
- ticYPxez0dTuFeqgO0GwdLJbsA==
-X-Google-Smtp-Source: APXvYqx+xKJ5Tu6ZnqvkExAnAIzdD8Z/iZOsJ2c15t82tViD3ZadPzpangNyUMTCxmOjsHbNuQSblg==
-X-Received: by 2002:a17:902:8216:: with SMTP id
- x22mr24406738pln.179.1575248682881; 
- Sun, 01 Dec 2019 17:04:42 -0800 (PST)
+ bh=KbjuFww7zuB3fL/Fbz84eOXxjpPoBRs5MDedHKSbw8k=;
+ b=l9LiZTnd/Q9TODXKqLg/IzxeXTCo7/kPcBDZ1BogJWOfllnIL4i1Ymcrhg0nY26UpU
+ 96cJcz0B5GWIOTpPQ28tZT1PA6pYDMak9ahYLFlO8nyvAIZTAUB3AxKMNyukDCIA1PlX
+ E65UWPQ2SkdBENCJ/iuHCMFpZCn5HufylkDyz4DVdLpsysNJXe+Xz+bM3peK7Y8FXubg
+ 9W4H12LDmaPhGv9jBoqLrSw1uiEqCPdH8o37iTJRvl6oWde5JOh8FLNU3zFbBXQ1R1iF
+ 4r1ArX1Qb9K7h7u2FA+rEYMC1CPLw0B/hjDAWvlaThCqXUoKp8sfH6Py0jY5NglCGB+t
+ UORw==
+X-Gm-Message-State: APjAAAWZO+YATsFikHV4u1FHlMnctOnihJi5VK3mDJumgw3/FMUhul0C
+ 5EYhcrwWscIC+P9BV4V2QIdjuQ==
+X-Google-Smtp-Source: APXvYqyfYAIJ2LAM+luSBSP2bOMpGmqFbLF77MBF0kXztokUWrUYtAyzpEWhQDp6/JQFWR5AJ2g9ZQ==
+X-Received: by 2002:a63:214e:: with SMTP id s14mr2257930pgm.428.1575249107496; 
+ Sun, 01 Dec 2019 17:11:47 -0800 (PST)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id t8sm16070523pjg.17.2019.12.01.17.04.41
+ by smtp.gmail.com with ESMTPSA id in19sm12012715pjb.11.2019.12.01.17.11.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 01 Dec 2019 17:04:42 -0800 (PST)
-Subject: Re: [PATCH v1 1/5] linux-user: convert target_mprotect debug to
- tracepoint
+ Sun, 01 Dec 2019 17:11:46 -0800 (PST)
+Subject: Re: [PATCH v1 2/5] linux-user: convert target_mmap debug to tracepoint
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20191128194603.24818-1-alex.bennee@linaro.org>
- <20191128194603.24818-2-alex.bennee@linaro.org>
+ <20191128194603.24818-3-alex.bennee@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b60ffffa-651c-b6f0-cf5c-f75304a38021@linaro.org>
-Date: Sun, 1 Dec 2019 17:04:40 -0800
+Message-ID: <44a30f10-a215-daa7-a8a4-0b0a1564a65e@linaro.org>
+Date: Sun, 1 Dec 2019 17:11:44 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <20191128194603.24818-2-alex.bennee@linaro.org>
+In-Reply-To: <20191128194603.24818-3-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,30 +102,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/28/19 7:45 PM, Alex Bennée wrote:
-> -#ifdef DEBUG_MMAP
-> -    printf("mprotect: start=0x" TARGET_ABI_FMT_lx
-> -           "len=0x" TARGET_ABI_FMT_lx " prot=%c%c%c\n", start, len,
-> -           prot & PROT_READ ? 'r' : '-',
-> -           prot & PROT_WRITE ? 'w' : '-',
-> -           prot & PROT_EXEC ? 'x' : '-');
-> -#endif
-> +    if (TRACE_TARGET_MPROTECT_ENABLED) {
+On 11/28/19 7:46 PM, Alex Bennée wrote:
+> +    if (TRACE_TARGET_MMAP_ENABLED) {
 > +        char prot_str[4];
-> +        prot_str[0] = prot & PROT_READ ? 'r' : '-';
-> +        prot_str[1] = prot & PROT_WRITE ? 'w' : '-';
-> +        prot_str[2] = prot & PROT_EXEC ? 'x' : '-';
-> +        prot_str[3] = 0;
-> +        trace_target_mprotect(start, len, prot_str);
-> +    }
+> +        g_autoptr(GString) flag_str = g_string_new(NULL);
+> +
+> +        pp_prot(&prot_str, prot);
+> +
+> +        if (flags & MAP_FIXED) {
+> +            g_string_append(flag_str, "MAP_FIXED ");
+> +        }
+> +        if (flags & MAP_ANONYMOUS) {
+> +            g_string_append(flag_str, "MAP_ANON ");
+> +        }
+> +
+> +        switch (flags & MAP_TYPE) {
+>          case MAP_PRIVATE:
+> -            printf("MAP_PRIVATE ");
+> +            g_string_append(flag_str, "MAP_PRIVATE ");
+>              break;
+>          case MAP_SHARED:
+> -            printf("MAP_SHARED ");
+> +            g_string_append(flag_str, "MAP_SHARED ");
+>              break;
+>          default:
+> -            printf("[MAP_TYPE=0x%x] ", flags & MAP_TYPE);
+> +            g_string_append_printf(flag_str, "[MAP_TYPE=0x%x] ",
+> +                                   flags & MAP_TYPE);
+>              break;
+>          }
+> -        printf("fd=%d offset=" TARGET_ABI_FMT_lx "\n", fd, offset);
+> +        trace_target_mmap(start, len, prot_str, flag_str->str, fd, offset);
+>      }
 
-There are other bits in prot other than these 3.
-See especially my linux-user BTI patch set, and
-know that the same sort of thing will be in the
-as-yet undecided abi for the MTE extension.
+I don't think that you need to re-create -strace output.
+There are also quite a lot of MAP_* flags that are not
+being printed, without any indication that they are left out.
 
-Unless you have a good reason otherwise, I think
-we should just print the numeric value in hex.
+Again, I think we should just print the hex value.
 
 
 r~
