@@ -2,85 +2,85 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D717DC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1798C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:16:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B0CC20748
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:13:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0CC20748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 7ECD320833
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 11:16:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xiV7tWWo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ECD320833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibjdc-000180-5k
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:13:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40471)
+	id 1ibjgj-0003EF-Es
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 06:16:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40920)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ibjcK-0008W2-CM
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:11:49 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ibjfP-0002NF-L6
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:15:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ibjcF-0006iy-5T
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:11:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:49092)
+ (envelope-from <peter.maydell@linaro.org>) id 1ibjfO-0008CG-G0
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:14:59 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35027)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ibjcE-0006hf-W3
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:11:43 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ibjcC-0007YZ-DK
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 11:11:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6348B2E8085
- for <qemu-devel@nongnu.org>; Mon,  2 Dec 2019 11:11:40 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ibjfO-0008Bx-AV
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 06:14:58 -0500
+Received: by mail-oi1-x242.google.com with SMTP id k196so15668325oib.2
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 03:14:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=xN2DMI7ujIHJDmHjQcTmxMXXC1w59NzaLVTz8uCIN04=;
+ b=xiV7tWWoibjcZDYkMIDqkXiXMYwQCKblJ/ZFe6EVovM5woD8kjN1WRON36vxeVnn8d
+ BDRsPARpuFvIKD0QrSwyu/2/ARUmUpy69V10/vOn/5JXjwEclFeeUcTluSAPi+4mEaOB
+ 1yLMMLFxp3Myfrwugb4PitEGGsqhEF/8cJpPaRLUp/PXNf8VUd0EAxSRf3qmHQuzJX2K
+ /nH747q/4IPdw1rM/wWkSOVf23Ns60t+eKFxpkuBgS1BYDe4c8t6+wqr7/JkHDItXvTh
+ /FDGseOA/NIAKOu64pMW+KHT9ygco/xPZT680GyAQBS7OjdllB5bFVy1urMAM7j6Doxz
+ LHpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xN2DMI7ujIHJDmHjQcTmxMXXC1w59NzaLVTz8uCIN04=;
+ b=HuMu8P5aNYOovzsPaRSQPEIL2fWHIjXn+BlxTXqYvcVC9yyl3ff07Tj0oxMOec8aSd
+ E/7opgEBtBZDNQ823TeUL4Hb32vOuvC7V60U1PcdrTbal1STanEEjneQW/cXw6AA5zEx
+ oxRF0jamV6gYMloxz8bM7VBFQd38/alw9iB5DlU5EUtyJlwkvdoLZeGHYtBRTIqepkFq
+ XBoW9DrBbVrf6wMIulLMxdA5fQpl3oKust8As1B4yeAVf13nqaOisYgFdBMB70dnkkz2
+ dLgY8I4350Cj3tbGIgP5epOyBM9LE2bDMB+25ZjZsVTkhyLcsM0JEUnp/JJcnzQiYEja
+ 1kjQ==
+X-Gm-Message-State: APjAAAXXY8LGWjn4IRfLuK/yfPQs0/b88yoR/nqFcD6ORyNdPpRJd6/m
+ 4S2BvPtn7oxGgpg9qaUGspron0lvz/xijX8+v7uQ4A==
+X-Google-Smtp-Source: APXvYqwhdMvCsN7xbqAwL+fzv9rQtKSYdpsOk3oogHIaCpRpKhke0OVzeyJvgCyLrVkm/Dp4Reh7DAhro61e5TjTNPo=
+X-Received: by 2002:aca:f5cc:: with SMTP id
+ t195mr20322028oih.163.1575285297444; 
+ Mon, 02 Dec 2019 03:14:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 02 Dec 2019 11:02:22 -0000
-From: Launchpad Bug Tracker <1848556@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=Fix Released; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Released; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug-Tags: verification-done verification-done-eoan
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor paelzer rodsmith sil2100 tjaalton
- ubuntu-sru-bot xanclic
-X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
-Message-Id: <157528454888.8939.495514277184391841.malone@ackee.canonical.com>
-Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 13923c14c74c5c02fcf11b062189158bf969e833
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+References: <20191018150630.31099-1-damien.hedde@greensocs.com>
+ <20191018150630.31099-4-damien.hedde@greensocs.com>
+ <CAFEAcA9kc1-=DkYSqL6DOrLCNKt5uuxnf6-XYJ97g15T--1NvA@mail.gmail.com>
+ <20402bef-d615-3258-bde9-12d42c9b1029@greensocs.com>
+In-Reply-To: <20402bef-d615-3258-bde9-12d42c9b1029@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 2 Dec 2019 11:14:46 +0000
+Message-ID: <CAFEAcA_XqjUhYvKmr-dNJCL3w32WPegqLmTw5FSDwAPZ+HeGkQ@mail.gmail.com>
+Subject: Re: [PATCH v5 03/13] hw/core: create Resettable QOM interface
+To: Damien Hedde <damien.hedde@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,110 +89,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1848556 <1848556@bugs.launchpad.net>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bug was fixed in the package qemu - 1:4.0+dfsg-0ubuntu9.2
+On Mon, 2 Dec 2019 at 11:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>
+>
+> On 11/29/19 7:32 PM, Peter Maydell wrote:
+> > On Fri, 18 Oct 2019 at 16:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
+> >> +/**
+> >> + * enter_phase_in_progress:
+> >> + * Flag telling whether we are currently in an enter phase where side
+> >> + * effects are forbidden. This flag allows us to catch if reset is called
+> >> + * again during during this phase.
+> >> + */
+> >> +static bool enter_phase_in_progress;
+> >
+> > This looks weird -- I don't think a global for this works,
+> > because you might have several distinct subtrees of
+> > devices, and be doing reset on them both at once.
+> > I think that we only use this for an assert, though -- is
+> > that right? If so, we could just drop this.
+>
+> We say that we need to own the iothread mutex for any reset, so global
+> should be ok. Thought, I just checked, it's only mentioned in the
+> documentation not in the header file. I should probably add a comment
+> there too along with the link to the documentation file.
 
----------------
-qemu (1:4.0+dfsg-0ubuntu9.2) eoan; urgency=3Dmedium
+Ah, right, I hadn't considered that the mutex is effectively
+restricting to only a single reset happening at once. If
+you want to keep the asserts you can, if you add a comment
+noting that these globals are (a) only for asserts and (b)
+OK because we rely on the iothread mutex to ensure that only
+one reset operation can be in progress at once.
 
-  * d/p/ubuntu/lp-1848556-curl-Handle-success-in-multi_check_completion.pat=
-ch:
-    fix a potential hang when qemu or qemu-img where accessing http backed
-    disks via libcurl (LP: #1848556)
-  * d/p/u/lp-1848497-virtio-balloon-fix-QEMU-4.0-config-size-migration-in.p=
-atch:
-    fix migration issue from qemu <4.0 when using virtio-balloon (LP: #1848=
-497)
-
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Mon, 21 Oct
-2019 14:51:45 +0200
-
-** Changed in: qemu (Ubuntu Eoan)
-       Status: Fix Committed =3D> Fix Released
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1848556
-
-Title:
-  qemu-img check failing on remote image in Eoan
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Eoan:
-  Fix Released
-Status in qemu source package in Focal:
-  Fix Released
-
-Bug description:
-  Ubuntu SRU Template:
-
-  [Impact]
-
-   * There is fallout due to changes in libcurl that affect qemu and might =
-
-     lead to a hang.
-
-   * Fix by backporting the upstream fix
-
-  [Test Case]
-
-   * If you have network just run
-     $ qemu-img check http://10.193.37.117/cloud/eoan-server-cloudimg-amd64=
-.img
-
-   * Without network, install apache2, and get a complex qemu file (like a =
-
-     cloud image) onto the system. Then access the file via apache http but =
-
-     not localhost (that would work)
-
-  [Regression Potential]
-
-   * The change is local to the libcurl usage of qemu, so that could be =
-
-     affected. But then this is what has been found to not work here, so I'=
-d =
-
-     expect not too much trouble. But if so then in the curl usage (which =
-
-     means disks on http)
-
-  [Other Info]
-   =
-
-   * n/a
-
-  ---
-
-  The "qemu-img check" function is failing on remote (HTTP-hosted)
-  images, beginning with Ubuntu 19.10 (qemu-utils version 1:4.0+dfsg-
-  0ubuntu9). With previous versions, through Ubuntu 19.04/qemu-utils
-  version 1:3.1+dfsg-2ubuntu3.5, the following worked:
-
-  $ /usr/bin/qemu-img check  http://10.193.37.117/cloud/eoan-server-cloudim=
-g-amd64.img
-  No errors were found on the image.
-  19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed cl=
-usters
-  Image end offset: 514064384
-
-  The 10.193.37.117 server holds an Apache server that hosts the cloud
-  images on a LAN. Beginning with Ubuntu 19.10/qemu-utils 1:4.0+dfsg-
-  0ubuntu9, the same command never returns. (I've left it for up to an
-  hour with no change.) I'm able to wget the image from the same server
-  and installation on which qemu-img check fails. I've tried several
-  .img files on the server, ranging from Bionic to Eoan, with the same
-  results with all of them.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1848556/+subscriptions
+thanks
+-- PMM
 
