@@ -2,122 +2,126 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7554FC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 14:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AF2DC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 14:23:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2989020717
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 14:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 543B1206F0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 14:23:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JspwYB9c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2989020717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U4gNDakP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 543B1206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibmUq-0001n5-5S
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 09:16:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35912)
+	id 1ibmbx-0004Fy-Dj
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 09:23:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37033)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ibmTR-00014V-6b
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:14:50 -0500
+ (envelope-from <david@redhat.com>) id 1ibmaa-0003fF-To
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:22:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ibmTN-0002Cw-7M
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:14:48 -0500
-Received: from mail-eopbgr40136.outbound.protection.outlook.com
- ([40.107.4.136]:33668 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ibmTM-0002Ca-8e; Mon, 02 Dec 2019 09:14:44 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mYOKuad2eyiuth7FeMvnU1Dp62ZU3immw0wYBmCWYhanXhJYFvpdGXIKJfB34lLCuaz0ilR8Gj465d7ZAIkAHKjzeIKZT0nv3OjTaMVvFB8WFkzYM2msYy60syKG0+hM7VqrskuO5hMgjgo6U88xvSJojP3eWXFDrCIwMVcuomHQYuSldin/U/B7nCC4XgyBwtLaKtlNHYBMhJiFtN9IRCIwhmaQIjkz+o/jc99N0ktlyVxbLpHWHGmWo7ePbM9PhExPGKx4zVtHnlea3AzFpTsck8XC02DZCe9sVjRJintny8CPcRsXrG44Ts28BSYCTdKxrXskvybIEKODcrNY4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8v+QXTFDdzgNeFxOcQgoNBFIw2Q1h8roppUZgQ9doCc=;
- b=XZFlr7ETC25xoJ/ML1CdQwdNUxuqDBHLgR/9ymiiNYyqbF7JKck7cNnVdUkx8hVgir7pwmluZlb7F3d3XITW7KH/6JpI87ros0Fqs4Sp1Fpqt0ryWBFe8QfxGJh7nOUZMdQ9jadnDensbupXqtwFeOJEbnUSQ1B81ZXqo4xXuHbWn3zUiH+wUTqDyvkh1EK5XtqyBl6ooF0A729PbuJ/tlUqb9QWkD/TKF+HRLK3WMKqr70sUHcu0GQKT3vgVemJ6evm2P7tAuYDVPq6huJwBEZ7SzTmp2eg3Lc7Zpy0E6/Xm4ifdVbgcJa2V2GgRw3EXRrnptKumT9LSwAXDLrzDg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8v+QXTFDdzgNeFxOcQgoNBFIw2Q1h8roppUZgQ9doCc=;
- b=JspwYB9caRDhcPJWBhd6ezdguN9MZ89vak3c63aDSSF/miuyyYJwoxRX/Ks11BoMsbWXRKKSp9qiPmgocEMUfoHELsk2TmzsRgKSaN3iirfiF82U5r0Zc7rftuw/hglyTA/FdrTRk/o/L3XkC45ablnL63AwZcbWPDDHC5Om0UA=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3733.eurprd08.prod.outlook.com (20.178.90.12) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.21; Mon, 2 Dec 2019 14:14:40 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2495.014; Mon, 2 Dec 2019
- 14:14:40 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v8 1/3] docs: improve qcow2 spec about extending image
- header
-Thread-Topic: [PATCH v8 1/3] docs: improve qcow2 spec about extending image
- header
-Thread-Index: AQHVhZkjTzzfnHiFj0qSiLP9bR+k/adgbZKAgAAKKwCAHitYAIABHveAgCdoawA=
-Date: Mon, 2 Dec 2019 14:14:40 +0000
-Message-ID: <c22ec011-0e13-5749-5b18-321d2a33f58b@virtuozzo.com>
-References: <20191018094758.7124-1-vsementsov@virtuozzo.com>
- <20191018094758.7124-2-vsementsov@virtuozzo.com>
- <71ad0b78-65da-9a39-4c12-f78449cdca9c@redhat.com>
- <ba5ae50c-9406-5095-89ae-6a10893e452e@virtuozzo.com>
- <8cfcca15-4018-2876-6d75-a4d5125beedc@redhat.com>
- <da2ddf4b-e549-c138-7bd9-237733885697@virtuozzo.com>
-In-Reply-To: <da2ddf4b-e549-c138-7bd9-237733885697@virtuozzo.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0401CA0071.eurprd04.prod.outlook.com
- (2603:10a6:3:19::39) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191202171438789
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 28b4004b-6d26-4412-b827-08d77731f88a
-x-ms-traffictypediagnostic: AM6PR08MB3733:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB373369FC94D2658A16A099BAC1430@AM6PR08MB3733.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:901;
-x-forefront-prvs: 0239D46DB6
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(396003)(39840400004)(346002)(376002)(366004)(189003)(199004)(86362001)(316002)(110136005)(7736002)(305945005)(6116002)(14454004)(6486002)(25786009)(36756003)(4326008)(8676002)(6246003)(81156014)(81166006)(5660300002)(8936002)(107886003)(6512007)(66066001)(2501003)(31696002)(256004)(478600001)(31686004)(71190400001)(3846002)(71200400001)(2906002)(99286004)(66556008)(76176011)(386003)(53546011)(52116002)(66476007)(102836004)(186003)(64756008)(6436002)(6506007)(26005)(66946007)(2616005)(11346002)(446003)(66446008)(54906003)(229853002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3733;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6OKLd2FM09uQNU0PvQBA5vLufAbED2bQExtHkORD81xkJNginF0hFqS9Ksb6L54ujXiPdfnIRx19TzddqayjkI3lmp+d/myNYtPP5FHcQMI+VzfgjW1DvT2NtokM9BeYOpgYQ1wzjCkVLnG3RtO8xsxfSTMo/QuelXP+v8Rv+WYyyC+fJypup6eBbtNId/ya39it8HmkSpsfTB0CcphCJITHB48x3rUykg4+S9CD7V5Pvean9YTmud9w6HZbVmimu8keTdta3tiQVnceZP/R+JE+D8x/b0jWvH5jeciDOIHFTSCTZhAeMGoaBeq3qPwxM9B3azj8r+U6zf1SDx2JTXJXDS1T85DN+LRH/0i+NvzQA+etW4CdslrcQwPUA4qqYG+QkJ33hSkjie1cM8nr8rZAkcpGKJXU6Z81xecUG+oXZO8yKSIJ7HjCcRaDR39u
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <BC8628984D2A1145A488B4FB308B6C5F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <david@redhat.com>) id 1ibmaY-00045J-6p
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:22:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49106
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1ibmaY-00045A-2h
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 09:22:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575296528;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=MdpcPgHbQ9llT439APuSCnlczpCMkbEL9M6+DXvkhOo=;
+ b=U4gNDakPNaI7HIEeIykmzFwyLbcaTLXWXXdZ6H0XSWviZeP3t9/wdIWYAEg7Twv9qIl7KM
+ F58nn4pItrJa4lJpzNQ+cluwBFDub4hifD1E4CXZnu3dpNnXXeJPlvmQXrb127IxtRpJMK
+ bPP3pAMhxS93Mc5g7D6erNL/lVTfX6U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-123-dUUsuYrOOxiFbP7WvgUccw-1; Mon, 02 Dec 2019 09:22:07 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1786E107ACC4;
+ Mon,  2 Dec 2019 14:22:06 +0000 (UTC)
+Received: from [10.36.117.49] (ovpn-117-49.ams2.redhat.com [10.36.117.49])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7FEF267648;
+ Mon,  2 Dec 2019 14:22:04 +0000 (UTC)
+Subject: Re: [PATCH v2 2/3] s390x: Add missing vcpu reset functions
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191202140146.3910-1-frankja@linux.ibm.com>
+ <20191202140146.3910-3-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <d17ee6d1-9fd6-89b1-9520-abc619777a65@redhat.com>
+Date: Mon, 2 Dec 2019 15:22:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 28b4004b-6d26-4412-b827-08d77731f88a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2019 14:14:40.7035 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: h9J5yp20RolIRNvEN1QRwBsp8uB+d0jt1pQFwqW0eFjgIYX3N9CZlSivbjQiJkVvwQW7wBZrYP2RikStWHqBxVuURBBfHwmTe/B5Sjl9GPs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3733
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.4.136
+In-Reply-To: <20191202140146.3910-3-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: dUUsuYrOOxiFbP7WvgUccw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,133 +133,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, mihajlov@linux.ibm.com,
+ qemu-s390x@nongnu.org, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDcuMTEuMjAxOSAxNToyNiwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4g
-MDYuMTEuMjAxOSAyMjoxOSwgRXJpYyBCbGFrZSB3cm90ZToNCj4+IE9uIDEwLzE4LzE5IDk6MzYg
-QU0sIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+Pg0KPj4+PiBNYXliZToN
-Cj4+Pj4NCj4+Pj4gaWYgc29mdHdhcmUgZG9lc24ndCBrbm93IGhvdyB0byBpbnRlcnByZXQgdGhl
-IGZpZWxkLCBpdCBtYXkgYmUgc2FmZWx5IGlnbm9yZWQgdW5sZXNzIGEgY29ycmVzcG9uZGluZyBp
-bmNvbXBhdGlibGUgZmVhdHVyZSBmbGFnIGJpdCBpcyBzZXQ7IGhvd2V2ZXIsIHRoZSBmaWVsZCBz
-aG91bGQgYmUgcHJlc2VydmVkIHVuY2hhbmdlZCB3aGVuIHJld3JpdGluZyB0aGUgaW1hZ2UgaGVh
-ZGVyLg0KPj4+Pg0KPj4+Pj4gKw0KPj4+Pj4gK0ZvciBhbGwgYWRkaXRpb25hbCBmaWVsZHMgemVy
-byB2YWx1ZSBlcXVhbHMgdG8gYWJzZW5jZSBvZiBmaWVsZCAoYWJzZW5jZSBpcw0KPj4+Pj4gK3do
-ZW4gZmllbGQub2Zmc2V0ICsgZmllbGQuc2l6ZSA+IEBoZWFkZXJfbGVuZ3RoKS4gVGhpcyBpbXBs
-aWVzDQo+Pj4+PiArdGhhdCBpZiBzb2Z0d2FyZSB3YW50J3MgdG8gc2V0IGZpZWxkcyB1cCB0byBz
-b21lIGZpZWxkIG5vdCBhbGlnbmVkIHRvIG11bHRpcGx5DQo+Pj4+PiArb2YgOCBpdCBtdXN0IGFs
-aWduIGhlYWRlciB1cCBieSB6ZXJvZXMuIEFuZCBvbiB0aGUgb3RoZXIgaGFuZCwgaWYgc29mdHdh
-cmUNCj4+Pj4+ICtuZWVkIHNvbWUgb3B0aW9uYWwgZmllbGQgd2hpY2ggaXMgYWJzZW50IGl0IHNo
-b3VsZCBhc3N1bWUgdGhhdCBpdCdzIHZhbHVlIGlzDQo+Pj4+PiAremVyby4NCj4+Pj4NCj4+Pj4g
-TWF5YmU6DQo+Pj4+DQo+Pj4+IEVhY2ggb3B0aW9uYWwgZmllbGQgdGhhdCBkb2VzIG5vdCBoYXZl
-IGEgY29ycmVzcG9uZGluZyBpbmNvbXBhdGlibGUgZmVhdHVyZSBiaXQgbXVzdCBzdXBwb3J0IHRo
-ZSB2YWx1ZSAwIHRoYXQgZ2l2ZXMgdGhlIHNhbWUgZGVmYXVsdCBiZWhhdmlvciBhcyB3aGVuIHRo
-ZSBvcHRpb25hbCBmaWVsZCBpcyBvbWl0dGVkLg0KPj4+DQo+Pj4gSG1tbS4gVGhhdCBkb2Vzbid0
-IHdvcmssIGFzICJjb3JyZXNwb25kaW5nIiBpcyBzb21ldGhpbmcgbm90IGFjdHVhbGx5IGRlZmlu
-ZWQuIENvbnNpZGVyIG91ciB6c3RkIGV4dGVuc2lvbi4NCj4+Pg0KPj4+IEl0IGhhcyBjb3JyZXNw
-b25kaW5nIGluY29tcGF0aWJsZSBiaXQsIHRoZXJlZm9yZSwgdGhpcyBzZW50ZW5jZSBkb2Vzbid0
-IGFwcGx5IHRvIGl0LiBCdXQgc3RpbGwsIGlmIGluY29tcGF0aWJsZSBiaXQgaXMgdW5zZXQgd2Ug
-Y2FuIGhhdmUgdGhpcyBmaWVsZC4gQW5kIGl0J3MgemVybyB2YWx1ZSBtdXN0IGNvcnJlc3BvbmQN
-Cj4+PiB0byB0aGUgYWJzZW5jZSBvZiB0aGUgZmllbGQuDQo+Pj4NCj4+PiBTbywgYWRkaXRpb25h
-bCBmaWVsZCBtYXkgdXNlIGluY29tYXB0aWJsZSBiaXQgb25seSBmb3Igc3Vic2V0IG9mIGl0cyB2
-YWx1ZXMuDQo+Pj4NCj4+PiBCdXQsIEkgc2VlLCB0aGF0IHlvdSB3YW50IHRvIGFsbG93IDAgdmFs
-dWUgdG8gbm90IG1hdGNoIGZpZWxkLWFic2VuY2UgaWYgaW5jb21wYXRpYmxlIGJpdCBpcyBzZXQ/
-DQo+Pg0KPj4gTm90IG5lY2Vzc2FyaWx5LsKgIFJhdGhlciwgaWYgdGhlIHZhbHVlIG9mIGFuIHVu
-a25vd24gZmllbGQgY2FuIGJlIHNhZmVseSBpZ25vcmVkLCB0aGVuIGl0IHNob3VsZCBkZWZhdWx0
-IHRvIDAuwqAgSWYgaXQgY2Fubm90IGJlIHNhZmVseSBpZ25vcmVkLCB0aGVuIHRoYXQgZmllbGQg
-d2lsbCBub3QgYmUgc2V0IHRvIGEgbm9uLXplcm8gdmFsdWUgd2l0aG91dCBhbHNvIHNldHRpbmcg
-YW4gaW5jb21wYXRpYmxlIGZlYXR1cmUgZmxhZywgc28gdGhhdCBzb2Z0d2FyZSB0aGF0IGRvZXMg
-bm90IGtub3cgaG93IHRvIGludGVycHJldCB0aGUgZmllbGQgd2lsbCBmYWlsIHRvIGxvYWQgdGhl
-IGltYWdlIGJlY2F1c2UgaXQgYWxzbyBmYWlscyB0byByZWNvZ25pemUgdGhlIGFzc29jaWF0ZWQg
-bmV3IGluY29tcGF0aWJsZSBmZWF0dXJlIGJpdC4NCj4+DQo+PiBCdXQgSSdkIHJlYWxseSBsaWtl
-IEtldmluJ3Mgb3BpbmlvbiBvbiBob3cgbXVjaCB3b3JkaW5nIGlzIHdvcnRoIGFkZGluZy4NCj4+
-DQo+Pj4NCj4+PiBTbywgbWF5IGJlDQo+Pj4NCj4+PiBBZGRpdGlvbmFsIGZpZWxkcyBoYXMgdGhl
-IGZvbGxvd2luZyBjb21wYXRpYmxlIGJlaGF2aW9yIGJ5IGRlZmF1bHQ6DQo+Pg0KPj4gcy9oYXMv
-aGF2ZS8NCj4+DQo+Pj4NCj4+PiAxLiBJZiBzb2Z0d2FyZSBkb2Vzbid0IGtub3cgaG93IHRvIGlu
-dGVycHJldCB0aGUgZmllbGQsIGl0IG1heSBiZSBzYWZlbHkgaWdub3JlZCwgb3RoZXIgdGhhbiBw
-cmVzZXJ2aW5nIHRoZSBmaWVsZCB1bmNoYW5nZWQgd2hlbiByZXdyaXRpbmcgdGhlIGltYWdlIGhl
-YWRlci4NCj4+PiAyLiBaZXJvZWQgYWRkaXRpb25hbCBmaWVsZCBnaXZlcyB0aGUgc2FtZSBiZWhh
-dmlvciBhcyB3aGVuIHRoaXMgZmllbGQgaXMgb21pdHRlZC4NCj4+DQo+PiBCb3RoIGdvb2QuDQo+
-Pg0KPj4+DQo+Pj4gVGhpcyBkZWZhdWx0IGJlaGF2aW9yIG1heSBiZSBhbHRlcmVkIHdpdGggaGVs
-cCBvZiBpbmNvbXBhdGlibGUgZmVhdHVyZSBiaXRzLiBTbywgaWYsIGZvciBleGFtcGxlLCBhZGRp
-dGlvbmFsIGZpZWxkIGhhcyBjb3JyZXNwb25kaW5nIGluY29tcGF0aWJsZSBmZWF0dXJlIGJpdCwg
-YW5kIGl0IGlzIHNldCwgd2UgYXJlIHN1cmUgdGhhdCBzb2Z0d2FyZSB3aGljaCBvcGVucyB0aGUg
-aW1hZ2Uga25vd3MgaG93IHRvIGludGVycHJldCB0aGUgZmllbGQsIHNvLA0KPj4+IDEuIFRoZSBm
-aWVsZCBkZWZpbml0ZWx5IHdpbGwgbm90IGJlIGlnbm9yZWQgd2hlbiBjb3JyZXNwb25kaW5nIGlu
-Y29tcGF0aWJsZSBiaXQgaXMgc2V0Lg0KPj4+IDIuIFRoZSBmaWVsZCBtYXkgZGVmaW5lIGFueSBt
-ZWFuaW5nIGl0IHdhbnRzIGZvciB6ZXJvIHZhbHVlIGZvciB0aGUgY2FzZSB3aGVuIGNvcnJlc3Bv
-bmRpbmcgaW5jb21wYXRpYmxlIGJpdCBpcyBzZXQuDQo+Pg0KPj4gUmF0aGVyIHdvcmR5IGJ1dCBz
-ZWVtcyBhY2N1cmF0ZS7CoCBQZXJoYXBzIGNvbXByZXNzIGl0IHRvOg0KPj4NCj4+IDMuIEFueSBh
-ZGRpdGlvbmFsIGZpZWxkIHdob3NlIHZhbHVlIG11c3Qgbm90IGJlIGlnbm9yZWQgZm9yIGNvcnJl
-Y3QgaGFuZGxpbmcgb2YgdGhlIGZpbGUgd2lsbCBiZSBhY2NvbXBhbmllZCBieSBhIGNvcnJlc3Bv
-bmRpbmcgaW5jb21wYXRpYmxlIGZlYXR1cmUgYml0Lg0KPj4NCj4+IGFuZCBtYXliZSBldmVuIHJl
-b3JkZXIgaXQgdG8gbGlzdCB0aGUgcG9pbnRzIGFzOg0KPj4NCj4+IEFkZGl0aW9uYWwgZmllbGRz
-IGhhdmUgdGhlIGZvbGxvd2luZyBjb21wYXRpYmlsaXR5IHJ1bGVzOg0KPj4gMS4gQW55IGFkZGl0
-aW9uYWwgZmllbGQgd2hvc2UgdmFsdWUgbXVzdCBub3QgYmUgaWdub3JlZCBmb3IgY29ycmVjdCBo
-YW5kbGluZyBvZiB0aGUgZmlsZSB3aWxsIGJlIGFjY29tcGFuaWVkIGJ5IGEgY29ycmVzcG9uZGlu
-ZyBpbmNvbXBhdGlibGUgZmVhdHVyZSBiaXQuDQo+IA0KPiBJJ2QgbGlrZSB0byBzdHJlc3MsIHRo
-YXQgaW5jb21wYXRpYmxlIGJpdCBpcyBuZWVkZWQgZm9yIGluY29tcGF0aWJsZSB2YWx1ZSwgbm90
-IGZvciB0aGUgZmllbGQgaXRzZWxmLiAoU28gZmllbGQgbWF5IGJlIGFjY29tcGFuaWVkIGJ5IGlu
-Y29tcGF0aWJsZSBiaXQgZm9yIHNvbWUNCj4gaXQncyB2YWx1ZXMgYW5kIGZvciBvdGhlcnMgLSBu
-b3QpLCBTbywgd2hhdCBhYm91dA0KPiANCj4gMS4gSWYgdGhlIHZhbHVlIG9mIHRoZSBhZGRpdGlv
-bmFsIGZpZWxkIG11c3Qgbm90IGJlIGlnbm9yZWQgZm9yIGNvcnJlY3QgaGFuZGxpbmcgb2YgdGhl
-IGZpbGUsIGl0IHdpbGwgYmUgYWNjb21wYW5pZWQgYnkgYSBjb3JyZXNwb25kaW5nIGluY29tcGF0
-aWJsZSBmZWF0dXJlIGJpdC4NCj4gDQo+PiAyLiBJZiB0aGVyZSBhcmUgbm8gdW5yZWNvZ25pemVk
-IGluY29tcGF0aWJsZSBmZWF0dXJlIGJpdHMgc2V0LCBhbiBhZGRpdGlvbmFsIGZpZWxkIG1heSBi
-ZSBzYWZlbHkgaWdub3JlZCBvdGhlciB0aGFuIHByZXNlcnZpbmcgaXRzIHZhbHVlIHdoZW4gcmV3
-cml0aW5nIHRoZSBpbWFnZSBoZWFkZXIuDQo+IA0KPiBTb3VuZHMgbGlrZSB3ZSBjYW4gaWdub3Jl
-IHRoZSBmaWVsZCBpZiB3ZSBrbm93IGl0cyBtZWFuaW5nIGFuZCBrbm93IGl0cyBpbmNvbXBhdGli
-bGUgYml0Li4NCj4gDQo+IDIuIElmIHRoZXJlIGFyZSBubyB1bnJlY29nbml6ZWQgaW5jb21wYXRp
-YmxlIGZlYXR1cmUgYml0cyBzZXQsIGFuIHVua25vd24gYWRkaXRpb25hbCBmaWVsZCBtYXkgYmUg
-c2FmZWx5IGlnbm9yZWQgb3RoZXIgdGhhbiBwcmVzZXJ2aW5nIGl0cyB2YWx1ZSB3aGVuIHJld3Jp
-dGluZyB0aGUgaW1hZ2UgaGVhZGVyLg0KPiANCj4+IDMuIEFuIGV4cGxpY2l0IHZhbHVlIG9mIDAg
-d2lsbCBoYXZlIHRoZSBzYW1lIGJlaGF2aW9yIGFzIHdoZW4gdGhlIGZpZWxkIGlzIG5vdCBwcmVz
-ZW50Lg0KPiANCj4gQnV0IGl0IG1heSBiZSBjaGFuZ2VkIGJ5IGluY29tcGF0aWJsZSBiaXQuLg0K
-PiANCj4gMy4gQW4gZXhwbGljaXQgdmFsdWUgb2YgMCB3aWxsIGhhdmUgdGhlIHNhbWUgYmVoYXZp
-b3IgYXMgd2hlbiB0aGUgZmllbGQgaXMgbm90IHByZXNlbnQsIGlmIG5vdCBhbHRlcmVkIGJ5IHNw
-ZWNpZmljIGluY29tcGF0aWJsZSBiaXQuDQo+IA0KDQpFcmljLCBPSyBmb3IgeW91Pw0KDQo+Pg0K
-Pj4NCj4+Pj4+ICtJdCdzIGFsbG93ZWQgZm9yIHRoZSBoZWFkZXIgZW5kIHRvIGN1dCBzb21lIGZp
-ZWxkIGluIHRoZSBtaWRkbGUgKGluIHRoaXMgY2FzZQ0KPj4+Pj4gK3RoZSBmaWVsZCBpcyBjb25z
-aWRlcmVkIGFzIGFic2VudCksIGJ1dCBpbiB0aGlzIGNhc2UgdGhlIHBhcnQgb2YgdGhlIGZpZWxk
-DQo+Pj4+PiArd2hpY2ggaXMgY292ZXJlZCBieSBAaGVhZGVyX2xlbmd0aCBtdXN0IGJlIHplcm9l
-ZC4NCj4+Pj4+ICsNCj4+Pj4+ICvCoMKgwqDCoMKgwqDCoCA8IC4uLiBObyBhZGRpdGlvbmFsIGZp
-ZWxkcyBpbiB0aGUgaGVhZGVyIGN1cnJlbnRseSAuLi4gPg0KPj4+Pg0KPj4+PiBEbyB3ZSBldmVu
-IHN0aWxsIG5lZWQgdGhpcyBpZiB3ZSByZXF1aXJlIDgtYnl0ZSBhbGlnbm1lbnQ/wqAgV2UnZCBu
-ZXZlciBiZSBhYmxlIHRvIGN1dCBhIHNpbmdsZSBmaWVsZCBpbiB0aGUgbWlkZGxlDQo+Pj4NCj4+
-PiBobW0sIGZvciBleGFtcGxlOg0KPj4+IDEwNTogY29tcHJlc3Npb24gYnl0ZQ0KPj4+IDEwNi0x
-MTM6IHNvbWUgb3RoZXIgOC1ieXRlcyBmaWVsZCwgdW5hbGluZ2VkDQo+Pj4gMTEzLTExOTogcGFk
-ZGluZyB0byBtdWx0aXBseSBvZiA4DQo+Pj4NCj4+PiAtIGJhZCBleGFtcGxlLCBmb3Igc3VyZS4g
-QnV0IHRvIHByZXZlbnQgaXQsIHdlIHNob3VsZCBhbHNvIGRlZmluZSBzb21lIGZpZWxkIGFsaWdu
-bWVudCByZXF1aXJlbWVudHMuLg0KPj4+DQo+Pj4NCj4+Pj4gLCBidXQgSSBzdXBwb3NlIHlvdSBh
-cmUgd29ycmllZCBhYm91dCBjdXR0aW5nIGEgMi1maWVsZCAxNi1ieXRlIGFkZGl0aW9uIHRpZWQg
-dG8gYSBzaW5nbGUgZmVhdHVyZSBpbiB0aGUgbWlkZGxlLg0KPj4+DQo+Pj4gYW5kIHRoaXMgdG9v
-Lg0KPj4+DQo+Pj4+IMKgwqAgQnV0IHRoYXQncyBub3QgZ29pbmcgdG8gaGFwcGVuIGluIHByYWN0
-aWNlLg0KPj4+DQo+Pj4gd2h5IG5vdD8NCj4+Pg0KPj4+IDQgYnl0ZXM6IGZlYXR1cmUgMQ0KPj4+
-DQo+Pj4gNCBieXRlczogZmVhdHVyZSAyDQo+Pj4gOCBieXRlczogZmVhdHVyZSAyDQo+Pj4NCj4+
-PiBzbywgbGFzdCAxMiBieXRlcyBtYXkgYmUgY29uc2lkZXJlZCBhcyBvbmUgZmllbGQuLiBBbmQg
-c29mdHdhcmUgd2hpY2ggZG9uJ3Qga25vdyBhYm91dCBmZWF0dXJlMiwgd2lsbCBwYWQgaGVhZGVy
-IHRvIHRoZSBtaWRkbGUgb2YgZmVhdHVyZTINCj4+Pg0KPj4+PiBUaGUgb25seSB0aW1lIHRoZSBo
-ZWFkZXIgd2lsbCBiZSBsb25nZXIgdGhhbiAxMDQgYnl0ZXMgaXMgaWYgYXQgbGVhc3Qgb25lIGRv
-Y3VtZW50ZWQgb3B0aW9uYWwgZmVhdHVyZSBoYXMgYmVlbiBpbXBsZW1lbnRlZC9iYWNrcG9ydGVk
-LCBhbmQgdGhhdCBmZWF0dXJlIHdpbGwgYmUgaW1wbGVtZW50ZWQgaW4gaXRzIGVudGlyZXR5LsKg
-IElmIHlvdSBiYWNrcG9ydCBhIGxhdGVyIGZlYXR1cmUgYnV0IG5vdCB0aGUgZWFybGllciwgeW91
-J3JlIHN0aWxsIGdvaW5nIHRvIHNldCBoZWFkZXJfbGVuZ3RoIHRvIHRoZSBib3VuZGFyeSBvZiB0
-aGUgZmVhdHVyZSB0aGF0IHlvdSBBUkUgYmFja3BvcnRpbmcuDQo+Pj4NCj4+PiBUaGF0J3MgdHJ1
-ZSwgb2YgY291cnNlLg0KPj4+DQo+Pj4+IMKgwqAgVGh1cywgSSBhcmd1ZSB0aGF0IGJsaW5kbHkg
-c2V0dGluZyBoZWFkZXJfbGVuZ3RoIHRvIDEyMCBwcmlvciB0byB0aGUgc3RhbmRhcmQgZXZlciBk
-ZWZpbmluZyBvcHRpb25hbCBmaWVsZChzKSBhdCAxMTItMTIwIGlzIHByZW1hdHVyZSwgYW5kIHRo
-YXQgaWYgd2UgZXZlciBhZGQgYSBmZWF0dXJlIHJlcXVpcmluZyBieXRlcyAxMTItMTI4IGZvciBh
-IG5ldyBmZWF0dXJlLCB5b3Ugd2lsbCBuZXZlciBzZWUgYSB2YWxpZCBxY293MiBmaWxlIHdpdGgg
-YSBoZWFkZXIgbGVuZ3RoIG9mIDEyMC4NCj4+Pg0KPj4+IGNvbnNpZGVyIG15IGV4YW1wbGUgYWJv
-dmUuDQo+Pg0KPj4gQXMgbG9uZyBhcyB3ZSBuZXZlciBhZGQgbmV3IGZpZWxkcyB0aGF0IGFyZSBu
-b3QgOC1ieXRlIGFsaWduZWQgKGluY2x1ZGluZyBhbnkgZXhwbGljaXQgcGFkZGluZyksIHRoZW4g
-d2Ugd2lsbCBuZXZlciBoYXZlIHRoZSBjYXNlIG9mIGRpdmlkaW5nIGZpZWxkcyBpbiB0aGUgbWlk
-ZGxlIGJ5IGtlZXBpbmcgdGhlIGhlYWRlciBsZW5ndGggYSBtdWx0aXBsZSBvZiA4Lg0KPj4NCj4g
-DQo+IE9LLg0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+On 02.12.19 15:01, Janosch Frank wrote:
+> Up to now we only had an ioctl to reset vcpu data QEMU couldn't reach
+> for the initial reset, which was also called for the clear reset. To
+> be architecture compliant, we also need to clear local interrupts on a
+> normal reset.
+> 
+> Because of this and the upcoming protvirt support we need to add
+> ioctls for the missing clear and normal resets.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  target/s390x/cpu.c       | 14 ++++++++++++--
+>  target/s390x/kvm-stub.c  | 10 +++++++++-
+>  target/s390x/kvm.c       | 42 ++++++++++++++++++++++++++++++++--------
+>  target/s390x/kvm_s390x.h |  4 +++-
+>  4 files changed, 58 insertions(+), 12 deletions(-)
+> 
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index 829ce6ad54..906285888e 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -139,8 +139,18 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
+>      }
+>  
+>      /* Reset state inside the kernel that we cannot access yet from QEMU. */
+> -    if (kvm_enabled() && type != S390_CPU_RESET_NORMAL) {
+> -        kvm_s390_reset_vcpu(cpu);
+> +    if (kvm_enabled()) {
+> +        switch (type) {
+> +        case S390_CPU_RESET_CLEAR:
+> +            kvm_s390_reset_vcpu_clear(cpu);
+> +            break;
+> +        case S390_CPU_RESET_INITIAL:
+> +            kvm_s390_reset_vcpu_initial(cpu);
+> +            break;
+> +        case S390_CPU_RESET_NORMAL:
+> +            kvm_s390_reset_vcpu_normal(cpu);
+> +            break;
+> +        }
+>      }
+>  }
+>  
+> diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
+> index 5152e2bdf1..c4cd497f85 100644
+> --- a/target/s390x/kvm-stub.c
+> +++ b/target/s390x/kvm-stub.c
+> @@ -83,7 +83,15 @@ void kvm_s390_cmma_reset(void)
+>  {
+>  }
+>  
+> -void kvm_s390_reset_vcpu(S390CPU *cpu)
+> +void kvm_s390_reset_vcpu_initial(S390CPU *cpu)
+> +{
+> +}
+> +
+> +void kvm_s390_reset_vcpu_clear(S390CPU *cpu)
+> +{
+> +}
+> +
+> +void kvm_s390_reset_vcpu_normal(S390CPU *cpu)
+>  {
+>  }
+>  
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index ad6e38c876..7a2ec8b9f8 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -151,6 +151,7 @@ static int cap_s390_irq;
+>  static int cap_ri;
+>  static int cap_gs;
+>  static int cap_hpage_1m;
+> +static int cap_vcpu_resets;
+>  
+>  static int active_cmma;
+>  
+> @@ -342,6 +343,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      cap_async_pf = kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+>      cap_mem_op = kvm_check_extension(s, KVM_CAP_S390_MEM_OP);
+>      cap_s390_irq = kvm_check_extension(s, KVM_CAP_S390_INJECT_IRQ);
+> +    cap_vcpu_resets = kvm_check_extension(s, KVM_CAP_S390_VCPU_RESETS);
+>  
+>      if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
+>          || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
+> @@ -403,20 +405,44 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+>      return 0;
+>  }
+>  
+> -void kvm_s390_reset_vcpu(S390CPU *cpu)
+> +static void kvm_s390_reset_vcpu(S390CPU *cpu, unsigned long type)
+>  {
+>      CPUState *cs = CPU(cpu);
+>  
+> -    /* The initial reset call is needed here to reset in-kernel
+> -     * vcpu data that we can't access directly from QEMU
+> -     * (i.e. with older kernels which don't support sync_regs/ONE_REG).
+> -     * Before this ioctl cpu_synchronize_state() is called in common kvm
+> -     * code (kvm-all) */
+> -    if (kvm_vcpu_ioctl(cs, KVM_S390_INITIAL_RESET, NULL)) {
+> -        error_report("Initial CPU reset failed on CPU %i", cs->cpu_index);
+> +    /*
+> +     * The reset call is needed here to reset in-kernel vcpu data that
+> +     * we can't access directly from QEMU (i.e. with older kernels
+> +     * which don't support sync_regs/ONE_REG).  Before this ioctl
+> +     * cpu_synchronize_state() is called in common kvm code
+> +     * (kvm-all).
+> +     */
+> +    if (kvm_vcpu_ioctl(cs, type)) {
+> +        error_report("CPU reset failed on CPU %i", cs->cpu_index);
+>      }
+>  }
+>  
+> +void kvm_s390_reset_vcpu_initial(S390CPU *cpu)
+> +{
+> +    kvm_s390_reset_vcpu(cpu, KVM_S390_INITIAL_RESET);
+> +}
+> +
+> +void kvm_s390_reset_vcpu_clear(S390CPU *cpu)
+> +{
+> +    if (!cap_vcpu_resets) {
+> +        kvm_s390_reset_vcpu(cpu, KVM_S390_INITIAL_RESET);
+> +    } else {
+> +        kvm_s390_reset_vcpu(cpu, KVM_S390_CLEAR_RESET);
+> +    }
+> +}
+> +
+> +void kvm_s390_reset_vcpu_normal(S390CPU *cpu)
+> +{
+> +    if (!cap_vcpu_resets) {
+> +        return;
+> +    }
+> +    kvm_s390_reset_vcpu(cpu, KVM_S390_NORMAL_RESET);
+
+if (cap_vcpu_resets) {
+    kvm_s390_reset_vcpu(cpu, KVM_S390_NORMAL_RESET);
+}
+
+saves one LOC ;)
+
+Acked-by: David Hildenbrand <david@redhat.com>
+
+-- 
+Thanks,
+
+David / dhildenb
+
 
