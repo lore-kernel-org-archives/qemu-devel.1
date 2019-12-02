@@ -2,92 +2,64 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 021E9C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 02:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B97AC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 02:42:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC5BD20833
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 02:26:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2142720881
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 02:42:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NdKXEZFP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC5BD20833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YPjZCd5a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2142720881
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibbPe-0006WJ-RF
-	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 21:26:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59286)
+	id 1ibbex-0002hp-U1
+	for qemu-devel@archiver.kernel.org; Sun, 01 Dec 2019 21:41:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32974)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ibbOP-0005L0-0m
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 21:24:54 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ibbdY-00027Z-Jm
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 21:40:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ibbON-0007Oc-QB
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 21:24:52 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34677)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ibbON-0007O7-J2
- for qemu-devel@nongnu.org; Sun, 01 Dec 2019 21:24:51 -0500
-Received: by mail-pl1-x641.google.com with SMTP id h13so15567200plr.1
- for <qemu-devel@nongnu.org>; Sun, 01 Dec 2019 18:24:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9uZMeOcjp69CcLk4kJoh51jLK8rzeIE59U8CnyNM9uw=;
- b=NdKXEZFPqImyiun752tSnpnNEyZG0dTjM0NwfMw7m/reaycfYDF5JhWaLkXPkOm+hW
- YtJqnFRYK+0i68KbHUGbwDX7xf2L5eRwOn0Z4XexdP5slDmA5M9LquKLrv4macGSEYB+
- s5lvW11sgcZfqb3Fz8f+XJD2vb21K0F+tofwnUu1/gRNzCoMkcxH2ttbHaiiykR0sR80
- zKnYQhYym+rUBSKupGJLIAaTPKdO44FmyaKa+ejylbqwcUx+cNLcEDR3D+he+esdPIw/
- sVYX/yIT9nXJNPQnA151wsnHZN1GMcCzCZX7udc5Evd2SyE0OrSvQbR5JwmWTD5ld3sc
- sV7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9uZMeOcjp69CcLk4kJoh51jLK8rzeIE59U8CnyNM9uw=;
- b=IoyZvC0cajE/wsYrs2Wvi4oLl/s//SDFJWBm6ogJIqLR3QnU0JYucrqFztTo2NR18O
- iDYFeCUaCYEdIE2WwgCuVMgvN2YUEX4p/bX1YvtNx6Ot4nFmgdv8S73g3Srnil+dA83o
- AnozvExMxwqisH92TP1mtP89HP5koDDBVUHmtcrRlyi+A0wm+p/LHLyhX20ms1GKMvO8
- KEksnN+Gz2wnDGiDC1RnjI/KzkGeER5iRDLPTOuRo8oOFBcSZoigDFe9i0lfqKq3aaOY
- 8eC1w0zSTOsq//kynhNi4BWYnmh4vL9E+Ol8lGOEKh9wzheSUfQ0DCSs525Ic7rsndgE
- m+Iw==
-X-Gm-Message-State: APjAAAXOTzDoWUOyv5dVaoP9f5YbFroqikJ18mvaV7J6VV64JhOfYUq+
- z3cTupkCwQAQPFsP9vJ42xdh0g==
-X-Google-Smtp-Source: APXvYqwNCsLHCmgtq4yEB82YTo8Go2tM/yn6Jyk+zdoQ0lb8zpr6smFP27PzPme3sWBdki3UBROaiw==
-X-Received: by 2002:a17:90a:30a4:: with SMTP id
- h33mr32078066pjb.50.1575253490309; 
- Sun, 01 Dec 2019 18:24:50 -0800 (PST)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id h3sm20818336pji.16.2019.12.01.18.24.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 01 Dec 2019 18:24:49 -0800 (PST)
-Subject: Re: [PATCH v2 08/14] gdbstub: extend GByteArray to read register
- helpers
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191130084602.10818-1-alex.bennee@linaro.org>
- <20191130084602.10818-9-alex.bennee@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <e052df9d-d2bc-b257-adf1-33299bf7b6a5@linaro.org>
-Date: Sun, 1 Dec 2019 18:24:47 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ (envelope-from <dgibson@ozlabs.org>) id 1ibbdV-0007uF-M1
+ for qemu-devel@nongnu.org; Sun, 01 Dec 2019 21:40:32 -0500
+Received: from ozlabs.org ([203.11.71.1]:41543)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ibbdR-0007pv-TX; Sun, 01 Dec 2019 21:40:29 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47R8VB5Kp6z9sPL; Mon,  2 Dec 2019 13:40:18 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1575254418;
+ bh=4oAtVOnNfVKzynPYcJABQoI+O5UNEl6quI9RpuYr6zo=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=YPjZCd5aaXFP3ca0+m1IncxVRu7EoD1TpnuXvE4acAoheIs54wBk5VgrhvHknkZQl
+ L7J7FeQhXlwYkKm4pQpoUarmkiGCR0qlc+bYLPZBa6N+fil3aM8t00HzDm7IL5aaAW
+ lAGPMuv5a3vcpdJPSJfRMMt38WCIbfSvGOS5SryM=
+Date: Mon, 2 Dec 2019 13:39:47 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v6] ppc: well form kvmppc_hint_smt_possible error hint
+ helper
+Message-ID: <20191202023947.GA37909@umbus.fritz.box>
+References: <20191127191434.20945-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20191130084602.10818-9-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="LQksG6bCIzRHxTLp"
+Content-Disposition: inline
+In-Reply-To: <20191127191434.20945-1-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,48 +71,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
- luis.machado@linaro.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Marek Vasut <marex@denx.de>,
- alan.hayward@arm.com, "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "open list:S390 TCG CPUs" <qemu-s390x@nongnu.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- Stafford Horne <shorne@gmail.com>, David Gibson <david@gibson.dropbear.id.au>,
- damien.hedde@greensocs.com,
- "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Chris Wulff <crwulff@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
- Michael Walle <michael@walle.cc>, Palmer Dabbelt <palmer@dabbelt.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/30/19 8:45 AM, Alex Bennée wrote:
-> -static int cpu_read_virt_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
-> +static int cpu_read_virt_reg(CPUS390XState *env, GByteArray *mem_buf, int n)
+
+--LQksG6bCIzRHxTLp
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Nov 27, 2019 at 10:14:34PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Make kvmppc_hint_smt_possible hint append helper well formed:
+> rename errp to errp_in, as it is IN-parameter here (which is unusual
+> for errp), rename function to be kvmppc_error_append_*_hint.
+
+I'm not entirely convinced by the errp_in name, since it's actually
+both an in and out parameter.  Nonetheless, I've applied this to
+ppc-for-5.0.
+
+
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>=20
+> v6: keep kvmppc_ function prefix
+>     add r-b by Marc-Andr=E9
+>=20
+>  target/ppc/kvm_ppc.h | 4 ++--
+>  hw/ppc/spapr.c       | 2 +-
+>  target/ppc/kvm.c     | 6 +++---
+>  3 files changed, 6 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 98bd7d5da6..47b08a4030 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -28,7 +28,7 @@ void kvmppc_set_papr(PowerPCCPU *cpu);
+>  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+>  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+>  int kvmppc_smt_threads(void);
+> -void kvmppc_hint_smt_possible(Error **errp);
+> +void kvmppc_error_append_smt_possible_hint(Error **errp_in);
+>  int kvmppc_set_smt_threads(int smt);
+>  int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+>  int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+> @@ -164,7 +164,7 @@ static inline int kvmppc_smt_threads(void)
+>      return 1;
+>  }
+> =20
+> -static inline void kvmppc_hint_smt_possible(Error **errp)
+> +static inline void kvmppc_error_append_smt_possible_hint(Error **errp_in)
 >  {
->      switch (n) {
->      case S390_VIRT_CKC_REGNUM:
-> @@ -296,9 +296,9 @@ static int cpu_write_virt_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
->  /* total number of registers in s390-gs.xml */
->  #define S390_NUM_GS_REGS 4
->  
-> -static int cpu_read_gs_reg(CPUS390XState *env, uint8_t *mem_buf, int n)
-> +static int cpu_read_gs_reg(CPUS390XState *env, GByteArray *buf, int n)
+>      return;
+>  }
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index e076f6023c..1b87eb0ffd 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2564,7 +2564,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState *=
+spapr, Error **errp)
+>                                        " requires the use of VSMT mode %d=
+=2E\n",
+>                                        smp_threads, kvm_smt, spapr->vsmt);
+>                  }
+> -                kvmppc_hint_smt_possible(&local_err);
+> +                kvmppc_error_append_smt_possible_hint(&local_err);
+>                  goto out;
+>              }
+>          }
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index c77f9848ec..7406d18945 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2076,7 +2076,7 @@ int kvmppc_set_smt_threads(int smt)
+>      return ret;
+>  }
+> =20
+> -void kvmppc_hint_smt_possible(Error **errp)
+> +void kvmppc_error_append_smt_possible_hint(Error **errp_in)
+>  {
+>      int i;
+>      GString *g;
+> @@ -2091,10 +2091,10 @@ void kvmppc_hint_smt_possible(Error **errp)
+>              }
+>          }
+>          s =3D g_string_free(g, false);
+> -        error_append_hint(errp, "%s.\n", s);
+> +        error_append_hint(errp_in, "%s.\n", s);
+>          g_free(s);
+>      } else {
+> -        error_append_hint(errp,
+> +        error_append_hint(errp_in,
+>                            "This KVM seems to be too old to support VSMT.=
+\n");
+>      }
+>  }
 
-Sometimes you're changing the name from mem_buf and sometimes not.  Perhaps
-better not to change it anywhere, or change it everywhere first, without
-changing the type.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--LQksG6bCIzRHxTLp
+Content-Type: application/pgp-signature; name="signature.asc"
 
-r~
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3keW4ACgkQbDjKyiDZ
+s5Ih5g//XqhftL0BwBdLuELvQhc2+vEi6X9aBIk/C2N3WaVl10M0OHDRE0EHpsAf
+o2K1pUXbJ9VMrXnwnQbAQd8/oiP7CUOpoxFdBeisLSjkYBvu5ihDpUKNzO0rUH60
+YCCE+GA+rJwfZRgjKU0iWESz6q1s5C5VBB3eGGwNnJvIYXExLrBLAZWjUrXqBcYb
+ITkmG5qn5l8++JlDI3P7KqwWWGMp6qNKn4Nxeg4+CTJF52ZXTjO65ROarHejf7v1
+MIvi5tQUqh5QRuFU9YEHoCs8TiAvyZR1d0Fhdv0os98xVYZVE016/SnagKvnP27S
+mf3W5Zbv44rBvocZuzIsHFUF++X58LlKkHup5plx03YpzCJ1GSlS4vJa5hylEl9E
+N474vWaz+xOpVzf4FUOB0tUAbDC0abaggsqMQEcCgjgRLXe1dgghWrfLneoB2XNa
+GYp44U0AXzJ7AZxM0etzULA3kFOWL12qAljNFMMovjxUBt+uo04yuMXNueAeOl6s
+fFQugE1oT7WSz2W+w9kqJcsQlSFtH6VT53DJv2zE/aQ+Ic86k5b13/P2b4qeeYJg
+zscjnCjiLY/L7RnTyzFCi7haS4OqLj8AjEICcVH/TIL+9pewPWca3YQ3Ku04FMv7
+j3XZDIb+LENbYvp2DgUSUJaOQt9AmbK3kBupYDAtlPWGJZ6OAfs=
+=8UCV
+-----END PGP SIGNATURE-----
+
+--LQksG6bCIzRHxTLp--
 
