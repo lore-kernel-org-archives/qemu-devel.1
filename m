@@ -2,140 +2,89 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA99DC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B3DBC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:02:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0DFA22B48
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:01:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0DFA22B48
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 56CDA2231B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 09:02:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cZwuwVzA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56CDA2231B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibhZo-0006rl-Pv
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 04:01:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50587)
+	id 1ibhbQ-0008TY-Hg
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 04:02:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50877)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1ibhYb-0006C7-L3
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:59:50 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ibha9-0007Q5-2H
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:01:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1ibhYa-0004WE-Fd
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:59:49 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49164)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1ibhYa-0004Vg-9n
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 03:59:48 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xB28vMl0173053
- for <qemu-devel@nongnu.org>; Mon, 2 Dec 2019 03:59:47 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wkm46a1av-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 03:59:46 -0500
-Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Mon, 2 Dec 2019 08:59:45 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 2 Dec 2019 08:59:42 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xB28xfuj40567244
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 2 Dec 2019 08:59:41 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6E6CBAE045;
- Mon,  2 Dec 2019 08:59:41 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1006CAE056;
- Mon,  2 Dec 2019 08:59:41 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.35.210])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  2 Dec 2019 08:59:40 +0000 (GMT)
-Subject: Re: [PATCH 0/3] s390x: Increase architectural compliance
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20191129142025.21453-1-frankja@linux.ibm.com>
- <20191202095729.64cfbcc2.cohuck@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Mon, 2 Dec 2019 09:59:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ibha7-0005Fy-67
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:01:24 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36352)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ibha6-0005FZ-Q1
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 04:01:23 -0500
+Received: by mail-ot1-x344.google.com with SMTP id i4so3485856otr.3
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 01:01:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=yXcORxTGPt1VrU/1lhDjcVCbReSDnNfKZVMf0iJfjoM=;
+ b=cZwuwVzAmN5cyI8hq31cHJ50o0e0l8zoUnqu4BoxdIJFMyfc3gas53UrdKnp0pjVb4
+ myoyJa7NlJ73v1HMiPCu/jhj9stYwbs0Ym0cvFQVFTcHu/DiUJHIl849qFpccGWwtAgo
+ /PNT4+gbCcX7JUYZEDEHzX3FGfoUxp8mGKjzR1iE2icCaoy2pB8xXgnfE3PBcFjSfTCS
+ GBe2dTLVhN6Yr9xOm2IbJc9kj/RX/F5YPj37wg1jPVYGg9KIwCduURd8/hE9nRsxjFo2
+ 0nK6ngOyAqvlwKEOiqWpRE5wSsHG9LTmBG7qMvxC3b9AnOkPb7isHXOTp1c2NMMcpJgG
+ cCDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=yXcORxTGPt1VrU/1lhDjcVCbReSDnNfKZVMf0iJfjoM=;
+ b=DApokTnU3PcWxjUVpvRJmfWdeTDl90dEngAwCmQDvCusYrqeEgfmrLxS+BnFqbJExd
+ gFYs0YzFpCdJevg+Dgh00nUYpLNch51wLmdMYOVEJt6xSS/xAzOME7wyHEJzEyHe0cj2
+ 7abfSS02T6TKa7VTiNvb/lKOkhBOWzJ2Ju79k1cmMb/QOv9bgvB56atj+tTMKAH0Ljhb
+ ZpEkmtSqesbOd0Iluxu8mQlu8aB9UXMx2hyeVX1RNsr882AYLzBzxDKRqLfeDrOyuwld
+ 1yx4O+1CnKFfAFtEd98dJTMkAc1gv6XtJeQRU7bb57oMLUgwOx7/ZLjdT/AYBQalU1bE
+ IjTw==
+X-Gm-Message-State: APjAAAXg5kpU4OPXRIZyfofFAyfpBe7ShgeYThBZXEBw8lj65/+XHKnY
+ kvx2Sh5O3PFmzpuKZyEAcSDfdHyqUOa9vYohDGg=
+X-Google-Smtp-Source: APXvYqxKvB/A5eoCOZMNB1CHhSb75C+J/LhQSf7Zztawfop2UGonIDVXma/n5/lpaKsexpdxAQlphWFWPkZ4g3tJO9w=
+X-Received: by 2002:a9d:58c9:: with SMTP id s9mr15061037oth.121.1575277281563; 
+ Mon, 02 Dec 2019 01:01:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191202095729.64cfbcc2.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="HsMq76CyCjxeFadung4RX3EVMWyxjoGF2"
-X-TM-AS-GCONF: 00
-x-cbid: 19120208-4275-0000-0000-00000389A6FF
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120208-4276-0000-0000-0000389D4023
-Message-Id: <3cee5d8e-dab7-e0d9-38b2-6dc3ac9e011b@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-02_01:2019-11-29,2019-12-02 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 malwarescore=0
- spamscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
- impostorscore=0 adultscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912020081
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Mon, 2 Dec 2019 01:01:21 -0800 (PST)
+In-Reply-To: <CAL1e-=gP+jBkvDtiB8_QWqP0_6weMYqe2TAwB+p_H43WPJhXKA@mail.gmail.com>
+References: <20191127175257.23480-1-mrolnik@gmail.com>
+ <20191127175257.23480-6-mrolnik@gmail.com>
+ <CAL1e-=jzJ3XAEqHOr4Z4UwyRZcfNs_nbKjvvUiX+BSKv6sPH5g@mail.gmail.com>
+ <CAL1e-=i9ft-Py65fjuNt=TBFqw+EOerp9JBUsZa2i0wN8mAPJw@mail.gmail.com>
+ <CAK4993gztHpfAViSboHQAio7oHMOoJk3gDr_T9w4e9mjA9avBA@mail.gmail.com>
+ <CAL1e-=gNsZeX8zdYO0Cjo8eYaRo-=MReR4u3UDcppPxV-bs+WQ@mail.gmail.com>
+ <CAK4993h961Yy4tFdRYwF+LOLYGynY-d7E6pPss-YZ984j9UpsA@mail.gmail.com>
+ <CAL1e-=gP+jBkvDtiB8_QWqP0_6weMYqe2TAwB+p_H43WPJhXKA@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 2 Dec 2019 10:01:21 +0100
+Message-ID: <CAL1e-=jPCDQu2TOgj1qN1Rm8tpWRXrKg_hzVUgr5gxXvFpvggQ@mail.gmail.com>
+Subject: Re: [PATCH v37 05/17] target/avr: Add instruction translation -
+ Arithmetic and Logic Instructions
+To: Michael Rolnik <mrolnik@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000ca5f8d0598b4d232"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,81 +96,320 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, qemu-devel@nongnu.org,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HsMq76CyCjxeFadung4RX3EVMWyxjoGF2
-Content-Type: multipart/mixed; boundary="Iro6rg5xKnEzr607dxHEQCW7X1SV48ZH5"
+--000000000000ca5f8d0598b4d232
+Content-Type: text/plain; charset="UTF-8"
 
---Iro6rg5xKnEzr607dxHEQCW7X1SV48ZH5
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+On Monday, December 2, 2019, Aleksandar Markovic <
+aleksandar.m.mail@gmail.com> wrote:
+>
+>
+> +
+> +    /* update status register */
+> +    tcg_gen_movi_tl(cpu_Vf, 0); /* Vf = 0 */
+> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
+> +    gen_ZNSf(R);
+> +    tcg_gen_mov_tl(Rd, R);
+> +
+>
+
+My email client drives me crazy, all lines from the above segment should be
+consecutive, without any empty lines in between. If you see empty lines,
+that is because of my email client.
+
+
+> The idea is to distinguish visually better the portions for updating
+> status register from the central part of the operation (usually marked by
+> "/* op */" comment. The code also gets more compact, which looks like a
+> good thing too.
+>
+> Aleksandar
+>
+>
+>> Regards,
+>> Michael Rolnik
+>>
+>> On Sun, Dec 1, 2019 at 1:11 AM Aleksandar Markovic <
+>> aleksandar.m.mail@gmail.com> wrote:
+>>
+>>>
+>>>
+>>> On Saturday, November 30, 2019, Michael Rolnik <mrolnik@gmail.com>
+>>> wrote:
+>>>
+>>>> Hi Aleksandar.
+>>>>
+>>>> thanks for pointing that out I was not aware of that.
+>>>> I can fix it.
+>>>>
+>>>>
+>>> Hey, Michael,
+>>>
+>>> Please take alook at this:
+>>>
+>>> https://en.m.wikipedia.org/wiki/ATtiny_microcontroller_comparison_chart
+>>>
+>>> It looks that all cases of AVR 16-gpr-registers cores belong to the
+>>> group "avrtiny10", that actually you may want to add to your solution.
+>>> Just a hint.
+>>>
+>>> Best regards,
+>>> Aleksandar
+>>>
+>>>
+>>>
+>>> Regards,
+>>>> Michael Rolnik
+>>>>
+>>>> On Sat, Nov 30, 2019 at 6:29 PM Aleksandar Markovic <
+>>>> aleksandar.m.mail@gmail.com> wrote:
+>>>>
+>>>>>
+>>>>>
+>>>>> On Saturday, November 30, 2019, Aleksandar Markovic <
+>>>>> aleksandar.m.mail@gmail.com> wrote:
+>>>>>
+>>>>>>
+>>>>>>
+>>>>>> On Wednesday, November 27, 2019, Michael Rolnik <mrolnik@gmail.com>
+>>>>>> wrote:
+>>>>>>
+>>>>>> +
+>>>>>>> +
+>>>>>>> +/*
+>>>>>>> + *  Performs the logical AND between the contents of register Rd
+>>>>>>> and register
+>>>>>>> + *  Rr and places the result in the destination register Rd.
+>>>>>>> + */
+>>>>>>> +static bool trans_AND(DisasContext *ctx, arg_AND *a)
+>>>>>>> +{
+>>>>>>> +    TCGv Rd = cpu_r[a->rd];
+>>>>>>> +    TCGv Rr = cpu_r[a->rr];
+>>>>>>> +    TCGv R = tcg_temp_new_i32();
+>>>>>>> +
+>>>>>>> +    /* op */
+>>>>>>> +    tcg_gen_and_tl(R, Rd, Rr); /* Rd = Rd and Rr */
+>>>>>>> +
+>>>>>>> +    /* Vf */
+>>>>>>> +    tcg_gen_movi_tl(cpu_Vf, 0); /* Vf = 0 */
+>>>>>>> +
+>>>>>>> +    /* Zf */
+>>>>>>> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0
+>>>>>>> */
+>>>>>>> +
+>>>>>>> +    gen_ZNSf(R);
+>>>>>>> +
+>>>>>>> +    /* R */
+>>>>>>> +    tcg_gen_mov_tl(Rd, R);
+>>>>>>> +
+>>>>>>> +    tcg_temp_free_i32(R);
+>>>>>>> +
+>>>>>>> +    return true;
+>>>>>>> +}
+>>>>>>> +
+>>>>>>> +
+>>>>>>>
+>>>>>>
+>>>>>> According to specs:
+>>>>>>
+>>>>>> http://ww1.microchip.com/downloads/en/devicedoc/atmel-42505-
+>>>>>> 8-bit-avr-microcontrollers-attiny102-attiny104_datasheet.pdf
+>>>>>>
+>>>>>> ... the chips in question have cores with 16 GPRs (that correspond to
+>>>>>> GPRs R16-R31 of more common AVR cores with 32 GPRs).
+>>>>>>
+>>>>>>
+>>>>> There are more examples;
+>>>>>
+>>>>> http://ww1.microchip.com/downloads/en/DeviceDoc/atmel-8127-
+>>>>> avr-8-bit-microcontroller-attiny4-attiny5-attiny9-
+>>>>> attiny10_datasheet.pdf
+>>>>>
+>>>>> Also ATtiny20, ATtiny40.
+>>>>>
+>>>>> How do you handle such cores?
+>>>>>>
+>>>>>> I don't see here anything preventing usage of all 32 GPRs, resulting,
+>>>>>> of course, in an inaccurate emulation.
+>>>>>>
+>>>>>> Thanks,
+>>>>>> Aleksandar
+>>>>>>
+>>>>>
+>>>>
+>>>> --
+>>>> Best Regards,
+>>>> Michael Rolnik
+>>>>
+>>>
+>>
+>> --
+>> Best Regards,
+>> Michael Rolnik
+>>
+>
+
+--000000000000ca5f8d0598b4d232
+Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 12/2/19 9:57 AM, Cornelia Huck wrote:
-> On Fri, 29 Nov 2019 09:20:22 -0500
-> Janosch Frank <frankja@linux.ibm.com> wrote:
->=20
->> On a diag 308 subcode 0 and 1 we need to load the whole reset PSW and
->> not just the address.
->>
->> On a cpu reset normal, we need to clear local cpus. Unfortunately we
->> need a new API for that, since KVM only exposes one of the three
->> resets.
->>
->> Patches are also in my cleanup branch.
->>
->> Janosch Frank (3):
->>   s390x: Properly fetch and test the short psw on diag308 subc 0/1
->>   Sync reset
->>   s390x: protvirt: Add new VCPU reset functions
->>
->>  linux-headers/linux/kvm.h |  7 +++++++
->>  target/s390x/cpu.c        | 26 ++++++++++++++++++++++----
->>  target/s390x/cpu.h        |  1 +
->>  target/s390x/kvm-stub.c   | 10 +++++++++-
->>  target/s390x/kvm.c        | 38 ++++++++++++++++++++++++++++++++------=
+<br><br>On Monday, December 2, 2019, Aleksandar Markovic &lt;<a href=3D"mai=
+lto:aleksandar.m.mail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt; wrote:=
+<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
+x #ccc solid;padding-left:1ex"><div><br></div><div><span style=3D"color:rgb=
+(0,123,53);font-size:14px;line-height:22.1200008392334px">+</span><br style=
+=3D"color:rgb(0,123,53);font-size:14px;line-height:22.1200008392334px"><spa=
+n style=3D"color:rgb(0,123,53);font-size:14px;line-height:22.1200008392334p=
+x">+=C2=A0 =C2=A0 /* update status register */</span><br style=3D"color:rgb=
+(0,123,53);font-size:14px;line-height:22.1200008392334px"><span style=3D"co=
+lor:rgb(0,123,53);font-size:14px;line-height:22.1200008392334px">+=C2=A0 =
+=C2=A0 tcg_gen_movi_tl(cpu_Vf, 0); /* Vf =3D 0 */</span><br style=3D"color:=
+rgb(0,123,53);font-size:14px;line-height:22.1200008392334px"><span style=3D=
+"color:rgb(0,123,53);font-size:14px;line-height:22.1200008392334px">+=C2=A0=
+ =C2=A0 tcg_gen_setcondi_tl(TCG_COND_</span><span style=3D"color:rgb(0,123,=
+53);font-size:14px;line-height:22.1200008392334px">E<wbr>Q, cpu_Zf, R, 0); =
+/* Zf =3D R =3D=3D 0 */</span><br style=3D"color:rgb(0,123,53);font-size:14=
+px;line-height:22.1200008392334px"><span style=3D"color:rgb(0,123,53);font-=
+size:14px;line-height:22.1200008392334px">+=C2=A0 =C2=A0 gen_ZNSf(R);</span=
+><br style=3D"color:rgb(0,123,53);font-size:14px;line-height:22.12000083923=
+34px"><span style=3D"color:rgb(0,123,53);font-size:14px;line-height:22.1200=
+008392334px">+=C2=A0 =C2=A0 tcg_gen_mov_tl(Rd, R);</span><br style=3D"color=
+:rgb(0,123,53);font-size:14px;line-height:22.1200008392334px"><span style=
+=3D"color:rgb(0,123,53);font-size:14px;line-height:22.1200008392334px">+</s=
+pan><br style=3D"color:rgb(0,123,53);font-size:14px;line-height:22.12000083=
+92334px"></div><div></div></blockquote><div><br></div><div>My email client =
+drives me crazy, all lines from the above segment should be consecutive, wi=
+thout any empty lines in between. If you see empty lines, that is because o=
+f my email client.=C2=A0</div><div><br></div><blockquote class=3D"gmail_quo=
+te" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"=
+><div></div><div><span style=3D"color:rgb(0,123,53);font-size:14px;line-hei=
+ght:22.1200008392334px"><br></span></div><div><div>The idea is to distingui=
+sh visually better the portions for updating status register from the centr=
+al part of the operation (usually marked by &quot;/* op */&quot; comment. T=
+he code also gets more compact, which looks like a good thing too.</div></d=
+iv><div><br></div><div>Aleksandar</div><div>=C2=A0</div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex"><div dir=3D"ltr"><div>Regards,</div><div>Michael Rolnik</div>=
+</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">=
+On Sun, Dec 1, 2019 at 1:11 AM Aleksandar Markovic &lt;<a href=3D"mailto:al=
+eksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a=
+>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br=
+><br>On Saturday, November 30, 2019, Michael Rolnik &lt;<a href=3D"mailto:m=
+rolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt; wrote:<br><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-lef=
+t:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr">Hi Aleksand=
+ar.<div><br></div><div>thanks for pointing that out I was not aware=C2=A0of=
+ that.</div><div>I can fix it.</div><div><br></div></div></blockquote><div>=
+<br></div><div>Hey, Michael,</div><div><br></div><div>Please take alook at =
+this:</div><div><br></div><div><a href=3D"https://en.m.wikipedia.org/wiki/A=
+Ttiny_microcontroller_comparison_chart" target=3D"_blank">https://en.m.wiki=
+pedia.org/wik<wbr>i/ATtiny_microcontroller_compa<wbr>rison_chart</a></div><=
+div><br></div><div>It looks that all cases of AVR 16-gpr-registers cores be=
+long to the group &quot;<span style=3D"color:rgb(34,34,34);font-family:-app=
+le-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,Lato,Helvetica,Ari=
+al,sans-serif;font-size:16px;line-height:26.4px">avrtiny10&quot;, that actu=
+ally you may want to add to your solution. Just a hint.</span></div><div><s=
+pan style=3D"color:rgb(34,34,34);font-family:-apple-system,BlinkMacSystemFo=
+nt,&quot;Segoe UI&quot;,Roboto,Lato,Helvetica,Arial,sans-serif;font-size:16=
+px;line-height:26.4px"><br></span></div><div><span style=3D"color:rgb(34,34=
+,34);font-family:-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Robo=
+to,Lato,Helvetica,Arial,sans-serif;font-size:16px;line-height:26.4px">Best =
+regards,</span></div><div>Aleksandar</div><div><span style=3D"color:rgb(34,=
+34,34);font-family:-apple-system,BlinkMacSystemFont,&quot;Segoe UI&quot;,Ro=
+boto,Lato,Helvetica,Arial,sans-serif;font-size:16px;line-height:26.4px"><br=
+></span></div><div><span style=3D"color:rgb(34,34,34);font-family:-apple-sy=
+stem,BlinkMacSystemFont,&quot;Segoe UI&quot;,Roboto,Lato,Helvetica,Arial,sa=
+ns-serif;font-size:16px;line-height:26.4px"><br></span></div><div><span sty=
+le=3D"color:rgb(34,34,34);font-family:-apple-system,BlinkMacSystemFont,&quo=
+t;Segoe UI&quot;,Roboto,Lato,Helvetica,Arial,sans-serif;font-size:16px;line=
+-height:26.4px"><br></span></div><blockquote class=3D"gmail_quote" style=3D=
+"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-le=
+ft:1ex"><div dir=3D"ltr"><div>Regards,</div><div>Michael Rolnik</div></div>=
+<br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Sat=
+, Nov 30, 2019 at 6:29 PM Aleksandar Markovic &lt;<a href=3D"mailto:aleksan=
+dar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt;=
+ wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
+0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br><br>=
+On Saturday, November 30, 2019, Aleksandar Markovic &lt;<a href=3D"mailto:a=
+leksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</=
+a>&gt; wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px =
+0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br><br>=
+On Wednesday, November 27, 2019, Michael Rolnik &lt;<a href=3D"mailto:mroln=
+ik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt; wrote:<div><br><b=
+lockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-le=
+ft:1px solid rgb(204,204,204);padding-left:1ex">
++<br>
++<br>
++/*<br>
++ *=C2=A0 Performs the logical AND between the contents of register Rd and =
+register<br>
++ *=C2=A0 Rr and places the result in the destination register Rd.<br>
++ */<br>
++static bool trans_AND(DisasContext *ctx, arg_AND *a)<br>
++{<br>
++=C2=A0 =C2=A0 TCGv Rd =3D cpu_r[a-&gt;rd];<br>
++=C2=A0 =C2=A0 TCGv Rr =3D cpu_r[a-&gt;rr];<br>
++=C2=A0 =C2=A0 TCGv R =3D tcg_temp_new_i32();<br>
++<br>
++=C2=A0 =C2=A0 /* op */<br>
++=C2=A0 =C2=A0 tcg_gen_and_tl(R, Rd, Rr); /* Rd =3D Rd and Rr */<br>
++<br>
++=C2=A0 =C2=A0 /* Vf */<br>
++=C2=A0 =C2=A0 tcg_gen_movi_tl(cpu_Vf, 0); /* Vf =3D 0 */<br>
++<br>
++=C2=A0 =C2=A0 /* Zf */<br>
++=C2=A0 =C2=A0 tcg_gen_setcondi_tl(TCG_COND_E<wbr>Q, cpu_Zf, R, 0); /* Zf =
+=3D R =3D=3D 0 */<br>
++<br>
++=C2=A0 =C2=A0 gen_ZNSf(R);<br>
++<br>
++=C2=A0 =C2=A0 /* R */<br>
++=C2=A0 =C2=A0 tcg_gen_mov_tl(Rd, R);<br>
++<br>
++=C2=A0 =C2=A0 tcg_temp_free_i32(R);<br>
++<br>
++=C2=A0 =C2=A0 return true;<br>
++}<br>
++<br>
++<br>
+</blockquote><div><br></div><div>According to specs:</div><div><br></div><d=
+iv><a href=3D"http://ww1.microchip.com/downloads/en/devicedoc/atmel-42505-8=
+-bit-avr-microcontrollers-attiny102-attiny104_datasheet.pdf" target=3D"_bla=
+nk">http://ww1.microchip.com/downl<wbr>oads/en/devicedoc/atmel-42505-<wbr>8=
+-bit-avr-microcontrollers-<wbr>attiny102-attiny104_datasheet.<wbr>pdf</a><b=
+r></div></div><div><br></div><div>... the chips in question have cores with=
+ 16 GPRs (that correspond to GPRs R16-R31 of more common AVR cores with 32 =
+GPRs).</div><div><br></div></blockquote><div><br></div><div>There are more =
+examples;</div><div><br></div><div><a href=3D"http://ww1.microchip.com/down=
+loads/en/DeviceDoc/atmel-8127-avr-8-bit-microcontroller-attiny4-attiny5-att=
+iny9-attiny10_datasheet.pdf" target=3D"_blank">http://ww1.microchip.com/dow=
+nl<wbr>oads/en/DeviceDoc/atmel-8127-<wbr>avr-8-bit-microcontroller-<wbr>att=
+iny4-attiny5-attiny9-<wbr>attiny10_datasheet.pdf</a><br></div><div><br></di=
+v><div>Also ATtiny20, ATtiny40.</div><div><br></div><blockquote class=3D"gm=
+ail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,=
+204,204);padding-left:1ex"><div>How do you handle such cores?</div><div><br=
+></div><div>I don&#39;t see here anything preventing usage of all 32 GPRs, =
+resulting, of course, in an inaccurate emulation.</div><div><br></div><div>=
+Thanks,</div><div>Aleksandar</div>
+</blockquote>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+>Best Regards,<br>Michael Rolnik</div>
+</blockquote>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+>Best Regards,<br>Michael Rolnik</div>
+</blockquote>
+</blockquote>
 
->>  target/s390x/kvm_s390x.h  |  4 +++-
->>  6 files changed, 74 insertions(+), 12 deletions(-)
->>
->=20
-> Ok, it seems I should just go ahead and pick patch 1, and defer the
-> remainder until after we agree on the interface, right?
->=20
-
-Yes. I'm currently reworking and testing the reset patch and there's one
-more patch that'll come into this series, as I found another problem.
-
-
---Iro6rg5xKnEzr607dxHEQCW7X1SV48ZH5--
-
---HsMq76CyCjxeFadung4RX3EVMWyxjoGF2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3k0nwACgkQ41TmuOI4
-ufi3Xg/+KO9ai3mARm1fBXbR4VIXdYNUM0NKcf7NdeMpsR205wqv3snZMnp/ILq+
-474xPd/7pZl51i42JgOfwPUrMl9g/aMCaEUVVLIib4UMDpkyIm4Q9A+tNTMAkEAj
-QYumJT031Ss3UuLBa/aDhWByooJgkunWIm+fo+GD2+CZLNHqYP8MWwWRoUtnq3QH
-16Ga7NZITnpUa9Wtwep+4sPEMJhqNl40F0zgVzeOzi55LcS0CarORg7Os7gJ2+K8
-YJayheAg5z6BZuoCtNL+RUGvUArhvaMeA6ZM5eRQCNmIwCgoXfhULWFHf3qlaO5p
-26nhwiWg22tZBSLJq9v3yb9+yiRZgBca7+O2ea8qstYH3FyG1S7Z4Y/j/JUMn29m
-2+2Uij63O0UfInJePxlOGL+k+mODuaR5ICAErPvlsrQc1WrTZ4miR4I2mFl9MQj7
-yEiDfSeTWyaIBQ5SUibVBGQLF9aegCm5mYZzct+atayTGQa9ETGTGQjo0JsUZ4dD
-U1j/09G3ggvP0VWRD5btYcaSMwNkY9wvTDfB3TIFzMGfQsY5VuvI6EFFK12gKMIE
-K6J6ScNmxxyNgg9ooyyB5Zuq/aWviYPYmu5sm2LWwMRjInG6HJHqjb2cGE3aZ6pj
-q7TzwNh7InrHF8zzFtMJ3egLKnrqXtiV1H3SEKLMak74BNmN3Bo=
-=6plc
------END PGP SIGNATURE-----
-
---HsMq76CyCjxeFadung4RX3EVMWyxjoGF2--
-
+--000000000000ca5f8d0598b4d232--
 
