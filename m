@@ -2,60 +2,63 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A531BC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 06:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D23DC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 06:17:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6397820705
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 06:09:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bi3XDkPw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6397820705
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 223D720833
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 06:17:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 223D720833
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibetk-00054a-JF
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 01:09:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58147)
+	id 1ibf1u-0007xV-9T
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 01:17:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58684)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ibesf-0004Vv-Cz
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 01:08:22 -0500
+ (envelope-from <jan.kiszka@siemens.com>) id 1ibf17-0007Yp-Tg
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 01:17:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ibesd-00016o-Th
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 01:08:21 -0500
-Received: from ozlabs.org ([203.11.71.1]:53979)
+ (envelope-from <jan.kiszka@siemens.com>) id 1ibf16-0002Qt-2F
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 01:17:05 -0500
+Received: from thoth.sbs.de ([192.35.17.2]:59111)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ibesZ-00016B-8u; Mon, 02 Dec 2019 01:08:16 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47RF621gLzz9sPL; Mon,  2 Dec 2019 17:08:10 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1575266890;
- bh=USu8JlsY/OzHA2YhXxTPxDDMZBunzRsn+270mXy38Zo=;
- h=From:To:Cc:Subject:Date:From;
- b=bi3XDkPwIZaOws/HGq/oT54ob58swfTjE0sP4YauSYuvixDLssPVIE1tKsGEYBcMJ
- TcWo7VfXn6a1tbmIzSpeW44GVJQYIZBwLMVJhCGTzM4LoTpcrnMQExbq2XR7JCzJCt
- mcZ+GuU/2FAVchKJPlHlrdjXqvsBtUQzN/lAns/Q=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PATCHv3] exynos4210_gic: Suppress gcc9 format-truncation warnings
-Date: Mon,  2 Dec 2019 17:08:06 +1100
-Message-Id: <20191202060806.77968-1-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.23.0
+ (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+ id 1ibf15-0002Qf-Or
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 01:17:04 -0500
+Received: from mail1.sbs.de (mail1.sbs.de [192.129.41.35])
+ by thoth.sbs.de (8.15.2/8.15.2) with ESMTPS id xB26GxtF019753
+ (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 2 Dec 2019 07:16:59 +0100
+Received: from [167.87.6.91] ([167.87.6.91])
+ by mail1.sbs.de (8.15.2/8.15.2) with ESMTP id xB26Gv0X023939;
+ Mon, 2 Dec 2019 07:16:58 +0100
+Subject: Re: [RFC][PATCH 0/3] IVSHMEM version 2 device for QEMU
+From: Jan Kiszka <jan.kiszka@siemens.com>
+To: Liang Yan <LYan@suse.com>, qemu-devel <qemu-devel@nongnu.org>
+References: <cover.1573477032.git.jan.kiszka@siemens.com>
+ <efd5fa87-90de-fccc-97a5-a4fc71a050c8@suse.com>
+ <fb213f9e-8bd8-6c33-7a6e-47dda982903d@siemens.com>
+Message-ID: <0c6969db-848f-f05b-2dc0-589cb422aa56@siemens.com>
+Date: Mon, 2 Dec 2019 07:16:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <fb213f9e-8bd8-6c33-7a6e-47dda982903d@siemens.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-MIME-Autoconverted: from 8bit to quoted-printable by thoth.sbs.de id
+ xB26GxtF019753
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 192.35.17.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,77 +70,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: i.mitsyanko@gmail.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Jailhouse <jailhouse-dev@googlegroups.com>,
+ Claudio Fontana <claudio.fontana@gmail.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-exynos4210_gic_realize() prints the number of cpus into some temporary
-buffers, but it only allows 3 bytes space for it.  That's plenty:
-existing machines will only ever set this value to EXYNOS4210_NCPUS
-(2).  But the compiler can't always figure that out, so some[*] gcc9
-versions emit -Wformat-truncation warnings.
-
-We can fix that by hinting the constraint to the compiler with a
-suitably placed assert().
-
-[*] The bizarre thing here, is that I've long gotten these warnings
-    compiling in a 32-bit x86 container as host - Fedora 30 with
-    gcc-9.2.1-1.fc30.i686 - but it compiles just fine on my normal
-    x86_64 host - Fedora 30 with and gcc-9.2.1-1.fc30.x86_64.
-
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Peter, up to you if you squeeze this in for qemu-4.2 or leave it until 5.=
-0
-
-Changes since v2:
- * Moved the assert outside the for loop using a trick suggested by
-   Richard Henderson
-Changes since v1:
- * Used an assert to hint the compiler, instead of increasing the
-   buffer size.
-
----
- hw/intc/exynos4210_gic.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
-index a1b699b6ba..ddd006aca6 100644
---- a/hw/intc/exynos4210_gic.c
-+++ b/hw/intc/exynos4210_gic.c
-@@ -293,6 +293,7 @@ static void exynos4210_gic_realize(DeviceState *dev, =
-Error **errp)
-     char cpu_alias_name[sizeof(cpu_prefix) + 3];
-     char dist_alias_name[sizeof(cpu_prefix) + 3];
-     SysBusDevice *gicbusdev;
-+    uint32_t n =3D s->num_cpu;
-     uint32_t i;
+On 27.11.19 18:19, Jan Kiszka wrote:
+> Hi Liang,
+>=20
+> On 27.11.19 16:28, Liang Yan wrote:
+>>
+>>
+>> On 11/11/19 7:57 AM, Jan Kiszka wrote:
+>>> To get the ball rolling after my presentation of the topic at KVM For=
+um
+>>> [1] and many fruitful discussions around it, this is a first concrete
+>>> code series. As discussed, I'm starting with the IVSHMEM implementati=
+on
+>>> of a QEMU device and server. It's RFC because, besides specification =
+and
+>>> implementation details, there will still be some decisions needed abo=
+ut
+>>> how to integrate the new version best into the existing code bases.
+>>>
+>>> If you want to play with this, the basic setup of the shared memory
+>>> device is described in patch 1 and 3. UIO driver and also the
+>>> virtio-ivshmem prototype can be found at
+>>>
+>>>     =20
+>>> http://git.kiszka.org/?p=3Dlinux.git;a=3Dshortlog;h=3Drefs/heads/queu=
+es/ivshmem2=20
+>>>
+>>>
+>>> Accessing the device via UIO is trivial enough. If you want to use it
+>>> for virtio, this is additionally to the description in patch 3 needed=
+ on
+>>> the virtio console backend side:
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 modprobe uio_ivshmem
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 echo "1af4 1110 1af4 1100 ffc003 ffffff" >=20
+>>> /sys/bus/pci/drivers/uio_ivshmem/new_id
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 linux/tools/virtio/virtio-ivshmem-console /d=
+ev/uio0
+>>>
+>>> And for virtio block:
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 echo "1af4 1110 1af4 1100 ffc002 ffffff" >=20
+>>> /sys/bus/pci/drivers/uio_ivshmem/new_id
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 linux/tools/virtio/virtio-ivshmem-console /d=
+ev/uio0=20
+>>> /path/to/disk.img
+>>>
+>>> After that, you can start the QEMU frontend instance with the
+>>> virtio-ivshmem driver installed which can use the new /dev/hvc* or
+>>> /dev/vda* as usual.
+>>>
+>>> Any feedback welcome!
+>>
+>> Hi, Jan,
+>>
+>> I have been playing your code for last few weeks, mostly study and tes=
+t,
+>> of course. Really nice work. I have a few questions here:
+>>
+>> First, qemu part looks good, I tried test between couple VMs, and devi=
+ce
+>> could pop up correctly for all of them, but I had some problems when
+>> trying load driver. For example, if set up two VMs, vm1 and vm2, start
+>> ivshmem server as you suggested. vm1 could load uio_ivshmem and
+>> virtio_ivshmem correctly, vm2 could load uio_ivshmem but could not sho=
+w
+>> up "/dev/uio0", virtio_ivshmem could not be loaded at all, these still
+>> exist even I switch the load sequence of vm1 and vm2, and sometimes
+>> reset "virtio_ivshmem" could crash both vm1 and vm2. Not quite sure th=
+is
+>> is bug or "Ivshmem Mode" issue, but I went through ivshmem-server code=
+,
+>> did not related information.
+>=20
+> If we are only talking about one ivshmem link and vm1 is the master,=20
+> there is not role for virtio_ivshmem on it as backend. That is purely a=
 =20
-     s->gic =3D qdev_create(NULL, "arm_gic");
-@@ -313,7 +314,14 @@ static void exynos4210_gic_realize(DeviceState *dev,=
- Error **errp)
-     memory_region_init(&s->dist_container, obj, "exynos4210-dist-contain=
-er",
-             EXYNOS4210_EXT_GIC_DIST_REGION_SIZE);
+> frontend driver. Vice versa for vm2: If you want to use its ivshmem=20
+> instance as virtio frontend, uio_ivshmem plays no role.
+>=20
+> The "crash" is would be interesting to understand: Do you see kernel=20
+> panics of the guests? Or are they stuck? Or are the QEMU instances=20
+> stuck? Do you know that you can debug the guest kernels via gdb (and=20
+> gdb-scripts of the kernel)?
+>=20
+>>
+>> I started some code work recently, such as fix code style issues and
+>> some work based on above testing, however I know you are also working =
+on
+>> RFC V2, beside the protocol between server-client and client-client is
+>> not finalized yet either, things may change, so much appreciate if you
+>> could squeeze me into your develop schedule and share with me some
+>> plans, :-)=C2=A0 Maybe I could send some pull request in your github r=
+epo?
+>=20
+> I'm currently working on a refresh of the Jailhouse queue and the kerne=
+l=20
+> patches to incorporate just two smaller changes:
+>=20
+>  =C2=A0- use Siemens device ID
+>  =C2=A0- drop "features" register from ivshmem device
+>=20
+> I have not yet touched the QEMU code for that so far, thus no conflict=20
+> yet. I would wait for your patches then.
+>=20
+> If it helps us to work on this together, I can push things to github as=
 =20
--    for (i =3D 0; i < s->num_cpu; i++) {
-+    /*
-+     * This clues in gcc that our on-stack buffers do, in fact have
-+     * enough room for the cpu numbers.  gcc 9.2.1 on 32-bit x86
-+     * doesn't figure this out, otherwise and gives spurious warnings.
-+     */
-+    assert(n <=3D EXYNOS4210_NCPUS);
-+    for (i =3D 0; i < n; i++) {
-+
-         /* Map CPU interface per SMP Core */
-         sprintf(cpu_alias_name, "%s%x", cpu_prefix, i);
-         memory_region_init_alias(&s->cpu_alias[i], obj,
+> well. Will drop you a note when done. We should just present the outcom=
+e=20
+> frequently as new series to the list.
+
+I've updated my queues, mostly small changes, mostly to the kernel bits.=20
+Besides the already announced places, you can also find them as PR=20
+targets on
+
+https://github.com/siemens/qemu/commits/wip/ivshmem2
+https://github.com/siemens/linux/commits/queues/ivshmem2
+
+To give the whole thing broader coverage, I will now also move forward=20
+and integrate the current state into Jailhouse - at the risk of having=20
+to rework the interface there once again. But there are a number of=20
+users already requiring the extended features (or even using them), plus=20
+this gives a nice test coverage of key components and properties.
+
+Jan
+
 --=20
-2.23.0
-
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
 
