@@ -2,79 +2,66 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B09C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 17:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1421C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 17:19:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD9F120833
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 17:10:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O01QHXJv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD9F120833
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AA59A20672
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 17:19:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA59A20672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibpDj-0000of-SS
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 12:10:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36911)
+	id 1ibpLz-0005i7-PN
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 12:19:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42921)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ibpCY-0007jd-Gc
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 12:09:36 -0500
+ (envelope-from <maz@kernel.org>) id 1ibpIe-0004WG-PB
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 12:15:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ibpCX-0001JT-AP
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 12:09:34 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:42350)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ibpCX-0001J2-4V
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 12:09:33 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 66so97315otd.9
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 09:09:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4Y78fvdi+nxijk60ZCF+if/ZzczwLSeFm6rRAef9Qj0=;
- b=O01QHXJvfkH1dyybknu6mu2DdNW6FSNOKuGxWd0kQVjJnFrL0AlmiNafgzoKs7ej9v
- mkXH8sZepSEmbSUhE9+XfgouufhqNHjJvV1P+IwSN5uQ6J/Y8cR7cTC7DLBTR0dSvVzd
- RSrZLCsyfQgEHVMnJnrHmIPFjKyEv/DTdac0FSxDkuZmV4xwt0QgJEd0sEaHT2TzXlbb
- twNLsQV1iICyaZ572pXL12W2LlUZe3HW86a2MOdDKPptWWypWpyZWf/Lpksjt1yILfqZ
- oWXxBhwD9jHiy7Xe5gkm2tMEw82bo6j/53TJFn42iuQOcwiT1gXuSVbkhfOzSJB407a2
- 7NPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4Y78fvdi+nxijk60ZCF+if/ZzczwLSeFm6rRAef9Qj0=;
- b=RBYIeuiH9u6/LB0LZdeVIW3wOpemMkTbyPbIFIgQBp7i1d+wSajTg+WTZVljSJRJq9
- suoAcwXW8REsM1igIr0bBzHlOUw4SKrcV+q7Dl7fN8R+aGF4KPDv4e+abGbczUNxB7SD
- 0HEn3nTU8q2KWeA7d1yn3lvdnoQFV48QAkOqUqe6yEGo+YtFGX6x4meHE7YdjTqhDqoF
- 1Fxpq9vLCCGaGaOeTu9KYYKllWBZ6erH84UTBebHKY4IoEXaTIz5iNZBnKHSfQFHjuXS
- 69gDcXXLIDVaiozwE6y6JLSVNAGB/uA7w4OifqN5ueeAFqntLd3dRIQhxCZnjExtMCnP
- H6BQ==
-X-Gm-Message-State: APjAAAVHOCZvoD5UncrZLPp/oszLNIIQvljtTAV21xewNAphr0CNMbnw
- cD1eWMeLMKlYjjAPz9wD/gJ81A/4Q4dkFOSOFpw39YgagWc=
-X-Google-Smtp-Source: APXvYqyi3I6tWoAtE7pXX06ozBVIpmZJ1afzfNXGlLer9f4Ag+/GQ/owbHlhC7WWH1VSPoOdD3lsFI6WJ78EwSarBho=
-X-Received: by 2002:a05:6830:2001:: with SMTP id e1mr37316otp.97.1575306572153; 
- Mon, 02 Dec 2019 09:09:32 -0800 (PST)
+ (envelope-from <maz@kernel.org>) id 1ibpId-0008Rl-PN
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 12:15:52 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:49773)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <maz@kernel.org>) id 1ibpId-0008OZ-IR
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 12:15:51 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1ibpIa-0004dV-NV; Mon, 02 Dec 2019 18:15:48 +0100
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 3/5] target/arm: Handle trapping to EL2 of AArch32 VMRS
+ instructions
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-References: <20191202152746.32292-1-armbru@redhat.com>
-In-Reply-To: <20191202152746.32292-1-armbru@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 2 Dec 2019 17:09:21 +0000
-Message-ID: <CAFEAcA8+-rmhFMFEAgR_TLXD4N6_xM2kS9NMCqdSqN2GYJ9OpQ@mail.gmail.com>
-Subject: Re: [PULL for-4.2 0/3] Error reporting patches for 2019-12-02
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Mon, 02 Dec 2019 17:15:48 +0000
+From: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <9909b304-9e52-6960-4397-b7d33159cebf@linaro.org>
+References: <20191201122018.25808-1-maz@kernel.org>
+ <20191201122018.25808-4-maz@kernel.org>
+ <0bc7c461-6b92-2782-4aec-2f649f5bc8cf@linaro.org>
+ <d2875338d734fca3e5263b94eaf52c18@www.loen.fr>
+ <9909b304-9e52-6960-4397-b7d33159cebf@linaro.org>
+Message-ID: <d69cc2d0d3f56b2c84d5c73bc5abd9ff@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ kvmarm@lists.cs.columbia.edu, peter.maydell@linaro.org,
+ edgar.iglesias@xilinx.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 213.251.177.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,43 +73,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2 Dec 2019 at 15:34, Markus Armbruster <armbru@redhat.com> wrote:
+On 2019-12-02 16:56, Richard Henderson wrote:
+> On 12/2/19 4:45 PM, Marc Zyngier wrote:
+>>> Annoying that there's a bug in the manual -- FPSID is listed as 
+>>> group 0 in
+>>> plenty of places, except in the pseudo-code for Accessing the FPSID
+>>> which uses TID3.
+>>
+>> Are you sure? I'm looking at DDI0487E_a,
+> ...
+>> Or have you spotted a discrepancy
+>> somewhere else (which would be oh-so-surprising...)?
 >
-> PATCH 1+2 fix a crash in virtio-net failover error handling.  Failover
-> is new in 4.2.  Jens Freimann would prefer this fix to go into 4.2.
+> In DDI0487E_a, page G8-6028:
 >
-> PATCH 3 fixes a crash in Linux AIO initialization error handling.
-> Stefan Hajnoczi thinks it's worth including in 4.2.
+>> elsif EL2Enabled() && !ELUsingAArch32(EL2) && HCR_EL2.TID3 == '1' 
+>> then
+>>   AArch64.AArch32SystemAccessTrap(EL2, 0x08);
+>> elsif EL2Enabled() && ELUsingAArch32(EL2) && HCR.TID3 == '1' then
+>>   AArch32.TakeHypTrapException(0x08);
+>> else
+>>   return FPSID;
 >
-> Both fixes are straightforward.
->
-> The following changes since commit fb2246882a2c8d7f084ebe0617e97ac78467d156:
->
->   .travis.yml: drop xcode9.4 from build matrix (2019-11-29 15:51:52 +0000)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/armbru.git tags/pull-error-2019-12-02
->
-> for you to fetch changes up to cb09104ea8418d9521d9a9d36ea0527b84ce51ac:
->
->   block/file-posix: Fix laio_init() error handling crash bug (2019-12-02 16:14:41 +0100)
->
-> ----------------------------------------------------------------
-> Error reporting patches for 2019-12-02
->
-> ----------------------------------------------------------------
+> within the summary documentation for FPSID.
 
+Ah, that was too obvious for me to find ;-). Indeed, this looks totally
+bogus. I'll try and poke a few people...
 
-Applied, thanks.
+Thanks,
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 
