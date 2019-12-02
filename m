@@ -2,84 +2,60 @@ Return-Path: <SRS0=6iUH=ZY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD2AC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 05:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A531BC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 06:09:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EF5F20881
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 05:24:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6397820705
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Dec 2019 06:09:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gd9qx4e3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF5F20881
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bi3XDkPw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6397820705
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59310 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibeC7-00036N-Q8
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 00:24:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52445)
+	id 1ibetk-00054a-JF
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 01:09:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58147)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ibeBQ-0002eh-4x
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 00:23:41 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ibesf-0004Vv-Cz
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 01:08:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ibeBN-0007Id-7y
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 00:23:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30653
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1ibesd-00016o-Th
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 01:08:21 -0500
+Received: from ozlabs.org ([203.11.71.1]:53979)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ibeBN-0007I9-2l
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 00:23:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575264215;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VYdy6+9Tyvn2U7tF7yy3sBWpbgyP+IkV77JT8AxADyU=;
- b=Gd9qx4e3sLHhKN3QmDvXXFJZ6lLjsXN1e8fyIXfLDXTihI0NfssP3zHf2IXSEWZrIAtrZr
- LfMPaQf823Fbfm0oc96hO0DvRAH4cOYoB9+1a9EcoN/Wo9tZ92nj9yGSmAL84vZaEk4ZJJ
- vPYtehmbq+JPU/ViRYO5j0Q8W07AYBU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-77-WS2bBucJOcC34q6EMH520A-1; Mon, 02 Dec 2019 00:22:54 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CBB018543A1;
- Mon,  2 Dec 2019 05:22:53 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4AC1819C68;
- Mon,  2 Dec 2019 05:22:50 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C9AE71138606; Mon,  2 Dec 2019 06:22:48 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Subject: Re: [PATCH v4 01/37] qdev: remove unused qdev_prop_int64
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <20191120152442.26657-2-marcandre.lureau@redhat.com>
-Date: Mon, 02 Dec 2019 06:22:48 +0100
-In-Reply-To: <20191120152442.26657-2-marcandre.lureau@redhat.com>
- (=?utf-8?Q?=22Marc-Andr=C3=A9?=
- Lureau"'s message of "Wed, 20 Nov 2019 19:24:06 +0400")
-Message-ID: <878snvnvx3.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ibesZ-00016B-8u; Mon, 02 Dec 2019 01:08:16 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47RF621gLzz9sPL; Mon,  2 Dec 2019 17:08:10 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1575266890;
+ bh=USu8JlsY/OzHA2YhXxTPxDDMZBunzRsn+270mXy38Zo=;
+ h=From:To:Cc:Subject:Date:From;
+ b=bi3XDkPwIZaOws/HGq/oT54ob58swfTjE0sP4YauSYuvixDLssPVIE1tKsGEYBcMJ
+ TcWo7VfXn6a1tbmIzSpeW44GVJQYIZBwLMVJhCGTzM4LoTpcrnMQExbq2XR7JCzJCt
+ mcZ+GuU/2FAVchKJPlHlrdjXqvsBtUQzN/lAns/Q=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PATCHv3] exynos4210_gic: Suppress gcc9 format-truncation warnings
+Date: Mon,  2 Dec 2019 17:08:06 +1100
+Message-Id: <20191202060806.77968-1-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: WS2bBucJOcC34q6EMH520A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,168 +67,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: i.mitsyanko@gmail.com, richard.henderson@linaro.org, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+exynos4210_gic_realize() prints the number of cpus into some temporary
+buffers, but it only allows 3 bytes space for it.  That's plenty:
+existing machines will only ever set this value to EXYNOS4210_NCPUS
+(2).  But the compiler can't always figure that out, so some[*] gcc9
+versions emit -Wformat-truncation warnings.
 
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/core/qdev-properties.c    | 32 --------------------------------
->  include/hw/qdev-properties.h |  3 ---
->  2 files changed, 35 deletions(-)
->
-> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
-> index ac28890e5a..be4cb01f0b 100644
-> --- a/hw/core/qdev-properties.c
-> +++ b/hw/core/qdev-properties.c
-> @@ -409,31 +409,6 @@ static void set_uint64(Object *obj, Visitor *v, cons=
-t char *name,
->      visit_type_uint64(v, name, ptr, errp);
->  }
-> =20
-> -static void get_int64(Object *obj, Visitor *v, const char *name,
-> -                      void *opaque, Error **errp)
-> -{
-> -    DeviceState *dev =3D DEVICE(obj);
-> -    Property *prop =3D opaque;
-> -    int64_t *ptr =3D qdev_get_prop_ptr(dev, prop);
-> -
-> -    visit_type_int64(v, name, ptr, errp);
-> -}
-> -
-> -static void set_int64(Object *obj, Visitor *v, const char *name,
-> -                      void *opaque, Error **errp)
-> -{
-> -    DeviceState *dev =3D DEVICE(obj);
-> -    Property *prop =3D opaque;
-> -    int64_t *ptr =3D qdev_get_prop_ptr(dev, prop);
-> -
-> -    if (dev->realized) {
-> -        qdev_prop_set_after_realize(dev, name, errp);
-> -        return;
-> -    }
-> -
-> -    visit_type_int64(v, name, ptr, errp);
-> -}
-> -
->  const PropertyInfo qdev_prop_uint64 =3D {
->      .name  =3D "uint64",
->      .get   =3D get_uint64,
-> @@ -441,13 +416,6 @@ const PropertyInfo qdev_prop_uint64 =3D {
->      .set_default_value =3D set_default_value_uint,
->  };
-> =20
-> -const PropertyInfo qdev_prop_int64 =3D {
-> -    .name  =3D "int64",
-> -    .get   =3D get_int64,
-> -    .set   =3D set_int64,
-> -    .set_default_value =3D set_default_value_int,
-> -};
-> -
->  /* --- string --- */
-> =20
->  static void release_string(Object *obj, const char *name, void *opaque)
-> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
-> index c6a8cb5516..690ff07ae2 100644
-> --- a/include/hw/qdev-properties.h
-> +++ b/include/hw/qdev-properties.h
-> @@ -13,7 +13,6 @@ extern const PropertyInfo qdev_prop_uint16;
->  extern const PropertyInfo qdev_prop_uint32;
->  extern const PropertyInfo qdev_prop_int32;
->  extern const PropertyInfo qdev_prop_uint64;
-> -extern const PropertyInfo qdev_prop_int64;
->  extern const PropertyInfo qdev_prop_size;
->  extern const PropertyInfo qdev_prop_string;
->  extern const PropertyInfo qdev_prop_chr;
-> @@ -164,8 +163,6 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
->      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_int32, int32_t)
->  #define DEFINE_PROP_UINT64(_n, _s, _f, _d)                      \
->      DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_uint64, uint64_t)
-> -#define DEFINE_PROP_INT64(_n, _s, _f, _d)                      \
-> -    DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_int64, int64_t)
->  #define DEFINE_PROP_SIZE(_n, _s, _f, _d)                       \
->      DEFINE_PROP_UNSIGNED(_n, _s, _f, _d, qdev_prop_size, uint64_t)
->  #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
+We can fix that by hinting the constraint to the compiler with a
+suitably placed assert().
 
-History of its use:
+[*] The bizarre thing here, is that I've long gotten these warnings
+    compiling in a 32-bit x86 container as host - Fedora 30 with
+    gcc-9.2.1-1.fc30.i686 - but it compiles just fine on my normal
+    x86_64 host - Fedora 30 with and gcc-9.2.1-1.fc30.x86_64.
 
-    Author: Peter Xu <peterx@redhat.com>
-    Date:   Tue Jul 18 11:39:01 2017 +0800
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-        qdev: provide DEFINE_PROP_INT64()
+Peter, up to you if you squeeze this in for qemu-4.2 or leave it until 5.=
+0
 
-        We have nearly all the stuff, but this one is missing. Add it in.
+Changes since v2:
+ * Moved the assert outside the for loop using a trick suggested by
+   Richard Henderson
+Changes since v1:
+ * Used an assert to hint the compiler, instead of increasing the
+   buffer size.
 
-        Am going to use this new helper for MigrationParameters fields, sin=
-ce
-        most of them are int64_t.
+---
+ hw/intc/exynos4210_gic.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-        CC: Markus Armbruster <armbru@redhat.com>
-        CC: Eduardo Habkost <ehabkost@redhat.com>
-        CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-        CC: Peter Xu <peterx@redhat.com>
-        CC: Juan Quintela <quintela@redhat.com>
-        CC: Marcel Apfelbaum <marcel@redhat.com>
-        CC: Eric Blake <eblake@redhat.com>
-        Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-        Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-        Reviewed-by: Juan Quintela <quintela@redhat.com>
-        Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-        Signed-off-by: Peter Xu <peterx@redhat.com>
-        Message-Id: <1500349150-13240-2-git-send-email-peterx@redhat.com>
-        Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-    commit 89632fafdc64927647b6f45416307cd3d4c746db
-    Author: Peter Xu <peterx@redhat.com>
-    Date:   Tue Jul 18 11:39:02 2017 +0800
-
-        migration: export parameters to props
-
-        Export migration parameters to qdev properties. Then we can use, fo=
-r
-        example:
-
-          -global migration.x-cpu-throttle-initial=3Dxxx
-
-        To specify migration parameters during init.
-
-        Prefix "x-" is appended for each parameter exported to show that th=
-is is
-        not a stable interface, and only for debugging/testing purpose.
-
-        Reviewed-by: Juan Quintela <quintela@redhat.com>
-        Signed-off-by: Peter Xu <peterx@redhat.com>
-        Message-Id: <1500349150-13240-3-git-send-email-peterx@redhat.com>
-        Signed-off-by: Juan Quintela <quintela@redhat.com>
-
-    [More commits adding uses...]
-
-    commit 741d4086c856320807a2575389d7c0505578270b
-    Author: Juan Quintela <quintela@redhat.com>
-    Date:   Fri Dec 1 13:08:38 2017 +0100
-
-        migration: Use proper types in json
-
-        We use int for everything (int64_t), and then we check that value i=
-s
-        between 0 and 255.  Change it to the valid types.
-
-        This change only happens for HMP.  QMP always use bytes and similar=
-.
-
-        Signed-off-by: Juan Quintela <quintela@redhat.com>
-        Reviewed-by: Eric Blake <eblake@redhat.com>
-
-    [All uses gone again]
-
-We can remove it now, and revert the removal when new uses pop up.
-Churn.  I'd say remove if we think new uses are unlikely.  I doubt they
-are.
+diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
+index a1b699b6ba..ddd006aca6 100644
+--- a/hw/intc/exynos4210_gic.c
++++ b/hw/intc/exynos4210_gic.c
+@@ -293,6 +293,7 @@ static void exynos4210_gic_realize(DeviceState *dev, =
+Error **errp)
+     char cpu_alias_name[sizeof(cpu_prefix) + 3];
+     char dist_alias_name[sizeof(cpu_prefix) + 3];
+     SysBusDevice *gicbusdev;
++    uint32_t n =3D s->num_cpu;
+     uint32_t i;
+=20
+     s->gic =3D qdev_create(NULL, "arm_gic");
+@@ -313,7 +314,14 @@ static void exynos4210_gic_realize(DeviceState *dev,=
+ Error **errp)
+     memory_region_init(&s->dist_container, obj, "exynos4210-dist-contain=
+er",
+             EXYNOS4210_EXT_GIC_DIST_REGION_SIZE);
+=20
+-    for (i =3D 0; i < s->num_cpu; i++) {
++    /*
++     * This clues in gcc that our on-stack buffers do, in fact have
++     * enough room for the cpu numbers.  gcc 9.2.1 on 32-bit x86
++     * doesn't figure this out, otherwise and gives spurious warnings.
++     */
++    assert(n <=3D EXYNOS4210_NCPUS);
++    for (i =3D 0; i < n; i++) {
++
+         /* Map CPU interface per SMP Core */
+         sprintf(cpu_alias_name, "%s%x", cpu_prefix, i);
+         memory_region_init_alias(&s->cpu_alias[i], obj,
+--=20
+2.23.0
 
 
