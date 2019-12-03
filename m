@@ -2,83 +2,76 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 209FFC432C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57CFFC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:24:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCE8020684
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:22:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19B0120684
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:24:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LM/jyIVV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCE8020684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WfFFgLYm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19B0120684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icGYd-0004Vs-W6
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 17:22:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40804)
+	id 1icGai-0005kp-BR
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 17:24:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37572)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1icFxN-00046x-Mb
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:43:43 -0500
+ (envelope-from <crmull121@gmail.com>) id 1icFVj-0008TA-7x
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:15:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1icFx7-00061J-B9
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:43:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53071
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1icFx6-0005so-4o
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:43:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575409402;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RNaUsrf/99dQ0NcERxnhOeyUPfp8bZQyhDaCGX7kSis=;
- b=LM/jyIVVPP2NctkN7ENA4jXG7XSphKDqWs4b30RKC3hw0ZzdggTbO1ubELiCFXaalAsMBu
- mIqv+RNe0564PfnhaWJhpAts1gtVBGeLuxtRaooZuH2bG5Jz1kb+0CrBHuy81aFfM5doWT
- ao4ZRjylQSQmp20X+Ld0ppmnD/abgK0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352-UviGYW0kOquiPGgeQwBctQ-1; Tue, 03 Dec 2019 16:43:20 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1C921856A60;
- Tue,  3 Dec 2019 21:43:19 +0000 (UTC)
-Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8AEE7600C8;
- Tue,  3 Dec 2019 21:43:19 +0000 (UTC)
-Subject: Re: [PATCH 21/21] tests-blockjob: Use error_free_or_abort()
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20191130194240.10517-1-armbru@redhat.com>
- <20191130194240.10517-22-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <318ed82a-a7a3-f5a5-eb92-4caac83a9acd@redhat.com>
-Date: Tue, 3 Dec 2019 15:43:18 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <crmull121@gmail.com>) id 1icFVg-00082K-8T
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:15:06 -0500
+Received: from mail-lj1-x22d.google.com ([2a00:1450:4864:20::22d]:39451)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <crmull121@gmail.com>) id 1icFVg-0007gi-1B
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:15:04 -0500
+Received: by mail-lj1-x22d.google.com with SMTP id e10so5486240ljj.6
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 13:15:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=5oATEj7h/vMT0yVmTV7JHpbZYEkGfnHC7nf8w+7PC40=;
+ b=WfFFgLYmNr9XfsQoukEPi1oDHyY0w+4gZTTZJ63E1FrvQeyw3dFfWAAmL8gZ+HNDiK
+ Vgug0K22n+Aw2tMxTybqVxHqkINZobZDTdR+bttoj8NsMBTVos7GYNz3RBrQrS3yHW28
+ zSZf174uE/ZXxezNmiiytP4fIj0OF8lU7YcebLTVY+wl19PsW0FuWidZW9HFWz741wRO
+ cZmLw+W0z50OIzxSOfzjRxOtjSe1J+7eKufjw9WeiddgxiN88R56E4Mk9H1VD97hVDIN
+ A5kDw8NzqE3/F5Ac36Q0Wxs1lBb+yHa43hsYN9VWH+q6LmmxtAY663CXGNH41B13m92R
+ HyAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=5oATEj7h/vMT0yVmTV7JHpbZYEkGfnHC7nf8w+7PC40=;
+ b=jJz1O3HPPZL5QY6BcJeUb7tU0f3U27lmB4AZJmiaXEGfv0c9gVmr6pTQiYRNagLU7l
+ HMrnqF7MMxjX5FIp4ZDZm+uhUBTRF13MDbECAE44e8RGtZ4UBv2tntUz5THA7/zGqW+W
+ k7U5srtmxdy+zmxm/7jloKdOr6fDrPhjcnlqQhoqhOnMyYAAa0uYKiJ5u6My24Z7DhD3
+ d03JoClZ9BF4zsB74O3Tr1yMUEYE4r4+v9AfaLaJg4DzEy4hR9iyQGuyl0IofbE6FkaP
+ 1m1QxkghiErpJvLDgCpCV0NycW08ZJUklQQymplUPZse6V+jetT9Uu/A3bGTbNEcYYAa
+ mtFw==
+X-Gm-Message-State: APjAAAUWzEiQdzCoI7tPbgHXnvmoHeA8w5Hn2xNPB+Y2Or7uFHWDfopI
+ JGoSKay2NtbWJUkuMj9Hvp6D1usKOAtrTuOx/SegqXwM
+X-Google-Smtp-Source: APXvYqx64LCSxrvVLpsAFmWrq+kDhcP7TVe8qTwDJgsdX64sJ6uOWghIaAgnI11gH5XXFMUcNiemGVJjVi/XOfMys7s=
+X-Received: by 2002:a2e:9b05:: with SMTP id u5mr3770790lji.59.1575407698476;
+ Tue, 03 Dec 2019 13:14:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191130194240.10517-22-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: UviGYW0kOquiPGgeQwBctQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+From: Craig Mull <crmull121@gmail.com>
+Date: Tue, 3 Dec 2019 15:14:47 -0600
+Message-ID: <CAPT-DMXZr4WSUoifEQ=hi9vCU1iZ7U2k6TLWScKfsUuMHtFMwQ@mail.gmail.com>
+Subject: Lack of OS vendor support for blockdev-snapshot
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::22d
+X-Mailman-Approved-At: Tue, 03 Dec 2019 16:35:03 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,40 +83,16 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com
+Cc: dwarcher@us.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/30/19 1:42 PM, Markus Armbruster wrote:
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   tests/test-blockjob.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
-> 
+Any insight as to why OS vendors (RHEL and Ubuntu in particular)
+aren't supporting blockdev-snapshot?
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+- RHEL claims no support for Qemu-based snapshots in any flavor
+- Ubuntu hasn't enabled blockdev-snapshot in it's 19.10 release
 
-> diff --git a/tests/test-blockjob.c b/tests/test-blockjob.c
-> index e670a20617..4eeb184caf 100644
-> --- a/tests/test-blockjob.c
-> +++ b/tests/test-blockjob.c
-> @@ -48,9 +48,8 @@ static BlockJob *mk_job(BlockBackend *blk, const char *id,
->               g_assert_cmpstr(job->job.id, ==, blk_name(blk));
->           }
->       } else {
-> -        g_assert_nonnull(err);
-> +        error_free_or_abort(&err);
->           g_assert_null(job);
-> -        error_free(err);
->       }
->   
->       return job;
-> 
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+-craig
 
