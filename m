@@ -2,79 +2,101 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44C85C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:51:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2227AC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:57:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FB47206EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:51:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2B122068E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:57:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e78gdWVp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FB47206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NoDC0fwm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B122068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic6iX-0006na-96
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 06:51:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53257)
+	id 1ic6ny-0008OO-3q
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 06:57:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ic6fy-0005zd-TC
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:49:08 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ic6iJ-000721-Nl
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:51:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ic6fw-0000U8-AM
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:49:06 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38003)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ic6fv-0000QU-TZ
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:49:04 -0500
-Received: by mail-oi1-x242.google.com with SMTP id b8so2988170oiy.5
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 03:49:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=J9a9Q25g3Pw3d8B2XWQ6fSo3JvscZVrNGGE/LmkOG4U=;
- b=e78gdWVplLjIhNu/AMecMmugJ37cfElNi4nZQ+auDgqzXWKfTKcP1e/vdTAzmge50y
- P2EW9SgCi43AXrcRvIuM+L45DLOzK83HOKlaCSNRmUoGn00+5S8kPjUBzIWC8Jm02mKt
- Wl7ejaJTVqkQvK3JK/ZEaXXCugrO77bUSRyveZxKPzgodz+3ypCD9uY/QD5qyGgQaUu1
- NOmW7u9R4AB/GWPdZvPsz8/pGK4o0ccofLbG1K7CQBq0RZhxKFqhrAVPph5IufrqTyCo
- nIPfvmX3M33lM0G/85H3q2Wdi31Vm1LyXoG94w6qwkP/BHWHJ2RKTnwUbmSSBejchftA
- +SFQ==
+ (envelope-from <pbonzini@redhat.com>) id 1ic6i9-0007OO-N3
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:51:24 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30470
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ic6i8-0007Lw-Ko
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:51:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575373878;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=A3LLEr3E3K2K7Bi4eRhsJUF7iecTI7a84MLmxXEs2TM=;
+ b=NoDC0fwmIb3pp44fwjA9QzKtlL/liR3Cg3/rfrUGty5Y22paAwh842KzqHqN2XX+n7NbwL
+ DGC5o1KxEw5xHqr4J2BnreqFjziJnVkLmCPhLUIiU21LIaAzcl/JbYcvisgQe2c/kwUv7K
+ IttXZXNq3W4aW/DCZEZK0WE/jN9Klqw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-434-wpJZxNqmN_KdV1y5ghAhMw-1; Tue, 03 Dec 2019 06:51:15 -0500
+Received: by mail-wm1-f71.google.com with SMTP id n4so872782wmd.7
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 03:51:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=J9a9Q25g3Pw3d8B2XWQ6fSo3JvscZVrNGGE/LmkOG4U=;
- b=lNMb/qbr3LMjaXW0dzR8O52RY1RH+g8RNfsIQgADZUVm8R81AA5SJtUlCfjcxdIUEN
- hHZER8InycnUQBMV8vlCg2NjiHbgSIa84auLCjzu9+LMOC3Au+CG6LOabkYz9jNcriL5
- wCaGEXo0/RfylKmico7WGCFvFGAahO4hiz1Dwxe5wPH53AI+4Du9ZHW/1dYBGVjC9bTN
- VRAtR6EqiKy39ytIPIkXsxb00vn+232mlSeMxr5Lhm7forXxTpGmzfVxbgH8CyJsmB8Q
- VA4cSaKssDxSwhSgvtQOq2U0CENaPoQ1KGD8/G+dCf2j8ardSi6J1fkutgnPGcp5msXx
- lP9Q==
-X-Gm-Message-State: APjAAAVqjpfBVDgEr3fEr8q6EqgJCYBKHR3Z0IRewnMsStpuqlPgCCXK
- liimsYuVVC/214l97M4389abh16T9d4BHZxsge0pZQ==
-X-Google-Smtp-Source: APXvYqzjjemuY92HI8Gpo8GGUfhYG7/mB8dIIvujLoGZ28kexWC4M67NLNov85A5LxXWTT/IRsM4VgGNYQseumhrG0k=
-X-Received: by 2002:aca:3182:: with SMTP id x124mr3275663oix.170.1575373742707; 
- Tue, 03 Dec 2019 03:49:02 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=A3LLEr3E3K2K7Bi4eRhsJUF7iecTI7a84MLmxXEs2TM=;
+ b=rjTiI9liO1vZM7zZfucmTOXfbO+WDhX8v7a7C4jciz0uKcfSQ88ADpzhdXU241bLhW
+ 2ncInC4n3fp3NHvSquJB1PtMA4nfsL6kKo/8uhCebZlZH0co9k/CsXK9piDbLjwJptDb
+ KITHCAw+62Y9yOmrFQHLTZupB5Lpm/6LesYSyID0TVsdzqdVgSW3y3IZ9OdgxI5BKqU6
+ PYfg+WPN4F76fbdUnlExqkCGH2nKLs1BLiWRM36EzJ6N8BUAKbXdhEtDUF2vR7l8G9tO
+ syAQrxNQCxFpqKNzyMFG1RQLRxhWV2KXKp6XWMBI5XKn3cCBE006/KjL+QxRyqZq5lgm
+ sS4Q==
+X-Gm-Message-State: APjAAAW4SdiBb3n6wFt3FR99flZEigZ+Y6XvpHKcfKwMJ8I9DmyReQ/a
+ ah+Km1sjUCpyQsSpsL4jDIsTI4RI82tg8Q4iqpPxGVQXGxJwPKLGHVhLDV4+w0iAImCslHe6Vtv
+ AWihPNKeWi8NQzK4=
+X-Received: by 2002:a5d:62d0:: with SMTP id o16mr4551159wrv.197.1575373874044; 
+ Tue, 03 Dec 2019 03:51:14 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwzTWLMF+Uyo0fvl0anTPTuHWtgvHul7ur9JIHUJI8XLSvNVHfnBGxbGyXpfrF1aoDfBpr+mw==
+X-Received: by 2002:a5d:62d0:: with SMTP id o16mr4551136wrv.197.1575373873776; 
+ Tue, 03 Dec 2019 03:51:13 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a?
+ ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
+ by smtp.gmail.com with ESMTPSA id f19sm3373240wrf.23.2019.12.03.03.51.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Dec 2019 03:51:13 -0800 (PST)
+Subject: Re: [PATCH] virtfs-proxy-helper: switch from libcap to libcap-ng
+To: Greg Kurz <groug@kaod.org>
+References: <20191129111632.22840-2-pbonzini@redhat.com>
+ <20191129133241.738b70ed@bahia.w3ibm.bluemix.net>
+ <4e49ea13-fe0c-2b06-052e-474d714b88ad@redhat.com>
+ <20191129135937.74a9b264@bahia.w3ibm.bluemix.net>
+ <20191203113449.4b2e129e@bahia.w3ibm.bluemix.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cd75561d-a10b-94d5-12c1-75aeac61ca0c@redhat.com>
+Date: Tue, 3 Dec 2019 12:51:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20191011134744.2477-1-richard.henderson@linaro.org>
- <20191011134744.2477-4-richard.henderson@linaro.org>
-In-Reply-To: <20191011134744.2477-4-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 3 Dec 2019 11:48:51 +0000
-Message-ID: <CAFEAcA8_SQ6ugs360PJD58547mmZY1yu5xb=Fq0P006HJ1yGRA@mail.gmail.com>
-Subject: Re: [PATCH v5 03/22] target/arm: Add MTE system registers
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <20191203113449.4b2e129e@bahia.w3ibm.bluemix.net>
+Content-Language: en-US
+X-MC-Unique: wpJZxNqmN_KdV1y5ghAhMw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,109 +108,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, berrange@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 11 Oct 2019 at 14:48, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> This is TFSRE0_EL1, TFSR_EL1, TFSR_EL2, TFSR_EL3,
-> RGSR_EL1, GCR_EL1, GMID_EL1, and PSTATE.TCO.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> v3: Add GMID; add access_mte.
-> v4: Define only TCO at mte_insn_reg.
-> ---
->  target/arm/cpu.h           |  3 ++
->  target/arm/internals.h     |  6 ++++
->  target/arm/helper.c        | 73 ++++++++++++++++++++++++++++++++++++++
->  target/arm/translate-a64.c | 11 ++++++
->  4 files changed, 93 insertions(+)
+On 03/12/19 11:34, Greg Kurz wrote:
+> On Fri, 29 Nov 2019 13:59:37 +0100
+> Greg Kurz <groug@kaod.org> wrote:
+> 
+>> On Fri, 29 Nov 2019 13:49:20 +0100
+>> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>>> On 29/11/19 13:32, Greg Kurz wrote:
+>>>> Nice. :)
+>>>>
+>>>> Reviewed-by: Greg Kurz <groug@kaod.org>
+>>>>
+>>>> Paolo,
+>>>>
+>>>> I can take this through my 9p tree if you want. Otherwise,
+>>>>
+>>>> Acked-by: Greg Kurz <groug@kaod.org>
+>>>
+>>> Yes, please do it since it's self-contained.  You'd probably also test
+>>> it better than me. :)
+>>>
+>>> Paolo
+>>>
+>>
+>> Ok I'll just do that then.
+>>
+> 
+> And it happens to be missing an extra-change in Makefile :)
+> 
+> -fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
+> +fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap-ng
 
+The new line is not needed, -lcap-ng should already be in LIBS via
 
-> +    { .name = "GMID_EL1", .state = ARM_CP_STATE_AA64,
-> +      .opc0 = 3, .opc1 = 1, .crn = 0, .crm = 0, .opc2 = 4,
-> +      .access = PL1_R, .type = ARM_CP_CONST, .resetvalue = GMID_EL1_BS },
+LIBS+=-lz $(LIBS_TOOLS)
 
-This should trap if HCR_EL2.TID5 is 1 (since we're adding
-support for the TID* ID reg trap bits now).
+However, removing -lcap is certainly a good idea. :)
 
-> +    REGINFO_SENTINEL
-> +};
-> +
-> +static const ARMCPRegInfo mte_tco_reginfo[] = {
-> +    { .name = "TCO", .state = ARM_CP_STATE_AA64,
-> +      .opc0 = 3, .opc1 = 3, .crn = 4, .crm = 2, .opc2 = 7,
-> +      .type = ARM_CP_NO_RAW,
-> +      .access = PL0_RW, .readfn = tco_read, .writefn = tco_write },
-> +    REGINFO_SENTINEL
-> +};
->  #endif
->
->  static CPAccessResult access_predinv(CPUARMState *env, const ARMCPRegInfo *ri,
-> @@ -6881,6 +6948,12 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->      if (cpu_isar_feature(aa64_rndr, cpu)) {
->          define_arm_cp_regs(cpu, rndr_reginfo);
->      }
+Paolo
 
-So, aa64_mte_insn_reg here is checking for ID_AA64PFR1_EL1 != 0
-("instructions accessible at EL0 are implemented")
-and aa64_mte is checking for >= 2 ("full implementation").
-I think a couple of brief comments would clarify:
-
-> +    if (cpu_isar_feature(aa64_mte_insn_reg, cpu)) {
-           /* EL0-visible MTE registers, present even for dummy
-implementation */
-> +        define_arm_cp_regs(cpu, mte_tco_reginfo);
-> +    }
-> +    if (cpu_isar_feature(aa64_mte, cpu)) {
-           /* MTE registers present for a full implementation */
-> +        define_arm_cp_regs(cpu, mte_reginfo);
-> +    }
-
-(The other way to arrange this would be to have the 'real'
-TCO regdef in mte_reginfo, and separately have "reginfo
-if we only have the dummy visible-from-EL0-parts-only
-which defines a constant 0 TCO" (and also make the MSR_i
-code implement a RAZ/WI for this case, for consistency).
-An implementation that allows the guest to toggle the PSTATE.TCO
-bit to no visible effect is architecturally valid, though.)
-
->  #endif
->
->      /*
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index c85db69db4..62bdf50796 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1611,6 +1611,17 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
->          s->base.is_jmp = DISAS_UPDATE;
->          break;
->
-> +    case 0x1c: /* TCO */
-> +        if (!dc_isar_feature(aa64_mte_insn_reg, s)) {
-> +            goto do_unallocated;
-> +        }
-> +        if (crm & 1) {
-> +            set_pstate_bits(PSTATE_TCO);
-> +        } else {
-> +            clear_pstate_bits(PSTATE_TCO);
-> +        }
-> +        break;
-> +
->      default:
->      do_unallocated:
->          unallocated_encoding(s);
-> --
-> 2.17.1
-
-Otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-
-
-thanks
--- PMM
 
