@@ -7,72 +7,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EC7C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 03:33:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79589C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 03:34:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0E15206DC
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 03:33:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36338206DC
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 03:34:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="AsfrtPnK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0E15206DC
+	dkim=pass (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="ltt/+arq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36338206DC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibywl-000214-TN
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 22:33:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55318)
+	id 1ibyxW-0002yJ-DL
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 22:34:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1ibyw0-0001Ti-Tz
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 22:33:10 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1ibywU-0001ut-EE
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 22:33:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1ibyvz-0003ae-3R
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 22:33:08 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44253)
+ (envelope-from <aik@ozlabs.ru>) id 1ibywS-0004O0-M7
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 22:33:38 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45721)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ibyvy-0003Wc-Dn
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 22:33:07 -0500
-Received: by mail-pg1-x544.google.com with SMTP id x7so970728pgl.11
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 19:33:05 -0800 (PST)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1ibywS-0004Me-CZ
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 22:33:36 -0500
+Received: by mail-pg1-x542.google.com with SMTP id k1so969937pgg.12
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 19:33:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
  h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=RHQ3bfkztbI1GsqkKPNKTs5d8XzxE6NAsYnqSou7r30=;
- b=AsfrtPnKN9zCtX8cyxk8+fOI7s2mNX+UKzbWbgDShHBB7d4M8VAberva2Ci24+dbTb
- T8h67izyfzVhKOpKlksXopPBsaVMDuHymQKVn8RnteNFMzbLl2IoNvD2rZQC8xgu8Mlj
- eFZn+gQy/syNuhG5/thS1NSpG5sXb0eMnC2nzNf84IVBk7tKIMMQFUtz+gJPXquBJDhZ
- 1SiqCJu+qLAyEDzeHMkEE/gH+c53UQA4uA9rzJo5UBHnmvrctEdnCTfcx9VjEg4j+nJz
- /bIprwbHfTxAyWofjXHTiv3MIZGXaMfUeM4pMNuy+451y+8DG8dEQMqpF04tUVrDtunw
- CfjA==
+ bh=05FQmTyDuPh8I5luJcJcG2WZRkFP5/Nddbpdz4wRCDo=;
+ b=ltt/+arqHLmiLDC8e+TsypDgJH/5j+963vhHkvwjwo9T0djYraxoL0Uwq8w684tARf
+ 8unnwQENz26gbmUO3DwriQP3XjWd3B2i/WeF4+7kkdNla09fK6ozl7LvH8vfsbTUM87W
+ PpFR/E2rHXGoSZeCKL9FRFCx3FWza55qOVIgigZgjb4jQG0yrR3PjeCqhm6oTMDROY3o
+ ce+dP3AXe1Gz+vw/hiD8HbGmSP3LGQo328OsRyMaxG7merYTNEXsk3T0f7UUwt48UOMm
+ tw53z7e1E/APJOvQGDb6KnbM5AYJYH6EhhT6ikYCKC0/tOu6O3a5csKiN9+7CIG/UqpB
+ /W/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=RHQ3bfkztbI1GsqkKPNKTs5d8XzxE6NAsYnqSou7r30=;
- b=ARnS99GNujOd6bGe4Goq1pjq4I3v5uv6zTSilclepZSYV2Q+5gW+7efrlt6g/ChNnZ
- WFmnxeVQVWScR0xg7B2KuEZmAefDZVGXaVnTpfQTJ8OcYQhGgS/0h+J9l8Ez1+xOJkLg
- MGxZldtQhuBLEH6kSO93iNAfkCAVSC8yoF4iKoC/X9jBWYT4QwIY3W2y2j4J4cqzPt57
- /lYAwJb7SNNMLesNpMgaOPDt9zTgRoS8ykC8G7tZ1Ib0u03gJ6uSYPRyr7AzhYJhCDCp
- g19RELZG3CvCebc3cGXcTRnfVp1ZpC6r4bFiuHYlCBznOwuxdwZK2+nb1HiZM8yLnK3M
- ZKQg==
-X-Gm-Message-State: APjAAAUmgo0xkL3HQVG+6sfdKNUwl/N0LGPtSVEajH8aRyFZYwDq00Jo
- tIZ8/mMW7TXP8EdiCbxhNQ/3cUwGJKQ=
-X-Google-Smtp-Source: APXvYqweZALG4S8IwqZdeePs0raxWKgY/MJQWuFA+BgfYBuE7l6ySAHLJRpIi8f8cK59SfdaO4g5mw==
-X-Received: by 2002:a65:654e:: with SMTP id a14mr3028647pgw.170.1575343984218; 
- Mon, 02 Dec 2019 19:33:04 -0800 (PST)
+ bh=05FQmTyDuPh8I5luJcJcG2WZRkFP5/Nddbpdz4wRCDo=;
+ b=X30z0Hvs3htCU6CxQOXtq4xXzuqqKu92GQ6Mc+RiTvZnrpy4fa/mUBYeEPkYTbk9Qq
+ qGCUjrsrKupfzBu/B1U76nzZg1trWQst+/m7i7/8A/OMmwBK5DPC82+3QYiF4WXysE3/
+ 0wntC3nxFCkyqT1vK0XHieeUPDns3rFqpNWLg27qBv2SEcw+I6HcyubUbe7Ke340hkEB
+ 4BUe0Xdp5ZiTegrnUjkqnsRsfnOAmk79qsst6IBXIt695UAec5q2v78053GuUnpvILF+
+ Q26WMer+f5nSAyMK0p1sSo7MyEjr3zmc/OXhCdXDkWd/yM501yzbwZcGlCh/2RsivUaw
+ /hGg==
+X-Gm-Message-State: APjAAAXu0rbl+lryCNLwW51c6VhnOBgVOLKg3zPtS/9O0EFfUlxLZJ3S
+ U9na1cwENM4asIEYfPKVJJkX2jsEiSA=
+X-Google-Smtp-Source: APXvYqws+aq+Dr4Hq//BDy4hwMvCdkUwah73zwJLTAtZkacgKTrJp2VKubBmMVzVbEPn3ahuJVEFiA==
+X-Received: by 2002:a05:6a00:9c:: with SMTP id
+ c28mr2568658pfj.234.1575344015172; 
+ Mon, 02 Dec 2019 19:33:35 -0800 (PST)
 Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id f18sm1030208pfk.124.2019.12.02.19.33.01
+ by smtp.gmail.com with ESMTPSA id q3sm1051601pfc.114.2019.12.02.19.33.32
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Dec 2019 19:33:03 -0800 (PST)
-Subject: Re: [for-5.0 1/4] spapr,ppc: Simplify signature of kvmppc_rma_size()
+ Mon, 02 Dec 2019 19:33:34 -0800 (PST)
+Subject: Re: [for-5.0 2/4] spapr: Don't attempt to clamp RMA to VRMA constraint
 To: David Gibson <david@gibson.dropbear.id.au>, groug@kaod.org, clg@kaod.org
 References: <20191129013504.145455-1-david@gibson.dropbear.id.au>
- <20191129013504.145455-2-david@gibson.dropbear.id.au>
+ <20191129013504.145455-3-david@gibson.dropbear.id.au>
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
 Autocrypt: addr=aik@ozlabs.ru; keydata=
  mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
@@ -147,18 +148,18 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <f70c476b-4329-c62f-38ed-0c57137fc93b@ozlabs.ru>
-Date: Tue, 3 Dec 2019 14:32:59 +1100
+Message-ID: <d2784a5f-5410-5eee-14f8-d9157946b8b0@ozlabs.ru>
+Date: Tue, 3 Dec 2019 14:33:30 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191129013504.145455-2-david@gibson.dropbear.id.au>
+In-Reply-To: <20191129013504.145455-3-david@gibson.dropbear.id.au>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -178,106 +179,178 @@ Sender: "Qemu-devel"
 
 
 On 29/11/2019 12:35, David Gibson wrote:
-> This function calculates the maximum size of the RMA as implied by the
-> host's page size of structure of the VRMA (there are a number of other
-> constraints on the RMA size which will supersede this one in many
-> circumstances).
+> The Real Mode Area (RMA) is the part of memory which a guest can access
+> when in real (MMU off) mode.  Of course, for a guest under KVM, the MMU
+> isn't really turned off, it's just in a special translation mode - Virtual
+> Real Mode Area (VRMA) - which looks like real mode in guest mode.
 > 
-> The current interface takes the current RMA size estimate, and clamps it
-> to the VRMA derived size.  The only current caller passes in an arguably
-> wrong value (it will match the current RMA estimate in some but not all
-> cases).
+> The mechanics of how this works when in Hashed Page Table (HPT) mode, put
+> a constraint on the size of the RMA, which depends on the size of the HPT.
+> So, the latter part of spapr_setup_hpt_and_vrma() clamps the RMA we
+> advertise to the guest based on this VRMA limit.
 > 
-> We want to fix that, but for now just keep concerns separated by having the
-> KVM helper function just return the VRMA derived limit, and let the caller
-> combine it with other constraints.  We call the new function
-> kvmppc_vrma_limit() to more clearly indicate its limited responsibility.
+> There are several things wrong with this:
+>  1) spapr_setup_hpt_and_vrma() doesn't actually clamp, it takes the minimum
+>     of Node 0 memory size and the VRMA limit.  That will *often* work the
+>     same as clamping, but there can be other constraints on RMA size which
+>     supersede Node 0 memory size.  We have real bugs caused by this
+>     (currently worked around in the guest kernel)
+>  2) Some callers of spapr_setup_hpt_and_vrma() are in a situation where
+>     we're past the point that we can actually advertise an RMA limit to the
+>     guest
+>  3) But most fundamentally, the VRMA limit depends on host configuration
+>     (page size) which shouldn't be visible to the guest, but this partially
+>     exposes it.  This can cause problems with migration in certain edge
+>     cases, although we will mostly get away with it.
 > 
-> The helper should only ever be called in the KVM enabled case, so replace
-> its !CONFIG_KVM stub with an assert() rather than a dummy value.
+> In practice, this clamping is almost never applied anyway.  With 64kiB
+> pages and the normal rules for sizing of the HPT, the theoretical VRMA
+> limit will be 4x(guest memory size) and so never hit.  It will hit with
+> 4kiB pages, where it will be (guest memory size)/4.  However all mainstream
+> distro kernels for POWER have used a 64kiB page size for at least 10 years.
+> 
+> So, simply replace this logic with a check that the RMA we've calculated
+> based only on guest visible configuration will fit within the host implied
+> VRMA limit.  This can break if running HPT guests on a host kernel with
+> 4kiB page size.  As noted that's very rare.  There also exist several
+> possible workarounds:
+>   * Change the host kernel to use 64kiB pages
+>   * Use radix MMU (RPT) guests instead of HPT
+>   * Use 64kiB hugepages on the host to back guest memory
+>   * Increase the guest memory size so that the RMA hits one of the fixed
+>     limits before the RMA limit.  This is relatively easy on POWER8 which
+>     has a 16GiB limit, harder on POWER9 which has a 1TiB limit.
+>   * Decrease guest memory size so that it's below the lower bound on VRMA
+>     limit (minimum HPT size is 256kiB, giving a minimum VRAM of 8MiB).
+>     Difficult in practice since modern guests tend to want 1-2GiB.
+>   * Use a guest NUMA configuration which artificially constrains the RMA
+>     within the VRMA limit (the RMA must always fit within Node 0).
+> 
+> Previously, on KVM, we also temporarily reduced the rma_size to 256M so
+> that the we'd load the kernel and initrd safely, regardless of the VRMA
+> limit.  This was a) confusing, b) could significantly limit the size of
+> images we could load and c) introduced a behavioural difference between
+> KVM and TCG.  So we remove that as well.
 > 
 > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 
-
-Besides not compiling, otherwise looks good.
 
 
 Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
 
 
-
 > ---
->  hw/ppc/spapr.c       | 5 +++--
->  target/ppc/kvm.c     | 5 ++---
->  target/ppc/kvm_ppc.h | 7 +++----
->  3 files changed, 8 insertions(+), 9 deletions(-)
+>  hw/ppc/spapr.c         | 28 ++++++++++------------------
+>  hw/ppc/spapr_hcall.c   |  4 ++--
+>  include/hw/ppc/spapr.h |  3 +--
+>  3 files changed, 13 insertions(+), 22 deletions(-)
 > 
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index d9c9a2bcee..069bd04a8d 100644
+> index 069bd04a8d..52c39daa99 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1635,8 +1635,9 @@ void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr)
+> @@ -1618,7 +1618,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
+>      spapr_set_all_lpcrs(0, LPCR_HR | LPCR_UPRT);
+>  }
+>  
+> -void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr)
+> +void spapr_setup_hpt(SpaprMachineState *spapr)
+>  {
+>      int hpt_shift;
+>  
+> @@ -1634,10 +1634,16 @@ void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr)
+>      }
 >      spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
 >  
->      if (spapr->vrma_adjust) {
-> -        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(MACHINE(spapr)),
-> -                                          spapr->htab_shift);
-> +        hwaddr vrma_limit = kvmppc_vrma_limit(spapr->htab_shift);
-> +
-> +        spapr->rma_size = MIN(spapr_node0_size(MACHINE(spapr)), vrma_limit);
+> -    if (spapr->vrma_adjust) {
+> +    if (kvm_enabled()) {
+>          hwaddr vrma_limit = kvmppc_vrma_limit(spapr->htab_shift);
+>  
+> -        spapr->rma_size = MIN(spapr_node0_size(MACHINE(spapr)), vrma_limit);
+> +        /* Check our RMA fits in the possible VRMA */
+> +        if (vrma_limit < spapr->rma_size) {
+> +            error_report("Unable to create %" HWADDR_PRIu
+> +                         "MiB RMA (VRMA only allows %" HWADDR_PRIu "MiB",
+> +                         spapr->rma_size / MiB, vrma_limit / MiB);
+> +            exit(EXIT_FAILURE);
+> +        }
 >      }
 >  }
 >  
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index c77f9848ec..09b3bd6443 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2101,7 +2101,7 @@ void kvmppc_hint_smt_possible(Error **errp)
+> @@ -1676,7 +1682,7 @@ static void spapr_machine_reset(MachineState *machine)
+>          spapr->patb_entry = PATE1_GR;
+>          spapr_set_all_lpcrs(LPCR_HR | LPCR_UPRT, LPCR_HR | LPCR_UPRT);
+>      } else {
+> -        spapr_setup_hpt_and_vrma(spapr);
+> +        spapr_setup_hpt(spapr);
+>      }
 >  
+>      qemu_devices_reset();
+> @@ -2711,20 +2717,6 @@ static void spapr_machine_init(MachineState *machine)
 >  
->  #ifdef TARGET_PPC64
-> -uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
-> +uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
->  {
->      struct kvm_ppc_smmu_info info;
->      long rampagesize, best_page_shift;
-> @@ -2128,8 +2128,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift)
+>      spapr->rma_size = node0_size;
+>  
+> -    /* With KVM, we don't actually know whether KVM supports an
+> -     * unbounded RMA (PR KVM) or is limited by the hash table size
+> -     * (HV KVM using VRMA), so we always assume the latter
+> -     *
+> -     * In that case, we also limit the initial allocations for RTAS
+> -     * etc... to 256M since we have no way to know what the VRMA size
+> -     * is going to be as it depends on the size of the hash table
+> -     * which isn't determined yet.
+> -     */
+> -    if (kvm_enabled()) {
+> -        spapr->vrma_adjust = 1;
+> -        spapr->rma_size = MIN(spapr->rma_size, 0x10000000);
+> -    }
+> -
+>      /* Actually we don't support unbounded RMA anymore since we added
+>       * proper emulation of HV mode. The max we can get is 16G which
+>       * also happens to be what we configure for PAPR mode so make sure
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 140f05c1c6..372ba8bd1c 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1456,7 +1456,7 @@ static void spapr_check_setup_free_hpt(SpaprMachineState *spapr,
+>          spapr_free_hpt(spapr);
+>      } else if (!(patbe_new & PATE1_GR)) {
+>          /* RADIX->HASH || NOTHING->HASH : Allocate HPT */
+> -        spapr_setup_hpt_and_vrma(spapr);
+> +        spapr_setup_hpt(spapr);
+>      }
+>      return;
+>  }
+> @@ -1772,7 +1772,7 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+>           * (because the guest isn't going to use radix) then set it up here. */
+>          if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
+>              /* legacy hash or new hash: */
+> -            spapr_setup_hpt_and_vrma(spapr);
+> +            spapr_setup_hpt(spapr);
 >          }
->      }
+>          spapr->cas_reboot =
+>              (spapr_h_cas_compose_response(spapr, args[1], args[2],
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index d5ab5ea7b2..85c33560c3 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -154,7 +154,6 @@ struct SpaprMachineState {
+>      SpaprPendingHpt *pending_hpt; /* in-progress resize */
 >  
-> -    return MIN(current_size,
-> -               1ULL << (best_page_shift + hash_shift - 7));
-> +    return 1ULL << (best_page_shift + hash_shift - 7));
->  }
->  #endif
->  
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 98bd7d5da6..4f0eec4c1b 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -45,7 +45,7 @@ void *kvmppc_create_spapr_tce(uint32_t liobn, uint32_t page_shift,
->                                int *pfd, bool need_vfio);
->  int kvmppc_remove_spapr_tce(void *table, int pfd, uint32_t window_size);
->  int kvmppc_reset_htab(int shift_hint);
-> -uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
-> +uint64_t kvmppc_vrma_limit(unsigned int hash_shift);
->  bool kvmppc_has_cap_spapr_vfio(void);
->  #endif /* !CONFIG_USER_ONLY */
->  bool kvmppc_has_cap_epr(void);
-> @@ -241,10 +241,9 @@ static inline int kvmppc_reset_htab(int shift_hint)
->      return 0;
->  }
->  
-> -static inline uint64_t kvmppc_rma_size(uint64_t current_size,
-> -                                       unsigned int hash_shift)
-> +static inline uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
->  {
-> -    return ram_size;
-> +    g_assert_not_reached();
->  }
->  
->  static inline bool kvmppc_hpt_needs_host_contiguous_pages(void)
+>      hwaddr rma_size;
+> -    int vrma_adjust;
+>      uint32_t fdt_size;
+>      uint32_t fdt_initial_size;
+>      void *fdt_blob;
+> @@ -772,7 +771,7 @@ int spapr_h_cas_compose_response(SpaprMachineState *sm,
+>                                   target_ulong addr, target_ulong size,
+>                                   SpaprOptionVector *ov5_updates);
+>  void close_htab_fd(SpaprMachineState *spapr);
+> -void spapr_setup_hpt_and_vrma(SpaprMachineState *spapr);
+> +void spapr_setup_hpt(SpaprMachineState *spapr);
+>  void spapr_free_hpt(SpaprMachineState *spapr);
+>  SpaprTceTable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn);
+>  void spapr_tce_table_enable(SpaprTceTable *tcet,
 > 
 
 -- 
