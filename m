@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9687C432C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B41C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 17:11:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86DD72064B
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1192D207DD
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 17:11:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zo2+HfN9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86DD72064B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VVfDgE3A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1192D207DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icBHV-0004ik-Ky
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 11:44:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34243)
+	id 1icBi5-0002m8-18
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 12:11:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38135)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1icAkS-0001jO-2a
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:10:02 -0500
+ (envelope-from <lvivier@redhat.com>) id 1icAm4-0002Nl-UN
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:11:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1icAkJ-0002JO-BN
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:09:53 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21008
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <lvivier@redhat.com>) id 1icAlx-000611-9s
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:11:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37640
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1icAkH-00027h-Vg
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:09:51 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1icAlx-0005nr-52
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:11:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575389384;
+ s=mimecast20190719; t=1575389490;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ixXcqn3ePFmPziQtAvn7WCFSBnmI7Uc/RJGDFsNdthg=;
- b=Zo2+HfN9N7mZdnbe9Aoo2duxU6sDWNr+rtrWVdMCloE1ZkhxJi19G93QxApPykagy38JMz
- SqzTwLaezY2yQ71l1MJz3REdYchlMT6yenRGvpVX/01XPvseRL11JsQgbc+tkijhkkdJ+J
- ZWoOJ4KJi7vUIOP5xfLLQdmdc+1t/L4=
+ bh=+btD3vFOaQQYrqX0fNjsldZtCxvIX8B5WgoYrYO0gtE=;
+ b=VVfDgE3AfM2KGG29lV2Uis5xNTqy/AacM6P5vwmN/8wyEO0qgZvJ5qPddm02mnlY0TyEoY
+ 5GXaDWtG7nKy0EqExgIEHO2MDp7gMkVi8YzzUqOxmQuBFkpDqFS3aqH5o5ebAOU8Xo86hg
+ khxjxeNaTMI6AMfQ1VHnZq9Cu3TtuAY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-BHQRnsMQPeSqf0GCI5RaVw-1; Tue, 03 Dec 2019 11:09:43 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-216-I-bm_0vVNWm6vpHJ6NylWg-1; Tue, 03 Dec 2019 11:11:26 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D91FB800D4C;
- Tue,  3 Dec 2019 16:09:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E29C18AAFC1;
+ Tue,  3 Dec 2019 16:11:25 +0000 (UTC)
 Received: from [10.36.117.138] (ovpn-117-138.ams2.redhat.com [10.36.117.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 494E5600C8;
- Tue,  3 Dec 2019 16:09:38 +0000 (UTC)
-Subject: Re: [PULL v2 4/6] spapr: Add /chosen to FDT only at reset time to
- preserve kernel and initramdisk
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 87C4D10246E3;
+ Tue,  3 Dec 2019 16:11:23 +0000 (UTC)
+Subject: Re: [PULL 30/53] spapr: Render full FDT on
+ ibm,client-architecture-support
+To: David Gibson <david@gibson.dropbear.id.au>, peter.maydell@linaro.org
+References: <20191004093747.31350-1-david@gibson.dropbear.id.au>
+ <20191004093747.31350-31-david@gibson.dropbear.id.au>
 From: Laurent Vivier <lvivier@redhat.com>
-To: qemu-devel@nongnu.org
-References: <20191118105319.7658-1-lvivier@redhat.com>
- <20191118105319.7658-5-lvivier@redhat.com>
- <a65399f9-fb59-a54b-3185-1f48ee979d3d@redhat.com>
 Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
  WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
@@ -119,21 +118,21 @@ Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
  XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
  D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <13846307-0e59-53b3-38cf-54270b43ed87@redhat.com>
-Date: Tue, 3 Dec 2019 17:09:38 +0100
+Message-ID: <f73b6b79-d8ae-b23d-d2d8-2ff4e8d7fb21@redhat.com>
+Date: Tue, 3 Dec 2019 17:11:22 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <a65399f9-fb59-a54b-3185-1f48ee979d3d@redhat.com>
+In-Reply-To: <20191004093747.31350-31-david@gibson.dropbear.id.au>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: BHQRnsMQPeSqf0GCI5RaVw-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: I-bm_0vVNWm6vpHJ6NylWg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -145,93 +144,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, groug@kaod.org,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 04/10/2019 11:37, David Gibson wrote:
+> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+> 
+> The ibm,client-architecture-support call is a way for the guest to
+> negotiate capabilities with a hypervisor. It is implemented as:
+> - the guest calls SLOF via client interface;
+> - SLOF calls QEMU (H_CAS hypercall) with an options vector from the guest;
+> - QEMU returns a device tree diff (which uses FDT format with
+> an additional header before it);
+> - SLOF walks through the partial diff tree and updates its internal tree
+> with the values from the diff.
+> 
+> This changes QEMU to simply re-render the entire tree and send it as
+> an update. SLOF can handle this already mostly, [1] is needed before this
+> can be applied. This stores the resulting tree in the spapr machine to have
+> the latest valid FDT copy possible (this should not matter much as
+> H_UPDATE_DT happens right after that but nevertheless).
+> 
+> The benefit is reduced code size as there is no need for another set of
+> DT rendering helpers such as spapr_fixup_cpu_dt().
+> 
+> The downside is that the updates are bigger now (as they include all
+> nodes and properties) but the difference on a '-smp 256,threads=1' system
+> before/after is 2.35s vs. 2.5s.
+> 
+> [1] https://patchwork.ozlabs.org/patch/1152915/
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> ---
+>  hw/ppc/spapr.c | 88 ++++++--------------------------------------------
+>  1 file changed, 9 insertions(+), 79 deletions(-)
 
-Bad reply, the problem is with
+[Resend the comment I sent to another patch by mistake]
 
-"spapr: Render full FDT on ibm,client-architecture-support"
+This patch breaks pseries boot when we use a pci-bridge (since v4.2.0-rc0):
 
-Sorry,
+...
+    -device pci-bridge,id=pci_bridge1,bus=pci.0,addr=0x3,chassis_nr=1 \
+    -device virtio-scsi-pci,bus=pci_bridge1 \
+...
+
+OF stdout device is: /vdevice/vty@71000000
+Preparing to boot Linux version 5.4.0-rc3+ (lvivier@localhost) (gcc
+version 4.8.5 20150623 (Red Hat 4.8.5-39) (GCC)) #2 SMP Wed Nov 13
+09:08:20 EST 2019
+Detected machine type: 0000000000000101
+command line: BOOT_IMAGE=/vmlinuz-5.4.0-rc3+ root=/dev/mapper/rhel-root
+ro crashkernel=auto rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap
+Max number of cores passed to firmware: 2048 (NR_CPUS = 2048)
+Calling ibm,client-architecture-support...
+
+( 300 ) Data Storage Exception [ 1dc5f230 ]
+
+
+    R0 .. R7           R8 .. R15         R16 .. R23         R24 .. R31
+8000000000001000   000000001e477010   0000000000000000   000000001dc17500
+000000001e67afe0   0000000020000004   0000000000000000   000000001dc1bf88
+000000001dc21800   000000001dc5f248   000000001e477010   0000000000000003
+000000001dc61000   000000001e78dc2d   000000001dc1c158   000000000000f001
+0000000000000000   a000000000000001   0000000000008000   000000001e67b060
+000000001dc5f230   0000000000000000   000000000000f003   ffffffffffffffff
+000000001e745860   0000000000000000   0000000000000006   000000001dbf48f8
+000000001dc5f248   0000000000000000   000000001e67b050   000000001dc1c350
+
+    CR / XER           LR / CTR          SRR0 / SRR1        DAR / DSISR
+        80000808   000000001dbf34d4   000000001dbf4194   0000000020000004
+0000000020000000   000000001dbf48f8   8000000000001000           40000000
+
+
+4a >
+
+Thanks,
 Laurent
-
-On 03/12/2019 16:57, Laurent Vivier wrote:
-> On 18/11/2019 11:53, Laurent Vivier wrote:
->> From: Alexey Kardashevskiy <aik@ozlabs.ru>
->>
->> Since "spapr: Render full FDT on ibm,client-architecture-support" we build
->> the entire flatten device tree (FDT) twice - at the reset time and
->> when "ibm,client-architecture-support" (CAS) is called. The full FDT from
->> CAS is then applied on top of the SLOF internal device tree.
->>
->> This is mostly ok, however there is a case when the QEMU is started with
->> -initrd and for some reason the guest decided to move/unpack the init RAM
->> disk image - the guest correctly notifies SLOF about the change but
->> at CAS it is overridden with the QEMU initial location addresses and
->> the guest may fail to boot if the original initrd memory was changed.
->>
->> This fixes the problem by only adding the /chosen node at the reset time
->> to prevent the original QEMU's linux,initrd-start/linux,initrd-end to
->> override the updated addresses.
->>
->> This only treats /chosen differently as we know there is a special case
->> already and it is unlikely anything else will need to change /chosen at CAS
->> we are better off not touching /chosen after we handed it over to SLOF.
->>
->> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->> Message-Id: <20191024041308.5673-1-aik@ozlabs.ru>
->> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->> ---
->>  hw/ppc/spapr.c | 25 +++++++++++++++----------
->>  1 file changed, 15 insertions(+), 10 deletions(-)
->>
-> 
-> This patch breaks pseries boot when we use a pci-bridge (since v4.2.0-rc0):
-> 
-> ...
->     -device pci-bridge,id=pci_bridge1,bus=pci.0,addr=0x3,chassis_nr=1 \
->     -device virtio-scsi-pci,bus=pci_bridge1 \
-> ...
-> 
-> OF stdout device is: /vdevice/vty@71000000
-> Preparing to boot Linux version 5.4.0-rc3+ (lvivier@localhost) (gcc
-> version 4.8.5 20150623 (Red Hat 4.8.5-39) (GCC)) #2 SMP Wed Nov 13
-> 09:08:20 EST 2019
-> Detected machine type: 0000000000000101
-> command line: BOOT_IMAGE=/vmlinuz-5.4.0-rc3+ root=/dev/mapper/rhel-root
-> ro crashkernel=auto rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap
-> Max number of cores passed to firmware: 2048 (NR_CPUS = 2048)
-> Calling ibm,client-architecture-support...
-> 
-> ( 300 ) Data Storage Exception [ 1dc5f230 ]
-> 
-> 
->     R0 .. R7           R8 .. R15         R16 .. R23         R24 .. R31
-> 8000000000001000   000000001e477010   0000000000000000   000000001dc17500
-> 000000001e67afe0   0000000020000004   0000000000000000   000000001dc1bf88
-> 000000001dc21800   000000001dc5f248   000000001e477010   0000000000000003
-> 000000001dc61000   000000001e78dc2d   000000001dc1c158   000000000000f001
-> 0000000000000000   a000000000000001   0000000000008000   000000001e67b060
-> 000000001dc5f230   0000000000000000   000000000000f003   ffffffffffffffff
-> 000000001e745860   0000000000000000   0000000000000006   000000001dbf48f8
-> 000000001dc5f248   0000000000000000   000000001e67b050   000000001dc1c350
-> 
->     CR / XER           LR / CTR          SRR0 / SRR1        DAR / DSISR
->         80000808   000000001dbf34d4   000000001dbf4194   0000000020000004
-> 0000000020000000   000000001dbf48f8   8000000000001000           40000000
-> 
-> 
-> 4a >
-> 
-> Thanks,
-> Laurent
-> 
 
 
