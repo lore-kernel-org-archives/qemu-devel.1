@@ -2,63 +2,87 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF78C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 02:12:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1A2C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 02:33:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73EFD20659
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 02:12:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73EFD20659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 586B72068E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 02:33:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mITxmaZC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 586B72068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ibxfZ-00004s-MJ
-	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 21:12:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53655)
+	id 1iby03-00053X-Vr
+	for qemu-devel@archiver.kernel.org; Mon, 02 Dec 2019 21:33:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1ibxeF-0007ui-A7
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 21:10:45 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ibxwd-0002xn-00
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 21:29:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1ibxeB-0003zr-EX
- for qemu-devel@nongnu.org; Mon, 02 Dec 2019 21:10:43 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2206 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1ibxe2-0003Mi-FD; Mon, 02 Dec 2019 21:10:30 -0500
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id AE02B229EEBA8B584857;
- Tue,  3 Dec 2019 10:10:09 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 3 Dec 2019
- 10:10:03 +0800
-Subject: Re: [RESEND PATCH v21 0/6] Add ARMv8 RAS virtualization support in
- QEMU
-To: Peter Maydell <peter.maydell@linaro.org>, Xiang Zheng
- <zhengxiang9@huawei.com>
-References: <20191111014048.21296-1-zhengxiang9@huawei.com>
- <CAFEAcA96Pk_d_T2=GL-QyEBwEXC2fV89K=5h4nEtSHUL0VKZQg@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <2fc18991-ecc7-a59f-c0ec-a39786e2dbf9@huawei.com>
-Date: Tue, 3 Dec 2019 10:09:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (envelope-from <richard.henderson@linaro.org>) id 1ibxwb-0007u9-T4
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 21:29:42 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:41369)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ibxwb-0007sq-Ng
+ for qemu-devel@nongnu.org; Mon, 02 Dec 2019 21:29:41 -0500
+Received: by mail-pf1-x444.google.com with SMTP id s18so974685pfd.8
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 18:29:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=bqFmG5Z1vaxgrnnahQPUtAEMOtLoaTFE8WYhisDg6pA=;
+ b=mITxmaZC7eclvocYyjWfbqDgOESFlDcSqs07Xn72GZulYpILeHcMKJK9qExMo1nb0t
+ Ws3LZ+i7fdamiuHCPRgHfAWZmoYVgGYOAI5/m3IWNEHsJWr9+UJALPoH2wXrlfKCVlsp
+ WnieNIVJ3oefOuG/AjQw2EN6DUVZbyQENzx79k7btiGIWJDAtDN9TOTNer5o9tx74u8n
+ NBbZ6QhBn/LfKhNjBLOI8+MDAPyzWPLxDuOXKZjee0oW+KQNtiBEPbRUX00Ttw3q5q6d
+ a9LoglXoGgpnOudbjjgil0bzoXkKR0HrMlFfrMmX9+MftC/TyQUNg6llZ4dx/xM4Vfjf
+ R2tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=bqFmG5Z1vaxgrnnahQPUtAEMOtLoaTFE8WYhisDg6pA=;
+ b=pwQLkZjfRwwzm2YDdoACN35dkJZL2/Y6gSu+FM1qtzasZgB3dzq9T7aKxT+6WRbbdF
+ zYMN1aqKAaeTvR8osk7E/1pLH+2WcqUxq4ZaK3cxX7Xilh0tGTjZWahW3stVWw1RNl7d
+ laJ0k4QhdEe+z6HyTTYDAB7vmJZrtmzR+4tVmA/ovwhsPpGWpySyM4Npgj1g3Mv31Dvj
+ I5oqGe3/5Vbuh5okbzZMUyitgWHQVsoFFtYGqC302yezRxf7lCYdNzqxR4vahLUzTHYk
+ WY89b/nRefG+CRW06totgqnPV1GRSsvusl9mr+hXFrppnrmFoNDpnqwQn+YT55twRE7a
+ IYrQ==
+X-Gm-Message-State: APjAAAWSpCyTI+wWJG2tJUCzRhkigkwX8bKUr4wQ+ZfxXFk5BoHqwCgo
+ WFfjWGU2eBHJH7SJzNEV4+uVa/6rOg8=
+X-Google-Smtp-Source: APXvYqyjYrTMidUh438qrX5fwv9SAgp+L4vbPniO4kTyjPld0K64wY0iFS+81WP03eCnW3p9MzWQNA==
+X-Received: by 2002:aa7:968b:: with SMTP id f11mr2326350pfk.209.1575340180449; 
+ Mon, 02 Dec 2019 18:29:40 -0800 (PST)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id q22sm873695pfg.170.2019.12.02.18.29.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Dec 2019 18:29:39 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 01/40] target/arm: Define isar_feature_aa64_vh
+Date: Mon,  2 Dec 2019 18:28:58 -0800
+Message-Id: <20191203022937.1474-2-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191203022937.1474-1-richard.henderson@linaro.org>
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA96Pk_d_T2=GL-QyEBwEXC2fV89K=5h4nEtSHUL0VKZQg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.190
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,39 +94,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, kvm-devel <kvm@vger.kernel.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, wanghaibin.wang@huawei.com,
- Marcelo Tosatti <mtosatti@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
- qemu-arm <qemu-arm@nongnu.org>, James Morse <james.morse@arm.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- "xuwei \(O\)" <xuwei5@huawei.com>, Laszlo Ersek <lersek@redhat.com>, Richard
- Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019/12/3 2:27, Peter Maydell wrote:
->> application within guest, host does not know which application encounters
->> errors.
->>
->> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
->> After user space gets the notification, it will record the CPER into guest GHES
->> buffer and inject an exception or IRQ into guest.
->>
->> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
->> treat it as a synchronous exception, and notify guest with ARMv8 SEA
->> notification type after recording CPER into guest.
-> Hi; I've given you reviewed-by tags on a couple of patches; other
-> people have given review comments on some of the other patches,
-> so I think you have enough to do a v22 addressing those.
-Thanks very much for the reviewed-by tags,  we will upload v22.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-
-> > thanks
-> -- PMM
-> .
-> 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 83a809d4ba..994cad2014 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3632,6 +3632,11 @@ static inline bool isar_feature_aa64_sve(const ARMISARegisters *id)
+     return FIELD_EX64(id->id_aa64pfr0, ID_AA64PFR0, SVE) != 0;
+ }
+ 
++static inline bool isar_feature_aa64_vh(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, VH) != 0;
++}
++
+ static inline bool isar_feature_aa64_lor(const ARMISARegisters *id)
+ {
+     return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, LO) != 0;
+-- 
+2.17.1
 
 
