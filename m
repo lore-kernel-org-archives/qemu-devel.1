@@ -2,94 +2,83 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DCAC43141
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:47:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C16C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:59:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE9F820684
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:47:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE9F820684
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 4D89C20656
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:59:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xS7z3I3a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D89C20656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icGxF-0007SK-Hg
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 17:47:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41417)
+	id 1icH8x-0006Rw-Qz
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 17:59:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58307)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1icGs5-0005x0-Ha
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:42:18 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1icH39-0002aQ-G3
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:53:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1icGs1-0007C5-GK
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:42:17 -0500
-Received: from mail.ilande.co.uk ([46.43.2.167]:60968
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1icGru-0005eO-91
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:42:06 -0500
-Received: from host86-173-229-99.range86-173.btcentralplus.com
- ([86.173.229.99] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1icGnI-0007rx-S4; Tue, 03 Dec 2019 22:37:21 +0000
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-References: <20191203072922.14981-1-thuth@redhat.com>
- <2b5d3c2d-6982-03f6-26cc-7400440b990f@redhat.com>
- <8ca69db3-7dfa-0c4d-bc50-61a80eb574c1@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <205c2f57-2022-316d-be90-85e63bbdcb61@ilande.co.uk>
-Date: Tue, 3 Dec 2019 22:36:30 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <8ca69db3-7dfa-0c4d-bc50-61a80eb574c1@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.173.229.99
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH] hw/ppc/prep: Remove the deprecated "prep" machine and the
- OpenHackware BIOS
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.43.2.167
+ (envelope-from <richard.henderson@linaro.org>) id 1icH38-0006Ro-7a
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:53:43 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46208)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1icH37-0006Nw-Kr
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:53:42 -0500
+Received: by mail-pf1-x442.google.com with SMTP id y14so2106035pfm.13
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 14:53:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=cInc5a19jU6WxGPEpK5KzVQbF4VsjSynVXIzjEULPhE=;
+ b=xS7z3I3aUvdGgcrTGD4qP+BY8TO1wrSKD/eSM1S3Kt34LxYnokHUQaT/dO4ycglfdE
+ cjZfPTqgnEZY7YWCIbYeC88KESjVbg8JAYMvifnOgkZOptcBZIubkKQF6sZ1nUlP1Dih
+ CHFNYSwOx5X5aI7I5xEP9tdTZjr7QADRaqDlTUXn3N8p8IGSBxCzZstGC1uxhZ1Kedxd
+ qoWxBZ0uFbwuJ+ni0kyWTCV22bgfdpBuMGAZjutRO+gHzHfi/DuiGDXGbKUQIyAmnnUS
+ D6YQlc2K32zTQNc/qMIBBXOZwYaoYL7v0wLFceXneT5+HCdsWYcDL09CAhySZYftAADz
+ 026w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=cInc5a19jU6WxGPEpK5KzVQbF4VsjSynVXIzjEULPhE=;
+ b=R7mgLxV3qjJLrIV263iJ3xXTZ+ARNpqehZ/MteGu8TOz8JaKO/FpbCn+7ngBNBrp+D
+ fg2pPZ870jqE9IHhzBGRr5zYx8ADhAmnXUoOBBrIMlmxnUO4ddkH4jTTLiUuW3YRNxwu
+ iC9eQb97l3VPqA1Af+vG2xLjDWMK6XbGuxX7X2oEp8v0C4JaF6bvd97VeDeAQ0A1P8oC
+ U7lO/G1yApiEJULaWBxwGzxB+0+7MLciWqx+jFlW6Q9v+VDNhoPGYNrCi6TCtIfMEzR6
+ unQLWbJGmyCzeBxpyz0RZU99Ct5tmxPDwjMHqqLljBHVwzm9TcT13KtREU073bu9CtYB
+ yOkA==
+X-Gm-Message-State: APjAAAX1D8wkP8lG3l/SsGkdYREQfcE9ZAEMlTst1m9jHcDigD2HBgYK
+ zZTUnQL8+EU7PxzALjhLy61hDxZq934=
+X-Google-Smtp-Source: APXvYqztNttbmbt/BiahwMrxyBDKq86VegofgBGvLajYVB8hUwSEvdsPiBw31jgePM7ueLOxAAhyQw==
+X-Received: by 2002:aa7:870c:: with SMTP id b12mr320615pfo.82.1575413620282;
+ Tue, 03 Dec 2019 14:53:40 -0800 (PST)
+Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
+ [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d22sm3789713pjd.2.2019.12.03.14.53.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Dec 2019 14:53:39 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 04/11] target/arm: Reduce CPSR_RESERVED
+Date: Tue,  3 Dec 2019 14:53:26 -0800
+Message-Id: <20191203225333.17055-5-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191203225333.17055-1-richard.henderson@linaro.org>
+References: <20191203225333.17055-1-richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,85 +90,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/12/2019 08:25, Thomas Huth wrote:
+Since v8.0, the CPSR_RESERVED bits have been allocated.
+We are not yet implementing ARMv8.4-DIT; retain CPSR_RESERVED,
+since that overlaps with our current hack for AA32 single step.
 
-> On 03/12/2019 08.45, Philippe Mathieu-Daudé wrote:
->> On 12/3/19 8:29 AM, Thomas Huth wrote:
->>> It's been deprecated since QEMU v3.1. The 40p machine should be
->>> used nowadays instead.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>   .gitmodules                |   3 -
->>>   MAINTAINERS                |   1 -
->>>   Makefile                   |   2 +-
->>>   docs/interop/firmware.json |   3 +-
->>>   hw/ppc/ppc.c               |  18 --
->>>   hw/ppc/prep.c              | 384 +------------------------------------
->>>   include/hw/ppc/ppc.h       |   1 -
->>>   pc-bios/README             |   3 -
->>>   pc-bios/ppc_rom.bin        | Bin 1048576 -> 0 bytes
->>>   qemu-deprecated.texi       |   6 -
->>>   qemu-doc.texi              |  15 +-
->>>   roms/openhackware          |   1 -
->>>   tests/boot-order-test.c    |  25 ---
->>>   tests/cdrom-test.c         |   2 +-
->>>   tests/endianness-test.c    |   2 +-
->>>   15 files changed, 10 insertions(+), 456 deletions(-)
->>>   delete mode 100644 pc-bios/ppc_rom.bin
->>>   delete mode 160000 roms/openhackware
->> [...]
->>> diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
->>> index a725bce729..4a6218a516 100644
->>> --- a/tests/boot-order-test.c
->>> +++ b/tests/boot-order-test.c
->>> @@ -108,30 +108,6 @@ static void test_pc_boot_order(void)
->>>       test_boot_orders(NULL, read_boot_order_pc, test_cases_pc);
->>>   }
->>>   -static uint8_t read_m48t59(QTestState *qts, uint64_t addr, uint16_t
->>> reg)
->>> -{
->>> -    qtest_writeb(qts, addr, reg & 0xff);
->>> -    qtest_writeb(qts, addr + 1, reg >> 8);
->>> -    return qtest_readb(qts, addr + 3);
->>> -}
->>> -
->>> -static uint64_t read_boot_order_prep(QTestState *qts)
->>> -{
->>> -    return read_m48t59(qts, 0x80000000 + 0x74, 0x34);
->>
->> I'd rather keep this generic mmio-mapped ISA test.
->> Maybe run it with the 40p machine?
-> 
-> I don't think that this is possible in an easy way here. On the prep
-> machine, the ISA bus is on a hard-coded MMIO address. On the 40p
-> machine, the ISA bus is behind a PCI-to-ISA bridge, thus the PCI part
-> needs to be set up first.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.h | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-FWIW for sun4u we already cheat a bit here: the ebus device is the first PCI device
-behind the PCI bridge which uses IO space, and so we know that this ultimately gets
-mapped to the start of the IO memory space. We also configure the PCI bridge in QEMU
-so that it allows IO accesses by default which means we also get the early console
-before PCI bus enumeration.
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 22c5706835..49dc436e5e 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1149,12 +1149,16 @@ void pmu_init(ARMCPU *cpu);
+ #define CPSR_IT_2_7 (0xfc00U)
+ #define CPSR_GE (0xfU << 16)
+ #define CPSR_IL (1U << 20)
+-/* Note that the RESERVED bits include bit 21, which is PSTATE_SS in
++/*
++ * Note that the RESERVED bits include bit 21, which is PSTATE_SS in
+  * an AArch64 SPSR but RES0 in AArch32 SPSR and CPSR. In QEMU we use
+  * env->uncached_cpsr bit 21 to store PSTATE.SS when executing in AArch32,
+  * where it is live state but not accessible to the AArch32 code.
++ *
++ * TODO: With ARMv8.4-DIT, bit 21 is DIT in AArch32 (bit 24 for AArch64).
++ * We will need to move AArch32 SS somewhere else at that point.
+  */
+-#define CPSR_RESERVED (0x7U << 21)
++#define CPSR_RESERVED (1U << 21)
+ #define CPSR_J (1U << 24)
+ #define CPSR_IT_0_1 (3U << 25)
+ #define CPSR_Q (1U << 27)
+-- 
+2.17.1
 
->> Maybe we can rename this as read_boot_order_mm, and the previous
->> read_boot_order_pc as read_boot_order_io.
-> 
-> I don't think it makes much sense. This was completely specific to the
-> "prep" machine, even the "40p" machine seems to prefer fw_cfg nowadays.
-> So let's simply remove this old stuff.
-
-From memory there were some issues with fw_cfg because the prep (OHW) and 40p
-(OpenBIOS) machines had different NVRAM layouts. Once the prep machine has been
-removed it should be easy to fix though.
-
-
-ATB,
-
-Mark.
 
