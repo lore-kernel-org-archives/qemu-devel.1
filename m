@@ -2,87 +2,142 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E4DBC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 19:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3FEDC432C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 19:28:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B20C920803
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 19:09:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iTxMY1lL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B20C920803
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9609820640
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 19:28:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9609820640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icDYA-0008F2-Qy
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 14:09:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60106)
+	id 1icDqN-0002RP-Qd
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 14:28:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1icChh-0001LS-K7
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 13:15:22 -0500
+ (envelope-from <borntraeger@de.ibm.com>) id 1icD1z-00025Q-Pl
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 13:36:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1icCX9-0006Yy-VM
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 13:04:26 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37039
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1icCX9-0006Sg-BE
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 13:04:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575396261;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OUnwykKhCDmNoJYNHlmoqQVgFsC9ZB1zfEVxlOKjtj8=;
- b=iTxMY1lLoIbskH36E4tJSy3zWAYExeW0YGlwJCrxYeLTGOiWaNmgraf+fEYLGAOZmH949V
- 8OglW+nR+HIuFOXrcpLp1lZUeia8xws53vs+d8jv4PcUdp68MUTLbRBKVTAT/VIP3NsSHz
- XJjI6qA0BtCd+DcFe+GAzmrAXX1X3AM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-YswC_AzrOEaICnKLMZ8bzQ-1; Tue, 03 Dec 2019 13:04:18 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D20810054E3;
- Tue,  3 Dec 2019 18:04:15 +0000 (UTC)
-Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4765B5D6A7;
- Tue,  3 Dec 2019 18:04:13 +0000 (UTC)
-Date: Tue, 3 Dec 2019 11:04:12 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-Message-ID: <20191203110412.055c38df@x1.home>
-In-Reply-To: <20191126005739.GA31144@joy-OptiPlex-7040>
-References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
- <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
- <20191112153020.71406c44@x1.home>
- <324ce4f8-d655-ee37-036c-fc9ef9045bef@nvidia.com>
- <20191113130705.32c6b663@x1.home>
- <7f74a2a1-ba1c-9d4c-dc5e-343ecdd7d6d6@nvidia.com>
- <20191114140625.213e8a99@x1.home>
- <20191126005739.GA31144@joy-OptiPlex-7040>
-Organization: Red Hat
+ (envelope-from <borntraeger@de.ibm.com>) id 1icCyv-0002x5-Mp
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 13:33:07 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:10676
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+ id 1icCyv-0002lq-HL
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 13:33:05 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xB3ITPQ4095071
+ for <qemu-devel@nongnu.org>; Tue, 3 Dec 2019 13:33:01 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wntc76tav-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 13:33:01 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+ Tue, 3 Dec 2019 18:32:57 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Tue, 3 Dec 2019 18:32:56 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xB3IWsNg19595268
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 3 Dec 2019 18:32:54 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 94E8DA405E;
+ Tue,  3 Dec 2019 18:32:54 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 491D9A405B;
+ Tue,  3 Dec 2019 18:32:54 +0000 (GMT)
+Received: from oc7455500831.ibm.com (unknown [9.145.183.14])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue,  3 Dec 2019 18:32:54 +0000 (GMT)
+Subject: Re: [PATCH v3 4/4] pc-bios/s390x: Fix reset psw mask
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191203132813.2734-1-frankja@linux.ibm.com>
+ <20191203132813.2734-5-frankja@linux.ibm.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+ nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
+Date: Tue, 3 Dec 2019 19:32:53 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: YswC_AzrOEaICnKLMZ8bzQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20191203132813.2734-5-frankja@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19120318-0020-0000-0000-000003933E0F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19120318-0021-0000-0000-000021EA61B2
+Message-Id: <2f8743a5-8e45-1ba5-268f-9e2dc21213f3@de.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-03_05:2019-12-02,2019-12-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0
+ lowpriorityscore=0 phishscore=0 mlxlogscore=999 spamscore=0
+ impostorscore=0 mlxscore=0 adultscore=0 clxscore=1015 priorityscore=1501
+ suspectscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1912030136
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,193 +149,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi
- L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: qemu-s390x@nongnu.org, mihajlov@linux.ibm.com, cohuck@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 25 Nov 2019 19:57:39 -0500
-Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> On Fri, Nov 15, 2019 at 05:06:25AM +0800, Alex Williamson wrote:
-> > On Fri, 15 Nov 2019 00:26:07 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> > > On 11/14/2019 1:37 AM, Alex Williamson wrote:  
-> > > > On Thu, 14 Nov 2019 01:07:21 +0530
-> > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > >     
-> > > >> On 11/13/2019 4:00 AM, Alex Williamson wrote:    
-> > > >>> On Tue, 12 Nov 2019 22:33:37 +0530
-> > > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > >>>        
-> > > >>>> All pages pinned by vendor driver through vfio_pin_pages API should be
-> > > >>>> considered as dirty during migration. IOMMU container maintains a list of
-> > > >>>> all such pinned pages. Added an ioctl defination to get bitmap of such    
-> > > >>>
-> > > >>> definition
-> > > >>>        
-> > > >>>> pinned pages for requested IO virtual address range.    
-> > > >>>
-> > > >>> Additionally, all mapped pages are considered dirty when physically
-> > > >>> mapped through to an IOMMU, modulo we discussed devices opting in to
-> > > >>> per page pinning to indicate finer granularity with a TBD mechanism to
-> > > >>> figure out if any non-opt-in devices remain.
-> > > >>>        
-> > > >>
-> > > >> You mean, in case of device direct assignment (device pass through)?    
-> > > > 
-> > > > Yes, or IOMMU backed mdevs.  If vfio_dmas in the container are fully
-> > > > pinned and mapped, then the correct dirty page set is all mapped pages.
-> > > > We discussed using the vpfn list as a mechanism for vendor drivers to
-> > > > reduce their migration footprint, but we also discussed that we would
-> > > > need a way to determine that all participants in the container have
-> > > > explicitly pinned their working pages or else we must consider the
-> > > > entire potential working set as dirty.
-> > > >     
-> > > 
-> > > How can vendor driver tell this capability to iommu module? Any suggestions?  
-> > 
-> > I think it does so by pinning pages.  Is it acceptable that if the
-> > vendor driver pins any pages, then from that point forward we consider
-> > the IOMMU group dirty page scope to be limited to pinned pages?  There  
-> we should also be aware of that dirty page scope is pinned pages + unpinned pages,
-> which means ever since a page is pinned, it should be regarded as dirty
-> no matter whether it's unpinned later. only after log_sync is called and
-> dirty info retrieved, its dirty state should be cleared.
 
-Yes, good point.  We can't just remove a vpfn when a page is unpinned
-or else we'd lose information that the page potentially had been
-dirtied while it was pinned.  Maybe that vpfn needs to move to a dirty
-list and both the currently pinned vpfns and the dirty vpfns are walked
-on a log_sync.  The dirty vpfns list would be cleared after a log_sync.
-The container would need to know that dirty tracking is enabled and
-only manage the dirty vpfns list when necessary.  Thanks,
+On 03.12.19 14:28, Janosch Frank wrote:
+> We need to set the short psw indication bit in the reset psw, as it is
+> a short psw.
+> 
+> fixes: 9629823290 ("pc-bios/s390-ccw: do a subsystem reset before running the guest")
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 
-Alex
- 
-> > are complications around non-singleton IOMMU groups, but I think we're
-> > already leaning towards that being a non-worthwhile problem to solve.
-> > So if we require that only singleton IOMMU groups can pin pages and we
-> > pass the IOMMU group as a parameter to
-> > vfio_iommu_driver_ops.pin_pages(), then the type1 backend can set a
-> > flag on its local vfio_group struct to indicate dirty page scope is
-> > limited to pinned pages.  We might want to keep a flag on the
-> > vfio_iommu struct to indicate if all of the vfio_groups for each
-> > vfio_domain in the vfio_iommu.domain_list dirty page scope limited to
-> > pinned pages as an optimization to avoid walking lists too often.  Then
-> > we could test if vfio_iommu.domain_list is not empty and this new flag
-> > does not limit the dirty page scope, then everything within each
-> > vfio_dma is considered dirty.
-> >    
-> > > >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > >>>> ---
-> > > >>>>    include/uapi/linux/vfio.h | 23 +++++++++++++++++++++++
-> > > >>>>    1 file changed, 23 insertions(+)
-> > > >>>>
-> > > >>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > > >>>> index 35b09427ad9f..6fd3822aa610 100644
-> > > >>>> --- a/include/uapi/linux/vfio.h
-> > > >>>> +++ b/include/uapi/linux/vfio.h
-> > > >>>> @@ -902,6 +902,29 @@ struct vfio_iommu_type1_dma_unmap {
-> > > >>>>    #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
-> > > >>>>    #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
-> > > >>>>    
-> > > >>>> +/**
-> > > >>>> + * VFIO_IOMMU_GET_DIRTY_BITMAP - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
-> > > >>>> + *                                     struct vfio_iommu_type1_dirty_bitmap)
-> > > >>>> + *
-> > > >>>> + * IOCTL to get dirty pages bitmap for IOMMU container during migration.
-> > > >>>> + * Get dirty pages bitmap of given IO virtual addresses range using
-> > > >>>> + * struct vfio_iommu_type1_dirty_bitmap. Caller sets argsz, which is size of
-> > > >>>> + * struct vfio_iommu_type1_dirty_bitmap. User should allocate memory to get
-> > > >>>> + * bitmap and should set size of allocated memory in bitmap_size field.
-> > > >>>> + * One bit is used to represent per page consecutively starting from iova
-> > > >>>> + * offset. Bit set indicates page at that offset from iova is dirty.
-> > > >>>> + */
-> > > >>>> +struct vfio_iommu_type1_dirty_bitmap {
-> > > >>>> +	__u32        argsz;
-> > > >>>> +	__u32        flags;
-> > > >>>> +	__u64        iova;                      /* IO virtual address */
-> > > >>>> +	__u64        size;                      /* Size of iova range */
-> > > >>>> +	__u64        bitmap_size;               /* in bytes */    
-> > > >>>
-> > > >>> This seems redundant.  We can calculate the size of the bitmap based on
-> > > >>> the iova size.
-> > > >>>       
-> > > >>
-> > > >> But in kernel space, we need to validate the size of memory allocated by
-> > > >> user instead of assuming user is always correct, right?    
-> > > > 
-> > > > What does it buy us for the user to tell us the size?  They could be
-> > > > wrong, they could be malicious.  The argsz field on the ioctl is mostly
-> > > > for the handshake that the user is competent, we should get faults from
-> > > > the copy-user operation if it's incorrect.
-> > > >    
-> > > 
-> > > It is to mainly fail safe.
-> > >   
-> > > >>>> +	void __user *bitmap;                    /* one bit per page */    
-> > > >>>
-> > > >>> Should we define that as a __u64* to (a) help with the size
-> > > >>> calculation, and (b) assure that we can use 8-byte ops on it?
-> > > >>>
-> > > >>> However, who defines page size?  Is it necessarily the processor page
-> > > >>> size?  A physical IOMMU may support page sizes other than the CPU page
-> > > >>> size.  It might be more important to indicate the expected page size
-> > > >>> than the bitmap size.  Thanks,
-> > > >>>       
-> > > >>
-> > > >> I see in QEMU and in vfio_iommu_type1 module, page sizes considered for
-> > > >> mapping are CPU page size, 4K. Do we still need to have such argument?    
-> > > > 
-> > > > That assumption exists for backwards compatibility prior to supporting
-> > > > the iova_pgsizes field in vfio_iommu_type1_info.  AFAIK the current
-> > > > interface has no page size assumptions and we should not add any.    
-> > > 
-> > > So userspace has iova_pgsizes information, which can be input to this 
-> > > ioctl. Bitmap should be considering smallest page size. Does that makes 
-> > > sense?  
-> > 
-> > I'm not sure.  I thought I had an argument that the iova_pgsize could
-> > indicate support for sizes smaller than the processor page size, which
-> > would make the user responsible for using a different base for their
-> > page size, but vfio_pgsize_bitmap() already masks out sub-page sizes.
-> > Clearly the vendor driver is pinning based on processor sized pages,
-> > but that's independent of an IOMMU and not part of a user ABI.
-> > 
-> > I'm tempted to say your bitmap_size field has a use here, but it seems
-> > to fail in validating the user page size at the low extremes.  For
-> > example if we have a single page mapping, the user can specify the iova
-> > size as 4K (for example), but the minimum bitmap_size they can indicate
-> > is 1 byte, would we therefore assume the user's bitmap page size is 512
-> > bytes (ie. they provided us with 8 bits to describe a 4K range)?  We'd
-> > need to be careful to specify that the minimum iova_pgsize indicated
-> > page size is our lower bound as well.  But then what do we do if the
-> > user provides us with a smaller buffer than we expect?  For example, a
-> > 128MB iova range and only an 8-byte buffer.  Do we go ahead and assume
-> > a 2MB page size and fill the bitmap accordingly or do we generate an
-> > error?  If the latter, might we support that at some point in time and
-> > is it sufficient to let the user perform trial and error to test if that
-> > exists?  Thanks,
-> > 
-> > Alex
-> >   
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> ---
+>  pc-bios/s390-ccw/jump2ipl.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+> index 266f1502b9..da13c43cc0 100644
+> --- a/pc-bios/s390-ccw/jump2ipl.c
+> +++ b/pc-bios/s390-ccw/jump2ipl.c
+> @@ -12,11 +12,11 @@
+>  #define KERN_IMAGE_START 0x010000UL
+>  #define PSW_MASK_64 0x0000000100000000ULL
+>  #define PSW_MASK_32 0x0000000080000000ULL
+> -#define IPL_PSW_MASK (PSW_MASK_32 | PSW_MASK_64)
+> +#define PSW_MASK_SHORTPSW 0x0008000000000000ULL
+> +#define RESET_PSW_MASK (PSW_MASK_SHORTPSW | PSW_MASK_32 | PSW_MASK_64)
+>  
+>  typedef struct ResetInfo {
+> -    uint32_t ipl_mask;
+> -    uint32_t ipl_addr;
+> +    uint64_t ipl_psw;
+>      uint32_t ipl_continue;
+>  } ResetInfo;
+>  
+> @@ -50,7 +50,9 @@ void jump_to_IPL_code(uint64_t address)
+>      ResetInfo *current = 0;
+>  
+>      save = *current;
+> -    current->ipl_addr = (uint32_t) (uint64_t) &jump_to_IPL_2;
+> +
+> +    current->ipl_psw = (uint64_t) &jump_to_IPL_2;
+> +    current->ipl_psw |= RESET_PSW_MASK;
+
+
+>      current->ipl_continue = address & 0x7fffffff;
+>  
+>      debug_print_int("set IPL addr to", current->ipl_continue);
+> @@ -82,7 +84,7 @@ void jump_to_low_kernel(void)
+>      }
+>  
+>      /* Trying to get PSW at zero address */
+> -    if (*((uint64_t *)0) & IPL_PSW_MASK) {
+> +    if (*((uint64_t *)0) & RESET_PSW_MASK) {
+>          jump_to_IPL_code((*((uint64_t *)0)) & 0x7fffffff);
+>      }
+>  
 > 
 
 
