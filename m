@@ -2,81 +2,89 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3665AC43215
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7C5C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:40:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 057D22073F
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:39:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89CB120674
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:40:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QISeKQpp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 057D22073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KTAruHtL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89CB120674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic6Wh-0008Rw-77
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 06:39:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58977)
+	id 1ic6XH-0000Xt-M0
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 06:40:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51214)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1ic6Ur-0007SC-03
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:37:38 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ic6SY-0006YM-KE
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:35:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1ic6Up-0004bV-Dr
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:37:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35668
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ic6Uk-0004Xt-2f
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:37:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575373046;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5k+TVu0cIfGxnOX/ynMd2OfHm/k4ejo/NeyD3pZO+z8=;
- b=QISeKQppfG51B+XruD9HCl0bu7Fmj/ApcHXs+UdNG4NtcFGF65eoqcYVkZeGpSFkltIoV9
- VFxuDGpWrd7Sixiyn6ZXh9rnDt5AwA2FeKLEgJ1pPcEyBw3jtFSS2QqN5Jo7u4xnCWTM70
- rno2MFf6zNHhm9rS1Jp86NeErw1x6Hs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18-bM7UFjCbPN2XtgtErmpyxA-1; Tue, 03 Dec 2019 06:37:25 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A42E51005502;
- Tue,  3 Dec 2019 11:37:23 +0000 (UTC)
-Received: from gondolin (ovpn-116-214.ams2.redhat.com [10.36.116.214])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 66D955D6A7;
- Tue,  3 Dec 2019 11:37:17 +0000 (UTC)
-Date: Tue, 3 Dec 2019 12:37:14 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v5 06/13] hw/core/qdev: handle parent bus change
- regarding resettable
-Message-ID: <20191203123714.0886e34f.cohuck@redhat.com>
-In-Reply-To: <CAFEAcA981i_W=8y+7_8JV=oMLT51TBMB8bTJJaiJJZqj6MuSAQ@mail.gmail.com>
-References: <20191018150630.31099-1-damien.hedde@greensocs.com>
- <20191018150630.31099-7-damien.hedde@greensocs.com>
- <CAFEAcA981i_W=8y+7_8JV=oMLT51TBMB8bTJJaiJJZqj6MuSAQ@mail.gmail.com>
-Organization: Red Hat GmbH
+ (envelope-from <alex.bennee@linaro.org>) id 1ic6SV-0001Wm-K5
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:35:13 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:47037)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ic6SU-0001QL-Qz
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:35:11 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z7so3163967wrl.13
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 03:35:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=o5IdihkwIqoR4PLBRSQ3xofls6u1LyP+ydwV/1VQvGQ=;
+ b=KTAruHtL6LlTgJt8BmQpZsJcJG1UcO0jkZtDlWhSwZyRBhhmugvaGS35MN42ncXIl6
+ TNu/065nyopEpdWGTg3kS+gLwfAYtzRYubjY4fiygMdq2bZSOCuUlxB7/WyVLMzVbMfS
+ eBw4Qq/5vglDI0gysDusFIcNAo/SW5BSiBLMpWhO2b6ZFNeqdXm3ZG5pvbX8oIOoYCAi
+ i8llOUQ1vXPuRE2Zr5JMkVUJNKUVY2k2FZdG9CZsaI6v6dkF6V745RZ6ljQHPs2g2iHj
+ ro5K/1ouzzS3WP7YJ8Q2ISyYr4yxbDSZFjPRHWeVp5vUZwEjOxUH0jXjkeGIYrFec6Se
+ ndAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=o5IdihkwIqoR4PLBRSQ3xofls6u1LyP+ydwV/1VQvGQ=;
+ b=MIeL2S9YGIHbk5EAPXrFa2s87SL7RIE3UPOj273KsoQY9JCi7qxlgZCPdq0iDjgfbi
+ RLGvwXVMq7bwkf4ZhsRi4X5STikK1HN8OqQ74yAcg1c73yIc5r/UmU9KzxpX5GkzzZV7
+ wp1e4dTzNaIqGSCHGSVZzo9U+efsPtoqGk/Q7ChNt85i9XbgJrNuWFca5RMMPr8Hwvml
+ OavycAq+JU36AaKKP0VgQh4wcG/DBS2y6RNV2ppKIJ10P+8+fr8E/3t1tVhiRL2MVfuO
+ Rfobs8e3uIjgTPTLygOzVsaJUn4Cb2B0KNy5DjwWHKxoYj370BtR1xXtFTun8gNi1P7E
+ 2MRA==
+X-Gm-Message-State: APjAAAVpmwpvH7jDFiCMpGSRiFED7OtjZO8XnUJ8wHdVtktBfCpkHAW1
+ hJPTgxzu2ctlX8RzVea92hhkPw==
+X-Google-Smtp-Source: APXvYqzL6J7Yn3TwVgRWAUL0mEYBOoDhGFTcFWocQ9I2G50oiUsjpdH+jBx3oU1hYJxIXf6Kvr7DwQ==
+X-Received: by 2002:adf:93c6:: with SMTP id 64mr4425037wrp.212.1575372908831; 
+ Tue, 03 Dec 2019 03:35:08 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k19sm2589820wmi.42.2019.12.03.03.35.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Dec 2019 03:35:07 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DA4B11FF87;
+ Tue,  3 Dec 2019 11:35:06 +0000 (GMT)
+References: <20191114134246.12073-1-wainersm@redhat.com>
+ <20191114134246.12073-2-wainersm@redhat.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Subject: Re: [PATCH 1/1] tests/vm: Allow to set qemu-img path
+In-reply-to: <20191114134246.12073-2-wainersm@redhat.com>
+Date: Tue, 03 Dec 2019 11:35:06 +0000
+Message-ID: <87fti1bq1h.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: bM7UFjCbPN2XtgtErmpyxA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,105 +96,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>, "Daniel
- P. Berrange" <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?UTF-8?B?TWF0aGll?= =?UTF-8?B?dS1EYXVkw6k=?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: fam@euphon.net, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 29 Nov 2019 18:41:26 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> On Fri, 18 Oct 2019 at 16:07, Damien Hedde <damien.hedde@greensocs.com> wrote:
-> >
-> > In qdev_set_parent_bus(), when changing the parent bus of a
-> > realized device, if the source and destination buses are not in the
-> > same reset state, some adaptation are required. This patch adds  
-> 
-> "adaptations"
-> 
-> > needed call to resettable_change_parent() to make sure a device reset
-> > state stays coherent with its parent bus.
-> >
-> > The addition is a no-op if:
-> > 1. the device being parented is not realized.
-> > 2. the device is realized, but both buses are not under reset.
-> >
-> > Case 2 means that as long as qdev_set_parent_bus() is called
-> > during the machine realization procedure (which is before the
-> > machine reset so nothing is in reset), it is a no op.
-> >
-> > There are 49 call sites of qdev_set_parent_bus(). All but one fall
-> > into the no-op case:
-> > + 28 calls related to virtio (in hw/{s390x,display,virtio}/
-> >   {vhost,virtio}-xxx.c) to set a _vdev_/_vgpu_ composing device
-> >   parent bus just before realizing the _vdev_/_vgpu_.
-> > + hw/qdev.c: when creating a device in qdev_try_create()
-> > + hw/sysbus.c: when initializing a device in the sysbus
-> > + hw/display/virtio-gpu-pci.c: before realizing VirtIOGPUPCIBase/vgpu
-> > + hw/display/virtio-vga.c: before realizing VirtIOVGABase/vgpu
-> > + hw/i386/amd_iommu.c: before realizing AMDVIState/pci
-> > + hw/misc/auxbus.c: when creating an AUXBus
-> > + hw/misc/auxbus.c: when creating an AUXBus child
-> > + hw/misc/macio/macio.c: when initializing a MACIOState child
-> > + hw/misc/macio/macio.c: before realizing NewWorldMacIOState/pmu
-> > + hw/misc/macio/macio.c: before realizing NewWorldMacIOState/cuda
-> > + hw/pci-host/designware.c: before realizing DesignwarePCIEHost/root
-> > + hw/pci-host/gpex.c: before realizing GPEXHost/root
-> > + hw/pci-host/prep.c: when initializaing PREPPCIState/pci_dev
-> > + hw/pci-host/q35.c: before realizing Q35PCIHost/mch
-> > + hw/pci-host/versatile.c: when initializing PCIVPBState/pci_dev
-> > + hw/pci-host/xilinx-pcie.c: before realizing XilinxPCIEHost/root
-> > + hw/s390x/event-facility.c: when creating SCLPEventFacility/
-> >                              TYPE_SCLP_QUIESCE
-> > + hw/s390x/event-facility.c: ditto with SCLPEventFacility/
-> >                              TYPE_SCLP_CPU_HOTPLUG
-> > + hw/s390x/sclp.c: Not trivial because it is called on a SLCPDevice
-> >   just after realizing it. Ok because at this point the destination
-> >   bus (sysbus) is not in reset; the realize step is before the
-> >   machine reset.
-> > + hw/sd/core.c: Not OK. Used in sdbus_reparent_card(). See below.
-> > + hw/ssi/ssi.c: Used to put spi slave on spi bus and connect the cs
-> >   line in ssi_auto_connect_slave(). Ok because this function is only
-> >   used in realize step in hw/ssi/aspeed_smc.ci, hw/ssi/imx_spi.c,
-> >   hw/ssi/mss-spi.c, hw/ssi/xilinx_spi.c and hw/ssi/xilinx_spips.c.
-> > + hw/xen/xen-legacy-backend.c: when creating a XenLegacyDevice device
-> > + qdev-monitor.c: in device hotplug creation procedure before realize  
-> 
-> This is a really useful analysis to have in the commit message;
-> thanks!
-> 
-> (Side note: I wonder if the sclp.c case could be reordered so
-> it realizes the device after parenting it? Anyway, not something
-> to worry about now.)
+Wainer dos Santos Moschetta <wainersm@redhat.com> writes:
 
-As far as I can see, that should work. This code is a bit weird anyway;
-the problem is that we need the sysbus somewhere in there... I'm
-wondering if that can be handled in a different way. But agreed, that
-is something we can revisit later.
+> By default VM build test use qemu-img from system's PATH to
+> create the image disk. Due the lack of qemu-img on the system
+> or the desire to simply use a version built with QEMU, it would
+> be nice to allow one to set its path. So this patch makes that
+> possible by reading the path to qemu-img from QEMU_IMG if set,
+> otherwise it fallback to default behavior.
+>
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
 
-> 
-> > Note that this commit alone will have no effect, right now there is no
-> > use of resettable API to reset anything. So a bus will never be tagged
-> > as in-reset by this same API.
-> >
-> > The one place where side-effect will occurs is in hw/sd/core.c in
-> > sdbus_reparent_card(). This function is only used in the raspi machines,
-> > including during the sysbus reset procedure. This case will be fixed by
-> > a following commit before globally enabling resettable API for sysbus
-> > reset.
-> >
-> > Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>  
-> 
-> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-> 
-> thanks
-> -- PMM
-> 
+Queued to testing/next, thanks.
 
+> ---
+>  docs/devel/testing.rst    | 6 ++++--
+>  tests/vm/Makefile.include | 1 +
+>  tests/vm/basevm.py        | 5 +++++
+>  tests/vm/centos           | 2 +-
+>  tests/vm/fedora           | 4 +---
+>  tests/vm/freebsd          | 3 +--
+>  tests/vm/netbsd           | 3 +--
+>  tests/vm/openbsd          | 3 +--
+>  tests/vm/ubuntu.i386      | 2 +-
+>  9 files changed, 16 insertions(+), 13 deletions(-)
+>
+> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
+> index 8e981e062d..9be6cd4410 100644
+> --- a/docs/devel/testing.rst
+> +++ b/docs/devel/testing.rst
+> @@ -418,13 +418,15 @@ access, so they SHOULD NOT be exposed to external i=
+nterfaces if you are
+>  concerned about attackers taking control of the guest and potentially
+>  exploiting a QEMU security bug to compromise the host.
+>=20=20
+> -QEMU binary
+> ------------
+> +QEMU binaries
+> +-------------
+>=20=20
+>  By default, qemu-system-x86_64 is searched in $PATH to run the guest. If=
+ there
+>  isn't one, or if it is older than 2.10, the test won't work. In this cas=
+e,
+>  provide the QEMU binary in env var: ``QEMU=3D/path/to/qemu-2.10+``.
+>=20=20
+> +Likewise the path to qemu-img can be set in QEMU_IMG environment variabl=
+e.
+> +
+>  Make jobs
+>  ---------
+>=20=20
+> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
+> index fea348e845..9e7c46a473 100644
+> --- a/tests/vm/Makefile.include
+> +++ b/tests/vm/Makefile.include
+> @@ -34,6 +34,7 @@ vm-help vm-test:
+>  	@echo "    DEBUG=3D1              	 - Enable verbose output on host and=
+ interactive debugging"
+>  	@echo "    V=3D1				 - Enable verbose ouput on host and guest commands"
+>  	@echo "    QEMU=3D/path/to/qemu		 - Change path to QEMU binary"
+> +	@echo "    QEMU_IMG=3D/path/to/qemu-img	 - Change path to qemu-img tool"
+>=20=20
+>  vm-build-all: $(addprefix vm-build-, $(IMAGES))
+>=20=20
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 91a9226026..d1efeb3646 100755
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -152,6 +152,11 @@ class BaseVM(object):
+>      def build_image(self, img):
+>          raise NotImplementedError
+>=20=20
+> +    def exec_qemu_img(self, *args):
+> +        cmd =3D [os.environ.get("QEMU_IMG", "qemu-img")]
+> +        cmd.extend(list(args))
+> +        subprocess.check_call(cmd)
+> +
+>      def add_source_dir(self, src_dir):
+>          name =3D "data-" + hashlib.sha1(src_dir.encode("utf-8")).hexdige=
+st()[:5]
+>          tarfile =3D os.path.join(self._tmpdir, name + ".tar")
+> diff --git a/tests/vm/centos b/tests/vm/centos
+> index 53976f1c4c..eac07dacd6 100755
+> --- a/tests/vm/centos
+> +++ b/tests/vm/centos
+> @@ -68,7 +68,7 @@ class CentosVM(basevm.BaseVM):
+>          sys.stderr.write("Extracting the image...\n")
+>          subprocess.check_call(["ln", "-f", cimg, img_tmp + ".xz"])
+>          subprocess.check_call(["xz", "--keep", "-dvf", img_tmp + ".xz"])
+> -        subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
+> +        self.exec_qemu_img("resize", img_tmp, "50G")
+>          self.boot(img_tmp, extra_args =3D ["-cdrom", self._gen_cloud_ini=
+t_iso()])
+>          self.wait_ssh()
+>          self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+> diff --git a/tests/vm/fedora b/tests/vm/fedora
+> index 7fec1479fb..8e270fc0f0 100755
+> --- a/tests/vm/fedora
+> +++ b/tests/vm/fedora
+> @@ -74,9 +74,7 @@ class FedoraVM(basevm.BaseVM):
+>=20=20
+>          self.print_step("Preparing iso and disk image")
+>          subprocess.check_call(["cp", "-f", cimg, iso])
+> -        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
+> -                               img_tmp, self.size])
+> -
+> +        self.exec_qemu_img("create", "-f", "qcow2", img_tmp, self.size)
+>          self.print_step("Booting installer")
+>          self.boot(img_tmp, extra_args =3D [
+>              "-bios", "pc-bios/bios-256k.bin",
+> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+> index 2a19461a90..1825cc5821 100755
+> --- a/tests/vm/freebsd
+> +++ b/tests/vm/freebsd
+> @@ -82,8 +82,7 @@ class FreeBSDVM(basevm.BaseVM):
+>          self.print_step("Preparing iso and disk image")
+>          subprocess.check_call(["cp", "-f", cimg, iso_xz])
+>          subprocess.check_call(["xz", "-dvf", iso_xz])
+> -        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
+> -                               img_tmp, self.size])
+> +        self.exec_qemu_img("create", "-f", "qcow2", img_tmp, self.size)
+>=20=20
+>          self.print_step("Booting installer")
+>          self.boot(img_tmp, extra_args =3D [
+> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+> index 611e6cc5b5..ec6f3563b2 100755
+> --- a/tests/vm/netbsd
+> +++ b/tests/vm/netbsd
+> @@ -77,8 +77,7 @@ class NetBSDVM(basevm.BaseVM):
+>=20=20
+>          self.print_step("Preparing iso and disk image")
+>          subprocess.check_call(["ln", "-f", cimg, iso])
+> -        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
+> -                               img_tmp, self.size])
+> +        self.exec_qemu_img("create", "-f", "qcow2", img_tmp, self.size)
+>=20=20
+>          self.print_step("Booting installer")
+>          self.boot(img_tmp, extra_args =3D [
+> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+> index b92c39f89a..6df5162dbf 100755
+> --- a/tests/vm/openbsd
+> +++ b/tests/vm/openbsd
+> @@ -73,8 +73,7 @@ class OpenBSDVM(basevm.BaseVM):
+>=20=20
+>          self.print_step("Preparing iso and disk image")
+>          subprocess.check_call(["cp", "-f", cimg, iso])
+> -        subprocess.check_call(["qemu-img", "create", "-f", "qcow2",
+> -                               img_tmp, self.size])
+> +        self.exec_qemu_img("create", "-f", "qcow2", img_tmp, self.size)
+>=20=20
+>          self.print_step("Booting installer")
+>          self.boot(img_tmp, extra_args =3D [
+> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+> index 38f740eabf..39bbe9cc21 100755
+> --- a/tests/vm/ubuntu.i386
+> +++ b/tests/vm/ubuntu.i386
+> @@ -70,7 +70,7 @@ class UbuntuX86VM(basevm.BaseVM):
+>              sha256sum=3D"e30091144c73483822b7c27193e9d47346dd1064229da57=
+7c3fedcf943f7cfcc")
+>          img_tmp =3D img + ".tmp"
+>          subprocess.check_call(["cp", "-f", cimg, img_tmp])
+> -        subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
+> +        self.exec_qemu_img("resize", img_tmp, "50G")
+>          self.boot(img_tmp, extra_args =3D ["-cdrom", self._gen_cloud_ini=
+t_iso()])
+>          self.wait_ssh()
+>          self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+
+
+--=20
+Alex Benn=C3=A9e
 
