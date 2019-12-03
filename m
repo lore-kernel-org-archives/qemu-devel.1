@@ -2,99 +2,101 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F361AC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA879C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:07:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3B6D2073C
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:05:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 870FA2053B
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:07:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VoOeBunj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3B6D2073C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XvmZCG4i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 870FA2053B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from [::1] (port=55534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icAfh-0006c5-S9
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 11:05:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44807)
+	id 1icAi6-0008MH-O6
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 11:07:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1icAWb-0002eA-T2
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:55:43 -0500
+ (envelope-from <philmd@redhat.com>) id 1icA7M-0000YS-WC
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:29:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1icAWS-0002LL-W2
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:55:34 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57845
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1icA7E-0003im-KG
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:29:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50680
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1icAWS-00026v-Jy
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:55:32 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icA78-0003aL-VX
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:29:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575388529;
+ s=mimecast20190719; t=1575386957;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Mj+7N6lpeGvHNflQt3MnyFasmRG156/84fI9GvVFRt4=;
- b=VoOeBunjd7RNQ9WvlZpLT3hHSvg2f/sTatbN8Uj5Dn6pZQ3zEGaTvD5nWwN3wUC7mbSSUz
- rh7xSbqL6oOKI8dQMlis9v0TQ8W6n5ngrBKUJ6+PdKkCm7XkBDLeuKYubUiNPXeL9eVtH1
- OVtzsIDNROCFrwm6lj0TWQdAlxkeLfc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-34-fxMzvH6AMUe3obDIwcfXvA-1; Tue, 03 Dec 2019 10:55:28 -0500
-X-MC-Unique: fxMzvH6AMUe3obDIwcfXvA-1
-Received: by mail-wr1-f71.google.com with SMTP id h30so2008677wrh.5
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 07:55:28 -0800 (PST)
+ bh=WeerkaiTznFWZe+uFrLFBE25ivmPwQ5NX0TUY7VdjnU=;
+ b=XvmZCG4ik084askNBa1nVGrltkHqBTvNZzNgy50r/KOXeBAyLvEIxiuzxLZTUat91yPAaX
+ ZqsQt7K6rZ6Hwe4fuHHpnmkBIehYtNiPSIQrZBYrPtaPacty5vV08uhu8R9iKxX/0HWfLJ
+ sKYDz2fJVii3iya7SkpimMu0YmBivvo=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-giLozA4MPYyyib0vhu5rEg-1; Tue, 03 Dec 2019 10:29:16 -0500
+Received: by mail-wm1-f70.google.com with SMTP id f16so1071517wmb.2
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 07:29:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to;
- bh=2u1fFr+7nbDZoXZkg2jwvS1uhtaLClJtvuVPI1eGyyQ=;
- b=n6595jnFdW5O2NkM3jFuiZWLVrHvRxZUs1R/u4KsBWfPn4as9umOW8blPN1IQNY89C
- lG7uSY6jaWGBvql6mZCRSHmYxUpAcna00pQMel0t/K0rMfW5hkL38H7LL6e+9r0+qaVd
- GKgPrdODJw0XyMWrTh2bUynWC/aB19L9gvN0Yv5azeoFZdix+nLYZd9c25DZ+OqyqMgz
- 8dAyWxoK4PnWLQUU5ACXjmev2S9VFl1FQ1YVnYwp6djqSRjZpkLHq53Okks2YWWL8vFQ
- cV0BmTK0XENL7nn6cb6SJQRhTBmOfNCfuiYL0QQDJWErVXfoTLJ6uNFFIpfJuEEe2KdS
- k9eg==
-X-Gm-Message-State: APjAAAUru/hIxI6AptMTfxPh5KyJFxR35Cq/szUy965J7CdfDfVnW+pw
- nsg/x9kHNP7ssBwBwVpYbfmZwux8Xhz/mT7jGJw2DBNjmJbI9NDuQ1C5zohWICpesLLHoVoF3Rv
- h+woM6h22Ta5VyGA=
-X-Received: by 2002:a1c:39c4:: with SMTP id g187mr37312399wma.78.1575388527103; 
- Tue, 03 Dec 2019 07:55:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyoy0CXUzMzd89pwtURaFmWkVRLx4rhMG1DfQolxrfulpCHSSDtMlRWoPz6zT0qaOOoPpeLIg==
-X-Received: by 2002:a1c:39c4:: with SMTP id g187mr37312387wma.78.1575388526870; 
- Tue, 03 Dec 2019 07:55:26 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a?
- ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
- by smtp.gmail.com with ESMTPSA id r63sm2829147wma.2.2019.12.03.07.55.25
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WeerkaiTznFWZe+uFrLFBE25ivmPwQ5NX0TUY7VdjnU=;
+ b=iPsjCLd6EXm4bOPiIVxxQ9nw+tvEnhDO4PGmcrc4rbLrn0R5WiilMgcJU+lZoOaJoz
+ kvo1KRC1sQsFnLo3aO0qlh7iq+CH2x5be3x8uwM+Y02C8JFdfQJmYOlDa72tnydDOPNZ
+ BXkQpwB+ohIwgrXOM/++MkY7C0g9tMGqt2q3e9DpaGpUzT0ZHm6mtEECj+7xayILGOgc
+ 0in8H06WOCzlka9DjyLuvloTMOm2ZAQfuUJ1P1lkUQ4d19LI/09vLAlpeBlCVj9XU0ml
+ TTiAWm844KFe+XuNiaLnoffxhT8rLpI740TAd5zBGsH0d96ymy/ETzXo7j4XcjCMMDir
+ sj+w==
+X-Gm-Message-State: APjAAAUpEY2q2jfoRk57PLdHa2fYDbIDTmvp+NakC/ByEThmld5GHVUp
+ kx6CBU7fyUJAvuLqZnhcCaIVZJ0eAfIwtBk1d8T4kCtq3li2AKPOinjtYV3FazJTdJ64Vbcwyjx
+ eL2UjyRS4jly5Ruo=
+X-Received: by 2002:a5d:4acb:: with SMTP id y11mr6035633wrs.106.1575386955609; 
+ Tue, 03 Dec 2019 07:29:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz/vvJxh8a4QR3uEQLBa4OwtJoTVRBtcinj837XMBskPpwh+4Pji2CUM5XqlJ+5llaRfTGXzA==
+X-Received: by 2002:a5d:4acb:: with SMTP id y11mr6035607wrs.106.1575386955402; 
+ Tue, 03 Dec 2019 07:29:15 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id c1sm3105575wmk.22.2019.12.03.07.29.13
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 03 Dec 2019 07:55:25 -0800 (PST)
-Subject: Re: [PATCH v2 05/15] stubs: add stubs for io_uring interface
-To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-References: <20191025160444.31632-1-stefanha@redhat.com>
- <20191025160444.31632-6-stefanha@redhat.com>
- <20191111111347.GC7297@linux.fritz.box>
- <20191203111600.GA167235@stefanha-x1.localdomain>
- <20191203142845.GE5637@linux.fritz.box>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <df85b405-c2a8-bfa0-b4b8-d50b40869332@redhat.com>
-Date: Tue, 3 Dec 2019 16:55:23 +0100
+ Tue, 03 Dec 2019 07:29:14 -0800 (PST)
+Subject: Re: [PATCH v6 9/9] hw/arm/xilinx_zynq: connect uart clocks to slcr
+To: Damien Hedde <damien.hedde@greensocs.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20190904125531.27545-1-damien.hedde@greensocs.com>
+ <20190904125531.27545-10-damien.hedde@greensocs.com>
+ <CAFEAcA96yu6Uttsi6eZokjyxE8At18ADF+Q6c7Na2ArvdLME+Q@mail.gmail.com>
+ <f373af20-0df4-384f-b1a3-10bf873c315e@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <db2836fa-e2f1-d1ab-88be-1b24f5a18302@redhat.com>
+Date: Tue, 3 Dec 2019 16:29:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191203142845.GE5637@linux.fritz.box>
+In-Reply-To: <f373af20-0df4-384f-b1a3-10bf873c315e@greensocs.com>
+Content-Language: en-US
+X-MC-Unique: giLozA4MPYyyib0vhu5rEg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="KPkxyLXD7nrnRO1IwIWxR9204NQRUJdOI"
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,59 +108,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, oleksandr@redhat.com, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KPkxyLXD7nrnRO1IwIWxR9204NQRUJdOI
-Content-Type: multipart/mixed; boundary="UdBxt8IoOVuM6Oyala99KSEwz5Ko4H3vh"
+On 12/3/19 3:59 PM, Damien Hedde wrote:
+> On 12/2/19 4:34 PM, Peter Maydell wrote:
+>> On Wed, 4 Sep 2019 at 13:56, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>>>
+>>> Add the connection between the slcr's output clocks and the uarts inputs.
+>>>
+>>> Also add the main board clock 'ps_clk', which is hard-coded to 33.33MHz
+>>> (the default frequency). This clock is used to feed the slcr's input
+>>> clock.
+>>>
+>>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>>
+>> Nothing obviously wrong in the body of the patch, but as with
+>> 7 and 8, review from a Xilinx person would be helpful.
+>>
+>> /* board base frequency: 33.333333 MHz */
+>> #define PS_CLK_FREQUENCY (100 * 1000 * 1000 / 3)
+>>
+>> This is interesting, because it's not an integer... I'll come back
+>> to this topic in a reply to the cover letter in a moment.
+> 
+> For this precise case, what I wanted is the resulting integer which I
+> got from the device trees in linux (btw I should probably add this point
+> in  comment). Just thought it was more readable this way than "33333333".
 
---UdBxt8IoOVuM6Oyala99KSEwz5Ko4H3vh
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+FWIW I'm auditing if it is possible to use the float type for 
+frequencies (before to ask on the list if this makes sense), because in 
+hw/core/ptimer we use timers with periods, and loose some precision 
+using 1/freq again.
 
-On 03/12/19 15:28, Kevin Wolf wrote:
->> * It's possible to argue against this and personally I'm not that
->> convinced by stubs for this scenario.  But io_uring.o should be
->> consistent with how things work today with linux-aio.o.  If you feel
->> strongly against having stubs then the linux-aio.o stubs should also be
->> removed (see commit c2b38b277a788).
-> I don't really like having block-specific things like Linux AIO or
-> io_uring in util/async.c, but given that they have per-AioContext state,
-> it's not clearly wrong either.
-
-A good reason to have AioContext in util/async.c is that nowadays Linux
-supports poll() via the AioContext ring too, and that would allow doing
-busy polling of network sockets.
-
-Paolo
-
-
---UdBxt8IoOVuM6Oyala99KSEwz5Ko4H3vh--
-
---KPkxyLXD7nrnRO1IwIWxR9204NQRUJdOI
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl3mhWsACgkQv/vSX3jH
-roMrsgf+PGvt/z5nqP6WkysJz/wxZ97tGorj2WV6ewFPkWJxPLaxlUrTELVIUkvH
-6Sv4fipI/gRkOhGUjvRzQ4pa9grCt8FKaB/qXdrhOGjG3fzhwfe+h2LYXKWAS/+N
-gjoRWs1bZ5CGjNzbAVL4x1B01C0cFITfu98CRGKCsYPTtu8N7EJ5JCJsSHG87mzI
-Bir1BiLxzaHFuKMGUE7CNz+UbtmHiPZMY1JFDi2oDI6dnVxUaln/4kE/tY+KDrWL
-MwK0A99uhxryK0AAQ2NrzuQSWLvz02s9h3f5CUwnxCPWUOgYwqYIai4Dn5tPs/6W
-s3+HEKu3AQRBXbBep4yVZeuKsXJA3g==
-=ixiP
------END PGP SIGNATURE-----
-
---KPkxyLXD7nrnRO1IwIWxR9204NQRUJdOI--
+Also we have MiB/KiB in "qemu/units.h" and I'd like to introduce MHz/KHz.
 
 
