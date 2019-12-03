@@ -2,141 +2,80 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57A17C432C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 10:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D9BBC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 10:13:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29F58206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 10:12:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29F58206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 68918206E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 10:13:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LEwWFmeG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68918206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic5A0-0004h9-7K
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 05:12:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56728)
+	id 1ic5BN-0005No-0a
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 05:13:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57074)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <borntraeger@de.ibm.com>) id 1ic55Z-0003Iz-Ek
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 05:07:27 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ic55f-0003JV-BO
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 05:07:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <borntraeger@de.ibm.com>) id 1ic55X-00037f-1o
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 05:07:24 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28162)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
- id 1ic55W-00031Y-LP
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 05:07:22 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xB3A3fMC052603
- for <qemu-devel@nongnu.org>; Tue, 3 Dec 2019 05:07:20 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wm6sp3rdq-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 05:07:20 -0500
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
- Tue, 3 Dec 2019 10:07:17 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Tue, 3 Dec 2019 10:07:15 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xB3A7E6r51708026
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 3 Dec 2019 10:07:14 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2DF87A4040;
- Tue,  3 Dec 2019 10:07:14 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EEB8AA4053;
- Tue,  3 Dec 2019 10:07:13 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.152.224.20])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue,  3 Dec 2019 10:07:13 +0000 (GMT)
-Subject: Re: [PATCH v2 3/3] s390x: Fix cpu normal reset ri clearing
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20191202140146.3910-1-frankja@linux.ibm.com>
- <20191202140146.3910-4-frankja@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Date: Tue, 3 Dec 2019 11:07:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (envelope-from <dgilbert@redhat.com>) id 1ic55Z-0003G0-I0
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 05:07:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48299
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ic55Z-00035T-3T
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 05:07:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575367642;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=M8crGNRJWKGYhR6vWuJjFkitcLzFutIoE8N1QERJx/4=;
+ b=LEwWFmeGMR4Zmkxgrydzonnbe2rmCzDLgbHdtl23y/qE9uXiXn0E2X/253eC26Ub1qTvqv
+ cr1cvuyhk9dHqgbWk92ViqwKUcT6yWXhTe3wORfEx3iNg4G9bgaQ0CW7JfLDlEMXCotLvY
+ 76gv84Kpgc5nPYXuq1AWsPRXLcq9H9k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-390-yBpcfnEKN266a-zZE7oZtA-1; Tue, 03 Dec 2019 05:07:18 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6790C1883523;
+ Tue,  3 Dec 2019 10:07:17 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 503E85DA2C;
+ Tue,  3 Dec 2019 10:07:11 +0000 (UTC)
+Date: Tue, 3 Dec 2019 10:07:08 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Fabiano Rosas <farosas@linux.ibm.com>
+Subject: Re: [PATCH] virtiofs: Relax DAX window protection for ppc
+Message-ID: <20191203100708.GA3078@work-vm>
+References: <20191202202639.102322-1-farosas@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20191202140146.3910-4-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19120310-0016-0000-0000-000002D0445B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120310-0017-0000-0000-000033323CC9
-Message-Id: <6aab8397-2b7b-7805-f417-1375f9fc8400@de.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-03_02:2019-11-29,2019-12-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 mlxscore=0
- suspectscore=0 clxscore=1015 malwarescore=0 adultscore=0 impostorscore=0
- phishscore=0 mlxlogscore=999 spamscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912030081
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20191202202639.102322-1-farosas@linux.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: yBpcfnEKN266a-zZE7oZtA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,105 +87,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, thuth@redhat.com, mihajlov@linux.ibm.com,
- qemu-s390x@nongnu.org, david@redhat.com
+Cc: virtio-fs@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+* Fabiano Rosas (farosas@linux.ibm.com) wrote:
+> When setting up the DAX window during the virtiofs driver probe inside
+> the guest, the Linux arch-specific function arch_add_memory is called,
+> which on ppc tries to do a cache flush [1] of the recently added
+> memory. At this point the window is mmap'ed PROT_NONE by QEMU, which
+> causes the following:
+>=20
+> <snip>
+> [   10.136703] virtio_fs virtio0: Cache len: 0x80000000 @ 0x210000000000
+> [   10.165106] radix-mmu: Mapped 0xc000210000000000-0xc000210080000000 wi=
+th 1.00 GiB pages
+> error: kvm run failed Bad address
+> NIP c000000000072350   LR c000000000072304 CTR 0000000001000000 XER 00000=
+00020040000 CPU#0
+> MSR 8000000002009033 HID0 0000000000000000  HF 8000000000000000 iidx 3 di=
+dx 3
+> TB 00000000 00000000 DECR 0
+> GPR00 c000000000072304 c0000000fa383100 c000000001190300 0000000000000000
+> GPR04 0000000000000001 0000000000000000 c0000000fa383208 0000000000000080
+> GPR08 c000210000000000 000000008000007f 0000000001000000 6874697720303030
+> <snip>
+>=20
+> The problem is the same for the memory device removal path
+> (e.g. during filesystem unmount).
+>=20
+> Since powerpc expects the memory to be accessible during device
+> addition/removal, this patch makes the DAX window readable at creation
+> and after virtio-fs unmap.
+>=20
+> 1 - https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/co=
+mmit/?id=3Dfb5924fd
+>=20
+> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
 
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-On 02.12.19 15:01, Janosch Frank wrote:
-> As it turns out we need to clear the ri controls and PSW enablement
-> bit to be architecture compliant.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Thanks, I'll do a pull after the tree opens again.
+
+Dave
+
 > ---
->  target/s390x/cpu.c | 5 +++++
->  target/s390x/cpu.h | 7 ++++++-
->  2 files changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 906285888e..c192e6b3b9 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -131,6 +131,11 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
->                                    &env->fpu_status);
->         /* fall through */
-
-As this is a fall through, do we want to change the INITIAL RESET to only clear up to 
-start_normal_reset_fields, e.g. something like this on top
-
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 829ce6ad5491..58ac721687a9 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -108,7 +108,7 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
-     case S390_CPU_RESET_INITIAL:
-         /* initial reset does not clear everything! */
-         memset(&env->start_initial_reset_fields, 0,
--               offsetof(CPUS390XState, end_reset_fields) -
-+               offsetof(CPUS390XState, start_normal_reset_fields) -
-                offsetof(CPUS390XState, start_initial_reset_fields));
- 
-         /* architectured initial value for Breaking-Event-Address register */
-
-
-to avoid double memsetting. 
-
-
-Other than this question
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-
->      case S390_CPU_RESET_NORMAL:
-> +        env->psw.mask &= ~PSW_MASK_RI;
-> +        memset(&env->start_normal_reset_fields, 0,
-> +               offsetof(CPUS390XState, end_reset_fields) -
-> +               offsetof(CPUS390XState, start_normal_reset_fields));
+>  hw/virtio/vhost-user-fs.c | 17 ++++++++++++++---
+>  1 file changed, 14 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/virtio/vhost-user-fs.c b/hw/virtio/vhost-user-fs.c
+> index 455e97beea..92958797d0 100644
+> --- a/hw/virtio/vhost-user-fs.c
+> +++ b/hw/virtio/vhost-user-fs.c
+> @@ -24,6 +24,16 @@
+>  #include "exec/address-spaces.h"
+>  #include "trace.h"
+> =20
+> +/*
+> + * The powerpc kernel code expects the memory to be accessible during
+> + * addition/removal.
+> + */
+> +#if defined(TARGET_PPC64) && defined(CONFIG_LINUX)
+> +#define DAX_WINDOW_PROT PROT_READ
+> +#else
+> +#define DAX_WINDOW_PROT PROT_NONE
+> +#endif
 > +
->          env->pfault_token = -1UL;
->          env->bpbc = false;
->          break;
-> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> index d5e18b096e..7f5fa1d35b 100644
-> --- a/target/s390x/cpu.h
-> +++ b/target/s390x/cpu.h
-> @@ -58,7 +58,6 @@ struct CPUS390XState {
->       */
->      uint64_t vregs[32][2] QEMU_ALIGNED(16);  /* vector registers */
->      uint32_t aregs[16];    /* access registers */
-> -    uint8_t riccb[64];     /* runtime instrumentation control */
->      uint64_t gscb[4];      /* guarded storage control */
->      uint64_t etoken;       /* etoken */
->      uint64_t etoken_extension; /* etoken extension */
-> @@ -114,6 +113,10 @@ struct CPUS390XState {
->      uint64_t gbea;
->      uint64_t pp;
->  
-> +    /* Fields up to this point are not cleared by normal CPU reset */
-> +    struct {} start_normal_reset_fields;
-> +    uint8_t riccb[64];     /* runtime instrumentation control */
+>  uint64_t vhost_user_fs_slave_map(struct vhost_dev *dev, VhostUserFSSlave=
+Msg *sm,
+>                                   int fd)
+>  {
+> @@ -133,8 +143,8 @@ uint64_t vhost_user_fs_slave_unmap(struct vhost_dev *=
+dev, VhostUserFSSlaveMsg *s
+>              continue;
+>          }
+> =20
+> -        ptr =3D mmap(cache_host + sm->c_offset[i], sm->len[i],
+> -                PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, =
+0);
+> +        ptr =3D mmap(cache_host + sm->c_offset[i], sm->len[i], DAX_WINDO=
+W_PROT,
+> +                   MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED, -1, 0);
+>          if (ptr !=3D (cache_host + sm->c_offset[i])) {
+>              res =3D -errno;
+>              fprintf(stderr, "%s: mmap failed (%s) [%d] %"
+> @@ -485,8 +495,9 @@ static void vuf_device_realize(DeviceState *dev, Erro=
+r **errp)
+> =20
+>      if (fs->conf.cache_size) {
+>          /* Anonymous, private memory is not counted as overcommit */
+> -        cache_ptr =3D mmap(NULL, fs->conf.cache_size, PROT_NONE,
+> +        cache_ptr =3D mmap(NULL, fs->conf.cache_size, DAX_WINDOW_PROT,
+>                           MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 > +
->      /* Fields up to this point are cleared by a CPU reset */
->      struct {} end_reset_fields;
->  
-> @@ -252,6 +255,7 @@ extern const VMStateDescription vmstate_s390_cpu;
->  #undef PSW_SHIFT_ASC
->  #undef PSW_MASK_CC
->  #undef PSW_MASK_PM
-> +#undef PSW_MASK_RI
->  #undef PSW_SHIFT_MASK_PM
->  #undef PSW_MASK_64
->  #undef PSW_MASK_32
-> @@ -274,6 +278,7 @@ extern const VMStateDescription vmstate_s390_cpu;
->  #define PSW_MASK_CC             0x0000300000000000ULL
->  #define PSW_MASK_PM             0x00000F0000000000ULL
->  #define PSW_SHIFT_MASK_PM       40
-> +#define PSW_MASK_RI             0x0000008000000000ULL
->  #define PSW_MASK_64             0x0000000100000000ULL
->  #define PSW_MASK_32             0x0000000080000000ULL
->  #define PSW_MASK_ESA_ADDR       0x000000007fffffffULL
-> 
+>          if (cache_ptr =3D=3D MAP_FAILED) {
+>              error_setg(errp, "Unable to mmap blank cache");
+>              return;
+> --=20
+> 2.23.0
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
