@@ -2,83 +2,94 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A02FC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:44:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DCAC43141
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:47:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 430232073C
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:44:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fb+O0X4D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 430232073C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CE9F820684
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:47:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE9F820684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icGts-0006JD-6S
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 17:44:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59917)
+	id 1icGxF-0007SK-Hg
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 17:47:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41417)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1icGjf-0001FT-4Q
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:33:36 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1icGs5-0005x0-Ha
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:42:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1icGjb-0002VI-NQ
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:33:32 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30401
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1icGja-0002KG-0u
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:33:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575412403;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=b20WeRXM7Jp/KM12IcdxyevGaUj2UlSo3qzmwyF+85o=;
- b=fb+O0X4DHdIcxGRs7z+qhJ5y7FnLHEnc0p2M0HphmdTzHrEIrOCWX0V97Ok1TBijLhMYnp
- 3SSeUreyq7nTp0jQQUaiTh6orn609pXpshFA0E99bRAJh9nPYSMOkZd7B7NTrdApTTh+Lf
- urMWo9mXkUB/j/29ySh1D3qb32iCgxE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-1BgQdtTpMdmx4GPNhZ9QCg-1; Tue, 03 Dec 2019 17:33:20 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE7391856A82;
- Tue,  3 Dec 2019 22:33:18 +0000 (UTC)
-Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EDD736B8CD;
- Tue,  3 Dec 2019 22:33:15 +0000 (UTC)
-Subject: Re: [PATCH 7/6] Makefile: Make Makefile depend on generated qga
- files, too
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20191120182551.23795-1-armbru@redhat.com>
- <20191129095927.17382-1-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <45cff400-7e88-cefe-560e-7642d2ea1d00@redhat.com>
-Date: Tue, 3 Dec 2019 16:33:15 -0600
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1icGs1-0007C5-GK
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:42:17 -0500
+Received: from mail.ilande.co.uk ([46.43.2.167]:60968
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1icGru-0005eO-91
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 17:42:06 -0500
+Received: from host86-173-229-99.range86-173.btcentralplus.com
+ ([86.173.229.99] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1icGnI-0007rx-S4; Tue, 03 Dec 2019 22:37:21 +0000
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+References: <20191203072922.14981-1-thuth@redhat.com>
+ <2b5d3c2d-6982-03f6-26cc-7400440b990f@redhat.com>
+ <8ca69db3-7dfa-0c4d-bc50-61a80eb574c1@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <205c2f57-2022-316d-be90-85e63bbdcb61@ilande.co.uk>
+Date: Tue, 3 Dec 2019 22:36:30 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191129095927.17382-1-armbru@redhat.com>
+In-Reply-To: <8ca69db3-7dfa-0c4d-bc50-61a80eb574c1@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 1BgQdtTpMdmx4GPNhZ9QCg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.173.229.99
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH] hw/ppc/prep: Remove the deprecated "prep" machine and the
+ OpenHackware BIOS
+X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.43.2.167
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,60 +101,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, mdroth@linux.vnet.ibm.com
+Cc: Laurent Vivier <lvivier@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/29/19 3:59 AM, Markus Armbruster wrote:
-> Generated .h need to be generated before compiling any .c using them.
-> To know which .h a .c uses, we need to compile it.
+On 03/12/2019 08:25, Thomas Huth wrote:
+
+> On 03/12/2019 08.45, Philippe Mathieu-Daudé wrote:
+>> On 12/3/19 8:29 AM, Thomas Huth wrote:
+>>> It's been deprecated since QEMU v3.1. The 40p machine should be
+>>> used nowadays instead.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>   .gitmodules                |   3 -
+>>>   MAINTAINERS                |   1 -
+>>>   Makefile                   |   2 +-
+>>>   docs/interop/firmware.json |   3 +-
+>>>   hw/ppc/ppc.c               |  18 --
+>>>   hw/ppc/prep.c              | 384 +------------------------------------
+>>>   include/hw/ppc/ppc.h       |   1 -
+>>>   pc-bios/README             |   3 -
+>>>   pc-bios/ppc_rom.bin        | Bin 1048576 -> 0 bytes
+>>>   qemu-deprecated.texi       |   6 -
+>>>   qemu-doc.texi              |  15 +-
+>>>   roms/openhackware          |   1 -
+>>>   tests/boot-order-test.c    |  25 ---
+>>>   tests/cdrom-test.c         |   2 +-
+>>>   tests/endianness-test.c    |   2 +-
+>>>   15 files changed, 10 insertions(+), 456 deletions(-)
+>>>   delete mode 100644 pc-bios/ppc_rom.bin
+>>>   delete mode 160000 roms/openhackware
+>> [...]
+>>> diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
+>>> index a725bce729..4a6218a516 100644
+>>> --- a/tests/boot-order-test.c
+>>> +++ b/tests/boot-order-test.c
+>>> @@ -108,30 +108,6 @@ static void test_pc_boot_order(void)
+>>>       test_boot_orders(NULL, read_boot_order_pc, test_cases_pc);
+>>>   }
+>>>   -static uint8_t read_m48t59(QTestState *qts, uint64_t addr, uint16_t
+>>> reg)
+>>> -{
+>>> -    qtest_writeb(qts, addr, reg & 0xff);
+>>> -    qtest_writeb(qts, addr + 1, reg >> 8);
+>>> -    return qtest_readb(qts, addr + 3);
+>>> -}
+>>> -
+>>> -static uint64_t read_boot_order_prep(QTestState *qts)
+>>> -{
+>>> -    return read_m48t59(qts, 0x80000000 + 0x74, 0x34);
+>>
+>> I'd rather keep this generic mmio-mapped ISA test.
+>> Maybe run it with the 40p machine?
 > 
-> Since commit 4115852bb0 "build: do not sprinkle around
-> GENERATED_HEADERS dependencies", we break this circular dependency the
-> simple & stupid way: the generated headers are a prerequisite of
-> Makefile, which causes Make to generate them first, then start over.
+> I don't think that this is possible in an easy way here. On the prep
+> machine, the ISA bus is on a hard-coded MMIO address. On the 40p
+> machine, the ISA bus is behind a PCI-to-ISA bridge, thus the PCI part
+> needs to be set up first.
 
-which is a pain when using 'make --dry-run' to see what would get built 
-(a dependency of Makefile _is_ rebuilt if Makefile itself has to be 
-updated), but not the fault of this patch.
+FWIW for sun4u we already cheat a bit here: the ebus device is the first PCI device
+behind the PCI bridge which uses IO space, and so we know that this ultimately gets
+mapped to the start of the IO memory space. We also configure the PCI bridge in QEMU
+so that it allows IO accesses by default which means we also get the early console
+before PCI bus enumeration.
 
+>> Maybe we can rename this as read_boot_order_mm, and the previous
+>> read_boot_order_pc as read_boot_order_io.
 > 
-> Except for qga we still use the older method of making all its .o
-> summarily depend on all its generated .h (commit 016c77ad62 "Makefile:
-> add missing deps on $(GENERATED_HEADERS)").
-> 
-> Add qga's generated files to generated-files-y to get rid of this
-> exception.
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->   Makefile | 21 +++++++++++----------
->   1 file changed, 11 insertions(+), 10 deletions(-)
+> I don't think it makes much sense. This was completely specific to the
+> "prep" machine, even the "40p" machine seems to prefer fw_cfg nowadays.
+> So let's simply remove this old stuff.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+From memory there were some issues with fw_cfg because the prep (OHW) and 40p
+(OpenBIOS) machines had different NVRAM layouts. Once the prep machine has been
+removed it should be easy to fix though.
 
 
-> +++ b/Makefile
-> @@ -130,6 +130,15 @@ GENERATED_QAPI_FILES += qapi/qapi-doc.texi
->   
->   generated-files-y += $(GENERATED_QAPI_FILES)
->   
-> +GENERATED_QGA_FILES := qga-qapi-types.c qga-qapi-types.h
-> +GENERATED_QGA_FILES += qga-qapi-visit.c qga-qapi-visit.h
-> +GENERATED_QGA_FILES += qga-qapi-commands.h qga-qapi-commands.c
-> +GENERATED_QGA_FILES += qga-qapi-init-commands.h qga-qapi-init-commands.c
-> +GENERATED_QGA_FILES += qga-qapi-doc.texi
-> +GENERATED_QGA_FILES := $(addprefix qga/qapi-generated/, $(GENERATED_QGA_FILES))
+ATB,
 
-Would it be worth using two separate variable names (maybe 
-GENERATED_QGA_BASEFILES for the first list) rather than exploiting the 
-arcane knowledge that consecutive use of := causes GNU make to rewrite 
-an existing variable with new contents?
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Mark.
 
