@@ -2,82 +2,142 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A14C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 08:30:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A4D1C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 08:36:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC3CF2053B
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 08:30:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E40DC20640
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 08:36:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="bpSHVj7x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC3CF2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVQ0iXYt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E40DC20640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic3ZK-0001oW-Rt
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 03:30:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40234)
+	id 1ic3g1-0005ZM-48
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 03:36:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45793)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1ic3XM-0000Tp-MP
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 03:28:02 -0500
+ (envelope-from <lvivier@redhat.com>) id 1ic3c3-0003X7-8W
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 03:32:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1ic3XE-00071m-AU
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 03:27:56 -0500
-Received: from forwardcorp1p.mail.yandex.net
- ([2a02:6b8:0:1472:2741:0:8b6:217]:57110)
+ (envelope-from <lvivier@redhat.com>) id 1ic3c0-0008N7-Si
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 03:32:50 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44604
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1ic3X8-0006wW-1S
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 03:27:48 -0500
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id BA6112E153B;
- Tue,  3 Dec 2019 11:27:40 +0300 (MSK)
-Received: from localhost (localhost [::1])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- vTAXRDL4Qv-Rev8NfPs; Tue, 03 Dec 2019 11:27:40 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1575361660; bh=3eQdbf7lTtOzcP1hFTyMtJ+3kGVeB+hbqIfMT228wjA=;
- h=Cc:Subject:Date:References:To:From:Message-Id;
- b=bpSHVj7x2Dt2pVA5ZCntXLfSV/kzOaagHD+5RLiwwO4mEA25GAkeJH8TDaXF/WYLf
- Je8GXSVtxtO+9rTAvLEp9Bz4Ur3ptepsFCF7n2HUJXAJeQao6tJEnHRMsfBLM/Wnl8
- zymrPC1fjsFDN7ct5zYUqRgBP/vqNDU9E0OWjJuE=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000071945
-X-Yandex-Avir: 1
-Received: from mxbackcorp1g.mail.yandex.net (localhost [::1])
- by mxbackcorp1g.mail.yandex.net with LMTP id DN8Z2l0ILW-4xqbSb5V
- for <yury-kotov@yandex-team.ru>; Tue, 03 Dec 2019 11:27:29 +0300
-Received: by vla1-6bb9290e4d68.qloud-c.yandex.net with HTTP;
- Tue, 03 Dec 2019 11:27:29 +0300
-From: Yury Kotov <yury-kotov@yandex-team.ru>
-To: Markus Armbruster <armbru@redhat.com>
-References: <20191122092347.28309-1-yury-kotov@yandex-team.ru>
- <87v9r3w0ro.fsf@dusky.pond.sub.org>
- <324361575308591@sas1-20474e4ea3be.qloud-c.yandex.net>
- <87wobea1vv.fsf@dusky.pond.sub.org>
-Subject: Re: [PATCH] monitor: Fix slow reading
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1ic3c0-0008Fv-N0
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 03:32:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575361966;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=ABurA59d0xsSiPo734dsFMpsLU/pdKywUMRjTRvG4Co=;
+ b=SVQ0iXYtTCevk4pgyIQgPvkcM6FcGd/sxlmxLWKfGi5S7lqW59yhz3R7tnAHLNVuK1F3K/
+ r4YAGAiUEKa/ymL4dK/JKEblcMkO11P7ViVh00HMTXJjSWnC3M7BImteX9BJAXh0Qn3IQX
+ qxhbMz1pv7v8MwE2rTB/Zcoa+VfZTF0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-29-0oq268nONpqh3dsKsYBy1g-1; Tue, 03 Dec 2019 03:32:45 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54BB9801E78;
+ Tue,  3 Dec 2019 08:32:44 +0000 (UTC)
+Received: from [10.36.117.138] (ovpn-117-138.ams2.redhat.com [10.36.117.138])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2F6DF10013A7;
+ Tue,  3 Dec 2019 08:32:36 +0000 (UTC)
+Subject: Re: [PATCH] virtio-serial-bus: fix memory leak while attach
+ virtio-serial-bus
+To: pannengyuan <pannengyuan@huawei.com>, mst@redhat.com, amit@kernel.org,
+ marcandre.lureau@redhat.com, pbonzini@redhat.com
+References: <1575285343-21864-1-git-send-email-pannengyuan@huawei.com>
+ <dad28876-1850-32f3-fe47-9e4ec2c68f20@redhat.com>
+ <4e9efebf-1862-8879-ed01-60f8777d4a65@huawei.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <4f535277-0494-7089-eb6f-9daea79463c8@redhat.com>
+Date: Tue, 3 Dec 2019 09:32:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Tue, 03 Dec 2019 11:27:39 +0300
-Message-Id: <490061575361649@vla1-6bb9290e4d68.qloud-c.yandex.net>
+In-Reply-To: <4e9efebf-1862-8879-ed01-60f8777d4a65@huawei.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 0oq268nONpqh3dsKsYBy1g-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a02:6b8:0:1472:2741:0:8b6:217
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,192 +146,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Denis Plotnikov <dplotnikov@virtuozzo.com>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
- "Denis V. Lunev" <den@openvz.org>,
- =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: liyiting@huawei.com, kuhn.chenqun@huawei.com, qemu-devel@nongnu.org,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-02.12.2019, 23:50, "Markus Armbruster" <armbru@redhat.com>:
-> Yury Kotov <yury-kotov@yandex-team.ru> writes:
->
->> =C2=A0Hi!
+On 03/12/2019 01:53, pannengyuan wrote:
+> 
+> 
+> On 2019/12/2 21:58, Laurent Vivier wrote:
+>> On 02/12/2019 12:15, pannengyuan@huawei.com wrote:
+>>> From: PanNengyuan <pannengyuan@huawei.com>
+>>>
+>>> ivqs/ovqs/c_ivq/c_ovq is forgot to cleanup in
+>>> virtio_serial_device_unrealize, the memory leak stack is as bellow:
+>>>
+>>> Direct leak of 1290240 byte(s) in 180 object(s) allocated from:
+>>>     #0 0x7fc9bfc27560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
+>>>     #1 0x7fc9bed6f015 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x50015)
+>>>     #2 0x5650e02b83e7 in virtio_add_queue /mnt/sdb/qemu-4.2.0-rc0/hw/virtio/virtio.c:2327
+>>>     #3 0x5650e02847b5 in virtio_serial_device_realize /mnt/sdb/qemu-4.2.0-rc0/hw/char/virtio-serial-bus.c:1089
+>>>     #4 0x5650e02b56a7 in virtio_device_realize /mnt/sdb/qemu-4.2.0-rc0/hw/virtio/virtio.c:3504
+>>>     #5 0x5650e03bf031 in device_set_realized /mnt/sdb/qemu-4.2.0-rc0/hw/core/qdev.c:876
+>>>     #6 0x5650e0531efd in property_set_bool /mnt/sdb/qemu-4.2.0-rc0/qom/object.c:2080
+>>>     #7 0x5650e053650e in object_property_set_qobject /mnt/sdb/qemu-4.2.0-rc0/qom/qom-qobject.c:26
+>>>     #8 0x5650e0533e14 in object_property_set_bool /mnt/sdb/qemu-4.2.0-rc0/qom/object.c:1338
+>>>     #9 0x5650e04c0e37 in virtio_pci_realize /mnt/sdb/qemu-4.2.0-rc0/hw/virtio/virtio-pci.c:1801
+>>>
+>>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>>> Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
+>>> ---
+>>>  hw/char/virtio-serial-bus.c | 6 ++++++
+>>>  1 file changed, 6 insertions(+)
+>>>
+>>> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+>>> index 3325904..da9019a 100644
+>>> --- a/hw/char/virtio-serial-bus.c
+>>> +++ b/hw/char/virtio-serial-bus.c
+>>> @@ -1126,9 +1126,15 @@ static void virtio_serial_device_unrealize(DeviceState *dev, Error **errp)
+>>>  {
+>>>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>>>      VirtIOSerial *vser = VIRTIO_SERIAL(dev);
+>>> +    int i;
+>>>  
+>>>      QLIST_REMOVE(vser, next);
+>>>  
+>>> +    for (i = 0; i <= vser->bus.max_nr_ports; i++) {
+>>> +        virtio_del_queue(vdev, 2 * i);
+>>> +        virtio_del_queue(vdev, 2 * i + 1);
+>>> +    }
+>>> +
 >>
->> =C2=A029.11.2019, 11:22, "Markus Armbruster" <armbru@redhat.com>:
->>> =C2=A0Yury Kotov <yury-kotov@yandex-team.ru> writes:
->>>
->>>> =C2=A0=C2=A0The monitor_can_read (as a callback of qemu_chr_fe_set_h=
-andlers)
->>>> =C2=A0=C2=A0should return size of buffer which monitor_qmp_read or m=
-onitor_read
->>>> =C2=A0=C2=A0can process.
->>>> =C2=A0=C2=A0Currently, monitor_can_read returns 1 as a result of log=
-ical not.
->>>> =C2=A0=C2=A0Thus, for each QMP command, len(QMD) iterations of the m=
-ain loop
->>>> =C2=A0=C2=A0are required to handle a command.
->>>> =C2=A0=C2=A0In fact, these both functions can process any buffer siz=
-e.
->>>> =C2=A0=C2=A0So, return 1024 as a reasonable size which is enough to =
-process
->>>> =C2=A0=C2=A0the most QMP commands, but not too big to block the main=
- loop for
->>>> =C2=A0=C2=A0a long time.
->>>>
->>>> =C2=A0=C2=A0Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
->>>> =C2=A0=C2=A0---
->>>> =C2=A0=C2=A0=C2=A0monitor/monitor.c | 9 ++++++++-
->>>> =C2=A0=C2=A0=C2=A01 file changed, 8 insertions(+), 1 deletion(-)
->>>>
->>>> =C2=A0=C2=A0diff --git a/monitor/monitor.c b/monitor/monitor.c
->>>> =C2=A0=C2=A0index 12898b6448..cac3f39727 100644
->>>> =C2=A0=C2=A0--- a/monitor/monitor.c
->>>> =C2=A0=C2=A0+++ b/monitor/monitor.c
->>>> =C2=A0=C2=A0@@ -50,6 +50,13 @@ typedef struct {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int64_t rate; /* Minimum t=
-ime (in ns) between two events */
->>>> =C2=A0=C2=A0=C2=A0} MonitorQAPIEventConf;
->>>>
->>>> =C2=A0=C2=A0+/*
->>>> =C2=A0=C2=A0+ * The maximum buffer size which the monitor can proces=
-s in one iteration
->>>> =C2=A0=C2=A0+ * of the main loop. We don't want to block the loop fo=
-r a long time
->>>> =C2=A0=C2=A0+ * because of JSON parser, so use a reasonable value.
->>>> =C2=A0=C2=A0+ */
->>>> =C2=A0=C2=A0+#define MONITOR_READ_LEN_MAX 1024
->>>> =C2=A0=C2=A0+
->>>> =C2=A0=C2=A0=C2=A0/* Shared monitor I/O thread */
->>>> =C2=A0=C2=A0=C2=A0IOThread *mon_iothread;
->>>>
->>>> =C2=A0=C2=A0@@ -498,7 +505,7 @@ int monitor_can_read(void *opaque)
->>>> =C2=A0=C2=A0=C2=A0{
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0Monitor *mon =3D opaque;
->>>>
->>>> =C2=A0=C2=A0- return !atomic_mb_read(&mon->suspend_cnt);
->>>> =C2=A0=C2=A0+ return atomic_mb_read(&mon->suspend_cnt) ? 0 : MONITOR=
-_READ_LEN_MAX;
->>>> =C2=A0=C2=A0=C2=A0}
->>>>
->>>> =C2=A0=C2=A0=C2=A0void monitor_list_append(Monitor *mon)
->>>
->>> =C2=A0Prior attempt:
->>> =C2=A0[PATCH 1/1] monitor: increase amount of data for monitor to rea=
-d
->>> =C2=A0Message-Id: <1493732857-10721-1-git-send-email-den@openvz.org>
->>> =C2=A0https://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg002=
-06.html
->>>
->>> =C2=A0Review concluded that it breaks HMP command migrate without -d.=
- QMP is
->>> =C2=A0probably okay. Sadly, no v2.
->>>
->>> =C2=A0Next one:
->>> =C2=A0Subject: [PATCH] monitor: increase amount of data for monitor t=
-o read
->>> =C2=A0Message-Id: <20190610105906.28524-1-dplotnikov@virtuozzo.com>
->>> =C2=A0https://lists.nongnu.org/archive/html/qemu-devel/2019-06/msg019=
-12.html
->>>
->>> =C2=A0Same patch, with a second, suspicious-looking hunk thrown in. I=
- didn't
->>> =C2=A0make the connection to the prior attempt back then. I wrote "I =
-think I
->>> =C2=A0need to (re-)examine how QMP reads input, with special consider=
-ation to
->>> =C2=A0its OOB feature."
->>>
->>> =C2=A0This patch is a cleaner variation on the same theme. Its ramifi=
-cations
->>> =C2=A0are as unobvious as ever.
->>>
->>> =C2=A0I figure the HMP situation is unchanged: not safe, although we =
-could
->>> =C2=A0probably make it safe if we wanted to (Daniel sketched how). My=
- simpler
->>> =C2=A0suggestion stands: separate f_can_read() callbacks for HMP and =
-QMP
->>> =C2=A0[PATCH 1], then change only the one for QMP [PATCH 2].
->>>
->>> =C2=A0The QMP situation is also unchanged: we still need to think thr=
-ough how
->>> =C2=A0this affects reading of QMP input, in particular OOB.
+>> According to virtio_serial_device_realize() and the number of
+>> virtio_add_queue(), I think you have more queues to delete:
 >>
->> =C2=A0I've read the discussion around patches:
->> =C2=A0"monitor: increase amount of data for monitor to read"
->> =C2=A0and realized the problem.
+>>   4 + 2 * vser->bus.max_nr_ports
 >>
->> =C2=A0It seems that my patch actually has some bugs with HMP and OOB
->> =C2=A0because of suspend/resume.
->
-> For HMP we're sure, for OOB we don't know.
->
->> =C2=A0IIUC there are some approaches to fix them:
+>> (for vser->ivqs[0], vser->ovqs[0], vser->c_ivq, vser->c_ovq,
+>> vser->ivqs[i], vser->ovqs[i]).
 >>
->> =C2=A01) Input buffer
->> =C2=A0=C2=A0=C2=A01. Add input buffer for Monitor struct
->> =C2=A0=C2=A0=C2=A02. Handle commands from monitor_xxx_read callbacks o=
-ne by one
->> =C2=A0=C2=A0=C2=A03. Schedule BH to handle remaining bytes in the buff=
-er
+>> Thanks,
+>> Laurent
 >>
->> =C2=A02) Input buffer for suspend/resume
->> =C2=A0=C2=A0=C2=A01. Add input buffer for Monitor struct
->> =C2=A0=C2=A0=C2=A02. Handle multiple commands until monitor is not sus=
-pended
->> =C2=A0=C2=A0=C2=A03. If monitor suspended, put remaining data to the b=
-uffer
->> =C2=A0=C2=A0=C2=A04. Handle remaining data in the buffer when we get r=
-esume
 >>
->> =C2=A0We use QEMU 2.12 which doesn't have the full support of OOB and =
-for which it's
->> =C2=A0enough to fix HMP case by separating can_read callbacks. But tho=
-se who use
->> =C2=A0a newer version of QEMU can use OOB feature to improve HMP/QMP p=
-erformance.
->
-> OOB isn't for monitor performance, it's for monitor availability.
->
-> QMP executes one command after the other. While a command executes, the
-> monitor is effectively unavailable. This can be a problem. OOB
-> execution lets you execute a few special commands right away, without
-> waiting for prior commands to complete.
->
->> =C2=A0So, I'm not sure there's a big sense in introducing some buffers=
-.
->
-> Reading byte-wise is pretty pathetic, but it works. I'm not sure how
-> much performance buffers can gain us, and whether it's worth the
-> necessary review effort. How QMP reads input is not trivial, thanks to
-> OOB.
->
-> Have you measured the improvement?
+> Thanks, but I think the queues is correct, the queues in
+> virtio_serial_device_realize is as follow:
+> 
+> // here is 2
+> vser->ivqs[0] = virtio_add_queue(vdev, 128, handle_input);
+> vser->ovqs[0] = virtio_add_queue(vdev, 128, handle_output);
+> 
+> // here is 2
+> vser->c_ivq = virtio_add_queue(vdev, 32, control_in);
+> vser->c_ovq = virtio_add_queue(vdev, 32, control_out);
+> 
+> // here 2 * (max_nr_ports - 1)  ----- i is from 1 to max_nr_ports - 1
+> for (i = 1; i < vser->bus.max_nr_ports; i++) {
+>     vser->ivqs[i] = virtio_add_queue(vdev, 128, handle_input);
+>     vser->ovqs[i] = virtio_add_queue(vdev, 128, handle_output);
+> }
+> 
+> so the total queues number is:  2 * (vser->bus.max_nr_ports + 1)
+> 
 
-Honestly, I have a different use case than Denis. But I think his assessm=
-ent
-of this improvement is reasonable.
+Yes, you're right. A comment in the code would have helped or written
+clearly like:
 
-My use case (sorry I didn't mention it before):
-I need this improvement to make sure that a single iteration of the main =
-loop
-will be enough to handle at least a single QMP command.
+for (i = 0; i < 2 * (vser->bus.max_nr_ports + 1); i++) {
+    virtio_del_queue(vdev, i);
+}
 
-It's helpful for my another patch:
-https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg04100.html
-
-If incoming migration yields for just a single byte of QMP stream so it n=
-eeds
-about 30 such yields to handle something like query-status to check wheth=
-er
-incoming-QEMU is still alive or not.
-
-Regards,
-Yury
+Thanks,
+Laurent
 
 
