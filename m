@@ -2,101 +2,118 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2227AC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2BF6C43215
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 12:09:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2B122068E
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:57:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 906DB206EC
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 12:09:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NoDC0fwm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B122068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="PnLpm+K+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 906DB206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic6ny-0008OO-3q
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 06:57:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43360)
+	id 1ic6zO-0002u4-PL
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 07:09:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ic6iJ-000721-Nl
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:51:33 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ic6ti-0001nV-Ga
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 07:03:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ic6i9-0007OO-N3
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:51:24 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30470
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ic6i8-0007Lw-Ko
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:51:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575373878;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=A3LLEr3E3K2K7Bi4eRhsJUF7iecTI7a84MLmxXEs2TM=;
- b=NoDC0fwmIb3pp44fwjA9QzKtlL/liR3Cg3/rfrUGty5Y22paAwh842KzqHqN2XX+n7NbwL
- DGC5o1KxEw5xHqr4J2BnreqFjziJnVkLmCPhLUIiU21LIaAzcl/JbYcvisgQe2c/kwUv7K
- IttXZXNq3W4aW/DCZEZK0WE/jN9Klqw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-wpJZxNqmN_KdV1y5ghAhMw-1; Tue, 03 Dec 2019 06:51:15 -0500
-Received: by mail-wm1-f71.google.com with SMTP id n4so872782wmd.7
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 03:51:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=A3LLEr3E3K2K7Bi4eRhsJUF7iecTI7a84MLmxXEs2TM=;
- b=rjTiI9liO1vZM7zZfucmTOXfbO+WDhX8v7a7C4jciz0uKcfSQ88ADpzhdXU241bLhW
- 2ncInC4n3fp3NHvSquJB1PtMA4nfsL6kKo/8uhCebZlZH0co9k/CsXK9piDbLjwJptDb
- KITHCAw+62Y9yOmrFQHLTZupB5Lpm/6LesYSyID0TVsdzqdVgSW3y3IZ9OdgxI5BKqU6
- PYfg+WPN4F76fbdUnlExqkCGH2nKLs1BLiWRM36EzJ6N8BUAKbXdhEtDUF2vR7l8G9tO
- syAQrxNQCxFpqKNzyMFG1RQLRxhWV2KXKp6XWMBI5XKn3cCBE006/KjL+QxRyqZq5lgm
- sS4Q==
-X-Gm-Message-State: APjAAAW4SdiBb3n6wFt3FR99flZEigZ+Y6XvpHKcfKwMJ8I9DmyReQ/a
- ah+Km1sjUCpyQsSpsL4jDIsTI4RI82tg8Q4iqpPxGVQXGxJwPKLGHVhLDV4+w0iAImCslHe6Vtv
- AWihPNKeWi8NQzK4=
-X-Received: by 2002:a5d:62d0:: with SMTP id o16mr4551159wrv.197.1575373874044; 
- Tue, 03 Dec 2019 03:51:14 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwzTWLMF+Uyo0fvl0anTPTuHWtgvHul7ur9JIHUJI8XLSvNVHfnBGxbGyXpfrF1aoDfBpr+mw==
-X-Received: by 2002:a5d:62d0:: with SMTP id o16mr4551136wrv.197.1575373873776; 
- Tue, 03 Dec 2019 03:51:13 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a?
- ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
- by smtp.gmail.com with ESMTPSA id f19sm3373240wrf.23.2019.12.03.03.51.12
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 03 Dec 2019 03:51:13 -0800 (PST)
-Subject: Re: [PATCH] virtfs-proxy-helper: switch from libcap to libcap-ng
-To: Greg Kurz <groug@kaod.org>
-References: <20191129111632.22840-2-pbonzini@redhat.com>
- <20191129133241.738b70ed@bahia.w3ibm.bluemix.net>
- <4e49ea13-fe0c-2b06-052e-474d714b88ad@redhat.com>
- <20191129135937.74a9b264@bahia.w3ibm.bluemix.net>
- <20191203113449.4b2e129e@bahia.w3ibm.bluemix.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <cd75561d-a10b-94d5-12c1-75aeac61ca0c@redhat.com>
-Date: Tue, 3 Dec 2019 12:51:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191203113449.4b2e129e@bahia.w3ibm.bluemix.net>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ic6tY-0002lX-28
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 07:03:13 -0500
+Received: from mail-eopbgr60136.outbound.protection.outlook.com
+ ([40.107.6.136]:58694 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ic6tX-0002N5-1Y; Tue, 03 Dec 2019 07:03:07 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=K3IWOomxBoC+ZCxO/EjMxMVOQyFUyhKUSzqEA4Dmk8uGM7XWjBeMdODTsHHX1U56yETpU07Ry5cw04NNsnaMLZrKyHEwjtZpiCiw7eIGpBYNqrh6kPWKNieTaV2/DJLdoJ7/Qmoheue2Dd1kj5DhI9NqZPMqgkpd42489Ywj3o0Hy8vMgb4DGxZkBhFNWiphUEYZvtukTWSqdf7HPiFp3eQejbO0RbRalUOmC5EuZ5JZNPKy1ph2gDeHniXR6TJwSfAfncdhhirduRpSOOThndFFWZ0IiDRE4d0B7VMkioX1dtZ2hjTisgEEOOii7K/Qw8OGMTMI3SxyoC82h65Fmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vbVL7d1iL2/Hfef3l27oT5XlQry14OTkTbx7vqNgtLY=;
+ b=I/7VcaL3t3OHVmrcfYCNLF251vFkGGEs5DkJgvugqiro2GWiWYu914FafNviNUOIqb6GDqlD2eRkzRt0shVYKZYO9TI+haBPFhQhCMUjE9mB9IQz85+PkEhSYTyzuGpH4RZh1K7IQEJ/75SgNVe9MNRd6+8CUW507V2C7LYvUcQ/937KoVLr7JuDl6LsfsQ4bB0wDhKpcuN1SUZWq/VXHQQT/hbgA5iiQIVXqBsYSAf77CTKWjU3IMuWbpbgLjUaETtExl2l6ZXvyjTzAjOkm2wnylpYA2iB9m12+AcXcJzP3pl1qF9DxamFAMB3slTQ0perAtNchaBVNRs5um8wFA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vbVL7d1iL2/Hfef3l27oT5XlQry14OTkTbx7vqNgtLY=;
+ b=PnLpm+K+/BkHsyQosx6iu1eGd8Wq5wIZCm0HXfLFUjHXFQUrFRF73gEUK4fJqAfdiLoWlLULIqVI4a9zIX7XxNngXbO/J90AciYG+JfkN0A0MFbcipDGpooBo/iV6HcMpiqKmPLPeRTBfuIt253b6Xi7xoPM3NKKVIARjJpyoXw=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4801.eurprd08.prod.outlook.com (10.255.96.10) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2495.17; Tue, 3 Dec 2019 12:03:00 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2516.003; Tue, 3 Dec 2019
+ 12:03:00 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH for-5.0 v2 17/23] iotests: Use skip_if_unsupported
+ decorator in 041
+Thread-Topic: [PATCH for-5.0 v2 17/23] iotests: Use skip_if_unsupported
+ decorator in 041
+Thread-Index: AQHVmKmI4onup1WXjUi3guzKLabinaeoceEA
+Date: Tue, 3 Dec 2019 12:03:00 +0000
+Message-ID: <7a83953d-7d31-324b-e209-5d4e08086440@virtuozzo.com>
+References: <20191111160216.197086-1-mreitz@redhat.com>
+ <20191111160216.197086-18-mreitz@redhat.com>
+In-Reply-To: <20191111160216.197086-18-mreitz@redhat.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-X-MC-Unique: wpJZxNqmN_KdV1y5ghAhMw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0176.eurprd05.prod.outlook.com
+ (2603:10a6:3:f8::24) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191203150258844
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8937b076-42e6-4ea1-a92a-08d777e8be53
+x-ms-traffictypediagnostic: AM6PR08MB4801:
+x-microsoft-antispam-prvs: <AM6PR08MB4801BF52DFBC212DAE671180C1420@AM6PR08MB4801.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:459;
+x-forefront-prvs: 02408926C4
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(376002)(39840400004)(136003)(366004)(396003)(199004)(189003)(478600001)(7736002)(305945005)(186003)(26005)(31686004)(386003)(102836004)(6506007)(4326008)(76176011)(52116002)(66446008)(66476007)(14454004)(66556008)(99286004)(25786009)(256004)(64756008)(2501003)(66946007)(558084003)(110136005)(54906003)(316002)(36756003)(81166006)(5660300002)(6486002)(6246003)(71190400001)(81156014)(31696002)(8936002)(229853002)(6512007)(11346002)(3846002)(446003)(8676002)(6116002)(6436002)(86362001)(71200400001)(2616005)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4801;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DeAnfEnaXA15USV9jGUlODMub5foJQ80vuSo2GN3aDQPmZKyoX2OxaNC9zQvJmicNA0LPr8GAf6EIv01YANIDwDIbxlQl/uZHwwfkYtV+WG5D6Yt5iq3hiOO9B3dYxCGNhNVOaV/aA7KcmwhUJuxWr7FpE6/M1F62GPyzW26dDIbrtVJOHvHkR//2QIiaBRRmUqvPgTuzIWRn6Dc/wDMTJG99AJNKjqAdYP7oYrvNYIZlc1lD0pIEvxwxPhnnzkFWZH7qH0gCHKlfuqnqlNJGhR049t0APEKCFHkd91KWV2PQWxnBLcydB1KzlTQK4nNWwB3X7Vnqs/vkg3PAAb7yZDXok7B6/96bzQUTLt3yhJrSydSmyazTMXmxuV7N/FJkCod2Tk+6UdcSpc0Us3ZSqCULU8Z3iDySiYmOnTOI+SkqGnuua2JH8aGO+8VGTS4
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <245F7CFAE604764EADD85AA0C784CE7E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8937b076-42e6-4ea1-a92a-08d777e8be53
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Dec 2019 12:03:00.7045 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: as78aOwQVrh3EXNtWH0i23LwOaJMPA45psatev5UFeY/AfegIqhBzO7gNZ7S7Hsr1PK8hSe5Va4AG4C2a+eJomnKKUXN5rqyb/YmhD7f3BM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4801
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,50 +125,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, berrange@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/12/19 11:34, Greg Kurz wrote:
-> On Fri, 29 Nov 2019 13:59:37 +0100
-> Greg Kurz <groug@kaod.org> wrote:
-> 
->> On Fri, 29 Nov 2019 13:49:20 +0100
->> Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->>> On 29/11/19 13:32, Greg Kurz wrote:
->>>> Nice. :)
->>>>
->>>> Reviewed-by: Greg Kurz <groug@kaod.org>
->>>>
->>>> Paolo,
->>>>
->>>> I can take this through my 9p tree if you want. Otherwise,
->>>>
->>>> Acked-by: Greg Kurz <groug@kaod.org>
->>>
->>> Yes, please do it since it's self-contained.  You'd probably also test
->>> it better than me. :)
->>>
->>> Paolo
->>>
->>
->> Ok I'll just do that then.
->>
-> 
-> And it happens to be missing an extra-change in Makefile :)
-> 
-> -fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
-> +fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap-ng
+11.11.2019 19:02, Max Reitz wrote:
+> We can use this decorator above TestRepairQuorum.setUp() to skip all
+> quorum tests with a single line.
+>=20
+> Signed-off-by: Max Reitz<mreitz@redhat.com>
 
-The new line is not needed, -lcap-ng should already be in LIBS via
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-LIBS+=-lz $(LIBS_TOOLS)
-
-However, removing -lcap is certainly a good idea. :)
-
-Paolo
-
+--=20
+Best regards,
+Vladimir
 
