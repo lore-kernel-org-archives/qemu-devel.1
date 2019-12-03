@@ -2,101 +2,89 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA879C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70AD9C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:15:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 870FA2053B
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:07:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E59C62068E
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 16:15:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XvmZCG4i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 870FA2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xvaJG4WN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E59C62068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icAi6-0008MH-O6
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 11:07:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47424)
+	id 1icApH-0003Ny-Ge
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 11:15:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44570)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1icA7M-0000YS-WC
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:29:37 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1icAON-0007cc-1Q
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:47:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1icA7E-0003im-KG
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:29:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50680
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icA78-0003aL-VX
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:29:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575386957;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WeerkaiTznFWZe+uFrLFBE25ivmPwQ5NX0TUY7VdjnU=;
- b=XvmZCG4ik084askNBa1nVGrltkHqBTvNZzNgy50r/KOXeBAyLvEIxiuzxLZTUat91yPAaX
- ZqsQt7K6rZ6Hwe4fuHHpnmkBIehYtNiPSIQrZBYrPtaPacty5vV08uhu8R9iKxX/0HWfLJ
- sKYDz2fJVii3iya7SkpimMu0YmBivvo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-giLozA4MPYyyib0vhu5rEg-1; Tue, 03 Dec 2019 10:29:16 -0500
-Received: by mail-wm1-f70.google.com with SMTP id f16so1071517wmb.2
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 07:29:16 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1icAOG-0001Yi-DV
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:47:05 -0500
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:51762)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1icAO0-0000UT-VW
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 10:47:04 -0500
+Received: by mail-wm1-x32e.google.com with SMTP id g206so3454987wme.1
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 07:46:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=QOTKx9PIDusdl8qlelapPVMnwrLaphVS6rQ1uM3GoEU=;
+ b=xvaJG4WNdSUfDWwhISEITWLtMazigFgYfT/ppmiXs5GA7UrbaqZoLBgKAmmHDtWN+i
+ 85at7I8kzDtSxJYxWpF9cwzCCfzWjVF0DfvYAATCk3mMkkXGg3v/5GoFVrbllb1CU5Yp
+ ZlIGPbnMCCkK1QqoLpbp3WPu8daPkNz23oAk0kPpEh9CZRTHeKcGcNNNpWwvUxuwSbaI
+ 4yXonUIv/QFNxjVNi2cGxzjFgoBN7b19GtQKv2WEFyZ8kp0E9+R6O0/CVJ013bGWDM2E
+ MbvqgJAoYj8d8tTJu03Z1K3Mg6yiVrHaj5AgoYyqC9uFkJqyz2J9mybvY57/1FSO90QR
+ JvyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WeerkaiTznFWZe+uFrLFBE25ivmPwQ5NX0TUY7VdjnU=;
- b=iPsjCLd6EXm4bOPiIVxxQ9nw+tvEnhDO4PGmcrc4rbLrn0R5WiilMgcJU+lZoOaJoz
- kvo1KRC1sQsFnLo3aO0qlh7iq+CH2x5be3x8uwM+Y02C8JFdfQJmYOlDa72tnydDOPNZ
- BXkQpwB+ohIwgrXOM/++MkY7C0g9tMGqt2q3e9DpaGpUzT0ZHm6mtEECj+7xayILGOgc
- 0in8H06WOCzlka9DjyLuvloTMOm2ZAQfuUJ1P1lkUQ4d19LI/09vLAlpeBlCVj9XU0ml
- TTiAWm844KFe+XuNiaLnoffxhT8rLpI740TAd5zBGsH0d96ymy/ETzXo7j4XcjCMMDir
- sj+w==
-X-Gm-Message-State: APjAAAUpEY2q2jfoRk57PLdHa2fYDbIDTmvp+NakC/ByEThmld5GHVUp
- kx6CBU7fyUJAvuLqZnhcCaIVZJ0eAfIwtBk1d8T4kCtq3li2AKPOinjtYV3FazJTdJ64Vbcwyjx
- eL2UjyRS4jly5Ruo=
-X-Received: by 2002:a5d:4acb:: with SMTP id y11mr6035633wrs.106.1575386955609; 
- Tue, 03 Dec 2019 07:29:15 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz/vvJxh8a4QR3uEQLBa4OwtJoTVRBtcinj837XMBskPpwh+4Pji2CUM5XqlJ+5llaRfTGXzA==
-X-Received: by 2002:a5d:4acb:: with SMTP id y11mr6035607wrs.106.1575386955402; 
- Tue, 03 Dec 2019 07:29:15 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id c1sm3105575wmk.22.2019.12.03.07.29.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 03 Dec 2019 07:29:14 -0800 (PST)
-Subject: Re: [PATCH v6 9/9] hw/arm/xilinx_zynq: connect uart clocks to slcr
-To: Damien Hedde <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20190904125531.27545-1-damien.hedde@greensocs.com>
- <20190904125531.27545-10-damien.hedde@greensocs.com>
- <CAFEAcA96yu6Uttsi6eZokjyxE8At18ADF+Q6c7Na2ArvdLME+Q@mail.gmail.com>
- <f373af20-0df4-384f-b1a3-10bf873c315e@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <db2836fa-e2f1-d1ab-88be-1b24f5a18302@redhat.com>
-Date: Tue, 3 Dec 2019 16:29:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:references:user-agent:from:to:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=QOTKx9PIDusdl8qlelapPVMnwrLaphVS6rQ1uM3GoEU=;
+ b=eVQbgEIh0uZ6p8BzzyDfU/CCgg38hC1+JQMUrvPPtNp9PYGUIt3BU1c4UVJ58YL/jS
+ iUCzShRpoaTfRePztQqRZaKfZIwMLuUbUMKwdocFAncibX1bwTNh0CCp0wA0myT+Q4Il
+ hCdO3Yw0Il9gcXWUhaXwL+TfRna5z+zk+57Ay+n5BfD5Q92OAjSmGEAe/KGa/yUmLLd9
+ iF2zAEpbTwZ8LZ+6YN9V24WZxHBDW/6akU/F2SDrGi/eAwN8BR3h34XL/HEtWu02eZfr
+ kGm01f2cS9SaNZtTqPdb0D0pbYcraVAfxW9RPo4xMeWxA0B2e9QHvx+FwMCqY9ruHMur
+ BPdg==
+X-Gm-Message-State: APjAAAU5X+UrY264ujIv3YHcpqNaq2KNZ/crwGhXANutMcF2NEroNvkO
+ OQ0k46RekRECca9oQVLu6LQo+YazBT0=
+X-Google-Smtp-Source: APXvYqyoj/K3IUT+H3cy/S4yCCiA22sdMdxNtwb6OurHdf3PsGd7LmeneWoeiABc+uIbOp5zWpFKxA==
+X-Received: by 2002:a1c:f702:: with SMTP id v2mr34623456wmh.157.1575387998131; 
+ Tue, 03 Dec 2019 07:46:38 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x11sm4277677wre.68.2019.12.03.07.46.36
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Dec 2019 07:46:37 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5D7EF1FF87
+ for <qemu-devel@nongnu.org>; Tue,  3 Dec 2019 15:46:36 +0000 (GMT)
+References: <CALS5s18QBnPsv3TbtbM7ie__zekvH1T59c-o8FRd+f0EtiwqFg@mail.gmail.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: Custom logic gates on user space emulation
+In-reply-to: <CALS5s18QBnPsv3TbtbM7ie__zekvH1T59c-o8FRd+f0EtiwqFg@mail.gmail.com>
+Date: Tue, 03 Dec 2019 15:46:36 +0000
+Message-ID: <877e3dbeeb.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <f373af20-0df4-384f-b1a3-10bf873c315e@greensocs.com>
-Content-Language: en-US
-X-MC-Unique: giLozA4MPYyyib0vhu5rEg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,48 +96,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/3/19 3:59 PM, Damien Hedde wrote:
-> On 12/2/19 4:34 PM, Peter Maydell wrote:
->> On Wed, 4 Sep 2019 at 13:56, Damien Hedde <damien.hedde@greensocs.com> wrote:
->>>
->>> Add the connection between the slcr's output clocks and the uarts inputs.
->>>
->>> Also add the main board clock 'ps_clk', which is hard-coded to 33.33MHz
->>> (the default frequency). This clock is used to feed the slcr's input
->>> clock.
->>>
->>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
->>
->> Nothing obviously wrong in the body of the patch, but as with
->> 7 and 8, review from a Xilinx person would be helpful.
->>
->> /* board base frequency: 33.333333 MHz */
->> #define PS_CLK_FREQUENCY (100 * 1000 * 1000 / 3)
->>
->> This is interesting, because it's not an integer... I'll come back
->> to this topic in a reply to the cover letter in a moment.
-> 
-> For this precise case, what I wanted is the resulting integer which I
-> got from the device trees in linux (btw I should probably add this point
-> in  comment). Just thought it was more readable this way than "33333333".
 
-FWIW I'm auditing if it is possible to use the float type for 
-frequencies (before to ask on the list if this makes sense), because in 
-hw/core/ptimer we use timers with periods, and loose some precision 
-using 1/freq again.
+burak sarac <burak@linux.com> writes:
 
-Also we have MiB/KiB in "qemu/units.h" and I'd like to introduce MHz/KHz.
+> Hello All,
+>  Currently I am studying qemu and I want to figure out how I can use
+> custom logic gates on user space emulation.  I am searching very basic
+> 'hello world' kind of tutorial or some resources to i.e. adding left
+> or LOR : 1 | 0 =3D 1 but 0 | 1 =3D 0 to existing x86 arch
+> ((https://en.wikibooks.org/wiki/X86_Assembly/Logic) ?).
 
+It's not clear what you want to do. Are you looking to extend an
+existing instruction set with additional custom instructions? Can you
+explain why you want to do this?
+
+> What I want to
+> try is run this extended x86 version with qemu user space emulation.
+> Do I need a custom toolchain also for this? I found this book:
+> https://subscription.packtpub.com/book/hardware_and_creative/978178328945=
+5/1/ch01lvl1sec15/generating-a-custom-toolchain-become-an-expert
+
+For testing you don't need a custom toolchain - you can use inline
+assembly with data statements to insert your custom instructions into a
+program. Again it depends on what your eventual aim is here.
+
+>
+> Sorry for my ignorance in case it is totally irrelevant and I would
+> appreciate any guidance! Or pseudo kind of road map for me!
+>
+> Thank you & have a nice day
+> Burak
+
+
+--=20
+Alex Benn=C3=A9e
 
