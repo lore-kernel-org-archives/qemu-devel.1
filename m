@@ -2,99 +2,99 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 355D2C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 06:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3D0DC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 06:29:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 02153206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 06:29:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C35D1206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 06:29:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L6+Iwu5I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02153206DF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QED/MzvI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C35D1206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic1gC-00065z-42
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 01:29:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32806)
+	id 1ic1gD-00066d-T9
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 01:29:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ic1cw-0003mo-N6
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:25:39 -0500
+ (envelope-from <philmd@redhat.com>) id 1ic1ea-000596-T3
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:27:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ic1cs-00085q-6D
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:25:38 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22639
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1ic1eZ-0002HI-Rh
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:27:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31164
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ic1cq-00085Q-83
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:25:32 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ic1eZ-0002FT-Me
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:27:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575354330;
+ s=mimecast20190719; t=1575354439;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=He9rihmnxHj6GDGMEr1gk9KgbhYOhD+yXu0lokGxh4Q=;
- b=L6+Iwu5IUzV1O9kBfd9DRFZCAGkaouOpDqv2T3S2p6KUOqtkX/j3DAJK3DYqo1ixoDDP2D
- WIhyPaBq2GtTq6VTzU77Pf4OZM6VVQDxPqNWucLOw034FWj8DakxJwq20Ld2NWy7+Kk1J6
- Drg/0HKokV9gc23RTSLyMzZqY56Y07Y=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-IYdwkfNnPaaw7ACh4qXQhA-1; Tue, 03 Dec 2019 01:25:29 -0500
-Received: by mail-qv1-f69.google.com with SMTP id bt18so1489621qvb.19
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 22:25:29 -0800 (PST)
+ bh=GxBLUfB0sh+dQHqvwrrkXsoAFeGxFKUJUiSZ9VYn4+0=;
+ b=QED/MzvI4crtaoRDMqYH9ra1zWD/7d5VLku2eVM20M8WUGaiNhxC1j+MlgLYVb/81nu/Jt
+ V1KYcoR7ULJMYU54yo+Qe6QxKho1dCQuXq1MtOGXbWEdYpdXs7ScH/cc/bylF6uHOU6Uxn
+ 5SF/I91jcsKNw+YMa2PVlqiscBHV/pk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-bUffgAY8Mle2fWwl4jl0Qw-1; Tue, 03 Dec 2019 01:27:17 -0500
+Received: by mail-wr1-f70.google.com with SMTP id t3so1208338wrm.23
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 22:27:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=9q/UD2rsSpz1ctszOrBLevwg6VznQdFf8L8vZR0QFrs=;
- b=RROSaorzP02YlkH/pvmY0wdUKnuSrLiK1KaYwmZYOQwIgAQd8BVSmnDThFv7hpdu6E
- nSFagfxTEaA3L17uL/Rs0uABiA8uIRAK3T4CTcMdjr4g1ziVW1CoEfMxUppJIFAfN23G
- ugj+Mad1PMOi8vhN/C2iT8EaG8hQeiykJspSqsjs7BW+EsTnE/yfmA3pBn+xGLSQjZ+a
- /fFYoOUsWOxYcuh4qKvav5iFUfOJYZGNwFVIUuHLp4mhP1lb6l7kt676VkcPX6S5F6N7
- 1a5z+E0PR3wAlCFYYyyCkFAtJD06Ss2MPxy6MbGhWQRpAI+cbhowgz0+itk/y43jnQPQ
- +Y8A==
-X-Gm-Message-State: APjAAAXx2l7g8zmzFQLMfxp0rWvHOc+lnq0xOfjFOxGKV8j0E4OSB6bR
- z0oWBQ+WqIQymTHrIqZKhzSPKN2eZswl2C0Vf2JDsqzg87a2F//2bLud2DH2ZV9c5ZYLQJIcp3L
- x0Hv4tuf6LCwF+KE=
-X-Received: by 2002:a05:620a:1311:: with SMTP id
- o17mr3587477qkj.94.1575354328923; 
- Mon, 02 Dec 2019 22:25:28 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzRO1L6aO7No1c2oVvKg3AbwRmuR8FhGwfFsinOS0ml/J06ByS9oDscqG0OoEPale4VGyy4Zw==
-X-Received: by 2002:a05:620a:1311:: with SMTP id
- o17mr3587451qkj.94.1575354328633; 
- Mon, 02 Dec 2019 22:25:28 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id y131sm1190721qkb.29.2019.12.02.22.25.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 02 Dec 2019 22:25:27 -0800 (PST)
-Date: Tue, 3 Dec 2019 01:25:22 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v20 0/8] Build ACPI Heterogeneous Memory Attribute Table
- (HMAT)
-Message-ID: <20191203010755-mutt-send-email-mst@kernel.org>
-References: <20191129075634.682-1-tao3.xu@intel.com>
- <a31eeaf7-406f-01c4-5183-cd25835af616@intel.com>
- <20191203003445-mutt-send-email-mst@kernel.org>
- <87y2vu7xt6.fsf@dusky.pond.sub.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=y0bL3BL6zdEt6o0B9Q5lMqRUmGlrmw5R3Y2yB4RLPxI=;
+ b=URLyg4Tjk57nbejoBRMv/jSsb5l0CroF1ROLSQGWA++2YkA+WWqRAmPLUaOxVhF9sG
+ BK09T3NwdTRU6d0oVl3y46tZCUMNfRh82MqWcFiII+qcg/uFyix4X3YPaEiuJENTIdw7
+ YvSMvyvrEeDkgjRuEUgj/h2J6oVyBK1kMlM0JuN8z8n6/n1g1ByVTuapUyqef8MWGF5A
+ rN6AxYfFxf2kwqQHEIsJkn26iDI5Q1yWOOBIy1SlP39QUljOAdBbAnKTMKXhyBBQdzQP
+ 8bIxAPmFfj1pALWpS6I5u3jmEbnvmkbyhtP2UcJJgVcvSR1zmYA/GN4JLLqI4riIWDnp
+ od1A==
+X-Gm-Message-State: APjAAAVVfnzuRowyHmT7IcwGVuaGshv1qJ8VEm8AC3NQf/+oiaYWDevj
+ JQfCroas42PJdxwY/EDvpbVGgdpnjNzn14MtWs/uoo22eGLhBbgvMDM+NXGdoC2erQSBdwmwrq9
+ 9BcDYhnf1fLMGDI0=
+X-Received: by 2002:adf:90e7:: with SMTP id i94mr3063649wri.47.1575354436870; 
+ Mon, 02 Dec 2019 22:27:16 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyoduBj0mpuI+Snm22CsFF4YNa3J2yPOpWCDbWTik7vwq1qgfTkbXqbF41UWVXqCjgLEAixrw==
+X-Received: by 2002:adf:90e7:: with SMTP id i94mr3063637wri.47.1575354436709; 
+ Mon, 02 Dec 2019 22:27:16 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id b17sm2260660wrx.15.2019.12.02.22.27.15
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 02 Dec 2019 22:27:16 -0800 (PST)
+Subject: Re: [PATCH v4 17/40] target/arm: Tidy ARMMMUIdx m-profile definitions
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-18-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6d9a0d67-e852-8590-8937-090b67e34c55@redhat.com>
+Date: Tue, 3 Dec 2019 07:27:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <87y2vu7xt6.fsf@dusky.pond.sub.org>
-X-MC-Unique: IYdwkfNnPaaw7ACh4qXQhA-1
+In-Reply-To: <20191203022937.1474-18-richard.henderson@linaro.org>
+Content-Language: en-US
+X-MC-Unique: bUffgAY8Mle2fWwl4jl0Qw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,89 +106,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
- "thuth@redhat.com" <thuth@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>, "sw@weilnetz.de" <sw@weilnetz.de>,
- Tao Xu <tao3.xu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>, "Liu,
- Jingqi" <jingqi.liu@intel.com>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Dec 03, 2019 at 07:00:53AM +0100, Markus Armbruster wrote:
-> "Michael S. Tsirkin" <mst@redhat.com> writes:
+On 12/3/19 3:29 AM, Richard Henderson wrote:
+> Replace the magic numbers with the relevant ARM_MMU_IDX_M_* constants.
+> Keep the definitions short by referencing previous symbols.
+
+Nice trick :)
+
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+
 >=20
-> > On Tue, Dec 03, 2019 at 08:53:30AM +0800, Tao Xu wrote:
-> >> Hi Michael,
-> >>=20
-> >> Could this patch series be queued?
-> >> Thank you very much!
-> >>=20
-> >> Tao
-> >
-> > QEMU is in freeze, so not yet. Please ping after the release.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>   target/arm/cpu.h | 16 ++++++++--------
+>   1 file changed, 8 insertions(+), 8 deletions(-)
 >=20
-> Just to avoid confusion: it's Michael's personal preference not to
-> process patches for the next version during freeze.  Other maintainers
-> do, and that's actually the project's policy:
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 6ba5126852..015301e93a 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2871,14 +2871,14 @@ typedef enum ARMMMUIdx {
+>       ARMMMUIdx_SE0 =3D 4 | ARM_MMU_IDX_A,
+>       ARMMMUIdx_SE1 =3D 5 | ARM_MMU_IDX_A,
+>       ARMMMUIdx_Stage2 =3D 6 | ARM_MMU_IDX_A,
+> -    ARMMMUIdx_MUser =3D 0 | ARM_MMU_IDX_M,
+> -    ARMMMUIdx_MPriv =3D 1 | ARM_MMU_IDX_M,
+> -    ARMMMUIdx_MUserNegPri =3D 2 | ARM_MMU_IDX_M,
+> -    ARMMMUIdx_MPrivNegPri =3D 3 | ARM_MMU_IDX_M,
+> -    ARMMMUIdx_MSUser =3D 4 | ARM_MMU_IDX_M,
+> -    ARMMMUIdx_MSPriv =3D 5 | ARM_MMU_IDX_M,
+> -    ARMMMUIdx_MSUserNegPri =3D 6 | ARM_MMU_IDX_M,
+> -    ARMMMUIdx_MSPrivNegPri =3D 7 | ARM_MMU_IDX_M,
+> +    ARMMMUIdx_MUser =3D ARM_MMU_IDX_M,
+> +    ARMMMUIdx_MPriv =3D ARM_MMU_IDX_M | ARM_MMU_IDX_M_PRIV,
+> +    ARMMMUIdx_MUserNegPri =3D ARMMMUIdx_MUser | ARM_MMU_IDX_M_NEGPRI,
+> +    ARMMMUIdx_MPrivNegPri =3D ARMMMUIdx_MPriv | ARM_MMU_IDX_M_NEGPRI,
+> +    ARMMMUIdx_MSUser =3D ARMMMUIdx_MUser | ARM_MMU_IDX_M_S,
+> +    ARMMMUIdx_MSPriv =3D ARMMMUIdx_MPriv | ARM_MMU_IDX_M_S,
+> +    ARMMMUIdx_MSUserNegPri =3D ARMMMUIdx_MUserNegPri | ARM_MMU_IDX_M_S,
+> +    ARMMMUIdx_MSPrivNegPri =3D ARMMMUIdx_MPrivNegPri | ARM_MMU_IDX_M_S,
+>       /* Indexes below here don't have TLBs and are used only for AT syst=
+em
+>        * instructions or for the first stage of an S12 page table walk.
+>        */
 >=20
-> Subject: QEMU Summit 2017: minutes
-> Message-ID: <CAFEAcA-b9oDkPfZbntWfhWSv1HOnbUf75p_xB_tF74h_NBGPmw@mail.gma=
-il.com>
-> https://lists.nongnu.org/archive/html/qemu-devel/2017-11/msg04453.html
->=20
->     qemu-next:
->      * Problem 1: Contributors cannot get patches merged during freeze
->        (bad experience)
->      [...]
->      * Markus Armbruster: Problem 1 is solved if maintainers keep their o=
-wn
->        -next trees
->      * Paolo Bonzini: Maintaining -next could slow down or create work fo=
-r
->        -freeze (e.g. who does backports)
->      * Action: Maintainers mustn't tell submitters to go away just becaus=
-e
->        we're in a release freeze (it's up to them whether they prefer to
->        maintain a "-next" tree for their subsystem with patches queued fo=
-r
->        the following release, or track which patches they've accepted
->        some other way)
->      * We're not going to have an official project-wide "-next" tree, tho=
-ugh
->=20
-> Michael, would queuing up patches in a -next branch really be too much
-> trouble for you?
-
-Thanks for pointing this out!
-
-I stopped asking for re-post since awhile ago.  I don't queue patches in
-a public tree but I do review and do keep track of pending patches.
-
-I tend to ask contributors to also ping because sometimes there's a
-problem with rebase, I drop the patch but forget to tell the
-contributor, and it tends to happen more with big patchsets posted during
-freeze as there's a rush to merge changes right after that.
-I usually don't bother people with this for small patches though.
-
-I'll try to be clearer in my communication so contributors don't feel
-stressed.
-
-Would something like:
-
-"I'll queue it for merge after the release. If possible please ping me
-after the release to help make sure it didn't get dropped."
-
-be clearer?
-
-Hopefully windows CI efforts will soon bear fruit to the point where
-they stress PCI enough to make maintaining next worth the effort.
-
---=20
-MST
 
 
