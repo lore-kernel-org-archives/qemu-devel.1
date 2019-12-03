@@ -2,90 +2,72 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5B5C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E875C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:11:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EAB18206EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:05:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jeCIrqL2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAB18206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id BA249206EC
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:11:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA249206EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mentor.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic8nS-0000SX-16
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 09:04:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48206)
+	id 1ic8u4-0003W3-MP
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 09:11:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ic8R1-0004jL-5b
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:41:48 -0500
+ (envelope-from <Harish_Kandiga@mentor.com>) id 1ic3uI-0002vX-71
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 03:51:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ic8Qi-0000tC-GM
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:41:30 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52078)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ic8Qg-0000rD-5q
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:41:27 -0500
-Received: by mail-wm1-x341.google.com with SMTP id g206so3005484wme.1
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 05:41:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=tPC/W10EVua89TnzTtuDQj/3TF3e8ybTN5z8+oumMyc=;
- b=jeCIrqL2pKBOMLR0rtfMd5cA05VsHj6NdXdLXoezgAShTsmFYslFXfE8D/sBv41qoa
- 5++/LGfMaS6xgsYxfVt2O/18pIQ3BsWz61dzbWuUFwk7HBxlYq00h39gN+9G6+imqGwI
- nIUG/4EnmuKQgR0iEC8tAsF32OmnqG5D94Mf1Fc1NLyyvJuQfKYotAm4bm4Hm2+SmnPn
- yTkh/6MgWyh5sAB4vuFf9h44xbTrGrt73Xhzo61muWvwGO0aDZ/BdR/6rr0NXmTWQg3n
- q4UX2hSBzIHSdfaVSteY+iSa8NKpx76VNp+mPkaZ9mCFD5hQQ3Kg9XgqDIAOgbpUm0Rd
- bPkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=tPC/W10EVua89TnzTtuDQj/3TF3e8ybTN5z8+oumMyc=;
- b=kE6G9nR1/m8RJyBTepOxse1SFTIAWqrU5CHeNyHwnQZnI/K8VtXpMIsUTS7jolzGoO
- BIiKiqG0Z3KdwW8f2lfxFH5VnpbG9qn/OHrBMW72F7LMVpElvCkmcwZBFZfKiV6/tfRo
- 4RiPyGy2NjPY+BxYpa7rXVpSobzjlksZOTl6SDvAAGkBiZIXdTH7M/DDx72c2zpD/hw0
- a3+cLaxZGsaSxACKpo32/ui7MPRwtbBHBDow0zAKSpl1loCw29L7L/qRiFXjhT4bPjzy
- HiORdtpAT99sdgkks8JwSIP7KkQT6ihNunX8g9gXYiO5+qGID8VBxsHWjHSWPUfQ27NI
- UCTQ==
-X-Gm-Message-State: APjAAAVjCsIRm84NWbL16zAXYvVCSyLJzvoU6B42QZl1TxEdoiUMifaR
- 55a5VQxTQaULrfCqA+6hsFaKZQ==
-X-Google-Smtp-Source: APXvYqy+I15y14xe93qBgWE7AsbYOlcUcQpSQvPBZhnDOz41bCzmPTxxcEM9cvHUlAZKoXrBL04bUQ==
-X-Received: by 2002:a7b:c004:: with SMTP id c4mr33765904wmb.45.1575380482370; 
- Tue, 03 Dec 2019 05:41:22 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x125sm3172070wmx.43.2019.12.03.05.41.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Dec 2019 05:41:21 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 7939B1FF87;
- Tue,  3 Dec 2019 13:41:20 +0000 (GMT)
-References: <20190818231827.27573-1-philmd@redhat.com>
- <20190818231827.27573-4-philmd@redhat.com>
- <20190820133113.GA4422@dhcp-17-173.bos.redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Cleber Rosa <crosa@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] tests/docker: Add test-acceptance runner
-In-reply-to: <20190820133113.GA4422@dhcp-17-173.bos.redhat.com>
-Date: Tue, 03 Dec 2019 13:41:20 +0000
-Message-ID: <87d0d5bk73.fsf@linaro.org>
+ (envelope-from <Harish_Kandiga@mentor.com>) id 1ic3uD-0007R4-Fc
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 03:51:39 -0500
+Received: from esa2.mentor.iphmx.com ([68.232.141.98]:44122)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Harish_Kandiga@mentor.com>)
+ id 1ic3uD-0007H2-5Y
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 03:51:37 -0500
+IronPort-SDR: t0BeAo8JjLRuoJpZZgLEZSXTPdSQIBDeUwk+NlEnAQYaY/dCcLVHLQO0E51/DIeAn91+p+Ewf3
+ c33baJUCQJZrsrMsBajY3VV/aGCilygQpBS64sUpRngMviAIXkERrqYTl0k6H1VxMzEmlMB5Xl
+ lr/5oap7UiuGjkKm+a0QzrzVeVb/5aDarjdH/YPIKrXb3Y+6uGrTgRoVgM4CHBs950G/Fpb33p
+ RBCiyVJF4UMQVFaG5mHjHoX0DoCO8ruWiHEXBF/kaAPFF9rptEbQLEIet7t6ukipGMBC6Xnbe0
+ uw4=
+X-IronPort-AV: E=Sophos;i="5.69,272,1571731200"; d="scan'208";a="43651534"
+Received: from orw-gwy-02-in.mentorg.com ([192.94.38.167])
+ by esa2.mentor.iphmx.com with ESMTP; 03 Dec 2019 00:51:33 -0800
+IronPort-SDR: V31aPAlTL4Jd77N/4vFkI/ULg0cF5PBYkzlUKlSwB5TqW2oengXeZXGIIUezjAPeS45uGXetRj
+ k8fdcbh6lAth0z2rEc/o8A8Yjx1Gs9FJcj8ClHn/v7e9trEbTEqyktunDgxc+NGMNzDE3uUt+H
+ tVPkPMHeGKWmqIn4OYYFVSQrHux/WyXhsdu22AjmEmoi5aXIBAP1OBiJIM2OD+5+c39ZCXjbpa
+ 5nlSWx1IxowCPCDsJce0jzoNxMJv4XdCFGcMxbpF2S+x4ddCnnoky/Je4mZZIOCotBY7rKE4oJ
+ 6+w=
+Subject: Re: [PATCH v3 5/7] gpio: Add GPIO Aggregator/Repeater driver
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+References: <20191127084253.16356-1-geert+renesas@glider.be>
+ <20191127084253.16356-6-geert+renesas@glider.be>
+ <585c4ad9-31fc-e87e-07c4-b8d6aa09c7e4@mentor.com>
+ <CAMuHMdW-n8ao7t7156WYxRg7v8+ojXsRgHGUOax=9nBo2F5xOw@mail.gmail.com>
+From: Harish Jenny K N <harish_kandiga@mentor.com>
+Message-ID: <d44598a5-184e-078c-1d6c-a99b522f7e26@mentor.com>
+Date: Tue, 3 Dec 2019 14:21:21 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+In-Reply-To: <CAMuHMdW-n8ao7t7156WYxRg7v8+ojXsRgHGUOax=9nBo2F5xOw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-Originating-IP: [137.202.0.90]
+X-ClientProxiedBy: svr-ies-mbx-05.mgc.mentorg.com (139.181.222.5) To
+ svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 68.232.141.98
+X-Mailman-Approved-At: Tue, 03 Dec 2019 09:05:26 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,85 +79,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE
+ TREE BINDINGS" <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Alexander Graf <graf@amazon.com>, "open
+ list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Cleber Rosa <crosa@redhat.com> writes:
-
-> On Mon, Aug 19, 2019 at 01:18:26AM +0200, Philippe Mathieu-Daud=C3=A9 wro=
-te:
->> Add a runner script to be able to run acceptance tests within
->> Docker images. We can now reproduce Travis CI builds locally (and
->> debug  them!).
->>=20
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> ---
->>  tests/docker/test-acceptance | 21 +++++++++++++++++++++
->>  1 file changed, 21 insertions(+)
->>  create mode 100755 tests/docker/test-acceptance
->>=20
->> diff --git a/tests/docker/test-acceptance b/tests/docker/test-acceptance
->> new file mode 100755
->> index 0000000000..84edaa676c
->> --- /dev/null
->> +++ b/tests/docker/test-acceptance
->> @@ -0,0 +1,21 @@
->> +#!/bin/bash -e
->> +#
->> +# Compile default Travis-CI target and run Avocado acceptance tests
->> +#
->> +# Copyright (c) 2019 Red Hat Inc.
->> +#
->> +# Authors:
->> +#  Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->> +#
->> +# This work is licensed under the terms of the GNU GPL, version 2
->> +# or (at your option) any later version. See the COPYING file in
->> +# the top-level directory.
->> +
->> +. common.rc
->> +
->> +cd "$BUILD_DIR"
->> +
->> +DEF_TARGET_LIST=3D"x86_64-softmmu,mips-softmmu,mips64el-softmmu,aarch64=
--softmmu,arm-softmmu,s390x-softmmu,alpha-softmmu"
->> +TARGET_LIST=3D${TARGET_LIST:-$DEF_TARGET_LIST} \
->> +build_qemu
->> +check_qemu check-acceptance
->> --=20
->> 2.20.1
->>=20
->>=20
+On 03/12/19 1:47 PM, Geert Uytterhoeven wrote:
+> Hi Harish,
 >
-> I'm currently seeing test errors when running in a container:
+> On Tue, Dec 3, 2019 at 6:42 AM Harish Jenny K N
+> <harish_kandiga@mentor.com> wrote:
+>>> +static int gpio_aggregator_probe(struct platform_device *pdev)
+>>> +{
+>>> +     struct device *dev = &pdev->dev;
+>>> +     struct gpio_desc **descs;
+>>> +     struct gpiochip_fwd *fwd;
+>>> +     int i, n;
+>>> +
+>>> +     n = gpiod_count(dev, NULL);
+>>> +     if (n < 0)
+>>> +             return n;
+>>> +
+>>> +     descs = devm_kmalloc_array(dev, n, sizeof(*descs), GFP_KERNEL);
+>>> +     if (!descs)
+>>> +             return -ENOMEM;
+>>> +
+>>> +     for (i = 0; i < n; i++) {
+>>> +             descs[i] = devm_gpiod_get_index(dev, NULL, i, GPIOD_ASIS);
+>> can you please add this check as well as we need to return EPROBE_DEFER.
+>>
+>> if (desc[i] == ERR_PTR(-ENOENT))
+>> <                 return -EPROBE_DEFER;
+> So gpiod_get_index() nevers return -EPROBE_DEFER, but returns -ENOENT
+> instead?
+> How can a driver distinguish between "GPIO not found" and "gpiochip driver
+> not yet initialized"?
+> Worse, so the *_optional() variants will return NULL in both cases, too, so
+> the caller will always fall back to optional GPIO not present?
 >
->   MKDIR   /tmp/qemu-test/build/tests/results
->   AVOCADO tests/acceptance
-> JOB ID     : fe56cc0b2d1adbc0b5bb5828902e113d596edccf
-> JOB LOG    : /tmp/qemu-test/build/tests/results/job-2019-08-19T22.13-fe56=
-cc0/job.log
->  (01/27) /tmp/qemu-test/src/tests/acceptance/boot_linux_console.py:BootLi=
-nuxConsole.test_x86_64_pc:  ERROR: join() argument must be str or bytes, no=
-t 'NoneType' (0.05 s)
-> Interrupting job (failfast).
-> RESULTS    : PASS 0 | ERROR 1 | FAIL 0 | SKIP 26 | WARN 0 | INTERRUPT 0 |=
- CANCEL 0
-> JOB TIME   : 0.26 s
-> /tmp/qemu-test/src/tests/Makefile.include:1158: recipe for target 'check-=
-acceptance' failed
-> make: *** [check-acceptance] Error 9
+> Or am I missing something?
 >
-> That being said, I'm not running it under docker, but under podman,
-> although I'm not convinced yet that is the defining issue.  I'll try
-> to identify what's going here.
+> Gr{oetje,eeting}s,
+>
+>                         Geert
 
-Was there a conclusion to the discussion about this series?
 
---=20
-Alex Benn=C3=A9e
+We had earlier tested our changes on 4.14 kernel and the explicit return of -EPROBE_DEFER was needed in the inverter driver.
+
+probably the commit 6662ae6af82df10259a70c7569b4c12ea7f3ba93 ( gpiolib: Keep returning EPROBE_DEFER when we should)
+
+has fixed the issue and now it returns -EPROBE_DEFER.  you can ignore this comment as of now. I will test and let you know if needed.
+
+
+Thanks,
+
+Harish
+
 
