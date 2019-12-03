@@ -2,76 +2,88 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57CFFC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00291C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:32:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19B0120684
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:24:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBADA20684
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 22:32:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WfFFgLYm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19B0120684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QtWbeuOz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBADA20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icGai-0005kp-BR
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 17:24:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37572)
+	id 1icGio-0000JW-TJ
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 17:32:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crmull121@gmail.com>) id 1icFVj-0008TA-7x
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:15:08 -0500
+ (envelope-from <eblake@redhat.com>) id 1icGD7-0001YK-Sr
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:59:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crmull121@gmail.com>) id 1icFVg-00082K-8T
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:15:06 -0500
-Received: from mail-lj1-x22d.google.com ([2a00:1450:4864:20::22d]:39451)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <crmull121@gmail.com>) id 1icFVg-0007gi-1B
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:15:04 -0500
-Received: by mail-lj1-x22d.google.com with SMTP id e10so5486240ljj.6
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 13:15:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to:cc;
- bh=5oATEj7h/vMT0yVmTV7JHpbZYEkGfnHC7nf8w+7PC40=;
- b=WfFFgLYmNr9XfsQoukEPi1oDHyY0w+4gZTTZJ63E1FrvQeyw3dFfWAAmL8gZ+HNDiK
- Vgug0K22n+Aw2tMxTybqVxHqkINZobZDTdR+bttoj8NsMBTVos7GYNz3RBrQrS3yHW28
- zSZf174uE/ZXxezNmiiytP4fIj0OF8lU7YcebLTVY+wl19PsW0FuWidZW9HFWz741wRO
- cZmLw+W0z50OIzxSOfzjRxOtjSe1J+7eKufjw9WeiddgxiN88R56E4Mk9H1VD97hVDIN
- A5kDw8NzqE3/F5Ac36Q0Wxs1lBb+yHa43hsYN9VWH+q6LmmxtAY663CXGNH41B13m92R
- HyAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=5oATEj7h/vMT0yVmTV7JHpbZYEkGfnHC7nf8w+7PC40=;
- b=jJz1O3HPPZL5QY6BcJeUb7tU0f3U27lmB4AZJmiaXEGfv0c9gVmr6pTQiYRNagLU7l
- HMrnqF7MMxjX5FIp4ZDZm+uhUBTRF13MDbECAE44e8RGtZ4UBv2tntUz5THA7/zGqW+W
- k7U5srtmxdy+zmxm/7jloKdOr6fDrPhjcnlqQhoqhOnMyYAAa0uYKiJ5u6My24Z7DhD3
- d03JoClZ9BF4zsB74O3Tr1yMUEYE4r4+v9AfaLaJg4DzEy4hR9iyQGuyl0IofbE6FkaP
- 1m1QxkghiErpJvLDgCpCV0NycW08ZJUklQQymplUPZse6V+jetT9Uu/A3bGTbNEcYYAa
- mtFw==
-X-Gm-Message-State: APjAAAUWzEiQdzCoI7tPbgHXnvmoHeA8w5Hn2xNPB+Y2Or7uFHWDfopI
- JGoSKay2NtbWJUkuMj9Hvp6D1usKOAtrTuOx/SegqXwM
-X-Google-Smtp-Source: APXvYqx64LCSxrvVLpsAFmWrq+kDhcP7TVe8qTwDJgsdX64sJ6uOWghIaAgnI11gH5XXFMUcNiemGVJjVi/XOfMys7s=
-X-Received: by 2002:a2e:9b05:: with SMTP id u5mr3770790lji.59.1575407698476;
- Tue, 03 Dec 2019 13:14:58 -0800 (PST)
+ (envelope-from <eblake@redhat.com>) id 1icGCz-0002x7-EW
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:59:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34030
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1icGCy-0002cw-Cw
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 16:59:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575410382;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ockXEWL0ht1UhdaAknyv2Hjkp6iESzOpm5o+3FY4ryc=;
+ b=QtWbeuOzX6lgqGgu1deEMp9RT1LWI9xBwNCsfI2otwEKJFvAPQgskjf9LT655SIsXXAKRZ
+ bpXD1FEGE7DgZm1QFcC7wOHDLQjIYZcwGWeWbLc1lQKW7BUDFT+EWf8rWV9yr9PVYk6cNh
+ TCM6fLVc/VwA1tvqSEPP1pGi90HGFRI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-aNoFGWNcM_aicxoVvxqGog-1; Tue, 03 Dec 2019 16:59:39 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C663891219;
+ Tue,  3 Dec 2019 21:59:37 +0000 (UTC)
+Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EF0DF19C69;
+ Tue,  3 Dec 2019 21:59:36 +0000 (UTC)
+Subject: Re: for 4.2 ??? Re: [PATCH V3 2/2] block/nbd: fix memory leak in
+ nbd_open()
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "pannengyuan@huawei.com" <pannengyuan@huawei.com>,
+ "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com"
+ <mreitz@redhat.com>, "sgarzare@redhat.com" <sgarzare@redhat.com>
+References: <1575012326-51324-1-git-send-email-pannengyuan@huawei.com>
+ <1575012326-51324-2-git-send-email-pannengyuan@huawei.com>
+ <1cff97de-303b-3b27-f737-3f69759746b0@virtuozzo.com>
+ <08f0d51d-f352-5d64-26a4-9a741a4cf2e0@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <ac646f3c-b3d2-b6c6-8d5e-f65e3d1402fc@redhat.com>
+Date: Tue, 3 Dec 2019 15:59:36 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-From: Craig Mull <crmull121@gmail.com>
-Date: Tue, 3 Dec 2019 15:14:47 -0600
-Message-ID: <CAPT-DMXZr4WSUoifEQ=hi9vCU1iZ7U2k6TLWScKfsUuMHtFMwQ@mail.gmail.com>
-Subject: Lack of OS vendor support for blockdev-snapshot
-To: qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::22d
-X-Mailman-Approved-At: Tue, 03 Dec 2019 16:35:03 -0500
+In-Reply-To: <08f0d51d-f352-5d64-26a4-9a741a4cf2e0@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: aNoFGWNcM_aicxoVvxqGog-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,16 +95,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dwarcher@us.ibm.com
+Cc: "liyiting@huawei.com" <liyiting@huawei.com>,
+ "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ qemu-stable <qemu-stable@nongnu.org>,
+ "kuhn.chenqun@huawei.com" <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Any insight as to why OS vendors (RHEL and Ubuntu in particular)
-aren't supporting blockdev-snapshot?
+On 12/3/19 12:54 PM, Eric Blake wrote:
+> On 12/3/19 11:52 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> It's just a memory leak, but it's a regression in 4.2.
+>>
+>> Should we take it into 4.2?
+>=20
+> Sorry, I was on holiday and then jury service, so I missed any chance at=
+=20
+> getting this into -rc3.=C2=A0 The memory leak only happens on failure, an=
+d=20
+> you'd have to be pretty desperate to purposefully attempt to open a lot=
+=20
+> of NBD devices where you know you'll get a failure just to trigger=20
+> enough of a leak to cause the OOM-killer to target qemu.=C2=A0 So I'm fin=
+e if=20
+> this is deferred to 5.0, and just cc's qemu-stable (now done).
+>=20
+> I'll queue this through my NBD tree for 5.0.
 
-- RHEL claims no support for Qemu-based snapshots in any flavor
-- Ubuntu hasn't enabled blockdev-snapshot in it's 19.10 release
+Actually, given the review comments on 1/2, we'll probably be better off=20
+with a v4 for the series.
 
--craig
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
