@@ -2,87 +2,89 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7751AC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 07:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1F5C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 07:21:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C86B206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 07:19:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7B39206DF
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 07:21:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E0h1e/Da"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C86B206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mV8iT+pN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7B39206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic2TS-00087G-Be
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 02:19:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44617)
+	id 1ic2Us-00015Q-R4
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 02:21:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38218)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ic2QY-0006OJ-SK
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 02:16:56 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ic2Tv-0000Sy-V6
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 02:20:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ic2QV-0001to-Op
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 02:16:53 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48022
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ic2QV-0001ox-Ch
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 02:16:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575357410;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=yfBKWzLEEVwr+XjlfPpSjMM8EdrJN6EWeoCFqPhfV4o=;
- b=E0h1e/DaiXoMNA0Oxto+/kH7CMdIyq+PtBzdTZoarJjR49LDCXazXvClHdxHsCCV3I5M2h
- rP4KqY8+NEnLyfH1XNxknWc1KeZD11kPmb66dAl4HPGMFLG6p7njgBw9fk4oQwykePZW0G
- PlkczQ7iZWjWq/TqAfBH7lyItm9c448=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-419-cObeZ2VQNjqSx19EgVHg-g-1; Tue, 03 Dec 2019 02:16:45 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D64C9801E72;
- Tue,  3 Dec 2019 07:16:43 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C7B319C68;
- Tue,  3 Dec 2019 07:16:40 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id E64661138606; Tue,  3 Dec 2019 08:16:38 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v20 0/8] Build ACPI Heterogeneous Memory Attribute Table
- (HMAT)
-References: <20191129075634.682-1-tao3.xu@intel.com>
- <a31eeaf7-406f-01c4-5183-cd25835af616@intel.com>
- <20191203003445-mutt-send-email-mst@kernel.org>
- <87y2vu7xt6.fsf@dusky.pond.sub.org>
- <20191203010755-mutt-send-email-mst@kernel.org>
-Date: Tue, 03 Dec 2019 08:16:38 +0100
-In-Reply-To: <20191203010755-mutt-send-email-mst@kernel.org> (Michael
- S. Tsirkin's message of "Tue, 3 Dec 2019 01:25:22 -0500")
-Message-ID: <87lfrt98vd.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1ic2Tu-0006uG-FL
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 02:20:23 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40973)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ic2Tu-0006qY-00
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 02:20:22 -0500
+Received: by mail-wr1-x441.google.com with SMTP id b18so2268650wrj.8
+ for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 23:20:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=q0Vsd1zf62gZ0k3iovKkNu3Vf/WpD4q1dfFJQMmRDJ0=;
+ b=mV8iT+pN85J6w7UA1kx80Pinz2mW4B7uF6VlYcN6D4eof1sSB6+HWJR/lRmZ5WawRs
+ Fzr1NKcNE5id8VfTOilBKsWzT20N2r7g2MYRuIHPpqHa06raxw2Xk+hf3nVaNsC97izF
+ Mf3NpHvEcjbGq5gUto2yw+2RVY2hGGj2YTKvckSIohzchK5JmOxEJPDPUHcA5bVEA/kn
+ qqhfWkTWWZ8WmFC8KAi2edaGe5Ix1yci6QGpgeNdmy2QZTOAVWVwBr3tR3v+n+j8jCvR
+ sM/nfscc5op3R3l3oTxVg3FFeX5TMJKlFK+MnYl+h0U+HHE4FT7dShwYHRg1w0QH23R3
+ vYIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=q0Vsd1zf62gZ0k3iovKkNu3Vf/WpD4q1dfFJQMmRDJ0=;
+ b=NYzATkqHSMkmVZJvySya6PjC7ZJGRYJcbJxfmNNUfTtycFklpR+E2EUwsySqtE8X+7
+ sMdpFviPFSqiq1XR9SDh89reVgppzecSMXrBVV6dm9WB4rtR9imk5Ro4b1ABBnTaR0lr
+ 8J8HAcaUGTtW1jIPy+L/IMiHBiaLJ8+mNJkO7aJXT9cHBx9RTLgszM7vs9pvhn1MwGzl
+ vIy6EM6IM06ZgBj4B2PuAF0t7XI6tNimR/UEb1GFajBU/qXqkM6h0t44RavBXcz8SpT+
+ gmqtDlExc2EAGQIHqzgHDs/JRqhTBNarE/JKrAI95OMwmXHrfaN7KTsreIHFO8a8HBRB
+ 6xdw==
+X-Gm-Message-State: APjAAAXoc9hpTvcWqdfZXEuUV+u8bWKCCXsqmvOlMwGrt513xZfhKigi
+ A0z1ScCxodfMLD9AkKnsDvjIiA==
+X-Google-Smtp-Source: APXvYqzwSZprvw737+b0DTaYxXdROlHBL45cE+UbzwB+NPbz5ZDs2IqeSS0YfAFD8Oxws1r+AXK2LQ==
+X-Received: by 2002:adf:dc06:: with SMTP id t6mr3476589wri.378.1575357618156; 
+ Mon, 02 Dec 2019 23:20:18 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z11sm2341622wrt.82.2019.12.02.23.20.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 02 Dec 2019 23:20:16 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E034C1FF87;
+ Tue,  3 Dec 2019 07:20:15 +0000 (GMT)
+References: <20191129150801.26654-1-pbonzini@redhat.com>
+ <20191202114958.606de16f@bahia.w3ibm.bluemix.net>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] docker: remove libcap development packages
+In-reply-to: <20191202114958.606de16f@bahia.w3ibm.bluemix.net>
+Date: Tue, 03 Dec 2019 07:20:15 +0000
+Message-ID: <87blsp6fkg.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: cObeZ2VQNjqSx19EgVHg-g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,92 +96,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
- "thuth@redhat.com" <thuth@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>, "sw@weilnetz.de" <sw@weilnetz.de>,
- Tao Xu <tao3.xu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>, "Liu,
- Jingqi" <jingqi.liu@intel.com>
+Cc: Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ berrange@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
 
-> On Tue, Dec 03, 2019 at 07:00:53AM +0100, Markus Armbruster wrote:
->> "Michael S. Tsirkin" <mst@redhat.com> writes:
->>=20
->> > On Tue, Dec 03, 2019 at 08:53:30AM +0800, Tao Xu wrote:
->> >> Hi Michael,
->> >>=20
->> >> Could this patch series be queued?
->> >> Thank you very much!
->> >>=20
->> >> Tao
->> >
->> > QEMU is in freeze, so not yet. Please ping after the release.
->>=20
->> Just to avoid confusion: it's Michael's personal preference not to
->> process patches for the next version during freeze.  Other maintainers
->> do, and that's actually the project's policy:
->>=20
->> Subject: QEMU Summit 2017: minutes
->> Message-ID: <CAFEAcA-b9oDkPfZbntWfhWSv1HOnbUf75p_xB_tF74h_NBGPmw@mail.gm=
-ail.com>
->> https://lists.nongnu.org/archive/html/qemu-devel/2017-11/msg04453.html
->>=20
->>     qemu-next:
->>      * Problem 1: Contributors cannot get patches merged during freeze
->>        (bad experience)
->>      [...]
->>      * Markus Armbruster: Problem 1 is solved if maintainers keep their =
-own
->>        -next trees
->>      * Paolo Bonzini: Maintaining -next could slow down or create work f=
-or
->>        -freeze (e.g. who does backports)
->>      * Action: Maintainers mustn't tell submitters to go away just becau=
-se
->>        we're in a release freeze (it's up to them whether they prefer to
->>        maintain a "-next" tree for their subsystem with patches queued f=
-or
->>        the following release, or track which patches they've accepted
->>        some other way)
->>      * We're not going to have an official project-wide "-next" tree, th=
-ough
->>=20
->> Michael, would queuing up patches in a -next branch really be too much
->> trouble for you?
->
-> Thanks for pointing this out!
->
-> I stopped asking for re-post since awhile ago.  I don't queue patches in
-> a public tree but I do review and do keep track of pending patches.
->
-> I tend to ask contributors to also ping because sometimes there's a
-> problem with rebase, I drop the patch but forget to tell the
-> contributor, and it tends to happen more with big patchsets posted during
-> freeze as there's a rush to merge changes right after that.
-> I usually don't bother people with this for small patches though.
->
-> I'll try to be clearer in my communication so contributors don't feel
-> stressed.
->
-> Would something like:
->
-> "I'll queue it for merge after the release. If possible please ping me
-> after the release to help make sure it didn't get dropped."
->
-> be clearer?
+Greg Kurz <groug@kaod.org> writes:
 
-Yes, that's both clearer and friendlier.  Thank you!
+> On Fri, 29 Nov 2019 16:08:01 +0100
+> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+>> Libcap was dropped from virtio-9p, so remove it from the dockerfiles as =
+well.
+>>=20
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>> ---
+>
+> Similarly to what was discussed in these threads:
+>
+> 20191129111632.22840-2-pbonzini@redhat.com
+>
+> 20191129142126.32967-1-dgilbert@redhat.com
+>
+> I'm ok to take this one in my tree as well if I get an ack from Alex
+> or Fam.
 
-> Hopefully windows CI efforts will soon bear fruit to the point where
-> they stress PCI enough to make maintaining next worth the effort.
+Acked-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-CI++ :)
+>
+>>  tests/docker/dockerfiles/fedora.docker     | 1 -
+>>  tests/docker/dockerfiles/ubuntu.docker     | 1 -
+>>  tests/docker/dockerfiles/ubuntu1804.docker | 1 -
+>>  3 files changed, 3 deletions(-)
+>>=20
+>> diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/docke=
+rfiles/fedora.docker
+>> index 4ddc7dd112..47732fc5d5 100644
+>> --- a/tests/docker/dockerfiles/fedora.docker
+>> +++ b/tests/docker/dockerfiles/fedora.docker
+>> @@ -25,7 +25,6 @@ ENV PACKAGES \
+>>      libasan \
+>>      libattr-devel \
+>>      libblockdev-mpath-devel \
+>> -    libcap-devel \
+>>      libcap-ng-devel \
+>>      libcurl-devel \
+>>      libfdt-devel \
+>> diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/docke=
+rfiles/ubuntu.docker
+>> index f486492224..ecea155646 100644
+>> --- a/tests/docker/dockerfiles/ubuntu.docker
+>> +++ b/tests/docker/dockerfiles/ubuntu.docker
+>> @@ -23,7 +23,6 @@ ENV PACKAGES flex bison \
+>>      libbrlapi-dev \
+>>      libbz2-dev \
+>>      libcacard-dev \
+>> -    libcap-dev \
+>>      libcap-ng-dev \
+>>      libcurl4-gnutls-dev \
+>>      libdrm-dev \
+>> diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/d=
+ockerfiles/ubuntu1804.docker
+>> index 3cc4f492c4..32a607471a 100644
+>> --- a/tests/docker/dockerfiles/ubuntu1804.docker
+>> +++ b/tests/docker/dockerfiles/ubuntu1804.docker
+>> @@ -12,7 +12,6 @@ ENV PACKAGES flex bison \
+>>      libbrlapi-dev \
+>>      libbz2-dev \
+>>      libcacard-dev \
+>> -    libcap-dev \
+>>      libcap-ng-dev \
+>>      libcurl4-gnutls-dev \
+>>      libdrm-dev \
 
+
+--=20
+Alex Benn=C3=A9e
 
