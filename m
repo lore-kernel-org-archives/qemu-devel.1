@@ -2,100 +2,68 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 137BEC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 06:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA41C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 06:53:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2C4D206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 06:34:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6PtMA+7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2C4D206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 552D2206E0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 06:53:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 552D2206E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49161 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic1lO-0002Ft-1k
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 01:34:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44284)
+	id 1ic23V-0007bT-CM
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 01:53:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36986)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ic1hK-0007eT-Tt
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:30:11 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1ic21t-0006xv-TD
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:51:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ic1hI-0007J4-Na
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:30:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53190
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <tao3.xu@intel.com>) id 1ic21p-0005mS-IZ
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:51:23 -0500
+Received: from mga12.intel.com ([192.55.52.136]:36020)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ic1hI-0007CJ-Hz
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:30:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575354606;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uhgKQ7PSjxzxG+ZCagR/Excy7EMvYaMER9oxDyGY8Kg=;
- b=d6PtMA+7FZ9cwL4NraWM4gcsUo34CoXvkJPNvrfLBAnZXGIQVVAQ8vtg4alBUJBtqfzZcA
- q9mr3VcWjbYjWXTDcYOePMv7Hlad1aTiO2pcwA7qxlWCRoO8Vl3wE4ZRWXdKjXOqmQwwp9
- X0JSNdwPCOJnPTx0m7k6Tehq3Z2Benc=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-415-U0rUqiO0Op-WtpiSmt3s8g-1; Tue, 03 Dec 2019 01:30:05 -0500
-Received: by mail-wm1-f72.google.com with SMTP id y125so960200wmg.1
- for <qemu-devel@nongnu.org>; Mon, 02 Dec 2019 22:30:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=OGVUA6CUfLD/Wf1tobX3x3tudHKAT+YBlN2TfC/HIGg=;
- b=RD3G/wxlxSNlrjEwwDNJ5ToRwhBDlgvUkGFGnJ4yyr0yhQd9icEFyVEf5BZQn0VVcf
- G8lo2ak86RSU68vjFSRAvKJgEKtbk5C1SC+oHpC4jB0+GKgnBaMVqENCtO95ph10HN8L
- n/w8v7iAaqFbrbtgiRcTFJQpJc54jBwyEh93zow0RJuv7JmDWJXl/zFnxE/pX9JD4E2l
- nfldQfWxNha3jR0cMxPA+1zhfQIq76l4svf0/HyPYQT9ESkKAUk3844jOu8NGPz3tYBC
- U8IG9vfvkncyX/AyDB3nmqRdRjHSg8BluHE01ciAN2gI/DwJjih/YROOTj/B9CIWZdHV
- uvsQ==
-X-Gm-Message-State: APjAAAWxcueL7Vr0yDZX8YwC7EiYXiAXoKJCTwiFl3YWETiS3QKuga7Q
- D5xBRYQnry1je+gdphWl9GqqmQgIxjvBLONFQL1Wf8nyhBWAHpaU/0/QCCSFx4nXLY3pKA8Zo6F
- 99H7uePOa6Yfmb4s=
-X-Received: by 2002:a1c:2745:: with SMTP id n66mr32163729wmn.171.1575354604079; 
- Mon, 02 Dec 2019 22:30:04 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwYW52xpvwLVkbXeJgMCHoUH8NV3MmmR52Y5mB3LuXMeLPr86NAKyLdk4hc2ShchWmzOKOihA==
-X-Received: by 2002:a1c:2745:: with SMTP id n66mr32163720wmn.171.1575354603885; 
- Mon, 02 Dec 2019 22:30:03 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id p10sm1766642wmi.15.2019.12.02.22.30.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 02 Dec 2019 22:30:03 -0800 (PST)
-Subject: Re: [PATCH v4 39/40] target/arm: Use bool for unmasked in
- arm_excp_unmasked
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20191203022937.1474-1-richard.henderson@linaro.org>
- <20191203022937.1474-40-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <205287d7-3562-3d9b-931c-e2841d02119a@redhat.com>
-Date: Tue, 3 Dec 2019 07:30:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1ic21n-0005aN-KV
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 01:51:19 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 02 Dec 2019 22:51:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,272,1571727600"; d="scan'208";a="385195873"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.197.115])
+ ([10.239.197.115])
+ by orsmga005.jf.intel.com with ESMTP; 02 Dec 2019 22:51:07 -0800
+Subject: Re: [PATCH v20 0/8] Build ACPI Heterogeneous Memory Attribute Table
+ (HMAT)
+To: "Michael S. Tsirkin" <mst@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+References: <20191129075634.682-1-tao3.xu@intel.com>
+ <a31eeaf7-406f-01c4-5183-cd25835af616@intel.com>
+ <20191203003445-mutt-send-email-mst@kernel.org>
+ <87y2vu7xt6.fsf@dusky.pond.sub.org>
+ <20191203010755-mutt-send-email-mst@kernel.org>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <d3c4b107-45c7-ff8e-a4e2-92babcfa96bd@intel.com>
+Date: Tue, 3 Dec 2019 14:51:06 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-In-Reply-To: <20191203022937.1474-40-richard.henderson@linaro.org>
+In-Reply-To: <20191203010755-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-X-MC-Unique: U0rUqiO0Op-WtpiSmt3s8g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,57 +75,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
+ "thuth@redhat.com" <thuth@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>, "sw@weilnetz.de" <sw@weilnetz.de>,
+ "Du, Fan" <fan.du@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
+ "imammedo@redhat.com" <imammedo@redhat.com>, "Liu,
+ Jingqi" <jingqi.liu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/3/19 3:29 AM, Richard Henderson wrote:
-> The value computed is fully boolean; using int8_t is odd.
->=20
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-> ---
->   target/arm/cpu.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 7a1177b883..a366448c6d 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -417,7 +417,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, un=
-signed int excp_idx,
->   {
->       CPUARMState *env =3D cs->env_ptr;
->       bool pstate_unmasked;
-> -    int8_t unmasked =3D 0;
-> +    bool unmasked =3D false;
->  =20
->       /*
->        * Don't take exceptions if they target a lower EL.
-> @@ -468,7 +468,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, un=
-signed int excp_idx,
->                * don't affect the masking logic, only the interrupt routi=
-ng.
->                */
->               if (target_el =3D=3D 3 || !secure) {
-> -                unmasked =3D 1;
-> +                unmasked =3D true;
->               }
->           } else {
->               /*
-> @@ -514,7 +514,7 @@ static inline bool arm_excp_unmasked(CPUState *cs, un=
-signed int excp_idx,
->               }
->  =20
->               if ((scr || hcr) && !secure) {
-> -                unmasked =3D 1;
-> +                unmasked =3D true;
->               }
->           }
->       }
->=20
-
+On 12/3/2019 2:25 PM, Michael S. Tsirkin wrote:
+> On Tue, Dec 03, 2019 at 07:00:53AM +0100, Markus Armbruster wrote:
+>> "Michael S. Tsirkin" <mst@redhat.com> writes:
+>>
+>>> On Tue, Dec 03, 2019 at 08:53:30AM +0800, Tao Xu wrote:
+>>>> Hi Michael,
+>>>>
+>>>> Could this patch series be queued?
+>>>> Thank you very much!
+>>>>
+>>>> Tao
+>>>
+>>> QEMU is in freeze, so not yet. Please ping after the release.
+>>
+>> Just to avoid confusion: it's Michael's personal preference not to
+>> process patches for the next version during freeze.  Other maintainers
+>> do, and that's actually the project's policy:
+>>
+>> Subject: QEMU Summit 2017: minutes
+>> Message-ID: <CAFEAcA-b9oDkPfZbntWfhWSv1HOnbUf75p_xB_tF74h_NBGPmw@mail.gmail.com>
+>> https://lists.nongnu.org/archive/html/qemu-devel/2017-11/msg04453.html
+>>
+>>      qemu-next:
+>>       * Problem 1: Contributors cannot get patches merged during freeze
+>>         (bad experience)
+>>       [...]
+>>       * Markus Armbruster: Problem 1 is solved if maintainers keep their own
+>>         -next trees
+>>       * Paolo Bonzini: Maintaining -next could slow down or create work for
+>>         -freeze (e.g. who does backports)
+>>       * Action: Maintainers mustn't tell submitters to go away just because
+>>         we're in a release freeze (it's up to them whether they prefer to
+>>         maintain a "-next" tree for their subsystem with patches queued for
+>>         the following release, or track which patches they've accepted
+>>         some other way)
+>>       * We're not going to have an official project-wide "-next" tree, though
+>>
+>> Michael, would queuing up patches in a -next branch really be too much
+>> trouble for you?
+> 
+> Thanks for pointing this out!
+> 
+> I stopped asking for re-post since awhile ago.  I don't queue patches in
+> a public tree but I do review and do keep track of pending patches.
+> 
+> I tend to ask contributors to also ping because sometimes there's a
+> problem with rebase, I drop the patch but forget to tell the
+> contributor, and it tends to happen more with big patchsets posted during
+> freeze as there's a rush to merge changes right after that.
+> I usually don't bother people with this for small patches though.
+> 
+> I'll try to be clearer in my communication so contributors don't feel
+> stressed.
+> 
+> Would something like:
+> 
+> "I'll queue it for merge after the release. If possible please ping me
+> after the release to help make sure it didn't get dropped."
+> 
+> be clearer?
+> 
+> Hopefully windows CI efforts will soon bear fruit to the point where
+> they stress PCI enough to make maintaining next worth the effort.
+> 
+I see. Thanks for Markus and Michael's kindly response. I feel happy 
+rather than stressed in QEMU community :)
 
