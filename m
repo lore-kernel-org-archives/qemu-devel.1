@@ -2,86 +2,90 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F177CC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:19:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35F77C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:20:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD803206EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:19:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0046B206EC
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 11:20:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fwldioBK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD803206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TGPj0Eo5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0046B206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic6Dj-0006jZ-TK
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 06:19:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54165)
+	id 1ic6EO-0007Cj-2j
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 06:20:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52848)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ic6BM-000552-Vf
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:17:30 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1ic6BD-0004xY-BL
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:17:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ic6BK-0000L6-PE
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:17:27 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46675
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ic6BK-0000ET-JJ
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:17:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575371844;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=E62q2fJikYuFO5aR+cEDhOCEL8dDkz36f1fy0GtrRjE=;
- b=fwldioBKtniysTsknfrHvqrHpTbE+PDAKty3nH4fKdZo8IIvZK1GMWBMVIiM8BB/ZB5EhP
- oW6q8dvB0Ayhgl2bhGk2o1/cZE885DJujgG9mQ2d3/qqNaX44I8aRg/mWLmiXh8jMBK31V
- PR22oZ4w7QTerKWA/41A8JFJ5ih1n9Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-ZDULRSlBNIez6qQ1AoR_kQ-1; Tue, 03 Dec 2019 06:17:21 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 358DE8017DF;
- Tue,  3 Dec 2019 11:17:20 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E41619C69;
- Tue,  3 Dec 2019 11:17:13 +0000 (UTC)
-Date: Tue, 3 Dec 2019 11:17:10 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: virtiofsd: Where should it live?
-Message-ID: <20191203111710.GC3078@work-vm>
-References: <20191125185021.GB3767@work-vm>
- <20191126102600.GG556568@redhat.com>
- <20191126121416.GE2928@work-vm>
- <CAFEAcA9Ln2uwg4f4s8oS6VeQk83W3BErmH9cHeyDJy7v-4gNxw@mail.gmail.com>
- <87k17ekhs9.fsf@dusky.pond.sub.org>
- <fef0eaaf-149a-f8a8-02c5-821d2d42becd@redhat.com>
- <20191203105341.GB3078@work-vm>
- <CAFEAcA8bjGAs7JSTNYYYwCH1yF06i0v0r9wjKXqZGZg_Sqy0VA@mail.gmail.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1ic6BB-0008IE-4e
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:17:18 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53748)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1ic6B2-0008CU-OB
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 06:17:09 -0500
+Received: by mail-wm1-x343.google.com with SMTP id u18so2513408wmc.3
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 03:17:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=czDIYX7qz+A0cudiap26LVM70Nz40ZVWYvcZEWbO/iM=;
+ b=TGPj0Eo50K6u1WHTbdZPzUCUOGbTjGEuT2zx6WxFQ2kw7VjZvmZBcXrr54ByZJWTgA
+ saJPJNIVve880j1BD5lq/Jr7b6iazlLpc+Kt7oGjsiao/DVX12d0Wb1Vk3pFUw5f5UY/
+ 56a38B/2IZK0VOQ3BUXZefILA5uI5KSQgAUAnP2hVS6lODxuDiNMNT/l7nOXF3FJRi7k
+ vAv28jrOJuAgBAbTwFze/W3/mdHAxZjYPvPH++qIiovVmmaLI50zROFqa4oqnhLWtLtI
+ uIJkHULP1cS4rQL/kBC7ctxikV4NzA2fk184z5VDp+IHDm/6sn3WCUtz8Iu5PH3SEmMj
+ YqQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=czDIYX7qz+A0cudiap26LVM70Nz40ZVWYvcZEWbO/iM=;
+ b=SQ/KyFD8C/UagRZL547Ya/zM7mNn0gicGifF2sLWG3En0cC6YNFyCoog5XV8c4cZY+
+ UGAJlyL2oyKskNGzQUB7ivC9/FPxeIT37ezzn4Vhv8OJjaVbIyFBFZxdH5NO1TK/0rba
+ FedeGLlpFuTqvHUwWsp3iNQCDy0usuosjSqPQkBd4WnSf/oMxEpC7d2HJksoXD8F2Oxb
+ wyASmzODLyHcqtVh3Wy6COUY0PvDlHVfvd1+Jku75MfgO+vp3zm/fD6H4qJdwPABgwd5
+ SjxieSs1/lh8zfkX/oDHk3xWvJj2NITfjMIVNmGn+XM8xnMUlCTAxylNdBb4RZi+5OrL
+ KAyA==
+X-Gm-Message-State: APjAAAXfLKqVSEQ/78pcaZDJ7I2SOXjfjE+2Wt53k3wKeaDs7MfgpG4a
+ bEkB2HOdrKdAeCAYkh2Zftt20g==
+X-Google-Smtp-Source: APXvYqwHW16umi/LnQ3SaNW5CWwzszx/N8EaJmlrA2u9omDEMrEVcKRJh3nmNgW5vEcQ/eFpaKepKQ==
+X-Received: by 2002:a7b:c218:: with SMTP id x24mr14064794wmi.149.1575371821952; 
+ Tue, 03 Dec 2019 03:17:01 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j12sm3326110wrw.54.2019.12.03.03.17.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Dec 2019 03:17:00 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C76C51FF87;
+ Tue,  3 Dec 2019 11:16:59 +0000 (GMT)
+References: <20191127220602.10827-1-jcmvbkbc@gmail.com>
+ <20191127220602.10827-2-jcmvbkbc@gmail.com>
+ <3c02ba4a-11fe-4d6a-e6d9-f1d164528d85@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 1/2] exec: flush CPU TB cache in breakpoint_invalidate
+In-reply-to: <3c02ba4a-11fe-4d6a-e6d9-f1d164528d85@linaro.org>
+Date: Tue, 03 Dec 2019 11:16:59 +0000
+Message-ID: <87immxbqvo.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8bjGAs7JSTNYYYwCH1yF06i0v0r9wjKXqZGZg_Sqy0VA@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: ZDULRSlBNIez6qQ1AoR_kQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,49 +97,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mszeredi@redhat.com, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- vgoyal@redhat.com
+Cc: Max Filippov <jcmvbkbc@gmail.com>, Richard Henderson <rth@twiddle.net>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> On Tue, 3 Dec 2019 at 10:53, Dr. David Alan Gilbert <dgilbert@redhat.com>=
- wrote:
-> >
-> > We seem to be coming to the conclusion something that:
-> >
-> >   a) It should live in the qemu tree
-> >   b) It shouldn't live under contrib
-> >   c) We'll create a new top level, i.e. 'daemons'
-> >   d) virtiofsd will be daemons/virtiofsd
-> >
-> > Now, somethings I'm less clear on:
-> >   e) What else would move into daemons?  It was suggested
-> >     that if we've got virtiofsd in there, then we should move
-> >     libvhost-user - which I understand, but then it's not a
-> >     'daemons'.
-> >     Are there any otehr daemons that should move?
->=20
-> I like the idea of a new top level directory, but I think
-> 'daemons' is a bit too specific -- for instance it seems to
-> me that qemu-img would be sensible to move out of the root,
-> and that's not a daemon.
 
-What would your preference be?
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Thomas was suggesting 'tools'.
+> On 11/27/19 10:06 PM, Max Filippov wrote:
+>> When a breakpoint is inserted at location for which there's currently no
+>> virtual to physical translation no action is taken on CPU TB cache. If a
+>> TB for that virtual address already exists but is not visible ATM the
+>> breakpoint won't be hit next time an instruction at that address will be
+>> executed.
+>>=20
+>> Flush entire CPU TB cache in breakpoint_invalidate to force
+>> re-translation of all TBs for the breakpoint address.
+>>=20
+>> This change fixes the following scenario:
+>> - linux user application is running
+>> - a breakpoint is inserted from QEMU gdbstub for a user address that is
+>>   not currently present in the target CPU TLB
+>> - an instruction at that address is executed, but the external debugger
+>>   doesn't get control.
+>>=20
+>> Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+>> ---
+>> Changes RFC->v1:
+>> - do tb_flush in breakpoint_invalidate unconditionally
+>
+> Unlike Paolo, I don't think this is a good idea.
 
-Dave
+We previously had a general tb_flush during the MTTCG implementation as
+a temporary fix. It was changed back in 406bc339b0 and it would be nice
+to minimise the flushing of code if we can. While most interactive users
+aren't going to notice the temporary slow down it would suck for any
+automated gdb scripting.
 
-> thanks
-> -- PMM
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+> If I was going to change anything here, I'd change this to not use
+> cpu_get_phys_page_attrs_debug but using the caching available from the ac=
+tual
+> cputlb, using cc->tlb_fill() in probe mode -- something akin to probe_acc=
+ess(),
+> but not returning a host address, nor handling watchpoints nor notdirty.
+>
+> This would help flushing too much by distinguishing different tbs for the=
+ same
+> virtual address mapping to a different physical address.
+>
+>
+> r~
 
+
+--=20
+Alex Benn=C3=A9e
 
