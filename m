@@ -2,77 +2,87 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47AB4C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 13:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9BDC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 13:20:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10296205F4
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 13:20:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D1B62070A
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 13:20:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eQeD3et4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10296205F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyEGeOjE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D1B62070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic86N-0000pM-5N
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 08:20:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48366)
+	id 1ic86f-0001D6-1S
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 08:20:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43788)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <buraksrc@gmail.com>) id 1ic83y-0007qW-Fv
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:18:00 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ic7sk-0008Tb-2G
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:06:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <buraksrc@gmail.com>) id 1ic83w-0000CH-Ai
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:17:58 -0500
-Received: from mail-lf1-x12d.google.com ([2a00:1450:4864:20::12d]:40499)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <buraksrc@gmail.com>) id 1ic83u-00008m-Al
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:17:55 -0500
-Received: by mail-lf1-x12d.google.com with SMTP id y5so2924477lfy.7
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 05:17:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:sender:from:date:message-id:subject:to;
- bh=om/lOJ/3SR5e2M2oS+aoHZhlXdrmRLH43DNF5vxr/DE=;
- b=eQeD3et4Vlmbto8O/zNj1DkjLcTQBfSf3FwyO+Ks513DalFZuS8CEIbXYUgApYvDpW
- Su7pJY2kLdsnn8u0k6A80D2TXf9nmcNcZJaOgdNTsEzz0qCX55c0exgAyI0seT5bmOG0
- qfflaKg4LsnQE3dShJRsRa12RbSlHwstNLSd7pkyijo37wSHHl7O+BXf44nFvZxefU+s
- tEbpE0p4lPKuu9/EBhtVfSWNrIMDZHisi9vNyhm1XXNXuOcMn25JjTZpv1OJmXsUgFTL
- WBCrMlUKBLo92dp6T70+mxsAu+tX5LRyaY4OmRjKRYV8gi5Gnd5pptYz9xBZ0F8/Qk7F
- cS+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
- :to; bh=om/lOJ/3SR5e2M2oS+aoHZhlXdrmRLH43DNF5vxr/DE=;
- b=ABoBk3w/M0cJW+Jx4aRjN1Z0qj1vBD4Dw+DjHd+9ZcIdiTEFxxb4r16JCS+g8pvgdz
- rVp8Wu2T/NpmPo0gI6t0XwRXw1mEqsJGdj8xo7KfQxv4sCmZ2nbYC922/jXHxhgADm6s
- HsWu4wE2AVH/AqMWCLb8lq1hHnA5FBVly3ao599C2VSE2YVRlyOi3Z4FTPRgsXXdbGxk
- pWJwre0gdRddPaGQkVKwTGAY5dolxvXXxLArLb9ois0G03x6K4Uju9KO/HJnI0Rc/eo8
- lylkdiYtvPRFjb6PyPsrBVyysn7IWgGYngFyMe+rDLnEjbOtapHSv8iMjRNjfevJCul8
- 81iw==
-X-Gm-Message-State: APjAAAXC44Qb7s5AECaJvKgjlOgvljXGBTLUW8bBPQPukjddL4btVlbg
- 0ki15vtKxJ2tnMnXsSoHsc9MAHEQuolizpqkbmuKzZC0
-X-Google-Smtp-Source: APXvYqw6GQfjKKaAljcYyqHcb/02ayKNXuTzBjMkuUKD9SZnWKCU4uNQZO7b/FTuRuphAB8UchzBqHqSwixntClzIas=
-X-Received: by 2002:a19:ac43:: with SMTP id r3mr2725519lfc.156.1575379068993; 
- Tue, 03 Dec 2019 05:17:48 -0800 (PST)
+ (envelope-from <dgilbert@redhat.com>) id 1ic7si-0005Ng-Mq
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:06:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53373
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ic7sh-0005K3-UP
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:06:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575378376;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=E2nx1DtZci1tueMQ6Vw0wJ5juB41IcRCZOApmXnQW+k=;
+ b=iyEGeOjEIcnZyAysl6G8S/tzq4IdKMQE1LD+CASg1/wbSQL5Ocal6uG1HCSoGAE43pNY/E
+ f6j/zYJH53/OOmV/NZ1NVfTGUf02IWgkkr7AIekuhz1YXUGj39tIShhhNJmJ26nTm9yssg
+ /owsX56brmT8FEyjJqImbfQPEsydZfc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-61-e8ATGUOzPNqQs4qvNzJp4Q-1; Tue, 03 Dec 2019 08:06:14 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4393800D4E;
+ Tue,  3 Dec 2019 13:06:13 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9DFD8600C8;
+ Tue,  3 Dec 2019 13:06:06 +0000 (UTC)
+Date: Tue, 3 Dec 2019 13:06:04 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: virtiofsd: Where should it live?
+Message-ID: <20191203130604.GE3078@work-vm>
+References: <20191125185021.GB3767@work-vm>
+ <20191126102600.GG556568@redhat.com>
+ <20191126121416.GE2928@work-vm>
+ <CAFEAcA9Ln2uwg4f4s8oS6VeQk83W3BErmH9cHeyDJy7v-4gNxw@mail.gmail.com>
+ <87k17ekhs9.fsf@dusky.pond.sub.org>
+ <fef0eaaf-149a-f8a8-02c5-821d2d42becd@redhat.com>
+ <20191203105341.GB3078@work-vm>
+ <CAFEAcA8bjGAs7JSTNYYYwCH1yF06i0v0r9wjKXqZGZg_Sqy0VA@mail.gmail.com>
+ <20191203111949.GB267814@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a19:2293:0:0:0:0:0 with HTTP;
- Tue, 3 Dec 2019 05:17:47 -0800 (PST)
-From: burak sarac <burak@linux.com>
-Date: Tue, 3 Dec 2019 14:17:47 +0100
-X-Google-Sender-Auth: 8mqS-fdqKFlQSzANKQUwdDelbZo
-Message-ID: <CALS5s18QBnPsv3TbtbM7ie__zekvH1T59c-o8FRd+f0EtiwqFg@mail.gmail.com>
-Subject: Custom logic gates on user space emulation
-To: qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::12d
+In-Reply-To: <20191203111949.GB267814@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: e8ATGUOzPNqQs4qvNzJp4Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,23 +94,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ mszeredi@redhat.com, QEMU Developers <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello All,
- Currently I am studying qemu and I want to figure out how I can use
-custom logic gates on user space emulation.  I am searching very basic
-'hello world' kind of tutorial or some resources to i.e. adding left
-or LOR : 1 | 0 = 1 but 0 | 1 = 0 to existing x86 arch
-((https://en.wikibooks.org/wiki/X86_Assembly/Logic) ?). What I want to
-try is run this extended x86 version with qemu user space emulation.
-Do I need a custom toolchain also for this? I found this book:
-https://subscription.packtpub.com/book/hardware_and_creative/9781783289455/1/ch01lvl1sec15/generating-a-custom-toolchain-become-an-expert
+* Daniel P. Berrang=E9 (berrange@redhat.com) wrote:
+> On Tue, Dec 03, 2019 at 11:06:44AM +0000, Peter Maydell wrote:
+> > On Tue, 3 Dec 2019 at 10:53, Dr. David Alan Gilbert <dgilbert@redhat.co=
+m> wrote:
+> > >
+> > > We seem to be coming to the conclusion something that:
+> > >
+> > >   a) It should live in the qemu tree
+> > >   b) It shouldn't live under contrib
+> > >   c) We'll create a new top level, i.e. 'daemons'
+> > >   d) virtiofsd will be daemons/virtiofsd
+> > >
+> > > Now, somethings I'm less clear on:
+> > >   e) What else would move into daemons?  It was suggested
+> > >     that if we've got virtiofsd in there, then we should move
+> > >     libvhost-user - which I understand, but then it's not a
+> > >     'daemons'.
+> > >     Are there any otehr daemons that should move?
+> >=20
+> > I like the idea of a new top level directory, but I think
+> > 'daemons' is a bit too specific -- for instance it seems to
+> > me that qemu-img would be sensible to move out of the root,
+> > and that's not a daemon.
+>=20
+> Do we really need an extra directory level ?
+>=20
+> IIUC, the main point against having $GIT_ROOT/virtiofsd is that
+> the root of our repo is quite cluttered already.
+>=20
+> Rather than trying to create a multi-level hierarchy which adds
+> a debate around naming, why not address the clutter by moving
+> *ALL* the .c/.h files out of the root so that we have a flatter
+> tree:
+>=20
+>   $GITROOT
+>     +- qemu-system
+>     |   +- vl.c
+>     |   +- ...most other files...
 
-Sorry for my ignorance in case it is totally irrelevant and I would
-appreciate any guidance! Or pseudo kind of road map for me!
+This seems like a good idea anyway (are all these files -system not
+user?)
 
-Thank you & have a nice day
-Burak
+>     +- qemu-img
+>     |   +- qemu-img.c
+>     +- qemu-nbd
+>     |   +- qemu-nbd.c
+>     +- qemu-io
+>     |   +- qemu-io.c
+>     |   +- qemu-io-cmds.c
+>     +- qemu-bridge-helper
+>     |   ...
+>     +- qemu-edid
+>     +- qemu-keymap
+>     +- qga  (already exists)
+
+I'm not seeing how having ~ one directory per file is helping; the
+number of entries doesn't drop much.
+
+> Then we can add virtiofsd and other programs at the root with no big
+> issue.
+
+Dave
+
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
