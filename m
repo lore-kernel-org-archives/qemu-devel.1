@@ -2,74 +2,79 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BC7C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 753A2C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:33:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1E88206EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:29:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1E88206EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mentor.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3D32420659
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:33:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M+LU6PAP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D32420659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic9Aw-0002s1-II
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 09:29:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47426)
+	id 1ic9FH-0004cd-Dy
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 09:33:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36658)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Harish_Kandiga@mentor.com>) id 1ic166-00070L-85
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 00:51:43 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ic98U-0002Wk-TJ
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 09:26:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Harish_Kandiga@mentor.com>) id 1ic164-0005R6-Jw
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 00:51:42 -0500
-Received: from esa4.mentor.iphmx.com ([68.232.137.252]:9757)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Harish_Kandiga@mentor.com>)
- id 1ic164-0005NG-8y
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 00:51:40 -0500
-IronPort-SDR: flc7+XsGPmNvGLlrZdJgOQtFi54JYuKQBmV1vxoytG1Y+QS+rWwoPwFYy6e3EG9XkC2iyS1U/i
- 9grvamY5IRFB9gW+CNZRpLt1FWHojHA+Yw8R3VIddhDCdQPXDz9xfjNwZgZz8ojwwObqDrONin
- YVyyJPsHyFBGiD5guUxbKl2VyL1XGVyxKoPzGW9qN1gWjP9FuK9KZqs0+Eo9oH1m1oYkCFFFko
- vEzKmhgLjs7nfVP5Wtm6j7lwCTipYmyZghmRTIUrrF+8UNDUKEbzDDAjgjil3L7NPDIrZpj6T9
- FkE=
-X-IronPort-AV: E=Sophos;i="5.69,272,1571731200"; d="scan'208";a="43750706"
-Received: from orw-gwy-01-in.mentorg.com ([192.94.38.165])
- by esa4.mentor.iphmx.com with ESMTP; 02 Dec 2019 21:51:38 -0800
-IronPort-SDR: i8krjONcTTsnPkHY7SRiGdPmITr+0xNAXFXEgjkJWTG1D1tRaDcT2sdw0OnXTIXhUqEDFgzvAR
- dttKo+ORd63AvM4to/DyzDuJF57oI5Vi7/iYpzrQEkc3xIqj3eJT457bxirU8BrDkuqz8apUvw
- JxXTyf13gnmnt2Ln1nepE0IY1Dr7ZC1/mxI+i6nWcNIcJmX2GgkCgi2Uo1v6wmGd1b+yqVAN9T
- 0VLnn5Y5apijUzN7Hq0gIyZaQmf5LOaoYKcT6i2bJwuZAsOGE6Kp5TQMK0MgNeNdOFviPXHdfV
- l0k=
-Subject: Re: [PATCH v3 4/7] dt-bindings: gpio: Add gpio-repeater bindings
-To: Geert Uytterhoeven <geert+renesas@glider.be>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <bgolaszewski@baylibre.com>,
- Jonathan Corbet <corbet@lwn.net>, Rob Herring <robh+dt@kernel.org>, Mark
- Rutland <mark.rutland@arm.com>, Eugeniu Rosca <erosca@de.adit-jv.com>
-References: <20191127084253.16356-1-geert+renesas@glider.be>
- <20191127084253.16356-5-geert+renesas@glider.be>
-From: Harish Jenny K N <harish_kandiga@mentor.com>
-Message-ID: <11ae473f-cee1-241b-174c-915dc46209b1@mentor.com>
-Date: Tue, 3 Dec 2019 11:21:26 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1ic98J-0001cZ-Jf
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 09:26:37 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44137)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ic98J-0001GE-Dh
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 09:26:31 -0500
+Received: by mail-ot1-x341.google.com with SMTP id x3so2999294oto.11
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 06:26:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=InB6KgY6GCiRdq/2s1tuH0uEgrcaw+iAWR/7DGnezY8=;
+ b=M+LU6PAP0IoEiZ/YA2PoMVzZk9dRZYO/gX6co+4B0LdPxoPBw8vPeZGZqg5cRYUNrK
+ CbKSMgiRNJP/uiuq67s49JexLbrrXsibIbVX7rtBRNG7MlXm3c0cIfEO7Rpj+RXO9//f
+ QMUGNii5kQXU38xL04o1cpKl0TM5oIzzwNFyPdzbWTNGspKogrC9OCDWZFI+8d6tlSJF
+ tkq04PyJ+PrBCdJVmvpHVkKbAarTbqf+ygSDk7WcRRb72eu8/0euBXbwqkA3cU0xbPsc
+ tQcslOxwIrL6ke2fCV9Ca69OqfVrfo5pn9TP+V0mk6TNqQ3X55ODTauwEEAxbYiyd2Gb
+ m9Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=InB6KgY6GCiRdq/2s1tuH0uEgrcaw+iAWR/7DGnezY8=;
+ b=LOgPfYIDm7WJIqI2B3E/xDBhEVLsgbJcp+s8AIm5Nd0n5EC6q+v/bWd7P/gLKIniHJ
+ 4ObUBmjE6lH+JIxgqm+PhTKB43HGLxo6n0b/9goaQfVywlfHuC/3jUPVvDuTD2gOVTo9
+ comTP5aFLbsP3F/Jh2CKzDWWdz5ROesuT7ZbM6at0hl6PSjiN6X+MbmYaX/bfMlaaP02
+ W7iiD6vcv3kAXUZZN31wvdmEc2sRkl/RArEDkllN4nWipWo+aKnsERoNKKAPp5qz+g5z
+ umANxNt/mILPOWCzEZxCb+uLXVTAu5GK2Rn6EfDuzdxV7YLm8+uZH0aJrjONfcf+JCCt
+ h8ZQ==
+X-Gm-Message-State: APjAAAWETXdd0APrgV8Lekfxg4MJ/dh1Be+szKwcza6fkElo0yNq17zG
+ VEhgCoA8bSitDAPFNXbGY2dsMGZqCSMdM342RDiRMw==
+X-Google-Smtp-Source: APXvYqyPYP54cld6SnY+4wB0EuojskSrW6EpK8sp44ZcmhXDIwYQTrb4mZlx70Dit3uW9tPKqkjbmx8HsGh9JlGGv9Q=
+X-Received: by 2002:a9d:12d2:: with SMTP id g76mr3400676otg.232.1575383183807; 
+ Tue, 03 Dec 2019 06:26:23 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191127084253.16356-5-geert+renesas@glider.be>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [137.202.0.90]
-X-ClientProxiedBy: svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1) To
- svr-ies-mbx-01.mgc.mentorg.com (139.181.222.1)
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 68.232.137.252
-X-Mailman-Approved-At: Tue, 03 Dec 2019 09:05:26 -0500
+References: <20191011134744.2477-1-richard.henderson@linaro.org>
+ <20191011134744.2477-7-richard.henderson@linaro.org>
+In-Reply-To: <20191011134744.2477-7-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 3 Dec 2019 14:26:13 +0000
+Message-ID: <CAFEAcA-p7TJEBCD3nh7-c1eaBgPGus7wLG7xqMy9HKSoy=9PSw@mail.gmail.com>
+Subject: Re: [PATCH v5 06/22] target/arm: Implement the IRG instruction
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,125 +86,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- linux-doc@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>,
- Magnus Damm <magnus.damm@gmail.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-gpio@vger.kernel.org,
- devicetree@vger.kernel.org, Alexander Graf <graf@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Phil Reid <preid@electromag.com.au>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 27/11/19 2:12 PM, Geert Uytterhoeven wrote:
-> Add Device Tree bindings for a GPIO repeater, with optional translation
-> of physical signal properties.  This is useful for describing explicitly
-> the presence of e.g. an inverter on a GPIO line, and was inspired by the
-> non-YAML gpio-inverter bindings by Harish Jenny K N
-> <harish_kandiga@mentor.com>[1].
+On Fri, 11 Oct 2019 at 14:49, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> Note that this is different from a GPIO Nexus Node[2], which cannot do
-> physical signal property translation.
->
-> While an inverter can be described implicitly by exchanging the
-> GPIO_ACTIVE_HIGH and GPIO_ACTIVE_LOW flags, this has its limitations.
-> Each GPIO line has only a single GPIO_ACTIVE_* flag, but applies to both
-> th provider and consumer sides:
->   1. The GPIO provider (controller) looks at the flags to know the
->      polarity, so it can translate between logical (active/not active)
->      and physical (high/low) signal levels.
->   2. While the signal polarity is usually fixed on the GPIO consumer
->      side (e.g. an LED is tied to either the supply voltage or GND),
->      it may be configurable on some devices, and both sides need to
->      agree.  Hence the GPIO_ACTIVE_* flag as seen by the consumer must
->      match the actual polarity.
->      There exists a similar issue with interrupt flags, where both the
->      interrupt controller and the device generating the interrupt need
->      to agree, which breaks in the presence of a physical inverter not
->      described in DT (see e.g. [3]).
->
-> [1] "[PATCH V4 2/2] gpio: inverter: document the inverter bindings"
->     https://lore.kernel.org/linux-gpio/1561699236-18620-3-git-send-email-harish_kandiga@mentor.com/
->
-> [2] Devicetree Specification v0.3-rc2, Section 2.5
->     https://github.com/devicetree-org/devicetree-specification/releases/tag/v0.3-rc2
->
-> [3] "[PATCH] wlcore/wl18xx: Add invert-irq OF property for physically
->     inverted IRQ"
->     https://lore.kernel.org/linux-renesas-soc/20190607172958.20745-1-erosca@de.adit-jv.com/
->
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-> v3:
->   - New.
+> v2: Update to 00eac5.
+>     Merge choose_random_nonexcluded_tag into helper_irg since
+>     that pseudo function no longer exists separately.
 > ---
->  .../bindings/gpio/gpio-repeater.yaml          | 53 +++++++++++++++++++
->  1 file changed, 53 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/gpio/gpio-repeater.yaml
+>  target/arm/helper-a64.h    |  1 +
+>  target/arm/mte_helper.c    | 57 ++++++++++++++++++++++++++++++++++++++
+>  target/arm/translate-a64.c |  7 +++++
+>  3 files changed, 65 insertions(+)
 >
-> diff --git a/Documentation/devicetree/bindings/gpio/gpio-repeater.yaml b/Documentation/devicetree/bindings/gpio/gpio-repeater.yaml
-> new file mode 100644
-> index 0000000000000000..efdee0c3be43f731
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/gpio/gpio-repeater.yaml
-> @@ -0,0 +1,53 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/gpio/gpio-repeater.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: GPIO Repeater
-> +
-> +maintainers:
-> +  - Harish Jenny K N <harish_kandiga@mentor.com>
-> +  - Geert Uytterhoeven <geert+renesas@glider.be>
-> +
-> +description:
-> +  This represents a repeater for one or more GPIOs, possibly including physical
-> +  signal property translation (e.g. polarity inversion).
-> +
-> +properties:
-> +  compatible:
-> +    const: gpio-repeater
-> +
-> +  "#gpio-cells":
-> +    const: 2
-> +
-> +  gpio-controller: true
-> +
-> +  gpios:
-> +    description:
-> +      Phandle and specifier, one for each repeated GPIO.
-> +
-> +  gpio-line-names:
-> +    description:
-> +      Strings defining the names of the GPIO lines going out of the GPIO
-> +      controller.
-> +
-> +required:
-> +  - compatible
-> +  - "#gpio-cells"
-> +  - gpio-controller
-> +  - gpios
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  # Device node describing a polarity inverter for a single GPIO
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +
-> +    inverter: gpio-repeater {
-> +        compatible = "gpio-repeater";
-> +        #gpio-cells = <2>;
-> +        gpio-controller;
-> +        gpios = <&gpio 95 GPIO_ACTIVE_LOW>;
-> +    };
+> diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
+> index a82e21f15a..6ff7f5b756 100644
+> --- a/target/arm/helper-a64.h
+> +++ b/target/arm/helper-a64.h
+> @@ -106,3 +106,4 @@ DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
+>  DEF_HELPER_FLAGS_2(mte_check1, TCG_CALL_NO_WG, i64, env, i64)
+>  DEF_HELPER_FLAGS_2(mte_check2, TCG_CALL_NO_WG, i64, env, i64)
+>  DEF_HELPER_FLAGS_3(mte_check3, TCG_CALL_NO_WG, i64, env, i64, i32)
+> +DEF_HELPER_FLAGS_3(irg, TCG_CALL_NO_RWG, i64, env, i64, i64)
+> diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
+> index bbb90cbe86..9848849a91 100644
+> --- a/target/arm/mte_helper.c
+> +++ b/target/arm/mte_helper.c
+> @@ -37,6 +37,31 @@ static int allocation_tag_from_addr(uint64_t ptr)
+>      return extract64(ptr, 56, 4);
+>  }
+>
+> +static int choose_nonexcluded_tag(int tag, int offset, uint16_t exclude)
+> +{
+> +    if (exclude == 0xffff) {
+> +        return 0;
+> +    }
+> +    if (offset == 0) {
+> +        while (exclude & (1 << tag)) {
+> +            tag = (tag + 1) & 15;
+> +        }
+> +    } else {
+> +        do {
+> +            do {
+> +                tag = (tag + 1) & 15;
+> +            } while (exclude & (1 << tag));
+> +        } while (--offset > 0);
+> +    }
 
+I feel like this would be easier to review if it matched
+the logic the pseudocode uses, though I think the end result
+comes out the same.
 
-just a suggestion: giving a gpio-line-names in the example would look useful.
+> +    return tag;
+> +}
+> +
+> +static uint64_t address_with_allocation_tag(uint64_t ptr, int rtag)
+> +{
+> +    rtag -= extract64(ptr, 55, 1);
+> +    return deposit64(ptr, 56, 4, rtag);
 
+This doesn't match AArch64.AddressWithAllocationTag -- the
+fiddling with bit 55 is unwanted.
+
+> +}
+> +
+>  /*
+>   * Perform a checked access for MTE.
+>   * On arrival, TBI is known to enabled, as is allocation_tag_access_enabled.
+> @@ -165,3 +190,35 @@ uint64_t HELPER(mte_check3)(CPUARMState *env, uint64_t dirty_ptr, uint32_t tbi)
+>          return dirty_ptr;
+>      }
+>  }
+> +
+> +uint64_t HELPER(irg)(CPUARMState *env, uint64_t rn, uint64_t rm)
+> +{
+> +    int el = arm_current_el(env);
+> +    uint64_t sctlr = arm_sctlr(env, el);
+> +    int rtag = 0;
+> +
+> +    if (allocation_tag_access_enabled(env, el, sctlr)) {
+> +        /*
+> +         * Our IMPDEF choice for GCR_EL1.RRND==1 is to behave as if
+> +         * GCR_EL1.RRND==0, always producing deterministic results.
+> +         */
+> +        uint16_t exclude = extract32(rm | env->cp15.gcr_el1, 0, 16);
+> +        int start = extract32(env->cp15.rgsr_el1, 0, 4);
+> +        int seed = extract32(env->cp15.rgsr_el1, 8, 16);
+> +        int offset, i;
+> +
+> +        /* RandomTag */
+> +        for (i = offset = 0; i < 4; ++i) {
+> +            /* NextRandomTagBit */
+> +            int top = (extract32(seed, 5, 1) ^ extract32(seed, 3, 1) ^
+> +                       extract32(seed, 2, 1) ^ extract32(seed, 0, 1));
+> +            seed = (top << 15) | (seed >> 1);
+> +            offset |= top << i;
+> +        }
+> +        rtag = choose_nonexcluded_tag(start, offset, exclude);
+> +
+> +        env->cp15.rgsr_el1 = rtag | (seed << 8);
+> +    }
+> +
+> +    return address_with_allocation_tag(rn, rtag);
+> +}
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 18d45fba87..83d253d67f 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -5156,6 +5156,13 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
+>      case 3: /* SDIV */
+>          handle_div(s, true, sf, rm, rn, rd);
+>          break;
+> +    case 4: /* IRG */
+> +        if (sf == 0 || !dc_isar_feature(aa64_mte_insn_reg, s)) {
+> +            goto do_unallocated;
+> +        }
+> +        gen_helper_irg(cpu_reg_sp(s, rd), cpu_env,
+> +                       cpu_reg_sp(s, rn), cpu_reg(s, rm));
+
+In the case of "we only have mte_insn_reg, not full MTE",
+the allocation tag we insert into the address must always
+be zero, so you could just special case this and emit code
+inline to clear bits [59:56]. The code as it stands works
+because we ensure that the guest can't set the SCTLR.*ATA*
+bits. (That's a bit inconsistent with our approach to the
+PSTATE.TCO bit, which we do allow a guest to toggle, but
+the inconsistency is permitted by the architecture.) I'm
+not sure whether "we only have the EL0 visible bits" is
+going to be a common enough config to care about to
+special-case.
+
+thanks
+-- PMM
 
