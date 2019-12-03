@@ -2,91 +2,89 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C54CCC432C3
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 17:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F52C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 17:41:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E6342073B
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 17:27:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BBB420803
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 17:41:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gxj93EMQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E6342073B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N8vNMPhN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BBB420803
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icBwy-0003re-5w
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 12:27:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44476)
+	id 1icCB7-0001wD-Ev
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 12:41:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1icApD-0003Zk-Ic
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:14:56 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1icBVv-0005rZ-8P
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:59:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1icAox-0003Ry-0m
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:14:40 -0500
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:35792)
+ (envelope-from <alex.bennee@linaro.org>) id 1icBVj-0000gU-9x
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:58:52 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36194)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1icAot-0003O0-7R
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:14:37 -0500
-Received: by mail-pj1-x1042.google.com with SMTP id w23so627882pjd.2
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 08:14:30 -0800 (PST)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1icBUg-0005IG-0f
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 11:58:49 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p17so4361922wma.1
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 08:57:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=m/GrtFDIpUGCPR2VKiymWN5ig4th9UzpETIPcVzQZwM=;
- b=Gxj93EMQEDNXx+9uH+yAaDemwYyjMep+z7TB242BIKQK09nNj945DFcwdZNZ+uaBnJ
- sfjS80AHP7xe72AMXJnKmjco6bERdJdkfMnaGP94wrh7m7W459Kmz/9gFeB8UXsveF6Q
- QJ+3dt1eRzjHpz6Pxb/9LNGkYNghSMpM19kPNIfhTdYelrvOth7cZoZ02fd0+uEKrHF7
- pAm5+Mpd4gnomkBq9Gl4JahycOG5I3Y9u1erWYy7uevU78vrTWnyrnodr+OkjGIomOCm
- YeaA4ZGa7EfOxKh28RtfgzM+f18OTVxZIOz1FQ3tKDq33Hosdx5NCEwDhRmFpyhYsRLh
- 5rxw==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Kpsn4xS9G03kN0ktTPQW/4w1Qmudh/u4s0MQhKO1J4I=;
+ b=N8vNMPhNOQh4PESRxiKr6XVbiCHP/KhK8t6+cknqfnDoiqtNHsvkgdSa79PG2D3jcY
+ 2e5YW72HPP4GH12D4MpaNSRBPW8gHdAGu+KIw+VpduAZZG9hzr0BF2SEn4Vy4Lu0NeW5
+ DGOu1fGxckd1iT+3b7aVEJ+rqC2oUwcd/oDpRsKtmic1HVutXr4b+SkCGck8WMQIJMFR
+ /9UvKMIdTEiw28ZH2CCb57TEroVciHJx0De7SJiJoDLCexFDZA30koUYgSpVIw0zp36b
+ 2ZNUPCCsQMdw4+70FQsatG52FQxXjLci00XT/jjJNvZwGuu371CMoesK7YktVgMvYBEs
+ nj0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=m/GrtFDIpUGCPR2VKiymWN5ig4th9UzpETIPcVzQZwM=;
- b=SLSgUAQVCMha5n+kjJUEHyS5cw8v9daw778B5/lQc+jwwPnFSTDuutEoET7VaxwMcx
- zobuTOXYePlA5b1qpVhkt95BkuXmIw3TWb9UVbW7f34VzN21RUdJu1AaxUuG6eJuuC0x
- xvjLF7phYiZ7wuK/7FUqUWc1YcKshz9JpEpI0l0dMpOEYQLUOkgjQrFQxVkdMQgH0CG+
- 4o1eCjD94bzsSDuSDEv4XGtzsSb0H//W/FrgQEdWalwYY8kvgV1op8POJ3xuV1vPk6Q3
- RWmQddvDT+tFwsU6SJX0ALkHbNHNlPe/cFqylMDv1rfp9uXroPm4Do4QrmSx1ttTqrP4
- +OVg==
-X-Gm-Message-State: APjAAAWPC7QSjRFwMMgGu+7gqb7mD9+cVqUZGOr6MvXv9FDjF4iY2N75
- yzCW9MppMVx9UzJIwWfAiytooQ==
-X-Google-Smtp-Source: APXvYqxoFEnmSaSoM4THYyoGsi0v6ZcdCmQhKgJKRlyvsIyjkE8b31oZhUcuenAr2dtNCloyR4U6GQ==
-X-Received: by 2002:a17:902:6b01:: with SMTP id
- o1mr5582660plk.24.1575389669582; 
- Tue, 03 Dec 2019 08:14:29 -0800 (PST)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id s60sm708994pjb.3.2019.12.03.08.14.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 03 Dec 2019 08:14:28 -0800 (PST)
-Subject: Re: [PATCH v5 04/22] target/arm: Add helper_mte_check{1,2,3}
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191011134744.2477-1-richard.henderson@linaro.org>
- <20191011134744.2477-5-richard.henderson@linaro.org>
- <CAFEAcA_WOMbFzFQghakLxxuCTc2b3p6eb18nS5KSrSj+oW-Ckg@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <120a00d4-a33d-6263-c6d4-4671449d7dab@linaro.org>
-Date: Tue, 3 Dec 2019 08:14:26 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Kpsn4xS9G03kN0ktTPQW/4w1Qmudh/u4s0MQhKO1J4I=;
+ b=mwnpJ2GnD9aazA8WmNK7Z5+AJddsF7HSUwxJzJ1PYtNTm9n6phMliclAPD1nGW5H7U
+ tirCmV26pYUuHpvyRZza5+t/wiAtDK9/UvyuZwWsaiiUtRdvckBaXFVq+MXshZyWQO+/
+ rNipvuwelBb2RLRoFBG+s3UwLoH78xwooON8hvknKKzwdeBnU8NrqabMysPvNCjkZUet
+ qPSF1VYeVWAioNF92MGn60nL7SqOPyVu5u3KI6OJ4pGTg4Pps/UtHTeN9gAEbYOjj+DG
+ nrDSufjmwMImhUkHZzH9VpbwwZY65OBZT+8GNPgu8iJrqK08ZhEOX9f+SkVdf3aLwSXY
+ L2Lw==
+X-Gm-Message-State: APjAAAWSk380ppJHmNOMC8MwmKXERNYWhlEvpJJwAPJmZ486Wc41Tjex
+ B6jGFouxAbuBB9jyuFo85bj4Zg==
+X-Google-Smtp-Source: APXvYqxLOZx/MpVV09/q85koxeoGiHtjsGeICVPRcn7dAXN2nrOHOyNRTlJcIQowyWtkbp8PpLZxdw==
+X-Received: by 2002:a1c:7c18:: with SMTP id x24mr34854011wmc.21.1575392257067; 
+ Tue, 03 Dec 2019 08:57:37 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z64sm3927933wmg.30.2019.12.03.08.57.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 03 Dec 2019 08:57:35 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 66F871FF87;
+ Tue,  3 Dec 2019 16:57:34 +0000 (GMT)
+References: <20191115180829.10275-1-wainersm@redhat.com>
+ <20191115180829.10275-3-wainersm@redhat.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Subject: Re: [PATCH 2/4] python/qemu: accel: Add list_accel() method
+In-reply-to: <20191115180829.10275-3-wainersm@redhat.com>
+Date: Tue, 03 Dec 2019 16:57:34 +0000
+Message-ID: <87tv6h9wjl.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_WOMbFzFQghakLxxuCTc2b3p6eb18nS5KSrSj+oW-Ckg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1042
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,76 +96,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, ehabkost@redhat.com, jsnow@redhat.com,
+ qemu-devel@nongnu.org, crosa@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Oh, to finish up on the replies...
 
-On 12/3/19 1:42 PM, Peter Maydell wrote:
->> +    ptr_tag = allocation_tag_from_addr(dirty_ptr);
->> +    if (ptr_tag == 0) {
->> +        ARMVAParameters p = aa64_va_parameters(env, dirty_ptr, stage1, true);
->> +        if (p.tcma) {
->> +            return clean_ptr;
->> +        }
->> +    }
-> 
-> I don't think this logic gets the "regime has two address ranges"
-> case correct. For a two-address-range translation regime (where
-> TCR_ELx has TCMA0 and TCMA1 bits, rather than just a single TCMA bit),
-> then the 'select' argument to this function needs to be involved,
-> because we should do a tag-unchecked access if:
->  * addr[59:55]==0b00000 (ie select == 0 and ptr_tag == 0)
->    and TCR_ELx.TCMA0 is set
->  * addr[59:55]==0b11111 (ie select == 1 and ptr_tag == 0xf)
->    and TCR_ELx.TCMA1 is set
-> (the pseudocode for this is in AArch64.AccessTagIsChecked(),
-> and the TCR_EL1.TCMA[01] bit definitions agree; the text in
-> D6.8.1 appears to be confused.)
+Wainer dos Santos Moschetta <wainersm@redhat.com> writes:
 
-It used to be correct.
+> Since commit cbe6d6365a48 the command `qemu -accel help` returns
+> the list of accelerators enabled in the QEMU binary. This adds
+> the list_accel() method which return that same list.
+>
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>  python/qemu/accel.py | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>
+> diff --git a/python/qemu/accel.py b/python/qemu/accel.py
+> index 1b825126c5..a63ff980a9 100644
+> --- a/python/qemu/accel.py
+> +++ b/python/qemu/accel.py
+> @@ -18,6 +18,7 @@ accelerators.
+>=20=20
+>  import logging
+>  import os
+> +import subprocess
+>=20=20
+>  LOG =3D logging.getLogger(__name__)
+>=20=20
+> @@ -28,6 +29,25 @@ ADDITIONAL_ARCHES =3D {
+>      "aarch64" : "armhf"
+>  }
+>=20=20
+> +def list_accel(qemu_bin):
+> +    """
+> +    List accelerators enabled in the QEMU binary.
+> +
+> +    @param qemu_bin (str): path to the QEMU binary.
+> +    @raise Exception: if failed to run `qemu -accel help`
+> +    @return a list of accelerator names.
+> +    """
+> +    if not qemu_bin:
+> +        return []
+> +    try:
+> +        out =3D subprocess.check_output("%s -accel help" % qemu_bin, she=
+ll=3DTrue)
+> +    except:
+> +        LOG.debug("Failed to get the list of accelerators in %s" %
+> qemu_bin)
 
-That was the lovely bit about physical vs logical tags.  Add 1 bit bit 55, let
-the carry ripple up, so that the physical tag check for TCMA was always against 0.
+Ahh here it is. So I guess either mention the fact we will be using it
+in the previous commit or bring it in here when we do use it.
 
-That seems to be broken now in the final spec.
+I see we use LOG.debug for a bunch of failure reasons but surely
+LOG.error is the more correct level for something that failed? I guess
+it doesn't matter as we don't mess with the levels.
 
->> +        el = arm_current_el(env);
->> +        regime_el = (el ? el : 1);   /* TODO: ARMv8.1-VHE EL2&0 regime */
-> 
-> We could write this as "regime_el(env, stage1)" if that function
-> wasn't local to helper.c, right ?
+> +        raise
+> +    lines =3D out.decode().splitlines()
+> +    # Skip the first line which is the header.
+> +    return [l.strip() for l in lines[1:] if l]
+> +
+>  def kvm_available(target_arch=3DNone):
+>      host_arch =3D os.uname()[4]
+>      if target_arch and target_arch !=3D host_arch:
 
-Yes.
+Anyway:
 
->> +            /* noreturn; fall through to assert anyway */
-> 
-> hopefully this fallthrough comment syntax doesn't confuse any
-> of our compilers/static analyzers...
-
-It shouldn't...
-
->> +            /* Tag check fail causes asynchronous flag set.  */
->> +            env->cp15.tfsr_el[regime_el] |= 1 << select;
-> 
-> Won't this incorrectly accumulate tagfails for EL0 into
-> TFSR_EL1 rather than TFSRE0_EL1 ? I think you want "[el]".
-
-Yep.
-
->> +            /* Case 3: Reserved. */
->> +            qemu_log_mask(LOG_GUEST_ERROR,
->> +                          "Tag check failure with SCTLR_EL%d.TCF "
->> +                          "set to reserved value %d\n", regime_el, tcf);
-> 
-> Technically this message is going to be wrong for the
-> case of el==0 (where it's SCTLR_EL1.TCF0, not .TCF, that's
-> been mis-set).
-
-Yep.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
 
-r~
+--=20
+Alex Benn=C3=A9e
 
