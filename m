@@ -2,83 +2,79 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30227C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 23:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7587EC432C3
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 23:50:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E661020656
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 23:50:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CC9E20656
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 23:50:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bT2K3/kC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E661020656
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CgMgDH2p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC9E20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icHwK-0000F9-TB
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 18:50:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39025)
+	id 1icHwT-0000QP-BV
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 18:50:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38730)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1icHom-0004Bc-H0
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 18:42:58 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1icHol-0006hE-BF
+ (envelope-from <richard.henderson@linaro.org>) id 1icHok-00048e-Gz
  for qemu-devel@nongnu.org; Tue, 03 Dec 2019 18:42:56 -0500
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:38737)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <richard.henderson@linaro.org>) id 1icHoh-0006U7-Kk
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 18:42:53 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:46500)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1icHol-0006XW-2r
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 18:42:55 -0500
-Received: by mail-pf1-x442.google.com with SMTP id x185so2633650pfc.5
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 15:42:52 -0800 (PST)
+ id 1icHof-0006RV-Rc
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 18:42:50 -0500
+Received: by mail-pg1-x541.google.com with SMTP id z124so2358780pgb.13
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 15:42:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=LDEaaXMkISHBRBQq2wWOEn0yi/1F+Nwrnq77hCMsb2U=;
- b=bT2K3/kCLVPgrnXrJUuITCBoXoouDNXGn+ITjOme4r9eyi0eeGLWofgQYgUwyx4hLs
- 8a/4J5RPHckXgp2rdhfxmXy81j/QJjyMR6RxeC/9Di1Wuogp+SbmCCSsAtmayhqS14V1
- VZDS3nftwm+7N4f2wUuC8+4F2vtJJX8r3LPeSZM+XsAsOsZPmzdyBJtD0LuHIlCAQ/Hf
- i7j6UAVrrt8J8IMkHChDqc29pd2QlQHwksR8Riowb5jLAHEyttpki+v5SyYlCCp9tUib
- gxzb4YsGhq/gI2SXkOYe4FLtI4Lluxvzg/8sVf+itPrHUzzCuiAIiPQa9zXkdyoxG+Og
- Scjg==
+ h=from:to:cc:subject:date:message-id;
+ bh=F49PxON0VnAE/h3y78/zUg66WDa1bFGtWTeeXtFn+7E=;
+ b=CgMgDH2pdHI0TDuIi4wo5pvawhBy50zsghJb0MfKJWO0eLH6vGPqMWHpkuXYnSGm4U
+ IMuAin9BSG5V9tvYcGfZk3wXm6cr3JDiie5vf6TB/UNl3LT+8peEZdtStc4qVrlWC1pd
+ XKBCI/JiCuwEfV7A3kOXxhXuCevul1+HpLoFgu50PODHjkJUHZncvOSb++PDN2z7Yif0
+ jABZk3+XN1VMXtEt24yWWaPy4zVvsm0FsZtXw8MyWkpduhEEPNsO6ieOiRiDsJn62vY3
+ vneh4K2sincYHh2Fv1HRgELlqEw4gyTqWN3L4GYpXJjI3u0cnucGbOPllZ/3qL9ERLdY
+ am5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=LDEaaXMkISHBRBQq2wWOEn0yi/1F+Nwrnq77hCMsb2U=;
- b=PSq5aqkVJsebGrAb0P50IRcORr6zW+dbd7Zxbp8iW7IRva7xq40+hhFaH9PegTIcVr
- LMw51Xeuwm9MiZfUoqKalQPurbZH3TFSUXR0FBYyn4N8FQNeW8PtHX8kb6sxZ+Wm9nOh
- HDiFdOIUBYY4lXkacWGcLAgWqQ2vSZ1yZuD1sjeUIku5P/oh8nnsGywdPZlE6RKMJFH9
- t+Mii95NgbYCqeKq7d3i93aP6gmSwSPp/So5m5SZQvc0m9Quz45NTPn9jOQWm5f57/qb
- ZyvwOEqhnSzhANdvdrkBxG5PS98N0A6p+5TA4rDH2LJikhqsA1UuU4j7vco6xjholsVl
- olLQ==
-X-Gm-Message-State: APjAAAVpNzH7dazM8IVUQwC+G4aeAK3pWVIkuSLdAGfVXnIWIANdAXkd
- K9xOaaQiQOqiDSAJ7qI3pyG9ejk1Jfc=
-X-Google-Smtp-Source: APXvYqwVJHifGdBZ2XKr61kQnrDwZUvQAdC5IsUGSe4q2WNvsK4vZ5I7zag1G3hmG+/PJwBawNimHw==
-X-Received: by 2002:a62:ed02:: with SMTP id u2mr510848pfh.240.1575416571689;
- Tue, 03 Dec 2019 15:42:51 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=F49PxON0VnAE/h3y78/zUg66WDa1bFGtWTeeXtFn+7E=;
+ b=HXisjfoG7/RdANJAobAXinuv29MLCntlU1BBhPHAF+XdYMk7Ejcnycsnhsb2y7FE+m
+ yysIIyly8WgpfmV8zHZug9GH+yOk3h2aL5YHxi2o039nWkgtGu6lYUD4S+LxLxbbVmOg
+ 93/StAnqrVuztntXtOTwop/RvvJeTxRgOUCz6+Usmyu4N7o6uvQ6cnx+hzAyddh5ipB0
+ vk1DaO/spGuExxsav6o1fKuIEXHUufuqdvOXCOkMR5OTlE0nVXgObyrmE6EV11ngPwvs
+ Wj4mMz/zoJtEUMWS0GOMgXqmz5ue/Kidsaww5aFUQ4nUUDNsFq1lGOj20XOCR2ErZrIk
+ je2Q==
+X-Gm-Message-State: APjAAAU+MYh/qHJreA/FblxO0UlQ6I9RQBb5FrnUzvHY9SkEfzy0JpDQ
+ jHQ7rhKnzULfn18ltGB3++XZbpK7xW0=
+X-Google-Smtp-Source: APXvYqzvQvpbnydmAePOAw8VXvqEniExeLlAxUsyJR5uMm5CZzgijEIMJ0R0HnXnQu3NZOCU2rv10A==
+X-Received: by 2002:a63:d958:: with SMTP id e24mr284065pgj.31.1575416566589;
+ Tue, 03 Dec 2019 15:42:46 -0800 (PST)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id k5sm4128256pju.14.2019.12.03.15.42.50
+ by smtp.gmail.com with ESMTPSA id k5sm4128256pju.14.2019.12.03.15.42.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Dec 2019 15:42:51 -0800 (PST)
+ Tue, 03 Dec 2019 15:42:45 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] target/arm: Enable ARMv8.2-UAO in -cpu max
-Date: Tue,  3 Dec 2019 15:42:44 -0800
-Message-Id: <20191203234244.9124-5-richard.henderson@linaro.org>
+Subject: [PATCH 0/4] target/arm: Implement ARMv8.2-UAO
+Date: Tue,  3 Dec 2019 15:42:40 -0800
+Message-Id: <20191203234244.9124-1-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191203234244.9124-1-richard.henderson@linaro.org>
-References: <20191203234244.9124-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,26 +91,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu64.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Based-on: <20191203225333.17055-1-richard.henderson@linaro.org>
+("target/arm: Implement ARMv8.1-PAN + ARMv8.2-ATS1E1")
 
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 9399253b4c..03377084e3 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -674,6 +674,10 @@ static void aarch64_max_initfn(Object *obj)
-         t = FIELD_DP64(t, ID_AA64MMFR1, PAN, 2); /* ATS1E1 */
-         cpu->isar.id_aa64mmfr1 = t;
- 
-+        t = cpu->isar.id_aa64mmfr2;
-+        t = FIELD_DP64(t, ID_AA64MMFR2, UAO, 1);
-+        cpu->isar.id_aa64mmfr2 = t;
-+
-         /* Replicate the same data to the 32-bit id registers.  */
-         u = cpu->isar.id_isar5;
-         u = FIELD_DP32(u, ID_ISAR5, AES, 2); /* AES + PMULL */
+This was relatively easy to do, and related to the VHE
+and PAN patch sets.  It's also already supported by the
+Linux kernel and thus easily tested.
+
+
+r~
+
+
+Richard Henderson (4):
+  target/arm: Add ID_AA64MMFR2_EL1
+  target/arm: Update MSR access to UAO
+  target/arm: Implement UAO semantics
+  target/arm: Enable ARMv8.2-UAO in -cpu max
+
+ target/arm/cpu.h           | 23 +++++++++++++
+ target/arm/cpu64.c         |  4 +++
+ target/arm/helper.c        | 66 +++++++++++++++++++++++++-------------
+ target/arm/kvm64.c         |  2 ++
+ target/arm/translate-a64.c | 14 ++++++++
+ 5 files changed, 87 insertions(+), 22 deletions(-)
+
 -- 
 2.17.1
 
