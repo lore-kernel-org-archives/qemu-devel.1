@@ -2,116 +2,108 @@ Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71192C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 13:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBEE7C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:00:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E206206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 13:52:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 631752054F
+	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 14:00:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Zpx2Jyx7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E206206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RPfDzrlm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 631752054F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ic8be-0001As-Eq
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 08:52:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60123)
+	id 1ic8jT-0004aj-5q
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 09:00:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ic8IT-0000PI-Ey
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:32:59 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ic8PW-00048d-9x
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:40:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ic8IP-0002g9-Il
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:32:57 -0500
-Received: from mail-eopbgr50121.outbound.protection.outlook.com
- ([40.107.5.121]:26222 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ic8IN-0002Tm-HF; Tue, 03 Dec 2019 08:32:53 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aB4zRe8mNwsMnNRxE9xLydU4MXZo/ERfNwfzt6IVSj6fMDmZdXB5s/oqLvIoBR4QKHUo7n0LoPs/f+1HUOW7wE6PD6HCwjShgu1rluq2kOkj9ZMTQ37eQu/SbGawluO/MpqX0UXfD6yVOHj9EMIWz6yoCf0sJIc4nVt6KQXk1H5lzgTtA3T1Ty6GzM06sCb70J9NXSne1J5VjPdEq5zG6N2Z0BQGTIx72NAj6j4xAJFQ9Xhj1kCecfhg+Tb8y6z3L77O+GgJWOv5b7k8KE6UaUmHJjyWtK9OL3E1//HELNpuFRDjs27Er97RmL48u0mkEwVW3GxP0EK4lVvsB9aRSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XCN3CBQfYkkiDkYXMUhmdWZ7wocaOP4dqkqH0E7KKw4=;
- b=Cq9QfBYdubWxkzRfXwGwybi9Uf5Xbj4ZHywpbvkHymokJUrJoYCWNRZloCFOdkYDcuzUD+/x2YKMVNV8J4Ksw3l1dVFPrWoy8mOTGxC660pjNvLvioBuNFMOKVCRSM4dTszf7eQ1qGCw3RmL+8Se5QiKisTxDkhc5BA7nVYNvdq0sg/jaOaQzXmK1SqQcGw5G5Tfn+vnj8+vg5dDGHYds4A25agmyOLkdD4SIJvj9m27gnUH08PspbdzsVWNPktaSOFivrVyzFaePhgGXwjUKLnZIo3qMVePMbMovbIh7YWsowwuf5Bo3BmKFqTI1YMTetO6lwghmKR63XyYuKvdbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XCN3CBQfYkkiDkYXMUhmdWZ7wocaOP4dqkqH0E7KKw4=;
- b=Zpx2Jyx7ieDzbov2RBXg4mI+FqnIy6xjt1SqlTwkvK06ArALZF/C4iCPfrqSaPhYPGhfTcwfLeLxAxX16QZgT/o/F1fIKKL52U3v77C1Gfwy5GdJGx2qTyyx8RBpS8UTB7NZWxI5d66sPJdFxD+IoCWz9aGD1ApeDjo5V6kAfqI=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3656.eurprd08.prod.outlook.com (20.177.116.74) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.21; Tue, 3 Dec 2019 13:32:49 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2516.003; Tue, 3 Dec 2019
- 13:32:49 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH for-5.0 v2 19/23] iotests: Resolve TODOs in 041
-Thread-Topic: [PATCH for-5.0 v2 19/23] iotests: Resolve TODOs in 041
-Thread-Index: AQHVmKmNmeJL6G4US0WS+6Oh5cK+GqeoivmA
-Date: Tue, 3 Dec 2019 13:32:48 +0000
-Message-ID: <2416e1d8-c1c3-4c88-6e7b-52670eb23c0e@virtuozzo.com>
-References: <20191111160216.197086-1-mreitz@redhat.com>
- <20191111160216.197086-20-mreitz@redhat.com>
-In-Reply-To: <20191111160216.197086-20-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR09CA0090.eurprd09.prod.outlook.com
- (2603:10a6:7:3d::34) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191203163247306
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d53bb2cb-2457-4388-e7e2-08d777f549f0
-x-ms-traffictypediagnostic: AM6PR08MB3656:
-x-microsoft-antispam-prvs: <AM6PR08MB3656BF62281FC7752A7D096FC1420@AM6PR08MB3656.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:400;
-x-forefront-prvs: 02408926C4
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(39840400004)(376002)(136003)(346002)(396003)(189003)(199004)(7736002)(25786009)(186003)(305945005)(102836004)(6506007)(386003)(558084003)(26005)(76176011)(52116002)(478600001)(5660300002)(6512007)(6486002)(2616005)(71200400001)(2906002)(6116002)(71190400001)(4326008)(446003)(2501003)(6246003)(11346002)(3846002)(66946007)(66556008)(86362001)(229853002)(31686004)(31696002)(14454004)(8936002)(36756003)(66476007)(81156014)(54906003)(110136005)(256004)(8676002)(81166006)(316002)(6436002)(66446008)(64756008)(99286004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3656;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: UPgcER2VRGSmAxPQ5bGAU7Ec8KImcGcEsntEeKUKYjOBB/C5PdAcETeQmg0bFpvqafDYvZuAMdYzE/7kbcRCPAj+AxCfQVLSn7lWA3OSldc9AxvGrH+61VuU1utmB+dMVfU3Vp1gyHULdGqgGUjRffkGqWVhPKxRy7MuDuffFH4VZrIJ2NWD7opDYbdWx/iewy6OrIjcjPtAafGOZq8ouXizvxw2RA83pwNGNeKCZs6vJt4SLoBIrvzOot252nwW83oPXIOWZhqu7kuKTtIivjgf1lhnSCQrBJ+z6uGd/63rp+wfhanal4mLS5Fxavui7D3DSL4CnT2vI7gJCX1cZYzVphj/eVEHvC8Z2Ge9Xdr51ecwI0UK1fkpx4o2/QhW5X3EPGbya0bhuIA4bPOwDb+n95T02Y5RzEvY1LAstaTmyEZcuP8YqUuyb4dv4ain
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <15097CE222F8284998E9AE35B4A0F58C@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <pbonzini@redhat.com>) id 1ic8PO-0006iq-T1
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:40:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34895
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ic8PO-0006fm-L9
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 08:40:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575380403;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LIm8k0scJ2bK9yiZ8iR9dDgveKvZhS/Mft46RWXwwHE=;
+ b=RPfDzrlmr20BFIdg9OOfqILWtSu/WTEfPphW/FaS54aVy5HWzBQv5xyTO0NutDcG7al6vR
+ VYnwr2BzGm5a3V+g97DGSz658KNCuPdb4qTfqfiAhQQyCJaemnQ7QTiqAf0jYvgJ/qLdTS
+ QDrzRvI/t054D3/DtEhBwePMCLzh/+w=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-125-Oit2ZZ_nNfyfKmO4Rh1_oQ-1; Tue, 03 Dec 2019 08:40:01 -0500
+Received: by mail-wr1-f71.google.com with SMTP id c17so1787241wrp.10
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 05:40:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=B8Hxq0/0hsGTIMJqqJxxw57QsGyRN8jlb1Y3fvDGz+E=;
+ b=FGnFF+4I8wkkk5JIfdrd9xbYyZ0IfpJm+DiNfOTb+pSri1w6NcekzOxHoLtB/pjPVT
+ D/8jXMkekW9dzsJtDOWXULTuf721NDwDlLpEGdosFG/tngXBA90zz0IwAVqa77lUWCUO
+ WgpAEjNeD6W6tgwydews4J7lISZnpm/D5szwRrqCq+HetwZ+myZrD+7p9V6ibToJiaPS
+ rbDl3uBXjDylGIvCw3+GqyNXQDrum2zFufg7eCyHB1ZnaF0wLhox5pOxh1D4RpeWJEGP
+ lyg1aMZjpnHmr+1Pze9r/K/FC7++kv36ZWCHzDEsm6tJn65j0G1QPTZ35J1CrnpELtJe
+ X/CA==
+X-Gm-Message-State: APjAAAU/NFNdt4rAxiP+E2aDP6+lU29l/JU8/tiMwdm5xQIzGOIOTdfp
+ Sh7h+mD0A12bBW+eWSCY7/icfvtrt3dwzeIrkkWhr8lkB4GbiDvXQ8RO4J23rx+wuU5MmHOgCxj
+ PnaG0J2YdIq5HPZM=
+X-Received: by 2002:adf:ef4e:: with SMTP id c14mr5415913wrp.142.1575380400370; 
+ Tue, 03 Dec 2019 05:40:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzSHfRxKmngzYe1OGQhB8ODvBy39RB+t/yO+a2ReNubTo0o73ehjVI+e9+S+SzX8jn97GJcFQ==
+X-Received: by 2002:adf:ef4e:: with SMTP id c14mr5415887wrp.142.1575380400066; 
+ Tue, 03 Dec 2019 05:40:00 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a?
+ ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
+ by smtp.gmail.com with ESMTPSA id s82sm3105499wms.28.2019.12.03.05.39.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Dec 2019 05:39:59 -0800 (PST)
+Subject: Re: [PATCH] hw/ppc/prep: Remove the deprecated "prep" machine and the
+ OpenHackware BIOS
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
+ <philmd@redhat.com>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+References: <20191203072922.14981-1-thuth@redhat.com>
+ <2b5d3c2d-6982-03f6-26cc-7400440b990f@redhat.com>
+ <8ca69db3-7dfa-0c4d-bc50-61a80eb574c1@redhat.com>
+ <6966e660-688a-977e-c882-9cb44ef97574@redhat.com>
+ <f9c24324-b04a-f88c-3da7-3dfd2041b048@redhat.com>
+ <7528162c-ce2f-985e-7f58-9267389edd33@redhat.com>
+ <fcee5492-8a0b-c54c-0a6a-16a69532892f@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <e36bf29a-bc58-2ec1-d796-643679f3c6bc@redhat.com>
+Date: Tue, 3 Dec 2019 14:39:58 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d53bb2cb-2457-4388-e7e2-08d777f549f0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Dec 2019 13:32:49.0060 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: KCqyp3grHl6vfluwLQmIbISlobTcU48qVwx2StaVgjIw+OzFLjayfLD/fMXFrYOH5tF0vXMUuMxCcUxd+EljiqQGw8b3M3VpRxxUc6y11AU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3656
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.121
+In-Reply-To: <fcee5492-8a0b-c54c-0a6a-16a69532892f@redhat.com>
+Content-Language: en-US
+X-MC-Unique: Oit2ZZ_nNfyfKmO4Rh1_oQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,19 +115,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-11.11.2019 19:02, Max Reitz wrote:
-> Signed-off-by: Max Reitz<mreitz@redhat.com>
+On 03/12/19 14:16, Thomas Huth wrote:
+> On 03/12/2019 14.04, Paolo Bonzini wrote:
+>> On 03/12/19 10:15, Thomas Huth wrote:
+>>>>>> Maybe we can rename this as read_boot_order_mm, and the previous
+>>>>>> read_boot_order_pc as read_boot_order_io.
+>>>>>
+>>>>> I don't think it makes much sense. This was completely specific to th=
+e
+>>>>> "prep" machine, even the "40p" machine seems to prefer fw_cfg nowaday=
+s.
+>>>>> So let's simply remove this old stuff.
+>>>>>
+>>>>>> diff --git a/tests/endianness-test.c b/tests/endianness-test.c
+>>>>>> index 58527952a5..2798802c63 100644
+>>>>>> --- a/tests/endianness-test.c
+>>>>>> +++ b/tests/endianness-test.c
+>>>>>> @@ -35,7 +35,7 @@ static const TestCase test_cases[] =3D {
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { "mips64", "malta", 0x10000000=
+, .bswap =3D true },
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { "mips64el", "fulong2e", 0x1fd=
+00000 },
+>>>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 { "ppc", "g3beige", 0xfe000000,=
+ .bswap =3D true, .superio =3D
+>>>>>> "i82378" },
+>>>>>> -=C2=A0=C2=A0=C2=A0 { "ppc", "prep", 0x80000000, .bswap =3D true },
+>>>>>> +=C2=A0=C2=A0=C2=A0 { "ppc", "40p", 0x80000000, .bswap =3D true },
+>>>>
+>>>> ... here you access the Super I/O behind the PCI bridge via MMIO?
+>>>
+>>> The difference is that this is an *arbitrary* address in I/O space
+>>> there.
+>>
+>> No, it's the base address of the ISA space, to which the tests add the
+>> address of the pc-testdev device.  It's not any different from the
+>> 0x80000000 in boot-order-test.
+>=20
+> Hmm, interesting. Why is it not necessary to set up the BARs of the
+> PCI-to-ISA bridge in this case?
 
+I don't know.  Maybe the machine doesn't need it, since these are not
+really BARs, since they are positive-decode addresses on the ISA bus.
+It may also be an emulation inaccuracy in the pc87312 ISA bridge.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Paolo
 
---=20
-Best regards,
-Vladimir
+>> That said, I think it's a sensible objection that boot order doesn't
+>> come from m48t59 on 40p (does it not?).
+> Right. I'm also not an expert here, but I think the OpenBIOS on 40p
+> rather uses fw_cfg instead.
+>=20
+>  Thomas
+>=20
+
 
