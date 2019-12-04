@@ -2,83 +2,87 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99001C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 12:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7272EC43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 12:15:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 629E520674
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 12:15:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FD7420674
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 12:15:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GFfd1Vqg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 629E520674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="1uvJNFWE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FD7420674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icTYd-00065k-WF
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 07:15:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35896)
+	id 1icTYh-0005S9-8D
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 07:15:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47906)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1icSCk-0004ij-PF
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 05:48:25 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1icST7-0002Ic-Dv
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 06:05:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1icSCf-0003T9-KD
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 05:48:19 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50507
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1icSSu-0000I6-T7
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 06:05:09 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:44230)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1icSCf-0003LF-9X
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 05:48:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575456495;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1icSSi-0007Mo-8r; Wed, 04 Dec 2019 06:04:53 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id A476D96EF0;
+ Wed,  4 Dec 2019 11:04:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1575457483;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=0zvA/GpHO8RuFn0TtmBqGCCyH1fWXZWNucJ0tk8jr7w=;
- b=GFfd1Vqgru6zI37PiidMJXvNL3CBtBj0Ki3aiUL8THjXODd0IzouD42wVIJbMGJn77Cl8T
- lldljHUhFyk6LzYF+SEzeAH8G8cnoj+U3O5hNuH+M0ti5oSpkSGyTQCFkOjS3mrl28auMz
- FJmq1Y+wTjEwF84igDPy1v1KrhGtnM0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-z2KEPGLpNUal2dvu80mXOg-1; Wed, 04 Dec 2019 05:48:12 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09372890E6A;
- Wed,  4 Dec 2019 10:48:11 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-39.ams2.redhat.com [10.36.117.39])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0672519C69;
- Wed,  4 Dec 2019 10:48:02 +0000 (UTC)
-Subject: Re: [PATCH v2 03/13] s390x: protvirt: Support unpack facility
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20191129094809.26684-1-frankja@linux.ibm.com>
- <20191129094809.26684-4-frankja@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <3f891828-f7d1-91a4-08de-71ac2ed00ad1@redhat.com>
-Date: Wed, 4 Dec 2019 11:48:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ in-reply-to:in-reply-to:references:references;
+ bh=hcjwxM4UObU02Iu0FnUFEfgmhSEGsz5B6l28uOEWu2U=;
+ b=1uvJNFWEMFotdydoqOGFrDvv/196PrbDBQalc4K9pVlXsGCmQtjKOK2xOFpH8fagwYtzBf
+ nz4qX9BQtv92JW+ViG8XeQkY/JQ72MaJwxEMHuLkFzLBZBwNoEoWXHnUgxsCwWiqrVxWPK
+ sL/M3+QFGiZwHcJ09A2/VDI6la7QFyQ=
+Subject: Re: [PATCH v6 5/9] qdev-clock: introduce an init array to ease the
+ device construction
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190904125531.27545-1-damien.hedde@greensocs.com>
+ <20190904125531.27545-6-damien.hedde@greensocs.com>
+ <CAFEAcA_Dc7K+NfVAScCk8MYykZ-VrbgJjJwFQCiQ3F7yyseNDQ@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <102dda6f-ca2d-7d16-0a65-8f6d5a6d1d46@greensocs.com>
+Date: Wed, 4 Dec 2019 12:04:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <20191129094809.26684-4-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: z2KEPGLpNUal2dvu80mXOg-1
-X-Mimecast-Spam-Score: 0
+In-Reply-To: <CAFEAcA_Dc7K+NfVAScCk8MYykZ-VrbgJjJwFQCiQ3F7yyseNDQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1575457483;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hcjwxM4UObU02Iu0FnUFEfgmhSEGsz5B6l28uOEWu2U=;
+ b=rVwR/jUlT7f/nrP/jeiZzwLoeaVKbTGAbtVgjWOOSJkz+T3XKLsYSe1v9hCdRaGGF4I/Ob
+ sulxMi3qF/yBiUCqOsgSHRXTf3WgtgvPWR/h5turZ2ncYRn+Sx9cPSa5XmN60qpCdJIGEN
+ xNQtVwmZy5B1eN4ctPh8NofjwEYLGBA=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575457483; a=rsa-sha256; cv=none;
+ b=Oqs2WeakP7YcTe0+dleEMc/eRA3F9RRrNMMczPRsT5NuYJCdCVJPSv0gIIu6NEC1ElX3XY
+ Rg1HC6j38PTiO1aarrSKB508ta64OFjrj4OM4LxLog/slhLbit0jRQleMVkTWZ0gq5OfYP
+ OFOjdB4XZLwWBRmTRU7mnmBS2PuxXAI=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,246 +94,164 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 29/11/2019 10.47, Janosch Frank wrote:
-> When a guest has saved a ipib of type 5 and call diagnose308 with
-> subcode 10, we have to setup the protected processing environment via
-> Ultravisor calls. The calls are done by KVM and are exposed via an API.
-> 
-> The following steps are necessary:
-> 1. Create a VM (register it with the Ultravisor)
-> 2. Create secure CPUs for all of our current cpus
-> 3. Forward the secure header to the Ultravisor (has all information on
-> how to decrypt the image and VM information)
-> 4. Protect image pages from the host and decrypt them
-> 5. Verify the image integrity
-> 
-> Only after step 5 a protected VM is allowed to run.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
-[...]
-> +++ b/hw/s390x/pv.c
-> @@ -0,0 +1,118 @@
-> +/*
-> + * Secure execution functions
-> + *
-> + * Copyright IBM Corp. 2019
-> + * Author(s):
-> + *  Janosch Frank <frankja@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +#include "qemu/osdep.h"
-> +#include <sys/ioctl.h>
-> +
-> +#include <linux/kvm.h>
-> +
-> +#include "qemu/error-report.h"
-> +#include "sysemu/kvm.h"
-> +#include "pv.h"
-> +
-> +static int s390_pv_cmd(uint32_t cmd, void *data)
-> +{
-> +    int rc;
-> +    struct kvm_pv_cmd pv_cmd = {
-> +        .cmd = cmd,
-> +        .data = (uint64_t)data,
-> +    };
-> +
-> +    rc = kvm_vm_ioctl(kvm_state, KVM_S390_PV_COMMAND, &pv_cmd);
-> +    if (rc) {
-> +        error_report("KVM PV command failed cmd: %d rc: %d", cmd, rc);
-> +        exit(1);
-> +    }
-> +    return rc;
-> +}
-> +
-> +static int s390_pv_cmd_vcpu(CPUState *cs, uint32_t cmd, void *data)
-> +{
-> +    int rc;
-> +    struct kvm_pv_cmd pv_cmd = {
-> +        .cmd = cmd,
-> +        .data = (uint64_t)data,
-> +    };
-> +
-> +    rc = kvm_vcpu_ioctl(cs, KVM_S390_PV_COMMAND_VCPU, &pv_cmd);
-> +    if (rc) {
-> +        error_report("KVM PV VCPU command failed cmd: %d rc: %d", cmd, rc);
-> +        exit(1);
-> +    }
-> +    return rc;
-> +}
-> +
-> +int s390_pv_vm_create(void)
-> +{
-> +    return s390_pv_cmd(KVM_PV_VM_CREATE, NULL);
-> +}
-> +
-> +int s390_pv_vm_destroy(void)
-> +{
-> +    return s390_pv_cmd(KVM_PV_VM_DESTROY, NULL);
-> +}
-> +
-> +int s390_pv_vcpu_create(CPUState *cs)
-> +{
-> +    return s390_pv_cmd_vcpu(cs, KVM_PV_VCPU_CREATE, NULL);
-> +}
-> +
-> +int s390_pv_vcpu_destroy(CPUState *cs)
-> +{
-> +    S390CPU *cpu = S390_CPU(cs);
-> +    CPUS390XState *env = &cpu->env;
-> +    int rc;
-> +
-> +    rc = s390_pv_cmd_vcpu(cs, KVM_PV_VCPU_DESTROY, NULL);
-> +    if (!rc) {
-> +        env->pv = false;
-> +    }
-> +    return rc;
-> +}
-> +
-> +int s390_pv_set_sec_parms(uint64_t origin, uint64_t length)
-> +{
-> +    struct kvm_s390_pv_sec_parm args = {
-> +        .origin = origin,
-> +        .length = length,
-> +    };
-> +
-> +    return s390_pv_cmd(KVM_PV_VM_SET_SEC_PARMS, &args);
-> +}
-> +
-> +/*
-> + * Called for each component in the SE type IPL parameter block 0.
-> + */
-> +int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak)
-> +{
-> +    struct kvm_s390_pv_unp args = {
-> +        .addr = addr,
-> +        .size = size,
-> +        .tweak = tweak,
-> +    };
-> +
-> +    return s390_pv_cmd(KVM_PV_VM_UNPACK, &args);
-> +}
-> +
-> +int s390_pv_perf_clear_reset(void)
-> +{
-> +    return s390_pv_cmd(KVM_PV_VM_PERF_CLEAR_RESET, NULL);
-> +}
-> +
-> +int s390_pv_verify(void)
-> +{
-> +    return s390_pv_cmd(KVM_PV_VM_VERIFY, NULL);
-> +}
-> +
-> +int s390_pv_unshare(void)
-> +{
-> +    return s390_pv_cmd(KVM_PV_VM_UNSHARE, NULL);
-> +}
-> diff --git a/hw/s390x/pv.h b/hw/s390x/pv.h
-> new file mode 100644
-> index 0000000000..eb074e4bc9
-> --- /dev/null
-> +++ b/hw/s390x/pv.h
-> @@ -0,0 +1,26 @@
-> +/*
-> + * Protected Virtualization header
-> + *
-> + * Copyright IBM Corp. 2019
-> + * Author(s):
-> + *  Janosch Frank <frankja@linux.ibm.com>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#ifndef HW_S390_PV_H
-> +#define HW_S390_PV_H
-> +
-> +int s390_pv_vm_create(void);
-> +int s390_pv_vm_destroy(void);
-> +int s390_pv_vcpu_destroy(CPUState *cs);
-> +int s390_pv_vcpu_create(CPUState *cs);
-> +int s390_pv_set_sec_parms(uint64_t origin, uint64_t length);
-> +int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
-> +int s390_pv_perf_clear_reset(void);
-> +int s390_pv_verify(void);
-> +int s390_pv_unshare(void);
 
-I still think you should make all those functions returning "void"
-instead of "int" - since errors results in an exit() in s390_pv_cmd()
-and s390_pv_cmd_vcpu() anyway...
 
-> +
-> +#endif /* HW_S390_PV_H */
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index c1d1440272..f9481ccace 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -41,6 +41,7 @@
->  #include "hw/qdev-properties.h"
->  #include "hw/s390x/tod.h"
->  #include "sysemu/sysemu.h"
-> +#include "hw/s390x/pv.h"
->  
->  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->  {
-> @@ -322,6 +323,7 @@ static void s390_machine_reset(MachineState *machine)
->  {
->      enum s390_reset reset_type;
->      CPUState *cs, *t;
-> +    S390CPU *cpu;
->  
->      /* get the reset parameters, reset them once done */
->      s390_ipl_get_reset_request(&cs, &reset_type);
-> @@ -329,6 +331,8 @@ static void s390_machine_reset(MachineState *machine)
->      /* all CPUs are paused and synchronized at this point */
->      s390_cmma_reset();
->  
-> +    cpu = S390_CPU(cs);
-> +
->      switch (reset_type) {
->      case S390_RESET_EXTERNAL:
->      case S390_RESET_REIPL:
-> @@ -357,6 +361,28 @@ static void s390_machine_reset(MachineState *machine)
->          run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
->          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->          break;
-> +    case S390_RESET_PV: /* Subcode 10 */
-> +        subsystem_reset();
-> +        s390_crypto_reset();
-> +
-> +        CPU_FOREACH(t) {
-> +            run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
-> +        }
-> +
-> +        /* Create SE VM */
-> +        s390_pv_vm_create();
-> +        CPU_FOREACH(t) {
-> +            s390_pv_vcpu_create(t);
-> +        }
-> +
-> +        /* Set SE header and unpack */
-> +        s390_ipl_prepare_pv_header();
-> +        /* Decrypt image */
-> +        s390_ipl_pv_unpack();
-> +        /* Verify integrity */
-> +        s390_pv_verify();
-> +        s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
-> +        break;
+On 12/2/19 4:13 PM, Peter Maydell wrote:
+> On Wed, 4 Sep 2019 at 13:56, Damien Hedde <damien.hedde@greensocs.com> =
+wrote:
+>>
+>> Introduce a function and macro helpers to setup several clocks
+>> in a device from a static array description.
+>>
+>> An element of the array describes the clock (name and direction) as
+>> well as the related callback and an optional offset to store the
+>> created object pointer in the device state structure.
+>>
+>> The array must be terminated by a special element QDEV_CLOCK_END.
+>>
+>> This is based on the original work of Frederic Konrad.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> ---
+>>  hw/core/qdev-clock.c    | 26 ++++++++++++++++
+>>  include/hw/qdev-clock.h | 67 ++++++++++++++++++++++++++++++++++++++++=
++
+>>  2 files changed, 93 insertions(+)
+>>
+>> diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
+>> index bebdd8fa15..32ad45c061 100644
+>> --- a/hw/core/qdev-clock.c
+>> +++ b/hw/core/qdev-clock.c
+>> @@ -153,3 +153,29 @@ void qdev_connect_clock_out(DeviceState *dev, con=
+st char *name, ClockIn *clk,
+>>
+>>      clock_connect(clk, clkout);
+>>  }
+>> +
+>> +void qdev_init_clocks(DeviceState *dev, const ClockPortInitArray cloc=
+ks)
+>> +{
+>> +    const struct ClockPortInitElem *elem;
+>> +
+>> +    assert(dev);
+>> +    assert(clocks);
+>=20
+> More unnecessary asserts, I think.
+>=20
+>=20
+>=20
+>> +/**
+>> + * ClockInitElem:
+>> + * @name: name of the clock (can't be NULL)
+>> + * @is_output: indicates whether the clock is input or output
+>> + * @callback: for inputs, optional callback to be called on clock's u=
+pdate
+>> + * with device as opaque
+>> + * @offset: optional offset to store the ClockIn or ClockOut pointer =
+in device
+>> + * state structure (0 means unused)
+>> + */
+>> +struct ClockPortInitElem {
+>> +    const char *name;
+>> +    bool is_output;
+>> +    ClockCallback *callback;
+>> +    size_t offset;
+>> +};
+>> +
+>> +#define clock_offset_value(_type, _devstate, _field) \
+>> +    (offsetof(_devstate, _field) + \
+>> +     type_check(_type *, typeof_field(_devstate, _field)))
+>=20
+> Avoid leading underscores, please.
+>=20
+>> +
+>> +#define QDEV_CLOCK(_is_output, _type, _devstate, _field, _callback) {=
+ \
+>> +    .name =3D (stringify(_field)), \
+>> +    .is_output =3D _is_output, \
+>> +    .callback =3D _callback, \
+>> +    .offset =3D clock_offset_value(_type, _devstate, _field), \
+>> +}
+>> +
+>> +/**
+>> + * QDEV_CLOCK_(IN|OUT):
+>> + * @_devstate: structure type. @dev argument of qdev_init_clocks belo=
+w must be
+>> + * a pointer to that same type.
+>=20
+> It's a bit unclear what "below" here is referring to. Maybe
+> just have this be "@devstate: name of a C struct type"
+> and then explain below...
+>=20
+>> + * @_field: a field in @_devstate (must be ClockIn* or ClockOut*)
+>> + * @_callback: (for input only) callback (or NULL) to be called with =
+the device
+>> + * state as argument
+>> + *
+>=20
+> ...here, where we can have a paragraph giving the purpose
+> of the macro:
+>=20
+> "Define an entry in a ClockPortInitArray which is intended
+> to be passed to qdev_init_clocks(), which should be called
+> with an @dev argument which is a pointer to the @devstate
+> struct type."
 
-... and here you completely ignore the return codes of all the new
-functions.
+Sounds good.
 
- Thomas
+>=20
+>> + * The name of the clock will be derived from @_field
+>=20
+> Derived how? Guessing from the stringify(_field) above that it
+> will be the same as the field name ?
 
+yes.
+
+>=20
+> It makes sense to hardcode the opaque pointer for the callback to be
+> the device pointer.
+>=20
+>=20
+>> + */
+>> +#define QDEV_CLOCK_IN(_devstate, _field, _callback) \
+>> +    QDEV_CLOCK(false, ClockIn, _devstate, _field, _callback)
+>> +
+>> +#define QDEV_CLOCK_OUT(_devstate, _field) \
+>> +    QDEV_CLOCK(true, ClockOut, _devstate, _field, NULL)
+>> +
+>> +/**
+>> + * QDEV_CLOCK_IN_NOFIELD:
+>> + * @_name: name of the clock
+>> + * @_callback: callback (or NULL) to be called with the device state =
+as argument
+>> + */
+>> +#define QDEV_CLOCK_IN_NOFIELD(_name, _callback) { \
+>> +    .name =3D _name, \
+>> +    .is_output =3D false, \
+>> +    .callback =3D _callback, \
+>> +    .offset =3D 0, \
+>> +}
+>=20
+> When would we want to use this one ?
+
+If the callback interaction is enough, we don't need to access the clock
+object directly. So we don't need the field in the device state
+structure. I can remove this macro for sake of simplicity.
+
+--
+Damien
 
