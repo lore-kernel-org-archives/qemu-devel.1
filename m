@@ -2,100 +2,99 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08ED1C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 09:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA71BC2BBE2
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 09:51:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C595E2077B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 09:48:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B49FD206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 09:51:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f4T+YlPk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C595E2077B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fE5/0J5D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B49FD206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icRGd-0002k1-1G
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 04:48:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55882)
+	id 1icRK2-0003rW-Uj
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 04:51:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59377)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1icQZF-00055h-C0
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:03:30 -0500
+ (envelope-from <philmd@redhat.com>) id 1icR2f-00062W-1p
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:33:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1icQZ2-0003YT-TQ
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:03:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37008
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1icR23-0005DN-45
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:33:17 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46338
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icQZ2-0003Lh-Nx
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:03:16 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icR22-0004q6-Cu
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:33:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575450193;
+ s=mimecast20190719; t=1575451988;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AunsICv+tc9ByKDHB67N3AR9wBDUA6R0R700dp0nRsM=;
- b=f4T+YlPkJKw0znsVL96RHzGnOWAbggu2dTQz4rW8QQxZrZpCuGvpgJehCO8ghYW4oLrzV+
- Oq52YRFcbm/uLUMZSBFsoJkjLh5KpM80V+0uuhJaMoBO7f1SzSvH0I+JuqIsEH7xKAmrSO
- C8Z7rO50BzAKoBofNSwFzlQSI+MYdZw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-0NFXzwsXPeCI66W7gcnYRQ-1; Wed, 04 Dec 2019 04:03:10 -0500
-Received: by mail-wr1-f70.google.com with SMTP id r2so3323787wrp.7
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 01:03:10 -0800 (PST)
+ bh=EWwlL811nqHOzwEEbPjS7cfietB8hdLHTpFyLp/+y9E=;
+ b=fE5/0J5DOyHE+s0dBY/IbsGhB6r07eQyCiCctTbprg9RZdMleQFgwCd6x7XultwnKmp6Og
+ aE5Cye7O147hN6NzNtEL0eBcVs+nvxxlBAtSbWhTSzruPDLsAftV8Unpdm/fUwa6/h0M8w
+ 0DMtu5k3IARya5AzYPdLlwRa4dt0Wic=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-154-kKb2wEcPNyKF9X23Q-b8CQ-1; Wed, 04 Dec 2019 04:33:05 -0500
+Received: by mail-wr1-f72.google.com with SMTP id h30so3365086wrh.5
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 01:33:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=AunsICv+tc9ByKDHB67N3AR9wBDUA6R0R700dp0nRsM=;
- b=Up0z6vrhTidy5Um2CKo4kz7yUlEPmejmfpnR54wN32GYTmQGGR6I2w4MOxQbZW6Qb7
- DZb/9VTZcoxqS9pF/rzdDBUoFh/Ap2he9tB+cY9siMW3oU+jwYtZKFm5Zhze74dqZcUh
- OFhTcHgqZwQrDCQbfvSXywfFqgXGUxZF+pHEgaDExEfPNJbv0SjYeJ0SKwo2Fvfi1jqC
- 4WAK4olaxcqk5cq/XTIO5eUBvz8zXG1MsMVAapJuW8bA7Mg2Uo0vgeO7QxRVqtNs7UaH
- UuJCTbK7NRHbPo4Uex6p/G90gNZk53H900f3gTcW9d9l1RtneWBveMKZuU9YyqdGSemO
- H+lg==
-X-Gm-Message-State: APjAAAV7Og5EqfsfRNP9XvgA5MnEkGThdFc/BRSIEFybEgl6xvwJ6aD8
- 10kBM29Z4HjfSpbe/C92xJwf+ooCixi1lmQ81+yLAAxOLjp1C7f6S0dY7zBeqh0YdGIJnxrRC7g
- gcDn0r85DlScv/sQ=
-X-Received: by 2002:a7b:c004:: with SMTP id c4mr37831513wmb.45.1575450189834; 
- Wed, 04 Dec 2019 01:03:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzofYsUKxTVohcM6lK2TK6wXEdnIC4MzT+dlZFmSWDAVJzlaIy5vJwZw6IiqEv+b59ncu4fhA==
-X-Received: by 2002:a7b:c004:: with SMTP id c4mr37831490wmb.45.1575450189566; 
- Wed, 04 Dec 2019 01:03:09 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id c2sm7263359wrp.46.2019.12.04.01.03.08
+ bh=DcM2aJ98/Fg9usqbQJE5tGT+B3fxRz/ty919EFqv248=;
+ b=r+KrsPAaXn1Zqe/YcAysdn3rpCRIg4pRvyJbJsbMeMsVlzz911ng/jR9CUjGR35ZSO
+ W7qj3jvtAGn2USytI684AfgCq4xzhx0s2a0rPRmHHJISmcr0T4dO0ALY4OMfle005Hzy
+ 3g3gzXpqiegRQY2i+5bi1mTOujqMjfzg05ql1Zv2XDmAXguDgx5BovPV4qm5bc2yd9mI
+ uEfeIAHO4MB8IUrdrGBhUsVZXXhPTZX0g0H5UdM/3ZnEvVQNGL7vzDB6qkguOW4RVDuh
+ wUEFc5XqhGUc55cOaIdFt68GHb5j6YOM9ihj1lcZUSAX3R6CWG4/a8lG/uVTzExDI4K8
+ 2nBw==
+X-Gm-Message-State: APjAAAUzGbEusrpcoRCTYaK9vKWjKpu3EYr3UEeXXL+FEuFJ7sRyJKxu
+ SOhS2IOE2qDJsS5/AtrO29p3Khv/zmh1SglPxyngr7v/nc5pHvEx7PakLer4JK766/Xwb0N4Fbi
+ dxeeXYY6K6QwRyqQ=
+X-Received: by 2002:a7b:c93a:: with SMTP id h26mr11355696wml.83.1575451983662; 
+ Wed, 04 Dec 2019 01:33:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwmZETtAcwMo4R/l8hQqvDK4FgYJHlFNh+J+rsTQGqDiydoAq2T46DtqRlG47HLfBg6Yf6H1A==
+X-Received: by 2002:a7b:c93a:: with SMTP id h26mr11355676wml.83.1575451983457; 
+ Wed, 04 Dec 2019 01:33:03 -0800 (PST)
+Received: from [192.168.43.238] (63.red-95-127-156.staticip.rima-tde.net.
+ [95.127.156.63])
+ by smtp.gmail.com with ESMTPSA id e16sm7370932wrj.80.2019.12.04.01.33.02
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Dec 2019 01:03:08 -0800 (PST)
-Subject: Re: [PATCH 02/10] hw: arm: add Xunlong Orange Pi PC machine
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-References: <20191202210947.3603-1-nieklinnenbank@gmail.com>
- <20191202210947.3603-3-nieklinnenbank@gmail.com>
- <b14e5a75-ebe3-311e-60a8-3f71b0874a10@redhat.com>
- <CAPan3Woz7+1K9Yth6MfHqLfjcDMh8xGVzTShN7gi3XM8W_BNnw@mail.gmail.com>
+ Wed, 04 Dec 2019 01:33:02 -0800 (PST)
+Subject: Re: [PATCH] travis.yml: Drop libcap-dev
+To: Greg Kurz <groug@kaod.org>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+References: <157544579267.3537077.17459176619888583836.stgit@bahia.lan>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <239606dc-3545-c3f7-1e11-429f53994147@redhat.com>
-Date: Wed, 4 Dec 2019 10:03:07 +0100
+Message-ID: <5baaa10a-bc9d-f7ec-0f16-7495aca48fed@redhat.com>
+Date: Wed, 4 Dec 2019 10:33:00 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAPan3Woz7+1K9Yth6MfHqLfjcDMh8xGVzTShN7gi3XM8W_BNnw@mail.gmail.com>
+In-Reply-To: <157544579267.3537077.17459176619888583836.stgit@bahia.lan>
 Content-Language: en-US
-X-MC-Unique: 0NFXzwsXPeCI66W7gcnYRQ-1
+X-MC-Unique: kKb2wEcPNyKF9X23Q-b8CQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,23 +106,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: b.galvani@gmail.com, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/3/19 8:33 PM, Niek Linnenbank wrote:
-> Hello Philippe,
-> 
-> Thanks for your quick review comments!
-> I'll start working on a v2 of the patches and include the changes you 
-> suggested.
+On 12/4/19 9:01 AM, Greg Kurz wrote:
+> Commit b1553ab12fe0 converted virtfs-proxy-helper to using libcap-ng. The=
+re
+> aren't any users of libcap anymore. No need to install libcap-dev.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>=20
+> Yet another follow-up to Paolo's patch to use libcap-ng instead of libcap=
+.
+> Like with the docker and the gitlab CI patches, if I get an ack from Alex
+> I'll gladly merge this in the 9p tree and send a PR as soon as 5.0 dev
+> begins. I'll make sure the SHA1 for Paolo's patch remains the same.
+>=20
+>   .travis.yml |    1 -
+>   1 file changed, 1 deletion(-)
+>=20
+> diff --git a/.travis.yml b/.travis.yml
+> index 445b0646c18a..6cb8af6fa599 100644
+> --- a/.travis.yml
+> +++ b/.travis.yml
+> @@ -26,7 +26,6 @@ addons:
+>         - libaio-dev
+>         - libattr1-dev
+>         - libbrlapi-dev
+> -      - libcap-dev
+>         - libcap-ng-dev
+>         - libgcc-4.8-dev
+>         - libgnutls28-dev
+>=20
+>=20
 
-Thanks, but I'd suggest to wait few more days to give time to others 
-reviewers. Else having multiple versions of a big series reviewed at the 
-same time is very confusing.
-I have other minor comments on others patches, but need to find the time 
-to continue reviewing.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
