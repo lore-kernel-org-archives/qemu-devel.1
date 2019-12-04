@@ -2,84 +2,78 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BTC_ID,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBABEC2BD09
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 17:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B78DBC43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 17:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5343205ED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 17:02:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 830722081B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 17:08:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="tnh7BobC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5343205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Id6dyCzj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 830722081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icY2V-0001Ks-Lu
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 12:02:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37650)
+	id 1icY8z-0007Jj-1B
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 12:08:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1icXhy-0007UQ-8a
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:40:59 -0500
+ (envelope-from <imammedo@redhat.com>) id 1icY6H-0005Ng-Eq
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 12:06:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1icXhr-0000Mr-1x
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:40:53 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:54638)
+ (envelope-from <imammedo@redhat.com>) id 1icY6G-00074U-3W
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 12:06:05 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56317
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1icXhe-0006zr-A7; Wed, 04 Dec 2019 11:40:39 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 8907096EF0;
- Wed,  4 Dec 2019 16:40:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1575477632;
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1icY6F-0006k1-V3
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 12:06:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575479162;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=DjGKPB5c4P8bd8a+QNrfUgzYWNg71wjN6eLs9KmHosA=;
- b=tnh7BobCcUBp+eIoC+Yfy9v91Q7AWWdA7AjwLJ6+QFRosm74E1i+ny0zlQro1llKDSDPEG
- E4opTNCd77Et0TWfXjt+L5z1r5/w2ZKJ4Jcy1kWUEZj0BwXZ9eT/VR8YFglupA8cATtPnB
- IL2V3unVulskwovAVJQyo3TLI3SjiDI=
-Subject: Re: [PATCH v6 0/9] Clock framework API
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190904125531.27545-1-damien.hedde@greensocs.com>
- <CAFEAcA98rt6nRDSrwk8XRbaBT67LZXvF=XEV13dtJBp4fPUscw@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <be199ad6-1b79-f77d-afad-faeb042151ed@greensocs.com>
-Date: Wed, 4 Dec 2019 17:40:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA98rt6nRDSrwk8XRbaBT67LZXvF=XEV13dtJBp4fPUscw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1575477632;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DjGKPB5c4P8bd8a+QNrfUgzYWNg71wjN6eLs9KmHosA=;
- b=31u+hFb35XIKDa1zPuVQ0clcg3xiPu4NiiRlCFmzEoaTMeZIlUAjP3BPdvy+D+SRLbcGNP
- E4KVIJnlSGQFOK69lfi8gKbAGuuLI50zbCmkY+T+Gg7c1udlnaLQNcMwj6PhGnWGOITGvM
- V7nkn9+3+Zvl+DzoLkYU2q7bGMfU65A=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575477632; a=rsa-sha256; cv=none;
- b=TRASPnEhWHWxFEkSUF/96I1NtUBXdQQaIT/hRwFBCIAVi8JltKJ72k9cDo+RVLqy0TwkdS
- +Lgp8RyONz60AWHMPlNzUyoa3Ldt1uBI3bszI0LavHW1b0fFbO/VR9UqDOxBmuX29KB02m
- kn5VpMDZ376B8+uebQQbfzPJZd0OP3M=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+ bh=hpMeJfL69t01dB4rXZUwcJ1cv+AEgkBhVyd3WRXvwJU=;
+ b=Id6dyCzjq9JyubOKC0s5mg2nE3zsx2BDwkUXEgNN04BCuUJfjHgcspD+1/BZO6lpJ9t+kA
+ bcctx15kjdcchkkGrH3aHEiiqbvVQHGTM2cL3wWLLpupbz4dbI346icNLHqz7YTY1Qp02N
+ IrJM+DovloHm0T21BHDrlShrZiZSJtQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-sBpHFzriMd-tDBZyFVDzRQ-1; Wed, 04 Dec 2019 12:05:57 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A0EE801E79
+ for <qemu-devel@nongnu.org>; Wed,  4 Dec 2019 17:05:56 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 60EB25D6BB;
+ Wed,  4 Dec 2019 17:05:55 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for-5.0 7/8] acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command
+Date: Wed,  4 Dec 2019 18:05:46 +0100
+Message-Id: <1575479147-6641-8-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1575479147-6641-1-git-send-email-imammedo@redhat.com>
+References: <1575479147-6641-1-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: sBpHFzriMd-tDBZyFVDzRQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,99 +85,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: pbonzini@redhat.com, philmd@redhat.com, lersek@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Extend CPU hotplug interface to return architecture specific
+identifier for current CPU in 2 registers:
+ - lower 32 bits existing ACPI_CPU_CMD_DATA_OFFSET_RW
+ - upper 32 bits in new ACPI_CPU_CMD_DATA2_OFFSET_R at
+   offset 0.
 
+Target user is UEFI firmware, which needs a way to enumerate
+all CPUs (including possible CPUs) to allocate and initialize
+CPU structures on boot.
+(for x86: it needs APIC ID and later command will be used to
+retrieve ARM's MPIDR which serves the similar to APIC ID purpose)
 
-On 12/2/19 5:15 PM, Peter Maydell wrote:
-> 
-> The one topic I think we could do with discussing is whether
-> a simple uint64_t giving the frequency of the clock in Hz is
-> the right representation. In particular in your patch 9 the
-> board has a clock frequency that's not a nice integer number
-> of Hz. I think Philippe also mentioned on irc some board where
-> the UART clock ends up at a weird frequency. Since the
-> representation of the frequency is baked into the migration
-> format it's going to be easier to get it right first rather
-> than trying to change it later.
-> 
-> So what should the representation be? Some random thoughts:
-> 
-> 1) ptimer internally uses a 'period plus fraction' representation:
->  int64_t period is the integer part of the period in nanoseconds,
->  uint32_t period_frac is the fractional part of the period
-> (if you like you can think of this as "96-bit integer
-> period measured in units of one-2^32nd of a nanosecond").
-> However its only public interfaces for setting the frequency
-> are (a) set the frequency in Hz (uint32_t) or (b) set
-> the period in nanoseconds (int64_t); the period_frac part
-> is used to handle frequencies which don't work out to
-> a nice whole number of nanoseconds per cycle.
-> 
-> 2) I hear that SystemC uses "value plus a time unit", with
-> the smallest unit being a picosecond. (I think SystemC
-> also lets you specify the duty cycle, but we definitely
-> don't want to get into that!)
+The new ACPI_CPU_CMD_DATA2_OFFSET_R register will also be used
+to detect presence of modern CPU hotplug, which will be described
+in follow up patch.
 
-The "value" is internally stored in a 64bits unsigned integer.
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+v1:
+ - s/ACPI_CPU_CMD_DATA2_OFFSET_RW/ACPI_CPU_CMD_DATA2_OFFSET_R/.
+---
+ docs/specs/acpi_cpu_hotplug.txt | 10 ++++++++--
+ hw/acpi/cpu.c                   | 15 +++++++++++++++
+ hw/acpi/trace-events            |  1 +
+ 3 files changed, 24 insertions(+), 2 deletions(-)
 
-> 
-> 3) QEMUTimers are basically just nanosecond timers
-> 
-> 4) The MAME emulator seems to work with periods of
-> 96-bit attoseconds (represented internally by a
-> 32-bit count of seconds plus a 64-bit count of
-> attoseconds). One attosecond is 1e-18 seconds.
-> 
-> Does anybody else have experience with other modelling
-> or emulator technology and how it represents clocks ?
+diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.=
+txt
+index 58c16c6..bb33144 100644
+--- a/docs/specs/acpi_cpu_hotplug.txt
++++ b/docs/specs/acpi_cpu_hotplug.txt
+@@ -44,7 +44,11 @@ keeps the current value.
+=20
+ read access:
+     offset:
+-    [0x0-0x3] reserved
++    [0x0-0x3] Command data 2: (DWORD access)
++              if last stored 'Command field' value:
++                  3: upper 32 bits of architecture specific identifying CP=
+U value
++                     (n x86 case: 0x0)
++                  other values: reserved
+     [0x4] CPU device status fields: (1 byte access)
+         bits:
+            0: Device is enabled and may be used by guest
+@@ -96,7 +100,9 @@ write access:
+               2: stores value into OST status register, triggers
+                  ACPI_DEVICE_OST QMP event from QEMU to external applicati=
+ons
+                  with current values of OST event and status registers.
+-            other values: reserved
++              3: lower 32 bit of architecture specific identifier
++                 (in x86 case: APIC ID)
++              other values: reserved
+=20
+     Typical usecases:
+         - Get a cpu with pending event
+diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
+index 87f30a3..87813ce 100644
+--- a/hw/acpi/cpu.c
++++ b/hw/acpi/cpu.c
+@@ -12,11 +12,13 @@
+ #define ACPI_CPU_FLAGS_OFFSET_RW 4
+ #define ACPI_CPU_CMD_OFFSET_WR 5
+ #define ACPI_CPU_CMD_DATA_OFFSET_RW 8
++#define ACPI_CPU_CMD_DATA2_OFFSET_R 0
+=20
+ enum {
+     CPHP_GET_NEXT_CPU_WITH_EVENT_CMD =3D 0,
+     CPHP_OST_EVENT_CMD =3D 1,
+     CPHP_OST_STATUS_CMD =3D 2,
++    CPHP_GET_CPU_ID_CMD =3D 3,
+     CPHP_CMD_MAX
+ };
+=20
+@@ -74,11 +76,24 @@ static uint64_t cpu_hotplug_rd(void *opaque, hwaddr add=
+r, unsigned size)
+         case CPHP_GET_NEXT_CPU_WITH_EVENT_CMD:
+            val =3D cpu_st->selector;
+            break;
++        case CPHP_GET_CPU_ID_CMD:
++           val =3D cdev->arch_id & 0xFFFFFFFF;
++           break;
+         default:
+            break;
+         }
+         trace_cpuhp_acpi_read_cmd_data(cpu_st->selector, val);
+         break;
++    case ACPI_CPU_CMD_DATA2_OFFSET_R:
++        switch (cpu_st->command) {
++        case CPHP_GET_CPU_ID_CMD:
++           val =3D cdev->arch_id >> 32;
++           break;
++        default:
++           break;
++        }
++        trace_cpuhp_acpi_read_cmd_data2(cpu_st->selector, val);
++        break;
+     default:
+         break;
+     }
+diff --git a/hw/acpi/trace-events b/hw/acpi/trace-events
+index 96b8273..afbc77d 100644
+--- a/hw/acpi/trace-events
++++ b/hw/acpi/trace-events
+@@ -23,6 +23,7 @@ cpuhp_acpi_read_flags(uint32_t idx, uint8_t flags) "idx[0=
+x%"PRIx32"] flags: 0x%"
+ cpuhp_acpi_write_idx(uint32_t idx) "set active cpu idx: 0x%"PRIx32
+ cpuhp_acpi_write_cmd(uint32_t idx, uint8_t cmd) "idx[0x%"PRIx32"] cmd: 0x%=
+"PRIx8
+ cpuhp_acpi_read_cmd_data(uint32_t idx, uint32_t data) "idx[0x%"PRIx32"] da=
+ta: 0x%"PRIx32
++cpuhp_acpi_read_cmd_data2(uint32_t idx, uint32_t data) "idx[0x%"PRIx32"] d=
+ata: 0x%"PRIx32
+ cpuhp_acpi_cpu_has_events(uint32_t idx, bool ins, bool rm) "idx[0x%"PRIx32=
+"] inserting: %d, removing: %d"
+ cpuhp_acpi_clear_inserting_evt(uint32_t idx) "idx[0x%"PRIx32"]"
+ cpuhp_acpi_clear_remove_evt(uint32_t idx) "idx[0x%"PRIx32"]"
+--=20
+2.7.4
 
-5) In linux, a clock rate is an "unsigned long" representing Hz.
-
-> 
-> I feel we should at least be able to represent clocks
-> with the same accuracy that ptimer has.
-
-Then is a maybe a good idea to store the period and not the frequency in
-clocks so that we don't loose anything when we switch from a clock to a
-ptimer ?
-
-Regarding the clock, I don't see any strong obstacle to switch
-internally to a period based value.
-The only things we have to choose is how to represent a disabled clock.
-Since putting a "0" period to a ptimer will disable the timer in
-ptimer_reload(). We can choose that (and it's a good value because we
-can multiply or divide it, it stays the same).
-
-We could use the same representation as a ptimer. But if we don't keep a
-C number representation, then computation of frequencies/periods will be
-complicated at best and error prone.
-
-From that point of view, if we could stick to a 64bits integer (or
-floating point number) it would be great. Can we use a sub nanosecond
-unit that fit our needs ?
-
-I did some test with a unit of 2^-32 of nanoseconds on 64bits (is that
-the unit of the ptimer fractional part ?) and if I'm not mistaken
-+ we have a frequency range from ~0.2Hz up to 10^18Hz
-+ the resolution is decreasing with the frequency (but at 100Mhz we have
-a ~2.3mHz resolution, at 1GHz it's ~0.23Hz and at 10GHz ~23Hz
-resolution). We hit 1Hz resolution around 2GHz.
-
-So it sounds to me we have largely enough resolution to model clocks in
-the range of frequencies we will have to handle. What do you think ?
-
---
-Damien
 
