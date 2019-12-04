@@ -2,82 +2,99 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A86B2C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C3ADC2BD09
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:23:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 621DB2077B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:21:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 487B8206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:23:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f5sesb5Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 621DB2077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RN5s3qki"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 487B8206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icXOz-0001ix-8Z
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 11:21:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60476)
+	id 1icXRW-0003oJ-BZ
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 11:23:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58258)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1icXFW-000566-Rq
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:11:37 -0500
+ (envelope-from <philmd@redhat.com>) id 1icX6B-00083G-5U
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:01:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1icXFV-00047r-5H
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:11:34 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41919)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1icXFU-00046f-A2; Wed, 04 Dec 2019 11:11:32 -0500
-Received: by mail-oi1-x242.google.com with SMTP id i1so3261594oie.8;
- Wed, 04 Dec 2019 08:11:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=5t/1v78hE6NyJ3o2GpUTU1gSeku0E4UCR1wVphzXSp8=;
- b=f5sesb5YnQ/z44M/W65klN3FzjaV2vupsX7HXvjF42WsFP2WRlxPtBurWsKdCXz5gQ
- VUZXTfBX4GTKlJT2h7zDnng7XrbfCXp1euLhsD02j4nMongOw4oGOEp8hG+Jed4iszW9
- 6wkclceNxBackjQq4kw/0FQ5UUox7MpnPWWevcRan+xdrRXA49FzHqXTDOQzD294aZa3
- +62A1m3HX32X3M11aU9G0WMal4nD06/lDh2+V5MFCcOx+PBm2thi3Gq8+6pqOF7yu13+
- V0HN704Muph5q2grlhjLvJhCg6pWC9M6yd6l4aza11FhVZm4pxbWjkNLX4mLRTi7fdF6
- jcyw==
+ (envelope-from <philmd@redhat.com>) id 1icX5z-0006PI-0b
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:01:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33435
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icX5u-0006MC-Gh
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:01:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575475290;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TNBoqztCstwZYxMByi6xuwbZGax13FXW2xIT8+Xcq8M=;
+ b=RN5s3qkiW7y0Uj5B9U3VMMBEDjxFKlk6I/orSVZ9LHegyNMAFTpXuqtuXAuCo5zTzlF1xF
+ UQqaa4QebPhuBRy611FkTJt1BjltuKZ1j+5SGxdWT5vKYQUK7zRbCVSVB5XqW5rAvTdoRb
+ EGYMEG5yz9CQRo7JZUebW5Vmj8lLZdE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-yy6BvyZ5PN-iLdMTDUUEAQ-1; Wed, 04 Dec 2019 11:01:26 -0500
+Received: by mail-wm1-f71.google.com with SMTP id s25so2257689wmj.3
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 08:01:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=5t/1v78hE6NyJ3o2GpUTU1gSeku0E4UCR1wVphzXSp8=;
- b=N7bVXmk6+WJw9okT6sz+vNfQaBZbAbO/8/BKTEtXjpeTxhFmtOGUQzD4rF+cxwL2eA
- Vku7c/y4agwCejTwWR4YJLcKUZmnujZU2n7HKIviE9UZ8HnV7VGYq+t+3b7KVm7avXAj
- p9vTMIrg3NCQTonHUaCzWL5j1q3LCKLdf2z38YviXH0eKCGpXXzvJgN0CcbwWRWuw4fM
- fMXo8xDrv1VpN3ziVVE8PH+htLGDKv81dJjRGNK+LiBaxahajJ361LkdgUqBwcREgaJg
- 6kROSC8UCPaMrGQ1F6H2muOBiyQx7LWbG5rd8nwvrgeGkA7ORx9FgAZXqDz6vrtgGB1Q
- rsPw==
-X-Gm-Message-State: APjAAAUuv+ThB9HlzpYP/joMM/xVapnP/fl3/sOOBREItgveXYeuy3g2
- teSnN2lKL2tA7OPiUm/HJ9+FHVSh1cM3aoss1GI=
-X-Google-Smtp-Source: APXvYqxUZ+jAdcGPjbecPw/g/WVBwmdylJiyeCZdznfJTk6fYWitEvneN5+muUyYDSY3GCoYDgamylautUTMMnrXFVw=
-X-Received: by 2002:aca:bd85:: with SMTP id n127mr3267748oif.136.1575475889777; 
- Wed, 04 Dec 2019 08:11:29 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pjhVVHKV653vzyxTWN9M8SByUKfzybjKDmv3ivyWFl4=;
+ b=s6h5AETk5mHHt99GT4zHyulzccTOfHCHm13Q1D/Gvn62V0Ev4faUcPt4lR9mRvZWw1
+ nULlRNDpKOXsTsKOEspL1hZw6kOftiJujDBZ5j3BUUSv7DBFwKmc4ieqQxqYbr4UVG2E
+ +Ft2IP3mq5nykz4RUK8pft9l7HVcnChd2KxB04e49SdY9YAlKAPGA4VD929T8iAQPZWB
+ VuFC6Il1hdkWfGqcVWIHKcneqzxscthYcDLakrzYYy4k2pkE3VMJZHIuHHwaE1TqeP8E
+ z9+myb13fhCpvMdMT8OusNnmBbul0G4M6ah73gdZrf5q5sArZP4WIRfYPS6vWSVcAMXd
+ Aq5w==
+X-Gm-Message-State: APjAAAW/iBB2MYsmw+FdDmrFVxd+lN6FPtnd34hziTbYcYoEmfdDnsfM
+ Dkzk9C2qL01zEK+CeSFE6+EFNcarW4syuKDd1Pio9/CIj/C4GaHTjQGjiW6AyjaZiub1/3ze3ku
+ cvx1o7+HEdP0r3cQ=
+X-Received: by 2002:a7b:c8d4:: with SMTP id f20mr247898wml.56.1575475284978;
+ Wed, 04 Dec 2019 08:01:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzb4UyTbQfuOvfhTggz2jJ981Lkx9EQtn4zy/9Pcsf2mjz7PGjoEQURkcMaPkLcrPwWN1uV8A==
+X-Received: by 2002:a7b:c8d4:: with SMTP id f20mr247860wml.56.1575475284685;
+ Wed, 04 Dec 2019 08:01:24 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id j184sm7539314wmb.44.2019.12.04.08.01.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 04 Dec 2019 08:01:24 -0800 (PST)
+Subject: Re: [PATCH v4 16/40] target/arm: Rearrange ARMMMUIdxBit
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-17-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7f43b552-e450-00f9-6e65-bcd59a6c870b@redhat.com>
+Date: Wed, 4 Dec 2019 17:01:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Wed, 4 Dec 2019 08:11:29 -0800 (PST)
-In-Reply-To: <20191202210947.3603-5-nieklinnenbank@gmail.com>
-References: <20191202210947.3603-1-nieklinnenbank@gmail.com>
- <20191202210947.3603-5-nieklinnenbank@gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 4 Dec 2019 17:11:29 +0100
-Message-ID: <CAL1e-=gVMXsWKAdo8c8QtjAYeK6p0AyTmi_a-sFHL2x4wGq6Vg@mail.gmail.com>
-Subject: Re: [PATCH 04/10] arm: allwinner-h3: add USB host controller
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000c332150598e3106d"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <20191203022937.1474-17-richard.henderson@linaro.org>
+Content-Language: en-US
+X-MC-Unique: yy6BvyZ5PN-iLdMTDUUEAQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,296 +106,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "b.galvani@gmail.com" <b.galvani@gmail.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c332150598e3106d
-Content-Type: text/plain; charset="UTF-8"
-
-On Monday, December 2, 2019, Niek Linnenbank <nieklinnenbank@gmail.com>
-wrote:
-
-> The Allwinner H3 System on Chip contains multiple USB 2.0 bus
-> connections which provide software access using the Enhanced
-> Host Controller Interface (EHCI) and Open Host Controller
-> Interface (OHCI) interfaces. This commit adds support for
-> both interfaces in the Allwinner H3 System on Chip.
->
-> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+On 12/3/19 3:29 AM, Richard Henderson wrote:
+> Define via macro expansion, so that renumbering of the base ARMMMUIdx
+> symbols is automatically reflexed in the bit definitions.
+>=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-
-
-Niek, hi!
-
-I would like to clarify a detail here:
-
-The spec of the SoC enumerates (in 8.5.2.4. USB Host Register List) a
-number of registers for reading various USB-related states, but also for
-setting some of USB features.
-
-Does this series cover these registers, and interaction with them? If yes,
-how and where? If not, do you think it is not necessary at all? Or perhaps
-that it is a non-crucial limitation of this series?
-
-Thanks in advance, and congrats for your, it seems, first submission!
-
-Aleksandar
-
-
- hw/arm/allwinner-h3.c    | 20 ++++++++++++++++++++
->  hw/usb/hcd-ehci-sysbus.c | 17 +++++++++++++++++
->  hw/usb/hcd-ehci.h        |  1 +
->  3 files changed, 38 insertions(+)
->
-> diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-> index 5566e979ec..afeb49c0ac 100644
-> --- a/hw/arm/allwinner-h3.c
-> +++ b/hw/arm/allwinner-h3.c
-> @@ -26,6 +26,7 @@
->  #include "hw/sysbus.h"
->  #include "hw/arm/allwinner-h3.h"
->  #include "hw/misc/unimp.h"
-> +#include "hw/usb/hcd-ehci.h"
->  #include "sysemu/sysemu.h"
->
->  static void aw_h3_init(Object *obj)
-> @@ -183,6 +184,25 @@ static void aw_h3_realize(DeviceState *dev, Error
-> **errp)
->      }
->      sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccu), 0, AW_H3_CCU_BASE);
->
-> +    /* Universal Serial Bus */
-> +    sysbus_create_simple(TYPE_AW_H3_EHCI, AW_H3_EHCI0_BASE,
-> +                         s->irq[AW_H3_GIC_SPI_EHCI0]);
-> +    sysbus_create_simple(TYPE_AW_H3_EHCI, AW_H3_EHCI1_BASE,
-> +                         s->irq[AW_H3_GIC_SPI_EHCI1]);
-> +    sysbus_create_simple(TYPE_AW_H3_EHCI, AW_H3_EHCI2_BASE,
-> +                         s->irq[AW_H3_GIC_SPI_EHCI2]);
-> +    sysbus_create_simple(TYPE_AW_H3_EHCI, AW_H3_EHCI3_BASE,
-> +                         s->irq[AW_H3_GIC_SPI_EHCI3]);
+>   target/arm/cpu.h | 39 +++++++++++++++++++++++----------------
+>   1 file changed, 23 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 5f295c7e60..6ba5126852 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2886,27 +2886,34 @@ typedef enum ARMMMUIdx {
+>       ARMMMUIdx_Stage1_E1 =3D 1 | ARM_MMU_IDX_NOTLB,
+>   } ARMMMUIdx;
+>  =20
+> -/* Bit macros for the core-mmu-index values for each index,
+> +/*
+> + * Bit macros for the core-mmu-index values for each index,
+>    * for use when calling tlb_flush_by_mmuidx() and friends.
+>    */
+> +#define TO_CORE_BIT(NAME) \
+> +    ARMMMUIdxBit_##NAME =3D 1 << (ARMMMUIdx_##NAME & ARM_MMU_IDX_COREIDX=
+_MASK)
 > +
-> +    sysbus_create_simple("sysbus-ohci", AW_H3_OHCI0_BASE,
-> +                         s->irq[AW_H3_GIC_SPI_OHCI0]);
-> +    sysbus_create_simple("sysbus-ohci", AW_H3_OHCI1_BASE,
-> +                         s->irq[AW_H3_GIC_SPI_OHCI1]);
-> +    sysbus_create_simple("sysbus-ohci", AW_H3_OHCI2_BASE,
-> +                         s->irq[AW_H3_GIC_SPI_OHCI2]);
-> +    sysbus_create_simple("sysbus-ohci", AW_H3_OHCI3_BASE,
-> +                         s->irq[AW_H3_GIC_SPI_OHCI3]);
+>   typedef enum ARMMMUIdxBit {
+> -    ARMMMUIdxBit_EL10_0 =3D 1 << 0,
+> -    ARMMMUIdxBit_EL10_1 =3D 1 << 1,
+> -    ARMMMUIdxBit_E2 =3D 1 << 2,
+> -    ARMMMUIdxBit_SE3 =3D 1 << 3,
+> -    ARMMMUIdxBit_SE0 =3D 1 << 4,
+> -    ARMMMUIdxBit_SE1 =3D 1 << 5,
+> -    ARMMMUIdxBit_Stage2 =3D 1 << 6,
+> -    ARMMMUIdxBit_MUser =3D 1 << 0,
+> -    ARMMMUIdxBit_MPriv =3D 1 << 1,
+> -    ARMMMUIdxBit_MUserNegPri =3D 1 << 2,
+> -    ARMMMUIdxBit_MPrivNegPri =3D 1 << 3,
+> -    ARMMMUIdxBit_MSUser =3D 1 << 4,
+> -    ARMMMUIdxBit_MSPriv =3D 1 << 5,
+> -    ARMMMUIdxBit_MSUserNegPri =3D 1 << 6,
+> -    ARMMMUIdxBit_MSPrivNegPri =3D 1 << 7,
+> +    TO_CORE_BIT(EL10_0),
+> +    TO_CORE_BIT(EL10_1),
+> +    TO_CORE_BIT(E2),
+> +    TO_CORE_BIT(SE0),
+> +    TO_CORE_BIT(SE1),
+> +    TO_CORE_BIT(SE3),
+> +    TO_CORE_BIT(Stage2),
 > +
->      /* UART */
->      if (serial_hd(0)) {
->          serial_mm_init(get_system_memory(), AW_H3_UART0_REG_BASE, 2,
-> diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c
-> index 020211fd10..174c3446ef 100644
-> --- a/hw/usb/hcd-ehci-sysbus.c
-> +++ b/hw/usb/hcd-ehci-sysbus.c
-> @@ -145,6 +145,22 @@ static const TypeInfo ehci_exynos4210_type_info = {
->      .class_init    = ehci_exynos4210_class_init,
->  };
->
-> +static void ehci_aw_h3_class_init(ObjectClass *oc, void *data)
-> +{
-> +    SysBusEHCIClass *sec = SYS_BUS_EHCI_CLASS(oc);
-> +    DeviceClass *dc = DEVICE_CLASS(oc);
+> +    TO_CORE_BIT(MUser),
+> +    TO_CORE_BIT(MPriv),
+> +    TO_CORE_BIT(MUserNegPri),
+> +    TO_CORE_BIT(MPrivNegPri),
+> +    TO_CORE_BIT(MSUser),
+> +    TO_CORE_BIT(MSPriv),
+> +    TO_CORE_BIT(MSUserNegPri),
+> +    TO_CORE_BIT(MSPrivNegPri),
+>   } ARMMMUIdxBit;
+>  =20
+> +#undef TO_CORE_BIT
 > +
-> +    sec->capsbase = 0x0;
-> +    sec->opregbase = 0x10;
-> +    set_bit(DEVICE_CATEGORY_USB, dc->categories);
-> +}
-> +
-> +static const TypeInfo ehci_aw_h3_type_info = {
-> +    .name          = TYPE_AW_H3_EHCI,
-> +    .parent        = TYPE_SYS_BUS_EHCI,
-> +    .class_init    = ehci_aw_h3_class_init,
-> +};
-> +
->  static void ehci_tegra2_class_init(ObjectClass *oc, void *data)
->  {
->      SysBusEHCIClass *sec = SYS_BUS_EHCI_CLASS(oc);
-> @@ -267,6 +283,7 @@ static void ehci_sysbus_register_types(void)
->      type_register_static(&ehci_platform_type_info);
->      type_register_static(&ehci_xlnx_type_info);
->      type_register_static(&ehci_exynos4210_type_info);
-> +    type_register_static(&ehci_aw_h3_type_info);
->      type_register_static(&ehci_tegra2_type_info);
->      type_register_static(&ehci_ppc4xx_type_info);
->      type_register_static(&ehci_fusbh200_type_info);
-> diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
-> index 0298238f0b..edb59311c4 100644
-> --- a/hw/usb/hcd-ehci.h
-> +++ b/hw/usb/hcd-ehci.h
-> @@ -342,6 +342,7 @@ typedef struct EHCIPCIState {
->  #define TYPE_SYS_BUS_EHCI "sysbus-ehci-usb"
->  #define TYPE_PLATFORM_EHCI "platform-ehci-usb"
->  #define TYPE_EXYNOS4210_EHCI "exynos4210-ehci-usb"
-> +#define TYPE_AW_H3_EHCI "aw-h3-ehci-usb"
->  #define TYPE_TEGRA2_EHCI "tegra2-ehci-usb"
->  #define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
->  #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
-> --
-> 2.17.1
->
->
->
+>   #define MMU_USER_IDX 0
+>  =20
+>   static inline int arm_to_core_mmu_idx(ARMMMUIdx mmu_idx)
+>=20
 
---000000000000c332150598e3106d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-<br><br>On Monday, December 2, 2019, Niek Linnenbank &lt;<a href=3D"mailto:=
-nieklinnenbank@gmail.com">nieklinnenbank@gmail.com</a>&gt; wrote:<br><block=
-quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
- solid;padding-left:1ex">The Allwinner H3 System on Chip contains multiple =
-USB 2.0 bus<br>
-connections which provide software access using the Enhanced<br>
-Host Controller Interface (EHCI) and Open Host Controller<br>
-Interface (OHCI) interfaces. This commit adds support for<br>
-both interfaces in the Allwinner H3 System on Chip.<br>
-<br>
-Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.c=
-om">nieklinnenbank@gmail.com</a>&gt;<br>
----</blockquote><div><br></div><div>Niek, hi!</div><div><br></div><div>I wo=
-uld like to clarify a detail here:</div><div><br></div><div>The spec of the=
- SoC enumerates (in 8.5.2.4. USB Host Register List) a number of registers =
-for reading various USB-related states, but also for setting some of USB fe=
-atures.</div><div>=C2=A0</div><div>Does this series cover these registers, =
-and interaction with them? If yes, how and where? If not, do you think it i=
-s not necessary at all? Or perhaps that it is a non-crucial limitation of t=
-his series?</div><div><br></div><div>Thanks in advance, and congrats for yo=
-ur, it seems, first submission!</div><div><br></div><div>Aleksandar</div><d=
-iv><br></div><div><br></div><blockquote class=3D"gmail_quote" style=3D"marg=
-in:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-=C2=A0hw/arm/allwinner-h3.c=C2=A0 =C2=A0 | 20 ++++++++++++++++++++<br>
-=C2=A0hw/usb/hcd-ehci-sysbus.c | 17 +++++++++++++++++<br>
-=C2=A0hw/usb/hcd-ehci.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 1 +<br>
-=C2=A03 files changed, 38 insertions(+)<br>
-<br>
-diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c<br>
-index 5566e979ec..afeb49c0ac 100644<br>
---- a/hw/arm/allwinner-h3.c<br>
-+++ b/hw/arm/allwinner-h3.c<br>
-@@ -26,6 +26,7 @@<br>
-=C2=A0#include &quot;hw/sysbus.h&quot;<br>
-=C2=A0#include &quot;hw/arm/allwinner-h3.h&quot;<br>
-=C2=A0#include &quot;hw/misc/unimp.h&quot;<br>
-+#include &quot;hw/usb/hcd-ehci.h&quot;<br>
-=C2=A0#include &quot;sysemu/sysemu.h&quot;<br>
-<br>
-=C2=A0static void aw_h3_init(Object *obj)<br>
-@@ -183,6 +184,25 @@ static void aw_h3_realize(DeviceState *dev, Error **er=
-rp)<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0sysbus_mmio_map(SYS_BUS_<wbr>DEVICE(&amp;s-&gt;ccu), 0,=
- AW_H3_CCU_BASE);<br>
-<br>
-+=C2=A0 =C2=A0 /* Universal Serial Bus */<br>
-+=C2=A0 =C2=A0 sysbus_create_simple(TYPE_AW_<wbr>H3_EHCI, AW_H3_EHCI0_BASE,=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0s-&gt;irq[AW_H3_GIC_SPI_EHCI0]);<br>
-+=C2=A0 =C2=A0 sysbus_create_simple(TYPE_AW_<wbr>H3_EHCI, AW_H3_EHCI1_BASE,=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0s-&gt;irq[AW_H3_GIC_SPI_EHCI1]);<br>
-+=C2=A0 =C2=A0 sysbus_create_simple(TYPE_AW_<wbr>H3_EHCI, AW_H3_EHCI2_BASE,=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0s-&gt;irq[AW_H3_GIC_SPI_EHCI2]);<br>
-+=C2=A0 =C2=A0 sysbus_create_simple(TYPE_AW_<wbr>H3_EHCI, AW_H3_EHCI3_BASE,=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0s-&gt;irq[AW_H3_GIC_SPI_EHCI3]);<br>
-+<br>
-+=C2=A0 =C2=A0 sysbus_create_simple(&quot;sysbus-<wbr>ohci&quot;, AW_H3_OHC=
-I0_BASE,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0s-&gt;irq[AW_H3_GIC_SPI_OHCI0]);<br>
-+=C2=A0 =C2=A0 sysbus_create_simple(&quot;sysbus-<wbr>ohci&quot;, AW_H3_OHC=
-I1_BASE,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0s-&gt;irq[AW_H3_GIC_SPI_OHCI1]);<br>
-+=C2=A0 =C2=A0 sysbus_create_simple(&quot;sysbus-<wbr>ohci&quot;, AW_H3_OHC=
-I2_BASE,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0s-&gt;irq[AW_H3_GIC_SPI_OHCI2]);<br>
-+=C2=A0 =C2=A0 sysbus_create_simple(&quot;sysbus-<wbr>ohci&quot;, AW_H3_OHC=
-I3_BASE,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0s-&gt;irq[AW_H3_GIC_SPI_OHCI3]);<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0/* UART */<br>
-=C2=A0 =C2=A0 =C2=A0if (serial_hd(0)) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0serial_mm_init(get_system_<wbr>memory(), =
-AW_H3_UART0_REG_BASE, 2,<br>
-diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c<br>
-index 020211fd10..174c3446ef 100644<br>
---- a/hw/usb/hcd-ehci-sysbus.c<br>
-+++ b/hw/usb/hcd-ehci-sysbus.c<br>
-@@ -145,6 +145,22 @@ static const TypeInfo ehci_exynos4210_type_info =3D {<=
-br>
-=C2=A0 =C2=A0 =C2=A0.class_init=C2=A0 =C2=A0 =3D ehci_exynos4210_class_init=
-,<br>
-=C2=A0};<br>
-<br>
-+static void ehci_aw_h3_class_init(<wbr>ObjectClass *oc, void *data)<br>
-+{<br>
-+=C2=A0 =C2=A0 SysBusEHCIClass *sec =3D SYS_BUS_EHCI_CLASS(oc);<br>
-+=C2=A0 =C2=A0 DeviceClass *dc =3D DEVICE_CLASS(oc);<br>
-+<br>
-+=C2=A0 =C2=A0 sec-&gt;capsbase =3D 0x0;<br>
-+=C2=A0 =C2=A0 sec-&gt;opregbase =3D 0x10;<br>
-+=C2=A0 =C2=A0 set_bit(DEVICE_CATEGORY_USB, dc-&gt;categories);<br>
-+}<br>
-+<br>
-+static const TypeInfo ehci_aw_h3_type_info =3D {<br>
-+=C2=A0 =C2=A0 .name=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_AW_H3_EHCI,=
-<br>
-+=C2=A0 =C2=A0 .parent=C2=A0 =C2=A0 =C2=A0 =C2=A0 =3D TYPE_SYS_BUS_EHCI,<br=
->
-+=C2=A0 =C2=A0 .class_init=C2=A0 =C2=A0 =3D ehci_aw_h3_class_init,<br>
-+};<br>
-+<br>
-=C2=A0static void ehci_tegra2_class_init(<wbr>ObjectClass *oc, void *data)<=
-br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0SysBusEHCIClass *sec =3D SYS_BUS_EHCI_CLASS(oc);<br>
-@@ -267,6 +283,7 @@ static void ehci_sysbus_register_types(<wbr>void)<br>
-=C2=A0 =C2=A0 =C2=A0type_register_static(&amp;ehci_<wbr>platform_type_info)=
-;<br>
-=C2=A0 =C2=A0 =C2=A0type_register_static(&amp;ehci_<wbr>xlnx_type_info);<br=
->
-=C2=A0 =C2=A0 =C2=A0type_register_static(&amp;ehci_<wbr>exynos4210_type_inf=
-o);<br>
-+=C2=A0 =C2=A0 type_register_static(&amp;ehci_aw_<wbr>h3_type_info);<br>
-=C2=A0 =C2=A0 =C2=A0type_register_static(&amp;ehci_<wbr>tegra2_type_info);<=
-br>
-=C2=A0 =C2=A0 =C2=A0type_register_static(&amp;ehci_<wbr>ppc4xx_type_info);<=
-br>
-=C2=A0 =C2=A0 =C2=A0type_register_static(&amp;ehci_<wbr>fusbh200_type_info)=
-;<br>
-diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h<br>
-index 0298238f0b..edb59311c4 100644<br>
---- a/hw/usb/hcd-ehci.h<br>
-+++ b/hw/usb/hcd-ehci.h<br>
-@@ -342,6 +342,7 @@ typedef struct EHCIPCIState {<br>
-=C2=A0#define TYPE_SYS_BUS_EHCI &quot;sysbus-ehci-usb&quot;<br>
-=C2=A0#define TYPE_PLATFORM_EHCI &quot;platform-ehci-usb&quot;<br>
-=C2=A0#define TYPE_EXYNOS4210_EHCI &quot;exynos4210-ehci-usb&quot;<br>
-+#define TYPE_AW_H3_EHCI &quot;aw-h3-ehci-usb&quot;<br>
-=C2=A0#define TYPE_TEGRA2_EHCI &quot;tegra2-ehci-usb&quot;<br>
-=C2=A0#define TYPE_PPC4xx_EHCI &quot;ppc4xx-ehci-usb&quot;<br>
-=C2=A0#define TYPE_FUSBH200_EHCI &quot;fusbh200-ehci-usb&quot;<br>
--- <br>
-2.17.1<br>
-<br>
-<br>
-</blockquote>
-
---000000000000c332150598e3106d--
 
