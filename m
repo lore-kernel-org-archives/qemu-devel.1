@@ -6,80 +6,87 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C96FBC43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9C7C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:17:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C2B62077B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D98B2077B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:17:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DvmVH+sg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C2B62077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QLIYeiYU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D98B2077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icXGx-0005E8-PY
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 11:13:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56369)
+	id 1icXKn-0007Fl-Nw
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 11:17:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57052)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1icWsP-0007zl-Ha
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:47:42 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1icWxq-00036c-Sl
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:53:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1icWsM-00016L-Pa
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:47:41 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22826
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1icWsM-00014d-Lh
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:47:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575474457;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZeT4eCJP83I9XOzpzs9v7jQ3UQn1BfRckosLr2Q8ki4=;
- b=DvmVH+sgaNjLMyqsZ5FsaE+TqegTDiIj/jIeEzUYj0j1GxCuqmzJXP3kDh0YBuGsl9KEpD
- kvx3yJWqP3HG4v7psaJ6QgxzSd+tV8e3ypcPrU4KzE6nv8DigcQ8BHjd0Plruj2CSP1cZx
- 0MVangFrRPyOx6GJLox2NlLrO9ERxpM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-JB1bfsHhNOOrCVhyzWEiiw-1; Wed, 04 Dec 2019 10:47:33 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A0C0F12A7E49;
- Wed,  4 Dec 2019 15:47:32 +0000 (UTC)
-Received: from localhost (ovpn-116-90.gru2.redhat.com [10.97.116.90])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 32561A4B60;
- Wed,  4 Dec 2019 15:47:31 +0000 (UTC)
-Date: Wed, 4 Dec 2019 12:47:30 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
- include msrs
-Message-ID: <20191204154730.GB498046@habkost.net>
-References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
- <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
- <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
- <714a0a86-4301-e756-654f-7765d4eb73db@redhat.com>
- <CAEn6zmHnTLZxa6Qv=8oDUPYpRD=rvGxJOLjd8Qb15k9-3U+CKw@mail.gmail.com>
- <3a1c97b2-789f-dd21-59ba-f780cf3bad92@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1icWxp-0003Fu-Hu
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:53:18 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43405)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1icWxm-0003ES-MT
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:53:17 -0500
+Received: by mail-wr1-x441.google.com with SMTP id d16so4578503wre.10
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 07:53:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=zJ5VltuwF9J0WFbKN94Y1Ob9y4zVLqrewOvo2Uo7DFE=;
+ b=QLIYeiYU6r/iXOiX2fkrEUQteqElWKBaumULHaB3iKUkey25qnA1GhjLfjR1wDEQP1
+ hx8fZq/EibeStySdPBj7YshpknIS8X9YIPeAsKXdtdHGHgprzL7pVTq5dVIgz1jB1LMh
+ IlmgQBG/GNUIn4EMSxbw9bZspQqcR9frXKLSsraYZUPZiPEbopab2P7ufaRjjuKgU0FI
+ poGRW5o1Eq9mtgO+JrFqxsOePGtMqSyg/0m+Q4Uy7dnGN7UdjEGoeNOn8NL4F2oZMPWK
+ jByK4Cw9VOFbEW8ZA9zctiDqwYLZUooa6KcMMDvG6kY02p7Cdq0tNcGIifr7MqIRqhXU
+ tCcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=zJ5VltuwF9J0WFbKN94Y1Ob9y4zVLqrewOvo2Uo7DFE=;
+ b=a7hKomPSw5zGB3T4lu9XS9IBRbQztFGXpmzM68uhTzkjYT2ft5OUM1TQmZivlc/mjW
+ Ki+jMoudOltNjxjyuEnsVL8ym9gcvUHhFcUITVa1vmXNIQFEVg+xFUxgxRNBeUuK7LJ9
+ 0gRWPtaXEsJhdwdaH3MdrGuSXMD65urMUmt12uBP43ZClOhEqMbtKgDUWGz4kXt1yoMy
+ KHn80CSv3ZC1ZR0jLHUTmujzz2QATimpOP+bo10m2sp48x/Z0PwA7fCbmwul+taFAmQz
+ ezW7E00zRy6WLCMWprS2X4aMeo5dw9jiUOCgSsaADo3bRh9Nc6Gf/v7kW4/hXdXlLKy8
+ /qhw==
+X-Gm-Message-State: APjAAAWawzJfNAqYd55YIAy67xzP+6bE5KgMdPfTpz+ahbNEAfY5Ku+i
+ MWYSwqnMQpwq5csmHfbI8hk2Yw==
+X-Google-Smtp-Source: APXvYqw2O9JOWyddUFdC7e1AquKCVkkhnhIcYQ46QwQwJ+Z7KHzQnrJiAwoIAklgJVb9us82+qtH0A==
+X-Received: by 2002:adf:d0c1:: with SMTP id z1mr4937147wrh.371.1575474792938; 
+ Wed, 04 Dec 2019 07:53:12 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u1sm7052656wmc.3.2019.12.04.07.53.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Dec 2019 07:53:11 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 750701FF87;
+ Wed,  4 Dec 2019 15:53:10 +0000 (GMT)
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-15-richard.henderson@linaro.org>
+ <87y2vs8gf1.fsf@linaro.org>
+ <dd46a349-cbe2-d114-90f4-5d9b8c7d6d84@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v4 14/40] target/arm: Recover 4 bits from TBFLAGs
+In-reply-to: <dd46a349-cbe2-d114-90f4-5d9b8c7d6d84@linaro.org>
+Date: Wed, 04 Dec 2019 15:53:10 +0000
+Message-ID: <8736e084ux.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <3a1c97b2-789f-dd21-59ba-f780cf3bad92@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: JB1bfsHhNOOrCVhyzWEiiw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,32 +98,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Catherine Ho <catherine.hecx@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Dec 04, 2019 at 04:34:45PM +0100, Paolo Bonzini wrote:
-> On 04/12/19 16:07, Catherine Ho wrote:
-> >> Ok, so the problem is that some MSR didn't exist in that version.  Whi=
-ch
-> > I thought in my platform, the only MSR didn't exist is MSR_IA32_VMX_BAS=
-IC
-> > (0x480). If I remove this kvm_msr_entry_add(), everything is ok, the gu=
-est can
-> > be boot up successfully.
-> >=20
->=20
-> MSR_IA32_VMX_BASIC was added in kvm-4.10.  Maybe the issue is the
-> _value_ that is being written to the VM is not valid?  Can you check
-> what's happening in vmx_restore_vmx_basic?
 
-I believe env->features[FEAT_VMX_BASIC] will be initialized to 0
-if the host kernel doesn't have KVM_CAP_GET_MSR_FEATURES.
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> On 12/4/19 3:43 AM, Alex Benn=C3=A9e wrote:
+<snip>
+>>>  void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int ma=
+x_insns)
+>>>  {
+>>> -    DisasContext dc;
+>>> +    DisasContext dc =3D { };
+>>=20
+>> We seemed to have dropped an initialise here which seems unrelated.
+>
+> Added, not dropped.
+
+But is it related to this patch or fixing another bug?
+
 
 --=20
-Eduardo
-
+Alex Benn=C3=A9e
 
