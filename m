@@ -2,66 +2,167 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 377DCC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 03:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77082C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 04:36:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 079752068E
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 03:41:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 079752068E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2B84320640
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 04:36:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="Q+F4wjNN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B84320640
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icLXv-0008Aw-3B
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 22:41:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42915)
+	id 1icMOy-00039m-Bs
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 23:36:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42103)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1icLNn-00060F-MA
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:31:24 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1icMC8-0001FX-Rt
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 23:23:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1icLNj-00010n-8C
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:31:19 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:52710 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1icLNX-0008E9-W2; Tue, 03 Dec 2019 22:31:04 -0500
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 89B0DE1142E1988051D4;
- Wed,  4 Dec 2019 11:30:53 +0800 (CST)
-Received: from [127.0.0.1] (10.120.177.99) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Wed, 4 Dec 2019
- 11:30:46 +0800
-Subject: Re: for 4.2 ??? Re: [PATCH V3 2/2] block/nbd: fix memory leak in
- nbd_open()
-To: Eric Blake <eblake@redhat.com>, Vladimir Sementsov-Ogievskiy
- <vsementsov@virtuozzo.com>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>, "sgarzare@redhat.com"
- <sgarzare@redhat.com>
-References: <1575012326-51324-1-git-send-email-pannengyuan@huawei.com>
- <1575012326-51324-2-git-send-email-pannengyuan@huawei.com>
- <1cff97de-303b-3b27-f737-3f69759746b0@virtuozzo.com>
- <08f0d51d-f352-5d64-26a4-9a741a4cf2e0@redhat.com>
-From: pannengyuan <pannengyuan@huawei.com>
-Message-ID: <20c34f0f-17cb-8de0-2cfc-7610bcad3b8e@huawei.com>
-Date: Wed, 4 Dec 2019 11:30:43 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ (envelope-from <aik@ozlabs.ru>) id 1icMC3-0004Z8-JP
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 23:23:17 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40744)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1icMC1-0004Ry-Dd
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 23:23:14 -0500
+Received: by mail-pl1-x644.google.com with SMTP id g6so2590251plp.7
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 20:23:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=KoKNce4lifwQRExbbrKK8kjWZqymkqDPeibKk3S4keI=;
+ b=Q+F4wjNNCwshaWsObUkBatgKwBqnJe1TIzCC/plX+W7fzgK++CAj6NZ4IaCwvfeBdB
+ XqVgu11iLAJOIleI0ZV158Au1JsA1b+0/+pyJqJI2J5F0jpM+TSNUSiM/CHVWvhUX+SL
+ bz5uykXGr2shuTSttSnfI2FQbuMF9YR55nVS25k3U+7/qMeQ1T8Aa8qt1EavnRmhToG4
+ 6jqgyNsiDGC2jVYyH4SACBwxPJBLmLg0C6k3poSd9vr8CX73vO6EDblyUCHIryAXQrap
+ C2R/oxXnNnKziIKefVyLhS78Y9lgFf4wdd2vEdriLOatlmJN/C9x2Y6jy919iaIEAHwd
+ Tm8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=KoKNce4lifwQRExbbrKK8kjWZqymkqDPeibKk3S4keI=;
+ b=hE0ssWr4aAt5nTguZibuqNHb+B5HjLuLuziBedlU5ArVRZ1HRV2CZd4/omwPGQVIjl
+ 0yg/0jFIJbcJm4VpaFJJ1Lfio3atsa1TDhdod7P3WWLx6/py6Yn6KBgfsXtO9OQ6wKBn
+ gzN5p7DgF9wgyK0LLhNvrj/2hlbm7MEgcXuMm1VudQASIL75UQTRZCdXvPBoNCWZc/zM
+ q0sUtXMfxVHB42TR70oXfHpcMGobTjA1kZpSY0v5j4G+5vmmAYdboxQFlY30YcZtgDCr
+ iFjDgnGtGNsW2mKwdctJb6XDmzP8OaPQLllfvTn+4cP8SnkqGq22pc6aFnKnkQgGE148
+ gzxA==
+X-Gm-Message-State: APjAAAWNWErKxZSvUWLEi3ETN5y+rEN+F8fepSVr/RPwDaSyvUJXj+g6
+ PQguNrPC7+1ZhMYOlVQ1Zj/IwQ==
+X-Google-Smtp-Source: APXvYqz4XYPJKAmI3R+VarfhODAx2lTVqjspcMLBaIOdgAq1IOIp4oaQ5SWRYgc0itsqk3OlVCWvDQ==
+X-Received: by 2002:a17:90a:bd91:: with SMTP id
+ z17mr1202875pjr.34.1575433387719; 
+ Tue, 03 Dec 2019 20:23:07 -0800 (PST)
+Received: from [10.61.2.175] ([122.99.82.10])
+ by smtp.gmail.com with ESMTPSA id f23sm4914558pgj.76.2019.12.03.20.23.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 03 Dec 2019 20:23:07 -0800 (PST)
+Subject: Re: [PULL v2 4/6] spapr: Add /chosen to FDT only at reset time to
+ preserve kernel and initramdisk
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20191118105319.7658-1-lvivier@redhat.com>
+ <20191118105319.7658-5-lvivier@redhat.com>
+ <a65399f9-fb59-a54b-3185-1f48ee979d3d@redhat.com>
+ <13846307-0e59-53b3-38cf-54270b43ed87@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Autocrypt: addr=aik@ozlabs.ru; keydata=
+ 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
+Message-ID: <96e02c6c-d381-1055-faca-406c475c94f4@ozlabs.ru>
+Date: Wed, 4 Dec 2019 15:23:03 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <08f0d51d-f352-5d64-26a4-9a741a4cf2e0@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-X-Originating-IP: [10.120.177.99]
-X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.35
+In-Reply-To: <13846307-0e59-53b3-38cf-54270b43ed87@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,71 +174,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "liyiting@huawei.com" <liyiting@huawei.com>,
- "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- qemu-stable <qemu-stable@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kuhn.chenqun@huawei.com" <kuhn.chenqun@huawei.com>
+Cc: qemu-ppc@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 2019/12/4 2:54, Eric Blake wrote:
-> On 12/3/19 11:52 AM, Vladimir Sementsov-Ogievskiy wrote:
->> It's just a memory leak, but it's a regression in 4.2.
->>
->> Should we take it into 4.2?
->=20
-> Sorry, I was on holiday and then jury service, so I missed any chance a=
-t
-> getting this into -rc3.=C2=A0 The memory leak only happens on failure, =
-and
-> you'd have to be pretty desperate to purposefully attempt to open a lot
-> of NBD devices where you know you'll get a failure just to trigger
-> enough of a leak to cause the OOM-killer to target qemu.=C2=A0 So I'm f=
-ine if
-> this is deferred to 5.0, and just cc's qemu-stable (now done).
->=20
-> I'll queue this through my NBD tree for 5.0.
->=20
->>
->>
->> 29.11.2019 10:25, pannengyuan@huawei.com wrote:
->>> From: PanNengyuan <pannengyuan@huawei.com>
->=20
+On 04/12/2019 03:09, Laurent Vivier wrote:
+> 
+> Bad reply, the problem is with
+> 
+> "spapr: Render full FDT on ibm,client-architecture-support"
+
+
+https://git.qemu.org/?p=SLOF.git;a=blob;f=board-qemu/slof/fdt.fs;h=3e4c1b34b8af2dcebde57e548c94417e5e20e1cc;hb=HEAD#l265
+
+A "bit ugly" became really ugly as before we were only patching
+interrupt-map for PHB (7 cells per line) only but now we have to patch
+(or, rather, skip) the PCI bridge interrupt-map (9 cells per line).
+
+Fixing now...
+
+
+> 
+> Sorry,
+> Laurent
+> 
+> On 03/12/2019 16:57, Laurent Vivier wrote:
+>> On 18/11/2019 11:53, Laurent Vivier wrote:
+>>> From: Alexey Kardashevskiy <aik@ozlabs.ru>
 >>>
->>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>> Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
->=20
-> I'm not one to tell you that your name is written incorrectly, but it
-> does look odd to have a single word rather than a space between two
-> capitalized portions.=C2=A0 If that's really how you want your S-o-b an=
-d
-> authorship to appear, I'm happy to preserve it; but you may want to
-> consider updating your git settings, and posting a v4 with an updated
-> spelling if you would prefer something different.=C2=A0 (It is also
-> acceptable to use UTF-8 characters; some people like listing an S-o-b i=
-n
-> both native characters and a Westernized variant).
->=20
-
-Thanks for your advice, I will update my git settings.
-
+>>> Since "spapr: Render full FDT on ibm,client-architecture-support" we build
+>>> the entire flatten device tree (FDT) twice - at the reset time and
+>>> when "ibm,client-architecture-support" (CAS) is called. The full FDT from
+>>> CAS is then applied on top of the SLOF internal device tree.
+>>>
+>>> This is mostly ok, however there is a case when the QEMU is started with
+>>> -initrd and for some reason the guest decided to move/unpack the init RAM
+>>> disk image - the guest correctly notifies SLOF about the change but
+>>> at CAS it is overridden with the QEMU initial location addresses and
+>>> the guest may fail to boot if the original initrd memory was changed.
+>>>
+>>> This fixes the problem by only adding the /chosen node at the reset time
+>>> to prevent the original QEMU's linux,initrd-start/linux,initrd-end to
+>>> override the updated addresses.
+>>>
+>>> This only treats /chosen differently as we know there is a special case
+>>> already and it is unlikely anything else will need to change /chosen at CAS
+>>> we are better off not touching /chosen after we handed it over to SLOF.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>> Message-Id: <20191024041308.5673-1-aik@ozlabs.ru>
+>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>>> ---
+>>>  hw/ppc/spapr.c | 25 +++++++++++++++----------
+>>>  1 file changed, 15 insertions(+), 10 deletions(-)
+>>>
 >>
->> May add:
+>> This patch breaks pseries boot when we use a pci-bridge (since v4.2.0-rc0):
 >>
->> Fixes: 8f071c9db506e03ab
->=20
-> Yes, information like that helps in deciding how long the problem has
-> been present (in this case, it is indeed a regression added in 4.2, eve=
-n
-> if minor in nature).
->=20
+>> ...
+>>     -device pci-bridge,id=pci_bridge1,bus=pci.0,addr=0x3,chassis_nr=1 \
+>>     -device virtio-scsi-pci,bus=pci_bridge1 \
+>> ...
+>>
+>> OF stdout device is: /vdevice/vty@71000000
+>> Preparing to boot Linux version 5.4.0-rc3+ (lvivier@localhost) (gcc
+>> version 4.8.5 20150623 (Red Hat 4.8.5-39) (GCC)) #2 SMP Wed Nov 13
+>> 09:08:20 EST 2019
+>> Detected machine type: 0000000000000101
+>> command line: BOOT_IMAGE=/vmlinuz-5.4.0-rc3+ root=/dev/mapper/rhel-root
+>> ro crashkernel=auto rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap
+>> Max number of cores passed to firmware: 2048 (NR_CPUS = 2048)
+>> Calling ibm,client-architecture-support...
+>>
+>> ( 300 ) Data Storage Exception [ 1dc5f230 ]
+>>
+>>
+>>     R0 .. R7           R8 .. R15         R16 .. R23         R24 .. R31
+>> 8000000000001000   000000001e477010   0000000000000000   000000001dc17500
+>> 000000001e67afe0   0000000020000004   0000000000000000   000000001dc1bf88
+>> 000000001dc21800   000000001dc5f248   000000001e477010   0000000000000003
+>> 000000001dc61000   000000001e78dc2d   000000001dc1c158   000000000000f001
+>> 0000000000000000   a000000000000001   0000000000008000   000000001e67b060
+>> 000000001dc5f230   0000000000000000   000000000000f003   ffffffffffffffff
+>> 000000001e745860   0000000000000000   0000000000000006   000000001dbf48f8
+>> 000000001dc5f248   0000000000000000   000000001e67b050   000000001dc1c350
+>>
+>>     CR / XER           LR / CTR          SRR0 / SRR1        DAR / DSISR
+>>         80000808   000000001dbf34d4   000000001dbf4194   0000000020000004
+>> 0000000020000000   000000001dbf48f8   8000000000001000           40000000
+>>
+>>
+>> 4a >
+>>
+>> Thanks,
+>> Laurent
+>>
+> 
 
-ok, I will add it next time.
-
-
+-- 
+Alexey
 
