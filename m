@@ -2,93 +2,82 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 383F4C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95585C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:58:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1E072073B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5F7022073C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:58:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FhG4mknX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1E072073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="TJAKTEAf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F7022073C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icV8B-0004d6-7T
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:55:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38191)
+	id 1icVAj-0006wj-3G
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:58:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1icV7H-00046x-GH
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:54:56 -0500
+ (envelope-from <prvs=2346a8ea7=sveith@amazon.com>)
+ id 1icV8j-000576-4W
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:56:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1icV7G-0004Yh-DL
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:54:55 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53162)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1icV7G-0004YX-6k
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:54:54 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p9so7073881wmc.2
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 05:54:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=dSSbcgmdVMXVBu0McqC6DQ+FnuwnC2+7IbOSf3VeioM=;
- b=FhG4mknXXJ9WpfLwJBRGENKOa4of2rzsuBaHfBrh+HRqKzuO5dm+Di6iu/P0zMn0Nh
- 8FYv0/m3jpzojvtrdYVmZTrbiAxs0MyGlxQ56E+e/WmmdND9/JuWxYiHaaffLtreZ4KU
- 0CegzfqGzHO87IihwmX55vyV6EZ8RgCJEr6tWKoWRn5DnFjhNU/2ZecxPPHMAdrb1By1
- MBUQlIm6s+HDYyC0WDsysvehz3rjDDhA7damRwsY87Lu1lYqjF/a8TFQ1/FoKfGpbrc0
- 9Ha172Vwmr0z7ngh1iojcHWcICI3IU9JM1XPZB/WNncy/Ia16E/ptzKuh5Cg0XSMP7nM
- LJ0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=dSSbcgmdVMXVBu0McqC6DQ+FnuwnC2+7IbOSf3VeioM=;
- b=KsRUguxAVwV3oBwYmRLHLguyjtm145XW1S+Oo+Z8Q/aKHX9Ukje4kx5UYG0eXS8VZT
- qvgEJFhsB6ivzsd7MBEPhxDhEq6/36VmCmh1xxzepl8lNj4oSZeHScJrxE+bulXJKt7I
- eskK6jWLUyaMAzxmud/xWXNl01b9zrDerCN+/kNzCy0ZawUDp3GDmPALML3r1uiXVcBF
- nwnhqPDj1M9aeamYQPWQ9OVmLpsmPfPRONWQlr51vaijAPleZ9PLtOmDp9lobgv8uppq
- mlVWbAOg8G3z+ZxFa+YPieTu2FfE/zN48N9YRcs7gD86XnrbG2T5kGoEvwcahNMDConA
- My8g==
-X-Gm-Message-State: APjAAAXRzMKOWaBH2caFwF2JPsnPuGgdggsFPQUpTSbNcppejmcGtGiZ
- 4XyXjtWOTIOKim/7VI1SLlMsMw==
-X-Google-Smtp-Source: APXvYqybtcCj0Ed/06kjDCvVxWYdZt6o21SzCSWnzQjnfL1o6aF0OUtvC75sreQqVPXpZNohhD+HqA==
-X-Received: by 2002:a1c:7c11:: with SMTP id x17mr5346609wmc.168.1575467692800; 
- Wed, 04 Dec 2019 05:54:52 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y20sm6604145wmi.25.2019.12.04.05.54.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Dec 2019 05:54:51 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E3D591FF87;
- Wed,  4 Dec 2019 13:54:50 +0000 (GMT)
-References: <87lfrtbtj6.fsf@linaro.org>
- <20191204083133.6198-1-thuth@redhat.com>
- <c727fe15-2448-22c5-2b0a-0ceb7bee2586@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v3] travis.yml: Run tcg tests with tci
-In-reply-to: <c727fe15-2448-22c5-2b0a-0ceb7bee2586@linaro.org>
-Date: Wed, 04 Dec 2019 13:54:50 +0000
-Message-ID: <87h82g8ac5.fsf@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+ (envelope-from <prvs=2346a8ea7=sveith@amazon.com>)
+ id 1icV8i-0005D1-2j
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:56:25 -0500
+Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:42197)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <prvs=2346a8ea7=sveith@amazon.com>)
+ id 1icV8f-00058h-N0; Wed, 04 Dec 2019 08:56:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+ t=1575467782; x=1607003782;
+ h=from:to:cc:subject:date:message-id:in-reply-to: references;
+ bh=qj63OZvgUd2blMa1aPgiv5NYnxSXE+CuB5YhjLWxvAQ=;
+ b=TJAKTEAf9mBVF6OR39gakACdYNs24NTz0lAPMf6D0rVo0oIG+hd++2qf
+ KuITrx/F/AVCuQH8WFv35c1ISiTFr7Hgo8ywZliCWOEvbSYcSmK9oUiwi
+ BTWOPXwG2gn3wXiaAIBayUjjmdyfPc437IIgLihMQtgkyA8R1u20y0NGd w=;
+IronPort-SDR: 9XWlbc6AWrPk3Sj3AkLAH72XL5hyTn7zSX2aKM1OSxlEtUk5upywo/vxwyze+8OM3TAF/7Xmah
+ 3NCeQZ6lGfYQ==
+X-IronPort-AV: E=Sophos;i="5.69,277,1571702400"; 
+   d="scan'208";a="7621879"
+Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO
+ email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com) ([10.124.125.6])
+ by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP;
+ 04 Dec 2019 13:56:19 +0000
+Received: from sveith-desktop.aka.corp.amazon.com
+ (pdx2-ws-svc-lb17-vlan3.amazon.com [10.247.140.70])
+ by email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com (Postfix) with ESMTPS
+ id 09EB5A1DCA; Wed,  4 Dec 2019 13:56:17 +0000 (UTC)
+Received: from sveith-desktop.aka.corp.amazon.com (localhost [127.0.0.1])
+ by sveith-desktop.aka.corp.amazon.com (8.15.2/8.15.2/Debian-3) with ESMTP id
+ xB4DuG4i029360; Wed, 4 Dec 2019 14:56:16 +0100
+Received: (from sveith@localhost)
+ by sveith-desktop.aka.corp.amazon.com (8.15.2/8.15.2/Submit) id xB4DuG1e029358;
+ Wed, 4 Dec 2019 14:56:16 +0100
+From: Simon Veith <sveith@amazon.de>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: Simon Veith <sveith@amazon.de>, Eric Auger <eric.auger@redhat.com>
+Subject: [PATCH 1/5] hw/arm/smmuv3: Apply address mask to linear strtab base
+ address
+Date: Wed,  4 Dec 2019 14:55:44 +0100
+Message-Id: <1575467748-28898-2-git-send-email-sveith@amazon.de>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1575467748-28898-1-git-send-email-sveith@amazon.de>
+References: <1575467748-28898-1-git-send-email-sveith@amazon.de>
+Precedence: Bulk
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 52.95.48.154
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,36 +86,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, Thomas Huth <thuth@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+In the SMMU_STRTAB_BASE register, the stream table base address only
+occupies bits [51:6]. Other bits, such as RA (bit [62]), must be masked
+out to obtain the base address.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+The branch for 2-level stream tables correctly applies this mask by way
+of SMMU_BASE_ADDR_MASK, but the one for linear stream tables does not.
 
-> On 12/4/19 12:31 AM, Thomas Huth wrote:
->> -    # We manually include builds which we disable "make check" for
->> +    # Check the TCG interpreter (TCI)
->>      - env:
->> -        - CONFIG=3D"--enable-debug --enable-tcg-interpreter"
->> -        - TEST_CMD=3D""
->> +        - CONFIG=3D"--enable-debug --enable-tcg-interpreter --disable-k=
-vm
->
-> While we're changing things, the interpreter will go much faster with
-> optimization enabled.  We can change this to --enable-debug-tcg, which le=
-aves
-> the asserts enabled, but compiles with -O2.
+Apply the missing mask in that case as well so that the correct stream
+base address is used by guests which configure a linear stream table.
 
-I've amended the commit in my tree - no need to resend.
->
->
-> r~
+Linux guests are unaffected by this change because they choose a 2-level
+stream table layout for the QEMU SMMUv3, based on the size of its stream
+ID space.
 
+ref. ARM IHI 0070C, section 6.3.23.
 
---=20
-Alex Benn=C3=A9e
+Signed-off-by: Simon Veith <sveith@amazon.de>
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org
+---
+ hw/arm/smmuv3.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index e2fbb83..eef9a18 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -429,7 +429,7 @@ static int smmu_find_ste(SMMUv3State *s, uint32_t sid, STE *ste,
+         }
+         addr = l2ptr + l2_ste_offset * sizeof(*ste);
+     } else {
+-        addr = s->strtab_base + sid * sizeof(*ste);
++        addr = (s->strtab_base & SMMU_BASE_ADDR_MASK) + sid * sizeof(*ste);
+     }
+ 
+     if (smmu_get_ste(s, addr, ste, event)) {
+-- 
+2.7.4
+
 
