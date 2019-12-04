@@ -1,84 +1,109 @@
-Return-Path: <SRS0=HheB=ZZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E97ABC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 23:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBE46C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 01:02:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A90620684
-	for <qemu-devel@archiver.kernel.org>; Tue,  3 Dec 2019 23:55:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADFFC20656
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 01:02:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P4ZZiAfx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A90620684
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="AfND8L1r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADFFC20656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icI10-0002ay-Bh
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 18:55:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38763)
+	id 1icJ43-0000CE-M9
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 20:02:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51676)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1icHor-000498-RR
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 18:43:04 -0500
+ (envelope-from <Babu.Moger@amd.com>) id 1icItq-0005YT-EV
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 19:52:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1icHoh-0006Uh-N6
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 18:42:53 -0500
-Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:36311)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1icHoh-0006TE-Fg
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 18:42:51 -0500
-Received: by mail-pg1-x52b.google.com with SMTP id k13so2384127pgh.3
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 15:42:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=7MVIDNVevAOck6qQcN8WApev5jEl5Rubg+oXUTbOUTk=;
- b=P4ZZiAfxWWEoKunNKcpxLUHv0QjWTix7hf2Dg/+dcPeXA6SF/5rf+m0QydnvoMsnFX
- 4ReacV1B0OEsRbeL6+BuF/3qnf0sBZc64mnS5heOC1+PS1DZNZNEClxQoy4FLARKsFc8
- Lrfvt7zdJoVfYUIdU908FDHCYtnusIfPccedqZjwcpUCykPvlcaDSB9l2hmL+t0QX8cP
- gwC0Qejgfk4T8MHQnTYOOrybFGdQPdM15s8KN5T14DCjG7FAZCCKreavbdmq1qV9imZ8
- Usled3xEcqJDkKipJwq+6Iv9LeY1WqgxoMiaqXgFi/4iNCRpMdzPAl03LXssBwm8hpeJ
- KIWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=7MVIDNVevAOck6qQcN8WApev5jEl5Rubg+oXUTbOUTk=;
- b=jFk3XYgAO0/93R+hUIIIl/jw2Ej8pmye77dGGmZnwWNUkkxRD6pM4PGtOtl6ZB0BBQ
- dym+WlXmGIBmXi+b8sOYhbruiBDbwtz7+3wydAhY0tHbHgtmlD23Nveg3LEopNs6630T
- Houf8cHBPYBtC57dOZA6R2mVy5lXIS7Rv8xDQ/FhxDvIFZvivRTaIs5tWOBwYiYv+V4z
- +J6WhV7hYi4Lgz7NTqCu5z290EL3VDPnrZ2NsWlbHmNTB+32KKfXK8oDxchiER33SZ8o
- nqve1TlJoiYAT+Gfd1yw1u4eFvhk+Pcsj4ZZA+mbaSlupqnP8gTx9H5OAuhjioBH8gvA
- y6eQ==
-X-Gm-Message-State: APjAAAVF1tUfQ7VXsNKmYxLs9Bgl+nv11DP4ZuA+Lmt6xbAaFVpYOxqN
- Itvugbd3pLvMop0KozDsM5qtlz8rTUg=
-X-Google-Smtp-Source: APXvYqyOGOFecK+Ka1VpfQ6KH0eJmPGIycLSY2aLs5WUEv/PBczINSC2uG3FBqMoRHTgxpaVlmASdg==
-X-Received: by 2002:a63:d153:: with SMTP id c19mr319473pgj.78.1575416569080;
- Tue, 03 Dec 2019 15:42:49 -0800 (PST)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id k5sm4128256pju.14.2019.12.03.15.42.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 03 Dec 2019 15:42:48 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/4] target/arm: Update MSR access to UAO
-Date: Tue,  3 Dec 2019 15:42:42 -0800
-Message-Id: <20191203234244.9124-3-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191203234244.9124-1-richard.henderson@linaro.org>
-References: <20191203234244.9124-1-richard.henderson@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::52b
+ (envelope-from <Babu.Moger@amd.com>) id 1icIgK-000351-A4
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 19:38:18 -0500
+Received: from mail-mw2nam10on2060.outbound.protection.outlook.com
+ ([40.107.94.60]:29852 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1icIgE-00031y-KX
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 19:38:12 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=evgmAKOTiUB7A9ac1zMAfqMiDdPu1L5NONlS0XVgGg2gJRfgH2fyjoQGchmLMcckz2aFE6BaAttX07UhEUsKcKphUkJWt/zvSiIcTvGvahKpSMQM4Xe9+2mfD5026xlN9tiUpRVxED19LhBgfoa5TQJSrA8m0qHMiBd+taTlFJUwRIzssge6zhAK/mNSI+BQB5nN/0nkpYLZ+Bm3I+fR2DVa4JUZ6jXpuvoXXkqVkyiB4LXhKZjMoect7m0dJnqF4DIAVNmT9eH9d377P3ysRvUi7ORzxg8o+U/OK42xkXyAmd2gIff14JKQPcrUFV2JYpEmgIDtyemoar6FFmUiWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gYPvnLEwNx4wh/5bDTbClI2XFhzNfeRgUD1gV0xieeE=;
+ b=ZL0hIthHhNrh1Y4MC4tx/y4u/IjdvgiunqJGvY/yzdS25LvTxd1Z+Lxv2eS28iN0uoYSki1fA3fhl5EdPWVtWFwM5zOohD6jd3DJZNF9yFPbJwOXspOo6Eu+Z7A2qMHnJ5V7pI+NULhw6Ij8n3dqPJ0WIsIFQd0frvOzDU6LDH9TQBjz+0HmIGZkYAeMvmmhCHMgY5tWZP1gQAdaYahk+sc0AH9Oi2eVevM5p1zY0SQdpwcfioFNr9sMc1IeCyqgCD1BRyCZqtTH4gKRLSnOq5LBfzEAf0TghTTyCUpOxfXRoQkc7NUluF8qrgeiwCAhoQ0MXvye5WG99/vTTc7OOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gYPvnLEwNx4wh/5bDTbClI2XFhzNfeRgUD1gV0xieeE=;
+ b=AfND8L1r91UhmBMS6p5pCkPh4AqNJvn26hcGZjEBGwJrCN/3NlUzDPXMdXK6Kj5wNUwJcvxxXjFmGGBiVCBXuMOORkTyX/Wws/e1futQd3Jh2hP3GzTEHQii/GirwD0s+1nDAJTdB7zExMr/t4g93znX4RCnIWZ9PFVEG3fiHAI=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Babu.Moger@amd.com; 
+Received: from DM5PR12MB2471.namprd12.prod.outlook.com (52.132.141.138) by
+ DM5PR12MB1369.namprd12.prod.outlook.com (10.168.234.147) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2495.19; Wed, 4 Dec 2019 00:38:06 +0000
+Received: from DM5PR12MB2471.namprd12.prod.outlook.com
+ ([fe80::d0f5:b875:7b5c:46c3]) by DM5PR12MB2471.namprd12.prod.outlook.com
+ ([fe80::d0f5:b875:7b5c:46c3%6]) with mapi id 15.20.2495.014; Wed, 4 Dec 2019
+ 00:38:06 +0000
+Subject: [PATCH v3 10/18] hw/386: Add EPYC mode topology decoding functions
+From: Babu Moger <babu.moger@amd.com>
+To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
+ pbonzini@redhat.com, rth@twiddle.net, eblake@redhat.com, armbru@redhat.com,
+ imammedo@redhat.com
+Date: Tue, 03 Dec 2019 18:38:04 -0600
+Message-ID: <157541988471.46157.6587693720990965800.stgit@naples-babu.amd.com>
+In-Reply-To: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
+References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
+User-Agent: StGit/unknown-version
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN2PR01CA0078.prod.exchangelabs.com (2603:10b6:800::46) To
+ DM5PR12MB2471.namprd12.prod.outlook.com (2603:10b6:4:b5::10)
+MIME-Version: 1.0
+X-Originating-IP: [165.204.78.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: fa4fd403-23e8-44cb-d9cc-08d778523a9f
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1369:|DM5PR12MB1369:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM5PR12MB13695C8C61691EE2746EB016955D0@DM5PR12MB1369.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-Forefront-PRVS: 0241D5F98C
+X-Forefront-Antispam-Report: SFV:NSPM;
+ SFS:(10009020)(4636009)(376002)(39860400002)(136003)(346002)(396003)(366004)(189003)(199004)(2906002)(25786009)(103116003)(50466002)(6116002)(5660300002)(478600001)(7736002)(3846002)(66476007)(230700001)(66556008)(44832011)(4326008)(11346002)(966005)(99286004)(14454004)(446003)(6512007)(23676004)(316002)(58126008)(81166006)(76176011)(66946007)(386003)(6506007)(305945005)(6436002)(6486002)(81156014)(2486003)(86362001)(8936002)(52116002)(8676002)(26005)(186003)(6306002);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM5PR12MB1369;
+ H:DM5PR12MB2471.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zoYmhzj5QRLOrwhFc41Mr2Oh1liGlBR7EzjC1cUJ5Dz5uPZZd/YAaGMKD6709NCS7LU2wah9Ya7qHl5LqtwyKLtc0dTdc539RO6RDrphGmjRsDZdABVwxRgC8TC6JUhw0F7dATRzh40tDsVOOLtDCPIGDw1uyJHrPa6j2kezJ1ILE+lL8QvkuPwvEDWDS7x4qO67sQGE5PUJ0jONZPxCX6PYGb/KepZ8DJk1zdvqsPrQSFkhKEX67Ln1P0IDPoXTdIz9z9hRVQ7q7NaG5FC9bxk8BxLNDN45qPI5t47L80qdQsTP+MqrJUWrIIQv/AxVtRNcez0r8m9nGopbB3LS+sf51ZD2EbtN/0rWGXB13mb/mZlQWtlbJEfqnO3TPILnCrjvhrpvtGOZblHPiTxz02g5d1HEfJ5NoyYBmDmFDFwHptKHBqFzxkqgrNtr39Xqt4eDzCF+l+YGDERSsRqKyrPlDy+Mmqfiaw8vqC7xkNE=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa4fd403-23e8-44cb-d9cc-08d778523a9f
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2019 00:38:06.4909 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: O3JG/HH9b96vaSsqKrr5FO37DUzEPLH2znydyyNY0epBvZeuYOQsWKikHL//Tlfs
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1369
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.94.60
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,107 +115,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: babu.moger@amd.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/arm/cpu.h           |  6 ++++++
- target/arm/helper.c        | 21 +++++++++++++++++++++
- target/arm/translate-a64.c | 14 ++++++++++++++
- 3 files changed, 41 insertions(+)
+These functions add support for building EPYC mode topology given the smp
+details like numa nodes, cores, threads and sockets.
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index cdf6caf869..dd284ba5c7 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1228,6 +1228,7 @@ void pmu_init(ARMCPU *cpu);
- #define PSTATE_IL (1U << 20)
- #define PSTATE_SS (1U << 21)
- #define PSTATE_PAN (1U << 22)
-+#define PSTATE_UAO (1U << 23)
- #define PSTATE_V (1U << 28)
- #define PSTATE_C (1U << 29)
- #define PSTATE_Z (1U << 30)
-@@ -3598,6 +3599,11 @@ static inline bool isar_feature_aa64_ats1e1(const ARMISARegisters *id)
-     return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, PAN) >= 2;
+The new apic id decoding is mostly similar to current apic id decoding
+except that it adds a new field llc_id when numa configured. Removes all
+the hardcoded values. Subsequent patches will use these functions to build
+the topology.
+
+Following functions are added.
+apicid_llc_width_epyc
+apicid_llc_offset_epyc
+apicid_pkg_offset_epyc
+apicid_from_topo_ids_epyc
+x86_topo_ids_from_idx_epyc
+x86_topo_ids_from_apicid_epyc
+x86_apicid_from_cpu_idx_epyc
+
+The topology details are available in Processor Programming Reference (PPR)
+for AMD Family 17h Model 01h, Revision B1 Processors.
+https://www.amd.com/system/files/TechDocs/55570-B1_PUB.zip
+
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+---
+ include/hw/i386/topology.h |   93 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 93 insertions(+)
+
+diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
+index cfb09312fe..adb92fe9ce 100644
+--- a/include/hw/i386/topology.h
++++ b/include/hw/i386/topology.h
+@@ -89,6 +89,11 @@ static inline unsigned apicid_die_width(X86CPUTopoInfo *topo_info)
+     return apicid_bitwidth_for_count(topo_info->dies_per_pkg);
  }
  
-+static inline bool isar_feature_aa64_uao(const ARMISARegisters *id)
++/* Bit width of the llc_ID field per socket */
++static inline unsigned apicid_llc_width_epyc(X86CPUTopoInfo *topo_info)
 +{
-+    return FIELD_EX64(id->id_aa64mmfr2, ID_AA64MMFR2, UAO) != 0;
++    return apicid_bitwidth_for_count(MAX(topo_info->nodes_per_pkg, 1));
 +}
-+
- static inline bool isar_feature_aa64_bti(const ARMISARegisters *id)
- {
-     return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, BT) != 0;
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 70f2db5447..8941a6c10f 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -4131,6 +4131,17 @@ static void aa64_pan_write(CPUARMState *env, const ARMCPRegInfo *ri,
-     env->pstate = (env->pstate & ~PSTATE_PAN) | (value & PSTATE_PAN);
+ /* Bit offset of the Core_ID field
+  */
+ static inline unsigned apicid_core_offset(X86CPUTopoInfo *topo_info)
+@@ -109,6 +114,94 @@ static inline unsigned apicid_pkg_offset(X86CPUTopoInfo *topo_info)
+     return apicid_die_offset(topo_info) + apicid_die_width(topo_info);
  }
  
-+static uint64_t aa64_uao_read(CPUARMState *env, const ARMCPRegInfo *ri)
-+{
-+    return env->pstate & PSTATE_UAO;
-+}
++#define LLC_OFFSET 3 /* Minimum LLC offset if numa configured */
 +
-+static void aa64_uao_write(CPUARMState *env, const ARMCPRegInfo *ri,
-+                           uint64_t value)
++/* Bit offset of the llc_ID field */
++static inline unsigned apicid_llc_offset_epyc(X86CPUTopoInfo *topo_info)
 +{
-+    env->pstate = (env->pstate & ~PSTATE_UAO) | (value & PSTATE_UAO);
-+}
++    unsigned offset = apicid_die_offset(topo_info) +
++                      apicid_die_width(topo_info);
 +
- static CPAccessResult aa64_cacheop_access(CPUARMState *env,
-                                           const ARMCPRegInfo *ri,
-                                           bool isread)
-@@ -7464,6 +7475,16 @@ void register_cp_regs_for_features(ARMCPU *cpu)
-         define_arm_cp_regs(cpu, ats1cp_reginfo);
-     }
- #endif
-+    if (cpu_isar_feature(aa64_uao, cpu)) {
-+        static const ARMCPRegInfo uao_reginfo[] = {
-+            { .name = "UAO", .state = ARM_CP_STATE_AA64,
-+              .opc0 = 3, .opc1 = 0, .crn = 4, .crm = 2, .opc2 = 4,
-+              .type = ARM_CP_NO_RAW, .access = PL1_RW,
-+              .readfn = aa64_uao_read, .writefn = aa64_uao_write, },
-+            REGINFO_SENTINEL
-+        };
-+        define_arm_cp_regs(cpu, uao_reginfo);
++    if (topo_info->nodes_per_pkg) {
++        return MAX(LLC_OFFSET, offset);
++    } else {
++        return offset;
 +    }
- 
-     if (arm_feature(env, ARM_FEATURE_EL2) && cpu_isar_feature(aa64_vh, cpu)) {
-         static const ARMCPRegInfo vhe_reginfo[] = {
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 7f5a68106b..2b6846ef01 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -1601,6 +1601,20 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
-         s->base.is_jmp = DISAS_NEXT;
-         break;
- 
-+    case 0x03: /* UAO */
-+        if (!dc_isar_feature(aa64_uao, s) || s->current_el == 0) {
-+            goto do_unallocated;
-+        }
-+        if (crm & 1) {
-+            set_pstate_bits(PSTATE_UAO);
-+        } else {
-+            clear_pstate_bits(PSTATE_UAO);
-+        }
-+        t1 = tcg_const_i32(s->current_el);
-+        gen_helper_rebuild_hflags_a64(cpu_env, t1);
-+        tcg_temp_free_i32(t1);
-+        break;
++}
 +
-     case 0x04: /* PAN */
-         if (!dc_isar_feature(aa64_pan, s) || s->current_el == 0) {
-             goto do_unallocated;
--- 
-2.17.1
++/* Bit offset of the Pkg_ID (socket ID) field */
++static inline unsigned apicid_pkg_offset_epyc(X86CPUTopoInfo *topo_info)
++{
++    return apicid_llc_offset_epyc(topo_info) + apicid_llc_width_epyc(topo_info);
++}
++
++/*
++ * Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
++ *
++ * The caller must make sure core_id < nr_cores and smt_id < nr_threads.
++ */
++static inline apic_id_t apicid_from_topo_ids_epyc(X86CPUTopoInfo *topo_info,
++                                                  const X86CPUTopoIDs *topo_ids)
++{
++    return (topo_ids->pkg_id  << apicid_pkg_offset_epyc(topo_info)) |
++           (topo_ids->llc_id << apicid_llc_offset_epyc(topo_info)) |
++           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
++           (topo_ids->core_id << apicid_core_offset(topo_info)) |
++           topo_ids->smt_id;
++}
++
++static inline void x86_topo_ids_from_idx_epyc(X86CPUTopoInfo *topo_info,
++                                              unsigned cpu_index,
++                                              X86CPUTopoIDs *topo_ids)
++{
++    unsigned nr_nodes = MAX(topo_info->nodes_per_pkg, 1);
++    unsigned nr_dies = topo_info->dies_per_pkg;
++    unsigned nr_cores = topo_info->cores_per_die;
++    unsigned nr_threads = topo_info->threads_per_core;
++    unsigned cores_per_node = DIV_ROUND_UP((nr_dies * nr_cores * nr_threads),
++                                            nr_nodes);
++
++    topo_ids->pkg_id = cpu_index / (nr_dies * nr_cores * nr_threads);
++    topo_ids->llc_id = (cpu_index / cores_per_node) % nr_nodes;
++    topo_ids->die_id = cpu_index / (nr_cores * nr_threads) % nr_dies;
++    topo_ids->core_id = cpu_index / nr_threads % nr_cores;
++    topo_ids->smt_id = cpu_index % nr_threads;
++}
++
++/*
++ * Calculate thread/core/package IDs for a specific topology,
++ * based on APIC ID
++ */
++static inline void x86_topo_ids_from_apicid_epyc(apic_id_t apicid,
++                                            X86CPUTopoInfo *topo_info,
++                                            X86CPUTopoIDs *topo_ids)
++{
++    topo_ids->smt_id = apicid &
++            ~(0xFFFFFFFFUL << apicid_smt_width(topo_info));
++    topo_ids->core_id =
++            (apicid >> apicid_core_offset(topo_info)) &
++            ~(0xFFFFFFFFUL << apicid_core_width(topo_info));
++    topo_ids->die_id =
++            (apicid >> apicid_die_offset(topo_info)) &
++            ~(0xFFFFFFFFUL << apicid_die_width(topo_info));
++    topo_ids->llc_id =
++            (apicid >> apicid_llc_offset_epyc(topo_info)) &
++            ~(0xFFFFFFFFUL << apicid_llc_width_epyc(topo_info));
++    topo_ids->pkg_id = apicid >> apicid_pkg_offset_epyc(topo_info);
++}
++
++/*
++ * Make APIC ID for the CPU 'cpu_index'
++ *
++ * 'cpu_index' is a sequential, contiguous ID for the CPU.
++ */
++static inline apic_id_t x86_apicid_from_cpu_idx_epyc(X86CPUTopoInfo *topo_info,
++                                                     unsigned cpu_index)
++{
++    X86CPUTopoIDs topo_ids;
++    x86_topo_ids_from_idx_epyc(topo_info, cpu_index, &topo_ids);
++    return apicid_from_topo_ids_epyc(topo_info, &topo_ids);
++}
+ /* Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
+  *
+  * The caller must make sure core_id < nr_cores and smt_id < nr_threads.
 
 
