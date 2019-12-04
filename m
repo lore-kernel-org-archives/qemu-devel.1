@@ -2,86 +2,65 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3291C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 02:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D44C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 03:11:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 620B92073C
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 02:18:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4xRQfOb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 620B92073C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 28BBA206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 03:11:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BBA206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icKFZ-00061Q-KZ
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 21:18:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34706)
+	id 1icL47-0000RM-Cu
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 22:11:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39547)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1icKC8-0004f8-NJ
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 21:15:15 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1icKw9-0007XE-4b
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:02:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1icKC2-0004Ce-31
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 21:15:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30583
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1icKw2-0003F7-7z
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:02:40 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2209 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1icKC1-00047n-LZ
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 21:15:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575425702;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wXEE1wJyPj6gtPCkc/kKuPTioY0kF5NKRS4t1wJ7Jmc=;
- b=C4xRQfObzwW5631IpFrJGDcK85FOkNpIirXrsx/oYcuul3+J7NqKm10i0Ah5AMD5eOPwuk
- erneeYbyEzC4HwDfT9Dao9iG8o920PT+IIYiLzHOYxAG13bGcu79dYoilvTCp16kDIF1WJ
- kAijK0m0dHKz7dR8QoLiO2/yeTIrnC4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-CeDC4bRnON-60DPUodyBfg-1; Tue, 03 Dec 2019 21:15:00 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75363107ACC4;
- Wed,  4 Dec 2019 02:14:58 +0000 (UTC)
-Received: from [10.72.12.78] (ovpn-12-78.pek2.redhat.com [10.72.12.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7EE2060C80;
- Wed,  4 Dec 2019 02:14:51 +0000 (UTC)
-Subject: Re: [PATCH] net/imx_fec: Updating the IMX_FEC IP to support loopback
- mode.
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- "Wasim, Bilal" <Bilal_Wasim@mentor.com>
-References: <20191129150508.24404-1-bilalwasim676@gmail.com>
- <afe9efde-7ac1-8607-446a-8fbf10accece@redhat.com>
- <8c956ae31e8f44a2b831a5030b2448b4@SVR-IES-MBX-03.mgc.mentorg.com>
- <CAP+75-X_POJfTO=gOUu1zCPtcfnQ5yemQo0hqB_s3jy_C17o9g@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <db2c5074-307c-d20e-73f2-9c2b44612d6f@redhat.com>
-Date: Wed, 4 Dec 2019 10:14:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1icKw1-0002Ka-Pp
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:02:38 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 2BE098103B73122705E5;
+ Wed,  4 Dec 2019 11:02:21 +0800 (CST)
+Received: from [127.0.0.1] (10.120.177.99) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Wed, 4 Dec 2019
+ 11:02:14 +0800
+Subject: Re: [PATCH] virtio-serial-bus: fix memory leak while attach
+ virtio-serial-bus
+To: Laurent Vivier <lvivier@redhat.com>, <mst@redhat.com>, <amit@kernel.org>, 
+ <marcandre.lureau@redhat.com>, <pbonzini@redhat.com>
+References: <1575285343-21864-1-git-send-email-pannengyuan@huawei.com>
+ <dad28876-1850-32f3-fe47-9e4ec2c68f20@redhat.com>
+ <4e9efebf-1862-8879-ed01-60f8777d4a65@huawei.com>
+ <4f535277-0494-7089-eb6f-9daea79463c8@redhat.com>
+From: pannengyuan <pannengyuan@huawei.com>
+Message-ID: <755efa85-b9a2-1cd5-1168-cd3181ac87ea@huawei.com>
+Date: Wed, 4 Dec 2019 11:02:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAP+75-X_POJfTO=gOUu1zCPtcfnQ5yemQo0hqB_s3jy_C17o9g@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: CeDC4bRnON-60DPUodyBfg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <4f535277-0494-7089-eb6f-9daea79463c8@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.120.177.99]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,127 +72,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "aa1ronham@gmail.com" <aa1ronham@gmail.com>,
- "jcd@tribudubois.net" <jcd@tribudubois.net>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "bilalwasim676@gmail.com" <bilalwasim676@gmail.com>,
- "linux@roeck-us.net" <linux@roeck-us.net>
+Cc: liyiting@huawei.com, kuhn.chenqun@huawei.com, qemu-devel@nongnu.org,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2019/11/30 =E4=B8=8A=E5=8D=8812:04, Philippe Mathieu-Daud=C3=A9 wrote:
-> On Fri, Nov 29, 2019 at 4:59 PM Wasim, Bilal <Bilal_Wasim@mentor.com> wro=
-te:
->> Thanks for the pointers philippe.. Is the patch okay to be merged withou=
-t it or do I need to do a re-submission with the updated username ?
-> If there are no review comments on your patch, I think the maintainer
-> taking your patch can fix this details directly, no need to resend.
->
->> -----Original Message-----
->> From: Philippe Mathieu-Daud=C3=A9 [mailto:philmd@redhat.com]
->> Sent: Friday, November 29, 2019 8:38 PM
->> To: bilalwasim676@gmail.com; qemu-devel@nongnu.org
->> Cc: peter.maydell@linaro.org; aa1ronham@gmail.com; jcd@tribudubois.net; =
-qemu-arm@nongnu.org; Wasim, Bilal <Bilal_Wasim@mentor.com>; linux@roeck-us.=
-net; Jason Wang <jasowang@redhat.com>
->> Subject: Re: [PATCH] net/imx_fec: Updating the IMX_FEC IP to support loo=
-pback mode.
->>
->> Hi Bilal,
->>
->> Cc'ing Jason, the maintainer of network devices.
->>
->> On 11/29/19 4:05 PM, bilalwasim676@gmail.com wrote:
->>> From: bwasim <bilal_wasim@mentor.com>
->> Your git setup misses your 'user.name', you could fix it running:
->>
->>     git config user.name "Bilal Wasim"
->>
->> (eventually with the --global option).
->>
->> The patch looks good otherwise.
->>
->> Thanks!
 
-
-Applied with the fix for user.name.
-
-Thanks
-
-
+On 2019/12/3 16:32, Laurent Vivier wrote:
+> On 03/12/2019 01:53, pannengyuan wrote:
 >>
->>> Loopback mode only works when specific conditions (as dictated by the
->>> IP guide) are met, i.e. the MII_MODE is set and the RMII_MODE is
->>> cleared. If not, we simply send the packet on the output queue (for TX
->>> to the host network). Tested by running a custom RTOS and TXing a ton
->>> of packets. The same packets were received on the RX side..
+>>
+>> On 2019/12/2 21:58, Laurent Vivier wrote:
+>>> On 02/12/2019 12:15, pannengyuan@huawei.com wrote:
+>>>> From: PanNengyuan <pannengyuan@huawei.com>
+>>>>
+>>>> ivqs/ovqs/c_ivq/c_ovq is forgot to cleanup in
+>>>> virtio_serial_device_unrealize, the memory leak stack is as bellow:
+>>>>
+>>>> Direct leak of 1290240 byte(s) in 180 object(s) allocated from:
+>>>>     #0 0x7fc9bfc27560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
+>>>>     #1 0x7fc9bed6f015 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x50015)
+>>>>     #2 0x5650e02b83e7 in virtio_add_queue /mnt/sdb/qemu-4.2.0-rc0/hw/virtio/virtio.c:2327
+>>>>     #3 0x5650e02847b5 in virtio_serial_device_realize /mnt/sdb/qemu-4.2.0-rc0/hw/char/virtio-serial-bus.c:1089
+>>>>     #4 0x5650e02b56a7 in virtio_device_realize /mnt/sdb/qemu-4.2.0-rc0/hw/virtio/virtio.c:3504
+>>>>     #5 0x5650e03bf031 in device_set_realized /mnt/sdb/qemu-4.2.0-rc0/hw/core/qdev.c:876
+>>>>     #6 0x5650e0531efd in property_set_bool /mnt/sdb/qemu-4.2.0-rc0/qom/object.c:2080
+>>>>     #7 0x5650e053650e in object_property_set_qobject /mnt/sdb/qemu-4.2.0-rc0/qom/qom-qobject.c:26
+>>>>     #8 0x5650e0533e14 in object_property_set_bool /mnt/sdb/qemu-4.2.0-rc0/qom/object.c:1338
+>>>>     #9 0x5650e04c0e37 in virtio_pci_realize /mnt/sdb/qemu-4.2.0-rc0/hw/virtio/virtio-pci.c:1801
+>>>>
+>>>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>>>> Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
+>>>> ---
+>>>>  hw/char/virtio-serial-bus.c | 6 ++++++
+>>>>  1 file changed, 6 insertions(+)
+>>>>
+>>>> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+>>>> index 3325904..da9019a 100644
+>>>> --- a/hw/char/virtio-serial-bus.c
+>>>> +++ b/hw/char/virtio-serial-bus.c
+>>>> @@ -1126,9 +1126,15 @@ static void virtio_serial_device_unrealize(DeviceState *dev, Error **errp)
+>>>>  {
+>>>>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
+>>>>      VirtIOSerial *vser = VIRTIO_SERIAL(dev);
+>>>> +    int i;
+>>>>  
+>>>>      QLIST_REMOVE(vser, next);
+>>>>  
+>>>> +    for (i = 0; i <= vser->bus.max_nr_ports; i++) {
+>>>> +        virtio_del_queue(vdev, 2 * i);
+>>>> +        virtio_del_queue(vdev, 2 * i + 1);
+>>>> +    }
+>>>> +
 >>>
->>> Signed-off-by: Bilal Wasim <bilal_wasim@mentor.com>
->>> ---
->>>    hw/net/imx_fec.c | 27 +++++++++++++++++++++++++--
->>>    1 file changed, 25 insertions(+), 2 deletions(-)
+>>> According to virtio_serial_device_realize() and the number of
+>>> virtio_add_queue(), I think you have more queues to delete:
 >>>
->>> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c index
->>> bd99236864..c51e7f7363 100644
->>> --- a/hw/net/imx_fec.c
->>> +++ b/hw/net/imx_fec.c
->>> @@ -256,6 +256,29 @@ static const VMStateDescription vmstate_imx_eth =
-=3D
->>> {
+>>>   4 + 2 * vser->bus.max_nr_ports
 >>>
->>>    static void imx_eth_update(IMXFECState *s);
+>>> (for vser->ivqs[0], vser->ovqs[0], vser->c_ivq, vser->c_ovq,
+>>> vser->ivqs[i], vser->ovqs[i]).
 >>>
->>> +/*
->>> + * Function to check if the MAC is configured to run in loopback mode.
->>> + * If so, invoke the "receive" routine.
->>> + * Else write to the output.
->>> + * */
->>> +static void send_pkt(IMXFECState *s, uint8_t *frame, int frame_size)
->>> +{
->>> +    NetClientState *nc =3D qemu_get_queue(s->nic);
->>> +
->>> +    /*
->>> +     * Loopback or Normal mode ?
->>> +     * Per the FEC Manual: If loopback is enabled, the MII_MODE
->>> +     * should be SET and the RMII_MODE should be cleared. Loopback
->>> +     * will only work if this criterion is met. If not met,
->>> +     * we will send the frame on the output queue. */
->>> +    if ((s->regs[ENET_RCR] & ENET_RCR_LOOP) && (s->regs[ENET_RCR] & EN=
-ET_RCR_MII_MODE)
->>> +            && !(s->regs[ENET_RCR] & ENET_RCR_RMII_MODE)) {
->>> +        nc->info->receive(nc, frame, frame_size);
->>> +    } else {
->>> +        qemu_send_packet(nc, frame, frame_size);
->>> +    }
->>> +}
->>> +
->>>    /*
->>>     * The MII phy could raise a GPIO to the processor which in turn
->>>     * could be handled as an interrpt by the OS.
->>> @@ -488,7 +511,7 @@ static void imx_fec_do_tx(IMXFECState *s)
->>>            frame_size +=3D len;
->>>            if (bd.flags & ENET_BD_L) {
->>>                /* Last buffer in frame.  */
->>> -            qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_s=
-ize);
->>> +            send_pkt(s, (uint8_t *)&s->frame, frame_size);
->>>                ptr =3D s->frame;
->>>                frame_size =3D 0;
->>>                s->regs[ENET_EIR] |=3D ENET_INT_TXF; @@ -586,7 +609,7 @@
->>> static void imx_enet_do_tx(IMXFECState *s, uint32_t index)
->>>                }
->>>                /* Last buffer in frame.  */
+>>> Thanks,
+>>> Laurent
 >>>
->>> -            qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_s=
-ize);
->>> +            send_pkt(s, (uint8_t *)&s->frame, frame_size);
->>>                ptr =3D s->frame;
 >>>
->>>                frame_size =3D 0;
->>>
+>> Thanks, but I think the queues is correct, the queues in
+>> virtio_serial_device_realize is as follow:
+>>
+>> // here is 2
+>> vser->ivqs[0] = virtio_add_queue(vdev, 128, handle_input);
+>> vser->ovqs[0] = virtio_add_queue(vdev, 128, handle_output);
+>>
+>> // here is 2
+>> vser->c_ivq = virtio_add_queue(vdev, 32, control_in);
+>> vser->c_ovq = virtio_add_queue(vdev, 32, control_out);
+>>
+>> // here 2 * (max_nr_ports - 1)  ----- i is from 1 to max_nr_ports - 1
+>> for (i = 1; i < vser->bus.max_nr_ports; i++) {
+>>     vser->ivqs[i] = virtio_add_queue(vdev, 128, handle_input);
+>>     vser->ovqs[i] = virtio_add_queue(vdev, 128, handle_output);
+>> }
+>>
+>> so the total queues number is:  2 * (vser->bus.max_nr_ports + 1)
+>>
+> 
+> Yes, you're right. A comment in the code would have helped or written
+> clearly like:
+> 
+> for (i = 0; i < 2 * (vser->bus.max_nr_ports + 1); i++) {
+>     virtio_del_queue(vdev, i);
+> }
+> 
+> Thanks,
+> Laurent
+> 
+> 
+yes, it would be helpful, Michael S. Tsirkin posted another way to make
+it more clear, I will reuse it in next version.
+
+Thanks.
+Nengyuan Pan.
 
 
