@@ -2,82 +2,103 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD30C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E44BC43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:54:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A6192073B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:52:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08B092073B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:54:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mf24LCKQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A6192073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GOLhE4d6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08B092073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icV4t-0002Zl-EC
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:52:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37617)
+	id 1icV6h-0003aX-7K
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:54:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38104)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1icV4G-00026z-HY
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:51:49 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1icV61-00035S-8B
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:53:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1icV4E-0003bj-Au
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:51:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60736
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1icV60-0004K9-2v
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:53:37 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26984
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1icV4E-0003b3-03
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:51:46 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1icV5z-0004K2-Vb
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:53:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575467505;
+ s=mimecast20190719; t=1575467615;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=p2FEE7Gn7YLh6/kTzVWkZiiIyM6EK6VOLNjp9yY0tZM=;
- b=Mf24LCKQ+llXsj9uM0Qipm/owRbcnt/JDjdkxsJMier+z7b9wBMKBUhzhPF2Bsc1tQX2jc
- E9rreg1uFmzedWOSiQSfWD7YGYkcKP9nm/StwLHomjURzVPriW3cXmiy2ypcMxeoeKNX62
- jnaFNmSTgNaeY0HoGMWECN0ls///FUs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-E1VgE3nnNXmic74qdHr2PA-1; Wed, 04 Dec 2019 08:51:43 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C69C78BD3B0;
- Wed,  4 Dec 2019 13:51:42 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-117-39.ams2.redhat.com [10.36.117.39])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 63140691B7;
- Wed,  4 Dec 2019 13:51:37 +0000 (UTC)
-Subject: Re: [PATCH v3] travis.yml: Run tcg tests with tci
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <87lfrtbtj6.fsf@linaro.org>
- <20191204083133.6198-1-thuth@redhat.com> <87muc88amd.fsf@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <ce570051-eb8f-4184-8f1e-bb9ba3652f62@redhat.com>
-Date: Wed, 4 Dec 2019 14:51:35 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ in-reply-to:in-reply-to:references:references;
+ bh=H1bItY3VlK/R7QUzEfTiED1NR3XB+RxnbiIFivpcdxU=;
+ b=GOLhE4d6Gu1iQOYUSkfFdGHTI60BAHAlp6+bSOgr/SCVgLXpJ685AX8WwWcxd6HD2Sm0IY
+ 9QZp+2XApcjYqnkbMnvkvIiFjnWZXb+BG5Uk6Hy+8qzKWH1ECGnXRL0DnGqrLKAUIfB76T
+ gENWQiqobEfccIKL+ep+XRnVq9Fg/K4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56-twTQ8v8yOCGvH09W1uyRMg-1; Wed, 04 Dec 2019 08:53:33 -0500
+Received: by mail-wr1-f69.google.com with SMTP id l20so3665387wrc.13
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 05:53:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JbunT/ja9JU/BRWbWg+UV5NSnnxoVIInWyWve9LRpWM=;
+ b=IfLokcxPnuN14QjZigefaS4RhKhFhiLxNZnEl1BmzSbnjrzPrEYlO3AD8H91gs/PmV
+ 3c2DAOGdP7KoEgpT3+IeBUEFlN/rWKcSNRl9Jr+6D7I0VisOjj0qFm+SxKFbh30ox54n
+ WTwm7EuQj/DXTl3rUy/IJ9CVQ0TLGjz+gWzQEQSAZJT7D4M9nwwp6MOGngFhYHlSNsfc
+ F5NivOUwkhMp5GHOZWfrQwjO8NCZX0XR+RSK0bIYWQfJHQr9z3/5gN2+mflgF8xlZm/s
+ XscPGUnUyEuV/uG+BcTkkVbewO1yKGikxH7KQFK5At2jxXRq0Qn0FuuUyN5pCWI5ko9c
+ cJYQ==
+X-Gm-Message-State: APjAAAUEtGDc/hp8sGQc2U757lM2LffYDJhxZ6qIsqS1BTbsVhZhJKG0
+ qFMEGRin6DHpXxbVNnS4wD0TjfMl9w+AKycwAmhw5QAdMKsJoW4w3vP5SqzxSqtJzP7Mrq0qaY9
+ cLbNsMVOMrfd5OCk=
+X-Received: by 2002:a05:600c:54c:: with SMTP id
+ k12mr39615093wmc.124.1575467612747; 
+ Wed, 04 Dec 2019 05:53:32 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxZdYYEroqPepi9PWforByvomgCbHr/8nblFYn2wfzsbutFK2puEjUdP9HwGsntldywmwxndQ==
+X-Received: by 2002:a05:600c:54c:: with SMTP id
+ k12mr39615074wmc.124.1575467612491; 
+ Wed, 04 Dec 2019 05:53:32 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a?
+ ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
+ by smtp.gmail.com with ESMTPSA id d9sm7771644wrj.10.2019.12.04.05.53.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 04 Dec 2019 05:53:32 -0800 (PST)
+Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
+ include msrs
+To: Catherine Ho <catherine.hecx@gmail.com>
+References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
+ <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
+ <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <714a0a86-4301-e756-654f-7765d4eb73db@redhat.com>
+Date: Wed, 4 Dec 2019 14:53:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <87muc88amd.fsf@linaro.org>
+In-Reply-To: <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: E1VgE3nnNXmic74qdHr2PA-1
+X-MC-Unique: twTQ8v8yOCGvH09W1uyRMg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,31 +110,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/12/2019 14.48, Alex Benn=C3=A9e wrote:
+On 04/12/19 14:33, Catherine Ho wrote:
+> Hi Paolo
+> [sorry to resend it, seems to reply it incorrectly]
 >=20
-> Thomas Huth <thuth@redhat.com> writes:
+> On Wed, 4 Dec 2019 at 19:23, Paolo Bonzini <pbonzini@redhat.com
+> <mailto:pbonzini@redhat.com>> wrote:
 >=20
->> So far we only have compile coverage for tci. But since commit
->> 2f160e0f9797c7522bfd0d09218d0c9340a5137c ("tci: Add implementation
->> for INDEX_op_ld16u_i64") has been included now, we can also run the
->> "tcg" and "qtest" tests with tci, so let's enable them in Travis now.
->> Since we don't gain much additional test coverage by compiling all
->> targets, and TCI is broken e.g. with the Sparc targets, we also limit
->> the target list to a reasonable subset now (which should still get us
->> test coverage by tests/boot-serial-test for example).
+>     On 04/12/19 09:50, Catherine Ho wrote:
+>     > Commit 20a78b02d315 ("target/i386: add VMX features") unconditional=
+ly
+>     > add vmx msr entry although older host kernels don't include them.
+>     >
+>     > But old host kernel + newest qemu will cause a qemu crash as follow=
+s:
+>     > qemu-system-x86_64: error: failed to set MSR 0x480 to 0x0
+>     > target/i386/kvm.c:2932: kvm_put_msrs: Assertion `ret =3D=3D
+>     > cpu->kvm_msr_buf->nmsrs' failed.
+>     >
+>     > This fixes it by relaxing the condition.
 >=20
-> Queued to testing/next, thanks.
+>     This is intentional.=C2=A0 The VMX MSR entries should not have been a=
+dded.
+>     What combination of host kernel/QEMU are you using, and what QEMU
+>     command line?
+>=20
+>=20
+> Host kernel: 4.15.0 (ubuntu 18.04)
+> Qemu: https://gitlab.com/virtio-fs/qemu/tree/virtio-fs-dev
+> cmdline: qemu-system-x86_64 -M pc -cpu host --enable-kvm -smp 8 \
+> =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 -m 4G,maxm=
+em=3D4G
+>=20
+> But before 20a78b02d315, the older kernel=C2=A0+ latest qemu can boot gue=
+st
+> successfully.
 
-Thanks! But could you maybe s/--enable-debug/--enable-debug-tcg/ as
-Richard just suggested in his mail? Or want me to send a v4?
+Ok, so the problem is that some MSR didn't exist in that version.  Which
+one it is?  Can you make it conditional, similar to MSR_IA32_VMX_VMFUNC?
 
- Thomas
+Thanks,
+
+Paolo
 
 
