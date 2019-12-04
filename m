@@ -2,89 +2,80 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BTC_ID,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5585CC43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBCFC43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:54:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 207CF20659
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:37:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B8FA2081B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:54:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iB5Rpk31"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 207CF20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NqWwN2hv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B8FA2081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icXen-0005OP-7M
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 11:37:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33864)
+	id 1icXue-00037Y-TA
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 11:54:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1icXPH-0002ba-SS
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:21:42 -0500
+ (envelope-from <atar4qemu@gmail.com>) id 1icXln-0000XL-U3
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:44:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1icXPE-0000sh-4h
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:21:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36723
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1icXPD-0000sY-To
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:21:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575476494;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mgUOs8PfpMssX/sytq+u7L4cvqr4iAF+Xzr8isJfaKc=;
- b=iB5Rpk317B34GROCZ2v02ADf6MLk0pgDmoLG8XPexFfX4aNV9hpGecivV9BzB7DScJy8Vz
- WWUf5qEcgYx1rECcTG5InrqiSWop4Y8U/FHLNkjmRHsu1o3i1mLVa4aNLtfJfobS9Gf8Vm
- hKCbR8OrfjhUDYQRwd0387wJBUwt0hg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-YqKhRVTfOvuZeKLr4V0_rw-1; Wed, 04 Dec 2019 11:21:33 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C67618B9FD7;
- Wed,  4 Dec 2019 16:21:32 +0000 (UTC)
-Received: from localhost (dhcp-192-223.str.redhat.com [10.33.192.223])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AC36A600CD;
- Wed,  4 Dec 2019 16:21:26 +0000 (UTC)
-Date: Wed, 4 Dec 2019 17:21:25 +0100
-From: Jens Freimann <jfreimann@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: qom device lifecycle interaction with hotplug/hotunplug ?
-Message-ID: <20191204162125.udpzdse3zchpfinw@jenstp.localdomain>
-References: <CAFEAcA9E-Z-RPwFsAiz9Pi3_MtBUFEU7enJFVrpOQ7UKW8e1DQ@mail.gmail.com>
- <20191128182705.0635d1d4@redhat.com>
- <CAFEAcA-qA6n49KdHsGLqt422L_b_9xPfSaJB3tATQvRdfKt-xw@mail.gmail.com>
- <20191129132641.4c7da6c5@redhat.com>
- <CAFEAcA_gcxqu+N5iV0L5WLyWmm5yxTFNMtmqQryBgVd4CCCT8A@mail.gmail.com>
- <20191129200545.GG14595@habkost.net>
- <CAFEAcA-BkETOSpOwBegDcbO3bqxDO_a9xoTB7Fc8Ajw_+CDcFA@mail.gmail.com>
- <20191203214004.GS14595@habkost.net>
- <20191204091824.cwufcnlfj5vm4vqu@jenstp.localdomain>
- <20191204143537.GA498046@habkost.net>
+ (envelope-from <atar4qemu@gmail.com>) id 1icXla-0000BJ-AZ
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:44:47 -0500
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:37012)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <atar4qemu@gmail.com>)
+ id 1icXla-0007ET-4M; Wed, 04 Dec 2019 11:44:42 -0500
+Received: by mail-il1-x144.google.com with SMTP id t9so156828iln.4;
+ Wed, 04 Dec 2019 08:44:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pDN1+c8AalYiVNXGBNDFbxymBo5liH2GkMsr9iK10LY=;
+ b=NqWwN2hv8/IKsrff0SnoufIJy80NmHo86vQlc8rKzPiT7QLM8ks2rgNbIntQC4oox8
+ rOSVBRQF+G2CyGZlIP7/F4cVbWC2ZfOA9gqzqqjzmzD2iL+85lJEFW75ib2UB8yufL7Q
+ fz5zoeJGKDTRTrOtWUgmCxMiaD6+vyDth6UQzy6io3alLnLFnmzTBChgoYsr6r1f1ZCF
+ ytIFDHWtlsVzmRazCohAPIfw93QCAGX9XVIl1wKnq4UJBVTzgY77etB6P2hFWogdb2xo
+ G2Gk8p1EgFwGs7AEFmbQAOOtNvKk7KxijNSaQy7hBhiQ7NvcSF0AINajsDY3v18OO7lz
+ g0oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pDN1+c8AalYiVNXGBNDFbxymBo5liH2GkMsr9iK10LY=;
+ b=E8ikmkT5uNwbgwyreEaa2GIMe+jjlFzjGTI3Nl8dYLau+SJn7wjgwxiBlEsK/YV54o
+ E7t+xIid8ObwtjZLsUXYubIIYwa4Pp08HFyKbB1mnAgDGxPd0KAPX0tpJAmofmV5do12
+ JqSZZ41AbBLuSNW6heejisM/MQapvp7HJ2A0H10sGCVzVaYWFbvBdYR6dBIHmNHtCqpv
+ mAcxXmDMhFZZopjrF1hRCHpVpZsvLuAwp4H60I9qlBviGBIrcX/WpmqGlSArO1HjOuVO
+ vtHtLJOHJRhcCV+mrq1f69kOmLDKB4qYW36Uwo1sFwv75tpUgrVcYFGv86Xlff7W1Cuh
+ BkYA==
+X-Gm-Message-State: APjAAAX3BxbdcmksA2DwLGux0gTtkW9gJ5kqFo/uvRhlRZ3CuC1ktdii
+ hPFvd9Gyov+/zkEQwL3cizUT6yvO+GgXnfAZmC8=
+X-Google-Smtp-Source: APXvYqyNZI48YOrAj70jdDJntFGvwb/aanq88XY9o7y7nYGOGY9HVCKAj3tBHzasoNoNAI3yCjTvBDkFGno6nVWb8d0=
+X-Received: by 2002:a92:1655:: with SMTP id r82mr4402389ill.72.1575477868602; 
+ Wed, 04 Dec 2019 08:44:28 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191204143537.GA498046@habkost.net>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: YqKhRVTfOvuZeKLr4V0_rw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20190930171044.25312-1-thuth@redhat.com>
+ <1b2ecf64-ee98-6a05-2455-436f822a7163@redhat.com>
+In-Reply-To: <1b2ecf64-ee98-6a05-2455-436f822a7163@redhat.com>
+From: Artyom Tarasenko <atar4qemu@gmail.com>
+Date: Wed, 4 Dec 2019 17:44:17 +0100
+Message-ID: <CACXAS8CVBUmVdR8a6bLS8x-DP8QKKyMhMpd1vrBUB30_dm7tXA@mail.gmail.com>
+Subject: Re: [PATCH] target/sparc: Remove old TODO file
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,101 +87,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Dec 04, 2019 at 11:35:37AM -0300, Eduardo Habkost wrote:
->On Wed, Dec 04, 2019 at 10:18:24AM +0100, Jens Freimann wrote:
->> On Tue, Dec 03, 2019 at 06:40:04PM -0300, Eduardo Habkost wrote:
->> > +jfreimann, +mst
->> >
->> > On Sat, Nov 30, 2019 at 11:10:19AM +0000, Peter Maydell wrote:
->> > > On Fri, 29 Nov 2019 at 20:05, Eduardo Habkost <ehabkost@redhat.com> =
-wrote:
->> > > > So, to summarize the current issues:
->> > > >
->> > > > 1) realize triggers a plug operation implicitly.
->> > > > 2) unplug triggers unrealize implicitly.
->> > > >
->> > > > Do you expect to see use cases that will require us to implement
->> > > > realize-without-plug?
->> > >
->> > > I don't think so, but only because of the oddity that
->> > > we put lots of devices on the 'sysbus' and claim that
->> > > that's plugging them into the bus. The common case of
->> > > 'realize' is where one device (say an SoC) has a bunch of child
->> > > devices (like UARTs); the SoC's realize method realizes its child
->> > > devices. Those devices all end up plugged into the 'sysbus'
->> > > but there's no actual bus there, it's fictional and about
->> > > the only thing it matters for is reset propagation (which
->> > > we don't model right either). A few devices don't live on
->> > > buses at all.
->> >
->> > That's my impression as well.
->> >
->> > >
->> > > > Similarly, do you expect use cases that will require us to
->> > > > implement unplug-without-unrealize?
->> > >
->> > > I don't know enough about hotplug to answer this one:
->> > > it's essentially what I'm hoping you'd be able to answer.
->> > > I vaguely had in mind that eg the user might be able to
->> > > create a 'disk' object, plug it into a SCSI bus, then
->> > > unplug it from the bus without the disk and all its data
->> > > evaporating, and maybe plug it back into the SCSI
->> > > bus (or some other SCSI bus) later ? But I don't know
->> > > anything about how we expose that kind of thing to the
->> > > user via QMP/HMP.
->> >
->> > This ability isn't exposed to the user at all.  Our existing
->> > interfaces are -device, device_add and device_del.
->> >
->> > We do have something new that sounds suspiciously similar to
->> > "unplugged but not unrealized", though: the new hidden device
->> > API, added by commit f3a850565693 ("qdev/qbus: add hidden device
->> > support").
->> >
->> > Jens, Michael, what exactly is the difference between a "hidden"
->> > device and a "unplugged" device?
->>
->> "hidden" the way we use it for virtio-net failover is actually unplugged=
-. But it
->> doesn't have to be that way. You can register a function that decides
->> if the device should be hidden, i.e. plugged now, or do something else
->> with it (in the virtio-net failover case we just save everything we
->> need to plug the device later).
->>
->> We did introduce a "unplugged but not unrealized" function too as part
->> of the failover feature. See "a99c4da9fc pci: mark devices partially
->> unplugged"
->>
->> This was needed so we would be able to re-plug the device in case a
->> migration failed and we need to hotplug the primary device back to the
->> guest. To avoid the risk of not getting the resources the device needs
->> we don't unrealize but just trigger the unplug from the guest OS.
+On Wed, Dec 4, 2019 at 5:27 PM Thomas Huth <thuth@redhat.com> wrote:
 >
->Thanks for the explanation.  Let me confirm if I understand the
->purpose of the new mechanisms: should_be_hidden is a mechanism
->for implementing realize-without-plug.  partially_hotplugged is a
->mechanism for implementing unplug-without-unrealize.  Is that
->correct?
+> On 30/09/2019 19.10, Thomas Huth wrote:
+> > This file hasn't seen a real (non-trivial) update since 2008 anymore,
+> > so we can assume that it is pretty much out of date and nobody cares
+> > for it anymore. Let's simply remove it.
+> >
+> > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > ---
+> >  target/sparc/TODO | 88 -----------------------------------------------
+> >  1 file changed, 88 deletions(-)
+> >  delete mode 100644 target/sparc/TODO
+> >
+> > diff --git a/target/sparc/TODO b/target/sparc/TODO
+> > deleted file mode 100644
+> > index b8c727e858..0000000000
+> > --- a/target/sparc/TODO
+> > +++ /dev/null
+> > @@ -1,88 +0,0 @@
+> > -TODO-list:
+> > -
+> > -CPU common:
+> > -- Unimplemented features/bugs:
+> > - - Delay slot handling may fail sometimes (branch end of page, delay
+> > - slot next page)
+> > - - Atomical instructions
+> > - - CPU features should match real CPUs (also ASI selection)
+> > -- Optimizations/improvements:
+> > - - Condition code/branch handling like x86, also for FPU?
+> > - - Remove remaining explicit alignment checks
+> > - - Global register for regwptr, so that windowed registers can be
+> > - accessed directly
+> > - - Improve Sparc32plus addressing
+> > - - NPC/PC static optimisations (use JUMP_TB when possible)? (Is this
+> > - obsolete?)
+> > - - Synthetic instructions
+> > - - MMU model dependent on CPU model
+> > - - Select ASI helper at translation time (on V9 only if known)
+> > - - KQemu/KVM support for VM only
+> > - - Hardware breakpoint/watchpoint support
+> > - - Cache emulation mode
+> > - - Reverse-endian pages
+> > - - Faster FPU emulation
+> > - - Busy loop detection
+> > -
+> > -Sparc32 CPUs:
+> > -- Unimplemented features/bugs:
+> > - - Sun4/Sun4c MMUs
+> > - - Some V8 ASIs
+> > -
+> > -Sparc64 CPUs:
+> > -- Unimplemented features/bugs:
+> > - - Interrupt handling
+> > - - Secondary address space, other MMU functions
+> > - - Many V9/UA2005/UA2007 ASIs
+> > - - Rest of V9 instructions, missing VIS instructions
+> > - - IG/MG/AG vs. UA2007 globals
+> > - - Full hypervisor support
+> > - - SMP/CMT
+> > - - Sun4v CPUs
+> > -
+> > -Sun4:
+> > -- To be added
+> > -
+> > -Sun4c:
+> > -- A lot of unimplemented features
+> > -- Maybe split from Sun4m
+> > -
+> > -Sun4m:
+> > -- Unimplemented features/bugs:
+> > - - Hardware devices do not match real boards
+> > - - Floppy does not work
+> > - - CS4231: merge with cs4231a, add DMA
+> > - - Add cg6, bwtwo
+> > - - Arbitrary resolution support
+> > - - PCI for MicroSparc-IIe
+> > - - JavaStation machines
+> > - - SBus slot probing, FCode ROM support
+> > - - SMP probing support
+> > - - Interrupt routing does not match real HW
+> > - - SuSE 7.3 keyboard sometimes unresponsive
+> > - - Gentoo 2004.1 SMP does not work
+> > - - SS600MP ledma -> lebuffer
+> > - - Type 5 keyboard
+> > - - Less fixed hardware choices
+> > - - DBRI audio (Am7930)
+> > - - BPP parallel
+> > - - Diagnostic switch
+> > - - ESP PIO mode
+> > -
+> > -Sun4d:
+> > -- A lot of unimplemented features:
+> > - - SBI
+> > - - IO-unit
+> > -- Maybe split from Sun4m
+> > -
+> > -Sun4u:
+> > -- Unimplemented features/bugs:
+> > - - Interrupt controller
+> > - - PCI/IOMMU support (Simba, JIO, Tomatillo, Psycho, Schizo, Safari...)
+> > - - SMP
+> > - - Happy Meal Ethernet, flash, I2C, GPIO
+> > - - A lot of real machine types
+> > -
+> > -Sun4v:
+> > -- A lot of unimplemented features
+> > - - A lot of real machine types
+> >
+>
+> Ping?
 
-should_be_hidden is a mechanism for implementing
-realize-without-plug: kind of. It's a mechanism that ensures
-qdev_device_add() returns early as long as the condition to hide the
-device is true. You could to the realize-without-plug in the handler
-function that decides if the device should be "hidden". =20
+Sorry for the delay, you are right the file doesn't reflect the
+current state, so
 
-partially_hotplugged is a mechanism for implementing
-unplug-without-unrealize: yes.=20
+Reviewed-by: Artyom Tarasenko <atar4qemu@gmail.com>
 
-regards
-Jens
 
+-- 
+Regards,
+Artyom Tarasenko
+
+SPARC and PPC PReP under qemu blog: http://tyom.blogspot.com/search/label/qemu
 
