@@ -2,85 +2,90 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BAFC43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF12C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:40:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AC55205ED
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:38:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95ECB205ED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:40:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="FsPwH7tU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AC55205ED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nOQSfPY/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95ECB205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icUrM-0003hl-Gm
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:38:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33376)
+	id 1icUtl-00053l-Kk
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:40:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33729)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1icUom-0002su-I9
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:35:49 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1icUs7-0004Fh-Tr
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:39:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1icUol-0005mq-9m
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:35:48 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:48770)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1icUog-0005lx-Be; Wed, 04 Dec 2019 08:35:42 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id A2AEA96EF0;
- Wed,  4 Dec 2019 13:35:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1575466540;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lfOQ/XuakjnWsNeoSdUr3UbRkZAPKweMNeEUHV4Xnuw=;
- b=FsPwH7tUIlPN+HEcjUAFkh6QI5D5MxlR5GSZf71wEkbnloI2SWr1EcTtiGDazvuvDHSv1e
- kZkzJtDEolHMEDmv/7f7WiNmiRy9LKFAHXO14fuQ/+9l0J/lPuHgvfFK8QAU0968EQfxzA
- 8FYZMLgPqklsa1uwF08ooTC3t63VdG4=
-Subject: Re: [PATCH v6 8/9] hw/char/cadence_uart: add clock support
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20190904125531.27545-1-damien.hedde@greensocs.com>
- <20190904125531.27545-9-damien.hedde@greensocs.com>
- <CAFEAcA8=7yhQR4Gw2OYmiF0cFJDaVn2hnUrfnZGFJK6wyuB97Q@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <75c38376-bbe9-1c52-d7a5-cc3aa73cbac2@greensocs.com>
-Date: Wed, 4 Dec 2019 14:35:39 +0100
+ (envelope-from <richard.henderson@linaro.org>) id 1icUs6-0006S3-I3
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:39:15 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38275)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1icUs6-0006Ra-8F
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:39:14 -0500
+Received: by mail-pf1-x441.google.com with SMTP id x185so3672479pfc.5
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 05:39:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=HfyHcT8LnXJmzN8lIjJLDzVoxV4uO/d2y1MsfPUV3/M=;
+ b=nOQSfPY/7rHVd9Xy3V9auvJpVEcYdd3bIQBMtMKWK1nYJivdYWfTqsWgFXKt5Bv1Nj
+ DWXkWAoclZlsXpL8J0RZBnIBuDJrQ9LLWTkLCSQUm1rtydmDAPghAy7tqW7vI5/Z6w7L
+ 4cML/Y0KXgbZKos1Ygo+sGHOFMrU7OM0jUJS02a3KT6MeBK6rCii5JZt2KdzDGeaZtt4
+ W0LXhRWkigoPoMthOWZsHYDOX3j3Df27wEbjHQEa/rHJ8fdppD8V9N/+rUMuUdk/bmkL
+ Hd5KqhJlxDLvjJi0QjuSbZNdmCFfM8ScucE0Sxsz6QCexZ5LaiUoYn+czvAu+YUEt6J8
+ XKlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=HfyHcT8LnXJmzN8lIjJLDzVoxV4uO/d2y1MsfPUV3/M=;
+ b=XR+A7Cogxx0t2WwbQQUyIVDvAJLKFpylfFvJJbRfPriw0qPygdc65zuch3CYC+SeUi
+ /VeYdIiKpso/6iyuKUUy7cYH3VRTtumHnSvoqI1JEFpKm6JtjQATugVLXD+UC5Zad4jT
+ SxXknQCyROkPTv4Lno+pZrZVXgzlo2cs4dhIJz5REyRd0lzW6+2tafSK8aXQPcaBl7f7
+ jlXtU5zEd8//db3W/ysnjkZ8kwfWcxqTjtPgo2yWnrxZZovxkaYZykxcG0wex4D1wf08
+ cou+f4N/fgglleoM5JP3FPYDQJ5VhcQPv4kGMfskX1DP/5uzM0uBev/Mg5IwWM9Y87Hq
+ v/wg==
+X-Gm-Message-State: APjAAAXs4Z2kuTjDNTe5SqvbTAs+cBdtVlpYjVUNrK7hc1B0WZ3pQsC/
+ VlntfW6wLtaKNqbNfYOp9B88bg==
+X-Google-Smtp-Source: APXvYqyGbcjccoGamnJdYTaQfHYVHCDONZqiAoz0WT+bF+tOL9SFjYYzqO9xA15KmtlVFYJvkci1lw==
+X-Received: by 2002:a65:530d:: with SMTP id m13mr3513853pgq.172.1575466752574; 
+ Wed, 04 Dec 2019 05:39:12 -0800 (PST)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id d6sm6272141pju.8.2019.12.04.05.39.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 04 Dec 2019 05:39:11 -0800 (PST)
+Subject: Re: [PATCH v3] travis.yml: Run tcg tests with tci
+To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+References: <87lfrtbtj6.fsf@linaro.org>
+ <20191204083133.6198-1-thuth@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c727fe15-2448-22c5-2b0a-0ceb7bee2586@linaro.org>
+Date: Wed, 4 Dec 2019 05:39:09 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8=7yhQR4Gw2OYmiF0cFJDaVn2hnUrfnZGFJK6wyuB97Q@mail.gmail.com>
+In-Reply-To: <20191204083133.6198-1-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1575466540;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lfOQ/XuakjnWsNeoSdUr3UbRkZAPKweMNeEUHV4Xnuw=;
- b=ZscCWZk7LlsX8kd02cRVKUwB1nMABjLhOmUc1PXXfZbZnq2OypHT4t49Wh2r3GkhDeJRgY
- Z9qV0aUv76SUzD51IgtrM6Wdr18gD74B0d0/8wUWiVNTwVFZ4zOBhVaTou6VI3ndT8W4Do
- 1Wr4V7PgTq5x/uPcfOlchRN/7HFpxIs=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575466540; a=rsa-sha256; cv=none;
- b=7hg/tmCb64KH5gTd7e1YfQlpOb0Kta8faJfKWjxmQq96wCOQ6V8Qme84h/PY0hjkgS74wz
- NKc4vsbiipK9Ic/5rhp42A6MQZK4/KhznzfS1GaMlCLz2lrqSbVJcr1li1Q/kSQCGg5R8S
- zmddbVnXlKnDB1jJSn8AGOzdsAg+C+k=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 5.135.226.135
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,90 +97,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+Cc: Stefan Weil <sw@weilnetz.de>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 12/4/19 12:31 AM, Thomas Huth wrote:
+> -    # We manually include builds which we disable "make check" for
+> +    # Check the TCG interpreter (TCI)
+>      - env:
+> -        - CONFIG="--enable-debug --enable-tcg-interpreter"
+> -        - TEST_CMD=""
+> +        - CONFIG="--enable-debug --enable-tcg-interpreter --disable-kvm
+
+While we're changing things, the interpreter will go much faster with
+optimization enabled.  We can change this to --enable-debug-tcg, which leaves
+the asserts enabled, but compiles with -O2.
 
 
-On 12/2/19 4:24 PM, Peter Maydell wrote:
-> On Wed, 4 Sep 2019 at 13:56, Damien Hedde <damien.hedde@greensocs.com> wrote:
->>
->> Switch the cadence uart to multi-phase reset and add the
->> reference clock input.
->>
->> The input clock frequency is added to the migration structure.
->>
->> The reference clock controls the baudrate generation. If it disabled,
->> any input characters and events are ignored.
->>
->> If this clock remains unconnected, the uart behaves as before
->> (it default to a 50MHz ref clock).
->>
->> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-> 
->>  static void uart_parameters_setup(CadenceUARTState *s)
->>  {
->>      QEMUSerialSetParams ssp;
->> -    unsigned int baud_rate, packet_size;
->> +    unsigned int baud_rate, packet_size, input_clk;
->> +    input_clk = clock_get_frequency(s->refclk);
->>
->> -    baud_rate = (s->r[R_MR] & UART_MR_CLKS) ?
->> -            UART_INPUT_CLK / 8 : UART_INPUT_CLK;
->> +    baud_rate = (s->r[R_MR] & UART_MR_CLKS) ? input_clk / 8 : input_clk;
->> +    baud_rate /= (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
->> +    trace_cadence_uart_baudrate(baud_rate);
->> +
->> +    ssp.speed = baud_rate;
->>
->> -    ssp.speed = baud_rate / (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
->>      packet_size = 1;
->>
->>      switch (s->r[R_MR] & UART_MR_PAR) {
->> @@ -215,6 +220,13 @@ static void uart_parameters_setup(CadenceUARTState *s)
->>      }
->>
->>      packet_size += ssp.data_bits + ssp.stop_bits;
->> +    if (ssp.speed == 0) {
->> +        /*
->> +         * Avoid division-by-zero below.
->> +         * TODO: find something better
->> +         */
-> 
-> Any ideas what might be better? :-)
-
-Well maybe the comment is misplaced. Because it is probably a good thing
-to round up the ssp.speed in case it becomes 0 (which is very unlikely
-apart from the case where the input clock is 0/disabled).
-
-The problem is what should we do when the clock is disabled ?
-Right now we:
-+ set a minimal baudrate
-+ ignore input characters/events
-+ still forward output characters... (I just checked)
-
-I suppose we could at least fix the last point: we can drop any output
-characters. But if this happen, there is definitely a problem somewhere
-(a firmware should not try to send characters to an unclocked uart). Is
-there a qemu way of reporting this kind of situation ?
-
-It would be best to somehow tell the backend we're not handling anything
-anymore. So I could put that in the comment instead.
-
-I really don't know if/how we can do that. When I looked I did not see
-any way to do the opposite of qemu_chr_fe_accept_input() which is done
-to start receiving stuff.
-
---
-Damien
+r~
 
