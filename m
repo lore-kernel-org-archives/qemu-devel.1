@@ -2,102 +2,82 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DDEC2BD09
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB37C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:36:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D87F206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:36:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48EB1206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:36:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U8xbtYu4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D87F206DF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bUO+nENq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48EB1206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icWhd-0001Xe-Ek
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:36:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53503)
+	id 1icWhh-0001c3-AD
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:36:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1icWg1-0000PQ-3U
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:34:55 -0500
+ (envelope-from <cohuck@redhat.com>) id 1icWfm-0000KQ-1D
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:34:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1icWfz-0000NL-Sv
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:34:53 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43070
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1icWfi-0000FJ-TW
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:34:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30943
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1icWfz-0000KZ-NY
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:34:51 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1icWfg-0000E8-Of
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:34:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575473689;
+ s=mimecast20190719; t=1575473671;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ohr+K9Wr9L1SwB4XbeQinW5OsnRUbekzuVwYWSF3DGY=;
- b=U8xbtYu4hl9nLHUcZWrbnMQWIbi12Rb2pfuB9OMDx//m1L6Urb8evIpi3rQbAZJrmu+QM7
- ttXCSFIv92Xw+ljs/mCp1pm7yRZG5usFnsLmoKP5n/MsMg6m/sJXEeV+JLC9bhBzf4LNfU
- jW2w1gE+pAxpHOZpkW8hNhFzII0Huw4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-zNs7vzLqMJ-ZhjB-Zgxkyg-1; Wed, 04 Dec 2019 10:34:48 -0500
-Received: by mail-wm1-f69.google.com with SMTP id p5so2230161wmc.4
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 07:34:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ohr+K9Wr9L1SwB4XbeQinW5OsnRUbekzuVwYWSF3DGY=;
- b=SvcnJrpGLGeEKfUKuaF8OsgWQlnE0NyRYIZ3R8ieA2A+ygjmK2JWRzQ6487eTJUHF/
- lpslsiVmfn1mDE+YTQUT1qfkHixoakxgNIrWSNdqO83XbsjiCnC+9GUIGUZHTsY7E0Iw
- FwBT2mm6cb/dyEMwzFFHGDWeerq5WZm18IuWGfqAx91UfcTibC3ZUNt9rQ5ymj1jg/c/
- mZb7cgvDoR5oYG1DGA2h79rbwhtRZQ/oyfY9TIdryT/LL01FwuIyIMhRWsW9N6QAw4uv
- eb7/0ZHM42J7HSVCUK53ZM4CxDXxDAbl0IgmEWEl7RvGzj09q87TnMqRMdjbQt+E0yui
- IAgA==
-X-Gm-Message-State: APjAAAU+Yep+0gLdH3Q3MZgJCDXW2B9lROQAeXLEuBNzP22Bmqj2gJ0e
- +HXQ/F/WV/DIWENRdYtD6ZlPIlIpTvYdczDZp1ps88//pHTgkQX3ZlMvtZpgPAdzBxDZj61EJXT
- Ej9W0YnwcX844deI=
-X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr4615822wrv.144.1575473687107; 
- Wed, 04 Dec 2019 07:34:47 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzCwDAGc25fHrVIgk3hM96SB/lE+J0Sx+odhAXM45pVbtAz8iw4flzaRpnlM2iJmSz78wu3Ng==
-X-Received: by 2002:a5d:4ed0:: with SMTP id s16mr4615796wrv.144.1575473686830; 
- Wed, 04 Dec 2019 07:34:46 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a?
- ([2001:b07:6468:f312:8dc6:5dd5:2c0a:6a9a])
- by smtp.gmail.com with ESMTPSA id c6sm6959402wmb.9.2019.12.04.07.34.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Dec 2019 07:34:46 -0800 (PST)
-Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
- include msrs
-To: Catherine Ho <catherine.hecx@gmail.com>
-References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
- <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
- <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
- <714a0a86-4301-e756-654f-7765d4eb73db@redhat.com>
- <CAEn6zmHnTLZxa6Qv=8oDUPYpRD=rvGxJOLjd8Qb15k9-3U+CKw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3a1c97b2-789f-dd21-59ba-f780cf3bad92@redhat.com>
-Date: Wed, 4 Dec 2019 16:34:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=kgQ+OOvPNio8TBho7hiutaT9T4s3hG/9mmOTlUbtP0I=;
+ b=bUO+nENqEHiPrJyAuoikk/WpRUpFbRjt3xuxgm3Y0f6N4viFqcveQYYsNeISykQkHEWZM2
+ ag6EV4SBRc4ocQL9+aiImgznSIFdrdOAEEbXUSokZkFdjd7piB0HaBp067PKKBJurBaEF8
+ zE46p373yl8Unsxze2Q+VEaYedY48mw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-G7FQaBSTPsqeXd5MgZSppw-1; Wed, 04 Dec 2019 10:34:29 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B165D64A7D;
+ Wed,  4 Dec 2019 15:34:27 +0000 (UTC)
+Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 735905D9C5;
+ Wed,  4 Dec 2019 15:34:23 +0000 (UTC)
+Date: Wed, 4 Dec 2019 16:33:09 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v3 2/4] s390x: Add missing vcpu reset functions
+Message-ID: <20191204163309.7af0582f.cohuck@redhat.com>
+In-Reply-To: <026a1b83-6a1f-3e09-e516-13fe0f13dee0@redhat.com>
+References: <20191203132813.2734-1-frankja@linux.ibm.com>
+ <20191203132813.2734-3-frankja@linux.ibm.com>
+ <20191204155937.76f6c0cd.cohuck@redhat.com>
+ <dd35552d-3e51-9f4d-caca-c52c0136d4ed@redhat.com>
+ <026a1b83-6a1f-3e09-e516-13fe0f13dee0@redhat.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <CAEn6zmHnTLZxa6Qv=8oDUPYpRD=rvGxJOLjd8Qb15k9-3U+CKw@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: zNs7vzLqMJ-ZhjB-Zgxkyg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: G7FQaBSTPsqeXd5MgZSppw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,24 +89,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com,
+ Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/12/19 16:07, Catherine Ho wrote:
->> Ok, so the problem is that some MSR didn't exist in that version.  Which
-> I thought in my platform, the only MSR didn't exist is MSR_IA32_VMX_BASIC
-> (0x480). If I remove this kvm_msr_entry_add(), everything is ok, the guest can
-> be boot up successfully.
+On Wed, 4 Dec 2019 16:08:48 +0100
+David Hildenbrand <david@redhat.com> wrote:
+
+> On 04.12.19 16:07, David Hildenbrand wrote:
+> > On 04.12.19 15:59, Cornelia Huck wrote:  
+> >> On Tue,  3 Dec 2019 08:28:11 -0500
+> >> Janosch Frank <frankja@linux.ibm.com> wrote:
+> >>  
+> >>> Up to now we only had an ioctl to reset vcpu data QEMU couldn't reach
+> >>> for the initial reset, and that was also called for the clear
+> >>> reset. To be architecture compliant, we also need to clear local
+> >>> interrupts on a normal reset.  
+> >>
+> >> Do we also need to do something like that for tcg? David?
+> >>  
+> > 
+> > So, we have
+> > 
+> > /* Fields up to this point are not cleared by initial CPU reset */
+> > struct {} start_initial_reset_fields;
+> > [...]
+> > int pending_int
+> > uint16_t external_call_addr;
+> > DECLARE_BITMAP(emergency_signals, S390_MAX_CPUS);
+> > [...]
+> > /* Fields up to this point are cleared by a CPU reset */
+> > struct {} end_reset_fields;
+> > 
+> > This means, local interrupts will be cleared by everything that zeroes
+> > "start_initial_reset_fields->end_reset_fields"
+> > 
+> > So, they will get cleared by S390_CPU_RESET_INITIAL only if I am not
+> > wrong. In order to clear them on S390_CPU_RESET_NORMAL, we have to
+> > manually set them to zero.  
 > 
+> Sorry, by S390_CPU_RESET_INITIAL and S390_CPU_RESET_CLEAR.
 
-MSR_IA32_VMX_BASIC was added in kvm-4.10.  Maybe the issue is the
-_value_ that is being written to the VM is not valid?  Can you check
-what's happening in vmx_restore_vmx_basic?
+Ok. Will you cook up a patch, or should I do it?
 
-Paolo
+> 
+> > 
+> > (we really should wrap TCG-only fields by ifdefs)
+
+They probably do not get into the way, but making it obvious that they
+a tcg-only is something we really should do.
+
+> >   
+> 
+> 
 
 
