@@ -2,89 +2,83 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PDS_BTC_ID,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB0AC43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D819FC2BC73
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:34:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BC552077B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:29:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94EA22073C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:34:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TO8uOoew"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC552077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZFP5+Q2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94EA22073C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icUiM-0007r2-FP
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:29:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60811)
+	id 1icUnh-000283-PY
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:34:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33097)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1icUhh-0007Ke-3R
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:28:29 -0500
+ (envelope-from <catherine.hecx@gmail.com>) id 1icUmb-0001NE-Lv
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:33:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1icUhf-0006Df-KP
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:28:28 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52908
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1icUhf-0006DY-Go
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:28:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575466106;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VZhH+3TpxcEDgCHzEzoyHzPp2D+CWOeAeZ7w0XgcrpY=;
- b=TO8uOoewK6F9T0GiHKp7R4GULgOmLa+XQsIQjo/QmKVMxe4gKASqZNJOL9+BpJBGSxbs0A
- X6iY+EldSrBHLiQpED9LKpRwZgEIL9RY3BDAxJkC9Y3wZ/ZIRwtGWEmjgr7KCs0nwX0f1w
- MsTynhVQZ+XClF3c8anIr7aJQV35hSE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-Toxq1eOKPEWil_21CtKWEQ-1; Wed, 04 Dec 2019 08:28:23 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E953800D5C;
- Wed,  4 Dec 2019 13:28:22 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AFCA019C6A;
- Wed,  4 Dec 2019 13:28:11 +0000 (UTC)
-Date: Wed, 4 Dec 2019 14:28:10 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: virtiofsd: Where should it live?
-Message-ID: <20191204132810.GB20250@dhcp-200-226.str.redhat.com>
-References: <20191126102600.GG556568@redhat.com>
- <20191126121416.GE2928@work-vm>
- <CAFEAcA9Ln2uwg4f4s8oS6VeQk83W3BErmH9cHeyDJy7v-4gNxw@mail.gmail.com>
- <87k17ekhs9.fsf@dusky.pond.sub.org>
- <fef0eaaf-149a-f8a8-02c5-821d2d42becd@redhat.com>
- <20191203105341.GB3078@work-vm>
- <CAFEAcA8bjGAs7JSTNYYYwCH1yF06i0v0r9wjKXqZGZg_Sqy0VA@mail.gmail.com>
- <20191203111949.GB267814@redhat.com>
- <87o8wofsda.fsf@dusky.pond.sub.org>
- <20191204081726.md3qakjtszftnuag@sirius.home.kraxel.org>
+ (envelope-from <catherine.hecx@gmail.com>) id 1icUma-0002TF-5S
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:33:33 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40824)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+ id 1icUmY-0002MJ-7M
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:33:32 -0500
+Received: by mail-oi1-x243.google.com with SMTP id 6so6825219oix.7
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 05:33:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=kgXZVlg/np2RFAlicTQXy8RF82Wnir/9w4md2lq06Cg=;
+ b=NZFP5+Q2g7RWxw6vPrVrYKyNjSxDWIaXsKo/j4Y4s4TT6eMqx+XZks80NjcKy5mck+
+ hrMcNyWcuRMryJaQrwdCt/HMd/oS2h0CQGkGInBhkr/mrCoAUONJJLMlaWYqPKEtx/Cp
+ xFrtpoBSjwNTQUOYXvP6xUnmYgBK9ulLe+bQkmK9KTdBsXxqIH+At7wHfXdDhIF7qu+C
+ ZUPMfc9KlyUVdOkB4C2FloWnSoPXIxfkaa6BdpHFK5uGgHx0ySs1oeSuXlUgtuUu1KEy
+ XZLMabvQK3rW7FZzuCvTUqSkGO1UuhokLt7pKGqoVL0p4AKbvYbcTxBuoRIb1sna6s+n
+ d44w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=kgXZVlg/np2RFAlicTQXy8RF82Wnir/9w4md2lq06Cg=;
+ b=hwLh89lQq3KNl54voXBkRwHok2WvFFBk4f1eAIBqxP9v+KVcvMN13ncIBGjzqJq66D
+ 1u3Nb3OKUi5xTr37k5GxiqOGelWNl6yfWc2dUpCapUp4RP8l0/4G0JMRS8ohN9alENfB
+ KeIWHIXHj8J9NwckEkZ8K3LqqefDLXHL/g0eFbA2cKUdJvrt1JOxTk5Ky/n+0d0Xhp2G
+ GNstaXaEuSm9IQzHbQwTiA2Ga5hGOO3V5FJxfKXMu3VZsA6OPbApPRao7puwldnv3QGv
+ EpdiStQ4RYaFebQW5VOkC3mtxbUBhnjY+D+6EWfSvky0DFro25boYiLIF7xyVvfEBPpJ
+ WdOg==
+X-Gm-Message-State: APjAAAWB1vSOApkbN+d1w2T1NtEo5+5eehRiXFM4qabEoJr68B0gMFGM
+ ZQ+VoOGb7Wuj6Kha0ddWDTvoB5V3yY8wFetWOpk=
+X-Google-Smtp-Source: APXvYqzPMynBnODSBzE67mrEmqAI1It0HVH7L5uZQfYArzHXrMmN5lt/Tiebv8iLmyYmJid3lrrDcZ1UKHVODA9uUrk=
+X-Received: by 2002:a05:6808:f:: with SMTP id
+ u15mr2471778oic.164.1575466404865; 
+ Wed, 04 Dec 2019 05:33:24 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191204081726.md3qakjtszftnuag@sirius.home.kraxel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: Toxq1eOKPEWil_21CtKWEQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
+ <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
+In-Reply-To: <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
+From: Catherine Ho <catherine.hecx@gmail.com>
+Date: Wed, 4 Dec 2019 21:33:12 +0800
+Message-ID: <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
+Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
+ include msrs
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000006ae9da0598e0db04"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,37 +90,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, mszeredi@redhat.com, Jason Wang <jasowang@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- vgoyal@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 04.12.2019 um 09:17 hat Gerd Hoffmann geschrieben:
->   Hi,
->=20
-> > >     |   ...
-> > >     +- qemu-edid
-> >=20
-> > Has its own MAINTAINERS section, together with hw/display/edit* and
-> > include/hw/display/edid.h.  I'm not sure moving it hw/display/ is a goo=
-d
-> > idea.  Gerd?
->=20
-> Sort-of makes sense.  My personal preference would be a tools/ directory
-> for all those small utilities though.
+--0000000000006ae9da0598e0db04
+Content-Type: text/plain; charset="UTF-8"
 
-I think I would like that better than throwing tools into block/ where
-currently mostly just block drivers live.
+Hi Paolo
+[sorry to resend it, seems to reply it incorrectly]
 
-Or, if we want to move the tools there, we'd need another directory
-level inside block/ to keep things reasonably organised.
+On Wed, 4 Dec 2019 at 19:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Kevin
+> On 04/12/19 09:50, Catherine Ho wrote:
+> > Commit 20a78b02d315 ("target/i386: add VMX features") unconditionally
+> > add vmx msr entry although older host kernels don't include them.
+> >
+> > But old host kernel + newest qemu will cause a qemu crash as follows:
+> > qemu-system-x86_64: error: failed to set MSR 0x480 to 0x0
+> > target/i386/kvm.c:2932: kvm_put_msrs: Assertion `ret ==
+> > cpu->kvm_msr_buf->nmsrs' failed.
+> >
+> > This fixes it by relaxing the condition.
+>
+> This is intentional.  The VMX MSR entries should not have been added.
+> What combination of host kernel/QEMU are you using, and what QEMU
+> command line?
+>
+>
+> Host kernel: 4.15.0 (ubuntu 18.04)
+Qemu: https://gitlab.com/virtio-fs/qemu/tree/virtio-fs-dev
+cmdline: qemu-system-x86_64 -M pc -cpu host --enable-kvm -smp 8 \
+                  -m 4G,maxmem=4G
 
+But before 20a78b02d315, the older kernel + latest qemu can boot guest
+successfully.
+
+Best Regards,
+Catherine
+
+--0000000000006ae9da0598e0db04
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><div>Hi Paolo</div><div>[sorry to resend =
+it, seems to reply it incorrectly]<br></div></div><br><div class=3D"gmail_q=
+uote"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, 4 Dec 2019 at 19:23, Pa=
+olo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com<=
+/a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0=
+px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">O=
+n 04/12/19 09:50, Catherine Ho wrote:<br>
+&gt; Commit 20a78b02d315 (&quot;target/i386: add VMX features&quot;) uncond=
+itionally<br>
+&gt; add vmx msr entry although older host kernels don&#39;t include them.<=
+br>
+&gt; <br>
+&gt; But old host kernel + newest qemu will cause a qemu crash as follows:<=
+br>
+&gt; qemu-system-x86_64: error: failed to set MSR 0x480 to 0x0<br>
+&gt; target/i386/kvm.c:2932: kvm_put_msrs: Assertion `ret =3D=3D<br>
+&gt; cpu-&gt;kvm_msr_buf-&gt;nmsrs&#39; failed.<br>
+&gt; <br>
+&gt; This fixes it by relaxing the condition.<br>
+<br>
+This is intentional.=C2=A0 The VMX MSR entries should not have been added.<=
+br>
+What combination of host kernel/QEMU are you using, and what QEMU<br>
+command line?<br>
+<br><br></blockquote><div>
+<div>Host kernel: 4.15.0 (ubuntu 18.04)</div><div>Qemu: <a href=3D"https://=
+gitlab.com/virtio-fs/qemu/tree/virtio-fs-dev" target=3D"_blank">https://git=
+lab.com/virtio-fs/qemu/tree/virtio-fs-dev</a></div><div>cmdline: qemu-syste=
+m-x86_64 -M pc -cpu host --enable-kvm -smp 8 \<br>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 -m 4G,maxmem=3D4G</div><div><br></di=
+v><div>But before=20
+20a78b02d315, the older kernel=C2=A0+ latest qemu can boot guest</div><div>=
+successfully.</div><div><br></div><div>Best Regards,</div><div>Catherine</d=
+iv>=C2=A0
+
+<br></div></div></div>
+
+--0000000000006ae9da0598e0db04--
 
