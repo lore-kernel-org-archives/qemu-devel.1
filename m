@@ -1,85 +1,91 @@
-Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25029C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:57:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C7FC43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:31:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E49E8206EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:57:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D757920675
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:31:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPzS9o6k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E49E8206EC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dUTzt/Os"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D757920675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihH5o-0000WA-4x
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:57:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60364)
+	id 1icUkB-0000WR-2A
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:31:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60892)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ihH4g-00080v-9A
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:56:00 -0500
+ (envelope-from <thuth@redhat.com>) id 1icUjD-0008Mb-4b
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:30:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ihH4f-0002Eq-1T
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:55:58 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39373
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1icUjB-0007Ta-Sb
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:30:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39359
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihH4e-0002Cd-UL
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:55:56 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1icUjB-0007TM-Pf
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:30:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576605356;
+ s=mimecast20190719; t=1575466201;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=XonMyJTSYe6axvH2XhPYMlGqglKHeb2J0yyugOm/J1I=;
- b=CPzS9o6klYqRavTeoQ/+ici5sjuyN6tscaMlJCWotBghTJqC+THeKP5TmU6mVVFAETdYEk
- eGPBxM7VF56U7L/rkxMYq9UWPaaZsMsKNcCyljeiABv3aIHguYS/l/w3O4eJUWeWy0JKHB
- INTZPoczuOLCQX64SXFUjtZKU/8NVjs=
+ bh=rRLjYxlhZes/kzF4zBZOobG0hp8DyG9ry/28Q215LlM=;
+ b=dUTzt/OsIp7KUV1w+SEugoY7JFebp193xRq96ktxkV/8RIY1itXjhdcWAa7nC55lM2+zDA
+ CzFdcLSBJK6hpH7J+HzhGgQfJv/CoEU+r8HFkoYqAS7Dg5hcQyJCljZczQB4vQ6YPehKdf
+ hKmtjuji9FVCzCwBxRV5bxejzf7+9u8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-94uUp8tSNAyWNMdnECtJXQ-1; Tue, 17 Dec 2019 12:55:54 -0500
+ us-mta-203-O7neUIikOVK1vfdKpJBgdw-1; Wed, 04 Dec 2019 08:29:57 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88ED1107ACCA;
- Tue, 17 Dec 2019 17:55:53 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-149.ams2.redhat.com [10.36.116.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 881E960BE0;
- Tue, 17 Dec 2019 17:55:49 +0000 (UTC)
-Subject: Re: [PATCH 3/6] hw/net/imx_fec: Rewrite fall through comments
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191217173425.5082-1-philmd@redhat.com>
- <20191217173425.5082-4-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4895A8005B6;
+ Wed,  4 Dec 2019 13:29:56 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-117-39.ams2.redhat.com [10.36.117.39])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0386260BE0;
+ Wed,  4 Dec 2019 13:29:45 +0000 (UTC)
+Subject: Re: virtiofsd: Where should it live?
+To: Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+References: <20191126102600.GG556568@redhat.com>
+ <20191126121416.GE2928@work-vm>
+ <CAFEAcA9Ln2uwg4f4s8oS6VeQk83W3BErmH9cHeyDJy7v-4gNxw@mail.gmail.com>
+ <87k17ekhs9.fsf@dusky.pond.sub.org>
+ <fef0eaaf-149a-f8a8-02c5-821d2d42becd@redhat.com>
+ <20191203105341.GB3078@work-vm>
+ <CAFEAcA8bjGAs7JSTNYYYwCH1yF06i0v0r9wjKXqZGZg_Sqy0VA@mail.gmail.com>
+ <20191203111949.GB267814@redhat.com> <87o8wofsda.fsf@dusky.pond.sub.org>
+ <20191204081726.md3qakjtszftnuag@sirius.home.kraxel.org>
+ <20191204132810.GB20250@dhcp-200-226.str.redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <2fc74b64-0a0b-c437-e925-4c16d3907da7@redhat.com>
-Date: Tue, 17 Dec 2019 18:55:47 +0100
+Message-ID: <7fd86048-ae06-14df-fb68-b0b04b8545ec@redhat.com>
+Date: Wed, 4 Dec 2019 14:29:44 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191217173425.5082-4-philmd@redhat.com>
+In-Reply-To: <20191204132810.GB20250@dhcp-200-226.str.redhat.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 94uUp8tSNAyWNMdnECtJXQ-1
+X-MC-Unique: O7neUIikOVK1vfdKpJBgdw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,74 +97,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org,
- Peter Chubb <peter.chubb@nicta.com.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, mszeredi@redhat.com, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ vgoyal@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/12/2019 18.34, Philippe Mathieu-Daud=C3=A9 wrote:
-> GCC9 is confused by this comment when building with CFLAG
-> -Wimplicit-fallthrough=3D2:
->=20
->   hw/net/imx_fec.c: In function =E2=80=98imx_eth_write=E2=80=99:
->   hw/net/imx_fec.c:906:12: error: this statement may fall through [-Werro=
-r=3Dimplicit-fallthrough=3D]
->     906 |         if (unlikely(single_tx_ring)) {
->         |            ^
->   hw/net/imx_fec.c:912:5: note: here
->     912 |     case ENET_TDAR:     /* FALLTHROUGH */
->         |     ^~~~
->   cc1: all warnings being treated as errors
->=20
-> Rewrite the comments in the correct place,  using 'fall through'
-> which is recognized by GCC and static analyzers.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
-> Cc: Peter Chubb <peter.chubb@nicta.com.au>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: qemu-arm@nongnu.org
-> ---
->  hw/net/imx_fec.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-> index bd99236864..30cc07753d 100644
-> --- a/hw/net/imx_fec.c
-> +++ b/hw/net/imx_fec.c
-> @@ -901,15 +901,17 @@ static void imx_eth_write(void *opaque, hwaddr offs=
-et, uint64_t value,
->              s->regs[index] =3D 0;
->          }
->          break;
-> -    case ENET_TDAR1:    /* FALLTHROUGH */
-> -    case ENET_TDAR2:    /* FALLTHROUGH */
-> +        /* fall through */
+On 04/12/2019 14.28, Kevin Wolf wrote:
+> Am 04.12.2019 um 09:17 hat Gerd Hoffmann geschrieben:
+>>   Hi,
+>>
+>>>>     |   ...
+>>>>     +- qemu-edid
+>>>
+>>> Has its own MAINTAINERS section, together with hw/display/edit* and
+>>> include/hw/display/edid.h.  I'm not sure moving it hw/display/ is a good
+>>> idea.  Gerd?
+>>
+>> Sort-of makes sense.  My personal preference would be a tools/ directory
+>> for all those small utilities though.
+> 
+> I think I would like that better than throwing tools into block/ where
+> currently mostly just block drivers live.
 
-Wrong location. And I think you don't need any comment here at all, GCC
-should stay silent without it?
-
-> +    case ENET_TDAR1:
-> +    case ENET_TDAR2:
->          if (unlikely(single_tx_ring)) {
->              qemu_log_mask(LOG_GUEST_ERROR,
->                            "[%s]%s: trying to access TDAR2 or TDAR1\n",
->                            TYPE_IMX_FEC, __func__);
->              return;
->          }
-> -    case ENET_TDAR:     /* FALLTHROUGH */
-> +        /* fall through */
-
-I'd suggest to simply remove it, too.
-
-> +    case ENET_TDAR:
->          if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
->              s->regs[index] =3D ENET_TDAR_TDAR;
->              imx_eth_do_tx(s, index);
->=20
++1 for tools/
 
  Thomas
 
