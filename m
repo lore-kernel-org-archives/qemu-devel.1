@@ -2,86 +2,72 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8B3C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 10:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C36C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 10:58:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5FEC20675
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 10:54:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J+S6sTOZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5FEC20675
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 82FB92073C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 10:58:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82FB92073C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icSIR-0006MT-FA
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 05:54:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56766)
+	id 1icSM3-0007dA-Ku
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 05:58:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57805)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1icRG7-0002Mz-65
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:47:49 -0500
+ (envelope-from <bounces@canonical.com>) id 1icREc-0002gp-GX
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:46:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1icRDw-0002ex-9m
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:45:35 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48462
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1icRDv-0002Uv-VK
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:45:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575452725;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1k47op3h9nADE9XzmjPwkej6OOpZrwHzR2XkAqlvbww=;
- b=J+S6sTOZE6q09pxNraL+IPZTT0gEevDULT01KVW62OBqtxWpaPc0CZ2A+/wxtqVwlIgAej
- jcKFCUhAgbwxGT5P4pL7Hib5biweXyLQQAoY39AUTS7/3QEYuq9XctwRu5s5cVUYwWOFQW
- oYAJj5LJwdfWpu/Xf8zkFJ1m6Gizp+k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-7HjpTIQeO_2XljaSjoV8hQ-1; Wed, 04 Dec 2019 04:45:24 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E6968C80F3
- for <qemu-devel@nongnu.org>; Wed,  4 Dec 2019 09:45:23 +0000 (UTC)
-Received: from redhat.com (ovpn-112-55.ams2.redhat.com [10.36.112.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F1A610246E3;
- Wed,  4 Dec 2019 09:45:22 +0000 (UTC)
-Date: Wed, 4 Dec 2019 09:45:19 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v2 02/18] crypto: Fix typo in QCryptoTLSSession's
- <example> comment
-Message-ID: <20191204094519.GB785462@redhat.com>
-References: <20191204093625.14836-1-armbru@redhat.com>
- <20191204093625.14836-3-armbru@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1icREW-0004Ci-Tw
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:46:11 -0500
+Received: from indium.canonical.com ([91.189.90.7]:37478)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1icREW-00047i-MI
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 04:46:08 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1icRER-0007bG-Ty
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 09:46:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D35F32E80BA
+ for <qemu-devel@nongnu.org>; Wed,  4 Dec 2019 09:46:03 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20191204093625.14836-3-armbru@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 7HjpTIQeO_2XljaSjoV8hQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Wed, 04 Dec 2019 09:30:53 -0000
+From: Julien Freche <1855072@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jfreche
+X-Launchpad-Bug-Reporter: Julien Freche (jfreche)
+X-Launchpad-Bug-Modifier: Julien Freche (jfreche)
+Message-Id: <157545185401.7205.1743602467950204624.malonedeb@gac.canonical.com>
+Subject: [Bug 1855072] [NEW] ARM: HCR.TVM traps are not implemented
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: fbfa3fe33f77c6baefe3ad20d06b38af83c1af42
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,30 +76,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+Reply-To: Bug 1855072 <1855072@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Dec 04, 2019 at 10:36:09AM +0100, Markus Armbruster wrote:
-> Cc: "Daniel P. Berrang=C3=A9" <berrange@redhat.com>
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  include/crypto/tlssession.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Public bug reported:
 
-Acked-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+On AARCH64, setting HCR.TVM to 1 is supposed to trap all writes to
+CTLR_EL1, TTBR0_EL1, TTBR1_EL1, TCR_EL1, ESR_EL1, FAR_EL1, AFSR0_EL1,
+AFSR1_EL1, MAIR_EL1, AMAIR_EL1, and CONTEXTIDR_EL1. However, it
+currently has no effect (QEMU emulator version 4.1.1).
 
+It is also likely that TRVM will not trap, but, I didn't verify this.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1855072
+
+Title:
+  ARM: HCR.TVM traps are not implemented
+
+Status in QEMU:
+  New
+
+Bug description:
+  On AARCH64, setting HCR.TVM to 1 is supposed to trap all writes to
+  CTLR_EL1, TTBR0_EL1, TTBR1_EL1, TCR_EL1, ESR_EL1, FAR_EL1, AFSR0_EL1,
+  AFSR1_EL1, MAIR_EL1, AMAIR_EL1, and CONTEXTIDR_EL1. However, it
+  currently has no effect (QEMU emulator version 4.1.1).
+
+  It is also likely that TRVM will not trap, but, I didn't verify this.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1855072/+subscriptions
 
