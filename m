@@ -2,83 +2,82 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F299C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 08:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EE21C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 08:58:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D99B42073B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 08:57:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DA16C2073B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 08:58:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ul2JdkZt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D99B42073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pxvE9MO5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA16C2073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icQTG-000260-2t
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 03:57:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46320)
+	id 1icQUo-0002dg-3S
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 03:58:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60981)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1icQGx-0006NT-3u
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 03:44:37 -0500
+ (envelope-from <catherine.hecx@gmail.com>) id 1icQOg-0000zX-A6
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 03:52:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1icQGq-00068Z-Ay
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 03:44:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30864
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1icQGq-0005qE-6M
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 03:44:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575449063;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PiN/8fKPNTaU2pznycIQdkbix1HMwLzh6aYJsOCrXkY=;
- b=Ul2JdkZtjY4gD0W0C+IJYQDLIrrWeb2tH45VwvEK2gBu/Nc9WxsoM+SiviwPmQ1s02RWmG
- kwN2M7fEQIr8fJXSJRO6drwOaa9YN979lipCDHoGPRVpsMIQfrnnFUAFJ8nS1EOpZP322o
- 4lyHPnn3CdPR1r7iFvA/LBXi2WEjPVc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-tCFUSmiXMYWIaJjNHzRmUQ-1; Wed, 04 Dec 2019 03:44:22 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A96758C2A40;
- Wed,  4 Dec 2019 08:44:20 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CB4FF600C8;
- Wed,  4 Dec 2019 08:44:10 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5B3F81138606; Wed,  4 Dec 2019 09:44:09 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 00/21] Error handling fixes, may contain 4.2 material
-References: <20191130194240.10517-1-armbru@redhat.com>
- <20191201094354-mutt-send-email-mst@kernel.org>
-Date: Wed, 04 Dec 2019 09:44:09 +0100
-In-Reply-To: <20191201094354-mutt-send-email-mst@kernel.org> (Michael
- S. Tsirkin's message of "Sun, 1 Dec 2019 09:44:47 -0500")
-Message-ID: <87immwfpk6.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: tCFUSmiXMYWIaJjNHzRmUQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+ (envelope-from <catherine.hecx@gmail.com>) id 1icQOb-000490-9a
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 03:52:30 -0500
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:42431)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+ id 1icQOb-0003cC-2P
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 03:52:29 -0500
+Received: by mail-qt1-x842.google.com with SMTP id j5so6932601qtq.9
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 00:52:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=EOhS8JDsg867aMPTPPeteOvbmqqjsw5vk6vXxMRaXi4=;
+ b=pxvE9MO5f9p/yUNdCgDLZQPjNTm3GpliVlCjX11Hc+NODaKH6B35Fyscwpgn+cqcL7
+ zgpfCuNw51xheY4xzL8Y/cgbvP6WlKdZaPbxpSYadkpH0eOPZyVMUet8SINxpFRAT5C5
+ 8j1P+Zuhjznd1SmYvp+uwrQ1JYs6dhjkzGCBzq9SbfWoGrSeZbbJrHDRuqLjtbZMrLtJ
+ qkg6dWhdASyMNvhH2pr3ApZYbmEXt5U2Zn/8K3L2ljh7h/hrcc0+R+vHa0C7+5xaH6LU
+ AM5skbDP2Holn90xSPgdwTNonumP/m7RHu92H28cMcYVjPihj0ltD2J+iW6sO6ZjRqWP
+ MQKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=EOhS8JDsg867aMPTPPeteOvbmqqjsw5vk6vXxMRaXi4=;
+ b=ERO8PryI2Z4WCXQ194pbs7viyd1/9c5UQrTIrFgmIbymA4uoTjgLmLLmGTrFFyB7B+
+ JSUU3uJomCubOqQdPXSWdLqQ60Db/tda1hGg1tCylJVu6ZTH4Z1MMYt51tH37t7s2Uo4
+ tcKjOsv6pEmdANQhYlH0PTLXRKeOR1Cz3bNg3qd1C5A0yP1OlVcuCfhMYGEUrrN3mncZ
+ Eqc/wh8uKYZOaugBiTJ+KTPhKkOmKlEGADCfkNdU7Hd7b/DTBxEhbkJLVPYzpgxPLKqy
+ 7KK6lnutDIRDxq4X5w0jVEOTD5NFxxfDFWYumu1TEShTkLihRvwdkX6V53zO/hrYvWOR
+ omoA==
+X-Gm-Message-State: APjAAAXHqw7OnPEEZgTQQlidGujjH1eh9QQCTst+YmY6aUOUOkR7Tco1
+ o0WmN3LbKu3kYYeol47Okj4=
+X-Google-Smtp-Source: APXvYqzTEn4f5QtgZACc5msyimnIHXttn0a0OY37DJuQ0hHUQX9gHuGApLqlXXYZrGFZEr/p65/7TQ==
+X-Received: by 2002:ac8:23a5:: with SMTP id q34mr1570560qtq.83.1575449539835; 
+ Wed, 04 Dec 2019 00:52:19 -0800 (PST)
+Received: from host.localdomain (104.129.187.94.16clouds.com. [104.129.187.94])
+ by smtp.gmail.com with ESMTPSA id q187sm3351795qkd.92.2019.12.04.00.52.19
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 04 Dec 2019 00:52:19 -0800 (PST)
+From: Catherine Ho <catherine.hecx@gmail.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ qemu-devel@nongnu.org
+Subject: [PATCH] target/i386: relax assert when old host kernels don't include
+ msrs
+Date: Wed,  4 Dec 2019 03:50:30 -0500
+Message-Id: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
+X-Mailer: git-send-email 1.7.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::842
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,41 +89,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Corey Minyard <cminyard@mvista.com>,
- vsementsov@virtuozzo.com,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- Nishanth Aravamudan <naravamudan@digitalocean.com>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Jens Freimann <jfreimann@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Catherine Ho <catherine.hecx@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Michael S. Tsirkin" <mst@redhat.com> writes:
+Commit 20a78b02d315 ("target/i386: add VMX features") unconditionally
+add vmx msr entry although older host kernels don't include them.
 
-> On Sat, Nov 30, 2019 at 08:42:19PM +0100, Markus Armbruster wrote:
->> PATCH 2-4 fix crash bugs.  Including them would be a no-brainer at
->> -rc0.  But we're post -rc3, and even for crash bugs we require a
->> certain likelihood of users getting bitten.
->>=20
->> Jens, please assess impact of PATCH 2's crash bug.
->>=20
->> Kevin, please do the same for PATCH 3.
->>=20
->> Daniel, please do the same for PATCH 4.
->
-> virtio things:
->
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+But old host kernel + newest qemu will cause a qemu crash as follows:
+qemu-system-x86_64: error: failed to set MSR 0x480 to 0x0
+target/i386/kvm.c:2932: kvm_put_msrs: Assertion `ret ==
+cpu->kvm_msr_buf->nmsrs' failed.
 
-In my haste to get this into -rc4, I lost your r-bys.  Sorry about that!
+This fixes it by relaxing the condition.
 
-> Jason do you want to pick these?
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Catherine Ho <catherine.hecx@gmail.com>
+---
+ target/i386/kvm.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Merged in commit 39032981fa851d25fb27527f25f046fed800e585.
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index bf16556..a8c44bf 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -2936,7 +2936,7 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
+                      (uint32_t)e->index, (uint64_t)e->data);
+     }
+ 
+-    assert(ret == cpu->kvm_msr_buf->nmsrs);
++    assert(ret <= cpu->kvm_msr_buf->nmsrs);
+     return 0;
+ }
+ 
+-- 
+1.7.1
 
 
