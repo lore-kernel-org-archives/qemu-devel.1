@@ -2,82 +2,82 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77082C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 04:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F1C8C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 04:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B84320640
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 04:36:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EA392073C
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 04:52:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="Q+F4wjNN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B84320640
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="wk/Ju48/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EA392073C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icMOy-00039m-Bs
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 23:36:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42103)
+	id 1icMeN-0007DU-8D
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 23:52:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42690)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1icMC8-0001FX-Rt
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 23:23:25 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1icMSu-000512-Br
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 23:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1icMC3-0004Z8-JP
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 23:23:17 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40744)
+ (envelope-from <aik@ozlabs.ru>) id 1icMSm-0008T4-Db
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 23:40:36 -0500
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:45303)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1icMC1-0004Ry-Dd
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 23:23:14 -0500
-Received: by mail-pl1-x644.google.com with SMTP id g6so2590251plp.7
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 20:23:08 -0800 (PST)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1icMSl-0008C4-4l
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 23:40:32 -0500
+Received: by mail-pj1-x1043.google.com with SMTP id r11so2428065pjp.12
+ for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 20:40:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ h=subject:from:to:cc:references:autocrypt:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=KoKNce4lifwQRExbbrKK8kjWZqymkqDPeibKk3S4keI=;
- b=Q+F4wjNNCwshaWsObUkBatgKwBqnJe1TIzCC/plX+W7fzgK++CAj6NZ4IaCwvfeBdB
- XqVgu11iLAJOIleI0ZV158Au1JsA1b+0/+pyJqJI2J5F0jpM+TSNUSiM/CHVWvhUX+SL
- bz5uykXGr2shuTSttSnfI2FQbuMF9YR55nVS25k3U+7/qMeQ1T8Aa8qt1EavnRmhToG4
- 6jqgyNsiDGC2jVYyH4SACBwxPJBLmLg0C6k3poSd9vr8CX73vO6EDblyUCHIryAXQrap
- C2R/oxXnNnKziIKefVyLhS78Y9lgFf4wdd2vEdriLOatlmJN/C9x2Y6jy919iaIEAHwd
- Tm8g==
+ bh=T1xxfmjBDCU6OPUHf00PBDkDb9YGfh04DGyAP/aGAUE=;
+ b=wk/Ju48/kClQ0u2MDTAsk8G48GhR5V9kNbqQD9msxSilPnVwwb30uH5ss/XwfMIuUE
+ RLUU0uASgFOy/A1Pk6TwX7Ow9VW0SPp2+QFcrJQpr4aE9qrlRY1MZADN0DmwFTXhX2lj
+ tspa6FL+RpYsFFhGF5KFgJ6ZcsqxXLsIuDiEWV3fVF1LCO+8VQTPnzGMO/bzk2tE65zg
+ idOjgPQKRJxzBImNVHGm/TVjUJ+i6ohDUIuWcxwO+KDBnrPbMDOiHVUfGl0pLD9kw1d+
+ 2HeMv8jPeR2jz/zuS5jWkUvCe8HkUS0YKe1S2WRrvazfTaldT/6Pvj+phq7ltkofQCph
+ oDtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ h=x-gm-message-state:subject:from:to:cc:references:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=KoKNce4lifwQRExbbrKK8kjWZqymkqDPeibKk3S4keI=;
- b=hE0ssWr4aAt5nTguZibuqNHb+B5HjLuLuziBedlU5ArVRZ1HRV2CZd4/omwPGQVIjl
- 0yg/0jFIJbcJm4VpaFJJ1Lfio3atsa1TDhdod7P3WWLx6/py6Yn6KBgfsXtO9OQ6wKBn
- gzN5p7DgF9wgyK0LLhNvrj/2hlbm7MEgcXuMm1VudQASIL75UQTRZCdXvPBoNCWZc/zM
- q0sUtXMfxVHB42TR70oXfHpcMGobTjA1kZpSY0v5j4G+5vmmAYdboxQFlY30YcZtgDCr
- iFjDgnGtGNsW2mKwdctJb6XDmzP8OaPQLllfvTn+4cP8SnkqGq22pc6aFnKnkQgGE148
- gzxA==
-X-Gm-Message-State: APjAAAWNWErKxZSvUWLEi3ETN5y+rEN+F8fepSVr/RPwDaSyvUJXj+g6
- PQguNrPC7+1ZhMYOlVQ1Zj/IwQ==
-X-Google-Smtp-Source: APXvYqz4XYPJKAmI3R+VarfhODAx2lTVqjspcMLBaIOdgAq1IOIp4oaQ5SWRYgc0itsqk3OlVCWvDQ==
-X-Received: by 2002:a17:90a:bd91:: with SMTP id
- z17mr1202875pjr.34.1575433387719; 
- Tue, 03 Dec 2019 20:23:07 -0800 (PST)
+ bh=T1xxfmjBDCU6OPUHf00PBDkDb9YGfh04DGyAP/aGAUE=;
+ b=aV1/zQFCg/uuDXvNph6xoUfPSDNNhiMgNJavEXZZLckTinZgoTRCLb6bL1W/fX5JjD
+ PXfseJjUkXFd/yPtiGSVDr9nc/CZMReUHHJdrJDBmsuSUUe3wQUqRT8Mjj4i/t0fNJfV
+ GJJ6bHHrsmzJyb8lhxbM2eNYX4iSt+rqrt3RAiL5Jt7LRn73h4tpQHu+8K3d4gSopC7S
+ T9szd2hKc42vLI9u3Flzj0Pt5bodNKCdM784ZZ5e8KIUklOHeHdJtc8GMt2Hm/Slm3cS
+ gQqZe3iHfLQH9BEmT0MNoAxjEfc2AJvwWZv36p0tnX+Bu9ydFlp10cFHDSEHkxvjmCH7
+ aLzQ==
+X-Gm-Message-State: APjAAAVu9poXV1Ux+DJPXqTF7RtzWQs80A6gHS3LgJw6LOzBs/LD7KX9
+ 4kU/kjxsN7INFzrn2ygJp6Ge3Q==
+X-Google-Smtp-Source: APXvYqxv3izc3EALubbwn9FwW3eh0k6ce8BEL17z8+JQjCK+Vq4vNGKAEmf/W0CvjIWJUjO6gfJ2kw==
+X-Received: by 2002:a17:902:7c04:: with SMTP id x4mr1642987pll.0.1575434427543; 
+ Tue, 03 Dec 2019 20:40:27 -0800 (PST)
 Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id f23sm4914558pgj.76.2019.12.03.20.23.04
+ by smtp.gmail.com with ESMTPSA id n15sm5342962pgf.17.2019.12.03.20.40.24
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 03 Dec 2019 20:23:07 -0800 (PST)
+ Tue, 03 Dec 2019 20:40:26 -0800 (PST)
 Subject: Re: [PULL v2 4/6] spapr: Add /chosen to FDT only at reset time to
  preserve kernel and initramdisk
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
 References: <20191118105319.7658-1-lvivier@redhat.com>
  <20191118105319.7658-5-lvivier@redhat.com>
  <a65399f9-fb59-a54b-3185-1f48ee979d3d@redhat.com>
  <13846307-0e59-53b3-38cf-54270b43ed87@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+ <96e02c6c-d381-1055-faca-406c475c94f4@ozlabs.ru>
 Autocrypt: addr=aik@ozlabs.ru; keydata=
  mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
  EePO1JqpVuIow/wGud9xaPA5uvuVgRS1q7RU8otD+7VLDFzPRiRE4Jfr2CW89Ox6BF+q5ZPV
@@ -151,18 +151,18 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <96e02c6c-d381-1055-faca-406c475c94f4@ozlabs.ru>
-Date: Wed, 4 Dec 2019 15:23:03 +1100
+Message-ID: <d52bab1e-a7bd-acf5-3243-da8543b5bc2c@ozlabs.ru>
+Date: Wed, 4 Dec 2019 15:40:23 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <13846307-0e59-53b3-38cf-54270b43ed87@redhat.com>
+In-Reply-To: <96e02c6c-d381-1055-faca-406c475c94f4@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2607:f8b0:4864:20::1043
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -183,97 +183,129 @@ Sender: "Qemu-devel"
 
 
 
-On 04/12/2019 03:09, Laurent Vivier wrote:
+On 04/12/2019 15:23, Alexey Kardashevskiy wrote:
 > 
-> Bad reply, the problem is with
 > 
-> "spapr: Render full FDT on ibm,client-architecture-support"
+> On 04/12/2019 03:09, Laurent Vivier wrote:
+>>
+>> Bad reply, the problem is with
+>>
+>> "spapr: Render full FDT on ibm,client-architecture-support"
+> 
+> 
+> https://git.qemu.org/?p=SLOF.git;a=blob;f=board-qemu/slof/fdt.fs;h=3e4c1b34b8af2dcebde57e548c94417e5e20e1cc;hb=HEAD#l265
+> 
+> A "bit ugly" became really ugly as before we were only patching
+> interrupt-map for PHB (7 cells per line) only but now we have to patch
+> (or, rather, skip) the PCI bridge interrupt-map (9 cells per line).
+> 
+> Fixing now...
 
 
-https://git.qemu.org/?p=SLOF.git;a=blob;f=board-qemu/slof/fdt.fs;h=3e4c1b34b8af2dcebde57e548c94417e5e20e1cc;hb=HEAD#l265
+Basically, this:
 
-A "bit ugly" became really ugly as before we were only patching
-interrupt-map for PHB (7 cells per line) only but now we have to patch
-(or, rather, skip) the PCI bridge interrupt-map (9 cells per line).
 
-Fixing now...
+diff --git a/board-qemu/slof/fdt.fs b/board-qemu/slof/fdt.fs
+index 3e4c1b34b8af..463a2a8c0c2d 100644
+--- a/board-qemu/slof/fdt.fs
++++ b/board-qemu/slof/fdt.fs
+@@ -300,8 +300,13 @@ fdt-claim-reserve
+    \ ." Replacing in " dup node>path type cr
+    >r
+    s" interrupt-map" r@ get-property 0= IF
+-      ( old new prop-addr prop-len  R: node )
+-      fdt-replace-interrupt-map
++      dup e00 = IF
++          ( old new prop-addr prop-len  R: node )
++          fdt-replace-interrupt-map
++      ELSE
++         2drop
++          ."  no idea what this is" cr
++      THEN
+    THEN
+
+
+
 
 
 > 
-> Sorry,
-> Laurent
 > 
-> On 03/12/2019 16:57, Laurent Vivier wrote:
->> On 18/11/2019 11:53, Laurent Vivier wrote:
->>> From: Alexey Kardashevskiy <aik@ozlabs.ru>
->>>
->>> Since "spapr: Render full FDT on ibm,client-architecture-support" we build
->>> the entire flatten device tree (FDT) twice - at the reset time and
->>> when "ibm,client-architecture-support" (CAS) is called. The full FDT from
->>> CAS is then applied on top of the SLOF internal device tree.
->>>
->>> This is mostly ok, however there is a case when the QEMU is started with
->>> -initrd and for some reason the guest decided to move/unpack the init RAM
->>> disk image - the guest correctly notifies SLOF about the change but
->>> at CAS it is overridden with the QEMU initial location addresses and
->>> the guest may fail to boot if the original initrd memory was changed.
->>>
->>> This fixes the problem by only adding the /chosen node at the reset time
->>> to prevent the original QEMU's linux,initrd-start/linux,initrd-end to
->>> override the updated addresses.
->>>
->>> This only treats /chosen differently as we know there is a special case
->>> already and it is unlikely anything else will need to change /chosen at CAS
->>> we are better off not touching /chosen after we handed it over to SLOF.
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>> Message-Id: <20191024041308.5673-1-aik@ozlabs.ru>
->>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
->>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->>> ---
->>>  hw/ppc/spapr.c | 25 +++++++++++++++----------
->>>  1 file changed, 15 insertions(+), 10 deletions(-)
->>>
 >>
->> This patch breaks pseries boot when we use a pci-bridge (since v4.2.0-rc0):
->>
->> ...
->>     -device pci-bridge,id=pci_bridge1,bus=pci.0,addr=0x3,chassis_nr=1 \
->>     -device virtio-scsi-pci,bus=pci_bridge1 \
->> ...
->>
->> OF stdout device is: /vdevice/vty@71000000
->> Preparing to boot Linux version 5.4.0-rc3+ (lvivier@localhost) (gcc
->> version 4.8.5 20150623 (Red Hat 4.8.5-39) (GCC)) #2 SMP Wed Nov 13
->> 09:08:20 EST 2019
->> Detected machine type: 0000000000000101
->> command line: BOOT_IMAGE=/vmlinuz-5.4.0-rc3+ root=/dev/mapper/rhel-root
->> ro crashkernel=auto rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap
->> Max number of cores passed to firmware: 2048 (NR_CPUS = 2048)
->> Calling ibm,client-architecture-support...
->>
->> ( 300 ) Data Storage Exception [ 1dc5f230 ]
->>
->>
->>     R0 .. R7           R8 .. R15         R16 .. R23         R24 .. R31
->> 8000000000001000   000000001e477010   0000000000000000   000000001dc17500
->> 000000001e67afe0   0000000020000004   0000000000000000   000000001dc1bf88
->> 000000001dc21800   000000001dc5f248   000000001e477010   0000000000000003
->> 000000001dc61000   000000001e78dc2d   000000001dc1c158   000000000000f001
->> 0000000000000000   a000000000000001   0000000000008000   000000001e67b060
->> 000000001dc5f230   0000000000000000   000000000000f003   ffffffffffffffff
->> 000000001e745860   0000000000000000   0000000000000006   000000001dbf48f8
->> 000000001dc5f248   0000000000000000   000000001e67b050   000000001dc1c350
->>
->>     CR / XER           LR / CTR          SRR0 / SRR1        DAR / DSISR
->>         80000808   000000001dbf34d4   000000001dbf4194   0000000020000004
->> 0000000020000000   000000001dbf48f8   8000000000001000           40000000
->>
->>
->> 4a >
->>
->> Thanks,
+>> Sorry,
 >> Laurent
+>>
+>> On 03/12/2019 16:57, Laurent Vivier wrote:
+>>> On 18/11/2019 11:53, Laurent Vivier wrote:
+>>>> From: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>>
+>>>> Since "spapr: Render full FDT on ibm,client-architecture-support" we build
+>>>> the entire flatten device tree (FDT) twice - at the reset time and
+>>>> when "ibm,client-architecture-support" (CAS) is called. The full FDT from
+>>>> CAS is then applied on top of the SLOF internal device tree.
+>>>>
+>>>> This is mostly ok, however there is a case when the QEMU is started with
+>>>> -initrd and for some reason the guest decided to move/unpack the init RAM
+>>>> disk image - the guest correctly notifies SLOF about the change but
+>>>> at CAS it is overridden with the QEMU initial location addresses and
+>>>> the guest may fail to boot if the original initrd memory was changed.
+>>>>
+>>>> This fixes the problem by only adding the /chosen node at the reset time
+>>>> to prevent the original QEMU's linux,initrd-start/linux,initrd-end to
+>>>> override the updated addresses.
+>>>>
+>>>> This only treats /chosen differently as we know there is a special case
+>>>> already and it is unlikely anything else will need to change /chosen at CAS
+>>>> we are better off not touching /chosen after we handed it over to SLOF.
+>>>>
+>>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>> Message-Id: <20191024041308.5673-1-aik@ozlabs.ru>
+>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+>>>> ---
+>>>>  hw/ppc/spapr.c | 25 +++++++++++++++----------
+>>>>  1 file changed, 15 insertions(+), 10 deletions(-)
+>>>>
+>>>
+>>> This patch breaks pseries boot when we use a pci-bridge (since v4.2.0-rc0):
+>>>
+>>> ...
+>>>     -device pci-bridge,id=pci_bridge1,bus=pci.0,addr=0x3,chassis_nr=1 \
+>>>     -device virtio-scsi-pci,bus=pci_bridge1 \
+>>> ...
+>>>
+>>> OF stdout device is: /vdevice/vty@71000000
+>>> Preparing to boot Linux version 5.4.0-rc3+ (lvivier@localhost) (gcc
+>>> version 4.8.5 20150623 (Red Hat 4.8.5-39) (GCC)) #2 SMP Wed Nov 13
+>>> 09:08:20 EST 2019
+>>> Detected machine type: 0000000000000101
+>>> command line: BOOT_IMAGE=/vmlinuz-5.4.0-rc3+ root=/dev/mapper/rhel-root
+>>> ro crashkernel=auto rd.lvm.lv=rhel/root rd.lvm.lv=rhel/swap
+>>> Max number of cores passed to firmware: 2048 (NR_CPUS = 2048)
+>>> Calling ibm,client-architecture-support...
+>>>
+>>> ( 300 ) Data Storage Exception [ 1dc5f230 ]
+>>>
+>>>
+>>>     R0 .. R7           R8 .. R15         R16 .. R23         R24 .. R31
+>>> 8000000000001000   000000001e477010   0000000000000000   000000001dc17500
+>>> 000000001e67afe0   0000000020000004   0000000000000000   000000001dc1bf88
+>>> 000000001dc21800   000000001dc5f248   000000001e477010   0000000000000003
+>>> 000000001dc61000   000000001e78dc2d   000000001dc1c158   000000000000f001
+>>> 0000000000000000   a000000000000001   0000000000008000   000000001e67b060
+>>> 000000001dc5f230   0000000000000000   000000000000f003   ffffffffffffffff
+>>> 000000001e745860   0000000000000000   0000000000000006   000000001dbf48f8
+>>> 000000001dc5f248   0000000000000000   000000001e67b050   000000001dc1c350
+>>>
+>>>     CR / XER           LR / CTR          SRR0 / SRR1        DAR / DSISR
+>>>         80000808   000000001dbf34d4   000000001dbf4194   0000000020000004
+>>> 0000000020000000   000000001dbf48f8   8000000000001000           40000000
+>>>
+>>>
+>>> 4a >
+>>>
+>>> Thanks,
+>>> Laurent
+>>>
 >>
 > 
 
