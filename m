@@ -2,88 +2,84 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5122C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 06:52:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DA3C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 06:58:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99FAB20661
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 06:52:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10ECF206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 06:58:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="boPBk7Pj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99FAB20661
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XhHN+Kkr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10ECF206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icOVz-0002PO-OR
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 01:51:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40330)
+	id 1icOc9-0003jf-41
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 01:58:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57216)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hhan@redhat.com>) id 1icOTK-0001Mh-N2
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 01:49:16 -0500
+ (envelope-from <armbru@redhat.com>) id 1icOan-0003Fl-9G
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 01:56:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hhan@redhat.com>) id 1icOTG-00031l-Uo
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 01:49:13 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52175
+ (envelope-from <armbru@redhat.com>) id 1icOaj-0004VG-Si
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 01:56:55 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50932
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <hhan@redhat.com>) id 1icOTA-0002vf-PE
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 01:49:06 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1icOaj-0004Sj-6c
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 01:56:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575442136;
+ s=mimecast20190719; t=1575442611;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=la7e7hR09dcEK4j7C1iBNGwb6oDApSdrHNvKiSNkA/M=;
- b=boPBk7PjZZFSp36T5mPOdq5tpzg2CSokECNBHVgVS+tO+/oAeQNFx0x3HnNTiX/EujlpBf
- NeP0woo/wbS6irupM+PjiITjKaJ7elFb5GLHVQhgUlXlVlG45HBWFVYfICMv5ncELAvMjm
- sZAuzIh7WDHq+W4yCNxfM3GarllRnls=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-_13z91WoNMGRR-o9z6coJQ-1; Wed, 04 Dec 2019 01:48:55 -0500
-Received: by mail-ot1-f69.google.com with SMTP id m26so2862240otk.12
- for <qemu-devel@nongnu.org>; Tue, 03 Dec 2019 22:48:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5K+z10WJPcVEYYNkRRpjbQI0xD/MXowcCp5XmpINRQI=;
- b=nHryqx60+/bCDw3rjztYyYF50ODvKj/2HZF0y2ttJhvu9FTO8Wf7LhdGIALIFcnf+R
- tHdaikw//AzWDX/nuklXfKsjCjJIW/mcV5ILc00QKIlNxYtbYEATdYSTmxEo+cHS0G7W
- 1gKg5qFAuaGZbUz4ySVpIWPd+xd3sYUDfWZ74J9a3B2thdfNwHZ8fgPrK2mqUkardEWT
- AIVVreJXQC3aRQVtWjHPjcj95rV8uh/zMKhZnHxOGWPiaWQUgAdL50gko+woEzU3eQUn
- +q5xnOjguJJpw6A+eWGJKQ3caQfkxwb8hYz9iOaH0wGClofw4DjdIKCuhug9K47uaF4M
- FBcw==
-X-Gm-Message-State: APjAAAUozRNMNJifi1MsVqLeEYuMw5BbqPoYwxr9e9CrPtuxYHxrc7mf
- cVnSHy0DpvuwEo7OTI+GrMHLQ5/8y7zR9W31jgMA8k7JrsxSK8al3iIU36zUzcVZtsi2rEXjdbs
- OPjfaoMzwC8ShZEhD+HeuIsOgOSHpFqY=
-X-Received: by 2002:a9d:6251:: with SMTP id i17mr1472493otk.14.1575442134419; 
- Tue, 03 Dec 2019 22:48:54 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzxPl4zVANBxfbfrpmnlLkOS15+oeQGFzNQ5KPhMWu/DzJQDVwZNjhTFuIFkWV+NAEiJaa7vCRcsdD1OMbS19A=
-X-Received: by 2002:a9d:6251:: with SMTP id i17mr1472482otk.14.1575442134156; 
- Tue, 03 Dec 2019 22:48:54 -0800 (PST)
+ bh=hrtfcmh34LkAnNcXhVDOpk/maERIhAM2EKdtWIsX9aY=;
+ b=XhHN+KkrwSoUE7lsevjiyw4BhFREnVowO6ZByKr4oNpR+DQQOIEh675VhTXNsLGlSRepuV
+ vXPelNONoDoDCNS6rYHSY9Zqk5jpaMGU7EdSQz93RLeVf3DAawY9b08IKUlIi+PYUox6Yr
+ LNDk0gs3ii+Q80WQhMUVUITUCrBacVg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-132-yFLDWYSgOm2HYNTaZIlaEw-1; Wed, 04 Dec 2019 01:56:48 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC65D800EB6;
+ Wed,  4 Dec 2019 06:56:47 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 795871001901;
+ Wed,  4 Dec 2019 06:56:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 02B321138606; Wed,  4 Dec 2019 07:56:45 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH 7/6] Makefile: Make Makefile depend on generated qga files, too
+References: <20191120182551.23795-1-armbru@redhat.com>
+ <20191129095927.17382-1-armbru@redhat.com>
+ <45cff400-7e88-cefe-560e-7642d2ea1d00@redhat.com>
+Date: Wed, 04 Dec 2019 07:56:45 +0100
+In-Reply-To: <45cff400-7e88-cefe-560e-7642d2ea1d00@redhat.com> (Eric Blake's
+ message of "Tue, 3 Dec 2019 16:33:15 -0600")
+Message-ID: <8736e0h93m.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-References: <20191113131655.307847-1-hhan@redhat.com>
- <CAHjf+S_miSm8ygAadObVnif1LKejA=j9OFae+OV5Oe-TedByyQ@mail.gmail.com>
-In-Reply-To: <CAHjf+S_miSm8ygAadObVnif1LKejA=j9OFae+OV5Oe-TedByyQ@mail.gmail.com>
-From: Han Han <hhan@redhat.com>
-Date: Wed, 4 Dec 2019 14:48:01 +0800
-Message-ID: <CAHjf+S8LVAMjuvXNhE5MyAirpFE7NgUsn6YDHX7yLPgK4brW2g@mail.gmail.com>
-Subject: Re: [PATCH] scripts: Fix undefinited name 'file' error for python3
-To: qemu-trivial@nongnu.org
-X-MC-Unique: _13z91WoNMGRR-o9z6coJQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: yFLDWYSgOm2HYNTaZIlaEw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/alternative; boundary="000000000000c55f7d0598db3478"
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,178 +91,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000c55f7d0598db3478
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Eric Blake <eblake@redhat.com> writes:
 
-Anyone help to review it?
-
-On Tue, Nov 26, 2019 at 1:54 PM Han Han <hhan@redhat.com> wrote:
-
-> ping
+> On 11/29/19 3:59 AM, Markus Armbruster wrote:
+>> Generated .h need to be generated before compiling any .c using them.
+>> To know which .h a .c uses, we need to compile it.
+>>
+>> Since commit 4115852bb0 "build: do not sprinkle around
+>> GENERATED_HEADERS dependencies", we break this circular dependency the
+>> simple & stupid way: the generated headers are a prerequisite of
+>> Makefile, which causes Make to generate them first, then start over.
 >
-> On Wed, Nov 13, 2019 at 9:17 PM Han Han <hhan@redhat.com> wrote:
->
->> In python3, 'file' is no longer a keyword for file type object. So it
->> will can error when run the scripts by python3:
+> which is a pain when using 'make --dry-run' to see what would get
+> built (a dependency of Makefile _is_ rebuilt if Makefile itself has to
+> be updated), but not the fault of this patch.
+
+Yes.
+
+>> Except for qga we still use the older method of making all its .o
+>> summarily depend on all its generated .h (commit 016c77ad62 "Makefile:
+>> add missing deps on $(GENERATED_HEADERS)").
 >>
->> $ python3 ./scripts/vmstate-static-checker.py -s 4.0.json -d 4.1.json
->> Traceback (most recent call last):
->>   File "./scripts/vmstate-static-checker.py", line 431, in <module>
->>     sys.exit(main())
->>   File "./scripts/vmstate-static-checker.py", line 378, in main
->>     parser.add_argument('-s', '--src', type=3Dfile, required=3DTrue,
->> NameError: name 'file' is not defined
+>> Add qga's generated files to generated-files-y to get rid of this
+>> exception.
 >>
->> Replace file type to argparse.FileType('r').
->>
->> Signed-off-by: Han Han <hhan@redhat.com>
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 >> ---
->>  scripts/vmstate-static-checker.py | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/vmstate-static-checker.py
->> b/scripts/vmstate-static-checker.py
->> index d3467288..14f199a0 100755
->> --- a/scripts/vmstate-static-checker.py
->> +++ b/scripts/vmstate-static-checker.py
->> @@ -375,9 +375,9 @@ def main():
->>      help_text =3D "Parse JSON-formatted vmstate dumps from QEMU in file=
-s
->> SRC and DEST.  Checks whether migration from SRC to DEST QEMU versions
->> would break based on the VMSTATE information contained within the JSON
->> outputs.  The JSON output is created from a QEMU invocation with the
->> -dump-vmstate parameter and a filename argument to it.  Other parameters=
- to
->> QEMU do not matter, except the -M (machine type) parameter."
->>
->>      parser =3D argparse.ArgumentParser(description=3Dhelp_text)
->> -    parser.add_argument('-s', '--src', type=3Dfile, required=3DTrue,
->> +    parser.add_argument('-s', '--src', type=3Dargparse.FileType('r'),
->> required=3DTrue,
->>                          help=3D'json dump from src qemu')
->> -    parser.add_argument('-d', '--dest', type=3Dfile, required=3DTrue,
->> +    parser.add_argument('-d', '--dest', type=3Dargparse.FileType('r'),
->> required=3DTrue,
->>                          help=3D'json dump from dest qemu')
->>      parser.add_argument('--reverse', required=3DFalse, default=3DFalse,
->>                          action=3D'store_true',
->> --
->> 2.23.0
->>
->>
+>>   Makefile | 21 +++++++++++----------
+>>   1 file changed, 11 insertions(+), 10 deletions(-)
 >
-> --
-> Best regards,
-> -----------------------------------
-> Han Han
-> Quality Engineer
-> Redhat.
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+
+Thanks!
+
+>> +++ b/Makefile
+>> @@ -130,6 +130,15 @@ GENERATED_QAPI_FILES +=3D qapi/qapi-doc.texi
+>>     generated-files-y +=3D $(GENERATED_QAPI_FILES)
+>>   +GENERATED_QGA_FILES :=3D qga-qapi-types.c qga-qapi-types.h
+>> +GENERATED_QGA_FILES +=3D qga-qapi-visit.c qga-qapi-visit.h
+>> +GENERATED_QGA_FILES +=3D qga-qapi-commands.h qga-qapi-commands.c
+>> +GENERATED_QGA_FILES +=3D qga-qapi-init-commands.h qga-qapi-init-command=
+s.c
+>> +GENERATED_QGA_FILES +=3D qga-qapi-doc.texi
+>> +GENERATED_QGA_FILES :=3D $(addprefix qga/qapi-generated/, $(GENERATED_Q=
+GA_FILES))
 >
-> Email: hhan@redhat.com
-> Phone: +861065339333
->
+> Would it be worth using two separate variable names (maybe
+> GENERATED_QGA_BASEFILES for the first list) rather than exploiting the
+> arcane knowledge that consecutive use of :=3D causes GNU make to rewrite
+> an existing variable with new contents?
 
+Our rules.mak relies on this already.  It's full of magic, which
+admittedly diminishes its suitability to serve as a good example.
 
---=20
-Best regards,
------------------------------------
-Han Han
-Quality Engineer
-Redhat.
+Your worry might be rooted in old "=3D" burns.  "=3D" makes the variable
+recursively expanded, and
 
-Email: hhan@redhat.com
-Phone: +861065339333
+    GENERATED_QGA_FILES =3D $(addprefix qga/qapi-generated/, $(GENERATED_QG=
+A_FILES))
 
---000000000000c55f7d0598db3478
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+would be an infinite loop.  ":=3D" makes it simply expanded; there's not
+even a loop, let alone an infinite one.  The GNU Make manual explains
+this clearly at
+https://www.gnu.org/software/make/manual/html_node/Flavors.html
 
-<div dir=3D"ltr"><div>Anyone help to review it?<br></div><br><div class=3D"=
-gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Nov 26, 2019 at =
-1:54 PM Han Han &lt;<a href=3D"mailto:hhan@redhat.com">hhan@redhat.com</a>&=
-gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div =
-dir=3D"ltr">ping<br></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" c=
-lass=3D"gmail_attr">On Wed, Nov 13, 2019 at 9:17 PM Han Han &lt;<a href=3D"=
-mailto:hhan@redhat.com" target=3D"_blank">hhan@redhat.com</a>&gt; wrote:<br=
-></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;=
-border-left:1px solid rgb(204,204,204);padding-left:1ex">In python3, &#39;f=
-ile&#39; is no longer a keyword for file type object. So it<br>
-will can error when run the scripts by python3:<br>
-<br>
-$ python3 ./scripts/vmstate-static-checker.py -s 4.0.json -d 4.1.json<br>
-Traceback (most recent call last):<br>
-=C2=A0 File &quot;./scripts/vmstate-static-checker.py&quot;, line 431, in &=
-lt;module&gt;<br>
-=C2=A0 =C2=A0 sys.exit(main())<br>
-=C2=A0 File &quot;./scripts/vmstate-static-checker.py&quot;, line 378, in m=
-ain<br>
-=C2=A0 =C2=A0 parser.add_argument(&#39;-s&#39;, &#39;--src&#39;, type=3Dfil=
-e, required=3DTrue,<br>
-NameError: name &#39;file&#39; is not defined<br>
-<br>
-Replace file type to argparse.FileType(&#39;r&#39;).<br>
-<br>
-Signed-off-by: Han Han &lt;<a href=3D"mailto:hhan@redhat.com" target=3D"_bl=
-ank">hhan@redhat.com</a>&gt;<br>
----<br>
-=C2=A0scripts/vmstate-static-checker.py | 4 ++--<br>
-=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
-<br>
-diff --git a/scripts/vmstate-static-checker.py b/scripts/vmstate-static-che=
-cker.py<br>
-index d3467288..14f199a0 100755<br>
---- a/scripts/vmstate-static-checker.py<br>
-+++ b/scripts/vmstate-static-checker.py<br>
-@@ -375,9 +375,9 @@ def main():<br>
-=C2=A0 =C2=A0 =C2=A0help_text =3D &quot;Parse JSON-formatted vmstate dumps =
-from QEMU in files SRC and DEST.=C2=A0 Checks whether migration from SRC to=
- DEST QEMU versions would break based on the VMSTATE information contained =
-within the JSON outputs.=C2=A0 The JSON output is created from a QEMU invoc=
-ation with the -dump-vmstate parameter and a filename argument to it.=C2=A0=
- Other parameters to QEMU do not matter, except the -M (machine type) param=
-eter.&quot;<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0parser =3D argparse.ArgumentParser(description=3Dhelp_t=
-ext)<br>
--=C2=A0 =C2=A0 parser.add_argument(&#39;-s&#39;, &#39;--src&#39;, type=3Dfi=
-le, required=3DTrue,<br>
-+=C2=A0 =C2=A0 parser.add_argument(&#39;-s&#39;, &#39;--src&#39;, type=3Dar=
-gparse.FileType(&#39;r&#39;), required=3DTrue,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0help=3D&#39;json dump from src qemu&#39;)<br>
--=C2=A0 =C2=A0 parser.add_argument(&#39;-d&#39;, &#39;--dest&#39;, type=3Df=
-ile, required=3DTrue,<br>
-+=C2=A0 =C2=A0 parser.add_argument(&#39;-d&#39;, &#39;--dest&#39;, type=3Da=
-rgparse.FileType(&#39;r&#39;), required=3DTrue,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0help=3D&#39;json dump from dest qemu&#39;)<br>
-=C2=A0 =C2=A0 =C2=A0parser.add_argument(&#39;--reverse&#39;, required=3DFal=
-se, default=3DFalse,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0action=3D&#39;store_true&#39;,<br>
--- <br>
-2.23.0<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr"><div dir=
-=3D"ltr"><div><div dir=3D"ltr"><div><div dir=3D"ltr">Best regards,</div><di=
-v dir=3D"ltr">-----------------------------------<br></div><div dir=3D"ltr"=
->Han Han<br>Quality Engineer<br>Redhat.<br><br>Email: <a href=3D"mailto:hha=
-n@redhat.com" target=3D"_blank">hhan@redhat.com</a><br>Phone: +861065339333=
-<br></div></div></div></div></div></div>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div><div dir=3D"ltr"><div><div dir=3D"ltr=
-">Best regards,</div><div dir=3D"ltr">-----------------------------------<b=
-r></div><div dir=3D"ltr">Han Han<br>Quality Engineer<br>Redhat.<br><br>Emai=
-l: <a href=3D"mailto:hhan@redhat.com" target=3D"_blank">hhan@redhat.com</a>=
-<br>Phone: +861065339333<br></div></div></div></div></div></div></div>
+Aside: there's a reason one of the two flavors is called "simple".  It
+could additionally be called "not as slow".  One of my pet makefile
+peeves: unthinking use of recursively expanded variables, complicating
+semantics and slowing down builds.
 
---000000000000c55f7d0598db3478--
+Back to this patch.  I had started to write the thing in longhand, but
+got tired of repeating qga/qapi-generated/, so I factored that out.
+Would longhand be easier to understand?
 
 
