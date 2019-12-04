@@ -2,78 +2,90 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BBFC43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9B4C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:17:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B67A206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:13:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B012320674
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:17:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pt2zZsat"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B67A206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OQaBBscU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B012320674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icVPX-0001LZ-Mk
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 09:13:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41374)
+	id 1icVTX-00041M-Kw
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 09:17:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1icVOe-0000qs-Je
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:12:54 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1icVRH-0003Ko-F8
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:15:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1icVOb-0002OI-Qn
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:12:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32580
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1icVOb-0002IR-Gs
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:12:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575468768;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Fx4HPfHoOU0v6xpaOj/z3RD0RKZcUIX5iOUwLOFUXeg=;
- b=Pt2zZsatyBB9JcAXUUxr4n7htDWPmJCBJM8vFWfPxgexajg7tT230iwE3tvxyqaJ4/r3eA
- qkACHOmkqaS6WVk/Tv7H841TBW6toXM5LQhclLxZeUfBIzV3xP24gWAduKZ5WGZqWws/hW
- m5Sumwb/VU4RAmDIineAaHKERzHI7qs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-iRvXMeGtPvCFvWevDNPCPw-1; Wed, 04 Dec 2019 09:12:47 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 494F3DB60;
- Wed,  4 Dec 2019 14:12:46 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 610A75C1B2;
- Wed,  4 Dec 2019 14:12:45 +0000 (UTC)
-Date: Wed, 4 Dec 2019 15:12:42 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2] qga: fence guest-set-time if hwclock not available
-Message-ID: <20191204151242.2e15cb12.cohuck@redhat.com>
-In-Reply-To: <20191128181100.23187-1-cohuck@redhat.com>
-References: <20191128181100.23187-1-cohuck@redhat.com>
-Organization: Red Hat GmbH
+ (envelope-from <alex.bennee@linaro.org>) id 1icVRG-0001Vv-57
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:15:35 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35547)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1icVRF-0001VZ-Tv
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:15:34 -0500
+Received: by mail-wr1-x442.google.com with SMTP id g17so8832238wro.2
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 06:15:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=8IYW7MezRHI9ulO07zjZUORVo19/F+46lSOVdCk3OlQ=;
+ b=OQaBBscUUwQqXcUJi0X4UQYY1hgx6OVNZBVjYxdfyLLABEid5WOUySb2r38usNA8IT
+ +AbweZO9DJOI2uuanNzAdSjBVqtzLJiInAnUeaws1dqML0zqdyBeKbHNMthlTyPyDrC6
+ jNSnbsjZAM1LBZI/lACONjzq+4dV29jhNu8OIwJ1wnm0dgbFjpLQsM+9Q6bgBAI5n1cp
+ Q27cMRMjnjLTjFQwqBA46fT6wgQ/ToD5G1vTAQYeOEphky/xFsBk3hdIrT9Mhnw9SQC8
+ 3nFEg9kQveYghC9nNPsl16zthPqvOu7Ay/t6XS/Yi9qfsAT1Gxpmz6xcTK1COEndKhnH
+ h4dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=8IYW7MezRHI9ulO07zjZUORVo19/F+46lSOVdCk3OlQ=;
+ b=Aup4v5vHcCNlTtSRZOHaBaXF5N/089BcWqpT3pvk5fP4e7bChnS4zzj7Tr17/SDJft
+ Xi5kzDZct2BiwkQnb17pEaPaIjr0YBl+QVFJywF41f4Y/SBmxr0tmbsHwzEq2/OCD3FA
+ G6/eDIampq9nTOVs0uDKMFXNhEoR1b3jY5X3FFTyX6pJi6JFVQH9Oi3WUfmphqqa0pa7
+ e+AlU4PYupmr/PuIpfoMMlOz7Yfaa7Iqw+lTt6V/A7MQ7gA5se39h22Y7oye3kf/FYpp
+ 885WYrwAYT6xEpygFv9OtxURWnGV834S4RHJzmfWHPzVq1VSSAbDVNI5h9s2HDf3bKHl
+ p+JA==
+X-Gm-Message-State: APjAAAXiWIQRQWrBZOydSPFfZu2iAheI7wxV3HGMl6FLWZTBH+v/6Z/F
+ ZPLXC3mXTunRMu5vgE3PB4ouEKHEVJc=
+X-Google-Smtp-Source: APXvYqzJFdWDdlLhHDX/VMEyL9O8rHQwdcxmAh5x9JYtuINV6cSBzP2S53nd31U13oWBUO/u42KtsQ==
+X-Received: by 2002:a5d:49cc:: with SMTP id t12mr4107249wrs.363.1575468931791; 
+ Wed, 04 Dec 2019 06:15:31 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 2sm8695183wrq.31.2019.12.04.06.15.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Dec 2019 06:15:30 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DEBCC1FF87;
+ Wed,  4 Dec 2019 14:15:29 +0000 (GMT)
+References: <87lfrtbtj6.fsf@linaro.org>
+ <20191204083133.6198-1-thuth@redhat.com> <87muc88amd.fsf@linaro.org>
+ <ce570051-eb8f-4184-8f1e-bb9ba3652f62@redhat.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v3] travis.yml: Run tcg tests with tci
+In-reply-to: <ce570051-eb8f-4184-8f1e-bb9ba3652f62@redhat.com>
+Date: Wed, 04 Dec 2019 14:15:29 +0000
+Message-ID: <87eexk89dq.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: iRvXMeGtPvCFvWevDNPCPw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,70 +97,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laszlo Ersek <lersek@redhat.com>,
- "Daniel P . =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+Cc: Stefan Weil <sw@weilnetz.de>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 28 Nov 2019 19:11:00 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
 
-> The Posix implementation of guest-set-time invokes hwclock to
-> set/retrieve the time to/from the hardware clock. If hwclock
-> is not available, the user is currently informed that "hwclock
-> failed to set hardware clock to system time", which is quite
-> misleading. This may happen e.g. on s390x, which has a different
-> timekeeping concept anyway.
-> 
-> Let's check for the availability of the hwclock command and
-> return QERR_UNSUPPORTED for guest-set-time if it is not available.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Thomas Huth <thuth@redhat.com> writes:
 
-Michael, any comments before I send a v3?
+> On 04/12/2019 14.48, Alex Benn=C3=A9e wrote:
+>>=20
+>> Thomas Huth <thuth@redhat.com> writes:
+>>=20
+>>> So far we only have compile coverage for tci. But since commit
+>>> 2f160e0f9797c7522bfd0d09218d0c9340a5137c ("tci: Add implementation
+>>> for INDEX_op_ld16u_i64") has been included now, we can also run the
+>>> "tcg" and "qtest" tests with tci, so let's enable them in Travis now.
+>>> Since we don't gain much additional test coverage by compiling all
+>>> targets, and TCI is broken e.g. with the Sparc targets, we also limit
+>>> the target list to a reasonable subset now (which should still get us
+>>> test coverage by tests/boot-serial-test for example).
+>>=20
+>> Queued to testing/next, thanks.
+>
+> Thanks! But could you maybe s/--enable-debug/--enable-debug-tcg/ as
+> Richard just suggested in his mail? Or want me to send a v4?
 
-> ---
-> 
-> v1 (RFC) -> v2:
-> - use hwclock_path[]
-> - use access() instead of stat()
-> 
-> ---
->  qga/commands-posix.c | 13 ++++++++++++-
->  1 file changed, 12 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-> index 1c1a165daed8..ffb6420fa9cd 100644
-> --- a/qga/commands-posix.c
-> +++ b/qga/commands-posix.c
-> @@ -156,6 +156,17 @@ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
->      pid_t pid;
->      Error *local_err = NULL;
->      struct timeval tv;
-> +    const char hwclock_path[] = "/sbin/hwclock";
-> +    static int hwclock_available = -1;
-> +
-> +    if (hwclock_available < 0) {
-> +        hwclock_available = (access(hwclock_path, X_OK) == 0);
-> +    }
-> +
-> +    if (!hwclock_available) {
-> +        error_setg(errp, QERR_UNSUPPORTED);
-> +        return;
-> +    }
->  
->      /* If user has passed a time, validate and set it. */
->      if (has_time) {
-> @@ -195,7 +206,7 @@ void qmp_guest_set_time(bool has_time, int64_t time_ns, Error **errp)
->  
->          /* Use '/sbin/hwclock -w' to set RTC from the system time,
->           * or '/sbin/hwclock -s' to set the system time from RTC. */
-> -        execle("/sbin/hwclock", "hwclock", has_time ? "-w" : "-s",
-> +        execle(hwclock_path, "hwclock", has_time ? "-w" : "-s",
->                 NULL, environ);
->          _exit(EXIT_FAILURE);
->      } else if (pid < 0) {
+I fixed it in my tree, no need to send v4
 
+>
+>  Thomas
+
+
+--=20
+Alex Benn=C3=A9e
 
