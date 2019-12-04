@@ -2,59 +2,93 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FABEC0044D
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 07:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1CCC43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 08:10:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 249132084F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 07:54:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 249132084F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9499520659
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 08:10:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9499520659
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icPUv-0007uz-7k
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 02:54:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42195)
+	id 1icPkC-0002xo-NK
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 03:10:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51240)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1icPAE-0001jW-8R
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 02:33:35 -0500
+ (envelope-from <groug@kaod.org>) id 1icPbn-0001FI-Ge
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 03:02:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1icPAD-0001By-4G
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 02:33:34 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:60714 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1icPAB-00016g-2Y
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 02:33:31 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id C67153C20B4AC2A03616;
- Wed,  4 Dec 2019 15:33:25 +0800 (CST)
-Received: from HGHY2P002143101.china.huawei.com (10.184.39.213) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 4 Dec 2019 15:33:15 +0800
-From: <pannengyuan@huawei.com>
-To: <mst@redhat.com>
-Subject: [PATCH v2 2/3] virtio-balloon: fix memory leak while attach
- virtio-balloon device
-Date: Wed, 4 Dec 2019 15:31:55 +0800
-Message-ID: <1575444716-17632-2-git-send-email-pannengyuan@huawei.com>
-X-Mailer: git-send-email 2.7.2.windows.1
-In-Reply-To: <1575444716-17632-1-git-send-email-pannengyuan@huawei.com>
-References: <1575444716-17632-1-git-send-email-pannengyuan@huawei.com>
+ (envelope-from <groug@kaod.org>) id 1icPbO-0005Qm-Sx
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 03:01:58 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26746
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1icPbO-00056W-Ko
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 03:01:38 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xB47vXI7075244
+ for <qemu-devel@nongnu.org>; Wed, 4 Dec 2019 03:01:32 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wnsquqnjd-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 03:01:31 -0500
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Wed, 4 Dec 2019 08:01:30 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 4 Dec 2019 08:01:27 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xB481Qg144302614
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 4 Dec 2019 08:01:26 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3BA6DA4060;
+ Wed,  4 Dec 2019 08:01:26 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 033B2A405C;
+ Wed,  4 Dec 2019 08:01:26 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.42.200])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed,  4 Dec 2019 08:01:25 +0000 (GMT)
+Subject: [PATCH] travis.yml: Drop libcap-dev
+From: Greg Kurz <groug@kaod.org>
+To: Alex =?utf-8?q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Wed, 04 Dec 2019 09:01:25 +0100
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.184.39.213]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.35
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19120408-0016-0000-0000-000002D0D68C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19120408-0017-0000-0000-00003332D443
+Message-Id: <157544579267.3537077.17459176619888583836.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-04_01:2019-12-04,2019-12-03 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0
+ priorityscore=1501 phishscore=0 spamscore=0 clxscore=1034
+ lowpriorityscore=0 mlxscore=0 mlxlogscore=707 suspectscore=0 bulkscore=0
+ adultscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1912040058
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,58 +100,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liyiting@huawei.com, kuhn.chenqun@huawei.com,
- Pan Nengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org,
- zhang.zhanghailiang@huawei.com
+Cc: Thomas Huth <thuth@redhat.com>,
+ Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pan Nengyuan <pannengyuan@huawei.com>
+Commit b1553ab12fe0 converted virtfs-proxy-helper to using libcap-ng. There
+aren't any users of libcap anymore. No need to install libcap-dev.
 
-ivq/dvq/svq/free_page_vq is forgot to cleanup in
-virtio_balloon_device_unrealize, the memory leak stack is as follow:
-
-Direct leak of 14336 byte(s) in 2 object(s) allocated from:
-    #0 0x7f99fd9d8560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
-    #1 0x7f99fcb20015 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x50015)
-    #2 0x557d90638437 in virtio_add_queue hw/virtio/virtio.c:2327
-    #3 0x557d9064401d in virtio_balloon_device_realize hw/virtio/virtio-balloon.c:793
-    #4 0x557d906356f7 in virtio_device_realize hw/virtio/virtio.c:3504
-    #5 0x557d9073f081 in device_set_realized hw/core/qdev.c:876
-    #6 0x557d908b1f4d in property_set_bool qom/object.c:2080
-    #7 0x557d908b655e in object_property_set_qobject qom/qom-qobject.c:26
-
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
-Change v2 to v1:
-- use virtio_delete_queue to cleanup vq through a vq pointer (suggested by
-  Michael S. Tsirkin)
----
- hw/virtio/virtio-balloon.c | 7 +++++++
- 1 file changed, 7 insertions(+)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 40b04f5..57f3b9f 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -831,6 +831,13 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
-     }
-     balloon_stats_destroy_timer(s);
-     qemu_remove_balloon_handler(s);
-+
-+    virtio_delete_queue(s->ivq);
-+    virtio_delete_queue(s->dvq);
-+    virtio_delete_queue(s->svq);
-+    if (s->free_page_vq) {
-+        virtio_delete_queue(s->free_page_vq);
-+    }
-     virtio_cleanup(vdev);
- }
- 
--- 
-2.7.2.windows.1
+Yet another follow-up to Paolo's patch to use libcap-ng instead of libcap.
+Like with the docker and the gitlab CI patches, if I get an ack from Alex
+I'll gladly merge this in the 9p tree and send a PR as soon as 5.0 dev
+begins. I'll make sure the SHA1 for Paolo's patch remains the same.
 
+ .travis.yml |    1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/.travis.yml b/.travis.yml
+index 445b0646c18a..6cb8af6fa599 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -26,7 +26,6 @@ addons:
+       - libaio-dev
+       - libattr1-dev
+       - libbrlapi-dev
+-      - libcap-dev
+       - libcap-ng-dev
+       - libgcc-4.8-dev
+       - libgnutls28-dev
 
 
