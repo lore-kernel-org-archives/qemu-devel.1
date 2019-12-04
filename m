@@ -2,83 +2,85 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D819FC2BC73
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1BAFC43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:38:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94EA22073C
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:34:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AC55205ED
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 13:38:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZFP5+Q2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94EA22073C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="FsPwH7tU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AC55205ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icUnh-000283-PY
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:34:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33097)
+	id 1icUrM-0003hl-Gm
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 08:38:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33376)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <catherine.hecx@gmail.com>) id 1icUmb-0001NE-Lv
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:33:34 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1icUom-0002su-I9
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:35:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <catherine.hecx@gmail.com>) id 1icUma-0002TF-5S
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:33:33 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40824)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
- id 1icUmY-0002MJ-7M
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:33:32 -0500
-Received: by mail-oi1-x243.google.com with SMTP id 6so6825219oix.7
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 05:33:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=kgXZVlg/np2RFAlicTQXy8RF82Wnir/9w4md2lq06Cg=;
- b=NZFP5+Q2g7RWxw6vPrVrYKyNjSxDWIaXsKo/j4Y4s4TT6eMqx+XZks80NjcKy5mck+
- hrMcNyWcuRMryJaQrwdCt/HMd/oS2h0CQGkGInBhkr/mrCoAUONJJLMlaWYqPKEtx/Cp
- xFrtpoBSjwNTQUOYXvP6xUnmYgBK9ulLe+bQkmK9KTdBsXxqIH+At7wHfXdDhIF7qu+C
- ZUPMfc9KlyUVdOkB4C2FloWnSoPXIxfkaa6BdpHFK5uGgHx0ySs1oeSuXlUgtuUu1KEy
- XZLMabvQK3rW7FZzuCvTUqSkGO1UuhokLt7pKGqoVL0p4AKbvYbcTxBuoRIb1sna6s+n
- d44w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=kgXZVlg/np2RFAlicTQXy8RF82Wnir/9w4md2lq06Cg=;
- b=hwLh89lQq3KNl54voXBkRwHok2WvFFBk4f1eAIBqxP9v+KVcvMN13ncIBGjzqJq66D
- 1u3Nb3OKUi5xTr37k5GxiqOGelWNl6yfWc2dUpCapUp4RP8l0/4G0JMRS8ohN9alENfB
- KeIWHIXHj8J9NwckEkZ8K3LqqefDLXHL/g0eFbA2cKUdJvrt1JOxTk5Ky/n+0d0Xhp2G
- GNstaXaEuSm9IQzHbQwTiA2Ga5hGOO3V5FJxfKXMu3VZsA6OPbApPRao7puwldnv3QGv
- EpdiStQ4RYaFebQW5VOkC3mtxbUBhnjY+D+6EWfSvky0DFro25boYiLIF7xyVvfEBPpJ
- WdOg==
-X-Gm-Message-State: APjAAAWB1vSOApkbN+d1w2T1NtEo5+5eehRiXFM4qabEoJr68B0gMFGM
- ZQ+VoOGb7Wuj6Kha0ddWDTvoB5V3yY8wFetWOpk=
-X-Google-Smtp-Source: APXvYqzPMynBnODSBzE67mrEmqAI1It0HVH7L5uZQfYArzHXrMmN5lt/Tiebv8iLmyYmJid3lrrDcZ1UKHVODA9uUrk=
-X-Received: by 2002:a05:6808:f:: with SMTP id
- u15mr2471778oic.164.1575466404865; 
- Wed, 04 Dec 2019 05:33:24 -0800 (PST)
+ (envelope-from <damien.hedde@greensocs.com>) id 1icUol-0005mq-9m
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 08:35:48 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:48770)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1icUog-0005lx-Be; Wed, 04 Dec 2019 08:35:42 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id A2AEA96EF0;
+ Wed,  4 Dec 2019 13:35:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1575466540;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lfOQ/XuakjnWsNeoSdUr3UbRkZAPKweMNeEUHV4Xnuw=;
+ b=FsPwH7tUIlPN+HEcjUAFkh6QI5D5MxlR5GSZf71wEkbnloI2SWr1EcTtiGDazvuvDHSv1e
+ kZkzJtDEolHMEDmv/7f7WiNmiRy9LKFAHXO14fuQ/+9l0J/lPuHgvfFK8QAU0968EQfxzA
+ 8FYZMLgPqklsa1uwF08ooTC3t63VdG4=
+Subject: Re: [PATCH v6 8/9] hw/char/cadence_uart: add clock support
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20190904125531.27545-1-damien.hedde@greensocs.com>
+ <20190904125531.27545-9-damien.hedde@greensocs.com>
+ <CAFEAcA8=7yhQR4Gw2OYmiF0cFJDaVn2hnUrfnZGFJK6wyuB97Q@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <75c38376-bbe9-1c52-d7a5-cc3aa73cbac2@greensocs.com>
+Date: Wed, 4 Dec 2019 14:35:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
- <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
-In-Reply-To: <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
-From: Catherine Ho <catherine.hecx@gmail.com>
-Date: Wed, 4 Dec 2019 21:33:12 +0800
-Message-ID: <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
-Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
- include msrs
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000006ae9da0598e0db04"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+In-Reply-To: <CAFEAcA8=7yhQR4Gw2OYmiF0cFJDaVn2hnUrfnZGFJK6wyuB97Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1575466540;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lfOQ/XuakjnWsNeoSdUr3UbRkZAPKweMNeEUHV4Xnuw=;
+ b=ZscCWZk7LlsX8kd02cRVKUwB1nMABjLhOmUc1PXXfZbZnq2OypHT4t49Wh2r3GkhDeJRgY
+ Z9qV0aUv76SUzD51IgtrM6Wdr18gD74B0d0/8wUWiVNTwVFZ4zOBhVaTou6VI3ndT8W4Do
+ 1Wr4V7PgTq5x/uPcfOlchRN/7HFpxIs=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575466540; a=rsa-sha256; cv=none;
+ b=7hg/tmCb64KH5gTd7e1YfQlpOb0Kta8faJfKWjxmQq96wCOQ6V8Qme84h/PY0hjkgS74wz
+ NKc4vsbiipK9Ic/5rhp42A6MQZK4/KhznzfS1GaMlCLz2lrqSbVJcr1li1Q/kSQCGg5R8S
+ zmddbVnXlKnDB1jJSn8AGOzdsAg+C+k=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,88 +92,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000006ae9da0598e0db04
-Content-Type: text/plain; charset="UTF-8"
 
-Hi Paolo
-[sorry to resend it, seems to reply it incorrectly]
 
-On Wed, 4 Dec 2019 at 19:23, Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 12/2/19 4:24 PM, Peter Maydell wrote:
+> On Wed, 4 Sep 2019 at 13:56, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>>
+>> Switch the cadence uart to multi-phase reset and add the
+>> reference clock input.
+>>
+>> The input clock frequency is added to the migration structure.
+>>
+>> The reference clock controls the baudrate generation. If it disabled,
+>> any input characters and events are ignored.
+>>
+>> If this clock remains unconnected, the uart behaves as before
+>> (it default to a 50MHz ref clock).
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> 
+>>  static void uart_parameters_setup(CadenceUARTState *s)
+>>  {
+>>      QEMUSerialSetParams ssp;
+>> -    unsigned int baud_rate, packet_size;
+>> +    unsigned int baud_rate, packet_size, input_clk;
+>> +    input_clk = clock_get_frequency(s->refclk);
+>>
+>> -    baud_rate = (s->r[R_MR] & UART_MR_CLKS) ?
+>> -            UART_INPUT_CLK / 8 : UART_INPUT_CLK;
+>> +    baud_rate = (s->r[R_MR] & UART_MR_CLKS) ? input_clk / 8 : input_clk;
+>> +    baud_rate /= (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
+>> +    trace_cadence_uart_baudrate(baud_rate);
+>> +
+>> +    ssp.speed = baud_rate;
+>>
+>> -    ssp.speed = baud_rate / (s->r[R_BRGR] * (s->r[R_BDIV] + 1));
+>>      packet_size = 1;
+>>
+>>      switch (s->r[R_MR] & UART_MR_PAR) {
+>> @@ -215,6 +220,13 @@ static void uart_parameters_setup(CadenceUARTState *s)
+>>      }
+>>
+>>      packet_size += ssp.data_bits + ssp.stop_bits;
+>> +    if (ssp.speed == 0) {
+>> +        /*
+>> +         * Avoid division-by-zero below.
+>> +         * TODO: find something better
+>> +         */
+> 
+> Any ideas what might be better? :-)
 
-> On 04/12/19 09:50, Catherine Ho wrote:
-> > Commit 20a78b02d315 ("target/i386: add VMX features") unconditionally
-> > add vmx msr entry although older host kernels don't include them.
-> >
-> > But old host kernel + newest qemu will cause a qemu crash as follows:
-> > qemu-system-x86_64: error: failed to set MSR 0x480 to 0x0
-> > target/i386/kvm.c:2932: kvm_put_msrs: Assertion `ret ==
-> > cpu->kvm_msr_buf->nmsrs' failed.
-> >
-> > This fixes it by relaxing the condition.
->
-> This is intentional.  The VMX MSR entries should not have been added.
-> What combination of host kernel/QEMU are you using, and what QEMU
-> command line?
->
->
-> Host kernel: 4.15.0 (ubuntu 18.04)
-Qemu: https://gitlab.com/virtio-fs/qemu/tree/virtio-fs-dev
-cmdline: qemu-system-x86_64 -M pc -cpu host --enable-kvm -smp 8 \
-                  -m 4G,maxmem=4G
+Well maybe the comment is misplaced. Because it is probably a good thing
+to round up the ssp.speed in case it becomes 0 (which is very unlikely
+apart from the case where the input clock is 0/disabled).
 
-But before 20a78b02d315, the older kernel + latest qemu can boot guest
-successfully.
+The problem is what should we do when the clock is disabled ?
+Right now we:
++ set a minimal baudrate
++ ignore input characters/events
++ still forward output characters... (I just checked)
 
-Best Regards,
-Catherine
+I suppose we could at least fix the last point: we can drop any output
+characters. But if this happen, there is definitely a problem somewhere
+(a firmware should not try to send characters to an unclocked uart). Is
+there a qemu way of reporting this kind of situation ?
 
---0000000000006ae9da0598e0db04
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+It would be best to somehow tell the backend we're not handling anything
+anymore. So I could put that in the comment instead.
 
-<div dir=3D"ltr"><div dir=3D"ltr"><div>Hi Paolo</div><div>[sorry to resend =
-it, seems to reply it incorrectly]<br></div></div><br><div class=3D"gmail_q=
-uote"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, 4 Dec 2019 at 19:23, Pa=
-olo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com<=
-/a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0=
-px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">O=
-n 04/12/19 09:50, Catherine Ho wrote:<br>
-&gt; Commit 20a78b02d315 (&quot;target/i386: add VMX features&quot;) uncond=
-itionally<br>
-&gt; add vmx msr entry although older host kernels don&#39;t include them.<=
-br>
-&gt; <br>
-&gt; But old host kernel + newest qemu will cause a qemu crash as follows:<=
-br>
-&gt; qemu-system-x86_64: error: failed to set MSR 0x480 to 0x0<br>
-&gt; target/i386/kvm.c:2932: kvm_put_msrs: Assertion `ret =3D=3D<br>
-&gt; cpu-&gt;kvm_msr_buf-&gt;nmsrs&#39; failed.<br>
-&gt; <br>
-&gt; This fixes it by relaxing the condition.<br>
-<br>
-This is intentional.=C2=A0 The VMX MSR entries should not have been added.<=
-br>
-What combination of host kernel/QEMU are you using, and what QEMU<br>
-command line?<br>
-<br><br></blockquote><div>
-<div>Host kernel: 4.15.0 (ubuntu 18.04)</div><div>Qemu: <a href=3D"https://=
-gitlab.com/virtio-fs/qemu/tree/virtio-fs-dev" target=3D"_blank">https://git=
-lab.com/virtio-fs/qemu/tree/virtio-fs-dev</a></div><div>cmdline: qemu-syste=
-m-x86_64 -M pc -cpu host --enable-kvm -smp 8 \<br>=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 -m 4G,maxmem=3D4G</div><div><br></di=
-v><div>But before=20
-20a78b02d315, the older kernel=C2=A0+ latest qemu can boot guest</div><div>=
-successfully.</div><div><br></div><div>Best Regards,</div><div>Catherine</d=
-iv>=C2=A0
+I really don't know if/how we can do that. When I looked I did not see
+any way to do the opposite of qemu_chr_fe_accept_input() which is done
+to start receiving stuff.
 
-<br></div></div></div>
-
---0000000000006ae9da0598e0db04--
+--
+Damien
 
