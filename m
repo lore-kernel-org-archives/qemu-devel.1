@@ -2,129 +2,91 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C2D9C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB1FC3F68F
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB94C2073B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:41:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9EBC20862
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:43:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KDd3Aci2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB94C2073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yx7LLFKn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9EBC20862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icWmm-0004iR-0C
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:41:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53791)
+	id 1icWo3-0005Kh-T0
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:43:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54837)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1icWgo-0000z5-VU
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:35:44 -0500
+ (envelope-from <armbru@redhat.com>) id 1icWm3-0004Mh-70
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:41:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1icWgn-0001mR-05
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:35:42 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27102
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1icWm0-0001WF-Op
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:41:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51892
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1icWgk-0001kh-Um
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:35:40 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1icWlu-0000ru-Gt
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:41:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575473737;
+ s=mimecast20190719; t=1575474053;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=T/bvIH0/NAM7pylQ0L3CVIYn8ioTXM2Bt1hRAGYDUgg=;
- b=KDd3Aci23xyVxcGPIBmIBesbUokfvME0NRtTLW/g6jtwvRgobG4HoWIjg7Kd8/OOQ5+w5P
- L+0gH9avoJHI5e18VddBN9PIT7KpDdTRov0pl7RYa19lPBAPDE9br3kzTHyilnZ6pO1FdA
- g83jh0iRCbu+5vRdruepwTTMd5J7cEE=
+ in-reply-to:in-reply-to:references:references;
+ bh=gsagw1tvNaMmWiyIeAFh8VJmbkqzIfypE6P8HwGxgiI=;
+ b=Yx7LLFKnD70Cs9BJORGkA9zdw3Asi2DtzrllTChuwy+yi6iVvvCBEw2aIfmLbaluUlv+zL
+ SSHDQ30gDjzGTYqeDAtN2dzcrVeAZlAeY4pDTiaoe0o1nLgzljeH1PZPdtszhP2AgcMAnG
+ BUrUY3rF4wcAeg6jrvUNUDmuGz0XdAc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-95-3NNYxG_JPnGpSsXhtYdADg-1; Wed, 04 Dec 2019 10:35:33 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-267-NHEI3qjlMgakTOqoAHsXfg-1; Wed, 04 Dec 2019 10:40:50 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94E4C800D5E;
- Wed,  4 Dec 2019 15:35:32 +0000 (UTC)
-Received: from [10.36.118.91] (unknown [10.36.118.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 32F385D6AE;
- Wed,  4 Dec 2019 15:35:31 +0000 (UTC)
-Subject: Re: [PATCH v3 2/4] s390x: Add missing vcpu reset functions
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20191203132813.2734-1-frankja@linux.ibm.com>
- <20191203132813.2734-3-frankja@linux.ibm.com>
- <20191204155937.76f6c0cd.cohuck@redhat.com>
- <dd35552d-3e51-9f4d-caca-c52c0136d4ed@redhat.com>
- <026a1b83-6a1f-3e09-e516-13fe0f13dee0@redhat.com>
- <20191204163309.7af0582f.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <1dfb4400-1c94-4daf-b30f-367d5469a37f@redhat.com>
-Date: Wed, 4 Dec 2019 16:35:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 151FD108BD15;
+ Wed,  4 Dec 2019 15:40:49 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A751C691A3;
+ Wed,  4 Dec 2019 15:40:48 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 386B61138606; Wed,  4 Dec 2019 16:40:47 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v6] error: rename errp to errp_in where it is IN-argument
+References: <20191127183704.14825-1-vsementsov@virtuozzo.com>
+ <878so05bca.fsf@dusky.pond.sub.org>
+ <f901e0db-61df-898f-ce18-096bfeadf525@virtuozzo.com>
+ <87mucf218w.fsf@dusky.pond.sub.org>
+ <80e563ee-31fb-da43-ddde-c8666e4b92c6@virtuozzo.com>
+ <87eexqda3c.fsf@dusky.pond.sub.org>
+ <41f32448-f2b8-1822-25df-f02c61df9bc4@virtuozzo.com>
+ <878snybrf7.fsf@dusky.pond.sub.org>
+ <87blsob5uq.fsf@dusky.pond.sub.org>
+ <d1a58207-604b-e6bc-c2c3-a30e692c880a@virtuozzo.com>
+Date: Wed, 04 Dec 2019 16:40:47 +0100
+In-Reply-To: <d1a58207-604b-e6bc-c2c3-a30e692c880a@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Wed, 4 Dec 2019 14:59:36 +0000")
+Message-ID: <8736e0nlog.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20191204163309.7af0582f.cohuck@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 3NNYxG_JPnGpSsXhtYdADg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: NHEI3qjlMgakTOqoAHsXfg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -136,58 +98,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com,
- Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.12.19 16:33, Cornelia Huck wrote:
-> On Wed, 4 Dec 2019 16:08:48 +0100
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 04.12.19 16:07, David Hildenbrand wrote:
->>> On 04.12.19 15:59, Cornelia Huck wrote:  
->>>> On Tue,  3 Dec 2019 08:28:11 -0500
->>>> Janosch Frank <frankja@linux.ibm.com> wrote:
->>>>  
->>>>> Up to now we only had an ioctl to reset vcpu data QEMU couldn't reach
->>>>> for the initial reset, and that was also called for the clear
->>>>> reset. To be architecture compliant, we also need to clear local
->>>>> interrupts on a normal reset.  
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+
+> 04.12.2019 16:03, Markus Armbruster wrote:
+>> Markus Armbruster <armbru@redhat.com> writes:
+>>=20
+>>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>>
+>>>> 29.11.2019 17:35, Markus Armbruster wrote:
+>> [...]
+>>>>> I pushed my fixups to git://repo.or.cz/qemu/armbru.git branch error-p=
+rep
+>>>>> for your convenience.  The commit messages of the fixed up commits ne=
+ed
+>>>>> rephrasing, of course.
+>>>>>
 >>>>
->>>> Do we also need to do something like that for tcg? David?
->>>>  
+>>>> Looked through fixups, looks OK for me, thanks! What next?
 >>>
->>> So, we have
->>>
->>> /* Fields up to this point are not cleared by initial CPU reset */
->>> struct {} start_initial_reset_fields;
->>> [...]
->>> int pending_int
->>> uint16_t external_call_addr;
->>> DECLARE_BITMAP(emergency_signals, S390_MAX_CPUS);
->>> [...]
->>> /* Fields up to this point are cleared by a CPU reset */
->>> struct {} end_reset_fields;
->>>
->>> This means, local interrupts will be cleared by everything that zeroes
->>> "start_initial_reset_fields->end_reset_fields"
->>>
->>> So, they will get cleared by S390_CPU_RESET_INITIAL only if I am not
->>> wrong. In order to clear them on S390_CPU_RESET_NORMAL, we have to
->>> manually set them to zero.  
->>
->> Sorry, by S390_CPU_RESET_INITIAL and S390_CPU_RESET_CLEAR.
-> 
-> Ok. Will you cook up a patch, or should I do it?
-> 
+>>> Let me finish my fixing incorrect dereferences of errp, and then we
+>>> figure out what to include in v7.
+>>=20
+>> Your v6 with my fixups does not conflict with my "[PATCH v2 00/18] Error
+>> handling fixes", except for "hw/core/loader-fit: fix freeing errp in
+>> fit_load_fdt", which my "[PATCH v2 07/18] hw/core: Fix fit_load_fdt()
+>> error handling violations" supersedes.
+>>=20
+>> Suggest you work in the fixups and post as v7.  I'll merge that in my
+>> tree, to give you a base for the remainder of your "auto propagated
+>> local_err" work.  While you work on that, I'll work on getting the base
+>> merged into master.  Sounds like a plan?
+>>=20
+>
+> Yes, that's good. I'll send v7 tomorrow.
+>
+> What you suggest to do after it?
+> Send in one series a patch with macro + coccinelle +
+> subset of autogenerated patches, which were reviewed (but not sending hal=
+f
+> a subsystem of course)?
 
-If you want to have some TCG fun, feel free. Otherwise, let me know :)
+Sounds good to me.
 
--- 
-Thanks,
-
-David / dhildenb
+Visibility into the complete work is useful, though.  Having the cover
+letter point to a branch in your public git repo should do.
 
 
