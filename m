@@ -6,105 +6,105 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E36EC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 01:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D267C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 01:49:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C8CB20674
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 01:47:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0440D20674
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 01:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="MlX4E/gp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C8CB20674
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="M8/QLS2b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0440D20674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icJl6-0000oO-SH
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 20:47:16 -0500
+	id 1icJmp-0001nN-7I
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 20:49:03 -0500
 Received: from eggs.gnu.org ([2001:470:142:3::10]:51676)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Babu.Moger@amd.com>) id 1icIuE-0005YT-HO
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 19:52:44 -0500
+ (envelope-from <Babu.Moger@amd.com>) id 1icIuP-0005YT-7t
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 19:52:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Babu.Moger@amd.com>) id 1icIg3-0002qg-1D
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 19:38:00 -0500
-Received: from mail-eopbgr820040.outbound.protection.outlook.com
- ([40.107.82.40]:42098 helo=NAM01-SN1-obe.outbound.protection.outlook.com)
+ (envelope-from <Babu.Moger@amd.com>) id 1icIfT-00019e-OK
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 19:37:25 -0500
+Received: from mail-eopbgr690082.outbound.protection.outlook.com
+ ([40.107.69.82]:40982 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1icIg1-0002ld-4y
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 19:37:57 -0500
+ (Exim 4.71) (envelope-from <Babu.Moger@amd.com>) id 1icIfS-00015B-7d
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 19:37:22 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AFU0bki4uzA4x5okcI8bP01+F7KDFDR/ayTk/iH+Rhr4IU7XJPRKfDfiGXZWS/BZiPGKfsDY28Rsl8nZa9RpAcZfHgaJFruJCPTPd4/Y3UTp/YIWbx/4vkngjFXSsKQT12LOj8ThOg710jUPEsctl5K1A7XYdEwgOS+nQee5XvTx0Y2bTjjOdze9uI1FaeNJJX8z0Ped52/LI2wCMA/vQgKvrzROccSfW/hcih2vkT/QCcSb4iCvzu7Iv3TRhk4vf73uHHkuJSN3HSnaBAHrrfCyZvmUZm0YeqI7H52yAFyn1zCDckyZjIX3l7T1T947KsR7cLPwAqswd6zQB/F6WA==
+ b=BSs23AsZpZkvoTlsEvLSDtF250Lt+lOJTnIv5K5BYHazMKnZInvaShJGU+2CUmovV0CHjTbl9I+wn2UKhafqDiuPpYhEL36sDqE00+1CjCatU7jjaKO1H2JHSChvvoCXevftw4P2qswFX6I45pGVvvZKTZA+0r8yfwtlK2txa7OIWz95Bff0SQsPmMQbBDktgCarNHfevL3qJT4nn/LWc9TwoC3SLgiuZacaf1meJHWo8FiF0fyj1lj1Q3309RlQ0xevFNJYKnHoVtDa1Dq7hI39YRf2G1rIrlBXNbVj2WdagJUOD5idpOp2itFWwNa5xlE9Psgtve7oFUjLZZiCPg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JtZ9dKqJ/zsn02SG07hRgqm2AI8/P2vrJCO2Ofpf7bc=;
- b=PTWMCa1gUgejY0EsDobdsUP4p0nlSAjQ6NlHgli/Y388XRphdMGa6eEkexIiWXL3gH+ulCD3l0DoPJ7vL0AOgR3x0EElc7ndzz3X8J+M5Zook/Er7IFnuFQ3k8CPfslSkGjp82MuCtwDoRsShDK5K/PNaSwcFWqwGcwvoTbPY6vPJY8GhmYVLtx5cQehTzFoY2f7YuYGwVyeD8RquaJYatETbgPJPchfu5VTJnat0s4eyU31nPamJfeI2w7OmontKnNAyXBbDlaUL8Ls4BnmJHovaNRO5I7LXZfE4B98gviBvTp3p7/kwCceq0uGS4dSH70KgO0GFDUhij3/dHcIjA==
+ bh=6mUu4MlxnYE2jSCz7QipQeRYwdPC7sFfziysveCkRpU=;
+ b=dsDoE9adJAUczCnzqf2dJatzqqQ1i9o289bU5eZpPDDfRZhYVrAB7L2vBlgahAO3unz2hvTH2QdECLQ/e0iz8KYlX1VOoSs6YoAbhQWjchw6TG2X00fTmNZbvTdMCVltCEvtZG4G0o3hYequmWFb+PRQpfsG6hdTyA0QG1iZWxBfm8IvlFKBnMZbp8ccLgYVydRBB+6rIR6D8tU4y3iKSiMDbii2MiVUoP5Lzfk399kyJVct1fmhr0wGbn37PTG6OP6KlHBzqg3oZTCOeaKDxMrFKszZJbfHxVLDo5arNBsxQb/2xfiUO3Nm9wZAxNa9xFxR3JQwzuD3LLe/r6OjWg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JtZ9dKqJ/zsn02SG07hRgqm2AI8/P2vrJCO2Ofpf7bc=;
- b=MlX4E/gpkVaQU9i04bIe+UMY6hIzPh1JIlijZcyWgLv91iRdotcYfsMISDaxjG1XvpsbqZ+SGWoIcZej/HP0hMQqadL2bx1aCDMUxfY4sb9e/QxA1MY6Tfj3MtQV/bZ03LssEbAhCMbregndlqQ9XUX2OZSjM1dQwIUGn2jwPtc=
+ bh=6mUu4MlxnYE2jSCz7QipQeRYwdPC7sFfziysveCkRpU=;
+ b=M8/QLS2bXlNfnGZ7dK2S6b6Fd9JQXOpiWFuNgeJzGGZst/lgF+6Oa2ZlRfwkbKzPaVmkPZQ8kCrq9ioD7NX/RAOAS5YTdG5LQRkjfkVxrJSBzZ3bqAjMG9szIjXB9vR4m3bBA3Ghlaby37NgtWkydOGeQHETczjPqYnnWQJIC5U=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Babu.Moger@amd.com; 
 Received: from DM5PR12MB2471.namprd12.prod.outlook.com (52.132.141.138) by
- DM5PR12MB2535.namprd12.prod.outlook.com (52.132.141.154) with Microsoft SMTP
+ DM5PR12MB1369.namprd12.prod.outlook.com (10.168.234.147) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.21; Wed, 4 Dec 2019 00:37:52 +0000
+ 15.20.2495.19; Wed, 4 Dec 2019 00:37:17 +0000
 Received: from DM5PR12MB2471.namprd12.prod.outlook.com
  ([fe80::d0f5:b875:7b5c:46c3]) by DM5PR12MB2471.namprd12.prod.outlook.com
  ([fe80::d0f5:b875:7b5c:46c3%6]) with mapi id 15.20.2495.014; Wed, 4 Dec 2019
- 00:37:52 +0000
-Subject: [PATCH v3 08/18] hw/i386: Update structures for nodes_per_pkg
+ 00:37:16 +0000
+Subject: [PATCH v3 03/18] hw/i386: Consolidate topology functions
 From: Babu Moger <babu.moger@amd.com>
 To: ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
  pbonzini@redhat.com, rth@twiddle.net, eblake@redhat.com, armbru@redhat.com,
  imammedo@redhat.com
-Date: Tue, 03 Dec 2019 18:37:51 -0600
-Message-ID: <157541987113.46157.12421621035195290598.stgit@naples-babu.amd.com>
+Date: Tue, 03 Dec 2019 18:37:15 -0600
+Message-ID: <157541983500.46157.10867081966222391072.stgit@naples-babu.amd.com>
 In-Reply-To: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
 References: <157541968844.46157.17994918142533791313.stgit@naples-babu.amd.com>
 User-Agent: StGit/unknown-version
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN6PR16CA0047.namprd16.prod.outlook.com
- (2603:10b6:805:ca::24) To DM5PR12MB2471.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN4PR0501CA0134.namprd05.prod.outlook.com
+ (2603:10b6:803:2c::12) To DM5PR12MB2471.namprd12.prod.outlook.com
  (2603:10b6:4:b5::10)
 MIME-Version: 1.0
 X-Originating-IP: [165.204.78.2]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 952d456a-1099-4922-1716-08d778523273
-X-MS-TrafficTypeDiagnostic: DM5PR12MB2535:|DM5PR12MB2535:
+X-MS-Office365-Filtering-Correlation-Id: 24fbb7aa-c013-4371-fd71-08d778521cdf
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1369:|DM5PR12MB1369:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DM5PR12MB25358DB07D329443983AD1A2955D0@DM5PR12MB2535.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1169;
+X-Microsoft-Antispam-PRVS: <DM5PR12MB1369D4FFA5BBA6186943BF58955D0@DM5PR12MB1369.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
 X-Forefront-PRVS: 0241D5F98C
 X-Forefront-Antispam-Report: SFV:NSPM;
- SFS:(10009020)(4636009)(346002)(376002)(396003)(39860400002)(136003)(366004)(199004)(189003)(5660300002)(76176011)(4326008)(14444005)(6506007)(386003)(3846002)(44832011)(11346002)(446003)(52116002)(186003)(230700001)(66946007)(2486003)(86362001)(6512007)(103116003)(2906002)(6116002)(50466002)(8936002)(81156014)(99286004)(66476007)(66556008)(26005)(15650500001)(23676004)(305945005)(7736002)(6436002)(8676002)(478600001)(58126008)(316002)(6486002)(25786009)(81166006)(14454004);
- DIR:OUT; SFP:1101; SCL:1; SRVR:DM5PR12MB2535;
+ SFS:(10009020)(4636009)(376002)(39860400002)(136003)(346002)(396003)(366004)(189003)(199004)(2906002)(25786009)(103116003)(50466002)(6116002)(5660300002)(478600001)(7736002)(3846002)(66476007)(230700001)(66556008)(44832011)(4326008)(11346002)(14444005)(99286004)(14454004)(446003)(6512007)(23676004)(316002)(58126008)(81166006)(76176011)(66946007)(386003)(6506007)(305945005)(6436002)(6486002)(81156014)(2486003)(86362001)(8936002)(52116002)(8676002)(26005)(186003);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:DM5PR12MB1369;
  H:DM5PR12MB2471.namprd12.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
+ PTR:InfoNoRecords; MX:1; A:1; 
 Received-SPF: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bTl9zPk68mTb5SNI+ePPMxt9eBWYyhziHVVDmnQKkrvanIP1Yetm+VktFAZy7bCL2wAOmrZ6qtHaXeBp5xtiBMJ4Ylgu4AohimCtNhYtZJDi5mLhKBB9ThYF1Prmkk+XeFgwnKLp3mVhl7z7SPFIhsgjnURCrccunrW+ff715stqWmkRbKdpQcyFPMDWHuZ03OWmil9ma3xZdSMb7d5KYk18kwSYW6j2us7GmH5in8IxJDL7Ps5gUPN/GIc8Y2on75r+wfiV2BnGHTke/UJLQ7XXkA+l67zqm1/NfJJ8IYs39uX+xDdqem+gR/ke9jKd9RuNvyNdOFj5xZUt+avT2p/NvEEYqFhotkD4aI/YZ5sW0+NkbmQNMtMWr9Dj/VLcrEWAnNFI2iIcPC4B8dJvu0lhEd9aFR3eo6BHboVo048Wdv2S3jHGYm1/M/OikiSl
+X-Microsoft-Antispam-Message-Info: AU3h8LYkiArb9Gj3S3kZNaJZrIpd0gWx6CAAK5P4oM9P9fVg8Np96rjJ9NDrlx9Nj0TeP3RFvsissFh1Yh4TgxoL6hgFROai5rhTPnxwXD4jJS8mbFBuM7gAJd6/vLSlNPnUH15Uqvzq1zcdCsX00JPYiTZWTO+1DmYZ3a1KdzoY8Dy9SZyR5rSYg8yNII4Pn08o0tBHI3uQvG9hev8caWj5qo74VVm92/TaNfiqiNYKc+R1f52nCa4MSJtlXQNofd2Z4LtxCcWvgvYDyFbLtWTiMxntoUxM2SZ1Ku0A5HtfZAiSPcxK6Khv4CiZ4cemQSEpsbhOnxeKarOtPOhd2nG2X38rOe/X3h2QGJPe6ZBTKzqh3mJ/6vKBCYO5WkZRvGejVqs6QgxhhIT5ri3vVJ+fhJq3CbcA+/WwxL/jPlTNnUk61C1SMKJNUpMb9jTF
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 952d456a-1099-4922-1716-08d778523273
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2019 00:37:52.7138 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 24fbb7aa-c013-4371-fd71-08d778521cdf
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2019 00:37:16.5286 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4VUTyxxd8Wiz46Y9+QewfA8jfeokBoWA/hb24XApZyPEs/vT/+UQrS4WnArmbYUd
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2535
+X-MS-Exchange-CrossTenant-UserPrincipalName: J2XEmsZluogZHB/OI/pmWuwV8AaHprjGwf77Wl17P6Vzf7xV+qmDyyNay0IkMS9K
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1369
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.82.40
+X-Received-From: 40.107.69.82
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,86 +121,197 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Update structures X86CPUTopoIDs and CPUX86State to hold the nodes_per_pkg. This
-is required to build EPYC mode topology.
+Now that we have all the parameters in X86CPUTopoInfo, we can just pass the
+structure to calculate the offsets and width.
 
 Signed-off-by: Babu Moger <babu.moger@amd.com>
 ---
- hw/i386/pc.c               |    4 ++++
- include/hw/i386/topology.h |    1 +
- target/i386/cpu.c          |    1 +
- target/i386/cpu.h          |    1 +
- 4 files changed, 7 insertions(+)
+ include/hw/i386/topology.h |   64 ++++++++++++++------------------------------
+ target/i386/cpu.c          |   23 ++++++++--------
+ 2 files changed, 32 insertions(+), 55 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index df5339c102..5dc11df922 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -870,6 +870,7 @@ static inline void initialize_topo_info(X86CPUTopoInfo *topo_info,
-                                         PCMachineState *pcms,
-                                         const MachineState *ms)
- {
-+    topo_info->nodes_per_pkg = ms->numa_state->num_nodes / ms->smp.sockets;
-     topo_info->dies_per_pkg = pcms->smp_dies;
-     topo_info->cores_per_die = ms->smp.cores;
-     topo_info->threads_per_core = ms->smp.threads;
-@@ -1390,11 +1391,13 @@ static void pc_new_cpu(PCMachineState *pcms, int64_t apic_id, Error **errp)
-     Object *cpu = NULL;
-     Error *local_err = NULL;
-     CPUX86State *env = NULL;
-+    MachineState *ms = MACHINE(pcms);
- 
-     cpu = object_new(MACHINE(pcms)->cpu_type);
- 
-     env = &X86_CPU(cpu)->env;
-     env->nr_dies = pcms->smp_dies;
-+    env->nr_nodes = ms->numa_state->num_nodes / ms->smp.sockets;
- 
-     object_property_set_uint(cpu, apic_id, "apic-id", &local_err);
-     object_property_set_bool(cpu, true, "realized", &local_err);
-@@ -2242,6 +2245,7 @@ static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
-     initialize_topo_info(&topo_info, pcms, ms);
- 
-     env->nr_dies = pcms->smp_dies;
-+    env->nr_nodes = ms->numa_state->num_nodes / ms->smp.sockets;
- 
-     /*
-      * If APIC ID is not set,
 diff --git a/include/hw/i386/topology.h b/include/hw/i386/topology.h
-index 1238006208..cfb09312fe 100644
+index cf1935d548..ba52d49079 100644
 --- a/include/hw/i386/topology.h
 +++ b/include/hw/i386/topology.h
-@@ -54,6 +54,7 @@ typedef struct X86CPUTopoIDs {
- } X86CPUTopoIDs;
+@@ -69,56 +69,42 @@ static unsigned apicid_bitwidth_for_count(unsigned count)
  
- typedef struct X86CPUTopoInfo {
-+    unsigned nodes_per_pkg;
-     unsigned dies_per_pkg;
-     unsigned cores_per_die;
-     unsigned threads_per_core;
+ /* Bit width of the SMT_ID (thread ID) field on the APIC ID
+  */
+-static inline unsigned apicid_smt_width(unsigned nr_dies,
+-                                        unsigned nr_cores,
+-                                        unsigned nr_threads)
++static inline unsigned apicid_smt_width(X86CPUTopoInfo *topo_info)
+ {
+-    return apicid_bitwidth_for_count(nr_threads);
++    return apicid_bitwidth_for_count(topo_info->threads_per_core);
+ }
+ 
+ /* Bit width of the Core_ID field
+  */
+-static inline unsigned apicid_core_width(unsigned nr_dies,
+-                                         unsigned nr_cores,
+-                                         unsigned nr_threads)
++static inline unsigned apicid_core_width(X86CPUTopoInfo *topo_info)
+ {
+-    return apicid_bitwidth_for_count(nr_cores);
++    return apicid_bitwidth_for_count(topo_info->cores_per_die);
+ }
+ 
+ /* Bit width of the Die_ID field */
+-static inline unsigned apicid_die_width(unsigned nr_dies,
+-                                        unsigned nr_cores,
+-                                        unsigned nr_threads)
++static inline unsigned apicid_die_width(X86CPUTopoInfo *topo_info)
+ {
+-    return apicid_bitwidth_for_count(nr_dies);
++    return apicid_bitwidth_for_count(topo_info->dies_per_pkg);
+ }
+ 
+ /* Bit offset of the Core_ID field
+  */
+-static inline unsigned apicid_core_offset(unsigned nr_dies,
+-                                          unsigned nr_cores,
+-                                          unsigned nr_threads)
++static inline unsigned apicid_core_offset(X86CPUTopoInfo *topo_info)
+ {
+-    return apicid_smt_width(nr_dies, nr_cores, nr_threads);
++    return apicid_smt_width(topo_info);
+ }
+ 
+ /* Bit offset of the Die_ID field */
+-static inline unsigned apicid_die_offset(unsigned nr_dies,
+-                                          unsigned nr_cores,
+-                                           unsigned nr_threads)
++static inline unsigned apicid_die_offset(X86CPUTopoInfo *topo_info)
+ {
+-    return apicid_core_offset(nr_dies, nr_cores, nr_threads) +
+-           apicid_core_width(nr_dies, nr_cores, nr_threads);
++    return apicid_core_offset(topo_info) + apicid_core_width(topo_info);
+ }
+ 
+ /* Bit offset of the Pkg_ID (socket ID) field
+  */
+-static inline unsigned apicid_pkg_offset(unsigned nr_dies,
+-                                         unsigned nr_cores,
+-                                         unsigned nr_threads)
++static inline unsigned apicid_pkg_offset(X86CPUTopoInfo *topo_info)
+ {
+-    return apicid_die_offset(nr_dies, nr_cores, nr_threads) +
+-           apicid_die_width(nr_dies, nr_cores, nr_threads);
++    return apicid_die_offset(topo_info) + apicid_die_width(topo_info);
+ }
+ 
+ /* Make APIC ID for the CPU based on Pkg_ID, Core_ID, SMT_ID
+@@ -128,13 +114,9 @@ static inline unsigned apicid_pkg_offset(unsigned nr_dies,
+ static inline apic_id_t apicid_from_topo_ids(X86CPUTopoInfo *topo_info,
+                                              const X86CPUTopoIDs *topo_ids)
+ {
+-    unsigned nr_dies = topo_info->dies_per_pkg;
+-    unsigned nr_cores = topo_info->cores_per_die;
+-    unsigned nr_threads = topo_info->threads_per_core;
+-
+-    return (topo_ids->pkg_id  << apicid_pkg_offset(nr_dies, nr_cores, nr_threads)) |
+-           (topo_ids->die_id  << apicid_die_offset(nr_dies, nr_cores, nr_threads)) |
+-           (topo_ids->core_id << apicid_core_offset(nr_dies, nr_cores, nr_threads)) |
++    return (topo_ids->pkg_id  << apicid_pkg_offset(topo_info)) |
++           (topo_ids->die_id  << apicid_die_offset(topo_info)) |
++           (topo_ids->core_id << apicid_core_offset(topo_info)) |
+            topo_ids->smt_id;
+ }
+ 
+@@ -162,19 +144,15 @@ static inline void x86_topo_ids_from_apicid(apic_id_t apicid,
+                                             X86CPUTopoInfo *topo_info,
+                                             X86CPUTopoIDs *topo_ids)
+ {
+-    unsigned nr_dies = topo_info->dies_per_pkg;
+-    unsigned nr_cores = topo_info->cores_per_die;
+-    unsigned nr_threads = topo_info->threads_per_core;
+-
+     topo_ids->smt_id = apicid &
+-            ~(0xFFFFFFFFUL << apicid_smt_width(nr_dies, nr_cores, nr_threads));
++            ~(0xFFFFFFFFUL << apicid_smt_width(topo_info));
+     topo_ids->core_id =
+-            (apicid >> apicid_core_offset(nr_dies, nr_cores, nr_threads)) &
+-            ~(0xFFFFFFFFUL << apicid_core_width(nr_dies, nr_cores, nr_threads));
++            (apicid >> apicid_core_offset(topo_info)) &
++            ~(0xFFFFFFFFUL << apicid_core_width(topo_info));
+     topo_ids->die_id =
+-            (apicid >> apicid_die_offset(nr_dies, nr_cores, nr_threads)) &
+-            ~(0xFFFFFFFFUL << apicid_die_width(nr_dies, nr_cores, nr_threads));
+-    topo_ids->pkg_id = apicid >> apicid_pkg_offset(nr_dies, nr_cores, nr_threads);
++            (apicid >> apicid_die_offset(topo_info)) &
++            ~(0xFFFFFFFFUL << apicid_die_width(topo_info));
++    topo_ids->pkg_id = apicid >> apicid_pkg_offset(topo_info);
+ }
+ 
+ /* Make APIC ID for the CPU 'cpu_index'
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 3c81aa3ecd..9b2608a4c8 100644
+index 07cf562d89..bc9b491557 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -5996,6 +5996,7 @@ static void x86_cpu_initfn(Object *obj)
-     FeatureWord w;
+@@ -4551,6 +4551,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+     uint32_t die_offset;
+     uint32_t limit;
+     uint32_t signature[3];
++    X86CPUTopoInfo topo_info;
++
++    topo_info.dies_per_pkg = env->nr_dies;
++    topo_info.cores_per_die = cs->nr_cores;
++    topo_info.threads_per_core = cs->nr_threads;
  
-     env->nr_dies = 1;
-+    env->nr_nodes = 1;
-     cpu_set_cpustate_pointers(cpu);
+     /* Calculate & apply limits for different index ranges */
+     if (index >= 0xC0000000) {
+@@ -4637,8 +4642,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+                                     eax, ebx, ecx, edx);
+                 break;
+             case 3: /* L3 cache info */
+-                die_offset = apicid_die_offset(env->nr_dies,
+-                                        cs->nr_cores, cs->nr_threads);
++                die_offset = apicid_die_offset(&topo_info);
+                 if (cpu->enable_l3_cache) {
+                     encode_cache_cpuid4(env->cache_info_cpuid4.l3_cache,
+                                         (1 << die_offset), cs->nr_cores,
+@@ -4729,14 +4733,12 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
  
-     object_property_add(obj, "family", "int",
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index a56d44e405..0ef4fdb55f 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1591,6 +1591,7 @@ typedef struct CPUX86State {
-     TPRAccess tpr_access_type;
- 
-     unsigned nr_dies;
-+    unsigned nr_nodes;
- } CPUX86State;
- 
- struct kvm_msrs;
+         switch (count) {
+         case 0:
+-            *eax = apicid_core_offset(env->nr_dies,
+-                                      cs->nr_cores, cs->nr_threads);
++            *eax = apicid_core_offset(&topo_info);
+             *ebx = cs->nr_threads;
+             *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
+             break;
+         case 1:
+-            *eax = apicid_pkg_offset(env->nr_dies,
+-                                     cs->nr_cores, cs->nr_threads);
++            *eax = apicid_pkg_offset(&topo_info);
+             *ebx = cs->nr_cores * cs->nr_threads;
+             *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
+             break;
+@@ -4760,20 +4762,17 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         *edx = cpu->apic_id;
+         switch (count) {
+         case 0:
+-            *eax = apicid_core_offset(env->nr_dies, cs->nr_cores,
+-                                                    cs->nr_threads);
++            *eax = apicid_core_offset(&topo_info);
+             *ebx = cs->nr_threads;
+             *ecx |= CPUID_TOPOLOGY_LEVEL_SMT;
+             break;
+         case 1:
+-            *eax = apicid_die_offset(env->nr_dies, cs->nr_cores,
+-                                                   cs->nr_threads);
++            *eax = apicid_die_offset(&topo_info);
+             *ebx = cs->nr_cores * cs->nr_threads;
+             *ecx |= CPUID_TOPOLOGY_LEVEL_CORE;
+             break;
+         case 2:
+-            *eax = apicid_pkg_offset(env->nr_dies, cs->nr_cores,
+-                                                   cs->nr_threads);
++            *eax = apicid_pkg_offset(&topo_info);
+             *ebx = env->nr_dies * cs->nr_cores * cs->nr_threads;
+             *ecx |= CPUID_TOPOLOGY_LEVEL_DIE;
+             break;
 
 
