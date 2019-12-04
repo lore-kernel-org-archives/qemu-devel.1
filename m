@@ -7,95 +7,94 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54866C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C20C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:58:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16FCC206DF
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:57:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FDCE20833
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 14:58:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DBrL2wp6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16FCC206DF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FAeosMCL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FDCE20833
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icW5O-0004FR-7t
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 09:57:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47281)
+	id 1icW6n-0005DL-1M
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 09:58:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47753)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1icW4R-0003fE-T1
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:56:04 -0500
+ (envelope-from <philmd@redhat.com>) id 1icW5q-0004j3-Ky
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:57:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1icW4Q-00070Q-Q7
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:56:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36119
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1icW5p-0001xu-Hn
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:57:30 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51677
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icW4Q-00070B-MI
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:56:02 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icW5p-0001tx-E9
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 09:57:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575471361;
+ s=mimecast20190719; t=1575471447;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6MgxO9ESAppqjsZ+axods+PWh44FAbjcTKVmzKuWeVE=;
- b=DBrL2wp6rh2WeMHmTClH0mvPGI/0sYwtKkFq2jQGfqQ9zi6WgRRZT9c0A0HbqAnKdXoR75
- xpA387+C0IqjUGgLC4kLbLiPeDhyjwVRdwo1fmsBy7+sJg4ltU7TzkE2QcMtf3UchRdwdw
- +q2Jv2hvQZ4UZ8nqpP5ZvKtdO9Y+Ldo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-b18knUL6PhSgN_Gfejl28w-1; Wed, 04 Dec 2019 09:55:59 -0500
-Received: by mail-wr1-f69.google.com with SMTP id z14so3777760wrs.4
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 06:55:59 -0800 (PST)
+ bh=mtjOLLxqnus2yVUjhuie5+4HlDENsrCgZj76bycgtcM=;
+ b=FAeosMCLd9kNrfby1YLqTn/+BvZvHW2NhU2vei55hVVvIzIbVCFJjsqUTa8tkSm+DI2OTA
+ JrX1u6p3LCyOSBUX4oCeAbdNQIbPJqKuP+78vXtePgGB7VFhr+7wfvioUaymW8/vJWVxmZ
+ AG+ZThu3SKreicQ0nUzPlsQFEpSikxM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-sGD526SoOGSVg_A5AqpGwA-1; Wed, 04 Dec 2019 09:57:26 -0500
+Received: by mail-wr1-f72.google.com with SMTP id f17so3740879wrt.19
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 06:57:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=U/etnBb4UC4sTQoeOwZJ/31OntsKMbTHdaRge4Xw4kA=;
- b=k09V6Vj6wTMdcFlXB1CUKwjYeKyTuHC9Lzt68MRWAIrIiUa+mMl971Ts7TrpFejObd
- P3Fjb6/3eLTs9HIpeulMREIz2hCGFJID7Z4ksooQr1K/dbPfu1oNVfmlKZRwSRskERJP
- p15S8wwAC88bhbMBlrECiW2UynGNKjSTdQi28Q5GKUqLJ8JsbdHj+zIAbmfn8OsqFN/K
- oo4EkUlUvBoOd4tGsNi7cb4pyoI5ZZolv+NHFm0GAyl+3ay1eAooPLstpsPqAH+3sbCy
- mjBFB4M8JiSqD8P5BE3QBoIh7Tvb22t54f1z3TRIBhC/csVuoS9xGEoTzkOKcyZunx+0
- Sm1w==
-X-Gm-Message-State: APjAAAUkniwViKb/jTVoX1OfLG/9au4ZdTLrnZO6zE9ycumSs3tgiX+7
- GeoMvgoo/4O7XaUS7ps3N/RLChpKYYO+SqP5QukI7Y9a88resMNeG1EWVtojC+PqumGAKVJvLXA
- Jw8m+b590wqY/4F4=
-X-Received: by 2002:adf:fcc4:: with SMTP id f4mr4508482wrs.247.1575471358593; 
- Wed, 04 Dec 2019 06:55:58 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwVEBCajO/I8Pg3ORBINHnWybFEz/dOWqSM9FnV7B1GVif9ODsvYqXMLN7+z8SrOeVi0XahLA==
-X-Received: by 2002:adf:fcc4:: with SMTP id f4mr4508468wrs.247.1575471358416; 
- Wed, 04 Dec 2019 06:55:58 -0800 (PST)
+ bh=IKd1j5nx0qht9JJskTFE03g1Ft1XF9eMK0orYIgve5w=;
+ b=UWcsHP1xbBPFnMpugRg1rhG42db7ibC6F2ZDoTTg06wsZfRjlyH/KVPqE6z9jPgsr2
+ ixNRTdvrpsYqsX+NGUHFEx7g9qo0hTzdHedBrpY4hyAmcM0klQO3CEZDDimSmtqAl9dU
+ P6P6mpNGxcnH+11a2xpQCWP8++PDWSkdJNwpbW6C8aAXdrCBEi31azs5BonFQ1uota8h
+ UshhEKILQt23paYGGvtPF6wgTz3mX1Qm6g5SiW3225qx9BQ6aonEOWLtqErLywM4IhQd
+ 1wZq+Yqgoqt9iNnHEcpss+DNlAIoecPop+iIuVIze32z7oYuedg2TZ8xVDznwN1UaC52
+ LeNQ==
+X-Gm-Message-State: APjAAAUk+HIGAOErFvfMVU/VOz//1nNFUIPQAKfmBkwP93ZrH2sg358L
+ IgMBHdc4I0B5FBCDOH/vHtlGfvGHLxBNpMDXqcPJgVPHGcdrmrOwlu+LWPLdbaurRWhkRArVoHb
+ cMCta+nggzf2DZ20=
+X-Received: by 2002:adf:f5cf:: with SMTP id k15mr4666715wrp.182.1575471445223; 
+ Wed, 04 Dec 2019 06:57:25 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz9/WOo523+JxIIQUFeOok9DUHid3A0dffrnHUH0TcfnK1cAAH6t9MJVMnCUZLCzTaYeI8x6A==
+X-Received: by 2002:adf:f5cf:: with SMTP id k15mr4666704wrp.182.1575471445066; 
+ Wed, 04 Dec 2019 06:57:25 -0800 (PST)
 Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
  [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id e6sm7681143wru.44.2019.12.04.06.55.57
+ by smtp.gmail.com with ESMTPSA id n8sm8403990wrx.42.2019.12.04.06.57.24
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 04 Dec 2019 06:55:57 -0800 (PST)
-Subject: Re: [PATCH v2 07/18] hw/core: Fix fit_load_fdt() error handling
- violations
+ Wed, 04 Dec 2019 06:57:24 -0800 (PST)
+Subject: Re: [PATCH v2 09/18] qga: Fix guest-get-fsinfo error API violations
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20191204093625.14836-1-armbru@redhat.com>
- <20191204093625.14836-8-armbru@redhat.com>
+ <20191204093625.14836-10-armbru@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <184b12c5-e7f2-c20f-ecd5-b140719b9d3c@redhat.com>
-Date: Wed, 4 Dec 2019 15:55:57 +0100
+Message-ID: <cd70098b-539e-f3bb-219a-8545bb3de11d@redhat.com>
+Date: Wed, 4 Dec 2019 15:57:23 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191204093625.14836-8-armbru@redhat.com>
+In-Reply-To: <20191204093625.14836-10-armbru@redhat.com>
 Content-Language: en-US
-X-MC-Unique: b18knUL6PhSgN_Gfejl28w-1
+X-MC-Unique: sGD526SoOGSVg_A5AqpGwA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,69 +106,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 12/4/19 10:36 AM, Markus Armbruster wrote:
-> fit_load_fdt() passes @errp to fit_image_addr(), then recovers from
-> ENOENT failures.  Passing @errp is wrong, because it works only as
-> long as @errp is neither @error_fatal nor @error_abort.  Messed up in
-> commit 3eb99edb48 "loader-fit: Wean off error_printf()".
+> build_guest_fsinfo_for_virtual_device() dereferences @errp when
+> build_guest_fsinfo_for_device() fails.  That's wrong; see the big
+> comment in error.h.  Introduced in commit 46d4c5723e "qga: Add
+> guest-get-fsinfo command".
 >=20
-> No caller actually passes such values.
+> No caller actually passes null.
 >=20
 > Fix anyway: splice in a local Error *err, and error_propagate().
 >=20
+> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   hw/core/loader-fit.c | 15 ++++++++-------
->   1 file changed, 8 insertions(+), 7 deletions(-)
+>   qga/commands-posix.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
 >=20
-> diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-> index 953b16bc82..c465921b8f 100644
-> --- a/hw/core/loader-fit.c
-> +++ b/hw/core/loader-fit.c
-> @@ -178,11 +178,12 @@ static int fit_load_fdt(const struct fit_loader *ld=
-r, const void *itb,
->                           int cfg, void *opaque, const void *match_data,
->                           hwaddr kernel_end, Error **errp)
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 1c1a165dae..0be527ccb8 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -1049,6 +1049,7 @@ static void build_guest_fsinfo_for_virtual_device(c=
+har const *syspath,
+>                                                     GuestFilesystemInfo *=
+fs,
+>                                                     Error **errp)
 >   {
 > +    Error *err =3D NULL;
->       const char *name;
->       const void *data;
->       const void *load_data;
->       hwaddr load_addr;
-> -    int img_off, err;
-> +    int img_off;
->       size_t sz;
->       int ret;
+>       DIR *dir;
+>       char *dirpath;
+>       struct dirent *entry;
+> @@ -1078,10 +1079,11 @@ static void build_guest_fsinfo_for_virtual_device=
+(char const *syspath,
 >  =20
-> @@ -197,13 +198,13 @@ static int fit_load_fdt(const struct fit_loader *ld=
-r, const void *itb,
->           return -EINVAL;
->       }
+>               g_debug(" slave device '%s'", entry->d_name);
+>               path =3D g_strdup_printf("%s/slaves/%s", syspath, entry->d_=
+name);
+> -            build_guest_fsinfo_for_device(path, fs, errp);
+> +            build_guest_fsinfo_for_device(path, fs, &err);
+>               g_free(path);
 >  =20
-> -    err =3D fit_image_addr(itb, img_off, "load", &load_addr, errp);
-> -    if (err =3D=3D -ENOENT) {
-> +    ret =3D fit_image_addr(itb, img_off, "load", &load_addr, &err);
-> +    if (ret =3D=3D -ENOENT) {
->           load_addr =3D ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
-> -        error_free(*errp);
-> -    } else if (err) {
-> -        error_prepend(errp, "unable to read FDT load address from FIT: "=
-);
-> -        ret =3D err;
-> +        error_free(err);
-> +    } else if (ret) {
-> +        error_propagate_prepend(errp, err,
-> +                                "unable to read FDT load address from FI=
-T: ");
->           goto out;
->       }
->  =20
-
-Cleaner.
+> -            if (*errp) {
+> +            if (err) {
+> +                error_propagate(errp, err);
+>                   break;
+>               }
+>           }
+>=20
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
