@@ -2,75 +2,77 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB6C3C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E73EC43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:56:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77D68206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:56:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBBF4206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:56:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eb76EICz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77D68206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iqu6dAht"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBBF4206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icX0b-0004G1-1g
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:56:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55925)
+	id 1icX18-0004VF-DR
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:56:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1icWrN-0007MJ-Ap
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:46:38 -0500
+ (envelope-from <thuth@redhat.com>) id 1icWru-0007Vh-5o
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:47:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1icWrL-0008Rb-I8
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:46:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60806
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1icWrs-0000Rb-60
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:47:09 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22530
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1icWrL-0008QZ-DZ
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:46:35 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1icWrr-0000In-Tm
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:47:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575474393;
+ s=mimecast20190719; t=1575474420;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=uAY0ML2pCQEDKcoFdAWTT5Pb0tF+6Wiqv/yJWxgHCKA=;
- b=eb76EICzBJ40bUWAM8IcTjuAD+ETnautzD/oK3AO3puDBldyfyGDR/nkqf5uT+RUuU1TeN
- LIryyPc2llGBCWItP+adEBV0v/yFj1OD3iIaMt8CbWzIQBOdBAL/E21FcrSMNnmEsEevdr
- PNokpHxn+eCGCVqgyCiQLGM//g2UsNM=
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wfbwmcxEU9ulT1ANQx9x8E9MQAuRCkvXgzodGvlOIe4=;
+ b=iqu6dAhtWdHy9HZ5S4hP+EPoO4uCUXLJ7o5pQg/jaXYPc2ERGTvR3AhH5uRKrVudOoE8NE
+ EWnso0SBZ8sPhzuvyz9rDL6+laQNGSbrPheohYHaDvy1zAlvuje0yZqDJsz8OLxezRNWz2
+ X8r1n+mKL+F688tijRP8mojLAm2/YEA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-332-ggpQZeIVM0KWT9PmLJdROg-1; Wed, 04 Dec 2019 10:46:32 -0500
+ us-mta-214-rEeKplYPNr-SCR6Qh66ndw-1; Wed, 04 Dec 2019 10:46:57 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E32051005509;
- Wed,  4 Dec 2019 15:46:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37C3618543A0;
+ Wed,  4 Dec 2019 15:46:56 +0000 (UTC)
 Received: from thuth.com (ovpn-117-39.ams2.redhat.com [10.36.117.39])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0D8F3600C8;
- Wed,  4 Dec 2019 15:46:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 583AF600C8;
+ Wed,  4 Dec 2019 15:46:54 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
-Subject: [PATCH v2 0/7] Enable Travis builds on arm64, ppc64le and s390x
-Date: Wed,  4 Dec 2019 16:46:11 +0100
-Message-Id: <20191204154618.23560-1-thuth@redhat.com>
-MIME-Version: 1.0
+Subject: [PATCH v2 7/7] travis.yml: Enable builds on arm64, ppc64le and s390x
+Date: Wed,  4 Dec 2019 16:46:18 +0100
+Message-Id: <20191204154618.23560-8-thuth@redhat.com>
+In-Reply-To: <20191204154618.23560-1-thuth@redhat.com>
+References: <20191204154618.23560-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: ggpQZeIVM0KWT9PmLJdROg-1
+X-MC-Unique: rEeKplYPNr-SCR6Qh66ndw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,44 +95,125 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Travis recently added build hosts for arm64, ppc64le and s390x, so
-this is a welcome addition to our Travis testing matrix.
+Travis recently added the possibility to test on these architectures,
+too, so let's enable them in our travis.yml file to extend our test
+coverage.
 
-Unfortunately, the builds are running in quite restricted LXD containers
-there, for example it is not possible to create huge files there (even
-if they are just sparse), and certain system calls are blocked. So we
-have to change some tests first to stop them failing in such environments.
+Unfortunately, the libssh in this Ubuntu version (bionic) is in a pretty
+unusable Frankenstein state and libspice-server-dev is not available here,
+so we can not use the global list of packages to install, but have to
+provide individual package lists instead.
 
-v2:
- - Added "make check-tcg" and Alex' patch to disable cross-containers
- - Explicitely set "dist: xenial" for arm64 and ppc64le since some
-   iotests are crashing on bionic on these hosts.
- - Dropped "libcap-dev" from the package list since it will be replaced
-   by libcapng-dev soon.
+Also, some of the iotests crash when using "dist: bionic" on arm64
+and ppc64le, thus these two builders have to use "dist: xenial" until
+the problem is understood / fixed.
 
-Alex Benn=C3=A9e (1):
-  configure: allow disable of cross compilation containers
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .travis.yml | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 86 insertions(+)
 
-Thomas Huth (6):
-  iotests: Provide a function for checking the creation of huge files
-  iotests: Skip test 060 if it is not possible to create large files
-  iotests: Skip test 079 if it is not possible to create large files
-  tests/hd-geo-test: Skip test when images can not be created
-  tests/test-util-filemonitor: Skip test on non-x86 Travis containers
-  travis.yml: Enable builds on arm64, ppc64le and s390x
-
- .travis.yml                   | 86 +++++++++++++++++++++++++++++++++++
- configure                     |  8 +++-
- tests/hd-geo-test.c           | 12 ++++-
- tests/qemu-iotests/005        |  5 +-
- tests/qemu-iotests/060        |  3 ++
- tests/qemu-iotests/079        |  3 ++
- tests/qemu-iotests/220        |  6 +--
- tests/qemu-iotests/common.rc  | 10 ++++
- tests/tcg/configure.sh        |  6 ++-
- tests/test-util-filemonitor.c | 11 +++++
- 10 files changed, 138 insertions(+), 12 deletions(-)
-
+diff --git a/.travis.yml b/.travis.yml
+index 445b0646c1..0e6458b0af 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -354,6 +354,92 @@ matrix:
+         - TEST_CMD=3D"make -j3 check-tcg V=3D1"
+         - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-gcc-debug-tcg"
+=20
++    - arch: arm64
++      dist: xenial
++      addons:
++        apt_packages:
++          - libaio-dev
++          - libattr1-dev
++          - libbrlapi-dev
++          - libcap-ng-dev
++          - libgcrypt20-dev
++          - libgnutls28-dev
++          - libgtk-3-dev
++          - libiscsi-dev
++          - liblttng-ust-dev
++          - libncurses5-dev
++          - libnfs-dev
++          - libnss3-dev
++          - libpixman-1-dev
++          - libpng-dev
++          - librados-dev
++          - libsdl2-dev
++          - libseccomp-dev
++          - liburcu-dev
++          - libusb-1.0-0-dev
++          - libvdeplug-dev
++          - libvte-2.91-dev
++      env:
++        - TEST_CMD=3D"make check check-tcg V=3D1"
++        - CONFIG=3D"--disable-containers --target-list=3D${MAIN_SOFTMMU_TA=
+RGETS}"
++
++    - arch: ppc64le
++      dist: xenial
++      addons:
++        apt_packages:
++          - libaio-dev
++          - libattr1-dev
++          - libbrlapi-dev
++          - libcap-ng-dev
++          - libgcrypt20-dev
++          - libgnutls28-dev
++          - libgtk-3-dev
++          - libiscsi-dev
++          - liblttng-ust-dev
++          - libncurses5-dev
++          - libnfs-dev
++          - libnss3-dev
++          - libpixman-1-dev
++          - libpng-dev
++          - librados-dev
++          - libsdl2-dev
++          - libseccomp-dev
++          - liburcu-dev
++          - libusb-1.0-0-dev
++          - libvdeplug-dev
++          - libvte-2.91-dev
++      env:
++        - TEST_CMD=3D"make check check-tcg V=3D1"
++        - CONFIG=3D"--disable-containers --target-list=3D${MAIN_SOFTMMU_TA=
+RGETS},ppc64le-linux-user"
++
++    - arch: s390x
++      dist: bionic
++      addons:
++        apt_packages:
++          - libaio-dev
++          - libattr1-dev
++          - libbrlapi-dev
++          - libcap-ng-dev
++          - libgcrypt20-dev
++          - libgnutls28-dev
++          - libgtk-3-dev
++          - libiscsi-dev
++          - liblttng-ust-dev
++          - libncurses5-dev
++          - libnfs-dev
++          - libnss3-dev
++          - libpixman-1-dev
++          - libpng-dev
++          - librados-dev
++          - libsdl2-dev
++          - libseccomp-dev
++          - liburcu-dev
++          - libusb-1.0-0-dev
++          - libvdeplug-dev
++          - libvte-2.91-dev
++      env:
++        - TEST_CMD=3D"make check check-tcg V=3D1"
++        - CONFIG=3D"--disable-containers --target-list=3D${MAIN_SOFTMMU_TA=
+RGETS},s390x-linux-user"
+=20
+     # Release builds
+     # The make-release script expect a QEMU version, so our tag must start=
+ with a 'v'.
 --=20
 2.18.1
 
