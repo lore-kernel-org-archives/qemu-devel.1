@@ -6,85 +6,81 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E48C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF22C43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:06:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 430752084F
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:04:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6705320637
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:06:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QI/4ajX3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 430752084F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gwAtNGs1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6705320637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icWCT-0002Gp-5r
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:04:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48538)
+	id 1icWEJ-00042h-Ga
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:06:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49360)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1icW9j-0008Lu-JI
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:01:32 -0500
+ (envelope-from <flukshun@gmail.com>) id 1icWDa-0003bE-M9
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1icW9i-0001V0-5y
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:01:31 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52587)
+ (envelope-from <flukshun@gmail.com>) id 1icWDV-0006aD-Op
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:05:30 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46374)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1icW9h-0001R1-RY
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:01:30 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p9so45789wmc.2
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 07:01:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=OiZUIgVr3CPfXnJvv4HcHQtpjQifyqmFG3z0NTVB/uU=;
- b=QI/4ajX3yt1JqnhIAiZUjm8A7YAUiYYixdcUUyiGSclnCYF6Qz5YKDWYlXfUsXU2pJ
- 4toeElW8CAJCyxGFTf6ZNHGDaz8F23QoqtAr+lcZEce22JuwiFE+JtUdzkJKvAph4VAy
- Leq+EjSi37+TnMnuFcBFGr4ITX3HK9eUajL5LVnYgxAuwXxwNzC8U27PjcyDxKri8L07
- W6m04vsiYhqDhOC/TbzGHiIqP1oxdOZyflsL/ki1nj/K39ccI8Gv0vl9Spnja+Zgs98I
- LLlvYwmU4cN+xRY4LY/Cco1VYptr+kvx45uAqdXHJV7Ii0/MGualr7F3RY7bc/dS+mr7
- BclA==
+ (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1icWDV-0006Yc-Jq
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:05:25 -0500
+Received: by mail-ot1-x341.google.com with SMTP id g18so6539700otj.13
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 07:05:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:mime-version:content-transfer-encoding:to:from:in-reply-to
+ :cc:references:message-id:user-agent:subject:date;
+ bh=12CGcXZDnwCyqDH63IGWU3qL/3R9EW7RkUtKUhX8ZF4=;
+ b=gwAtNGs1O6259vaozkDzHetTeJV0DrCK0M6Ipu08RRT/aqlAV6R3cgGsHPT9f4kVac
+ gglDGzJvPsVZ1SO3P/xuQNRfhQYt1lFcSqTtST/6xkCRrPXSOMe5Ne/wcAyZdFiK8MYi
+ PVZN7dR7b7mz6eXr4TlCwe+1CQMJnOnYbzrL3aoxf/JfHxDP7qe+MlUvLuLjB03Aln4J
+ on39fvRVgE6GSjVs5IZZMEXt63ubKO45CroxN7NDTVh/NWpEYhUCdXlP+mZYdhjgHWbC
+ DeOk95/8SGAGJJWviz7JY/sxiaIIT/XC2MhO1ycK3npsUGCSzyoAslD0dTMsgeHgFWu6
+ qbjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=OiZUIgVr3CPfXnJvv4HcHQtpjQifyqmFG3z0NTVB/uU=;
- b=P2MHWZ08z9o06K4Q6aL5EvxKGDpnrr4awf4NPKPqqZxGUZJyhfTTyJmeOQ7WGPTr8j
- AeCG42n2R5C0gL2KpJHo3spMt/047nSNR8DMJZXwnztpkwzxF7rx/YlnvLUWHYmOIlHs
- svPimI3aG2UVyK23mc9HzXArr5dDHYWt+iAcT9WozPfZh6tcZxGE48JX/avF5+R0J+v8
- HeR39JKxMSGutqv3vSYkEUwbLnZrS8GxuST9folUFsRps33KmsQJviM3KRAKca2qZPGn
- 2yp1SwxI+UU0wNZkY7df9VRSGNt1VWiQoL1Iuo+6fzyNY/GNO6EImJhCZSnu3YKzzMEX
- 9WDQ==
-X-Gm-Message-State: APjAAAXTwSumYZg81WrqYgyxYIFDmXU4ES4KNo1ZppkA1H15Zlp/qy2L
- K5sKSZTU1zaaGCzCWq04neRTug==
-X-Google-Smtp-Source: APXvYqzc7AEU0BnWDB9Girurvlrh/idUsYACKuBbEkDlKhKB8p+0O39k5+S3x5BDpWbPotQZAvjWsA==
-X-Received: by 2002:a1c:a984:: with SMTP id s126mr10619wme.146.1575471687907; 
- Wed, 04 Dec 2019 07:01:27 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m10sm8660965wrx.19.2019.12.04.07.01.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Dec 2019 07:01:26 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 265D21FF87;
- Wed,  4 Dec 2019 15:01:25 +0000 (GMT)
-References: <20191203022937.1474-1-richard.henderson@linaro.org>
- <20191203022937.1474-23-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v4 22/40] target/arm: Update aa64_zva_access for EL2
-In-reply-to: <20191203022937.1474-23-richard.henderson@linaro.org>
-Date: Wed, 04 Dec 2019 15:01:25 +0000
-Message-ID: <875ziw8796.fsf@linaro.org>
+ h=x-gm-message-state:sender:mime-version:content-transfer-encoding:to
+ :from:in-reply-to:cc:references:message-id:user-agent:subject:date;
+ bh=12CGcXZDnwCyqDH63IGWU3qL/3R9EW7RkUtKUhX8ZF4=;
+ b=r6orhRbvCMteLyanv3pyo/pGF7tTIms+EARly9sGDsEC1Foej78ZZ/o5Y8IQ7avNUd
+ ALEkUHoud5VyDovgynY7tWvF4br5gHKI8nsVgx/SUuqGGpUWX5XeT/fqB+256CmemtxP
+ zWXt9pTrkrXYHf5ACu77y+eC9CM1BBUOlQRIpcsWND4MsYASZ7bnXPK5jMyPcI2Bux1E
+ BB5r1XJgzLsM5m/YnnJduWw56BWSP43z9d4nCR3oNmUTfGYeYGaB3doEl5dXZZuLUlFv
+ SJ6dStehH2ouTMqwT0cCFxwg9d5M9ydUGi8CDgoxRVMZ4KQv+w+jLsGHY1gHcOFxkeTg
+ Jyeg==
+X-Gm-Message-State: APjAAAWue9n+sP+QokO0bvRdUDmuo5Cf+Pjww/GgK43B3pf8x0F/0/ey
+ cNyNlaXUo+T/v/exKvn4NWI=
+X-Google-Smtp-Source: APXvYqzBe4crTubY4x1NIMNyil8kC1sH93eCuN9VTmpMvRkh6kOyTC3+IFR8+LWY0BAXjri5aRGL0w==
+X-Received: by 2002:a9d:6745:: with SMTP id w5mr2706264otm.221.1575471922458; 
+ Wed, 04 Dec 2019 07:05:22 -0800 (PST)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id o4sm2260265ota.57.2019.12.04.07.05.20
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Wed, 04 Dec 2019 07:05:21 -0800 (PST)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+To: Cornelia Huck <cohuck@redhat.com>
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20191128181100.23187-1-cohuck@redhat.com>
+References: <20191128181100.23187-1-cohuck@redhat.com>
+Message-ID: <157547191693.3810.11857712694339556499@sif>
+User-Agent: alot/0.7
+Subject: Re: [PATCH v2] qga: fence guest-set-time if hwclock not available
+Date: Wed, 04 Dec 2019 09:05:16 -0600
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,67 +92,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Laszlo Ersek <lersek@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ =?utf-8?q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Quoting Cornelia Huck (2019-11-28 12:11:00)
+> The Posix implementation of guest-set-time invokes hwclock to
+> set/retrieve the time to/from the hardware clock. If hwclock
+> is not available, the user is currently informed that "hwclock
+> failed to set hardware clock to system time", which is quite
+> misleading. This may happen e.g. on s390x, which has a different
+> timekeeping concept anyway.
+> =
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+> Let's check for the availability of the hwclock command and
+> return QERR_UNSUPPORTED for guest-set-time if it is not available.
+> =
 
-> The comment that we don't support EL2 is somewhat out of date.
-> Update to include checks against HCR_EL2.TDZ.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 
 > ---
->  target/arm/helper.c | 26 +++++++++++++++++++++-----
->  1 file changed, 21 insertions(+), 5 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 4f5e0b656c..ffa82b5509 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -4109,11 +4109,27 @@ static void tlbi_aa64_ipas2e1is_write(CPUARMState=
- *env, const ARMCPRegInfo *ri,
->  static CPAccessResult aa64_zva_access(CPUARMState *env, const ARMCPRegIn=
-fo *ri,
->                                        bool isread)
->  {
-> -    /* We don't implement EL2, so the only control on DC ZVA is the
-> -     * bit in the SCTLR which can prohibit access for EL0.
-> -     */
-> -    if (arm_current_el(env) =3D=3D 0 && !(env->cp15.sctlr_el[1] & SCTLR_=
-DZE)) {
-> -        return CP_ACCESS_TRAP;
-> +    int cur_el =3D arm_current_el(env);
-> +
-> +    if (cur_el < 2) {
-> +        uint64_t hcr =3D arm_hcr_el2_eff(env);
-> +
-> +        if (cur_el =3D=3D 0) {
-> +            if ((hcr & (HCR_E2H | HCR_TGE)) =3D=3D (HCR_E2H | HCR_TGE)) {
-> +                if (!(env->cp15.sctlr_el[2] & SCTLR_DZE)) {
-> +                    return CP_ACCESS_TRAP_EL2;
-> +                }
-> +            } else {
-> +                if (!(env->cp15.sctlr_el[1] & SCTLR_DZE)) {
-> +                    return CP_ACCESS_TRAP;
-> +                }
-> +                if (hcr & HCR_TDZ) {
-> +                    return CP_ACCESS_TRAP_EL2;
-> +                }
-> +            }
-> +        } else if (hcr & HCR_TDZ) {
-> +            return CP_ACCESS_TRAP_EL2;
-> +        }
->      }
->      return CP_ACCESS_OK;
->  }
+> =
 
+> v1 (RFC) -> v2:
+> - use hwclock_path[]
+> - use access() instead of stat()
+> =
 
---=20
-Alex Benn=C3=A9e
+> ---
+>  qga/commands-posix.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
+> =
+
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index 1c1a165daed8..ffb6420fa9cd 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -156,6 +156,17 @@ void qmp_guest_set_time(bool has_time, int64_t time_=
+ns, Error **errp)
+>      pid_t pid;
+>      Error *local_err =3D NULL;
+>      struct timeval tv;
+> +    const char hwclock_path[] =3D "/sbin/hwclock";
+> +    static int hwclock_available =3D -1;
+> +
+> +    if (hwclock_available < 0) {
+> +        hwclock_available =3D (access(hwclock_path, X_OK) =3D=3D 0);
+> +    }
+> +
+> +    if (!hwclock_available) {
+> +        error_setg(errp, QERR_UNSUPPORTED);
+> +        return;
+> +    }
+>  =
+
+>      /* If user has passed a time, validate and set it. */
+>      if (has_time) {
+> @@ -195,7 +206,7 @@ void qmp_guest_set_time(bool has_time, int64_t time_n=
+s, Error **errp)
+>  =
+
+>          /* Use '/sbin/hwclock -w' to set RTC from the system time,
+>           * or '/sbin/hwclock -s' to set the system time from RTC. */
+> -        execle("/sbin/hwclock", "hwclock", has_time ? "-w" : "-s",
+> +        execle(hwclock_path, "hwclock", has_time ? "-w" : "-s",
+>                 NULL, environ);
+>          _exit(EXIT_FAILURE);
+>      } else if (pid < 0) {
+> -- =
+
+> 2.21.0
+>=20
 
