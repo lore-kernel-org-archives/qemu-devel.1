@@ -6,61 +6,59 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D44C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 03:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7508C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 03:29:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28BBA206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 03:11:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BBA206DB
+	by mail.kernel.org (Postfix) with ESMTPS id 9388A206DF
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 03:29:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9388A206DF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icL47-0000RM-Cu
-	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 22:11:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39547)
+	id 1icLLc-0004jO-Ls
+	for qemu-devel@archiver.kernel.org; Tue, 03 Dec 2019 22:29:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1icKw9-0007XE-4b
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:02:48 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1icL6J-0001O6-Pz
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:13:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1icKw2-0003F7-7z
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:02:40 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2209 helo=huawei.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1icL6D-0002HM-KV
+ for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:13:11 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:54518 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1icKw1-0002Ka-Pp
- for qemu-devel@nongnu.org; Tue, 03 Dec 2019 22:02:38 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 2BE098103B73122705E5;
- Wed,  4 Dec 2019 11:02:21 +0800 (CST)
-Received: from [127.0.0.1] (10.120.177.99) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Wed, 4 Dec 2019
- 11:02:14 +0800
-Subject: Re: [PATCH] virtio-serial-bus: fix memory leak while attach
- virtio-serial-bus
-To: Laurent Vivier <lvivier@redhat.com>, <mst@redhat.com>, <amit@kernel.org>, 
- <marcandre.lureau@redhat.com>, <pbonzini@redhat.com>
-References: <1575285343-21864-1-git-send-email-pannengyuan@huawei.com>
- <dad28876-1850-32f3-fe47-9e4ec2c68f20@redhat.com>
- <4e9efebf-1862-8879-ed01-60f8777d4a65@huawei.com>
- <4f535277-0494-7089-eb6f-9daea79463c8@redhat.com>
+ id 1icL5y-0001e3-Dr; Tue, 03 Dec 2019 22:12:55 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 574B5F9B48D6C18F8201;
+ Wed,  4 Dec 2019 11:12:32 +0800 (CST)
+Received: from [127.0.0.1] (10.120.177.99) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Wed, 4 Dec 2019
+ 11:12:22 +0800
+Subject: Re: [PATCH V3 1/2] block/nbd: extract the common cleanup code
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "eblake@redhat.com" <eblake@redhat.com>, "kwolf@redhat.com"
+ <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>,
+ "sgarzare@redhat.com" <sgarzare@redhat.com>
+References: <1575012326-51324-1-git-send-email-pannengyuan@huawei.com>
+ <77f53371-aa58-849a-b0e4-2d6b4e4557d4@virtuozzo.com>
 From: pannengyuan <pannengyuan@huawei.com>
-Message-ID: <755efa85-b9a2-1cd5-1168-cd3181ac87ea@huawei.com>
-Date: Wed, 4 Dec 2019 11:02:11 +0800
+Message-ID: <7d06d51d-12a5-03e1-d695-8f4faf754bec@huawei.com>
+Date: Wed, 4 Dec 2019 11:12:19 +0800
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <4f535277-0494-7089-eb6f-9daea79463c8@redhat.com>
+In-Reply-To: <77f53371-aa58-849a-b0e4-2d6b4e4557d4@virtuozzo.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.120.177.99]
 X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.190
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,108 +70,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liyiting@huawei.com, kuhn.chenqun@huawei.com, qemu-devel@nongnu.org,
- zhang.zhanghailiang@huawei.com
+Cc: "liyiting@huawei.com" <liyiting@huawei.com>,
+ "kuhn.chenqun@huawei.com" <kuhn.chenqun@huawei.com>,
+ "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 2019/12/3 16:32, Laurent Vivier wrote:
-> On 03/12/2019 01:53, pannengyuan wrote:
->>
->>
->> On 2019/12/2 21:58, Laurent Vivier wrote:
->>> On 02/12/2019 12:15, pannengyuan@huawei.com wrote:
->>>> From: PanNengyuan <pannengyuan@huawei.com>
->>>>
->>>> ivqs/ovqs/c_ivq/c_ovq is forgot to cleanup in
->>>> virtio_serial_device_unrealize, the memory leak stack is as bellow:
->>>>
->>>> Direct leak of 1290240 byte(s) in 180 object(s) allocated from:
->>>>     #0 0x7fc9bfc27560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
->>>>     #1 0x7fc9bed6f015 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x50015)
->>>>     #2 0x5650e02b83e7 in virtio_add_queue /mnt/sdb/qemu-4.2.0-rc0/hw/virtio/virtio.c:2327
->>>>     #3 0x5650e02847b5 in virtio_serial_device_realize /mnt/sdb/qemu-4.2.0-rc0/hw/char/virtio-serial-bus.c:1089
->>>>     #4 0x5650e02b56a7 in virtio_device_realize /mnt/sdb/qemu-4.2.0-rc0/hw/virtio/virtio.c:3504
->>>>     #5 0x5650e03bf031 in device_set_realized /mnt/sdb/qemu-4.2.0-rc0/hw/core/qdev.c:876
->>>>     #6 0x5650e0531efd in property_set_bool /mnt/sdb/qemu-4.2.0-rc0/qom/object.c:2080
->>>>     #7 0x5650e053650e in object_property_set_qobject /mnt/sdb/qemu-4.2.0-rc0/qom/qom-qobject.c:26
->>>>     #8 0x5650e0533e14 in object_property_set_bool /mnt/sdb/qemu-4.2.0-rc0/qom/object.c:1338
->>>>     #9 0x5650e04c0e37 in virtio_pci_realize /mnt/sdb/qemu-4.2.0-rc0/hw/virtio/virtio-pci.c:1801
->>>>
->>>> Reported-by: Euler Robot <euler.robot@huawei.com>
->>>> Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
->>>> ---
->>>>  hw/char/virtio-serial-bus.c | 6 ++++++
->>>>  1 file changed, 6 insertions(+)
->>>>
->>>> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
->>>> index 3325904..da9019a 100644
->>>> --- a/hw/char/virtio-serial-bus.c
->>>> +++ b/hw/char/virtio-serial-bus.c
->>>> @@ -1126,9 +1126,15 @@ static void virtio_serial_device_unrealize(DeviceState *dev, Error **errp)
->>>>  {
->>>>      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
->>>>      VirtIOSerial *vser = VIRTIO_SERIAL(dev);
->>>> +    int i;
->>>>  
->>>>      QLIST_REMOVE(vser, next);
->>>>  
->>>> +    for (i = 0; i <= vser->bus.max_nr_ports; i++) {
->>>> +        virtio_del_queue(vdev, 2 * i);
->>>> +        virtio_del_queue(vdev, 2 * i + 1);
->>>> +    }
->>>> +
->>>
->>> According to virtio_serial_device_realize() and the number of
->>> virtio_add_queue(), I think you have more queues to delete:
->>>
->>>   4 + 2 * vser->bus.max_nr_ports
->>>
->>> (for vser->ivqs[0], vser->ovqs[0], vser->c_ivq, vser->c_ovq,
->>> vser->ivqs[i], vser->ovqs[i]).
->>>
->>> Thanks,
->>> Laurent
->>>
->>>
->> Thanks, but I think the queues is correct, the queues in
->> virtio_serial_device_realize is as follow:
->>
->> // here is 2
->> vser->ivqs[0] = virtio_add_queue(vdev, 128, handle_input);
->> vser->ovqs[0] = virtio_add_queue(vdev, 128, handle_output);
->>
->> // here is 2
->> vser->c_ivq = virtio_add_queue(vdev, 32, control_in);
->> vser->c_ovq = virtio_add_queue(vdev, 32, control_out);
->>
->> // here 2 * (max_nr_ports - 1)  ----- i is from 1 to max_nr_ports - 1
->> for (i = 1; i < vser->bus.max_nr_ports; i++) {
->>     vser->ivqs[i] = virtio_add_queue(vdev, 128, handle_input);
->>     vser->ovqs[i] = virtio_add_queue(vdev, 128, handle_output);
->> }
->>
->> so the total queues number is:  2 * (vser->bus.max_nr_ports + 1)
->>
+On 2019/12/4 1:38, Vladimir Sementsov-Ogievskiy wrote:
+> Hi!
 > 
-> Yes, you're right. A comment in the code would have helped or written
-> clearly like:
-> 
-> for (i = 0; i < 2 * (vser->bus.max_nr_ports + 1); i++) {
->     virtio_del_queue(vdev, i);
-> }
-> 
-> Thanks,
-> Laurent
-> 
-> 
-yes, it would be helpful, Michael S. Tsirkin posted another way to make
-it more clear, I will reuse it in next version.
+> First, please, when sending more than one patch, create a cover-letter. Also,
+> summarize (in cover letter) what was changed since previous version.
+In previous version, I only send one patch(2/2 in this version), so I
+only add a change summarize in 2/2 patch in this version. should I add a
+summarize in 1/2 patch too if 1/2 patch is a new one?
 
-Thanks.
-Nengyuan Pan.
+> 
+> 29.11.2019 10:25, pannengyuan@huawei.com wrote:
+>> From: PanNengyuan <pannengyuan@huawei.com>
+> 
+> Strange line. Check you git preferences. Such line appears (and make sense)
+> when you are sending patches authored by someone else.. But here is your name,
+> the same as in email's From:.
+
+Thanks for your reminding. I will correct it in next version.
+
+> 
+>>
+>> The BDRVNBDState cleanup code is common in two places, add
+>> nbd_free_bdrvstate_prop() function to do these cleanups (suggested by
+>> Stefano Garzarella).
+>>
+>> Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
+> 
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+>> ---
+>>   block/nbd.c | 23 +++++++++++++----------
+>>   1 file changed, 13 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/block/nbd.c b/block/nbd.c
+>> index 1239761..5805979 100644
+>> --- a/block/nbd.c
+>> +++ b/block/nbd.c
+>> @@ -94,6 +94,8 @@ typedef struct BDRVNBDState {
+>>   
+>>   static int nbd_client_connect(BlockDriverState *bs, Error **errp);
+>>   
+>> +static void nbd_free_bdrvstate_prop(BDRVNBDState *s);
+>> +
+>>   static void nbd_channel_error(BDRVNBDState *s, int ret)
+>>   {
+>>       if (ret == -EIO) {
+>> @@ -1486,6 +1488,15 @@ static int nbd_client_connect(BlockDriverState *bs, Error **errp)
+>>       }
+>>   }
+>>   
+>> +static void nbd_free_bdrvstate_prop(BDRVNBDState *s)
+>> +{
+>> +    object_unref(OBJECT(s->tlscreds));
+>> +    qapi_free_SocketAddress(s->saddr);
+>> +    g_free(s->export);
+>> +    g_free(s->tlscredsid);
+>> +    g_free(s->x_dirty_bitmap);
+>> +}
+>> +
+>>   /*
+>>    * Parse nbd_open options
+>>    */
+>> @@ -1855,10 +1866,7 @@ static int nbd_process_options(BlockDriverState *bs, QDict *options,
+>>   
+>>    error:
+>>       if (ret < 0) {
+>> -        object_unref(OBJECT(s->tlscreds));
+>> -        qapi_free_SocketAddress(s->saddr);
+>> -        g_free(s->export);
+>> -        g_free(s->tlscredsid);
+>> +        nbd_free_bdrvstate_prop(s);
+>>       }
+>>       qemu_opts_del(opts);
+>>       return ret;
+>> @@ -1937,12 +1945,7 @@ static void nbd_close(BlockDriverState *bs)
+>>       BDRVNBDState *s = bs->opaque;
+>>   
+>>       nbd_client_close(bs);
+>> -
+>> -    object_unref(OBJECT(s->tlscreds));
+>> -    qapi_free_SocketAddress(s->saddr);
+>> -    g_free(s->export);
+>> -    g_free(s->tlscredsid);
+>> -    g_free(s->x_dirty_bitmap);
+>> +    nbd_free_bdrvstate_prop(s);
+>>   }
+>>   
+>>   static int64_t nbd_getlength(BlockDriverState *bs)
+>>
+> 
+> 
 
 
