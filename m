@@ -2,90 +2,92 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D336BC43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99A9DC43603
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:31:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9709A206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:27:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56474206DB
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 16:31:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eIw49PjJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9709A206DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E6R1CMji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56474206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icXV2-0006uX-DH
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 11:27:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60582)
+	id 1icXYn-0001oi-Bk
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 11:31:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33504)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1icXFs-00057h-IP
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:11:58 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1icXNg-0001Iu-Ez
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:20:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1icXFr-0004TP-8G
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:11:56 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41035)
+ (envelope-from <richard.henderson@linaro.org>) id 1icXNf-000839-D3
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:20:00 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42662)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1icXFq-0004Qw-27
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:11:55 -0500
-Received: by mail-wr1-x441.google.com with SMTP id c9so2868491wrw.8
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 08:11:50 -0800 (PST)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1icXNe-00082W-Uh
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 11:19:59 -0500
+Received: by mail-pl1-x642.google.com with SMTP id x13so3351192plr.9
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 08:19:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=ecq2Xvl+gCXXdLlelDcZXcDIY2/d4e/x0MvRTkrEgCk=;
- b=eIw49PjJ6BYSLeNOcYzTdZPVlU/OROvtTZs4gDKAUY1ijKbiOSPLpPbV3QSAYSxYcg
- GQOAvLilPoLoix9uN6w3LNen8e8FSFxP4A5CMOmeyopUmIA2bghE0gVr6TllPxfjNYSN
- aUPT5WnC7Uju+XuGPuTYvKd7l+LgV6KuQLZumeN9VfjQFvhDBYr2JMy1atjF5Km4Uwxe
- VqAtl3HS23PF9R1hVbmO+PPTohm1qGwiodXwSKstHVEzmKgaXc4YF/eyg76zicM6d1jG
- Vuup/1oPHwtu/4+cGHL1Mp+0ozZR0zRIQ6yHGHs97XXgtgapFarX4DxDKKm4aZbhSMk9
- D3SQ==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=JB0TVAz+9UHryDP3Z7x+pIufhUFoHIE7WhkCCe/6Tug=;
+ b=E6R1CMjii8hqfgI5doJ9ZwfZd45dwf5PgKOKlN8i2BpxwidveFhulRXF9/tksItrm5
+ JDeb7yyZart5bpiWWZxtezxK6OP+rfY7DwMJGfzq85RUdV1P+OAazPVeqwx4h/ZPYxWy
+ ghBtkEPgZgFvansX/gdotms7Ked135xjpkEHY/UstD75T9N8Mw9LXb2/xSi4J9W9c94s
+ xZg9WlG6RSAzoYiaC9Fo/2AJ7SjhJObz3RtDVl1fiCHdrUN6vYY80nEFMjurOQrst29j
+ 4GYIJlR8FLndKfMnV14ZM+o/uDWUizXZuGYiQs6z45esbXHe3eX4Nj5IPcJyi4oRP/3W
+ BIsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=ecq2Xvl+gCXXdLlelDcZXcDIY2/d4e/x0MvRTkrEgCk=;
- b=OSvPHfwcVqixYOKpNNvKOfUxxjpEoVzM5QBF9dvqtg48hJ0KmlQhPqA8B2m8ieXCnB
- +lOW7JabD19g/PtjT2RMYphqAqNT0TrgDDXyxSveoI+xZ5qdQSEXf6vxOC9jfhbjZ8e8
- PwhudsJ3KgISxWJpNmCC4ctc8TzjgWi0cTZDYsPWoqzPhVQLbd67Q0fIL9SPp6IhG7Gb
- DgP+IT0TzwUkkZt20PVn3Y/PSZnFC8dnXuoBZBJT5PPMQVE85RquEW7eJ0ga7sKO1/0O
- aToJ+nHIcCSYr5/os+JUkGONIYM3ZkPD3BjGFDhvE2IA4d3GyeXIpNHmHv5Hzdcdg9Ji
- yFZw==
-X-Gm-Message-State: APjAAAUSXmOjsQjW0Ou2wOSgifbdm2PNi4DgN4DKL0qHJwyeWKOmxxMY
- dnwhsLWbLz0di2VXd/iB2UvkMw==
-X-Google-Smtp-Source: APXvYqxAuKpVhSJO+hz/UAIzDrke07uNCV2pe6xjelhqdiiAAoj2WLwnQrpp6odrxHvOAwgiihIzPw==
-X-Received: by 2002:a05:6000:12:: with SMTP id
- h18mr4655531wrx.87.1575475908605; 
- Wed, 04 Dec 2019 08:11:48 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d12sm8621364wrp.62.2019.12.04.08.11.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 04 Dec 2019 08:11:47 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A630C1FF87;
- Wed,  4 Dec 2019 16:11:46 +0000 (GMT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JB0TVAz+9UHryDP3Z7x+pIufhUFoHIE7WhkCCe/6Tug=;
+ b=Rwy3+qc42qVVzoGeLMx6KCBT6KqXL5w7XKBkPb+IoqFOV8dQXkTb3TdtUh4MKZvMIg
+ zEmLB3qnbe+EkwtO1nGwXr0T198IZgYHsVB4VPevn4ZDEsH1XCOBbweGA+nKH+dgUclR
+ f7piot67OdCWZdh+1mX1dOa89CtGhy+ahKBDiDnoL+tEVsisFmHg/tDEVYMhRHJMOmAu
+ nU99itzBapi4TfmVpdCURYm1PiXQJIY/NUVbFbcP20NaoRS2XInFVmaYcoAe0vMmiLvg
+ N8MXxbd4o2E6+bB6aAo/B4CBNWWYcWSmiLsoMuw0E0ORBeUmgw4JZXF+YHzeO9reIuuW
+ hxoQ==
+X-Gm-Message-State: APjAAAVN0nHa7pEoHuidUYLXuldvBLAmMhCq3YtN69+479AH07TQlCTL
+ cYmamjXpSpdaoAxMAAKF57Ksug==
+X-Google-Smtp-Source: APXvYqw+///S9LhOr1uW6DcEiUQqXoWT864JvfvJRvWznjvN/0keFQkMosrm0rAWDVoVuKhrtjv/Xg==
+X-Received: by 2002:a17:90a:7f89:: with SMTP id
+ m9mr4137316pjl.143.1575476397715; 
+ Wed, 04 Dec 2019 08:19:57 -0800 (PST)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id 136sm7940957pgg.74.2019.12.04.08.19.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 04 Dec 2019 08:19:56 -0800 (PST)
+Subject: Re: [PATCH v4 14/40] target/arm: Recover 4 bits from TBFLAGs
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 References: <20191203022937.1474-1-richard.henderson@linaro.org>
- <20191203022937.1474-24-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v4 23/40] target/arm: Update ctr_el0_access for EL2
-In-reply-to: <20191203022937.1474-24-richard.henderson@linaro.org>
-Date: Wed, 04 Dec 2019 16:11:46 +0000
-Message-ID: <87zhg86pfh.fsf@linaro.org>
+ <20191203022937.1474-15-richard.henderson@linaro.org>
+ <87y2vs8gf1.fsf@linaro.org> <dd46a349-cbe2-d114-90f4-5d9b8c7d6d84@linaro.org>
+ <8736e084ux.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a86c86f5-3352-46d5-94ec-716156c27968@linaro.org>
+Date: Wed, 4 Dec 2019 08:19:54 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
+In-Reply-To: <8736e084ux.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,60 +104,31 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 12/4/19 7:53 AM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> On 12/4/19 3:43 AM, Alex Bennée wrote:
+> <snip>
+>>>>  void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int max_insns)
+>>>>  {
+>>>> -    DisasContext dc;
+>>>> +    DisasContext dc = { };
+>>>
+>>> We seemed to have dropped an initialise here which seems unrelated.
+>>
+>> Added, not dropped.
+> 
+> But is it related to this patch or fixing another bug?
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+It is related to the patch.
 
-> Update to include checks against HCR_EL2.TID2.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+We used to initialize all of the a32 and m32 fields in DisasContext by
+assignment.  Now we only initialize either the a32 or m32 by assignment,
+because the bits overlap in tbflags.  So zero out the other bits here.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  target/arm/helper.c | 26 +++++++++++++++++++++-----
->  1 file changed, 21 insertions(+), 5 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index ffa82b5509..9ad5015d5c 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -5212,11 +5212,27 @@ static const ARMCPRegInfo el3_cp_reginfo[] =3D {
->  static CPAccessResult ctr_el0_access(CPUARMState *env, const ARMCPRegInf=
-o *ri,
->                                       bool isread)
->  {
-> -    /* Only accessible in EL0 if SCTLR.UCT is set (and only in AArch64,
-> -     * but the AArch32 CTR has its own reginfo struct)
-> -     */
-> -    if (arm_current_el(env) =3D=3D 0 && !(env->cp15.sctlr_el[1] & SCTLR_=
-UCT)) {
-> -        return CP_ACCESS_TRAP;
-> +    int cur_el =3D arm_current_el(env);
-> +
-> +    if (cur_el < 2) {
-> +        uint64_t hcr =3D arm_hcr_el2_eff(env);
-> +
-> +        if (cur_el =3D=3D 0) {
-> +            if ((hcr & (HCR_E2H | HCR_TGE)) =3D=3D (HCR_E2H | HCR_TGE)) {
-> +                if (!(env->cp15.sctlr_el[2] & SCTLR_UCT)) {
-> +                    return CP_ACCESS_TRAP_EL2;
-> +                }
-> +            } else {
-> +                if (!(env->cp15.sctlr_el[1] & SCTLR_UCT)) {
-> +                    return CP_ACCESS_TRAP;
-> +                }
-> +                if (hcr & HCR_TID2) {
-> +                    return CP_ACCESS_TRAP_EL2;
-> +                }
-> +            }
-> +        } else if (hcr & HCR_TID2) {
-> +            return CP_ACCESS_TRAP_EL2;
-> +        }
->      }
->      return CP_ACCESS_OK;
->  }
+I'll add this to the commit message.
 
 
---=20
-Alex Benn=C3=A9e
+r~
 
