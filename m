@@ -2,126 +2,83 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C3EFC43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:08:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43130C2BC73
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:10:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 239C92081B
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:08:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1244F2081B
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 15:10:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f/8GLQ3+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 239C92081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hUQVOwdm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1244F2081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icWGa-0005X2-Ai
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:08:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49631)
+	id 1icWI4-0006of-8g
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 10:10:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49667)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1icWFk-0004kR-IO
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:07:45 -0500
+ (envelope-from <catherine.hecx@gmail.com>) id 1icWFu-0004xu-Ov
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:07:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1icWFi-0007mv-NT
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:07:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38838
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1icWFi-0007mF-J8
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:07:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575472061;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=vxp8ijuKnK5CgWvUN1ZV3r/8RKCAzVoAi7hoagSyNRY=;
- b=f/8GLQ3+dxWS5eB7Z/FaJeozGVbZFxEK06wzjtHIbpU1nWIOu+t5MkiED6R5eO7eA/av+Q
- qxUr5cRx4gOz7WztYZMQYhtWt/mtqx/4b3mYLD29mvXj/vbGGP5cnWYJEdsj8ERvbUMo2Q
- Tr8E96qUMzjHLQZ+WmeNCtX3ZL1tnpE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-94-Fn8rzgqVOr2jakkJxAKItQ-1; Wed, 04 Dec 2019 10:07:36 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94A3718B5F69;
- Wed,  4 Dec 2019 15:07:34 +0000 (UTC)
-Received: from [10.36.118.91] (unknown [10.36.118.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3C9EB5D9C5;
- Wed,  4 Dec 2019 15:07:33 +0000 (UTC)
-Subject: Re: [PATCH v3 2/4] s390x: Add missing vcpu reset functions
-To: Cornelia Huck <cohuck@redhat.com>, Janosch Frank <frankja@linux.ibm.com>
-References: <20191203132813.2734-1-frankja@linux.ibm.com>
- <20191203132813.2734-3-frankja@linux.ibm.com>
- <20191204155937.76f6c0cd.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <dd35552d-3e51-9f4d-caca-c52c0136d4ed@redhat.com>
-Date: Wed, 4 Dec 2019 16:07:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <catherine.hecx@gmail.com>) id 1icWFt-0007yc-II
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:07:54 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:34772)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <catherine.hecx@gmail.com>)
+ id 1icWFt-0007yJ-DB
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 10:07:53 -0500
+Received: by mail-oi1-x242.google.com with SMTP id l136so7167921oig.1
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 07:07:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=9ctF7i3YtaWmAPKJFqGq+fBuSBQxGx/l8PItlK/C7Eo=;
+ b=hUQVOwdmFC9xwg7/Ve37lsNCG6PtBBrZi+lRiu9Ki5QARiteTFoWW4qiYJj3C/70nY
+ 7TitbHQQkRxiZEUS3klsV40tLT8rkp774g0yCbVmbjWk0C5MEqy5hWeF4tQB+N+ab5w1
+ /dqTGur7jQvVV9j3MkOWRcJZh/GgmK20d68ERS0gQlNIkF0sEnjotboBeZlq2iqOkvA9
+ sj/F4KNkS1fnDpD8iiFSgSEOvFcqGt/fgZyY2TEOQ4P+UxsjTmumMvIWl1AR7d2QSz8S
+ HmVWoo6adrh5PEa4d1qv89bSsT/mwQNemlymhPkeeFvSP8MvFEshri0Uo1qYmfqISexr
+ s+1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9ctF7i3YtaWmAPKJFqGq+fBuSBQxGx/l8PItlK/C7Eo=;
+ b=EY8/LtxT7e7i8+lOOZyy7/RFgxQN6K69k8F78QDkwlpvVVLX4YaHy6ypZ/kq6D7Bj8
+ xNKjh1qkA8TZclmiajO/GGICF07ynCG1Ae+f8fomh3JeCNs4pKy9QBQ1vcbJmij7ABZQ
+ o4VNir4N7E36/Im44c2rwT3Yn88dgrZES15rRKLmjz0N6k+Qf+Ol1+99gCDO0yE5FvyH
+ TBjoZwHpkH/zO9qzVoqX0qfnw+A3GtPFlAcyjlshIna3Oi/tzO+F57z7fOxpZhayoaUA
+ Dq9goQB6FsC3HHLM7fU99y6oO8eulxmE3krFMd8uQI/tAEN66wNTc/oB5cYvT2tIh7rD
+ o4gA==
+X-Gm-Message-State: APjAAAVGZgN5l+KvTwDR9/Hke1qxHPdQku+TVO0w1AVI1SaChTXh3iso
+ GbL1UliDbrsDIexmDjCPVad2ZpFojpKZPkLNp5w=
+X-Google-Smtp-Source: APXvYqwlVzccHWoUnndVXD/fSaLr9oIIxWv9l1YrNMvD8H8Rb/h63ukjjNcKXQuVAxyXR9S/QoCJIOIusbFgT7Fb3/o=
+X-Received: by 2002:aca:4712:: with SMTP id u18mr609507oia.93.1575472072501;
+ Wed, 04 Dec 2019 07:07:52 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191204155937.76f6c0cd.cohuck@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: Fn8rzgqVOr2jakkJxAKItQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <1575449430-23366-1-git-send-email-catherine.hecx@gmail.com>
+ <2ac1a83c-6958-1b49-295f-92149749fa7c@redhat.com>
+ <CAEn6zmFex9WJ9jr5-0br7YzQZ=jA5bQn314OM+U=Q6ZGPiCRAg@mail.gmail.com>
+ <714a0a86-4301-e756-654f-7765d4eb73db@redhat.com>
+In-Reply-To: <714a0a86-4301-e756-654f-7765d4eb73db@redhat.com>
+From: Catherine Ho <catherine.hecx@gmail.com>
+Date: Wed, 4 Dec 2019 23:07:39 +0800
+Message-ID: <CAEn6zmHnTLZxa6Qv=8oDUPYpRD=rvGxJOLjd8Qb15k9-3U+CKw@mail.gmail.com>
+Subject: Re: [PATCH] target/i386: relax assert when old host kernels don't
+ include msrs
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,48 +90,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com,
- qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04.12.19 15:59, Cornelia Huck wrote:
-> On Tue,  3 Dec 2019 08:28:11 -0500
-> Janosch Frank <frankja@linux.ibm.com> wrote:
->=20
->> Up to now we only had an ioctl to reset vcpu data QEMU couldn't reach
->> for the initial reset, and that was also called for the clear
->> reset. To be architecture compliant, we also need to clear local
->> interrupts on a normal reset.
->=20
-> Do we also need to do something like that for tcg? David?
->=20
+Hi Paolo
 
-So, we have
 
-/* Fields up to this point are not cleared by initial CPU reset */
-struct {} start_initial_reset_fields;
-[...]
-int pending_int
-uint16_t external_call_addr;
-DECLARE_BITMAP(emergency_signals, S390_MAX_CPUS);
-[...]
-/* Fields up to this point are cleared by a CPU reset */
-struct {} end_reset_fields;
+On Wed, 4 Dec 2019 at 21:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 04/12/19 14:33, Catherine Ho wrote:
+> > Hi Paolo
+> > [sorry to resend it, seems to reply it incorrectly]
+> >
+> > On Wed, 4 Dec 2019 at 19:23, Paolo Bonzini <pbonzini@redhat.com
+> > <mailto:pbonzini@redhat.com>> wrote:
+> >
+> >     On 04/12/19 09:50, Catherine Ho wrote:
+> >     > Commit 20a78b02d315 ("target/i386: add VMX features") unconditionally
+> >     > add vmx msr entry although older host kernels don't include them.
+> >     >
+> >     > But old host kernel + newest qemu will cause a qemu crash as follows:
+> >     > qemu-system-x86_64: error: failed to set MSR 0x480 to 0x0
+> >     > target/i386/kvm.c:2932: kvm_put_msrs: Assertion `ret ==
+> >     > cpu->kvm_msr_buf->nmsrs' failed.
+> >     >
+> >     > This fixes it by relaxing the condition.
+> >
+> >     This is intentional.  The VMX MSR entries should not have been added.
+> >     What combination of host kernel/QEMU are you using, and what QEMU
+> >     command line?
+> >
+> >
+> > Host kernel: 4.15.0 (ubuntu 18.04)
+> > Qemu: https://gitlab.com/virtio-fs/qemu/tree/virtio-fs-dev
+> > cmdline: qemu-system-x86_64 -M pc -cpu host --enable-kvm -smp 8 \
+> >                   -m 4G,maxmem=4G
+> >
+> > But before 20a78b02d315, the older kernel + latest qemu can boot guest
+> > successfully.
+>
+> Ok, so the problem is that some MSR didn't exist in that version.  Which
+I thought in my platform, the only MSR didn't exist is MSR_IA32_VMX_BASIC
+(0x480). If I remove this kvm_msr_entry_add(), everything is ok, the guest can
+be boot up successfully.
 
-This means, local interrupts will be cleared by everything that zeroes
-"start_initial_reset_fields->end_reset_fields"
+> one it is?  Can you make it conditional, similar to MSR_IA32_VMX_VMFUNC?
+Ok, I will. Thanks for the suggestion
 
-So, they will get cleared by S390_CPU_RESET_INITIAL only if I am not
-wrong. In order to clear them on S390_CPU_RESET_NORMAL, we have to
-manually set them to zero.
-
-(we really should wrap TCG-only fields by ifdefs)
-
---=20
-Thanks,
-
-David / dhildenb
-
+Best regards
+Catherine
 
