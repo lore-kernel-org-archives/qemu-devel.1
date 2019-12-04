@@ -2,75 +2,93 @@ Return-Path: <SRS0=xVqP=Z2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,PDS_BTC_ID,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56550C43603
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 11:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BADA3C2BD09
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 11:23:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26DC0206DB
-	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 11:11:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26DC0206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6CEF320637
+	for <qemu-devel@archiver.kernel.org>; Wed,  4 Dec 2019 11:23:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LAaQlRQV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CEF320637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icSZO-00040y-8M
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 06:11:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46563)
+	id 1icSlA-0008KU-HR
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 06:23:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1icRYW-0001Uu-Iy
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 05:06:51 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1icS3T-0007Id-7x
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 05:38:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1icRYM-0001uy-T6
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 05:06:43 -0500
-Received: from indium.canonical.com ([91.189.90.7]:50098)
+ (envelope-from <alex.bennee@linaro.org>) id 1icS3Q-0006FQ-BT
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 05:38:45 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42894)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1icRYM-0001gO-ME
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 05:06:38 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1icRYI-00045z-BC
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 10:06:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 505712E8073
- for <qemu-devel@nongnu.org>; Wed,  4 Dec 2019 10:06:34 +0000 (UTC)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1icS3P-0006Bp-Pi
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 05:38:44 -0500
+Received: by mail-wr1-x441.google.com with SMTP id a15so7907483wrf.9
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 02:38:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=xIoqR+lEwHYliMr6zAOom4U0hXtVp/tMWha4w4SUc+Q=;
+ b=LAaQlRQVou0ODtdFVX3A6NtyQQn3Lvbsjf/0LX23o3a1BMWu9hik+CKhrpTGzCUXuk
+ 27x+4i02GVYlkwSeBzV81sZGN56xSWCmT+AbGZyIWHPZwqPH3LWRreVgEQ4CsQz1golY
+ NIV9/SsNLY9bntt7RImdKwmEs3EzT5ydLkxMiwppn7uC3NdtPrlSY4J9Uxmph3npKmUM
+ elFH9KcDyx6NKgH2b7zHDwID758ohxF99JDCqjjAOYb9YdLJXnXB6TQ5XVqda5LbL5QJ
+ jCbKy3JnMNxhDCaqoEKfs1KTcQ84YSngxpU22NLsGhmNt7Cnr86jwEh1pHcdEU8YLSS1
+ DpYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=xIoqR+lEwHYliMr6zAOom4U0hXtVp/tMWha4w4SUc+Q=;
+ b=KfbLVaQ3ZLfx6aRjn4KXbs089MLMB/Roby9vBbzmoOPxMpYKaqsSIu5PtBpq8hpMao
+ 9urgUbIcBP9CVLWmq8jF/0xL027pd4bvO3kqJrGt0tEKLhfCA/sCQc/kgn9A0XuDVowb
+ GAtZTA2ZL+wxIYIkuqIJVFniHO0GGt6ZpI3WRITIpnryv5CdNodX0M3qUbbXb3p4rWOP
+ voZubm1482Fmcl/fsDNqJfVm/4kj0CQX70kJBNM9tDsfgidrbBl+5J8l1oy7BPQTgu5b
+ WLOCGMGHpecaNpKmxYIXMlBwhR2MW+zRGpRRm7P4619R1rRjGBTBG6HApOhdUgym7ID4
+ VW5g==
+X-Gm-Message-State: APjAAAX87NwuiNcIKUvyFCTbAM1as0gAAJjYmjupMJk6JhmTvIViaVhs
+ WXSXtGXFytbaOxVlk47stVKkBg==
+X-Google-Smtp-Source: APXvYqykiVjJNlDujv5g1x9L+qPBLz5b9EzLRvoffvaqPx3hkr199A+R4mpFZ9p/HHj+2s0Ox5IP2A==
+X-Received: by 2002:adf:de84:: with SMTP id w4mr3030165wrl.97.1575455918619;
+ Wed, 04 Dec 2019 02:38:38 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id q144sm519200wme.46.2019.12.04.02.38.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 04 Dec 2019 02:38:37 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A6EA71FF87;
+ Wed,  4 Dec 2019 10:38:36 +0000 (GMT)
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-9-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v4 08/40] target/arm: Rename ARMMMUIdx*_S12NSE* to
+ ARMMMUIdx*_E10_*
+In-reply-to: <20191203022937.1474-9-richard.henderson@linaro.org>
+Date: Wed, 04 Dec 2019 10:38:36 +0000
+Message-ID: <87fti09xzn.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 04 Dec 2019 10:00:41 -0000
-From: Kevin Wolf <1846427@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h kwolf-redhat lersek mattihami
- michael-weiser psyhomb sej7278
-X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
-X-Launchpad-Bug-Modifier: Kevin Wolf (kwolf-redhat)
-References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
-Message-Id: <157545364168.22731.1438248059975608060.malone@chaenomeles.canonical.com>
-Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 9b225531f6306e75cfcaf8a00158a11606ee878c
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,154 +97,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I don't see anything suspicious in that command line. My only idea for a
-different configuration to test would be discard=3Doff, which would remove
-a few code paths that could contain a bug.
 
-Anyway, I think it's pretty clear now that you're hitting a different
-bug than Michael. Maybe it would be better to create a new report, too,
-and to continue there.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-Did you upgrade from 4.0 to 4.1 when you first hit the bug or was it
-from an earlier version?
+> This is part of a reorganization to the set of mmu_idx.
+> This emphasizes that they apply to the EL1&0 regime.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-It would be perfect if you could bisect the problem like Michael did
-with his, but I understand that this might not be possible soon.
-Alternatively, I could also debug it myself if I had a clear reproducer
-(that ideally doesn't involve Windows).
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
--- =
+> ---
+>  target/arm/cpu.h           |  8 ++++----
+>  target/arm/internals.h     |  4 ++--
+>  target/arm/helper.c        | 40 +++++++++++++++++++-------------------
+>  target/arm/translate-a64.c |  4 ++--
+>  target/arm/translate.c     |  6 +++---
+>  5 files changed, 31 insertions(+), 31 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 9729e62d2c..802cddd2df 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2864,8 +2864,8 @@ static inline bool arm_excp_unmasked(CPUState *cs, =
+unsigned int excp_idx,
+>  #define ARM_MMU_IDX_COREIDX_MASK 0x7
+>=20=20
+>  typedef enum ARMMMUIdx {
+> -    ARMMMUIdx_S12NSE0 =3D 0 | ARM_MMU_IDX_A,
+> -    ARMMMUIdx_S12NSE1 =3D 1 | ARM_MMU_IDX_A,
+> +    ARMMMUIdx_EL10_0 =3D 0 | ARM_MMU_IDX_A,
+> +    ARMMMUIdx_EL10_1 =3D 1 | ARM_MMU_IDX_A,
+>      ARMMMUIdx_S1E2 =3D 2 | ARM_MMU_IDX_A,
+>      ARMMMUIdx_S1E3 =3D 3 | ARM_MMU_IDX_A,
+>      ARMMMUIdx_S1SE0 =3D 4 | ARM_MMU_IDX_A,
+> @@ -2890,8 +2890,8 @@ typedef enum ARMMMUIdx {
+>   * for use when calling tlb_flush_by_mmuidx() and friends.
+>   */
+>  typedef enum ARMMMUIdxBit {
+> -    ARMMMUIdxBit_S12NSE0 =3D 1 << 0,
+> -    ARMMMUIdxBit_S12NSE1 =3D 1 << 1,
+> +    ARMMMUIdxBit_EL10_0 =3D 1 << 0,
+> +    ARMMMUIdxBit_EL10_1 =3D 1 << 1,
+>      ARMMMUIdxBit_S1E2 =3D 1 << 2,
+>      ARMMMUIdxBit_S1E3 =3D 1 << 3,
+>      ARMMMUIdxBit_S1SE0 =3D 1 << 4,
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index f5313dd3d4..54142dd789 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -808,8 +808,8 @@ static inline void arm_call_el_change_hook(ARMCPU *cp=
+u)
+>  static inline bool regime_is_secure(CPUARMState *env, ARMMMUIdx mmu_idx)
+>  {
+>      switch (mmu_idx) {
+> -    case ARMMMUIdx_S12NSE0:
+> -    case ARMMMUIdx_S12NSE1:
+> +    case ARMMMUIdx_EL10_0:
+> +    case ARMMMUIdx_EL10_1:
+>      case ARMMMUIdx_S1NSE0:
+>      case ARMMMUIdx_S1NSE1:
+>      case ARMMMUIdx_S1E2:
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 6c09cda4ea..d2b90763ca 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -670,8 +670,8 @@ static void tlbiall_nsnh_write(CPUARMState *env, cons=
+t ARMCPRegInfo *ri,
+>      CPUState *cs =3D env_cpu(env);
+>=20=20
+>      tlb_flush_by_mmuidx(cs,
+> -                        ARMMMUIdxBit_S12NSE1 |
+> -                        ARMMMUIdxBit_S12NSE0 |
+> +                        ARMMMUIdxBit_EL10_1 |
+> +                        ARMMMUIdxBit_EL10_0 |
+>                          ARMMMUIdxBit_S2NS);
+>  }
+>=20=20
+> @@ -681,8 +681,8 @@ static void tlbiall_nsnh_is_write(CPUARMState *env, c=
+onst ARMCPRegInfo *ri,
+>      CPUState *cs =3D env_cpu(env);
+>=20=20
+>      tlb_flush_by_mmuidx_all_cpus_synced(cs,
+> -                                        ARMMMUIdxBit_S12NSE1 |
+> -                                        ARMMMUIdxBit_S12NSE0 |
+> +                                        ARMMMUIdxBit_EL10_1 |
+> +                                        ARMMMUIdxBit_EL10_0 |
+>                                          ARMMMUIdxBit_S2NS);
+>  }
+>=20=20
+> @@ -3068,7 +3068,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint=
+64_t value,
+>          format64 =3D arm_s1_regime_using_lpae_format(env, mmu_idx);
+>=20=20
+>          if (arm_feature(env, ARM_FEATURE_EL2)) {
+> -            if (mmu_idx =3D=3D ARMMMUIdx_S12NSE0 || mmu_idx =3D=3D ARMMM=
+UIdx_S12NSE1) {
+> +            if (mmu_idx =3D=3D ARMMMUIdx_EL10_0 || mmu_idx =3D=3D ARMMMU=
+Idx_EL10_1) {
+>                  format64 |=3D env->cp15.hcr_el2 & (HCR_VM | HCR_DC);
+>              } else {
+>                  format64 |=3D arm_current_el(env) =3D=3D 2;
+> @@ -3167,11 +3167,11 @@ static void ats_write(CPUARMState *env, const ARM=
+CPRegInfo *ri, uint64_t value)
+>          break;
+>      case 4:
+>          /* stage 1+2 NonSecure PL1: ATS12NSOPR, ATS12NSOPW */
+> -        mmu_idx =3D ARMMMUIdx_S12NSE1;
+> +        mmu_idx =3D ARMMMUIdx_EL10_1;
+>          break;
+>      case 6:
+>          /* stage 1+2 NonSecure PL0: ATS12NSOUR, ATS12NSOUW */
+> -        mmu_idx =3D ARMMMUIdx_S12NSE0;
+> +        mmu_idx =3D ARMMMUIdx_EL10_0;
+>          break;
+>      default:
+>          g_assert_not_reached();
+> @@ -3229,10 +3229,10 @@ static void ats_write64(CPUARMState *env, const A=
+RMCPRegInfo *ri,
+>          mmu_idx =3D secure ? ARMMMUIdx_S1SE0 : ARMMMUIdx_S1NSE0;
+>          break;
+>      case 4: /* AT S12E1R, AT S12E1W */
+> -        mmu_idx =3D secure ? ARMMMUIdx_S1SE1 : ARMMMUIdx_S12NSE1;
+> +        mmu_idx =3D secure ? ARMMMUIdx_S1SE1 : ARMMMUIdx_EL10_1;
+>          break;
+>      case 6: /* AT S12E0R, AT S12E0W */
+> -        mmu_idx =3D secure ? ARMMMUIdx_S1SE0 : ARMMMUIdx_S12NSE0;
+> +        mmu_idx =3D secure ? ARMMMUIdx_S1SE0 : ARMMMUIdx_EL10_0;
+>          break;
+>      default:
+>          g_assert_not_reached();
+> @@ -3531,8 +3531,8 @@ static void vttbr_write(CPUARMState *env, const ARM=
+CPRegInfo *ri,
+>      /* Accesses to VTTBR may change the VMID so we must flush the TLB.  =
+*/
+>      if (raw_read(env, ri) !=3D value) {
+>          tlb_flush_by_mmuidx(cs,
+> -                            ARMMMUIdxBit_S12NSE1 |
+> -                            ARMMMUIdxBit_S12NSE0 |
+> +                            ARMMMUIdxBit_EL10_1 |
+> +                            ARMMMUIdxBit_EL10_0 |
+>                              ARMMMUIdxBit_S2NS);
+>          raw_write(env, ri, value);
+>      }
+> @@ -3893,7 +3893,7 @@ static int vae1_tlbmask(CPUARMState *env)
+>      if (arm_is_secure_below_el3(env)) {
+>          return ARMMMUIdxBit_S1SE1 | ARMMMUIdxBit_S1SE0;
+>      } else {
+> -        return ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0;
+> +        return ARMMMUIdxBit_EL10_1 | ARMMMUIdxBit_EL10_0;
+>      }
+>  }
+>=20=20
+> @@ -3929,9 +3929,9 @@ static int vmalle1_tlbmask(CPUARMState *env)
+>      if (arm_is_secure_below_el3(env)) {
+>          return ARMMMUIdxBit_S1SE1 | ARMMMUIdxBit_S1SE0;
+>      } else if (arm_feature(env, ARM_FEATURE_EL2)) {
+> -        return ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0 | ARMMMUIdxBi=
+t_S2NS;
+> +        return ARMMMUIdxBit_EL10_1 | ARMMMUIdxBit_EL10_0 | ARMMMUIdxBit_=
+S2NS;
+>      } else {
+> -        return ARMMMUIdxBit_S12NSE1 | ARMMMUIdxBit_S12NSE0;
+> +        return ARMMMUIdxBit_EL10_1 | ARMMMUIdxBit_EL10_0;
+>      }
+>  }
+>=20=20
+> @@ -8671,8 +8671,8 @@ static inline TCR *regime_tcr(CPUARMState *env, ARM=
+MMUIdx mmu_idx)
+>   */
+>  static inline ARMMMUIdx stage_1_mmu_idx(ARMMMUIdx mmu_idx)
+>  {
+> -    if (mmu_idx =3D=3D ARMMMUIdx_S12NSE0 || mmu_idx =3D=3D ARMMMUIdx_S12=
+NSE1) {
+> -        mmu_idx +=3D (ARMMMUIdx_S1NSE0 - ARMMMUIdx_S12NSE0);
+> +    if (mmu_idx =3D=3D ARMMMUIdx_EL10_0 || mmu_idx =3D=3D ARMMMUIdx_EL10=
+_1) {
+> +        mmu_idx +=3D (ARMMMUIdx_S1NSE0 - ARMMMUIdx_EL10_0);
+>      }
+>      return mmu_idx;
+>  }
+> @@ -8715,8 +8715,8 @@ static inline bool regime_is_user(CPUARMState *env,=
+ ARMMMUIdx mmu_idx)
+>          return true;
+>      default:
+>          return false;
+> -    case ARMMMUIdx_S12NSE0:
+> -    case ARMMMUIdx_S12NSE1:
+> +    case ARMMMUIdx_EL10_0:
+> +    case ARMMMUIdx_EL10_1:
+>          g_assert_not_reached();
+>      }
+>  }
+> @@ -10620,7 +10620,7 @@ bool get_phys_addr(CPUARMState *env, target_ulong=
+ address,
+>                     target_ulong *page_size,
+>                     ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
+>  {
+> -    if (mmu_idx =3D=3D ARMMMUIdx_S12NSE0 || mmu_idx =3D=3D ARMMMUIdx_S12=
+NSE1) {
+> +    if (mmu_idx =3D=3D ARMMMUIdx_EL10_0 || mmu_idx =3D=3D ARMMMUIdx_EL10=
+_1) {
+>          /* Call ourselves recursively to do the stage 1 and then stage 2
+>           * translations.
+>           */
+> @@ -11148,7 +11148,7 @@ ARMMMUIdx arm_mmu_idx_el(CPUARMState *env, int el)
+>      if (el < 2 && arm_is_secure_below_el3(env)) {
+>          return ARMMMUIdx_S1SE0 + el;
+>      } else {
+> -        return ARMMMUIdx_S12NSE0 + el;
+> +        return ARMMMUIdx_EL10_0 + el;
+>      }
+>  }
+>=20=20
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index d4bebbe629..2703ebf32a 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -113,8 +113,8 @@ static inline int get_a64_user_mem_index(DisasContext=
+ *s)
+>      ARMMMUIdx useridx;
+>=20=20
+>      switch (s->mmu_idx) {
+> -    case ARMMMUIdx_S12NSE1:
+> -        useridx =3D ARMMMUIdx_S12NSE0;
+> +    case ARMMMUIdx_EL10_1:
+> +        useridx =3D ARMMMUIdx_EL10_0;
+>          break;
+>      case ARMMMUIdx_S1SE1:
+>          useridx =3D ARMMMUIdx_S1SE0;
+> diff --git a/target/arm/translate.c b/target/arm/translate.c
+> index 4d5d4bd888..e3deea50e0 100644
+> --- a/target/arm/translate.c
+> +++ b/target/arm/translate.c
+> @@ -153,9 +153,9 @@ static inline int get_a32_user_mem_index(DisasContext=
+ *s)
+>       */
+>      switch (s->mmu_idx) {
+>      case ARMMMUIdx_S1E2:        /* this one is UNPREDICTABLE */
+> -    case ARMMMUIdx_S12NSE0:
+> -    case ARMMMUIdx_S12NSE1:
+> -        return arm_to_core_mmu_idx(ARMMMUIdx_S12NSE0);
+> +    case ARMMMUIdx_EL10_0:
+> +    case ARMMMUIdx_EL10_1:
+> +        return arm_to_core_mmu_idx(ARMMMUIdx_EL10_0);
+>      case ARMMMUIdx_S1E3:
+>      case ARMMMUIdx_S1SE0:
+>      case ARMMMUIdx_S1SE1:
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1846427
 
-Title:
-  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
-
-Status in QEMU:
-  Fix Committed
-
-Bug description:
-  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
-  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
-  savevm/quit/loadvm cycles. I've narrowed it down to the following
-  reproducer (further notes below):
-
-  # qemu-img check debian.qcow2
-  No errors were found on the image.
-  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
-  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
-96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
-=3Ddebian.qcow2,id=3Dd -S
-  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
-bus: Did not receive a reply. Possible causes include: the remote applicati=
-on did not send a reply, the message bus security policy blocked the reply,=
- the reply timeout expired, or the network connection was broken.
-  QEMU 4.1.50 monitor - type 'help' for more information
-  (qemu) loadvm foo
-  (qemu) c
-  (qemu) qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  quit
-  [m@nargothrond:~] qemu-img check debian.qcow2
-  Leaked cluster 85179 refcount=3D2 reference=3D1
-  Leaked cluster 85180 refcount=3D2 reference=3D1
-  ERROR cluster 266150 refcount=3D0 reference=3D2
-  [...]
-  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
-
-  9493 errors were found on the image.
-  Data may be corrupted, or further writes to the image may corrupt it.
-
-  2 leaked clusters were found on the image.
-  This means waste of disk space, but no harm to data.
-  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
-
-  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
-  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
-  similarly current.
-
-  Reproduced with qemu-4.1.0 from distribution package as well as
-  vanilla git checkout of tag v4.1.0 and commit
-  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
-  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
-  sequence:
-
-  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
-mu --disable-werror --disable-docs
-  [...]
-  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
-  [...] (can provide full configure output if helpful)
-  make -j8 install
-
-  The kind of guest OS does not matter: seen with Debian testing 64bit,
-  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
-
-  The virtual storage controller does not seem to matter: seen with
-  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
-
-  Caching modes (none, directsync, writeback), aio mode (threads,
-  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
-  not influence occurence either.
-
-  Having more RAM in the guest seems to increase odds of corruption:
-  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
-  RAM it happens almost instantly.
-
-  An automated reproducer works as follows:
-
-  - the guest *does* mount its root fs and swap with option discard and
-  my testing leaves me with the impression that file deletion rather
-  than reading is causing the issue
-
-  - foo is a snapshot of the running Debian VM which is already running
-  command
-
-  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
-ne
-
-  to produce some I/O to the disk (4GB file with 4GB of RAM).
-
-  - on the host a loop continuously resumes and saves the guest state
-  and quits qemu inbetween:
-
-  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
-  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
-  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
-  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
-  none ; done
-
-  - quitting qemu inbetween saves and loads seems to be necessary for
-  the problem to occur. Just continusouly in one session saving and
-  loading guest state does not trigger it.
-
-  - For me, after about 2 to 6 iterations of above loop the image is
-  corrupted.
-
-  - corruption manifests with other messages from qemu as well, e.g.:
-
-  (qemu) loadvm foo
-  Error: Device 'd' does not have the requested snapshot 'foo'
-
-  Using above reproducer I have to the be best of my ability bisected
-  the introduction of the problem to commit
-  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
-  block_status call if possible). qemu compiled from the commit before
-  does not exhibit the issue, from that commit on it does and reverting
-  the commit off of current master makes it disappear.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
+--=20
+Alex Benn=C3=A9e
 
