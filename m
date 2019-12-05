@@ -2,86 +2,91 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7DCEC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B42C8C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:11:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 978B024249
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:11:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8674224249
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:11:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KL+VybSE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 978B024249
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IoWIJMAi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8674224249
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icvb6-0008Es-GC
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 13:11:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54698)
+	id 1icvbF-0008VZ-IJ
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 13:11:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54314)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1icvGL-00022t-Ai
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:50:02 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1icvOm-0003jA-Bq
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:58:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1icvGJ-0003VX-Uu
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:50:01 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49437
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1icvGJ-0003RX-Nu
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:49:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575568198;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jWVoYb8x9VTh57thCyW8u9A7acacs8cnWBy2auzTy0k=;
- b=KL+VybSEktW35JmpUlCOchRO0m9fljtlhfvNqMcL5tUhs9ewbXlbdYk5bJbq+97L6ts1Y7
- UWi0jKfpxxo6iC+5ak/RYVaYDHec1G8Axw9SxhVN41gJsiHSbE7Ro+Auyo4FIsi3j/XLmJ
- g9FAkGNuu6SQUUAchfqc1zL9MmcEyqQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-FZMVmSnsPeSWKfAq0JPJkg-1; Thu, 05 Dec 2019 12:49:57 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5408D800D5E;
- Thu,  5 Dec 2019 17:49:56 +0000 (UTC)
-Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 95DD960136;
- Thu,  5 Dec 2019 17:49:55 +0000 (UTC)
-Subject: Re: [PATCH v7 21/21] nbd: assert that Error** is not NULL in
- nbd_iter_channel_error
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20191205152019.8454-1-vsementsov@virtuozzo.com>
- <20191205152019.8454-22-vsementsov@virtuozzo.com>
- <c4ff448d-e756-9d95-b07e-4ae5f2d5b9b0@redhat.com>
- <93046486-1580-14a1-520d-08abdf74da0e@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <443bfd26-08df-a421-fe88-71b2c068d8e4@redhat.com>
-Date: Thu, 5 Dec 2019 11:49:54 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <alex.bennee@linaro.org>) id 1icvOl-0005WM-1D
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:58:44 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35900)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1icvOk-0005Qz-Pi
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:58:42 -0500
+Received: by mail-wm1-x344.google.com with SMTP id p17so4675399wma.1
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 09:58:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=zMecNqqSJ4VYfE/rNTGUDOH12wNz/+QCGWYMWDkatnw=;
+ b=IoWIJMAifHTwtkmnO6vgnTrUBLDmvpqfdgd3vANXlY6EOX2nIMI7et2D9rrSR7Z3uF
+ MGE7TZCLiyhBhevScAUidT+i0b6bftMNaCMmm49DFyGzUdUMv7Yu835B6CN/N05LnT+a
+ jXKKjKAOLi7716w7VNPdYIAWyjtfdfFstFFjaOeAsB3Z7k3GzxETo+c8Qr9+c07A88Ni
+ e+ZIy2OdK1zKG8RD1dsMDHIE2k0SH24Qhi2qaHSY4WSxDAXTddB6PXjw7zX6O/J8/RI8
+ DNoIOSBjIsJ2NTDlxMu645yMtyP9e54O0MK6EppBSZruRRc17T2rZbv853M0Q8+A4AUe
+ dmLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=zMecNqqSJ4VYfE/rNTGUDOH12wNz/+QCGWYMWDkatnw=;
+ b=YlNMHQfHdN3fznYJyqUukchsVyaQioaFgNEn/8pugHBTd6WCQj5bqOtJ5aQmJwrP6J
+ nlD8nImJQMqa2aWaIKcGnIzNK415WuWsixo8TirLWj6O4oyjG1nZXv7wBkop5bGXhMYq
+ QFHgptbc6Ly4u5W+dTuw0nLruiyWZfo4aOUK8OVEqpOkrZWYA8cnwrV0QVxvsUCiE0XF
+ /AJ9KD7mLqBVpv0xfxuWytQQdXeAjV7/DEQQu0raNZqeyM/q8l67pVww9c5TYdUo/L7i
+ UrkoEgNAOQ4i2uWH99Lmof7mpV2CY8ieWh2z6KzNzz637FBBXwrhhW2IuX5HkYpzA1lI
+ WZMg==
+X-Gm-Message-State: APjAAAVOIqycit8S8NQXfFj7MOtKyyixy4Wpeke4X6FMB9S9sELCVJMp
+ HSxK8YP5caK3BRghN0CT95hZ/w==
+X-Google-Smtp-Source: APXvYqxV8LbcaCOV6vBjSzDSswM/k2nv1dJvpI8Xxj3yxlJsl6ZqXbbW2HF1okJelzOr+87AlL1gyw==
+X-Received: by 2002:a05:600c:249:: with SMTP id 9mr6329166wmj.2.1575568721311; 
+ Thu, 05 Dec 2019 09:58:41 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id t5sm13215195wrr.35.2019.12.05.09.58.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Dec 2019 09:58:39 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3E09E1FF87;
+ Thu,  5 Dec 2019 17:58:39 +0000 (GMT)
+References: <20191130084602.10818-1-alex.bennee@linaro.org>
+ <20191130084602.10818-7-alex.bennee@linaro.org>
+ <987465d3-3b13-e675-9622-c13e2d5205c2@redhat.com>
+ <42017B4E-E961-494C-A505-FCDA74EFB265@arm.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Alan Hayward <Alan.Hayward@arm.com>
+Subject: Re: [PATCH v2 06/14] target/arm: use gdb_get_reg helpers
+In-reply-to: <42017B4E-E961-494C-A505-FCDA74EFB265@arm.com>
+Date: Thu, 05 Dec 2019 17:58:39 +0000
+Message-ID: <87lfrq7iy8.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <93046486-1580-14a1-520d-08abdf74da0e@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: FZMVmSnsPeSWKfAq0JPJkg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,87 +98,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: "damien.hedde@greensocs.com" <damien.hedde@greensocs.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Luis Machado <luis.machado@linaro.org>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "open list:ARM
+ TCG CPUs" <qemu-arm@nongnu.org>, nd <nd@arm.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/5/19 11:39 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 05.12.2019 20:14, Eric Blake wrote:
->> On 12/5/19 9:20 AM, Vladimir Sementsov-Ogievskiy wrote:
->>> The local_err parameter is not here to return information about
->>> nbd_iter_channel_error failure. Instead it's assumed to be filled when
->>> passed to the function. This is already stressed by its name
->>> (local_err, instead of classic errp). Stress it additionally by
->>> assertion.
->>>
 
->>
->> Would it be better to assert(!local_err || *local_err)?=A0 The assertion=
- as written is too strict without ERRP_AUTO_PROPAGATE, but you get away wit=
-h it because none of the grandparents pass NULL; but is appropriate as writ=
-ten for after after the macro conversion so then we wonder if churn on the =
-macro is worth it.
->=20
-> We don't have any grandparents, this function is always called on local_e=
-rr. And it's argument named local_err to stress it.
+Alan Hayward <Alan.Hayward@arm.com> writes:
 
-Then the commit message should state that. How about:
+>> On 1 Dec 2019, at 20:05, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>=
+ wrote:
+>>=20
+>> On 11/30/19 9:45 AM, Alex Benn=C3=A9e wrote:
+>>> This is cleaner than poking memory directly and will make later
+>>> clean-ups easier.
+>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>> ---
+>>> v2
+>>>   - make sure we pass hi/lo correctly as quads are stored in LE order
+>>> ---
+>>>  target/arm/helper.c | 18 +++++++-----------
+>>>  1 file changed, 7 insertions(+), 11 deletions(-)
+>>> diff --git a/target/arm/helper.c b/target/arm/helper.c
+>>> index 0bf8f53d4b8..0ac950d6c71 100644
+>>> --- a/target/arm/helper.c
+>>> +++ b/target/arm/helper.c
+>>> @@ -105,21 +105,17 @@ static int aarch64_fpu_gdb_get_reg(CPUARMState *e=
+nv, uint8_t *buf, int reg)
+>>>  {
+>>>      switch (reg) {
+>>>      case 0 ... 31:
+>>> -        /* 128 bit FP register */
+>>> -        {
+>>> -            uint64_t *q =3D aa64_vfp_qreg(env, reg);
+>>> -            stq_le_p(buf, q[0]);
+>>> -            stq_le_p(buf + 8, q[1]);
+>>> -            return 16;
+>>> -        }
+>>> +    {
+>>> +        /* 128 bit FP register - quads are in LE order */
+>>=20
+>> Oh, this was always wrong on BE :(
+>
+> Am I right in thinking this patch correctly matches the SVE BE changes fr=
+om June?
+>
+> Specifically, this patch:
+> http://lists.infradead.org/pipermail/linux-arm-kernel/2019-June/657826.ht=
+ml
 
-All callers of nbd_iter_channel_error() pass the address of a local_err=20
-variable, and only call this function if an error has already occurred,=20
-using this function to append details to that error.  This is already=20
-implied by its name (local_err instead of the classic errp), but it is=20
-worth additionally stressing this by adding an assertion to make it part=20
-of the function contract.
+Not quite. This is just taking into account the way we store the data
+internally in cpu.h. The gdb_get_reg128 helper will then ensure stuff is
+in target endian format which is what gdbstub defines.
 
-> The function is an API to report error, and it wants filled local_err obj=
-ect.
->=20
-> It will crash anyway if local_err is NULL, as it dereferences it.
->=20
-> I just want to place an assertion at start of functions like this,
-> which will be easily recognizable by coccinelle.
+There aren't any actual kernel to userspace transfers going on here.
 
-With an improved commit message, the assertion makes sense, so
+>
+>
+> Alan.
+>
+>>=20
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>=20
+>>> +        uint64_t *q =3D aa64_vfp_qreg(env, reg);
+>>> +        return gdb_get_reg128(buf, q[1], q[0]);
+>>> +    }
+>>>      case 32:
+>>>          /* FPSR */
+>>> -        stl_p(buf, vfp_get_fpsr(env));
+>>> -        return 4;
+>>> +        return gdb_get_reg32(buf, vfp_get_fpsr(env));
+>>>      case 33:
+>>>          /* FPCR */
+>>> -        stl_p(buf, vfp_get_fpcr(env));
+>>> -        return 4;
+>>> +        return gdb_get_reg32(buf,vfp_get_fpcr(env));
+>>>      default:
+>>>          return 0;
+>>>      }
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
->=20
-> ---
->=20
-> We can improve the API, to support local_err=3D=3DNULL, for the case when=
- original request was called with
-> errp=3D=3DNULL, but for this we'll need more changes, like, pass errp to =
-NBD_FOREACH_REPLY_CHUNK and save
-> it into iter object...
->=20
-> But how to detect it in code? Something like
->=20
->=20
-> --- a/block/nbd.c
-> +++ b/block/nbd.c
-> @@ -1059,8 +1059,10 @@ static int nbd_co_receive_blockstatus_reply(BDRVNB=
-DState *s,
->            case NBD_REPLY_TYPE_BLOCK_STATUS:
->                if (received) {
->                    nbd_channel_error(s, -EINVAL);
-> -                error_setg(&local_err, "Several BLOCK_STATUS chunks in r=
-eply");
-> -                nbd_iter_channel_error(&iter, -EINVAL, &local_err);
-> +                if (errp) {
-> +                    error_setg(&local_err, "Several BLOCK_STATUS chunks =
-in reply");
-> +                }
-> +                nbd_iter_channel_error(&iter, -EINVAL, errp ? &local_err=
- : NULL);
-
-No, that's not worth it.
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+Alex Benn=C3=A9e
 
