@@ -1,86 +1,82 @@
-Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25E7EC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51867C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 06:34:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6CA2206EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:59:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C97F20707
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 06:34:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hx504QzL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6CA2206EC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JydRla8A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C97F20707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihH7n-0002Ej-1n
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:59:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32960)
+	id 1ickif-0006LH-9T
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 01:34:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57881)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihH6H-0000zT-7c
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:57:39 -0500
+ (envelope-from <jasowang@redhat.com>) id 1ickhp-0005p1-EG
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 01:33:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ihH6D-0006zb-CH
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:57:35 -0500
-Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:43930)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ihH6D-0006ua-3z
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:57:33 -0500
-Received: by mail-wr1-x42f.google.com with SMTP id d16so12314734wre.10
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 09:57:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Yky/nTR0SQlrT6THuvlR/Qqa2GZaOthOIWsdsv/boS4=;
- b=hx504QzLSsd6/5PlrzrVOD7dX+nP/9auWMsV+IEZAa6Z6Cv5+2m5lC1nY2s+uTQ8Wd
- +mlhHIZl4rKce8ypISijzrbwnacjcuL1dsjmfF5x82oCtFbcCQgKHEOpNLZZGkFq5H2+
- nxio3FUWQoALqHkbaQgL8sdRk41yDrq5fr6fWNKCaXPiB+rMCcwPUkjUUgMJnoMfR5PA
- uFSuVT4vcW1KSVQPCIpZDrtELCv4fonPyfCK5g9sBYztC6xnlMiI25YHfkHOnyExjCuz
- xmFCD2ab21N1prm3yIEJbmx4akHydAArLpd1qCohfMhTovG+yAWBZHxawULgQJXloDzd
- C2Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=Yky/nTR0SQlrT6THuvlR/Qqa2GZaOthOIWsdsv/boS4=;
- b=YsuGMuK+krcc64IcHf5zWkCG9DukeVvBwnCBsfOFE5WuAcRClwfKO3X5B9xEZiiPC+
- 6YiLp7DuWysH4xNmA08h4ueq33W2ro88e3Gw5G0RYVWAYHbRY3EQQfNPMxOWDAZAjRxf
- wL6vUu9JEbjklPondLWmDLwrtDby6MjwBzTpihFCLs6+6qLdGYA7Ma63Sgp5jf5B4Ekg
- u+kDocFC9CzesC0/Y2PkPwDN1y9yK43QIQkXJi1H3U/A/0Ro/pAisRAE0BZ0oaWP12DE
- al5SKLAwg9kMH0Q1ZSc1IQ4nH300ytveiLBvkux0DVkAKoBF07Br1vuicN8NxlCrS85D
- lTxA==
-X-Gm-Message-State: APjAAAVvTZ5MgwoPHEeiiuRwdAD7EeOGdI0J7eHB/l4TXPCkMsj2fH3q
- o6t6S5MTDAmfRXVV586HG+CuPjNa
-X-Google-Smtp-Source: APXvYqwh4bk9gEbf1SPOKzw8XdECrFyKobdYmY59CKnjCfJfpXze17ccV41/wwZ05cAVfUKADUMwiw==
-X-Received: by 2002:adf:eb09:: with SMTP id s9mr39916298wrn.61.1576605447836; 
- Tue, 17 Dec 2019 09:57:27 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q8sm3649573wmq.3.2019.12.17.09.57.26
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 17 Dec 2019 09:57:26 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/62] Misc patches for 2019-12-16
-Date: Tue, 17 Dec 2019 18:57:23 +0100
-Message-Id: <1576605445-28158-1-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
+ (envelope-from <jasowang@redhat.com>) id 1ickhm-0002v7-05
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 01:33:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57426
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1ickhl-0002oj-G8
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 01:33:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575527616;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=uann5yvEuq3udAu6ej8cq9ot9VledIB2oOikqNTWQEg=;
+ b=JydRla8A8w0XiNEzdoUksAQD74wKOPsk4CQ7HJbFx3OfBfGBnqW41Si3G2lBcqUJivm7rL
+ Ol8uVizyi7fqnQOBcoY3wHuBXjpsm9FUlRuKEA94uJZi96Gk4heEhFD4dPKeWDt6ZIRx9m
+ Jq4aUQn5MCClf3eugrsp5Arm9xYGt6s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-ijXDY0RjMK2LL723yd9R1Q-1; Thu, 05 Dec 2019 01:33:31 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 296A98017DF;
+ Thu,  5 Dec 2019 06:33:30 +0000 (UTC)
+Received: from [10.72.12.247] (ovpn-12-247.pek2.redhat.com [10.72.12.247])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B697A5DA32;
+ Thu,  5 Dec 2019 06:33:21 +0000 (UTC)
+Subject: Re: [RFC PATCH 0/9] Introduce mediate ops in vfio-pci
+To: Yan Zhao <yan.y.zhao@intel.com>, alex.williamson@redhat.com
+References: <20191205032419.29606-1-yan.y.zhao@intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <8bcf603c-f142-f96d-bb11-834d686f5519@redhat.com>
+Date: Thu, 5 Dec 2019 14:33:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42f
+In-Reply-To: <20191205032419.29606-1-yan.y.zhao@intel.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: ijXDY0RjMK2LL723yd9R1Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,215 +88,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kevin.tian@intel.com, kvm@vger.kernel.org, libvir-list@redhat.com,
+ cohuck@redhat.com, linux-kernel@vger.kernel.org, zhenyuw@linux.intel.com,
+ qemu-devel@nongnu.org, shaopeng.he@intel.com, zhi.a.wang@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 084a398bf8aa7634738e6c6c0103236ee1b3b72f:
+Hi:
 
-  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-12-13 18:14:07 +0000)
+On 2019/12/5 =E4=B8=8A=E5=8D=8811:24, Yan Zhao wrote:
+> For SRIOV devices, VFs are passthroughed into guest directly without host
+> driver mediation. However, when VMs migrating with passthroughed VFs,
+> dynamic host mediation is required to  (1) get device states, (2) get
+> dirty pages. Since device states as well as other critical information
+> required for dirty page tracking for VFs are usually retrieved from PFs,
+> it is handy to provide an extension in PF driver to centralizingly contro=
+l
+> VFs' migration.
+>
+> Therefore, in order to realize (1) passthrough VFs at normal time, (2)
+> dynamically trap VFs' bars for dirty page tracking and
 
-are available in the git repository at:
+
+A silly question, what's the reason for doing this, is this a must for=20
+dirty page tracking?
 
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+>   (3) centralizing
+> VF critical states retrieving and VF controls into one driver, we propose
+> to introduce mediate ops on top of current vfio-pci device driver.
+>
+>
+>                                     _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+>                                   =20
+>   __________   register mediate ops|  ___________     ___________    |
+> |          |<-----------------------|     VF    |   |           |
+> | vfio-pci |                      | |  mediate  |   | PF driver |   |
+> |__________|----------------------->|   driver  |   |___________|
+>       |            open(pdev)      |  -----------          |         |
+>       |                                                    |
+>       |                            |_ _ _ _ _ _ _ _ _ _ _ _|_ _ _ _ _|
+>      \|/                                                  \|/
+> -----------                                         ------------
+> |    VF   |                                         |    PF    |
+> -----------                                         ------------
+>
+>
+> VF mediate driver could be a standalone driver that does not bind to
+> any devices (as in demo code in patches 5-6) or it could be a built-in
+> extension of PF driver (as in patches 7-9) .
+>
+> Rather than directly bind to VF, VF mediate driver register a mediate
+> ops into vfio-pci in driver init. vfio-pci maintains a list of such
+> mediate ops.
+> (Note that: VF mediate driver can register mediate ops into vfio-pci
+> before vfio-pci binding to any devices. And VF mediate driver can
+> support mediating multiple devices.)
+>
+> When opening a device (e.g. a VF), vfio-pci goes through the mediate ops
+> list and calls each vfio_pci_mediate_ops->open() with pdev of the opening
+> device as a parameter.
+> VF mediate driver should return success or failure depending on it
+> supports the pdev or not.
+> E.g. VF mediate driver would compare its supported VF devfn with the
+> devfn of the passed-in pdev.
+> Once vfio-pci finds a successful vfio_pci_mediate_ops->open(), it will
+> stop querying other mediate ops and bind the opening device with this
+> mediate ops using the returned mediate handle.
+>
+> Further vfio-pci ops (VFIO_DEVICE_GET_REGION_INFO ioctl, rw, mmap) on the
+> VF will be intercepted into VF mediate driver as
+> vfio_pci_mediate_ops->get_region_info(),
+> vfio_pci_mediate_ops->rw,
+> vfio_pci_mediate_ops->mmap, and get customized.
+> For vfio_pci_mediate_ops->rw and vfio_pci_mediate_ops->mmap, they will
+> further return 'pt' to indicate whether vfio-pci should further
+> passthrough data to hw.
+>
+> when vfio-pci closes the VF, it calls its vfio_pci_mediate_ops->release()
+> with a mediate handle as parameter.
+>
+> The mediate handle returned from vfio_pci_mediate_ops->open() lets VF
+> mediate driver be able to differentiate two opening VFs of the same devic=
+e
+> id and vendor id.
+>
+> When VF mediate driver exits, it unregisters its mediate ops from
+> vfio-pci.
+>
+>
+> In this patchset, we enable vfio-pci to provide 3 things:
+> (1) calling mediate ops to allow vendor driver customizing default
+> region info/rw/mmap of a region.
+> (2) provide a migration region to support migration
 
-for you to fetch changes up to 74c14076700436f9d340652042c81f46eaf0cf9f:
 
-  colo: fix return without releasing RCU (2019-12-17 14:03:44 +0100)
+What's the benefit of introducing a region? It looks to me we don't=20
+expect the region to be accessed directly from guest. Could we simply=20
+extend device fd ioctl for doing such things?
 
-----------------------------------------------------------------
-* More uses of RCU_READ_LOCK_GUARD (Dave, myself)
-* QOM doc improvments (Greg)
-* Cleanups from the Meson conversion (Marc-André)
-* Support for multiple -accel options (myself)
-* Many x86 machine cleanup (Philippe, myself)
-* tests/migration-test cleanup (Juan)
 
-----------------------------------------------------------------
-Dr. David Alan Gilbert (3):
-      kvm: Reallocate dirty_bmap when we change a slot
-      hyperv: Use auto rcu_read macros
-      qsp: Use WITH_RCU_READ_LOCK_GUARD
+> (3) provide a dynamic trap bar info region to allow vendor driver
+> control trap/untrap of device pci bars
+>
+> This vfio-pci + mediate ops way differs from mdev way in that
+> (1) medv way needs to create a 1:1 mdev device on top of one VF, device
+> specific mdev parent driver is bound to VF directly.
+> (2) vfio-pci + mediate ops way does not create mdev devices and VF
+> mediate driver does not bind to VFs. Instead, vfio-pci binds to VFs.
+>
+> The reason why we don't choose the way of writing mdev parent driver is
+> that
+> (1) VFs are almost all the time directly passthroughed. Directly binding
+> to vfio-pci can make most of the code shared/reused.
 
-Greg Kurz (1):
-      object: Improve documentation of interfaces
 
-Juan Quintela (10):
-      migration-test: Create cmd_soure and cmd_target
-      migration-test: Move hide_stderr to common commandline
-      migration-test: Move -machine to common commandline
-      migration-test: Move memory size to common commandline
-      migration-test: Move shmem handling to common commandline
-      migration-test: Move -name handling to common commandline
-      migration-test: Move -serial handling to common commandline
-      migration-test: Move -incomming handling to common commandline
-      migration-test: Rename cmd_src/dst to arch_source/arch_target
-      migration-test: Use a struct for test_migrate_start parameters
+Can we split out the common parts from vfio-pci?
 
-Marc-André Lureau (7):
-      build-sys: build vhost-user-gpu only if CONFIG_TOOLS
-      migration: fix maybe-uninitialized warning
-      monitor: fix maybe-uninitialized
-      vhost-user-scsi: fix printf format warning
-      os-posix: simplify os_find_datadir
-      tests: skip block layer tests if !CONFIG_TOOLS
-      configure: simplify vhost condition with Kconfig
 
-Paolo Bonzini (35):
-      memory: do not look at current_machine->accel
-      vl: move icount configuration earlier
-      tcg: move qemu_tcg_configure to accel/tcg/tcg-all.c
-      vl: extract accelerator option processing to a separate function
-      vl: merge -accel processing into configure_accelerators
-      accel: compile accel/accel.c just once
-      vl: introduce object_parse_property_opt
-      vl: configure accelerators from -accel options
-      vl: warn for unavailable accelerators, clarify messages
-      qom: introduce object_register_sugar_prop
-      qom: add object_new_with_class
-      accel: pass object to accel_init_machine
-      tcg: convert "-accel threads" to a QOM property
-      tcg: add "-accel tcg,tb-size" and deprecate "-tb-size"
-      xen: convert "-machine igd-passthru" to an accelerator property
-      kvm: convert "-machine kvm_shadow_mem" to an accelerator property
-      kvm: introduce kvm_kernel_irqchip_* functions
-      kvm: convert "-machine kernel_irqchip" to an accelerator property
-      Makefile: remove unused variables
-      build-sys: do not include Windows SLIRP dependencies in $LIBS
-      libvixl: remove per-target compiler flags
-      crypto: move common bits for all emulators to libqemuutil
-      stubs: replace stubs with lnot if applicable
-      configure: set $PYTHON to a full path
-      i386: conditionally compile more files
-      fw_cfg: allow building without other devices
-      hw: replace hw/i386/pc.h with a header just for the i8259
-      pci-stub: add more MSI functions
-      x86: move SMM property to X86MachineState
-      x86: move more x86-generic functions out of PC files
-      acpi: move PC stubs out of stubs/
-      pc: stubify x86 iommu
-      hw/isa/isa-bus: cleanup irq functions
-      memory: use RCU_READ_LOCK_GUARD
-      colo: fix return without releasing RCU
+>   If we write a
+> vendor specific mdev parent driver, most of the code (like passthrough
+> style of rw/mmap) still needs to be copied from vfio-pci driver, which is
+> actually a duplicated and tedious work.
 
-Philippe Mathieu-Daudé (6):
-      hw/i386/pc: Convert DPRINTF() to trace events
-      hw/i386: De-duplicate gsi_handler() to remove kvm_pc_gsi_handler()
-      hw/i386: Simplify ioapic_init_gsi()
-      hw/i386/pc: Use TYPE_PORT92 instead of hardcoded string
-      hw/i386/pc: Inline port92_init()
-      hw/i386/pc: Extract the port92 device
 
- Kconfig.host                                       |   5 +
- Makefile                                           |  14 +-
- Makefile.objs                                      |   6 +-
- Makefile.target                                    |   2 -
- accel/Makefile.objs                                |   2 +-
- accel/accel.c                                      |  73 +-----
- accel/kvm/kvm-all.c                                | 161 ++++++++++--
- accel/tcg/tcg-all.c                                | 149 ++++++++++-
- configure                                          |  10 +-
- contrib/vhost-user-scsi/vhost-user-scsi.c          |   2 +-
- cpus.c                                             |  72 -----
- crypto/Makefile.objs                               |  13 +-
- disas/libvixl/Makefile.objs                        |  11 +-
- hw/acpi/Makefile.objs                              |   3 +-
- .../pc_madt_cpu_entry.c => hw/acpi/acpi-x86-stub.c |   0
- hw/alpha/alpha_sys.h                               |   3 +-
- hw/alpha/dp264.c                                   |   1 +
- hw/core/machine.c                                  | 141 ----------
- hw/hppa/hppa_sys.h                                 |   3 +-
- hw/hppa/machine.c                                  |   1 +
- hw/hyperv/hyperv.c                                 |  22 +-
- hw/i386/Kconfig                                    |   6 +
- hw/i386/Makefile.objs                              |  10 +-
- hw/i386/acpi-build.c                               |   1 +
- hw/i386/fw_cfg.c                                   |   8 +-
- hw/i386/fw_cfg.h                                   |   2 +
- hw/i386/kvm/Makefile.objs                          |   6 +-
- hw/i386/kvm/i8259.c                                |   1 +
- hw/i386/kvm/ioapic.c                               |  14 +-
- hw/i386/microvm.c                                  |   4 +-
- hw/i386/pc.c                                       | 291 +--------------------
- hw/i386/pc_piix.c                                  |   6 +-
- hw/i386/pc_q35.c                                   |   2 +-
- hw/i386/port92.c                                   | 126 +++++++++
- hw/i386/trace-events                               |   8 +
- hw/i386/x86-iommu-stub.c                           |  34 +++
- hw/i386/x86.c                                      | 154 ++++++++++-
- hw/input/pckbd.c                                   |   1 -
- hw/intc/Kconfig                                    |   2 +
- hw/intc/apic.c                                     |   2 +-
- hw/intc/i8259.c                                    |   2 +-
- hw/intc/i8259_common.c                             |   2 +-
- hw/intc/ioapic.c                                   |   3 +-
- hw/isa/i82378.c                                    |   2 +-
- hw/isa/isa-bus.c                                   |  11 +-
- hw/isa/lpc_ich9.c                                  |   1 -
- hw/isa/piix4.c                                     |   2 +-
- hw/mips/gt64xxx_pci.c                              |   2 +-
- hw/mips/mips_fulong2e.c                            |   2 +-
- hw/mips/mips_jazz.c                                |   2 +-
- hw/mips/mips_r4k.c                                 |   2 +-
- hw/pci-host/bonito.c                               |   1 -
- hw/pci-host/prep.c                                 |   2 +-
- hw/pci/pci-stub.c                                  |  27 ++
- hw/ppc/e500.c                                      |   5 +-
- hw/ppc/spapr_irq.c                                 |  16 +-
- hw/virtio/Kconfig                                  |   3 +
- hw/virtio/Makefile.objs                            |   4 +-
- hw/xen/xen-common.c                                |  18 ++
- hw/xen/xen_pt.c                                    |   2 +
- include/exec/memory.h                              |   3 +-
- include/hw/boards.h                                |   7 -
- include/hw/i386/pc.h                               |  32 +--
- include/hw/i386/x86.h                              |  23 ++
- include/hw/intc/i8259.h                            |  12 +
- include/hw/isa/i8259_internal.h                    |   2 +-
- include/hw/isa/isa.h                               |   8 +-
- include/qom/object.h                               |  23 +-
- include/sysemu/accel.h                             |   4 +-
- include/sysemu/cpus.h                              |   2 -
- include/sysemu/kvm.h                               |   8 +-
- memory.c                                           |   5 +-
- migration/ram.c                                    |  53 ++--
- monitor/misc.c                                     |   3 +-
- os-posix.c                                         |  41 +--
- qemu-deprecated.texi                               |   6 +
- qemu-options.hx                                    |  30 ++-
- qom/object.c                                       |  28 +-
- stubs/Makefile.objs                                |   1 -
- target/arm/kvm.c                                   |   8 +-
- target/i386/cpu.c                                  |   8 +-
- target/i386/kvm.c                                  |  11 +-
- target/i386/machine.c                              |   2 +-
- target/i386/monitor.c                              |   1 -
- target/mips/kvm.c                                  |   2 +-
- target/ppc/kvm.c                                   |   2 +-
- target/s390x/cpu_models.c                          |   4 +-
- target/s390x/kvm.c                                 |   2 +-
- tests/Makefile.include                             |   4 +-
- tests/arm-cpu-features.c                           |   4 +-
- tests/bios-tables-test.c                           |  16 +-
- tests/boot-serial-test.c                           |   4 +-
- tests/cdrom-test.c                                 |   2 +-
- tests/libqtest.c                                   |   4 +-
- tests/migration-test.c                             | 264 ++++++++++---------
- tests/pflash-cfi02-test.c                          |   4 +-
- tests/pnv-xscom-test.c                             |   4 +-
- tests/prom-env-test.c                              |   2 +-
- tests/pxe-test.c                                   |   2 +-
- tests/vmgenid-test.c                               |   2 +-
- util/Makefile.objs                                 |   3 +-
- util/qsp.c                                         |  22 +-
- vl.c                                               | 225 +++++++++++-----
- 103 files changed, 1298 insertions(+), 1076 deletions(-)
- rename stubs/pc_madt_cpu_entry.c => hw/acpi/acpi-x86-stub.c (100%)
- create mode 100644 hw/i386/port92.c
- create mode 100644 hw/i386/x86-iommu-stub.c
- create mode 100644 include/hw/intc/i8259.h
--- 
-1.8.3.1
+The mediate ops looks quite similar to what vfio-mdev did. And it looks=20
+to me we need to consider live migration for mdev as well. In that case,=20
+do we still expect mediate ops through VFIO directly?
+
+
+> (2) For features like dynamically trap/untrap pci bars, if they are in
+> vfio-pci, they can be available to most people without repeated code
+> copying and re-testing.
+> (3) with a 1:1 mdev driver which passthrough VFs most of the time, people
+> have to decide whether to bind VFs to vfio-pci or mdev parent driver befo=
+re
+> it runs into a real migration need. However, if vfio-pci is bound
+> initially, they have no chance to do live migration when there's a need
+> later.
+
+
+We can teach management layer to do this.
+
+Thanks
+
+
+>
+> In this patchset,
+> - patches 1-4 enable vfio-pci to call mediate ops registered by vendor
+>    driver to mediate/customize region info/rw/mmap.
+>
+> - patches 5-6 provide a standalone sample driver to register a mediate op=
+s
+>    for Intel Graphics Devices. It does not bind to IGDs directly but deci=
+des
+>    what devices it supports via its pciidlist. It also demonstrates how t=
+o
+>    dynamic trap a device's PCI bars. (by adding more pciids in its
+>    pciidlist, this sample driver actually is not necessarily limited to
+>    support IGDs)
+>
+> - patch 7-9 provide a sample on i40e driver that supports Intel(R)
+>    Ethernet Controller XL710 Family of devices. It supports VF precopy li=
+ve
+>    migration on Intel's 710 SRIOV. (but we commented out the real
+>    implementation of dirty page tracking and device state retrieving part
+>    to focus on demonstrating framework part. Will send out them in future
+>    versions)
+>  =20
+>    patch 7 registers/unregisters VF mediate ops when PF driver
+>    probes/removes. It specifies its supporting VFs via
+>    vfio_pci_mediate_ops->open(pdev)
+>
+>    patch 8 reports device cap of VFIO_PCI_DEVICE_CAP_MIGRATION and
+>    provides a sample implementation of migration region.
+>    The QEMU part of vfio migration is based on v8
+>    https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05542.html.
+>    We do not based on recent v9 because we think there are still opens in
+>    dirty page track part in that series.
+>
+>    patch 9 reports device cap of VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR and
+>    provides an example on how to trap part of bar0 when migration starts
+>    and passthrough this part of bar0 again when migration fails.
+>
+> Yan Zhao (9):
+>    vfio/pci: introduce mediate ops to intercept vfio-pci ops
+>    vfio/pci: test existence before calling region->ops
+>    vfio/pci: register a default migration region
+>    vfio-pci: register default dynamic-trap-bar-info region
+>    samples/vfio-pci/igd_dt: sample driver to mediate a passthrough IGD
+>    sample/vfio-pci/igd_dt: dynamically trap/untrap subregion of IGD bar0
+>    i40e/vf_migration: register mediate_ops to vfio-pci
+>    i40e/vf_migration: mediate migration region
+>    i40e/vf_migration: support dynamic trap of bar0
+>
+>   drivers/net/ethernet/intel/Kconfig            |   2 +-
+>   drivers/net/ethernet/intel/i40e/Makefile      |   3 +-
+>   drivers/net/ethernet/intel/i40e/i40e.h        |   2 +
+>   drivers/net/ethernet/intel/i40e/i40e_main.c   |   3 +
+>   .../ethernet/intel/i40e/i40e_vf_migration.c   | 626 ++++++++++++++++++
+>   .../ethernet/intel/i40e/i40e_vf_migration.h   |  78 +++
+>   drivers/vfio/pci/vfio_pci.c                   | 189 +++++-
+>   drivers/vfio/pci/vfio_pci_private.h           |   2 +
+>   include/linux/vfio.h                          |  18 +
+>   include/uapi/linux/vfio.h                     | 160 +++++
+>   samples/Kconfig                               |   6 +
+>   samples/Makefile                              |   1 +
+>   samples/vfio-pci/Makefile                     |   2 +
+>   samples/vfio-pci/igd_dt.c                     | 367 ++++++++++
+>   14 files changed, 1455 insertions(+), 4 deletions(-)
+>   create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.c
+>   create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
+>   create mode 100644 samples/vfio-pci/Makefile
+>   create mode 100644 samples/vfio-pci/igd_dt.c
+>
 
 
