@@ -8,76 +8,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 795A4C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 13:45:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8D78C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 13:49:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D75B2464D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 13:45:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 241F12464D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 13:49:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZkapLcTn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D75B2464D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lzZ8zk2s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 241F12464D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54357 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icrS0-0005nM-Gt
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 08:45:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35735)
+	id 1icrVK-0000au-7N
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 08:49:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47121)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1icrOy-0002gV-I9
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:42:48 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1icrKG-0006vq-IA
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:37:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1icrOq-0003SO-FG
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:42:40 -0500
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:46943)
+ (envelope-from <mrolnik@gmail.com>) id 1icrJz-00034v-Ip
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:37:41 -0500
+Received: from mail-vk1-xa41.google.com ([2607:f8b0:4864:20::a41]:46260)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1icrOq-0003Pk-5P
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:42:32 -0500
-Received: by mail-qt1-x842.google.com with SMTP id 38so3497854qtb.13
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 05:42:32 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1icrJz-0002zq-5a
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:37:31 -0500
+Received: by mail-vk1-xa41.google.com with SMTP id u6so1081759vkn.13
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 05:37:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vWBu7O+uh5/zNbTxoZ/IWHkeOuOR3colOKKLdXYJcmk=;
- b=ZkapLcTnryurP54Q4mCQI66OQRECNsCWnfnZWGrG+8WFIBYgZI2xF64KycnFZ6NuBu
- L9lgAraC4kcjlvUmab2q1BFoeVThjXrZXob4Wu1PCOndRvoCSkgqEIFYjiEQqO7vc1rd
- I40l1qIgNrHQbz5uF+AAOoCjGLYeI4nHsK38uidtaTbB+Lyd3M4uTIhqfof0hiHE+2M7
- tQ5PPWTSxNoDNJj8A0GkCcOZzylp54uU/ngbYMBqRvU+geNrJMbMsG0Pywb9DvZZC2dB
- nLKMkKFylCbrV1ofd8iwaFUUqB3fMwaE1ulmHDXfz3J5wkxoKOoVOR57QHsvIKDbQ1bv
- nYUw==
+ :cc; bh=Svy9Frf3+iiJZXLruZmdVgShBae5icU+Mw5+TU3oMgU=;
+ b=lzZ8zk2sTK+bPuXTha2biXo+30egCHF7URkqeHeJKGX82FtytXw3TOZ2a5HsNuweUl
+ iM/pjaz2vDQ2iWvy087peRkbPJ8X957hrmJf4zjWPEFpMuFwu9jO9sGC0zK5ivGA8dHB
+ qLvNSMKZ1PHW5elS0Rsm637PSm0cKWef1KIAixtxbRrbPTveQ2SXexi8+f7GejfWrXfS
+ BI+/5SB16QdBgTBZH+XTFsrm6BwXhzwi80m52lCauwiFnNh1+48nra5x3srMaRYYwG+z
+ VZcB7BgVg4Ul9bGkeW265d9JCSsJQdxwH+HFDcB7uZnkNNwlcrJyHnT1vG4sbqnH0PrE
+ jSrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=vWBu7O+uh5/zNbTxoZ/IWHkeOuOR3colOKKLdXYJcmk=;
- b=As8BK/QZNMEsPV6RmDZGZt8EAz5zUz/FTCIlysihNTr6IE4JiRFJynPDKvG8q/46sV
- tx+n6Di784T/87eQ1/QNTZEi1PaeO4C3WguXofaZTq9yD3mygs/xjK1W/63lyvend39v
- DQZHSLIksRq0lxPteqHWNjGCbuyJWRBXgf139FnJO6wgNns/UOx7uQF/7h9ZzDQN5esX
- 2ZDSn6FmHd694RHlIBnPZ0Kbt5uTxR9I1QwcsgGq8udkWwBGNicyzZMOl+k2SPlhLYzF
- 2Nl6LIeagPA076JgRHkjwGLHLH3xLIj4qX6FAFCU2A7kvajFoRiKnibHPj+yrW2Y0EhY
- 2Wwg==
-X-Gm-Message-State: APjAAAVGb6p/mL9qm5TC4NV7hf8XaYhbIOh7JxjWgOnqOMX5VFDktaqH
- 56l4hy1ERInG6YqUgOuQyquhTHjljRplxTW55l69R+qNbiM=
-X-Google-Smtp-Source: APXvYqxNItoeanmaTQKimv9bIqsIzJ34LrY0+0VMu/U6R4eJui0Oal0T0Yyy75p2OTOs8Cjtd3WQxr7bd4TajfWXsvk=
-X-Received: by 2002:ac8:3094:: with SMTP id v20mr7561948qta.306.1575551862914; 
- Thu, 05 Dec 2019 05:17:42 -0800 (PST)
+ bh=Svy9Frf3+iiJZXLruZmdVgShBae5icU+Mw5+TU3oMgU=;
+ b=qtUhXI6UDcV1HAwm8V41IQJ24e4qHcJ+8lhdeCOnb0jnlpv0IQQg035ofeBYCeVaJb
+ CcPcvn5MvxvL59d/HREfslQC8IW6F5Er1b8TyLkENJD5VUOmhCQD9+/nCH4lQTcJF3it
+ jz7toKlDB8dfUUSVvxu1bHhDnTDgmTN9WmUSLu+wLqGxo8RDyTU3sb+ncl5StFI/YXRp
+ LT+JfE52tC4if8w37YUuGsd/FV4SoDwg7QdLdReWczKb+Ngu0UGNPXWOddV3/rumCPbR
+ sQElJts6ntC7r3ox6RnPFKlC5qo1oIg+NrG11SP0XYPhGWz2/LKj/6zM4RDjTdop28j/
+ sUmw==
+X-Gm-Message-State: APjAAAUwj33/TEF2SrOui5mfpa0sjYbfVIO+++QqQKwfQa9/XpZfCD5w
+ nTY3QzyY00tBWubcqvGmXNkW0K+VXEDFHwoCd+lwmQmV4BSy2A==
+X-Google-Smtp-Source: APXvYqxIi9icXzsPs24aHI+CKUuFdBiW/7ivTRZjiHlb2msUqLPjp50gtr2yaSu801sDuthOWKAlyos4k4fg6NXOsLM=
+X-Received: by 2002:a0c:e9cf:: with SMTP id q15mr7332785qvo.137.1575552571915; 
+ Thu, 05 Dec 2019 05:29:31 -0800 (PST)
 MIME-Version: 1.0
 References: <20191127175257.23480-1-mrolnik@gmail.com>
  <20191127175257.23480-8-mrolnik@gmail.com>
  <CAL1e-=iG-Y+QB5nFdf41tr1vJSSwjmADQr9Hcgk-_MQpFseS5Q@mail.gmail.com>
-In-Reply-To: <CAL1e-=iG-Y+QB5nFdf41tr1vJSSwjmADQr9Hcgk-_MQpFseS5Q@mail.gmail.com>
+ <CAK4993h+rahNxEQD14kfmRJ_ZJ251TxEkCwrpV7P66TKdTS7eA@mail.gmail.com>
+In-Reply-To: <CAK4993h+rahNxEQD14kfmRJ_ZJ251TxEkCwrpV7P66TKdTS7eA@mail.gmail.com>
 From: Michael Rolnik <mrolnik@gmail.com>
-Date: Thu, 5 Dec 2019 15:17:04 +0200
-Message-ID: <CAK4993h+rahNxEQD14kfmRJ_ZJ251TxEkCwrpV7P66TKdTS7eA@mail.gmail.com>
+Date: Thu, 5 Dec 2019 15:28:53 +0200
+Message-ID: <CAK4993iTLV2f-8CjOA62qkPLbNyVSjMu+JF3qcRD6tMPKw8b0g@mail.gmail.com>
 Subject: Re: [PATCH v37 07/17] target/avr: Add instruction translation - Bit
  and Bit-test Instructions
 To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000001d42770598f4c199"
+Content-Type: multipart/alternative; boundary="0000000000005fc2ac0598f4eb78"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::842
+X-Received-From: 2607:f8b0:4864:20::a41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,1369 +101,1394 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001d42770598f4c199
+--0000000000005fc2ac0598f4eb78
 Content-Type: text/plain; charset="UTF-8"
 
-I think they do follow the division in the docs.
+my mistake. Thanks. I will split it.
 
-On Thu, Dec 5, 2019 at 2:28 PM Aleksandar Markovic <
-aleksandar.m.mail@gmail.com> wrote:
+On Thu, Dec 5, 2019 at 3:17 PM Michael Rolnik <mrolnik@gmail.com> wrote:
 
+> I think they do follow the division in the docs.
 >
+> On Thu, Dec 5, 2019 at 2:28 PM Aleksandar Markovic <
+> aleksandar.m.mail@gmail.com> wrote:
 >
-> On Wednesday, November 27, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
->
->> This includes:
->>     - LSR, ROR
->>     - ASR
->>     - SWAP
->>     - SBI, CBI
->>     - BST, BLD
->>     - BSET, BCLR
->>
->> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
->> ---
->>  target/avr/translate.c | 1123 ++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 1123 insertions(+)
 >>
 >>
-> Hello, Michael
->
-> I said I am on vacation, and truly I am, but, fir the next version if the
-> series, I would like to ask you to extract "data transfer" instruction (as
-> defined in avr docs, MOV LD ST etc) from this patch, and create a new patch
-> for them - so that the patches follow the division from docs.
->
-> Yours,
-> Aleksandar
->
->
->
->
->
->> diff --git a/target/avr/translate.c b/target/avr/translate.c
->> index 48a42c984a..dc6a1af2fc 100644
->> --- a/target/avr/translate.c
->> +++ b/target/avr/translate.c
->> @@ -317,6 +317,15 @@ static void gen_goto_tb(DisasContext *ctx, int n,
->> target_ulong dest)
->>  }
+>> On Wednesday, November 27, 2019, Michael Rolnik <mrolnik@gmail.com>
+>> wrote:
+>>
+>>> This includes:
+>>>     - LSR, ROR
+>>>     - ASR
+>>>     - SWAP
+>>>     - SBI, CBI
+>>>     - BST, BLD
+>>>     - BSET, BCLR
+>>>
+>>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+>>> ---
+>>>  target/avr/translate.c | 1123 ++++++++++++++++++++++++++++++++++++++++
+>>>  1 file changed, 1123 insertions(+)
+>>>
+>>>
+>> Hello, Michael
+>>
+>> I said I am on vacation, and truly I am, but, fir the next version if the
+>> series, I would like to ask you to extract "data transfer" instruction (as
+>> defined in avr docs, MOV LD ST etc) from this patch, and create a new patch
+>> for them - so that the patches follow the division from docs.
+>>
+>> Yours,
+>> Aleksandar
 >>
 >>
->> +static void gen_rshift_ZNVSf(TCGv R)
->> +{
->> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
->> +    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
->> +    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
->> +    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
->> +}
->> +
->> +
->>  /*
->>   *  Adds two registers without the C Flag and places the result in the
->>   *  destination register Rd.
->> @@ -1508,3 +1517,1117 @@ static bool trans_BRBS(DisasContext *ctx,
->> arg_BRBS *a)
->>      return true;
->>  }
->>
->> +
->> +/*
->> + *  This instruction makes a copy of one register into another. The
->> source
->> + *  register Rr is left unchanged, while the destination register Rd is
->> loaded
->> + *  with a copy of Rr.
->> + */
->> +static bool trans_MOV(DisasContext *ctx, arg_MOV *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv Rr = cpu_r[a->rr];
->> +
->> +    tcg_gen_mov_tl(Rd, Rr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  This instruction makes a copy of one register pair into another
->> register
->> + *  pair. The source register pair Rr+1:Rr is left unchanged, while the
->> + *  destination register pair Rd+1:Rd is loaded with a copy of Rr +
->> 1:Rr.  This
->> + *  instruction is not available in all devices. Refer to the device
->> specific
->> + *  instruction set summary.
->> + */
->> +static bool trans_MOVW(DisasContext *ctx, arg_MOVW *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_MOVW)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv RdL = cpu_r[a->rd];
->> +    TCGv RdH = cpu_r[a->rd + 1];
->> +    TCGv RrL = cpu_r[a->rr];
->> +    TCGv RrH = cpu_r[a->rr + 1];
->> +
->> +    tcg_gen_mov_tl(RdH, RrH);
->> +    tcg_gen_mov_tl(RdL, RrL);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + * Loads an 8 bit constant directly to register 16 to 31.
->> + */
->> +static bool trans_LDI(DisasContext *ctx, arg_LDI *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    int imm = a->imm;
->> +
->> +    tcg_gen_movi_tl(Rd, imm);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Loads one byte from the data space to a register. For parts with
->> SRAM,
->> + *  the data space consists of the Register File, I/O memory and
->> internal SRAM
->> + *  (and external SRAM if applicable). For parts without SRAM, the data
->> space
->> + *  consists of the register file only. The EEPROM has a separate
->> address space.
->> + *  A 16-bit address must be supplied. Memory access is limited to the
->> current
->> + *  data segment of 64KB. The LDS instruction uses the RAMPD Register to
->> access
->> + *  memory above 64KB. To access another data segment in devices with
->> more than
->> + *  64KB data space, the RAMPD in register in the I/O area has to be
->> changed.
->> + *  This instruction is not available in all devices. Refer to the device
->> + *  specific instruction set summary.
->> + */
->> +static bool trans_LDS(DisasContext *ctx, arg_LDS *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = tcg_temp_new_i32();
->> +    TCGv H = cpu_rampD;
->> +    a->imm = next_word(ctx);
->> +
->> +    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
->> +    tcg_gen_shli_tl(addr, addr, 16);
->> +    tcg_gen_ori_tl(addr, addr, a->imm);
->> +
->> +    gen_data_load(ctx, Rd, addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Loads one byte indirect from the data space to a register. For parts
->> + *  with SRAM, the data space consists of the Register File, I/O memory
->> and
->> + *  internal SRAM (and external SRAM if applicable). For parts without
->> SRAM, the
->> + *  data space consists of the Register File only. In some parts the
->> Flash
->> + *  Memory has been mapped to the data space and can be read using this
->> command.
->> + *  The EEPROM has a separate address space.  The data location is
->> pointed to by
->> + *  the X (16 bits) Pointer Register in the Register File. Memory access
->> is
->> + *  limited to the current data segment of 64KB. To access another data
->> segment
->> + *  in devices with more than 64KB data space, the RAMPX in register in
->> the I/O
->> + *  area has to be changed.  The X-pointer Register can either be left
->> unchanged
->> + *  by the operation, or it can be post-incremented or predecremented.
->> These
->> + *  features are especially suited for accessing arrays, tables, and
->> Stack
->> + *  Pointer usage of the X-pointer Register. Note that only the low byte
->> of the
->> + *  X-pointer is updated in devices with no more than 256 bytes data
->> space. For
->> + *  such devices, the high byte of the pointer is not used by this
->> instruction
->> + *  and can be used for other purposes. The RAMPX Register in the I/O
->> area is
->> + *  updated in parts with more than 64KB data space or more than 64KB
->> Program
->> + *  memory, and the increment/decrement is added to the entire 24-bit
->> address on
->> + *  such devices.  Not all variants of this instruction is available in
->> all
->> + *  devices. Refer to the device specific instruction set summary.  In
->> the
->> + *  Reduced Core tinyAVR the LD instruction can be used to achieve the
->> same
->> + *  operation as LPM since the program memory is mapped to the data
->> memory
->> + *  space.
->> + */
->> +static bool trans_LDX1(DisasContext *ctx, arg_LDX1 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_xaddr();
->> +
->> +    gen_data_load(ctx, Rd, addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_LDX2(DisasContext *ctx, arg_LDX2 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_xaddr();
->> +
->> +    gen_data_load(ctx, Rd, addr);
->> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
->> +
->> +    gen_set_xaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_LDX3(DisasContext *ctx, arg_LDX3 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_xaddr();
->> +
->> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
->> +    gen_data_load(ctx, Rd, addr);
->> +    gen_set_xaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_STX1(DisasContext *ctx, arg_STX1 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rr];
->> +    TCGv addr = gen_get_xaddr();
->> +
->> +    gen_data_store(ctx, Rd, addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +static bool trans_STX2(DisasContext *ctx, arg_STX2 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rr];
->> +    TCGv addr = gen_get_xaddr();
->> +
->> +    gen_data_store(ctx, Rd, addr);
->> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
->> +    gen_set_xaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +static bool trans_STX3(DisasContext *ctx, arg_STX3 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rr];
->> +    TCGv addr = gen_get_xaddr();
->> +
->> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
->> +    gen_data_store(ctx, Rd, addr);
->> +    gen_set_xaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Loads one byte indirect with or without displacement from the data
->> space
->> + *  to a register. For parts with SRAM, the data space consists of the
->> Register
->> + *  File, I/O memory and internal SRAM (and external SRAM if
->> applicable). For
->> + *  parts without SRAM, the data space consists of the Register File
->> only. In
->> + *  some parts the Flash Memory has been mapped to the data space and
->> can be
->> + *  read using this command. The EEPROM has a separate address space.
->> The data
->> + *  location is pointed to by the Y (16 bits) Pointer Register in the
->> Register
->> + *  File. Memory access is limited to the current data segment of 64KB.
->> To
->> + *  access another data segment in devices with more than 64KB data
->> space, the
->> + *  RAMPY in register in the I/O area has to be changed.  The Y-pointer
->> Register
->> + *  can either be left unchanged by the operation, or it can be
->> post-incremented
->> + *  or predecremented.  These features are especially suited for
->> accessing
->> + *  arrays, tables, and Stack Pointer usage of the Y-pointer Register.
->> Note that
->> + *  only the low byte of the Y-pointer is updated in devices with no
->> more than
->> + *  256 bytes data space. For such devices, the high byte of the pointer
->> is not
->> + *  used by this instruction and can be used for other purposes. The
->> RAMPY
->> + *  Register in the I/O area is updated in parts with more than 64KB
->> data space
->> + *  or more than 64KB Program memory, and the
->> increment/decrement/displacement
->> + *  is added to the entire 24-bit address on such devices.  Not all
->> variants of
->> + *  this instruction is available in all devices. Refer to the device
->> specific
->> + *  instruction set summary.  In the Reduced Core tinyAVR the LD
->> instruction can
->> + *  be used to achieve the same operation as LPM since the program
->> memory is
->> + *  mapped to the data memory space.
->> + */
->> +static bool trans_LDY2(DisasContext *ctx, arg_LDY2 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_yaddr();
->> +
->> +    gen_data_load(ctx, Rd, addr);
->> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
->> +
->> +    gen_set_yaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_LDY3(DisasContext *ctx, arg_LDY3 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_yaddr();
->> +
->> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
->> +    gen_data_load(ctx, Rd, addr);
->> +    gen_set_yaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_LDDY(DisasContext *ctx, arg_LDDY *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_yaddr();
->> +
->> +    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
->> +    gen_data_load(ctx, Rd, addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_STY2(DisasContext *ctx, arg_STY2 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_yaddr();
->> +
->> +    gen_data_store(ctx, Rd, addr);
->> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
->> +    gen_set_yaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_STY3(DisasContext *ctx, arg_STY3 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_yaddr();
->> +
->> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
->> +    gen_data_store(ctx, Rd, addr);
->> +    gen_set_yaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_STDY(DisasContext *ctx, arg_STDY *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_yaddr();
->> +
->> +    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
->> +    gen_data_store(ctx, Rd, addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Loads one byte indirect with or without displacement from the data
->> space
->> + *  to a register. For parts with SRAM, the data space consists of the
->> Register
->> + *  File, I/O memory and internal SRAM (and external SRAM if
->> applicable). For
->> + *  parts without SRAM, the data space consists of the Register File
->> only. In
->> + *  some parts the Flash Memory has been mapped to the data space and
->> can be
->> + *  read using this command. The EEPROM has a separate address space.
->> The data
->> + *  location is pointed to by the Z (16 bits) Pointer Register in the
->> Register
->> + *  File. Memory access is limited to the current data segment of 64KB.
->> To
->> + *  access another data segment in devices with more than 64KB data
->> space, the
->> + *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer
->> Register
->> + *  can either be left unchanged by the operation, or it can be
->> post-incremented
->> + *  or predecremented.  These features are especially suited for Stack
->> Pointer
->> + *  usage of the Z-pointer Register, however because the Z-pointer
->> Register can
->> + *  be used for indirect subroutine calls, indirect jumps and table
->> lookup, it
->> + *  is often more convenient to use the X or Y-pointer as a dedicated
->> Stack
->> + *  Pointer. Note that only the low byte of the Z-pointer is updated in
->> devices
->> + *  with no more than 256 bytes data space. For such devices, the high
->> byte of
->> + *  the pointer is not used by this instruction and can be used for other
->> + *  purposes. The RAMPZ Register in the I/O area is updated in parts
->> with more
->> + *  than 64KB data space or more than 64KB Program memory, and the
->> + *  increment/decrement/displacement is added to the entire 24-bit
->> address on
->> + *  such devices.  Not all variants of this instruction is available in
->> all
->> + *  devices. Refer to the device specific instruction set summary.  In
->> the
->> + *  Reduced Core tinyAVR the LD instruction can be used to achieve the
->> same
->> + *  operation as LPM since the program memory is mapped to the data
->> memory
->> + *  space.  For using the Z-pointer for table lookup in Program memory
->> see the
->> + *  LPM and ELPM instructions.
->> + */
->> +static bool trans_LDZ2(DisasContext *ctx, arg_LDZ2 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    gen_data_load(ctx, Rd, addr);
->> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
->> +
->> +    gen_set_zaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_LDZ3(DisasContext *ctx, arg_LDZ3 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
->> +    gen_data_load(ctx, Rd, addr);
->> +
->> +    gen_set_zaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_LDDZ(DisasContext *ctx, arg_LDDZ *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
->> +    gen_data_load(ctx, Rd, addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_STZ2(DisasContext *ctx, arg_STZ2 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    gen_data_store(ctx, Rd, addr);
->> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
->> +
->> +    gen_set_zaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_STZ3(DisasContext *ctx, arg_STZ3 *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
->> +    gen_data_store(ctx, Rd, addr);
->> +
->> +    gen_set_zaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_STDZ(DisasContext *ctx, arg_STDZ *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
->> +    gen_data_store(ctx, Rd, addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +
->> +/*
->> + *  Stores one byte from a Register to the data space. For parts with
->> SRAM,
->> + *  the data space consists of the Register File, I/O memory and
->> internal SRAM
->> + *  (and external SRAM if applicable). For parts without SRAM, the data
->> space
->> + *  consists of the Register File only. The EEPROM has a separate
->> address space.
->> + *  A 16-bit address must be supplied. Memory access is limited to the
->> current
->> + *  data segment of 64KB. The STS instruction uses the RAMPD Register to
->> access
->> + *  memory above 64KB. To access another data segment in devices with
->> more than
->> + *  64KB data space, the RAMPD in register in the I/O area has to be
->> changed.
->> + *  This instruction is not available in all devices. Refer to the device
->> + *  specific instruction set summary.
->> + */
->> +static bool trans_STS(DisasContext *ctx, arg_STS *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = tcg_temp_new_i32();
->> +    TCGv H = cpu_rampD;
->> +    a->imm = next_word(ctx);
->> +
->> +    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
->> +    tcg_gen_shli_tl(addr, addr, 16);
->> +    tcg_gen_ori_tl(addr, addr, a->imm);
->> +
->> +    gen_data_store(ctx, Rd, addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Loads one byte pointed to by the Z-register into the destination
->> + *  register Rd. This instruction features a 100% space effective
->> constant
->> + *  initialization or constant data fetch. The Program memory is
->> organized in
->> + *  16-bit words while the Z-pointer is a byte address. Thus, the least
->> + *  significant bit of the Z-pointer selects either low byte (ZLSB = 0)
->> or high
->> + *  byte (ZLSB = 1). This instruction can address the first 64KB (32K
->> words) of
->> + *  Program memory. The Zpointer Register can either be left unchanged
->> by the
->> + *  operation, or it can be incremented. The incrementation does not
->> apply to
->> + *  the RAMPZ Register.  Devices with Self-Programming capability can
->> use the
->> + *  LPM instruction to read the Fuse and Lock bit values.  Refer to the
->> device
->> + *  documentation for a detailed description.  The LPM instruction is not
->> + *  available in all devices. Refer to the device specific instruction
->> set
->> + *  summary
->> + */
->> +static bool trans_LPM1(DisasContext *ctx, arg_LPM1 *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rd = cpu_r[0];
->> +    TCGv addr = tcg_temp_new_i32();
->> +    TCGv H = cpu_r[31];
->> +    TCGv L = cpu_r[30];
->> +
->> +    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
->> +    tcg_gen_or_tl(addr, addr, L);
->> +
->> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_LPM2(DisasContext *ctx, arg_LPM2 *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = tcg_temp_new_i32();
->> +    TCGv H = cpu_r[31];
->> +    TCGv L = cpu_r[30];
->> +
->> +    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
->> +    tcg_gen_or_tl(addr, addr, L);
->> +
->> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_LPMX(DisasContext *ctx, arg_LPMX *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_LPMX)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = tcg_temp_new_i32();
->> +    TCGv H = cpu_r[31];
->> +    TCGv L = cpu_r[30];
->> +
->> +    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
->> +    tcg_gen_or_tl(addr, addr, L);
->> +
->> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
->> +
->> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
->> +
->> +    tcg_gen_andi_tl(L, addr, 0xff);
->> +
->> +    tcg_gen_shri_tl(addr, addr, 8);
->> +    tcg_gen_andi_tl(H, addr, 0xff);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Loads one byte pointed to by the Z-register and the RAMPZ Register in
->> + *  the I/O space, and places this byte in the destination register Rd.
->> This
->> + *  instruction features a 100% space effective constant initialization
->> or
->> + *  constant data fetch. The Program memory is organized in 16-bit words
->> while
->> + *  the Z-pointer is a byte address. Thus, the least significant bit of
->> the
->> + *  Z-pointer selects either low byte (ZLSB = 0) or high byte (ZLSB =
->> 1). This
->> + *  instruction can address the entire Program memory space. The
->> Z-pointer
->> + *  Register can either be left unchanged by the operation, or it can be
->> + *  incremented. The incrementation applies to the entire 24-bit
->> concatenation
->> + *  of the RAMPZ and Z-pointer Registers.  Devices with Self-Programming
->> + *  capability can use the ELPM instruction to read the Fuse and Lock
->> bit value.
->> + *  Refer to the device documentation for a detailed description.  This
->> + *  instruction is not available in all devices. Refer to the device
->> specific
->> + *  instruction set summary.
->> + */
->> +static bool trans_ELPM1(DisasContext *ctx, arg_ELPM1 *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rd = cpu_r[0];
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_ELPM2(DisasContext *ctx, arg_ELPM2 *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_ELPMX(DisasContext *ctx, arg_ELPMX *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_ELPMX)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
->> +
->> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
->> +
->> +    gen_set_zaddr(addr);
->> +
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  SPM can be used to erase a page in the Program memory, to write a
->> page
->> + *  in the Program memory (that is already erased), and to set Boot
->> Loader Lock
->> + *  bits. In some devices, the Program memory can be written one word at
->> a time,
->> + *  in other devices an entire page can be programmed simultaneously
->> after first
->> + *  filling a temporary page buffer. In all cases, the Program memory
->> must be
->> + *  erased one page at a time. When erasing the Program memory, the
->> RAMPZ and
->> + *  Z-register are used as page address. When writing the Program
->> memory, the
->> + *  RAMPZ and Z-register are used as page or word address, and the R1:R0
->> + *  register pair is used as data(1). When setting the Boot Loader Lock
->> bits,
->> + *  the R1:R0 register pair is used as data. Refer to the device
->> documentation
->> + *  for detailed description of SPM usage. This instruction can address
->> the
->> + *  entire Program memory.  The SPM instruction is not available in all
->> devices.
->> + *  Refer to the device specific instruction set summary.  Note: 1. R1
->> + *  determines the instruction high byte, and R0 determines the
->> instruction low
->> + *  byte.
->> + */
->> +static bool trans_SPM(DisasContext *ctx, arg_SPM *a)
->> +{
->> +    /* TODO */
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_SPM)) {
->> +        return true;
->> +    }
->> +
->> +    return true;
->> +}
->> +
->> +
->> +static bool trans_SPMX(DisasContext *ctx, arg_SPMX *a)
->> +{
->> +    /* TODO */
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_SPMX)) {
->> +        return true;
->> +    }
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Loads data from the I/O Space (Ports, Timers, Configuration
->> Registers,
->> + *  etc.) into register Rd in the Register File.
->> + */
->> +static bool trans_IN(DisasContext *ctx, arg_IN *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv port = tcg_const_i32(a->imm);
->> +
->> +    gen_helper_inb(Rd, cpu_env, port);
->> +
->> +    tcg_temp_free_i32(port);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Stores data from register Rr in the Register File to I/O Space
->> (Ports,
->> + *  Timers, Configuration Registers, etc.).
->> + */
->> +static bool trans_OUT(DisasContext *ctx, arg_OUT *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv port = tcg_const_i32(a->imm);
->> +
->> +    gen_helper_outb(cpu_env, port, Rd);
->> +
->> +    tcg_temp_free_i32(port);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  This instruction stores the contents of register Rr on the STACK. The
->> + *  Stack Pointer is post-decremented by 1 after the PUSH.  This
->> instruction is
->> + *  not available in all devices. Refer to the device specific
->> instruction set
->> + *  summary.
->> + */
->> +static bool trans_PUSH(DisasContext *ctx, arg_PUSH *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +
->> +    gen_data_store(ctx, Rd, cpu_sp);
->> +    tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  This instruction loads register Rd with a byte from the STACK. The
->> Stack
->> + *  Pointer is pre-incremented by 1 before the POP.  This instruction is
->> not
->> + *  available in all devices. Refer to the device specific instruction
->> set
->> + *  summary.
->> + */
->> +static bool trans_POP(DisasContext *ctx, arg_POP *a)
->> +{
->> +    /*
->> +     * Using a temp to work around some strange behaviour:
->> +     * tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
->> +     * gen_data_load(ctx, Rd, cpu_sp);
->> +     * seems to cause the add to happen twice.
->> +     * This doesn't happen if either the add or the load is removed.
->> +     */
->> +    TCGv t1 = tcg_temp_new_i32();
->> +    TCGv Rd = cpu_r[a->rd];
->> +
->> +    tcg_gen_addi_tl(t1, cpu_sp, 1);
->> +    gen_data_load(ctx, Rd, t1);
->> +    tcg_gen_mov_tl(cpu_sp, t1);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Exchanges one byte indirect between register and data space.  The
->> data
->> + *  location is pointed to by the Z (16 bits) Pointer Register in the
->> Register
->> + *  File. Memory access is limited to the current data segment of 64KB.
->> To
->> + *  access another data segment in devices with more than 64KB data
->> space, the
->> + *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer
->> Register
->> + *  is left unchanged by the operation. This instruction is especially
->> suited
->> + *  for writing/reading status bits stored in SRAM.
->> + */
->> +static bool trans_XCH(DisasContext *ctx, arg_XCH *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv t0 = tcg_temp_new_i32();
->> +    TCGv addr = gen_get_zaddr();
->> +
->> +    gen_data_load(ctx, t0, addr);
->> +    gen_data_store(ctx, Rd, addr);
->> +    tcg_gen_mov_tl(Rd, t0);
->> +
->> +    tcg_temp_free_i32(t0);
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Load one byte indirect from data space to register and set bits in
->> data
->> + *  space specified by the register. The instruction can only be used
->> towards
->> + *  internal SRAM.  The data location is pointed to by the Z (16 bits)
->> Pointer
->> + *  Register in the Register File. Memory access is limited to the
->> current data
->> + *  segment of 64KB. To access another data segment in devices with more
->> than
->> + *  64KB data space, the RAMPZ in register in the I/O area has to be
->> changed.
->> + *  The Z-pointer Register is left unchanged by the operation. This
->> instruction
->> + *  is especially suited for setting status bits stored in SRAM.
->> + */
->> +static bool trans_LAS(DisasContext *ctx, arg_LAS *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rr = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +    TCGv t0 = tcg_temp_new_i32();
->> +    TCGv t1 = tcg_temp_new_i32();
->> +
->> +    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
->> +    tcg_gen_or_tl(t1, t0, Rr);
->> +
->> +    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
->> +    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
->> +
->> +    tcg_temp_free_i32(t1);
->> +    tcg_temp_free_i32(t0);
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Load one byte indirect from data space to register and stores and
->> clear
->> + *  the bits in data space specified by the register. The instruction can
->> + *  only be used towards internal SRAM.  The data location is pointed to
->> by
->> + *  the Z (16 bits) Pointer Register in the Register File. Memory access
->> is
->> + *  limited to the current data segment of 64KB. To access another data
->> + *  segment in devices with more than 64KB data space, the RAMPZ in
->> register
->> + *  in the I/O area has to be changed.  The Z-pointer Register is left
->> + *  unchanged by the operation. This instruction is especially suited for
->> + *  clearing status bits stored in SRAM.
->> + */
->> +static bool trans_LAC(DisasContext *ctx, arg_LAC *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rr = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +    TCGv t0 = tcg_temp_new_i32();
->> +    TCGv t1 = tcg_temp_new_i32();
->> +
->> +    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
->> +        /* t1 = t0 & (0xff - Rr) = t0 and ~Rr */
->> +    tcg_gen_andc_tl(t1, t0, Rr);
->> +
->> +    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
->> +    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
->> +
->> +    tcg_temp_free_i32(t1);
->> +    tcg_temp_free_i32(t0);
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Load one byte indirect from data space to register and toggles bits
->> in
->> + *  the data space specified by the register.  The instruction can only
->> be used
->> + *  towards SRAM.  The data location is pointed to by the Z (16 bits)
->> Pointer
->> + *  Register in the Register File. Memory access is limited to the
->> current data
->> + *  segment of 64KB. To access another data segment in devices with more
->> than
->> + *  64KB data space, the RAMPZ in register in the I/O area has to be
->> changed.
->> + *  The Z-pointer Register is left unchanged by the operation. This
->> instruction
->> + *  is especially suited for changing status bits stored in SRAM.
->> + */
->> +static bool trans_LAT(DisasContext *ctx, arg_LAT *a)
->> +{
->> +    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
->> +        return true;
->> +    }
->> +
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv addr = gen_get_zaddr();
->> +    TCGv t0 = tcg_temp_new_i32();
->> +    TCGv t1 = tcg_temp_new_i32();
->> +
->> +    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
->> +    tcg_gen_xor_tl(t1, t0, Rd);
->> +
->> +    tcg_gen_mov_tl(Rd, t0); /* Rd = t0 */
->> +    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
->> +
->> +    tcg_temp_free_i32(t1);
->> +    tcg_temp_free_i32(t0);
->> +    tcg_temp_free_i32(addr);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit
->> 0 is
->> + *  loaded into the C Flag of the SREG. This operation effectively
->> divides an
->> + *  unsigned value by two. The C Flag can be used to round the result.
->> + */
->> +static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +
->> +    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
->> +
->> +    tcg_gen_shri_tl(Rd, Rd, 1);
->> +
->> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf = Rd == 0 */
->> +    tcg_gen_movi_tl(cpu_Nf, 0);
->> +    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
->> +    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Shifts all bits in Rd one place to the right. The C Flag is shifted
->> into
->> + *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation,
->> combined
->> + *  with ASR, effectively divides multi-byte signed values by two.
->> Combined with
->> + *  LSR it effectively divides multi-byte unsigned values by two. The
->> Carry Flag
->> + *  can be used to round the result.
->> + */
->> +static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv t0 = tcg_temp_new_i32();
->> +
->> +    tcg_gen_shli_tl(t0, cpu_Cf, 7);
->> +    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
->> +    tcg_gen_shri_tl(Rd, Rd, 1);
->> +    tcg_gen_or_tl(Rd, Rd, t0);
->> +
->> +    gen_rshift_ZNVSf(Rd);
->> +
->> +    tcg_temp_free_i32(t0);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Shifts all bits in Rd one place to the right. Bit 7 is held
->> constant. Bit 0
->> + *  is loaded into the C Flag of the SREG. This operation effectively
->> divides a
->> + *  signed value by two without changing its sign. The Carry Flag can be
->> used to
->> + *  round the result.
->> + */
->> +static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv t0 = tcg_temp_new_i32();
->> +
->> +    /* Cf */
->> +    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf = Rd(0) */
->> +
->> +    /* op */
->> +    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd = (Rd & 0x80) | (Rd >> 1) */
->> +    tcg_gen_shri_tl(Rd, Rd, 1);
->> +    tcg_gen_or_tl(Rd, Rd, t0);
->> +
->> +    gen_rshift_ZNVSf(Rd);
->> +
->> +    tcg_temp_free_i32(t0);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Swaps high and low nibbles in a register.
->> + */
->> +static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv t0 = tcg_temp_new_i32();
->> +    TCGv t1 = tcg_temp_new_i32();
->> +
->> +    tcg_gen_andi_tl(t0, Rd, 0x0f);
->> +    tcg_gen_shli_tl(t0, t0, 4);
->> +    tcg_gen_andi_tl(t1, Rd, 0xf0);
->> +    tcg_gen_shri_tl(t1, t1, 4);
->> +    tcg_gen_or_tl(Rd, t0, t1);
->> +
->> +    tcg_temp_free_i32(t1);
->> +    tcg_temp_free_i32(t0);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Sets a specified bit in an I/O Register. This instruction operates on
->> + *  the lower 32 I/O Registers -- addresses 0-31.
->> + */
->> +static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
->> +{
->> +    TCGv data = tcg_temp_new_i32();
->> +    TCGv port = tcg_const_i32(a->reg);
->> +
->> +    gen_helper_inb(data, cpu_env, port);
->> +    tcg_gen_ori_tl(data, data, 1 << a->bit);
->> +    gen_helper_outb(cpu_env, port, data);
->> +
->> +    tcg_temp_free_i32(port);
->> +    tcg_temp_free_i32(data);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Clears a specified bit in an I/O Register. This instruction operates
->> on
->> + *  the lower 32 I/O Registers -- addresses 0-31.
->> + */
->> +static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
->> +{
->> +    TCGv data = tcg_temp_new_i32();
->> +    TCGv port = tcg_const_i32(a->reg);
->> +
->> +    gen_helper_inb(data, cpu_env, port);
->> +    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
->> +    gen_helper_outb(cpu_env, port, data);
->> +
->> +    tcg_temp_free_i32(data);
->> +    tcg_temp_free_i32(port);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Stores bit b from Rd to the T Flag in SREG (Status Register).
->> + */
->> +static bool trans_BST(DisasContext *ctx, arg_BST *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +
->> +    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
->> +    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Copies the T Flag in the SREG (Status Register) to bit b in register
->> Rd.
->> + */
->> +static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
->> +{
->> +    TCGv Rd = cpu_r[a->rd];
->> +    TCGv t1 = tcg_temp_new_i32();
->> +
->> +    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
->> +    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
->> +    tcg_gen_or_tl(Rd, Rd, t1);
->> +
->> +    tcg_temp_free_i32(t1);
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Sets a single Flag or bit in SREG.
->> + */
->> +static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
->> +{
->> +    switch (a->bit) {
->> +    case 0x00:
->> +        tcg_gen_movi_tl(cpu_Cf, 0x01);
->> +        break;
->> +    case 0x01:
->> +        tcg_gen_movi_tl(cpu_Zf, 0x01);
->> +        break;
->> +    case 0x02:
->> +        tcg_gen_movi_tl(cpu_Nf, 0x01);
->> +        break;
->> +    case 0x03:
->> +        tcg_gen_movi_tl(cpu_Vf, 0x01);
->> +        break;
->> +    case 0x04:
->> +        tcg_gen_movi_tl(cpu_Sf, 0x01);
->> +        break;
->> +    case 0x05:
->> +        tcg_gen_movi_tl(cpu_Hf, 0x01);
->> +        break;
->> +    case 0x06:
->> +        tcg_gen_movi_tl(cpu_Tf, 0x01);
->> +        break;
->> +    case 0x07:
->> +        tcg_gen_movi_tl(cpu_If, 0x01);
->> +        break;
->> +    }
->> +
->> +    return true;
->> +}
->> +
->> +
->> +/*
->> + *  Clears a single Flag in SREG.
->> + */
->> +static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
->> +{
->> +    switch (a->bit) {
->> +    case 0x00:
->> +        tcg_gen_movi_tl(cpu_Cf, 0x00);
->> +        break;
->> +    case 0x01:
->> +        tcg_gen_movi_tl(cpu_Zf, 0x00);
->> +        break;
->> +    case 0x02:
->> +        tcg_gen_movi_tl(cpu_Nf, 0x00);
->> +        break;
->> +    case 0x03:
->> +        tcg_gen_movi_tl(cpu_Vf, 0x00);
->> +        break;
->> +    case 0x04:
->> +        tcg_gen_movi_tl(cpu_Sf, 0x00);
->> +        break;
->> +    case 0x05:
->> +        tcg_gen_movi_tl(cpu_Hf, 0x00);
->> +        break;
->> +    case 0x06:
->> +        tcg_gen_movi_tl(cpu_Tf, 0x00);
->> +        break;
->> +    case 0x07:
->> +        tcg_gen_movi_tl(cpu_If, 0x00);
->> +        break;
->> +    }
->> +
->> +    return true;
->> +}
->> --
->> 2.17.2 (Apple Git-113)
 >>
 >>
+>>
+>>> diff --git a/target/avr/translate.c b/target/avr/translate.c
+>>> index 48a42c984a..dc6a1af2fc 100644
+>>> --- a/target/avr/translate.c
+>>> +++ b/target/avr/translate.c
+>>> @@ -317,6 +317,15 @@ static void gen_goto_tb(DisasContext *ctx, int n,
+>>> target_ulong dest)
+>>>  }
+>>>
+>>>
+>>> +static void gen_rshift_ZNVSf(TCGv R)
+>>> +{
+>>> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
+>>> +    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
+>>> +    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
+>>> +    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
+>>> +}
+>>> +
+>>> +
+>>>  /*
+>>>   *  Adds two registers without the C Flag and places the result in the
+>>>   *  destination register Rd.
+>>> @@ -1508,3 +1517,1117 @@ static bool trans_BRBS(DisasContext *ctx,
+>>> arg_BRBS *a)
+>>>      return true;
+>>>  }
+>>>
+>>> +
+>>> +/*
+>>> + *  This instruction makes a copy of one register into another. The
+>>> source
+>>> + *  register Rr is left unchanged, while the destination register Rd is
+>>> loaded
+>>> + *  with a copy of Rr.
+>>> + */
+>>> +static bool trans_MOV(DisasContext *ctx, arg_MOV *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv Rr = cpu_r[a->rr];
+>>> +
+>>> +    tcg_gen_mov_tl(Rd, Rr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  This instruction makes a copy of one register pair into another
+>>> register
+>>> + *  pair. The source register pair Rr+1:Rr is left unchanged, while the
+>>> + *  destination register pair Rd+1:Rd is loaded with a copy of Rr +
+>>> 1:Rr.  This
+>>> + *  instruction is not available in all devices. Refer to the device
+>>> specific
+>>> + *  instruction set summary.
+>>> + */
+>>> +static bool trans_MOVW(DisasContext *ctx, arg_MOVW *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_MOVW)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv RdL = cpu_r[a->rd];
+>>> +    TCGv RdH = cpu_r[a->rd + 1];
+>>> +    TCGv RrL = cpu_r[a->rr];
+>>> +    TCGv RrH = cpu_r[a->rr + 1];
+>>> +
+>>> +    tcg_gen_mov_tl(RdH, RrH);
+>>> +    tcg_gen_mov_tl(RdL, RrL);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + * Loads an 8 bit constant directly to register 16 to 31.
+>>> + */
+>>> +static bool trans_LDI(DisasContext *ctx, arg_LDI *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    int imm = a->imm;
+>>> +
+>>> +    tcg_gen_movi_tl(Rd, imm);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Loads one byte from the data space to a register. For parts with
+>>> SRAM,
+>>> + *  the data space consists of the Register File, I/O memory and
+>>> internal SRAM
+>>> + *  (and external SRAM if applicable). For parts without SRAM, the data
+>>> space
+>>> + *  consists of the register file only. The EEPROM has a separate
+>>> address space.
+>>> + *  A 16-bit address must be supplied. Memory access is limited to the
+>>> current
+>>> + *  data segment of 64KB. The LDS instruction uses the RAMPD Register
+>>> to access
+>>> + *  memory above 64KB. To access another data segment in devices with
+>>> more than
+>>> + *  64KB data space, the RAMPD in register in the I/O area has to be
+>>> changed.
+>>> + *  This instruction is not available in all devices. Refer to the
+>>> device
+>>> + *  specific instruction set summary.
+>>> + */
+>>> +static bool trans_LDS(DisasContext *ctx, arg_LDS *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = tcg_temp_new_i32();
+>>> +    TCGv H = cpu_rampD;
+>>> +    a->imm = next_word(ctx);
+>>> +
+>>> +    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
+>>> +    tcg_gen_shli_tl(addr, addr, 16);
+>>> +    tcg_gen_ori_tl(addr, addr, a->imm);
+>>> +
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Loads one byte indirect from the data space to a register. For parts
+>>> + *  with SRAM, the data space consists of the Register File, I/O memory
+>>> and
+>>> + *  internal SRAM (and external SRAM if applicable). For parts without
+>>> SRAM, the
+>>> + *  data space consists of the Register File only. In some parts the
+>>> Flash
+>>> + *  Memory has been mapped to the data space and can be read using this
+>>> command.
+>>> + *  The EEPROM has a separate address space.  The data location is
+>>> pointed to by
+>>> + *  the X (16 bits) Pointer Register in the Register File. Memory
+>>> access is
+>>> + *  limited to the current data segment of 64KB. To access another data
+>>> segment
+>>> + *  in devices with more than 64KB data space, the RAMPX in register in
+>>> the I/O
+>>> + *  area has to be changed.  The X-pointer Register can either be left
+>>> unchanged
+>>> + *  by the operation, or it can be post-incremented or predecremented.
+>>> These
+>>> + *  features are especially suited for accessing arrays, tables, and
+>>> Stack
+>>> + *  Pointer usage of the X-pointer Register. Note that only the low
+>>> byte of the
+>>> + *  X-pointer is updated in devices with no more than 256 bytes data
+>>> space. For
+>>> + *  such devices, the high byte of the pointer is not used by this
+>>> instruction
+>>> + *  and can be used for other purposes. The RAMPX Register in the I/O
+>>> area is
+>>> + *  updated in parts with more than 64KB data space or more than 64KB
+>>> Program
+>>> + *  memory, and the increment/decrement is added to the entire 24-bit
+>>> address on
+>>> + *  such devices.  Not all variants of this instruction is available in
+>>> all
+>>> + *  devices. Refer to the device specific instruction set summary.  In
+>>> the
+>>> + *  Reduced Core tinyAVR the LD instruction can be used to achieve the
+>>> same
+>>> + *  operation as LPM since the program memory is mapped to the data
+>>> memory
+>>> + *  space.
+>>> + */
+>>> +static bool trans_LDX1(DisasContext *ctx, arg_LDX1 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_xaddr();
+>>> +
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_LDX2(DisasContext *ctx, arg_LDX2 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_xaddr();
+>>> +
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
+>>> +
+>>> +    gen_set_xaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_LDX3(DisasContext *ctx, arg_LDX3 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_xaddr();
+>>> +
+>>> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +    gen_set_xaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_STX1(DisasContext *ctx, arg_STX1 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rr];
+>>> +    TCGv addr = gen_get_xaddr();
+>>> +
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +static bool trans_STX2(DisasContext *ctx, arg_STX2 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rr];
+>>> +    TCGv addr = gen_get_xaddr();
+>>> +
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
+>>> +    gen_set_xaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +static bool trans_STX3(DisasContext *ctx, arg_STX3 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rr];
+>>> +    TCGv addr = gen_get_xaddr();
+>>> +
+>>> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +    gen_set_xaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Loads one byte indirect with or without displacement from the data
+>>> space
+>>> + *  to a register. For parts with SRAM, the data space consists of the
+>>> Register
+>>> + *  File, I/O memory and internal SRAM (and external SRAM if
+>>> applicable). For
+>>> + *  parts without SRAM, the data space consists of the Register File
+>>> only. In
+>>> + *  some parts the Flash Memory has been mapped to the data space and
+>>> can be
+>>> + *  read using this command. The EEPROM has a separate address space.
+>>> The data
+>>> + *  location is pointed to by the Y (16 bits) Pointer Register in the
+>>> Register
+>>> + *  File. Memory access is limited to the current data segment of 64KB.
+>>> To
+>>> + *  access another data segment in devices with more than 64KB data
+>>> space, the
+>>> + *  RAMPY in register in the I/O area has to be changed.  The Y-pointer
+>>> Register
+>>> + *  can either be left unchanged by the operation, or it can be
+>>> post-incremented
+>>> + *  or predecremented.  These features are especially suited for
+>>> accessing
+>>> + *  arrays, tables, and Stack Pointer usage of the Y-pointer Register.
+>>> Note that
+>>> + *  only the low byte of the Y-pointer is updated in devices with no
+>>> more than
+>>> + *  256 bytes data space. For such devices, the high byte of the
+>>> pointer is not
+>>> + *  used by this instruction and can be used for other purposes. The
+>>> RAMPY
+>>> + *  Register in the I/O area is updated in parts with more than 64KB
+>>> data space
+>>> + *  or more than 64KB Program memory, and the
+>>> increment/decrement/displacement
+>>> + *  is added to the entire 24-bit address on such devices.  Not all
+>>> variants of
+>>> + *  this instruction is available in all devices. Refer to the device
+>>> specific
+>>> + *  instruction set summary.  In the Reduced Core tinyAVR the LD
+>>> instruction can
+>>> + *  be used to achieve the same operation as LPM since the program
+>>> memory is
+>>> + *  mapped to the data memory space.
+>>> + */
+>>> +static bool trans_LDY2(DisasContext *ctx, arg_LDY2 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_yaddr();
+>>> +
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
+>>> +
+>>> +    gen_set_yaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_LDY3(DisasContext *ctx, arg_LDY3 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_yaddr();
+>>> +
+>>> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +    gen_set_yaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_LDDY(DisasContext *ctx, arg_LDDY *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_yaddr();
+>>> +
+>>> +    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_STY2(DisasContext *ctx, arg_STY2 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_yaddr();
+>>> +
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
+>>> +    gen_set_yaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_STY3(DisasContext *ctx, arg_STY3 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_yaddr();
+>>> +
+>>> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +    gen_set_yaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_STDY(DisasContext *ctx, arg_STDY *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_yaddr();
+>>> +
+>>> +    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Loads one byte indirect with or without displacement from the data
+>>> space
+>>> + *  to a register. For parts with SRAM, the data space consists of the
+>>> Register
+>>> + *  File, I/O memory and internal SRAM (and external SRAM if
+>>> applicable). For
+>>> + *  parts without SRAM, the data space consists of the Register File
+>>> only. In
+>>> + *  some parts the Flash Memory has been mapped to the data space and
+>>> can be
+>>> + *  read using this command. The EEPROM has a separate address space.
+>>> The data
+>>> + *  location is pointed to by the Z (16 bits) Pointer Register in the
+>>> Register
+>>> + *  File. Memory access is limited to the current data segment of 64KB.
+>>> To
+>>> + *  access another data segment in devices with more than 64KB data
+>>> space, the
+>>> + *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer
+>>> Register
+>>> + *  can either be left unchanged by the operation, or it can be
+>>> post-incremented
+>>> + *  or predecremented.  These features are especially suited for Stack
+>>> Pointer
+>>> + *  usage of the Z-pointer Register, however because the Z-pointer
+>>> Register can
+>>> + *  be used for indirect subroutine calls, indirect jumps and table
+>>> lookup, it
+>>> + *  is often more convenient to use the X or Y-pointer as a dedicated
+>>> Stack
+>>> + *  Pointer. Note that only the low byte of the Z-pointer is updated in
+>>> devices
+>>> + *  with no more than 256 bytes data space. For such devices, the high
+>>> byte of
+>>> + *  the pointer is not used by this instruction and can be used for
+>>> other
+>>> + *  purposes. The RAMPZ Register in the I/O area is updated in parts
+>>> with more
+>>> + *  than 64KB data space or more than 64KB Program memory, and the
+>>> + *  increment/decrement/displacement is added to the entire 24-bit
+>>> address on
+>>> + *  such devices.  Not all variants of this instruction is available in
+>>> all
+>>> + *  devices. Refer to the device specific instruction set summary.  In
+>>> the
+>>> + *  Reduced Core tinyAVR the LD instruction can be used to achieve the
+>>> same
+>>> + *  operation as LPM since the program memory is mapped to the data
+>>> memory
+>>> + *  space.  For using the Z-pointer for table lookup in Program memory
+>>> see the
+>>> + *  LPM and ELPM instructions.
+>>> + */
+>>> +static bool trans_LDZ2(DisasContext *ctx, arg_LDZ2 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
+>>> +
+>>> +    gen_set_zaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_LDZ3(DisasContext *ctx, arg_LDZ3 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +
+>>> +    gen_set_zaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_LDDZ(DisasContext *ctx, arg_LDDZ *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
+>>> +    gen_data_load(ctx, Rd, addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_STZ2(DisasContext *ctx, arg_STZ2 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
+>>> +
+>>> +    gen_set_zaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_STZ3(DisasContext *ctx, arg_STZ3 *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +
+>>> +    gen_set_zaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_STDZ(DisasContext *ctx, arg_STDZ *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +
+>>> +/*
+>>> + *  Stores one byte from a Register to the data space. For parts with
+>>> SRAM,
+>>> + *  the data space consists of the Register File, I/O memory and
+>>> internal SRAM
+>>> + *  (and external SRAM if applicable). For parts without SRAM, the data
+>>> space
+>>> + *  consists of the Register File only. The EEPROM has a separate
+>>> address space.
+>>> + *  A 16-bit address must be supplied. Memory access is limited to the
+>>> current
+>>> + *  data segment of 64KB. The STS instruction uses the RAMPD Register
+>>> to access
+>>> + *  memory above 64KB. To access another data segment in devices with
+>>> more than
+>>> + *  64KB data space, the RAMPD in register in the I/O area has to be
+>>> changed.
+>>> + *  This instruction is not available in all devices. Refer to the
+>>> device
+>>> + *  specific instruction set summary.
+>>> + */
+>>> +static bool trans_STS(DisasContext *ctx, arg_STS *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = tcg_temp_new_i32();
+>>> +    TCGv H = cpu_rampD;
+>>> +    a->imm = next_word(ctx);
+>>> +
+>>> +    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
+>>> +    tcg_gen_shli_tl(addr, addr, 16);
+>>> +    tcg_gen_ori_tl(addr, addr, a->imm);
+>>> +
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Loads one byte pointed to by the Z-register into the destination
+>>> + *  register Rd. This instruction features a 100% space effective
+>>> constant
+>>> + *  initialization or constant data fetch. The Program memory is
+>>> organized in
+>>> + *  16-bit words while the Z-pointer is a byte address. Thus, the least
+>>> + *  significant bit of the Z-pointer selects either low byte (ZLSB = 0)
+>>> or high
+>>> + *  byte (ZLSB = 1). This instruction can address the first 64KB (32K
+>>> words) of
+>>> + *  Program memory. The Zpointer Register can either be left unchanged
+>>> by the
+>>> + *  operation, or it can be incremented. The incrementation does not
+>>> apply to
+>>> + *  the RAMPZ Register.  Devices with Self-Programming capability can
+>>> use the
+>>> + *  LPM instruction to read the Fuse and Lock bit values.  Refer to the
+>>> device
+>>> + *  documentation for a detailed description.  The LPM instruction is
+>>> not
+>>> + *  available in all devices. Refer to the device specific instruction
+>>> set
+>>> + *  summary
+>>> + */
+>>> +static bool trans_LPM1(DisasContext *ctx, arg_LPM1 *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rd = cpu_r[0];
+>>> +    TCGv addr = tcg_temp_new_i32();
+>>> +    TCGv H = cpu_r[31];
+>>> +    TCGv L = cpu_r[30];
+>>> +
+>>> +    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
+>>> +    tcg_gen_or_tl(addr, addr, L);
+>>> +
+>>> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_LPM2(DisasContext *ctx, arg_LPM2 *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = tcg_temp_new_i32();
+>>> +    TCGv H = cpu_r[31];
+>>> +    TCGv L = cpu_r[30];
+>>> +
+>>> +    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
+>>> +    tcg_gen_or_tl(addr, addr, L);
+>>> +
+>>> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_LPMX(DisasContext *ctx, arg_LPMX *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_LPMX)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = tcg_temp_new_i32();
+>>> +    TCGv H = cpu_r[31];
+>>> +    TCGv L = cpu_r[30];
+>>> +
+>>> +    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
+>>> +    tcg_gen_or_tl(addr, addr, L);
+>>> +
+>>> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
+>>> +
+>>> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
+>>> +
+>>> +    tcg_gen_andi_tl(L, addr, 0xff);
+>>> +
+>>> +    tcg_gen_shri_tl(addr, addr, 8);
+>>> +    tcg_gen_andi_tl(H, addr, 0xff);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Loads one byte pointed to by the Z-register and the RAMPZ Register
+>>> in
+>>> + *  the I/O space, and places this byte in the destination register Rd.
+>>> This
+>>> + *  instruction features a 100% space effective constant initialization
+>>> or
+>>> + *  constant data fetch. The Program memory is organized in 16-bit
+>>> words while
+>>> + *  the Z-pointer is a byte address. Thus, the least significant bit of
+>>> the
+>>> + *  Z-pointer selects either low byte (ZLSB = 0) or high byte (ZLSB =
+>>> 1). This
+>>> + *  instruction can address the entire Program memory space. The
+>>> Z-pointer
+>>> + *  Register can either be left unchanged by the operation, or it can be
+>>> + *  incremented. The incrementation applies to the entire 24-bit
+>>> concatenation
+>>> + *  of the RAMPZ and Z-pointer Registers.  Devices with Self-Programming
+>>> + *  capability can use the ELPM instruction to read the Fuse and Lock
+>>> bit value.
+>>> + *  Refer to the device documentation for a detailed description.  This
+>>> + *  instruction is not available in all devices. Refer to the device
+>>> specific
+>>> + *  instruction set summary.
+>>> + */
+>>> +static bool trans_ELPM1(DisasContext *ctx, arg_ELPM1 *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rd = cpu_r[0];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_ELPM2(DisasContext *ctx, arg_ELPM2 *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_ELPMX(DisasContext *ctx, arg_ELPMX *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_ELPMX)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
+>>> +
+>>> +    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
+>>> +
+>>> +    gen_set_zaddr(addr);
+>>> +
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  SPM can be used to erase a page in the Program memory, to write a
+>>> page
+>>> + *  in the Program memory (that is already erased), and to set Boot
+>>> Loader Lock
+>>> + *  bits. In some devices, the Program memory can be written one word
+>>> at a time,
+>>> + *  in other devices an entire page can be programmed simultaneously
+>>> after first
+>>> + *  filling a temporary page buffer. In all cases, the Program memory
+>>> must be
+>>> + *  erased one page at a time. When erasing the Program memory, the
+>>> RAMPZ and
+>>> + *  Z-register are used as page address. When writing the Program
+>>> memory, the
+>>> + *  RAMPZ and Z-register are used as page or word address, and the R1:R0
+>>> + *  register pair is used as data(1). When setting the Boot Loader Lock
+>>> bits,
+>>> + *  the R1:R0 register pair is used as data. Refer to the device
+>>> documentation
+>>> + *  for detailed description of SPM usage. This instruction can address
+>>> the
+>>> + *  entire Program memory.  The SPM instruction is not available in all
+>>> devices.
+>>> + *  Refer to the device specific instruction set summary.  Note: 1. R1
+>>> + *  determines the instruction high byte, and R0 determines the
+>>> instruction low
+>>> + *  byte.
+>>> + */
+>>> +static bool trans_SPM(DisasContext *ctx, arg_SPM *a)
+>>> +{
+>>> +    /* TODO */
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_SPM)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +static bool trans_SPMX(DisasContext *ctx, arg_SPMX *a)
+>>> +{
+>>> +    /* TODO */
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_SPMX)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Loads data from the I/O Space (Ports, Timers, Configuration
+>>> Registers,
+>>> + *  etc.) into register Rd in the Register File.
+>>> + */
+>>> +static bool trans_IN(DisasContext *ctx, arg_IN *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv port = tcg_const_i32(a->imm);
+>>> +
+>>> +    gen_helper_inb(Rd, cpu_env, port);
+>>> +
+>>> +    tcg_temp_free_i32(port);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Stores data from register Rr in the Register File to I/O Space
+>>> (Ports,
+>>> + *  Timers, Configuration Registers, etc.).
+>>> + */
+>>> +static bool trans_OUT(DisasContext *ctx, arg_OUT *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv port = tcg_const_i32(a->imm);
+>>> +
+>>> +    gen_helper_outb(cpu_env, port, Rd);
+>>> +
+>>> +    tcg_temp_free_i32(port);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  This instruction stores the contents of register Rr on the STACK.
+>>> The
+>>> + *  Stack Pointer is post-decremented by 1 after the PUSH.  This
+>>> instruction is
+>>> + *  not available in all devices. Refer to the device specific
+>>> instruction set
+>>> + *  summary.
+>>> + */
+>>> +static bool trans_PUSH(DisasContext *ctx, arg_PUSH *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +
+>>> +    gen_data_store(ctx, Rd, cpu_sp);
+>>> +    tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  This instruction loads register Rd with a byte from the STACK. The
+>>> Stack
+>>> + *  Pointer is pre-incremented by 1 before the POP.  This instruction
+>>> is not
+>>> + *  available in all devices. Refer to the device specific instruction
+>>> set
+>>> + *  summary.
+>>> + */
+>>> +static bool trans_POP(DisasContext *ctx, arg_POP *a)
+>>> +{
+>>> +    /*
+>>> +     * Using a temp to work around some strange behaviour:
+>>> +     * tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
+>>> +     * gen_data_load(ctx, Rd, cpu_sp);
+>>> +     * seems to cause the add to happen twice.
+>>> +     * This doesn't happen if either the add or the load is removed.
+>>> +     */
+>>> +    TCGv t1 = tcg_temp_new_i32();
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +
+>>> +    tcg_gen_addi_tl(t1, cpu_sp, 1);
+>>> +    gen_data_load(ctx, Rd, t1);
+>>> +    tcg_gen_mov_tl(cpu_sp, t1);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Exchanges one byte indirect between register and data space.  The
+>>> data
+>>> + *  location is pointed to by the Z (16 bits) Pointer Register in the
+>>> Register
+>>> + *  File. Memory access is limited to the current data segment of 64KB.
+>>> To
+>>> + *  access another data segment in devices with more than 64KB data
+>>> space, the
+>>> + *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer
+>>> Register
+>>> + *  is left unchanged by the operation. This instruction is especially
+>>> suited
+>>> + *  for writing/reading status bits stored in SRAM.
+>>> + */
+>>> +static bool trans_XCH(DisasContext *ctx, arg_XCH *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv t0 = tcg_temp_new_i32();
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +
+>>> +    gen_data_load(ctx, t0, addr);
+>>> +    gen_data_store(ctx, Rd, addr);
+>>> +    tcg_gen_mov_tl(Rd, t0);
+>>> +
+>>> +    tcg_temp_free_i32(t0);
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Load one byte indirect from data space to register and set bits in
+>>> data
+>>> + *  space specified by the register. The instruction can only be used
+>>> towards
+>>> + *  internal SRAM.  The data location is pointed to by the Z (16 bits)
+>>> Pointer
+>>> + *  Register in the Register File. Memory access is limited to the
+>>> current data
+>>> + *  segment of 64KB. To access another data segment in devices with
+>>> more than
+>>> + *  64KB data space, the RAMPZ in register in the I/O area has to be
+>>> changed.
+>>> + *  The Z-pointer Register is left unchanged by the operation. This
+>>> instruction
+>>> + *  is especially suited for setting status bits stored in SRAM.
+>>> + */
+>>> +static bool trans_LAS(DisasContext *ctx, arg_LAS *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rr = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +    TCGv t0 = tcg_temp_new_i32();
+>>> +    TCGv t1 = tcg_temp_new_i32();
+>>> +
+>>> +    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
+>>> +    tcg_gen_or_tl(t1, t0, Rr);
+>>> +
+>>> +    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
+>>> +    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
+>>> +
+>>> +    tcg_temp_free_i32(t1);
+>>> +    tcg_temp_free_i32(t0);
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Load one byte indirect from data space to register and stores and
+>>> clear
+>>> + *  the bits in data space specified by the register. The instruction
+>>> can
+>>> + *  only be used towards internal SRAM.  The data location is pointed
+>>> to by
+>>> + *  the Z (16 bits) Pointer Register in the Register File. Memory
+>>> access is
+>>> + *  limited to the current data segment of 64KB. To access another data
+>>> + *  segment in devices with more than 64KB data space, the RAMPZ in
+>>> register
+>>> + *  in the I/O area has to be changed.  The Z-pointer Register is left
+>>> + *  unchanged by the operation. This instruction is especially suited
+>>> for
+>>> + *  clearing status bits stored in SRAM.
+>>> + */
+>>> +static bool trans_LAC(DisasContext *ctx, arg_LAC *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rr = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +    TCGv t0 = tcg_temp_new_i32();
+>>> +    TCGv t1 = tcg_temp_new_i32();
+>>> +
+>>> +    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
+>>> +        /* t1 = t0 & (0xff - Rr) = t0 and ~Rr */
+>>> +    tcg_gen_andc_tl(t1, t0, Rr);
+>>> +
+>>> +    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
+>>> +    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
+>>> +
+>>> +    tcg_temp_free_i32(t1);
+>>> +    tcg_temp_free_i32(t0);
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Load one byte indirect from data space to register and toggles bits
+>>> in
+>>> + *  the data space specified by the register.  The instruction can only
+>>> be used
+>>> + *  towards SRAM.  The data location is pointed to by the Z (16 bits)
+>>> Pointer
+>>> + *  Register in the Register File. Memory access is limited to the
+>>> current data
+>>> + *  segment of 64KB. To access another data segment in devices with
+>>> more than
+>>> + *  64KB data space, the RAMPZ in register in the I/O area has to be
+>>> changed.
+>>> + *  The Z-pointer Register is left unchanged by the operation. This
+>>> instruction
+>>> + *  is especially suited for changing status bits stored in SRAM.
+>>> + */
+>>> +static bool trans_LAT(DisasContext *ctx, arg_LAT *a)
+>>> +{
+>>> +    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
+>>> +        return true;
+>>> +    }
+>>> +
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv addr = gen_get_zaddr();
+>>> +    TCGv t0 = tcg_temp_new_i32();
+>>> +    TCGv t1 = tcg_temp_new_i32();
+>>> +
+>>> +    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
+>>> +    tcg_gen_xor_tl(t1, t0, Rd);
+>>> +
+>>> +    tcg_gen_mov_tl(Rd, t0); /* Rd = t0 */
+>>> +    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
+>>> +
+>>> +    tcg_temp_free_i32(t1);
+>>> +    tcg_temp_free_i32(t0);
+>>> +    tcg_temp_free_i32(addr);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit
+>>> 0 is
+>>> + *  loaded into the C Flag of the SREG. This operation effectively
+>>> divides an
+>>> + *  unsigned value by two. The C Flag can be used to round the result.
+>>> + */
+>>> +static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +
+>>> +    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
+>>> +
+>>> +    tcg_gen_shri_tl(Rd, Rd, 1);
+>>> +
+>>> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf = Rd == 0 */
+>>> +    tcg_gen_movi_tl(cpu_Nf, 0);
+>>> +    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
+>>> +    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Shifts all bits in Rd one place to the right. The C Flag is shifted
+>>> into
+>>> + *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation,
+>>> combined
+>>> + *  with ASR, effectively divides multi-byte signed values by two.
+>>> Combined with
+>>> + *  LSR it effectively divides multi-byte unsigned values by two. The
+>>> Carry Flag
+>>> + *  can be used to round the result.
+>>> + */
+>>> +static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv t0 = tcg_temp_new_i32();
+>>> +
+>>> +    tcg_gen_shli_tl(t0, cpu_Cf, 7);
+>>> +    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
+>>> +    tcg_gen_shri_tl(Rd, Rd, 1);
+>>> +    tcg_gen_or_tl(Rd, Rd, t0);
+>>> +
+>>> +    gen_rshift_ZNVSf(Rd);
+>>> +
+>>> +    tcg_temp_free_i32(t0);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Shifts all bits in Rd one place to the right. Bit 7 is held
+>>> constant. Bit 0
+>>> + *  is loaded into the C Flag of the SREG. This operation effectively
+>>> divides a
+>>> + *  signed value by two without changing its sign. The Carry Flag can
+>>> be used to
+>>> + *  round the result.
+>>> + */
+>>> +static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv t0 = tcg_temp_new_i32();
+>>> +
+>>> +    /* Cf */
+>>> +    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf = Rd(0) */
+>>> +
+>>> +    /* op */
+>>> +    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd = (Rd & 0x80) | (Rd >> 1) */
+>>> +    tcg_gen_shri_tl(Rd, Rd, 1);
+>>> +    tcg_gen_or_tl(Rd, Rd, t0);
+>>> +
+>>> +    gen_rshift_ZNVSf(Rd);
+>>> +
+>>> +    tcg_temp_free_i32(t0);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Swaps high and low nibbles in a register.
+>>> + */
+>>> +static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv t0 = tcg_temp_new_i32();
+>>> +    TCGv t1 = tcg_temp_new_i32();
+>>> +
+>>> +    tcg_gen_andi_tl(t0, Rd, 0x0f);
+>>> +    tcg_gen_shli_tl(t0, t0, 4);
+>>> +    tcg_gen_andi_tl(t1, Rd, 0xf0);
+>>> +    tcg_gen_shri_tl(t1, t1, 4);
+>>> +    tcg_gen_or_tl(Rd, t0, t1);
+>>> +
+>>> +    tcg_temp_free_i32(t1);
+>>> +    tcg_temp_free_i32(t0);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Sets a specified bit in an I/O Register. This instruction operates
+>>> on
+>>> + *  the lower 32 I/O Registers -- addresses 0-31.
+>>> + */
+>>> +static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
+>>> +{
+>>> +    TCGv data = tcg_temp_new_i32();
+>>> +    TCGv port = tcg_const_i32(a->reg);
+>>> +
+>>> +    gen_helper_inb(data, cpu_env, port);
+>>> +    tcg_gen_ori_tl(data, data, 1 << a->bit);
+>>> +    gen_helper_outb(cpu_env, port, data);
+>>> +
+>>> +    tcg_temp_free_i32(port);
+>>> +    tcg_temp_free_i32(data);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Clears a specified bit in an I/O Register. This instruction
+>>> operates on
+>>> + *  the lower 32 I/O Registers -- addresses 0-31.
+>>> + */
+>>> +static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
+>>> +{
+>>> +    TCGv data = tcg_temp_new_i32();
+>>> +    TCGv port = tcg_const_i32(a->reg);
+>>> +
+>>> +    gen_helper_inb(data, cpu_env, port);
+>>> +    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
+>>> +    gen_helper_outb(cpu_env, port, data);
+>>> +
+>>> +    tcg_temp_free_i32(data);
+>>> +    tcg_temp_free_i32(port);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Stores bit b from Rd to the T Flag in SREG (Status Register).
+>>> + */
+>>> +static bool trans_BST(DisasContext *ctx, arg_BST *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +
+>>> +    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
+>>> +    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Copies the T Flag in the SREG (Status Register) to bit b in
+>>> register Rd.
+>>> + */
+>>> +static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
+>>> +{
+>>> +    TCGv Rd = cpu_r[a->rd];
+>>> +    TCGv t1 = tcg_temp_new_i32();
+>>> +
+>>> +    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
+>>> +    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
+>>> +    tcg_gen_or_tl(Rd, Rd, t1);
+>>> +
+>>> +    tcg_temp_free_i32(t1);
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Sets a single Flag or bit in SREG.
+>>> + */
+>>> +static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
+>>> +{
+>>> +    switch (a->bit) {
+>>> +    case 0x00:
+>>> +        tcg_gen_movi_tl(cpu_Cf, 0x01);
+>>> +        break;
+>>> +    case 0x01:
+>>> +        tcg_gen_movi_tl(cpu_Zf, 0x01);
+>>> +        break;
+>>> +    case 0x02:
+>>> +        tcg_gen_movi_tl(cpu_Nf, 0x01);
+>>> +        break;
+>>> +    case 0x03:
+>>> +        tcg_gen_movi_tl(cpu_Vf, 0x01);
+>>> +        break;
+>>> +    case 0x04:
+>>> +        tcg_gen_movi_tl(cpu_Sf, 0x01);
+>>> +        break;
+>>> +    case 0x05:
+>>> +        tcg_gen_movi_tl(cpu_Hf, 0x01);
+>>> +        break;
+>>> +    case 0x06:
+>>> +        tcg_gen_movi_tl(cpu_Tf, 0x01);
+>>> +        break;
+>>> +    case 0x07:
+>>> +        tcg_gen_movi_tl(cpu_If, 0x01);
+>>> +        break;
+>>> +    }
+>>> +
+>>> +    return true;
+>>> +}
+>>> +
+>>> +
+>>> +/*
+>>> + *  Clears a single Flag in SREG.
+>>> + */
+>>> +static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
+>>> +{
+>>> +    switch (a->bit) {
+>>> +    case 0x00:
+>>> +        tcg_gen_movi_tl(cpu_Cf, 0x00);
+>>> +        break;
+>>> +    case 0x01:
+>>> +        tcg_gen_movi_tl(cpu_Zf, 0x00);
+>>> +        break;
+>>> +    case 0x02:
+>>> +        tcg_gen_movi_tl(cpu_Nf, 0x00);
+>>> +        break;
+>>> +    case 0x03:
+>>> +        tcg_gen_movi_tl(cpu_Vf, 0x00);
+>>> +        break;
+>>> +    case 0x04:
+>>> +        tcg_gen_movi_tl(cpu_Sf, 0x00);
+>>> +        break;
+>>> +    case 0x05:
+>>> +        tcg_gen_movi_tl(cpu_Hf, 0x00);
+>>> +        break;
+>>> +    case 0x06:
+>>> +        tcg_gen_movi_tl(cpu_Tf, 0x00);
+>>> +        break;
+>>> +    case 0x07:
+>>> +        tcg_gen_movi_tl(cpu_If, 0x00);
+>>> +        break;
+>>> +    }
+>>> +
+>>> +    return true;
+>>> +}
+>>> --
+>>> 2.17.2 (Apple Git-113)
+>>>
+>>>
+>
+> --
+> Best Regards,
+> Michael Rolnik
+>
+
 
 -- 
 Best Regards,
 Michael Rolnik
 
---0000000000001d42770598f4c199
+--0000000000005fc2ac0598f4eb78
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">I think they do follow the division in the docs.</div><br>=
-<div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, De=
-c 5, 2019 at 2:28 PM Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m=
-.mail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br></div><block=
-quote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1=
-px solid rgb(204,204,204);padding-left:1ex"><br><br>On Wednesday, November =
-27, 2019, Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" target=3D=
-"_blank">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quo=
-te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
-);padding-left:1ex">This includes:<br>
+<div dir=3D"ltr">my mistake. Thanks. I will split it.</div><br><div class=
+=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Dec 5, 2019 =
+at 3:17 PM Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com">mrolnik@=
+gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex"><div dir=3D"ltr">I think they do follow the division in the docs=
+.</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr"=
+>On Thu, Dec 5, 2019 at 2:28 PM Aleksandar Markovic &lt;<a href=3D"mailto:a=
+leksandar.m.mail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</=
+a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0p=
+x 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><b=
+r><br>On Wednesday, November 27, 2019, Michael Rolnik &lt;<a href=3D"mailto=
+:mrolnik@gmail.com" target=3D"_blank">mrolnik@gmail.com</a>&gt; wrote:<br><=
+blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-l=
+eft:1px solid rgb(204,204,204);padding-left:1ex">This includes:<br>
 =C2=A0 =C2=A0 - LSR, ROR<br>
 =C2=A0 =C2=A0 - ASR<br>
 =C2=A0 =C2=A0 - SWAP<br>
@@ -2832,7 +2858,9 @@ bit */<br>
 <br>
 </blockquote>
 </blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+>Best Regards,<br>Michael Rolnik</div>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
  class=3D"gmail_signature">Best Regards,<br>Michael Rolnik</div>
 
---0000000000001d42770598f4c199--
+--0000000000005fc2ac0598f4eb78--
 
