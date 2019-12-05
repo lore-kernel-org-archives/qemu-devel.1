@@ -2,83 +2,95 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC69C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 09:44:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC73C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 09:49:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97BD62464D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 09:44:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 955322464D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 09:49:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nee7Zrr0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97BD62464D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VflVecgw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 955322464D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icngo-0007kC-0K
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 04:44:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53072)
+	id 1icnl5-00011Z-Jc
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 04:49:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50993)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chanmickyyun@gmail.com>) id 1icnfV-0006tW-AW
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:43:31 -0500
+ (envelope-from <sgarzare@redhat.com>) id 1icnfG-0006fP-6G
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:43:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chanmickyyun@gmail.com>) id 1icnfQ-0004at-PE
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:43:27 -0500
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:44443)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chanmickyyun@gmail.com>)
- id 1icnfQ-0004XI-BX
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:43:24 -0500
-Received: by mail-ed1-x542.google.com with SMTP id cm12so2034420edb.11
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 01:43:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=K0zxWYQKUtjfIO0WBRIWr4EH8CkelKvwfG9/UjT23TI=;
- b=Nee7Zrr0WzGpLhMLynQcY0qgFKaLXExK60pJor7aJFUpNg7TN9EGyWG4wLU56CoCSk
- WjlLf+rJToQHzWKvZJ8a8oKK/fr9let/c1BAdqbX9y0MVz9UMGX9cUOrc5mzYKcSsO3V
- 1ihd+afEZULEXIozURsaW0G9MTWnTwclCOIhH9J6exWemPfsDTKE8Hy22w5bAFYnHyXD
- jVuT1KJ3v7shGERzgHfK5kKQlicvEzSGoG3iKzRJcaap1iXRhhKs73iYrdKAu4Es66r2
- jqUkklX3FPGLas5YKT15d9Rb86by7WTP6bTQk88YNWa01RYxH3DoUkcslgFlD0sW0nbj
- lPfg==
+ (envelope-from <sgarzare@redhat.com>) id 1icnfE-0003q7-KF
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:43:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55073
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1icnfC-0003oA-LU
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:43:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575538988;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kplMizwHfbOJX7uz/OCWjKr2gh75iAnTy3WnYskBIXU=;
+ b=VflVecgwyOYmaY3CLW7Yk2HaHLirNANqZMVBkj20z8rMsJF6zcfgFXoNXqNICCrSLICICO
+ bt4qlGxP8D33TvixnEZhdAw/vTSn6RKCrihxr3Ebm2xQuD36GJ4A15vuDpZX9NBD0D1NCw
+ UqvY2cWClXS9LqPKLiHaERCFRbJ0urw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-TCVabl1fNxOJ9zJcjt8WYg-1; Thu, 05 Dec 2019 04:43:03 -0500
+Received: by mail-wr1-f72.google.com with SMTP id u12so1276000wrt.15
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 01:43:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=K0zxWYQKUtjfIO0WBRIWr4EH8CkelKvwfG9/UjT23TI=;
- b=YDHSxRPUbFA6OHm4Y4hZRiU7poUFjdf64rlRtpW7HesbQpKax4VRWtHeQPNv8KDtug
- DU/mWmRgGjBzECRTHp2CHv9frrFgzEaK60b9oN5UNbwBm75zI5XGDFHtRU+6C8f1MSpW
- q8QSKesEh74Y98JFCxPK6SOu7qGSRHBD+DQMJWmLSQgz0o24bn21inoUlRup9h2KNwUp
- Iva8j6TnFkDSbsVLj1oX+PlpgQfdrdq5jFEKe80HrL0/RlpaARyG17toUdMpldVhBGA0
- jIwGUWkG8BPnAneVJ6jCoMuPn64AS23IL1gGN1y+pIaYYnpzxLBXTfi6dBgSsv54FtYy
- hzBQ==
-X-Gm-Message-State: APjAAAU7XP5IBPGRXxwNKVt2SFsa1v8TqbMEaXDGRCoOk1sEWLSkM8RZ
- axuyJjL6D4SzM5bCBgytlhe2jHdfrxQtYaLiJHdY7RCtH4A=
-X-Google-Smtp-Source: APXvYqxtpdckvbAb5Su6fO/EatLaPaSRvI0VeJrxVSoHpVadycYrKV08LhSWdcK0WVnb9DrQ9MehhrVmEjPcJlLlccM=
-X-Received: by 2002:a17:906:b253:: with SMTP id
- ce19mr8243447ejb.61.1575539002346; 
- Thu, 05 Dec 2019 01:43:22 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=Oo8JdBzSfmLgf5O2t1WIVNXf0TLwGIs0qvPU19562gg=;
+ b=sh0AY4naSwFqs9ILLvgUZSNxovoR897b2rtSIII5YjTsC+cdewsZ3RF43vqQF9pIoH
+ YUJi6bal7boBlociWba2EiM0a77BKIzEL50xLv4/1NohCxfC9vZf2kYCUkRd68pZ3RlY
+ EzIWRjVX27MdvMWtQriJlseuoMivoV7OVohl/H3bd3Pc6KxBqlUMWk7FXJTXgSSZn3qI
+ LiMIuRFYrpoQfhv5wJo2vYeZdmmI2Ap5BfmgbklsQ4Yz9nrJWyD9wD1tbas2lJHCCoXs
+ cDnKQzM7B0s/LI4VG8UvPldKaBfuKNn+mDA1wrNJME09vEsGNWXeV233YwKfk+zn3Y2Z
+ uCGw==
+X-Gm-Message-State: APjAAAVYKuSQX3JeNf/1rLx5sbnivxWPfj0AY2LPTsirF2tZkksbyaVL
+ 2CCqqjTPGmS7yWx5QSd6YVpy1x3+yWdKx7xq5LqBiJPQ4FrVCGle2J+DtMZLFZ25es4/hl5Lnbh
+ TYbJv3sshkaVvRY0=
+X-Received: by 2002:a5d:6305:: with SMTP id i5mr9166617wru.119.1575538982185; 
+ Thu, 05 Dec 2019 01:43:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy+1JkO0o9DaqlHc9KcymYynztI/EfdBz02tbzP6XelXMoEzYwimlzZdq7cjGpfpP+Ohnxi9g==
+X-Received: by 2002:a5d:6305:: with SMTP id i5mr9166596wru.119.1575538981959; 
+ Thu, 05 Dec 2019 01:43:01 -0800 (PST)
+Received: from steredhat (host28-88-dynamic.16-87-r.retail.telecomitalia.it.
+ [87.16.88.28])
+ by smtp.gmail.com with ESMTPSA id v15sm9253624wmh.24.2019.12.05.01.43.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Dec 2019 01:43:01 -0800 (PST)
+Date: Thu, 5 Dec 2019 10:42:59 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: pannengyuan@huawei.com
+Subject: Re: [PATCH v5 1/2] block/nbd: extract the common cleanup code
+Message-ID: <20191205094259.r4qb4jxcrom76x7f@steredhat>
+References: <1575517528-44312-1-git-send-email-pannengyuan@huawei.com>
+ <1575517528-44312-2-git-send-email-pannengyuan@huawei.com>
 MIME-Version: 1.0
-References: <20191125051722.15523-1-chanmickyyun@gmail.com>
- <CAPojyfO0DQhptkUix5j1hzcV4y4pwQ0ZRDQYsrrPBCvpEWL2NQ@mail.gmail.com>
-In-Reply-To: <CAPojyfO0DQhptkUix5j1hzcV4y4pwQ0ZRDQYsrrPBCvpEWL2NQ@mail.gmail.com>
-From: Micky C <chanmickyyun@gmail.com>
-Date: Thu, 5 Dec 2019 17:43:10 +0800
-Message-ID: <CAPojyfM+M+eftqT_Vvgpf1yYYL3MG=v6LhVSvg1vUkUYr17RBg@mail.gmail.com>
-Subject: Re: [PATCH v7] Implement backend program convention command for
- vhost-user-blk
-To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="000000000000908ff30598f1c2c9"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::542
+In-Reply-To: <1575517528-44312-2-git-send-email-pannengyuan@huawei.com>
+X-MC-Unique: TCVabl1fNxOJ9zJcjt8WYg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,540 +102,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, liyiting@huawei.com, zhang.zhanghailiang@huawei.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000908ff30598f1c2c9
-Content-Type: text/plain; charset="UTF-8"
+Hi Pan,
 
-Ping again
+On Thu, Dec 05, 2019 at 11:45:27AM +0800, pannengyuan@huawei.com wrote:
+> From: Pan Nengyuan <pannengyuan@huawei.com>
+>=20
+> The BDRVNBDState cleanup code is common in two places, add
+> nbd_clear_bdrvstate() function to do these cleanups.
+>=20
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 
-On Mon, Dec 2, 2019 at 9:53 AM Micky C <chanmickyyun@gmail.com> wrote:
+I only suggested this change, so I think is better to change it in:
+Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
 
-> Ping
->
-> On Mon, Nov 25, 2019 at 1:17 PM Micky Yun Chan(michiboo) <
-> chanmickyyun@gmail.com> wrote:
->
->> From: Micky Yun Chan <chanmickyyun@gmail.com>
->>
->> This patch is to add standard commands defined in
->> docs/interop/vhost-user.rst
->> For vhost-user-* program
->>
->> Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
->> ---
->>  contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
->>  docs/interop/vhost-user.json            |  31 +++++++
->>  docs/interop/vhost-user.rst             |  15 ++++
->>  3 files changed, 110 insertions(+), 44 deletions(-)
->>
->> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c
->> b/contrib/vhost-user-blk/vhost-user-blk.c
->> index ae61034656..6fd91c7e99 100644
->> --- a/contrib/vhost-user-blk/vhost-user-blk.c
->> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
->> @@ -576,70 +576,90 @@ vub_new(char *blk_file)
->>      return vdev_blk;
->>  }
->>
->> +static int opt_fdnum = -1;
->> +static char *opt_socket_path;
->> +static char *opt_blk_file;
->> +static gboolean opt_print_caps;
->> +static gboolean opt_read_only;
->> +
->> +static GOptionEntry entries[] = {
->> +    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
->> +      "Print capabilities", NULL },
->> +    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
->> +      "Use inherited fd socket", "FDNUM" },
->> +    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
->> +      "Use UNIX socket path", "PATH" },
->> +    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
->> +     "block device or file path", "PATH"},
->> +    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
->> +      "Enable read-only", NULL }
->> +};
->> +
->>  int main(int argc, char **argv)
->>  {
->> -    int opt;
->> -    char *unix_socket = NULL;
->> -    char *blk_file = NULL;
->> -    bool enable_ro = false;
->>      int lsock = -1, csock = -1;
->>      VubDev *vdev_blk = NULL;
->> +    GError *error = NULL;
->> +    GOptionContext *context;
->>
->> -    while ((opt = getopt(argc, argv, "b:rs:h")) != -1) {
->> -        switch (opt) {
->> -        case 'b':
->> -            blk_file = g_strdup(optarg);
->> -            break;
->> -        case 's':
->> -            unix_socket = g_strdup(optarg);
->> -            break;
->> -        case 'r':
->> -            enable_ro = true;
->> -            break;
->> -        case 'h':
->> -        default:
->> -            printf("Usage: %s [ -b block device or file, -s UNIX domain
->> socket"
->> -                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
->> -            return 0;
->> +    context = g_option_context_new(NULL);
->> +    g_option_context_add_main_entries(context, entries, NULL);
->> +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
->> +        g_printerr("Option parsing failed: %s\n", error->message);
->> +        exit(EXIT_FAILURE);
->> +    }
->> +    if (opt_print_caps) {
->> +        g_print("{\n");
->> +        g_print("  \"type\": \"block\",\n");
->> +        g_print("  \"features\": [\n");
->> +        g_print("    \"read-only\",\n");
->> +        g_print("    \"blk-file\"\n");
->> +        g_print("  ]\n");
->> +        g_print("}\n");
->> +        exit(EXIT_SUCCESS);
->> +    }
->> +
->> +    if (!opt_blk_file) {
->> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
->> +        exit(EXIT_FAILURE);
->> +    }
->> +
->> +    if (opt_socket_path) {
->> +        lsock = unix_sock_new(opt_socket_path);
->> +        if (lsock < 0) {
->> +            exit(EXIT_FAILURE);
->>          }
->> +    } else if (opt_fdnum < 0) {
->> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
->> +        exit(EXIT_FAILURE);
->> +    } else {
->> +        lsock = opt_fdnum;
->>      }
->>
->> -    if (!unix_socket || !blk_file) {
->> -        printf("Usage: %s [ -b block device or file, -s UNIX domain
->> socket"
->> -               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
->> -        return -1;
->> -    }
->> -
->> -    lsock = unix_sock_new(unix_socket);
->> -    if (lsock < 0) {
->> -        goto err;
->> -    }
->> -
->> -    csock = accept(lsock, (void *)0, (void *)0);
->> +    csock = accept(lsock, NULL, NULL);
->>      if (csock < 0) {
->> -        fprintf(stderr, "Accept error %s\n", strerror(errno));
->> -        goto err;
->> +        g_printerr("Accept error %s\n", strerror(errno));
->> +        exit(EXIT_FAILURE);
->>      }
->>
->> -    vdev_blk = vub_new(blk_file);
->> +    vdev_blk = vub_new(opt_blk_file);
->>      if (!vdev_blk) {
->> -        goto err;
->> +        exit(EXIT_FAILURE);
->>      }
->> -    if (enable_ro) {
->> +    if (opt_read_only) {
->>          vdev_blk->enable_ro = true;
->>      }
->>
->>      if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
->>                    vub_panic_cb, &vub_iface)) {
->> -        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
->> -        goto err;
->> +        g_printerr("Failed to initialize libvhost-user-glib\n");
->> +        exit(EXIT_FAILURE);
->>      }
->>
->>      g_main_loop_run(vdev_blk->loop);
->> -
->> +    g_main_loop_unref(vdev_blk->loop);
->> +    g_option_context_free(context);
->>      vug_deinit(&vdev_blk->parent);
->> -
->> -err:
->>      vub_free(vdev_blk);
->>      if (csock >= 0) {
->>          close(csock);
->> @@ -647,8 +667,8 @@ err:
->>      if (lsock >= 0) {
->>          close(lsock);
->>      }
->> -    g_free(unix_socket);
->> -    g_free(blk_file);
->> +    g_free(opt_socket_path);
->> +    g_free(opt_blk_file);
->>
->>      return 0;
->>  }
->> diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
->> index da6aaf51c8..ce0ef74db5 100644
->> --- a/docs/interop/vhost-user.json
->> +++ b/docs/interop/vhost-user.json
->> @@ -54,6 +54,37 @@
->>    ]
->>  }
->>
->> +##
->> +# @VHostUserBackendBlockFeature:
->> +#
->> +# List of vhost user "block" features.
->> +#
->> +# @read-only: The --read-only command line option is supported.
->> +# @blk-file: The --blk-file command line option is supported.
->> +#
->> +# Since: 5.0
->> +##
->> +{
->> +  'enum': 'VHostUserBackendBlockFeature',
->> +  'data': [ 'read-only', 'blk-file' ]
->> +}
->> +
->> +##
->> +# @VHostUserBackendCapabilitiesBlock:
->> +#
->> +# Capabilities reported by vhost user "block" backends
->> +#
->> +# @features: list of supported features.
->> +#
->> +# Since: 5.0
->> +##
->> +{
->> +  'struct': 'VHostUserBackendCapabilitiesBlock',
->> +  'data': {
->> +    'features': [ 'VHostUserBackendBlockFeature' ]
->> +  }
->> +}
->> +
->>  ##
->>  # @VHostUserBackendInputFeature:
->>  #
->> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
->> index 7827b710aa..2f0910d515 100644
->> --- a/docs/interop/vhost-user.rst
->> +++ b/docs/interop/vhost-user.rst
->> @@ -1376,3 +1376,18 @@ Command line options:
->>    Enable virgl rendering support.
->>
->>    (optional)
->> +
->> +vhost-user-blk
->> +--------------
->> +
->> +Command line options:
->> +
->> +--blk-file=PATH
->> +
->> +  Specify block device or file path.
->> +
->> +--read-only
->> +
->> +  Enable read-only.
->> +
->> +  (optional)
->> --
->> 2.21.0
->>
->>
+Thanks,
+Stefano
 
---000000000000908ff30598f1c2c9
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+> v3:
+> - new patch, split form 2/2 patch (suggested by Stefano Garzarella)
+> Changes v4 to v3:
+> - replace function name from nbd_free_bdrvstate_prop to
+>   nbd_clear_bdrvstate and set cleared fields to NULL (suggested by Eric
+>   Blake)
+> - remove static function prototype. (suggested by Eric Blake)
+> ---
+> Changes v5 to v4:
+> - correct the wrong email address
+> ---
+>  block/nbd.c | 25 +++++++++++++++----------
+>  1 file changed, 15 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/block/nbd.c b/block/nbd.c
+> index 1239761..8b4a65a 100644
+> --- a/block/nbd.c
+> +++ b/block/nbd.c
+> @@ -94,6 +94,19 @@ typedef struct BDRVNBDState {
+> =20
+>  static int nbd_client_connect(BlockDriverState *bs, Error **errp);
+> =20
+> +void nbd_clear_bdrvstate(BDRVNBDState *s)
+> +{
+> +    object_unref(OBJECT(s->tlscreds));
+> +    qapi_free_SocketAddress(s->saddr);
+> +    s->saddr =3D NULL;
+> +    g_free(s->export);
+> +    s->export =3D NULL;
+> +    g_free(s->tlscredsid);
+> +    s->tlscredsid =3D NULL;
+> +    g_free(s->x_dirty_bitmap);
+> +    s->x_dirty_bitmap =3D NULL;
+> +}
+> +
+>  static void nbd_channel_error(BDRVNBDState *s, int ret)
+>  {
+>      if (ret =3D=3D -EIO) {
+> @@ -1855,10 +1868,7 @@ static int nbd_process_options(BlockDriverState *b=
+s, QDict *options,
+> =20
+>   error:
+>      if (ret < 0) {
+> -        object_unref(OBJECT(s->tlscreds));
+> -        qapi_free_SocketAddress(s->saddr);
+> -        g_free(s->export);
+> -        g_free(s->tlscredsid);
+> +        nbd_clear_bdrvstate(s);
+>      }
+>      qemu_opts_del(opts);
+>      return ret;
+> @@ -1937,12 +1947,7 @@ static void nbd_close(BlockDriverState *bs)
+>      BDRVNBDState *s =3D bs->opaque;
+> =20
+>      nbd_client_close(bs);
+> -
+> -    object_unref(OBJECT(s->tlscreds));
+> -    qapi_free_SocketAddress(s->saddr);
+> -    g_free(s->export);
+> -    g_free(s->tlscredsid);
+> -    g_free(s->x_dirty_bitmap);
+> +    nbd_clear_bdrvstate(s);
+>  }
+> =20
+>  static int64_t nbd_getlength(BlockDriverState *bs)
+> --=20
+> 2.7.2.windows.1
+>=20
+>=20
 
-<div dir=3D"ltr">Ping again<br></div><br><div class=3D"gmail_quote"><div di=
-r=3D"ltr" class=3D"gmail_attr">On Mon, Dec 2, 2019 at 9:53 AM Micky C &lt;<=
-a href=3D"mailto:chanmickyyun@gmail.com">chanmickyyun@gmail.com</a>&gt; wro=
-te:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px =
-0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"=
-ltr"><div dir=3D"ltr">Ping<br></div><br><div class=3D"gmail_quote"><div dir=
-=3D"ltr" class=3D"gmail_attr">On Mon, Nov 25, 2019 at 1:17 PM Micky Yun Cha=
-n(michiboo) &lt;<a href=3D"mailto:chanmickyyun@gmail.com" target=3D"_blank"=
->chanmickyyun@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_=
-quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,=
-204);padding-left:1ex">From: Micky Yun Chan &lt;<a href=3D"mailto:chanmicky=
-yun@gmail.com" target=3D"_blank">chanmickyyun@gmail.com</a>&gt;<br>
-<br>
-This patch is to add standard commands defined in docs/interop/vhost-user.r=
-st<br>
-For vhost-user-* program<br>
-<br>
-Signed-off-by: Micky Yun Chan (michiboo) &lt;<a href=3D"mailto:chanmickyyun=
-@gmail.com" target=3D"_blank">chanmickyyun@gmail.com</a>&gt;<br>
----<br>
-=C2=A0contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++---------=
--<br>
-=C2=A0docs/interop/vhost-user.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- |=C2=A0 31 +++++++<br>
-=C2=A0docs/interop/vhost-user.rst=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0|=C2=A0 15 ++++<br>
-=C2=A03 files changed, 110 insertions(+), 44 deletions(-)<br>
-<br>
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-b=
-lk/vhost-user-blk.c<br>
-index ae61034656..6fd91c7e99 100644<br>
---- a/contrib/vhost-user-blk/vhost-user-blk.c<br>
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c<br>
-@@ -576,70 +576,90 @@ vub_new(char *blk_file)<br>
-=C2=A0 =C2=A0 =C2=A0return vdev_blk;<br>
-=C2=A0}<br>
-<br>
-+static int opt_fdnum =3D -1;<br>
-+static char *opt_socket_path;<br>
-+static char *opt_blk_file;<br>
-+static gboolean opt_print_caps;<br>
-+static gboolean opt_read_only;<br>
-+<br>
-+static GOptionEntry entries[] =3D {<br>
-+=C2=A0 =C2=A0 { &quot;print-capabilities&quot;, &#39;c&#39;, 0, G_OPTION_A=
-RG_NONE, &amp;opt_print_caps,<br>
-+=C2=A0 =C2=A0 =C2=A0 &quot;Print capabilities&quot;, NULL },<br>
-+=C2=A0 =C2=A0 { &quot;fd&quot;, &#39;f&#39;, 0, G_OPTION_ARG_INT, &amp;opt=
-_fdnum,<br>
-+=C2=A0 =C2=A0 =C2=A0 &quot;Use inherited fd socket&quot;, &quot;FDNUM&quot=
-; },<br>
-+=C2=A0 =C2=A0 { &quot;socket-path&quot;, &#39;s&#39;, 0, G_OPTION_ARG_FILE=
-NAME, &amp;opt_socket_path,<br>
-+=C2=A0 =C2=A0 =C2=A0 &quot;Use UNIX socket path&quot;, &quot;PATH&quot; },=
-<br>
-+=C2=A0 =C2=A0 {&quot;blk-file&quot;, &#39;b&#39;, 0, G_OPTION_ARG_FILENAME=
-, &amp;opt_blk_file,<br>
-+=C2=A0 =C2=A0 =C2=A0&quot;block device or file path&quot;, &quot;PATH&quot=
-;},<br>
-+=C2=A0 =C2=A0 { &quot;read-only&quot;, &#39;r&#39;, 0, G_OPTION_ARG_NONE, =
-&amp;opt_read_only,<br>
-+=C2=A0 =C2=A0 =C2=A0 &quot;Enable read-only&quot;, NULL }<br>
-+};<br>
-+<br>
-=C2=A0int main(int argc, char **argv)<br>
-=C2=A0{<br>
--=C2=A0 =C2=A0 int opt;<br>
--=C2=A0 =C2=A0 char *unix_socket =3D NULL;<br>
--=C2=A0 =C2=A0 char *blk_file =3D NULL;<br>
--=C2=A0 =C2=A0 bool enable_ro =3D false;<br>
-=C2=A0 =C2=A0 =C2=A0int lsock =3D -1, csock =3D -1;<br>
-=C2=A0 =C2=A0 =C2=A0VubDev *vdev_blk =3D NULL;<br>
-+=C2=A0 =C2=A0 GError *error =3D NULL;<br>
-+=C2=A0 =C2=A0 GOptionContext *context;<br>
-<br>
--=C2=A0 =C2=A0 while ((opt =3D getopt(argc, argv, &quot;b:rs:h&quot;)) !=3D=
- -1) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 switch (opt) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case &#39;b&#39;:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 blk_file =3D g_strdup(optarg);<b=
-r>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case &#39;s&#39;:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unix_socket =3D g_strdup(optarg)=
-;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case &#39;r&#39;:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 enable_ro =3D true;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 case &#39;h&#39;:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 default:<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 printf(&quot;Usage: %s [ -b bloc=
-k device or file, -s UNIX domain socket&quot;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot=
-; | -r Enable read-only ] | [ -h ]\n&quot;, argv[0]);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
-+=C2=A0 =C2=A0 context =3D g_option_context_new(NULL);<br>
-+=C2=A0 =C2=A0 g_option_context_add_main_entries(context, entries, NULL);<b=
-r>
-+=C2=A0 =C2=A0 if (!g_option_context_parse(context, &amp;argc, &amp;argv, &=
-amp;error)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_printerr(&quot;Option parsing failed: %s\n&q=
-uot;, error-&gt;message);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 if (opt_print_caps) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;{\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 \&quot;type\&quot;: \&quo=
-t;block\&quot;,\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 \&quot;features\&quot;: [=
-\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 =C2=A0 \&quot;read-only\&=
-quot;,\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 =C2=A0 \&quot;blk-file\&q=
-uot;\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 ]\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;}\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_SUCCESS);<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 if (!opt_blk_file) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;%s\n&quot;, g_option_context_get=
-_help(context, true, NULL));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 if (opt_socket_path) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 lsock =3D unix_sock_new(opt_socket_path);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (lsock &lt; 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-+=C2=A0 =C2=A0 } else if (opt_fdnum &lt; 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;%s\n&quot;, g_option_context_get=
-_help(context, true, NULL));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
-+=C2=A0 =C2=A0 } else {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 lsock =3D opt_fdnum;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
--=C2=A0 =C2=A0 if (!unix_socket || !blk_file) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 printf(&quot;Usage: %s [ -b block device or fi=
-le, -s UNIX domain socket&quot;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot; | -r Enable =
-read-only ] | [ -h ]\n&quot;, argv[0]);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
--=C2=A0 =C2=A0 }<br>
--<br>
--=C2=A0 =C2=A0 lsock =3D unix_sock_new(unix_socket);<br>
--=C2=A0 =C2=A0 if (lsock &lt; 0) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
--=C2=A0 =C2=A0 }<br>
--<br>
--=C2=A0 =C2=A0 csock =3D accept(lsock, (void *)0, (void *)0);<br>
-+=C2=A0 =C2=A0 csock =3D accept(lsock, NULL, NULL);<br>
-=C2=A0 =C2=A0 =C2=A0if (csock &lt; 0) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;Accept error %s\n&quot;,=
- strerror(errno));<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_printerr(&quot;Accept error %s\n&quot;, stre=
-rror(errno));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
--=C2=A0 =C2=A0 vdev_blk =3D vub_new(blk_file);<br>
-+=C2=A0 =C2=A0 vdev_blk =3D vub_new(opt_blk_file);<br>
-=C2=A0 =C2=A0 =C2=A0if (!vdev_blk) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
--=C2=A0 =C2=A0 if (enable_ro) {<br>
-+=C2=A0 =C2=A0 if (opt_read_only) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vdev_blk-&gt;enable_ro =3D true;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0if (!vug_init(&amp;vdev_blk-&gt;parent, VHOST_USER_BLK_=
-MAX_QUEUES, csock,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vub_pa=
-nic_cb, &amp;vub_iface)) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;Failed to initialized li=
-bvhost-user-glib\n&quot;);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_printerr(&quot;Failed to initialize libvhost=
--user-glib\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0g_main_loop_run(vdev_blk-&gt;loop);<br>
--<br>
-+=C2=A0 =C2=A0 g_main_loop_unref(vdev_blk-&gt;loop);<br>
-+=C2=A0 =C2=A0 g_option_context_free(context);<br>
-=C2=A0 =C2=A0 =C2=A0vug_deinit(&amp;vdev_blk-&gt;parent);<br>
--<br>
--err:<br>
-=C2=A0 =C2=A0 =C2=A0vub_free(vdev_blk);<br>
-=C2=A0 =C2=A0 =C2=A0if (csock &gt;=3D 0) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0close(csock);<br>
-@@ -647,8 +667,8 @@ err:<br>
-=C2=A0 =C2=A0 =C2=A0if (lsock &gt;=3D 0) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0close(lsock);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
--=C2=A0 =C2=A0 g_free(unix_socket);<br>
--=C2=A0 =C2=A0 g_free(blk_file);<br>
-+=C2=A0 =C2=A0 g_free(opt_socket_path);<br>
-+=C2=A0 =C2=A0 g_free(opt_blk_file);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0return 0;<br>
-=C2=A0}<br>
-diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json<br=
->
-index da6aaf51c8..ce0ef74db5 100644<br>
---- a/docs/interop/vhost-user.json<br>
-+++ b/docs/interop/vhost-user.json<br>
-@@ -54,6 +54,37 @@<br>
-=C2=A0 =C2=A0]<br>
-=C2=A0}<br>
-<br>
-+##<br>
-+# @VHostUserBackendBlockFeature:<br>
-+#<br>
-+# List of vhost user &quot;block&quot; features.<br>
-+#<br>
-+# @read-only: The --read-only command line option is supported.<br>
-+# @blk-file: The --blk-file command line option is supported.<br>
-+#<br>
-+# Since: 5.0<br>
-+##<br>
-+{<br>
-+=C2=A0 &#39;enum&#39;: &#39;VHostUserBackendBlockFeature&#39;,<br>
-+=C2=A0 &#39;data&#39;: [ &#39;read-only&#39;, &#39;blk-file&#39; ]<br>
-+}<br>
-+<br>
-+##<br>
-+# @VHostUserBackendCapabilitiesBlock:<br>
-+#<br>
-+# Capabilities reported by vhost user &quot;block&quot; backends<br>
-+#<br>
-+# @features: list of supported features.<br>
-+#<br>
-+# Since: 5.0<br>
-+##<br>
-+{<br>
-+=C2=A0 &#39;struct&#39;: &#39;VHostUserBackendCapabilitiesBlock&#39;,<br>
-+=C2=A0 &#39;data&#39;: {<br>
-+=C2=A0 =C2=A0 &#39;features&#39;: [ &#39;VHostUserBackendBlockFeature&#39;=
- ]<br>
-+=C2=A0 }<br>
-+}<br>
-+<br>
-=C2=A0##<br>
-=C2=A0# @VHostUserBackendInputFeature:<br>
-=C2=A0#<br>
-diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst<br>
-index 7827b710aa..2f0910d515 100644<br>
---- a/docs/interop/vhost-user.rst<br>
-+++ b/docs/interop/vhost-user.rst<br>
-@@ -1376,3 +1376,18 @@ Command line options:<br>
-=C2=A0 =C2=A0Enable virgl rendering support.<br>
-<br>
-=C2=A0 =C2=A0(optional)<br>
-+<br>
-+vhost-user-blk<br>
-+--------------<br>
-+<br>
-+Command line options:<br>
-+<br>
-+--blk-file=3DPATH<br>
-+<br>
-+=C2=A0 Specify block device or file path.<br>
-+<br>
-+--read-only<br>
-+<br>
-+=C2=A0 Enable read-only.<br>
-+<br>
-+=C2=A0 (optional)<br>
--- <br>
-2.21.0<br>
-<br>
-</blockquote></div></div>
-</blockquote></div>
+--=20
 
---000000000000908ff30598f1c2c9--
 
