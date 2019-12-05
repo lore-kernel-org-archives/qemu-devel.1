@@ -2,78 +2,79 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA176C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 16:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6B90C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 16:14:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFE4620801
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 16:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F52B20801
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 16:14:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g2apd/nZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFE4620801
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jezf4rJE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F52B20801
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ictky-00080E-I9
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 11:13:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60650)
+	id 1ictm1-0000hv-IP
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 11:14:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41200)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ictf0-0002W3-JK
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 11:07:23 -0500
+ (envelope-from <cohuck@redhat.com>) id 1icthD-0004Zz-Ba
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 11:09:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ictez-0007aA-6x
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 11:07:22 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24441
+ (envelope-from <cohuck@redhat.com>) id 1icthB-000826-Vh
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 11:09:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39127
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ictez-0007Vg-0v
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 11:07:21 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1icthB-000806-Pr
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 11:09:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575562040;
+ s=mimecast20190719; t=1575562175;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qzY2+flel7cUoD+n9jLwtG3t65kY9BOAOghRyMPnfis=;
- b=g2apd/nZUHqB12qgPvfXKPK8QiazRIV6Le7hKpgJxVUVHHYB2YCsCjAya5DIdf2o7+K8gl
- hRurxD4y4Nn4zHsIu+CqKU6TV//RvgRQ1zmqRmzfqyvV6QBzyDThH9uOgcJigXfPqWg35N
- 5EBh2va081lUUrGoXDZv32h3s4aXjHg=
+ bh=aGalizfwmSIPEH9H505AFCk6XaXeoS9BCoK4p/HGGEI=;
+ b=Jezf4rJEoceYXHM3s8AgXrCX3UvY/k5gT46wSANra6hLX1AQqahimmJDGaF1cIKGV1Yw01
+ BVXrx/xF1yTBDAZtJODdiDIrupM+BMlchbFYLTX3EhiWvYR0vVuYD3VJLToWsUGl+pRZ4/
+ GGgXZ/X/RIx4bcg0ratTZ/CaTI37SLw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-aHDn-LFfMHqqhi2Xq7BbKQ-1; Thu, 05 Dec 2019 11:07:17 -0500
+ us-mta-421-t6rzFpjYN6-pjx3B9CIp7Q-1; Thu, 05 Dec 2019 11:09:32 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3391DBF0;
- Thu,  5 Dec 2019 16:07:15 +0000 (UTC)
-Received: from thuth.com (ovpn-116-87.ams2.redhat.com [10.36.116.87])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D7BD6691BF;
- Thu,  5 Dec 2019 16:07:11 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH 3/3] hw/pci: Remove the "command_serr_enable" property
-Date: Thu,  5 Dec 2019 17:06:52 +0100
-Message-Id: <20191205160652.23493-4-thuth@redhat.com>
-In-Reply-To: <20191205160652.23493-1-thuth@redhat.com>
-References: <20191205160652.23493-1-thuth@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E733C8E96B1;
+ Thu,  5 Dec 2019 16:09:30 +0000 (UTC)
+Received: from gondolin (unknown [10.36.118.1])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 57ED76A028;
+ Thu,  5 Dec 2019 16:09:26 +0000 (UTC)
+Date: Thu, 5 Dec 2019 17:09:23 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v7 20/21] hw/vfio/ap: drop local_err from vfio_ap_realize
+Message-ID: <20191205170923.3a710a71.cohuck@redhat.com>
+In-Reply-To: <20191205152019.8454-21-vsementsov@virtuozzo.com>
+References: <20191205152019.8454-1-vsementsov@virtuozzo.com>
+ <20191205152019.8454-21-vsementsov@virtuozzo.com>
+Organization: Red Hat GmbH
+MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: aHDn-LFfMHqqhi2Xq7BbKQ-1
+X-MC-Unique: t6rzFpjYN6-pjx3B9CIp7Q-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,63 +86,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Pierre Morel <pmorel@linux.ibm.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org, armbru@redhat.com,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that the old pc-0.x machine types have been removed, this config
-knob is not required anymore.
+On Thu,  5 Dec 2019 18:20:18 +0300
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/pci/pci.c         | 6 +-----
- include/hw/pci/pci.h | 3 ---
- 2 files changed, 1 insertion(+), 8 deletions(-)
+> No reason for local_err here, use errp directly instead.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  hw/vfio/ap.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index cbc7a32568..e3d310365d 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -69,8 +69,6 @@ static Property pci_props[] =3D {
-     DEFINE_PROP_UINT32("rombar",  PCIDevice, rom_bar, 1),
-     DEFINE_PROP_BIT("multifunction", PCIDevice, cap_present,
-                     QEMU_PCI_CAP_MULTIFUNCTION_BITNR, false),
--    DEFINE_PROP_BIT("command_serr_enable", PCIDevice, cap_present,
--                    QEMU_PCI_CAP_SERR_BITNR, true),
-     DEFINE_PROP_BIT("x-pcie-lnksta-dllla", PCIDevice, cap_present,
-                     QEMU_PCIE_LNKSTA_DLLLA_BITNR, true),
-     DEFINE_PROP_BIT("x-pcie-extcap-init", PCIDevice, cap_present,
-@@ -751,9 +749,7 @@ static void pci_init_wmask(PCIDevice *dev)
-     pci_set_word(dev->wmask + PCI_COMMAND,
-                  PCI_COMMAND_IO | PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER =
-|
-                  PCI_COMMAND_INTX_DISABLE);
--    if (dev->cap_present & QEMU_PCI_CAP_SERR) {
--        pci_word_test_and_set_mask(dev->wmask + PCI_COMMAND, PCI_COMMAND_S=
-ERR);
--    }
-+    pci_word_test_and_set_mask(dev->wmask + PCI_COMMAND, PCI_COMMAND_SERR)=
-;
-=20
-     memset(dev->wmask + PCI_CONFIG_HEADER_SIZE, 0xff,
-            config_size - PCI_CONFIG_HEADER_SIZE);
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index db75c6dfd0..5b6ebd15c6 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -174,9 +174,6 @@ enum {
- #define QEMU_PCI_CAP_MULTIFUNCTION_BITNR        3
-     QEMU_PCI_CAP_MULTIFUNCTION =3D (1 << QEMU_PCI_CAP_MULTIFUNCTION_BITNR)=
-,
-=20
--    /* command register SERR bit enabled */
--#define QEMU_PCI_CAP_SERR_BITNR 4
--    QEMU_PCI_CAP_SERR =3D (1 << QEMU_PCI_CAP_SERR_BITNR),
-     /* Standard hot plug controller. */
- #define QEMU_PCI_SHPC_BITNR 5
-     QEMU_PCI_CAP_SHPC =3D (1 << QEMU_PCI_SHPC_BITNR),
---=20
-2.18.1
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 
