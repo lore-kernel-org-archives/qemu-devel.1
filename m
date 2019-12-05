@@ -2,89 +2,83 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC61C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C75DC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:08:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8EC42245C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:07:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCA432245C
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:08:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M38C/sxQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8EC42245C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bv0ikgxj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA432245C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icrmq-0000bL-Ck
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:07:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42644)
+	id 1icrnh-0001UT-B8
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:08:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48833)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1icrbn-0007jf-Ll
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:55:56 -0500
+ (envelope-from <eblake@redhat.com>) id 1icrkp-000733-5Q
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:05:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1icrbm-0000Rt-1h
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:55:55 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39556)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1icrbl-0000MS-NG
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:55:53 -0500
-Received: by mail-wr1-x444.google.com with SMTP id y11so3708103wrt.6
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 05:55:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=+aAcg7zfu3h11WqWsNjIj4w0+SSQrzO+SPiMdumxwPs=;
- b=M38C/sxQAU0NtdioFNZF9aZmTzys4b+YebJd6E6ryGA5szJQ/nxOY0gESlUJqu3pUY
- 2WknaPFSyQYiaPkhe9NGpp6VPqCo4+mwI2mlrDojQO2QUvnqVG0CxhEwk1ApmpwpS2uX
- qmRqwB8i2zbCKprwTTBpHoUVJd+EBr3c9R1wEOvPzFZLvijJeN/HWt82TiioU2Hhxylx
- c9h4mfDBpyH7JOQAuWWsghvhHNzXL+mHqGEFTh0mHFH1P2exmzh7uf3C3tMqDPZ0RIQK
- QL38hjsnIkIf4qkMsGh1ucv4qKqpXlUgME4+s7K7Zec38ft+Vg9lHkKylpLEyZrqL0E5
- 3l+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=+aAcg7zfu3h11WqWsNjIj4w0+SSQrzO+SPiMdumxwPs=;
- b=FyeS22JEpO5V8J05Ogzp4OtCQntqN2lFpfKSdcEAQfI9z6mUDrG/pUX3PSmZeNB2mC
- G4fV/XuYz4OcdAp1fwGda9/ERX/aatYGSeaZaJhGj0JSDbDjv4JWdwH38eAs7u9ugv1g
- wmACOP+cTLzoXCkMt2r9/eDliljQDChqATItAMHvXwW6KaocEhMYt4M+BFi52cyITMkY
- Jsil9mdQaidl1oCakqb0T8ZNJUj1/uJb7WND2GVdmUL+UHALlpffKj+a+9sFuytlnm5J
- 4VvVcvkesrokxiDYfV/RNnytzPUy2fQMQVs/29wFLNODcyxmLrqW5O2h5n4cswrP5w22
- 8nNg==
-X-Gm-Message-State: APjAAAWd0vrPq5NOMMSXObL+DeFVCcDPqualrNlkB+7eVVsAzZkg4GuE
- 4rH5sK/Z67hBEZoJ2OOi28pNaXr02Ds=
-X-Google-Smtp-Source: APXvYqwy2+El1zorGSaAjV9lh9JnG3fvQrzwpUbWk9vOW/x19vOf2ZEg54rhbs+KB4t73Yjnwsb27Q==
-X-Received: by 2002:adf:f382:: with SMTP id m2mr9800560wro.163.1575548725921; 
- Thu, 05 Dec 2019 04:25:25 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v3sm9639813wml.47.2019.12.05.04.25.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Dec 2019 04:25:22 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6A1A31FF91;
- Thu,  5 Dec 2019 12:25:18 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 4/6] linux-user: log page table changes under -d page
-Date: Thu,  5 Dec 2019 12:25:15 +0000
-Message-Id: <20191205122518.10010-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191205122518.10010-1-alex.bennee@linaro.org>
-References: <20191205122518.10010-1-alex.bennee@linaro.org>
+ (envelope-from <eblake@redhat.com>) id 1icrki-00052C-0u
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:05:13 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50730
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1icrkh-000504-Dp
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:05:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575554705;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xrLOjqRJEOMRhQ9wY5J+pof9or9Bev2i1+87m8yPU78=;
+ b=bv0ikgxjHovZUCk/dF7VbrSMW6YgRhA9I0QbEKidL03tonCtIQ64kHvRm417oKPsY38/D2
+ zNXIT2l2DYdw1/+RiYqoVk4SPfHb8xhIeixkaMlHzu1mST8+B33QsF+KrnbDzZggs8wq9m
+ KFhUgwOT/Be7QdV8jG5aMPCDvES0rd4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-JTm5SuTNNMGAYpEHe_m6fg-1; Thu, 05 Dec 2019 09:05:03 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3F7B801E7E;
+ Thu,  5 Dec 2019 14:05:01 +0000 (UTC)
+Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1792A1D1;
+ Thu,  5 Dec 2019 14:04:59 +0000 (UTC)
+Subject: Re: [PATCH v5 1/2] block/nbd: extract the common cleanup code
+To: Stefano Garzarella <sgarzare@redhat.com>, pannengyuan@huawei.com
+References: <1575517528-44312-1-git-send-email-pannengyuan@huawei.com>
+ <1575517528-44312-2-git-send-email-pannengyuan@huawei.com>
+ <20191205094259.r4qb4jxcrom76x7f@steredhat>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <d5ff2791-0171-404b-3c19-69159921586b@redhat.com>
+Date: Thu, 5 Dec 2019 08:04:58 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+In-Reply-To: <20191205094259.r4qb4jxcrom76x7f@steredhat>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: JTm5SuTNNMGAYpEHe_m6fg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,105 +90,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: kwolf@redhat.com, liyiting@huawei.com, zhang.zhanghailiang@huawei.com,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
+ kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The CPU_LOG_PAGE flag is woefully underused and could stand to do
-extra duty tracking page changes. If the user doesn't want to see the
-details as things change they still have the tracepoints available.
+On 12/5/19 3:42 AM, Stefano Garzarella wrote:
+> Hi Pan,
+> 
+> On Thu, Dec 05, 2019 at 11:45:27AM +0800, pannengyuan@huawei.com wrote:
+>> From: Pan Nengyuan <pannengyuan@huawei.com>
+>>
+>> The BDRVNBDState cleanup code is common in two places, add
+>> nbd_clear_bdrvstate() function to do these cleanups.
+>>
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> 
+> I only suggested this change, so I think is better to change it in:
+> Suggested-by: Stefano Garzarella <sgarzare@redhat.com>
 
-We push the locking into log_page_dump and pass a reason for the
-banner text.
+Concur. I'll make that change while queuing this series through my NBD 
+tree for 5.0.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
----
-  v2
-    - reworded banner text
-    - moved locking into helper
-    - converted stray calls of page_dump
----
- include/exec/log.h | 5 ++++-
- bsd-user/main.c    | 2 +-
- linux-user/main.c  | 2 +-
- linux-user/mmap.c  | 8 ++++----
- 4 files changed, 10 insertions(+), 7 deletions(-)
-
-diff --git a/include/exec/log.h b/include/exec/log.h
-index e2cfd436e61..012af09f9b3 100644
---- a/include/exec/log.h
-+++ b/include/exec/log.h
-@@ -50,9 +50,12 @@ static inline void log_disas(void *code, unsigned long size)
- 
- #if defined(CONFIG_USER_ONLY)
- /* page_dump() output to the log file: */
--static inline void log_page_dump(void)
-+static inline void log_page_dump(const char *operation)
- {
-+    qemu_log_lock();
-+    qemu_log("page layout changed following %s\n", operation);
-     page_dump(qemu_logfile);
-+    qemu_log_unlock();
- }
- #endif
- #endif
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 470a8bf79ed..7f4e3cd6271 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -963,7 +963,7 @@ int main(int argc, char **argv)
- 
-     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-         qemu_log("guest_base  0x%lx\n", guest_base);
--        log_page_dump();
-+        log_page_dump("binary load");
- 
-         qemu_log("start_brk   0x" TARGET_ABI_FMT_lx "\n", info->start_brk);
-         qemu_log("end_code    0x" TARGET_ABI_FMT_lx "\n", info->end_code);
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 6ff7851e86f..8718d03ee21 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -826,7 +826,7 @@ int main(int argc, char **argv, char **envp)
- 
-     if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-         qemu_log("guest_base  0x%lx\n", guest_base);
--        log_page_dump();
-+        log_page_dump("binary load");
- 
-         qemu_log("start_brk   0x" TARGET_ABI_FMT_lx "\n", info->start_brk);
-         qemu_log("end_code    0x" TARGET_ABI_FMT_lx "\n", info->end_code);
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index 0b1b43ac3c0..3d90fa459ca 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -18,6 +18,7 @@
-  */
- #include "qemu/osdep.h"
- #include "trace.h"
-+#include "exec/log.h"
- #include "qemu.h"
- 
- //#define DEBUG_MMAP
-@@ -539,10 +540,9 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
-     page_set_flags(start, start + len, prot | PAGE_VALID);
-  the_end:
-     trace_target_mmap_complete(start);
--#ifdef DEBUG_MMAP
--    page_dump(stdout);
--    printf("\n");
--#endif
-+    if (qemu_loglevel_mask(CPU_LOG_PAGE)) {
-+        log_page_dump(__func__);
-+    }
-     tb_invalidate_phys_range(start, start + len);
-     mmap_unlock();
-     return start;
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
