@@ -2,81 +2,73 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90ED2C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 01:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43382C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 01:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C77B2073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 01:29:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GttJ0UWW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C77B2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1478520675
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 01:32:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1478520675
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=h3c.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icfxp-00006h-GH
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 20:29:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42153)
+	id 1icg0Q-00023u-74
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 20:32:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37642)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgreid@google.com>) id 1icd2M-0005n6-36
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 17:22:23 -0500
+ (envelope-from <wang.yongD@h3c.com>) id 1icfyg-0001E6-0v
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 20:30:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgreid@google.com>) id 1icd2K-00040o-H9
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 17:22:21 -0500
-Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:45192)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dgreid@google.com>) id 1icd2J-0003vg-Ke
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 17:22:19 -0500
-Received: by mail-io1-xd44.google.com with SMTP id i11so1353867ioi.12
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 14:22:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=hpXJI4NLs0I4ZriAcFAdSSLy+0Om+yLhN0XPeaEdXnA=;
- b=GttJ0UWWQOhtVjPobt05AC3bYuBP8UE86Nac4S5IP41IYX6Vwzavuh/KF9Hl/OPtnX
- UGu19/me6EupqxnngXDZ5OUzBGfEX1gmxBr40MQQb5R6rhSGcgZy7FpNvX/1h7NhTgEU
- MFIJvoUuj+MZWy+Y7RbiVuEmOnFAW2009CX6Q=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=hpXJI4NLs0I4ZriAcFAdSSLy+0Om+yLhN0XPeaEdXnA=;
- b=p5qZELiTfn0f7tQUD7yahAof5oVvEvn0KoCbFAYJQYYDTZsRVSfNT0FdKMuGF/H8uQ
- /7ktJDOZiMQSxYSWXBX11KbLAxl0ApttvwRAojdGL+lasodfNfhz5/4R953VtmbfU1fp
- PAmmLs0P48PMuw0Ceb2qnmaj6vdoUbRpWa8toKglffzJC9n8aTLclTM2pOSOV6Ruk5Nh
- VvKfV49m/6dwYdMZnE8cS+0UjX6qmn5z2WQEj/f3rWN29amBVUzAjGmDJzh/pRq7vpri
- IzWyuWu4f6qjwgmcFvb/K6g0bKoNuXi8zCCXFaYQE+DVAl8EGOsdCDCotStADIEBKPLx
- xSdg==
-X-Gm-Message-State: APjAAAUKSU5u0W7u11nDdqwu0XhtPPUff0RD4WiYMfx5TGL/klINEPcc
- MPu3cx08BgFMbX6FDekYt2b3MOBfFeQtzgTmvgOchg==
-X-Google-Smtp-Source: APXvYqzkc1kQpPFnkmp0Z3McFZSu3S43486QhArBoLARKD5cL29LGEqOhh0nTi4vh+dAiQWuOuwT/MdfgwIY1DYawNU=
-X-Received: by 2002:a5d:9245:: with SMTP id e5mr3771183iol.116.1575498137524; 
- Wed, 04 Dec 2019 14:22:17 -0800 (PST)
+ (envelope-from <wang.yongD@h3c.com>) id 1icfya-0000xR-KJ
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 20:30:43 -0500
+Received: from smtp.h3c.com ([60.191.123.50]:60768 helo=h3cspam02-ex.h3c.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wang.yongD@h3c.com>) id 1icfyZ-0000DX-Qg
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 20:30:40 -0500
+Received: from DAG2EX09-IDC.srv.huawei-3com.com ([10.8.0.72])
+ by h3cspam02-ex.h3c.com with ESMTPS id xB51U8Ju038082
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Thu, 5 Dec 2019 09:30:08 +0800 (GMT-8)
+ (envelope-from wang.yongD@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
+ DAG2EX09-IDC.srv.huawei-3com.com (10.8.0.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Thu, 5 Dec 2019 09:30:09 +0800
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
+ by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%6])
+ with mapi id 15.01.1713.004; Thu, 5 Dec 2019 09:30:09 +0800
+From: Wangyong <wang.yongD@h3c.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, "pbonzini@redhat.com"
+ <pbonzini@redhat.com>, "mark.kanda@oracle.com" <mark.kanda@oracle.com>,
+ "hch@lst.de" <hch@lst.de>
+Subject: RE: issue about virtio-blk queue size
+Thread-Topic: issue about virtio-blk queue size
+Thread-Index: AdWkwymM2x+KvjIaQMm6NC0SqitPwwE4PnOAAFjHq6A=
+Date: Thu, 5 Dec 2019 01:30:09 +0000
+Message-ID: <18dcb1c11c1d481eadf491f9074f6306@h3c.com>
+References: <8920655f41aa4d1bbd5b7590ac0d1bef@h3c.com>
+ <20191203143731.GD230219@stefanha-x1.localdomain>
+In-Reply-To: <20191203143731.GD230219@stefanha-x1.localdomain>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.125.108.162]
+x-sender-location: DAG2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
- <CAD=HUj7EsxrkSubmY6HE4aYJOykVKtmGXjMjeGqnoJw1KZUc5Q@mail.gmail.com>
- <20191106124101.fsfxibdkypo4rswv@sirius.home.kraxel.org>
- <72712fe048af1489368f7416faa92c45@hostfission.com>
- <CAAFQd5Cpb=3HRL3NbgxP+S259nkNEuA=u75ew1JQTzvVUU5NeQ@mail.gmail.com>
- <d65bec5074eda5f389668e28922c1609@hostfission.com>
- <CAAFQd5AWqYaNWfYQ2hepjg7OD8y8ehHn0guusAR8JYefc+BNaw@mail.gmail.com>
-In-Reply-To: <CAAFQd5AWqYaNWfYQ2hepjg7OD8y8ehHn0guusAR8JYefc+BNaw@mail.gmail.com>
-From: Dylan Reid <dgreid@chromium.org>
-Date: Thu, 5 Dec 2019 09:22:04 +1100
-Message-ID: <CAEUnVG77y2DrV5kLTHDy1xio+yzMGv9j=M0c4388vH_LUaiXLg@mail.gmail.com>
-Subject: Re: guest / host buffer sharing ...
-To: Tomasz Figa <tfiga@chromium.org>, Zach Reizner <zachr@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d44
-X-Mailman-Approved-At: Wed, 04 Dec 2019 20:28:05 -0500
+X-DNSRBL: 
+X-MAIL: h3cspam02-ex.h3c.com xB51U8Ju038082
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 60.191.123.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,118 +80,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Geoffrey McRae <geoff@hostfission.com>, Hans Verkuil <hverkuil@xs4all.nl>,
- Alex Lau <alexlau@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
- virtio-dev@lists.oasis-open.org, qemu-devel <qemu-devel@nongnu.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Keiichi Watanabe <keiichiw@chromium.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Daniel Vetter <daniel@ffwll.ch>,
- =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>, David Stevens <stevensd@chromium.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 21, 2019 at 4:59 PM Tomasz Figa <tfiga@chromium.org> wrote:
->
-> On Thu, Nov 21, 2019 at 6:41 AM Geoffrey McRae <geoff@hostfission.com> wrote:
-> >
-> >
-> >
-> > On 2019-11-20 23:13, Tomasz Figa wrote:
-> > > Hi Geoffrey,
-> > >
-> > > On Thu, Nov 7, 2019 at 7:28 AM Geoffrey McRae <geoff@hostfission.com>
-> > > wrote:
-> > >>
-> > >>
-> > >>
-> > >> On 2019-11-06 23:41, Gerd Hoffmann wrote:
-> > >> > On Wed, Nov 06, 2019 at 05:36:22PM +0900, David Stevens wrote:
-> > >> >> > (1) The virtio device
-> > >> >> > =====================
-> > >> >> >
-> > >> >> > Has a single virtio queue, so the guest can send commands to register
-> > >> >> > and unregister buffers.  Buffers are allocated in guest ram.  Each buffer
-> > >> >> > has a list of memory ranges for the data. Each buffer also has some
-> > >> >>
-> > >> >> Allocating from guest ram would work most of the time, but I think
-> > >> >> it's insufficient for many use cases. It doesn't really support things
-> > >> >> such as contiguous allocations, allocations from carveouts or <4GB,
-> > >> >> protected buffers, etc.
-> > >> >
-> > >> > If there are additional constrains (due to gpu hardware I guess)
-> > >> > I think it is better to leave the buffer allocation to virtio-gpu.
-> > >>
-> > >> The entire point of this for our purposes is due to the fact that we
-> > >> can
-> > >> not allocate the buffer, it's either provided by the GPU driver or
-> > >> DirectX. If virtio-gpu were to allocate the buffer we might as well
-> > >> forget
-> > >> all this and continue using the ivshmem device.
-> > >
-> > > I don't understand why virtio-gpu couldn't allocate those buffers.
-> > > Allocation doesn't necessarily mean creating new memory. Since the
-> > > virtio-gpu device on the host talks to the GPU driver (or DirectX?),
-> > > why couldn't it return one of the buffers provided by those if
-> > > BIND_SCANOUT is requested?
-> > >
-> >
-> > Because in our application we are a user-mode application in windows
-> > that is provided with buffers that were allocated by the video stack in
-> > windows. We are not using a virtual GPU but a physical GPU via vfio
-> > passthrough and as such we are limited in what we can do. Unless I have
-> > completely missed what virtio-gpu does, from what I understand it's
-> > attempting to be a virtual GPU in its own right, which is not at all
-> > suitable for our requirements.
->
-> Not necessarily. virtio-gpu in its basic shape is an interface for
-> allocating frame buffers and sending them to the host to display.
->
-> It sounds to me like a PRIME-based setup similar to how integrated +
-> discrete GPUs are handled on regular systems could work for you. The
-> virtio-gpu device would be used like the integrated GPU that basically
-> just drives the virtual screen. The guest component that controls the
-> display of the guest (typically some sort of a compositor) would
-> allocate the frame buffers using virtio-gpu and then import those to
-> the vfio GPU when using it for compositing the parts of the screen.
-> The parts of the screen themselves would be rendered beforehand by
-> applications into local buffers managed fully by the vfio GPU, so
-> there wouldn't be any need to involve virtio-gpu there. Only the
-> compositor would have to be aware of it.
->
-> Of course if your guest is not Linux, I have no idea if that can be
-> handled in any reasonable way. I know those integrated + discrete GPU
-> setups do work on Windows, but things are obviously 100% proprietary,
-> so I don't know if one could make them work with virtio-gpu as the
-> integrated GPU.
->
-> >
-> > This discussion seems to have moved away completely from the original
-> > simple feature we need, which is to share a random block of guest
-> > allocated ram with the host. While it would be nice if it's contiguous
-> > ram, it's not an issue if it's not, and with udmabuf (now I understand
-> > it) it can be made to appear contigous if it is so desired anyway.
-> >
-> > vhost-user could be used for this if it is fixed to allow dynamic
-> > remapping, all the other bells and whistles that are virtio-gpu are
-> > useless to us.
-> >
->
-> As far as I followed the thread, my impression is that we don't want
-> to have an ad-hoc interface just for sending memory to the host. The
-> thread was started to look for a way to create identifiers for guest
-> memory, which proper virtio devices could use to refer to the memory
-> within requests sent to the host.
->
-> That said, I'm not really sure if there is any benefit of making it
-> anything other than just the specific virtio protocol accepting
-> scatterlist of guest pages directly.
->
-> Putting the ability to obtain the shared memory itself, how do you
-> trigger a copy from the guest frame buffer to the shared memory?
-
-Adding Zach for more background on virtio-wl particular use cases.
+Pg0KPiBPbiBUaHUsIE5vdiAyOCwgMjAxOSBhdCAwODo0NDo0M0FNICswMDAwLCBXYW5neW9uZyB3
+cm90ZToNCj4gPiBIaSBhbGwsDQo+DQo+IFRoaXMgbG9va3MgaW50ZXJlc3RpbmcsIHBsZWFzZSBj
+b250aW51ZSB0aGlzIGRpc2N1c3Npb24gb24gdGhlIFFFTVUgbWFpbGluZyBsaXN0DQo+IDxxZW11
+LWRldmVsQG5vbmdudS5vcmc+IHNvIHRoYXQgb3RoZXJzIGNhbiBwYXJ0aWNpcGF0ZS4NCj4NCj4g
+Pg0KPiA+IFRoaXMgcGF0Y2ggbWFrZXMgdmlydGlvX2JsayBxdWV1ZSBzaXplIGNvbmZpZ3VyYWJs
+ZQ0KPiA+DQo+ID4gY29tbWl0IDYwNDBhZWRkZGI1ZjQ3NGE5YzIzMDRiNmE0MzJhNjUyZDgyYjNk
+M2MNCj4gPiBBdXRob3I6IE1hcmsgS2FuZGEgPG1hcmsua2FuZGFAb3JhY2xlLmNvbT4NCj4gPiBE
+YXRlOiAgIE1vbiBEZWMgMTEgMDk6MTY6MjQgMjAxNyAtMDYwMA0KPiA+DQo+ID4gICAgIHZpcnRp
+by1ibGs6IG1ha2UgcXVldWUgc2l6ZSBjb25maWd1cmFibGUNCj4gPg0KPiA+IEJ1dCB3aGVuIHdl
+IHNldCB0aGUgcXVldWUgc2l6ZSB0byBtb3JlIHRoYW4gMTI4LCBpdCB3aWxsIG5vdCB0YWtlIGVm
+ZmVjdC4NCj4gPg0KPiA+IFRoYXQncyBiZWNhdXNlIGxpbnV4IGFpbydzIG1heGltdW0gb3V0c3Rh
+bmRpbmcgcmVxdWVzdHMgYXQgYSB0aW1lIGlzDQo+ID4gYWx3YXlzIGxlc3MgdGhhbiBvciBlcXVh
+bCB0byAxMjgNCj4gPg0KPiA+IFRoZSBmb2xsb3dpbmcgY29kZSBsaW1pdHMgdGhlIG91dHN0YW5k
+aW5nIHJlcXVlc3RzIGF0IGEgdGltZToNCj4gPg0KPiA+ICNkZWZpbmUgTUFYX0VWRU5UUyAxMjgN
+Cj4gPg0KPiA+IGxhaW9fZG9fc3VibWl0KCkNCj4gPiB7DQo+ID4NCj4gPiAgICAgaWYgKCFzLT5p
+b19xLmJsb2NrZWQgJiYNCj4gPiAgICAgICAgICghcy0+aW9fcS5wbHVnZ2VkIHx8DQo+ID4gICAg
+ICAgICAgcy0+aW9fcS5pbl9mbGlnaHQgKyBzLT5pb19xLmluX3F1ZXVlID49IE1BWF9FVkVOVFMp
+KSB7DQo+ID4gICAgICAgICBpb3Ffc3VibWl0KHMpOw0KPiA+ICAgICB9DQo+ID4gfQ0KPiA+DQo+
+ID4gU2hvdWxkIHdlIG1ha2UgdGhlIHZhbHVlIG9mIE1BWF9FVkVOVFMgY29uZmlndXJhYmxlID8N
+Cj4NCj4gSW5jcmVhc2luZyBNQVhfRVZFTlRTIHRvIGEgbGFyZ2VyIGhhcmRjb2RlZCB2YWx1ZSBz
+ZWVtcyByZWFzb25hYmxlIGFzIGENCj4gc2hvcnR0ZXJtIGZpeC4gIFBsZWFzZSBmaXJzdCBjaGVj
+ayBob3cgL3Byb2Mvc3lzL2ZzL2Fpby1tYXgtbnIgYW5kDQo+IGlvX3NldHVwKDIpIGhhbmRsZSB0
+aGlzIHJlc291cmNlIGxpbWl0LiAgVGhlIHBhdGNoIG11c3Qgbm90IGJyZWFrIGV4aXN0aW5nDQo+
+IHN5c3RlbXMgd2hlcmUgMTI4IHdvcmtzIHRvZGF5Lg0KW3Jvb3RAbm9kZTIgfl0jIGNhdCAvZXRj
+L2NlbnRvcy1yZWxlYXNlDQpDZW50T1MgTGludXggcmVsZWFzZSA3LjUuMTgwNCAoQ29yZSkNCg0K
+W3Jvb3RAbm9kZTIgfl0jIGNhdCAvcHJvYy9zeXMvZnMvYWlvLW1heC1ucg0KNDI5NDk2NzI5Ng0K
+DQo+ID4gTUFYX0VWRU5UUyBzaG91bGQgaGF2ZSB0aGUgc2FtZSB2YWx1ZSBhcyBxdWV1ZSBzaXpl
+ID8NCj4NCj4gTXVsdGlwbGUgdmlydGlvLWJsayBkZXZpY2VzIGNhbiBzaGFyZSBhIHNpbmdsZSBB
+aW9Db250ZXh0LA0KSXMgbXVsdGlwbGUgdmlydGlvLWJsayBjb25maWd1cmVkIHdpdGggb25lIElP
+VGhyZWFkPw0KTXVsdGlwbGUgdmlydGlvLWJsayBwZXJmb3JtYW5jZSB3aWxsIGJlIHdvcnNlLg0K
+DQo+c28gc2V0dGluZyBpdCB0byB0aGUNCj4gcXVldWUgc2l6ZSBtYXkgbm90IGJlIGVub3VnaC4g
+IFRoYXQncyB3aHkgSSBzdWdnZXN0IGluY3JlYXNpbmcgdGhlDQo+IGhhcmRjb2RlZCBsaW1pdCBm
+b3Igbm93IHVubGVzcyBzb21lb25lIHRoaW5ncyB1cCBhIHdheSB0byBzaXplIE1BWF9FVkVOVFMN
+Cj4gY29ycmVjdGx5Lg0KPg0KPiA+IEkgc2V0IHRoZSB2aXJ0aW8gYmxrIHF1ZXVlIHNpemUgdG8g
+MTAyNCwgdGhlbiB0ZXN0ZWQgdGhlIHJlc3VsdHMgYXMNCj4gPiBmb2xsb3dzDQo+ID4NCj4gPiBm
+aW8gLS1maWxlbmFtZT0vZGV2L3ZkYSAtZGlyZWN0PTEgLWlvZGVwdGg9MTAyNCAtdGhyZWFkIC1y
+dz1yYW5kcmVhZA0KPiA+IC1pb2VuZ2luZT1saWJhaW8gLWJzPThrIC1zaXplPTUwRyAtbnVtam9i
+cz0xIC1ydW50aW1lPTYwMA0KPiA+IC1ncm91cF9yZXBvcnRpbmcgLW5hbWU9dGVzdA0KPiA+IGd1
+ZXN0Og0KPiA+DQo+ID4gW3Jvb3RAbG9jYWxob3N0IH5dIyBjYXQgL3N5cy9tb2R1bGUvdmlydGlv
+X2Jsay9wYXJhbWV0ZXJzL3F1ZXVlX2RlcHRoDQo+ID4gMTAyNA0KPiA+DQo+ID4gW3Jvb3RAbG9j
+YWxob3N0IH5dIyBjYXQgL3N5cy9ibG9jay92ZGEvcXVldWUvbnJfcmVxdWVzdHMNCj4gPiAxMDI0
+DQo+ID4NCj4gPiBEZXZpY2U6ICAgICAgICAgcnJxbS9zICAgd3JxbS9zICAgICByL3MgICAgIHcv
+cyAgICBya0IvcyAgICB3a0Ivcw0KPiBhdmdycS1zeiBhdmdxdS1zeiAgIGF3YWl0IHJfYXdhaXQg
+d19hd2FpdCAgc3ZjdG0gICV1dGlsDQo+ID4gdmRhICAgICAgICAgICAgICAgMC4wMCAgICAgMC4w
+MCAgICAwLjAwIDE0MzIuMDAgICAgIDAuMDAgMTE0NTYuMDANCj4gMTYuMDAgIDEwMjQuOTEgIDcy
+MC44MiAgICAwLjAwICA3MjAuODIgICAwLjcwIDEwMC4xMA0KPg0KPiBUaGlzIGlvc3RhdCBvdXRw
+dXQgZG9lc24ndCBjb3JyZXNwb25kIHRvIHRoZSBmaW8gLXJ3PXJhbmRyZWFkIGNvbW1hbmQtbGlu
+ZQ0KPiB5b3UgcG9zdGVkIGJlY2F1c2UgaXQgc2hvd3Mgd3JpdGVzIGluc3RlYWQgb2YgcmVhZHMg
+OykuICBJIGFzc3VtZSBub3RoaW5nIGVsc2UNCj4gd2FzIGNoYW5nZWQgaW4gdGhlIGZpbyBjb21t
+YW5kLWxpbmUuDQpmaW8gLS1maWxlbmFtZT0vZGV2L3ZkYSAtZGlyZWN0PTEgLWlvZGVwdGg9MTAy
+NCAtdGhyZWFkIC1ydz1yYW5kcmVhZCAtaW9lbmdpbmU9bGliYWlvIC1icz04ayAtc2l6ZT01MEcg
+LW51bWpvYnM9MSAtcnVudGltZT02MDAgLWdyb3VwX3JlcG9ydGluZyAtbmFtZT10ZXN0DQoNCk1B
+WF9FVkVOVFMgPSAxMjgNCg0KZ3Vlc3Q6DQoNCkRldmljZTogICAgICAgICBycnFtL3MgICB3cnFt
+L3MgICAgIHIvcyAgICAgdy9zICAgIHJrQi9zICAgIHdrQi9zIGF2Z3JxLXN6IGF2Z3F1LXN6ICAg
+YXdhaXQgcl9hd2FpdCB3X2F3YWl0ICBzdmN0bSAgJXV0aWwNCnZkYSAgICAgICAgICAgICAgIDAu
+MDAgICAgIDAuMDAgMTMyNC4wMCAgICAwLjAwIDEwNTkyLjAwICAgICAwLjAwICAgIDE2LjAwICAx
+MDIzLjkwICA3NjkuMDUgIDc2OS4wNSAgICAwLjAwICAgMC43NiAxMDAuMDANCg0KaG9zdDoNCg0K
+cm9vdEBjdmt+L2J1aWxkIyBjYXQgL3N5cy9ibG9jay9zZGEvcXVldWUvbnJfcmVxdWVzdHMNCjEw
+MjQNCg0KRGV2aWNlOiAgICAgICAgIHJycW0vcyAgIHdycW0vcyAgICAgci9zICAgICB3L3MgICAg
+cmtCL3MgICAgd2tCL3MgYXZncnEtc3ogYXZncXUtc3ogICBhd2FpdCByX2F3YWl0IHdfYXdhaXQg
+IHN2Y3RtICAldXRpbA0Kc2RhICAgICAgICAgICAgICAgMC4wMCAgICAgMC4wMCAxMzU5LjAwICAg
+IDAuMDAgMTA4NzIuMDAgICAgIDAuMDAgICAgMTYuMDAgICAxMjcuOTEgICA5My45MyAgIDkzLjkz
+ICAgIDAuMDAgICAwLjc0IDEwMC4wMA0KDQoNCkkgcmVkZWZpbmVkIHRoaXMgbWFjcm8oTUFYX0VW
+RU5UUyA9IDEwMjQpDQojZGVmaW5lIE1BWF9FVkVOVFMgMTAyNA0KVGhlbiByZXRlc3RlZCwgdGhl
+IHJlc3VsdHMgYXJlIGFzIGZvbGxvd3M6IO+8iElPIHBlcmZvcm1hbmNlIHdpbGwgYmUgZ3JlYXRs
+eSBpbXByb3ZlZO+8iQ0KDQpndWVzdDoNCg0KW3Jvb3RAbG9jYWxob3N0IH5dIyBjYXQgL3N5cy9t
+b2R1bGUvdmlydGlvX2Jsay9wYXJhbWV0ZXJzL3F1ZXVlX2RlcHRoDQoxMDI0DQoNCltyb290QGxv
+Y2FsaG9zdCB+XSMgY2F0IC9zeXMvYmxvY2svdmRhL3F1ZXVlL25yX3JlcXVlc3RzDQoxMDI0DQoN
+CkRldmljZTogICAgICAgICBycnFtL3MgICB3cnFtL3MgICAgIHIvcyAgICAgdy9zICAgIHJrQi9z
+ICAgIHdrQi9zIGF2Z3JxLXN6IGF2Z3F1LXN6ICAgYXdhaXQgcl9hd2FpdCB3X2F3YWl0ICBzdmN0
+bSAgJXV0aWwNCnZkYSAgICAgICAgICAgICAgIDAuMDAgICAgIDAuMDAgMTc0My4wMCAgICAwLjAw
+IDEzOTQ0LjAwICAgICAwLjAwICAgIDE2LjAwICAxMDI0LjUwICA1ODQuOTQgIDU4NC45NCAgICAw
+LjAwICAgMC41NyAxMDAuMTANCg0KDQpob3N0Og0KDQpyb290QGN2a34vYnVpbGQjIGNhdCAvc3lz
+L2Jsb2NrL3NkYS9xdWV1ZS9ucl9yZXF1ZXN0cw0KMTAyNA0KDQoNCkRldmljZTogICAgICAgICBy
+cnFtL3MgICB3cnFtL3MgICAgIHIvcyAgICAgdy9zICAgIHJrQi9zICAgIHdrQi9zIGF2Z3JxLXN6
+IGF2Z3F1LXN6ICAgYXdhaXQgcl9hd2FpdCB3X2F3YWl0ICBzdmN0bSAgJXV0aWwNCnNkYSAgICAg
+ICAgICAgICAgIDAuMDAgICAgIDAuMDAgMTQxNC4wMCAgICAxLjAwIDExMzEyLjAwICAgICAxLjAw
+ICAgIDE1Ljk5ICAxMDIzLjM3ICA3MjYuMzYgIDcyNi44NiAgIDI0LjAwICAgMC43MSAxMDAuMDAN
+Cj4NCj4gPg0KPiA+IGhvc3Q6DQo+ID4NCj4gPiByb290QGN2a34vYnVpbGQjIGNhdCAvc3lzL2Js
+b2NrL3NkYS9xdWV1ZS9ucl9yZXF1ZXN0cw0KPiA+IDEwMjQNCj4gPg0KPiA+IERldmljZTogICAg
+ICAgICBycnFtL3MgICB3cnFtL3MgICAgIHIvcyAgICAgdy9zICAgIHJrQi9zICAgIHdrQi9zDQo+
+IGF2Z3JxLXN6IGF2Z3F1LXN6ICAgYXdhaXQgcl9hd2FpdCB3X2F3YWl0ICBzdmN0bSAgJXV0aWwN
+Cj4gPiBzZGEgICAgICAgICAgICAgICAwLjAwICAgIDExLjAwICAgIDAuMDAgMTQwMi4wMCAgICAg
+MC4wMCAxMTI0NC4wMA0KPiAxNi4wNCAgIDEyOC4wMCAgIDg4LjMwICAgIDAuMDAgICA4OC4zMCAg
+IDAuNzEgMTAwLjAwDQo+ID4NCj4gPg0KPiA+DQo+ID4gSSByZWRlZmluZWQgdGhpcyBtYWNybyhN
+QVhfRVZFTlRTID0gMTAyNCkgI2RlZmluZSBNQVhfRVZFTlRTIDEwMjQNCj4gPg0KPiA+IFRoZW4g
+cmV0ZXN0ZWQsIHRoZSByZXN1bHRzIGFyZSBhcyBmb2xsb3dzOiDvvIhJTyBwZXJmb3JtYW5jZSB3
+aWxsIGJlDQo+ID4gZ3JlYXRseSBpbXByb3ZlZO+8iQ0KPiA+DQo+ID4gZmlvIC0tZmlsZW5hbWU9
+L2Rldi92ZGEgLWRpcmVjdD0xIC1pb2RlcHRoPTEwMjQgLXRocmVhZCAtcnc9cmFuZHJlYWQNCj4g
+PiAtaW9lbmdpbmU9bGliYWlvIC1icz04ayAtc2l6ZT01MEcgLW51bWpvYnM9MSAtcnVudGltZT02
+MDANCj4gPiAtZ3JvdXBfcmVwb3J0aW5nIC1uYW1lPXRlc3QNCj4gPg0KPiA+IGd1ZXN0Og0KPiA+
+DQo+ID4gW3Jvb3RAbG9jYWxob3N0IH5dIyBjYXQgL3N5cy9tb2R1bGUvdmlydGlvX2Jsay9wYXJh
+bWV0ZXJzL3F1ZXVlX2RlcHRoDQo+ID4gMTAyNA0KPiA+DQo+ID4gW3Jvb3RAbG9jYWxob3N0IH5d
+IyBjYXQgL3N5cy9ibG9jay92ZGEvcXVldWUvbnJfcmVxdWVzdHMNCj4gPiAxMDI0DQo+ID4NCj4g
+PiBEZXZpY2U6ICAgICAgICAgcnJxbS9zICAgd3JxbS9zICAgICByL3MgICAgIHcvcyAgICBya0Iv
+cyAgICB3a0Ivcw0KPiBhdmdycS1zeiBhdmdxdS1zeiAgIGF3YWl0IHJfYXdhaXQgd19hd2FpdCAg
+c3ZjdG0gICV1dGlsDQo+ID4gdmRhICAgICAgICAgICAgICAgMC4wMCAgICAgMC4wMCAxNzQzLjAw
+ICAgIDAuMDAgMTM5NDQuMDAgICAgIDAuMDANCj4gMTYuMDAgIDEwMjQuNTAgIDU4NC45NCAgNTg0
+Ljk0ICAgIDAuMDAgICAwLjU3IDEwMC4xMA0KPg0KPiBOb3cgdGhlIGlvc3RhdCBvdXRwdXQgc2hv
+d3MgcmVhZHMgaW5zdGVhZCBvZiB3cml0ZXMuICBQbGVhc2UgY2hlY2sgYWdhaW4gYW5kDQo+IG1h
+a2Ugc3VyZSB5b3UncmUgY29tcGFyaW5nIHJlYWRzIHdpdGggcmVhZHMuDQo+DQo+IFRoYW5rcywN
+Cj4gU3RlZmFuDQoNClRoYW5rcw0KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0K5pys6YKu5Lu25Y+K5YW2
+6ZmE5Lu25ZCr5pyJ5paw5Y2O5LiJ6ZuG5Zui55qE5L+d5a+G5L+h5oGv77yM5LuF6ZmQ5LqO5Y+R
+6YCB57uZ5LiK6Z2i5Zyw5Z2A5Lit5YiX5Ye6DQrnmoTkuKrkurrmiJbnvqTnu4TjgILnpoHmraLk
+u7vkvZXlhbbku5bkurrku6Xku7vkvZXlvaLlvI/kvb/nlKjvvIjljIXmi6zkvYbkuI3pmZDkuo7l
+hajpg6jmiJbpg6jliIblnLDms4TpnLLjgIHlpI3liLbjgIENCuaIluaVo+WPke+8ieacrOmCruS7
+tuS4reeahOS/oeaBr+OAguWmguaenOaCqOmUmeaUtuS6huacrOmCruS7tu+8jOivt+aCqOeri+WN
+s+eUteivneaIlumCruS7tumAmuefpeWPkeS7tuS6uuW5tuWIoOmZpOacrA0K6YKu5Lu277yBDQpU
+aGlzIGUtbWFpbCBhbmQgaXRzIGF0dGFjaG1lbnRzIGNvbnRhaW4gY29uZmlkZW50aWFsIGluZm9y
+bWF0aW9uIGZyb20gTmV3IEgzQywgd2hpY2ggaXMNCmludGVuZGVkIG9ubHkgZm9yIHRoZSBwZXJz
+b24gb3IgZW50aXR5IHdob3NlIGFkZHJlc3MgaXMgbGlzdGVkIGFib3ZlLiBBbnkgdXNlIG9mIHRo
+ZQ0KaW5mb3JtYXRpb24gY29udGFpbmVkIGhlcmVpbiBpbiBhbnkgd2F5IChpbmNsdWRpbmcsIGJ1
+dCBub3QgbGltaXRlZCB0bywgdG90YWwgb3IgcGFydGlhbA0KZGlzY2xvc3VyZSwgcmVwcm9kdWN0
+aW9uLCBvciBkaXNzZW1pbmF0aW9uKSBieSBwZXJzb25zIG90aGVyIHRoYW4gdGhlIGludGVuZGVk
+DQpyZWNpcGllbnQocykgaXMgcHJvaGliaXRlZC4gSWYgeW91IHJlY2VpdmUgdGhpcyBlLW1haWwg
+aW4gZXJyb3IsIHBsZWFzZSBub3RpZnkgdGhlIHNlbmRlcg0KYnkgcGhvbmUgb3IgZW1haWwgaW1t
+ZWRpYXRlbHkgYW5kIGRlbGV0ZSBpdCENCg==
 
