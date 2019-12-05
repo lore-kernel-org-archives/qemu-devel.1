@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E56EC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 17:58:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9B1C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 17:59:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64E0121823
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 17:58:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64E0121823
+	by mail.kernel.org (Postfix) with ESMTPS id C23702464D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 17:59:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C23702464D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icvOk-000377-8e
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 12:58:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46746)
+	id 1icvPH-00045K-DL
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 12:59:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45250)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1icvDe-00083W-9n
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:47:16 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icvDI-0007c0-En
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:46:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1icvDc-0004sq-4i
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:47:14 -0500
-Received: from relay.sw.ru ([185.231.240.75]:48370)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icvDG-0003bB-9j
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:46:52 -0500
+Received: from relay.sw.ru ([185.231.240.75]:48292)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1icvDa-0003Vb-7r; Thu, 05 Dec 2019 12:47:12 -0500
+ id 1icvDE-0003SJ-4g
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:46:48 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1icvD9-00013M-32; Thu, 05 Dec 2019 20:46:43 +0300
+ id 1icvD8-00013M-IV; Thu, 05 Dec 2019 20:46:42 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 20/21] hw/vfio/ap: drop local_err from vfio_ap_realize
-Date: Thu,  5 Dec 2019 20:46:34 +0300
-Message-Id: <20191205174635.18758-21-vsementsov@virtuozzo.com>
+Subject: [PATCH v8 17/21] hw/usb: rename Error ** parameter to more common errp
+Date: Thu,  5 Dec 2019 20:46:31 +0300
+Message-Id: <20191205174635.18758-18-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191205174635.18758-1-vsementsov@virtuozzo.com>
 References: <20191205174635.18758-1-vsementsov@virtuozzo.com>
@@ -59,64 +60,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, vsementsov@virtuozzo.com,
- Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>, armbru@redhat.com,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Alex Williamson <alex.williamson@redhat.com>
+Cc: vsementsov@virtuozzo.com, armbru@redhat.com,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No reason for local_err here, use errp directly instead.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/vfio/ap.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ hw/usb/dev-network.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index da6a20669d..8fbaa724c2 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -89,14 +89,13 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/usb/dev-network.c b/hw/usb/dev-network.c
+index 5de6213cc4..b81a8abe83 100644
+--- a/hw/usb/dev-network.c
++++ b/hw/usb/dev-network.c
+@@ -1342,7 +1342,7 @@ static NetClientInfo net_usbnet_info = {
+     .cleanup = usbnet_cleanup,
+ };
+ 
+-static void usb_net_realize(USBDevice *dev, Error **errrp)
++static void usb_net_realize(USBDevice *dev, Error **errp)
  {
-     int ret;
-     char *mdevid;
--    Error *local_err = NULL;
-     VFIOGroup *vfio_group;
-     APDevice *apdev = AP_DEVICE(dev);
-     VFIOAPDevice *vapdev = VFIO_AP_DEVICE(apdev);
+     USBNetState *s = USB_NET(dev);
  
--    vfio_group = vfio_ap_get_group(vapdev, &local_err);
-+    vfio_group = vfio_ap_get_group(vapdev, errp);
-     if (!vfio_group) {
--        goto out_err;
-+        return;
-     }
- 
-     vapdev->vdev.ops = &vfio_ap_ops;
-@@ -113,7 +112,7 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
-      */
-     vapdev->vdev.balloon_allowed = true;
- 
--    ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, &local_err);
-+    ret = vfio_get_device(vfio_group, mdevid, &vapdev->vdev, errp);
-     if (ret) {
-         goto out_get_dev_err;
-     }
-@@ -123,8 +122,6 @@ static void vfio_ap_realize(DeviceState *dev, Error **errp)
- out_get_dev_err:
-     vfio_ap_put_device(vapdev);
-     vfio_put_group(vfio_group);
--out_err:
--    error_propagate(errp, local_err);
- }
- 
- static void vfio_ap_unrealize(DeviceState *dev, Error **errp)
 -- 
 2.21.0
 
