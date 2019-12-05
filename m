@@ -2,76 +2,81 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BCCC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C0CAC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:19:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECFF42464F
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:18:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE0942464F
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:19:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H6Clc6jQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECFF42464F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ipl2EU0N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE0942464F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icvht-00068I-05
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 13:18:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57803)
+	id 1icvit-0006zN-Vk
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 13:19:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54135)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1icvZ9-0006uL-Gu
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 13:09:28 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1icvh7-0005om-Iq
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 13:17:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1icvZ5-0007n9-NQ
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 13:09:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55794
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icvZ5-0007io-9h
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 13:09:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575569362;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=OjyaI8O7SmbMvhSVlPQtDMl8MgJOeJ/4LUngnzRxRNA=;
- b=H6Clc6jQJMC0mHdjaBmhycB/cKcxSWocH2ZqOc7L/SLmMM55iJPcJo3ZbkBia5epydy/l/
- t1tUzlYNR4M/Yi1rK5JgsU/O0rUKOCcjvE515mV+lB1/MO21hL6nUdsPNigkkIaBZQmfTR
- fq5wLDpoB5Hx1WYpZ6xNN5elqjbjV8o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-bJ7fdi0oOgG4aBBJfRgKfQ-1; Thu, 05 Dec 2019 13:09:20 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6DEC593A0;
- Thu,  5 Dec 2019 18:09:19 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-76.brq.redhat.com [10.40.205.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B739419488;
- Thu,  5 Dec 2019 18:09:15 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0] roms/edk2-funcs: Force armhf toolchain prefix on
- Debian
-Date: Thu,  5 Dec 2019 19:09:13 +0100
-Message-Id: <20191205180913.15263-1-philmd@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1icvh5-0001DR-QY
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 13:17:41 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41368)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1icvh5-00019g-Jx
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 13:17:39 -0500
+Received: by mail-ot1-x341.google.com with SMTP id r27so3423709otc.8
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 10:17:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=YZ4Mv11SbDP5AhWiY1/9jeSZG9dC8AF0VxMGlBUfvlo=;
+ b=Ipl2EU0Nj4ZgDIEFzKSAjPGLxvdDU6FB7z0H+28C46+NaH88JCG/94tMI2O2DIT1eG
+ f4JN8+xm2HKsjFudmLkE/0rzk2E3ZaW5p8JcIey0JDKhbluASgJNJxTpDe3xe79DKTwO
+ FWrMHErCqvaBecO+jZe1ROvWw0N0Tv4KfNbxS2JJGJpZN6+rU1fi1UQGy7rOggyTcNJ/
+ UDcU4fv/KCZd09zWix0UmGIzDxCBOtOf3CnpGvU+QbOXg1sZwPr0QpWPynqAFpjiEmbV
+ UO8ybBBRzgrYWsDk3h5z/DyQGDHAwH94mn57pVT/pijUw5nccb1hcgwb6moJe9ugRb+5
+ cScQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=YZ4Mv11SbDP5AhWiY1/9jeSZG9dC8AF0VxMGlBUfvlo=;
+ b=i4c18hEntP1JuIAwDk+kygMAwpDOSwZjGe/wwFUpbGecXtsqt7I3ahyS4hEN+8+NyZ
+ OYzlrvF3IrVJTz9cBEm6K7TZE4u8qq9io7/dXiDB9SuDQXCtj8j3fv/t46mTSTCOnLrf
+ isBkIYwdxbKPAlYgeAxKRUTYX3nRxqpOw59QDPLpbnoAtXgAq+TXp00tsuJ1wykCa99a
+ KVCyeJbslzG4tlwZN9HfRUFJ6/kxli4jPZtjub66QQGgC1VOG++q8qHDZKRupzhvwEEO
+ lWeclmPHiBJsjO2gQUxKIpKjG8Md8coc2o31BLQ1lwvBMvxTxHFsrcthOOP4Uxqkbv4p
+ Fzww==
+X-Gm-Message-State: APjAAAVIqSA3ar4y3OhX2KG2pWYVuECyc9ussDAX4EM0lAt9UlXYMUxr
+ 6EYElvtMngFlBka90ytsRw6GMkNBeFtU6aiibZSK+w==
+X-Google-Smtp-Source: APXvYqzkxcU2015HGUspQwgwNwRnTrMjHDlzJSVP5pjq2g6nclp0TxuEvWiZjawykVA39s0nDPTqlf4yzM0juF86HkY=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr1878403otd.91.1575569858679; 
+ Thu, 05 Dec 2019 10:17:38 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: bJ7fdi0oOgG4aBBJfRgKfQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <20191011134744.2477-1-richard.henderson@linaro.org>
+ <20191011134744.2477-17-richard.henderson@linaro.org>
+In-Reply-To: <20191011134744.2477-17-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Dec 2019 18:17:27 +0000
+Message-ID: <CAFEAcA_K4wreQRXxEdDB4M-NCBC3NmGTyT0aEZxfAwBbSp23Rg@mail.gmail.com>
+Subject: Re: [PATCH v5 16/22] target/arm: Implement data cache set allocation
+ tags
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,51 +88,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Debian (based) distributions historically provides 2 ARM
-toolchains, documented as [1]:
+On Fri, 11 Oct 2019 at 14:50, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> This is DC GVA and DC GZVA.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+> v2: Use allocation_tag_mem + memset.
+> v3: Require pre-cleaned addresses.
+> ---
 
-* The ARM EABI (armel) port targets a range of older 32-bit ARM
-  devices, particularly those used in NAS hardware and a variety
-  of *plug computers.
-* The newer ARM hard-float (armhf) port supports newer, more
-  powerful 32-bit devices using version 7 of the ARM architecture
-  specification.
+> diff --git a/target/arm/mte_helper.c b/target/arm/mte_helper.c
+> index f1315bae37..e8d8a6bedb 100644
+> --- a/target/arm/mte_helper.c
+> +++ b/target/arm/mte_helper.c
+> @@ -510,3 +510,31 @@ void HELPER(stzgm)(CPUARMState *env, uint64_t ptr, uint64_t val)
+>          }
+>      }
+>  }
+> +
+> +void HELPER(dc_gva)(CPUARMState *env, uint64_t ptr)
+> +{
+> +    ARMCPU *cpu = env_archcpu(env);
+> +    size_t blocklen = 4 << cpu->dcz_blocksize;
+> +    int el;
+> +    uint64_t sctlr;
+> +    uint8_t *mem;
+> +    int rtag;
+> +
+> +    ptr = QEMU_ALIGN_DOWN(ptr, blocklen);
+> +
+> +    /* Trap if accessing an invalid page.  */
+> +    mem = allocation_tag_mem(env, ptr, true, GETPC());
+> +
+> +    /* No action if page does not support tags, or if access is disabled.  */
+> +    el = arm_current_el(env);
+> +    sctlr = arm_sctlr(env, el);
+> +    if (!mem || !allocation_tag_access_enabled(env, el, sctlr)) {
+> +        return;
+> +    }
+> +
+> +    rtag = allocation_tag_from_addr(ptr);
+> +    rtag |= rtag << 4;
+> +
+> +    assert(QEMU_IS_ALIGNED(blocklen, 2 * TAG_GRANULE));
 
-The EDK2 documentation suggests to use the hard-float toolchain.
+Could we assert this on CPU init rather than in this helper?
+That way if anybody tries to create a CPU whose dcz_blocksize
+doesn't work with the TAG_GRANULE they'll realize immediately
+rather than only if they happen to run a guest workload that
+use DC GVA or DC GZVA.
 
-Force the armhf cross toolchain prefix on Debian distributions.
+I also had to think a bit to work out which way round this
+assert is checking: it's testing that the ZVA block length
+(usually 64 bytes) is a multiple of (twice the TAG_GRANULE),
+which is to say a multiple of 32. Given that the blocksize
+is stored as a log2 value, this can only fail for blocksizes
+16, 8, 4, 2 or 1, which are all fairly unlikely.
 
-[1] https://www.debian.org/ports/arm/#status
-[2] https://github.com/tianocore/edk2-platforms/blob/master/Readme.md#if-cr=
-oss-compiling
+> +    memset(mem, rtag, blocklen / (2 * TAG_GRANULE));
+> +}
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 49817b96ae..31260f97f9 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1769,6 +1769,15 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
+>          tcg_rt = clean_data_tbi(s, cpu_reg(s, rt), false);
+>          gen_helper_dc_zva(cpu_env, tcg_rt);
+>          return;
+> +    case ARM_CP_DC_GVA:
+> +        tcg_rt = clean_data_tbi(s, cpu_reg(s, rt), false);
+> +        gen_helper_dc_gva(cpu_env, tcg_rt);
+> +        return;
+> +    case ARM_CP_DC_GZVA:
+> +        tcg_rt = clean_data_tbi(s, cpu_reg(s, rt), false);
+> +        gen_helper_dc_zva(cpu_env, tcg_rt);
+> +        gen_helper_dc_gva(cpu_env, tcg_rt);
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- roms/edk2-funcs.sh | 3 +++
- 1 file changed, 3 insertions(+)
+I think this means that if there's a watchpoint set on the memory
+partway through the block we're zeroing then we'll take the
+watchpoint with some of the memory zeroed but without the
+corresponding tags having been updated. But that's probably OK
+(at any rate I wouldn't worry about it for now...)
 
-diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
-index 3f4485b201..a546aa1d11 100644
---- a/roms/edk2-funcs.sh
-+++ b/roms/edk2-funcs.sh
-@@ -112,6 +112,9 @@ qemu_edk2_get_cross_prefix()
-      ( [ "$gcc_arch" =3D=3D i686 ] && [ "$host_arch" =3D=3D x86_64 ] ); th=
-en
-     # no cross-compiler needed
-     :
-+  elif ( [ -e /etc/debian_version ] && [ "$gcc_arch" =3D=3D arm ] ); then
-+    # force hard-float cross-compiler on Debian
-+    printf 'arm-linux-gnueabihf-'
-   else
-     printf '%s-linux-gnu-\n' "$gcc_arch"
-   fi
---=20
-2.21.0
+> +        return;
+>      default:
+>          break;
+>      }
+> --
 
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
 
