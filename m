@@ -2,141 +2,120 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48421C2BD09
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 17:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4DFC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 17:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2607921835
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 17:36:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2607921835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C129206D9
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 17:41:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IDzNS0+s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C129206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icv3d-0003Fh-AL
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 12:36:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36312)
+	id 1icv7e-0004hh-D5
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 12:41:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55083)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1icv1c-0001s5-08
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:34:49 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icv6B-00045b-Uw
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1icv1Z-0000tg-OC
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:34:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45670)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icv6A-0001vZ-Hd
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:39:31 -0500
+Received: from mail-eopbgr130095.outbound.protection.outlook.com
+ ([40.107.13.95]:22127 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1icv1Y-0000mS-RV
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:34:45 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xB5HRXRK134282
- for <qemu-devel@nongnu.org>; Thu, 5 Dec 2019 12:34:40 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wq2ucuqgf-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 12:34:39 -0500
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 5 Dec 2019 17:34:37 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 5 Dec 2019 17:34:35 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xB5HYYwE54132746
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 5 Dec 2019 17:34:34 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1935311C050;
- Thu,  5 Dec 2019 17:34:34 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9A2F611C04A;
- Thu,  5 Dec 2019 17:34:33 +0000 (GMT)
-Received: from linux.fritz.box (unknown [9.145.180.36])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu,  5 Dec 2019 17:34:33 +0000 (GMT)
-Subject: Re: [PATCH v2 06/13] s390x: protvirt: KVM intercept changes
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20191129094809.26684-1-frankja@linux.ibm.com>
- <20191129094809.26684-7-frankja@linux.ibm.com>
- <20191205181532.46bee55c.cohuck@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Thu, 5 Dec 2019 18:34:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1icv65-0001Yv-CO; Thu, 05 Dec 2019 12:39:26 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ncZAeq5oNsgVPU04Cf9Y3uhFymf+hfovk+toHx6fxKczTvlbDzre4+ZRU6oL0f06cMA2LAMDih/nmhURPDWFyTn7FUG5J3Who6xqT9FLU66dTor7StEbxcIdN3Ljxenh2fwhnCzkFDK/yikR729A/vp2Iva/TG5WQEHFmAw3FS/GtsE9cnDG/dThT9Fzaev5fVwOFFl2VlaB9Z67l1psHVUBNIy1tmmnfkpxztkGXlgZzo8UpdsKpmQ/K/Ys8kNK35N3IOAtRdy3ArCW3JxImA2xd8TyJG5WjV6ZBdU4++GNkwPzSxpXgyXwl/aYtS3h2xZLlIqbU0CoQSP9oq0euQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iHVTnPZ4cAOt6dj7VZhOFTrufyLpTFOTFsLoVvTrtGo=;
+ b=I/qaFkA8kDQWu3NpXTwbK7DO0jzL9nrdj6fgsHwhEB1olyxma220ix/QaLUrC7NeYTL6Evm1n187pLzpjEQG/nbhQzgxDs79AreAbWFrwSuxBJcJwpcAM3JR6ti+MyFPb9SEjzoFap9xm4RI2+drfv1fwPMidUOfPQECKG3teWtl8ktLmJmUWSycjAwmna7+itZ6WsU0hAtTXiqnxTILrnDNZDo9XHvpkty1IQSELnz5zC5QnsHk1Dowx//beG162XuvYy0l77qHALJkaGMAe5L1WWVcE/M6XLW9eqX3R5v9rjjU93APgh2bro6bY3Gb2cjf4X6F6/25WReA0GTKgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iHVTnPZ4cAOt6dj7VZhOFTrufyLpTFOTFsLoVvTrtGo=;
+ b=IDzNS0+sygg8EKlNf/aZa0rDU5uy6Z2SmZW2HMPZF3dxNWmEmldgIxnZQfS51AXpPu4ahLEvpRZlg7lRXBXmh9hp0E7visYtNbfmIE8irrh63d+Cu2QhoiAuBIwUlVRfAxOkdogGQngyiVPt96tgTAjfTleQqHJt0B72je1yAn4=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3462.eurprd08.prod.outlook.com (20.177.113.23) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2516.14; Thu, 5 Dec 2019 17:39:21 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2516.014; Thu, 5 Dec 2019
+ 17:39:21 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: Re: [PATCH v7 21/21] nbd: assert that Error** is not NULL in
+ nbd_iter_channel_error
+Thread-Topic: [PATCH v7 21/21] nbd: assert that Error** is not NULL in
+ nbd_iter_channel_error
+Thread-Index: AQHVq3+LSA8OoYLZZUia0++YbcEGYaerx+kAgAAG74A=
+Date: Thu, 5 Dec 2019 17:39:21 +0000
+Message-ID: <93046486-1580-14a1-520d-08abdf74da0e@virtuozzo.com>
+References: <20191205152019.8454-1-vsementsov@virtuozzo.com>
+ <20191205152019.8454-22-vsementsov@virtuozzo.com>
+ <c4ff448d-e756-9d95-b07e-4ae5f2d5b9b0@redhat.com>
+In-Reply-To: <c4ff448d-e756-9d95-b07e-4ae5f2d5b9b0@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0402CA0001.eurprd04.prod.outlook.com
+ (2603:10a6:3:d0::11) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191205203919271
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 815c5471-8891-4c90-e424-08d779aa0fe6
+x-ms-traffictypediagnostic: AM6PR08MB3462:
+x-microsoft-antispam-prvs: <AM6PR08MB346206B130A2F3E5C2248C7AC15C0@AM6PR08MB3462.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:983;
+x-forefront-prvs: 02426D11FE
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(396003)(39850400004)(346002)(376002)(136003)(189003)(199004)(186003)(31686004)(26005)(86362001)(6512007)(6506007)(229853002)(102836004)(71200400001)(71190400001)(36756003)(31696002)(64756008)(99286004)(8676002)(14454004)(81166006)(2616005)(25786009)(81156014)(53546011)(6486002)(76176011)(4326008)(66556008)(66446008)(66476007)(305945005)(8936002)(5660300002)(11346002)(14444005)(52116002)(478600001)(54906003)(66946007)(110136005)(2906002)(316002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3462;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ymAvGOXT3Ifepn7kruzDzoB2rW5qRKddIkZ0ttYMWc3SbYT5AjIJW1jvq21R2uczUAIpItG3djPobjhtihktBXWJiCGeZaETjHDJOHb5hKZKQ8rSd4j9orpJw3WcsH1SNsCv4uY/AiEQOcFILPOEg5z+y1yS/ulTo7f5aAGfzWF8FEh8UA2EKausGCKUBnlgbIIAmqpU+12ssmAtBSkvlbdAFA7IVfEs3dY/e6+AH4TmopoxkhnoSDzuyfRFzAW2aeRK1hh4UUlHAEx1V0lqVCmAj0/j9m/t/63bqRRnCWj04kN0GtjHpnKZGNczmcVtFymzb793iyFQZfW+uVqutA3o5fHkQQFLZ4ZMvCe4oco8PYctwzHBw010BOBhlboAQihjwhLq/Wx94pDULlWaokP5hzpCRnFQhFyFmCjYQxE+5m7yyLFo2E4VIWQ4NTru
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <0EAC9A060F7CBC47921895F64750BF37@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20191205181532.46bee55c.cohuck@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="cRLum6UrFSSMQ0HMQ7s0GcKwzRezfJNHQ"
-X-TM-AS-GCONF: 00
-x-cbid: 19120517-0020-0000-0000-0000039471B6
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120517-0021-0000-0000-000021EBA0FB
-Message-Id: <3cdbba69-c465-f2ce-d3e4-15e0b8d1218e@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-05_05:2019-12-04,2019-12-05 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 clxscore=1015
- mlxscore=0 malwarescore=0 impostorscore=0 priorityscore=1501
- mlxlogscore=999 bulkscore=0 suspectscore=0 spamscore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912050147
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 815c5471-8891-4c90-e424-08d779aa0fe6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2019 17:39:21.5654 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2KRRCGvfhU/mGSPnZLP8o8M6rHTJulo13yWIf7RwOZ2xW5suj9cBTftyGqh6sCL4BJHSD5NBQwsK/RLprvoNopCTH3M3I77+mSZTO6bR1Ts=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3462
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.13.95
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,129 +127,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mihajlov@linux.ibm.com
+Cc: Kevin Wolf <kwolf@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cRLum6UrFSSMQ0HMQ7s0GcKwzRezfJNHQ
-Content-Type: multipart/mixed; boundary="MTXuauC15rkK56ItspVCTmvCn1Mx9j1m6"
-
---MTXuauC15rkK56ItspVCTmvCn1Mx9j1m6
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 12/5/19 6:15 PM, Cornelia Huck wrote:
-> On Fri, 29 Nov 2019 04:48:02 -0500
-> Janosch Frank <frankja@linux.ibm.com> wrote:
->=20
->> Secure guests no longer intercept with code 4 for an instruction
->> interception. Instead they have codes 104 and 108 for secure
->> instruction interception and secure instruction notification
->> respectively.
+05.12.2019 20:14, Eric Blake wrote:
+> On 12/5/19 9:20 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> The local_err parameter is not here to return information about
+>> nbd_iter_channel_error failure. Instead it's assumed to be filled when
+>> passed to the function. This is already stressed by its name
+>> (local_err, instead of classic errp). Stress it additionally by
+>> assertion.
 >>
->> The 104 mirrors the 4 interception.
->>
->> The 108 is a notification interception to let KVM and QEMU know that
->> something changed and we need to update tracking information or
->> perform specific tasks. It's currently taken for the following
->> instructions:
->>
->> * stpx (To inform about the changed prefix location)
->> * sclp (On incorrect SCCB values, so we can inject a IRQ)
->> * sigp (All but "stop and store status")
->> * diag308 (Subcodes 0/1)
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 >> ---
->>  target/s390x/kvm.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
+>> =A0 block/nbd.c | 1 +
+>> =A0 1 file changed, 1 insertion(+)
 >>
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index ad6e38c876..3d9c44ba9d 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -115,6 +115,8 @@
->>  #define ICPT_CPU_STOP                   0x28
->>  #define ICPT_OPEREXC                    0x2c
->>  #define ICPT_IO                         0x40
->> +#define ICPT_PV_INSTR                   0x68
->> +#define ICPT_PV_INSTR_NOTIFICATION      0x6c
->> =20
->>  #define NR_LOCAL_IRQS 32
->>  /*
->> @@ -151,6 +153,7 @@ static int cap_s390_irq;
->>  static int cap_ri;
->>  static int cap_gs;
->>  static int cap_hpage_1m;
->> +static int cap_protvirt;
->> =20
->>  static int active_cmma;
->> =20
->> @@ -342,6 +345,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>      cap_async_pf =3D kvm_check_extension(s, KVM_CAP_ASYNC_PF);
->>      cap_mem_op =3D kvm_check_extension(s, KVM_CAP_S390_MEM_OP);
->>      cap_s390_irq =3D kvm_check_extension(s, KVM_CAP_S390_INJECT_IRQ);=
-
->> +    cap_protvirt =3D kvm_check_extension(s, KVM_CAP_S390_PROTECTED);
->> =20
->>      if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
->>          || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
->> @@ -1664,6 +1668,8 @@ static int handle_intercept(S390CPU *cpu)
->>              (long)cs->kvm_run->psw_addr);
->>      switch (icpt_code) {
->>          case ICPT_INSTRUCTION:
->> +        case ICPT_PV_INSTR:
->> +        case ICPT_PV_INSTR_NOTIFICATION:
->>              r =3D handle_instruction(cpu, run);
+>> diff --git a/block/nbd.c b/block/nbd.c
+>> index 5f18f78a94..d085554f21 100644
+>> --- a/block/nbd.c
+>> +++ b/block/nbd.c
+>> @@ -866,6 +866,7 @@ typedef struct NBDReplyChunkIter {
+>> =A0 static void nbd_iter_channel_error(NBDReplyChunkIter *iter,
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int ret, Error **local_err)
+>> =A0 {
+>> +=A0=A0=A0 assert(local_err && *local_err);
 >=20
-> I'm still a bit uneasy about going through the same path for both 104
-> and 108. How does the handler figure out whether it should emulate an
-> instruction, or just process a notification? Is it guaranteed that a
-> given instruction is always showing up as either a 104 or a 108, so
-> that the handler can check the pv state?
+> Why are we forbidding grandparent callers from passing NULL when they wan=
+t to ignore an error?=A0 We are called by several parent functions that get=
+ an errp from the grandparent, and use this function to do some common grun=
+t work.=A0 Let's look at the possibilities:
+>=20
+> 1. grandparent passes address of a local error: we want to append to the =
+error message, parent will then deal with the error how it wants (report it=
+, ignore it, propagate it, whatever)
+>=20
+> 2. grandparent passes &error_fatal: we want to append a hint, but before =
+ERRP_AUTO_PROPAGATE, the parent has already exited.=A0 After ERRP_AUTO_PROP=
+AGATE, this looks like case 1.
+>=20
+> 3. grandparent passes &error_abort: we should never be reached (failure e=
+arlier in the parent should have already aborted) - true whether or not ERR=
+P_AUTO_PROPAGATE is applied
+>=20
+> 4. grandparent passes NULL to ignore the error. Does not currently happen=
+ in any of the grandparent callers, because if it did, your assertion in th=
+is patch would now fire.=A0 After ERRP_AUTO_PROPAGATE, this would look like=
+ case 1.
+>=20
+> Would it be better to assert(!local_err || *local_err)?=A0 The assertion =
+as written is too strict without ERRP_AUTO_PROPAGATE, but you get away with=
+ it because none of the grandparents pass NULL; but is appropriate as writt=
+en for after after the macro conversion so then we wonder if churn on the m=
+acro is worth it.
 
-diag 308 subcode 0/1 are 108, but all other subcodes are defined as a
-104 (if they are an exit at all)...
+We don't have any grandparents, this function is always called on local_err=
+. And it's argument named local_err to stress it.
+The function is an API to report error, and it wants filled local_err objec=
+t.
+
+It will crash anyway if local_err is NULL, as it dereferences it.
+
+I just want to place an assertion at start of functions like this,
+which will be easily recognizable by coccinelle.
+
+---
+
+We can improve the API, to support local_err=3D=3DNULL, for the case when o=
+riginal request was called with
+errp=3D=3DNULL, but for this we'll need more changes, like, pass errp to NB=
+D_FOREACH_REPLY_CHUNK and save
+it into iter object...
+
+But how to detect it in code? Something like
+
+
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -1059,8 +1059,10 @@ static int nbd_co_receive_blockstatus_reply(BDRVNBDS=
+tate *s,
+          case NBD_REPLY_TYPE_BLOCK_STATUS:
+              if (received) {
+                  nbd_channel_error(s, -EINVAL);
+-                error_setg(&local_err, "Several BLOCK_STATUS chunks in rep=
+ly");
+-                nbd_iter_channel_error(&iter, -EINVAL, &local_err);
++                if (errp) {
++                    error_setg(&local_err, "Several BLOCK_STATUS chunks in=
+ reply");
++                }
++                nbd_iter_channel_error(&iter, -EINVAL, errp ? &local_err :=
+ NULL);
+              }
+              received =3D true;
+
+
+is ugly..
+
+
+So, to support original errp=3DNULL the whole thing should be refactored.. =
+Not worth it, I think.
+
 
 >=20
-> [Even if that works, it still feels a bit unclean to me.]
->=20
->>              break;
->>          case ICPT_PROGRAM:
->=20
+>> =A0=A0=A0=A0=A0 assert(ret < 0);
+>> =A0=A0=A0=A0=A0 if (!iter->ret) {
+>>
 >=20
 
 
-
---MTXuauC15rkK56ItspVCTmvCn1Mx9j1m6--
-
---cRLum6UrFSSMQ0HMQ7s0GcKwzRezfJNHQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3pP6kACgkQ41TmuOI4
-ufihixAAnqET7tN5AIT4GPNa0v/oUUeNSA7vY5UP1/ouGhwNOt0eOi+3cAwKeLnd
-g3JPt5L2lpT6ch3yyRO82NP0GHZPJ7dgupau3Unzf2W0PuHrrzCf8PpIhxnhdey0
-FVOnIUn+hioa2QnaULqwZnkKT5RJ3Xou6527q3Ve/KHuTj9bBNyhN/ZFnaJv9xCD
-SEshvWXpN9nf8trpTSYmQVh8O8hgIw9HFyLs6K/q6LDEWfmuPWnxHBx2xzmgK/zo
-zVlwxBob/vp82tvoU9HbHxzpqVH5OogamWJTIDoldGHQth5HEpltHklua9LiFoyC
-S15qQLaLG8byRB82ti5NOGHrjIOusBkdV6xlnSzW7CrRwF+4ISnjhLO/Khaayids
-nENCARp40U6LrnHHRxnNE3eQVqs6HXSEW48S9TbJbsebB48NVqk4yqhcHQFOCBHR
-QWTu/8qcs1aTtVf/H3jMg/oF5rSKxyF8VkfBVTDI6X5C4NlXKS6vQbRiHdBsarij
-nJo2Iwm88A1k14uUWKTHvyaY5E9mIqu6Rd6JEUR3UNe5geq/zkjmIXU9G5yR9hHV
-+LAHIM5WhWlsFLDk9GEbEVMtiQe5Ye8v2kIbIwP+rCN6joFSbkkhIKh8scFX5fjv
-Gi3VfKNFMb3rP9FVA79DKcu4E0gDA62sudoA275Iv2S2kIwjUDU=
-=23mO
------END PGP SIGNATURE-----
-
---cRLum6UrFSSMQ0HMQ7s0GcKwzRezfJNHQ--
-
+--=20
+Best regards,
+Vladimir
 
