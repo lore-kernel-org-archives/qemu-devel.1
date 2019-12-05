@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C4D4C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 03:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC65C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 03:54:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDAE420707
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 03:52:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDAE420707
+	by mail.kernel.org (Postfix) with ESMTPS id 7304D20707
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 03:54:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7304D20707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iciBW-0003Pn-VA
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 22:52:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45832)
+	id 1iciDl-0005Cv-KO
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 22:54:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45751)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1ici5n-0006Qz-ME
+ (envelope-from <pannengyuan@huawei.com>) id 1ici5n-0006Qa-DI
  for qemu-devel@nongnu.org; Wed, 04 Dec 2019 22:46:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1ici5m-0003zg-DP
+ (envelope-from <pannengyuan@huawei.com>) id 1ici5l-0003xb-TM
  for qemu-devel@nongnu.org; Wed, 04 Dec 2019 22:46:15 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2214 helo=huawei.com)
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2213 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1ici5e-0003iG-8A; Wed, 04 Dec 2019 22:46:06 -0500
+ id 1ici5e-0003iF-BE; Wed, 04 Dec 2019 22:46:06 -0500
 Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 66AAEE0F3FCDB6FA77B1;
+ by Forcepoint Email with ESMTP id 6C297C3899B770F24072;
  Thu,  5 Dec 2019 11:45:56 +0800 (CST)
 Received: from HGHY2P002143101.china.huawei.com (10.184.39.213) by
  DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 5 Dec 2019 11:45:48 +0800
+ 14.3.439.0; Thu, 5 Dec 2019 11:45:49 +0800
 From: <pannengyuan@huawei.com>
 To: <eblake@redhat.com>, <kwolf@redhat.com>, <mreitz@redhat.com>
-Subject: [PATCH v5 1/2] block/nbd: extract the common cleanup code
-Date: Thu, 5 Dec 2019 11:45:27 +0800
-Message-ID: <1575517528-44312-2-git-send-email-pannengyuan@huawei.com>
+Subject: [PATCH v5 2/2] block/nbd: fix memory leak in nbd_open()
+Date: Thu, 5 Dec 2019 11:45:28 +0800
+Message-ID: <1575517528-44312-3-git-send-email-pannengyuan@huawei.com>
 X-Mailer: git-send-email 2.7.2.windows.1
 In-Reply-To: <1575517528-44312-1-git-send-email-pannengyuan@huawei.com>
 References: <1575517528-44312-1-git-send-email-pannengyuan@huawei.com>
@@ -64,86 +64,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liyiting@huawei.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
- Pan Nengyuan <pannengyuan@huawei.com>, qemu-devel@nongnu.org,
- kuhn.chenqun@huawei.com, Stefano Garzarella <sgarzare@redhat.com>
+Cc: liyiting@huawei.com, Vladimir
+ Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, zhang.zhanghailiang@huawei.com,
+ qemu-block@nongnu.org, Pan Nengyuan <pannengyuan@huawei.com>,
+ qemu-devel@nongnu.org, qemu-stable <qemu-stable@nongnu.org>,
+ kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Pan Nengyuan <pannengyuan@huawei.com>
 
-The BDRVNBDState cleanup code is common in two places, add
-nbd_clear_bdrvstate() function to do these cleanups.
+In currently implementation there will be a memory leak when
+nbd_client_connect() returns error status. Here is an easy way to
+reproduce:
 
-Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+1. run qemu-iotests as follow and check the result with asan:
+    ./check -raw 143
+
+Following is the asan output backtrack:
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x7f629688a560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
+    #1 0x7f6295e7e015 in g_malloc0  (/usr/lib64/libglib-2.0.so.0+0x50015)
+    #2 0x56281dab4642 in qobject_input_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:295
+    #3 0x56281dab1a04 in visit_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:49
+    #4 0x56281dad1827 in visit_type_SocketAddress  qapi/qapi-visit-sockets.c:386
+    #5 0x56281da8062f in nbd_config   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
+    #6 0x56281da8062f in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
+    #7 0x56281da8062f in nbd_open /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
+
+Direct leak of 15 byte(s) in 1 object(s) allocated from:
+    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
+    #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
+    #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
+    #3 0x56281da804ac in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1834
+    #4 0x56281da804ac in nbd_open /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
+
+Indirect leak of 24 byte(s) in 1 object(s) allocated from:
+    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
+    #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
+    #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
+    #3 0x56281dab41a3 in qobject_input_type_str_keyval /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:536
+    #4 0x56281dab2ee9 in visit_type_str /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:297
+    #5 0x56281dad0fa1 in visit_type_UnixSocketAddress_members qapi/qapi-visit-sockets.c:141
+    #6 0x56281dad17b6 in visit_type_SocketAddress_members qapi/qapi-visit-sockets.c:366
+    #7 0x56281dad186a in visit_type_SocketAddress qapi/qapi-visit-sockets.c:393
+    #8 0x56281da8062f in nbd_config /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
+    #9 0x56281da8062f in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
+    #10 0x56281da8062f in nbd_open /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
+
+Fixes: 8f071c9db506e03ab
+Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-stable <qemu-stable@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
-v3:
-- new patch, split form 2/2 patch (suggested by Stefano Garzarella)
+Changes v2 to v1:
+- add a new function to do the common cleanups (suggested by Stefano
+  Garzarella).
+---
+Changes v3 to v2:
+- split in two patches(suggested by Stefano Garzarella)
+---
 Changes v4 to v3:
 - replace function name from nbd_free_bdrvstate_prop to
-  nbd_clear_bdrvstate and set cleared fields to NULL (suggested by Eric
-  Blake)
-- remove static function prototype. (suggested by Eric Blake)
+  nbd_clear_bdrvstate and add Fixes tag.
 ---
 Changes v5 to v4:
 - correct the wrong email address
 ---
- block/nbd.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
+ block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/block/nbd.c b/block/nbd.c
-index 1239761..8b4a65a 100644
+index 8b4a65a..9062409 100644
 --- a/block/nbd.c
 +++ b/block/nbd.c
-@@ -94,6 +94,19 @@ typedef struct BDRVNBDState {
+@@ -1891,6 +1891,7 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
  
- static int nbd_client_connect(BlockDriverState *bs, Error **errp);
- 
-+void nbd_clear_bdrvstate(BDRVNBDState *s)
-+{
-+    object_unref(OBJECT(s->tlscreds));
-+    qapi_free_SocketAddress(s->saddr);
-+    s->saddr = NULL;
-+    g_free(s->export);
-+    s->export = NULL;
-+    g_free(s->tlscredsid);
-+    s->tlscredsid = NULL;
-+    g_free(s->x_dirty_bitmap);
-+    s->x_dirty_bitmap = NULL;
-+}
-+
- static void nbd_channel_error(BDRVNBDState *s, int ret)
- {
-     if (ret == -EIO) {
-@@ -1855,10 +1868,7 @@ static int nbd_process_options(BlockDriverState *bs, QDict *options,
- 
-  error:
+     ret = nbd_client_connect(bs, errp);
      if (ret < 0) {
--        object_unref(OBJECT(s->tlscreds));
--        qapi_free_SocketAddress(s->saddr);
--        g_free(s->export);
--        g_free(s->tlscredsid);
 +        nbd_clear_bdrvstate(s);
+         return ret;
      }
-     qemu_opts_del(opts);
-     return ret;
-@@ -1937,12 +1947,7 @@ static void nbd_close(BlockDriverState *bs)
-     BDRVNBDState *s = bs->opaque;
- 
-     nbd_client_close(bs);
--
--    object_unref(OBJECT(s->tlscreds));
--    qapi_free_SocketAddress(s->saddr);
--    g_free(s->export);
--    g_free(s->tlscredsid);
--    g_free(s->x_dirty_bitmap);
-+    nbd_clear_bdrvstate(s);
- }
- 
- static int64_t nbd_getlength(BlockDriverState *bs)
+     /* successfully connected */
 -- 
 2.7.2.windows.1
 
