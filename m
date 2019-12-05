@@ -2,90 +2,95 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BTC_ID,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URG_BIZ,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A25C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FE4C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:11:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9463206D9
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:11:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61D67206D9
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:11:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HloIVpv2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9463206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FGYKyEM4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D67206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icrqO-0004vD-D5
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:11:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56768)
+	id 1icrqW-0005Gd-6i
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:11:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1icrex-0002Xw-4s
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:59:12 -0500
+ (envelope-from <peterx@redhat.com>) id 1icrbw-0007qb-Q4
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:56:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1icrew-0000Yl-0H
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:59:11 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38127)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1icrev-0000VF-PO
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:59:09 -0500
-Received: by mail-wr1-x444.google.com with SMTP id y17so3731489wrh.5
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 05:59:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=et7ltZY7DPRXGygmqJQSM9s82vIGOWea1S/OwancEF4=;
- b=HloIVpv2ZsUpCeB42Jm/DQW8F9xJlGHdlqPleFxK8RcIiHbRu8uIVNQs89iJZ5/fxA
- 7XzBsbwZ5KPNkEtR2ApMkLaQYRFE+Mmdmya408z6SxkDKa+/vW1zjbbObGBq142BF2Oh
- W2ZCn9g/aqbtRNB7jvCxeRJs4Gb7ZWMDfDXZlSP9sK6S4uoGkICBhrHiy2g5BLFD1KRF
- pUEcggkqBm/3Xxtr+wJnX86SZ/KiZUzYBexdhh66dfKm8bTWGfLxK1LASWIlgaR6zCJb
- BL7POBLO9y0hffJYFCkiSYj+G/fEp1nAKU2HoyNx/5gd358sPM387nWpzZHxMsfaQ/cX
- R+ww==
+ (envelope-from <peterx@redhat.com>) id 1icrbv-0000cN-I3
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:56:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60169
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1icrbt-0000ad-0k
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:56:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575554160;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=a5LEmeBgNeFxpwu+F2QwvSZ7e/bau9swAX/PFV/EtRg=;
+ b=FGYKyEM4DYCIyaM/wQruU4IiPLZyEnCB+TXQ4MatfcAXyt8Uw+SmN6S/7aeDJcXprWn+Gv
+ cUBnb3zjDO6GXlvIhRudgbTWLewuz7jFuwhQvyNZV6vtmu9EY+kW+kUDeEBQQymxj8qzez
+ 68WN3hCZ3E3yJul5+iGJ/27IsL/FU8g=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-219-jFR7t8gPNpa6N5wF7e8Knw-1; Thu, 05 Dec 2019 08:55:59 -0500
+Received: by mail-qt1-f198.google.com with SMTP id h14so2510643qtq.11
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 05:55:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=et7ltZY7DPRXGygmqJQSM9s82vIGOWea1S/OwancEF4=;
- b=IwZesQVCPJLz961VtIPQ+WPHscbXUsi0lBYzSXdakNadPFXgJe/cr1eUwd0K+Ggw5P
- sX2tKclMLubjczE1dQ6XZxZk6kc8Ssli8Ln+6FzYztNPhTxmWyssa3z2P0d7iF7CDXXT
- Wtcy4YcCiIBZGkyRRC48UcogpORsTNS93Zl80sWKJWvWB8C1uDa8Tdlemrp/UUPXJJlt
- Mz2kdcm8d3VHWO7HgpyGatDtcSOviXdXPJs+bT/GX1PvL2dyj3U86RSHKjdN8z1h9eU0
- ACeub89ozPeQJlf4PbnzIfTFdIMgvN8NNlPD2PObgHqw3434L91cnTjU+GKkf1n2/5+k
- 8Dbg==
-X-Gm-Message-State: APjAAAVXstFaO6ItJM/wH6nZODRjYgWWdg93Qb3ZyXeY2rRjxx+HCrt8
- dtJCUvaTdp2AdK2IO30rTP9Pr9AFygs=
-X-Google-Smtp-Source: APXvYqxvuHZ2tnnTGJfH/sNA0j6Lp6f1S8UalXH8PjWZADaUT4CiODLGGQR7QjXc65KJ0SFRf3RHkA==
-X-Received: by 2002:a5d:4a84:: with SMTP id o4mr9712985wrq.396.1575548728753; 
- Thu, 05 Dec 2019 04:25:28 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i127sm10954997wma.35.2019.12.05.04.25.20
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=bBMUbllceoxZYLj0y2soALV70A6VyMICRdvanuq60ik=;
+ b=KeABt1MMIbpO/Zmk0BtymhhAqFuQ/b9C4c6dFXfg+zvt5jsgYXUHyPBuhkRWcN4Ooa
+ mww7tcMZPU/eSOliyEzV6mIOoAfS6iXX3P1Xhbn4JzXXU80HnDafVjI00K5Lwr7oeEPO
+ 8GUjNTcT68TW89Yc7S3iqz+U0a2YxiEDuIRoRpo/0XZBiOlCS2njJq1qvNr72GxjBHMd
+ iB1fV+cootgQsqHw1miucrBOgqwHapjh0GS8d631lJPtvyru4SmPwMvviZtAa8jmGpOC
+ 24ryaFPa8EysjvMVCTedyyBTgwsmLj6ukn0/ONRQdI7/2c//QPlE94VuyOkCvtbQaqQh
+ 7JCQ==
+X-Gm-Message-State: APjAAAWfS9xK/Xi5WVUa5J+Az5VlnmXxzkM3YLva+OkSCDgVppFIlgvr
+ zWnWirBP4ltFeD4HFXCNUbPGDBkGaEXAHfViIdVWU8Wk+zY1cs9ArywKkeewGGY7RTcKkbgb+ZD
+ vJiNcACmZxIlWbDA=
+X-Received: by 2002:a0c:e84d:: with SMTP id l13mr7446445qvo.53.1575554158535; 
+ Thu, 05 Dec 2019 05:55:58 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyJQ3yy8a3z4QFTeZTYcibHvWYJowytRSl9SnFpezFArhnlxk5PSL978zxA5MA3Uwu7d0B/hQ==
+X-Received: by 2002:a0c:e84d:: with SMTP id l13mr7446423qvo.53.1575554158114; 
+ Thu, 05 Dec 2019 05:55:58 -0800 (PST)
+Received: from xz-x1 ([2607:9880:19c0:3f::3])
+ by smtp.gmail.com with ESMTPSA id c79sm4963175qkg.76.2019.12.05.05.55.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Dec 2019 04:25:23 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 947E11FF93;
- Thu,  5 Dec 2019 12:25:18 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 6/6] trace: replace hand-crafted pattern_glob with
- g_pattern_match_simple
-Date: Thu,  5 Dec 2019 12:25:17 +0000
-Message-Id: <20191205122518.10010-7-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191205122518.10010-1-alex.bennee@linaro.org>
-References: <20191205122518.10010-1-alex.bennee@linaro.org>
+ Thu, 05 Dec 2019 05:55:57 -0800 (PST)
+Date: Thu, 5 Dec 2019 08:55:55 -0500
+From: Peter Xu <peterx@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH] migration: Rate limit inside host pages
+Message-ID: <20191205135555.GC9673@xz-x1>
+References: <20191205102918.63294-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+In-Reply-To: <20191205102918.63294-1-dgilbert@redhat.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
+X-MC-Unique: jFR7t8gPNpa6N5wF7e8Knw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,73 +102,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: quintela@redhat.com, qemu-devel@nongnu.org, LMa@suse.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We already use g_pattern_match elsewhere so remove the duplication.
+On Thu, Dec 05, 2019 at 10:29:18AM +0000, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> When using hugepages, rate limiting is necessary within each huge
+> page, since a 1G huge page can take a significant time to send, so
+> you end up with bursty behaviour.
+>=20
+> Fixes: 4c011c37ecb3 ("postcopy: Send whole huge pages")
+> Reported-by: Lin Ma <LMa@suse.com>
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  migration/migration.c  | 57 ++++++++++++++++++++++++------------------
+>  migration/migration.h  |  1 +
+>  migration/ram.c        |  2 ++
+>  migration/trace-events |  4 +--
+>  4 files changed, 37 insertions(+), 27 deletions(-)
+>=20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 354ad072fa..27500d09a9 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -3224,6 +3224,37 @@ void migration_consume_urgent_request(void)
+>      qemu_sem_wait(&migrate_get_current()->rate_limit_sem);
+>  }
+> =20
+> +/* Returns true if the rate limiting was broken by an urgent request */
+> +bool migration_rate_limit(void)
+> +{
+> +    int64_t now =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    MigrationState *s =3D migrate_get_current();
+> +
+> +    bool urgent =3D false;
+> +    migration_update_counters(s, now);
+> +    if (qemu_file_rate_limit(s->to_dst_file)) {
+> +        /*
+> +         * Wait for a delay to do rate limiting OR
+> +         * something urgent to post the semaphore.
+> +         */
+> +        int ms =3D s->iteration_start_time + BUFFER_DELAY - now;
+> +        trace_migration_rate_limit_pre(ms);
+> +        if (qemu_sem_timedwait(&s->rate_limit_sem, ms) =3D=3D 0) {
+> +            /*
+> +             * We were woken by one or more urgent things but
+> +             * the timedwait will have consumed one of them.
+> +             * The service routine for the urgent wake will dec
+> +             * the semaphore itself for each item it consumes,
+> +             * so add this one we just eat back.
+> +             */
+> +            qemu_sem_post(&s->rate_limit_sem);
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- trace/control.c | 35 +----------------------------------
- 1 file changed, 1 insertion(+), 34 deletions(-)
+I remembered I've commented around this when it was first introduced
+on whether we can avoid this post().  IMHO we can if with something
+like an eventfd, so when we queue the page we write the eventfd to 1,
+here we poll() on the eventfd with the same timeout, then clear it
+after the poll no matter what.  When unqueue, we can probably simply
+do nothing.  I'm not sure about Windows or other OS, though..
 
-diff --git a/trace/control.c b/trace/control.c
-index d9cafc161bb..0fb81241607 100644
---- a/trace/control.c
-+++ b/trace/control.c
-@@ -98,38 +98,6 @@ TraceEvent *trace_event_name(const char *name)
-     return NULL;
- }
- 
--static bool pattern_glob(const char *pat, const char *ev)
--{
--    while (*pat != '\0' && *ev != '\0') {
--        if (*pat == *ev) {
--            pat++;
--            ev++;
--        }
--        else if (*pat == '*') {
--            if (pattern_glob(pat, ev+1)) {
--                return true;
--            } else if (pattern_glob(pat+1, ev)) {
--                return true;
--            } else {
--                return false;
--            }
--        } else {
--            return false;
--        }
--    }
--
--    while (*pat == '*') {
--        pat++;
--    }
--
--    if (*pat == '\0' && *ev == '\0') {
--        return true;
--    } else {
--        return false;
--    }
--}
--
--
- void trace_event_iter_init(TraceEventIter *iter, const char *pattern)
- {
-     iter->event = 0;
-@@ -148,8 +116,7 @@ TraceEvent *trace_event_iter_next(TraceEventIter *iter)
-             iter->group++;
-         }
-         if (!iter->pattern ||
--            pattern_glob(iter->pattern,
--                         trace_event_get_name(ev))) {
-+            g_pattern_match_simple(iter->pattern, trace_event_get_name(ev))) {
-             return ev;
-         }
-     }
--- 
-2.20.1
+Anyway this patch is not changing that part but to fix huge page
+issue, so that's another story for sure.
+
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Thanks,
+
+--=20
+Peter Xu
 
 
