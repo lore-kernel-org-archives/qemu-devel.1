@@ -2,83 +2,92 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 122EAC2D0BF
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 20:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD61EC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 20:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D370F205F4
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 20:39:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96D8520659
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 20:41:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DyiSIakt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D370F205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kr+5LIob"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D8520659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icxu6-00089b-US
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 15:39:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39400)
+	id 1icxvr-0000to-LK
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 15:41:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43239)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1icxsX-0007RA-Cn
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 15:37:38 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1icxtr-00088R-If
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 15:39:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1icxsW-0000aT-75
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 15:37:37 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49654
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1icxsV-0000WN-Rv
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 15:37:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575578253;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1+Ms4oK14lCx0cWv082pH+l+ab5cD3lN4rSYuDQ+s0A=;
- b=DyiSIakttBueYDZfdlq4Bt2ulyBrBXB5tHc58F04ZvY21rpbgWbLqM8g9UdgkNcTcoa824
- u0xHV8G8ZkodBp+wt5iQHTnB2ARxaB6Gdf86hMP0DDIHA97C8Wrh6cEI8WfnuyfLZrLy+0
- AtRDsy3EeZ9pkYvV6usQqQRSdDvpq3w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-aPUj9rIWPI-ZrbcKRHci7A-1; Thu, 05 Dec 2019 15:37:32 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A561318557C0;
- Thu,  5 Dec 2019 20:37:30 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-125-37.rdu2.redhat.com
- [10.10.125.37])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2E5555D6A3;
- Thu,  5 Dec 2019 20:37:21 +0000 (UTC)
-Date: Thu, 5 Dec 2019 15:37:19 -0500
-From: Cleber Rosa <crosa@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2 5/7] tests/test-util-filemonitor: Skip test on non-x86
- Travis containers
-Message-ID: <20191205203719.GE29262@localhost.localdomain>
-References: <20191204154618.23560-1-thuth@redhat.com>
- <20191204154618.23560-6-thuth@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1icxtq-0002gM-7I
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 15:38:59 -0500
+Received: from mail-pj1-x102d.google.com ([2607:f8b0:4864:20::102d]:34999)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1icxtp-0002bj-TF
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 15:38:58 -0500
+Received: by mail-pj1-x102d.google.com with SMTP id w23so1761594pjd.2
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 12:38:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=6Xwn3stanzQTThUZS9/BzgifLfh83RoGNDbrcf7/gRc=;
+ b=kr+5LIob2jzAWyaa0HalfctGAJWBItl4LullfZ6A9aE5bTzNFSVJnNNuTQE3RjTlPz
+ GfrwGDrPNq91rjb5G2hTAZMXLMgq/7LHQGp4Y2B9gb6mJmSasS1urQ3Ufh6gmiK+Iq9J
+ VFrDQ6Zb3Xa2d+SVU+VtDQaq4ZwQVoZOH+EpIcQljMGSW5EdmbWV4y5Oo/bhPykmQ/KM
+ yDQk8YqlC44gSLtE6pKs4ULOGMbUTEFrzjtD5ux2VDVLdY+B6esc2qGDDVcFfLXCZQvf
+ Ol0LFB5o4kTRpL03lLcBm5n/tXE1OIT371zSrQ6ShteNxN3bD2h5ivS+b8KtF6GqHI3X
+ DaNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=6Xwn3stanzQTThUZS9/BzgifLfh83RoGNDbrcf7/gRc=;
+ b=LUkTGDB6GlWJB6YeJ1KyqN95lw4o0H3ufg5VI/CLtjXKWJ2naxpbaen5bC2XRpEAee
+ 3rl3M9YcOVMhluKQlEcwqjH0rbSwzNllAwsoh0dKzRRuiVz8rrFEJc7NhlXvRVK0E4Kl
+ ZiT2DsrFX2FJ2IESnCcIAN35l/tKdBCDMpMuRqY+Cvtc6iO+Pxf/pEhLWQN3ZchxpYG5
+ dQmJt4Jr2VlPZf2c8oNvu+9k3Qn4piaSSx/7yWuncVdbPwIiIBvuu74n4VIja3Pa+lFm
+ 19r2AIkHum40CIRDdA8xxa+hKg1C6u9aQnFp+TCxk6VqV7OFyOufDatIGl0AB7eSd80Z
+ wvzQ==
+X-Gm-Message-State: APjAAAUW6viMNXJzxyHvB9mlJs+sncSS40GDfutUnasAWvZLkff/uZtO
+ ARwned6L1DvkphEeEtgISB+GpA==
+X-Google-Smtp-Source: APXvYqzdOk40HpgwFI0k647i4q3nVDVLiUesZp31T6644fYOPdvaU7jOCC55rsU8qkn0qr3gRx14dw==
+X-Received: by 2002:a17:90a:1aa3:: with SMTP id
+ p32mr11694736pjp.8.1575578336432; 
+ Thu, 05 Dec 2019 12:38:56 -0800 (PST)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id k9sm568547pje.26.2019.12.05.12.38.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Dec 2019 12:38:55 -0800 (PST)
+Subject: Re: [PATCH-for-5.0] hw/alpha/dp264: Use the DECchip Tulip network
+ interface
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191204233918.6073-1-philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <fccf1e01-c198-fb4e-0063-1418fd64c744@linaro.org>
+Date: Thu, 5 Dec 2019 12:38:53 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <20191204154618.23560-6-thuth@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: aPUj9rIWPI-ZrbcKRHci7A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20191204233918.6073-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::102d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,61 +99,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- Eric Auger <eric.auger@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: "Emilio G . Cota" <cota@braap.org>, Sven Schnelle <svens@stackframe.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Dec 04, 2019 at 04:46:16PM +0100, Thomas Huth wrote:
-> test-util-filemonitor fails in restricted non-x86 Travis containers
-> since they apparently blacklisted some required system calls there.
-> Let's simply skip the test if we detect such an environment.
->=20
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 12/4/19 3:39 PM, Philippe Mathieu-Daudé wrote:
+> Commit 34ea023d4b9 introduced the Tulip PCI NIC.
+> Since this better models the DP264 hardware, use it.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  tests/test-util-filemonitor.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/tests/test-util-filemonitor.c b/tests/test-util-filemonitor.=
-c
-> index 301cd2db61..45009c69f4 100644
-> --- a/tests/test-util-filemonitor.c
-> +++ b/tests/test-util-filemonitor.c
-> @@ -406,10 +406,21 @@ test_file_monitor_events(void)
->      char *pathdst =3D NULL;
->      QFileMonitorTestData data;
->      GHashTable *ids =3D g_hash_table_new(g_int64_hash, g_int64_equal);
-> +    char *travis_arch;
-> =20
->      qemu_mutex_init(&data.lock);
->      data.records =3D NULL;
-> =20
-> +    /*
-> +     * This test does not work on Travis LXD containers since some
-> +     * syscalls are blocked in that environment.
-> +     */
-> +    travis_arch =3D getenv("TRAVIS_ARCH");
-> +    if (travis_arch && !g_str_equal(travis_arch, "x86_64")) {
-> +        g_test_skip("Test does not work on non-x86 Travis containers.");
-> +        return;
-> +    }
-> +
->      /*
->       * The file monitor needs the main loop running in
->       * order to receive events from inotify. We must
-> --=20
-> 2.18.1
->=20
+>  hw/alpha/dp264.c | 4 ++--
+>  hw/alpha/Kconfig | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
+I've tested that a 5.4 kernel built for alpha is able to communicate via this
+driver model.
+
+
+r~
 
