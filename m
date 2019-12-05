@@ -2,83 +2,75 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 568C5C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 20:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B58B7C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 21:07:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FE1820659
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 20:41:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Np99CaGE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FE1820659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 82E3D20707
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 21:07:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82E3D20707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icxwX-0001Xx-8O
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 15:41:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46518)
+	id 1icyLo-0007k1-OS
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 16:07:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60987)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1icxuP-00009K-4Z
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 15:39:38 -0500
+ (envelope-from <robherring2@gmail.com>) id 1icyKz-0007KV-LW
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 16:07:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1icxuE-00044t-MN
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 15:39:25 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39009
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1icxuE-00042E-Ax
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 15:39:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575578361;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lgNEwiswR6v+HEnmXUcovTS5zeio6VWzpZJAxLbD74c=;
- b=Np99CaGE0J/hs+iqmauo2kugBnrgX2mJ1RdYVK8KRUVl8pTuiHEDMAjkBOv2yoLAj5SlQy
- chDADdybeWAqFiomEGbQoZIhHc0D413Ugjem9OGes51cLInp19YaWrsnlOQM6bGbBYxGmq
- /5AaKE6L4ZReyTJDXdVrwPmsrGWsEZo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-116-Iv0Q8_2EN4yrkg99aCjRrA-1; Thu, 05 Dec 2019 15:39:20 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 042771005510;
- Thu,  5 Dec 2019 20:39:19 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-125-37.rdu2.redhat.com
- [10.10.125.37])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 83C60694DD;
- Thu,  5 Dec 2019 20:39:10 +0000 (UTC)
-Date: Thu, 5 Dec 2019 15:39:08 -0500
-From: Cleber Rosa <crosa@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2 6/7] configure: allow disable of cross compilation
- containers
-Message-ID: <20191205203908.GF29262@localhost.localdomain>
-References: <20191204154618.23560-1-thuth@redhat.com>
- <20191204154618.23560-7-thuth@redhat.com>
+ (envelope-from <robherring2@gmail.com>) id 1icyKx-0006Ys-8J
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 16:07:00 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:43917)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robherring2@gmail.com>)
+ id 1icyKu-0006Vf-Ve
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 16:06:57 -0500
+Received: by mail-ot1-f68.google.com with SMTP id p8so3880685oth.10
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 13:06:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=kfZJgMdMZnEWqYp4l6MRhDa+lgrmX+5UPFpYfdvrZFQ=;
+ b=hu4NuF61mLNQ1XTH8h98XOhu/TJVr+XJY53IXwMk8qHLFtwECUJ+A7aPagvwLseywM
+ 6Nco+tkyyy2QWwQfsJEZ39W0IF+dkRfar5TgqokhAN2LvYW1AmvHe1jj8t6O7SJ7qCiP
+ 8QzkseDHlw+0B0Wfuo4y4IpqQ6xJc14ueKGQVMmFvI1BchjZu1ctiFHt/DpF9mzhmZdS
+ i2sSTGV6TQVHWejoG9/L58E2v1As0/Xe5B63bsza/mnJ+KRl/7gE1n3jwhLzMHiweCb7
+ 8MWWFAtTbvFzluRZiBC7QYyzqE3mwVGhjEOoG5IUudB4CP/711l7TWDZs9KZvm5npTeG
+ kSCw==
+X-Gm-Message-State: APjAAAUgF8l2TtjY52z/HHBHolNYDL/S7lJ2TP3pk6vf4IehjyuGvUZ1
+ ply5S4kQqX0g2HEGvzCv/g==
+X-Google-Smtp-Source: APXvYqz+giNRZ8MeXlmxtPAkMj15JPvC0Xm4AbR1+kfJ6wADHeXGxnfrjZfPcXGkJATVHVwmwkF53w==
+X-Received: by 2002:a9d:75c7:: with SMTP id c7mr2839523otl.181.1575580014993; 
+ Thu, 05 Dec 2019 13:06:54 -0800 (PST)
+Received: from localhost (24-155-109-49.dyn.grandenetworks.net.
+ [24.155.109.49])
+ by smtp.gmail.com with ESMTPSA id r25sm3819723otk.22.2019.12.05.13.06.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Dec 2019 13:06:54 -0800 (PST)
+Date: Thu, 5 Dec 2019 15:06:53 -0600
+From: Rob Herring <robh@kernel.org>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: Re: [PATCH v3 4/7] dt-bindings: gpio: Add gpio-repeater bindings
+Message-ID: <20191205210653.GA29969@bogus>
+References: <20191127084253.16356-1-geert+renesas@glider.be>
+ <20191127084253.16356-5-geert+renesas@glider.be>
 MIME-Version: 1.0
-In-Reply-To: <20191204154618.23560-7-thuth@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: Iv0Q8_2EN4yrkg99aCjRrA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20191127084253.16356-5-geert+renesas@glider.be>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 209.85.210.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,95 +82,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Christian Ehrhardt <christian.ehrhardt@canonical.com>,
- Eric Auger <eric.auger@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Phil Reid <preid@electromag.com.au>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>, Linus Walleij <linus.walleij@linaro.org>,
+ linux-doc@vger.kernel.org, Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>, devicetree@vger.kernel.org,
+ Harish Jenny K N <harish_kandiga@mentor.com>, linux-gpio@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Dec 04, 2019 at 04:46:17PM +0100, Thomas Huth wrote:
-> From: Alex Benn=E9e <alex.bennee@linaro.org>
->=20
-> Our docker infrastructure isn't quite as multiarch as we would wish so
-> let's allow the user to disable it if they want. This will allow us to
-> use still run check-tcg on non-x86 CI setups.
->=20
-> Signed-off-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Reviewed-by: Stefan Weil <sw@weilnetz.de>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  configure              | 8 +++++++-
->  tests/tcg/configure.sh | 6 ++++--
->  2 files changed, 11 insertions(+), 3 deletions(-)
->=20
-> diff --git a/configure b/configure
-> index 6099be1d84..fe6d0971f1 100755
-> --- a/configure
-> +++ b/configure
-> @@ -302,6 +302,7 @@ audio_win_int=3D""
->  libs_qga=3D""
->  debug_info=3D"yes"
->  stack_protector=3D""
-> +use_containers=3D"yes"
-> =20
->  if test -e "$source_path/.git"
->  then
-> @@ -1539,6 +1540,10 @@ for opt do
->    ;;
->    --disable-plugins) plugins=3D"no"
->    ;;
-> +  --enable-containers) use_containers=3D"yes"
-> +  ;;
-> +  --disable-containers) use_containers=3D"no"
-> +  ;;
->    *)
->        echo "ERROR: unknown option $opt"
->        echo "Try '$0 --help' for more information"
-> @@ -1722,6 +1727,7 @@ Advanced options (experts only):
->                             track the maximum stack usage of stacks creat=
-ed by qemu_alloc_stack
->    --enable-plugins
->                             enable plugins via shared library loading
-> +  --disable-containers     don't use containers for cross-building
-> =20
->  Optional features, enabled with --enable-FEATURE and
->  disabled with --disable-FEATURE, default is enabled if available:
-> @@ -8039,7 +8045,7 @@ done
->  (for i in $cross_cc_vars; do
->    export $i
->  done
-> -export target_list source_path
-> +export target_list source_path use_containers
->  $source_path/tests/tcg/configure.sh)
-> =20
->  # temporary config to build submodules
-> diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-> index 6c4a471aea..210e68396f 100755
-> --- a/tests/tcg/configure.sh
-> +++ b/tests/tcg/configure.sh
-> @@ -36,8 +36,10 @@ TMPC=3D"${TMPDIR1}/qemu-conf.c"
->  TMPE=3D"${TMPDIR1}/qemu-conf.exe"
-> =20
->  container=3D"no"
-> -if has "docker" || has "podman"; then
-> -  container=3D$($python $source_path/tests/docker/docker.py probe)
-> +if test $use_containers =3D "yes"; then
-> +    if has "docker" || has "podman"; then
-> +        container=3D$($python $source_path/tests/docker/docker.py probe)
-> +    fi
->  fi
-> =20
->  # cross compilers defaults, can be overridden with --cross-cc-ARCH
-> --=20
-> 2.18.1
->=20
+On Wed, Nov 27, 2019 at 09:42:50AM +0100, Geert Uytterhoeven wrote:
+> Add Device Tree bindings for a GPIO repeater, with optional translation
+> of physical signal properties.  This is useful for describing explicitly
+> the presence of e.g. an inverter on a GPIO line, and was inspired by the
+> non-YAML gpio-inverter bindings by Harish Jenny K N
+> <harish_kandiga@mentor.com>[1].
+> 
+> Note that this is different from a GPIO Nexus Node[2], which cannot do
+> physical signal property translation.
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
+It can't? Why not? The point of the passthru mask is to not do 
+translation of flags, but without it you are always doing translation of 
+cells.
 
+> 
+> While an inverter can be described implicitly by exchanging the
+> GPIO_ACTIVE_HIGH and GPIO_ACTIVE_LOW flags, this has its limitations.
+> Each GPIO line has only a single GPIO_ACTIVE_* flag, but applies to both
+> th provider and consumer sides:
+>   1. The GPIO provider (controller) looks at the flags to know the
+>      polarity, so it can translate between logical (active/not active)
+>      and physical (high/low) signal levels.
+>   2. While the signal polarity is usually fixed on the GPIO consumer
+>      side (e.g. an LED is tied to either the supply voltage or GND),
+>      it may be configurable on some devices, and both sides need to
+>      agree.  Hence the GPIO_ACTIVE_* flag as seen by the consumer must
+>      match the actual polarity.
+>      There exists a similar issue with interrupt flags, where both the
+>      interrupt controller and the device generating the interrupt need
+>      to agree, which breaks in the presence of a physical inverter not
+>      described in DT (see e.g. [3]).
+
+Adding an inverted flag as I've suggested would also solve this issue.
+
+> 
+> [1] "[PATCH V4 2/2] gpio: inverter: document the inverter bindings"
+>     https://lore.kernel.org/linux-gpio/1561699236-18620-3-git-send-email-harish_kandiga@mentor.com/
+> 
+> [2] Devicetree Specification v0.3-rc2, Section 2.5
+>     https://github.com/devicetree-org/devicetree-specification/releases/tag/v0.3-rc2
+> 
+> [3] "[PATCH] wlcore/wl18xx: Add invert-irq OF property for physically
+>     inverted IRQ"
+>     https://lore.kernel.org/linux-renesas-soc/20190607172958.20745-1-erosca@de.adit-jv.com/
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
