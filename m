@@ -2,79 +2,76 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF952C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 19:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B05C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 19:03:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB5F424249
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 19:01:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3BC024249
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 19:03:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N32gbZ2V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB5F424249
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ge08L8hE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3BC024249
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icwNQ-0007fC-O2
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 14:01:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44555)
+	id 1icwPf-0000g3-RN
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 14:03:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47778)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1icwKk-0006zJ-UD
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 13:58:40 -0500
+ (envelope-from <philmd@redhat.com>) id 1icwMV-0007dO-M9
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 14:00:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1icwKi-0003y0-HI
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 13:58:38 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39901)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1icwKg-0003ug-BA
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 13:58:36 -0500
-Received: by mail-oi1-x243.google.com with SMTP id a67so3749017oib.6
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 10:58:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AEQI4xHNIqMIIegnskaMD5l3+ExBopVS61N6I2vC0DI=;
- b=N32gbZ2VEtN1AHvzpjEXiZx4Ufd7FLblT6aZPLL0RX9jZhF+HfkH7WHvz20n5EUjl5
- hcyYU30R+uZIPoq68oSlvUl7U8xqwB1R8WtdWlFybSSvIp+CrIOws8yuPJRAHiucfOKU
- 5hYFYJTQw1dmhC8vwi0n6L/gLPua22W5v/ca8cj1FBatZjwitlygXg6RJkOz9QlCyIUk
- lYWHEQATshFkx2oGQFukvjfrxKqobGsm/N8nTOo5d1dRX2nqt4CWW+KwTTz2vxuGov6w
- t2HjmPRFtMjoP9IhTIcdlSFOWNFlFLEdpWJpFBBljkA83BnwSFZ6Offx4MNa5Blz4x48
- wSwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=AEQI4xHNIqMIIegnskaMD5l3+ExBopVS61N6I2vC0DI=;
- b=qnFcPXLGq9XGPZHzAsPwpi+tHy9AttcZI947yiELDirjkRvxUmDDr5APxpZ9u4/iNi
- VfvBsOhzBGYxoTEkWmKkvvuArYxKOMNph9CEGqsRsjFLEf/hcewwo1/IY0UmV23qzXKG
- 1dANTkc1Iyw7afzhN6S0uRPFSoowrA4d+7Nf8FVmj7jaLh808D8tAFJVcdcj9D1YB/7y
- 9/Iw7oj6HV0rNqpd6+Y3dQYl5laxHxFwDzHBGWJxQOhleQl2rRycQWinC1rpbhhf7ULP
- ZLcMDSBewMlUMqLcFvp4gF6dKTyBepkoG5IDkbsSwDnE6N80XAw59OhtpRj7CkCMgjxv
- DRfA==
-X-Gm-Message-State: APjAAAXw+dB4LqEFeHAuuNKX0fPVOV40QG1Q6rJzi5XnibDIa5rcOadn
- 9DEtDELE4Xnsv8RE6veIcx9l9K83clzAz0nRKfvHwg==
-X-Google-Smtp-Source: APXvYqw/AISrj/43VSH6spRMT8kKxwzOMJTGiR6VxBuZ2Y0SNwLSjenNeiDz9BmnsUe6Pe2diizbucxV8pbkwu54Msk=
-X-Received: by 2002:aca:f484:: with SMTP id s126mr8226827oih.48.1575572312105; 
- Thu, 05 Dec 2019 10:58:32 -0800 (PST)
+ (envelope-from <philmd@redhat.com>) id 1icwMR-0006ZL-QB
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 14:00:25 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54151
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icwMP-0006Vt-Ga
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 14:00:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575572417;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=pWqTHndHSaB17NTTzJCZJfEVxiOKpMXueQWTX8SitHM=;
+ b=ge08L8hEMhrXOWDJNNzMkETqdhhVd1iJtfpmYKMvrlxL8h5HfYxyg2zafaUvQAFpzNHEdb
+ 7ZTXU1/CmHtta/ISiOZiHam/E3+Q+iToiZIbUFg6EHovQUqMDKAQlmBb2DvH6eKIQwWIE3
+ xOi2F5h8inFw4TT2X3RJofMVutkwleY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-N8sR-gH3OqSWGDk6Dy_X6w-1; Thu, 05 Dec 2019 14:00:16 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27084804A2F;
+ Thu,  5 Dec 2019 19:00:15 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-76.brq.redhat.com [10.40.205.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E1991001281;
+ Thu,  5 Dec 2019 19:00:08 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.0 v2] roms/edk2-funcs: Force softfloat ARM toolchain
+ prefix on Debian
+Date: Thu,  5 Dec 2019 20:00:06 +0100
+Message-Id: <20191205190006.19352-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20191011134744.2477-1-richard.henderson@linaro.org>
- <20191011134744.2477-16-richard.henderson@linaro.org>
-In-Reply-To: <20191011134744.2477-16-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 5 Dec 2019 18:58:21 +0000
-Message-ID: <CAFEAcA86hhBNLWhAe2UY+0-pS65wpSdPKFPTA9O4m9avjECxaA@mail.gmail.com>
-Subject: Re: [PATCH v5 15/22] target/arm: Clean address for DC ZVA
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: N8sR-gH3OqSWGDk6Dy_X6w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,39 +83,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Laszlo Ersek <lersek@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 11 Oct 2019 at 14:50, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> This data access was forgotten in the previous patch.
->
-> Fixes: 3a471103ac1823ba
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-a64.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 4e049bb4aa..49817b96ae 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1766,7 +1766,7 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
->          return;
->      case ARM_CP_DC_ZVA:
->          /* Writes clear the aligned block of memory which rt points into. */
-> -        tcg_rt = cpu_reg(s, rt);
-> +        tcg_rt = clean_data_tbi(s, cpu_reg(s, rt), false);
->          gen_helper_dc_zva(cpu_env, tcg_rt);
->          return;
+The Debian (based) distributions currently provides 2 ARM
+toolchains, documented as [1]:
 
-...doesn't this mean we don't do a tag check for DC ZVA?
-Or is that handled in the helper ? (I guess it has to be,
-the DC ZVA will span multiple tag granules).
+* The ARM EABI (armel) port targets a range of older 32-bit ARM
+  devices, particularly those used in NAS hardware and a variety
+  of *plug computers.
+* The newer ARM hard-float (armhf) port supports newer, more
+  powerful 32-bit devices using version 7 of the ARM architecture
+  specification.
 
-thanks
--- PMM
+For various reasons documented in [2], the EDK2 project recommend
+to use the softfloat toolchain (named 'armel' by Debian).
+
+Force the softfloat cross toolchain prefix on Debian distributions.
+
+[1] https://www.debian.org/ports/arm/#status
+[2] https://github.com/tianocore/edk2/commit/41203b9a
+
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ roms/edk2-funcs.sh | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
+index 3f4485b201..abd6bbe1fd 100644
+--- a/roms/edk2-funcs.sh
++++ b/roms/edk2-funcs.sh
+@@ -112,6 +112,9 @@ qemu_edk2_get_cross_prefix()
+      ( [ "$gcc_arch" =3D=3D i686 ] && [ "$host_arch" =3D=3D x86_64 ] ); th=
+en
+     # no cross-compiler needed
+     :
++  elif ( [ -e /etc/debian_version ] && [ "$gcc_arch" =3D=3D arm ] ); then
++    # force hard-float cross-compiler on Debian
++    printf 'arm-linux-gnueabi-'
+   else
+     printf '%s-linux-gnu-\n' "$gcc_arch"
+   fi
+--=20
+2.21.0
+
 
