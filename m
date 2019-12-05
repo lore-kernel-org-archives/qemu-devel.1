@@ -2,55 +2,57 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,PDS_BTC_ID,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FACC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 03:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52848C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 03:35:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79D5B2073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 03:35:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79D5B2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2A1E22073B
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 03:35:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A1E22073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ichvO-0001gi-Bi
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 22:35:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52307)
+	id 1ichvR-0001im-KZ
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 22:35:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1ichst-0008Ic-Co
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 22:32:57 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1ichsQ-0007Xj-1H
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 22:32:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1ichsq-00070E-KO
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 22:32:54 -0500
-Received: from mga02.intel.com ([134.134.136.20]:48880)
+ (envelope-from <pannengyuan@huawei.com>) id 1ichsN-0005ez-Tw
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 22:32:25 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2275 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1ichsq-0006ik-64
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 22:32:52 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 04 Dec 2019 19:32:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,279,1571727600"; d="scan'208";a="205628942"
-Received: from joy-optiplex-7040.sh.intel.com ([10.239.13.9])
- by orsmga008.jf.intel.com with ESMTP; 04 Dec 2019 19:32:45 -0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: alex.williamson@redhat.com
-Subject: [RFC PATCH 0/9] Introduce mediate ops in vfio-pci
-Date: Wed,  4 Dec 2019 22:24:19 -0500
-Message-Id: <20191205032419.29606-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.20
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1ichsH-0005Ug-Gs; Wed, 04 Dec 2019 22:32:19 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 0962F1780982CBE37420;
+ Thu,  5 Dec 2019 11:32:08 +0800 (CST)
+Received: from HGHY2P002143101.china.huawei.com (10.184.39.213) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 5 Dec 2019 11:31:59 +0800
+From: <pannengyuan@huawei.com>
+To: <eblake@redhat.com>, <kwolf@redhat.com>, <mreitz@redhat.com>
+Subject: [PATCH v4 2/2] block/nbd: fix memory leak in nbd_open()
+Date: Thu, 5 Dec 2019 11:29:02 +0800
+Message-ID: <1575516542-54640-3-git-send-email-pannengyuan@huawei.com>
+X-Mailer: git-send-email 2.7.2.windows.1
+In-Reply-To: <1575516542-54640-1-git-send-email-pannengyuan@huawei.com>
+References: <1575516542-54640-1-git-send-email-pannengyuan@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -62,179 +64,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>, kvm@vger.kernel.org,
- libvir-list@redhat.com, cohuck@redhat.com, linux-kernel@vger.kernel.org,
- zhenyuw@linux.intel.com, qemu-devel@nongnu.org, shaopeng.he@intel.com,
- zhi.a.wang@intel.com
+Cc: liyiting@huawei.com, Vladimir
+ Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, zhang.zhanghailiang@huawei.com,
+ qemu-block@nongnu.org, Pan Nengyuan <pannengyuan@huawei.com>,
+ qemu-devel@nongnu.org, qemu-stable <qemu-stable@nongnu.org>,
+ kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For SRIOV devices, VFs are passthroughed into guest directly without host
-driver mediation. However, when VMs migrating with passthroughed VFs,
-dynamic host mediation is required to  (1) get device states, (2) get
-dirty pages. Since device states as well as other critical information
-required for dirty page tracking for VFs are usually retrieved from PFs,
-it is handy to provide an extension in PF driver to centralizingly control
-VFs' migration.
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
-Therefore, in order to realize (1) passthrough VFs at normal time, (2)
-dynamically trap VFs' bars for dirty page tracking and (3) centralizing
-VF critical states retrieving and VF controls into one driver, we propose
-to introduce mediate ops on top of current vfio-pci device driver.
+In currently implementation there will be a memory leak when
+nbd_client_connect() returns error status. Here is an easy way to
+reproduce:
 
+1. run qemu-iotests as follow and check the result with asan:
+    ./check -raw 143
 
-                                   _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
-                                  
- __________   register mediate ops|  ___________     ___________    |
-|          |<-----------------------|     VF    |   |           |   
-| vfio-pci |                      | |  mediate  |   | PF driver |   |
-|__________|----------------------->|   driver  |   |___________|   
-     |            open(pdev)      |  -----------          |         |
-     |                                                    |         
-     |                            |_ _ _ _ _ _ _ _ _ _ _ _|_ _ _ _ _|
-    \|/                                                  \|/
------------                                         ------------
-|    VF   |                                         |    PF    |
------------                                         ------------
+Following is the asan output backtrack:
+Direct leak of 40 byte(s) in 1 object(s) allocated from:
+    #0 0x7f629688a560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
+    #1 0x7f6295e7e015 in g_malloc0  (/usr/lib64/libglib-2.0.so.0+0x50015)
+    #2 0x56281dab4642 in qobject_input_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:295
+    #3 0x56281dab1a04 in visit_start_struct  /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:49
+    #4 0x56281dad1827 in visit_type_SocketAddress  qapi/qapi-visit-sockets.c:386
+    #5 0x56281da8062f in nbd_config   /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
+    #6 0x56281da8062f in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
+    #7 0x56281da8062f in nbd_open /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
 
+Direct leak of 15 byte(s) in 1 object(s) allocated from:
+    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
+    #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
+    #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
+    #3 0x56281da804ac in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1834
+    #4 0x56281da804ac in nbd_open /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
 
-VF mediate driver could be a standalone driver that does not bind to
-any devices (as in demo code in patches 5-6) or it could be a built-in
-extension of PF driver (as in patches 7-9) .
+Indirect leak of 24 byte(s) in 1 object(s) allocated from:
+    #0 0x7f629688a3a0 in malloc (/usr/lib64/libasan.so.3+0xc73a0)
+    #1 0x7f6295e7dfbd in g_malloc (/usr/lib64/libglib-2.0.so.0+0x4ffbd)
+    #2 0x7f6295e96ace in g_strdup (/usr/lib64/libglib-2.0.so.0+0x68ace)
+    #3 0x56281dab41a3 in qobject_input_type_str_keyval /mnt/sdb/qemu-4.2.0-rc0/qapi/qobject-input-visitor.c:536
+    #4 0x56281dab2ee9 in visit_type_str /mnt/sdb/qemu-4.2.0-rc0/qapi/qapi-visit-core.c:297
+    #5 0x56281dad0fa1 in visit_type_UnixSocketAddress_members qapi/qapi-visit-sockets.c:141
+    #6 0x56281dad17b6 in visit_type_SocketAddress_members qapi/qapi-visit-sockets.c:366
+    #7 0x56281dad186a in visit_type_SocketAddress qapi/qapi-visit-sockets.c:393
+    #8 0x56281da8062f in nbd_config /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1716
+    #9 0x56281da8062f in nbd_process_options /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1829
+    #10 0x56281da8062f in nbd_open /mnt/sdb/qemu-4.2.0-rc0/block/nbd.c:1873
 
-Rather than directly bind to VF, VF mediate driver register a mediate
-ops into vfio-pci in driver init. vfio-pci maintains a list of such
-mediate ops.
-(Note that: VF mediate driver can register mediate ops into vfio-pci
-before vfio-pci binding to any devices. And VF mediate driver can
-support mediating multiple devices.)
+Fixes: 8f071c9db506e03ab
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Cc: qemu-stable <qemu-stable@nongnu.org>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+Changes v2 to v1:
+- add a new function to do the common cleanups (suggested by Stefano
+  Garzarella).
+---
+Changes v3 to v2:
+- split in two patches(suggested by Stefano Garzarella)
+---
+Changes v4 to v3:
+- replace function name from nbd_free_bdrvstate_prop to
+  nbd_clear_bdrvstate and add Fixes tag.
+---
+ block/nbd.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-When opening a device (e.g. a VF), vfio-pci goes through the mediate ops
-list and calls each vfio_pci_mediate_ops->open() with pdev of the opening
-device as a parameter.
-VF mediate driver should return success or failure depending on it
-supports the pdev or not.
-E.g. VF mediate driver would compare its supported VF devfn with the
-devfn of the passed-in pdev.
-Once vfio-pci finds a successful vfio_pci_mediate_ops->open(), it will
-stop querying other mediate ops and bind the opening device with this
-mediate ops using the returned mediate handle.
-
-Further vfio-pci ops (VFIO_DEVICE_GET_REGION_INFO ioctl, rw, mmap) on the
-VF will be intercepted into VF mediate driver as
-vfio_pci_mediate_ops->get_region_info(),
-vfio_pci_mediate_ops->rw,
-vfio_pci_mediate_ops->mmap, and get customized.
-For vfio_pci_mediate_ops->rw and vfio_pci_mediate_ops->mmap, they will
-further return 'pt' to indicate whether vfio-pci should further
-passthrough data to hw.
-
-when vfio-pci closes the VF, it calls its vfio_pci_mediate_ops->release()
-with a mediate handle as parameter.
-
-The mediate handle returned from vfio_pci_mediate_ops->open() lets VF
-mediate driver be able to differentiate two opening VFs of the same device
-id and vendor id.
-
-When VF mediate driver exits, it unregisters its mediate ops from
-vfio-pci.
-
-
-In this patchset, we enable vfio-pci to provide 3 things:
-(1) calling mediate ops to allow vendor driver customizing default
-region info/rw/mmap of a region.
-(2) provide a migration region to support migration
-(3) provide a dynamic trap bar info region to allow vendor driver
-control trap/untrap of device pci bars
-
-This vfio-pci + mediate ops way differs from mdev way in that
-(1) medv way needs to create a 1:1 mdev device on top of one VF, device
-specific mdev parent driver is bound to VF directly.
-(2) vfio-pci + mediate ops way does not create mdev devices and VF
-mediate driver does not bind to VFs. Instead, vfio-pci binds to VFs.
-
-The reason why we don't choose the way of writing mdev parent driver is
-that
-(1) VFs are almost all the time directly passthroughed. Directly binding
-to vfio-pci can make most of the code shared/reused. If we write a
-vendor specific mdev parent driver, most of the code (like passthrough
-style of rw/mmap) still needs to be copied from vfio-pci driver, which is
-actually a duplicated and tedious work.
-(2) For features like dynamically trap/untrap pci bars, if they are in
-vfio-pci, they can be available to most people without repeated code
-copying and re-testing.
-(3) with a 1:1 mdev driver which passthrough VFs most of the time, people
-have to decide whether to bind VFs to vfio-pci or mdev parent driver before
-it runs into a real migration need. However, if vfio-pci is bound
-initially, they have no chance to do live migration when there's a need
-later. 
-
-In this patchset,
-- patches 1-4 enable vfio-pci to call mediate ops registered by vendor
-  driver to mediate/customize region info/rw/mmap.
-
-- patches 5-6 provide a standalone sample driver to register a mediate ops
-  for Intel Graphics Devices. It does not bind to IGDs directly but decides
-  what devices it supports via its pciidlist. It also demonstrates how to
-  dynamic trap a device's PCI bars. (by adding more pciids in its
-  pciidlist, this sample driver actually is not necessarily limited to
-  support IGDs)
-
-- patch 7-9 provide a sample on i40e driver that supports Intel(R)
-  Ethernet Controller XL710 Family of devices. It supports VF precopy live
-  migration on Intel's 710 SRIOV. (but we commented out the real
-  implementation of dirty page tracking and device state retrieving part
-  to focus on demonstrating framework part. Will send out them in future
-  versions)
+diff --git a/block/nbd.c b/block/nbd.c
+index 8b4a65a..9062409 100644
+--- a/block/nbd.c
++++ b/block/nbd.c
+@@ -1891,6 +1891,7 @@ static int nbd_open(BlockDriverState *bs, QDict *options, int flags,
  
-  patch 7 registers/unregisters VF mediate ops when PF driver
-  probes/removes. It specifies its supporting VFs via
-  vfio_pci_mediate_ops->open(pdev)
-
-  patch 8 reports device cap of VFIO_PCI_DEVICE_CAP_MIGRATION and
-  provides a sample implementation of migration region.
-  The QEMU part of vfio migration is based on v8
-  https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05542.html.
-  We do not based on recent v9 because we think there are still opens in
-  dirty page track part in that series.
-
-  patch 9 reports device cap of VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR and
-  provides an example on how to trap part of bar0 when migration starts
-  and passthrough this part of bar0 again when migration fails.
-
-Yan Zhao (9):
-  vfio/pci: introduce mediate ops to intercept vfio-pci ops
-  vfio/pci: test existence before calling region->ops
-  vfio/pci: register a default migration region
-  vfio-pci: register default dynamic-trap-bar-info region
-  samples/vfio-pci/igd_dt: sample driver to mediate a passthrough IGD
-  sample/vfio-pci/igd_dt: dynamically trap/untrap subregion of IGD bar0
-  i40e/vf_migration: register mediate_ops to vfio-pci
-  i40e/vf_migration: mediate migration region
-  i40e/vf_migration: support dynamic trap of bar0
-
- drivers/net/ethernet/intel/Kconfig            |   2 +-
- drivers/net/ethernet/intel/i40e/Makefile      |   3 +-
- drivers/net/ethernet/intel/i40e/i40e.h        |   2 +
- drivers/net/ethernet/intel/i40e/i40e_main.c   |   3 +
- .../ethernet/intel/i40e/i40e_vf_migration.c   | 626 ++++++++++++++++++
- .../ethernet/intel/i40e/i40e_vf_migration.h   |  78 +++
- drivers/vfio/pci/vfio_pci.c                   | 189 +++++-
- drivers/vfio/pci/vfio_pci_private.h           |   2 +
- include/linux/vfio.h                          |  18 +
- include/uapi/linux/vfio.h                     | 160 +++++
- samples/Kconfig                               |   6 +
- samples/Makefile                              |   1 +
- samples/vfio-pci/Makefile                     |   2 +
- samples/vfio-pci/igd_dt.c                     | 367 ++++++++++
- 14 files changed, 1455 insertions(+), 4 deletions(-)
- create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.c
- create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
- create mode 100644 samples/vfio-pci/Makefile
- create mode 100644 samples/vfio-pci/igd_dt.c
-
+     ret = nbd_client_connect(bs, errp);
+     if (ret < 0) {
++        nbd_clear_bdrvstate(s);
+         return ret;
+     }
+     /* successfully connected */
 -- 
-2.17.1
+2.7.2.windows.1
+
 
 
