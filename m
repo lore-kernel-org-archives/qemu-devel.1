@@ -2,130 +2,118 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E91E6C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1767DC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 15:00:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2C7E2245C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:50:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C39FC21835
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 15:00:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y6ms4vMJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2C7E2245C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fLNSvBOW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C39FC21835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icsSP-0003kr-QH
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:50:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46966)
+	id 1icscC-0008AT-U5
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 10:00:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1icsR9-0002pY-Gm
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:49:01 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icsau-0007QI-7Y
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:59:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1icsR6-0004cO-R7
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:48:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48245
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1icsR6-0004Xm-Em
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:48:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575557335;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=W9hFwCJdj0olIjCa06RnUIZy1n5wb60wg5egL1IJY/0=;
- b=Y6ms4vMJ/E2m6XA1UXpVuTYyoCPAAd6X26FPZCk1ZpHboT9muGOIy8cu2aeVYlZFrghb74
- fNSnFDYJrmBACwHAQSNvhHbzb8yeBZYqIWvCxoeqrDUmV/1JLzoiQKHDXeWKLjroJEkDiL
- ko4HeKr73JatS4vUBrSPrwp/MKUp1YE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-BBefBAc_PHiPBr0dMJ8e9Q-1; Thu, 05 Dec 2019 09:48:52 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 667DD183B700;
- Thu,  5 Dec 2019 14:48:50 +0000 (UTC)
-Received: from [10.36.116.252] (ovpn-116-252.ams2.redhat.com [10.36.116.252])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D40AE5D6A5;
- Thu,  5 Dec 2019 14:48:47 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] s390x/cpumodel: Introduce dynamic feature groups
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <b062f580-d664-f68c-2364-1f65df6ee265@de.ibm.com>
- <C829F458-099D-4E95-B835-67F008E60B13@redhat.com>
- <b4f4546d-b620-0428-40bf-59f4584a80f3@de.ibm.com>
- <b4ee8526-b1e3-21ee-5e1e-b22520e29339@redhat.com>
- <20191129193317.GE14595@habkost.net>
- <a5ae30ef-e193-fd22-b3e2-a7626e82d9b1@redhat.com>
- <20191205143506.GG498046@habkost.net>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <b0467d48-1fff-e2ae-4866-1c9dbe03fb6c@redhat.com>
-Date: Thu, 5 Dec 2019 15:48:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191205143506.GG498046@habkost.net>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icsas-0007oF-4t
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:59:03 -0500
+Received: from mail-eopbgr20110.outbound.protection.outlook.com
+ ([40.107.2.110]:26143 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1icsaq-0007iY-7t; Thu, 05 Dec 2019 09:59:02 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WQU3RZweU4eFuQT5pAoOJSL8qn26rFI7/JLB+Kx0T6sV8xlqjH6Fgwl9LDRicgwBY2MrBILOwmsxkx1a7mvVf4gY7j5HxH3qeNXDXj0+vmK3m4fkfzSkJADEx2ESFZYOu7dZTOWIXwzJ7NftYtl5UaIpCu+vK29XZVcEF9MvCbf+LqOztAcZLXMCqRMMrhelqYMyu1/DJKa2abEUmka0SvCUsdQGfm9z/6BKCoRSGnVROwZp5nQhvpa4iZmwE1pUU1VwLF/ZK9F6M49T3Q5171APHUHLvTpXC2wem7ak3eDtpXmJ35XJ9A1ImSj0Di+0jD7Yei65dwT/DI22K7oU6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z9qcvYIewmJI5A6vWn3JtW1ppPG3kwmVYrEc3hjTzyM=;
+ b=f4mBrYayH0nrP9mSofE1qPcRQ5FbABUXl9q0CKjZiSuA0z0B4DqiZtx87Oucylit2LpLEyfGLRshIPiANlaIYpVc+R4jQegzQ5QBwm8foAoRoefr6gR0sEqUqdUd9jR53t9opojkeEMYGEp5d/tF5mHaTAEOAxmoPMtv6Bp//pgQwdeAyPMirCGQdOCg/BH0PUMbEe/OZlTcX+VJoHOCrMwDOZpKiCQubO4U/CaU5XHdN0q8Xf+edV4aF//Vp21bF+LRFMtpOL8zMvBKJHwpz1eAjKHToPEE/JxQfw9P9hyXqonvP8FzVrUY6YQKuCcU3V7HwZu9w6xV1EHqAnSCLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z9qcvYIewmJI5A6vWn3JtW1ppPG3kwmVYrEc3hjTzyM=;
+ b=fLNSvBOW+SN+uAa81zdtJe++gDojv06rNG4DZPXfBDYEQZSg7pCa6rFErFMD1A23ceWrvFd+bc2EJwuj4bxAmJUVdNQBCuQXejZguhbNs4IG2/K52M93hCMkkWkB1bnAypFZuUnjKw9AZxSE4oMPdJgTd4Artr1EmL8FD0D3rsM=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB2949.eurprd08.prod.outlook.com (52.135.167.152) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2516.12; Thu, 5 Dec 2019 14:58:54 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2516.014; Thu, 5 Dec 2019
+ 14:58:54 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [RFC v5 024/126] error: auto propagated local_err
+Thread-Topic: [RFC v5 024/126] error: auto propagated local_err
+Thread-Index: AQHVgE3c5dwPNEl0z0OyUhbNfTU1EqeqZpzagAFqo4D///+mMYAAJ34A
+Date: Thu, 5 Dec 2019 14:58:53 +0000
+Message-ID: <eef60af5-ff92-3df7-bad5-c981690d66ad@virtuozzo.com>
+References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ <20191011160552.22907-25-vsementsov@virtuozzo.com>
+ <87muc8p24w.fsf@dusky.pond.sub.org>
+ <55393c08-5bda-8042-1a95-f350b3781d99@virtuozzo.com>
+ <87d0d3c5k7.fsf@dusky.pond.sub.org>
+In-Reply-To: <87d0d3c5k7.fsf@dusky.pond.sub.org>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: BBefBAc_PHiPBr0dMJ8e9Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR06CA0141.eurprd06.prod.outlook.com
+ (2603:10a6:7:16::28) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191205175848006
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1b469883-1ae0-440e-ddae-08d77993a55d
+x-ms-traffictypediagnostic: AM6PR08MB2949:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB2949C842E2E59951446C6B61C15C0@AM6PR08MB2949.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 02426D11FE
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(366004)(39850400004)(346002)(396003)(376002)(189003)(199004)(81156014)(81166006)(8676002)(54906003)(6486002)(478600001)(8936002)(6512007)(26005)(6506007)(102836004)(186003)(4326008)(11346002)(99286004)(76176011)(14454004)(25786009)(31686004)(2616005)(52116002)(6916009)(5660300002)(36756003)(31696002)(305945005)(2906002)(86362001)(7366002)(7416002)(7406005)(316002)(64756008)(66946007)(66556008)(66476007)(229853002)(14444005)(7336002)(66446008)(71190400001)(71200400001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB2949;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 4crTOeKmgG48QjzZhnAuYFtWswZIf77y8ORhRNTejYzCsMIkLT6bFbpipZ3a8PBsHk8PT6270E308dkstK4wjxYSsV7D0MCni9iRBj2yDsi7F7FMTzSzhvXHM/pUy0uy0NBnAFd1nLxrx5L7MYYvuqu6wWv9OuBoNrCXIcZJE6lj94yvOi8OzEj37wsQMLqsqvTfEjG1tJK9mqK2o1YBVC4k20J905cYJ9YuyHPwNhV/mH/gVJB52Lq7NfiKF6crtp2CNS+NjSG8vH3ZqeZO6+UlMzyduDwB9GTfBwKv3FnQHNBVWZjSnPUcbXz48EhZLtUVpMojnbmQJppyk3Rhb/LnqTEBmWKwzrBHDH/AWq/Gs+cOGCEFxH7X8ShlOltuZwkqycuYZmsyNdeTvpqnhXfSm0ten/g6+72aymQ2PSAS5Gw1MSeu+64rRzMq+P/3
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <C0D07A0C4DBC374FAB57C7541713859B@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1b469883-1ae0-440e-ddae-08d77993a55d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2019 14:58:53.9739 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: N94XwTGcnPiNX6Z6dsbqpipTtg0l8F5dAsDF8P6qSeSD2lYtDayDjWdPouRNUKnhrv4XVzHNFGUUqvSL2so+xoap9LiXZHXnxo/99BUigak=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2949
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.2.110
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -137,158 +125,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Jiri Denemark <jdenemar@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Jeff Cody <codyprime@gmail.com>,
+ Jan Kiszka <jan.kiszka@siemens.com>, Alberto Garcia <berto@igalia.com>,
+ Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Halil Pasic <pasic@linux.ibm.com>,
+ =?utf-8?B?SGVydsOpIFBvdXNzaW5lYXU=?= <hpoussin@reactos.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Anthony Green <green@moxielogic.com>, Laurent Vivier <lvivier@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ "Dr. David
+ Alan Gilbert" <dgilbert@redhat.com>, Beniamino Galvani <b.galvani@gmail.com>,
+ Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Chris Wulff <crwulff@gmail.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Walle <michael@walle.cc>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "sheepdog@lists.wpkg.org" <sheepdog@lists.wpkg.org>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Palmer Dabbelt <palmer@sifive.com>, Eric Farman <farman@linux.ibm.com>,
+ Max Filippov <jcmvbkbc@gmail.com>, Hannes Reinecke <hare@suse.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, Liu Yuan <namei.unix@gmail.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ Amit Shah <amit@kernel.org>, Stefan Weil <sw@weilnetz.de>,
+ Greg Kurz <groug@kaod.org>, Yuval Shaia <yuval.shaia@oracle.com>,
+ "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?utf-8?B?Q8OpZHJpYyBMZSBHb2F0ZXI=?= <clg@kaod.org>,
+ Stafford Horne <shorne@gmail.com>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <pburton@wavecomp.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Paul Durrant <paul@xen.org>,
+ Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Guan Xuetao <gxt@mprc.pku.edu.cn>, Ari Sundholm <ari@tuxera.com>,
+ Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Joel Stanley <joel@jms.id.au>,
+ Jason Dillaman <dillaman@redhat.com>, Antony Pavlov <antonynpavlov@gmail.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ "integration@gluster.org" <integration@gluster.org>,
+ Laszlo Ersek <lersek@redhat.com>, "Richard
+ W.M. Jones" <rjones@redhat.com>, Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Max Reitz <mreitz@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Vincenzo Maffione <v.maffione@gmail.com>, Marek Vasut <marex@denx.de>,
+ =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Tony Krowiak <akrowiak@linux.ibm.com>,
+ =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05.12.19 15:35, Eduardo Habkost wrote:
-> On Mon, Dec 02, 2019 at 10:15:12AM +0100, David Hildenbrand wrote:
->>
->>>> Say the user has the option to select a model (zEC12, z13, z14), upper
->>>> layers always want to have a model that includes all backported securi=
-ty
->>>> features. While the host model can do that, CPU definitions can't. You
->>>> can't change default models within a QEMU release, or for older releas=
-es
->>>> (e.g., a z13).
->>>>
->>>
->>> This is a good description of the main use case we're worried
->>> about in x86 too, and the main reason we have added versioned CPU
->>> models.
->>>
->>> I remember I was planning to use `query-cpu-model-expansion` for
->>> "please give me the best configuration for this specific CPU
->>> model" (which would be very similar to the approach used in this
->>> series).  Now, I need to refresh my memory and try to remember
->>> why I concluded this approach wouldn't work for x86.
->>
->> I would be interested in that - I don't really think exposing CPU
->> versions to the user is necessary here.
->>
->> E.g., you can maintain the versions internally and enable the stored
->> features of the fitting one with "recommended-features=3Don...".
->=20
-> I was re-reading some code and threads, and now I remember: the
-> main obstacle for using query-cpu-model-expansion for CPU model
-> version resolution in x86 is the fact that the x86 CPU models
-> aren't static yet.  (type=3Dfull expansion isn't useful for CPU the
-> use case above; type=3Dstatic expansion requires static CPU models
-> to be useful)
-
-
-I think, you could if you would expand "best X" to something like
-
--cpu X,all-features=3Doff,featX=3Don,featY=3Don ...
-
-The "all-features" part would need a better name as discussed. Such a
-model would always have a defined feature set (all listed features) =3D=3D
-static. The list could get a little longer, which is why s390x has these
-static "base" features. But that's not a road blocker.
-
->=20
-> I was planning to make x86 CPU models static, then I noticed we
-> do have lots of feature flags that depend on the current
-> accelerator (set by kvm_default_props) or current machine (set
-> by compat_props).  This breaks the rules for static CPU models.
-
-The static models we have (e.g., z13-base) contain a minimum set of
-features we expect to be around in every environment (but doesn't have
-to). It's just a way to make the featX=3Don,featY=3Don ... list shorter.
-
-X would be expanded to e.g.,
-
--cpu X-base,featX=3Don,featY=3Don ...
-
-But nothing speaks against having
-
--cpu X-base,featX=3Doff,featY=3Don ...
-
-A very simplistic base model would be a model without any features.
-(like -cpu X,all-features=3Doff), but then it would be set in stone.
-
->=20
-> We can still try to provide useful static CPU models in x86 in
-> the future (I want to).  But I don't want to make this an
-> obstacle for providing a CPU model update mechanism that works
-> for x86 (which is more urgent).
->=20
->>
->>>
->>>
->>>>>
->>>>> Maybe its just the interface or the name. But I find this very non-in=
-tuitive
->>>>
->>>> I'm open for suggestions.
->>>>
->>>>>
->>>>> e.g. you wrote
->>>>>
->>>>>     Get the maximum possible feature set (e.g., including deprecated
->>>>>     features) for a CPU definition in the configuration ("everything =
-that
->>>>>     could be enabled"):
->>>>>         -cpu z14,all-features=3Doff,available-features=3Don
->>>>>
->>>>>     Get all valid features for a CPU definition:
->>>>>         -cpu z14,all-features=3Don
->>>>>
->>>>> What is the point of this? It is either the same as the one before, o=
-r it wont
->>>>> be able to start.=20
->>>>
->>>> valid !=3D available, all !=3D available. Yes, the model won't run unl=
-ess
->>>> you are on pretty good HW :)
->>>>
->>>> Maybe I should just have dropped the last example, as it seems to
->>>> confuse people - it's mostly only relevant for introspection via CPU
->>>> model expansion.
->>>>
->>>> I am open for better names. e.g. all-features -> valid-features.
->>>
->>> "all" is not a meaningful name to me.  It surely doesn't mean
->>> "all features in the universe", so it means a more specific set
->>> of features.  How is that set defined?
->>>
->>> "valid" seems clearer, but we still need a description of what
->>> "valid" means exactly.
->>>
->>
->> So, we have
->>
->> +static S390DynFeatGroupDef s390_dyn_feature_groups[] =3D {
->> +    /* "all" corresponds to our "full" definitions */
->> +    DYN_FEAT_GROUP_INIT("all-features", ALL, "Features valid for a CPU
->> definition"),
->> [...]
->> +};
->>
->> it includes features that are not available - all features that could
->> theoretically be enabled for that CPU definition.
->>
->> (e.g., "vx" was introduced with z13 and cannot be enabled for the z12.
->> It's part of the full model of a z13, but not of a z12)
->=20
-> Isn't this something already returned by device-list-properties?
->=20
-
-We do register all feature properties for all models. So, yes, it would
-have been possible if we (I) would have implemented that differently. We
-could (and maybe should) still change that - only register the features
-that are part of the "full" model.
-
---=20
-Thanks,
-
-David / dhildenb
-
+MDUuMTIuMjAxOSAxNTozNiwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IFZsYWRpbWlyIFNl
+bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPiAN
+Cj4+IDA0LjEyLjIwMTkgMTc6NTksIE1hcmt1cyBBcm1icnVzdGVyIHdyb3RlOg0KPj4+IFZsYWRp
+bWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVz
+Og0KPj4+DQo+Pj4+IEhlcmUgaXMgaW50cm9kdWNlZCBFUlJQX0FVVE9fUFJPUEFHQVRFIG1hY3Jv
+LCB0byBiZSB1c2VkIGF0IHN0YXJ0IG9mDQo+Pj4+IGZ1bmN0aW9ucyB3aXRoIGVycnAgT1VUIHBh
+cmFtZXRlci4NCj4+Pj4NCj4+Pj4gSXQgaGFzIHRocmVlIGdvYWxzOg0KPj4+Pg0KPj4+PiAxLiBG
+aXggaXNzdWUgd2l0aCBlcnJvcl9mYXRhbCAmIGVycm9yX3ByZXBlbmQvZXJyb3JfYXBwZW5kX2hp
+bnQ6IHVzZXINCj4+Pj4gY2FuJ3Qgc2VlIHRoaXMgYWRkaXRpb25hbCBpbmZvcm1hdGlvbiwgYmVj
+YXVzZSBleGl0KCkgaGFwcGVucyBpbg0KPj4+PiBlcnJvcl9zZXRnIGVhcmxpZXIgdGhhbiBpbmZv
+cm1hdGlvbiBpcyBhZGRlZC4gW1JlcG9ydGVkIGJ5IEdyZWcgS3Vyel0NCj4+Pj4NCj4+Pj4gMi4g
+Rml4IGlzc3VlIHdpdGggZXJyb3JfYWJvcnQgJiBlcnJvcl9wcm9wYWdhdGU6IHdoZW4gd2Ugd3Jh
+cA0KPj4+PiBlcnJvcl9hYm9ydCBieSBsb2NhbF9lcnIrZXJyb3JfcHJvcGFnYXRlLCByZXN1bHRp
+bmcgY29yZWR1bXAgd2lsbA0KPj4+PiByZWZlciB0byBlcnJvcl9wcm9wYWdhdGUgYW5kIG5vdCB0
+byB0aGUgcGxhY2Ugd2hlcmUgZXJyb3IgaGFwcGVuZWQuDQo+Pj4NCj4+PiBJIGdldCB3aGF0IHlv
+dSBtZWFuLCBidXQgSSBoYXZlIHBsZW50eSBvZiBjb250ZXh0Lg0KPj4+DQo+Pj4+ICh0aGUgbWFj
+cm8gaXRzZWxmIGRvZXNuJ3QgZml4IHRoZSBpc3N1ZSwgYnV0IGl0IGFsbG93cyB0byBbMy5dIGRy
+b3AgYWxsDQo+Pj4+IGxvY2FsX2VycitlcnJvcl9wcm9wYWdhdGUgcGF0dGVybiwgd2hpY2ggd2ls
+bCBkZWZpbml0ZWx5IGZpeCB0aGUgaXNzdWUpDQo+Pj4NCj4+PiBUaGUgcGFyZW50aGVzaXMgaXMg
+bm90IHBhcnQgb2YgdGhlIGdvYWwuDQo+Pj4NCj4+Pj4gW1JlcG9ydGVkIGJ5IEtldmluIFdvbGZd
+DQo+Pj4+DQo+Pj4+IDMuIERyb3AgbG9jYWxfZXJyK2Vycm9yX3Byb3BhZ2F0ZSBwYXR0ZXJuLCB3
+aGljaCBpcyB1c2VkIHRvIHdvcmthcm91bmQNCj4+Pj4gdm9pZCBmdW5jdGlvbnMgd2l0aCBlcnJw
+IHBhcmFtZXRlciwgd2hlbiBjYWxsZXIgd2FudHMgdG8ga25vdyByZXN1bHRpbmcNCj4+Pj4gc3Rh
+dHVzLiAoTm90ZTogYWN0dWFsbHkgdGhlc2UgZnVuY3Rpb25zIGNvdWxkIGJlIG1lcmVseSB1cGRh
+dGVkIHRvDQo+Pj4+IHJldHVybiBpbnQgZXJyb3IgY29kZSkuDQo+Pj4+DQo+Pj4+IFRvIGFjaGll
+dmUgdGhlc2UgZ29hbHMsIHdlIG5lZWQgdG8gYWRkIGludm9jYXRpb24gb2YgdGhlIG1hY3JvIGF0
+IHN0YXJ0DQo+Pj4+IG9mIGZ1bmN0aW9ucywgd2hpY2ggbmVlZHMgZXJyb3JfcHJlcGVuZC9lcnJv
+cl9hcHBlbmRfaGludCAoMS4pOyBhZGQNCj4+Pj4gaW52b2NhdGlvbiBvZiB0aGUgbWFjcm8gYXQg
+c3RhcnQgb2YgZnVuY3Rpb25zIHdoaWNoIGRvDQo+Pj4+IGxvY2FsX2VycitlcnJvcl9wcm9wYWdh
+dGUgc2NlbmFyaW8gdGhlIGNoZWNrIGVycm9ycywgZHJvcCBsb2NhbCBlcnJvcnMNCj4+Pj4gZnJv
+bSB0aGVtIGFuZCBqdXN0IHVzZSAqZXJycCBpbnN0ZWFkICgyLiwgMy4pLg0KPj4+DQo+Pj4gVGhl
+IHBhcmFncmFwaCB0YWxrcyBhYm91dCB0d28gY2FzZXM6IDEuIGFuZCAyLiszLg0KPj4NCj4+IEht
+bSwgSSBkb24ndCB0aGluayBzby4uIDEuIGFuZCAyLiBhcmUgaXNzdWVzLiAzLiBpcyBhIHJlZmFj
+dG9yaW5nLi4gV2UganVzdA0KPj4gZml4IGFjaGlldmUgMiBhbmQgMyBieSBvbmUgYWN0aW9uLg0K
+Pj4NCj4+PiBNYWtlcyBtZSB0aGluayB3ZQ0KPj4+IHdhbnQgdHdvIHBhcmFncmFwaHMsIGVhY2gg
+aWxsdXN0cmF0ZWQgd2l0aCBhbiBleGFtcGxlLg0KPj4+DQo+Pj4gV2hhdCBhYm91dCB5b3UgcHJv
+dmlkZSB0aGUgZXhhbXBsZXMsIGFuZCB0aGVuIEkgdHJ5IHRvIHBvbGlzaCB0aGUgcHJvc2U/DQo+
+Pg0KPj4gMTogZXJyb3JfZmF0YWwgcHJvYmxlbQ0KPj4NCj4+IEFzc3VtZSB0aGUgZm9sbG93aW5n
+IGNvZGUgZmxvdzoNCj4+DQo+PiBpbnQgZjEoZXJycCkgew0KPj4gICAgICAuLi4NCj4+ICAgICAg
+cmV0ID0gZjIoZXJycCk7DQo+PiAgICAgIGlmIChyZXQgPCAwKSB7DQo+PiAgICAgICAgIGVycm9y
+X2FwcGVuZF9oaW50KGVycnAsICJ2ZXJ5IHVzZWZ1bCBoaW50Iik7DQo+PiAgICAgICAgIHJldHVy
+biByZXQ7DQo+PiAgICAgIH0NCj4+ICAgICAgLi4uDQo+PiB9DQo+Pg0KPj4gTm93LCBpZiB3ZSBj
+YWxsIGYxIHdpdGggJmVycm9yX2ZhdGFsIGFyZ3VtZW50IGFuZCBmMiBmYWlscywgdGhlIHByb2dy
+YW0NCj4+IHdpbGwgZXhpdCBpbW1lZGlhdGVseSBpbnNpZGUgZjIsIHdoZW4gc2V0dGluZyB0aGUg
+ZXJycC4gVXNlciB3aWxsIG5vdA0KPj4gc2VlIHRoZSBoaW50Lg0KPj4NCj4+IFNvLCBpbiB0aGlz
+IGNhc2Ugd2Ugc2hvdWxkIHVzZSBsb2NhbF9lcnIuDQo+IA0KPiBIb3cgZG9lcyB0aGlzIGV4YW1w
+bGUgbG9vayBhZnRlciB0aGUgdHJhbnNmb3JtYXRpb24/DQoNCkdvb2QgcG9pbnQuDQoNCmludCBm
+MShlcnJwKSB7DQogICAgRVJSUF9BVVRPX1BST1BBR0FURSgpOw0KICAgIC4uLg0KICAgIHJldCA9
+IGYyKGVycnApOw0KICAgIGlmIChyZXQgPCAwKSB7DQogICAgICAgZXJyb3JfYXBwZW5kX2hpbnQo
+ZXJycCwgInZlcnkgdXNlZnVsIGhpbnQiKTsNCiAgICAgICByZXR1cm4gcmV0Ow0KICAgIH0NCiAg
+ICAuLi4NCn0NCg0KLSBub3RoaW5nIGNoYW5nZWQsIG9ubHkgYWRkIG1hY3JvIGF0IHN0YXJ0LiBC
+dXQgbm93IGVycnAgaXMgc2FmZSwgaWYgaXQgd2FzDQplcnJvcl9mYXRhbCBpdCBpcyB3cmFwcGVk
+IGJ5IGxvY2FsIGVycm9yLCBhbmQgd2lsbCBvbmx5IGNhbGwgZXhpdCBvbiBhdXRvbWF0aWMNCnBy
+b3BhZ2F0aW9uIG9uIGYxIGZpbmlzaC4NCg0KPiANCj4+IDI6IGVycm9yX2Fib3J0IHByb2JsZW0N
+Cj4+DQo+PiBOb3csIGNvbnNpZGVyIGZ1bmN0aW9ucyB3aXRob3V0IHJldHVybiB2YWx1ZS4gV2Ug
+bm9ybWFsbHkgdXNlIGxvY2FsX2Vycg0KPj4gdmFyaWFibGUgdG8gY2F0Y2ggZmFpbHVyZXM6DQo+
+Pg0KPj4gdm9pZCBmMShlcnJwKSB7DQo+PiAgICAgIEVycm9yICpsb2NhbF9lcnIgPSBOVUxMOw0K
+Pj4gICAgICAuLi4NCj4+ICAgICAgZjIoJmxvY2FsX2Vycik7DQo+PiAgICAgIGlmIChsb2NhbF9l
+cnIpIHsNCj4+ICAgICAgICAgIGVycm9yX3Byb3BhZ2F0ZShlcnJwLCBsb2NhbF9lcnIpOw0KPj4g
+ICAgICAgICAgcmV0dXJuOw0KPj4gICAgICB9DQo+PiAgICAgIC4uLg0KPj4gfQ0KPj4NCj4+IE5v
+dywgaWYgd2UgY2FsbCBmMiB3aXRoICZlcnJvcl9hYm9ydCBhbmQgZjIgZmFpbHMsIHRoZSBzdGFj
+ayBpbiByZXN1bHRpbmcNCj4+IGNyYXNoIGR1bXAgd2lsbCBwb2ludCB0byBlcnJvcl9wcm9wYWdh
+dGUsIG5vdCB0byB0aGUgZmFpbHVyZSBwb2ludCBpbiBmMiwNCj4+IHdoaWNoIGNvbXBsaWNhdGVz
+IGRlYnVnZ2luZy4NCj4+DQo+PiBTbywgd2Ugc2hvdWxkIG5ldmVyIHdyYXAgZXJyb3JfYWJvcnQg
+YnkgbG9jYWxfZXJyLg0KPiANCj4gTGlrZXdpc2UuDQoNCkFuZCBoZXJlOg0KDQp2b2lkIGYxKGVy
+cnApIHsNCiAgICAgRVJSUF9BVVRPX1BST1BBR0FURSgpOw0KICAgICAuLi4NCiAgICAgZjIoZXJy
+cCk7DQogICAgIGlmICgqZXJycCkgew0KICAgICAgICAgcmV0dXJuOw0KICAgICB9DQogICAgIC4u
+Lg0KDQotIGlmIGVycnAgd2FzIE5VTEwsIGl0IGlzIHdyYXBwZWQsIHNvIGRlcmVmZXJlbmNpbmcg
+ZXJycCBpcyBzYWZlLiBPbiByZXR1cm4sDQogICBsb2NhbCBlcnJvciBpcyBhdXRvbWF0aWNhbGx5
+IHByb3BhZ2F0ZWQgdG8gb3JpZ2luYWwgb25lLg0KDQo+IA0KPj4NCj4+ID09PQ0KPj4NCj4+IE91
+ciBzb2x1dGlvbjoNCj4+DQo+PiAtIEZpeGVzIFsxLl0sIGFkZGluZyBpbnZvY2F0aW9uIG9mIG5l
+dyBtYWNybyBpbnRvIGZ1bmN0aW9ucyB3aXRoIGVycm9yX2FwcGVuX2hpbnQvZXJyb3JfcHJlcGVu
+ZCwNCj4+ICAgICBOZXcgbWFjcm8gd2lsbCB3cmFwIGVycm9yX2ZhdGFsLg0KPj4gLSBGaXhlcyBb
+Mi5dLCBieSBzd2l0Y2hpbmcgZnJvbSBoYW5kLXdyaXR0ZW4gbG9jYWxfZXJyIHRvIHNtYXJ0IG1h
+Y3JvLCB3aGljaCBuZXZlcg0KPj4gICAgIHdyYXBzIGVycm9yX2Fib3J0Lg0KPj4gLSBIYW5kbGVz
+IFszLl0sIGJ5IHN3aXRjaGluZyB0byBtYWNybywgd2hpY2ggaXMgbGVzcyBjb2RlDQo+PiAtIEFk
+ZGl0aW9uYWxseSwgbWFjcm8gZG9lc24ndCB3cmFwIG5vcm1hbCBub24temVybyBlcnJwLCB0byBh
+dm9pZCBleHRyYSBwcm9wYWdhdGlvbnMNCj4+ICAgICAoaW4gZmFjdCwgZXJyb3JfcHJvcGFnYXRl
+IGlzIGNhbGxlZCwgYnV0IHJldHVybnMgaW1tZWRpYXRlbHkgb24gZmlyc3QgaWYgKCFsb2NhbF9l
+cnIpKQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
 
