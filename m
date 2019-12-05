@@ -2,82 +2,85 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 148ABC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 13:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0340C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 13:54:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1AC5224F8
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 13:53:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95369224F8
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 13:54:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6lfOMjX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1AC5224F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HV66kXuS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95369224F8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icrZ5-0004Mk-BX
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 08:53:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49249)
+	id 1icrZx-00052p-HQ
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 08:54:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1icrMB-0007qE-Qt
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:39:49 -0500
+ (envelope-from <armbru@redhat.com>) id 1icrLh-0007hn-PX
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:39:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1icrM9-0004hw-Tf
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:39:47 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45925)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1icrM7-0004eN-Vf
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:39:45 -0500
-Received: by mail-wr1-x443.google.com with SMTP id j42so3593249wrj.12
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 05:39:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=BdM0n/nQk6kktthI0wibTMVkn3bLWQjeBHeZaBMxe54=;
- b=V6lfOMjXtDDiHW69bKLM/3jMarICVRMJ5Y3mwBUML7I1RtTSu9KlC9awps4pvV/5mk
- Ogq4fyEHz+t+alfHfne4b99HxKLgv1LV+e0z37XpbBLn/58YnW9jf7ZNzX+zAqTqxHRj
- SWwFCWbxg41mG7dyQtb/1u9HoehNmCOSRBunjLK12ZrhQ7pgNOBZ8fMZrnQ8isme67ad
- z8PuIBA/F2cX0fUSsV8wo3RybPoqyuXHxwlG5xtMF9oGPWERdduGzEcK3FmAefnsmDk3
- Prk9IFHE4pOkvkWt/CiNUo03ISmmCSlUdS0llkSpyIopfZVoB84cMr8SQYpBultMUA2b
- y28A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=BdM0n/nQk6kktthI0wibTMVkn3bLWQjeBHeZaBMxe54=;
- b=cKNunHIbzbTKyGuV4uhZJ2kQvTNLWUapChBcIRlfJbqbehextAZYdxeGaNOZfGdIyX
- sQBfddQjzhAEsUyhPBMWuu0fHfOjqopGFxNt9EEq1jjZSwerbRYMXbOUTnDhyHwdbRaN
- AAThi6QxWNC6LtQoQxhU5gJy6I9PkmUjuf+yByKIeZhRZq/yO3XmpPnI4JP/KQ6SJpWh
- 2Z8BhX3WR13wp2DJf+TNfwXeyIGdrUgGoCnQ52mMvONDQJYouqAaU/qQI0TvbJyAas3I
- meL9pnCWbocoPfjcvfpl5+JIfAVE4Jzgu9qQilycD12Z6IuFXCqzTRpbkUffTcV0Xvym
- PRiw==
-X-Gm-Message-State: APjAAAWYQZKGkf6x7ysvrR8ooXOrtLvi326HKfEKpVBrjOzcQ82I3Za7
- COjtGYzcMy8D20drYudkG97QvKRJM59XSBdw7pBB1uJN
-X-Google-Smtp-Source: APXvYqx3h9RZNhghYxPymHSo3lnSHB2yCaBb6UGmfrNzdH4GyaZFgxOT1wA2ZSDS+GlQe3G11Ca97pAYEHgC2vZl6F8=
-X-Received: by 2002:a5d:6350:: with SMTP id b16mr10431340wrw.132.1575553176950; 
- Thu, 05 Dec 2019 05:39:36 -0800 (PST)
+ (envelope-from <armbru@redhat.com>) id 1icrLe-0004S5-Qc
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:39:16 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29659
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1icrLd-0004Pq-3h
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:39:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575553150;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hnhb/x6YaZwfbYwlyRlda7171y0HPcU5qK2g5bnRUHs=;
+ b=HV66kXuStetuAOJKDAWC5J25aq+52xIA7o9LJKwmjZYRVw6H80MmvmIgnBqPueQZ/u6qFZ
+ z/0cXKIZFJBuTmnvKCAqULunXONc6vmcpbVxpy5mGnh/8G0NsAeL2klQXKcSe8cC3rJyA8
+ mY/KRgMIkamjdIu4Qgj/o3A/P22H8H0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-In8rOFh3PGWTvk4no7Xklw-1; Thu, 05 Dec 2019 07:37:20 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 247F5100;
+ Thu,  5 Dec 2019 12:37:14 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 59B435C1B5;
+ Thu,  5 Dec 2019 12:36:42 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id BB0531138606; Thu,  5 Dec 2019 13:36:40 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [RFC v5 024/126] error: auto propagated local_err
+References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ <20191011160552.22907-25-vsementsov@virtuozzo.com>
+ <87muc8p24w.fsf@dusky.pond.sub.org>
+ <55393c08-5bda-8042-1a95-f350b3781d99@virtuozzo.com>
+Date: Thu, 05 Dec 2019 13:36:40 +0100
+In-Reply-To: <55393c08-5bda-8042-1a95-f350b3781d99@virtuozzo.com> (Vladimir
+ Sementsov-Ogievskiy's message of "Thu, 5 Dec 2019 09:38:49 +0000")
+Message-ID: <87d0d3c5k7.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-References: <20191125051722.15523-1-chanmickyyun@gmail.com>
-In-Reply-To: <20191125051722.15523-1-chanmickyyun@gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 5 Dec 2019 17:39:24 +0400
-Message-ID: <CAJ+F1CL-h3KrObUyKzGBjVra9EZPZFyK-WbW7=Co1Pn9YbypWA@mail.gmail.com>
-Subject: Re: [PATCH v7] Implement backend program convention command for
- vhost-user-blk
-To: "Micky Yun Chan(michiboo)" <chanmickyyun@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: In8rOFh3PGWTvk4no7Xklw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,258 +92,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Jeff Cody <codyprime@gmail.com>,
+ Jan Kiszka <jan.kiszka@siemens.com>, Alberto Garcia <berto@igalia.com>,
+ Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>, Halil Pasic <pasic@linux.ibm.com>,
+ =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Anthony Green <green@moxielogic.com>, Laurent Vivier <lvivier@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>, Chris Wulff <crwulff@gmail.com>,
+ Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Walle <michael@walle.cc>,
+ "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "sheepdog@lists.wpkg.org" <sheepdog@lists.wpkg.org>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Palmer Dabbelt <palmer@sifive.com>, Eric Farman <farman@linux.ibm.com>,
+ Max Filippov <jcmvbkbc@gmail.com>, Hannes Reinecke <hare@suse.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, Liu Yuan <namei.unix@gmail.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ Amit Shah <amit@kernel.org>, Stefan Weil <sw@weilnetz.de>,
+ Greg Kurz <groug@kaod.org>, Yuval Shaia <yuval.shaia@oracle.com>,
+ "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>,
+ =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Stafford Horne <shorne@gmail.com>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <pburton@wavecomp.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>, Paul Durrant <paul@xen.org>,
+ Jason Wang <jasowang@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Guan Xuetao <gxt@mprc.pku.edu.cn>, Ari Sundholm <ari@tuxera.com>,
+ Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, Joel Stanley <joel@jms.id.au>,
+ Jason Dillaman <dillaman@redhat.com>, Antony Pavlov <antonynpavlov@gmail.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+ "integration@gluster.org" <integration@gluster.org>,
+ Laszlo Ersek <lersek@redhat.com>, "Richard W.M. Jones" <rjones@redhat.com>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, Max Reitz <mreitz@redhat.com>,
+ Denis Lunev <den@virtuozzo.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Vincenzo Maffione <v.maffione@gmail.com>, Marek Vasut <marex@denx.de>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Tony Krowiak <akrowiak@linux.ibm.com>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Jean-Christophe Dubois <jcd@tribudubois.net>,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
 
-On Mon, Nov 25, 2019 at 9:17 AM Micky Yun Chan(michiboo)
-<chanmickyyun@gmail.com> wrote:
+> 04.12.2019 17:59, Markus Armbruster wrote:
+>> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>>=20
+>>> Here is introduced ERRP_AUTO_PROPAGATE macro, to be used at start of
+>>> functions with errp OUT parameter.
+>>>
+>>> It has three goals:
+>>>
+>>> 1. Fix issue with error_fatal & error_prepend/error_append_hint: user
+>>> can't see this additional information, because exit() happens in
+>>> error_setg earlier than information is added. [Reported by Greg Kurz]
+>>>
+>>> 2. Fix issue with error_abort & error_propagate: when we wrap
+>>> error_abort by local_err+error_propagate, resulting coredump will
+>>> refer to error_propagate and not to the place where error happened.
+>>=20
+>> I get what you mean, but I have plenty of context.
+>>=20
+>>> (the macro itself doesn't fix the issue, but it allows to [3.] drop all
+>>> local_err+error_propagate pattern, which will definitely fix the issue)
+>>=20
+>> The parenthesis is not part of the goal.
+>>=20
+>>> [Reported by Kevin Wolf]
+>>>
+>>> 3. Drop local_err+error_propagate pattern, which is used to workaround
+>>> void functions with errp parameter, when caller wants to know resulting
+>>> status. (Note: actually these functions could be merely updated to
+>>> return int error code).
+>>>
+>>> To achieve these goals, we need to add invocation of the macro at start
+>>> of functions, which needs error_prepend/error_append_hint (1.); add
+>>> invocation of the macro at start of functions which do
+>>> local_err+error_propagate scenario the check errors, drop local errors
+>>> from them and just use *errp instead (2., 3.).
+>>=20
+>> The paragraph talks about two cases: 1. and 2.+3.=20
 >
-> From: Micky Yun Chan <chanmickyyun@gmail.com>
+> Hmm, I don't think so.. 1. and 2. are issues. 3. is a refactoring.. We ju=
+st
+> fix achieve 2 and 3 by one action.
 >
-> This patch is to add standard commands defined in docs/interop/vhost-user=
-.rst
-> For vhost-user-* program
+>> Makes me think we
+>> want two paragraphs, each illustrated with an example.
+>>=20
+>> What about you provide the examples, and then I try to polish the prose?
 >
-> Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
-> ---
->  contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
->  docs/interop/vhost-user.json            |  31 +++++++
->  docs/interop/vhost-user.rst             |  15 ++++
->  3 files changed, 110 insertions(+), 44 deletions(-)
+> 1: error_fatal problem
 >
-> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user=
--blk/vhost-user-blk.c
-> index ae61034656..6fd91c7e99 100644
-> --- a/contrib/vhost-user-blk/vhost-user-blk.c
-> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
-> @@ -576,70 +576,90 @@ vub_new(char *blk_file)
->      return vdev_blk;
->  }
+> Assume the following code flow:
 >
-> +static int opt_fdnum =3D -1;
-> +static char *opt_socket_path;
-> +static char *opt_blk_file;
-> +static gboolean opt_print_caps;
-> +static gboolean opt_read_only;
-> +
-> +static GOptionEntry entries[] =3D {
-> +    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-> +      "Print capabilities", NULL },
-> +    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-> +      "Use inherited fd socket", "FDNUM" },
-> +    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-> +      "Use UNIX socket path", "PATH" },
-> +    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
-> +     "block device or file path", "PATH"},
-> +    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
-> +      "Enable read-only", NULL }
-> +};
-> +
->  int main(int argc, char **argv)
->  {
-> -    int opt;
-> -    char *unix_socket =3D NULL;
-> -    char *blk_file =3D NULL;
-> -    bool enable_ro =3D false;
->      int lsock =3D -1, csock =3D -1;
->      VubDev *vdev_blk =3D NULL;
-> +    GError *error =3D NULL;
-> +    GOptionContext *context;
+> int f1(errp) {
+>     ...
+>     ret =3D f2(errp);
+>     if (ret < 0) {
+>        error_append_hint(errp, "very useful hint");
+>        return ret;
+>     }
+>     ...
+> }
 >
-> -    while ((opt =3D getopt(argc, argv, "b:rs:h")) !=3D -1) {
-> -        switch (opt) {
-> -        case 'b':
-> -            blk_file =3D g_strdup(optarg);
-> -            break;
-> -        case 's':
-> -            unix_socket =3D g_strdup(optarg);
-> -            break;
-> -        case 'r':
-> -            enable_ro =3D true;
-> -            break;
-> -        case 'h':
-> -        default:
-> -            printf("Usage: %s [ -b block device or file, -s UNIX domain =
-socket"
-> -                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
-> -            return 0;
-> +    context =3D g_option_context_new(NULL);
-> +    g_option_context_add_main_entries(context, entries, NULL);
-> +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-> +        g_printerr("Option parsing failed: %s\n", error->message);
-> +        exit(EXIT_FAILURE);
-> +    }
-> +    if (opt_print_caps) {
-> +        g_print("{\n");
-> +        g_print("  \"type\": \"block\",\n");
-> +        g_print("  \"features\": [\n");
-> +        g_print("    \"read-only\",\n");
-> +        g_print("    \"blk-file\"\n");
-> +        g_print("  ]\n");
-> +        g_print("}\n");
-> +        exit(EXIT_SUCCESS);
-> +    }
-> +
-> +    if (!opt_blk_file) {
-> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
-> +    if (opt_socket_path) {
-> +        lsock =3D unix_sock_new(opt_socket_path);
-> +        if (lsock < 0) {
-> +            exit(EXIT_FAILURE);
->          }
-> +    } else if (opt_fdnum < 0) {
-> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-> +        exit(EXIT_FAILURE);
-> +    } else {
-> +        lsock =3D opt_fdnum;
->      }
+> Now, if we call f1 with &error_fatal argument and f2 fails, the program
+> will exit immediately inside f2, when setting the errp. User will not
+> see the hint.
 >
-> -    if (!unix_socket || !blk_file) {
-> -        printf("Usage: %s [ -b block device or file, -s UNIX domain sock=
-et"
-> -               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
-> -        return -1;
-> -    }
-> -
-> -    lsock =3D unix_sock_new(unix_socket);
-> -    if (lsock < 0) {
-> -        goto err;
-> -    }
-> -
-> -    csock =3D accept(lsock, (void *)0, (void *)0);
-> +    csock =3D accept(lsock, NULL, NULL);
->      if (csock < 0) {
-> -        fprintf(stderr, "Accept error %s\n", strerror(errno));
-> -        goto err;
-> +        g_printerr("Accept error %s\n", strerror(errno));
-> +        exit(EXIT_FAILURE);
->      }
->
-> -    vdev_blk =3D vub_new(blk_file);
-> +    vdev_blk =3D vub_new(opt_blk_file);
->      if (!vdev_blk) {
-> -        goto err;
-> +        exit(EXIT_FAILURE);
->      }
-> -    if (enable_ro) {
-> +    if (opt_read_only) {
->          vdev_blk->enable_ro =3D true;
->      }
->
->      if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
->                    vub_panic_cb, &vub_iface)) {
-> -        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
-> -        goto err;
-> +        g_printerr("Failed to initialize libvhost-user-glib\n");
-> +        exit(EXIT_FAILURE);
->      }
->
->      g_main_loop_run(vdev_blk->loop);
-> -
-> +    g_main_loop_unref(vdev_blk->loop);
-> +    g_option_context_free(context);
->      vug_deinit(&vdev_blk->parent);
-> -
-> -err:
->      vub_free(vdev_blk);
->      if (csock >=3D 0) {
->          close(csock);
-> @@ -647,8 +667,8 @@ err:
->      if (lsock >=3D 0) {
->          close(lsock);
->      }
-> -    g_free(unix_socket);
-> -    g_free(blk_file);
-> +    g_free(opt_socket_path);
-> +    g_free(opt_blk_file);
->
->      return 0;
->  }
-> diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-> index da6aaf51c8..ce0ef74db5 100644
-> --- a/docs/interop/vhost-user.json
-> +++ b/docs/interop/vhost-user.json
-> @@ -54,6 +54,37 @@
->    ]
->  }
->
-> +##
-> +# @VHostUserBackendBlockFeature:
-> +#
-> +# List of vhost user "block" features.
-> +#
-> +# @read-only: The --read-only command line option is supported.
-> +# @blk-file: The --blk-file command line option is supported.
-> +#
-> +# Since: 5.0
-> +##
-> +{
-> +  'enum': 'VHostUserBackendBlockFeature',
-> +  'data': [ 'read-only', 'blk-file' ]
-> +}
-> +
-> +##
-> +# @VHostUserBackendCapabilitiesBlock:
-> +#
-> +# Capabilities reported by vhost user "block" backends
-> +#
-> +# @features: list of supported features.
-> +#
-> +# Since: 5.0
-> +##
-> +{
-> +  'struct': 'VHostUserBackendCapabilitiesBlock',
-> +  'data': {
-> +    'features': [ 'VHostUserBackendBlockFeature' ]
-> +  }
-> +}
-> +
->  ##
->  # @VHostUserBackendInputFeature:
->  #
-> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
-> index 7827b710aa..2f0910d515 100644
-> --- a/docs/interop/vhost-user.rst
-> +++ b/docs/interop/vhost-user.rst
-> @@ -1376,3 +1376,18 @@ Command line options:
->    Enable virgl rendering support.
->
->    (optional)
-> +
-> +vhost-user-blk
-> +--------------
-> +
-> +Command line options:
-> +
-> +--blk-file=3DPATH
-> +
-> +  Specify block device or file path.
+> So, in this case we should use local_err.
 
-Would it make sense to make it optional? Since you have a
-corresponding "blk-file" feature already, there is not much to change
-but the doc.
+How does this example look after the transformation?
 
-> +
-> +--read-only
-> +
-> +  Enable read-only.
-> +
-> +  (optional)
-> --
-> 2.21.0
+> 2: error_abort problem
 >
+> Now, consider functions without return value. We normally use local_err
+> variable to catch failures:
 >
+> void f1(errp) {
+>     Error *local_err =3D NULL;
+>     ...
+>     f2(&local_err);
+>     if (local_err) {
+>         error_propagate(errp, local_err);
+>         return;
+>     }
+>     ...
+> }
+>
+> Now, if we call f2 with &error_abort and f2 fails, the stack in resulting
+> crash dump will point to error_propagate, not to the failure point in f2,
+> which complicates debugging.
+>
+> So, we should never wrap error_abort by local_err.
 
-Looks good to me otherwise
+Likewise.
 
---=20
-Marc-Andr=C3=A9 Lureau
+>
+> =3D=3D=3D
+>
+> Our solution:
+>
+> - Fixes [1.], adding invocation of new macro into functions with error_ap=
+pen_hint/error_prepend,
+>    New macro will wrap error_fatal.
+> - Fixes [2.], by switching from hand-written local_err to smart macro, wh=
+ich never
+>    wraps error_abort.
+> - Handles [3.], by switching to macro, which is less code
+> - Additionally, macro doesn't wrap normal non-zero errp, to avoid extra p=
+ropagations
+>    (in fact, error_propagate is called, but returns immediately on first =
+if (!local_err))
+
 
