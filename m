@@ -2,93 +2,120 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E270EC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 06:42:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF42C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 08:02:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB9C222525
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 06:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 337C1206D9
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 08:02:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TElHbqcr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB9C222525
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="tfj1ysUW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 337C1206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ickpz-00088M-QJ
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 01:42:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37152)
+	id 1icm5N-0006wV-7j
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 03:02:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1ickoz-0007gp-08
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 01:41:06 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1icm3X-0006PH-I4
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 03:00:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1ickow-0001uy-OS
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 01:41:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23497
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1ickow-0001qM-GT
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 01:41:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575528061;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sYykLxeRNbyvgufiP1yhUOFKxyTi8jvErN3SBjZGj7c=;
- b=TElHbqcrjtbyLdVE3oLfqGC+PPMCSpAFbW0VSvnL4nY4P00iaTC4gTq4W5znzBV5vzGaSJ
- H2x2Cz9Mu1YinAzqaq6mttnSUqVwIY5RqseW+9w41sMLuVoxBYX6aBUG/uvWX9XgvEdw0P
- ZIQ+ES683ZQteLCbAgxhWtNuO6CZNHU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-UHfvQywvMD2vF9lOKjgKrA-1; Thu, 05 Dec 2019 01:40:18 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CED88017DF;
- Thu,  5 Dec 2019 06:40:15 +0000 (UTC)
-Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A54B600F2;
- Thu,  5 Dec 2019 06:40:13 +0000 (UTC)
-Date: Wed, 4 Dec 2019 23:40:12 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-Message-ID: <20191204234012.25f6159e@x1.home>
-In-Reply-To: <77538a77-91ec-8a60-1f87-3fc18bd1cfe4@nvidia.com>
-References: <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
- <20191112153020.71406c44@x1.home>
- <324ce4f8-d655-ee37-036c-fc9ef9045bef@nvidia.com>
- <20191113130705.32c6b663@x1.home>
- <7f74a2a1-ba1c-9d4c-dc5e-343ecdd7d6d6@nvidia.com>
- <20191114140625.213e8a99@x1.home>
- <20191126005739.GA31144@joy-OptiPlex-7040>
- <20191203110412.055c38df@x1.home>
- <cce08ca5-79df-2839-16cd-15723b995c07@nvidia.com>
- <20191204113457.16c1316d@x1.home>
- <20191205012835.GB31791@joy-OptiPlex-7040>
- <fc7e8cf2-d5e6-0fe6-7466-7bdde55ff7d6@nvidia.com>
- <20191204225637.382db416@x1.home>
- <77538a77-91ec-8a60-1f87-3fc18bd1cfe4@nvidia.com>
-Organization: Red Hat
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1icm3R-0000ZM-G7
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 03:00:11 -0500
+Received: from mail-eopbgr10090.outbound.protection.outlook.com
+ ([40.107.1.90]:51841 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1icm3N-0000PI-J5
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 03:00:03 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QERd7JfWYch7RjtgMAtYSxaHoKi5mhVB0YnQDtbOJHN8BCk1/9LzZdc7V2BVOk7ZLY+oWgwWPN4EvZ3Ff72NxweaLx1DSfSJZ/wU1XxYPUYT2eYHZtj+O/RRvcm+HBF35po/4KvIyVZxqOnzp6ochmcxyUEIz37S4GuiLpS8AenEz93xl4aR5RPyOvFvU6pVeoHH10SwR7zPfdYinMrI+uUv7FVoLfoEnjJzDTflqufaCHXljIhaKN1YufXQW1OWuyDDOaOrWBPPDfSerIZwjPdvTLpJx/ANQL81nXZ9hCTqLWoat1TBU2z7PFNiaoCqB7L0HCdBweXF5lfWeCX4Jw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zC6045CZhpS0W2UuhP/NDta5E3Hr6agU3XjJMUz/vuU=;
+ b=bJGjPJ/YcXb5nZMLFnoTsWSa+uZwRy5oLvO5iqFlWj3Zw2C0biiF62sLRfx4zeVbr0XzJQbgsoqvGejFQIdsvPICQ/a4/FiCRjgnqKZFpOQcex9uSawQhgWPReUjUDXsZploYHHjkxFaV8EEMXSvopY7j74+fcFAhVphFJIdWMsreR7A1qk6RNIZv0Ol8Mmt227U08GMetGgd5vuErl19whJV2vebi53TUC/qpZPzGp4LvnE7y9hXvz4FqYrybJ9fhL2R20aBNM65CEtAxpNCN/QCYRqYSQP5BJsM8RIYyWEwYxG85zd4WIqi0RBv/Z+Av38wVbVp+4TgYcyYKhTHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zC6045CZhpS0W2UuhP/NDta5E3Hr6agU3XjJMUz/vuU=;
+ b=tfj1ysUW8hf/eTsYsp8qxn2PG6FfCyAaVTYoMPC+3ho9rKO5WHdxoQFzlbLLMwNfavkKzDjnuJDeTBujzXavw5hqNBYFaMPjyybB1qcgLtyKPRnA3OuJnIgYfoxc/3pAJ7oKeqmdgkUv48rdIfFx2ZNCbaMIcCwaBupAA2GTRhM=
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
+ AM0PR08MB5235.eurprd08.prod.outlook.com (10.255.31.12) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2516.12; Thu, 5 Dec 2019 07:59:54 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::893d:bf37:4b98:12]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::893d:bf37:4b98:12%4]) with mapi id 15.20.2516.014; Thu, 5 Dec 2019
+ 07:59:54 +0000
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] virtio: fix IO request length in virtio SCSI/block
+ #PSBM-78839
+Thread-Topic: [PATCH] virtio: fix IO request length in virtio SCSI/block
+ #PSBM-78839
+Thread-Index: AQHVhasj1hrogEqe4kWfxpGYRrvmHqdoxjuAgADscwCAFHZTAIAd3+QAgA9vtoA=
+Date: Thu, 5 Dec 2019 07:59:54 +0000
+Message-ID: <f0a0906b-0a76-fe28-331c-f08e00014cef@virtuozzo.com>
+References: <20191018115547.19299-1-dplotnikov@virtuozzo.com>
+ <20191023172005-mutt-send-email-mst@kernel.org>
+ <42b80a75-6ab4-5123-bbf5-eee21c2841ac@virtuozzo.com>
+ <20191106065816-mutt-send-email-mst@kernel.org>
+ <c39d90bc-92c0-6b53-b7a6-992ec69bb0b0@virtuozzo.com>
+In-Reply-To: <c39d90bc-92c0-6b53-b7a6-992ec69bb0b0@virtuozzo.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0165.eurprd05.prod.outlook.com
+ (2603:10a6:3:f8::13) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [46.63.224.51]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 02ac38b1-197c-4662-942d-08d779591ccf
+x-ms-traffictypediagnostic: AM0PR08MB5235:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR08MB5235D6E773CF93F7712B4933CF5C0@AM0PR08MB5235.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-forefront-prvs: 02426D11FE
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(39850400004)(396003)(366004)(136003)(346002)(199004)(189003)(71200400001)(8936002)(71190400001)(31696002)(14454004)(86362001)(5660300002)(478600001)(54906003)(14444005)(6916009)(7736002)(2906002)(6436002)(6486002)(52116002)(53546011)(6246003)(66476007)(76176011)(66556008)(25786009)(2616005)(4326008)(11346002)(99286004)(6506007)(81166006)(31686004)(3846002)(66946007)(186003)(6116002)(316002)(26005)(6512007)(66446008)(8676002)(36756003)(81156014)(64756008)(305945005)(229853002)(102836004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB5235;
+ H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: GSShuuevkVTE598LYJtACsNjbLSxHtyxNQW570NN3UOWDvoVGH1N52Z0dwwbd7u5QQZWo1c7/QTryAE1AxWL31zR4FE8Hs/PaQgZa24supd2HMlOOB1cJOA3LYDuGOe8utw58zMwkBfZw9jwWv+7bHwbV/KtsqTxn4A4dUO05g8S6nW/BFjpt0MnAeQSwhIsyYtSFrnv/qpeQB/GSYaUJ6bZ3idZR3d8tcXxLIsmeJqsj77W3EoIqYHbuD8b1n107MowKeYN9UzDQGsmkYOtpwd7j/WBrsxTJa8oCY3l1948XFOIS6tyiqiXSFATVgnbreT7P4HIT+DHafPD+ntKSJUmKtwzA5AEfoS0nK8F0XrMDnr6vJSRHYuDe0nkfTtyfn+fffuLJLfYttfaZ7s6x99Y6O4p6cBxliYw3k+THnRV/mP9l5B40p2Yppn9iOLV
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <3949B4E2A7351E45B8710819497AE9D4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: UHfvQywvMD2vF9lOKjgKrA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02ac38b1-197c-4662-942d-08d779591ccf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2019 07:59:54.1139 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ufcwplNJxex1jP/RgmqLcv4g+4GyjIz4BNxosLc3rVsh0StBdH0HFIdO6gUdTnRe/j4UDVpizHxnE+bWQIrvD1vNe5P0kGPnoakhZQhdMLA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB5235
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.1.90
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,174 +127,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>,
- Yan Zhao <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>, Roman Kagan <rkagan@virtuozzo.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "kraxel@redhat.com" <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 5 Dec 2019 11:49:00 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
-
-> On 12/5/2019 11:26 AM, Alex Williamson wrote:
-> > On Thu, 5 Dec 2019 11:12:23 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> On 12/5/2019 6:58 AM, Yan Zhao wrote:  
-> >>> On Thu, Dec 05, 2019 at 02:34:57AM +0800, Alex Williamson wrote:  
-> >>>> On Wed, 4 Dec 2019 23:40:25 +0530
-> >>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >>>>     
-> >>>>> On 12/3/2019 11:34 PM, Alex Williamson wrote:  
-> >>>>>> On Mon, 25 Nov 2019 19:57:39 -0500
-> >>>>>> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> >>>>>>         
-> >>>>>>> On Fri, Nov 15, 2019 at 05:06:25AM +0800, Alex Williamson wrote:  
-> >>>>>>>> On Fri, 15 Nov 2019 00:26:07 +0530
-> >>>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >>>>>>>>            
-> >>>>>>>>> On 11/14/2019 1:37 AM, Alex Williamson wrote:  
-> >>>>>>>>>> On Thu, 14 Nov 2019 01:07:21 +0530
-> >>>>>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >>>>>>>>>>              
-> >>>>>>>>>>> On 11/13/2019 4:00 AM, Alex Williamson wrote:  
-> >>>>>>>>>>>> On Tue, 12 Nov 2019 22:33:37 +0530
-> >>>>>>>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >>>>>>>>>>>>                 
-> >>>>>>>>>>>>> All pages pinned by vendor driver through vfio_pin_pages API should be
-> >>>>>>>>>>>>> considered as dirty during migration. IOMMU container maintains a list of
-> >>>>>>>>>>>>> all such pinned pages. Added an ioctl defination to get bitmap of such  
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> definition
-> >>>>>>>>>>>>                 
-> >>>>>>>>>>>>> pinned pages for requested IO virtual address range.  
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> Additionally, all mapped pages are considered dirty when physically
-> >>>>>>>>>>>> mapped through to an IOMMU, modulo we discussed devices opting in to
-> >>>>>>>>>>>> per page pinning to indicate finer granularity with a TBD mechanism to
-> >>>>>>>>>>>> figure out if any non-opt-in devices remain.
-> >>>>>>>>>>>>                 
-> >>>>>>>>>>>
-> >>>>>>>>>>> You mean, in case of device direct assignment (device pass through)?  
-> >>>>>>>>>>
-> >>>>>>>>>> Yes, or IOMMU backed mdevs.  If vfio_dmas in the container are fully
-> >>>>>>>>>> pinned and mapped, then the correct dirty page set is all mapped pages.
-> >>>>>>>>>> We discussed using the vpfn list as a mechanism for vendor drivers to
-> >>>>>>>>>> reduce their migration footprint, but we also discussed that we would
-> >>>>>>>>>> need a way to determine that all participants in the container have
-> >>>>>>>>>> explicitly pinned their working pages or else we must consider the
-> >>>>>>>>>> entire potential working set as dirty.
-> >>>>>>>>>>              
-> >>>>>>>>>
-> >>>>>>>>> How can vendor driver tell this capability to iommu module? Any suggestions?  
-> >>>>>>>>
-> >>>>>>>> I think it does so by pinning pages.  Is it acceptable that if the
-> >>>>>>>> vendor driver pins any pages, then from that point forward we consider
-> >>>>>>>> the IOMMU group dirty page scope to be limited to pinned pages?  There  
-> >>>>>>> we should also be aware of that dirty page scope is pinned pages + unpinned pages,
-> >>>>>>> which means ever since a page is pinned, it should be regarded as dirty
-> >>>>>>> no matter whether it's unpinned later. only after log_sync is called and
-> >>>>>>> dirty info retrieved, its dirty state should be cleared.  
-> >>>>>>
-> >>>>>> Yes, good point.  We can't just remove a vpfn when a page is unpinned
-> >>>>>> or else we'd lose information that the page potentially had been
-> >>>>>> dirtied while it was pinned.  Maybe that vpfn needs to move to a dirty
-> >>>>>> list and both the currently pinned vpfns and the dirty vpfns are walked
-> >>>>>> on a log_sync.  The dirty vpfns list would be cleared after a log_sync.
-> >>>>>> The container would need to know that dirty tracking is enabled and
-> >>>>>> only manage the dirty vpfns list when necessary.  Thanks,
-> >>>>>>         
-> >>>>>
-> >>>>> If page is unpinned, then that page is available in free page pool for
-> >>>>> others to use, then how can we say that unpinned page has valid data?
-> >>>>>
-> >>>>> If suppose, one driver A unpins a page and when driver B of some other
-> >>>>> device gets that page and he pins it, uses it, and then unpins it, then
-> >>>>> how can we say that page has valid data for driver A?
-> >>>>>
-> >>>>> Can you give one example where unpinned page data is considered reliable
-> >>>>> and valid?  
-> >>>>
-> >>>> We can only pin pages that the user has already allocated* and mapped
-> >>>> through the vfio DMA API.  The pinning of the page simply locks the
-> >>>> page for the vendor driver to access it and unpinning that page only
-> >>>> indicates that access is complete.  Pages are not freed when a vendor
-> >>>> driver unpins them, they still exist and at this point we're now
-> >>>> assuming the device dirtied the page while it was pinned.  Thanks,
-> >>>>
-> >>>> Alex
-> >>>>
-> >>>> * An exception here is that the page might be demand allocated and the
-> >>>>     act of pinning the page could actually allocate the backing page for
-> >>>>     the user if they have not faulted the page to trigger that allocation
-> >>>>     previously.  That page remains mapped for the user's virtual address
-> >>>>     space even after the unpinning though.
-> >>>>     
-> >>>
-> >>> Yes, I can give an example in GVT.
-> >>> when a gem_object is allocated in guest, before submitting it to guest
-> >>> vGPU, gfx cmds in its ring buffer need to be pinned into GGTT to get a
-> >>> global graphics address for hardware access. At that time, we shadow
-> >>> those cmds and pin pages through vfio pin_pages(), and submit the shadow
-> >>> gem_object to physial hardware.
-> >>> After guest driver thinks the submitted gem_object has completed hardware
-> >>> DMA, it unnpinnd those pinned GGTT graphics memory addresses. Then in
-> >>> host, we unpin the shadow pages through vfio unpin_pages.
-> >>> But, at this point, guest driver is still free to access the gem_object
-> >>> through vCPUs, and guest user space is probably still mapping an object
-> >>> into the gem_object in guest driver.
-> >>> So, missing the dirty page tracking for unpinned pages would cause
-> >>> data inconsitency.
-> >>>      
-> >>
-> >> If pages are accessed by guest through vCPUs, then RAM module in QEMU
-> >> will take care of tracking those pages as dirty.
-> >>
-> >> All unpinned pages might not be used, so tracking all unpinned pages
-> >> during VM or application life time would also lead to tracking lots of
-> >> stale pages, even though they are not being used. Increasing number of
-> >> not needed pages could also lead to increasing migration data leading
-> >> increase in migration downtime.  
-> > 
-> > We can't rely on the vCPU also dirtying a page, the overhead is
-> > unavoidable.  It doesn't matter if the migration is fast if it's
-> > incorrect.  We only need to track unpinned dirty pages while the
-> > migration is active and the tracking is flushed on each log_sync
-> > callback.  Thanks,
-> >   
-> 
->  From Yan's comment, pasted below, I thought, need to track all unpinned 
-> pages during application or VM's lifetime.
-> 
->  > There we should also be aware of that dirty page scope is pinned   
-> pages  > + unpinned pages, which means ever since a page is pinned, it 
-> should
->  > be regarded as dirty no matter whether it's unpinned later.  
-> 
-> But if its about tracking pages which are unpinned "while the migration 
-> is active", then that set would be less, will do this change.
-
-When we first start a pre-copy, all RAM (including anything previously
-pinned) is dirty anyway.  I believe the log_sync callback is only
-intended to report pages dirtied since the migration was started, or
-since the last log_sync callback.  We then assume that currently pinned
-pages are constantly dirty and previously pinned pages are dirty until
-we've reported them through log_sync.  Thanks,
-
-Alex
-
+UGluZyENCg0KT24gMjUuMTEuMjAxOSAxMjoxNiwgRGVuaXMgUGxvdG5pa292IHdyb3RlOg0KPg0K
+Pg0KPiBPbiAwNi4xMS4yMDE5IDE1OjAzLCBNaWNoYWVsIFMuIFRzaXJraW4gd3JvdGU6DQo+PiBP
+biBUaHUsIE9jdCAyNCwgMjAxOSBhdCAxMTozNDozNEFNICswMDAwLCBEZW5pcyBMdW5ldiB3cm90
+ZToNCj4+PiBPbiAxMC8yNC8xOSAxMjoyOCBBTSwgTWljaGFlbCBTLiBUc2lya2luIHdyb3RlOg0K
+Pj4+PiBPbiBGcmksIE9jdCAxOCwgMjAxOSBhdCAwMjo1NTo0N1BNICswMzAwLCBEZW5pcyBQbG90
+bmlrb3Ygd3JvdGU6DQo+Pj4+PiBGcm9tOiAiRGVuaXMgVi4gTHVuZXYiIDxkZW5Ab3BlbnZ6Lm9y
+Zz4NCj4+Pj4+DQo+Pj4+PiBMaW51eCBndWVzdHMgc3VibWl0IElPIHJlcXVlc3RzIG5vIGxvbmdl
+ciB0aGFuIFBBR0VfU0laRSAqIG1heF9zZWcNCj4+Pj4+IGZpZWxkIHJlcG9ydGVkIGJ5IFNDU0kg
+Y29udHJvbGVyLiBUaHVzIHR5cGljYWwgc2VxdWVudGlhbCByZWFkIHdpdGgNCj4+Pj4+IDEgTUIg
+c2l6ZSByZXN1bHRzIGluIHRoZSBmb2xsb3dpbmcgcGF0dGVybiBvZiB0aGUgSU8gZnJvbSB0aGUg
+Z3Vlc3Q6DQo+Pj4+PiDCoMKgIDgsMTbCoMKgIDHCoMKgwqAgMTU3NTTCoMKgwqDCoCAyLjc2NjA5
+NTEyMsKgIDIwNzHCoCBEwqDCoCBSIDIwOTUxMDQgKyAxMDA4IFtkZF0NCj4+Pj4+IMKgwqAgOCwx
+NsKgwqAgMcKgwqDCoCAxNTc1NcKgwqDCoMKgIDIuNzY2MTA4Nzg1wqAgMjA3McKgIETCoMKgIFIg
+MjA5NjExMiArIDEwMDggW2RkXQ0KPj4+Pj4gwqDCoCA4LDE2wqDCoCAxwqDCoMKgIDE1NzU2wqDC
+oMKgwqAgMi43NjYxMTM0ODbCoCAyMDcxwqAgRMKgwqAgUiAyMDk3MTIwICsgMzIgW2RkXQ0KPj4+
+Pj4gwqDCoCA4LDE2wqDCoCAxwqDCoMKgIDE1NzU3wqDCoMKgwqAgMi43Njc2Njg5NjHCoMKgwqDC
+oCAwwqAgQ8KgwqAgUiAyMDk1MTA0ICsgMTAwOCBbMF0NCj4+Pj4+IMKgwqAgOCwxNsKgwqAgMcKg
+wqDCoCAxNTc1OMKgwqDCoMKgIDIuNzY4NTM0MzE1wqDCoMKgwqAgMMKgIEPCoMKgIFIgMjA5NjEx
+MiArIDEwMDggWzBdDQo+Pj4+PiDCoMKgIDgsMTbCoMKgIDHCoMKgwqAgMTU3NTnCoMKgwqDCoCAy
+Ljc2ODUzOTc4MsKgwqDCoMKgIDDCoCBDwqDCoCBSIDIwOTcxMjAgKyAzMiBbMF0NCj4+Pj4+IFRo
+ZSBJTyB3YXMgZ2VuZXJhdGVkIGJ5DQo+Pj4+PiDCoMKgIGRkIGlmPS9kZXYvc2RhIG9mPS9kZXYv
+bnVsbCBicz0xMDI0IGlmbGFnPWRpcmVjdA0KPj4+Pj4NCj4+Pj4+IFRoaXMgZWZmZWN0aXZlbHkg
+bWVhbnMgdGhhdCBvbiByb3RhdGlvbmFsIGRpc2tzIHdlIHdpbGwgb2JzZXJ2ZSAzIA0KPj4+Pj4g
+SU9QUw0KPj4+Pj4gZm9yIGVhY2ggMiBNQnMgcHJvY2Vzc2VkLiBUaGlzIGRlZmluaXRlbHkgbmVn
+YXRpdmVseSBhZmZlY3RzIGJvdGgNCj4+Pj4+IGd1ZXN0IGFuZCBob3N0IElPIHBlcmZvcm1hbmNl
+Lg0KPj4+Pj4NCj4+Pj4+IFRoZSBjdXJlIGlzIHJlbGF0aXZlbHkgc2ltcGxlIC0gd2Ugc2hvdWxk
+IHJlcG9ydCBsZW5ndGh5IA0KPj4+Pj4gc2NhdHRlci1nYXRoZXINCj4+Pj4+IGFiaWxpdHkgb2Yg
+dGhlIFNDU0kgY29udHJvbGxlci4gRm9ydHVuYXRlbHkgdGhlIHNpdHVhdGlvbiBoZXJlIGlzIA0K
+Pj4+Pj4gdmVyeQ0KPj4+Pj4gZ29vZC4gVmlydElPIHRyYW5zcG9ydCBsYXllciBjYW4gYWNjb21v
+ZGF0ZSAxMDI0IGl0ZW1zIGluIG9uZSByZXF1ZXN0DQo+Pj4+PiB3aGlsZSB3ZSBhcmUgdXNpbmcg
+b25seSAxMjguIFRoaXMgc2l0dWF0aW9uIGlzIHByZXNlbnQgc2luY2UgYWxtb3N0DQo+Pj4+PiB2
+ZXJ5IGJlZ2lubmluZy4gMiBpdGVtcyBhcmUgZGVkaWNhdGVkIGZvciByZXF1ZXN0IG1ldGFkYXRh
+IHRodXMgd2UNCj4+Pj4+IHNob3VsZCBwdWJsaXNoIFZJUlRRVUVVRV9NQVhfU0laRSAtIDIgYXMg
+bWF4X3NlZy4NCj4+Pj4+DQo+Pj4+PiBUaGUgZm9sbG93aW5nIHBhdHRlcm4gaXMgb2JzZXJ2ZWQg
+YWZ0ZXIgdGhlIHBhdGNoOg0KPj4+Pj4gwqDCoCA4LDE2wqDCoCAxwqDCoMKgwqAgOTkyMcKgwqDC
+oMKgIDIuNjYyNzIxMzQwwqAgMjA2M8KgIETCoMKgIFIgMjA5NTEwNCArIDEwMjQgW2RkXQ0KPj4+
+Pj4gwqDCoCA4LDE2wqDCoCAxwqDCoMKgwqAgOTkyMsKgwqDCoMKgIDIuNjYyNzM3NTg1wqAgMjA2
+M8KgIETCoMKgIFIgMjA5NjEyOCArIDEwMjQgW2RkXQ0KPj4+Pj4gwqDCoCA4LDE2wqDCoCAxwqDC
+oMKgwqAgOTkyM8KgwqDCoMKgIDIuNjY1MTg4MTY3wqDCoMKgwqAgMMKgIEPCoMKgIFIgMjA5NTEw
+NCArIDEwMjQgWzBdDQo+Pj4+PiDCoMKgIDgsMTbCoMKgIDHCoMKgwqDCoCA5OTI0wqDCoMKgwqAg
+Mi42NjUxOTg3NzfCoMKgwqDCoCAwwqAgQ8KgwqAgUiAyMDk2MTI4ICsgMTAyNCBbMF0NCj4+Pj4+
+IHdoaWNoIGlzIG11Y2ggYmV0dGVyLg0KPj4+Pj4NCj4+Pj4+IFRoZSBkYXJrIHNpZGUgb2YgdGhp
+cyBwYXRjaCBpcyB0aGF0IHdlIGFyZSB0d2Vha2luZyBndWVzdCB2aXNpYmxlDQo+Pj4+PiBwYXJh
+bWV0ZXIsIHRob3VnaCB0aGlzIHNob3VsZCBiZSByZWxhdGl2ZWx5IHNhZmUgYXMgYWJvdmUgdHJh
+bnNwb3J0DQo+Pj4+PiBsYXllciBzdXBwb3J0IGlzIHByZXNlbnQgaW4gUUVNVS9ob3N0IExpbnV4
+IGZvciBhIHZlcnkgbG9uZyB0aW1lLg0KPj4+Pj4gVGhlIHBhdGNoIGFkZHMgY29uZmlndXJhYmxl
+IHByb3BlcnR5IGZvciBWaXJ0SU8gU0NTSSB3aXRoIGEgbmV3IA0KPj4+Pj4gZGVmYXVsdA0KPj4+
+Pj4gYW5kIGhhcmRjb2RlIG9wdGlvbiBmb3IgVmlydEJsb2NrIHdoaWNoIGRvZXMgbm90IHByb3Zp
+ZGUgZ29vZA0KPj4+Pj4gY29uZmlndXJhYmxlIGZyYW1ld29yay4NCj4+Pj4+DQo+Pj4+PiBVbmZv
+cnR1bmF0ZWx5IHRoZSBjb21taXQgY2FuIG5vdCBiZSBhcHBsaWVkIGFzIGlzLiBGb3IgdGhlIHJl
+YWwgDQo+Pj4+PiBjdXJlIHdlDQo+Pj4+PiBuZWVkIGd1ZXN0IHRvIGJlIGZpeGVkIHRvIGFjY29t
+b2RhdGUgdGhhdCBxdWV1ZSBsZW5ndGgsIHdoaWNoIGlzIGRvbmUNCj4+Pj4+IG9ubHkgaW4gdGhl
+IGxhdGVzdCA0LjE0IGtlcm5lbC4gVGh1cyB3ZSBhcmUgZ29pbmcgdG8gZXhwb3NlIHRoZSANCj4+
+Pj4+IHByb3BlcnR5DQo+Pj4+PiBhbmQgdHdlYWsgaXQgb24gbWFjaGluZSB0eXBlIGxldmVsLg0K
+Pj4+Pj4NCj4+Pj4+IFRoZSBwcm9ibGVtIHdpdGggdGhlIG9sZCBrZXJuZWxzIGlzIHRoYXQgdGhl
+eSBoYXZlDQo+Pj4+PiBtYXhfc2VnbWVudHMgPD0gdmlydHF1ZXVlX3NpemUgcmVzdHJpY3Rpb24g
+d2hpY2ggY2F1c2UgdGhlIGd1ZXN0DQo+Pj4+PiBjcmFzaGluZyBpbiB0aGUgY2FzZSBvZiB2aW9s
+YXRpb24uDQo+Pj4+IFRoaXMgaXNuJ3QganVzdCBpbiB0aGUgZ3Vlc3RzOiB2aXJ0aW8gc3BlYyBh
+bHNvIHNlZW1zIHRvIGltcGx5IHRoaXMsDQo+Pj4+IG9yIGF0IGxlYXN0IGJlIHZhZ3VlIG9uIHRo
+aXMgcG9pbnQuDQo+Pj4+DQo+Pj4+IFNvIEkgdGhpbmsgaXQnbGwgbmVlZCBhIGZlYXR1cmUgYml0
+Lg0KPj4+PiBEb2luZyB0aGF0IGluIGEgc2FmZSB3YXkgd2lsbCBhbHNvIGFsbG93IGJlaW5nIGNv
+bXBhdGlibGUgd2l0aCBvbGQgDQo+Pj4+IGd1ZXN0cy4NCj4+Pj4NCj4+Pj4gVGhlIG9ubHkgZG93
+bnNpZGUgaXMgaXQncyBhIGJpdCBtb3JlIHdvcmsgYXMgd2UgbmVlZCB0bw0KPj4+PiBzcGVjIHRo
+aXMgb3V0IGFuZCBhZGQgZ3Vlc3Qgc3VwcG9ydC4NCj4+Pj4NCj4+Pj4+IFRvIGZpeCB0aGUgY2Fz
+ZSBkZXNjcmliZWQgYWJvdmUgaW4gdGhlIG9sZCBrZXJuZWxzIHdlIGNhbiBpbmNyZWFzZQ0KPj4+
+Pj4gdmlydHF1ZXVlX3NpemUgdG8gMjU2IGFuZCBtYXhfc2VnbWVudHMgdG8gMjU0LiBUaGUgcGl0
+ZmFsbCBoZXJlIGlzDQo+Pj4+PiB0aGF0IHNlYWJpb3MgYWxsb3dzIHRoZSB2aXJ0cXVldWVfc2l6
+ZS1zIDwgMTI4LCBob3dldmVyLCB0aGUgc2VhYmlvcw0KPj4+Pj4gcGF0Y2ggZXh0ZW5kaW5nIHRo
+YXQgdmFsdWUgdG8gMjU2IGlzIHBlbmRpbmcuDQo+Pj4+IEFuZCB0aGUgZml4IGhlcmUgaXMganVz
+dCB0byBsaW1pdCBsYXJnZSB2cSBzaXplIHRvIHZpcnRpbyAxLjAuDQo+Pj4+IEluIHRoYXQgbW9k
+ZSBpdCdzIGZpbmUgSSB0aGluazoNCj4+Pj4NCj4+Pj4NCj4+Pj4gwqDCoMKgIC8qIGNoZWNrIGlm
+IHRoZSBxdWV1ZSBpcyBhdmFpbGFibGUgKi8NCj4+Pj4gwqDCoMKgIGlmICh2cC0+dXNlX21vZGVy
+bikgew0KPj4+PiDCoMKgwqDCoMKgwqDCoCBudW0gPSB2cF9yZWFkKCZ2cC0+Y29tbW9uLCB2aXJ0
+aW9fcGNpX2NvbW1vbl9jZmcsIHF1ZXVlX3NpemUpOw0KPj4+PiDCoMKgwqDCoMKgwqDCoCBpZiAo
+bnVtID4gTUFYX1FVRVVFX05VTSkgew0KPj4+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZwX3dy
+aXRlKCZ2cC0+Y29tbW9uLCB2aXJ0aW9fcGNpX2NvbW1vbl9jZmcsIHF1ZXVlX3NpemUsDQo+Pj4+
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgTUFYX1FVRVVFX05VTSk7
+DQo+Pj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbnVtID0gdnBfcmVhZCgmdnAtPmNvbW1vbiwg
+dmlydGlvX3BjaV9jb21tb25fY2ZnLCANCj4+Pj4gcXVldWVfc2l6ZSk7DQo+Pj4+IMKgwqDCoMKg
+wqDCoMKgIH0NCj4+Pj4gwqDCoMKgIH0gZWxzZSB7DQo+Pj4+IMKgwqDCoMKgwqDCoMKgIG51bSA9
+IHZwX3JlYWQoJnZwLT5sZWdhY3ksIHZpcnRpb19wY2lfbGVnYWN5LCBxdWV1ZV9udW0pOw0KPj4+
+PiDCoMKgwqAgfQ0KPiBUaGUgc2FtZSBzZWFiaW9zIHNuaXBwZXQswqAgYnV0IG1vcmUgZGV0YWls
+ZWQ6DQo+DQo+IHZwX2ZpbmRfdnEoKQ0KPiB7DQo+IMKgwqAgLi4uDQo+IMKgwqAgLyogY2hlY2sg
+aWYgdGhlIHF1ZXVlIGlzIGF2YWlsYWJsZSAqLw0KPiDCoMKgIGlmICh2cC0+dXNlX21vZGVybikg
+ew0KPiDCoMKgwqDCoMKgwqAgbnVtID0gdnBfcmVhZCgmdnAtPmNvbW1vbiwgdmlydGlvX3BjaV9j
+b21tb25fY2ZnLCBxdWV1ZV9zaXplKTsNCj4gwqDCoMKgwqDCoMKgIGlmIChudW0gPiBNQVhfUVVF
+VUVfTlVNKSB7DQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZwX3dyaXRlKCZ2cC0+Y29tbW9uLCB2
+aXJ0aW9fcGNpX2NvbW1vbl9jZmcsIHF1ZXVlX3NpemUsDQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIE1BWF9RVUVVRV9OVU0pOw0KPiDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCBudW0gPSB2cF9yZWFkKCZ2cC0+Y29tbW9uLCB2aXJ0aW9fcGNpX2NvbW1vbl9jZmcsIHF1ZXVl
+X3NpemUpOw0KPiDCoMKgwqDCoMKgwqAgfQ0KPiDCoMKgIH0gZWxzZSB7DQo+IMKgwqDCoMKgwqDC
+oCBudW0gPSB2cF9yZWFkKCZ2cC0+bGVnYWN5LCB2aXJ0aW9fcGNpX2xlZ2FjeSwgcXVldWVfbnVt
+KTsNCj4gwqDCoCB9DQo+IMKgwqAgaWYgKCFudW0pIHsNCj4gwqDCoMKgwqDCoMKgIGRwcmludGYo
+MSwgIkVSUk9SOiBxdWV1ZSBzaXplIGlzIDBcbiIpOw0KPiDCoMKgwqDCoMKgwqAgZ290byBmYWls
+Ow0KPiDCoMKgIH0NCj4gwqDCoCBpZiAobnVtID4gTUFYX1FVRVVFX05VTSkgew0KPiDCoMKgwqDC
+oMKgwqAgZHByaW50ZigxLCAiRVJST1I6IHF1ZXVlIHNpemUgJWQgPiAlZFxuIiwgbnVtLCBNQVhf
+UVVFVUVfTlVNKTsNCj4gwqDCoMKgwqDCoMKgIGdvdG8gZmFpbDsNCj4gwqDCoCB9DQo+IC4uLg0K
+PiB9DQo+DQo+IEl0IHR1cm5lZCBvdXQgdGhhdCB0aGUgcHJvYmxlbSBpcyBoZXJlLCBidXQgbm90
+IGJlY2F1c2Ugb2YgdGhlIHNlYWJpb3MgDQo+IGNvZGUuDQo+IFRoZSB2aXJ0cXVldWUgc2l6ZSBp
+cyB3cml0dGVuIGFuZCB0aGVuIGluY29ycmVjdCB2YWx1ZSBpcyByZS1yZWFkLg0KPiBUaGFua3Mg
+dG8gUm9tYW4gS2FnYW4gKHJrYWdhbkB2aXJ0dW96em8uY29tKSBmb3IgaW52ZXN0aWdhdGluZyB0
+aGUgDQo+IHJvb3QgY2F1c2Ugb2YgdGhlIHByb2JsZW0uDQo+DQo+IEFzIHRoZSBjb2RlIHN0YXRl
+cywgZm9yIHRoZSBtb2Rlcm4gZGV2aWNlcywgc2VhYmlvcyByZWFkcyB0aGUgcXVldWUgDQo+IHNp
+emUgYW5kIGlmIGl0J3MNCj4gZ3JlYXRlciB0aGFuIHNlYWJpb3MgY2FuIHN1cHBvcnQsIHJlZHVj
+ZSB0aGUgcXVldWUgc2l6ZSB0byB0aGUgbWF4IA0KPiBzZWFiaW9zIHN1cHBvcnRlZCB2YWx1ZS4N
+Cj4NCj4gVGhpcyBkb2Vzbid0IHdvcmsuDQo+DQo+IFRoZSByZWFzb24gaXMgdGhhdCB0aGUgc2l6
+ZSBpcyByZWFkIGZyb20gdGhlIHZpcnRpbyBkZXZpY2UsDQo+DQo+IHZpcnRpb19wY2lfY29tbW9u
+X3JlYWQoKQ0KPiB7DQo+IMKgwqDCoCAuLi4NCj4gwqDCoMKgIGNhc2UgVklSVElPX1BDSV9DT01N
+T05fUV9TSVpFOg0KPiDCoMKgwqDCoMKgwqDCoCB2YWwgPSB2aXJ0aW9fcXVldWVfZ2V0X251bSh2
+ZGV2LCB2ZGV2LT5xdWV1ZV9zZWwpOw0KPiDCoMKgwqDCoMKgwqDCoCBicmVhazsNCj4gwqDCoMKg
+IC4uLg0KPiB9DQo+DQo+IGJ1dCBpcyB3cml0dGVuIHRvIHRoZSBwcm94eQ0KPg0KPiB2aXJ0aW9f
+cGNpX2NvbW1vbl93cml0ZSgpDQo+IHsNCj4gwqDCoMKgIC4uLg0KPiDCoMKgwqAgY2FzZSBWSVJU
+SU9fUENJX0NPTU1PTl9RX1NJWkU6DQo+IMKgwqDCoMKgwqDCoMKgIHByb3h5LT52cXNbdmRldi0+
+cXVldWVfc2VsXS5udW0gPSB2YWw7DQo+IMKgwqDCoMKgwqDCoMKgIGJyZWFrOw0KPiDCoMKgIC4u
+Lg0KPiB9Lg0KPg0KPiBUaGUgZmluYWwgc3RhZ2Ugb2YgdGhlIHNpemUgc2V0dGluZyBpcyBwcm9w
+YWdhdGVkIGl0IGZyb20gdGhlIHByb3h5IHRvIA0KPiB0aGUgZGV2aWNlIG9uIHZpcnRxdWV1ZSBl
+bmFibGluZzoNCj4NCj4gdmlydGlvX2NwaV9jb21tb25fd3JpdGUoKQ0KPiB7DQo+IMKgwqDCoCAu
+Li4NCj4gwqDCoMKgIGNhc2UgVklSVElPX1BDSV9DT01NT05fUV9FTkFCTEU6DQo+IMKgwqDCoMKg
+wqDCoMKgIHZpcnRpb19xdWV1ZV9zZXRfbnVtKHZkZXYsIHZkZXYtPnF1ZXVlX3NlbCwNCj4gcHJv
+eHktPnZxc1t2ZGV2LT5xdWV1ZV9zZWxdLm51bSk7DQo+IMKgwqDCoMKgwqDCoMKgIHZpcnRpb19x
+dWV1ZV9zZXRfcmluZ3ModmRldiwgdmRldi0+cXVldWVfc2VsLA0KPiAoKHVpbnQ2NF90KXByb3h5
+LT52cXNbdmRldi0+cXVldWVfc2VsXS5kZXNjWzFdKSA8PCAzMiB8DQo+IMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHByb3h5LT52cXNbdmRldi0+cXVldWVfc2Vs
+XS5kZXNjWzBdLA0KPiAoKHVpbnQ2NF90KXByb3h5LT52cXNbdmRldi0+cXVldWVfc2VsXS5hdmFp
+bFsxXSkgPDwgMzIgfA0KPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBwcm94eS0+dnFzW3ZkZXYtPnF1ZXVlX3NlbF0uYXZhaWxbMF0sDQo+ICgodWludDY0X3Qp
+cHJveHktPnZxc1t2ZGV2LT5xdWV1ZV9zZWxdLnVzZWRbMV0pIDw8IDMyIHwNCj4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcHJveHktPnZxc1t2ZGV2LT5xdWV1
+ZV9zZWxdLnVzZWRbMF0pOw0KPiDCoMKgwqDCoMKgwqDCoCBwcm94eS0+dnFzW3ZkZXYtPnF1ZXVl
+X3NlbF0uZW5hYmxlZCA9IDE7DQo+IMKgwqDCoMKgwqDCoMKgIGJyZWFrOw0KPiDCoMKgwqAgLi4u
+DQo+IH0uDQo+DQo+IFNvIHdlIGhhdmUgdGhlIGZvbGxvd2luZyB3b3JrZmxvdzoNCj4gc3VwcG9z
+ZSB0aGUgZGV2aWNlIGhhcyB2aXJ0cXVldWUgc2l6ZSA9IDI1NiBhbmQgc2VhYmlvcyBNQVhfUVVF
+VUVfTlVNIA0KPiA9IDEyOC4NCj4gSW4gdGhhdCBjYXNlIHRoZSBzZWFiaW9zIHdvcmtzIGxpa2U6
+DQo+DQo+IDEuIGlmIHZwX21vZGVybiByZWFkIHRoZSBzaXplICgyNTYpDQo+IDIuIDI1NiA+IDEy
+OA0KPiAzLiB3cml0ZSB2aXJ0cXVldWUgc2l6ZSA9IDEyOA0KPiA0LiByZS1yZWFkIHZpcnRxdWV1
+ZSBzaXplID0gMjU2ICEhIQ0KPiA1LiBmYWlsIGJlY2F1c2Ugb2YgdGhlIGNoZWNrDQo+IMKgwqDC
+oCBpZiAobnVtID4gTUFYX1FVRVVFX05VTSkgew0KPiDCoMKgwqDCoMKgwqDCoCBkcHJpbnRmKDEs
+ICJFUlJPUjogcXVldWUgc2l6ZSAlZCA+ICVkXG4iLCBudW0sIE1BWF9RVUVVRV9OVU0pOw0KPiDC
+oMKgwqDCoMKgwqDCoCBnb3RvIGZhaWw7DQo+IMKgwqDCoCB9DQo+DQo+IFRvIGZpeCB0aGUgaXNz
+dWUsIHdlIG5lZWQgdG8gcmVhZCBhbmQgd3JpdGUgdGhlIHZpcnRxdWV1ZSBzaXplIGZyb20gDQo+
+IHRoZSBzYW1lIHBsYWNlLg0KPiBTaG91bGQgd2UgZG8gd2l0aCB0aGUgcHJveHk/DQo+IElzIHRo
+ZXJlIGFueSByZWFzb24gdG8gcmVhZCBmcm9tIHRoZSBkZXZpY2UgYW5kIHdyaXRlIHRvIHRoZSBw
+cm94eT8NCj4NCj4gRnVydGhlcm1vcmUsIHRoZSBzaXplIHNldHRpbmcgaGFzIGEgZmV3IGZsYXdz
+Og0KPg0KPiAxLiBUaGUgc2l6ZSBiZWluZyBzZXQgc2hvdWxkIGJlIGEgcG93ZXIgb2YgMg0KPiAy
+LiBUaGUgc2l6ZSBiZWluZyBzZXQgc2hvdWxkIGJlIGxlc3Mgb3IgZXF1YWwgdG8gdGhlIHZpcnRx
+dWV1ZSBzaXplIA0KPiAoYW5kIGJlIGdyZWF0ZXIgdGhhdCAyPykNCj4NCj4gRGVuaXMNCj4+PiB5
+b3UgbWVhbiB0byBwdXQgdGhlIGNvZGUgbGlrZSB0aGlzIGludG8gdmlydGlvX3BjaV9yZWFsaXpl
+KCkgaW5zaWRlIA0KPj4+IFFFTVU/DQo+Pj4NCj4+PiBJZiBubywgY2FuIHlvdSBwbHMgY2xhcmlm
+eSB3aGljaCBjb21wb25lbnQgc2hvdWxkIGJlIHRvdWNoZWQuDQo+Pj4NCj4+PiBEZW4NCj4+IEkg
+bWVhbjoNCj4+IMKgIC0gYWRkIGFuIEFQSSB0byBjaGFuZ2UgdGhlIGRlZmF1bHQgcXVldWUgc2l6
+ZQ0KPj4gwqAgLSBhZGQgYSB2YWxpZGF0ZSBmZWF0dXJlcyBjYWxsYmFjaywgaW4gdGhlcmUgY2hl
+Y2sgYW5kIGZvciBtb2Rlcm4NCj4+IMKgwqDCoCBmbGFnIHNldCBpbiBmZWF0dXJlcyBpbmNyZWFz
+ZSB0aGUgcXVldWUgc2l6ZQ0KPj4NCj4+IG1heWJlIGFsbCB0aGlzIGlzIHRvbyBtdWNoIHdvcmss
+IHdlIGNvdWxkIGJsb2NrIHRoaXMNCj4+IGZvciB0cmFuc2l0aW9uYWwgZGV2aWNlcywgYnV0IHlv
+dXIgcGF0Y2ggZG9lcyBub3QgZG8gaXQsDQo+PiB5b3UgbmVlZCB0byBjaGVjayB0aGF0IGxlZ2Fj
+eSBpcyBlbmFibGVkIG5vdCB0aGF0IG1vZGVybg0KPj4gaXMgbm90IGRpc2FibGVkLg0KPj4NCj4+
+DQo+Pg0KPg0KDQo=
 
