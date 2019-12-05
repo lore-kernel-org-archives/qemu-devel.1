@@ -2,87 +2,100 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0144C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 04:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A6E7C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 04:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3E2F2073B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 04:53:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dcxx0tKE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3E2F2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D25C82077B
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 04:57:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25C82077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icj8f-0000et-Pr
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 23:53:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35128)
+	id 1icjCH-0003ce-0S
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 23:57:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42979)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pagupta@redhat.com>) id 1icj74-0008I4-U0
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 23:51:40 -0500
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1icjBW-0002vk-C1
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 23:56:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pagupta@redhat.com>) id 1icj71-0008Gp-L3
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 23:51:36 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21374
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pagupta@redhat.com>) id 1icj71-0008CU-7i
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 23:51:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575521493;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=v2TGSxXfagF9PFoCPDMKr6eUnTS+dRMKAXKrKn5s4m0=;
- b=Dcxx0tKEYJe+PGRMUUPGQr6IhXAltZOeWrS5cT6KDQYXHTudzxbn4Upz6D9rlu0HYnhzGG
- vjiA+nyAGhSPHD+YuTzTDz3R5sETR9cwNpotF5HuYtYtG1qTmisUk1Wz/pDfobLmFlY2JK
- gKmPgix/5Md8E0k4swAdF/hTDcJI96U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-0NRkW1yaMoWJMMVbgIKPkQ-1; Wed, 04 Dec 2019 23:51:32 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22D37DB61;
- Thu,  5 Dec 2019 04:51:31 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0094F5D6AE;
- Thu,  5 Dec 2019 04:51:30 +0000 (UTC)
-Received: from zmail21.collab.prod.int.phx2.redhat.com
- (zmail21.collab.prod.int.phx2.redhat.com [10.5.83.24])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id 968FC4EBC0;
- Thu,  5 Dec 2019 04:51:30 +0000 (UTC)
-Date: Wed, 4 Dec 2019 23:51:30 -0500 (EST)
-From: Pankaj Gupta <pagupta@redhat.com>
-To: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <1984104376.39119240.1575521490101.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1e063551-a1bd-f64d-fbac-548ec0dd905a@huawei.com>
-References: <1575444716-17632-1-git-send-email-pannengyuan@huawei.com>
- <606337023.38890965.1575448387620.JavaMail.zimbra@redhat.com>
- <1e063551-a1bd-f64d-fbac-548ec0dd905a@huawei.com>
-Subject: Re: [PATCH v2 1/3] virtio: add ability to delete vq through a pointer
+ (envelope-from <ganeshgr@linux.ibm.com>) id 1icjBU-0007P5-Ih
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 23:56:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57396)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
+ id 1icjBU-0007Kk-7m
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 23:56:12 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xB54qe4t122332
+ for <qemu-devel@nongnu.org>; Wed, 4 Dec 2019 23:56:10 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wpsayu60p-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 23:56:10 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
+ Thu, 5 Dec 2019 04:56:07 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 5 Dec 2019 04:56:03 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xB54u2j844892480
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 5 Dec 2019 04:56:02 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 7F57DA4062;
+ Thu,  5 Dec 2019 04:56:02 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 93895A405B;
+ Thu,  5 Dec 2019 04:55:59 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.80.105])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu,  5 Dec 2019 04:55:59 +0000 (GMT)
+Subject: Re: [PATCH v17 5/7] ppc: spapr: Handle "ibm,nmi-register" and
+ "ibm,nmi-interlock" RTAS calls
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20191024074307.22821-1-ganeshgr@linux.ibm.com>
+ <20191024074307.22821-6-ganeshgr@linux.ibm.com>
+ <20191119023932.GL5582@umbus.fritz.box>
+From: Ganesh <ganeshgr@linux.ibm.com>
+Date: Thu, 5 Dec 2019 10:25:58 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.1
 MIME-Version: 1.0
-X-Originating-IP: [10.67.116.147, 10.4.195.28]
-Thread-Topic: virtio: add ability to delete vq through a pointer
-Thread-Index: 7gkNVoO4EQjahQMg+mQNTYBZ1ceCLg==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 0NRkW1yaMoWJMMVbgIKPkQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20191119023932.GL5582@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19120504-0020-0000-0000-000003941DEE
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19120504-0021-0000-0000-000021EB4921
+Message-Id: <edc7a454-98dc-aac1-88cc-a5596ee34860@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-04_04:2019-12-04,2019-12-04 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0
+ mlxlogscore=999 phishscore=0 priorityscore=1501 spamscore=0
+ impostorscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 mlxscore=0
+ suspectscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1912050036
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,125 +107,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liyiting@huawei.com, kuhn chenqun <kuhn.chenqun@huawei.com>, mst@redhat.com,
- zhang zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org
+Cc: arawinda.p@gmail.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ paulus@ozlabs.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
->=20
-> On 2019/12/4 16:33, Pankaj Gupta wrote:
-> >=20
-> >> From: Pan Nengyuan <pannengyuan@huawei.com>
-> >>
-> >> Devices tend to maintain vq pointers, allow deleting them trough a vq
-> >> pointer.
-> >>
-> >> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> >> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> >> ---
-> >> Changes v2 to v1:
-> >> - add a new function virtio_delete_queue to cleanup vq through a vq
-> >> pointer
-> >> ---
-> >>  hw/virtio/virtio.c         | 16 +++++++++++-----
-> >>  include/hw/virtio/virtio.h |  2 ++
-> >>  2 files changed, 13 insertions(+), 5 deletions(-)
-> >>
-> >> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> >> index 04716b5..6de3cfd 100644
-> >> --- a/hw/virtio/virtio.c
-> >> +++ b/hw/virtio/virtio.c
-> >> @@ -2330,17 +2330,23 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev=
-,
-> >> int
-> >> queue_size,
-> >>      return &vdev->vq[i];
-> >>  }
-> >> =20
-> >> +void virtio_delete_queue(VirtQueue *vq)
-> >> +{
-> >> +    vq->vring.num =3D 0;
-> >> +    vq->vring.num_default =3D 0;
-> >> +    vq->handle_output =3D NULL;
-> >> +    vq->handle_aio_output =3D NULL;
-> >> +    g_free(vq->used_elems);
-> >> +    vq->used_elems =3D NULL;
-> >> +}
-> >> +
-> >>  void virtio_del_queue(VirtIODevice *vdev, int n)
-> >>  {
-> >>      if (n < 0 || n >=3D VIRTIO_QUEUE_MAX) {
-> >>          abort();
-> >>      }
-> >> =20
-> >> -    vdev->vq[n].vring.num =3D 0;
-> >> -    vdev->vq[n].vring.num_default =3D 0;
-> >> -    vdev->vq[n].handle_output =3D NULL;
-> >> -    vdev->vq[n].handle_aio_output =3D NULL;
-> >> -    g_free(vdev->vq[n].used_elems);
-> >> +    virtio_delete_queue(&vdev->vq[n]);
-> >>  }
-> >> =20
-> >>  static void virtio_set_isr(VirtIODevice *vdev, int value)
-> >> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> >> index c32a815..e18756d 100644
-> >> --- a/include/hw/virtio/virtio.h
-> >> +++ b/include/hw/virtio/virtio.h
-> >> @@ -183,6 +183,8 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, in=
-t
-> >> queue_size,
-> >> =20
-> >>  void virtio_del_queue(VirtIODevice *vdev, int n);
-> >> =20
-> >> +void virtio_delete_queue(VirtQueue *vq);
-> >> +
-> >>  void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
-> >>                      unsigned int len);
-> >>  void virtqueue_flush(VirtQueue *vq, unsigned int count);
-> >> --
-> >> 2.7.2.windows.1
-> >>
-> >>
-> > Overall it ooks good to me.
-> >=20
-> > Just one point: e.g in virtio_rng: "virtio_rng_device_unrealize" functi=
-on
-> > We are doing :     virtio_del_queue(vdev, 0);
-> >=20
-> > One can directly call "virtio_delete_queue". It can become confusing
-> > to call multiple functions for same purpose. Instead, Can we make
-> > "virtio_delete_queue" static inline?
-> >=20
-> yes, It will be a little confused, but I think it will have the same
-> problem if we make "virtio_delete_queue" static inline. We can directly
-> call it aslo. =EF=BC=88e.g virtio-serial-bus.c virtio-balloon.c).
->=20
-> How about replacing the function name to make it more clear (e.g
-> virtio_delete_queue -> virtio_queue_cleanup) ? It's too similar between
-> "virtio_del_queue" and "virtio_delete_queue".
-
-I am just thinking if we need these two separate functions.
-
-Yes, changing name of virtio_delete_queue -> virtio_queue_cleanup
-should be good enough.
-
-Thanks,
-Pankaj
-
->=20
-> > Other than that:
-> > Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
-> >=20
-> >>
-> >>
-> >=20
-> >=20
-> > .
-> >=20
->=20
->=20
->=20
+On 11/19/19 8:09 AM, David Gibson wrote:
+> On Thu, Oct 24, 2019 at 01:13:05PM +0530, Ganesh Goudar wrote:
+>> From: Aravinda Prasad <arawinda.p@gmail.com>
+>>
+>> This patch adds support in QEMU to handle "ibm,nmi-register"
+>> and "ibm,nmi-interlock" RTAS calls.
+>>
+>> The machine check notification address is saved when the
+>> OS issues "ibm,nmi-register" RTAS call.
+>>
+>> This patch also handles the case when multiple processors
+>> experience machine check at or about the same time by
+>> handling "ibm,nmi-interlock" call. In such cases, as per
+>> PAPR, subsequent processors serialize waiting for the first
+>> processor to issue the "ibm,nmi-interlock" call. The second
+>> processor that also received a machine check error waits
+>> till the first processor is done reading the error log.
+>> The first processor issues "ibm,nmi-interlock" call
+>> when the error log is consumed.
+>>
+>> [Move fwnmi registeration to .apply hook]
+> s/registeration/registration/
+Thanks
+>
+>> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
+>> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+>> ---
+>>   hw/ppc/spapr_caps.c    |  9 +++++--
+>>   hw/ppc/spapr_rtas.c    | 57 ++++++++++++++++++++++++++++++++++++++++++
+>>   include/hw/ppc/spapr.h |  5 +++-
+>>   3 files changed, 68 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
+>> index 976d709210..1675ebd45e 100644
+>> --- a/hw/ppc/spapr_caps.c
+>> +++ b/hw/ppc/spapr_caps.c
+>> @@ -509,9 +509,14 @@ static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
+>>            * of software injected faults like duplicate SLBs).
+>>            */
+>>           warn_report("Firmware Assisted Non-Maskable Interrupts not supported in TCG");
+> This logic still isn't quite right.  To start with the warn_report()
+> above possible wants to be more weakly worded.  With TCG, FWNMI won't
+> generally *do* anything, and there are some edge cases where the
+> behaviour is arguably incorrect.  However there's no reason we can't
+> make the RTAS calls work basically as expected and in almost all cases
+> things will behave correctly - at least according to the case where no
+> fwnmi events are delivered...
+ok
+>
+>> -    } else if (kvm_enabled() && (kvmppc_set_fwnmi() != 0)) {
+>> -        error_setg(errp,
+>> +    } else if (kvm_enabled()) {
+>> +        if (!kvmppc_set_fwnmi()) {
+>> +            /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
+>> +            spapr_fwnmi_register();
+> ..but here you only register the RTAS calls in the KVM case, which
+> breaks that.  If there really is a strong reason to do this, then the
+> warn_report() above should be error_setg() and fail the apply.
+>
+>> +        } else {
+>> +            error_setg(errp,
+>>   "Firmware Assisted Non-Maskable Interrupts not supported by KVM, try cap-fwnmi-mce=off");
+>> +        }
+>>       }
+>>   }
+>>   
+>> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+>> index 2c066a372d..0328b1f341 100644
+>> --- a/hw/ppc/spapr_rtas.c
+>> +++ b/hw/ppc/spapr_rtas.c
+>> @@ -400,6 +400,55 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
+>>       rtas_st(rets, 1, 100);
+>>   }
+>>   
+>> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
+>> +                                  SpaprMachineState *spapr,
+>> +                                  uint32_t token, uint32_t nargs,
+>> +                                  target_ulong args,
+>> +                                  uint32_t nret, target_ulong rets)
+>> +{
+>> +    hwaddr rtas_addr = spapr_get_rtas_addr();
+>> +
+>> +    if (!rtas_addr) {
+>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+>> +        return;
+>> +    }
+>> +
+>> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_OFF) {
+>> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
+> Actually, since you explicitly test for the cap being enabled here,
+> there's no reason not to *always* register this RTAS call.  Also this
+> test for the feature flag should go first, before delving into the
+> device tree for the RTAS address.
+Sure, will do
+>
+>> +        return;
+>> +    }
+>> +
+>> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
+>> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>> +}
+>> +
+>> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>> +                                   SpaprMachineState *spapr,
+>> +                                   uint32_t token, uint32_t nargs,
+>> +                                   target_ulong args,
+>> +                                   uint32_t nret, target_ulong rets)
+>> +{
+>> +    if (spapr->guest_machine_check_addr == -1) {
+>> +        /* NMI register not called */
+>> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>> +        return;
+>> +    }
+>> +
+>> +    if (spapr->mc_status != cpu->vcpu_id) {
+>> +        /* The vCPU that hit the NMI should invoke "ibm,nmi-interlock" */
+>> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
+>> +        return;
+>> +    }
+>> +
+>> +    /*
+>> +     * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
+>> +     * hence unset mc_status.
+>> +     */
+>> +    spapr->mc_status = -1;
+>> +    qemu_cond_signal(&spapr->mc_delivery_cond);
+>> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>> +}
+>> +
+>>   static struct rtas_call {
+>>       const char *name;
+>>       spapr_rtas_fn fn;
+>> @@ -503,6 +552,14 @@ hwaddr spapr_get_rtas_addr(void)
+>>       return (hwaddr)fdt32_to_cpu(*rtas_data);
+>>   }
+>>   
+>> +void spapr_fwnmi_register(void)
+>> +{
+>> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
+>> +                        rtas_ibm_nmi_register);
+>> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
+>> +                        rtas_ibm_nmi_interlock);
+>> +}
+>> +
+>>   static void core_rtas_register_types(void)
+>>   {
+>>       spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
+>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+>> index 4afa8d4d09..86f0fc8fdd 100644
+>> --- a/include/hw/ppc/spapr.h
+>> +++ b/include/hw/ppc/spapr.h
+>> @@ -653,8 +653,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
+>>   #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
+>>   #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
+>>   #define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0x2A)
+>> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2B)
+>> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2C)
+>>   
+>> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
+>> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2D)
+>>   
+>>   /* RTAS ibm,get-system-parameter token values */
+>>   #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
+>> @@ -907,4 +909,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
+>>   
+>>   void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
+>>   hwaddr spapr_get_rtas_addr(void);
+>> +void spapr_fwnmi_register(void);
+>>   #endif /* HW_SPAPR_H */
 
 
