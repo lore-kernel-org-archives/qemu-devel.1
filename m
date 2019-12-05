@@ -2,117 +2,83 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC64AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 09:41:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBC69C2D0BF
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 09:44:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 672142464D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 09:41:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97BD62464D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 09:44:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="QkLJr1FN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 672142464D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nee7Zrr0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97BD62464D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icndX-0005Pa-KK
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 04:41:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59142)
+	id 1icngo-0007kC-0K
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 04:44:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53072)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1icnbp-0004Wp-Gq
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:39:45 -0500
+ (envelope-from <chanmickyyun@gmail.com>) id 1icnfV-0006tW-AW
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:43:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1icnbk-0004YO-Na
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:39:41 -0500
-Received: from mail-eopbgr20093.outbound.protection.outlook.com
- ([40.107.2.93]:30222 helo=EUR02-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1icnb3-0003eC-1u; Thu, 05 Dec 2019 04:38:53 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lgbmmPUW15cSoetFA3ZWreoJdiz/el29JWIPI5TnrdMeYgIX+sd9bf/Z0pacAEOnB1Tv73bj/P97RyVIVJpfnCvXqXqzUzjFaJTvEUTw7ZrYka38MboYkwoTH+GmIGwqKUPNSna/tjXkEYcztZDGbr2P2JiXuWeKzcqXsz6HnQWwZB9ipAROkn1LX28j2a5P84z2ZNC7eIqsBd9HGKBN/E0tNmll6rNEn7KiqwdICyuZ3lidcgj+moP4HcsJ2S6TDyRPzVZ92IbocUS53ugSiMGCOgJxURTLNYH0hINNl9lcTAwI5i2/o23N1embqUJj6QbPoZ/GRlE/h09Si+PYNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ia1p69Vw40bANxIuoeSQaYjHJYbA1cGLl9V08AlorT0=;
- b=WloxzEqTOA/f84qsLhHHAWfUySOH3TbQFjj9G+L3uI1g/YScEiCurtcd0qSiw40nTE5gINNaJOF44xbQPY7tmpn0DDSUAlPLDb21I0yMG4A5DaChi+iFnMjmNK2dI50ihv6m8aA37nQjVqvQ4FrO5pViRsnt9QzQi/eIIkpdseIJjRJ3XwSGASTngdmiULfV84Y0oG4FSfXkTRN430N9xsIEdwX5N+SKgAShYu/7uTzcuuEEd8DF6vTE6S5jibEHCaVxn3TcBza9cb7TE8D0jWpWj6Idva/b9fUoSV7vOnmrCOL9lW31L1wHneXTzG1l9pI2oirOyMhuEsc+T1Y73Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ia1p69Vw40bANxIuoeSQaYjHJYbA1cGLl9V08AlorT0=;
- b=QkLJr1FNVx7QQXGiFeXr2rmDS+fqIScBFoDPV9YYNcF1JAVQp8PojDKXhry5FVGRDXxPRnTAbK9NcvuoqpkivztsKd4z0hRluXFSdpwcg3YM09jmG7I7q1S6aB1zU4zd+fcWWp1u0DGJj70k7p08wRVcj6h/CWweHP1c+P4vYJQ=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB5157.eurprd08.prod.outlook.com (10.255.121.222) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.18; Thu, 5 Dec 2019 09:38:49 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2516.014; Thu, 5 Dec 2019
- 09:38:49 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [RFC v5 024/126] error: auto propagated local_err
-Thread-Topic: [RFC v5 024/126] error: auto propagated local_err
-Thread-Index: AQHVgE3c5dwPNEl0z0OyUhbNfTU1EqeqZpzagAE4WYA=
-Date: Thu, 5 Dec 2019 09:38:49 +0000
-Message-ID: <55393c08-5bda-8042-1a95-f350b3781d99@virtuozzo.com>
-References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <20191011160552.22907-25-vsementsov@virtuozzo.com>
- <87muc8p24w.fsf@dusky.pond.sub.org>
-In-Reply-To: <87muc8p24w.fsf@dusky.pond.sub.org>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0902CA0025.eurprd09.prod.outlook.com
- (2603:10a6:7:15::14) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191205123843275
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 131543c0-e3c1-4dcb-969f-08d77966eea0
-x-ms-traffictypediagnostic: AM6PR08MB5157:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB5157CBF8A895803EB98637F6C15C0@AM6PR08MB5157.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 02426D11FE
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(39850400004)(346002)(376002)(396003)(199004)(189003)(76176011)(6512007)(66476007)(7406005)(4326008)(102836004)(229853002)(186003)(36756003)(81156014)(7336002)(86362001)(66946007)(31696002)(2906002)(305945005)(99286004)(6916009)(71200400001)(6486002)(7366002)(5660300002)(14444005)(54906003)(6506007)(52116002)(64756008)(71190400001)(316002)(26005)(66446008)(81166006)(14454004)(478600001)(66574012)(8936002)(66556008)(8676002)(11346002)(25786009)(2616005)(31686004)(7416002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5157;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: lirdQib7k4PxnfJ+vDdfG+yoKfBMvF4GgPpvWhMQUT0OjE0FJX8JlYokHPfK19o4lkhN46RptVNpTH46xCbgsUSlu4HW7pT/mTXWE2Ivjb9TIKQM60Xp9egWPpu7FgGhFnUeLR/J8tkz26wmrPQL8x5GVpHOMYohnrevfPycAfltZubsAwbYR0jeosKm2A+Tym+xLSHYzSr7tvscIcUV90NCxgBo/dRUjGmW3eSGBxxRsir01a87oMmdHFKEzdwFllCk8jWjeZPfimUz/GmQaQmWRGBYb8Zo4y69kssEyGDZr/swePPikZegCQopC+WbgPET2HP73mC61kKF2TxUn+k3k222tNl0x0IJkLm5k342mLCWw3DUMaSKszKtTtZeI3GY86fccMxEryDNtKlwkjIc8KsAOD4q+9sHMeP9AYYZa3xBoEgH/GTrzKqGdjbL
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CA36B47A479D8E409B4F581AE63E4D0A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <chanmickyyun@gmail.com>) id 1icnfQ-0004at-PE
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:43:27 -0500
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:44443)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chanmickyyun@gmail.com>)
+ id 1icnfQ-0004XI-BX
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 04:43:24 -0500
+Received: by mail-ed1-x542.google.com with SMTP id cm12so2034420edb.11
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 01:43:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=K0zxWYQKUtjfIO0WBRIWr4EH8CkelKvwfG9/UjT23TI=;
+ b=Nee7Zrr0WzGpLhMLynQcY0qgFKaLXExK60pJor7aJFUpNg7TN9EGyWG4wLU56CoCSk
+ WjlLf+rJToQHzWKvZJ8a8oKK/fr9let/c1BAdqbX9y0MVz9UMGX9cUOrc5mzYKcSsO3V
+ 1ihd+afEZULEXIozURsaW0G9MTWnTwclCOIhH9J6exWemPfsDTKE8Hy22w5bAFYnHyXD
+ jVuT1KJ3v7shGERzgHfK5kKQlicvEzSGoG3iKzRJcaap1iXRhhKs73iYrdKAu4Es66r2
+ jqUkklX3FPGLas5YKT15d9Rb86by7WTP6bTQk88YNWa01RYxH3DoUkcslgFlD0sW0nbj
+ lPfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=K0zxWYQKUtjfIO0WBRIWr4EH8CkelKvwfG9/UjT23TI=;
+ b=YDHSxRPUbFA6OHm4Y4hZRiU7poUFjdf64rlRtpW7HesbQpKax4VRWtHeQPNv8KDtug
+ DU/mWmRgGjBzECRTHp2CHv9frrFgzEaK60b9oN5UNbwBm75zI5XGDFHtRU+6C8f1MSpW
+ q8QSKesEh74Y98JFCxPK6SOu7qGSRHBD+DQMJWmLSQgz0o24bn21inoUlRup9h2KNwUp
+ Iva8j6TnFkDSbsVLj1oX+PlpgQfdrdq5jFEKe80HrL0/RlpaARyG17toUdMpldVhBGA0
+ jIwGUWkG8BPnAneVJ6jCoMuPn64AS23IL1gGN1y+pIaYYnpzxLBXTfi6dBgSsv54FtYy
+ hzBQ==
+X-Gm-Message-State: APjAAAU7XP5IBPGRXxwNKVt2SFsa1v8TqbMEaXDGRCoOk1sEWLSkM8RZ
+ axuyJjL6D4SzM5bCBgytlhe2jHdfrxQtYaLiJHdY7RCtH4A=
+X-Google-Smtp-Source: APXvYqxtpdckvbAb5Su6fO/EatLaPaSRvI0VeJrxVSoHpVadycYrKV08LhSWdcK0WVnb9DrQ9MehhrVmEjPcJlLlccM=
+X-Received: by 2002:a17:906:b253:: with SMTP id
+ ce19mr8243447ejb.61.1575539002346; 
+ Thu, 05 Dec 2019 01:43:22 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 131543c0-e3c1-4dcb-969f-08d77966eea0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2019 09:38:49.7229 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LhcoyOJ5bEmmfrdgXnTpGdf1tL/cuSq/l6GPmhOsKiruDJsofxQBmJwqa3tEeYao5TbvIg7vA83OWS2QxenMON/C14K7RKKqDOdqwBaJ4hw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5157
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.2.93
+References: <20191125051722.15523-1-chanmickyyun@gmail.com>
+ <CAPojyfO0DQhptkUix5j1hzcV4y4pwQ0ZRDQYsrrPBCvpEWL2NQ@mail.gmail.com>
+In-Reply-To: <CAPojyfO0DQhptkUix5j1hzcV4y4pwQ0ZRDQYsrrPBCvpEWL2NQ@mail.gmail.com>
+From: Micky C <chanmickyyun@gmail.com>
+Date: Thu, 5 Dec 2019 17:43:10 +0800
+Message-ID: <CAPojyfM+M+eftqT_Vvgpf1yYYL3MG=v6LhVSvg1vUkUYr17RBg@mail.gmail.com>
+Subject: Re: [PATCH v7] Implement backend program convention command for
+ vhost-user-blk
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="000000000000908ff30598f1c2c9"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,259 +90,540 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ronnie Sahlberg <ronniesahlberg@gmail.com>, Jeff Cody <codyprime@gmail.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Alberto Garcia <berto@igalia.com>,
- Hailiang Zhang <zhang.zhanghailiang@huawei.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Aleksandar Rikalo <arikalo@wavecomp.com>, Halil Pasic <pasic@linux.ibm.com>,
- =?utf-8?B?SGVydsOpIFBvdXNzaW5lYXU=?= <hpoussin@reactos.org>,
- Anthony Perard <anthony.perard@citrix.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Laszlo Ersek <lersek@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Kevin Wolf <kwolf@redhat.com>,
- Andrew Jeffery <andrew@aj.id.au>, Chris Wulff <crwulff@gmail.com>,
- Subbaraya Sundeep <sundeep.lkml@gmail.com>, Michael Walle <michael@walle.cc>,
- "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Igor Mammedov <imammedo@redhat.com>, Fam Zheng <fam@euphon.net>,
- Peter Maydell <peter.maydell@linaro.org>,
- "sheepdog@lists.wpkg.org" <sheepdog@lists.wpkg.org>,
- Matthew Rosato <mjrosato@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Palmer Dabbelt <palmer@sifive.com>, Eric Farman <farman@linux.ibm.com>,
- Max Filippov <jcmvbkbc@gmail.com>, Hannes Reinecke <hare@suse.com>,
- Stefano Stabellini <sstabellini@kernel.org>, "Gonglei
- \(Arei\)" <arei.gonglei@huawei.com>, Liu Yuan <namei.unix@gmail.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Amit Shah <amit@kernel.org>, Stefan Weil <sw@weilnetz.de>,
- Greg Kurz <groug@kaod.org>, Yuval Shaia <yuval.shaia@oracle.com>,
- "qemu-s390x@nongnu.org" <qemu-s390x@nongnu.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- Peter Chubb <peter.chubb@nicta.com.au>,
- =?utf-8?B?Q8OpZHJpYyBMZSBHb2F0ZXI=?= <clg@kaod.org>,
- Stafford Horne <shorne@gmail.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Paul Burton <pburton@wavecomp.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Paul Durrant <paul@xen.org>,
- Anthony Green <green@moxielogic.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar
- E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>,
- Ari Sundholm <ari@tuxera.com>, Juan Quintela <quintela@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, Joel Stanley <joel@jms.id.au>,
- Jason Dillaman <dillaman@redhat.com>, Antony Pavlov <antonynpavlov@gmail.com>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
- "integration@gluster.org" <integration@gluster.org>,
- =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- "Richard W.M. Jones" <rjones@redhat.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, Max Reitz <mreitz@redhat.com>,
- Denis Lunev <den@virtuozzo.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>, Marek Vasut <marex@denx.de>,
- =?utf-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>,
- David Gibson <david@gibson.dropbear.id.au>,
- Tony Krowiak <akrowiak@linux.ibm.com>,
- =?utf-8?B?RGFuaWVsIFAuIEJlcnJhbmfDqQ==?= <berrange@redhat.com>,
- Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
- Pierre Morel <pmorel@linux.ibm.com>, Wen Congyang <wencongyang2@huawei.com>,
- Jean-Christophe Dubois <jcd@tribudubois.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDQuMTIuMjAxOSAxNzo1OSwgTWFya3VzIEFybWJydXN0ZXIgd3JvdGU6DQo+IFZsYWRpbWlyIFNl
-bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4gd3JpdGVzOg0KPiAN
-Cj4+IEhlcmUgaXMgaW50cm9kdWNlZCBFUlJQX0FVVE9fUFJPUEFHQVRFIG1hY3JvLCB0byBiZSB1
-c2VkIGF0IHN0YXJ0IG9mDQo+PiBmdW5jdGlvbnMgd2l0aCBlcnJwIE9VVCBwYXJhbWV0ZXIuDQo+
-Pg0KPj4gSXQgaGFzIHRocmVlIGdvYWxzOg0KPj4NCj4+IDEuIEZpeCBpc3N1ZSB3aXRoIGVycm9y
-X2ZhdGFsICYgZXJyb3JfcHJlcGVuZC9lcnJvcl9hcHBlbmRfaGludDogdXNlcg0KPj4gY2FuJ3Qg
-c2VlIHRoaXMgYWRkaXRpb25hbCBpbmZvcm1hdGlvbiwgYmVjYXVzZSBleGl0KCkgaGFwcGVucyBp
-bg0KPj4gZXJyb3Jfc2V0ZyBlYXJsaWVyIHRoYW4gaW5mb3JtYXRpb24gaXMgYWRkZWQuIFtSZXBv
-cnRlZCBieSBHcmVnIEt1cnpdDQo+Pg0KPj4gMi4gRml4IGlzc3VlIHdpdGggZXJyb3JfYWJvcnQg
-JiBlcnJvcl9wcm9wYWdhdGU6IHdoZW4gd2Ugd3JhcA0KPj4gZXJyb3JfYWJvcnQgYnkgbG9jYWxf
-ZXJyK2Vycm9yX3Byb3BhZ2F0ZSwgcmVzdWx0aW5nIGNvcmVkdW1wIHdpbGwNCj4+IHJlZmVyIHRv
-IGVycm9yX3Byb3BhZ2F0ZSBhbmQgbm90IHRvIHRoZSBwbGFjZSB3aGVyZSBlcnJvciBoYXBwZW5l
-ZC4NCj4gDQo+IEkgZ2V0IHdoYXQgeW91IG1lYW4sIGJ1dCBJIGhhdmUgcGxlbnR5IG9mIGNvbnRl
-eHQuDQo+IA0KPj4gKHRoZSBtYWNybyBpdHNlbGYgZG9lc24ndCBmaXggdGhlIGlzc3VlLCBidXQg
-aXQgYWxsb3dzIHRvIFszLl0gZHJvcCBhbGwNCj4+IGxvY2FsX2VycitlcnJvcl9wcm9wYWdhdGUg
-cGF0dGVybiwgd2hpY2ggd2lsbCBkZWZpbml0ZWx5IGZpeCB0aGUgaXNzdWUpDQo+IA0KPiBUaGUg
-cGFyZW50aGVzaXMgaXMgbm90IHBhcnQgb2YgdGhlIGdvYWwuDQo+IA0KPj4gW1JlcG9ydGVkIGJ5
-IEtldmluIFdvbGZdDQo+Pg0KPj4gMy4gRHJvcCBsb2NhbF9lcnIrZXJyb3JfcHJvcGFnYXRlIHBh
-dHRlcm4sIHdoaWNoIGlzIHVzZWQgdG8gd29ya2Fyb3VuZA0KPj4gdm9pZCBmdW5jdGlvbnMgd2l0
-aCBlcnJwIHBhcmFtZXRlciwgd2hlbiBjYWxsZXIgd2FudHMgdG8ga25vdyByZXN1bHRpbmcNCj4+
-IHN0YXR1cy4gKE5vdGU6IGFjdHVhbGx5IHRoZXNlIGZ1bmN0aW9ucyBjb3VsZCBiZSBtZXJlbHkg
-dXBkYXRlZCB0bw0KPj4gcmV0dXJuIGludCBlcnJvciBjb2RlKS4NCj4+DQo+PiBUbyBhY2hpZXZl
-IHRoZXNlIGdvYWxzLCB3ZSBuZWVkIHRvIGFkZCBpbnZvY2F0aW9uIG9mIHRoZSBtYWNybyBhdCBz
-dGFydA0KPj4gb2YgZnVuY3Rpb25zLCB3aGljaCBuZWVkcyBlcnJvcl9wcmVwZW5kL2Vycm9yX2Fw
-cGVuZF9oaW50ICgxLik7IGFkZA0KPj4gaW52b2NhdGlvbiBvZiB0aGUgbWFjcm8gYXQgc3RhcnQg
-b2YgZnVuY3Rpb25zIHdoaWNoIGRvDQo+PiBsb2NhbF9lcnIrZXJyb3JfcHJvcGFnYXRlIHNjZW5h
-cmlvIHRoZSBjaGVjayBlcnJvcnMsIGRyb3AgbG9jYWwgZXJyb3JzDQo+PiBmcm9tIHRoZW0gYW5k
-IGp1c3QgdXNlICplcnJwIGluc3RlYWQgKDIuLCAzLikuDQo+IA0KPiBUaGUgcGFyYWdyYXBoIHRh
-bGtzIGFib3V0IHR3byBjYXNlczogMS4gYW5kIDIuKzMuIA0KDQpIbW0sIEkgZG9uJ3QgdGhpbmsg
-c28uLiAxLiBhbmQgMi4gYXJlIGlzc3Vlcy4gMy4gaXMgYSByZWZhY3RvcmluZy4uIFdlIGp1c3QN
-CmZpeCBhY2hpZXZlIDIgYW5kIDMgYnkgb25lIGFjdGlvbi4NCg0KPiBNYWtlcyBtZSB0aGluayB3
-ZQ0KPiB3YW50IHR3byBwYXJhZ3JhcGhzLCBlYWNoIGlsbHVzdHJhdGVkIHdpdGggYW4gZXhhbXBs
-ZS4NCj4gDQo+IFdoYXQgYWJvdXQgeW91IHByb3ZpZGUgdGhlIGV4YW1wbGVzLCBhbmQgdGhlbiBJ
-IHRyeSB0byBwb2xpc2ggdGhlIHByb3NlPw0KDQoxOiBlcnJvcl9mYXRhbCBwcm9ibGVtDQoNCkFz
-c3VtZSB0aGUgZm9sbG93aW5nIGNvZGUgZmxvdzoNCg0KaW50IGYxKGVycnApIHsNCiAgICAuLi4N
-CiAgICByZXQgPSBmMihlcnJwKTsNCiAgICBpZiAocmV0IDwgMCkgew0KICAgICAgIGVycm9yX2Fw
-cGVuZF9oaW50KGVycnAsICJ2ZXJ5IHVzZWZ1bCBoaW50Iik7DQogICAgICAgcmV0dXJuIHJldDsN
-CiAgICB9DQogICAgLi4uDQp9DQoNCk5vdywgaWYgd2UgY2FsbCBmMSB3aXRoICZlcnJvcl9mYXRh
-bCBhcmd1bWVudCBhbmQgZjIgZmFpbHMsIHRoZSBwcm9ncmFtDQp3aWxsIGV4aXQgaW1tZWRpYXRl
-bHkgaW5zaWRlIGYyLCB3aGVuIHNldHRpbmcgdGhlIGVycnAuIFVzZXIgd2lsbCBub3QNCnNlZSB0
-aGUgaGludC4NCg0KU28sIGluIHRoaXMgY2FzZSB3ZSBzaG91bGQgdXNlIGxvY2FsX2Vyci4NCg0K
-MjogZXJyb3JfYWJvcnQgcHJvYmxlbQ0KDQpOb3csIGNvbnNpZGVyIGZ1bmN0aW9ucyB3aXRob3V0
-IHJldHVybiB2YWx1ZS4gV2Ugbm9ybWFsbHkgdXNlIGxvY2FsX2Vycg0KdmFyaWFibGUgdG8gY2F0
-Y2ggZmFpbHVyZXM6DQoNCnZvaWQgZjEoZXJycCkgew0KICAgIEVycm9yICpsb2NhbF9lcnIgPSBO
-VUxMOw0KICAgIC4uLg0KICAgIGYyKCZsb2NhbF9lcnIpOw0KICAgIGlmIChsb2NhbF9lcnIpIHsN
-CiAgICAgICAgZXJyb3JfcHJvcGFnYXRlKGVycnAsIGxvY2FsX2Vycik7DQogICAgICAgIHJldHVy
-bjsNCiAgICB9DQogICAgLi4uDQp9DQoNCk5vdywgaWYgd2UgY2FsbCBmMiB3aXRoICZlcnJvcl9h
-Ym9ydCBhbmQgZjIgZmFpbHMsIHRoZSBzdGFjayBpbiByZXN1bHRpbmcNCmNyYXNoIGR1bXAgd2ls
-bCBwb2ludCB0byBlcnJvcl9wcm9wYWdhdGUsIG5vdCB0byB0aGUgZmFpbHVyZSBwb2ludCBpbiBm
-MiwNCndoaWNoIGNvbXBsaWNhdGVzIGRlYnVnZ2luZy4NCg0KU28sIHdlIHNob3VsZCBuZXZlciB3
-cmFwIGVycm9yX2Fib3J0IGJ5IGxvY2FsX2Vyci4NCg0KPT09DQoNCk91ciBzb2x1dGlvbjoNCg0K
-LSBGaXhlcyBbMS5dLCBhZGRpbmcgaW52b2NhdGlvbiBvZiBuZXcgbWFjcm8gaW50byBmdW5jdGlv
-bnMgd2l0aCBlcnJvcl9hcHBlbl9oaW50L2Vycm9yX3ByZXBlbmQsDQogICBOZXcgbWFjcm8gd2ls
-bCB3cmFwIGVycm9yX2ZhdGFsLg0KLSBGaXhlcyBbMi5dLCBieSBzd2l0Y2hpbmcgZnJvbSBoYW5k
-LXdyaXR0ZW4gbG9jYWxfZXJyIHRvIHNtYXJ0IG1hY3JvLCB3aGljaCBuZXZlcg0KICAgd3JhcHMg
-ZXJyb3JfYWJvcnQuDQotIEhhbmRsZXMgWzMuXSwgYnkgc3dpdGNoaW5nIHRvIG1hY3JvLCB3aGlj
-aCBpcyBsZXNzIGNvZGUNCi0gQWRkaXRpb25hbGx5LCBtYWNybyBkb2Vzbid0IHdyYXAgbm9ybWFs
-IG5vbi16ZXJvIGVycnAsIHRvIGF2b2lkIGV4dHJhIHByb3BhZ2F0aW9ucw0KICAgKGluIGZhY3Qs
-IGVycm9yX3Byb3BhZ2F0ZSBpcyBjYWxsZWQsIGJ1dCByZXR1cm5zIGltbWVkaWF0ZWx5IG9uIGZp
-cnN0IGlmICghbG9jYWxfZXJyKSkNCg0KPiANCj4+IFNpZ25lZC1vZmYtYnk6IFZsYWRpbWlyIFNl
-bWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4+IFJldmlld2Vk
-LWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4NCj4+IC0tLQ0KPj4NCj4+IENDOiBH
-ZXJkIEhvZmZtYW5uIDxrcmF4ZWxAcmVkaGF0LmNvbT4NCj4+IENDOiAiR29uZ2xlaSAoQXJlaSki
-IDxhcmVpLmdvbmdsZWlAaHVhd2VpLmNvbT4NCj4+IENDOiBFZHVhcmRvIEhhYmtvc3QgPGVoYWJr
-b3N0QHJlZGhhdC5jb20+DQo+PiBDQzogSWdvciBNYW1tZWRvdiA8aW1hbW1lZG9AcmVkaGF0LmNv
-bT4NCj4+IENDOiBMYXVyZW50IFZpdmllciA8bHZpdmllckByZWRoYXQuY29tPg0KPj4gQ0M6IEFt
-aXQgU2hhaCA8YW1pdEBrZXJuZWwub3JnPg0KPj4gQ0M6IEtldmluIFdvbGYgPGt3b2xmQHJlZGhh
-dC5jb20+DQo+PiBDQzogTWF4IFJlaXR6IDxtcmVpdHpAcmVkaGF0LmNvbT4NCj4+IENDOiBKb2hu
-IFNub3cgPGpzbm93QHJlZGhhdC5jb20+DQo+PiBDQzogQXJpIFN1bmRob2xtIDxhcmlAdHV4ZXJh
-LmNvbT4NCj4+IENDOiBQYXZlbCBEb3ZnYWx5dWsgPHBhdmVsLmRvdmdhbHVrQGlzcHJhcy5ydT4N
-Cj4+IENDOiBQYW9sbyBCb256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPj4gQ0M6IFN0ZWZh
-biBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4NCj4+IENDOiBGYW0gWmhlbmcgPGZhbUBl
-dXBob24ubmV0Pg0KPj4gQ0M6IFN0ZWZhbiBXZWlsIDxzd0B3ZWlsbmV0ei5kZT4NCj4+IENDOiBS
-b25uaWUgU2FobGJlcmcgPHJvbm5pZXNhaGxiZXJnQGdtYWlsLmNvbT4NCj4+IENDOiBQZXRlciBM
-aWV2ZW4gPHBsQGthbXAuZGU+DQo+PiBDQzogRXJpYyBCbGFrZSA8ZWJsYWtlQHJlZGhhdC5jb20+
-DQo+PiBDQzogIkRlbmlzIFYuIEx1bmV2IiA8ZGVuQG9wZW52ei5vcmc+DQo+PiBDQzogTWFya3Vz
-IEFybWJydXN0ZXIgPGFybWJydUByZWRoYXQuY29tPg0KPj4gQ0M6IEFsYmVydG8gR2FyY2lhIDxi
-ZXJ0b0BpZ2FsaWEuY29tPg0KPj4gQ0M6IEphc29uIERpbGxhbWFuIDxkaWxsYW1hbkByZWRoYXQu
-Y29tPg0KPj4gQ0M6IFdlbiBDb25neWFuZyA8d2VuY29uZ3lhbmcyQGh1YXdlaS5jb20+DQo+PiBD
-QzogWGllIENoYW5nbG9uZyA8eGllY2hhbmdsb25nLmRAZ21haWwuY29tPg0KPj4gQ0M6IExpdSBZ
-dWFuIDxuYW1laS51bml4QGdtYWlsLmNvbT4NCj4+IENDOiAiUmljaGFyZCBXLk0uIEpvbmVzIiA8
-cmpvbmVzQHJlZGhhdC5jb20+DQo+PiBDQzogSmVmZiBDb2R5IDxjb2R5cHJpbWVAZ21haWwuY29t
-Pg0KPj4gQ0M6ICJNYXJjLUFuZHLDqSBMdXJlYXUiIDxtYXJjYW5kcmUubHVyZWF1QHJlZGhhdC5j
-b20+DQo+PiBDQzogIkRhbmllbCBQLiBCZXJyYW5nw6kiIDxiZXJyYW5nZUByZWRoYXQuY29tPg0K
-Pj4gQ0M6IFJpY2hhcmQgSGVuZGVyc29uIDxydGhAdHdpZGRsZS5uZXQ+DQo+PiBDQzogR3JlZyBL
-dXJ6IDxncm91Z0BrYW9kLm9yZz4NCj4+IENDOiAiTWljaGFlbCBTLiBUc2lya2luIiA8bXN0QHJl
-ZGhhdC5jb20+DQo+PiBDQzogTWFyY2VsIEFwZmVsYmF1bSA8bWFyY2VsLmFwZmVsYmF1bUBnbWFp
-bC5jb20+DQo+PiBDQzogQmVuaWFtaW5vIEdhbHZhbmkgPGIuZ2FsdmFuaUBnbWFpbC5jb20+DQo+
-PiBDQzogUGV0ZXIgTWF5ZGVsbCA8cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnPg0KPj4gQ0M6ICJD
-w6lkcmljIExlIEdvYXRlciIgPGNsZ0BrYW9kLm9yZz4NCj4+IENDOiBBbmRyZXcgSmVmZmVyeSA8
-YW5kcmV3QGFqLmlkLmF1Pg0KPj4gQ0M6IEpvZWwgU3RhbmxleSA8am9lbEBqbXMuaWQuYXU+DQo+
-PiBDQzogQW5kcmV3IEJhdW1hbm4gPEFuZHJldy5CYXVtYW5uQG1pY3Jvc29mdC5jb20+DQo+PiBD
-QzogIlBoaWxpcHBlIE1hdGhpZXUtRGF1ZMOpIiA8cGhpbG1kQHJlZGhhdC5jb20+DQo+PiBDQzog
-QW50b255IFBhdmxvdiA8YW50b255bnBhdmxvdkBnbWFpbC5jb20+DQo+PiBDQzogSmVhbi1DaHJp
-c3RvcGhlIER1Ym9pcyA8amNkQHRyaWJ1ZHVib2lzLm5ldD4NCj4+IENDOiBQZXRlciBDaHViYiA8
-cGV0ZXIuY2h1YmJAbmljdGEuY29tLmF1Pg0KPj4gQ0M6IFN1YmJhcmF5YSBTdW5kZWVwIDxzdW5k
-ZWVwLmxrbWxAZ21haWwuY29tPg0KPj4gQ0M6IEVyaWMgQXVnZXIgPGVyaWMuYXVnZXJAcmVkaGF0
-LmNvbT4NCj4+IENDOiBBbGlzdGFpciBGcmFuY2lzIDxhbGlzdGFpckBhbGlzdGFpcjIzLm1lPg0K
-Pj4gQ0M6ICJFZGdhciBFLiBJZ2xlc2lhcyIgPGVkZ2FyLmlnbGVzaWFzQGdtYWlsLmNvbT4NCj4+
-IENDOiBTdGVmYW5vIFN0YWJlbGxpbmkgPHNzdGFiZWxsaW5pQGtlcm5lbC5vcmc+DQo+PiBDQzog
-QW50aG9ueSBQZXJhcmQgPGFudGhvbnkucGVyYXJkQGNpdHJpeC5jb20+DQo+PiBDQzogUGF1bCBE
-dXJyYW50IDxwYXVsQHhlbi5vcmc+DQo+PiBDQzogUGF1bCBCdXJ0b24gPHBidXJ0b25Ad2F2ZWNv
-bXAuY29tPg0KPj4gQ0M6IEFsZWtzYW5kYXIgUmlrYWxvIDxhcmlrYWxvQHdhdmVjb21wLmNvbT4N
-Cj4+IENDOiBDaHJpcyBXdWxmZiA8Y3J3dWxmZkBnbWFpbC5jb20+DQo+PiBDQzogTWFyZWsgVmFz
-dXQgPG1hcmV4QGRlbnguZGU+DQo+PiBDQzogRGF2aWQgR2lic29uIDxkYXZpZEBnaWJzb24uZHJv
-cGJlYXIuaWQuYXU+DQo+PiBDQzogQ29ybmVsaWEgSHVjayA8Y29odWNrQHJlZGhhdC5jb20+DQo+
-PiBDQzogSGFsaWwgUGFzaWMgPHBhc2ljQGxpbnV4LmlibS5jb20+DQo+PiBDQzogQ2hyaXN0aWFu
-IEJvcm50cmFlZ2VyIDxib3JudHJhZWdlckBkZS5pYm0uY29tPg0KPj4gQ0M6ICJIZXJ2w6kgUG91
-c3NpbmVhdSIgPGhwb3Vzc2luQHJlYWN0b3Mub3JnPg0KPj4gQ0M6IFhpYW8gR3Vhbmdyb25nIDx4
-aWFvZ3Vhbmdyb25nLmVyaWNAZ21haWwuY29tPg0KPj4gQ0M6IEF1cmVsaWVuIEphcm5vIDxhdXJl
-bGllbkBhdXJlbDMyLm5ldD4NCj4+IENDOiBBbGVrc2FuZGFyIE1hcmtvdmljIDxhbWFya292aWNA
-d2F2ZWNvbXAuY29tPg0KPj4gQ0M6IE1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRA
-aWxhbmRlLmNvLnVrPg0KPj4gQ0M6IEphc29uIFdhbmcgPGphc293YW5nQHJlZGhhdC5jb20+DQo+
-PiBDQzogTGFzemxvIEVyc2VrIDxsZXJzZWtAcmVkaGF0LmNvbT4NCj4+IENDOiBZdXZhbCBTaGFp
-YSA8eXV2YWwuc2hhaWFAb3JhY2xlLmNvbT4NCj4+IENDOiBQYWxtZXIgRGFiYmVsdCA8cGFsbWVy
-QHNpZml2ZS5jb20+DQo+PiBDQzogU2FnYXIgS2FyYW5kaWthciA8c2FnYXJrQGVlY3MuYmVya2Vs
-ZXkuZWR1Pg0KPj4gQ0M6IEJhc3RpYW4gS29wcGVsbWFubiA8a2Jhc3RpYW5AbWFpbC51bmktcGFk
-ZXJib3JuLmRlPg0KPj4gQ0M6IERhdmlkIEhpbGRlbmJyYW5kIDxkYXZpZEByZWRoYXQuY29tPg0K
-Pj4gQ0M6IFRob21hcyBIdXRoIDx0aHV0aEByZWRoYXQuY29tPg0KPj4gQ0M6IEVyaWMgRmFybWFu
-IDxmYXJtYW5AbGludXguaWJtLmNvbT4NCj4+IENDOiBNYXR0aGV3IFJvc2F0byA8bWpyb3NhdG9A
-bGludXguaWJtLmNvbT4NCj4+IENDOiBIYW5uZXMgUmVpbmVja2UgPGhhcmVAc3VzZS5jb20+DQo+
-PiBDQzogTWljaGFlbCBXYWxsZSA8bWljaGFlbEB3YWxsZS5jYz4NCj4+IENDOiBBcnR5b20gVGFy
-YXNlbmtvIDxhdGFyNHFlbXVAZ21haWwuY29tPg0KPj4gQ0M6IFN0ZWZhbiBCZXJnZXIgPHN0ZWZh
-bmJAbGludXguaWJtLmNvbT4NCj4+IENDOiBTYW11ZWwgVGhpYmF1bHQgPHNhbXVlbC50aGliYXVs
-dEBlbnMtbHlvbi5vcmc+DQo+PiBDQzogQWxleCBXaWxsaWFtc29uIDxhbGV4LndpbGxpYW1zb25A
-cmVkaGF0LmNvbT4NCj4+IENDOiBUb255IEtyb3dpYWsgPGFrcm93aWFrQGxpbnV4LmlibS5jb20+
-DQo+PiBDQzogUGllcnJlIE1vcmVsIDxwbW9yZWxAbGludXguaWJtLmNvbT4NCj4+IENDOiBNaWNo
-YWVsIFJvdGggPG1kcm90aEBsaW51eC52bmV0LmlibS5jb20+DQo+PiBDQzogSGFpbGlhbmcgWmhh
-bmcgPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT4NCj4+IENDOiBKdWFuIFF1aW50ZWxh
-IDxxdWludGVsYUByZWRoYXQuY29tPg0KPj4gQ0M6ICJEci4gRGF2aWQgQWxhbiBHaWxiZXJ0IiA8
-ZGdpbGJlcnRAcmVkaGF0LmNvbT4NCj4+IENDOiBMdWlnaSBSaXp6byA8cml6em9AaWV0LnVuaXBp
-Lml0Pg0KPj4gQ0M6IEdpdXNlcHBlIExldHRpZXJpIDxnLmxldHRpZXJpQGlldC51bmlwaS5pdD4N
-Cj4+IENDOiBWaW5jZW56byBNYWZmaW9uZSA8di5tYWZmaW9uZUBnbWFpbC5jb20+DQo+PiBDQzog
-SmFuIEtpc3prYSA8amFuLmtpc3prYUBzaWVtZW5zLmNvbT4NCj4+IENDOiBBbnRob255IEdyZWVu
-IDxncmVlbkBtb3hpZWxvZ2ljLmNvbT4NCj4+IENDOiBTdGFmZm9yZCBIb3JuZSA8c2hvcm5lQGdt
-YWlsLmNvbT4NCj4+IENDOiBHdWFuIFh1ZXRhbyA8Z3h0QG1wcmMucGt1LmVkdS5jbj4NCj4+IEND
-OiBNYXggRmlsaXBwb3YgPGpjbXZia2JjQGdtYWlsLmNvbT4NCj4+IENDOiBxZW11LWJsb2NrQG5v
-bmdudS5vcmcNCj4+IENDOiBpbnRlZ3JhdGlvbkBnbHVzdGVyLm9yZw0KPj4gQ0M6IHNoZWVwZG9n
-QGxpc3RzLndwa2cub3JnDQo+PiBDQzogcWVtdS1hcm1Abm9uZ251Lm9yZw0KPj4gQ0M6IHhlbi1k
-ZXZlbEBsaXN0cy54ZW5wcm9qZWN0Lm9yZw0KPj4gQ0M6IHFlbXUtcHBjQG5vbmdudS5vcmcNCj4+
-IENDOiBxZW11LXMzOTB4QG5vbmdudS5vcmcNCj4+IENDOiBxZW11LXJpc2N2QG5vbmdudS5vcmcN
-Cj4+DQo+PiAgIGluY2x1ZGUvcWFwaS9lcnJvci5oIHwgMzggKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysNCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDM4IGluc2VydGlvbnMoKykN
-Cj4+DQo+PiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9xYXBpL2Vycm9yLmggYi9pbmNsdWRlL3FhcGkv
-ZXJyb3IuaA0KPj4gaW5kZXggZDY4OThkODMzYi4uNDcyMzhkOTA2NSAxMDA2NDQNCj4+IC0tLSBh
-L2luY2x1ZGUvcWFwaS9lcnJvci5oDQo+PiArKysgYi9pbmNsdWRlL3FhcGkvZXJyb3IuaA0KPj4g
-QEAgLTM0NSw2ICszNDUsNDQgQEAgdm9pZCBlcnJvcl9zZXRfaW50ZXJuYWwoRXJyb3IgKiplcnJw
-LA0KPj4gICAgICAgICAgICAgICAgICAgICAgICAgICBFcnJvckNsYXNzIGVycl9jbGFzcywgY29u
-c3QgY2hhciAqZm10LCAuLi4pDQo+PiAgICAgICBHQ0NfRk1UX0FUVFIoNiwgNyk7DQo+PiAgIA0K
-Pj4gK3R5cGVkZWYgc3RydWN0IEVycm9yUHJvcGFnYXRvciB7DQo+PiArICAgIEVycm9yICpsb2Nh
-bF9lcnI7DQo+PiArICAgIEVycm9yICoqZXJycDsNCj4+ICt9IEVycm9yUHJvcGFnYXRvcjsNCj4+
-ICsNCj4+ICtzdGF0aWMgaW5saW5lIHZvaWQgZXJyb3JfcHJvcGFnYXRvcl9jbGVhbnVwKEVycm9y
-UHJvcGFnYXRvciAqcHJvcCkNCj4+ICt7DQo+PiArICAgIGVycm9yX3Byb3BhZ2F0ZShwcm9wLT5l
-cnJwLCBwcm9wLT5sb2NhbF9lcnIpOw0KPj4gK30NCj4+ICsNCj4+ICtHX0RFRklORV9BVVRPX0NM
-RUFOVVBfQ0xFQVJfRlVOQyhFcnJvclByb3BhZ2F0b3IsIGVycm9yX3Byb3BhZ2F0b3JfY2xlYW51
-cCk7DQo+PiArDQo+PiArLyoNCj4+ICsgKiBFUlJQX0FVVE9fUFJPUEFHQVRFDQo+PiArICoNCj4+
-ICsgKiBUaGlzIG1hY3JvIGlzIGNyZWF0ZWQgdG8gYmUgdGhlIGZpcnN0IGxpbmUgb2YgYSBmdW5j
-dGlvbiB3aXRoIEVycm9yICoqZXJycA0KPj4gKyAqIE9VVCBwYXJhbWV0ZXIuIEl0J3MgbmVlZGVk
-IG9ubHkgaW4gY2FzZXMgd2hlcmUgd2Ugd2FudCB0byB1c2UgZXJyb3JfcHJlcGVuZCwNCj4+ICsg
-KiBlcnJvcl9hcHBlbmRfaGludCBvciBkZXJlZmVyZW5jZSAqZXJycC4gSXQncyBzdGlsbCBzYWZl
-IChidXQgdXNlbGVzcykgaW4NCj4+ICsgKiBvdGhlciBjYXNlcy4NCj4+ICsgKg0KPj4gKyAqIElm
-IGVycnAgaXMgTlVMTCBvciBwb2ludHMgdG8gZXJyb3JfZmF0YWwsIGl0IGlzIHJld3JpdHRlbiB0
-byBwb2ludCB0byBhDQo+PiArICogbG9jYWwgRXJyb3Igb2JqZWN0LCB3aGljaCB3aWxsIGJlIGF1
-dG9tYXRpY2FsbHkgcHJvcGFnYXRlZCB0byB0aGUgb3JpZ2luYWwNCj4+ICsgKiBlcnJwIG9uIGZ1
-bmN0aW9uIGV4aXQgKHNlZSBlcnJvcl9wcm9wYWdhdG9yX2NsZWFudXApLg0KPj4gKyAqDQo+PiAr
-ICogQWZ0ZXIgaW52b2NhdGlvbiBvZiB0aGlzIG1hY3JvIGl0IGlzIGFsd2F5cyBzYWZlIHRvIGRl
-cmVmZXJlbmNlIGVycnANCj4+ICsgKiAoYXMgaXQncyBub3QgTlVMTCBhbnltb3JlKSBhbmQgdG8g
-YWRkIGluZm9ybWF0aW9uIChieSBlcnJvcl9wcmVwZW5kIG9yDQo+PiArICogZXJyb3JfYXBwZW5k
-X2hpbnQpDQo+PiArICogKGFzLCBpZiBpdCB3YXMgZXJyb3JfZmF0YWwsIHdlIHN3YXBwZWQgaXQg
-d2l0aCBhIGxvY2FsX2Vycm9yIHRvIGJlDQo+PiArICogcHJvcGFnYXRlZCBvbiBjbGVhbnVwKS4N
-Cj4+ICsgKg0KPj4gKyAqIE5vdGU6IHdlIGRvbid0IHdyYXAgdGhlIGVycm9yX2Fib3J0IGNhc2Us
-IGFzIHdlIHdhbnQgcmVzdWx0aW5nIGNvcmVkdW1wDQo+PiArICogdG8gcG9pbnQgdG8gdGhlIHBs
-YWNlIHdoZXJlIHRoZSBlcnJvciBoYXBwZW5lZCwgbm90IHRvIGVycm9yX3Byb3BhZ2F0ZS4NCj4+
-ICsgKi8NCj4+ICsjZGVmaW5lIEVSUlBfQVVUT19QUk9QQUdBVEUoKSAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBcDQo+PiArICAgIGdfYXV0byhFcnJvclByb3BhZ2F0b3IpIF9hdXRv
-X2VycnBfcHJvcCA9IHsuZXJycCA9IGVycnB9OyAgXA0KPj4gKyAgICBlcnJwID0gKChlcnJwID09
-IE5VTEwgfHwgKmVycnAgPT0gZXJyb3JfZmF0YWwpICAgICAgICAgICAgIFwNCj4+ICsgICAgICAg
-ICAgICA/ICZfYXV0b19lcnJwX3Byb3AubG9jYWxfZXJyIDogZXJycCkNCj4+ICsNCj4+ICAgLyoN
-Cj4+ICAgICogU3BlY2lhbCBlcnJvciBkZXN0aW5hdGlvbiB0byBhYm9ydCBvbiBlcnJvci4NCj4+
-ICAgICogU2VlIGVycm9yX3NldGcoKSBhbmQgZXJyb3JfcHJvcGFnYXRlKCkgZm9yIGRldGFpbHMu
-DQo+IA0KPiBNaXNzaW5nOiB1cGRhdGUgb2YgdGhlIGJpZyBjb21tZW50IHN0YXJ0aW5nIHdpdGgg
-IkVycm9yIHJlcG9ydGluZyBzeXN0ZW0NCj4gbG9vc2VseSBwYXR0ZXJuZWQgYWZ0ZXIgR2xpYidz
-IEdFcnJvci4iDQo+IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+--000000000000908ff30598f1c2c9
+Content-Type: text/plain; charset="UTF-8"
+
+Ping again
+
+On Mon, Dec 2, 2019 at 9:53 AM Micky C <chanmickyyun@gmail.com> wrote:
+
+> Ping
+>
+> On Mon, Nov 25, 2019 at 1:17 PM Micky Yun Chan(michiboo) <
+> chanmickyyun@gmail.com> wrote:
+>
+>> From: Micky Yun Chan <chanmickyyun@gmail.com>
+>>
+>> This patch is to add standard commands defined in
+>> docs/interop/vhost-user.rst
+>> For vhost-user-* program
+>>
+>> Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
+>> ---
+>>  contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
+>>  docs/interop/vhost-user.json            |  31 +++++++
+>>  docs/interop/vhost-user.rst             |  15 ++++
+>>  3 files changed, 110 insertions(+), 44 deletions(-)
+>>
+>> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c
+>> b/contrib/vhost-user-blk/vhost-user-blk.c
+>> index ae61034656..6fd91c7e99 100644
+>> --- a/contrib/vhost-user-blk/vhost-user-blk.c
+>> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
+>> @@ -576,70 +576,90 @@ vub_new(char *blk_file)
+>>      return vdev_blk;
+>>  }
+>>
+>> +static int opt_fdnum = -1;
+>> +static char *opt_socket_path;
+>> +static char *opt_blk_file;
+>> +static gboolean opt_print_caps;
+>> +static gboolean opt_read_only;
+>> +
+>> +static GOptionEntry entries[] = {
+>> +    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
+>> +      "Print capabilities", NULL },
+>> +    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
+>> +      "Use inherited fd socket", "FDNUM" },
+>> +    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
+>> +      "Use UNIX socket path", "PATH" },
+>> +    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
+>> +     "block device or file path", "PATH"},
+>> +    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
+>> +      "Enable read-only", NULL }
+>> +};
+>> +
+>>  int main(int argc, char **argv)
+>>  {
+>> -    int opt;
+>> -    char *unix_socket = NULL;
+>> -    char *blk_file = NULL;
+>> -    bool enable_ro = false;
+>>      int lsock = -1, csock = -1;
+>>      VubDev *vdev_blk = NULL;
+>> +    GError *error = NULL;
+>> +    GOptionContext *context;
+>>
+>> -    while ((opt = getopt(argc, argv, "b:rs:h")) != -1) {
+>> -        switch (opt) {
+>> -        case 'b':
+>> -            blk_file = g_strdup(optarg);
+>> -            break;
+>> -        case 's':
+>> -            unix_socket = g_strdup(optarg);
+>> -            break;
+>> -        case 'r':
+>> -            enable_ro = true;
+>> -            break;
+>> -        case 'h':
+>> -        default:
+>> -            printf("Usage: %s [ -b block device or file, -s UNIX domain
+>> socket"
+>> -                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+>> -            return 0;
+>> +    context = g_option_context_new(NULL);
+>> +    g_option_context_add_main_entries(context, entries, NULL);
+>> +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+>> +        g_printerr("Option parsing failed: %s\n", error->message);
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +    if (opt_print_caps) {
+>> +        g_print("{\n");
+>> +        g_print("  \"type\": \"block\",\n");
+>> +        g_print("  \"features\": [\n");
+>> +        g_print("    \"read-only\",\n");
+>> +        g_print("    \"blk-file\"\n");
+>> +        g_print("  ]\n");
+>> +        g_print("}\n");
+>> +        exit(EXIT_SUCCESS);
+>> +    }
+>> +
+>> +    if (!opt_blk_file) {
+>> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
+>> +        exit(EXIT_FAILURE);
+>> +    }
+>> +
+>> +    if (opt_socket_path) {
+>> +        lsock = unix_sock_new(opt_socket_path);
+>> +        if (lsock < 0) {
+>> +            exit(EXIT_FAILURE);
+>>          }
+>> +    } else if (opt_fdnum < 0) {
+>> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
+>> +        exit(EXIT_FAILURE);
+>> +    } else {
+>> +        lsock = opt_fdnum;
+>>      }
+>>
+>> -    if (!unix_socket || !blk_file) {
+>> -        printf("Usage: %s [ -b block device or file, -s UNIX domain
+>> socket"
+>> -               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+>> -        return -1;
+>> -    }
+>> -
+>> -    lsock = unix_sock_new(unix_socket);
+>> -    if (lsock < 0) {
+>> -        goto err;
+>> -    }
+>> -
+>> -    csock = accept(lsock, (void *)0, (void *)0);
+>> +    csock = accept(lsock, NULL, NULL);
+>>      if (csock < 0) {
+>> -        fprintf(stderr, "Accept error %s\n", strerror(errno));
+>> -        goto err;
+>> +        g_printerr("Accept error %s\n", strerror(errno));
+>> +        exit(EXIT_FAILURE);
+>>      }
+>>
+>> -    vdev_blk = vub_new(blk_file);
+>> +    vdev_blk = vub_new(opt_blk_file);
+>>      if (!vdev_blk) {
+>> -        goto err;
+>> +        exit(EXIT_FAILURE);
+>>      }
+>> -    if (enable_ro) {
+>> +    if (opt_read_only) {
+>>          vdev_blk->enable_ro = true;
+>>      }
+>>
+>>      if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
+>>                    vub_panic_cb, &vub_iface)) {
+>> -        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
+>> -        goto err;
+>> +        g_printerr("Failed to initialize libvhost-user-glib\n");
+>> +        exit(EXIT_FAILURE);
+>>      }
+>>
+>>      g_main_loop_run(vdev_blk->loop);
+>> -
+>> +    g_main_loop_unref(vdev_blk->loop);
+>> +    g_option_context_free(context);
+>>      vug_deinit(&vdev_blk->parent);
+>> -
+>> -err:
+>>      vub_free(vdev_blk);
+>>      if (csock >= 0) {
+>>          close(csock);
+>> @@ -647,8 +667,8 @@ err:
+>>      if (lsock >= 0) {
+>>          close(lsock);
+>>      }
+>> -    g_free(unix_socket);
+>> -    g_free(blk_file);
+>> +    g_free(opt_socket_path);
+>> +    g_free(opt_blk_file);
+>>
+>>      return 0;
+>>  }
+>> diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
+>> index da6aaf51c8..ce0ef74db5 100644
+>> --- a/docs/interop/vhost-user.json
+>> +++ b/docs/interop/vhost-user.json
+>> @@ -54,6 +54,37 @@
+>>    ]
+>>  }
+>>
+>> +##
+>> +# @VHostUserBackendBlockFeature:
+>> +#
+>> +# List of vhost user "block" features.
+>> +#
+>> +# @read-only: The --read-only command line option is supported.
+>> +# @blk-file: The --blk-file command line option is supported.
+>> +#
+>> +# Since: 5.0
+>> +##
+>> +{
+>> +  'enum': 'VHostUserBackendBlockFeature',
+>> +  'data': [ 'read-only', 'blk-file' ]
+>> +}
+>> +
+>> +##
+>> +# @VHostUserBackendCapabilitiesBlock:
+>> +#
+>> +# Capabilities reported by vhost user "block" backends
+>> +#
+>> +# @features: list of supported features.
+>> +#
+>> +# Since: 5.0
+>> +##
+>> +{
+>> +  'struct': 'VHostUserBackendCapabilitiesBlock',
+>> +  'data': {
+>> +    'features': [ 'VHostUserBackendBlockFeature' ]
+>> +  }
+>> +}
+>> +
+>>  ##
+>>  # @VHostUserBackendInputFeature:
+>>  #
+>> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+>> index 7827b710aa..2f0910d515 100644
+>> --- a/docs/interop/vhost-user.rst
+>> +++ b/docs/interop/vhost-user.rst
+>> @@ -1376,3 +1376,18 @@ Command line options:
+>>    Enable virgl rendering support.
+>>
+>>    (optional)
+>> +
+>> +vhost-user-blk
+>> +--------------
+>> +
+>> +Command line options:
+>> +
+>> +--blk-file=PATH
+>> +
+>> +  Specify block device or file path.
+>> +
+>> +--read-only
+>> +
+>> +  Enable read-only.
+>> +
+>> +  (optional)
+>> --
+>> 2.21.0
+>>
+>>
+
+--000000000000908ff30598f1c2c9
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Ping again<br></div><br><div class=3D"gmail_quote"><div di=
+r=3D"ltr" class=3D"gmail_attr">On Mon, Dec 2, 2019 at 9:53 AM Micky C &lt;<=
+a href=3D"mailto:chanmickyyun@gmail.com">chanmickyyun@gmail.com</a>&gt; wro=
+te:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px =
+0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"=
+ltr"><div dir=3D"ltr">Ping<br></div><br><div class=3D"gmail_quote"><div dir=
+=3D"ltr" class=3D"gmail_attr">On Mon, Nov 25, 2019 at 1:17 PM Micky Yun Cha=
+n(michiboo) &lt;<a href=3D"mailto:chanmickyyun@gmail.com" target=3D"_blank"=
+>chanmickyyun@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_=
+quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,=
+204);padding-left:1ex">From: Micky Yun Chan &lt;<a href=3D"mailto:chanmicky=
+yun@gmail.com" target=3D"_blank">chanmickyyun@gmail.com</a>&gt;<br>
+<br>
+This patch is to add standard commands defined in docs/interop/vhost-user.r=
+st<br>
+For vhost-user-* program<br>
+<br>
+Signed-off-by: Micky Yun Chan (michiboo) &lt;<a href=3D"mailto:chanmickyyun=
+@gmail.com" target=3D"_blank">chanmickyyun@gmail.com</a>&gt;<br>
+---<br>
+=C2=A0contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++---------=
+-<br>
+=C2=A0docs/interop/vhost-user.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ |=C2=A0 31 +++++++<br>
+=C2=A0docs/interop/vhost-user.rst=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0|=C2=A0 15 ++++<br>
+=C2=A03 files changed, 110 insertions(+), 44 deletions(-)<br>
+<br>
+diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-b=
+lk/vhost-user-blk.c<br>
+index ae61034656..6fd91c7e99 100644<br>
+--- a/contrib/vhost-user-blk/vhost-user-blk.c<br>
++++ b/contrib/vhost-user-blk/vhost-user-blk.c<br>
+@@ -576,70 +576,90 @@ vub_new(char *blk_file)<br>
+=C2=A0 =C2=A0 =C2=A0return vdev_blk;<br>
+=C2=A0}<br>
+<br>
++static int opt_fdnum =3D -1;<br>
++static char *opt_socket_path;<br>
++static char *opt_blk_file;<br>
++static gboolean opt_print_caps;<br>
++static gboolean opt_read_only;<br>
++<br>
++static GOptionEntry entries[] =3D {<br>
++=C2=A0 =C2=A0 { &quot;print-capabilities&quot;, &#39;c&#39;, 0, G_OPTION_A=
+RG_NONE, &amp;opt_print_caps,<br>
++=C2=A0 =C2=A0 =C2=A0 &quot;Print capabilities&quot;, NULL },<br>
++=C2=A0 =C2=A0 { &quot;fd&quot;, &#39;f&#39;, 0, G_OPTION_ARG_INT, &amp;opt=
+_fdnum,<br>
++=C2=A0 =C2=A0 =C2=A0 &quot;Use inherited fd socket&quot;, &quot;FDNUM&quot=
+; },<br>
++=C2=A0 =C2=A0 { &quot;socket-path&quot;, &#39;s&#39;, 0, G_OPTION_ARG_FILE=
+NAME, &amp;opt_socket_path,<br>
++=C2=A0 =C2=A0 =C2=A0 &quot;Use UNIX socket path&quot;, &quot;PATH&quot; },=
+<br>
++=C2=A0 =C2=A0 {&quot;blk-file&quot;, &#39;b&#39;, 0, G_OPTION_ARG_FILENAME=
+, &amp;opt_blk_file,<br>
++=C2=A0 =C2=A0 =C2=A0&quot;block device or file path&quot;, &quot;PATH&quot=
+;},<br>
++=C2=A0 =C2=A0 { &quot;read-only&quot;, &#39;r&#39;, 0, G_OPTION_ARG_NONE, =
+&amp;opt_read_only,<br>
++=C2=A0 =C2=A0 =C2=A0 &quot;Enable read-only&quot;, NULL }<br>
++};<br>
++<br>
+=C2=A0int main(int argc, char **argv)<br>
+=C2=A0{<br>
+-=C2=A0 =C2=A0 int opt;<br>
+-=C2=A0 =C2=A0 char *unix_socket =3D NULL;<br>
+-=C2=A0 =C2=A0 char *blk_file =3D NULL;<br>
+-=C2=A0 =C2=A0 bool enable_ro =3D false;<br>
+=C2=A0 =C2=A0 =C2=A0int lsock =3D -1, csock =3D -1;<br>
+=C2=A0 =C2=A0 =C2=A0VubDev *vdev_blk =3D NULL;<br>
++=C2=A0 =C2=A0 GError *error =3D NULL;<br>
++=C2=A0 =C2=A0 GOptionContext *context;<br>
+<br>
+-=C2=A0 =C2=A0 while ((opt =3D getopt(argc, argv, &quot;b:rs:h&quot;)) !=3D=
+ -1) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 switch (opt) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 case &#39;b&#39;:<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 blk_file =3D g_strdup(optarg);<b=
+r>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 case &#39;s&#39;:<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 unix_socket =3D g_strdup(optarg)=
+;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 case &#39;r&#39;:<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 enable_ro =3D true;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 case &#39;h&#39;:<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 default:<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 printf(&quot;Usage: %s [ -b bloc=
+k device or file, -s UNIX domain socket&quot;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot=
+; | -r Enable read-only ] | [ -h ]\n&quot;, argv[0]);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
++=C2=A0 =C2=A0 context =3D g_option_context_new(NULL);<br>
++=C2=A0 =C2=A0 g_option_context_add_main_entries(context, entries, NULL);<b=
+r>
++=C2=A0 =C2=A0 if (!g_option_context_parse(context, &amp;argc, &amp;argv, &=
+amp;error)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_printerr(&quot;Option parsing failed: %s\n&q=
+uot;, error-&gt;message);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
++=C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 if (opt_print_caps) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;{\n&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 \&quot;type\&quot;: \&quo=
+t;block\&quot;,\n&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 \&quot;features\&quot;: [=
+\n&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 =C2=A0 \&quot;read-only\&=
+quot;,\n&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 =C2=A0 \&quot;blk-file\&q=
+uot;\n&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;=C2=A0 ]\n&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;}\n&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_SUCCESS);<br>
++=C2=A0 =C2=A0 }<br>
++<br>
++=C2=A0 =C2=A0 if (!opt_blk_file) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;%s\n&quot;, g_option_context_get=
+_help(context, true, NULL));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
++=C2=A0 =C2=A0 }<br>
++<br>
++=C2=A0 =C2=A0 if (opt_socket_path) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 lsock =3D unix_sock_new(opt_socket_path);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (lsock &lt; 0) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
++=C2=A0 =C2=A0 } else if (opt_fdnum &lt; 0) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_print(&quot;%s\n&quot;, g_option_context_get=
+_help(context, true, NULL));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
++=C2=A0 =C2=A0 } else {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 lsock =3D opt_fdnum;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 if (!unix_socket || !blk_file) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 printf(&quot;Usage: %s [ -b block device or fi=
+le, -s UNIX domain socket&quot;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot; | -r Enable =
+read-only ] | [ -h ]\n&quot;, argv[0]);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
+-=C2=A0 =C2=A0 }<br>
+-<br>
+-=C2=A0 =C2=A0 lsock =3D unix_sock_new(unix_socket);<br>
+-=C2=A0 =C2=A0 if (lsock &lt; 0) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
+-=C2=A0 =C2=A0 }<br>
+-<br>
+-=C2=A0 =C2=A0 csock =3D accept(lsock, (void *)0, (void *)0);<br>
++=C2=A0 =C2=A0 csock =3D accept(lsock, NULL, NULL);<br>
+=C2=A0 =C2=A0 =C2=A0if (csock &lt; 0) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;Accept error %s\n&quot;,=
+ strerror(errno));<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_printerr(&quot;Accept error %s\n&quot;, stre=
+rror(errno));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+-=C2=A0 =C2=A0 vdev_blk =3D vub_new(blk_file);<br>
++=C2=A0 =C2=A0 vdev_blk =3D vub_new(opt_blk_file);<br>
+=C2=A0 =C2=A0 =C2=A0if (!vdev_blk) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+-=C2=A0 =C2=A0 if (enable_ro) {<br>
++=C2=A0 =C2=A0 if (opt_read_only) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vdev_blk-&gt;enable_ro =3D true;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (!vug_init(&amp;vdev_blk-&gt;parent, VHOST_USER_BLK_=
+MAX_QUEUES, csock,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vub_pa=
+nic_cb, &amp;vub_iface)) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, &quot;Failed to initialized li=
+bvhost-user-glib\n&quot;);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 goto err;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_printerr(&quot;Failed to initialize libvhost=
+-user-glib\n&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0g_main_loop_run(vdev_blk-&gt;loop);<br>
+-<br>
++=C2=A0 =C2=A0 g_main_loop_unref(vdev_blk-&gt;loop);<br>
++=C2=A0 =C2=A0 g_option_context_free(context);<br>
+=C2=A0 =C2=A0 =C2=A0vug_deinit(&amp;vdev_blk-&gt;parent);<br>
+-<br>
+-err:<br>
+=C2=A0 =C2=A0 =C2=A0vub_free(vdev_blk);<br>
+=C2=A0 =C2=A0 =C2=A0if (csock &gt;=3D 0) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0close(csock);<br>
+@@ -647,8 +667,8 @@ err:<br>
+=C2=A0 =C2=A0 =C2=A0if (lsock &gt;=3D 0) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0close(lsock);<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+-=C2=A0 =C2=A0 g_free(unix_socket);<br>
+-=C2=A0 =C2=A0 g_free(blk_file);<br>
++=C2=A0 =C2=A0 g_free(opt_socket_path);<br>
++=C2=A0 =C2=A0 g_free(opt_blk_file);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0return 0;<br>
+=C2=A0}<br>
+diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json<br=
+>
+index da6aaf51c8..ce0ef74db5 100644<br>
+--- a/docs/interop/vhost-user.json<br>
++++ b/docs/interop/vhost-user.json<br>
+@@ -54,6 +54,37 @@<br>
+=C2=A0 =C2=A0]<br>
+=C2=A0}<br>
+<br>
++##<br>
++# @VHostUserBackendBlockFeature:<br>
++#<br>
++# List of vhost user &quot;block&quot; features.<br>
++#<br>
++# @read-only: The --read-only command line option is supported.<br>
++# @blk-file: The --blk-file command line option is supported.<br>
++#<br>
++# Since: 5.0<br>
++##<br>
++{<br>
++=C2=A0 &#39;enum&#39;: &#39;VHostUserBackendBlockFeature&#39;,<br>
++=C2=A0 &#39;data&#39;: [ &#39;read-only&#39;, &#39;blk-file&#39; ]<br>
++}<br>
++<br>
++##<br>
++# @VHostUserBackendCapabilitiesBlock:<br>
++#<br>
++# Capabilities reported by vhost user &quot;block&quot; backends<br>
++#<br>
++# @features: list of supported features.<br>
++#<br>
++# Since: 5.0<br>
++##<br>
++{<br>
++=C2=A0 &#39;struct&#39;: &#39;VHostUserBackendCapabilitiesBlock&#39;,<br>
++=C2=A0 &#39;data&#39;: {<br>
++=C2=A0 =C2=A0 &#39;features&#39;: [ &#39;VHostUserBackendBlockFeature&#39;=
+ ]<br>
++=C2=A0 }<br>
++}<br>
++<br>
+=C2=A0##<br>
+=C2=A0# @VHostUserBackendInputFeature:<br>
+=C2=A0#<br>
+diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst<br>
+index 7827b710aa..2f0910d515 100644<br>
+--- a/docs/interop/vhost-user.rst<br>
++++ b/docs/interop/vhost-user.rst<br>
+@@ -1376,3 +1376,18 @@ Command line options:<br>
+=C2=A0 =C2=A0Enable virgl rendering support.<br>
+<br>
+=C2=A0 =C2=A0(optional)<br>
++<br>
++vhost-user-blk<br>
++--------------<br>
++<br>
++Command line options:<br>
++<br>
++--blk-file=3DPATH<br>
++<br>
++=C2=A0 Specify block device or file path.<br>
++<br>
++--read-only<br>
++<br>
++=C2=A0 Enable read-only.<br>
++<br>
++=C2=A0 (optional)<br>
+-- <br>
+2.21.0<br>
+<br>
+</blockquote></div></div>
+</blockquote></div>
+
+--000000000000908ff30598f1c2c9--
 
