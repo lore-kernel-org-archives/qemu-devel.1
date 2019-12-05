@@ -2,89 +2,86 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BTC_ID,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC03AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 11:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F55C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 11:16:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A3792245C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 11:14:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E45B72245C
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 11:16:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dXrljjOl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A3792245C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RgwU9Nc5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E45B72245C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icp5Y-0002ip-N1
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 06:14:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44819)
+	id 1icp72-0003u2-3p
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 06:16:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1icp4c-0001hn-JO
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 06:13:32 -0500
+ (envelope-from <armbru@redhat.com>) id 1icp5o-0003F8-58
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 06:14:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1icp4a-0004Mi-Iu
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 06:13:30 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:39857)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1icp4W-0004HC-04
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 06:13:24 -0500
-Received: by mail-oi1-x242.google.com with SMTP id a67so2358151oib.6
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 03:13:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=nwVLJCHDhe+L7VkcN7T0cNaLHAII9uD6cDr5bifPb6s=;
- b=dXrljjOlbC1rlpyTGICxxoz8/bknVkjUxyKKBuVg/3tz2n3YelgeGEnYndddiwxnMo
- /odo6gRor8igsclGSzPuwxJIVWHopTq9vmiPs2ygixRzVwf6qPi5P/dhFPL6LPHZn9Oe
- iCDbfHTU5BLymNgh4DrGKd9Y5SUpHx8SvWKQI2f2am51NJ7PSb0QWEweiRKD3CEPqXJQ
- Tb0pAgwrDDyB0qdfkjMh0xC0niAX7vst6Gi35lVYVsQ7ks9JTvVFKOXYkYch0RrZy+Mb
- QAIUKdzdS7vjbXM1/0HKIWCXeujfvWxb3pSP2YWhlKaJ9grwhrJOhAH9D6N2kEump/iO
- QsgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=nwVLJCHDhe+L7VkcN7T0cNaLHAII9uD6cDr5bifPb6s=;
- b=bnf+UY5AAt34bFggKurewkLF/eZnQ4lyi0uQmRS3onkkSDq3nmwmO2ndrwsIQqx00Y
- nrPdEuaeGr6DmShsP4deSCJJNLCDS0tMvOj4UePS882+ljDt0l9cj18M+/wmkM4RBKeg
- n02xxX6K+sK6Muhna7S/ueZOeri+ZO6/YJSA4KCSHRrolfhZLedmGejg0Ryr4LTSDsGh
- QKEHdODru1dnDMmeIxcm4OrLF8S10oIPvm1GvnoYC/77e3i5HiW0cpPx5E2/261esLUq
- Skl3A6gdJuPwqSBtXfNB5eOgELbfVScAFIdW1g8R7D8A8fRvykPBQWcKYAsTmGjLfo7F
- qQaQ==
-X-Gm-Message-State: APjAAAW7V6CuD8eIN+B+WKjZa73/mCCHZ7fX6f85YJEMpg+fIR76fGkm
- 36ampvYUSvKNP9TADIZn/wv1RsrhddiTsRcQrCI=
-X-Google-Smtp-Source: APXvYqyxMwH3i81BoHXLeT/6S/2c/GwZxKG6M3mLXlZodI5YUymTMpEQid4qyCmbdG5K/0y4DbW3NjzSkcKMIopSRCs=
-X-Received: by 2002:a05:6808:98b:: with SMTP id
- a11mr6785605oic.62.1575544400356; 
- Thu, 05 Dec 2019 03:13:20 -0800 (PST)
+ (envelope-from <armbru@redhat.com>) id 1icp5h-0000VZ-F4
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 06:14:41 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33985
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1icp5g-0000Rg-Fv
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 06:14:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575544475;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Rgb8euoYFnCAZsAcXHn/xvyr0PLr2EPPClKi016CL2E=;
+ b=RgwU9Nc5KgYUOcT7+yd/ORztwV+Qn3Pla8jYYd5BvMieEBISLtMX72dPxyrYZQKRmDxh1j
+ H8kmSgBhsQst4PpWG/KNRwGTbncfjXvIhIW4K88t0w5yvvq7dRj+F/0zCdzzua/1RJHvnP
+ WpvSsOd5M/w6yudccFTASFRpJDQsEIs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-163-kHGUDLqpNziNq_bbANHhFw-1; Thu, 05 Dec 2019 06:14:30 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6077C800EC0;
+ Thu,  5 Dec 2019 11:14:28 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 178215C1C3;
+ Thu,  5 Dec 2019 11:14:20 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9E03A1138606; Thu,  5 Dec 2019 12:14:18 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: Re: [RFC][PATCH 2/3] docs/specs: Add specification of ivshmem device
+ revision 2
+References: <cover.1573477032.git.jan.kiszka@siemens.com>
+ <cover.1573477032.git.jan.kiszka@siemens.com>
+ <f5996d934d24775160bcedbf28ac975a95d91101.1573477032.git.jan.kiszka@siemens.com>
+Date: Thu, 05 Dec 2019 12:14:18 +0100
+In-Reply-To: <f5996d934d24775160bcedbf28ac975a95d91101.1573477032.git.jan.kiszka@siemens.com>
+ (Jan Kiszka's message of "Mon, 11 Nov 2019 13:57:11 +0100")
+Message-ID: <87blsndnxx.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Thu, 5 Dec 2019 03:13:19 -0800 (PST)
-In-Reply-To: <CAL1e-=i6qjd2hwNqpV3eWmhN-QozC2c7jJnsns0JjGpLb+-Ppg@mail.gmail.com>
-References: <20190719082647.18113-1-mrolnik@gmail.com>
- <20190719082647.18113-6-mrolnik@gmail.com>
- <000c01d542cf$d8476a00$88d63e00$@ru>
- <CAL1e-=h70Hrs7fFEBMgzhrq3HKhxuy9qGQg5148jJ1ACALSThg@mail.gmail.com>
- <CAL1e-=i6qjd2hwNqpV3eWmhN-QozC2c7jJnsns0JjGpLb+-Ppg@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 5 Dec 2019 12:13:19 +0100
-Message-ID: <CAL1e-=izrNETHWpUNhUTsuLD9sSKSpUWXT8-=dgW9W=4sjmiLw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v27 5/8] target/avr: Add limited support for
- USART and 16 bit timer peripherals
-To: Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000004fa7be0598f304ff"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: kHGUDLqpNziNq_bbANHhFw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,248 +93,668 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Michael Rolnik <mrolnik@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "philmd@redhat.com" <philmd@redhat.com>
+Cc: liang yan <lyan@suse.com>, Jailhouse <jailhouse-dev@googlegroups.com>,
+ Claudio Fontana <claudio.fontana@gmail.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004fa7be0598f304ff
-Content-Type: text/plain; charset="UTF-8"
+This has been on the list for more than three weeks already.  I
+apologize for the delay.
 
-On Thursday, December 5, 2019, Aleksandar Markovic <
-aleksandar.m.mail@gmail.com> wrote:
+Jan Kiszka <jan.kiszka@siemens.com> writes:
 
+> From: Jan Kiszka <jan.kiszka@siemens.com>
 >
+> This imports the ivshmem v2 specification draft from Jailhouse. Its
+> final home is to be decided, this shall just simplify the review process
+> at this stage.
 >
-> On Thursday, December 5, 2019, Aleksandar Markovic <
-> aleksandar.m.mail@gmail.com> wrote:
+> Note that specifically the Features register (offset 08h) is still under
+> consideration. In particular, its bit 0 seems useless now as its benefit
+> to guests, specifically when they want to be portable, is close to zero.
+> Maybe the register should still be kept, with all bits RsvdZ, for easier
+> extensibility.
 >
->>
->>
->> On Thursday, July 25, 2019, Pavel Dovgalyuk <dovgaluk@ispras.ru> wrote:
->>
->>> > From: Qemu-devel [mailto:qemu-devel-bounces+patchwork-qemu-
->>> > devel=patchwork.kernel.org@nongnu.org] On Behalf Of Michael Rolnik
->>> > From: Sarah Harris <S.E.Harris@kent.ac.uk>
->>> >
->>> > These were designed to facilitate testing but should provide enough
->>> function to be useful in
->>> > other contexts.
->>>
->>> USART is very useful for testing, but to which model of AVR is belongs?
->>> We also started implementation of USART and other devices in our
->>> internship program,
->>> using prior version of your patches.
->>> There were other register addresses for the registers and some of them
->>> even intersect
->>> making read/write logic more complex (we looked at Atmega8).
->>>
->>> You also mix the board and the SoC into one file, making
->>> hardware-on-chip harder to reuse.
->>>
->>> I think that the structure can be revised in the following way:
->>> Board -> SoC -> Devices
->>>
->>>
->> Pavel,
->>
->> By "structure", did you mean structure of patches?
->>
->> Let's say, after the all ISA instruction patches are introduced, we first
->> introduce one real board of our choice (only infrastructure, with almost
->> empty content, than devices on that board, than the corresponding SoC/MCU
->> infrastucture, than device in that SoC.
->>
->> Additional boards would follow the same pattern, potentially reusing
->> already implemented devices, or whole SoC/MCU.
->>
->> One more question:
->>
->> We already saw that devices within SoC/MCUs for AVR platform exibit great
->> variation. First, there are around 17 generation of AVR cores (avr1, avr2,
->> ... xmega7). Than, there is, I think 600+ SoC/MCU models (hard to believe,
->> but true). Each SoC defines its devices, and in potentially different way
->> (not only its starting address, but real differences in terms of
->> functionality). I thought that at least for a particular core, the devices
->> would be defined in a consistent way, but even that is not true - for
->> example ADC for a SoC having core X can be significantly different that ADC
->> for another SoC having the same core X.
->>
->> How to deal with such avalanche of devices? How to organize and maintain
->> 27 significantly different versions of ADC; and 53 significantly different
->> versions of Watchdogs (the numbers are invented by me, but are likely to
->> describe the situation well)?
->>
->>
-> Peter, may I ask you the same questions?
+> The rest appears now rather mature and reasonably implementable, as
+> proven also by a version for Jailhouse.
 >
-> I have a strong impression we here need to think colectively.
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> ---
+>  docs/specs/ivshmem-2-device-spec.md | 333 ++++++++++++++++++++++++++++++=
+++++++
+>  1 file changed, 333 insertions(+)
+>  create mode 100644 docs/specs/ivshmem-2-device-spec.md
 >
->
-Of course, I did not mean that we'll ever support 600+ AVR SoCs/MCUs, or 53
-AVR watchogs, but, as the work in Pavel's repository illustrates, we will
-stumble very soon on, let's say different USART devices (in this case
-between "atmega2560" and one of "xmega" cores. It is realistic that we can
-potentially end up needing support for 5-6 AVR USARTs. How to name them, as
-a first question?
+> diff --git a/docs/specs/ivshmem-2-device-spec.md b/docs/specs/ivshmem-2-d=
+evice-spec.md
+> new file mode 100644
+> index 0000000000..98cfde585a
+> --- /dev/null
+> +++ b/docs/specs/ivshmem-2-device-spec.md
+> @@ -0,0 +1,333 @@
+> +IVSHMEM Device Specification
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> +
+> +** NOTE: THIS IS WORK-IN-PROGRESS, NOT YET A STABLE INTERFACE SPECIFICAT=
+ION! **
+> +
+> +The Inter-VM Shared Memory device provides the following features to its=
+ users:
+> +
+> +- Interconnection between up to 65536 peers
+> +
+> +- Multi-purpose shared memory region
+> +
+> +    - common read/writable section
+> +
+> +    - unidirectional sections that are read/writable for one peer and on=
+ly
+> +      readable for the others
+> +
+> +    - section with peer states
+> +
+> +- Event signaling via interrupt to remote sides
+> +
+> +- Support for life-cycle management via state value exchange and interru=
+pt
+> +  notification on changes, backed by a shared memory section
+> +
+> +- Free choice of protocol to be used on top
+> +
+> +- Protocol type declaration
+> +
+> +- Unprivileged access to memory-mapped or I/O registers feasible
+> +
+> +- Discoverable and configurable via standard PCI mechanisms
 
-Not to mention also possible dependencies between various devices,
-interleaved memory ranges, shared registers...
+Stating requirements is much appreciated.  Design rationale would be
+even better :)
 
+As pointed out many times, shared memory is not a solution to any
+communication problem, it's merely a building block for building such
+solutions: you invariably have to layer some protocol on top.  In your
+KVM Forum talk, you mention layering virtio on top.  Makes sense to me.
+But why does *this* virtio transport have to be an independent device?
+Other transports aren't.
 
+Now let me indulge in spec nitpicking :)
 
-> Yours,
->
-> Aleksandar
->
->
->
->> Best regards,
->>
->> Aleksandar
->>
->>
->>
->>
->>
->>> Board includes SoC, loads the firmware, and adds some external
->>> peripheral devices, if needed.
->>>
->>> SoC includes embedded peripherals. It dispatches IO memory accesses and
->>> passes them
->>> to the devices. In this case you can have different register addresses
->>> for different SoCs, but
->>> the embedded device emulation code can be mostly the same for simple
->>> devices like USART.
->>>
->>> > Only a subset of the functions of each peripheral is implemented,
->>> mainly due to the lack of a
->>> > standard way to handle electrical connections (like GPIO pins).
->>>
->>> We did not got too much results, you can check for our changes here:
->>> https://github.com/Dovgalyuk/qemu/tree/avr8
->>>
->>> But we can help you in development of better version of the patches and
->>> split the work
->>> for making this platform more usable.
->>>
->>>
->>> Pavel Dovgalyuk
->>>
->>>
->>>
+> +
+> +
+> +Hypervisor Model
+> +----------------
+> +
+> +In order to provide a consistent link between peers, all connected insta=
+nces of
+> +IVSHMEM devices need to be configured, created and run by the hypervisor
+> +according to the following requirements:
+> +
+> +- The instances of the device need to be accessible via PCI programming
+> +  interfaces on all sides.
 
---0000000000004fa7be0598f304ff
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+What does that mean?
 
-<br><br>On Thursday, December 5, 2019, Aleksandar Markovic &lt;<a href=3D"m=
-ailto:aleksandar.m.mail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt; wrot=
-e:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-l=
-eft:1px #ccc solid;padding-left:1ex"><br><br>On Thursday, December 5, 2019,=
- Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com" tar=
-get=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt; wrote:<br><blockquote cl=
-ass=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;p=
-adding-left:1ex"><br><br>On Thursday, July 25, 2019, Pavel Dovgalyuk &lt;<a=
- href=3D"mailto:dovgaluk@ispras.ru" target=3D"_blank">dovgaluk@ispras.ru</a=
->&gt; wrote:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8e=
-x;border-left:1px #ccc solid;padding-left:1ex">&gt; From: Qemu-devel [mailt=
-o:<a href=3D"mailto:qemu-devel-bounces+patchwork-qemu-" target=3D"_blank">q=
-emu-devel-bounces+pat<wbr>chwork-qemu-</a><br>
-&gt; devel=3D<a href=3D"mailto:patchwork.kernel.org@nongnu.org" target=3D"_=
-blank">patchwork.kernel.org@non<wbr>gnu.org</a>] On Behalf Of Michael Rolni=
-k<br>
-&gt; From: Sarah Harris &lt;<a href=3D"mailto:S.E.Harris@kent.ac.uk" target=
-=3D"_blank">S.E.Harris@kent.ac.uk</a>&gt;<br>
-&gt; <br>
-&gt; These were designed to facilitate testing but should provide enough fu=
-nction to be useful in<br>
-&gt; other contexts.<br>
-<br>
-USART is very useful for testing, but to which model of AVR is belongs?<br>
-We also started implementation of USART and other devices in our internship=
- program,<br>
-using prior version of your patches.<br>
-There were other register addresses for the registers and some of them even=
- intersect<br>
-making read/write logic more complex (we looked at Atmega8).<br>
-<br>
-You also mix the board and the SoC into one file, making hardware-on-chip h=
-arder to reuse.<br>
-<br>
-I think that the structure can be revised in the following way:<br>
-Board -&gt; SoC -&gt; Devices<br>
-<br></blockquote><div><br></div><div>Pavel,</div><div><br></div><div>By &qu=
-ot;structure&quot;, did you mean structure of patches?</div><div><br></div>=
-<div>Let&#39;s say, after the all ISA instruction patches are introduced, w=
-e first introduce one real board of our choice (only infrastructure, with a=
-lmost empty content, than devices on that board, than the corresponding SoC=
-/MCU infrastucture, than device in that SoC.</div><div><br></div><div>Addit=
-ional boards would follow the same pattern, potentially reusing already imp=
-lemented devices, or whole SoC/MCU.</div><div><br></div><div>One more quest=
-ion:</div><div><br></div><div>We already saw that devices within SoC/MCUs f=
-or AVR platform exibit great variation. First, there are around 17 generati=
-on of AVR cores (avr1, avr2, ... xmega7). Than, there is, I think 600+ SoC/=
-MCU models (hard to believe, but true). Each SoC defines its devices, and i=
-n potentially different way (not only its starting address, but real differ=
-ences in terms of functionality). I thought that at least for a particular =
-core, the devices would be defined in a consistent way, but even that is no=
-t true - for example ADC for a SoC having core X can be significantly diffe=
-rent that ADC for another SoC having the same core X.</div><div><br></div><=
-div>How to deal with such avalanche of devices? How to organize and maintai=
-n 27 significantly different versions of ADC; and 53 significantly differen=
-t versions of Watchdogs (the numbers are invented by me, but are likely to =
-describe the situation well)?</div><div><br></div></blockquote><div><br></d=
-iv><div>Peter, may I ask you the same questions?</div><div><br></div><div>I=
- have a strong impression we here need to think colectively.</div><div><br>=
-</div></blockquote><div><br></div><div>Of course, I did not mean that we&#3=
-9;ll ever support 600+ AVR SoCs/MCUs, or 53 AVR watchogs, but, as the work =
-in Pavel&#39;s repository illustrates, we will stumble very soon on, let&#3=
-9;s say different USART devices (in this case between &quot;atmega2560&quot=
-; and one of &quot;xmega&quot; cores. It is realistic that we can potential=
-ly end up needing support for 5-6 AVR USARTs. How to name them, as a first =
-question?</div><div><br></div><div>Not to mention also possible dependencie=
-s between various devices, interleaved memory ranges, shared registers...</=
-div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><div>You=
-rs,</div><div><br></div><div>Aleksandar</div><div><br></div><div>=C2=A0</di=
-v><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:=
-1px #ccc solid;padding-left:1ex"><div>Best regards,</div><div><br></div><di=
-v>Aleksandar</div><div><br></div><div><br></div><div><br></div><div>=C2=A0<=
-/div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-le=
-ft:1px #ccc solid;padding-left:1ex">
-Board includes SoC, loads the firmware, and adds some external peripheral d=
-evices, if needed.<br>
-<br>
-SoC includes embedded peripherals. It dispatches IO memory accesses and pas=
-ses them<br>
-to the devices. In this case you can have different register addresses for =
-different SoCs, but<br>
-the embedded device emulation code can be mostly the same for simple device=
-s like USART.<br>
-<br>
-&gt; Only a subset of the functions of each peripheral is implemented, main=
-ly due to the lack of a<br>
-&gt; standard way to handle electrical connections (like GPIO pins).<br>
-<br>
-We did not got too much results, you can check for our changes here: <a hre=
-f=3D"https://github.com/Dovgalyuk/qemu/tree/avr8" target=3D"_blank">https:/=
-/github.com/Dovgalyuk/q<wbr>emu/tree/avr8</a><br>
-<br>
-But we can help you in development of better version of the patches and spl=
-it the work<br>
-for making this platform more usable.<br>
-<br>
-<br>
-Pavel Dovgalyuk<br>
-<br>
-<br>
-</blockquote>
-</blockquote>
-</blockquote>
+> +
+> +- The read/write shared memory section has to be of the same size for al=
+l
+> +  peers and, if non-zero, has to reflect the same memory content for the=
+m.
 
---0000000000004fa7be0598f304ff--
+Isn't "same memory content" redundant with "shared memory"?
+
+> +
+> +- If output sections are present (non-zero section size), there must be =
+one
+> +  reserved for each peer with exclusive write access. All output section=
+s
+> +  must have the same size and must be readable for all peers. They have =
+to
+> +  reflect the same memory content for all peers.
+
+Are these the "unidirectional sections" mentioned previously?
+
+> +
+> +- The State Table must have the same size for all peers, must be large e=
+nough to
+> +  hold a state values of all peers, and must be read-only for the user.
+
+"the state values", I guess.
+
+> +
+> +- State register changes (explicit writes, peer resets) have to be propa=
+gated
+> +  to the other peers by updating the corresponding State Table entry and=
+ issuing
+> +  an interrupt to all other peers if they enabled reception.
+> +
+> +- Interrupts events triggered by a peer have to be delivered to the targ=
+et peer,
+> +  provided the receiving side is valid and has enabled the reception.
+> +
+> +- All peers must have the same interrupt delivery features available, i.=
+e. MSI-X
+> +  with the same maximum number of vectors on platforms supporting this
+> +  mechanism, otherwise INTx with one vector.
+
+Use case for legacy INTx?
+
+For what it's worth, we removed INTx support from ivshmem v1 in rev 1,
+QEMU 2.6.
+
+> +
+> +
+> +Guest-side Programming Model
+> +----------------------------
+> +
+> +An IVSHMEM device appears as a PCI device to its users. Unless otherwise=
+ noted,
+> +it conforms to the PCI Local Bus Specification, Revision 3.0 As such, it=
+ is
+
+Uh, is there anything in it that does *not* conform to this spec?
+
+> +discoverable via the PCI configuration space and provides a number of st=
+andard
+> +and custom PCI configuration registers.
+> +
+> +### Shared Memory Region Layout
+> +
+> +The shared memory region is divided into several sections.
+> +
+> +    +-----------------------------+   -
+> +    |                             |   :
+> +    | Output Section for peer n-1 |   : Output Section Size
+> +    |     (n =3D Maximum Peers)     |   :
+> +    +-----------------------------+   -
+> +    :                             :
+> +    :                             :
+> +    :                             :
+> +    +-----------------------------+   -
+> +    |                             |   :
+> +    |  Output Section for peer 1  |   : Output Section Size
+> +    |                             |   :
+> +    +-----------------------------+   -
+> +    |                             |   :
+> +    |  Output Section for peer 0  |   : Output Section Size
+> +    |                             |   :
+> +    +-----------------------------+   -
+> +    |                             |   :
+> +    |     Read/Write Section      |   : R/W Section Size
+> +    |                             |   :
+> +    +-----------------------------+   -
+> +    |                             |   :
+> +    |         State Table         |   : State Table Size
+> +    |                             |   :
+> +    +-----------------------------+   <-- Shared memory base address
+> +
+> +The first section consists of the mandatory State Table. Its size is def=
+ined by
+> +the State Table Size register and cannot be zero. This section is read-o=
+nly for
+> +all peers.
+> +
+> +The second section consists of shared memory that is read/writable for a=
+ll
+> +peers. Its size is defined by the R/W Section Size register. A size of z=
+ero is
+> +permitted.
+> +
+> +The third and following sections are unidirectional output sections, one=
+ for
+> +each peer. Their sizes are all identical. The size of a single output se=
+ction is
+> +defined by the Output Section Size register. An output section is read/w=
+ritable
+> +for the corresponding peer and read-only for all other peers. E.g., only=
+ the
+> +peer with ID 3 can write to the fourths output section, but all peers ca=
+n read
+> +from this section.
+> +
+> +All sizes have to be rounded up to multiples of a mappable page in order=
+ to
+> +allow access control according to the section restrictions.
+> +
+> +### Configuration Space Registers
+> +
+> +#### Header Registers
+> +
+> +| Offset | Register               | Content                             =
+                 |
+> +|-------:|:-----------------------|:------------------------------------=
+-----------------|
+> +|    00h | Vendor ID              | 1AF4h                               =
+                 |
+> +|    02h | Device ID              | 1110h                               =
+                 |
+
+Same as ivshmem v1.  Revision ID (offset 08h) disambiguates.
+
+> +|    04h | Command Register       | 0000h on reset, implementing bits 1,=
+ 2, 10           |
+
+What does "implementing bits ..." mean?
+
+> +|    06h | Status Register        | 0010h, static value (bit 3 not imple=
+mented)          |
+
+What does "bit 3 not implemented" mean?
+
+> +|    08h | Revision ID            | 02h                                 =
+                 |
+
+ivshmem v1 is rev 0 before QEMU 2.6, rev 1 since.  Rev 1 is
+backward-compatible to rev 0 for guest software.  Is rev 2 intended to
+be backward-compatible, too?
+
+You should probably explan how your v2 relates to v1 in more detail,
+possibly in its own top-level section.
+
+> +|    09h | Class Code, Interface  | Protocol Type bits 0-7, see [Protoco=
+ls](#Protocols)  |
+> +|    0Ah | Class Code, Sub-Class  | Protocol Type bits 8-15, see [Protoc=
+ols](#Protocols) |
+> +|    0Bh | Class Code, Base Class | FFh                                 =
+                 |
+
+FFh means "device does not fit any defined class."  For what it's worth,
+ivshmem v1 uses 05h "Memory Controller", with sub-class and interface
+00h "RAM Controller".
+
+> +|    0Eh | Header Type            | 00h                                 =
+                 |
+> +|    10h | BAR 0                  | MMIO or I/O register region         =
+                 |
+
+Use case for I/O?
+
+For what it's worth, ivshmem v1 never supported I/O.
+
+> +|    14h | BAR 1                  | MSI-X region                        =
+                 |
+> +|    18h | BAR 2 (with BAR 3)     | optional: 64-bit shared memory regio=
+n                |
+
+What does "(with BAR 3)" mean?
+
+> +|    2Ch | Subsystem Vendor ID    | same as Vendor ID, or provider-speci=
+fic value        |
+> +|    2Eh | Subsystem ID           | same as Device ID, or provider-speci=
+fic value        |
+
+ivshmem v1 leaves these blank.
+
+> +|    34h | Capability Pointer     | First capability                    =
+                 |
+> +|    3Eh | Interrupt Pin          | 01h-04h, must be 00h if MSI-X is ava=
+ilable           |
+
+"If MSI-X is available"?
+
+A PCIe device always provides MSI-X, and may additionally provide legacy
+INTx.  A conventional PCI device may provide either or both.  In any
+case, the Interrupt Pin register is zero when legacy INTx is not
+provided,
+
+> +
+> +If BAR 2 is not present, the shared memory region is not relocatable by =
+the
+> +user. In that case, the hypervisor has to implement the Base Address reg=
+ister in
+> +the vendor-specific capability.
+> +
+> +Other header registers may not be implemented. If not implemented, they =
+return 0
+> +on read and ignore write accesses.
+
+Is this an example of where the device does not conform to the PCI Local
+Bus Specification?
+
+> +
+> +#### Vendor Specific Capability (ID 09h)
+> +
+> +| Offset | Register            | Content                                =
+        |
+> +|-------:|:--------------------|:---------------------------------------=
+--------|
+> +|    00h | ID                  | 09h                                    =
+        |
+> +|    01h | Next Capability     | Pointer to next capability or 00h      =
+        |
+> +|    02h | Length              | 18h or 20h                             =
+        |
+> +|    03h | Privileged Control  | Bit 0 (read/write): one-shot interrupt =
+mode    |
+> +|        |                     | Bits 1-7: RsvdZ                        =
+        |
+
+Please define RsvdZ somewhere, or use plainer language.
+
+> +|    04h | State Table Size    | 32-bit size of read-only State Table   =
+        |
+> +|    08h | R/W Section Size    | 64-bit size of common read/write sectio=
+n       |
+> +|    10h | Output Section Size | 64-bit size of unidirectional output se=
+ctions  |
+> +|    18h | Base Address        | optional: 64-bit base address of shared=
+ memory |
+
+Length is 20h when Base Adress is present, else 18h.  Worth spelling
+that out?
+
+> +
+> +All registers are read-only, except for bit 0 of the Privileged Control
+> +register.
+
+Well, the other bits of that register are writable, they're just
+ignored.
+
+For what it's worth, existing ivshmem-spec.txt uses the terms read-only,
+write-only, read/write and reserved bits rigorously: "Software should
+only access the registers as specified [...]  Reserved bits should be
+ignored on read, and preserved on write."
+
+> +
+> +When bit 0 in the Privileged Control register is set to 1, the device cl=
+ears
+> +bit 0 in the Interrupt Control register on each interrupt delivery. This=
+ enables
+> +automatic interrupt throttling when re-enabling shall be performed by a
+> +scheduled unprivileged instance on the user side.
+> +
+> +If an IVSHMEM device does not support a relocatable shared memory region=
+, BAR 2
+> +must not be implemented by the provider. Instead, the Base Address regis=
+ter has
+> +to be implemented to report the location of the shared memory region in =
+the
+> +user's address space.
+
+Rationale for not wanting to support relocatable shared memory?
+
+> +
+> +A non-existing shared memory section has to report zero in its Section S=
+ize
+> +register.
+
+This vendor-specific capability must always be present, I presume.
+Worth spelling out.
+
+> +
+> +#### MSI-X Capability (ID 11h)
+> +
+> +On platforms supporting MSI-X, IVSHMEM has to provide interrupt delivery=
+ via
+> +this mechanism. In that case, the legacy INTx delivery mechanism is not
+> +available, and the Interrupt Pin configuration register returns 0.
+
+I'm confused.  Does that mean the device shall support either MSI-X or
+legacy INTx, but never both?
+
+> +
+> +The IVSHMEM device has no notion of pending interrupts. Therefore, readi=
+ng from
+> +the MSI-X Pending Bit Array will always return 0.
+
+I guess this means a polling mode of operation is not possible.
+Correct?
+
+> +
+> +The corresponding MSI-X MMIO region is configured via BAR 1.
+> +
+> +The MSI-X table size reported by the MSI-X capability structure is ident=
+ical for
+> +all peers.
+> +
+> +### Register Region
+> +
+> +The register region may be implemented as MMIO or I/O.
+> +
+> +When implementing it as MMIO, the hypervisor has to ensure that the regi=
+ster
+> +region can be mapped as a single page into the address space of the user=
+. Write
+
+"can be mapped as a single page" depends on the host system, not the
+device.
+
+For what it's worth, ivshmem v1 fixes the size of BAR0 to 256 bytes.
+Any particular reason to keep its size so loosely specified in v2?
+
+> +accesses to MMIO region offsets that are not backed by registers have to=
+ be
+> +ignored, read accesses have to return 0. This enables the user to hand o=
+ut the
+> +complete region, along with the shared memory, to an unprivileged instan=
+ce.
+> +
+> +The region location in the user's physical address space is configured v=
+ia BAR
+> +0. The following table visualizes the region layout:
+> +
+> +| Offset | Register                                                     =
+       |
+> +|-------:|:-------------------------------------------------------------=
+-------|
+> +|    00h | ID                                                           =
+       |
+> +|    04h | Maximum Peers                                                =
+       |
+> +|    08h | Features                                                     =
+       |
+> +|    0Ch | Interrupt Control                                            =
+       |
+> +|    10h | Doorbell                                                     =
+       |
+> +|    14h | State                                                        =
+       |
+> +
+> +All registers support only aligned 32-bit accesses.
+
+Definitely not backwards compatible to rev 1.  I figure that means v2
+should use a different Vendor ID / Device ID, not just bump the Revsion
+ID.
+
+No interrupt status register?
+
+> +
+> +#### ID Register (Offset 00h)
+> +
+> +Read-only register that reports the ID of the local device. It is unique=
+ for all
+> +of the connected devices and remains unchanged over their lifetime.
+> +
+> +#### Maximum Peers Register (Offset 04h)
+> +
+> +Read-only register that reports the maximum number of possible peers (in=
+cluding
+> +the local one). The supported range is between 2 and 65536 and remains c=
+onstant
+> +over the lifetime of all peers.
+
+Value 1 would be boring, but is it really impossible?
+
+> +
+> +#### Features Register (Offset 08h)
+> +
+> +Read-only register that reports features of the local device or the conn=
+ected
+> +peers. Its content remains constant over the lifetime of all peers.
+> +
+> +| Bits | Content                                                        =
+       |
+> +|-----:|:---------------------------------------------------------------=
+-------|
+> +|    0 | 1: Synchronized shared memory base address                     =
+       |
+> +| 1-31 | RsvdZ                                                          =
+       |
+> +
+> +If "synchronized shared memory base address" is reported (bit 0 is set),=
+ the
+> +shared memory region is mapped at the same address into the user address=
+ spaces
+> +of all connected peers. Thus, peers can use physical addresses as pointe=
+rs when
+> +exchanging information via the shared memory. This feature flag is never=
+ set
+> +when the shared memory region is relocatable via BAR 2.
+> +
+> +#### Interrupt Control Register (Offset 0Ch)
+> +
+> +This read/write register controls the generation of interrupts whenever =
+a peer
+> +writes to the Doorbell register or changes its state.
+> +
+> +| Bits | Content                                                        =
+       |
+> +|-----:|:---------------------------------------------------------------=
+-------|
+> +|    0 | 1: Enable interrupt generation                                 =
+       |
+> +| 1-31 | RsvdZ                                                          =
+       |
+> +
+> +Note that bit 0 is reset to 0 on interrupt delivery if one-shot interrup=
+t mode
+> +is enabled in the Enhanced Features register.
+> +
+> +The value of this register after device reset is 0.
+
+I presume this applies only to legacy INTx.  Correct?
+
+ivshmem v1 calls this Interrupt Mask.
+
+> +
+> +#### Doorbell Register (Offset 10h)
+> +
+> +Write-only register that triggers an interrupt vector in the target devi=
+ce if it
+> +is enabled there.
+> +
+> +| Bits  | Content                                                       =
+       |
+> +|------:|:--------------------------------------------------------------=
+-------|
+> +|  0-15 | Vector number                                                 =
+       |
+> +| 16-31 | Target ID                                                     =
+       |
+> +
+> +Writing a vector number that is not enabled by the target has no effect.=
+ The
+> +peers can derive the number of available vectors from their own device
+> +capabilities and are expected to define or negotiate the used ones via t=
+he
+> +selected protocol.
+
+That's because all peers use the same number of vectors.  Worth spelling ou=
+t?
+
+> +
+> +Addressing a non-existing or inactive target has no effect. Peers can id=
+entify
+> +active targets via the State Table.
+> +
+> +The behavior on reading from this register is undefined.
+> +
+> +#### State Register (Offset 14h)
+> +
+> +Read/write register that defines the state of the local device. Writing =
+to this
+> +register sets the state and triggers interrupt vector 0 on the remote de=
+vice if
+
+"the remote device"?  Do you mean all peers?
+
+"interrupt vector 0" assumes MSI-X.  With legacy INTx, it simply
+triggers an interrupt.
+
+How can guest software distinguish between "interrupt due to remote
+state change" and "interrupt due to doorbell"?
+
+Things become so much easier when you ditch INTx: reserve vector 0 for
+state change, done.
+
+> +the written state value differs from the previous one. The user of the r=
+emote
+> +device can read the value written to this register from the State Table.
+> +
+> +The value of this register after device reset is 0.
+
+I guess the meaning of state values depends on the protocol type.
+Correct?
+
+> +
+> +### State Table
+> +
+> +The State Table is a read-only section at the beginning of the shared me=
+mory
+> +region. It contains a 32-bit state value for each of the peers. Locating=
+ the
+> +table in shared memory allows fast checking of remote states without reg=
+ister
+> +accesses.
+> +
+> +The table is updated on each state change of a peers. Whenever a user of=
+ an
+> +IVSHMEM device writes a value to the Local State register, this value is=
+ copied
+> +into the corresponding entry of the State Table. When a IVSHMEM device i=
+s reset
+> +or disconnected from the other peers, zero is written into the correspon=
+ding
+> +table entry. The initial content of the table is all zeros.
+> +
+> +    +--------------------------------+
+> +    | 32-bit state value of peer n-1 |
+> +    +--------------------------------+
+> +    :                                :
+> +    +--------------------------------+
+> +    | 32-bit state value of peer 1   |
+> +    +--------------------------------+
+> +    | 32-bit state value of peer 0   |
+> +    +--------------------------------+ <-- Shared memory base address
+> +
+> +
+> +Protocols
+> +---------
+> +
+> +The IVSHMEM device shall support the peers of a connection in agreeing o=
+n the
+> +protocol used over the shared memory devices. For that purpose, the inte=
+rface
+> +byte (offset 09h) and the sub-class byte (offset 0Ah) of the Class Code =
+register
+> +encodes a 16-bit protocol type for the users. The following type values =
+are
+> +defined:
+> +
+> +| Protocol Type | Description                                           =
+       |
+> +|--------------:|:------------------------------------------------------=
+-------|
+> +|         0000h | Undefined type                                        =
+       |
+> +|         0001h | Virtual peer-to-peer Ethernet                         =
+       |
+> +|   0002h-3FFFh | Reserved                                              =
+       |
+> +|   4000h-7FFFh | User-defined protocols                                =
+       |
+> +|   8000h-BFFFh | Virtio over Shared Memory, front-end peer             =
+       |
+> +|   C000h-FFFFh | Virtio over Shared Memory, back-end peer              =
+       |
+> +
+> +Details of the protocols are not in the scope of this specification.
+
+Are you sure this use of PCI class code is kosher?
+
+Final request: please break your lines around column 70 for readability.
+
 
