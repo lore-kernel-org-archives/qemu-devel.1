@@ -2,50 +2,48 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 251B8C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 15:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F7C8C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 15:50:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFFC5206DB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 15:49:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFFC5206DB
+	by mail.kernel.org (Postfix) with ESMTPS id E2E10206DB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 15:50:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2E10206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ictNe-0004Gb-2H
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 10:49:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49101)
+	id 1ictP0-0005Na-3e
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 10:50:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1icswQ-0000Jn-1W
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 10:21:19 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icswg-0000Y9-SO
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 10:21:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1icswL-00067H-77
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 10:21:17 -0500
-Received: from relay.sw.ru ([185.231.240.75]:43638)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icswe-0006j5-TG
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 10:21:34 -0500
+Received: from relay.sw.ru ([185.231.240.75]:43676)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1icswH-0005ex-1E; Thu, 05 Dec 2019 10:21:12 -0500
+ id 1icswd-0005lz-1D; Thu, 05 Dec 2019 10:21:32 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1icsvb-00007O-6v; Thu, 05 Dec 2019 18:20:27 +0300
+ id 1icsvZ-00007O-1t; Thu, 05 Dec 2019 18:20:25 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 07/21] ppc: well form kvmppc_hint_smt_possible error hint
- helper
-Date: Thu,  5 Dec 2019 18:20:05 +0300
-Message-Id: <20191205152019.8454-8-vsementsov@virtuozzo.com>
+Subject: [PATCH v7 00/21] error: prepare for auto propagated local_err
+Date: Thu,  5 Dec 2019 18:19:58 +0300
+Message-Id: <20191205152019.8454-1-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191205152019.8454-1-vsementsov@virtuozzo.com>
-References: <20191205152019.8454-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
@@ -60,71 +58,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-ppc@nongnu.org, armbru@redhat.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Paul Burton <pburton@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org,
+ David Hildenbrand <david@redhat.com>, armbru@redhat.com,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Tony Krowiak <akrowiak@linux.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Greg Kurz <groug@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Kevin Wolf <kwolf@redhat.com>,
+ vsementsov@virtuozzo.com,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-s390x@nongnu.org, Max Reitz <mreitz@redhat.com>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make kvmppc_hint_smt_possible hint append helper well formed:
-rename errp to errp_in, as it is IN-parameter here (which is unusual
-for errp), rename function to be kvmppc_error_append_*_hint.
+Hi all!
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- target/ppc/kvm_ppc.h | 4 ++--
- hw/ppc/spapr.c       | 2 +-
- target/ppc/kvm.c     | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+This is the first part of the bit series, which contains mostly simple
+cleanups.
 
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 98bd7d5da6..f22daabf51 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -28,7 +28,7 @@ void kvmppc_set_papr(PowerPCCPU *cpu);
- int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
- void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
- int kvmppc_smt_threads(void);
--void kvmppc_hint_smt_possible(Error **errp);
-+void kvmppc_error_append_smt_possible_hint(Error *const *errp);
- int kvmppc_set_smt_threads(int smt);
- int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
- int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
-@@ -164,7 +164,7 @@ static inline int kvmppc_smt_threads(void)
-     return 1;
- }
- 
--static inline void kvmppc_hint_smt_possible(Error **errp)
-+static inline void kvmppc_error_append_smt_possible_hint(Error *const *errp)
- {
-     return;
- }
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index e076f6023c..1b87eb0ffd 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -2564,7 +2564,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
-                                       " requires the use of VSMT mode %d.\n",
-                                       smp_threads, kvm_smt, spapr->vsmt);
-                 }
--                kvmppc_hint_smt_possible(&local_err);
-+                kvmppc_error_append_smt_possible_hint(&local_err);
-                 goto out;
-             }
-         }
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index c77f9848ec..27ea3ce535 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2076,7 +2076,7 @@ int kvmppc_set_smt_threads(int smt)
-     return ret;
- }
- 
--void kvmppc_hint_smt_possible(Error **errp)
-+void kvmppc_error_append_smt_possible_hint(Error *const *errp)
- {
-     int i;
-     GString *g;
+v6 was sent in separate (I'm sorry for inconvenience)
+
+v7: by Markus review (and with his prepared fixups, thanks a lot!):
+  - don't rename Error** paramters
+  - switch to Error *const * where appropriate
+  last patch is new and replaces
+   "nbd: well form nbd_iter_channel_error errp handler"
+
+Vladimir Sementsov-Ogievskiy (21):
+  hw/core/loader-fit: fix freeing errp in fit_load_fdt
+  net/net: Clean up variable shadowing in net_client_init()
+  error: rename errp to errp_in where it is IN-argument
+  hmp: drop Error pointer indirection in hmp_handle_error
+  vnc: drop Error pointer indirection in vnc_client_io_error
+  qdev-monitor: well form error hint helpers
+  ppc: well form kvmppc_hint_smt_possible error hint helper
+  9pfs: well form error hint helpers
+  hw/core/qdev: cleanup Error ** variables
+  block/snapshot: rename Error ** parameter to more common errp
+  hw/i386/amd_iommu: rename Error ** parameter to more common errp
+  qga: rename Error ** parameter to more common errp
+  monitor/qmp-cmds: rename Error ** parameter to more common errp
+  hw/s390x: rename Error ** parameter to more common errp
+  hw/sd: drop extra whitespace in sdhci_sysbus_realize() header
+  hw/tpm: rename Error ** parameter to more common errp
+  hw/usb: rename Error ** parameter to more common errp
+  include/qom/object.h: rename Error ** parameter to more common errp
+  backends/cryptodev: drop local_err from cryptodev_backend_complete()
+  hw/vfio/ap: drop local_err from vfio_ap_realize
+  nbd: assert that Error** is not NULL in nbd_iter_channel_error
+
+Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>
+Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>
+Cc: Paul Burton <pburton@wavecomp.com>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: "Philippe Mathieu-Daudé" <philmd@redhat.com>
+Cc: Stefan Berger <stefanb@linux.ibm.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
+Cc: qemu-ppc@nongnu.org
+Cc: qemu-s390x@nongnu.org
+
+ include/block/snapshot.h   |   2 +-
+ include/monitor/hmp.h      |   2 +-
+ include/qapi/error.h       |   6 +-
+ include/qom/object.h       |   4 +-
+ target/ppc/kvm_ppc.h       |   4 +-
+ ui/vnc.h                   |   2 +-
+ backends/cryptodev.c       |  11 +--
+ block/nbd.c                |   1 +
+ block/snapshot.c           |   4 +-
+ dump/dump-hmp-cmds.c       |   4 +-
+ hw/9pfs/9p-local.c         |   2 +-
+ hw/9pfs/9p-proxy.c         |   2 +-
+ hw/core/loader-fit.c       |   5 +-
+ hw/core/machine-hmp-cmds.c |   6 +-
+ hw/core/qdev.c             |  28 ++++---
+ hw/i386/amd_iommu.c        |  14 ++--
+ hw/ppc/spapr.c             |   2 +-
+ hw/s390x/event-facility.c  |   2 +-
+ hw/s390x/s390-stattrib.c   |   3 +-
+ hw/sd/sdhci.c              |   2 +-
+ hw/tpm/tpm_emulator.c      |   8 +-
+ hw/usb/dev-network.c       |   2 +-
+ hw/vfio/ap.c               |   9 +--
+ monitor/hmp-cmds.c         | 155 ++++++++++++++++++-------------------
+ monitor/qmp-cmds.c         |   2 +-
+ net/net.c                  |  17 ++--
+ qdev-monitor.c             |  16 ++--
+ qga/commands-posix.c       |   2 +-
+ qga/commands-win32.c       |   2 +-
+ qga/commands.c             |  12 +--
+ qom/qom-hmp-cmds.c         |   4 +-
+ target/ppc/kvm.c           |   2 +-
+ ui/vnc.c                   |  20 ++---
+ util/error.c               |   6 +-
+ 34 files changed, 173 insertions(+), 190 deletions(-)
+
 -- 
 2.21.0
 
