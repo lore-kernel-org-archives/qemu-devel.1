@@ -2,61 +2,61 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69389C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 02:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27717C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 02:37:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D669206DB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 02:32:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D669206DB
+	by mail.kernel.org (Postfix) with ESMTPS id EFA6121744
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 02:37:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA6121744
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icgvz-0005YR-Ow
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 21:32:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57949)
+	id 1ich1I-000053-29
+	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 21:37:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55668)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pannengyuan@huawei.com>) id 1icguo-0004m5-Ee
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 21:30:51 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1icgzm-0007cu-S2
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 21:35:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pannengyuan@huawei.com>) id 1icgum-00027Z-5X
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 21:30:49 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:51962 helo=huawei.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1icgzl-0002pz-1M
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 21:35:58 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2211 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
- id 1icgul-000251-Q2
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 21:30:48 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id E74381A96953FE647D2D;
- Thu,  5 Dec 2019 10:30:42 +0800 (CST)
-Received: from [127.0.0.1] (10.120.177.99) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Thu, 5 Dec 2019
- 10:30:32 +0800
+ id 1icgzk-0002eD-Jg
+ for qemu-devel@nongnu.org; Wed, 04 Dec 2019 21:35:56 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id F3550714885439EC8B01;
+ Thu,  5 Dec 2019 10:35:51 +0800 (CST)
+Received: from [127.0.0.1] (10.120.177.99) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Thu, 5 Dec 2019
+ 10:35:42 +0800
 Subject: Re: [PATCH v2 1/3] virtio: add ability to delete vq through a pointer
-To: Pankaj Gupta <pagupta@redhat.com>
+To: Eric Blake <eblake@redhat.com>, <mst@redhat.com>
 References: <1575444716-17632-1-git-send-email-pannengyuan@huawei.com>
- <606337023.38890965.1575448387620.JavaMail.zimbra@redhat.com>
+ <40c11e5e-60a0-9407-4ebe-52d23d70ea85@redhat.com>
 From: Pan Nengyuan <pannengyuan@huawei.com>
-Message-ID: <1e063551-a1bd-f64d-fbac-548ec0dd905a@huawei.com>
-Date: Thu, 5 Dec 2019 10:30:31 +0800
+Message-ID: <fd6d2433-062b-3985-e40f-f4865e6c2616@huawei.com>
+Date: Thu, 5 Dec 2019 10:35:41 +0800
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <606337023.38890965.1575448387620.JavaMail.zimbra@redhat.com>
+In-Reply-To: <40c11e5e-60a0-9407-4ebe-52d23d70ea85@redhat.com>
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 X-Originating-IP: [10.120.177.99]
 X-CFilter-Loop: Reflected
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.35
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,113 +68,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liyiting@huawei.com, kuhn chenqun <kuhn.chenqun@huawei.com>,
- zhang zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-devel@nongnu.org,
- mst@redhat.com
+Cc: liyiting@huawei.com, kuhn.chenqun@huawei.com, qemu-devel@nongnu.org,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 2019/12/4 16:33, Pankaj Gupta wrote:
->=20
+On 2019/12/4 22:40, Eric Blake wrote:
+> On 12/4/19 1:31 AM, pannengyuan@huawei.com wrote:
 >> From: Pan Nengyuan <pannengyuan@huawei.com>
 >>
 >> Devices tend to maintain vq pointers, allow deleting them trough a vq
 >> pointer.
+> 
+> through
+
+Thanks. I'm sorry for my carelessness.
+
+> 
 >>
 >> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 >> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 >> ---
->> Changes v2 to v1:
->> - add a new function virtio_delete_queue to cleanup vq through a vq po=
-inter
->> ---
->>  hw/virtio/virtio.c         | 16 +++++++++++-----
->>  include/hw/virtio/virtio.h |  2 ++
->>  2 files changed, 13 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
->> index 04716b5..6de3cfd 100644
->> --- a/hw/virtio/virtio.c
->> +++ b/hw/virtio/virtio.c
->> @@ -2330,17 +2330,23 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev=
-, int
->> queue_size,
->>      return &vdev->vq[i];
->>  }
->> =20
->> +void virtio_delete_queue(VirtQueue *vq)
->> +{
->> +    vq->vring.num =3D 0;
->> +    vq->vring.num_default =3D 0;
->> +    vq->handle_output =3D NULL;
->> +    vq->handle_aio_output =3D NULL;
->> +    g_free(vq->used_elems);
->> +    vq->used_elems =3D NULL;
->> +}
->> +
->>  void virtio_del_queue(VirtIODevice *vdev, int n)
->>  {
->>      if (n < 0 || n >=3D VIRTIO_QUEUE_MAX) {
->>          abort();
->>      }
->> =20
->> -    vdev->vq[n].vring.num =3D 0;
->> -    vdev->vq[n].vring.num_default =3D 0;
->> -    vdev->vq[n].handle_output =3D NULL;
->> -    vdev->vq[n].handle_aio_output =3D NULL;
->> -    g_free(vdev->vq[n].used_elems);
->> +    virtio_delete_queue(&vdev->vq[n]);
->>  }
->> =20
->>  static void virtio_set_isr(VirtIODevice *vdev, int value)
->> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
->> index c32a815..e18756d 100644
->> --- a/include/hw/virtio/virtio.h
->> +++ b/include/hw/virtio/virtio.h
->> @@ -183,6 +183,8 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, in=
-t
->> queue_size,
->> =20
->>  void virtio_del_queue(VirtIODevice *vdev, int n);
->> =20
->> +void virtio_delete_queue(VirtQueue *vq);
->> +
->>  void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
->>                      unsigned int len);
->>  void virtqueue_flush(VirtQueue *vq, unsigned int count);
->> --
->> 2.7.2.windows.1
->>
->>
-> Overall it ooks good to me.
->=20
-> Just one point: e.g in virtio_rng: "virtio_rng_device_unrealize" functi=
-on
-> We are doing :     virtio_del_queue(vdev, 0);
->=20
-> One can directly call "virtio_delete_queue". It can become confusing
-> to call multiple functions for same purpose. Instead, Can we make=20
-> "virtio_delete_queue" static inline?
->=20
-yes, It will be a little confused, but I think it will have the same
-problem if we make "virtio_delete_queue" static inline. We can directly
-call it aslo. =EF=BC=88e.g virtio-serial-bus.c virtio-balloon.c).
+> 
+> Also, don't forget to send a 0/3 cover letter (any series longer than
+> one patch should have a cover letter; it is possible to configure git to
+> do this automatically: https://wiki.qemu.org/Contribute/SubmitAPatch has
+> this tip and others)
 
-How about replacing the function name to make it more clear (e.g
-virtio_delete_queue -> virtio_queue_cleanup) ? It's too similar between
-"virtio_del_queue" and "virtio_delete_queue".
+ok, thanks.
 
-> Other than that:
-> Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
->=20
->>
->>
->=20
->=20
-> .
->=20
+> 
 
 
