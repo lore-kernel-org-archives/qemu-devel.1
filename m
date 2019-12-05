@@ -2,100 +2,91 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED474C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A55C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:44:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE608206DB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:11:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE608206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 765962077B
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:44:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ISRlBNZ1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 765962077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icjPo-0004rE-9x
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 00:11:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60382)
+	id 1icjvs-0003yW-H7
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 00:44:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58048)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1icjOs-0003uK-Pw
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:10:04 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1icjuS-0003Xu-Mf
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:42:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1icjOr-0001NH-2p
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:10:02 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53430)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1icjOq-0001M2-So
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:10:01 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xB557AiP135198
- for <qemu-devel@nongnu.org>; Thu, 5 Dec 2019 00:10:00 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wkm49xj5t-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 00:09:59 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Thu, 5 Dec 2019 05:09:39 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 5 Dec 2019 05:09:35 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xB559YWu43188716
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 5 Dec 2019 05:09:34 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5FEB9A4064;
- Thu,  5 Dec 2019 05:09:34 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E1315A405F;
- Thu,  5 Dec 2019 05:09:30 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.80.105])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu,  5 Dec 2019 05:09:30 +0000 (GMT)
-Subject: Re: [PATCH v17 6/7] migration: Include migration support for machine
- check handling
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20191024074307.22821-1-ganeshgr@linux.ibm.com>
- <20191024074307.22821-7-ganeshgr@linux.ibm.com>
- <20191119024514.GM5582@umbus.fritz.box>
-From: Ganesh <ganeshgr@linux.ibm.com>
-Date: Thu, 5 Dec 2019 10:39:29 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.1
+ (envelope-from <kwankhede@nvidia.com>) id 1icjuQ-0004Xe-84
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:42:39 -0500
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:11276)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1icjuP-0004SO-VO
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:42:38 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5de898c70003>; Wed, 04 Dec 2019 21:42:31 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Wed, 04 Dec 2019 21:42:35 -0800
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Wed, 04 Dec 2019 21:42:35 -0800
+Received: from [10.25.73.41] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 5 Dec
+ 2019 05:42:27 +0000
+Subject: Re: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
+ dirty pages bitmap.
+To: Yan Zhao <yan.y.zhao@intel.com>, Alex Williamson
+ <alex.williamson@redhat.com>
+References: <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
+ <20191112153020.71406c44@x1.home>
+ <324ce4f8-d655-ee37-036c-fc9ef9045bef@nvidia.com>
+ <20191113130705.32c6b663@x1.home>
+ <7f74a2a1-ba1c-9d4c-dc5e-343ecdd7d6d6@nvidia.com>
+ <20191114140625.213e8a99@x1.home> <20191126005739.GA31144@joy-OptiPlex-7040>
+ <20191203110412.055c38df@x1.home>
+ <cce08ca5-79df-2839-16cd-15723b995c07@nvidia.com>
+ <20191204113457.16c1316d@x1.home> <20191205012835.GB31791@joy-OptiPlex-7040>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <fc7e8cf2-d5e6-0fe6-7466-7bdde55ff7d6@nvidia.com>
+Date: Thu, 5 Dec 2019 11:12:23 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <20191119024514.GM5582@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20191205012835.GB31791@joy-OptiPlex-7040>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19120505-0028-0000-0000-000003C52240
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120505-0029-0000-0000-0000248842EA
-Message-Id: <5348d151-bc01-b704-7587-77e7856f90e5@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-04_04:2019-12-04,2019-12-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 malwarescore=0
- spamscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1011
- impostorscore=0 adultscore=0 suspectscore=0 mlxlogscore=999 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912050038
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1575524552; bh=QomU4SmjJyIxMryZCqD+GkcHlHWka01/FM6djKbN2fw=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=ISRlBNZ1gU0eCEH4oDOFET2q++wk8b1/KyI+LbOwyHkLdqWfTJTh0tlpZeSmSsK8x
+ V+JDijwWZTazbnQWzx++T46EB1NiLKwLq9EoN+8yh0Yt/eYP+KmaRhryUzPOYU3S8i
+ S5le2c7X/RuuBeliSLkVqZmUrGWMZ1cb8wEn3JZxKZkqO75mcCKRdizWVzTsQgdJDG
+ mz+9DAgx6xEkDcqk8i15G+ww5ectrbkF/REb02iiH/4GoIIJYJiojUFGkewwC7OrYs
+ wYmA5be5LUMZi/F27YhwVad6SmLWJ4mS+0RC+rBdou8UZCXTAfvFbFjaUeHmm612IE
+ 1NfiqD84iTW4A==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,202 +98,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arawinda.p@gmail.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- paulus@ozlabs.org, qemu-ppc@nongnu.org
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 11/19/19 8:15 AM, David Gibson wrote:
-> On Thu, Oct 24, 2019 at 01:13:06PM +0530, Ganesh Goudar wrote:
->> From: Aravinda Prasad <arawinda.p@gmail.com>
->>
->> This patch includes migration support for machine check
->> handling. Especially this patch blocks VM migration
->> requests until the machine check error handling is
->> complete as these errors are specific to the source
->> hardware and is irrelevant on the target hardware.
->>
->> [Do not set FWNMI cap in post_load, now its done in .apply hook]
->> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
->> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
->> ---
->>   hw/ppc/spapr.c         | 41 +++++++++++++++++++++++++++++++++++++++++
->>   hw/ppc/spapr_events.c  | 16 +++++++++++++++-
->>   hw/ppc/spapr_rtas.c    |  2 ++
->>   include/hw/ppc/spapr.h |  2 ++
->>   4 files changed, 60 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
->> index 346ec5ba6c..e0d0f95ec0 100644
->> --- a/hw/ppc/spapr.c
->> +++ b/hw/ppc/spapr.c
->> @@ -46,6 +46,7 @@
->>   #include "migration/qemu-file-types.h"
->>   #include "migration/global_state.h"
->>   #include "migration/register.h"
->> +#include "migration/blocker.h"
->>   #include "mmu-hash64.h"
->>   #include "mmu-book3s-v3.h"
->>   #include "cpu-models.h"
->> @@ -1751,6 +1752,8 @@ static void spapr_machine_reset(MachineState *machine)
->>   
->>       /* Signal all vCPUs waiting on this condition */
->>       qemu_cond_broadcast(&spapr->mc_delivery_cond);
->> +
->> +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
->>   }
->>   
->>   static void spapr_create_nvram(SpaprMachineState *spapr)
->> @@ -2041,6 +2044,43 @@ static const VMStateDescription vmstate_spapr_dtb = {
->>       },
->>   };
->>   
->> +static bool spapr_fwnmi_needed(void *opaque)
->> +{
->> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
->> +
->> +    return spapr->guest_machine_check_addr != -1;
->> +}
->> +
->> +static int spapr_fwnmi_pre_save(void *opaque)
->> +{
->> +    SpaprMachineState *spapr = (SpaprMachineState *)opaque;
->> +
->> +    /*
->> +     * With -only-migratable QEMU option, we cannot block migration.
->> +     * Hence check if machine check handling is in progress and print
->> +     * a warning message.
->> +     */
-> IIUC the logic below this could also occur in the case where the fwnmi
-> event occurs after a migration has started, but before it completes,
-> not just with -only-migratable.  Is that correct?
-Yes
->
->> +    if (spapr->mc_status != -1) {
->> +        warn_report("A machine check is being handled during migration. The"
->> +                "handler may run and log hardware error on the destination");
->> +    }
->> +
->> +    return 0;
->> +}
->> +
->> +static const VMStateDescription vmstate_spapr_machine_check = {
->> +    .name = "spapr_machine_check",
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .needed = spapr_fwnmi_needed,
->> +    .pre_save = spapr_fwnmi_pre_save,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
->> +        VMSTATE_INT32(mc_status, SpaprMachineState),
->> +        VMSTATE_END_OF_LIST()
->> +    },
->> +};
->> +
->>   static const VMStateDescription vmstate_spapr = {
->>       .name = "spapr",
->>       .version_id = 3,
->> @@ -2075,6 +2115,7 @@ static const VMStateDescription vmstate_spapr = {
->>           &vmstate_spapr_cap_large_decr,
->>           &vmstate_spapr_cap_ccf_assist,
->>           &vmstate_spapr_cap_fwnmi,
->> +        &vmstate_spapr_machine_check,
->>           NULL
->>       }
->>   };
->> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
->> index db44e09154..30d9371c88 100644
->> --- a/hw/ppc/spapr_events.c
->> +++ b/hw/ppc/spapr_events.c
->> @@ -43,6 +43,7 @@
->>   #include "qemu/main-loop.h"
->>   #include "hw/ppc/spapr_ovec.h"
->>   #include <libfdt.h>
->> +#include "migration/blocker.h"
->>   
->>   #define RTAS_LOG_VERSION_MASK                   0xff000000
->>   #define   RTAS_LOG_VERSION_6                    0x06000000
->> @@ -842,6 +843,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
->>   {
->>       SpaprMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
->>       CPUState *cs = CPU(cpu);
->> +    int ret;
->> +    Error *local_err = NULL;
->>   
->>       if (spapr->guest_machine_check_addr == -1) {
->>           /*
->> @@ -871,8 +874,19 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recovered)
->>               return;
->>           }
->>       }
->> -    spapr->mc_status = cpu->vcpu_id;
->>   
->> +    ret = migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_err);
->> +    if (ret == -EBUSY) {
->> +        /*
->> +         * We don't want to abort so we let the migration to continue.
->> +         * In a rare case, the machine check handler will run on the target.
->> +         * Though this is not preferable, it is better than aborting
->> +         * the migration or killing the VM.
->> +         */
->> +        warn_report_err(local_err);
-> I suspect the error message in local_err won't be particularly
-> meaningful on its own.  Perhaps you need to add a prefix to clarify
-> that the problem is you've received a fwnmi after migration has
-> commenced?
-ok
->
->> +    }
->> +
->> +    spapr->mc_status = cpu->vcpu_id;
->>       spapr_mce_dispatch_elog(cpu, recovered);
->>   }
->>   
->> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index 0328b1f341..c78d96ee7e 100644
->> --- a/hw/ppc/spapr_rtas.c
->> +++ b/hw/ppc/spapr_rtas.c
->> @@ -50,6 +50,7 @@
->>   #include "hw/ppc/fdt.h"
->>   #include "target/ppc/mmu-hash64.h"
->>   #include "target/ppc/mmu-book3s-v3.h"
->> +#include "migration/blocker.h"
->>   
->>   static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>                                      uint32_t token, uint32_t nargs,
->> @@ -446,6 +447,7 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
->>        */
->>       spapr->mc_status = -1;
->>       qemu_cond_signal(&spapr->mc_delivery_cond);
->> +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
-> Oh... damn.  I suggested using a static fwnmi_migration_blocker
-> instance, but I just realized there's a problem with it.
->
-> If we do receive multiple fwnmi events on different cpus at roughly
-> the same time, this will break: I think we'll try to add the same
-> migration blocker instance multiple times, which won't be good.  Even
-> if that doesn't do anything *too* bad, then we'll unblock the
-> migration on the first interlock, rather than waiting for all pending
-> fwnmi events to complete.
-Ok, not sure how to handle this, ill look into it.
->
->>       rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->>   }
->>   
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 86f0fc8fdd..290abd6328 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -215,6 +215,8 @@ struct SpaprMachineState {
->>   
->>       unsigned gpu_numa_id;
->>       SpaprTpmProxy *tpm_proxy;
->> +
->> +    Error *fwnmi_migration_blocker;
->>   };
->>   
->>   #define H_SUCCESS         0
 
+On 12/5/2019 6:58 AM, Yan Zhao wrote:
+> On Thu, Dec 05, 2019 at 02:34:57AM +0800, Alex Williamson wrote:
+>> On Wed, 4 Dec 2019 23:40:25 +0530
+>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>
+>>> On 12/3/2019 11:34 PM, Alex Williamson wrote:
+>>>> On Mon, 25 Nov 2019 19:57:39 -0500
+>>>> Yan Zhao <yan.y.zhao@intel.com> wrote:
+>>>>    
+>>>>> On Fri, Nov 15, 2019 at 05:06:25AM +0800, Alex Williamson wrote:
+>>>>>> On Fri, 15 Nov 2019 00:26:07 +0530
+>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>>>>       
+>>>>>>> On 11/14/2019 1:37 AM, Alex Williamson wrote:
+>>>>>>>> On Thu, 14 Nov 2019 01:07:21 +0530
+>>>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>>>>>>         
+>>>>>>>>> On 11/13/2019 4:00 AM, Alex Williamson wrote:
+>>>>>>>>>> On Tue, 12 Nov 2019 22:33:37 +0530
+>>>>>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>>>>>>>>            
+>>>>>>>>>>> All pages pinned by vendor driver through vfio_pin_pages API should be
+>>>>>>>>>>> considered as dirty during migration. IOMMU container maintains a list of
+>>>>>>>>>>> all such pinned pages. Added an ioctl defination to get bitmap of such
+>>>>>>>>>>
+>>>>>>>>>> definition
+>>>>>>>>>>            
+>>>>>>>>>>> pinned pages for requested IO virtual address range.
+>>>>>>>>>>
+>>>>>>>>>> Additionally, all mapped pages are considered dirty when physically
+>>>>>>>>>> mapped through to an IOMMU, modulo we discussed devices opting in to
+>>>>>>>>>> per page pinning to indicate finer granularity with a TBD mechanism to
+>>>>>>>>>> figure out if any non-opt-in devices remain.
+>>>>>>>>>>            
+>>>>>>>>>
+>>>>>>>>> You mean, in case of device direct assignment (device pass through)?
+>>>>>>>>
+>>>>>>>> Yes, or IOMMU backed mdevs.  If vfio_dmas in the container are fully
+>>>>>>>> pinned and mapped, then the correct dirty page set is all mapped pages.
+>>>>>>>> We discussed using the vpfn list as a mechanism for vendor drivers to
+>>>>>>>> reduce their migration footprint, but we also discussed that we would
+>>>>>>>> need a way to determine that all participants in the container have
+>>>>>>>> explicitly pinned their working pages or else we must consider the
+>>>>>>>> entire potential working set as dirty.
+>>>>>>>>         
+>>>>>>>
+>>>>>>> How can vendor driver tell this capability to iommu module? Any suggestions?
+>>>>>>
+>>>>>> I think it does so by pinning pages.  Is it acceptable that if the
+>>>>>> vendor driver pins any pages, then from that point forward we consider
+>>>>>> the IOMMU group dirty page scope to be limited to pinned pages?  There
+>>>>> we should also be aware of that dirty page scope is pinned pages + unpinned pages,
+>>>>> which means ever since a page is pinned, it should be regarded as dirty
+>>>>> no matter whether it's unpinned later. only after log_sync is called and
+>>>>> dirty info retrieved, its dirty state should be cleared.
+>>>>
+>>>> Yes, good point.  We can't just remove a vpfn when a page is unpinned
+>>>> or else we'd lose information that the page potentially had been
+>>>> dirtied while it was pinned.  Maybe that vpfn needs to move to a dirty
+>>>> list and both the currently pinned vpfns and the dirty vpfns are walked
+>>>> on a log_sync.  The dirty vpfns list would be cleared after a log_sync.
+>>>> The container would need to know that dirty tracking is enabled and
+>>>> only manage the dirty vpfns list when necessary.  Thanks,
+>>>>    
+>>>
+>>> If page is unpinned, then that page is available in free page pool for
+>>> others to use, then how can we say that unpinned page has valid data?
+>>>
+>>> If suppose, one driver A unpins a page and when driver B of some other
+>>> device gets that page and he pins it, uses it, and then unpins it, then
+>>> how can we say that page has valid data for driver A?
+>>>
+>>> Can you give one example where unpinned page data is considered reliable
+>>> and valid?
+>>
+>> We can only pin pages that the user has already allocated* and mapped
+>> through the vfio DMA API.  The pinning of the page simply locks the
+>> page for the vendor driver to access it and unpinning that page only
+>> indicates that access is complete.  Pages are not freed when a vendor
+>> driver unpins them, they still exist and at this point we're now
+>> assuming the device dirtied the page while it was pinned.  Thanks,
+>>
+>> Alex
+>>
+>> * An exception here is that the page might be demand allocated and the
+>>    act of pinning the page could actually allocate the backing page for
+>>    the user if they have not faulted the page to trigger that allocation
+>>    previously.  That page remains mapped for the user's virtual address
+>>    space even after the unpinning though.
+>>
+> 
+> Yes, I can give an example in GVT.
+> when a gem_object is allocated in guest, before submitting it to guest
+> vGPU, gfx cmds in its ring buffer need to be pinned into GGTT to get a
+> global graphics address for hardware access. At that time, we shadow
+> those cmds and pin pages through vfio pin_pages(), and submit the shadow
+> gem_object to physial hardware.
+> After guest driver thinks the submitted gem_object has completed hardware
+> DMA, it unnpinnd those pinned GGTT graphics memory addresses. Then in
+> host, we unpin the shadow pages through vfio unpin_pages.
+> But, at this point, guest driver is still free to access the gem_object
+> through vCPUs, and guest user space is probably still mapping an object
+> into the gem_object in guest driver.
+> So, missing the dirty page tracking for unpinned pages would cause
+> data inconsitency.
+> 
+
+If pages are accessed by guest through vCPUs, then RAM module in QEMU 
+will take care of tracking those pages as dirty.
+
+All unpinned pages might not be used, so tracking all unpinned pages 
+during VM or application life time would also lead to tracking lots of 
+stale pages, even though they are not being used. Increasing number of 
+not needed pages could also lead to increasing migration data leading 
+increase in migration downtime.
+
+Thanks,
+Kirti
 
