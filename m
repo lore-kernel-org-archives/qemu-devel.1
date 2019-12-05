@@ -2,70 +2,89 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF443C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:23:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 289DDC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:24:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EF77206DB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:23:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF77206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E8052206DB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:24:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H9d2840q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8052206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ics2E-000882-Kz
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:23:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47153)
+	id 1ics32-0000Jk-R6
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:24:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45874)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1icrpR-0004PX-4V
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:10:06 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1icrwD-0002c0-Qs
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:17:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1icrpO-0004bY-VZ
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:10:00 -0500
-Resent-Date: Thu, 05 Dec 2019 09:10:00 -0500
-Resent-Message-Id: <E1icrpO-0004bY-VZ@eggs.gnu.org>
-Received: from sender4-of-o50.zoho.com ([136.143.188.50]:21034)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1icrpO-0004So-MM
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:09:58 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1575554984; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=OeBAE/y0b6MaKioCUa1oScbfUJAqwhHAqZPLbNwpfuDKCtmVQYQD2ucrDIHv6y68juAbG5bV2sWHm+xA4O1uFrezSqIMRyDnIhCCezQyptA9oxO5DyYMmTGBYjmBAgvLbTS6xma6fXYM9XEakQua9wZn4ehEOgtsfYPybZT6VkA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1575554984;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=lucN9eUclCoEw69/wrH8xZ7E0A1YJcrJQh6j3W8wz6M=; 
- b=A4sfBXkpuSrw4Z0oMvMAzvL1D8Hc4qSxEvKPKgic/JnJa7rMde9/u/gD0sHimp2NrG5UGdDYrMI6d54hvlfQkt0OHcpl1R+G8pyYJD7aMCpJ4Np3GDpARzdwx2XF4/qaN8oA2vRBXkEYl+IX8YJFG5bg3fF8z+y7Iu9i31D/UDQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1575554981686609.6460774169741;
- Thu, 5 Dec 2019 06:09:41 -0800 (PST)
-In-Reply-To: <03fbd542d6bae4cf07be56c51d57fc2962720445.1575546855.git.tgolembi@redhat.com>
-Subject: Re: [PATCH v6] qga: add command guest-get-devices for reporting
- VirtIO devices
-Message-ID: <157555498034.27890.12517932225629858010@37313f22b938>
+ (envelope-from <alex.bennee@linaro.org>) id 1icrwC-0003tT-CI
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:17:01 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34183)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1icrwC-0003oN-26
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:17:00 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t2so3847049wrr.1
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 06:16:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=j8BHLefjvES9SOUgRcfX4ySy651Dqcu3C9AOxEtMINE=;
+ b=H9d2840qQHkWnEUhW/yRLuN9XbkJ2AtviP8lUc4S+3SvC/u3qn30KkX2ynW/dZwws6
+ zkN3DLP2z983CcHPnDhwOXKwaQPjRbrb8BZ0L2Cezw2jGMmWpcKM2zXwhQEhlz1R3cII
+ ROP0sz9Bf5oa8LMBWqXRrcTv4faM/KDoITZ3ntc5gh1gTrv99MHqd9g9rcfwDjIA4Avi
+ 496oyNAP8pZrxwjmMeooiCOX6usOZSK2uueloRDSm6appx2Qgz8nvOFZr6hhlMZSxExj
+ nlMhC0NlKxfcyzLS1KpPcKIfdbNKs7OmIdAM1aBiUP1fixn8ZM2N5hiHAWki6e9euXrT
+ leBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=j8BHLefjvES9SOUgRcfX4ySy651Dqcu3C9AOxEtMINE=;
+ b=mDnz0TlgDjouTJP6vUuJ/XNPlCzJ8FVcgBT7IianKrEWI6NRybi3XV7H0gUWkXseap
+ 4miYtbWrbrxIm1sYGwOUzMwjHQXW2UQMoFNOnWsUuwUMGH3dE03xt3s7XQCiva0U9w4O
+ OdBPoQTUt0n7Xdl+BeOlJCaIpgGx+YH3jgeIBpDnYguIjEn435BQ8f00JFZll9Zl6Qfd
+ ted3Ce042xfxB5dFUbTC6MJjprqZ2e506LRAVRR6CLFkTbr+2TSqI44T0UneV93Kimk5
+ VKKaj3i7Un2NNftCuzZSXpOrCvTbIYC7cjuC4XuPRDKmtoVR6gu+TaURRwz3MVld23Bb
+ uulA==
+X-Gm-Message-State: APjAAAURnyZ3ktPIOMqQrlatwKw3jGddm4NuqjCOMQIeF9Qv/T/3294x
+ v8xZLRhEXfXvnZ+XTaPQacBzPnaQvDw=
+X-Google-Smtp-Source: APXvYqxydtaMiRT0SEobaIhuXxFW9PNVF4Dvltqac99Cpx361b4ZTkA+usCgXtBBEasv5LBJRNCKGw==
+X-Received: by 2002:adf:fa50:: with SMTP id y16mr9908354wrr.183.1575548723861; 
+ Thu, 05 Dec 2019 04:25:23 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a64sm11379882wmc.18.2019.12.05.04.25.18
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 05 Dec 2019 04:25:20 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5225C1FF90;
+ Thu,  5 Dec 2019 12:25:18 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v2 3/6] linux-user: add target_mmap_complete tracepoint
+Date: Thu,  5 Dec 2019 12:25:14 +0000
+Message-Id: <20191205122518.10010-4-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191205122518.10010-1-alex.bennee@linaro.org>
+References: <20191205122518.10010-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: tgolembi@redhat.com
-Date: Thu, 5 Dec 2019 06:09:41 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.50
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,59 +96,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: marcandre.lureau@redhat.com, tgolembi@redhat.com, berrange@redhat.com,
- qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8wM2ZiZDU0MmQ2YmFlNGNmMDdi
-ZTU2YzUxZDU3ZmMyOTYyNzIwNDQ1LjE1NzU1NDY4NTUuZ2l0LnRnb2xlbWJpQHJlZGhhdC5jb20v
-CgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxk
-IHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQg
-YmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVw
-cm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFz
-aApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JL
-PTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKICBCVUlMRCAgIHBjLWJpb3Mvb3B0aW9ucm9tL2t2bXZhcGlj
-LmltZwogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20vbXVsdGlib290LnJhdwovdG1wL3FlbXUt
-dGVzdC9zcmMvcWdhL2NvbW1hbmRzLXdpbjMyLmM6IEluIGZ1bmN0aW9uICdxbXBfZ3Vlc3RfZ2V0
-X2RldmljZXMnOgovdG1wL3FlbXUtdGVzdC9zcmMvcWdhL2NvbW1hbmRzLXdpbjMyLmM6MjM4OTox
-OTogZXJyb3I6ICdHdWVzdERldmljZUluZm8nIHtha2EgJ3N0cnVjdCBHdWVzdERldmljZUluZm8n
-fSBoYXMgbm8gbWVtYmVyIG5hbWVkICd2ZW5kb3JfaWQnCiAgICAgICAgICAgICBkZXZpY2UtPnZl
-bmRvcl9pZCA9IGdfYXNjaWlfc3RydG91bGwodmVuZG9yX2lkLCBOVUxMLCAxNik7CiAgICAgICAg
-ICAgICAgICAgICBefgovdG1wL3FlbXUtdGVzdC9zcmMvcWdhL2NvbW1hbmRzLXdpbjMyLmM6MjM5
-MDoxOTogZXJyb3I6ICdHdWVzdERldmljZUluZm8nIHtha2EgJ3N0cnVjdCBHdWVzdERldmljZUlu
-Zm8nfSBoYXMgbm8gbWVtYmVyIG5hbWVkICdkZXZpY2VfaWQnCiAgICAgICAgICAgICBkZXZpY2Ut
-PmRldmljZV9pZCA9IGdfYXNjaWlfc3RydG91bGwoZGV2aWNlX2lkLCBOVUxMLCAxNik7CiAgICAg
-ICAgICAgICAgICAgICBefgogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20vbGludXhib290LnJh
-dwogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20vbGludXhib290X2RtYS5yYXcKICBCVUlMRCAg
-IHBjLWJpb3Mvb3B0aW9ucm9tL2t2bXZhcGljLnJhdwogIFNJR04gICAgcGMtYmlvcy9vcHRpb25y
-b20vbXVsdGlib290LmJpbgptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6
-Njk6IHFnYS9jb21tYW5kcy13aW4zMi5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1
-bmZpbmlzaGVkIGpvYnMuLi4uCiAgQ0MgICAgICBxZW11LWltZy5vCiAgU0lHTiAgICBwYy1iaW9z
-L29wdGlvbnJvbS9saW51eGJvb3QuYmluCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9y
-KHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1sn
-c3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFu
-Y2UudXVpZD01ZjIxYTlmNzE0M2U0YTU2YTk4OTEzZDhjNTJjZGE5ZCcsICctdScsICcxMDAxJywg
-Jy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RB
-UkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAn
-LWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0ND
-QUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3Fl
-bXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRj
-aGV3LXRlc3Rlci10bXAtNjQwcXA5cWMvc3JjL2RvY2tlci1zcmMuMjAxOS0xMi0wNS0wOS4wMy41
-NC4yNzM1OTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVt
-dS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpm
-aWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD01ZjIxYTlmNzE0M2U0
-YTU2YTk4OTEzZDhjNTJjZGE5ZAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFr
-ZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC02NDBx
-cDlxYy9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9yYV0gRXJyb3Ig
-MgoKcmVhbCAgICA1bTQ3LjMyOXMKdXNlciAgICAwbTkuMDMxcwoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMDNmYmQ1NDJkNmJhZTRjZjA3YmU1
-NmM1MWQ1N2ZjMjk2MjcyMDQ0NS4xNTc1NTQ2ODU1LmdpdC50Z29sZW1iaUByZWRoYXQuY29tL3Rl
-c3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
-dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
-c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+For full details we also want to see where the mmaps end up.
+
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ linux-user/mmap.c       | 2 +-
+ linux-user/trace-events | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index f4f10deaeac..0b1b43ac3c0 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -538,8 +538,8 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
+  the_end1:
+     page_set_flags(start, start + len, prot | PAGE_VALID);
+  the_end:
++    trace_target_mmap_complete(start);
+ #ifdef DEBUG_MMAP
+-    printf("ret=0x" TARGET_ABI_FMT_lx "\n", start);
+     page_dump(stdout);
+     printf("\n");
+ #endif
+diff --git a/linux-user/trace-events b/linux-user/trace-events
+index 8d8d4c3c68c..6d6aeef7b52 100644
+--- a/linux-user/trace-events
++++ b/linux-user/trace-events
+@@ -15,3 +15,4 @@ user_s390x_restore_sigregs(void *env, uint64_t sc_psw_addr, uint64_t env_psw_add
+ # mmap.c
+ target_mprotect(uint64_t start, uint64_t len, int flags) "start=0x%"PRIx64 " len=0x%"PRIx64 " prot=0x%x"
+ target_mmap(uint64_t start, uint64_t len, int pflags, int mflags, int fd, uint64_t offset) "start=0x%"PRIx64 " len=0x%"PRIx64 " prot=0x%x flags=0x%x fd=%d offset=0x%"PRIx64
++target_mmap_complete(uint64_t retaddr) "retaddr=0x%"PRIx64
+-- 
+2.20.1
 
 
