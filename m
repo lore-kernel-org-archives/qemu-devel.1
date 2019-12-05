@@ -2,100 +2,99 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A6E7C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 04:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB68C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:04:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D25C82077B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 04:57:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25C82077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA7812077B
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:04:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="OX+hWXUV";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EOZvZyXL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA7812077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icjCH-0003ce-0S
-	for qemu-devel@archiver.kernel.org; Wed, 04 Dec 2019 23:57:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42979)
+	id 1icjJ5-0007yM-4V
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 00:04:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51921)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1icjBW-0002vk-C1
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 23:56:15 -0500
+ (envelope-from <andrew@aj.id.au>) id 1icjHw-00078I-CC
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:02:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ganeshgr@linux.ibm.com>) id 1icjBU-0007P5-Ih
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 23:56:14 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57396)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ganeshgr@linux.ibm.com>)
- id 1icjBU-0007Kk-7m
- for qemu-devel@nongnu.org; Wed, 04 Dec 2019 23:56:12 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xB54qe4t122332
- for <qemu-devel@nongnu.org>; Wed, 4 Dec 2019 23:56:10 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wpsayu60p-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 04 Dec 2019 23:56:10 -0500
-Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <ganeshgr@linux.ibm.com>;
- Thu, 5 Dec 2019 04:56:07 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 5 Dec 2019 04:56:03 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xB54u2j844892480
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 5 Dec 2019 04:56:02 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7F57DA4062;
- Thu,  5 Dec 2019 04:56:02 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 93895A405B;
- Thu,  5 Dec 2019 04:55:59 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.80.105])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu,  5 Dec 2019 04:55:59 +0000 (GMT)
-Subject: Re: [PATCH v17 5/7] ppc: spapr: Handle "ibm,nmi-register" and
- "ibm,nmi-interlock" RTAS calls
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20191024074307.22821-1-ganeshgr@linux.ibm.com>
- <20191024074307.22821-6-ganeshgr@linux.ibm.com>
- <20191119023932.GL5582@umbus.fritz.box>
-From: Ganesh <ganeshgr@linux.ibm.com>
-Date: Thu, 5 Dec 2019 10:25:58 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.1
-MIME-Version: 1.0
-In-Reply-To: <20191119023932.GL5582@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19120504-0020-0000-0000-000003941DEE
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19120504-0021-0000-0000-000021EB4921
-Message-Id: <edc7a454-98dc-aac1-88cc-a5596ee34860@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-04_04:2019-12-04,2019-12-04 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- mlxlogscore=999 phishscore=0 priorityscore=1501 spamscore=0
- impostorscore=0 lowpriorityscore=0 bulkscore=0 adultscore=0 mlxscore=0
- suspectscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-1912050036
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <andrew@aj.id.au>) id 1icjHv-0004Mp-0i
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:02:52 -0500
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:57249)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrew@aj.id.au>)
+ id 1icjHo-0004AQ-FD; Thu, 05 Dec 2019 00:02:46 -0500
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailout.nyi.internal (Postfix) with ESMTP id 1402A227B8;
+ Thu,  5 Dec 2019 00:02:41 -0500 (EST)
+Received: from imap2 ([10.202.2.52])
+ by compute4.internal (MEProxy); Thu, 05 Dec 2019 00:02:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
+ mime-version:message-id:in-reply-to:references:date:from:to:cc
+ :subject:content-type:content-transfer-encoding; s=fm1; bh=Gm0Bu
+ 76qnev5eR0jj9tPedHTPd0qyliUowe7Q0H39aI=; b=OX+hWXUVlXljYh73YbpVX
+ uk67rYXN4fsOD5l+nVQ1fdHNEAop0/CPM39xmLBfZCWpPndnxWbIpnF2hydvMVXu
+ iDLt86pWkUR4+XTb5sGDbDi3q40LVMZ/Lf/CHuFFdVXi42UNTN/m8f1U8SxSIt9/
+ 9PPlsF37mTXaayfyTjrp0sDf8DyrzAGUpMfYYIJL+f1D3ALYZMPMAMSltN4w5Rnx
+ pDeFqhq0IZo+1lRh6zxP7npx5a39XOZvvpw8FnFYjTelyrZks9p3L3HIMSMb8veJ
+ bVRJJHuyYYPSjq7xlgxE7mxtkFcAWXCvYzeGyMJRncJnE+6usaFxpopFsfYYZuya
+ A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:content-type
+ :date:from:in-reply-to:message-id:mime-version:references
+ :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+ :x-sasl-enc; s=fm1; bh=Gm0Bu76qnev5eR0jj9tPedHTPd0qyliUowe7Q0H39
+ aI=; b=EOZvZyXLmz0TaFvn8tufEc/zPRTBUr6dclFE1VBO73z426qsNWf01DoCe
+ dXCgMPH3kEujC61WF/4DZ4S7ZZ0LCOG2r6zUenehQ5ne+JyWmBv9Lqv6tz3FvpLg
+ If5wj/K9SO0MOcK4+L95nuQGpzAZvEXmUCu95qh3TdvjI/MJInfG+WjbYQUCfuM4
+ qWib4AfeEzJuy7UC0cUz8Q/t7UELUMqe/i0TUa3bGhI+NooEfqxQeBrwQjVfaItU
+ FM+TQkHDu8hhbm5CxBqwaj8pq5RPbr1fjKRQRbuKCcMt+9T6klV3Omfu/YFTdOEZ
+ SauWSGyR9RAkp2KjHup2K0CPhUkMQ==
+X-ME-Sender: <xms:cI_oXaX3jlb25omEAYtzXsQQUePA4rxoBtw4Ow302Ve9cwgE_hCWZQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrudektddgjeelucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedftehn
+ ughrvgifucflvghffhgvrhihfdcuoegrnhgurhgvfiesrghjrdhiugdrrghuqeenucfrrg
+ hrrghmpehmrghilhhfrhhomheprghnughrvgifsegrjhdrihgurdgruhenucevlhhushht
+ vghrufhiiigvpedt
+X-ME-Proxy: <xmx:cI_oXa2knlD6TnwXA42kGk-bxpS64sIHNJ4BIN3P8dq9cB_LfbUPUQ>
+ <xmx:cI_oXZZ4pnIn3c37bcw2UgmrDU4VGkOsCbWbcDHrH6aSuIbQH4rv7g>
+ <xmx:cI_oXVolf65iVtdkqbv_AJNZnMB_qK2QzAKjaBX-E1Nt6c3BHYAn2g>
+ <xmx:cY_oXStJPN0fIE_l7k3y3IhX5YCfwgxM-Ty25801dspTkHqXRArDDg>
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+ id 63050E00A2; Thu,  5 Dec 2019 00:02:40 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.1.7-612-g13027cc-fmstable-20191203v1
+Mime-Version: 1.0
+Message-Id: <ef0aab28-093c-41ef-9a2c-925de97145b2@www.fastmail.com>
+In-Reply-To: <87bf3c1d-9e77-f4a1-1163-548a3cfee3bc@redhat.com>
+References: <20191203041440.6275-1-andrew@aj.id.au>
+ <20191203041440.6275-3-andrew@aj.id.au>
+ <283c152b-b1c7-551e-bec0-c087b14de996@redhat.com>
+ <4e90d36d-aa13-441f-9298-56f83a5bff6a@www.fastmail.com>
+ <87bf3c1d-9e77-f4a1-1163-548a3cfee3bc@redhat.com>
+Date: Thu, 05 Dec 2019 15:34:15 +1030
+From: "Andrew Jeffery" <andrew@aj.id.au>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-arm@nongnu.org
+Subject: Re: [PATCH v2 2/4] target/arm: Abstract the generic timer frequency
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 66.111.4.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,181 +106,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arawinda.p@gmail.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- paulus@ozlabs.org, qemu-ppc@nongnu.org
+Cc: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 11/19/19 8:09 AM, David Gibson wrote:
-> On Thu, Oct 24, 2019 at 01:13:05PM +0530, Ganesh Goudar wrote:
->> From: Aravinda Prasad <arawinda.p@gmail.com>
->>
->> This patch adds support in QEMU to handle "ibm,nmi-register"
->> and "ibm,nmi-interlock" RTAS calls.
->>
->> The machine check notification address is saved when the
->> OS issues "ibm,nmi-register" RTAS call.
->>
->> This patch also handles the case when multiple processors
->> experience machine check at or about the same time by
->> handling "ibm,nmi-interlock" call. In such cases, as per
->> PAPR, subsequent processors serialize waiting for the first
->> processor to issue the "ibm,nmi-interlock" call. The second
->> processor that also received a machine check error waits
->> till the first processor is done reading the error log.
->> The first processor issues "ibm,nmi-interlock" call
->> when the error log is consumed.
->>
->> [Move fwnmi registeration to .apply hook]
-> s/registeration/registration/
-Thanks
->
->> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
->> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
->> ---
->>   hw/ppc/spapr_caps.c    |  9 +++++--
->>   hw/ppc/spapr_rtas.c    | 57 ++++++++++++++++++++++++++++++++++++++++++
->>   include/hw/ppc/spapr.h |  5 +++-
->>   3 files changed, 68 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/ppc/spapr_caps.c b/hw/ppc/spapr_caps.c
->> index 976d709210..1675ebd45e 100644
->> --- a/hw/ppc/spapr_caps.c
->> +++ b/hw/ppc/spapr_caps.c
->> @@ -509,9 +509,14 @@ static void cap_fwnmi_mce_apply(SpaprMachineState *spapr, uint8_t val,
->>            * of software injected faults like duplicate SLBs).
->>            */
->>           warn_report("Firmware Assisted Non-Maskable Interrupts not supported in TCG");
-> This logic still isn't quite right.  To start with the warn_report()
-> above possible wants to be more weakly worded.  With TCG, FWNMI won't
-> generally *do* anything, and there are some edge cases where the
-> behaviour is arguably incorrect.  However there's no reason we can't
-> make the RTAS calls work basically as expected and in almost all cases
-> things will behave correctly - at least according to the case where no
-> fwnmi events are delivered...
-ok
->
->> -    } else if (kvm_enabled() && (kvmppc_set_fwnmi() != 0)) {
->> -        error_setg(errp,
->> +    } else if (kvm_enabled()) {
->> +        if (!kvmppc_set_fwnmi()) {
->> +            /* Register ibm,nmi-register and ibm,nmi-interlock RTAS calls */
->> +            spapr_fwnmi_register();
-> ..but here you only register the RTAS calls in the KVM case, which
-> breaks that.  If there really is a strong reason to do this, then the
-> warn_report() above should be error_setg() and fail the apply.
->
->> +        } else {
->> +            error_setg(errp,
->>   "Firmware Assisted Non-Maskable Interrupts not supported by KVM, try cap-fwnmi-mce=off");
->> +        }
->>       }
->>   }
->>   
->> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
->> index 2c066a372d..0328b1f341 100644
->> --- a/hw/ppc/spapr_rtas.c
->> +++ b/hw/ppc/spapr_rtas.c
->> @@ -400,6 +400,55 @@ static void rtas_get_power_level(PowerPCCPU *cpu, SpaprMachineState *spapr,
->>       rtas_st(rets, 1, 100);
->>   }
->>   
->> +static void rtas_ibm_nmi_register(PowerPCCPU *cpu,
->> +                                  SpaprMachineState *spapr,
->> +                                  uint32_t token, uint32_t nargs,
->> +                                  target_ulong args,
->> +                                  uint32_t nret, target_ulong rets)
->> +{
->> +    hwaddr rtas_addr = spapr_get_rtas_addr();
->> +
->> +    if (!rtas_addr) {
->> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
->> +        return;
->> +    }
->> +
->> +    if (spapr_get_cap(spapr, SPAPR_CAP_FWNMI_MCE) == SPAPR_CAP_OFF) {
->> +        rtas_st(rets, 0, RTAS_OUT_NOT_SUPPORTED);
-> Actually, since you explicitly test for the cap being enabled here,
-> there's no reason not to *always* register this RTAS call.  Also this
-> test for the feature flag should go first, before delving into the
-> device tree for the RTAS address.
-Sure, will do
->
->> +        return;
->> +    }
->> +
->> +    spapr->guest_machine_check_addr = rtas_ld(args, 1);
->> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->> +}
->> +
->> +static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
->> +                                   SpaprMachineState *spapr,
->> +                                   uint32_t token, uint32_t nargs,
->> +                                   target_ulong args,
->> +                                   uint32_t nret, target_ulong rets)
->> +{
->> +    if (spapr->guest_machine_check_addr == -1) {
->> +        /* NMI register not called */
->> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
->> +        return;
->> +    }
->> +
->> +    if (spapr->mc_status != cpu->vcpu_id) {
->> +        /* The vCPU that hit the NMI should invoke "ibm,nmi-interlock" */
->> +        rtas_st(rets, 0, RTAS_OUT_PARAM_ERROR);
->> +        return;
->> +    }
->> +
->> +    /*
->> +     * vCPU issuing "ibm,nmi-interlock" is done with NMI handling,
->> +     * hence unset mc_status.
->> +     */
->> +    spapr->mc_status = -1;
->> +    qemu_cond_signal(&spapr->mc_delivery_cond);
->> +    rtas_st(rets, 0, RTAS_OUT_SUCCESS);
->> +}
->> +
->>   static struct rtas_call {
->>       const char *name;
->>       spapr_rtas_fn fn;
->> @@ -503,6 +552,14 @@ hwaddr spapr_get_rtas_addr(void)
->>       return (hwaddr)fdt32_to_cpu(*rtas_data);
->>   }
->>   
->> +void spapr_fwnmi_register(void)
->> +{
->> +    spapr_rtas_register(RTAS_IBM_NMI_REGISTER, "ibm,nmi-register",
->> +                        rtas_ibm_nmi_register);
->> +    spapr_rtas_register(RTAS_IBM_NMI_INTERLOCK, "ibm,nmi-interlock",
->> +                        rtas_ibm_nmi_interlock);
->> +}
->> +
->>   static void core_rtas_register_types(void)
->>   {
->>       spapr_rtas_register(RTAS_DISPLAY_CHARACTER, "display-character",
->> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->> index 4afa8d4d09..86f0fc8fdd 100644
->> --- a/include/hw/ppc/spapr.h
->> +++ b/include/hw/ppc/spapr.h
->> @@ -653,8 +653,10 @@ target_ulong spapr_hypercall(PowerPCCPU *cpu, target_ulong opcode,
->>   #define RTAS_IBM_REMOVE_PE_DMA_WINDOW           (RTAS_TOKEN_BASE + 0x28)
->>   #define RTAS_IBM_RESET_PE_DMA_WINDOW            (RTAS_TOKEN_BASE + 0x29)
->>   #define RTAS_IBM_SUSPEND_ME                     (RTAS_TOKEN_BASE + 0x2A)
->> +#define RTAS_IBM_NMI_REGISTER                   (RTAS_TOKEN_BASE + 0x2B)
->> +#define RTAS_IBM_NMI_INTERLOCK                  (RTAS_TOKEN_BASE + 0x2C)
->>   
->> -#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2B)
->> +#define RTAS_TOKEN_MAX                          (RTAS_TOKEN_BASE + 0x2D)
->>   
->>   /* RTAS ibm,get-system-parameter token values */
->>   #define RTAS_SYSPARM_SPLPAR_CHARACTERISTICS      20
->> @@ -907,4 +909,5 @@ void spapr_check_pagesize(SpaprMachineState *spapr, hwaddr pagesize,
->>   
->>   void spapr_set_all_lpcrs(target_ulong value, target_ulong mask);
->>   hwaddr spapr_get_rtas_addr(void);
->> +void spapr_fwnmi_register(void);
->>   #endif /* HW_SPAPR_H */
 
+On Wed, 4 Dec 2019, at 03:57, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 12/3/19 1:48 PM, Andrew Jeffery wrote:
+> > On Tue, 3 Dec 2019, at 16:39, Philippe Mathieu-Daud=C3=A9 wrote:
+> >> On 12/3/19 5:14 AM, Andrew Jeffery wrote:
+> >>> Prepare for SoCs such as the ASPEED AST2600 whose firmware configu=
+res
+> >>> CNTFRQ to values significantly larger than the static 62.5MHz valu=
+e
+> >>> currently derived from GTIMER_SCALE. As the OS potentially derives=
+ its
+> >>> timer periods from the CNTFRQ value the lack of support for runnin=
+g
+> >>> QEMUTimers at the appropriate rate leads to sticky behaviour in th=
+e
+> >>> guest.
+> >>>
+> >>> Substitute the GTIMER_SCALE constant with use of a helper to deriv=
+e the
+> >>> period from gt_cntfrq stored in struct ARMCPU. Initially set gt_cn=
+tfrq
+> >>> to the frequency associated with GTIMER_SCALE so current behaviour=
+ is
+> >>> maintained.
+> >>>
+> >>> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+> >>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> >>> ---
+> >>>    target/arm/cpu.c    |  2 ++
+> >>>    target/arm/cpu.h    | 10 ++++++++++
+> >>>    target/arm/helper.c | 10 +++++++---
+> >>>    3 files changed, 19 insertions(+), 3 deletions(-)
+> >>>
+> >>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> >>> index 7a4ac9339bf9..5698a74061bb 100644
+> >>> --- a/target/arm/cpu.c
+> >>> +++ b/target/arm/cpu.c
+> >>> @@ -974,6 +974,8 @@ static void arm_cpu_initfn(Object *obj)
+> >>>        if (tcg_enabled()) {
+> >>>            cpu->psci_version =3D 2; /* TCG implements PSCI 0.2 */
+> >>>        }
+> >>> +
+> >>> +    cpu->gt_cntfrq =3D NANOSECONDS_PER_SECOND / GTIMER_SCALE;
+> >>>    }
+> >>>   =20
+> >>>    static Property arm_cpu_reset_cbar_property =3D
+> >>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> >>> index 83a809d4bac4..666c03871fdf 100644
+> >>> --- a/target/arm/cpu.h
+> >>> +++ b/target/arm/cpu.h
+> >>> @@ -932,8 +932,18 @@ struct ARMCPU {
+> >>>         */
+> >>>        DECLARE_BITMAP(sve_vq_map, ARM_MAX_VQ);
+> >>>        DECLARE_BITMAP(sve_vq_init, ARM_MAX_VQ);
+> >>> +
+> >>> +    /* Generic timer counter frequency, in Hz */
+> >>> +    uint64_t gt_cntfrq;
+> >>
+> >> You can also explicit the unit by calling it 'gt_cntfrq_hz'.
+> >=20
+> > Fair call, I'll fix that.
+> >=20
+> >>
+> >>>    };
+> >>>   =20
+> >>> +static inline unsigned int gt_cntfrq_period_ns(ARMCPU *cpu)
+> >>> +{
+> >>> +    /* XXX: Could include qemu/timer.h to get NANOSECONDS_PER_SEC=
+OND? */
+> >>
+> >> Why inline this call? I doubt there is a significant performance ga=
+in.
+> >=20
+> > It wasn't so much performance. It started out as a macro for a simpl=
+e calculation
+> > because I didn't want to duplicate it across a number of places, the=
+n I wanted type
+> > safety for the pointer so  I switched the macro in the header to an =
+inline function. So
+> > it is an evolution of the patch rather than something that came from=
+ an explicit goal
+> > of e.g. performance.
+>=20
+> OK. Eventually NANOSECONDS_PER_SECOND will move to "qemu/units.h".
+>=20
+> Should the XXX comment stay? I'm not sure, it is confusing.
+
+I'll remove that.=20
+
+>=20
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Thanks. However, did you still want your comment on 4/4 addressed (move
+the comment to this patch)?
+
+Andrew
 
