@@ -2,89 +2,84 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 289DDC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:24:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DC1C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:26:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8052206DB
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:24:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E3C8206DB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:26:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H9d2840q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8052206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HdhHfMIK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E3C8206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ics32-0000Jk-R6
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:24:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45874)
+	id 1ics5B-0002q4-5w
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:26:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49050)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1icrwD-0002c0-Qs
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:17:03 -0500
+ (envelope-from <lersek@redhat.com>) id 1icrxa-0003Db-0Z
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:18:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1icrwC-0003tT-CI
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:17:01 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34183)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1icrwC-0003oN-26
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:17:00 -0500
-Received: by mail-wr1-x441.google.com with SMTP id t2so3847049wrr.1
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 06:16:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=j8BHLefjvES9SOUgRcfX4ySy651Dqcu3C9AOxEtMINE=;
- b=H9d2840qQHkWnEUhW/yRLuN9XbkJ2AtviP8lUc4S+3SvC/u3qn30KkX2ynW/dZwws6
- zkN3DLP2z983CcHPnDhwOXKwaQPjRbrb8BZ0L2Cezw2jGMmWpcKM2zXwhQEhlz1R3cII
- ROP0sz9Bf5oa8LMBWqXRrcTv4faM/KDoITZ3ntc5gh1gTrv99MHqd9g9rcfwDjIA4Avi
- 496oyNAP8pZrxwjmMeooiCOX6usOZSK2uueloRDSm6appx2Qgz8nvOFZr6hhlMZSxExj
- nlMhC0NlKxfcyzLS1KpPcKIfdbNKs7OmIdAM1aBiUP1fixn8ZM2N5hiHAWki6e9euXrT
- leBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=j8BHLefjvES9SOUgRcfX4ySy651Dqcu3C9AOxEtMINE=;
- b=mDnz0TlgDjouTJP6vUuJ/XNPlCzJ8FVcgBT7IianKrEWI6NRybi3XV7H0gUWkXseap
- 4miYtbWrbrxIm1sYGwOUzMwjHQXW2UQMoFNOnWsUuwUMGH3dE03xt3s7XQCiva0U9w4O
- OdBPoQTUt0n7Xdl+BeOlJCaIpgGx+YH3jgeIBpDnYguIjEn435BQ8f00JFZll9Zl6Qfd
- ted3Ce042xfxB5dFUbTC6MJjprqZ2e506LRAVRR6CLFkTbr+2TSqI44T0UneV93Kimk5
- VKKaj3i7Un2NNftCuzZSXpOrCvTbIYC7cjuC4XuPRDKmtoVR6gu+TaURRwz3MVld23Bb
- uulA==
-X-Gm-Message-State: APjAAAURnyZ3ktPIOMqQrlatwKw3jGddm4NuqjCOMQIeF9Qv/T/3294x
- v8xZLRhEXfXvnZ+XTaPQacBzPnaQvDw=
-X-Google-Smtp-Source: APXvYqxydtaMiRT0SEobaIhuXxFW9PNVF4Dvltqac99Cpx361b4ZTkA+usCgXtBBEasv5LBJRNCKGw==
-X-Received: by 2002:adf:fa50:: with SMTP id y16mr9908354wrr.183.1575548723861; 
- Thu, 05 Dec 2019 04:25:23 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id a64sm11379882wmc.18.2019.12.05.04.25.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Dec 2019 04:25:20 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5225C1FF90;
- Thu,  5 Dec 2019 12:25:18 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 3/6] linux-user: add target_mmap_complete tracepoint
-Date: Thu,  5 Dec 2019 12:25:14 +0000
-Message-Id: <20191205122518.10010-4-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191205122518.10010-1-alex.bennee@linaro.org>
-References: <20191205122518.10010-1-alex.bennee@linaro.org>
+ (envelope-from <lersek@redhat.com>) id 1icrxV-0005za-Bf
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:18:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43272
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1icrxT-0005wn-V6
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:18:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575555497;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+F4G0Z9RQ0x9S7RB1CVcM2M0dFKOSTvTeq5Z9+Kt4kc=;
+ b=HdhHfMIKZck6m+XBv5NAxcG/PuBsmeUAgYKr3KL5hFE/zjH1RwbjGNzK0Y4pR0r9Acc3lN
+ xPG+FqlcD8II9C46x8LRuYXAC10pA6znGrWGEdGPTQaOP/8OdZkVyOhou9fYjcbyxhHL5Y
+ 33q1oGRm6gjxJuwe1t8fZCl24TaVWsA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-125-jsc8_4dJOAORysXJWuVdRQ-1; Thu, 05 Dec 2019 07:17:30 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34E77800D5F
+ for <qemu-devel@nongnu.org>; Thu,  5 Dec 2019 12:17:29 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-62.ams2.redhat.com
+ [10.36.116.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6267B600F0;
+ Thu,  5 Dec 2019 12:17:22 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 4/8] acpi: cpuhp: spec: fix 'Command data'
+ description
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+References: <1575479147-6641-1-git-send-email-imammedo@redhat.com>
+ <1575479147-6641-5-git-send-email-imammedo@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <680b7776-044b-59e8-2ee9-f9e1751c5577@redhat.com>
+Date: Thu, 5 Dec 2019 13:17:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+In-Reply-To: <1575479147-6641-5-git-send-email-imammedo@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: jsc8_4dJOAORysXJWuVdRQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,47 +91,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: pbonzini@redhat.com, philmd@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For full details we also want to see where the mmaps end up.
+On 12/04/19 18:05, Igor Mammedov wrote:
+> Correct returned value description in case 'Command field' == 0x0,
+> it's in not PXM but CPU selector value with pending event
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
----
- linux-user/mmap.c       | 2 +-
- linux-user/trace-events | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
+(1) s/in not/not/
 
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index f4f10deaeac..0b1b43ac3c0 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -538,8 +538,8 @@ abi_long target_mmap(abi_ulong start, abi_ulong len, int prot,
-  the_end1:
-     page_set_flags(start, start + len, prot | PAGE_VALID);
-  the_end:
-+    trace_target_mmap_complete(start);
- #ifdef DEBUG_MMAP
--    printf("ret=0x" TARGET_ABI_FMT_lx "\n", start);
-     page_dump(stdout);
-     printf("\n");
- #endif
-diff --git a/linux-user/trace-events b/linux-user/trace-events
-index 8d8d4c3c68c..6d6aeef7b52 100644
---- a/linux-user/trace-events
-+++ b/linux-user/trace-events
-@@ -15,3 +15,4 @@ user_s390x_restore_sigregs(void *env, uint64_t sc_psw_addr, uint64_t env_psw_add
- # mmap.c
- target_mprotect(uint64_t start, uint64_t len, int flags) "start=0x%"PRIx64 " len=0x%"PRIx64 " prot=0x%x"
- target_mmap(uint64_t start, uint64_t len, int pflags, int mflags, int fd, uint64_t offset) "start=0x%"PRIx64 " len=0x%"PRIx64 " prot=0x%x flags=0x%x fd=%d offset=0x%"PRIx64
-+target_mmap_complete(uint64_t retaddr) "retaddr=0x%"PRIx64
--- 
-2.20.1
+> 
+> In addition describe 0 blanket value in case of not supported
+> 'Command field' value.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  docs/specs/acpi_cpu_hotplug.txt | 11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
+> index 4e65286..19c508f 100644
+> --- a/docs/specs/acpi_cpu_hotplug.txt
+> +++ b/docs/specs/acpi_cpu_hotplug.txt
+> @@ -56,9 +56,8 @@ read access:
+>             3-7: reserved and should be ignored by OSPM
+>      [0x5-0x7] reserved
+>      [0x8] Command data: (DWORD access)
+> -          in case of error or unsupported command reads is 0xFFFFFFFF
+> -          current 'Command field' value:
+> -              0: returns PXM value corresponding to device
+> +          contains 0 unless last stored in 'Command field' value is one of:
+> +              0: contains 'CPU selector' value of a CPU with pending event[s]
+
+(2) I think we can improve the word order:
+
+  last stored in 'Command field' value
+->
+  value last stored in 'Command field'
+
+>  
+>  write access:
+>      offset:
+> @@ -81,9 +80,9 @@ write access:
+>            value:
+>              0: selects a CPU device with inserting/removing events and
+>                 following reads from 'Command data' register return
+> -               selected CPU (CPU selector value). If no CPU with events
+> -               found, the current CPU selector doesn't change and
+> -               corresponding insert/remove event flags are not set.
+> +               selected CPU ('CPU selector' value).
+> +               If no CPU with events found, the current 'CPU selector' doesn't
+> +               change and corresponding insert/remove event flags are not set.
+
+(3) AFAICT this is only a -- useful! -- re-wrapping. But, since we are
+modifying this section anyway, can we replace "flags are not set" with
+"flags are left unchanged" or "flags are not modified"?
+
+"set" is ambiguous with bit fields: it can mean "rewritten", and it can
+mean "set to 1".
+
+>              1: following writes to 'Command data' register set OST event
+>                 register in QEMU
+>              2: following writes to 'Command data' register set OST status
+> 
+
+Anyway, these are all superficial comments. Pick up whatever you agree
+with. Either way:
+
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+
+Thanks!
+Laszlo
 
 
