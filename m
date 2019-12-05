@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE72C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 046BDC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:03:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37DF720675
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:02:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37DF720675
+	by mail.kernel.org (Postfix) with ESMTPS id C7D4F20675
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:03:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7D4F20675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icvSi-0007px-O7
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 13:02:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45886)
+	id 1icvTW-0000UI-CT
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 13:03:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1icvDP-0007nH-JN
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:47:00 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icvDQ-0007oo-7V
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:47:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1icvDO-00045m-6E
+ (envelope-from <vsementsov@virtuozzo.com>) id 1icvDO-00047z-Ln
  for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:46:59 -0500
-Received: from relay.sw.ru ([185.231.240.75]:48344)
+Received: from relay.sw.ru ([185.231.240.75]:48356)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1icvDN-0003VS-UP
+ id 1icvDO-0003Va-Ci
  for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:46:58 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1icvD5-00013M-Rr; Thu, 05 Dec 2019 20:46:39 +0300
+ id 1icvD8-00013M-Dr; Thu, 05 Dec 2019 20:46:42 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v8 01/21] hw/core/loader-fit: fix freeing errp in fit_load_fdt
-Date: Thu,  5 Dec 2019 20:46:15 +0300
-Message-Id: <20191205174635.18758-2-vsementsov@virtuozzo.com>
+Subject: [PATCH v8 16/21] hw/tpm: rename Error ** parameter to more common errp
+Date: Thu,  5 Dec 2019 20:46:30 +0300
+Message-Id: <20191205174635.18758-17-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191205174635.18758-1-vsementsov@virtuozzo.com>
 References: <20191205174635.18758-1-vsementsov@virtuozzo.com>
@@ -60,38 +60,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>, vsementsov@virtuozzo.com,
- armbru@redhat.com
+Cc: vsementsov@virtuozzo.com, armbru@redhat.com,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-fit_load_fdt forget to check that errp is not NULL and to zero it after
-freeing. Fix it.
-
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 ---
- hw/core/loader-fit.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ hw/tpm/tpm_emulator.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/core/loader-fit.c b/hw/core/loader-fit.c
-index 953b16bc82..3ee9fb2f2e 100644
---- a/hw/core/loader-fit.c
-+++ b/hw/core/loader-fit.c
-@@ -200,7 +200,10 @@ static int fit_load_fdt(const struct fit_loader *ldr, const void *itb,
-     err = fit_image_addr(itb, img_off, "load", &load_addr, errp);
-     if (err == -ENOENT) {
-         load_addr = ROUND_UP(kernel_end, 64 * KiB) + (10 * MiB);
--        error_free(*errp);
-+        if (errp) {
-+            error_free(*errp);
-+            *errp = NULL;
-+        }
-     } else if (err) {
-         error_prepend(errp, "unable to read FDT load address from FIT: ");
-         ret = err;
+diff --git a/hw/tpm/tpm_emulator.c b/hw/tpm/tpm_emulator.c
+index 22f9113432..10d587ed40 100644
+--- a/hw/tpm/tpm_emulator.c
++++ b/hw/tpm/tpm_emulator.c
+@@ -155,7 +155,7 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
+                                      const uint8_t *in, uint32_t in_len,
+                                      uint8_t *out, uint32_t out_len,
+                                      bool *selftest_done,
+-                                     Error **err)
++                                     Error **errp)
+ {
+     ssize_t ret;
+     bool is_selftest = false;
+@@ -165,20 +165,20 @@ static int tpm_emulator_unix_tx_bufs(TPMEmulator *tpm_emu,
+         is_selftest = tpm_util_is_selftest(in, in_len);
+     }
+ 
+-    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, err);
++    ret = qio_channel_write_all(tpm_emu->data_ioc, (char *)in, in_len, errp);
+     if (ret != 0) {
+         return -1;
+     }
+ 
+     ret = qio_channel_read_all(tpm_emu->data_ioc, (char *)out,
+-              sizeof(struct tpm_resp_hdr), err);
++              sizeof(struct tpm_resp_hdr), errp);
+     if (ret != 0) {
+         return -1;
+     }
+ 
+     ret = qio_channel_read_all(tpm_emu->data_ioc,
+               (char *)out + sizeof(struct tpm_resp_hdr),
+-              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), err);
++              tpm_cmd_get_size(out) - sizeof(struct tpm_resp_hdr), errp);
+     if (ret != 0) {
+         return -1;
+     }
 -- 
 2.21.0
 
