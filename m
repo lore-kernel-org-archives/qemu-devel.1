@@ -2,85 +2,70 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=BITCOIN_SPAM_02,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BTC_ID,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A5AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF443C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:23:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C03A82245C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:21:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NWWY4z4m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C03A82245C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9EF77206DB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:23:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF77206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ics0P-0005OU-Ir
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:21:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36915)
+	id 1ics2E-000882-Kz
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:23:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47153)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1icrnb-00021a-Fv
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:08:09 -0500
+ (envelope-from <no-reply@patchew.org>) id 1icrpR-0004PX-4V
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:10:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1icrnY-0006Xw-8l
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:08:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58173
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1icrnX-0006W2-Pq
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:08:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575554883;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Fx0KPSqLtLNOhBgI0DxRqqJ3IjKkLR8pxNccO5bTjp4=;
- b=NWWY4z4mib6aFVpf4fR9Tp4TZrhwPzrpPdemkt9eZ1n2cdEvtP0ouNHl/AXjpztrGHKo7T
- Ma3aEbOvL53LTH3p68PcsKhOPxHBz2cp8Y0/RGx8WFYwFJ5PxTPsP559338TNl5++KAkpQ
- yay1doTpW9Uzt9qj5TuClfhB1Bu6P84=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-NROMmUjPNEW9HK1W1GhtvA-1; Thu, 05 Dec 2019 09:08:01 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4DFE190D341
- for <qemu-devel@nongnu.org>; Thu,  5 Dec 2019 14:08:00 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-62.ams2.redhat.com
- [10.36.116.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A5FE1CB;
- Thu,  5 Dec 2019 14:07:54 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 8/8] acpi: cpuhp: spec: document procedure for
- enabling modern CPU hotplug
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <1575479147-6641-1-git-send-email-imammedo@redhat.com>
- <1575479147-6641-9-git-send-email-imammedo@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <bb601078-db09-1915-1d12-350093887183@redhat.com>
-Date: Thu, 5 Dec 2019 15:07:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <no-reply@patchew.org>) id 1icrpO-0004bY-VZ
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:10:00 -0500
+Resent-Date: Thu, 05 Dec 2019 09:10:00 -0500
+Resent-Message-Id: <E1icrpO-0004bY-VZ@eggs.gnu.org>
+Received: from sender4-of-o50.zoho.com ([136.143.188.50]:21034)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1icrpO-0004So-MM
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:09:58 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1575554984; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=OeBAE/y0b6MaKioCUa1oScbfUJAqwhHAqZPLbNwpfuDKCtmVQYQD2ucrDIHv6y68juAbG5bV2sWHm+xA4O1uFrezSqIMRyDnIhCCezQyptA9oxO5DyYMmTGBYjmBAgvLbTS6xma6fXYM9XEakQua9wZn4ehEOgtsfYPybZT6VkA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1575554984;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=lucN9eUclCoEw69/wrH8xZ7E0A1YJcrJQh6j3W8wz6M=; 
+ b=A4sfBXkpuSrw4Z0oMvMAzvL1D8Hc4qSxEvKPKgic/JnJa7rMde9/u/gD0sHimp2NrG5UGdDYrMI6d54hvlfQkt0OHcpl1R+G8pyYJD7aMCpJ4Np3GDpARzdwx2XF4/qaN8oA2vRBXkEYl+IX8YJFG5bg3fF8z+y7Iu9i31D/UDQ=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1575554981686609.6460774169741;
+ Thu, 5 Dec 2019 06:09:41 -0800 (PST)
+In-Reply-To: <03fbd542d6bae4cf07be56c51d57fc2962720445.1575546855.git.tgolembi@redhat.com>
+Subject: Re: [PATCH v6] qga: add command guest-get-devices for reporting
+ VirtIO devices
+Message-ID: <157555498034.27890.12517932225629858010@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <1575479147-6641-9-git-send-email-imammedo@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: NROMmUjPNEW9HK1W1GhtvA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: tgolembi@redhat.com
+Date: Thu, 5 Dec 2019 06:09:41 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 136.143.188.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,169 +77,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, philmd@redhat.com, mst@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: marcandre.lureau@redhat.com, tgolembi@redhat.com, berrange@redhat.com,
+ qemu-devel@nongnu.org, mdroth@linux.vnet.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/04/19 18:05, Igor Mammedov wrote:
-> Describe how to enable and detect modern CPU hotplug interface.
-> Detection part is based on new CPHP_GET_CPU_ID_CMD command,
-> introduced by "acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command" patch.
->
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  docs/specs/acpi_cpu_hotplug.txt | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
-
-Could we make this usecase / workflow independent of the new
-CPHP_GET_CPU_ID_CMD command please?
-
-I'd like to suggest the following:
-
-> diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
-> index bb33144..667b264 100644
-> --- a/docs/specs/acpi_cpu_hotplug.txt
-> +++ b/docs/specs/acpi_cpu_hotplug.txt
-> @@ -15,14 +15,14 @@ CPU present bitmap for:
->    PIIX-PM  (IO port 0xaf00-0xaf1f, 1-byte access)
->    One bit per CPU. Bit position reflects corresponding CPU APIC ID. Read-only.
->    The first DWORD in bitmap is used in write mode to switch from legacy
-> -  to new CPU hotplug interface, write 0 into it to do switch.
-> +  to modern CPU hotplug interface, write 0 into it to do switch.
->  ---------------------------------------------------------------
->  QEMU sets corresponding CPU bit on hot-add event and issues SCI
->  with GPE.2 event set. CPU present map is read by ACPI BIOS GPE.2 handler
->  to notify OS about CPU hot-add events. CPU hot-remove isn't supported.
->
->  =====================================
-> -ACPI CPU hotplug interface registers:
-> +Modern ACPI CPU hotplug interface registers:
->  -------------------------------------
->  Register block base address:
->      ICH9-LPC IO port 0x0cd8
-> @@ -105,6 +105,24 @@ write access:
->                other values: reserved
->
->      Typical usecases:
-> +        - (x86) Detecting and enabling modern CPU hotplug interface.
-
-(1) I think we can drop the (x86) restriction. (Because, we don't need
-to depend on APIC ID specifics; see below.)
-
-> +          QEMU starts with legacy CPU hotplug interface enabled. Detecting and
-> +          switching to modern interface is based on the 2 legacy CPU hotplug features:
-> +            1. Writes into CPU bitmap are ignored.
-> +            2. CPU bitmap always has bit#0 set, corresponding to boot CPU.
-> +
-> +          Use following steps to detect and enable modern CPU hotplug interface:
-> +            1. Store 0x0 to the 'CPU selector' register,
-> +               attempting to switch to modern mode
-> +            2. Store 0x0 to the 'CPU selector' register,
-> +               to ensure valid selector value
-
-OK thus far.
-
-> +            3. Store 0x3 to the 'Command field' register,
-> +               sets the 'Command data 2' register into architecture specific
-> +               CPU identifier mode
-
-(2) Can we please store command 0 here
-(CPHP_GET_NEXT_CPU_WITH_EVENT_CMD)?
-
-That might change the selector value, yes. (Even if that happens, the
-new selector will be *valid*.)
-
-But the main point is that, with 0 stored to the command register, one
-of the following *four* cases will hold, subsequently:
-
-(2a) if register block is totally missing:
-
---> Offset#0 will read as all-bits-one (unassigned read)
-
-(2b) if register block is legacy-only:
-
---> Offset#0 will read as nonzero, due to CPU#0 being always present
-
-(2c) if the modern register block is active, but the "Command data 2"
-register is *not* yet described in the spec file:
-
---> Offset#0 will read as zero, because it is *reserved*:
-
-> read access:
->     offset:
->     [0x0-0x3] reserved <---- HERE
-
-(2d) if the modern register block is active, and the "Command data 2"
-register *is* described in the spec file:
-
---> the "Command data 2" register (at offset#0) will read as zero,
-because:
-
-> read access:
->     offset:
->     [0x0-0x3] Command data 2: (DWORD access)
->               if last stored 'Command field' value:
->                   3: upper 32 bits of architecture specific identifying CPU value
->                      (n x86 case: 0x0)
->                   other values: reserved <------ HERE
-
-and then step#4 applies just the same:
-
-On 12/04/19 18:05, Igor Mammedov wrote:
-> +            4. Read the 'Command data 2' register.
-> +               If read value is 0x0, the modern interface is enabled.
-> +               Otherwise legacy or no CPU hotplug interface available
-> +
-
-because "read value is 0x0" corresponds to the *union* of cases (2c) and
-(2d) -- namely, "the modern register block is active".
-
-My proposal above is what I implemented for OVMF in October:
-
-  [edk2-devel] [PATCH v2 3/3]
-  OvmfPkg/PlatformPei: rewrite MaxCpuCountInitialization() for CPU hotplug
-
-  http://mid.mail-archive.com/20191022221554.14963-4-lersek@redhat.com
-
-and it works very well.
-
-So the benefits would be:
-
-- I wouldn't have to rewrite that (complex!) patch :) ,
-
-- the logic would not store the new CPHP_GET_CPU_ID_CMD command, only
-  read offset#0,
-
-- the logic would not be x86 specific (it would not have to rely on the
-  most significant 32 bits of the 64-bit arch-specific CPU identifier --
-  here: the APIC ID -- being zero).
-
-Furthermore,
-
-(3) In step#4, I suggest replacing 'Command data 2' with "offset 0",
-
-(4) finally, I'd suggest squashing this patch (updated as requested
-above) into patch "acpi: cpuhp: spec: add typical usecases".
-
-Using my suggestion (2), you can define the "modern interface
-enablement" workflow as well, without any dependency on
-CPHP_GET_CPU_ID_CMD. The only thing that's necessary is the small update
-from (3), and then you can describe all three important use cases in one
-go, in patch#6.
-
-And then you can introduce CPHP_GET_CPU_ID_CMD in the last patch
-(patch#7), while staying compatible with the previously-documented
-workflows.
-
-Pretty please? :)
-
-Thanks!
-Laszlo
-
->          - Get a cpu with pending event
->            1. Store 0x0 to the 'CPU selector' register.
->            2. Store 0x0 to the 'Command field' register.
->
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8wM2ZiZDU0MmQ2YmFlNGNmMDdi
+ZTU2YzUxZDU3ZmMyOTYyNzIwNDQ1LjE1NzU1NDY4NTUuZ2l0LnRnb2xlbWJpQHJlZGhhdC5jb20v
+CgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxk
+IHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQg
+YmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBpbnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVw
+cm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhIC9iaW4vYmFz
+aApleHBvcnQgQVJDSD14ODZfNjQKbWFrZSBkb2NrZXItaW1hZ2UtZmVkb3JhIFY9MSBORVRXT1JL
+PTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LW1pbmd3QGZlZG9yYSBKPTE0IE5FVFdPUks9MQo9PT0g
+VEVTVCBTQ1JJUFQgRU5EID09PQoKICBCVUlMRCAgIHBjLWJpb3Mvb3B0aW9ucm9tL2t2bXZhcGlj
+LmltZwogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20vbXVsdGlib290LnJhdwovdG1wL3FlbXUt
+dGVzdC9zcmMvcWdhL2NvbW1hbmRzLXdpbjMyLmM6IEluIGZ1bmN0aW9uICdxbXBfZ3Vlc3RfZ2V0
+X2RldmljZXMnOgovdG1wL3FlbXUtdGVzdC9zcmMvcWdhL2NvbW1hbmRzLXdpbjMyLmM6MjM4OTox
+OTogZXJyb3I6ICdHdWVzdERldmljZUluZm8nIHtha2EgJ3N0cnVjdCBHdWVzdERldmljZUluZm8n
+fSBoYXMgbm8gbWVtYmVyIG5hbWVkICd2ZW5kb3JfaWQnCiAgICAgICAgICAgICBkZXZpY2UtPnZl
+bmRvcl9pZCA9IGdfYXNjaWlfc3RydG91bGwodmVuZG9yX2lkLCBOVUxMLCAxNik7CiAgICAgICAg
+ICAgICAgICAgICBefgovdG1wL3FlbXUtdGVzdC9zcmMvcWdhL2NvbW1hbmRzLXdpbjMyLmM6MjM5
+MDoxOTogZXJyb3I6ICdHdWVzdERldmljZUluZm8nIHtha2EgJ3N0cnVjdCBHdWVzdERldmljZUlu
+Zm8nfSBoYXMgbm8gbWVtYmVyIG5hbWVkICdkZXZpY2VfaWQnCiAgICAgICAgICAgICBkZXZpY2Ut
+PmRldmljZV9pZCA9IGdfYXNjaWlfc3RydG91bGwoZGV2aWNlX2lkLCBOVUxMLCAxNik7CiAgICAg
+ICAgICAgICAgICAgICBefgogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20vbGludXhib290LnJh
+dwogIEJVSUxEICAgcGMtYmlvcy9vcHRpb25yb20vbGludXhib290X2RtYS5yYXcKICBCVUlMRCAg
+IHBjLWJpb3Mvb3B0aW9ucm9tL2t2bXZhcGljLnJhdwogIFNJR04gICAgcGMtYmlvcy9vcHRpb25y
+b20vbXVsdGlib290LmJpbgptYWtlOiAqKiogWy90bXAvcWVtdS10ZXN0L3NyYy9ydWxlcy5tYWs6
+Njk6IHFnYS9jb21tYW5kcy13aW4zMi5vXSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1
+bmZpbmlzaGVkIGpvYnMuLi4uCiAgQ0MgICAgICBxZW11LWltZy5vCiAgU0lHTiAgICBwYy1iaW9z
+L29wdGlvbnJvbS9saW51eGJvb3QuYmluCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9y
+KHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1sn
+c3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFu
+Y2UudXVpZD01ZjIxYTlmNzE0M2U0YTU2YTk4OTEzZDhjNTJjZGE5ZCcsICctdScsICcxMDAxJywg
+Jy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RB
+UkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAn
+LWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0ND
+QUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3Fl
+bXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRj
+aGV3LXRlc3Rlci10bXAtNjQwcXA5cWMvc3JjL2RvY2tlci1zcmMuMjAxOS0xMi0wNS0wOS4wMy41
+NC4yNzM1OTovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVt
+dS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpm
+aWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD01ZjIxYTlmNzE0M2U0
+YTU2YTk4OTEzZDhjNTJjZGE5ZAptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFr
+ZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC02NDBx
+cDlxYy9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LW1pbmd3QGZlZG9yYV0gRXJyb3Ig
+MgoKcmVhbCAgICA1bTQ3LjMyOXMKdXNlciAgICAwbTkuMDMxcwoKClRoZSBmdWxsIGxvZyBpcyBh
+dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMDNmYmQ1NDJkNmJhZTRjZjA3YmU1
+NmM1MWQ1N2ZjMjk2MjcyMDQ0NS4xNTc1NTQ2ODU1LmdpdC50Z29sZW1iaUByZWRoYXQuY29tL3Rl
+c3RpbmcuZG9ja2VyLW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJh
+dGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
