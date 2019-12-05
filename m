@@ -2,99 +2,81 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB68C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D886CC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:06:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA7812077B
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9ABCF206DB
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 05:06:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="OX+hWXUV";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EOZvZyXL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA7812077B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S7WfDctZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ABCF206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icjJ5-0007yM-4V
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 00:04:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51921)
+	id 1icjLu-0001nx-Pu
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 00:06:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53645)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrew@aj.id.au>) id 1icjHw-00078I-CC
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:02:53 -0500
+ (envelope-from <crosa@redhat.com>) id 1icjKp-0000v2-6j
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:05:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrew@aj.id.au>) id 1icjHv-0004Mp-0i
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:02:52 -0500
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:57249)
+ (envelope-from <crosa@redhat.com>) id 1icjKm-0002Ik-31
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:05:50 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38571
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrew@aj.id.au>)
- id 1icjHo-0004AQ-FD; Thu, 05 Dec 2019 00:02:46 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.nyi.internal (Postfix) with ESMTP id 1402A227B8;
- Thu,  5 Dec 2019 00:02:41 -0500 (EST)
-Received: from imap2 ([10.202.2.52])
- by compute4.internal (MEProxy); Thu, 05 Dec 2019 00:02:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
- mime-version:message-id:in-reply-to:references:date:from:to:cc
- :subject:content-type:content-transfer-encoding; s=fm1; bh=Gm0Bu
- 76qnev5eR0jj9tPedHTPd0qyliUowe7Q0H39aI=; b=OX+hWXUVlXljYh73YbpVX
- uk67rYXN4fsOD5l+nVQ1fdHNEAop0/CPM39xmLBfZCWpPndnxWbIpnF2hydvMVXu
- iDLt86pWkUR4+XTb5sGDbDi3q40LVMZ/Lf/CHuFFdVXi42UNTN/m8f1U8SxSIt9/
- 9PPlsF37mTXaayfyTjrp0sDf8DyrzAGUpMfYYIJL+f1D3ALYZMPMAMSltN4w5Rnx
- pDeFqhq0IZo+1lRh6zxP7npx5a39XOZvvpw8FnFYjTelyrZks9p3L3HIMSMb8veJ
- bVRJJHuyYYPSjq7xlgxE7mxtkFcAWXCvYzeGyMJRncJnE+6usaFxpopFsfYYZuya
- A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:content-type
- :date:from:in-reply-to:message-id:mime-version:references
- :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
- :x-sasl-enc; s=fm1; bh=Gm0Bu76qnev5eR0jj9tPedHTPd0qyliUowe7Q0H39
- aI=; b=EOZvZyXLmz0TaFvn8tufEc/zPRTBUr6dclFE1VBO73z426qsNWf01DoCe
- dXCgMPH3kEujC61WF/4DZ4S7ZZ0LCOG2r6zUenehQ5ne+JyWmBv9Lqv6tz3FvpLg
- If5wj/K9SO0MOcK4+L95nuQGpzAZvEXmUCu95qh3TdvjI/MJInfG+WjbYQUCfuM4
- qWib4AfeEzJuy7UC0cUz8Q/t7UELUMqe/i0TUa3bGhI+NooEfqxQeBrwQjVfaItU
- FM+TQkHDu8hhbm5CxBqwaj8pq5RPbr1fjKRQRbuKCcMt+9T6klV3Omfu/YFTdOEZ
- SauWSGyR9RAkp2KjHup2K0CPhUkMQ==
-X-ME-Sender: <xms:cI_oXaX3jlb25omEAYtzXsQQUePA4rxoBtw4Ow302Ve9cwgE_hCWZQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrudektddgjeelucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepofgfggfkjghffffhvffutgfgsehtqhertderreejnecuhfhrohhmpedftehn
- ughrvgifucflvghffhgvrhihfdcuoegrnhgurhgvfiesrghjrdhiugdrrghuqeenucfrrg
- hrrghmpehmrghilhhfrhhomheprghnughrvgifsegrjhdrihgurdgruhenucevlhhushht
- vghrufhiiigvpedt
-X-ME-Proxy: <xmx:cI_oXa2knlD6TnwXA42kGk-bxpS64sIHNJ4BIN3P8dq9cB_LfbUPUQ>
- <xmx:cI_oXZZ4pnIn3c37bcw2UgmrDU4VGkOsCbWbcDHrH6aSuIbQH4rv7g>
- <xmx:cI_oXVolf65iVtdkqbv_AJNZnMB_qK2QzAKjaBX-E1Nt6c3BHYAn2g>
- <xmx:cY_oXStJPN0fIE_l7k3y3IhX5YCfwgxM-Ty25801dspTkHqXRArDDg>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id 63050E00A2; Thu,  5 Dec 2019 00:02:40 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.1.7-612-g13027cc-fmstable-20191203v1
-Mime-Version: 1.0
-Message-Id: <ef0aab28-093c-41ef-9a2c-925de97145b2@www.fastmail.com>
-In-Reply-To: <87bf3c1d-9e77-f4a1-1163-548a3cfee3bc@redhat.com>
-References: <20191203041440.6275-1-andrew@aj.id.au>
- <20191203041440.6275-3-andrew@aj.id.au>
- <283c152b-b1c7-551e-bec0-c087b14de996@redhat.com>
- <4e90d36d-aa13-441f-9298-56f83a5bff6a@www.fastmail.com>
- <87bf3c1d-9e77-f4a1-1163-548a3cfee3bc@redhat.com>
-Date: Thu, 05 Dec 2019 15:34:15 +1030
-From: "Andrew Jeffery" <andrew@aj.id.au>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-arm@nongnu.org
-Subject: Re: [PATCH v2 2/4] target/arm: Abstract the generic timer frequency
-Content-Type: text/plain;charset=utf-8
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1icjKl-0002Fm-Ga
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 00:05:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575522346;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Su50AQySwUQzDkyzjok5Ulxx+oWaZqAM79M+cL2fXno=;
+ b=S7WfDctZh7hR6QInKveOiTp1donmfiB///iYSDzcxROlnqXIPRI2izAdHFxCVPmUmR5OUV
+ okZB5fbhbqE9LDbL8fSOIa8r/935Z7iLb4a3Ivt1LXNFnSEnpN5Di8tl75IgSa26QyR+JY
+ BkoDu0XCXmSniMfDcJBxR47uJIdfGI4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-3-rhKp8iiNNryHoOrM9AE1tg-1; Thu, 05 Dec 2019 00:05:43 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 221871005509;
+ Thu,  5 Dec 2019 05:05:42 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-125-37.rdu2.redhat.com
+ [10.10.125.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B8E1E5D9C5;
+ Thu,  5 Dec 2019 05:05:38 +0000 (UTC)
+Date: Thu, 5 Dec 2019 00:05:37 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC] QEMU Gating CI
+Message-ID: <20191205050537.GA19290@localhost.localdomain>
+References: <20191202140552.GA5353@localhost.localdomain>
+ <CAFEAcA-pOBjia36W3n1Sz-5EsUfT8gkzzn2Gpb7J6Zrjfbu6XQ@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-pOBjia36W3n1Sz-5EsUfT8gkzzn2Gpb7J6Zrjfbu6XQ@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: rhKp8iiNNryHoOrM9AE1tg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 66.111.4.28
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,108 +88,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Cc: Jeff Nelson <jen@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Ademar Reis <areis@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On Wed, 4 Dec 2019, at 03:57, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 12/3/19 1:48 PM, Andrew Jeffery wrote:
-> > On Tue, 3 Dec 2019, at 16:39, Philippe Mathieu-Daud=C3=A9 wrote:
-> >> On 12/3/19 5:14 AM, Andrew Jeffery wrote:
-> >>> Prepare for SoCs such as the ASPEED AST2600 whose firmware configu=
-res
-> >>> CNTFRQ to values significantly larger than the static 62.5MHz valu=
-e
-> >>> currently derived from GTIMER_SCALE. As the OS potentially derives=
- its
-> >>> timer periods from the CNTFRQ value the lack of support for runnin=
-g
-> >>> QEMUTimers at the appropriate rate leads to sticky behaviour in th=
-e
-> >>> guest.
-> >>>
-> >>> Substitute the GTIMER_SCALE constant with use of a helper to deriv=
-e the
-> >>> period from gt_cntfrq stored in struct ARMCPU. Initially set gt_cn=
-tfrq
-> >>> to the frequency associated with GTIMER_SCALE so current behaviour=
- is
-> >>> maintained.
-> >>>
-> >>> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
-> >>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-> >>> ---
-> >>>    target/arm/cpu.c    |  2 ++
-> >>>    target/arm/cpu.h    | 10 ++++++++++
-> >>>    target/arm/helper.c | 10 +++++++---
-> >>>    3 files changed, 19 insertions(+), 3 deletions(-)
-> >>>
-> >>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> >>> index 7a4ac9339bf9..5698a74061bb 100644
-> >>> --- a/target/arm/cpu.c
-> >>> +++ b/target/arm/cpu.c
-> >>> @@ -974,6 +974,8 @@ static void arm_cpu_initfn(Object *obj)
-> >>>        if (tcg_enabled()) {
-> >>>            cpu->psci_version =3D 2; /* TCG implements PSCI 0.2 */
-> >>>        }
-> >>> +
-> >>> +    cpu->gt_cntfrq =3D NANOSECONDS_PER_SECOND / GTIMER_SCALE;
-> >>>    }
-> >>>   =20
-> >>>    static Property arm_cpu_reset_cbar_property =3D
-> >>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> >>> index 83a809d4bac4..666c03871fdf 100644
-> >>> --- a/target/arm/cpu.h
-> >>> +++ b/target/arm/cpu.h
-> >>> @@ -932,8 +932,18 @@ struct ARMCPU {
-> >>>         */
-> >>>        DECLARE_BITMAP(sve_vq_map, ARM_MAX_VQ);
-> >>>        DECLARE_BITMAP(sve_vq_init, ARM_MAX_VQ);
-> >>> +
-> >>> +    /* Generic timer counter frequency, in Hz */
-> >>> +    uint64_t gt_cntfrq;
-> >>
-> >> You can also explicit the unit by calling it 'gt_cntfrq_hz'.
-> >=20
-> > Fair call, I'll fix that.
-> >=20
-> >>
-> >>>    };
-> >>>   =20
-> >>> +static inline unsigned int gt_cntfrq_period_ns(ARMCPU *cpu)
-> >>> +{
-> >>> +    /* XXX: Could include qemu/timer.h to get NANOSECONDS_PER_SEC=
-OND? */
-> >>
-> >> Why inline this call? I doubt there is a significant performance ga=
-in.
-> >=20
-> > It wasn't so much performance. It started out as a macro for a simpl=
-e calculation
-> > because I didn't want to duplicate it across a number of places, the=
-n I wanted type
-> > safety for the pointer so  I switched the macro in the header to an =
-inline function. So
-> > it is an evolution of the patch rather than something that came from=
- an explicit goal
-> > of e.g. performance.
+On Tue, Dec 03, 2019 at 05:54:38PM +0000, Peter Maydell wrote:
+> On Mon, 2 Dec 2019 at 14:06, Cleber Rosa <crosa@redhat.com> wrote:
+> >
+> > RFC: QEMU Gating CI
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > This RFC attempts to address most of the issues described in
+> > "Requirements/GatinCI"[1].  An also relevant write up is the "State of
+> > QEMU CI as we enter 4.0"[2].
+> >
+> > The general approach is one to minimize the infrastructure maintenance
+> > and development burden, leveraging as much as possible "other people's"
+> > infrastructure and code.  GitLab's CI/CD platform is the most relevant
+> > component dealt with here.
 >=20
-> OK. Eventually NANOSECONDS_PER_SECOND will move to "qemu/units.h".
+> Thanks for writing up this RFC.
 >=20
-> Should the XXX comment stay? I'm not sure, it is confusing.
+> My overall view is that there's some interesting stuff in
+> here and definitely some things we'll want to cover at some
+> point, but there's also a fair amount that is veering away
+> from solving the immediate problem we want to solve, and
+> which we should thus postpone for later (beyond making some
+> reasonable efforts not to design something which paints us
+> into a corner so it's annoyingly hard to improve later).
+>
 
-I'll remove that.=20
+Right.  I think this is a valid perspective to consider as we define
+the order and scope of thanks.  I'll follow up with a more
+straightforward suggestion with the bare minimum actions for a first
+round.
 
+> > To exemplify my point, if one specific test run as part of "check-tcg"
+> > is found to be faulty on a specific job (say on a specific OS), the
+> > entire "check-tcg" test set may be disabled as a CI-level maintenance
+> > action.  Of course a follow up action to deal with the specific test
+> > is required, probably in the form of a Launchpad bug and patches
+> > dealing with the issue, but without necessarily a CI related angle to
+> > it.
+> >
+> > If/when test result presentation and control mechanism evolve, we may
+> > feel confident and go into finer grained granularity.  For instance, a
+> > mechanism for disabling nothing but "tests/migration-test" on a given
+> > environment would be possible and desirable from a CI management level.
 >=20
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> For instance, we don't have anything today for granularity of
+> definition of what tests we run where or where we disable them.
+> So we don't need it in order to move away from the scripting
+> approach I have at the moment. We can just say "the CI system
+> will run make and make check (and maybe in some hosts some
+> additional test-running commands) on these hosts" and hardcode
+> that into whatever yaml file the CI system's configured in.
+>
 
-Thanks. However, did you still want your comment on 4/4 addressed (move
-the comment to this patch)?
+I absolutely agree.  That's why I even considered *if* this will done,
+and not only *when*.  Because I happen to be biased from working on a
+test runner/framework, this is something that I had to at least talk
+about, so that it can be evaluated and maybe turned into a goal.
 
-Andrew
+> > Pre-merge
+> > ~~~~~~~~~
+> >
+> > The natural way to have pre-merge CI jobs in GitLab is to send "Merge
+> > Requests"[3] (abbreviated as "MR" from now on).  In most projects, a
+> > MR comes from individual contributors, usually the authors of the
+> > changes themselves.  It's my understanding that the current maintainer
+> > model employed in QEMU will *not* change at this time, meaning that
+> > code contributions and reviews will continue to happen on the mailing
+> > list.  A maintainer then, having collected a number of patches, would
+> > submit a MR either in addition or in substitution to the Pull Requests
+> > sent to the mailing list.
+>=20
+> Eventually it would be nice to allow any submaintainer
+> to send a merge request to the CI system (though you would
+> want it to have a "but don't apply until somebody else approves it"
+> gate as well as the automated testing part). But right now all
+> we need is for the one person managing merges and releases
+> to be able to say "here's the branch where I merged this
+> pullrequest, please test it". At any rate, supporting multiple
+> submaintainers all talking to the CI independently should be
+> out of scope for now.
+>
+
+OK, noted.
+
+> > Multi-maintainer model
+> > ~~~~~~~~~~~~~~~~~~~~~~
+> >
+> > The previous section already introduced some of the proposed workflow
+> > that can enable such a multi-maintainer model.  With a Gating CI
+> > system, though, it will be natural to have a smaller "Mean time
+> > between (CI) failures", simply because of the expected increased
+> > number of systems and checks.  A lot of countermeasures have to be
+> > employed to keep that MTBF in check.
+> >
+> > For once, it's imperative that the maintainers for such systems and
+> > jobs are clearly defined and readily accessible.  Either the same
+> > MAINTAINERS file or a more suitable variation of such data should be
+> > defined before activating the *gating* rules.  This would allow a
+> > routing to request the attention of the maintainer responsible.
+> >
+> > In case of unresposive maintainers, or any other condition that
+> > renders and keeps one or more CI jobs failing for a given previously
+> > established amount of time, the job can be demoted with an
+> > "allow_failure" configuration[7].  Once such a change is commited, the
+> > path to promotion would be just the same as in a newly added job
+> > definition.
+> >
+> > Note: In a future phase we can evaluate the creation of rules that
+> > look at changed paths in a MR (similar to "F:" entries on MAINTAINERS)
+> > and the execution of specific CI jobs, which would be the
+> > responsibility of a given maintainer[8].
+>=20
+> All this stuff is not needed to start with. We cope at the
+> moment with "everything is gating, and if something doesn't
+> pass it needs to be fixed or manually removed from the setup".
+>
+
+OK, I get your point.  But, I think it's fair to say though, that one
+big motivation that we also have for this work, is to be able to
+provide new machines and jobs into the Gating CI in the very near
+future.  And to do that, we must set common rules so that anyone
+else can do the same and abide by the same terms.
+
+> > GitLab Jobs and Pipelines
+> > -------------------------
+> >
+> > GitLab CI is built around two major concepts: jobs and pipelines.  The
+> > current GitLab CI configuration in QEMU uses jobs only (or putting it
+> > another way, all jobs in a single pipeline stage).  Consider the
+> > folowing job definition[9]:
+> >
+> >    build-tci:
+> >     script:
+> >     - TARGETS=3D"aarch64 alpha arm hppa m68k microblaze moxie ppc64 s39=
+0x x86_64"
+> >     - ./configure --enable-tcg-interpreter
+> >          --target-list=3D"$(for tg in $TARGETS; do echo -n ${tg}'-softm=
+mu '; done)"
+> >     - make -j2
+> >     - make tests/boot-serial-test tests/cdrom-test tests/pxe-test
+> >     - for tg in $TARGETS ; do
+> >         export QTEST_QEMU_BINARY=3D"${tg}-softmmu/qemu-system-${tg}" ;
+> >         ./tests/boot-serial-test || exit 1 ;
+> >         ./tests/cdrom-test || exit 1 ;
+> >       done
+> >     - QTEST_QEMU_BINARY=3D"x86_64-softmmu/qemu-system-x86_64" ./tests/p=
+xe-test
+> >     - QTEST_QEMU_BINARY=3D"s390x-softmmu/qemu-system-s390x" ./tests/pxe=
+-test -m slow
+> >
+> > All the lines under "script" are performed sequentially.  It should be
+> > clear that there's the possibility of breaking this down into multiple
+> > stages, so that a build happens first, and then "common set of tests"
+> > run in parallel.
+>=20
+> We could do this, but we don't do it today, so we don't need
+> to think about this at all to start with.
+>
+
+So, in your opinion, this is phase >=3D 1 material.  Noted.
+
+> > In theory, there's nothing that prevents an entire QEMU build
+> > directory, to be treated as an artifact.  In practice, there are
+> > predefined limits on GitLab that prevents that from being possible,
+>=20
+> ...so we don't need to worry about somehow defining some
+> cut-down "build artefact" that we provide to the testing
+> phase. Just do a build and test run as a single thing.
+> We can always come back and improve later.
+>=20
+>=20
+> Have you been able to investigate and confirm that we can
+> get a gitlab-runner setup that works on non-x86 ? That seems
+> to me like an important thing we should be confident about
+> early before we sink too much effort into a gitlab-based
+> solution.
+>
+
+I've successfully built gitlab-runner and run jobs on aarch64, ppc64le
+and s390x.  The binaries are available here:
+
+   https://cleber.fedorapeople.org/gitlab-runner/v12.4.1/
+
+But, with the "shell" executor (given that Docker helper images are
+not available for those architectures).  I don't think we'd have to
+depend on GitLab providing those images though, it should be possible
+to create them for different architectures and tweak the gitlab-runner
+code to use different image references on those architectures.
+
+Does this answer this specific question?
+
+Best,
+- Cleber.
+
+> thanks
+> -- PMM
+>=20
+
 
