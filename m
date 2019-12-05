@@ -2,92 +2,83 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BTC_ID,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URG_BIZ,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96FE4C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF5DC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:11:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61D67206D9
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:11:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A7D421823
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 14:11:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FGYKyEM4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D67206D9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yy4eDk86"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A7D421823
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icrqW-0005Gd-6i
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:11:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42966)
+	id 1icrqZ-0005JP-6x
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 09:11:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55553)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1icrbw-0007qb-Q4
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:56:05 -0500
+ (envelope-from <jasowang@redhat.com>) id 1icrlw-0008Kv-L5
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:06:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1icrbv-0000cN-I3
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:56:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60169
+ (envelope-from <jasowang@redhat.com>) id 1icrlv-0000WC-7R
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:06:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40606
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1icrbt-0000ad-0k
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 08:56:02 -0500
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1icrlu-0000TW-UP
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 09:06:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575554160;
+ s=mimecast20190719; t=1575554782;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=a5LEmeBgNeFxpwu+F2QwvSZ7e/bau9swAX/PFV/EtRg=;
- b=FGYKyEM4DYCIyaM/wQruU4IiPLZyEnCB+TXQ4MatfcAXyt8Uw+SmN6S/7aeDJcXprWn+Gv
- cUBnb3zjDO6GXlvIhRudgbTWLewuz7jFuwhQvyNZV6vtmu9EY+kW+kUDeEBQQymxj8qzez
- 68WN3hCZ3E3yJul5+iGJ/27IsL/FU8g=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-jFR7t8gPNpa6N5wF7e8Knw-1; Thu, 05 Dec 2019 08:55:59 -0500
-Received: by mail-qt1-f198.google.com with SMTP id h14so2510643qtq.11
- for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 05:55:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=bBMUbllceoxZYLj0y2soALV70A6VyMICRdvanuq60ik=;
- b=KeABt1MMIbpO/Zmk0BtymhhAqFuQ/b9C4c6dFXfg+zvt5jsgYXUHyPBuhkRWcN4Ooa
- mww7tcMZPU/eSOliyEzV6mIOoAfS6iXX3P1Xhbn4JzXXU80HnDafVjI00K5Lwr7oeEPO
- 8GUjNTcT68TW89Yc7S3iqz+U0a2YxiEDuIRoRpo/0XZBiOlCS2njJq1qvNr72GxjBHMd
- iB1fV+cootgQsqHw1miucrBOgqwHapjh0GS8d631lJPtvyru4SmPwMvviZtAa8jmGpOC
- 24ryaFPa8EysjvMVCTedyyBTgwsmLj6ukn0/ONRQdI7/2c//QPlE94VuyOkCvtbQaqQh
- 7JCQ==
-X-Gm-Message-State: APjAAAWfS9xK/Xi5WVUa5J+Az5VlnmXxzkM3YLva+OkSCDgVppFIlgvr
- zWnWirBP4ltFeD4HFXCNUbPGDBkGaEXAHfViIdVWU8Wk+zY1cs9ArywKkeewGGY7RTcKkbgb+ZD
- vJiNcACmZxIlWbDA=
-X-Received: by 2002:a0c:e84d:: with SMTP id l13mr7446445qvo.53.1575554158535; 
- Thu, 05 Dec 2019 05:55:58 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyJQ3yy8a3z4QFTeZTYcibHvWYJowytRSl9SnFpezFArhnlxk5PSL978zxA5MA3Uwu7d0B/hQ==
-X-Received: by 2002:a0c:e84d:: with SMTP id l13mr7446423qvo.53.1575554158114; 
- Thu, 05 Dec 2019 05:55:58 -0800 (PST)
-Received: from xz-x1 ([2607:9880:19c0:3f::3])
- by smtp.gmail.com with ESMTPSA id c79sm4963175qkg.76.2019.12.05.05.55.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 05 Dec 2019 05:55:57 -0800 (PST)
-Date: Thu, 5 Dec 2019 08:55:55 -0500
-From: Peter Xu <peterx@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH] migration: Rate limit inside host pages
-Message-ID: <20191205135555.GC9673@xz-x1>
-References: <20191205102918.63294-1-dgilbert@redhat.com>
+ bh=NLRko2/oQTzK9BJwSE/ikxWjurLXgr2kyfOXgtePXp0=;
+ b=Yy4eDk86vfviu2XvuEQpRqAU5CN8lyc2NQJj5BnBPAM0B1TGsmCji30JO1A6tIA6haHRX2
+ H2xY+61U0lPQtvC8KaRkclmuLy7ueCiNgJxRuE+t/XEdu5GHQIIxRrA+SOqv2qqVSgcfHS
+ gCnUZ/L6AzE2z4BY5r64UuFMv9EDB+c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-Rvc7Il-UOk2M4BUmu0_qfQ-1; Thu, 05 Dec 2019 09:06:19 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EBC6186E658;
+ Thu,  5 Dec 2019 14:06:17 +0000 (UTC)
+Received: from [10.72.12.127] (ovpn-12-127.pek2.redhat.com [10.72.12.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 737C55D6A5;
+ Thu,  5 Dec 2019 14:06:11 +0000 (UTC)
+Subject: Re: [PATCH] net/imx_fec: Updating the IMX_FEC IP to support loopback
+ mode.
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191129150508.24404-1-bilalwasim676@gmail.com>
+ <afe9efde-7ac1-8607-446a-8fbf10accece@redhat.com>
+ <8c956ae31e8f44a2b831a5030b2448b4@SVR-IES-MBX-03.mgc.mentorg.com>
+ <CAP+75-X_POJfTO=gOUu1zCPtcfnQ5yemQo0hqB_s3jy_C17o9g@mail.gmail.com>
+ <db2c5074-307c-d20e-73f2-9c2b44612d6f@redhat.com>
+ <CAFEAcA89Zw+MUJzhwSx39qVv8cRVNgRf7fe1K1oLYVjZfur9Wg@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <4d9b3cb3-db73-5a58-c32c-594984508a68@redhat.com>
+Date: Thu, 5 Dec 2019 22:06:09 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191205102918.63294-1-dgilbert@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-MC-Unique: jFR7t8gPNpa6N5wF7e8Knw-1
+In-Reply-To: <CAFEAcA89Zw+MUJzhwSx39qVv8cRVNgRf7fe1K1oLYVjZfur9Wg@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: Rvc7Il-UOk2M4BUmu0_qfQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -102,77 +93,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com, qemu-devel@nongnu.org, LMa@suse.com
+Cc: "bilalwasim676@gmail.com" <bilalwasim676@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "aa1ronham@gmail.com" <aa1ronham@gmail.com>,
+ "jcd@tribudubois.net" <jcd@tribudubois.net>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "Wasim,
+ Bilal" <Bilal_Wasim@mentor.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "linux@roeck-us.net" <linux@roeck-us.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 05, 2019 at 10:29:18AM +0000, Dr. David Alan Gilbert (git) wrot=
-e:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> When using hugepages, rate limiting is necessary within each huge
-> page, since a 1G huge page can take a significant time to send, so
-> you end up with bursty behaviour.
->=20
-> Fixes: 4c011c37ecb3 ("postcopy: Send whole huge pages")
-> Reported-by: Lin Ma <LMa@suse.com>
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  migration/migration.c  | 57 ++++++++++++++++++++++++------------------
->  migration/migration.h  |  1 +
->  migration/ram.c        |  2 ++
->  migration/trace-events |  4 +--
->  4 files changed, 37 insertions(+), 27 deletions(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 354ad072fa..27500d09a9 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -3224,6 +3224,37 @@ void migration_consume_urgent_request(void)
->      qemu_sem_wait(&migrate_get_current()->rate_limit_sem);
->  }
-> =20
-> +/* Returns true if the rate limiting was broken by an urgent request */
-> +bool migration_rate_limit(void)
-> +{
-> +    int64_t now =3D qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-> +    MigrationState *s =3D migrate_get_current();
-> +
-> +    bool urgent =3D false;
-> +    migration_update_counters(s, now);
-> +    if (qemu_file_rate_limit(s->to_dst_file)) {
-> +        /*
-> +         * Wait for a delay to do rate limiting OR
-> +         * something urgent to post the semaphore.
-> +         */
-> +        int ms =3D s->iteration_start_time + BUFFER_DELAY - now;
-> +        trace_migration_rate_limit_pre(ms);
-> +        if (qemu_sem_timedwait(&s->rate_limit_sem, ms) =3D=3D 0) {
-> +            /*
-> +             * We were woken by one or more urgent things but
-> +             * the timedwait will have consumed one of them.
-> +             * The service routine for the urgent wake will dec
-> +             * the semaphore itself for each item it consumes,
-> +             * so add this one we just eat back.
-> +             */
-> +            qemu_sem_post(&s->rate_limit_sem);
 
-I remembered I've commented around this when it was first introduced
-on whether we can avoid this post().  IMHO we can if with something
-like an eventfd, so when we queue the page we write the eventfd to 1,
-here we poll() on the eventfd with the same timeout, then clear it
-after the poll no matter what.  When unqueue, we can probably simply
-do nothing.  I'm not sure about Windows or other OS, though..
+On 2019/12/4 =E4=B8=8B=E5=8D=8811:11, Peter Maydell wrote:
+> On Wed, 4 Dec 2019 at 02:15, Jason Wang<jasowang@redhat.com>  wrote:
+>> On 2019/11/30 =E4=B8=8A=E5=8D=8812:04, Philippe Mathieu-Daud=C3=A9 wrote=
+:
+>>> On Fri, Nov 29, 2019 at 4:59 PM Wasim, Bilal<Bilal_Wasim@mentor.com>  w=
+rote:
+>>>> Thanks for the pointers philippe.. Is the patch okay to be merged with=
+out it or do I need to do a re-submission with the updated username ?
+>>> If there are no review comments on your patch, I think the maintainer
+>>> taking your patch can fix this details directly, no need to resend.
+>>>
+>>>> -----Original Message-----
+>>>> From: Philippe Mathieu-Daud=C3=A9 [mailto:philmd@redhat.com]
+>>>> Sent: Friday, November 29, 2019 8:38 PM
+>>>> To:bilalwasim676@gmail.com;qemu-devel@nongnu.org
+>>>> Cc:peter.maydell@linaro.org;aa1ronham@gmail.com;jcd@tribudubois.net;qe=
+mu-arm@nongnu.org; Wasim, Bilal<Bilal_Wasim@mentor.com>;linux@roeck-us.net;=
+ Jason Wang<jasowang@redhat.com>
+>>>> Subject: Re: [PATCH] net/imx_fec: Updating the IMX_FEC IP to support l=
+oopback mode.
+>>>>
+>>>> Hi Bilal,
+>>>>
+>>>> Cc'ing Jason, the maintainer of network devices.
+>>>>
+>>>> On 11/29/19 4:05 PM,bilalwasim676@gmail.com  wrote:
+>>>>> From: bwasim<bilal_wasim@mentor.com>
+>>>> Your git setup misses your 'user.name', you could fix it running:
+>>>>
+>>>>      git config user.name "Bilal Wasim"
+>>>>
+>>>> (eventually with the --global option).
+>>>>
+>>>> The patch looks good otherwise.
+>>>>
+>>>> Thanks!
+>> Applied with the fix for user.name.
+> Could you fix up the non-standard block comment formatting too?
+>
+> thanks
+> -- PMM
+>
 
-Anyway this patch is not changing that part but to fix huge page
-issue, so that's another story for sure.
+Yes, fixed.
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
-Thanks,
-
---=20
-Peter Xu
+Thanks
 
 
