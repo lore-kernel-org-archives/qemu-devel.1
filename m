@@ -2,74 +2,151 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7BEFC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 22:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25675C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 22:39:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A31C22245C
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 22:35:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E250920675
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 22:39:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LP6zaUom"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A31C22245C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WsydljwK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E250920675
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iczi8-0000Ba-O0
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 17:35:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33724)
+	id 1iczm3-0002LZ-CW
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 17:39:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51707)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iczh8-0007zy-C5
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 17:34:00 -0500
+ (envelope-from <jsnow@redhat.com>) id 1iczkR-00019Q-5t
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 17:37:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iczh1-0005ik-WC
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 17:33:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33519
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1iczkP-000461-KX
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 17:37:22 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:24777
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iczgz-0005ep-1q
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 17:33:50 -0500
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iczkP-00041E-D9
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 17:37:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575585227;
+ s=mimecast20190719; t=1575585440;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=HWMtsqko9C2dTYmM1o5ZIxnFXtXC2FTQMR5CQothB7s=;
- b=LP6zaUombxh/2BvqKv9i5MkinwY7xK5NxIRUUoOnS6wkAAV6Eo1nOGQJquyLcH7y7iE4ps
- uR6geSdvQjlOjHnsIu+gbQeRl74MP2aWg/XtuD0nS+2/pSQBpMO5uUgYMqh/zA2h+7nSYt
- 4kfDHW5ED5rsSMPZGPYC7gCPZqmtopo=
+ content-transfer-encoding:content-transfer-encoding:autocrypt:autocrypt;
+ bh=AExbn28Zb1DUFfFl4AnyOGw73dqX3qAuYA0ZK0EOoUg=;
+ b=WsydljwKP+Hz0V3Uw8v3q9jwbj5U2G3tlxEZw5d6oAU+yzcVsQkf1ckrlhShLf0wl7nqBZ
+ xBwfU5zNWeq+gWO4T6cG1weQjxDP3Aw6Ur8qMqQIatckSdPXgGUc7mHutemlBMW/KHusXT
+ Qiz0TPG9K9RCWX5zEJ889CH5n6TB/m8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-q8yD5t2aOqy2FN8xu6vG6A-1; Thu, 05 Dec 2019 17:33:46 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-322-aM9JLmFdMTOeL6eANW1rLA-1; Thu, 05 Dec 2019 17:37:17 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDA77101F4F2;
- Thu,  5 Dec 2019 22:33:44 +0000 (UTC)
-Received: from localhost (ovpn-116-90.gru2.redhat.com [10.97.116.90])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0018A5D6BB;
- Thu,  5 Dec 2019 22:33:40 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] i386: Resolve CPU models to v1 by default
-Date: Thu,  5 Dec 2019 19:33:39 -0300
-Message-Id: <20191205223339.764534-1-ehabkost@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E739718557C2;
+ Thu,  5 Dec 2019 22:37:15 +0000 (UTC)
+Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5720B6A97A;
+ Thu,  5 Dec 2019 22:37:12 +0000 (UTC)
+To: Qemu-block <qemu-block@nongnu.org>
+From: John Snow <jsnow@redhat.com>
+Subject: Offline manipulation of Dirty Bitmaps by qemu-img
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
+ IYzhgrPEe7ZmPxbCSe4iMykjhwMh5byIHDoPGDU+FsQty2KXuoxto+ZdrP9gymAgmyqdk3aV
+ vzzmCa3cOppcqKvA0Kqr10UeX/z4OMVV390V+DVWUvzXpda45/Sxup57pk+hyY52wxxjIqef
+ rj8u5BN93s5uCVTus0oiVA6W+iXYzTvVDStMFVqnTxSxlpZoH5RGKvmoWV3uutByQyBPHW2U
+ 1Y6n6iEZ9MlP3hcDqlo0S8jeP03HaD4gOqCuqLceWF5+2WyHzNfylpNMFVi+Hp0H/nSDtCvQ
+ ua7j+6Pt7q5rvqgHvRipkDDVsjqwasuNc3wyoHexrBeLU/iJBuDld5iLy+dHXoYMB3HmjMxj
+ 3K5/8XhGrDx6BDFeO3HIpi3u2z1jniB7RtyVEtdupED6lqsDj0oSz9NxaOFZrS3Jf6z/kHIf
+ h42mM9Sx7+s4c07N2LieUxcfqhFTaa/voRibF4cmkBVUhOD1AKXNfhEsTvmcz9NbUchCkcvA
+ T9119CrsxfVsE7bXiGvdXnzyGLXdsoosjzwacKdOrVaDmN3Uy+SHiQXo6TlkSdV0XH2PUxTM
+ LsBFIO9qXO43Ai6J6iPAP/01l8fuZfpJE0/L/c25yyaND7xA3wARAQABtCpKb2huIFNub3cg
+ KEpvaG4gSHVzdG9uKSA8anNub3dAcmVkaGF0LmNvbT6JAlQEEwECAD4CGwMCHgECF4AFCwkI
+ BwMFFQoJCAsFFgIDAQAWIQT665cRoSz0dYEvGPKIqQZNGDVh6wUCXF392gUJC1Xq3gAKCRCI
+ qQZNGDVh6558D/9pM4pu4njX5aT6uUW3vAmbWLF1jfPxiTQgSHAnm9EBMZED/fsvkzj97clo
+ LN7JKmbYZNgJmR01A7flG45V4iOR/249qAfaVuD+ZzZi1R4jFzr13WS+IEdn0hYp9ITndb7R
+ ezW+HGu6/rP2PnfmDnNowgJu6Dp6IUEabq8SXXwGHXZPuMIrsXJxUdKJdGnh1o2u7271yNO7
+ J9PEMuMDsgjsdnaGtv7aQ9CECtXvBleAc06pLW2HU10r5wQyBMZGITemJdBhhdzGmbHAL0M6
+ vKi/bafHRWqfMqOAdDkv3Jg4arl2NCG/uNateR1z5e529+UlB4XVAQT+f5T/YyI65DFTY940
+ il3aZhA8u788jZEPMXmt94u7uPZbEYp7V0jt68SrTaOgO7NaXsboXFjwEa42Ug5lB5d5/Qdp
+ 1AITUv0NJ51kKwhHL1dEagGeloIsGVQILmpS0MLdtitBHqZLsnJkRvtMaxo47giyBlv2ewmq
+ tIGTlVLxHx9xkc9aVepOuiGlZaZB72c9AvZs9rKaAjgU2UfJHlB/Hr4uSk/1EY0IgMv4vnsG
+ 1sA5gvS7A4T4euu0PqHtn2sZEWDrk5RDbw0yIb53JYdXboLFmFXKzVASfKh2ZVeXRBlQQSJi
+ 3PBR1GzzqORlfryby7mkY857xzCI2NkIkD2eq+HhzFTfFOTdGrkCDQRUynn8ARAAwbhP45BE
+ d/zAMBPV2dk2WwIwKRSKULElP3kXpcuiDWYQob3UODUUqClO+3aXVRndaNmZX9WbzGYexVo3
+ 5j+CVBCGr3DlU8AL9pp3KQ3SJihWcDed1LSmUf8tS+10d6mdGxDqgnd/OWU214isvhgWZtZG
+ MM/Xj7cx5pERIiP+jqu7PT1cibcfcEKhPjYdyV1QnLtKNGrTg/UMKaL+qkWBUI/8uBoa0HLs
+ NH63bXsRtNAG8w6qG7iiueYZUIXKc4IHINUguqYQJVdSe+u8b2N5XNhDSEUhdlqFYraJvX6d
+ TjxMTW5lzVG2KjztfErRNSUmu2gezbw1/CV0ztniOKDA7mkQi6UIUDRh4LxRm5mflfKiCyDQ
+ L6P/jxHBxFv+sIgjuLrfNhIC1p3z9rvCh+idAVJgtHtYl8p6GAVrF+4xQV2zZH45tgmHo2+S
+ JsLPjXZtWVsWANpepXnesyabWtNAV4qQB7/SfC77zZwsVX0OOY2Qc+iohmXo8U7DgXVDgl/R
+ /5Qgfnlv0/3rOdMt6ZPy5LJr8D9LJmcP0RvX98jyoBOf06Q9QtEwJsNLCOCo2LKNL71DNjZr
+ nXEwjUH66CXiRXDbDKprt71BiSTitkFhGGU88XCtrp8R9yArXPf4MN+wNYBjfT7K29gWTzxt
+ 9DYQIvEf69oZD5Z5qHYGp031E90AEQEAAYkCPAQYAQIAJgIbDBYhBPrrlxGhLPR1gS8Y8oip
+ Bk0YNWHrBQJcXf3JBQkLVerNAAoJEIipBk0YNWHrU1AP/1FOK2SBGbyhHa5vDHuf47fgLipC
+ e0/h1E0vdSonzlhPxuZoQ47FjzG9uOhqqQG6/PqtWs/FJIyz8aGG4aV+pSA/9Ko3/2ND8MSY
+ ZflWs7Y8Peg08Ro01GTHFITjEUgHpTpHiT6TNcZB5aZNJ8jqCtW5UlqvXXbVeSTmO70ZiVtc
+ vUJbpvSxYmzhFfZWaXIPcNcKWL1rnmnzs67lDhMLdkYVf91aml/XtyMUlfB8Iaejzud9Ht3r
+ C0pA9MG57pLblX7okEshxAC0+tUdY2vANWFeX0mgqRt1GSuG9XM9H/cKP1czfUV/FgaWo/Ya
+ fM4eMhUAlL/y+/AJxxumPhBXftM4yuiktp2JMezoIMJI9fmhjfWDw7+2jVrx9ze1joLakFD1
+ rVAoHxVJ7ORfQ4Ni/qWbQm3T6qQkSMt4N/scNsMczibdTPxU7qtwQwIeFOOc3wEwmJ9Qe3ox
+ TODQ0agXiWVj0OXYCHJ6MxTDswtyTGQW+nUHpKBgHGwUaR6d1kr/LK9+5LpOfRlK9VRfEu7D
+ PGNiRkr8Abp8jHsrBqQWfUS1bAf62bq6XUel0kUCtb7qCq024aOczXYWPFpJFX+nhp4d7NeH
+ Edq+wlC13sBSiSHC7T5yssJ+7JPa2ATLlSKhEvBsLe2TsSTTtFlA0nBclqhfJXzimiuge9qU
+ E40lvMWBuQINBFTKimUBEADDbJ+pQ5M4QBMWkaWImRj7c598xIZ37oKM6rGaSnuB1SVb7YCr
+ Ci2MTwQcrQscA2jm80O8VFqWk+/XsEp62dty47GVwSfdGje/3zv3VTH2KhOCKOq3oPP5ZXWY
+ rz2d2WnTvx++o6lU7HLHDEC3NGLYNLkL1lyVxLhnhvcMxkf1EGA1DboEcMgnJrNB1pGP27ww
+ cSfvdyPGseV+qZZa8kuViDga1oxmnYDxFKMGLxrClqHrRt8geQL1Wj5KFM5hFtGTK4da5lPn
+ wGNd6/CINMeCT2AWZY5ySz7/tSZe5F22vPvVZGoPgQicYWdNc3ap7+7IKP86JNjmec/9RJcz
+ jvrYjJdiqBVldXou72CtDydKVLVSKv8c2wBDJghYZitfYIaL8cTvQfUHRYTfo0n5KKSec8Vo
+ vjDuxmdbOUBA+SkRxqmneP5OxGoZ92VusrwWCjry8HRsNdR+2T+ClDCO6Wpihu4V3CPkQwTy
+ eCuMHPAT0ka5paTwLrnZIxsdfnjUa96T10vzmQgAxpbbiaLvgKJ8+76OPdDnhddyxd2ldYfw
+ RkF5PEGg3mqZnYKNNBtwjvX49SAvgETQvLzQ8IKVgZS0m4z9qHHvtc1BsQnFfe+LJOFjzZr7
+ CrDNJMqk1JTHYsSi2JcN3vY32WMezXSQ0TzeMK4kdnclSQyp/h23GWod5QARAQABiQRbBBgB
+ AgAmAhsCFiEE+uuXEaEs9HWBLxjyiKkGTRg1YesFAlxd/coFCQtV2mQCKcFdIAQZAQIABgUC
+ VMqKZQAKCRB974EGqvw5DiJoEACLmuiRq9ifvOh5DyBFwRS7gvA14DsGQngmC57EzV0EFcfM
+ XVi1jX5OtwUyUe0Az5r6lHyyHDsDsIpLKBlWrYCeLpUhRR3oy181T7UNxvujGFeTkzvLAOo6
+ Hs3b8Wv9ARg+7acRYkQRNY7k0GIJ6YZz149tRyRKAy/vSjsaB9Lt0NOd1wf2EQMKwRVELwJD
+ y0AazGn+0PRP7Bua2YbtxaBmhBBDb2tPpwn8U9xdckB4Vlft9lcWNsC/18Gi9bpjd9FSbdH/
+ sOUI+3ToWYENeoT4IP09wn6EkgWaJS3nAUN/MOycNej2i4Yhy2wDDSKyTAnVkSSSoXk+tK91
+ HfqtokbDanB8daP+K5LgoiWHzjfWzsxA2jKisI4YCGjrYQzTyGOT6P6u6SEeoEx10865B/zc
+ 8/vN50kncdjYz2naacIDEKQNZlnGLsGkpCbfmfdi3Zg4vuWKNdWr0wGUzDUcpqW0y/lUXna+
+ 6uyQShX5e4JD2UPuf9WAQ9HtgSAkaDd4O1I2J41sleePzZOVB3DmYgy+ECRJJ5nw3ihdxpgc
+ y/v3lfcJaqiyCv0PF+K/gSOvwhH7CbVqARmptT7yhhxqFdaYWo2Z2ksuKyoKSRMFCXQY5oac
+ uTmyPIT4STFyUQFeqSCWDum/NFNoSKhmItw2Td+4VSJHShRVbg39KNFPZ7mXYAkQiKkGTRg1
+ YesWJA/+PV3qDUtPNEGwjVvjQqHSbrBy94tu6gJvPHgGPtRDYvxnCaJsmgiC0pGB2KFRsnfl
+ 2zBNBEWF/XwsI081jQE5UO60GKmHTputChLXpVobyuc+lroG2YhknXRBAV969SLnZR4BS/1s
+ Gi046gOXfaKYatve8BiZr5it5Foq3FMPDNgZMit1H9Dk8rkKFfDMRf8EGS/Z+TmyEsIf99H7
+ TH3n7lco8qO81fSFwkh4pvo2kWRFYTC5vsIVQ+GqVUp+W1DZJHxX8LwWuF1AzUt4MUTtNAvy
+ TXl5EgsmoY9mpNNL7ZnW65oG63nEP5KNiybvuQJzXVxR8eqzOh2Mod4nHg3PE7UCd3DvLNsn
+ GXFRo44WyT/G2lArBtjpkut7bDm0i1nENABy2UgS+1QvdmgNu6aEZxdNthwRjUhuuvCCDMA4
+ rCDQYyakH2tJNQgkXkeLodBKF4bHiBbuwj0E39S9wmGgg+q4OTnAO/yhQGknle7a7G5xHBwE
+ i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
+ RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
+ glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
+Message-ID: <4a9e19d1-fe87-e3f5-8faf-18127914b7b4@redhat.com>
+Date: Thu, 5 Dec 2019 17:37:11 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: q8yD5t2aOqy2FN8xu6vG6A-1
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: aM9JLmFdMTOeL6eANW1rLA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,92 +158,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, libvir-list@redhat.com,
- qemu-stable@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel <qemu-devel@nongnu.org>, libvirt-list@redhat.com,
+ Nir Soffer <nsoffer@redhat.com>, "Denis V. Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When using `query-cpu-definitions` using `-machine none`,
-QEMU is resolving all CPU models to their latest versions.  The
-actual CPU model version being used by another machine type (e.g.
-`pc-q35-4.0`) might be different.
+This has come up in the past, and I believe we discussed this at KVM
+Forum, too:
 
-In theory, this was OK because the correct CPU model
-version is returned when using the correct `-machine` argument.
+There have been requests from oVirt (via Nir Soffer) to add some offline
+bitmap manipulation functionality. In the past, our stance has generally
+been "Use QEMU without an accelerator, and use QMP to manipulate the
+images."
 
-Except that in practice, this breaks libvirt expectations:
-libvirt always use `-machine none` when checking if a CPU model
-is runnable, because runnability is not expected to be affected
-when the machine type is changed.
+We like this for a few reasons:
 
-For example, when running on a Haswell host without TSX,
-Haswell-v4 is runnable, but Haswell-v1 is not.  On those hosts,
-`query-cpu-definitions` says Haswell is runnable if using
-`-machine none`, but Haswell is actually not runnable using any
-of the `pc-*` machine types (because they resolve Haswell to
-Haswell-v1).  In other words, we're breaking the "runnability
-guarantee" we promised to not break for a few releases (see
-qemu-deprecated.texi).
+1. It keeps bitmap management code tightly centralized
+2. It allows for the full suite of bitmap manipulations in either
+offline or online mode with one tool
+3. We wouldn't have to write new code.
+4. Or design new CLIs and duplicate our existing work.
+5. Or write even more tests.
 
-To address this issue, change the default CPU model version to v1
-on all machine types, so we make `query-cpu-definitions` output
-when using `-machine none` match the results when using `pc-*`.
-This will change in the future (the plan is to always return the
-latest CPU model version if using `-machine none`), but only
-after giving libvirt the opportunity to adapt.
+However, tools like oVirt may or may not be fully equipped to launch
+QEMU in this context, and there is always a desire for qemu-img to be
+able to "do more", so existing management suites could extend
+functionality more easily.
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1779078
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-I don't think this should block QEMU 4.2.0 from being tagged.
-The bug is present since 4.1.0, so we can fix it in 4.1.2 and/or
-4.2.1.
----
- qemu-deprecated.texi | 8 ++++++++
- target/i386/cpu.c    | 8 +++++++-
- 2 files changed, 15 insertions(+), 1 deletion(-)
+(Or so I am imagining.)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 4b4b7425ac..b42d8b3c5f 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -374,6 +374,14 @@ guarantees must resolve the CPU model aliases using te
- ``alias-of'' field returned by the ``query-cpu-definitions'' QMP
- command.
-=20
-+While those guarantees are kept, the return value of
-+``query-cpu-definitions'' will have existing CPU model aliases
-+point to a version that doesn't break runnability guarantees
-+(specifically, version 1 of those CPU models).  In future QEMU
-+versions, aliases will point to newer CPU model versions
-+depending on the machine type, so management software must
-+resolve CPU model aliases before starting a virtual machine.
-+
-=20
- @node Recently removed features
- @appendix Recently removed features
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 69f518a21a..54e7f18a09 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3924,7 +3924,13 @@ static PropValue tcg_default_props[] =3D {
- };
-=20
-=20
--X86CPUVersion default_cpu_version =3D CPU_VERSION_LATEST;
-+/*
-+ * We resolve CPU model aliases using -v1 when using "-machine
-+ * none", but this is just for compatibility while libvirt isn't
-+ * adapted to resolve CPU model versions before creating VMs.
-+ * See "Runnability guarantee of CPU models" at * qemu-deprecated.texi.
-+ */
-+X86CPUVersion default_cpu_version =3D 1;
-=20
- void x86_cpu_set_default_version(X86CPUVersion version)
- {
---=20
-2.23.0
+I am still leaning heavily against adding any more CLI commands or
+options to qemu-img right now. Even if we do add some of the fundamental
+ones like "add" or "remove", it seems only a matter of time before we
+have to add "clear", "merge", etc. Is this just a race to code duplication?
+
+On the other hand, one of the other suggestions is to have qemu-img
+check --repair optionally delete corrupted bitmaps. I kind of like this
+idea: it's a buyer beware operation that might make management layers
+unhappy, but then again ... repair is always something that could make
+things worse.
+
+Plus, if you manage to corrupt bitmaps badly enough that they can't even
+be parsed, you might need a heavyweight repair operation.
+
+Nir, do you think that'd be sufficient for your needs for now, or would
+you still like to see more granular offline management?
+
+--js
 
 
