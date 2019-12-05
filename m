@@ -2,84 +2,106 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10795C2BD09
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 10:45:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 252ABC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 10:45:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC5F62464D
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 10:44:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D297120659
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 10:45:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a/rD3Dvi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC5F62464D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMqT9wqI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D297120659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icod0-00073A-PF
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 05:44:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53402)
+	id 1icody-00089c-2q
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 05:45:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1icocA-0006Ub-6t
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 05:44:08 -0500
+ (envelope-from <philmd@redhat.com>) id 1icoch-000716-1e
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 05:44:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1icoc7-00046A-3j
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 05:44:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35453
+ (envelope-from <philmd@redhat.com>) id 1icocf-0006PJ-5N
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 05:44:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57959
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1icoc6-00041I-Rj
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 05:44:03 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icoce-0006NB-PY
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 05:44:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575542641;
+ s=mimecast20190719; t=1575542676;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QnZRknmfvNLHK4FGTTxnnirw9fc6t86X65qlanAoH70=;
- b=a/rD3DviNs9KyWa1iarBUrI0QrNS5hHlmz9tnaCM/weVQUuNK7VfOlvKeLhazUukws3EyG
- AwQVMMuQrkSwpo8gCbZ0uMmzkcyamohI91D9fpVLMC75OBwfP6tJ/0Y7JdQVaSHpoj52Rl
- 4i8va5cRoZjnZIFaPgJgZ+/nUSizIvQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-zwG5bGjWMBajMo8J58DZ5Q-1; Thu, 05 Dec 2019 05:44:00 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90B1764A7E
- for <qemu-devel@nongnu.org>; Thu,  5 Dec 2019 10:43:59 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-62.ams2.redhat.com
- [10.36.116.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 826385C1C3;
- Thu,  5 Dec 2019 10:43:52 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 1/8] q35: implement 128K SMRAM at default SMBASE
- address
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-References: <1575479147-6641-1-git-send-email-imammedo@redhat.com>
- <1575479147-6641-2-git-send-email-imammedo@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <e31fc667-0288-eaa5-f3a6-0b0acab59ea2@redhat.com>
-Date: Thu, 5 Dec 2019 11:43:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ bh=lhawk+7QAumuGEx2EWdI28pWmojk/kin7rpyyfooEDA=;
+ b=gMqT9wqIgA9c1UZSY1UivZtpoMAiJLJbZvHSF6AC0ho7cpIf9tYhhVQ2FJo/u2jN2DTjkz
+ NVW5muKdiY64kas9MhihVy1g6wb48WuyAndMciHy+G8c4WP3qau7cPUiyPtCBI1RwJ94B5
+ 2Zhqy5Cj9oXNRAD/jDhBmJsSkIpgDhw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-zkaZce-_M2eVMYExuuI5_A-1; Thu, 05 Dec 2019 05:44:35 -0500
+Received: by mail-wm1-f71.google.com with SMTP id f21so830451wmh.5
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 02:44:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=In4bmOnsZd0q+I7ygBE8TQjD0OOGqmrLAO5Hp37qapI=;
+ b=TwzDUQ4vHzrlkB2WrrBoNa7uc2aqbbrtKmAl3wC/pPSqBKwTzxuEIXuvLvAuB7j0/0
+ 8y3IFcPT5looh4YS5gB6bU8gpFQ20cGZE/Ej2TBn7o5mW/cASYQU8s3fTRYH7kOWBGN4
+ 4ubbf4FHNsNuRRy1vXLcGzJOfYvAYPFQvn+ICmNjCJDLYH+mzJavDHCboTTgMrclL7cj
+ EHYlh+l6cy2SMFpC424tr+SKaXKZu5boe1Zv0mhTTv0qH5AOEbgUGtF7/aUP2ankaeRU
+ QnMMp6mZakf2+zXiMGurAa9BsPsnYsrzCdhhN2gislvFCgrPb+NHOk4hRdBeSoPyNhzf
+ GcCg==
+X-Gm-Message-State: APjAAAVTc+14ad1fWTpAmvSjR6cXBuDNRRF4x25Xkof4XruGM5/IxCFI
+ lEbbz45M1IluNZpykeYCNP7VqeH5YDuNPoo23jVEImtN3i/aX7vaUQiZzKQGIU9abljRbRFPAb1
+ ek4YDoHMxpWcM2ns=
+X-Received: by 2002:adf:fd07:: with SMTP id e7mr9091496wrr.21.1575542673869;
+ Thu, 05 Dec 2019 02:44:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzjA697wN0vZkw8ucgS33XJrZtoMr+2mDfNVCYhVDdfxect/ELgWSHjYEa40hu9V4Nei21cdA==
+X-Received: by 2002:adf:fd07:: with SMTP id e7mr9091462wrr.21.1575542673522;
+ Thu, 05 Dec 2019 02:44:33 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id w13sm12376880wru.38.2019.12.05.02.44.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 05 Dec 2019 02:44:32 -0800 (PST)
+Subject: Re: [PATCH v6 0/9] Clock framework API
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20190904125531.27545-1-damien.hedde@greensocs.com>
+ <CAFEAcA98rt6nRDSrwk8XRbaBT67LZXvF=XEV13dtJBp4fPUscw@mail.gmail.com>
+ <be199ad6-1b79-f77d-afad-faeb042151ed@greensocs.com>
+ <febdb64d-9d02-66ad-84d2-dc795879e48b@redhat.com>
+ <a0cea550-d6c7-0193-b4e6-24ed879be61d@greensocs.com>
+ <279a0fd5-1ea5-b3c7-27bb-b1d22db5e359@redhat.com>
+ <20191205102151.GB2824@work-vm>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f3aa4881-dd41-ce71-0f5a-8d36bf5c3828@redhat.com>
+Date: Thu, 5 Dec 2019 11:44:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1575479147-6641-2-git-send-email-imammedo@redhat.com>
+In-Reply-To: <20191205102151.GB2824@work-vm>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: zwG5bGjWMBajMo8J58DZ5Q-1
+X-MC-Unique: zkaZce-_M2eVMYExuuI5_A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,336 +113,215 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, philmd@redhat.com, mst@redhat.com
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Igor,
+On 12/5/19 11:21 AM, Dr. David Alan Gilbert wrote:
+> * Philippe Mathieu-Daud=C3=A9 (philmd@redhat.com) wrote:
+>> On 12/5/19 10:36 AM, Damien Hedde wrote:
+>>> On 12/4/19 9:34 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>>> On 12/4/19 5:40 PM, Damien Hedde wrote:
+>>>>> On 12/2/19 5:15 PM, Peter Maydell wrote:
+>>>>>>
+>>>>>> The one topic I think we could do with discussing is whether
+>>>>>> a simple uint64_t giving the frequency of the clock in Hz is
+>>>>>> the right representation. In particular in your patch 9 the
+>>>>>> board has a clock frequency that's not a nice integer number
+>>>>>> of Hz. I think Philippe also mentioned on irc some board where
+>>>>>> the UART clock ends up at a weird frequency. Since the
+>>>>>> representation of the frequency is baked into the migration
+>>>>>> format it's going to be easier to get it right first rather
+>>>>>> than trying to change it later.
+>>>>
+>>>> Important precision for Damien, IIUC we can not migrate float/double t=
+ypes.
+>>>>
+>>>>>> So what should the representation be? Some random thoughts:
+>>>>>>
+>>>>>> 1) ptimer internally uses a 'period plus fraction' representation:
+>>>>>>   =C2=A0 int64_t period is the integer part of the period in nanosec=
+onds,
+>>>>>>   =C2=A0 uint32_t period_frac is the fractional part of the period
+>>>>>> (if you like you can think of this as "96-bit integer
+>>>>>> period measured in units of one-2^32nd of a nanosecond").
+>>>>>> However its only public interfaces for setting the frequency
+>>>>>> are (a) set the frequency in Hz (uint32_t) or (b) set
+>>>>>> the period in nanoseconds (int64_t); the period_frac part
+>>>>>> is used to handle frequencies which don't work out to
+>>>>>> a nice whole number of nanoseconds per cycle.
+>>>>
+>>>> This is very clear, thanks Peter!
+>>>>
+>>>> The period+period_frac split allow us to migrate the 96 bits:
+>>>>
+>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMSTATE_UINT32(period_fra=
+c, ptimer_state),
+>>>>   =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VMSTATE_INT64(period, pti=
+mer_state),
+>>>>
+>>>>>> 2) I hear that SystemC uses "value plus a time unit", with
+>>>>>> the smallest unit being a picosecond. (I think SystemC
+>>>>>> also lets you specify the duty cycle, but we definitely
+>>>>>> don't want to get into that!)
+>>>>>
+>>>>> The "value" is internally stored in a 64bits unsigned integer.
+>>>>>
+>>>>>>
+>>>>>> 3) QEMUTimers are basically just nanosecond timers
+>>>>
+>>>> Similarly to SystemC, the QEMUTimers macro use a 'scale' unit, of:
+>>>>
+>>>> #define SCALE_MS 1000000
+>>>> #define SCALE_US 1000
+>>>> #define SCALE_NS 1
+>>>>
+>>>>>>
+>>>>>> 4) The MAME emulator seems to work with periods of
+>>>>>> 96-bit attoseconds (represented internally by a
+>>>>>> 32-bit count of seconds plus a 64-bit count of
+>>>>>> attoseconds). One attosecond is 1e-18 seconds.
+>>>>>>
+>>>>>> Does anybody else have experience with other modelling
+>>>>>> or emulator technology and how it represents clocks ?
+>>>>>
+>>>>> 5) In linux, a clock rate is an "unsigned long" representing Hz.
+>>>>>
+>>>>>>
+>>>>>> I feel we should at least be able to represent clocks
+>>>>>> with the same accuracy that ptimer has.
+>>>>>
+>>>>> Then is a maybe a good idea to store the period and not the frequency=
+ in
+>>>>> clocks so that we don't loose anything when we switch from a clock to=
+ a
+>>>>> ptimer ?
+>>>>
+>>>> I think storing the period as an integer type is a good idea.
+>>>>
+>>>> However if we store the period in nanoseconds, we get at most 1GHz
+>>>> frequency.
+>>>>
+>>>> The attosecond granularity feels overkill.
+>>>>
+>>>> If we use a 96-bit integer to store picoseconds and use similar SCALE
+>>>> macros we get to 1THz.
+>>>>
+>>>> Regardless the unit chosen, as long it is integer, we can migrate it.
+>>>> If can migrate the period, we don't need to migrate the frequency.
+>>>> We can then use the float type in with the timer API to pass frequenci=
+es
+>>>> (which in the modeled hardware are ratios, likely not integers).
+>>>>
+>>>> So we could use set_freq(100e6 / 3), set_freq(40e6 / 5.5) directly.
+>>>>
+>>>>> Regarding the clock, I don't see any strong obstacle to switch
+>>>>> internally to a period based value.
+>>>>> The only things we have to choose is how to represent a disabled cloc=
+k.
+>>>>> Since putting a "0" period to a ptimer will disable the timer in
+>>>>> ptimer_reload(). We can choose that (and it's a good value because we
+>>>>> can multiply or divide it, it stays the same).
+>>>>>
+>>>>> We could use the same representation as a ptimer. But if we don't kee=
+p a
+>>>>> C number representation, then computation of frequencies/periods will=
+ be
+>>>>> complicated at best and error prone.
+>>>>>
+>>>>>   =C2=A0From that point of view, if we could stick to a 64bits intege=
+r (or
+>>>>> floating point number) it would be great. Can we use a sub nanosecond
+>>>>> unit that fit our needs ?
+>>>>>
+>>>>> I did some test with a unit of 2^-32 of nanoseconds on 64bits (is tha=
+t
+>>>>> the unit of the ptimer fractional part ?) and if I'm not mistaken
+>>>>> + we have a frequency range from ~0.2Hz up to 10^18Hz
+>>>>> + the resolution is decreasing with the frequency (but at 100Mhz we h=
+ave
+>>>>> a ~2.3mHz resolution, at 1GHz it's ~0.23Hz and at 10GHz ~23Hz
+>>>>> resolution). We hit 1Hz resolution around 2GHz.
+>>>>>
+>>>>> So it sounds to me we have largely enough resolution to model clocks =
+in
+>>>>> the range of frequencies we will have to handle. What do you think ?
+>>>>
+>>>> Back to your series, I wonder why you want to store the frequency in
+>>>> ClockIn. ClockIn shouldn't be aware at what frequency it is clocked.
+>>>> What matters is ClockOut, and each device exposing ClockOuts has a
+>>>> (migrated) state of the output frequencies (rather in fields, or encod=
+ed
+>>>> in registers). Once migrated, after the state is loaded back into the
+>>>> device, we call post_load(). Isn't it a good place to call
+>>>> clock_set_frequency(ClockOut[]) which will correctly set each ClockIn
+>>>> frequency.
+>>>>
+>>>> IOW I don't think ClockIn/ClockOut require to migrate a frequency fiel=
+d.
+>>>>
+>>>
+>>> I agree it is more logical to store the frequency in clock out. But,
+>>> regarding migration constraints, we have no choice I think because a
+>>> device cannot rely on values that are migrated by another device for
+>>> restoring its state. (when I checked, I add the impression that
+>>> post_load()s are called on a per device migration basis not all at the
+>>> end of migration).
+>>
+>> Cc'ing David to clear that out.
+>=20
+>=20
+> That's pretty much right; the 'post_load' is called on a structure at the=
+ end
+> of loading the data for that structure.
+>=20
+> You can do things at the end of migration; one way is to register a
+> vm change state handler (search for qemu_add_vm_change_state_handler)
+> and that means you get a kick when the VM starts running or a timer set
+> in virtual time (not wall clock time because that becomes sensitive
+> to the speed of the host).
+>=20
+> Somewhere ^^^ it says we can't migrate fp values; I'm not sure that's
+> true; we've got a VMSTATE_FLOAT64 macro but I don't see it's used
+> anywhere.
 
-On 12/04/19 18:05, Igor Mammedov wrote:
-> Use commit (2f295167e0 q35/mch: implement extended TSEG sizes) for
-> inspiration and (ab)use reserved register in config space at 0x9c
-> offset [*] to extend q35 pci-host with ability to use 128K at
-> 0x30000 as SMRAM and hide it (like TSEG) from non-SMM context.
->
-> Usage:
->   1: write 0xff in the register
->   2: if the feature is supported, follow up read from the register
->      should return 0x01. At this point RAM at 0x30000 is still
->      available for SMI handler configuration from non-SMM context
->   3: writing 0x02 in the register, locks SMBASE area, making its contents
->      available only from SMM context. In non-SMM context, reads return
->      0xff and writes are ignored. Further writes into the register are
->      ignored until the system reset.
->
-> *) https://www.mail-archive.com/qemu-devel@nongnu.org/msg455991.html
->
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
->  include/hw/pci-host/q35.h | 10 ++++++
->  hw/i386/pc.c              |  4 ++-
->  hw/pci-host/q35.c         | 80 ++++++++++++++++++++++++++++++++++++++++++-----
->  3 files changed, 86 insertions(+), 8 deletions(-)
+OK, Cc'ing Alex & Richard now, because I guess remember a discussion=20
+about "we can not migrate floats because this is a architectural=20
+implementation, so cross-architecture migration is likely to fail". But=20
+I can't find trace of a such discussion on the list or IRC logs.
+Maybe this was instead about whether we can use the host FPU registers.
 
-I have now applied this series of yours on a local topic branch, on top
-of v4.2.0-rc4.
+I hope I'm wrong and confuse, this is a great news for me to know we
+can migrate floats!
 
-Earlier, I applied your
-
-  [Qemu-devel] [PATCH 0/2]
-  q35: mch: allow to lock down 128K RAM at default SMBASE address
-
-on top of commit f8c3db33a5e8 ("target/sparc: Switch to
-do_transaction_failed() hook", 2019-09-17), on another local topic
-branch. Those patches can be found at:
-
-  http://mid.mail-archive.com/20190917130708.10281-2-imammedo@redhat.com
-  http://mid.mail-archive.com/20190917130708.10281-3-imammedo@redhat.com
-
-I have now run "git range-diff" to compare the first two patches
-between both series. They are identical, except for:
-- a small (harmless) context difference in patch #1,
-- a slight commit message update in patch #2.
-
-See below:
-
-> 1:  09b22eeda732 ! 1:  5aafb1228e86 q35: implement 128K SMRAM at default SMBASE address
->     @@ -20,7 +20,7 @@
->          *) https://www.mail-archive.com/qemu-devel@nongnu.org/msg455991.html
->
->          Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->     -    Message-Id: <20190917130708.10281-2-imammedo@redhat.com>
->     +    Message-Id: <1575479147-6641-2-git-send-email-imammedo@redhat.com>
->
->      diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
->      --- a/include/hw/pci-host/q35.h
->     @@ -61,8 +61,8 @@
->      --- a/hw/i386/pc.c
->      +++ b/hw/i386/pc.c
->      @@
->     - /* Physical Address of PVH entry point read from kernel ELF NOTE */
->     - static size_t pvh_start_addr;
->     +
->     + struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
->
->      -GlobalProperty pc_compat_4_1[] = {};
->      +GlobalProperty pc_compat_4_1[] = {
-> 2:  feeb6a5262d4 ! 2:  f1a896f4dbc6 tests: q35: MCH: add default SMBASE SMRAM lock test
->     @@ -2,11 +2,11 @@
->
->          tests: q35: MCH: add default SMBASE SMRAM lock test
->
->     -    test lockable SMRAM at default SMBASE feature introduced by
->     -    commit "q35: implement 128K SMRAM at default SMBASE address"
->     +    test lockable SMRAM at default SMBASE feature, introduced by
->     +    patch "q35: implement 128K SMRAM at default SMBASE address"
->
->          Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->     -    Message-Id: <20190917130708.10281-3-imammedo@redhat.com>
->     +    Message-Id: <1575479147-6641-3-git-send-email-imammedo@redhat.com>
->
->      diff --git a/tests/q35-test.c b/tests/q35-test.c
->      --- a/tests/q35-test.c
-
-Therefore, my Tested-by that I gave in the earlier thread, applies
-still:
-
-  http://mid.mail-archive.com/c18f1ada-3eca-d5f1-da4f-e74181c5a862@redhat.com
-
-(I gave that T-b after writing and posting the interfacing OVMF patches,
-which have been reviewed since, and waiting for the QEMU patches to go
-in first.)
-
-However, at this time, I'd like to propose two (easy) updates:
-
-(1) In message
-
-  http://mid.mail-archive.com/6799e19d-1aa8-ee09-9ef4-2533a7241360@redhat.com
-
-Paolo said he was OK with this approach, but he asked for comments
-stating that "this is not what real hardware does".
-
-Can you please add such comments to the code?
-
-Then, please see below for another comment:
-
-On 12/04/19 18:05, Igor Mammedov wrote:
->
-> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
-> index b3bcf2e..976fbae 100644
-> --- a/include/hw/pci-host/q35.h
-> +++ b/include/hw/pci-host/q35.h
-> @@ -32,6 +32,7 @@
->  #include "hw/acpi/ich9.h"
->  #include "hw/pci-host/pam.h"
->  #include "hw/i386/intel_iommu.h"
-> +#include "qemu/units.h"
->
->  #define TYPE_Q35_HOST_DEVICE "q35-pcihost"
->  #define Q35_HOST_DEVICE(obj) \
-> @@ -54,6 +55,8 @@ typedef struct MCHPCIState {
->      MemoryRegion smram_region, open_high_smram;
->      MemoryRegion smram, low_smram, high_smram;
->      MemoryRegion tseg_blackhole, tseg_window;
-> +    MemoryRegion smbase_blackhole, smbase_window;
-> +    bool has_smram_at_smbase;
->      Range pci_hole;
->      uint64_t below_4g_mem_size;
->      uint64_t above_4g_mem_size;
-> @@ -97,6 +100,13 @@ typedef struct Q35PCIHost {
->  #define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY  0xffff
->  #define MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX    0xfff
->
-> +#define MCH_HOST_BRIDGE_SMBASE_SIZE            (128 * KiB)
-> +#define MCH_HOST_BRIDGE_SMBASE_ADDR            0x30000
-> +#define MCH_HOST_BRIDGE_F_SMBASE               0x9c
-> +#define MCH_HOST_BRIDGE_F_SMBASE_QUERY         0xff
-> +#define MCH_HOST_BRIDGE_F_SMBASE_IN_RAM        0x01
-> +#define MCH_HOST_BRIDGE_F_SMBASE_LCK           0x02
-> +
->  #define MCH_HOST_BRIDGE_PCIEXBAR               0x60    /* 64bit register */
->  #define MCH_HOST_BRIDGE_PCIEXBAR_SIZE          8       /* 64bit register */
->  #define MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT       0xb0000000
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index ac08e63..9c4b4ac 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -103,7 +103,9 @@
->
->  struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
->
-> -GlobalProperty pc_compat_4_1[] = {};
-> +GlobalProperty pc_compat_4_1[] = {
-> +    { "mch", "smbase-smram", "off" },
-> +};
->  const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
->
->  GlobalProperty pc_compat_4_0[] = {};
-
-(2) Because this series is now being proposed for QEMU 5.0, I think this
-compat property should be introduced for machine types up to and
-including 4.2, not 4.1.
-
-... Technically, this change will invalidate my Tested-by (I will not
-have tested your *exact* (upcoming) v2 patch, i.e. the one including the
-4.2 bump, so we can't carry the T-b forward). Thus, I will re-test your
-v2 (with the extra comments and the 4.2 bump).
-
-I have no other comments for the first two patches in this series.
-
-Thanks!
-Laszlo
-
-
-> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
-> index 158d270..c1bd9f7 100644
-> --- a/hw/pci-host/q35.c
-> +++ b/hw/pci-host/q35.c
-> @@ -275,20 +275,20 @@ static const TypeInfo q35_host_info = {
->   * MCH D0:F0
->   */
->
-> -static uint64_t tseg_blackhole_read(void *ptr, hwaddr reg, unsigned size)
-> +static uint64_t blackhole_read(void *ptr, hwaddr reg, unsigned size)
->  {
->      return 0xffffffff;
->  }
->
-> -static void tseg_blackhole_write(void *opaque, hwaddr addr, uint64_t val,
-> -                                 unsigned width)
-> +static void blackhole_write(void *opaque, hwaddr addr, uint64_t val,
-> +                            unsigned width)
->  {
->      /* nothing */
->  }
->
-> -static const MemoryRegionOps tseg_blackhole_ops = {
-> -    .read = tseg_blackhole_read,
-> -    .write = tseg_blackhole_write,
-> +static const MemoryRegionOps blackhole_ops = {
-> +    .read = blackhole_read,
-> +    .write = blackhole_write,
->      .endianness = DEVICE_NATIVE_ENDIAN,
->      .valid.min_access_size = 1,
->      .valid.max_access_size = 4,
-> @@ -430,6 +430,46 @@ static void mch_update_ext_tseg_mbytes(MCHPCIState *mch)
->      }
->  }
->
-> +static void mch_update_smbase_smram(MCHPCIState *mch)
-> +{
-> +    PCIDevice *pd = PCI_DEVICE(mch);
-> +    uint8_t *reg = pd->config + MCH_HOST_BRIDGE_F_SMBASE;
-> +    bool lck;
-> +
-> +    if (!mch->has_smram_at_smbase) {
-> +        return;
-> +    }
-> +
-> +    if (*reg == MCH_HOST_BRIDGE_F_SMBASE_QUERY) {
-> +        pd->wmask[MCH_HOST_BRIDGE_F_SMBASE] =
-> +            MCH_HOST_BRIDGE_F_SMBASE_LCK;
-> +        *reg = MCH_HOST_BRIDGE_F_SMBASE_IN_RAM;
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * default/reset state, discard written value
-> +     * which will disable SMRAM balackhole at SMBASE
-> +     */
-> +    if (pd->wmask[MCH_HOST_BRIDGE_F_SMBASE] == 0xff) {
-> +        *reg = 0x00;
-> +    }
-> +
-> +    memory_region_transaction_begin();
-> +    if (*reg & MCH_HOST_BRIDGE_F_SMBASE_LCK) {
-> +        /* disable all writes */
-> +        pd->wmask[MCH_HOST_BRIDGE_F_SMBASE] &=
-> +            ~MCH_HOST_BRIDGE_F_SMBASE_LCK;
-> +        *reg = MCH_HOST_BRIDGE_F_SMBASE_LCK;
-> +        lck = true;
-> +    } else {
-> +        lck = false;
-> +    }
-> +    memory_region_set_enabled(&mch->smbase_blackhole, lck);
-> +    memory_region_set_enabled(&mch->smbase_window, lck);
-> +    memory_region_transaction_commit();
-> +}
-> +
->  static void mch_write_config(PCIDevice *d,
->                                uint32_t address, uint32_t val, int len)
->  {
-> @@ -456,6 +496,10 @@ static void mch_write_config(PCIDevice *d,
->                         MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE)) {
->          mch_update_ext_tseg_mbytes(mch);
->      }
-> +
-> +    if (ranges_overlap(address, len, MCH_HOST_BRIDGE_F_SMBASE, 1)) {
-> +        mch_update_smbase_smram(mch);
-> +    }
->  }
->
->  static void mch_update(MCHPCIState *mch)
-> @@ -464,6 +508,7 @@ static void mch_update(MCHPCIState *mch)
->      mch_update_pam(mch);
->      mch_update_smram(mch);
->      mch_update_ext_tseg_mbytes(mch);
-> +    mch_update_smbase_smram(mch);
->
->      /*
->       * pci hole goes from end-of-low-ram to io-apic.
-> @@ -514,6 +559,9 @@ static void mch_reset(DeviceState *qdev)
->                       MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY);
->      }
->
-> +    d->config[MCH_HOST_BRIDGE_F_SMBASE] = 0;
-> +    d->wmask[MCH_HOST_BRIDGE_F_SMBASE] = 0xff;
-> +
->      mch_update(mch);
->  }
->
-> @@ -563,7 +611,7 @@ static void mch_realize(PCIDevice *d, Error **errp)
->      memory_region_add_subregion(&mch->smram, 0xfeda0000, &mch->high_smram);
->
->      memory_region_init_io(&mch->tseg_blackhole, OBJECT(mch),
-> -                          &tseg_blackhole_ops, NULL,
-> +                          &blackhole_ops, NULL,
->                            "tseg-blackhole", 0);
->      memory_region_set_enabled(&mch->tseg_blackhole, false);
->      memory_region_add_subregion_overlap(mch->system_memory,
-> @@ -575,6 +623,23 @@ static void mch_realize(PCIDevice *d, Error **errp)
->      memory_region_set_enabled(&mch->tseg_window, false);
->      memory_region_add_subregion(&mch->smram, mch->below_4g_mem_size,
->                                  &mch->tseg_window);
-> +
-> +    memory_region_init_io(&mch->smbase_blackhole, OBJECT(mch), &blackhole_ops,
-> +                          NULL, "smbase-blackhole",
-> +                          MCH_HOST_BRIDGE_SMBASE_SIZE);
-> +    memory_region_set_enabled(&mch->smbase_blackhole, false);
-> +    memory_region_add_subregion_overlap(mch->system_memory,
-> +                                        MCH_HOST_BRIDGE_SMBASE_ADDR,
-> +                                        &mch->smbase_blackhole, 1);
-> +
-> +    memory_region_init_alias(&mch->smbase_window, OBJECT(mch),
-> +                             "smbase-window", mch->ram_memory,
-> +                             MCH_HOST_BRIDGE_SMBASE_ADDR,
-> +                             MCH_HOST_BRIDGE_SMBASE_SIZE);
-> +    memory_region_set_enabled(&mch->smbase_window, false);
-> +    memory_region_add_subregion(&mch->smram, MCH_HOST_BRIDGE_SMBASE_ADDR,
-> +                                &mch->smbase_window);
-> +
->      object_property_add_const_link(qdev_get_machine(), "smram",
->                                     OBJECT(&mch->smram), &error_abort);
->
-> @@ -601,6 +666,7 @@ uint64_t mch_mcfg_base(void)
->  static Property mch_props[] = {
->      DEFINE_PROP_UINT16("extended-tseg-mbytes", MCHPCIState, ext_tseg_mbytes,
->                         16),
-> +    DEFINE_PROP_BOOL("smbase-smram", MCHPCIState, has_smram_at_smbase, true),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->
->
+> Dave
+>=20
+>>> So we could store the frequency in clock out and migrate things there.
+>>> But since we have no way to ensure all clock out states are migrated
+>>> before some device fetch a ClockIn: we'll have to say "don't fetch one
+>>> of your ClockIn frequency during migration and migrate the value
+>>> yourself if you need it", pretty much like gpios.
+>>>
+>>> So we will probably migrate all ClockOut and almost all ClockIn.
+>>>
+>>> It would nice if we had a way to ensure clocks are migrated before
+>>> devices try to use them. But I don't think this is possible.
+>>>
+>>> --
+>>> Damien
+>>>
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
 
 
