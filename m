@@ -2,76 +2,80 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B05C43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 19:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF30FC43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 19:12:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3BC024249
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 19:03:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ge08L8hE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3BC024249
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id BFA1F2464D
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 19:12:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFA1F2464D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=freebsd.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icwPf-0000g3-RN
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 14:03:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47778)
+	id 1icwXh-0005Is-Sj
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 14:12:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55133)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1icwMV-0007dO-M9
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 14:00:29 -0500
+ (envelope-from <kevans@freebsd.org>) id 1icwQ9-0001JO-47
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 14:04:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1icwMR-0006ZL-QB
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 14:00:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54151
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kevans@freebsd.org>) id 1icwQ7-0003sQ-KX
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 14:04:12 -0500
+Received: from mx2.freebsd.org ([2610:1c1:1:606c::19:2]:46366)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1icwMP-0006Vt-Ga
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 14:00:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575572417;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=pWqTHndHSaB17NTTzJCZJfEVxiOKpMXueQWTX8SitHM=;
- b=ge08L8hEMhrXOWDJNNzMkETqdhhVd1iJtfpmYKMvrlxL8h5HfYxyg2zafaUvQAFpzNHEdb
- 7ZTXU1/CmHtta/ISiOZiHam/E3+Q+iToiZIbUFg6EHovQUqMDKAQlmBb2DvH6eKIQwWIE3
- xOi2F5h8inFw4TT2X3RJofMVutkwleY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-N8sR-gH3OqSWGDk6Dy_X6w-1; Thu, 05 Dec 2019 14:00:16 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 27084804A2F;
- Thu,  5 Dec 2019 19:00:15 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-76.brq.redhat.com [10.40.205.76])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E1991001281;
- Thu,  5 Dec 2019 19:00:08 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 v2] roms/edk2-funcs: Force softfloat ARM toolchain
- prefix on Debian
-Date: Thu,  5 Dec 2019 20:00:06 +0100
-Message-Id: <20191205190006.19352-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <kevans@freebsd.org>) id 1icwQ7-0003np-EM
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 14:04:11 -0500
+Received: from mx1.freebsd.org (mx1.freebsd.org [IPv6:2610:1c1:1:606c::19:1])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client CN "mx1.freebsd.org",
+ Issuer "Let's Encrypt Authority X3" (verified OK))
+ by mx2.freebsd.org (Postfix) with ESMTPS id 9F8E67E1DE
+ for <qemu-devel@nongnu.org>; Thu,  5 Dec 2019 19:04:08 +0000 (UTC)
+ (envelope-from kevans@freebsd.org)
+Received: from smtp.freebsd.org (smtp.freebsd.org [96.47.72.83])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ server-signature RSA-PSS (4096 bits)
+ client-signature RSA-PSS (4096 bits) client-digest SHA256)
+ (Client CN "smtp.freebsd.org",
+ Issuer "Let's Encrypt Authority X3" (verified OK))
+ by mx1.freebsd.org (Postfix) with ESMTPS id 47TQB0313kz4XQG
+ for <qemu-devel@nongnu.org>; Thu,  5 Dec 2019 19:04:08 +0000 (UTC)
+ (envelope-from kevans@freebsd.org)
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com
+ [209.85.222.180])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Client CN "smtp.gmail.com", Issuer "GTS CA 1O1" (verified OK))
+ (Authenticated sender: kevans)
+ by smtp.freebsd.org (Postfix) with ESMTPSA id 3FB9014EC7
+ for <qemu-devel@nongnu.org>; Thu,  5 Dec 2019 19:04:08 +0000 (UTC)
+ (envelope-from kevans@freebsd.org)
+Received: by mail-qk1-f180.google.com with SMTP id i18so4247010qkl.11
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 11:04:08 -0800 (PST)
+X-Gm-Message-State: APjAAAUj0b5KJYjHDVPJ48pOafAluKqEGByoNzUGOD4Md87ukpuZ8kbs
+ 3OXynffDzlfSbBCeISaxWCJTfaDvz2CwnQMwA4A=
+X-Google-Smtp-Source: APXvYqxfFIPcDJ29F9aUfkgImdDkv/s0rqyuBJytKmmo/JWcUP/cV/aDtLR139A+6saqL94yNicQkbK9m373KBlxK60=
+X-Received: by 2002:ae9:eb53:: with SMTP id b80mr10254574qkg.430.1575572646731; 
+ Thu, 05 Dec 2019 11:04:06 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: N8sR-gH3OqSWGDk6Dy_X6w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191029000757.r2ma5qt3zoic5ynd@shiva.audeuro.com>
+In-Reply-To: <20191029000757.r2ma5qt3zoic5ynd@shiva.audeuro.com>
+From: Kyle Evans <kevans@freebsd.org>
+Date: Thu, 5 Dec 2019 13:03:55 -0600
+X-Gmail-Original-Message-ID: <CACNAnaGw0NoWyW66T=YAABj+WDaZvJdw3N6miX+d_pycMaOEEg@mail.gmail.com>
+Message-ID: <CACNAnaGw0NoWyW66T=YAABj+WDaZvJdw3N6miX+d_pycMaOEEg@mail.gmail.com>
+Subject: Re: safe_syscall design guidance
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2610:1c1:1:606c::19:2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,52 +87,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laszlo Ersek <lersek@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Warner Losh <imp@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Debian (based) distributions currently provides 2 ARM
-toolchains, documented as [1]:
+On Mon, Oct 28, 2019 at 7:08 PM Kyle Evans <kevans@freebsd.org> wrote:
+>
+> Hi,
+>
+> We're working on improving bsd-user in a local tree and rebasing forward
+> to get our work suitable for upstreaming. I'm porting the safe_syscall stuff
+> over to bsd-user, and would like to get some design guidance as it may best
+> be implemented with some refactoring of linux-user.
+>
+> Below is an example of the refactoring my initial approach takes. I'm
+> omitting !x86_64 in this e-mail because it's all along the same lines and
+> only including the part relevant to linux-user. Effectively, linux-user/host
+> is moved to qemu-user/host along with ^/linux-user/safe-syscall.S.
+>
+> Some bits specific to FreeBSD, also likely other *BSD but I've not yet
+> verified, are sprinkled throughout host/*/* parts; this is the main point I
+> suspect may be objectionable. FreeBSD indicates syscall error differently
+> than Linux, and *context bits are also different. Other OS-specific bits
+> for other arch are similar to the diff below.
+>
+> A full version of this can be found in my tree, currently only available on
+> GitHub: https://github.com/kevans91/qemu-bsd-user/tree/safe_syscall -- this
+> is applied to our version, currently based on qemu 3.1.
+>
+> Thoughts?
+>
 
-* The ARM EABI (armel) port targets a range of older 32-bit ARM
-  devices, particularly those used in NAS hardware and a variety
-  of *plug computers.
-* The newer ARM hard-float (armhf) port supports newer, more
-  powerful 32-bit devices using version 7 of the ARM architecture
-  specification.
+We've settled on duplicating the linux-user side over to bsd-user for
+now to make progress, and make another attempt to solicit design
+feedback later when we've rebased the rest of our work forward to
+modern qemu.
 
-For various reasons documented in [2], the EDK2 project recommend
-to use the softfloat toolchain (named 'armel' by Debian).
+Thanks,
 
-Force the softfloat cross toolchain prefix on Debian distributions.
-
-[1] https://www.debian.org/ports/arm/#status
-[2] https://github.com/tianocore/edk2/commit/41203b9a
-
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- roms/edk2-funcs.sh | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/roms/edk2-funcs.sh b/roms/edk2-funcs.sh
-index 3f4485b201..abd6bbe1fd 100644
---- a/roms/edk2-funcs.sh
-+++ b/roms/edk2-funcs.sh
-@@ -112,6 +112,9 @@ qemu_edk2_get_cross_prefix()
-      ( [ "$gcc_arch" =3D=3D i686 ] && [ "$host_arch" =3D=3D x86_64 ] ); th=
-en
-     # no cross-compiler needed
-     :
-+  elif ( [ -e /etc/debian_version ] && [ "$gcc_arch" =3D=3D arm ] ); then
-+    # force hard-float cross-compiler on Debian
-+    printf 'arm-linux-gnueabi-'
-   else
-     printf '%s-linux-gnu-\n' "$gcc_arch"
-   fi
---=20
-2.21.0
-
+Kyle Evans
 
