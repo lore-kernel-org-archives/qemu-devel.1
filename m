@@ -2,81 +2,80 @@ Return-Path: <SRS0=YrRb=Z3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C679BC43603
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DC7C43603
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:02:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9521421823
-	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:00:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DC6720675
+	for <qemu-devel@archiver.kernel.org>; Thu,  5 Dec 2019 18:02:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AAapc3Hp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9521421823
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HUNJNG/d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DC6720675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1icvQJ-0005ka-Ft
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 13:00:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46393)
+	id 1icvSd-0007f3-4L
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 13:02:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53141)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1icvDV-0007wd-R9
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:47:06 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1icvG0-0001XG-L8
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:49:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1icvDU-0004Xw-Gh
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:47:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25966
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1icvDU-0004TP-6l
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:47:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575568023;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=nDcbxzbOMA4nf42c5ZWc09yQqLCECm9H7b9z/f14cUY=;
- b=AAapc3HpKMIwQWkm5aP2sRPswo/t4jAKc9c3Kp+UX404sifpbo8rBphyGlmFTSjFjmlmvU
- iZXo7bCtwGFVzHI6yJJNE+OrkLKjjIZxa+WwZszvle9vP11FjGuhVaCVTlNv/eez6KKGgo
- cMlZpOI0mabtIUW31lw9AreNvic7LsU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-196-f6jDHjppOY-mqln1pcXhFA-1; Thu, 05 Dec 2019 12:46:59 -0500
-X-MC-Unique: f6jDHjppOY-mqln1pcXhFA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A80D800D5E;
- Thu,  5 Dec 2019 17:46:54 +0000 (UTC)
-Received: from gondolin (unknown [10.36.118.1])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 27FCC19488;
- Thu,  5 Dec 2019 17:46:49 +0000 (UTC)
-Date: Thu, 5 Dec 2019 18:46:37 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v2 06/13] s390x: protvirt: KVM intercept changes
-Message-ID: <20191205184637.4e6f4d23.cohuck@redhat.com>
-In-Reply-To: <3cdbba69-c465-f2ce-d3e4-15e0b8d1218e@linux.ibm.com>
-References: <20191129094809.26684-1-frankja@linux.ibm.com>
- <20191129094809.26684-7-frankja@linux.ibm.com>
- <20191205181532.46bee55c.cohuck@redhat.com>
- <3cdbba69-c465-f2ce-d3e4-15e0b8d1218e@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <peter.maydell@linaro.org>) id 1icvFz-0001xB-3D
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:49:40 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36457)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1icvFy-0001rZ-PI
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 12:49:38 -0500
+Received: by mail-oi1-x242.google.com with SMTP id c16so3557559oic.3
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 09:49:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7TZrodYeXioGpPRAE8ETahiLdBZLUfn2Bk6fVVqCSEE=;
+ b=HUNJNG/dr1YTRjWt3dX54M87sHzpPiOvZQre8eN8yoJpamPABH+Kh6Isj8UR3GJh0f
+ mBL30w3DXmU2D7ge6BEDL0rCIl6R6EeVAx0MfF16CjbcCqjVfxGA/RJT9JY8JYqtl5+i
+ LUO7SuZMqr5QA2DrFxo6G5zEV+ASvZdQecLM69Wrs/LmTeHdEw+PLa3KgIN0v5kLTrKW
+ 4XSw+n7YPYB/2OYM91K/WI3ULiMp4Np35xvQXUFBY/hK9VEKyNEqhhJxbsG+WJIQl5Se
+ ZlYflHgu3NyCyGD8az9dwFBOKBXpG/Cj/7IKqPXdfmm6xj18SWN2YORi4PmpuNSmhQQS
+ iyOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7TZrodYeXioGpPRAE8ETahiLdBZLUfn2Bk6fVVqCSEE=;
+ b=MJlUdHHHmI1e7pdlSP8LgJoS6z+ENBqlAJ1M16fhYZ4y7vqgTDA6/j3GspzlFv5eU9
+ 5UYj8oT+QmTB5Xd1nYp14z4afKOu2QbeNb02U65Nxi1vwIdyrufWYkCJYJQQvwbwcm+1
+ X9uNQxoG6o1dpdFKnoSKJ5BJBRTDmBOzZdravwVz99VcP8fYFwKsIqoZ9JYuc7Y/5qTz
+ v3fIvpN4uyRva6H4oLIEKuCG63hqiiHjQmLHUOPx2j2bAFkeFpizes7QQDhENTDk7SqM
+ 5ft7Ja5qRr52jWOgnplbsbuaZlK+TPAy/SMQ2fXhK/9EG4/aZhXnCYXk0Bp+EatZ8fjY
+ deag==
+X-Gm-Message-State: APjAAAWHv7UxQXRvV/8yDRdMzVdEONvAWSm2Wq0P7qeo0GKGKhpWhyQZ
+ N+4zslXBmzFoASfQMmmDW3YD5uUVZgTV67hjLx6VhA==
+X-Google-Smtp-Source: APXvYqxz4uaWdLhYj/w4g6/vR65niMndWEAx9/kARVQUdtjT6Y7737Yk4n5sFptfNJhhLagz90O2RyazktSQVyCUEQM=
+X-Received: by 2002:aca:3182:: with SMTP id x124mr8488329oix.170.1575568177597; 
+ Thu, 05 Dec 2019 09:49:37 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; boundary="Sig_/9l.JmnWFa2O_0vpL1tJqkQM";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <20191011134744.2477-1-richard.henderson@linaro.org>
+ <20191011134744.2477-15-richard.henderson@linaro.org>
+In-Reply-To: <20191011134744.2477-15-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 5 Dec 2019 17:49:26 +0000
+Message-ID: <CAFEAcA9tHvwN-FbVWoMRfidGC8uJD6k8w=ucs537Gh-=CtmxeA@mail.gmail.com>
+Subject: Re: [PATCH v5 14/22] target/arm: Implement the access tag cache
+ flushes
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,100 +87,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mihajlov@linux.ibm.com
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/9l.JmnWFa2O_0vpL1tJqkQM
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Fri, 11 Oct 2019 at 14:50, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Like the regular data cache flushes, these are nops within qemu.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 48 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 48 insertions(+)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index f435a8d8bd..33bc176e1c 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -5978,6 +5978,54 @@ static const ARMCPRegInfo mte_reginfo[] = {
+>      { .name = "GMID_EL1", .state = ARM_CP_STATE_AA64,
+>        .opc0 = 3, .opc1 = 1, .crn = 0, .crm = 0, .opc2 = 4,
+>        .access = PL1_R, .type = ARM_CP_CONST, .resetvalue = GMID_EL1_BS },
+> +    { .name = "IGVAC", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 3,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "IGSW", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 4,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "IGDVAC", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 5,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "IGDSW", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 6, .opc2 = 6,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CGSW", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 10, .opc2 = 4,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CGDSW", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 10, .opc2 = 6,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CIGSW", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 14, .opc2 = 4,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CIGDSW", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 0, .crn = 7, .crm = 14, .opc2 = 6,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CGVAC", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 10, .opc2 = 3,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CGDVAC", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 10, .opc2 = 5,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CGVAP", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 12, .opc2 = 3,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CGDVAP", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 12, .opc2 = 5,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CGVADP", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 13, .opc2 = 3,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CGDVADP", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 13, .opc2 = 5,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CIGVAC", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 14, .opc2 = 3,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+> +    { .name = "CIGDVAC", .state = ARM_CP_STATE_AA64,
+> +      .opc0 = 1, .opc1 = 3, .crn = 7, .crm = 14, .opc2 = 5,
+> +      .type = ARM_CP_NOP, .access = PL1_W },
+>      REGINFO_SENTINEL
+>  };
 
-On Thu, 5 Dec 2019 18:34:32 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Some of these, but not all, are conditionally available at EL0,
+which means that for those that are:
+ * .access should be PL0_W
+ * .accessfn should be aa64_cacheop_access() (which checks
+    SCTLR_EL1.UCI)
+ * they need to be in a reginfo that makes them available
+   for the insns-and-regs-only flavour of MTE
 
-> On 12/5/19 6:15 PM, Cornelia Huck wrote:
-> > On Fri, 29 Nov 2019 04:48:02 -0500
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >  =20
-> >> Secure guests no longer intercept with code 4 for an instruction
-> >> interception. Instead they have codes 104 and 108 for secure
-> >> instruction interception and secure instruction notification
-> >> respectively.
-> >>
-> >> The 104 mirrors the 4 interception.
-> >>
-> >> The 108 is a notification interception to let KVM and QEMU know that
-> >> something changed and we need to update tracking information or
-> >> perform specific tasks. It's currently taken for the following
-> >> instructions:
-> >>
-> >> * stpx (To inform about the changed prefix location)
-> >> * sclp (On incorrect SCCB values, so we can inject a IRQ)
-> >> * sigp (All but "stop and store status")
-> >> * diag308 (Subcodes 0/1)
-> >>
-> >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >> ---
-> >>  target/s390x/kvm.c | 6 ++++++
-> >>  1 file changed, 6 insertions(+)
-> >>
-
-> >> @@ -1664,6 +1668,8 @@ static int handle_intercept(S390CPU *cpu)
-> >>              (long)cs->kvm_run->psw_addr);
-> >>      switch (icpt_code) {
-> >>          case ICPT_INSTRUCTION:
-> >> +        case ICPT_PV_INSTR:
-> >> +        case ICPT_PV_INSTR_NOTIFICATION:
-> >>              r =3D handle_instruction(cpu, run); =20
-> >=20
-> > I'm still a bit uneasy about going through the same path for both 104
-> > and 108. How does the handler figure out whether it should emulate an
-> > instruction, or just process a notification? Is it guaranteed that a
-> > given instruction is always showing up as either a 104 or a 108, so
-> > that the handler can check the pv state? =20
->=20
-> diag 308 subcode 0/1 are 108, but all other subcodes are defined as a
-> 104 (if they are an exit at all)...
-
-I think that's a reason to really split 108 from 4/104, or at least add
-an parameter...
-
->=20
-> >=20
-> > [Even if that works, it still feels a bit unclean to me.]
-> >  =20
-> >>              break;
-> >>          case ICPT_PROGRAM: =20
-> >=20
-> >  =20
->=20
->=20
-
-
---Sig_/9l.JmnWFa2O_0vpL1tJqkQM
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3pQn0ACgkQ3s9rk8bw
-L6+LNg/8DgmYj+mH0adbQFGcPj919e6QXab5X2igRtyBrhya8qEFICrAkXV74Lh9
-hgvvTH5oi24De5kXvJSXXUmcRLVzD0Xc8g2aMQDd56QPPTVpj+NgAhpgwIYQ9RY7
-L3TOfBrwxXX6eoUkrAXn63WMCEfkRLey7P4MvFyfTXIu/x8csBNP0ET18FkqBNLr
-V1uNTXeeltDw6xRxpL2Vj1DmWB/A0k8un5QQeXzW0EIrOl6+jHgo5xq1acGluOVr
-L/sEbmaHn5fFn+V3CNY6Rq1XR23BLLv0XDc48zZ/y9yYYAgM2FFD2fOzNQiFHDk3
-vcQ1PR4OBeOOr+SJr2pUsObWie9fViKGc+At85OyycXIO3/xq4XnyjdjlAEDyRDX
-D1NpTb9SzUiwkIXcDmaKeheW9DtBp1ypZxXVBKS6AqLrXPgpeZ/AEIhkJ7l7G/ya
-Eyuw38yE1AouJTTLlvqFZKtj5w9gn0vgl8GgDsp5MMYvINNT8OxgiMGDxlpzh4mg
-eLxlMfQL7a65RF2UTzaHS1R+peqT9XvktSWxmYha1J7Rj/vHj5GYA+pIyS/3niR3
-ob04pS1JBVYb3oNLCS7BvzWnyrq2c+sxM3bCGNlWb6Nvoajz/OkRZRHGeaj8sumJ
-LqrwJZDiPx/zXqHFzN8OAA/vgIMAfhBEAZTSVdvujmLYdm1JWmw=
-=D/cJ
------END PGP SIGNATURE-----
-
---Sig_/9l.JmnWFa2O_0vpL1tJqkQM--
-
+thanks
+-- PMM
 
