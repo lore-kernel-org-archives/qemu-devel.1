@@ -2,82 +2,79 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6405BC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23914C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:12:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30E3020706
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:12:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E34B820706
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:12:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gB31Ta5p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30E3020706
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fFIDUgKO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E34B820706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idH97-00029N-Pr
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 12:12:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36416)
+	id 1idH9p-0002VY-HI
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 12:12:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1idFHi-0005t2-K3
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:12:48 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idFRn-0008DP-VU
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:23:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1idFHf-0006CD-N4
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:12:44 -0500
-Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:43283)
+ (envelope-from <peter.maydell@linaro.org>) id 1idFRm-000785-Iq
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:23:11 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42031)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1idFHf-0006Af-Db
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:12:43 -0500
-Received: by mail-oi1-x236.google.com with SMTP id x14so14974oic.10
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 07:12:43 -0800 (PST)
+ id 1idFRm-00075a-8o
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:23:10 -0500
+Received: by mail-ot1-x344.google.com with SMTP id 66so6081470otd.9
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 07:23:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=fIBaNeFOZ37BGpa+Pr3035ahuSXMmGbC1qGhADzI+gI=;
- b=gB31Ta5pICnU8zfpO+0k7SLBFNEgO3Ab6EpYi0fg1MN07w2BCofqsJ+zFLQgFe9BPJ
- 0IgligFJHriHNc5ePfySog7fwUEcLWE4uuxNVMJJ9NpGmwhlcom+I6Fm5XpWVzm7Dqg8
- RWMTHDMF73IE29S9ufFAbG90wBbEniHA38vL5OZH9zHxfSHvFKbQCIvCwjXJnTYSSWpS
- /ziW6p9bfG3j5FOJGNBqq5jQd85oU158aoOIecWm3ZWgFROmKyal0GUbZSWrMYwZoivo
- g/2BMiatpAvNXpqN39QL/zNnia7T4OhbQkit6GJAzKrwztjVzaD6wazKbwjrYqIf5vwo
- eCGA==
+ :cc; bh=lLL/PA8yye6H36YmDTDJ1uLtOzjPFZ9wMfmCB3T9Qaw=;
+ b=fFIDUgKOI1eK6U6SOWpzPMY5IN6xLt9g7ESb8lserQJo4MEbirU+ui8SF1e4sw60+S
+ E1Xf+J43b/F8q3V8NvBwVLwOIL+W1EsXSxY3Dc2H9NlwF6aeE470tJBYmDgrRTfeLvkF
+ HFrAomGXZqDzHmZM+HrnhTUJ5UC5Z9v1YgiMUWq5mBdT9vUPGwE9emNaiP4EtNUwNi45
+ FwliZR36D0M1XhKbSPx3HbHNsiLnn40s84Yd8RL2ISNZhZW4RqPVCnakx+J9v3PeY33F
+ mxlimG9lU9M5Jw4qT+gnRtXyt5g6zGUS2kYQaFu5E1f2aDM0Kv0AaSW8BLUBbh3XK6yb
+ IpwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=fIBaNeFOZ37BGpa+Pr3035ahuSXMmGbC1qGhADzI+gI=;
- b=fBVrb5ZZ+wOvnV9ohHypJ3LCKaSpFwTd6usSHx0Kd9sIb5ny8z09p0BlGVhBWFO721
- xh+Veh0+36By9/i5AxHvLr5vsVlbHEtiRbzmMJH2UDa5cs3rN4xrz4UPhfC/q9D3/aT2
- PYMpBMjgen5ADLbpwjaLBwMobYYwcoF+C34JbpJ6aAKJtw0UbGlu005oDFyZSJnGrTNu
- +Ft/wDWx1Z4ylTRtMJ/0sbS9lPXGmS/6ybTIdxRNk44L9yi+CKRIKl1nN2KBXvdHCWvS
- gfc1Lio8a4AAqqIcoDZ5AsX1eI/damHi9trzYkcbEZjyyXds/YznZFsItAFDqylI/NDL
- +Srg==
-X-Gm-Message-State: APjAAAXN6Wd8PspMLOiqh5SkZ7XvopjmnjE9n+xj2K8zTNYc9eGprvFf
- G6r2wMoGDckGlBPXQ4U7nfUymi8xBi0o+e7/rxAtHQ==
-X-Google-Smtp-Source: APXvYqwi+ETXGrn5Ju2rH9gezIchib/aRlnHg3SsqgDQTX7+BQ7FXGTu5yfXENANdtBDNxvSjj9OZjrxainv7JIu4lo=
-X-Received: by 2002:aca:f5cc:: with SMTP id
- t195mr12770833oih.163.1575645162493; 
- Fri, 06 Dec 2019 07:12:42 -0800 (PST)
+ :message-id:subject:to:cc;
+ bh=lLL/PA8yye6H36YmDTDJ1uLtOzjPFZ9wMfmCB3T9Qaw=;
+ b=ltjCEJcm/I3FhuOZaC1DB8Pe5amMQGm2pw2T8CDX9kg3823LxZynvNeCNYYEgHMmta
+ Lz6/l7PZCOsIUTUZbnuXj3hv3+lGDpcs2MGPKLscLMXLhfD9gr6eW33Xi35ZP7cmW68R
+ yT7HHsLkftd4A3yZ90oABwKlC8X08ejM5xur3nAxQ0xWcw4a74LJfbQRAVYCnvpgibox
+ oLtocwv2YYyDlsBz0VPui2U6wf/Jxi69R9Hwf/ObcY+1kHzLkgd0Oz04RC2Or141s9bS
+ +51TysZQJ8aUGFVvPw73EeztJdT/5tq2zgB0annJwprdxFXRLJkoHvDef41nVvGahYcZ
+ f+YA==
+X-Gm-Message-State: APjAAAXAAekccDXBCsaxOnvD9GU4nJLaESQ0ANAW7434v+0jwkMoyEX8
+ uT9TNpPnujl36/pb9LlVQdAy5uO2dzeDUh0oCP86vA==
+X-Google-Smtp-Source: APXvYqw03zSH9ugAJHHK2drjDnpsWCs3dJY/2x/6anKkZgiejvRbtuCIpGjAyWmr6rs8oUwX7MlxyngqTAlyD4EoXlY=
+X-Received: by 2002:a9d:12d2:: with SMTP id g76mr11769992otg.232.1575645789270; 
+ Fri, 06 Dec 2019 07:23:09 -0800 (PST)
 MIME-Version: 1.0
-References: <20191206150844.20124-1-crosa@redhat.com>
-In-Reply-To: <20191206150844.20124-1-crosa@redhat.com>
+References: <20191016143410.5023-1-drjones@redhat.com>
+In-Reply-To: <20191016143410.5023-1-drjones@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Dec 2019 15:12:31 +0000
-Message-ID: <CAFEAcA8ekevaZnwOg5bwJmkFkDFaC_qkrLLESLbSJs=L80viHA@mail.gmail.com>
-Subject: Re: [PULL 0/1] Fix for m68k/q800 acceptance test for QEMU 4.2-rc
-To: Cleber Rosa <crosa@redhat.com>
+Date: Fri, 6 Dec 2019 15:22:58 +0000
+Message-ID: <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
+Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
+ virtual time
+To: Andrew Jones <drjones@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::236
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,39 +86,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beraldo Leal <bleal@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, bijan.mottahedeh@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Dec 2019 at 15:09, Cleber Rosa <crosa@redhat.com> wrote:
+On Wed, 16 Oct 2019 at 15:34, Andrew Jones <drjones@redhat.com> wrote:
 >
-> The following changes since commit 1bdc319ab5d289ce6b822e06fb2b13666fd927=
-8e:
+> v2:
+>  - move from RFC status to v1
+>  - put kvm_arm_vm_state_change() in kvm.c to share among kvm32.c and kvm64.c
+>  - add r-b's from Richard
 >
->   Update version for v4.2.0-rc4 release (2019-12-03 17:56:30 +0000)
 >
-> are available in the Git repository at:
->
->   git://github.com/clebergnu/qemu.git tags/python-next-pull-request
->
-> for you to fetch changes up to 820649aa00ee343a0d473ad1002c59c70ba8c158:
->
->   tests/boot_linux_console: Fetch assets from Debian snapshot archives (2=
-019-12-06 09:48:35 -0500)
->
-> ----------------------------------------------------------------
-> Fix for m68k/q800 acceptance test (Philippe Mathieu-Daud=C3=A9)
+> This series is inspired by a series[1] posted by Bijan Mottahedeh about
+> a year ago.  The problem described in the cover letter of [1] is easily
+> reproducible and some users would like to have the option to avoid it.
+> However the solution, which is to adjust the virtual counter offset each
+> time the VM transitions to the running state, introduces a different
+> problem, which is that the virtual and physical counters diverge.  As
+> described in the cover letter of [1] this divergence is easily observed
+> when comparing the output of `date` and `hwclock` after suspending the
+> guest, waiting a while, and then resuming it.  Because this different
+> problem may actually be worse for some users, unlike [1], the series
+> posted here makes the virtual counter offset adjustment optional and not
+> even enabled by default.  Besides the adjustment being optional, this
+> series approaches the needed changes differently to apply them in more
+> appropriate locations.  Finally, unlike [1], this series doesn't attempt
+> to measure "pause time" itself.  Simply using QEMU_CLOCK_VIRTUAL, which
+> only ticks when the VM is not stopped, is sufficient.
 
-Any pullreq after about rc2 needs to clearly say
-what it's fixing and why it's justifiable for it to
-go in rather than waiting for the next release.
-Otherwise you get the default response:
-  nope, not at this point in the release cycle.
+So I guess my overall question is "what is the x86 solution to
+this problem, and why is this all arm-specific?" It would also
+be helpful to know how it fits into all the other proposals regarding
+time in VMs.
 
 thanks
 -- PMM
