@@ -2,84 +2,70 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4C64C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 23:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D039C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 23:49:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD71D20707
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 23:14:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AD/oX91n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD71D20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F2E9220409
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 23:49:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2E9220409
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idMo4-0006Qm-PS
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 18:14:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39798)
+	id 1idNMD-0003md-3Z
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 18:49:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56300)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1idMnD-0005sa-3M
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 18:13:48 -0500
+ (envelope-from <no-reply@patchew.org>) id 1idNLX-0003Mq-Cc
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 18:49:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1idMnA-0004ss-Dh
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 18:13:45 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56801
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1idMn9-0004fp-Eu
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 18:13:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575674022;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=c2liiLua+vDGh/gfnmWAijNKZrk6v9hVwlYubgc588Q=;
- b=AD/oX91nydqNI+O+z/3l9rl4Hvw1LrV9CdULFjYoNEHtvcd4miRAW3TjTrRKhib2dCecUC
- +0Z3a9Xb1B5IgaS/7ETV4yrslD6tlxWM8WP8DQsiwRhAVgrwnXZ8ogqX/G0z4zdbRaJzma
- hzGzv6EkKQ6GkW7sIqh7ybTqh3b40q4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-167-ke8FPo4OP5W046Jk9LX56w-1; Fri, 06 Dec 2019 18:13:38 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4919107ACC7;
- Fri,  6 Dec 2019 23:13:36 +0000 (UTC)
-Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C3D65D6BB;
- Fri,  6 Dec 2019 23:13:31 +0000 (UTC)
-Subject: Re: [RFC PATCH 1/9] vfio/pci: introduce mediate ops to intercept
- vfio-pci ops
-To: Yan Zhao <yan.y.zhao@intel.com>, alex.williamson@redhat.com
-References: <20191205032419.29606-1-yan.y.zhao@intel.com>
- <20191205032536.29653-1-yan.y.zhao@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <9461f821-73fd-a66f-e142-c1a55e38e7a0@redhat.com>
-Date: Fri, 6 Dec 2019 17:13:30 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <no-reply@patchew.org>) id 1idNLV-000520-NA
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 18:49:14 -0500
+Resent-Date: Fri, 06 Dec 2019 18:49:14 -0500
+Resent-Message-Id: <E1idNLV-000520-NA@eggs.gnu.org>
+Received: from sender4-of-o50.zoho.com ([136.143.188.50]:21037)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1idNLV-0004mI-Dk
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 18:49:13 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1575676138; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=AmH8Mzg7pWaYVEzE4knc/JjgZCnz/U9oRW7aaFLkcu4CBSbKEB9IJC96+p2X82+Wb1+iziy34LvGEUGH6fD/0eFLBexvc4HdA9PB227QDtgPgy1J83/Fdz8cy3op6NFMLlIBm9SAdGOzosv40262ZYDj/3xSuajxwFUzQInYVTE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1575676138;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=E1jlx6HZE4rmafsjKWjU2SJkYMh4I37w9SK1XsVquGA=; 
+ b=OA/FACuChlwaat1dUMe8IHWhiYVzhS32kIlPtoRlMjU+LIp2dHDY8GmBSM+8RsiOwYnCXSO7yFlugO9IMweL99ABkkZUl/CqfqeIxhWyGeJLwaQNMqHzmyQYfCNHx8p4nu0sRWMhNGqjR2RVJ/68e8j3+pokhqQc3fCi+h6fDJ0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1575676137139446.59853742157395;
+ Fri, 6 Dec 2019 15:48:57 -0800 (PST)
+In-Reply-To: <1575627817-24625-1-git-send-email-catherine.hecx@gmail.com>
+Subject: Re: [PATCH] target/i386: skip kvm_msr_entry_add when kvm_vmx_basic is
+ 0
+Message-ID: <157567613553.744.12283750572800820793@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <20191205032536.29653-1-yan.y.zhao@intel.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: ke8FPo4OP5W046Jk9LX56w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: catherine.hecx@gmail.com
+Date: Fri, 6 Dec 2019 15:48:57 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 136.143.188.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,37 +77,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kevin.tian@intel.com, kvm@vger.kernel.org, libvir-list@redhat.com,
- cohuck@redhat.com, linux-kernel@vger.kernel.org, zhenyuw@linux.intel.com,
- qemu-devel@nongnu.org, shaopeng.he@intel.com, zhi.a.wang@intel.com
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, mtosatti@redhat.com,
+ qemu-devel@nongnu.org, catherine.hecx@gmail.com, pbonzini@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/4/19 9:25 PM, Yan Zhao wrote:
-> when vfio-pci is bound to a physical device, almost all the hardware
-> resources are passthroughed.
-
-The intent is obvious, but it sounds awkward to a native speaker.
-s/passthroughed/passed through/
-
-> Sometimes, vendor driver of this physcial device may want to mediate some
-
-physical
-
-> hardware resource access for a short period of time, e.g. dirty page
-> tracking during live migration.
-> 
-> Here we introduce mediate ops in vfio-pci for this purpose.
-> 
-> Vendor driver can register a mediate ops to vfio-pci.
-> But rather than directly bind to the passthroughed device, the
-
-passed-through
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc1NjI3ODE3LTI0NjI1LTEt
+Z2l0LXNlbmQtZW1haWwtY2F0aGVyaW5lLmhlY3hAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2Vy
+aWVzIHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQg
+YmVsb3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0hdIHRhcmdldC9pMzg2
+OiBza2lwIGt2bV9tc3JfZW50cnlfYWRkIHdoZW4ga3ZtX3ZteF9iYXNpYyBpcyAwClR5cGU6IHNl
+cmllcwpNZXNzYWdlLWlkOiAxNTc1NjI3ODE3LTI0NjI1LTEtZ2l0LXNlbmQtZW1haWwtY2F0aGVy
+aW5lLmhlY3hAZ21haWwuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hl
+ZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjk4NzQ0MWYgdGFyZ2V0L2kzODY6IHNraXAga3ZtX21z
+cl9lbnRyeV9hZGQgd2hlbiBrdm1fdm14X2Jhc2ljIGlzIDAKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzM4OiBGSUxFOiB0YXJn
+ZXQvaTM4Ni9rdm0uYzoyNjM3OgorXkkvKiBPbmx5IGFkZCB0aGUgZW50cnkgd2hlbiBob3N0IHN1
+cHBvcnRzIGl0ICovJAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNCBsaW5lcyBjaGVj
+a2VkCgpDb21taXQgOTg3NDQxZjc0MjRjICh0YXJnZXQvaTM4Njogc2tpcCBrdm1fbXNyX2VudHJ5
+X2FkZCB3aGVuIGt2bV92bXhfYmFzaWMgaXMgMCkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
+cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
+dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
+PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
+ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU3NTYy
+NzgxNy0yNDYyNS0xLWdpdC1zZW5kLWVtYWlsLWNhdGhlcmluZS5oZWN4QGdtYWlsLmNvbS90ZXN0
+aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0
+aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91
+ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
