@@ -2,75 +2,53 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0080C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3F5C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:43:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BEB420706
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:39:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OdPOp5MF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BEB420706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A510B20706
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:43:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A510B20706
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idElj-0000eF-3w
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:39:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59331)
+	id 1idEp8-0004Jz-89
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:43:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1idEOI-0001Pz-Pt
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:15:32 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEOo-00021a-2L
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1idEOH-0001U4-61
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:15:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42627
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEOm-0002PK-Fy
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:01 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:43535 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1idEOH-0001Sn-1u
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:15:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575641728;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Bf/sq2X8LvwM7XPzmbbgVK4hHmEwYBU4eGspdFx65Yg=;
- b=OdPOp5MF3ev/G/fHW49dCXcGOWFOXJihRKJNUyVFSiglT7ir4BUSZ8n9Itr0fydm3wFiPS
- S2OC2LCQfGWD8/I9m60DcLXRO2LOO/9eyJ0KdKhdmbNkK2a+jr2PfedCV4zLdzbXVXod77
- h+ohOyOBACElN5oTBc9/1/8+VqC2Heg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-238-utEINZruNCSvTvHzwpFR_g-1; Fri, 06 Dec 2019 09:00:17 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 867AF801E7A;
- Fri,  6 Dec 2019 14:00:16 +0000 (UTC)
-Received: from virtlab501.virt.lab.eng.bos.redhat.com
- (virtlab501.virt.lab.eng.bos.redhat.com [10.19.152.162])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C4D4E60E3E;
- Fri,  6 Dec 2019 14:00:12 +0000 (UTC)
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+ (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
+ id 1idEOm-0000SP-8A
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:00 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 1F0B21A218C;
+ Fri,  6 Dec 2019 14:58:14 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
+ [10.10.14.93])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 054191A1D63;
+ Fri,  6 Dec 2019 14:58:14 +0100 (CET)
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/2] tests/acceptance: Add boot vmlinux test
-Date: Fri,  6 Dec 2019 09:00:10 -0500
-Message-Id: <20191206140012.15517-1-wainersm@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: utEINZruNCSvTvHzwpFR_g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Subject: [PATCH 0/5] mips: machines: Renovate coding style
+Date: Fri,  6 Dec 2019 14:58:02 +0100
+Message-Id: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,44 +60,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, alex.bennee@linaro.org, wrampazz@redhat.com,
- crosa@redhat.com, philmd@redhat.com, sgarzare@redhat.com
+Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
+ amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series add a new acceptance test: boot an uncompressed
-Linux kernel built with CONFIG_PVH, so checking the PVH
-capability introduced in QEMU 4.0 works.
+The scripts checkpatch.pl located in scripts folder
+was used to check for errors and warnings in fllowing
+mips machines:
 
-The test implementation depends on [1] which is likely released
-on next Avocado. So that will need a version 2 of this
-series to bump Avocado version.
+    Jazz
+    Malta
+    Mipssim
+    R4000
+    Fulong 2E
+    Boston
 
-Also I want to use this as an example of a scenario that test
-assets could be better managed. As you see on patch 01 the
-kernel is built at test time on localhost. While Avocado provides
-an API to easily fetch and build it, the whole process takes
-reasonable time - besides the fact that localhost must have
-all build dependencies installed. How could it be done better?
+All generated errors and warnings were corrected
+and the script was ran again to make sure there
+are no more errors and warnings
 
-Nonetheless I argue in favor of merging this as is, and
-gradually implement corrections to improve the tests assets
-management. Also if eventually the test is proven to unacceptable
-slow down the Travis CI then I can add a guard to skip it.
+Note:
 
-[1] https://github.com/avocado-framework/avocado/pull/3389
+    Boston machine was already clear of errors
+    and warnings so the boston machine files 
+    were not edited.
 
-Wainer dos Santos Moschetta (2):
-  tests/acceptance: Add PVH boot test
-  .travis.yml: Add kernel build deps for acceptance tests
+Note:
 
- .travis.yml             |  2 ++
- tests/acceptance/pvh.py | 48 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+)
- create mode 100644 tests/acceptance/pvh.py
+    One error occured due to the machro #IF 0.
+    That error was not corrected beacuse there
+    is some reduntant code within that macro that
+    might be used in future versions.
 
---=20
-2.21.0
+v2:
+
+    * changed lines in hw/mips/mips_malta.c from 848 to
+      995 so that comments begin at the same line
+
+    * changed line 573 in hw/mips/mips_malta.c to fix
+      the build error due to the function g_new0 that is
+      used for allocating
+
+    * changed lines 103 and 107 in tests/acceptance/mips_malta.c
+      so that splitting lines are aligned vertically 
+      belove the opening brackets
+
+    * changed line 121 in mips_r4k.c so that INITRD_PAGE_MASK so 
+      that it is aligned vertically belove the opening bracket
+
+Filip Bozuta (5):
+  mips: jazz: Renovate coding style
+  mips: malta: Renovate coding style
+  mips: mipssim: Renovate coding style
+  mips: r4000: Renovate coding style
+  mips: fulong 2e: Renovate coding style
+
+ hw/display/jazz_led.c                    | 123 +++++++++++-----------
+ hw/dma/rc4030.c                          |  12 ++-
+ hw/isa/vt82c686.c                        |  23 +++--
+ hw/mips/mips_jazz.c                      |  32 +++---
+ hw/mips/mips_malta.c                     | 169 ++++++++++++++++---------------
+ hw/mips/mips_r4k.c                       |  55 ++++++----
+ hw/net/mipsnet.c                         |  44 ++++----
+ hw/pci-host/bonito.c                     |  60 ++++++-----
+ tests/acceptance/linux_ssh_mips_malta.py |   6 +-
+ 9 files changed, 281 insertions(+), 243 deletions(-)
+
+-- 
+2.7.4
 
 
