@@ -6,87 +6,88 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C41EC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F789C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07642206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:52:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFCC6206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:54:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ra0Ps2aX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07642206DF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pQy42ixr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFCC6206DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idIii-0000JL-Uk
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:52:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48350)
+	id 1idIkg-0002hd-Ny
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:54:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57229)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1idHti-0006KE-U6
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:00:11 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1idHyy-000409-4s
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:05:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1idHth-0005PU-I9
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:00:10 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:33589)
+ (envelope-from <richard.henderson@linaro.org>) id 1idHyw-0005zL-Qx
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:05:35 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:39315)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1idHth-0005J4-89
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:00:09 -0500
-Received: by mail-pf1-x443.google.com with SMTP id y206so3723512pfb.0
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 10:00:09 -0800 (PST)
+ id 1idHyw-0005sQ-GN
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:05:34 -0500
+Received: by mail-pf1-x441.google.com with SMTP id 2so3712661pfx.6
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 10:05:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=p26an9r2CXB30mdsIXABb9LuiAqHiTdYDwy3yCrP5w0=;
- b=Ra0Ps2aXJPCrYY+ilgX5GQ0jkOXloGOh6Clsrrp3qkW7axSDFmjLmBQPy6JfyU+jr1
- B/+IddZL/fDBplQcK53qFB8mrBcyZhz69DZCig/hGTlShZIreexIQ/U+GJ71yv/GB0Bi
- S6m5MUcRnvBsFQ+d24xtt9Z/v++TUOEZYw0as0240BdGc9xtW150kzwlc4r1wbUQrB2k
- ZqSavhnkIIEecO/WaraB12zayqvF2HS+OKkZGibyPlHPQbHGRs43AU+qWL1bZc6ttJIV
- vZ4w1WcUdrXAJDC1oheqdYqti4UKTpDqzR7rOgz4WHrLzToSvGW1bK2nNC9CygCCzEur
- pdHw==
+ bh=u+zfmB+GQiFMKMGY09la3VUx4ibV3jw6mD5lvbjuXQg=;
+ b=pQy42ixrgcbTTghLZhbnSpKP9/BYUr2xSybxPi0r4Ff7d/w3IU1bu+JYyTpaBmZXu/
+ krBsQ6WBA8aMjoeqQmPTD9fUulf+VQyh0/H7SJv2AeyC1eJpHxO21owJ/nGP1Tvorvej
+ CnV2ofQYElLErqPKGyCjMOh5fsqULmOp0amGsJNXs3GwiMD3mngECe63znxa79dRr3Ju
+ OXdt2wiUzSskEHAauIWgZqcwNOHuiUH/zlfIPuPCPCOOo1myazVygHb06Vp1QHW7tSpf
+ yfpe/1uWEqALpaM1y5RyK53HJ73Sfyz1T8Y5L7MyPh8HLbimQo7v+wbbIivqRCgcVo7W
+ 1MDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=p26an9r2CXB30mdsIXABb9LuiAqHiTdYDwy3yCrP5w0=;
- b=f+Fa3gaSicBSfsKfGpl/CjiHl+wF1P5ixRyMuX3LWhlOML0Vlzg0OTgWwmYG2lcBpr
- DLDzu7cKfPOQcxNToEepk+KoJU4cLfDJkvY4Q/GRrFL1z/2hrpP3KNMy/h1mz+ELqBAy
- v7Jr8iNgFQXUGA6EfXjy4wED7Rj6mDMY9Yv3wWXE/27PsxfmY99jrutTmUWeN/Y42lAD
- NHNofi9Ldenrc0gWxhhRZld6qT8nkTn7lwyez3VpII+mf784+YSugz8K8g+OWV9aoTIJ
- TPOrnhyQt2pJcDTsi2vFc7nTfhdxbiJYICsfXp71VGU8r46qfujS7fTFSVLsoKAq1Nb2
- 9emg==
-X-Gm-Message-State: APjAAAXQMjaZPu8lKH4VPnhMu9Abg8Nc2f3hvb3ya26HJOApR7cDky4Y
- UIl5sKDdpDWIcLPzHZFzGnkOKQ==
-X-Google-Smtp-Source: APXvYqyumStn3u+gP+vn0nA1DirhN/5D1CZNKfvKe8TSFmfinkW76nEbD5Aks8z4NZZ+HHNv0vWnVA==
-X-Received: by 2002:a65:42c2:: with SMTP id l2mr4768477pgp.172.1575655207700; 
- Fri, 06 Dec 2019 10:00:07 -0800 (PST)
+ bh=u+zfmB+GQiFMKMGY09la3VUx4ibV3jw6mD5lvbjuXQg=;
+ b=tkDl9frkoYCaL2sdRSZbCmU/rwMdC7mBO971B7HXIJET03ZU4W9SyUb8dxJ3v0iDDk
+ b+ZU4Wn3MeTcmcr+mVMEFkL0xXBfCy/D9Kseem3x6YdQHMlgDRnEcCaO0w1+stdieKsU
+ peDd3HepNuy6UQpT5ChloS0z7fTqigrknOVBF4PN1B3l1jwrBA1BcQAVEppHl9BOydb1
+ SQytovZGFcpuxFOUB6p0zDs837dEE7gE01Ue23tc99Ll13lx4yqUOdw9oNBQufwC3uMx
+ vJM+DelsuuOjpA+1pBf+P89eMUJErf9u8p/67OAFUNwU0ye7zkyJT5HX/rUaBPNQdQlG
+ 7o4Q==
+X-Gm-Message-State: APjAAAVw962+7EhfThx+3IOTYk9A+PsMrTW9AXfrvQze7zF4JfZvj14L
+ ACyZwcP8ANN1Hh95sr1+JQ568g==
+X-Google-Smtp-Source: APXvYqyGf4tBlIITWx73yW9pm5VBNd0Vyrid4QjvSmyWtpEkjMY7i/NncfTepkVqyTtlEFuhLDWfSA==
+X-Received: by 2002:a62:7986:: with SMTP id
+ u128mr16433604pfc.192.1575655532959; 
+ Fri, 06 Dec 2019 10:05:32 -0800 (PST)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id gc1sm3881082pjb.20.2019.12.06.10.00.06
+ by smtp.gmail.com with ESMTPSA id m7sm17710785pfb.153.2019.12.06.10.05.31
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 06 Dec 2019 10:00:06 -0800 (PST)
-Subject: Re: [PATCH v4 08/40] target/arm: Rename ARMMMUIdx*_S12NSE* to
- ARMMMUIdx*_E10_*
+ Fri, 06 Dec 2019 10:05:32 -0800 (PST)
+Subject: Re: [PATCH v4 09/40] target/arm: Rename ARMMMUIdx_S2NS to
+ ARMMMUIdx_Stage2
 To: Peter Maydell <peter.maydell@linaro.org>
 References: <20191203022937.1474-1-richard.henderson@linaro.org>
- <20191203022937.1474-9-richard.henderson@linaro.org>
- <CAFEAcA9Bf1F0CcbsqASemuu+CxPSEUHBWzyR1Qo1QUTE9hBkKA@mail.gmail.com>
+ <20191203022937.1474-10-richard.henderson@linaro.org>
+ <CAFEAcA-2mpUSjwnkAJGdwHX5P0xvF_eZyVLt9xPv57330Qu3dg@mail.gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <95e1ce50-e98e-d7d2-8af6-d5f315b8fa95@linaro.org>
-Date: Fri, 6 Dec 2019 10:00:05 -0800
+Message-ID: <8bafc341-7560-14c5-3534-cb299c5b9428@linaro.org>
+Date: Fri, 6 Dec 2019 10:05:30 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9Bf1F0CcbsqASemuu+CxPSEUHBWzyR1Qo1QUTE9hBkKA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-2mpUSjwnkAJGdwHX5P0xvF_eZyVLt9xPv57330Qu3dg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,19 +105,21 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/6/19 7:45 AM, Peter Maydell wrote:
+On 12/6/19 7:46 AM, Peter Maydell wrote:
 > On Tue, 3 Dec 2019 at 02:29, Richard Henderson
 > <richard.henderson@linaro.org> wrote:
 >>
->> This is part of a reorganization to the set of mmu_idx.
->> This emphasizes that they apply to the EL1&0 regime.
+>> The EL1&0 regime is the only one that uses 2-stage translation.
 > 
-> It loses the important point that they are stage 1&2
-> translations rather than stage 1 or stage 2, though,
-> and also now they're out of line with the naming convention
-> that all the other indexes use :-(
+> ...now what happens when we support secure EL2 and we need a
+> secure stage 2 MMUIdx ?
 
-It won't be out of line once all of the other renamings are done.
+ARMMMUIdx_SStage2?
+
+Or probably some other massive rearrangement, because SecEL2 looks as if it
+might need 4 new mmu_idx (secure el2&0-el0, secure el2&0-el2, secure
+el2&0-el2-pan, secure stage2), which would put the total at 18, which overflows
+the current limit of 16.
 
 
 r~
