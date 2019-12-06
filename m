@@ -2,80 +2,80 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C78C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7837CC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 957A8205F4
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:06:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4749E205F4
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:06:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YK0y91Uy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 957A8205F4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I3fr0R0v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4749E205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idH3K-0003vS-RF
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 12:06:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48721)
+	id 1idH3o-0004di-3c
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 12:06:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58894)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1idFED-00014t-0D
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:09:10 -0500
+ (envelope-from <drjones@redhat.com>) id 1idFvF-0001Oq-0g
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:53:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1idFEB-0000cA-K3
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:09:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23241
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <drjones@redhat.com>) id 1idFvD-0001TF-NK
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:53:36 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:35100
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1idFEB-0000al-Fi
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:09:07 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1idFvD-0001Rf-Ju
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:53:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575644946;
+ s=mimecast20190719; t=1575647614;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MV0fOidRF7C4EAztP9ZWauegvPnXcw1LymAIIRWE6Bk=;
- b=YK0y91UyMM5WnOveZWNVQdeQ3GBAhK96pPfJ/nqpfvp5cuZtg+GjKpU7QmtaUpQakooiG1
- aRQnZe45pDUcKQGAeeZqZfQZlDjAH7ywOFtMZURt6C8VQNY05VEpIkj5eHAUvIXM7nHLb6
- 0E1Qprprpgb6We1ciZbQJOH2xzKdxHQ=
+ bh=xx+gBQINEfsdCHgzHWk9u1vbTF0umg2qaZIaBUYeVFs=;
+ b=I3fr0R0v4FYy9x4JfAx8fDj3syXyx9AVruAC8wMYYhG5svmRSuArVbHajeJ09WOrTslS9S
+ Oc0s3uyVf2AIVlvd0IIl+OmekIxP3DQuC06tOwqaWIHt6w/sz9g7h/m0GNQoMyp5J8rK1K
+ p+y2Wa+/tFIHHp4DrXhGATT6Edsop+U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-43DSfnp9NryNg402202AmQ-1; Fri, 06 Dec 2019 10:09:04 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-219-ZKWUJp0YOXu4ZFKdzCgesQ-1; Fri, 06 Dec 2019 10:53:31 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52F6A100A174;
- Fri,  6 Dec 2019 15:09:03 +0000 (UTC)
-Received: from dhcp-17-72.bos.redhat.com (dhcp-17-72.bos.redhat.com
- [10.18.17.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5E73A5D6C8;
- Fri,  6 Dec 2019 15:09:00 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 1/1] tests/boot_linux_console: Fetch assets from Debian
- snapshot archives
-Date: Fri,  6 Dec 2019 10:08:44 -0500
-Message-Id: <20191206150844.20124-2-crosa@redhat.com>
-In-Reply-To: <20191206150844.20124-1-crosa@redhat.com>
-References: <20191206150844.20124-1-crosa@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28DD0DB22;
+ Fri,  6 Dec 2019 15:53:30 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CFB325D9E1;
+ Fri,  6 Dec 2019 15:53:28 +0000 (UTC)
+Date: Fri, 6 Dec 2019 16:53:27 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
+ virtual time
+Message-ID: <20191206155327.7adiyjjkjh56mg2t@kamzik.brq.redhat.com>
+References: <20191016143410.5023-1-drjones@redhat.com>
+ <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 43DSfnp9NryNg402202AmQ-1
+In-Reply-To: <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: ZKWUJp0YOXu4ZFKdzCgesQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,50 +87,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Beraldo Leal <bleal@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, bijan.mottahedeh@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On Fri, Dec 06, 2019 at 03:22:58PM +0000, Peter Maydell wrote:
+> On Wed, 16 Oct 2019 at 15:34, Andrew Jones <drjones@redhat.com> wrote:
+> >
+> > v2:
+> >  - move from RFC status to v1
+> >  - put kvm_arm_vm_state_change() in kvm.c to share among kvm32.c and kv=
+m64.c
+> >  - add r-b's from Richard
+> >
+> >
+> > This series is inspired by a series[1] posted by Bijan Mottahedeh about
+> > a year ago.  The problem described in the cover letter of [1] is easily
+> > reproducible and some users would like to have the option to avoid it.
+> > However the solution, which is to adjust the virtual counter offset eac=
+h
+> > time the VM transitions to the running state, introduces a different
+> > problem, which is that the virtual and physical counters diverge.  As
+> > described in the cover letter of [1] this divergence is easily observed
+> > when comparing the output of `date` and `hwclock` after suspending the
+> > guest, waiting a while, and then resuming it.  Because this different
+> > problem may actually be worse for some users, unlike [1], the series
+> > posted here makes the virtual counter offset adjustment optional and no=
+t
+> > even enabled by default.  Besides the adjustment being optional, this
+> > series approaches the needed changes differently to apply them in more
+> > appropriate locations.  Finally, unlike [1], this series doesn't attemp=
+t
+> > to measure "pause time" itself.  Simply using QEMU_CLOCK_VIRTUAL, which
+> > only ticks when the VM is not stopped, is sufficient.
+>=20
+> So I guess my overall question is "what is the x86 solution to
+> this problem, and why is this all arm-specific?" It would also
 
-The kernel packaged was fetched from an unstable repository.
-Use the stable snapshot archive instead.
+x86 adjusts the counter offset by default, and I don't think there's any
+way to turn that behavior off. I think it's too late to follow that
+default for arm, but this series provides a way to opt into the same
+behavior.
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20191126223810.20180-2-philmd@redhat.com>
-Tested-by: Willian Rampazzo <wrampazz@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
----
- tests/acceptance/boot_linux_console.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> be helpful to know how it fits into all the other proposals regarding
+> time in VMs.
 
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
-_linux_console.py
-index 7e41cebd47..752f776f68 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -479,7 +479,8 @@ class BootLinuxConsole(Test):
-         :avocado: tags=3Darch:m68k
-         :avocado: tags=3Dmachine:q800
-         """
--        deb_url =3D ('http://ftp.ports.debian.org/debian-ports/pool-m68k/m=
-ain'
-+        deb_url =3D ('https://snapshot.debian.org/archive/debian-ports'
-+                   '/20191021T083923Z/pool-m68k/main'
-                    '/l/linux/kernel-image-5.3.0-1-m68k-di_5.3.7-1_m68k.ude=
-b')
-         deb_hash =3D '044954bb9be4160a3ce81f8bc1b5e856b75cccd1'
-         try:
---=20
-2.21.0
+I've been lightly following the other stuff, but haven't yet seen any
+overlap.
+
+BTW, this series needs to be rebased and reposted. I've been waiting for
+4.2 though.
+
+Thanks,
+drew
 
 
