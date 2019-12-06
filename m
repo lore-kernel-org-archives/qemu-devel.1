@@ -4,59 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DED41C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CC4C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:19:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACE0C206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:18:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE0C206DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 39780206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:19:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39780206DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idIBL-00005y-T2
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:18:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39439)
+	id 1idIC4-0008Gd-2l
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:19:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1idGwL-0005A1-1N
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 11:58:49 -0500
+ (envelope-from <alexandru.elisei@arm.com>) id 1idHXP-0003vi-Hi
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:37:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1idGwI-0007pi-SN
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 11:58:48 -0500
-Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:47681)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1idGwI-0007j8-Kr
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 11:58:46 -0500
-Received: from player711.ha.ovh.net (unknown [10.108.16.68])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id 10F8A84B9B
- for <qemu-devel@nongnu.org>; Fri,  6 Dec 2019 17:58:43 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player711.ha.ovh.net (Postfix) with ESMTPSA id EBFDACE26FC2;
- Fri,  6 Dec 2019 16:58:41 +0000 (UTC)
-Date: Fri, 6 Dec 2019 17:58:40 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] exec: Remove the duplicated check in parse_cpu_option()
-Message-ID: <20191206175840.06507c32@bahia.w3ibm.bluemix.net>
-In-Reply-To: <20191206063337.39764-1-gshan@redhat.com>
-References: <20191206063337.39764-1-gshan@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <alexandru.elisei@arm.com>) id 1idHXN-0001RF-Lb
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:37:07 -0500
+Received: from foss.arm.com ([217.140.110.172]:59740)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <alexandru.elisei@arm.com>)
+ id 1idHXK-0001D7-30; Fri, 06 Dec 2019 12:37:02 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4A52431B;
+ Fri,  6 Dec 2019 09:37:00 -0800 (PST)
+Received: from [10.1.196.63] (e123195-lin.cambridge.arm.com [10.1.196.63])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E51A03F52E;
+ Fri,  6 Dec 2019 09:36:58 -0800 (PST)
+Subject: Re: [kvm-unit-tests RFC 01/10] arm64: Provide read/write_sysreg_s
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ maz@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org
+References: <20191206172724.947-1-eric.auger@redhat.com>
+ <20191206172724.947-2-eric.auger@redhat.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <efe2c571-1b69-5cc4-3505-24d092a9f985@arm.com>
+Date: Fri, 6 Dec 2019 17:36:57 +0000
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20191206172724.947-2-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 9854720412128156054
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudekfedgledtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+Content-Language: en-US
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.74.227
+X-Received-From: 217.140.110.172
+X-Mailman-Approved-At: Fri, 06 Dec 2019 12:46:09 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,52 +69,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, andrew.murray@arm.com, drjones@redhat.com,
+ andre.przywara@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri,  6 Dec 2019 17:33:37 +1100
-Gavin Shan <gshan@redhat.com> wrote:
+Hi,
 
-> The @cpu_option shouldn't be NULL, otherwise assertion from g_strsplit()
-> should be raised as below message indicates. So it's meaningless to validate
-> @model_pices[0] in parse_cpu_option() as it shouldn't be NULL either.
-> 
->    qemu-system-aarch64: GLib: g_strsplit: assertion 'string != NULL' failed
-> 
-> This just removes the check and unused message.
-> 
-
-Hrm... the check isn't about @cpu_option being NULL. It is about filtering out
-invalid syntaxes like:
-
--cpu ''
-
-or
-
--cpu ,some-prop
-
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
+On 12/6/19 5:27 PM, Eric Auger wrote:
+> From: Andrew Jones <drjones@redhat.com>
+>
+> Sometimes we need to test access to system registers which are
+> missing assembler mnemonics.
+>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
 > ---
->  exec.c | 5 -----
->  1 file changed, 5 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index ffdb518535..3cff459e43 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -963,11 +963,6 @@ const char *parse_cpu_option(const char *cpu_option)
->      const char *cpu_type;
+>  lib/arm64/asm/sysreg.h | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/lib/arm64/asm/sysreg.h b/lib/arm64/asm/sysreg.h
+> index a03830b..a45eebd 100644
+> --- a/lib/arm64/asm/sysreg.h
+> +++ b/lib/arm64/asm/sysreg.h
+> @@ -38,6 +38,17 @@
+>  	asm volatile("msr " xstr(r) ", %x0" : : "rZ" (__val));	\
+>  } while (0)
 >  
->      model_pieces = g_strsplit(cpu_option, ",", 2);
-> -    if (!model_pieces[0]) {
-> -        error_report("-cpu option cannot be empty");
-> -        exit(1);
-> -    }
-> -
->      oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
->      if (oc == NULL) {
->          error_report("unable to find CPU model '%s'", model_pieces[0]);
+> +#define read_sysreg_s(r) ({					\
+> +	u64 __val;						\
+> +	asm volatile("mrs_s %0, " xstr(r) : "=r" (__val));	\
+> +	__val;							\
+> +})
+> +
+> +#define write_sysreg_s(v, r) do {				\
+> +	u64 __val = (u64)v;					\
+> +	asm volatile("msr_s " xstr(r) ", %x0" : : "rZ" (__val));\
+> +} while (0)
+> +
+>  asm(
+>  "	.irp	num,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30\n"
+>  "	.equ	.L__reg_num_x\\num, \\num\n"
 
+That's exactly the code that I wrote for my EL2 series :)
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+
+Thanks,
+Alex
 
