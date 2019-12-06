@@ -2,161 +2,81 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4FFDC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF96C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:10:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9243A2053B
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:08:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2BC42053B
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:10:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQU+9na/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9243A2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yTIDXKVm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2BC42053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idIxb-0004Vw-D6
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 14:08:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35767)
+	id 1idIzX-0006Sj-Vc
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 14:10:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42796)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1idIsN-0000Vb-7z
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:02:53 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idINP-0006SI-Hk
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:30:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1idIsK-0008Nr-1J
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:02:49 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59025
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1idIsJ-0008He-LL
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:02:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575658964;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=uh3/HM/Ye+atMLt5vLgd5Xyp7lGMTg5pG0zfdNrTJbM=;
- b=jQU+9na/xXTX7CNEz4B4tCYNq9LlAHK0VIR2QP/WE1M9JS4mVuEEaJxEzAgav/DCiOkl+B
- s+U7eOetDX8Cd/KSN5LdcpbOCTTFu17r8DyIaNn7iZy8786l+iF7ccUPpCEqJW/MrYQwDd
- QkSB2LNTwm+yAG77PvsDyJhLhOp4JOA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-381-MxMGOMf9Nv6oueYvrjfgzQ-1; Fri, 06 Dec 2019 14:02:41 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5976F8005A9;
- Fri,  6 Dec 2019 19:02:40 +0000 (UTC)
-Received: from [10.10.121.25] (ovpn-121-25.rdu2.redhat.com [10.10.121.25])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5DF305D9C9;
- Fri,  6 Dec 2019 19:02:36 +0000 (UTC)
-Subject: Re: [PATCH for-4.2?] block/qcow2-bitmap: fix crash bug in
- qcow2_co_remove_persistent_dirty_bitmap
-To: Eric Blake <eblake@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191205193049.30666-1-vsementsov@virtuozzo.com>
- <22af83d1-91e2-ab71-2dc4-349b5b24d1d8@redhat.com>
- <990da2e0-8223-b257-254d-a27659ef1d24@redhat.com>
- <6a74ae0a-e377-0f70-c347-0307580d7981@virtuozzo.com>
- <36655f7a-7ea5-e80a-ebfd-5b19c90622c0@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <8c7c5f50-1899-3457-e1bc-77d8fee87de7@redhat.com>
-Date: Fri, 6 Dec 2019 14:02:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <peter.maydell@linaro.org>) id 1idINO-0002S8-3Y
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:30:51 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:32996)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1idINN-0002Pn-Sc
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:30:50 -0500
+Received: by mail-oi1-x243.google.com with SMTP id v140so669466oie.0
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 10:30:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5z/6XKC2ep64MfVJ30LGpD9q+AIs6sDy4td/Qd+8kbk=;
+ b=yTIDXKVmIliNX0JM4RsjhYWiVmn1KTEpjw5KD9PbkoSVMxb9oXajNFzyvXsCmWQOYF
+ dYyhs8egVMofVbF/5/9iJMwi/A4rwU8X0PzlWORStpaTRMWREn2YxmPUaHD2O4MIy6uT
+ f5S+4IlbqkWixKbj3fYEsCvjsOLEj2L4DAVo7llBYtgrotqdWQ4t4zo0ESwG5YmqPqNz
+ NbfLYoHfMdzXbxT+IcKTqW5p/kwOLPbLcobMfI+W9TNd2WtE2ZMf6/yvEIPXDvh7Qqk7
+ NKyvh7YaVPXlqh4dCcujUrJ/Im4Ydsv0knkLlC9zYe4+I7nhied7VcjICXFSOu1avJgd
+ uVUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5z/6XKC2ep64MfVJ30LGpD9q+AIs6sDy4td/Qd+8kbk=;
+ b=TYSJmLt+3vHrmG8daMwQbKZaMI3XUn67ln1WfOKZ4aWybn1k7EyFIuuSw2VbVHnuQm
+ p0onOY6xHO3VKL8CDIvVmWyLN2bBoMhC04MCuopzITAyuOnRc8rIrynkgS9UGIcj76+G
+ JyF9B9jQ4++PRyn+LwL/n8c6s3LKB6v/ka4BAeIsNc6Yx0PVVeDAmwQJtnVnq40PvSfK
+ RcOwJu2/7a64mRP4EdgY4MaXkWA1MDblCVk4T1I1uGmgF461tcSshYPH+axxwNHQuX9A
+ 6Np/byDHpWAMWX90XzcvN7gO+uXeyXv0GK8AsjRLuKXdtPriPtHYxRB5K7QBGMzhPSTq
+ h9Ng==
+X-Gm-Message-State: APjAAAUDkTxj2wfY93I4qFWNtu4VxVbZFP9JFE/6+cHtFwiTptah9zzf
+ OTBa/ktWAQ3A21Yjr/eveRsm6Lep5xSWSghiWvdKIA==
+X-Google-Smtp-Source: APXvYqzmezMfKbw7yMDOjdxzmK0N/3n6k+6/OhECxz7QYxn6hdgwU8w4aqOh8arO+pC8jtzD1TQrm5y1KHvnFb2/MEo=
+X-Received: by 2002:a05:6808:996:: with SMTP id
+ a22mr13006347oic.146.1575657048818; 
+ Fri, 06 Dec 2019 10:30:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <36655f7a-7ea5-e80a-ebfd-5b19c90622c0@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: MxMGOMf9Nv6oueYvrjfgzQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20191203234244.9124-1-richard.henderson@linaro.org>
+ <20191203234244.9124-3-richard.henderson@linaro.org>
+In-Reply-To: <20191203234244.9124-3-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Dec 2019 18:30:37 +0000
+Message-ID: <CAFEAcA914CO2vfMAkr4aeEA_FV0Vub6S9eF43qN=14e7nU1uHg@mail.gmail.com>
+Subject: Re: [PATCH 2/4] target/arm: Update MSR access to UAO
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -168,152 +88,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Peter Krempa <pkrempa@redhat.com>,
- "libvirt-list@redhat.com" <libvirt-list@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 12/6/19 9:36 AM, Eric Blake wrote:
-> [adding in Peter Maydell, as there is now potential talk of other
-> 4.2-worthy patches]
->=20
-> On 12/6/19 4:18 AM, Vladimir Sementsov-Ogievskiy wrote:
->> 05.12.2019 23:16, John Snow wrote:
->>>
->>>
->>> On 12/5/19 3:09 PM, Eric Blake wrote:
->>>> On 12/5/19 1:30 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>>> Here is double bug:
->>>>>
->>>>> First, return error but not set errp. This may lead to:
->>>>> qmp block-dirty-bitmap-remove may report success when actually failed
->>>>>
->>>>> block-dirty-bitmap-remove used in a transaction will crash, as
->>>>> qmp_transaction will think that it returned success and will cal
->>>>
->>>> call
->>>>
->>>>> block_dirty_bitmap_remove_commit which will crash, as state->bitmap i=
-s
->>>>> NULL
->>>>>
->>>>> Second (like in anecdote), this case is not an error at all. As it is
->>>>> documented in the comment above bdrv_co_remove_persistent_dirty_bitma=
-p
->>>>> definition, absence of bitmap is not an error, and similar case
->>>>> handled
->>>>> at start of qcow2_co_remove_persistent_dirty_bitmap, it returns 0 whe=
-n
->>>>> there is no bitmaps at all..
->>>>
->>>> double .
->>>>
->>>>>
->>>>> But when there are some bitmaps, but not the requested one, it return
->>>>> error with errp unset.
->>>>>
->>>>> Fix that.
->>>>>
->>>>> Fixes: b56a1e31759b750
->>>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com=
+On Tue, 3 Dec 2019 at 23:42, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
->>>>> ---
->>>>>
->>>>> Hi all!
->>>>>
->>>>> Ohm, suddenly we faced this bug. It's a regression in 4.2. I'm very
->>>>> sorry for introducing it, and it sad that it's found so late..
->>>>>
->>>>> Personally, I think that this one worth rc5, as it makes new bitmap
->>>>> interfaces unusable. But the decision is yours.
->>>>>
->>>>> Last minute edit: hmm, actually, transaction action introduced in
->>>>> 4.2, so crash is not a regression, only broken
->>>>> block-dirty-bitmap-remove
->>>>> command is a regression... Maybe it's OK for stable.
->>>>
->>>> Libvirt REALLY wants to use transaction bitmap management (and require
->>>> qemu 4.2) for its incremental backup patches that Peter is almost read=
-y
->>>> to merge in.=A0 I'm trying to ascertain:
->>>>
->>>> When exactly can this bug hit?=A0 Can you give a sequence of QMP comma=
-nds
->>>> that will trigger it for easy reproduction?=A0 Are there workarounds
->>>> (such
->>>> as checking that a bitmap exists prior to attempting to remove it)?=A0=
- If
->>>> it does NOT get fixed in rc5, how will libvirt be able to probe whethe=
-r
->>>> the fix is in place?
->>>>
->>>
->>> It looks like:
->>>
->>> - You need to have at least one bitmap
->>> - You need to use transactional remove
->>> - you need to misspell the bitmap name
->>> - The remove will fail (return -EINVAL) but doesn't set errp
->>> - The caller chokes on incomplete information, state->bitmap is NULL
->>
->>
->> No, that would be too simple, the thing is worse. Absolutele correct
->> removing is broken, without any misspelling
->>
->> Bug triggers when we are removing persistent bitmap that is not stored
->> yet in the image AND at least one (another) bitmap already stored in
->> the image. So, something like:
->>
->> 1. create persistent bitmap A
->> 2. shutdown vm=A0 (bitmap A is synced)
->> 3. start vm
->> 4. create persistent bitmap B
->> 5. remove bitmap B - it fails (and crashes if in transaction)
->>
->> =3D=3D=3D=3D
->>
->> Hmm, workaround..
->>
->> I'm afraid that the only thing is not remove persistent bitmaps, which
->> were never synced to the image. So, instead the sequence above, we need
->>
->>
->> 1. create persistent bitmap A
->> 2. shutdown vm
->> 3. start vm
->> 4. create persistent bitmap B
->> 5. remember, that we want to remove bitmap B after vm shutdown
->> ...
->> =A0=A0 some other operations
->> ...
->> 6. vm shutdown
->> 7. start vm in stopped mode, and remove all bitmaps marked for removing
->> 8. stop vm
->>
->> But, I think that in real circumstances, vm shutdown is rare thing...
->=20
-> This is sounding a bit more serious. As I said earlier, it shouldn't
-> delay 4.2 on its own, but if the fix is obvious (and other than
-> comments, it is a single change from 'ret =3D -EINVAL' to 'ret =3D 0' whi=
-ch
-> fixes a definite reproducible crash), I think it rises to the level of
-> acceptable.
->=20
-> I've been so worried about the question of which release, that I don't
-> know if I've previously offered:
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu.h           |  6 ++++++
+>  target/arm/helper.c        | 21 +++++++++++++++++++++
+>  target/arm/translate-a64.c | 14 ++++++++++++++
+>  3 files changed, 41 insertions(+)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index cdf6caf869..dd284ba5c7 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -1228,6 +1228,7 @@ void pmu_init(ARMCPU *cpu);
+>  #define PSTATE_IL (1U << 20)
+>  #define PSTATE_SS (1U << 21)
+>  #define PSTATE_PAN (1U << 22)
+> +#define PSTATE_UAO (1U << 23)
+>  #define PSTATE_V (1U << 28)
+>  #define PSTATE_C (1U << 29)
+>  #define PSTATE_Z (1U << 30)
+> @@ -3598,6 +3599,11 @@ static inline bool isar_feature_aa64_ats1e1(const ARMISARegisters *id)
+>      return FIELD_EX64(id->id_aa64mmfr1, ID_AA64MMFR1, PAN) >= 2;
+>  }
+>
+> +static inline bool isar_feature_aa64_uao(const ARMISARegisters *id)
+> +{
+> +    return FIELD_EX64(id->id_aa64mmfr2, ID_AA64MMFR2, UAO) != 0;
+> +}
+> +
+>  static inline bool isar_feature_aa64_bti(const ARMISARegisters *id)
+>  {
+>      return FIELD_EX64(id->id_aa64pfr1, ID_AA64PFR1, BT) != 0;
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 70f2db5447..8941a6c10f 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -4131,6 +4131,17 @@ static void aa64_pan_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>      env->pstate = (env->pstate & ~PSTATE_PAN) | (value & PSTATE_PAN);
+>  }
+>
+> +static uint64_t aa64_uao_read(CPUARMState *env, const ARMCPRegInfo *ri)
+> +{
+> +    return env->pstate & PSTATE_UAO;
+> +}
+> +
+> +static void aa64_uao_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> +                           uint64_t value)
+> +{
+> +    env->pstate = (env->pstate & ~PSTATE_UAO) | (value & PSTATE_UAO);
+> +}
+> +
+>  static CPAccessResult aa64_cacheop_access(CPUARMState *env,
+>                                            const ARMCPRegInfo *ri,
+>                                            bool isread)
+> @@ -7464,6 +7475,16 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>          define_arm_cp_regs(cpu, ats1cp_reginfo);
+>      }
+>  #endif
+> +    if (cpu_isar_feature(aa64_uao, cpu)) {
+> +        static const ARMCPRegInfo uao_reginfo[] = {
+> +            { .name = "UAO", .state = ARM_CP_STATE_AA64,
+> +              .opc0 = 3, .opc1 = 0, .crn = 4, .crm = 2, .opc2 = 4,
+> +              .type = ARM_CP_NO_RAW, .access = PL1_RW,
+> +              .readfn = aa64_uao_read, .writefn = aa64_uao_write, },
+> +            REGINFO_SENTINEL
+> +        };
 
-Oh, that is quite a bit more serious than I thought too.
+This could just be a file-scope global, right?
+Also, you can just use define_one_arm_cp_reg() rather
+than having a list with one entry. (cf zcr_el1_reginfo).
 
-Yeah, I want this in 4.2 if at all possible.
+> +        define_arm_cp_regs(cpu, uao_reginfo);
+> +    }
+>
+>      if (arm_feature(env, ARM_FEATURE_EL2) && cpu_isar_feature(aa64_vh, cpu)) {
+>          static const ARMCPRegInfo vhe_reginfo[] = {
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 7f5a68106b..2b6846ef01 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1601,6 +1601,20 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
+>          s->base.is_jmp = DISAS_NEXT;
+>          break;
+>
+> +    case 0x03: /* UAO */
+> +        if (!dc_isar_feature(aa64_uao, s) || s->current_el == 0) {
+> +            goto do_unallocated;
+> +        }
+> +        if (crm & 1) {
+> +            set_pstate_bits(PSTATE_UAO);
+> +        } else {
+> +            clear_pstate_bits(PSTATE_UAO);
+> +        }
+> +        t1 = tcg_const_i32(s->current_el);
+> +        gen_helper_rebuild_hflags_a64(cpu_env, t1);
+> +        tcg_temp_free_i32(t1);
+> +        break;
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Do we also need to end the TB since we've messed with
+the hflags, or is some bit of code not in the patch
+context handling that?
 
+> +
+>      case 0x04: /* PAN */
+>          if (!dc_isar_feature(aa64_pan, s) || s->current_el == 0) {
+>              goto do_unallocated;
+> --
+> 2.17.1
+
+Does the "on exception entry PSTATE.UAO is zeroed" behaviour
+fall out automatically for us? How about "on exception entry
+from aarch32 to aarch64 SPSR_ELx.UAO is set to zero" ?
+
+I think we may also want a minor code change so that an exception
+return from aarch64 to aarch32 doesn't copy a bogus SPSR UAO==1
+into the pstate/cpsr.
+
+thanks
+-- PMM
 
