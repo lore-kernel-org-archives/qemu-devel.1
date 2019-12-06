@@ -2,83 +2,125 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F54CC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37399C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:22:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A575206C3
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:20:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04A5921835
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:22:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fAw40+MU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A575206C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HB7rlllU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04A5921835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idFPY-0004iv-On
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:20:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43835)
+	id 1idFQl-0006Kg-Du
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:22:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1idEeZ-00021q-70
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:32:20 -0500
+ (envelope-from <david@redhat.com>) id 1idEaA-0005O4-AJ
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:27:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1idEeX-0007xw-Tz
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:32:19 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52347
+ (envelope-from <david@redhat.com>) id 1idEa9-0005IY-5M
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:27:46 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22671
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1idEeV-0007tP-S0
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:32:15 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1idEa6-00056q-Nt
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:27:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575642733;
+ s=mimecast20190719; t=1575642459;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=CdM0/clrngtCdjTfFct9BH5736Cv3YIQ9HaUbJP4ixo=;
- b=fAw40+MUwZKV1mZ3p/PY3h9xx97K1EcDMTXukkDiMYevZugcRuMX/BMH/uhFzM2HAaD4hb
- CRXORD/5z3NCIqBDqHoyP8aoRAi4VOtoMfXQXTUagtY3oDgj1oniV8UH602On2ynzMADfk
- IY7R6JoB6MlYS2PqJ9Xuz4rU6UWQfCQ=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Dn++faWn8cCgCaz9s1NNs1ojuta34h/ULatiFurbzAI=;
+ b=HB7rlllUgdkmRvvhFLN970INMHsOmtk13aqLLutM5BNdL8fzP1ATv7qug2+ENuebM8gXiX
+ lZLp4U8JcibQ7YLIi/zhDoVrvAdajnho+TIFMsribYFWkJcMx9YzcB/WTm3ID3F/TmTs1P
+ mJQ5BLGsxMQPASlPLudonS8uB2Mxl1o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-47-9JzSBnOCM5ehmEsYcNWePw-1; Fri, 06 Dec 2019 03:29:30 -0500
-X-MC-Unique: 9JzSBnOCM5ehmEsYcNWePw-1
+ us-mta-63-fZdkNXr0OFm8ZrOAJTf03Q-1; Fri, 06 Dec 2019 09:27:36 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 98E60107ACC7;
- Fri,  6 Dec 2019 08:29:28 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B77C25D9C9;
- Fri,  6 Dec 2019 08:29:24 +0000 (UTC)
-Date: Fri, 6 Dec 2019 09:29:13 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v2 06/13] s390x: protvirt: KVM intercept changes
-Message-ID: <20191206092913.3af251dd.cohuck@redhat.com>
-In-Reply-To: <bc5eb50d-1647-f40a-73b6-53be5445fd85@linux.ibm.com>
-References: <20191129094809.26684-1-frankja@linux.ibm.com>
- <20191129094809.26684-7-frankja@linux.ibm.com>
- <20191205181532.46bee55c.cohuck@redhat.com>
- <3cdbba69-c465-f2ce-d3e4-15e0b8d1218e@linux.ibm.com>
- <20191205184637.4e6f4d23.cohuck@redhat.com>
- <bc5eb50d-1647-f40a-73b6-53be5445fd85@linux.ibm.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7FF791005502;
+ Fri,  6 Dec 2019 14:27:35 +0000 (UTC)
+Received: from [10.36.117.134] (ovpn-117-134.ams2.redhat.com [10.36.117.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7C72F5D9E1;
+ Fri,  6 Dec 2019 14:27:34 +0000 (UTC)
+Subject: Re: [PATCH v2] s390x/tcg: clear local interrupts on reset normal
+To: Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>
+References: <20191206135404.16051-1-cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
 Organization: Red Hat GmbH
+Message-ID: <294f16c1-f793-7209-aea8-9bcaad104de6@redhat.com>
+Date: Fri, 6 Dec 2019 15:27:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
+In-Reply-To: <20191206135404.16051-1-cohuck@redhat.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: fZdkNXr0OFm8ZrOAJTf03Q-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; boundary="Sig_/GnMCouvjfL_nGKWxvpxra3Y";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,97 +132,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mihajlov@linux.ibm.com
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/GnMCouvjfL_nGKWxvpxra3Y
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 06.12.19 14:54, Cornelia Huck wrote:
+> We neglected to clean up pending interrupts and emergency signals;
+> fix that.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+> 
+> v1->v2:
+> - rebased on top of my s390-next branch; we can now move the fields
+>   to be reset instead of clearing them manually
+> 
+> Further cleanup possible in a follow-up patch.
+> 
+> ---
+>  target/s390x/cpu.h | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 7f5fa1d35b73..e195e5c7c8bb 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -98,10 +98,6 @@ struct CPUS390XState {
+>  
+>      uint64_t cregs[16]; /* control registers */
+>  
+> -    int pending_int;
+> -    uint16_t external_call_addr;
+> -    DECLARE_BITMAP(emergency_signals, S390_MAX_CPUS);
+> -
+>      uint64_t ckc;
+>      uint64_t cputm;
+>      uint32_t todpr;
+> @@ -117,6 +113,10 @@ struct CPUS390XState {
+>      struct {} start_normal_reset_fields;
+>      uint8_t riccb[64];     /* runtime instrumentation control */
+>  
+> +    int pending_int;
+> +    uint16_t external_call_addr;
+> +    DECLARE_BITMAP(emergency_signals, S390_MAX_CPUS);
+> +
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
+>  
+> 
 
-On Fri, 6 Dec 2019 08:44:52 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-> On 12/5/19 6:46 PM, Cornelia Huck wrote:
-> > On Thu, 5 Dec 2019 18:34:32 +0100
-> > Janosch Frank <frankja@linux.ibm.com> wrote:
-> >  =20
-> >> On 12/5/19 6:15 PM, Cornelia Huck wrote: =20
-> >>> On Fri, 29 Nov 2019 04:48:02 -0500
-> >>> Janosch Frank <frankja@linux.ibm.com> wrote:
-> >>>    =20
-> >>>> Secure guests no longer intercept with code 4 for an instruction
-> >>>> interception. Instead they have codes 104 and 108 for secure
-> >>>> instruction interception and secure instruction notification
-> >>>> respectively.
-> >>>>
-> >>>> The 104 mirrors the 4 interception.
-> >>>>
-> >>>> The 108 is a notification interception to let KVM and QEMU know that
-> >>>> something changed and we need to update tracking information or
-> >>>> perform specific tasks. It's currently taken for the following
-> >>>> instructions:
-> >>>>
-> >>>> * stpx (To inform about the changed prefix location)
-> >>>> * sclp (On incorrect SCCB values, so we can inject a IRQ)
-> >>>> * sigp (All but "stop and store status")
-> >>>> * diag308 (Subcodes 0/1)
-> >>>>
-> >>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> >>>> ---
-> >>>>  target/s390x/kvm.c | 6 ++++++
-> >>>>  1 file changed, 6 insertions(+)
-> >>>> =20
-> >  =20
-> >>>> @@ -1664,6 +1668,8 @@ static int handle_intercept(S390CPU *cpu)
-> >>>>              (long)cs->kvm_run->psw_addr);
-> >>>>      switch (icpt_code) {
-> >>>>          case ICPT_INSTRUCTION:
-> >>>> +        case ICPT_PV_INSTR:
-> >>>> +        case ICPT_PV_INSTR_NOTIFICATION:
-> >>>>              r =3D handle_instruction(cpu, run);   =20
-> >>>
-> >>> I'm still a bit uneasy about going through the same path for both 104
-> >>> and 108. How does the handler figure out whether it should emulate an
-> >>> instruction, or just process a notification? Is it guaranteed that a
-> >>> given instruction is always showing up as either a 104 or a 108, so
-> >>> that the handler can check the pv state?   =20
-> >>
-> >> diag 308 subcode 0/1 are 108, but all other subcodes are defined as a
-> >> 104 (if they are an exit at all)... =20
-> >=20
-> > I think that's a reason to really split 108 from 4/104, or at least add
-> > an parameter... =20
->=20
-> And still call the diag 308 handler or have separate handlers?
+-- 
+Thanks,
 
-I'd probably split it into a "normal" one and one for pv special
-handling... does that make sense?
-
---Sig_/GnMCouvjfL_nGKWxvpxra3Y
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3qEVkACgkQ3s9rk8bw
-L69new//aaXr5qFiRr2CHdB3/qZ9Nch3T/pDwLTz42/TCIR2R5xz84PHCoIYQFVi
-MbGvubJVSINVZo7VuGoRcO/Dwe3H/W9DWlwtjQyX4UoOYnyNd5HT3SDbxQUQoax8
-hnwq0zxcNQhxNYgpQQ0CbmvZmAueHDnM/Ur+DSBoSueJ4a8Rn3o7ZEg/s/r4JTWd
-JhXkCyEibAB3+TfeDHKy7IiVPMmF6KNaTq0hE9AZvvn7Xwt+SqMpbkV94VgftACe
-nYq4K7OuahTwsBMkqRVlwS5G3z31hqwRV1wnvWrq0W76uA7R8qwQXYq6ELjjxRyO
-7XIT3oOd+asB22IBIiLafd0hseGTXaPIlmy+rKmiZBKZ8OTlG+9aYp6DKuLlgJYN
-0c5tnE3W6a9fkcHLcBAw1giLZIT9eJiS4+JwYBCobegYyRodvH83ddYGpVq44M03
-oKs9RwMlOpSUqkHuvTj3pOGwGG2oS8cmXNX7q4KAKHMTOljVkN2OPDu5bqP9dTgu
-0vmnh1BA4gz1BkiTA+EQG6wJGmKDqMozxiUXhnkF8AtPUi3+G6y66AkOphe+X1/5
-JiThZo2RIo9KEd0YJDamKzeWJooY8oPmgsqrIgg/rkkl5Gc5WOgDB5wz7mEf9G2B
-Coh+WYfDxyY+gk4HCTDvIUMKl70/mE2LZs3fb5KtgbxykByNeP4=
-=XUcx
------END PGP SIGNATURE-----
-
---Sig_/GnMCouvjfL_nGKWxvpxra3Y--
+David / dhildenb
 
 
