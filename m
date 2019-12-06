@@ -2,77 +2,92 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255FFC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:22:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EFE4C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:23:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E50CA20659
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:22:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AD6720659
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:23:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XXKj6bHw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E50CA20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aUrDqqAP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AD6720659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40775 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idGNS-0000jE-3T
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:22:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48455)
+	id 1idGNx-0001DY-Pk
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:23:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1idFE9-0000xb-GO
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:09:06 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1idEyt-0000FW-TV
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:53:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1idFE7-0000Vt-F8
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:09:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52178
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1idFE7-0000UZ-Ap
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:09:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575644942;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=MNiUvkiM0DD9iKxU0fe0AFvwNGHmzCfP+aLuS5lAodg=;
- b=XXKj6bHwihQnI/6y/8xDSklfBukpwFwOmSKq+aIVsMqUyGUE4F3OrvIWpQtuosxPWZ2rDD
- 5NECe5tGxrmh2fE/t/DnNhOfTxYB9mPLCzOATgs2AfyIR6uUfwG7Zdd/A7ak2blzgAjSDV
- 7Gn3pSMhP2wUthhMoyk+fxbvSB7RUro=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-K0Y2f4suOHKEJsLQNdLJ6A-1; Fri, 06 Dec 2019 10:09:01 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D825DC29;
- Fri,  6 Dec 2019 15:09:00 +0000 (UTC)
-Received: from dhcp-17-72.bos.redhat.com (dhcp-17-72.bos.redhat.com
- [10.18.17.72])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 061425D6C8;
- Fri,  6 Dec 2019 15:08:45 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 0/1] Fix for m68k/q800 acceptance test for QEMU 4.2-rc
-Date: Fri,  6 Dec 2019 10:08:43 -0500
-Message-Id: <20191206150844.20124-1-crosa@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1idEys-0005gZ-Q4
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:53:19 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40913)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1idEys-0005eO-IG
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:53:18 -0500
+Received: by mail-wm1-x344.google.com with SMTP id t14so7604685wmi.5
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:53:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=gMIAeVAhQnvfU6oBZoSTFxIjczft5EtT5+HIXiu9QZI=;
+ b=aUrDqqAPVvlCCENFDPUImD8blVexBwRl7lulCMy2I+hhW5sgPqtcWz9Iu2ULtB3U4V
+ /A6OpnuYQiSvfHGa2zyJ0n6ba+HmBKRhiIDLLDiFNvFx63E/xnIGOqjrr9TOfMx1M/Ah
+ nJoUaH9oeiyzi+msEUKC9GnSTof1alx2WqDnyvxIV2KGrq22TsCtDVAuf3d00/Wz/S8W
+ LRdCMjwUuvFQup3t0Q2Ci9i24Ie9DGovKUoe/tlsMpFmv/txGqBI6HabylepLLxnrRDo
+ V2gOs8JtLZZJrvMquaNpA37ZnU3DqO5o8d/VhkBJ9X5ZzwTr2gJXWIz9C+3pwzJ0FCsf
+ qxzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=gMIAeVAhQnvfU6oBZoSTFxIjczft5EtT5+HIXiu9QZI=;
+ b=CdqNY+xtGp0ymvoJXxPE09mb+xcFV3eXMcA50TZyKtyxqNR/VCESLhthlgHngDFaGx
+ s7mYoGbPnQN0IOdhNhXDLn/pdv+T38aUKxSzLARIuouYQyIFX1h4lpBF8ZBDmp0fM6uv
+ eMB+DSJebNGkE1LsoSADZNL5+R1hVK+Cw+7JI744r+USR9bVQR+uG0aqtd0DlkeELetp
+ LYTYkLrTDnlvbFlgXSSZ6nTyPtWctVAwE8td5Me4g+vRZ5nwD0BzlPYp7ztp2qy4/pI+
+ SVf2bgX3+zgxVW4cMLxfmiY9wEcS0q7glnrZSbjKgYNnNPYTOjzKwFc70PsL3y74oJkf
+ ge/g==
+X-Gm-Message-State: APjAAAXdTwQMZNf26apYnPsKwVQpqE05XJ0Kx23nfZE2GI+e/KZkVmtY
+ 5EyBBR1kTZfq3FqtBH9ZRt0koQvBGlA=
+X-Google-Smtp-Source: APXvYqzKlcTlbb7TvBXhcAQ7bl9ozgPfC6ZvVjekAFfrli448mCdXbUyWEvktLa8LwE38eLw8xqVmQ==
+X-Received: by 2002:a05:600c:2318:: with SMTP id
+ 24mr8336506wmo.48.1575633543772; 
+ Fri, 06 Dec 2019 03:59:03 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c4sm3200192wml.7.2019.12.06.03.59.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Dec 2019 03:59:02 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C21661FF87;
+ Fri,  6 Dec 2019 11:59:01 +0000 (GMT)
+References: <20191205122518.10010-1-alex.bennee@linaro.org>
+ <20191205122518.10010-7-alex.bennee@linaro.org>
+ <20191206110354.GA775461@stefanha-x1.localdomain>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH  v2 6/6] trace: replace hand-crafted pattern_glob with
+ g_pattern_match_simple
+In-reply-to: <20191206110354.GA775461@stefanha-x1.localdomain>
+Date: Fri, 06 Dec 2019 11:59:01 +0000
+Message-ID: <87immt7ji2.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: K0Y2f4suOHKEJsLQNdLJ6A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,41 +99,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Beraldo Leal <bleal@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 1bdc319ab5d289ce6b822e06fb2b13666fd9278e=
-:
 
-  Update version for v4.2.0-rc4 release (2019-12-03 17:56:30 +0000)
+Stefan Hajnoczi <stefanha@redhat.com> writes:
 
-are available in the Git repository at:
+> On Thu, Dec 05, 2019 at 12:25:17PM +0000, Alex Benn=C3=A9e wrote:
+>> We already use g_pattern_match elsewhere so remove the duplication.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  trace/control.c | 35 +----------------------------------
+>>  1 file changed, 1 insertion(+), 34 deletions(-)
+>
+> Is g_pattern_match() a superset of pattern_glob()?  Existing patterns
+> should continue to work.
 
-  git://github.com/clebergnu/qemu.git tags/python-next-pull-request
+Yes - it supports more than pattern_glob and a bit less than the system
+glob():
 
-for you to fetch changes up to 820649aa00ee343a0d473ad1002c59c70ba8c158:
+  The g_pattern_match* functions match a string against a pattern
+  containing '*' and '?' wildcards with similar semantics as the standard
+  glob() function: '*' matches an arbitrary, possibly empty, string, '?'
+  matches an arbitrary character.
 
-  tests/boot_linux_console: Fetch assets from Debian snapshot archives (201=
-9-12-06 09:48:35 -0500)
+  Note that in contrast to glob(), the '/' character can be matched by the
+  wildcards, there are no '[...]' character ranges and '*' and '?' can not
+  be escaped to include them literally in a pattern.
 
-----------------------------------------------------------------
-Fix for m68k/q800 acceptance test (Philippe Mathieu-Daud=C3=A9)
+If you give me some example existing pattern forms we can add them to
+test-logging. I manually tested both single and double * patterns while
+working on the rest of the series.
 
-----------------------------------------------------------------
+>
+> Stefan
 
-Philippe Mathieu-Daud=C3=A9 (1):
-  tests/boot_linux_console: Fetch assets from Debian snapshot archives
 
- tests/acceptance/boot_linux_console.py | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
---=20
-2.21.0
-
+--
+Alex Benn=C3=A9e
 
