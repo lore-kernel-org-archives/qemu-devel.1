@@ -2,65 +2,56 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_SBL,URIBL_SBL_A,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF12C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:39:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3358EC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:39:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3055D20706
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:39:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3055D20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0974D20706
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:39:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0974D20706
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idElY-0000S5-V0
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:39:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55712)
+	id 1idEld-0000XJ-Qb
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:39:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maz@kernel.org>) id 1idENl-0000dh-Nc
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:14:58 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEOo-00022t-Oj
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maz@kernel.org>) id 1idENk-0000Sg-G4
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:14:57 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:43437)
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEOm-0002Pn-LP
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:02 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:43547 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maz@kernel.org>) id 1idENk-0000NI-8b
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:14:56 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1idENg-0004EG-0L; Fri, 06 Dec 2019 15:14:52 +0100
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 3/5] target/arm: Handle trapping to EL2 of AArch32 VMRS
- instructions
-X-PHP-Originating-Script: 0:main.inc
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Fri, 06 Dec 2019 14:14:51 +0000
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <CAFEAcA_YGBXY4X5KYE_xny1bYtP1fKefT+VubmNYbe8TxdwBOw@mail.gmail.com>
-References: <20191201122018.25808-1-maz@kernel.org>
- <20191201122018.25808-4-maz@kernel.org>
- <CAFEAcA_YGBXY4X5KYE_xny1bYtP1fKefT+VubmNYbe8TxdwBOw@mail.gmail.com>
-Message-ID: <eecc1855c043f690bc48cfaaeae442a4@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, qemu-devel@nongnu.org,
- kvmarm@lists.cs.columbia.edu, richard.henderson@linaro.org,
- edgar.iglesias@xilinx.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
+ (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
+ id 1idEOm-0000Sr-9J
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:00 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 8FFFB1A21A9;
+ Fri,  6 Dec 2019 14:58:14 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
+ [10.10.14.93])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 6092C1A219F;
+ Fri,  6 Dec 2019 14:58:14 +0100 (CET)
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 4/5] mips: r4000: Renovate coding style
+Date: Fri,  6 Dec 2019 14:58:06 +0100
+Message-Id: <1575640687-20744-5-git-send-email-Filip.Bozuta@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 213.251.177.50
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,57 +63,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
+Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
+ amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-12-06 14:08, Peter Maydell wrote:
-> On Sun, 1 Dec 2019 at 12:20, Marc Zyngier <maz@kernel.org> wrote:
->>
->> HCR_EL2.TID3 requires that AArch32 reads of MVFR[012] are trapped to
->> EL2, and HCR_EL2.TID0 does the same for reads of FPSID.
->> In order to handle this, introduce a new TCG helper function that
->> checks for these control bits before executing the VMRC instruction.
->>
->> Tested with a hacked-up version of KVM/arm64 that sets the control
->> bits for 32bit guests.
->>
->> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
->> Signed-off-by: Marc Zyngier <maz@kernel.org>
->> ---
->>  target/arm/helper-a64.h        |  2 ++
->>  target/arm/translate-vfp.inc.c | 18 +++++++++++++++---
->>  target/arm/vfp_helper.c        | 29 +++++++++++++++++++++++++++++
->>  3 files changed, 46 insertions(+), 3 deletions(-)
->>
->> diff --git a/target/arm/helper-a64.h b/target/arm/helper-a64.h
->> index a915c1247f..0af44dc814 100644
->> --- a/target/arm/helper-a64.h
->> +++ b/target/arm/helper-a64.h
->> @@ -102,3 +102,5 @@ DEF_HELPER_FLAGS_3(autda, TCG_CALL_NO_WG, i64, 
->> env, i64, i64)
->>  DEF_HELPER_FLAGS_3(autdb, TCG_CALL_NO_WG, i64, env, i64, i64)
->>  DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
->>  DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
->> +
->> +DEF_HELPER_3(check_hcr_el2_trap, void, env, i32, i32)
->
-> This has to be in helper.h, not helper-a64.h, otherwise
-> the arm-softmmu target won't build. helper-a64.h is for
-> helper functions which only exist in the aarch64 binary.
+The script checkpatch.pl located in scripts folder was
+used to detect all errors and warrnings in file:
+    hw/mips/mips_r4k.c
 
-Ah, fair enough. I guess I should build all targets rather than
-limit myself to aarch64...
+This mips r4000 machine file was edited and
+all the errors and warrings generated by the checkpatch.pl
+script were corrected and then the script was
+ran again to make sure there are no more errors and warnings.
 
-I'll fix that and repost the series, having hopefully addressed
-Richard's comments.
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ hw/mips/mips_r4k.c | 55 +++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 34 insertions(+), 21 deletions(-)
 
-Thanks,
-
-         M.
+diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
+index 7002423..d1f5d6b 100644
+--- a/hw/mips/mips_r4k.c
++++ b/hw/mips/mips_r4k.c
+@@ -6,7 +6,7 @@
+  * ISA memory at the 0x10000000 (PHYS, 16Mb in size).
+  * All peripherial devices are attached to this "bus" with
+  * the standard PC ISA addresses.
+-*/
++ */
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
+@@ -54,17 +54,18 @@ static struct _loaderparams {
+     const char *initrd_filename;
+ } loaderparams;
+ 
+-static void mips_qemu_write (void *opaque, hwaddr addr,
+-                             uint64_t val, unsigned size)
++static void mips_qemu_write(void *opaque, hwaddr addr,
++                            uint64_t val, unsigned size)
+ {
+-    if ((addr & 0xffff) == 0 && val == 42)
++    if ((addr & 0xffff) == 0 && val == 42) {
+         qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+-    else if ((addr & 0xffff) == 4 && val == 42)
++    } else if ((addr & 0xffff) == 4 && val == 42) {
+         qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++    }
+ }
+ 
+-static uint64_t mips_qemu_read (void *opaque, hwaddr addr,
+-                                unsigned size)
++static uint64_t mips_qemu_read(void *opaque, hwaddr addr,
++                               unsigned size)
+ {
+     return 0;
+ }
+@@ -100,8 +101,9 @@ static int64_t load_kernel(void)
+                            (uint64_t *)&kernel_high, big_endian,
+                            EM_MIPS, 1, 0);
+     if (kernel_size >= 0) {
+-        if ((entry & ~0x7fffffffULL) == 0x80000000)
++        if ((entry & ~0x7fffffffULL) == 0x80000000) {
+             entry = (int32_t)entry;
++        }
+     } else {
+         error_report("could not load kernel '%s': %s",
+                      loaderparams.kernel_filename,
+@@ -113,9 +115,10 @@ static int64_t load_kernel(void)
+     initrd_size = 0;
+     initrd_offset = 0;
+     if (loaderparams.initrd_filename) {
+-        initrd_size = get_image_size (loaderparams.initrd_filename);
++        initrd_size = get_image_size(loaderparams.initrd_filename);
+         if (initrd_size > 0) {
+-            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) & INITRD_PAGE_MASK;
++            initrd_offset = (kernel_high + ~INITRD_PAGE_MASK) &
++                             INITRD_PAGE_MASK;
+             if (initrd_offset + initrd_size > ram_size) {
+                 error_report("memory too small for initial ram disk '%s'",
+                              loaderparams.initrd_filename);
+@@ -139,11 +142,13 @@ static int64_t load_kernel(void)
+     params_buf[1] = tswap32(0x12345678);
+ 
+     if (initrd_size > 0) {
+-        snprintf((char *)params_buf + 8, 256, "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
++        snprintf((char *)params_buf + 8, 256,
++                 "rd_start=0x%" PRIx64 " rd_size=%" PRId64 " %s",
+                  cpu_mips_phys_to_kseg0(NULL, initrd_offset),
+                  initrd_size, loaderparams.kernel_cmdline);
+     } else {
+-        snprintf((char *)params_buf + 8, 256, "%s", loaderparams.kernel_cmdline);
++        snprintf((char *)params_buf + 8, 256,
++        "%s", loaderparams.kernel_cmdline);
+     }
+ 
+     rom_add_blob_fixed("params", params_buf, params_size,
+@@ -207,15 +212,21 @@ void mips_r4k_init(MachineState *machine)
+ 
+     memory_region_add_subregion(address_space_mem, 0, ram);
+ 
+-    memory_region_init_io(iomem, NULL, &mips_qemu_ops, NULL, "mips-qemu", 0x10000);
++    memory_region_init_io(iomem, NULL, &mips_qemu_ops,
++                          NULL, "mips-qemu", 0x10000);
++
+     memory_region_add_subregion(address_space_mem, 0x1fbf0000, iomem);
+ 
+-    /* Try to load a BIOS image. If this fails, we continue regardless,
+-       but initialize the hardware ourselves. When a kernel gets
+-       preloaded we also initialize the hardware, since the BIOS wasn't
+-       run. */
+-    if (bios_name == NULL)
++    /*
++     * Try to load a BIOS image. If this fails, we continue regardless,
++     * but initialize the hardware ourselves. When a kernel gets
++     * preloaded we also initialize the hardware, since the BIOS wasn't
++     * run.
++     */
++
++    if (bios_name == NULL) {
+         bios_name = BIOS_FILENAME;
++    }
+     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+     if (filename) {
+         bios_size = get_image_size(filename);
+@@ -227,6 +238,7 @@ void mips_r4k_init(MachineState *machine)
+ #else
+     be = 0;
+ #endif
++    dinfo = drive_get(IF_PFLASH, 0, 0);
+     if ((bios_size > 0) && (bios_size <= BIOS_SIZE)) {
+         bios = g_new(MemoryRegion, 1);
+         memory_region_init_ram(bios, NULL, "mips_r4k.bios", BIOS_SIZE,
+@@ -235,7 +247,7 @@ void mips_r4k_init(MachineState *machine)
+         memory_region_add_subregion(get_system_memory(), 0x1fc00000, bios);
+ 
+         load_image_targphys(filename, 0x1fc00000, BIOS_SIZE);
+-    } else if ((dinfo = drive_get(IF_PFLASH, 0, 0)) != NULL) {
++    } else if (dinfo != NULL) {
+         uint32_t mips_rom = 0x00400000;
+         if (!pflash_cfi01_register(0x1fc00000, "mips_r4k.bios", mips_rom,
+                                    blk_by_legacy_dinfo(dinfo),
+@@ -280,11 +292,12 @@ void mips_r4k_init(MachineState *machine)
+ 
+     isa_vga_init(isa_bus);
+ 
+-    if (nd_table[0].used)
++    if (nd_table[0].used) {
+         isa_ne2000_init(isa_bus, 0x300, 9, &nd_table[0]);
++    }
+ 
+     ide_drive_get(hd, ARRAY_SIZE(hd));
+-    for(i = 0; i < MAX_IDE_BUS; i++)
++    for (i = 0; i < MAX_IDE_BUS; i++)
+         isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[i], ide_irq[i],
+                      hd[MAX_IDE_DEVS * i],
+                      hd[MAX_IDE_DEVS * i + 1]);
 -- 
-Jazz is not dead. It just smells funny...
+2.7.4
+
 
