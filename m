@@ -2,81 +2,56 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_SBL,URIBL_SBL_A,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 270B9C2D0C2
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B704C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:31:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E515824659
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:30:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zvl2mVQ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E515824659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4CEEA2464E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:31:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CEEA2464E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idEcl-0007kN-KH
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:30:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49933)
+	id 1idEdn-0000gc-RM
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:31:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1idEMO-0007Y2-M5
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:13:33 -0500
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEOo-00021v-Et
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1idEMM-00074z-J1
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:13:32 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43973)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1idEMJ-00072Z-Ih
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:13:28 -0500
-Received: by mail-oi1-x241.google.com with SMTP id x14so2705152oic.10
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:13:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=J2q1f98KR0wGElWIwm3u+M2lDD8HEzvSwjuSvmqxxb0=;
- b=zvl2mVQ6N547pgiGIqf6rQdQq4UqCgnj0aDYcc39Sz6VrXJZv+trHJe4eTTwjBknZE
- ZQCYxVYuBuYAAEOO0XKzPZjGSLkLkic5raZTDQbAeAWzxVqAQANEXFyNdG4r2oTEAC7E
- V1rcN4evSXaTYCs/6H8AcEoGAniydfVgxrm/xd3PKTWyIVcqnxQ2/BWSwGXTMx6r+Nmc
- aaw4oUUI/+VGzG96DLfVgcfneSZklGcDjpbdQZg84yCBdM4+MTOfpDGsUaqH+AJnKi4V
- 6UrVsrfRJMDCv85zOu/tlVSStR0Xp0BYxnej4VgFM7wmf/hCux1IS9gAoTGGdEoDKxBi
- 2/NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=J2q1f98KR0wGElWIwm3u+M2lDD8HEzvSwjuSvmqxxb0=;
- b=pk0jkteVYQsZVfG1eoTzDT/4Tm3iDIsF62Rmi/YLtglZ2Z1tLAgWJV7vEZZ/DV5nUS
- itXd/cWSEiD6DPdHpFDDp5mFwqOBpyQBU8vPiTGcxCk4PFSvjm4qVuOoIk1rv2maUKOt
- W6CL3c7/PVA1D8gQGQqAjRE8g1Ln0uCoJDykB4exwjtneooGCPLTmNcC7XtMXMPewN9t
- CRb7psB86+hcO9XAkPtiDfhKz9jmGLdl/CpXXIHJZxoyjT60h2+itU21qtW7UeXL7wwH
- 62NSIr3FYmCGKpZHl5g27GjEUJ+iS2IH8lp8HWSr4bFmTBxEQiMur/FossSVw0ATe4dr
- 02HA==
-X-Gm-Message-State: APjAAAVfTNNSQSas7u9cfNPmvxCsWFrgoJMmWZCCO/zcYdm7i+a0dZ8j
- XQZ8YSMNDIPVdlO/BNLeDB1Z06pCxUEWYNmes+sQCHPv
-X-Google-Smtp-Source: APXvYqxEWvKxw9pBmETAIUihguHt0dQSLv9UjpNJ4nn2jfCwGcUK7nHshxpg7hVPCCQ6N0ipuk1rEWJlSiFDh1/SVYA=
-X-Received: by 2002:aca:edd5:: with SMTP id l204mr12043755oih.98.1575631205358; 
- Fri, 06 Dec 2019 03:20:05 -0800 (PST)
-MIME-Version: 1.0
-References: <20191206044134.259488-1-david@gibson.dropbear.id.au>
- <CAFEAcA-oGLx+mcgqxC6-QRv9dSdzOqvM8g7q7SzUuAqKSZU-tA@mail.gmail.com>
- <20191206102903.GM5031@umbus.fritz.box>
-In-Reply-To: <20191206102903.GM5031@umbus.fritz.box>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Dec 2019 11:19:54 +0000
-Message-ID: <CAFEAcA_j3VdVGgu8=vTPtmafEjX34OMKjyjdYuRkKNU=yAW7BA@mail.gmail.com>
-Subject: Re: [PULL 0/1] ppc-for-4.2 queue 20191206
-To: David Gibson <david@gibson.dropbear.id.au>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEOm-0002PX-Ip
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:01 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:43549 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
+ id 1idEOm-0000St-77
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:00 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id 8439B1A218E;
+ Fri,  6 Dec 2019 14:58:14 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
+ [10.10.14.93])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 56D7C1A21B3;
+ Fri,  6 Dec 2019 14:58:14 +0100 (CET)
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 3/5] mips: mipssim: Renovate coding style
+Date: Fri,  6 Dec 2019 14:58:05 +0100
+Message-Id: <1575640687-20744-4-git-send-email-Filip.Bozuta@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,49 +63,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Laurent Vivier <lvivier@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Greg Kurz <groug@kaod.org>
+Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
+ amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Dec 2019 at 10:43, David Gibson <david@gibson.dropbear.id.au> wrote:
->
-> On Fri, Dec 06, 2019 at 09:52:54AM +0000, Peter Maydell wrote:
-> > On Fri, 6 Dec 2019 at 04:41, David Gibson <david@gibson.dropbear.id.au> wrote:
-> > >
-> > > The following changes since commit 1bdc319ab5d289ce6b822e06fb2b13666fd9278e:
-> > >
-> > >   Update version for v4.2.0-rc4 release (2019-12-03 17:56:30 +0000)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   git://github.com/dgibson/qemu.git tags/ppc-for-4.2-20191206
-> > >
-> > > for you to fetch changes up to d887a8cfc083bcf3856f9f42352989f3624e0cae:
-> > >
-> > >   pseries: Update SLOF firmware image (2019-12-06 15:33:23 +1100)
-> > >
-> > > ----------------------------------------------------------------
-> > > ppc patch queue 2019-12-06
-> > >
-> > > This is a last minute pull request for ppc-for-4.2.  I know it's very
-> > > late in freeze, but this does fix a regression: a bad interaction
-> > > between the new qemu and SLOF device tree construction code means that
-> > > SLOF will crash if PCI to PCI bridges are included in the system.
-> >
-> > I really really really don't want to do an rc5. This would
-> > have to be "everybody using ppc gets crashes" for me to
-> > really want to put it in at this point...
->
-> Yeah, alright.  I'll send it to Mike for a 4.2.1.
+The script checkpatch.pl located in scripts folder was
+used to detect all errors and warrnings in files:
+    hw/mips/mips_mipssim.c
+    hw/net/mipsnet.c
 
-Paolo says he has something that needs to go into rc5, so maybe
-we can take this too. How confident are you that the change is
-small and safe? It's a bit hard to tell with updates to
-firmware binaries.
+All these mips mipssim machine files were edited and
+all the errors and warrings generated by the checkpatch.pl
+script were corrected and then the script was
+ran again to make sure there are no more errors and warnings.
 
-thanks
--- PMM
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+---
+ hw/net/mipsnet.c | 44 ++++++++++++++++++++++++--------------------
+ 1 file changed, 24 insertions(+), 20 deletions(-)
+
+diff --git a/hw/net/mipsnet.c b/hw/net/mipsnet.c
+index f7ae1ce..cb3331f 100644
+--- a/hw/net/mipsnet.c
++++ b/hw/net/mipsnet.c
+@@ -9,19 +9,19 @@
+ 
+ /* MIPSnet register offsets */
+ 
+-#define MIPSNET_DEV_ID		0x00
+-#define MIPSNET_BUSY		0x08
+-#define MIPSNET_RX_DATA_COUNT	0x0c
+-#define MIPSNET_TX_DATA_COUNT	0x10
+-#define MIPSNET_INT_CTL		0x14
+-# define MIPSNET_INTCTL_TXDONE		0x00000001
+-# define MIPSNET_INTCTL_RXDONE		0x00000002
+-# define MIPSNET_INTCTL_TESTBIT		0x80000000
+-#define MIPSNET_INTERRUPT_INFO	0x18
+-#define MIPSNET_RX_DATA_BUFFER	0x1c
+-#define MIPSNET_TX_DATA_BUFFER	0x20
+-
+-#define MAX_ETH_FRAME_SIZE	1514
++#define MIPSNET_DEV_ID          0x00
++#define MIPSNET_BUSY            0x08
++#define MIPSNET_RX_DATA_COUNT   0x0c
++#define MIPSNET_TX_DATA_COUNT   0x10
++#define MIPSNET_INT_CTL         0x14
++# define MIPSNET_INTCTL_TXDONE          0x00000001
++# define MIPSNET_INTCTL_RXDONE          0x00000002
++# define MIPSNET_INTCTL_TESTBIT         0x80000000
++#define MIPSNET_INTERRUPT_INFO  0x18
++#define MIPSNET_RX_DATA_BUFFER  0x1c
++#define MIPSNET_TX_DATA_BUFFER  0x20
++
++#define MAX_ETH_FRAME_SIZE      1514
+ 
+ #define TYPE_MIPS_NET "mipsnet"
+ #define MIPS_NET(obj) OBJECT_CHECK(MIPSnetState, (obj), TYPE_MIPS_NET)
+@@ -64,8 +64,9 @@ static void mipsnet_update_irq(MIPSnetState *s)
+ 
+ static int mipsnet_buffer_full(MIPSnetState *s)
+ {
+-    if (s->rx_count >= MAX_ETH_FRAME_SIZE)
++    if (s->rx_count >= MAX_ETH_FRAME_SIZE) {
+         return 1;
++    }
+     return 0;
+ }
+ 
+@@ -73,18 +74,21 @@ static int mipsnet_can_receive(NetClientState *nc)
+ {
+     MIPSnetState *s = qemu_get_nic_opaque(nc);
+ 
+-    if (s->busy)
++    if (s->busy) {
+         return 0;
++    }
+     return !mipsnet_buffer_full(s);
+ }
+ 
+-static ssize_t mipsnet_receive(NetClientState *nc, const uint8_t *buf, size_t size)
++static ssize_t mipsnet_receive(NetClientState *nc,
++                               const uint8_t *buf, size_t size)
+ {
+     MIPSnetState *s = qemu_get_nic_opaque(nc);
+ 
+-    trace_mipsnet_receive(size);
+-    if (!mipsnet_can_receive(nc))
++    race_mipsnet_receive(size);
++    if (!mipsnet_can_receive(nc)) {
+         return 0;
++    }
+ 
+     if (size >= sizeof(s->rx_buffer)) {
+         return 0;
+@@ -115,10 +119,10 @@ static uint64_t mipsnet_ioport_read(void *opaque, hwaddr addr,
+     addr &= 0x3f;
+     switch (addr) {
+     case MIPSNET_DEV_ID:
+-        ret = be32_to_cpu(0x4d495053);		/* MIPS */
++        ret = be32_to_cpu(0x4d495053);          /* MIPS */
+         break;
+     case MIPSNET_DEV_ID + 4:
+-        ret = be32_to_cpu(0x4e455430);		/* NET0 */
++        ret = be32_to_cpu(0x4e455430);          /* NET0 */
+         break;
+     case MIPSNET_BUSY:
+         ret = s->busy;
+-- 
+2.7.4
+
 
