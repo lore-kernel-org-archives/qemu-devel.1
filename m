@@ -2,83 +2,80 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02ABFC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDD9C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:45:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1956206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:27:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 899812173E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:45:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jVlF64Fg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1956206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gam2MXLD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 899812173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idJGP-0004u3-Tr
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 14:27:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37112)
+	id 1idJXL-0004V3-LI
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 14:45:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58439)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1idJ5C-0004Hx-2O
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:16:06 -0500
+ (envelope-from <crosa@redhat.com>) id 1idJVp-0003Vr-K0
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:43:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1idJ5A-0007FL-UI
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:16:05 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36302)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1idJ5A-0007Cc-Nj
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:16:04 -0500
-Received: by mail-ot1-x342.google.com with SMTP id i4so6765018otr.3
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 11:16:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=cW+nm4Xhk3Bi28rCVdfeb6XTtdYXaDHT7P/bjJNIZHU=;
- b=jVlF64Fg/Le+3zzXOKFgb1kA63dN7uBfZrLCnksZuwA3EVA4QSSZn9av+AkjLmB8j3
- Gk7iepohBrExX3xktfCyMgA0N5afDSOAOYrNZmXd7fuRwk+7rke8FQ2wYC/z4WLuRN6n
- ToCe8Su5qudXaeyHg3lACxl77MfiWX1IcCcUW7DuTahBypGd/Sa1N0hCTtV8PyEhMkfj
- 3H/mNsG0visS4yfDQ/oM8S/E5I5tH6xZbYsCfvCa/arbJxD1BiIuJLoL2JKa2v/DUg52
- b20SNjUsjrKh7p/1DduL6CGLJK8I5HZnrYClxGnF1mtj+ohrqh0YX2JsLHujnpACNov6
- poTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=cW+nm4Xhk3Bi28rCVdfeb6XTtdYXaDHT7P/bjJNIZHU=;
- b=gonEoYyYgjbJgGuV/kSXUZd6Ou2V1OVTTyC0makTYRLTwrnYeEzxn6HgsONYiUgxmV
- 3wHSqF/N+lEi2WyQ2w8zyrE34EhvmTSMghFf4dn+pMJ3ZmvOzmh7jrnLO+FbYQRyEBi+
- dHvCgjo7B84Z2Ihb6bwEDGq/tpBQyrwzXsqrXPs58475CvWQmanwW31nOGqAOOBKxu50
- iqo4JKI3jUzFiBGHuazX1TSxhVRZDqY+vIhI1GjVhyA93bTb036/AHFWmmZtwcH2ZFn9
- TzvFnPeK4egeH0wkoq8w3rS8gLJ63DW6bLJtPIg+IPpww47SauQrpwZ7OrwUIyuqeFIH
- T+fw==
-X-Gm-Message-State: APjAAAU0th4cS0n4p2zz15YzGxdZZ9y54whLChfndmu6clxulqiYGtpq
- tRnzv+U/n00pdSxi0yWSVyfCxPt1cf6nCjZsBY8Ucw==
-X-Google-Smtp-Source: APXvYqxlYdv8S6R9R6jesSV9DEjLtVSfuekvGOEPULS1IGMyZuDamsebDt2hNSRGVJNOQohB1m8Y0k3l3L5AlFzXaIc=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr6477254otd.91.1575659763946; 
- Fri, 06 Dec 2019 11:16:03 -0800 (PST)
+ (envelope-from <crosa@redhat.com>) id 1idJVo-0008Vd-3w
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:43:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39993
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1idJVn-0008Qr-SZ
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:43:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575661414;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=lwDPJdeVukC/Zy+MU39YGqgOXUqmL18SE/F5bkiXv58=;
+ b=Gam2MXLDHKfUoeD1UuiNyoLlc4aHSxIPad8LCWWlR0eQTiAVsGrH67XXpiRJP4Ok2YiKHO
+ jlK48/Ufuf+uba7k2pvh2jnPnT9DYul8z/kIxQa9OsaOsa/LBAsqV1vRENQnYRFxOX3yJM
+ xRaQ+TdfbttUKzVawy2oi7qVtc4oO5Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-85-a4bVArL7P4eJk67924P6AQ-1; Fri, 06 Dec 2019 14:43:33 -0500
+X-MC-Unique: a4bVArL7P4eJk67924P6AQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 921201005502;
+ Fri,  6 Dec 2019 19:43:31 +0000 (UTC)
+Received: from dhcp-17-72.bos.redhat.com (dhcp-17-72.bos.redhat.com
+ [10.18.17.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EBE341CB;
+ Fri,  6 Dec 2019 19:43:27 +0000 (UTC)
+Date: Fri, 6 Dec 2019 14:43:25 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH for-5.0 v2 0/3] benchmark util
+Message-ID: <20191206194325.GB6252@dhcp-17-72.bos.redhat.com>
+References: <20191126154848.193407-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-References: <20191203022937.1474-1-richard.henderson@linaro.org>
- <20191203022937.1474-36-richard.henderson@linaro.org>
- <CAFEAcA_DmXG2QJsLCu_gYSCYVCQ4xr1hPkEbfpVXMTZe_wnb6Q@mail.gmail.com>
- <b48552b0-33d0-405f-85ad-59b46e1702d0@linaro.org>
-In-Reply-To: <b48552b0-33d0-405f-85ad-59b46e1702d0@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Dec 2019 19:15:52 +0000
-Message-ID: <CAFEAcA9HWVJqnH-sP7ym3WRPN7RegZnga7hk=rmhUavEYhkfmw@mail.gmail.com>
-Subject: Re: [PATCH v4 35/40] target/arm: Update arm_cpu_do_interrupt_aarch64
- for VHE
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+In-Reply-To: <20191126154848.193407-1-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="5/uDoXvLw7AC5HRs"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,30 +87,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ ehabkost@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@gmail.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Dec 2019 at 18:51, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 12/6/19 8:03 AM, Peter Maydell wrote:
-> > So I *think* what the code is doing is:
-> >
-> >  When VHE is enabled, the exception level below EL2 is
-> >  not EL1, but EL0, and so to identify the entry vector
-> >  offset for exceptions targeting EL2 we need to look
-> >  at the width of EL0, not of EL1.
-> >
-> > Is that right?
->
-> Correct.  Much better wording, thanks.  Will update.
+--5/uDoXvLw7AC5HRs
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In that case
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+On Tue, Nov 26, 2019 at 06:48:45PM +0300, Vladimir Sementsov-Ogievskiy wrot=
+e:
+> Hi all!
+>=20
+> Here is simple benchmarking utility, to generate performance
+> comparison tables, like the following:
+>=20
+> ----------  -------------  -------------  -------------
+>             backup-1       backup-2       mirror
+> ssd -> ssd  0.43 +- 0.00   4.48 +- 0.06   4.38 +- 0.02
+> ssd -> hdd  10.60 +- 0.08  10.69 +- 0.18  10.57 +- 0.05
+> ssd -> nbd  33.81 +- 0.37  10.67 +- 0.17  10.07 +- 0.07
+> ----------  -------------  -------------  -------------
+>=20
+> This is a v2, as v1 was inside
+>  "[RFC 00/24] backup performance: block_status + async"
+>=20
+> I'll use this benchmark in other series, hope someone
+> will like it.
+>=20
+> Vladimir Sementsov-Ogievskiy (3):
+>   python: add simplebench.py
+>   python: add qemu/bench_block_job.py
+>   python: add example usage of simplebench
+>=20
+>  python/bench-example.py        |  80 +++++++++++++++++++++
+>  python/qemu/bench_block_job.py | 115 +++++++++++++++++++++++++++++
+>  python/simplebench.py          | 128 +++++++++++++++++++++++++++++++++
+>  3 files changed, 323 insertions(+)
+>  create mode 100644 python/bench-example.py
+>  create mode 100755 python/qemu/bench_block_job.py
+>  create mode 100644 python/simplebench.py
+>=20
+> --=20
+> 2.18.0
+>=20
 
-thanks
--- PMM
+Hi Vladimir,
+
+This looks interesting.
+
+Do you think the execution of "test cases" in an "environment" are a
+generic enough concept that could be reused (or reuse other system)?
+My point is that it'd be nice to do the same thing say for the
+acceptance tests, or any tests for that matter.  For instance, for
+known parameters, we could record what's the time difference between
+booting a guest with q35 or pc machine types and virtio-block or
+virtio-scsi devices.
+
+BTW, This reminded me of a IOzone[1] test runner / results analyzer:
+
+  https://github.com/avocado-framework-tests/avocado-misc-tests/blob/master=
+/io/disk/iozone.py
+
+I'm also cc'ing Luk=C3=A1=C5=A1 Doktor, who has actively worked in somethin=
+g
+similar.
+
+Cheers,
+- Cleber.
+
+--5/uDoXvLw7AC5HRs
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl3qr1sACgkQZX6NM6Xy
+CfPCWhAAmOMKZLdDzT8pxFP1vcIetz9IuXySMO1ZNvyKMO/6eOVcxas/BGrhbagz
+RA+Ig6H03mFi5GXGDpiEmJ+yfkGdtZxCMLa5Y3UFr1zUoEh0GN6oZ8tRwYg1uL4H
+uu3RNNrXt1KUvIYF9tWypkj36zFqGIrRjmZXXKXFvooXic8z+oQZLk8ZLM2UNZUs
+/pOTZNdLOhIL8UIeGR4s14qc8ELPbf6V2wQsjHkP0aLuepRMpSzdRdn/TCS33eIM
+FFsXPA0MUhHnLcb40CX8EwxqVjIlEkUQEDozcKdgdXwMtxoI2So7HOhURwtfcgeV
+3li6HYaj0f83fwtvphMYB2vAfOBiE3FxB+zPejiygXeWG/+uEHguUV/EquSXt4FF
+Upb+V9KSRjyhWindhLRJrsDVaq/ssNRKC5Y24Ld6zAeHLsnQHapOram20ri+m/xi
+yazLRwx0dgmxPKjixz/yb8pTgMA79IxNdRd+YBwqrLvAsNEYD9U9+wPY1S+D9z7P
+cg7pMrFQMBsi98YjJuKABIBnqdSs9B9r2U0Wma1nRVLXoe6Hyn1MZxNVIYpNovJh
+wJeGu/CYD7XfDVOi7UrgztJEWFrb5My4zqxZnvhIq0oeEzFlL6vi6UuYxS7mWMHW
+1ODvHlxtfivTI2KcDe7jsadVye9jcSc/ZD4AsfjJBtXMXbdkKuI=
+=XuKn
+-----END PGP SIGNATURE-----
+
+--5/uDoXvLw7AC5HRs--
+
 
