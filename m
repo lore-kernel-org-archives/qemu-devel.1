@@ -2,76 +2,66 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.7 required=3.0 tests=FORGED_HOTMAIL_RCVD2,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DA5C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 03:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8AE4C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 04:22:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0E802173E
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 03:01:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E802173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 830102173E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 04:22:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="iJTrSZyx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 830102173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1id3sQ-000434-Tt
-	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 22:01:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51082)
+	id 1id58m-0005OP-IS
+	for qemu-devel@archiver.kernel.org; Thu, 05 Dec 2019 23:22:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41923)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1id3rg-0003eI-52
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 22:01:09 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1id57h-0004QI-Ue
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 23:21:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1id3re-0002lC-Gp
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 22:01:07 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39958)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1id3rc-0002iI-C3
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 22:01:06 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1id3rY-0006vK-7Q
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 03:01:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 108182E80CF
- for <qemu-devel@nongnu.org>; Fri,  6 Dec 2019 03:01:00 +0000 (UTC)
+ (envelope-from <dgibson@ozlabs.org>) id 1id57f-0004Vm-JT
+ for qemu-devel@nongnu.org; Thu, 05 Dec 2019 23:21:45 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:38461 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1id57f-0004OU-4E; Thu, 05 Dec 2019 23:21:43 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47TfYC61VXz9sPn; Fri,  6 Dec 2019 15:21:35 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1575606095;
+ bh=7boRys3YcPkpLs69ArwRWS26VDY90VRF8n/5OHu59Vw=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=iJTrSZyxYwr8nMlxvr7n9HZOfSq4b2YJ+CbMVI3Mm3+iMG6xM/7kuybXMxodO2VP6
+ ZfFXE7YHEJWnHGGdqI9AcywDLRfuPETIW7m8d4SrtlgAe+4hwWshpeYtsWztiMBYLB
+ 775Z94OvGjS7rTeLUUTqTBc/gysS92FRTrvqeAIM=
+Date: Fri, 6 Dec 2019 12:38:25 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [GIT PULL for qemu-pseries] pseries: Update SLOF firmware image
+Message-ID: <20191206013825.GK5031@umbus.fritz.box>
+References: <20191206012529.81012-1-aik@ozlabs.ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 06 Dec 2019 02:52:48 -0000
-From: wzis <wzis@hotmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: sparc
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: mark-cave-ayland michal-nowak-b wzis
-X-Launchpad-Bug-Reporter: Michal Nowak (michal-nowak-b)
-X-Launchpad-Bug-Modifier: wzis (wzis)
-References: <20170305190118.21996.2136.malonedeb@gac.canonical.com>
-Message-Id: <157560076861.21339.15386387648150298716.malone@soybean.canonical.com>
-Subject: [Bug 1670175] Re: qemu-system-sparc64 with tribblix-sparc-0m16.iso
- ends with "panic - kernel: no nucleus hblk8 to allocate"
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: b9be3b09a402ce62ecd657d83d83d56ad04ec956
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Received-From: 91.189.90.7
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="utPK4TBebyzZxMrE"
+Content-Disposition: inline
+In-Reply-To: <20191206012529.81012-1-aik@ozlabs.ru>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,96 +70,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1670175 <1670175@bugs.launchpad.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu sparc64 also failed to boot Oracle Linux
 
--- =
+--utPK4TBebyzZxMrE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1670175
+On Fri, Dec 06, 2019 at 12:25:29PM +1100, Alexey Kardashevskiy wrote:
+> The following changes since commit 1bdc319ab5d289ce6b822e06fb2b13666fd927=
+8e:
+>=20
+>   Update version for v4.2.0-rc4 release (2019-12-03 17:56:30 +0000)
+>=20
+> are available in the Git repository at:
+>=20
+>   git@github.com:aik/qemu.git tags/qemu-slof-20191206
+>=20
+> for you to fetch changes up to e53a5569a27066a4f2f36ae368c728ab6c514352:
+>=20
+>   pseries: Update SLOF firmware image (2019-12-06 12:20:42 +1100)
 
-Title:
-  qemu-system-sparc64 with tribblix-sparc-0m16.iso ends with "panic -
-  kernel: no nucleus hblk8 to allocate"
+Thanks, merged into ppc-for-4.2, and I'm preparing a PR for Peter
+right now.
 
-Status in QEMU:
-  New
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Bug description:
-  > qemu-system-sparc64 -m 1024 -cdrom Downloads/tribblix-sparc-0m16.iso -b=
-oot d -nographic
-  OpenBIOS for Sparc64
-  Configuration device id QEMU version 1 machine id 0
-  kernel cmdline =
+--utPK4TBebyzZxMrE
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  CPUs: 1 x SUNW,UltraSPARC-IIi
-  UUID: 00000000-0000-0000-0000-000000000000
-  Welcome to OpenBIOS v1.1 built on Nov 24 2016 21:23
-    Type 'help' for detailed information
-  Trying cdrom:f...
-  Not a bootable ELF image
-  Not a bootable a.out image
+-----BEGIN PGP SIGNATURE-----
 
-  Loading FCode image...
-  Loaded 7120 bytes
-  entry point is 0x4000
-  Evaluating FCode...
-  Evaluating FCode...
-  Ignoring failed claim for va 10a96a0 memsz 19!
-  Ignoring failed claim for va 1000000 memsz d1fb6!
-  Ignoring failed claim for va 1402000 memsz 32518!
-  Ignoring failed claim for va 1800000 memsz 52ac8!
-  SunOS Release 5.11 Version tribblix-m16 64-bit
-  Copyright (c) 1983, 2010, Oracle and/or its affiliates. All rights reserv=
-ed.
-  could not find debugger-vocabulary-hook>threads:interpret: exception -13 =
-caught
-  interpret \ ident	"%Z%%M%	%I%	%E% SMI"
-  \ Copyright 2005 Sun Microsystems, Inc.  All rights reserved.
-  \ Use is subject to license terms.
-  \
-  \ CDDL HEADER START
-  \
-  \ The contents of this file are subject to the terms of the
-  \ Common Development and Distribution License, Version 1.0 only
-  \ (the "License").  You may not use this file except in compliance
-  \ with the License.
-  \
-  \ You can obtain a copy of the license at usr/src/OPENSOLARIS.LICENSE
-  \ or http://www.opensolaris.org/os/licensing.
-  \ See the License for =
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3psREACgkQbDjKyiDZ
+s5KJvw/8DI6plNIhbsveOsroeb+Ba3ga1gcI7oGbUyZgGcb4H2FK5CB3k0dEvQ+C
+diXsCWvMdFo+FcGtO9Ctml6xo+GFBzhUNLBUYQMObrh4iMkPOK8HlB/z0jupVumv
+oxxIJMWyaro7TgSL8Z9cSM415fej7mEDoIXNhb/pGZA1u3/6Vivdvc94SCuwi70R
+O4zfRqBPeIDcMK0TNNVTjMXo/yoITxhuRy9HjcDlKZ+1hTSuhIxMu+iboN44HxrS
+NtzN7SQ2J3bjhznUcp4gGCdHS4XoZpVjjcwHWAYUNUACAF6QChy8EhfetCH6gv+t
+ZSjCHurbIVX9HtHbDhU7gACSXbMLIbZqvYkx7LkGXhWLp7o7uC1oxr+lMTq7NS9D
+cvTnQjOTzIE63gV6vUlrL5kBlYzYdETPirBjbTB9quD2Xc48eNXKQ8eJlaJEh25j
+LE4nEaQjMFMcOO8XGlEAWyfrDflq3QMKoSCUNsMkbBgYSG7vzNUAbRfd2ameyWeS
+V/QIAob7nDzDM+E3II9aHILt7Z5UEuKW7Py3vnNg3olJ/J7JYGGZZcDnTn6l67lP
+YIEdXy9E2Eg40pLXJDNzGCoe8BKvEHhZQyj38nbpKQMj2N58oeRQumLQ2rKzjciy
+B3l5qHMWN2fLhTIajO7E3AQDKzlrd8do6/m4QmovNhEEEBLRz5w=
+=0kLc
+-----END PGP SIGNATURE-----
 
-  WARNING: add_spec: No major number for sf
-  panic - kernel: no nucleus hblk8 to allocate
-  EXIT
-
-  QEMU keeps running (CPU is on 100 % all the time), I can interact with
-  the prompt:
-
-  0 > boot
-  Not a Linux kernel image
-  Not a bootable ELF image
-  Not a bootable a.out image
-
-  Loading FCode image...
-  Unhandled Exception 0x0000000000000018
-  PC =3D 0x00000000ffd25310 NPC =3D 0x00000000ffd25314
-  Stopping execution
-
-  > qemu-system-sparc64 -version
-  QEMU emulator version 2.8.0(Virtualization:Staging / SLE_12_SP2)
-
-  from
-  https://build.opensuse.org/package/show/Virtualization:Staging/qemu on
-  openSUSE Leap 42.2.
-
-  ISO: http://pkgs.tribblix.org/iso/tribblix-sparc-0m16.iso.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1670175/+subscriptions
+--utPK4TBebyzZxMrE--
 
