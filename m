@@ -2,62 +2,81 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0F16C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFC1C2BD09
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:07:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7638E24659
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:06:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7638E24659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5C7B624659
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:07:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C5BwTg0N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C7B624659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idFC3-0006NS-TF
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:06:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50306)
+	id 1idFCX-00078c-7c
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:07:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43239)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maz@kernel.org>) id 1idESF-0005dc-J6
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:19:37 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idEXa-0002qt-CY
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:25:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maz@kernel.org>) id 1idESD-0007Eo-5P
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:19:34 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:53363)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maz@kernel.org>) id 1idESA-00078B-N9
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:19:31 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1idES3-0004NV-Dl; Fri, 06 Dec 2019 15:19:23 +0100
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 0/5] target/arm: More EL2 trapping fixes
-X-PHP-Originating-Script: 0:main.inc
+ (envelope-from <peter.maydell@linaro.org>) id 1idEXY-0007CK-9r
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:25:06 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35444)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1idEXW-000798-9H
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:25:02 -0500
+Received: by mail-ot1-x342.google.com with SMTP id o9so5940928ote.2
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:25:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=8W6n0kR1bFwEF85pvn2wG6pk2VseIJva/P+1Sid05Ck=;
+ b=C5BwTg0N0cLIemU9LmFGcOSdiqFyMuYJQZ5ZHKz0Cjn4bXHy3oNoY0TRgNcxkfLmlc
+ abWDdeqGigWC4/qqEL+gGScnLmmbrdHbewdt3fn5+RnpIRQ0MYAdSnlNPEIixTQgQGYz
+ n/QoZHFXTYWSGOW56fJJzOqVfCX2PALnpdaZ7ZteUrdaJwcrINbttNQ9weXd+lbEuTNJ
+ WB98kIC6Wbyl2QplcvyLO2VcE9bhSaSIY08aC9YNo12pErbruZWIP7d6hVigkgEaZHF0
+ MoKe4cYRwJ9uQGmlhU1GDEV6+pwIIBEaYhg0y7Z31uaG9WkTgqh50O3S3ROKh6Sjcn8U
+ rAUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=8W6n0kR1bFwEF85pvn2wG6pk2VseIJva/P+1Sid05Ck=;
+ b=GgcIYCiH5GY/m/Gou68dWv2Jw4Sg3dABCuEO8nZXtFcThqYBO/CoSwA2lzONaO68Vd
+ v4cFhYduf4l1YJ4YTAmQGBriWvEHYSPjZTFXrXQXrT4bHzXC7rj1U4KvTIBLBNAY8yAh
+ qA9daoqogH/TCcM8J2PcFJlZFBmJ42DV5fjC9a9gULnj01v5sus059R7QIfHHDz7nA1g
+ D0uE7CvFajxiF4fZqef1FkXpM4Jyv75VBnHVF6v28FPHygeqydPOQfHQQsNZcmEJupJ5
+ MF61L57FbOHFZjLbOoflWsruxWyyuD0yzFgPaQxFgnnc4JTzu4SKzkM89ofaZItffiuM
+ usuQ==
+X-Gm-Message-State: APjAAAXH9pgv+n8TmLORL32xRaadxXNhNFs4QftwEOoK/gFGzKY24lUp
+ G3JaKRdi2LMj3iZPEtZbKQofb23+vU3vG1unW3kuig==
+X-Google-Smtp-Source: APXvYqzzTBy2ONOQ/mNa4QskKxAUjTeT3fk2vxqCng1mGL3g5x1Gp1TinrINyvb69lcPZ3/LKmU/9n2rg2Y7OlSrWrU=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr5197606otd.91.1575642300952; 
+ Fri, 06 Dec 2019 06:25:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Fri, 06 Dec 2019 14:19:23 +0000
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <CAFEAcA_XWvO4yhJzEaTGatTfqqjZ9u3cTd=eo1xaPszwEYpPkQ@mail.gmail.com>
-References: <20191201122018.25808-1-maz@kernel.org>
- <CAFEAcA_XWvO4yhJzEaTGatTfqqjZ9u3cTd=eo1xaPszwEYpPkQ@mail.gmail.com>
-Message-ID: <848fd5b2d53b092476879a102b5bd40c@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, qemu-devel@nongnu.org,
- kvmarm@lists.cs.columbia.edu, richard.henderson@linaro.org,
- edgar.iglesias@xilinx.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 213.251.177.50
+References: <20191202210947.3603-1-nieklinnenbank@gmail.com>
+ <20191202210947.3603-7-nieklinnenbank@gmail.com>
+In-Reply-To: <20191202210947.3603-7-nieklinnenbank@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Dec 2019 14:24:50 +0000
+Message-ID: <CAFEAcA9XxH7zSmm6=KR-2ttfuqdauXxq05SWw++WgGEWw06NEQ@mail.gmail.com>
+Subject: Re: [PATCH 06/10] arm/arm-powerctl: set NSACR.{CP11,
+ CP10} bits in arm_set_cpu_on()
+To: Niek Linnenbank <nieklinnenbank@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,43 +88,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
+Cc: Beniamino Galvani <b.galvani@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-12-06 14:13, Peter Maydell wrote:
-> On Sun, 1 Dec 2019 at 12:20, Marc Zyngier <maz@kernel.org> wrote:
->>
->> Hi all,
->>
->> This series is a follow-up on [1], which tried to address the
->> remaining missing HCR_EL2.TIDx traps. I've hopefully now adressed 
->> the
->> comments that Peter and Edgar raised.
->>
->> I've also tried to tackle missing traps generated by HSTR_EL2, which
->> got completely ignored so far. Note that this results in the use of 
->> a
->> new TB bit, which I understand is a rare resource. I'd welcome
->> comments on how to handle it differently if at all possible.
->>
->> Finally, and as a bonus non-feature, I've added support for the
->> missing Jazelle registers, giving me the opportunity to allow 
->> trapping
->> of JIDR to EL2 using HCR_EL2.TID0. Yay, Christmas! ;-)
->>
->> I'm now going back to kernel stuff. I swear!
+On Mon, 2 Dec 2019 at 21:10, Niek Linnenbank <nieklinnenbank@gmail.com> wrote:
 >
-> To save you from having to roll a v3, I've fixed up the
-> handful of nits Richard and I found as I applied this
-> series to target-arm.next.
+> This change ensures that the FPU can be accessed in Non-Secure mode
+> when the CPU core is reset using the arm_set_cpu_on() function call.
+> The NSACR.{CP11,CP10} bits define the exception level required to
+> access the FPU in Non-Secure mode. Without these bits set, the CPU
+> will give an undefined exception trap on the first FPU access for the
+> secondary cores under Linux.
+>
+> Fixes: fc1120a7f5
+> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+> ---
 
-Ah, brilliant. Thanks a lot Peter.
+Oops, another place where we failed to realise the ramifications
+of making NSACR actually do something.
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+Since this is a bugfix I'm going to fish it out of this patchset
+and apply it to target-arm.next with a cc: stable.
+
+Thanks for the catch!
+
+-- PMM
 
