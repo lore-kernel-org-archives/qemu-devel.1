@@ -2,82 +2,86 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E162C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 05:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55713C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 05:05:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62F892245C
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 05:00:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B8C420707
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 05:05:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KrUQ068N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62F892245C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cXa3mXzO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B8C420707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35636 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1id5j1-0007hT-K6
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 00:00:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50879)
+	id 1id5nZ-0000pd-57
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 00:05:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44005)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1id5i2-0007HC-M6
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 23:59:20 -0500
+ (envelope-from <thuth@redhat.com>) id 1id5mu-0000NY-EY
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 00:04:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1id5hy-00030q-Gy
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 23:59:16 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52629
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <thuth@redhat.com>) id 1id5mt-0000DZ-3b
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 00:04:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54715
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1id5hx-0002tq-GD
- for qemu-devel@nongnu.org; Thu, 05 Dec 2019 23:59:14 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1id5ms-00009h-RV
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 00:04:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575608352;
+ s=mimecast20190719; t=1575608657;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=QPjLWPI/hdWo6bQrg/TI5tjPZ9/Ne2JsC/zMzNrc9B4=;
- b=KrUQ068NodnOrJiRZLd+hUaWCph1uidMsvDpp47RTIO5hzFL3b2J+8Z+aidX4RZyyOWrUP
- 5/Qv3KoOb8eWFpbtaNyLkKOkPEAwTbbikcn5JFEeB48hM7rcZBd//YquWJkzQLXhP35Kxr
- MySTbKMZXsk13n15y/ke4HnZrUt13Dk=
+ bh=plxeAknv5eed5jstIZjsz0Oc2gIbhJcbeKzCEy/zK0w=;
+ b=cXa3mXzOkSyA+93j/wDlV6YKGilf5S/O4eFYvZrvLMWDtDzurXEXV/kbkeymDCtkV5+YJj
+ Se8jwSjJbXLUfImUSOLiT1a8GvA6bXgSOOH/wKA5qjiONqy7akYQRmi7G5WOH9/4JcZRf2
+ nX0p/+8ZXskCLJfqzFxPecvPagoGxyg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-1cuVvn3IOhSr28IXPvoPUQ-1; Thu, 05 Dec 2019 23:59:10 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-158-cffz70JrPxSuMIOrD3vHqg-1; Fri, 06 Dec 2019 00:04:16 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3E198017DF
- for <qemu-devel@nongnu.org>; Fri,  6 Dec 2019 04:59:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90CA31005502;
+ Fri,  6 Dec 2019 05:04:15 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-116-97.ams2.redhat.com [10.36.116.97])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 63AB110016E8;
- Fri,  6 Dec 2019 04:59:09 +0000 (UTC)
-Subject: Re: [PATCH] hw/misc/ivshmem: Bury dead legacy INTx code
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20191205203557.11254-1-armbru@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8967065F40;
+ Fri,  6 Dec 2019 05:04:05 +0000 (UTC)
+Subject: Re: [libvirt] [PATCH 1/3] hw/i386: Remove the deprecated machines
+ 0.12 up to 0.15
+To: Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
+References: <20191205160652.23493-1-thuth@redhat.com>
+ <20191205160652.23493-2-thuth@redhat.com>
+ <ae470823-ed46-ce15-9902-671b6b1f0989@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <b7f1090c-9b7c-933d-1f11-74c9e23f2db1@redhat.com>
-Date: Fri, 6 Dec 2019 05:59:07 +0100
+Message-ID: <6ba48a97-67c8-c8eb-e8c7-ea06e5f9ce65@redhat.com>
+Date: Fri, 6 Dec 2019 06:04:03 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191205203557.11254-1-armbru@redhat.com>
+In-Reply-To: <ae470823-ed46-ce15-9902-671b6b1f0989@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 1cuVvn3IOhSr28IXPvoPUQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: cffz70JrPxSuMIOrD3vHqg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,90 +93,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: libvir-list@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/12/2019 21.35, Markus Armbruster wrote:
-> Devices "ivshmem-plain" and "ivshmem-doorbell" support only MSI-X.
-> Config space register Interrupt Pin is zero.  Device "ivshmem"
-> additionally supported legacy INTx, but it was removed in commit
-> 5a0e75f0a9 "hw/misc/ivshmem: Remove deprecated "ivshmem" legacy
-> device".  The commit left ivshmem_update_irq() behind.  Since the
-> Interrupt Pin register is zero, the function does nothing.  Remove it.
+On 05/12/2019 23.00, Eric Blake wrote:
+> On 12/5/19 10:06 AM, Thomas Huth wrote:
+>> They can't be used reliable for live-migration anymore (see
+>> https://lists.gnu.org/archive/html/qemu-devel/2018-12/msg04516.html
+>> for details) and have been marked as deprecated since QEMU v4.0,
+>> so time to remove them now.
+>>
+>> And while we're at it, mark the remaining pc-1.x machine types
+>> as deprecated now, too, so that we finally only have "pc-i440fx"
+>> and "pc-q35" machine types left (apart from the non-versioned
+>> "isapc" and "microvm") once we removed them in a couple of releases.
 > 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
->  hw/misc/ivshmem.c | 35 -----------------------------------
->  1 file changed, 35 deletions(-)
-> 
-> diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-> index 5e3b05eae0..710cdb7263 100644
-> --- a/hw/misc/ivshmem.c
-> +++ b/hw/misc/ivshmem.c
-> @@ -136,44 +136,11 @@ static inline bool ivshmem_is_master(IVShmemState *s)
->      return s->master == ON_OFF_AUTO_ON;
->  }
->  
-> -static void ivshmem_update_irq(IVShmemState *s)
-> -{
-> -    PCIDevice *d = PCI_DEVICE(s);
-> -    uint32_t isr = s->intrstatus & s->intrmask;
-> -
-> -    /*
-> -     * Do nothing unless the device actually uses INTx.  Here's how
-> -     * the device variants signal interrupts, what they put in PCI
-> -     * config space:
-> -     * Device variant    Interrupt  Interrupt Pin  MSI-X cap.
-> -     * ivshmem-plain         none            0         no
-> -     * ivshmem-doorbell     MSI-X            1        yes(1)
-> -     * ivshmem,msi=off       INTx            1         no
-> -     * ivshmem,msi=on       MSI-X            1(2)     yes(1)
-> -     * (1) if guest enabled MSI-X
-> -     * (2) the device lies
-> -     * Leads to the condition for doing nothing:
-> -     */
-> -    if (ivshmem_has_feature(s, IVSHMEM_MSI)
-> -        || !d->config[PCI_INTERRUPT_PIN]) {
-> -        return;
-> -    }
-> -
-> -    /* don't print ISR resets */
-> -    if (isr) {
-> -        IVSHMEM_DPRINTF("Set IRQ to %d (%04x %04x)\n",
-> -                        isr ? 1 : 0, s->intrstatus, s->intrmask);
-> -    }
-> -
-> -    pci_set_irq(d, isr != 0);
-> -}
-> -
->  static void ivshmem_IntrMask_write(IVShmemState *s, uint32_t val)
->  {
->      IVSHMEM_DPRINTF("IntrMask write(w) val = 0x%04x\n", val);
->  
->      s->intrmask = val;
-> -    ivshmem_update_irq(s);
->  }
->  
->  static uint32_t ivshmem_IntrMask_read(IVShmemState *s)
-> @@ -189,7 +156,6 @@ static void ivshmem_IntrStatus_write(IVShmemState *s, uint32_t val)
->      IVSHMEM_DPRINTF("IntrStatus write(w) val = 0x%04x\n", val);
->  
->      s->intrstatus = val;
-> -    ivshmem_update_irq(s);
->  }
->  
->  static uint32_t ivshmem_IntrStatus_read(IVShmemState *s)
-> @@ -198,7 +164,6 @@ static uint32_t ivshmem_IntrStatus_read(IVShmemState *s)
->  
->      /* reading ISR clears all interrupts */
->      s->intrstatus = 0;
-> -    ivshmem_update_irq(s);
->      return ret;
->  }
->  
-> 
+> Did you mean s/removed/remove/ ?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Yes :-)
+
+ Thomas
 
 
