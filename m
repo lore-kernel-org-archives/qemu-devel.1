@@ -2,80 +2,65 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DATE_IN_PAST_03_06,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3247AC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A94A3C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:39:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF154206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:38:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zzsj35yd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF154206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7D433206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:39:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D433206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idFgs-0000fa-Ik
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:38:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51425)
+	id 1idFhg-0001SX-Mz
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:39:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55255)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1idErz-0007tT-2d
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:46:14 -0500
+ (envelope-from <yan.y.zhao@intel.com>) id 1idEh0-0004Mp-UW
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:34:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1idErx-0002Yv-Bp
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:46:10 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35841)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1idErx-0002XO-4U
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:46:09 -0500
-Received: by mail-oi1-x244.google.com with SMTP id c16so6378174oic.3
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:46:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uhSPlg+i9CiAubF7ClC0ww2vNy2qAmWgFnaNVgQgOxE=;
- b=zzsj35yd960LbiaSBcl/usD7GRpWOsvW98l1RP+jhOWQfLebIUn2wV2+T9mfupbxch
- e93nHD4TZJlfhk5O0kSjTqVQ9kAmqFigsdzw6vbxNcKNbYHGBBJR4WtLJnOtCYmfeiWN
- Oc+Mal+rpJUHvmiVerGR7FkUHafsoCh0ZCI/9hWqOsB9KukvjFnW74gfHF3KczHaYLWp
- 90mLdshDyOYx7g1tE/o7HSHRWfK5XlNlhEZz7D2BrQGNv608xXmdvKJr0jGdZnhSOT91
- Ecuk55bLRIX9g6M3EnNxsdA5sxTN0qkNTXzWj7muhFqvRD2MpCWlWU466cSZdN2ZMZ9+
- 5LRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=uhSPlg+i9CiAubF7ClC0ww2vNy2qAmWgFnaNVgQgOxE=;
- b=pD+49TxdV3h0pGA4m0BIjQ8lnVoAs3S5N2Rs75BYIt7oYNjdDy+LCx0NnPFzSM3IfA
- bfQuz0RT1D1pDfdzTA6T/IgcRCWBgmzNwb22mitHmfnwySl6HcdjN5aDobBun9RUBkzG
- e1EECUxtJR7Xgj07ba/9O/4kyWoiA6LkHxSVfCvFmhIedatUu94UJIBfxEXvha4K19cY
- O//V3fwDkW4/7mgrJLvXKvrXimaeTzHMZJX23RUhRt+/htwAhHn4jrhuUoHvb3+Eya0q
- 2uj9RYIeyHfpyVZQP2Nx2dorjuP6MBP0GijoO57UqxhSIE8l+nUSZhVUeRad85dYWV7H
- yXgg==
-X-Gm-Message-State: APjAAAXzR/fVNT09vOkrMIfwZkD9FNe+Nb49e00rHn580fM6yaPJwil8
- opGPLcAd3UJsX5GPIrhG19UmtoX3Itvc0Pf64w7gnvfl
-X-Google-Smtp-Source: APXvYqw2gpZf9eGRHwCYCA4+iyO+tNdoHE1d4WU9umvAw5Ya5N+sNHgm4KB59ivtXp+w1i5oD9gVxA0jXOWo5q4I3vU=
-X-Received: by 2002:aca:edd5:: with SMTP id l204mr12121697oih.98.1575632772773; 
- Fri, 06 Dec 2019 03:46:12 -0800 (PST)
+ (envelope-from <yan.y.zhao@intel.com>) id 1idEgy-0003P0-SN
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:34:50 -0500
+Received: from mga09.intel.com ([134.134.136.24]:17868)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1idEgy-0003FH-C5
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:34:48 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 05 Dec 2019 22:12:19 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,283,1571727600"; d="scan'208";a="209359347"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by fmsmga008.fm.intel.com with ESMTP; 05 Dec 2019 22:12:17 -0800
+Date: Fri, 6 Dec 2019 01:04:07 -0500
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RFC PATCH 4/9] vfio-pci: register default dynamic-trap-bar-info
+ region
+Message-ID: <20191206060407.GF31791@joy-OptiPlex-7040>
+References: <20191205032419.29606-1-yan.y.zhao@intel.com>
+ <20191205032650.29794-1-yan.y.zhao@intel.com>
+ <20191205165530.1f29fe85@x1.home>
 MIME-Version: 1.0
-References: <20191011134744.2477-1-richard.henderson@linaro.org>
- <20191011134744.2477-22-richard.henderson@linaro.org>
-In-Reply-To: <20191011134744.2477-22-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Dec 2019 11:46:02 +0000
-Message-ID: <CAFEAcA8aJZRMFEpKaUN_W4U5LXoWvvzYUe0FQYwTd=RiFHeFEQ@mail.gmail.com>
-Subject: Re: [PATCH v5 21/22] target/arm: Add mmu indexes for tag memory
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191205165530.1f29fe85@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,138 +72,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "He,
+ Shaopeng" <shaopeng.he@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 11 Oct 2019 at 14:50, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Fri, Dec 06, 2019 at 07:55:30AM +0800, Alex Williamson wrote:
+> On Wed,  4 Dec 2019 22:26:50 -0500
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> 
+> > Dynamic trap bar info region is a channel for QEMU and vendor driver to
+> > communicate dynamic trap info. It is of type
+> > VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO and subtype
+> > VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO.
+> > 
+> > This region has two fields: dt_fd and trap.
+> > When QEMU detects a device regions of this type, it will create an
+> > eventfd and write its eventfd id to dt_fd field.
+> > When vendor drivre signals this eventfd, QEMU reads trap field of this
+> > info region.
+> > - If trap is true, QEMU would search the device's PCI BAR
+> > regions and disable all the sparse mmaped subregions (if the sparse
+> > mmaped subregion is disablable).
+> > - If trap is false, QEMU would re-enable those subregions.
+> > 
+> > A typical usage is
+> > 1. vendor driver first cuts its bar 0 into several sections, all in a
+> > sparse mmap array. So initally, all its bar 0 are passthroughed.
+> > 2. vendor driver specifys part of bar 0 sections to be disablable.
+> > 3. on migration starts, vendor driver signals dt_fd and set trap to true
+> > to notify QEMU disabling the bar 0 sections of disablable flags on.
+> > 4. QEMU disables those bar 0 section and hence let vendor driver be able
+> > to trap access of bar 0 registers and make dirty page tracking possible.
+> > 5. on migration failure, vendor driver signals dt_fd to QEMU again.
+> > QEMU reads trap field of this info region which is false and QEMU
+> > re-passthrough the whole bar 0 region.
+> > 
+> > Vendor driver specifies whether it supports dynamic-trap-bar-info region
+> > through cap VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR in
+> > vfio_pci_mediate_ops->open().
+> > 
+> > If vfio-pci detects this cap, it will create a default
+> > dynamic_trap_bar_info region on behalf of vendor driver with region len=0
+> > and region->ops=null.
+> > Vvendor driver should override this region's len, flags, rw, mmap in its
+> > vfio_pci_mediate_ops.
+> 
+> TBH, I don't like this interface at all.  Userspace doesn't pass data
+> to the kernel via INFO ioctls.  We have a SET_IRQS ioctl for
+> configuring user signaling with eventfds.  I think we only need to
+> define an IRQ type that tells the user to re-evaluate the sparse mmap
+> information for a region.  The user would enumerate the device IRQs via
+> GET_IRQ_INFO, find one of this type where the IRQ info would also
+> indicate which region(s) should be re-evaluated on signaling.  The user
+> would enable that signaling via SET_IRQS and simply re-evaluate the
+ok. I'll try to switch to this way. Thanks for this suggestion.
+
+> sparse mmap capability for the associated regions when signaled.
+
+Do you like the "disablable" flag of sparse mmap ?
+I think it's a lightweight way for user to switch mmap state of a whole region,
+otherwise going through a complete flow of GET_REGION_INFO and re-setup
+region might be too heavy.
+
+Thanks
+Yan
+
+> Thanks,
+> 
+> Alex
 >
-> The process by which one goes from an address space plus physical
-> address to a host pointer is complex.  It is easiest to reuse the
-> mechanism already present within cputlb, and letting that cache
-> the results.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu-param.h |  2 +-
->  target/arm/cpu.h       | 12 +++++++++---
->  target/arm/internals.h |  2 ++
->  target/arm/helper.c    | 25 +++++++++++++++++++++++--
->  4 files changed, 35 insertions(+), 6 deletions(-)
->
-> diff --git a/target/arm/cpu-param.h b/target/arm/cpu-param.h
-> index 6e6948e960..18ac562346 100644
-> --- a/target/arm/cpu-param.h
-> +++ b/target/arm/cpu-param.h
-> @@ -29,6 +29,6 @@
->  # define TARGET_PAGE_BITS_MIN  10
->  #endif
->
-> -#define NB_MMU_MODES 8
-> +#define NB_MMU_MODES 9
->
->  #endif
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index faca43ea78..c3609ef9d5 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -2854,8 +2854,8 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
->  #define ARM_MMU_IDX_M_NEGPRI 0x2
->  #define ARM_MMU_IDX_M_S 0x4
->
-> -#define ARM_MMU_IDX_TYPE_MASK (~0x7)
-> -#define ARM_MMU_IDX_COREIDX_MASK 0x7
-> +#define ARM_MMU_IDX_TYPE_MASK (~0xf)
-> +#define ARM_MMU_IDX_COREIDX_MASK 0xf
->
->  typedef enum ARMMMUIdx {
->      ARMMMUIdx_S12NSE0 = 0 | ARM_MMU_IDX_A,
-> @@ -2865,6 +2865,9 @@ typedef enum ARMMMUIdx {
->      ARMMMUIdx_S1SE0 = 4 | ARM_MMU_IDX_A,
->      ARMMMUIdx_S1SE1 = 5 | ARM_MMU_IDX_A,
->      ARMMMUIdx_S2NS = 6 | ARM_MMU_IDX_A,
-> +    ARMMMUIdx_TagNS = 7 | ARM_MMU_IDX_A,
-> +    ARMMMUIdx_TagS = 8 | ARM_MMU_IDX_A,
-> +
->      ARMMMUIdx_MUser = 0 | ARM_MMU_IDX_M,
->      ARMMMUIdx_MPriv = 1 | ARM_MMU_IDX_M,
->      ARMMMUIdx_MUserNegPri = 2 | ARM_MMU_IDX_M,
-> @@ -2891,6 +2894,8 @@ typedef enum ARMMMUIdxBit {
->      ARMMMUIdxBit_S1SE0 = 1 << 4,
->      ARMMMUIdxBit_S1SE1 = 1 << 5,
->      ARMMMUIdxBit_S2NS = 1 << 6,
-> +    ARMMMUIdxBit_TagNS = 1 << 7,
-> +    ARMMMUIdxBit_TagS = 1 << 8,
->      ARMMMUIdxBit_MUser = 1 << 0,
->      ARMMMUIdxBit_MPriv = 1 << 1,
->      ARMMMUIdxBit_MUserNegPri = 1 << 2,
-> @@ -3254,7 +3259,8 @@ enum {
->  /* Return the address space index to use for a memory access */
->  static inline int arm_asidx_from_attrs(CPUState *cs, MemTxAttrs attrs)
->  {
-> -    return attrs.secure ? ARMASIdx_S : ARMASIdx_NS;
-> +    return ((attrs.target_tlb_bit2 ? ARMASIdx_TagNS : ARMASIdx_NS)
-> +            + attrs.secure);
 
-If you want to do the "just add attrs.secure" can we have
-a build-time assert that ARMASIdx_S is ARMASIdx_NS + 1, and
-ditto for TagNS/TagS, please? It seems like the kind of thing
-that will catch us out later on.
 
->  }
 
->      if (env->cp15.hcr_el2 & HCR_TGE) {
-> @@ -10662,7 +10671,9 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
->                     target_ulong *page_size,
->                     ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
->  {
-> -    if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
-> +    switch (mmu_idx) {
-> +    case ARMMMUIdx_S12NSE0:
-> +    case ARMMMUIdx_S12NSE1:
->          /* Call ourselves recursively to do the stage 1 and then stage 2
->           * translations.
->           */
-> @@ -10713,6 +10724,16 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
->               */
->              mmu_idx = stage_1_mmu_idx(mmu_idx);
->          }
-> +        break;
-> +
-> +    case ARMMMUIdx_TagS:
-> +    case ARMMMUIdx_TagNS:
-> +        /* Indicate tag memory to arm_asidx_from_attrs.  */
-> +        attrs->target_tlb_bit2 = true;
-> +        break;
 
-So here we fall through to the "handle a stage 1 lookup" code, which:
- * sets attrs->secure
- * sets attrs->user (always false, so we could have left it alone)
- * skips the FCSE handling (as we're v8)
- * skips the PMSA handling
- * hits the regime_translation_disabled() check, which fills in
-   *phys_ptr, *prot and *page_size and returns
-
-Maybe it would be clearer if this case here just did all of that:
-
-    case ARMMMUIdx_TagS:
-        attrs->secure = true;
-        /* fall through */
-    case ARMMMUIdx_TagNS:
-        /* Indicate tag memory to arm_asidx_from_attrs.  */
-        attrs->target_tlb_bit2 = true;
-        *phys_ptr = address;
-        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
-        *page_size = TARGET_PAGE_SIZE;
-        return 0;
-
-Did I miss anything out?
-Or are we going to want more things which are common between
-the stage 1 codepath and the "just a tag ram access" case
-in future?
-
-thanks
--- PMM
+> > 
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > 
+> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci.c | 16 ++++++++++++++++
+> >  include/linux/vfio.h        |  3 ++-
+> >  include/uapi/linux/vfio.h   | 11 +++++++++++
+> >  3 files changed, 29 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+> > index 059660328be2..62b811ca43e4 100644
+> > --- a/drivers/vfio/pci/vfio_pci.c
+> > +++ b/drivers/vfio/pci/vfio_pci.c
+> > @@ -127,6 +127,19 @@ void init_migration_region(struct vfio_pci_device *vdev)
+> >  		NULL);
+> >  }
+> >  
+> > +/**
+> > + * register a region to hold info for dynamically trap bar regions
+> > + */
+> > +void init_dynamic_trap_bar_info_region(struct vfio_pci_device *vdev)
+> > +{
+> > +	vfio_pci_register_dev_region(vdev,
+> > +		VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO,
+> > +		VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO,
+> > +		NULL, 0,
+> > +		VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_WRITE,
+> > +		NULL);
+> > +}
+> > +
+> >  static void vfio_pci_probe_mmaps(struct vfio_pci_device *vdev)
+> >  {
+> >  	struct resource *res;
+> > @@ -538,6 +551,9 @@ static int vfio_pci_open(void *device_data)
+> >  				if (caps & VFIO_PCI_DEVICE_CAP_MIGRATION)
+> >  					init_migration_region(vdev);
+> >  
+> > +				if (caps & VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR)
+> > +					init_dynamic_trap_bar_info_region(vdev);
+> > +
+> >  				pr_info("vfio pci found mediate_ops %s, caps=%llx, handle=%x for %x:%x\n",
+> >  						vdev->mediate_ops->name, caps,
+> >  						handle, vdev->pdev->vendor,
+> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> > index cddea8e9dcb2..cf8ecf687bee 100644
+> > --- a/include/linux/vfio.h
+> > +++ b/include/linux/vfio.h
+> > @@ -197,7 +197,8 @@ extern void vfio_virqfd_disable(struct virqfd **pvirqfd);
+> >  
+> >  struct vfio_pci_mediate_ops {
+> >  	char	*name;
+> > -#define VFIO_PCI_DEVICE_CAP_MIGRATION (0x01)
+> > +#define VFIO_PCI_DEVICE_CAP_MIGRATION		(0x01)
+> > +#define VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR	(0x02)
+> >  	int	(*open)(struct pci_dev *pdev, u64 *caps, u32 *handle);
+> >  	void	(*release)(int handle);
+> >  	void	(*get_region_info)(int handle,
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index caf8845a67a6..74a2d0b57741 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -258,6 +258,9 @@ struct vfio_region_info {
+> >  struct vfio_region_sparse_mmap_area {
+> >  	__u64	offset;	/* Offset of mmap'able area within region */
+> >  	__u64	size;	/* Size of mmap'able area */
+> > +	__u32	disablable;	/* whether this mmap'able are able to
+> > +				 *  be dynamically disabled
+> > +				 */
+> >  };
+> >  
+> >  struct vfio_region_info_cap_sparse_mmap {
+> > @@ -454,6 +457,14 @@ struct vfio_device_migration_info {
+> >  #define VFIO_DEVICE_DIRTY_PFNS_ALL	(~0ULL)
+> >  } __attribute__((packed));
+> >  
+> > +/* Region type and sub-type to hold info to dynamically trap bars */
+> > +#define VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO		(4)
+> > +#define VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO	(1)
+> > +
+> > +struct vfio_device_dt_bar_info_region {
+> > +	__u32 dt_fd; /* fd of eventfd to notify qemu trap/untrap bars*/
+> > +	__u32 trap;   /* trap/untrap bar regions */
+> > +};
+> >  
+> >  /* sub-types for VFIO_REGION_TYPE_PCI_* */
+> >  
+> 
 
