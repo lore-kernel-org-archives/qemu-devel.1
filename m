@@ -2,91 +2,101 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA05C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9DAC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:48:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C804620659
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:48:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79ED320659
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:48:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fd8Ovthm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C804620659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MurRmRCf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79ED320659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idFq0-0002qe-80
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:48:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54676)
+	id 1idFq5-0002x8-OX
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:48:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48756)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1idEt9-0000O0-FL
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:47:24 -0500
+ (envelope-from <philmd@redhat.com>) id 1idElH-0000kW-24
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:39:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1idEt6-0003kr-TJ
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:47:21 -0500
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:41811)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1idEt6-0003dl-9X
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:47:20 -0500
-Received: by mail-pj1-x1041.google.com with SMTP id ca19so2832436pjb.8
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:47:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Ou2NIgpCqpSNreFVd54xN+SCEb16nwgso+pX/SawtfY=;
- b=Fd8OvthmQkw/GsY6S905ylcQrpZ884BcwuhMOHSNo3zAU6sVr6aJsKGQ6sTxDKHTvM
- pTMYt8b9JFDOSQq26xLJGTitsjohWxFB2O27kHIUvIvxtR/WXWcCTR4dasGUkm6BdFa7
- zfwh2dx0/R4YnOQNj59d3zlRuMs6G04Wz1jDAMSaja33x4jxctSgQrykxGQcz2+nACgp
- sgnPomnHoj0w0624Q67w8RnJdMejqRWI8ymO+s+BLS9Y78pV7ru8KIImDlY6l+AGD9nn
- XF4+wSFsllcXoge+1N7BtZ0gFeSF05PdEcCLO/pFKg1N5slAFOaFvUOpIsa5PWeGDHgR
- lRZQ==
+ (envelope-from <philmd@redhat.com>) id 1idElF-0001gP-Tq
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:39:14 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29964
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1idElF-0001f7-Pl
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:39:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575643153;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=24TZiEsa9WFToT2V3ewXUqAU8uyhbYVoZ91o2XZUhdc=;
+ b=MurRmRCfydG1p/lO24PY4vdJev3nHi2Kna1gmRwayyyABcSl5qmQdddrdWrGE88wYHIqa2
+ U/rLdPFH7zXWSKtargYtYdJrOx9yIHhofsL35k+qmdloastdkwNGGMTRzORbglV2cj3EPr
+ LOTKG1BptvvnWfRgP9vJhDc2yOYzdwQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-136-tchFe7fzOU6nnCdU1yojJg-1; Fri, 06 Dec 2019 02:37:51 -0500
+Received: by mail-wr1-f69.google.com with SMTP id f1so763321wre.14
+ for <qemu-devel@nongnu.org>; Thu, 05 Dec 2019 23:37:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Ou2NIgpCqpSNreFVd54xN+SCEb16nwgso+pX/SawtfY=;
- b=tyCXtm3d/KnV3uad1Amo75t2j3GL+E8mf897BFz9UVWlZcupSUZQ4Qxg3TYljbn0wv
- XSVPYwcpECQ2ISo0VXRoLIRj+oOjGVbuPQD+PN9Hp33Gp+/S3JGD3IC75OdG6kmU2X2M
- WkmY5suSsYQAPRDfAHfIoAT4/GtIqUm+FFD3FbjtiPi2i9Q+XHDH6+cIsBsZh9OTKtea
- XfiUnR5k2FhUipP4svn5pa7u27ytb0zmEBKSXCsTlOiQQDzaHN96qG6ud6vlZkPUXBbc
- LTGtaKR35eh894TY01xqP2Srg4bu3IAwv/RIp+aECtY0CagFti2aN93Ftlint1dum72S
- pbBw==
-X-Gm-Message-State: APjAAAVdbXhRS7C1wBCrwPAYTPU2ta03kBKN2hy7B0uYsjHwmGRVVfdF
- vHURUkos3rLKzoT86/rsYMchRg==
-X-Google-Smtp-Source: APXvYqxLD0LwUBKhDzrDEj45ePVTacM/K10xf/6cqmiMz3a6bF5fvPqlELND7WgSc9RRnQLi/CLk6Q==
-X-Received: by 2002:a17:90b:f06:: with SMTP id
- br6mr2226536pjb.125.1575643628749; 
- Fri, 06 Dec 2019 06:47:08 -0800 (PST)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id a22sm17794578pfk.108.2019.12.06.06.47.07
+ bh=nx12kXObBCGl7RyZwIueYAz7xt4q+2T+2o6nn0LvO8o=;
+ b=G4DiAbPtlW8KodhSFTWSID5FJM+eENK1iOQW5XAADuZcLy0l7YLCHwKYtmzs8Dvwra
+ ZYRZBGQ54AjLPq9BdnlcAbt07UayqlCQNz4+STcYd5fV/i+BrgsvQ+PqOGkruO/XCNT4
+ bZeDwX0Jh8IHcaI14l09/mi4hXSt6650HP0haRiMkgKK+VDd78RT9rkfv6Xu+wxVfCAa
+ GX8V3Ze1VBjXm5hBjqvmcZLdM8dEyNVesITr+DLMKozBdZomCCLj0JG9Rh+9uIzHKEQi
+ p4MBj+hHZNycmW0DK6LFW+mJuDu2OhUYDAvUjx5e4skS3TLelUPzhX3n2cv95LtMjwra
+ WnaQ==
+X-Gm-Message-State: APjAAAVp7x4IcS4JKqRF6v/m8j9mnlwAaAR6b7fjqSqf7EZFXs84erGE
+ qy2Vnq7YruO4M9MXkkaWhuNTQ6xtt1baKYrS2RKQV2PSXO/8KeHZv/cB1MFGSGnFtXXeDvE3hGf
+ 8T6am3vdBpnh3YCc=
+X-Received: by 2002:a1c:6086:: with SMTP id u128mr8950843wmb.131.1575617869021; 
+ Thu, 05 Dec 2019 23:37:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwOKN1MrAniCQ0BxbraqhRuAwNxb9CwjVKPYIKA0+2+7t1HGR/++KV4s6kleb4bYc1ZpFUYFQ==
+X-Received: by 2002:a1c:6086:: with SMTP id u128mr8950823wmb.131.1575617868831; 
+ Thu, 05 Dec 2019 23:37:48 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id o1sm15452959wrn.84.2019.12.05.23.37.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 06 Dec 2019 06:47:07 -0800 (PST)
-Subject: Re: [PATCH v5 03/22] target/arm: Add MTE system registers
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191011134744.2477-1-richard.henderson@linaro.org>
- <20191011134744.2477-4-richard.henderson@linaro.org>
- <CAFEAcA8_SQ6ugs360PJD58547mmZY1yu5xb=Fq0P006HJ1yGRA@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <597e1b27-24df-164e-d289-f8d8bb69f0c3@linaro.org>
-Date: Fri, 6 Dec 2019 06:47:05 -0800
+ Thu, 05 Dec 2019 23:37:48 -0800 (PST)
+Subject: Re: [PATCH v8 14/21] hw/s390x: rename Error ** parameter to more
+ common errp
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel@nongnu.org
+References: <20191205174635.18758-1-vsementsov@virtuozzo.com>
+ <20191205174635.18758-15-vsementsov@virtuozzo.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <f9c61820-9ae7-e197-fa24-d28e29140866@redhat.com>
+Date: Fri, 6 Dec 2019 08:37:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8_SQ6ugs360PJD58547mmZY1yu5xb=Fq0P006HJ1yGRA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191205174635.18758-15-vsementsov@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+X-MC-Unique: tchFe7fzOU6nnCdU1yojJg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,41 +108,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ armbru@redhat.com, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/3/19 3:48 AM, Peter Maydell wrote:
->> +    { .name = "GMID_EL1", .state = ARM_CP_STATE_AA64,
->> +      .opc0 = 3, .opc1 = 1, .crn = 0, .crm = 0, .opc2 = 4,
->> +      .access = PL1_R, .type = ARM_CP_CONST, .resetvalue = GMID_EL1_BS },
-> 
-> This should trap if HCR_EL2.TID5 is 1 (since we're adding
-> support for the TID* ID reg trap bits now).
+On 12/5/19 6:46 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
-Done.
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-> So, aa64_mte_insn_reg here is checking for ID_AA64PFR1_EL1 != 0
-> ("instructions accessible at EL0 are implemented")
-> and aa64_mte is checking for >= 2 ("full implementation").
-> I think a couple of brief comments would clarify:
+> ---
+>   hw/s390x/event-facility.c | 2 +-
+>   hw/s390x/s390-stattrib.c  | 3 ++-
+>   2 files changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/s390x/event-facility.c b/hw/s390x/event-facility.c
+> index 66205697ae..dc733ee2af 100644
+> --- a/hw/s390x/event-facility.c
+> +++ b/hw/s390x/event-facility.c
+> @@ -439,7 +439,7 @@ static void sclp_event_set_allow_all_mask_sizes(Objec=
+t *obj, bool value,
+>       ef->allow_all_mask_sizes =3D value;
+>   }
+>  =20
+> -static bool sclp_event_get_allow_all_mask_sizes(Object *obj, Error **e)
+> +static bool sclp_event_get_allow_all_mask_sizes(Object *obj, Error **err=
+p)
+>   {
+>       SCLPEventFacility *ef =3D (SCLPEventFacility *)obj;
+>  =20
+> diff --git a/hw/s390x/s390-stattrib.c b/hw/s390x/s390-stattrib.c
+> index bf5ac014c4..58121b9f68 100644
+> --- a/hw/s390x/s390-stattrib.c
+> +++ b/hw/s390x/s390-stattrib.c
+> @@ -352,7 +352,8 @@ static void s390_stattrib_class_init(ObjectClass *oc,=
+ void *data)
+>       dc->realize =3D s390_stattrib_realize;
+>   }
+>  =20
+> -static inline bool s390_stattrib_get_migration_enabled(Object *obj, Erro=
+r **e)
+> +static inline bool s390_stattrib_get_migration_enabled(Object *obj,
+> +                                                       Error **errp)
+>   {
+>       S390StAttribState *s =3D S390_STATTRIB(obj);
+>  =20
+>=20
 
-Done.
-
-> (The other way to arrange this would be to have the 'real'
-> TCO regdef in mte_reginfo, and separately have "reginfo
-> if we only have the dummy visible-from-EL0-parts-only
-> which defines a constant 0 TCO" (and also make the MSR_i
-> code implement a RAZ/WI for this case, for consistency).
-
-Done.  I agree this is a better way to treat the EL0-only case...
-
-> An implementation that allows the guest to toggle the PSTATE.TCO
-> bit to no visible effect is architecturally valid, though.
-
-... because this could turn out to be slightly confusing.
-
-
-r~
 
