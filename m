@@ -2,66 +2,89 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,PDS_BTC_ID,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6266FC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FBBBC2BBE2
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:28:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 256E220659
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:27:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256E220659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C2E720659
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:28:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a/EiFpEq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C2E720659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idGRw-0006mM-Qe
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:27:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33685)
+	id 1idGTB-0007rZ-LW
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:28:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1idEz7-0000an-B1
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:53:35 -0500
+ (envelope-from <wrampazz@redhat.com>) id 1idF9z-0004dE-Bl
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:04:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1idEz4-000641-9l
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:53:32 -0500
-Received: from mga14.intel.com ([192.55.52.115]:51170)
+ (envelope-from <wrampazz@redhat.com>) id 1idF9w-0002d9-Df
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:04:46 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31553
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1idEz3-0005vo-Qm
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:53:30 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Dec 2019 00:30:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,283,1571727600"; d="scan'208";a="243561927"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by fmsmga002.fm.intel.com with ESMTP; 06 Dec 2019 00:30:42 -0800
-Date: Fri, 6 Dec 2019 03:22:33 -0500
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC PATCH 0/9] Introduce mediate ops in vfio-pci
-Message-ID: <20191206082232.GH31791@joy-OptiPlex-7040>
-References: <20191205032419.29606-1-yan.y.zhao@intel.com>
- <8bcf603c-f142-f96d-bb11-834d686f5519@redhat.com>
- <20191205085111.GD31791@joy-OptiPlex-7040>
- <fe84dba6-5af7-daad-3102-9fa86a90aa4d@redhat.com>
+ (Exim 4.71) (envelope-from <wrampazz@redhat.com>) id 1idF9v-0002c6-Di
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:04:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575644681;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7eq4p6SND3EJWrRrLgNGeuphFeMxKCBxlZlwscXmGRw=;
+ b=a/EiFpEq1GHo0aRf0aHPf6SKy9UIskY/eTsdbiBmD+9BpKa5e4yCfY9h90RILJ0az/ZJHh
+ JFR7RI3/2YRuZc4ck29yBvP/Ws5aWUwiEGNO88RKOz9OgiGsuS8k76nCybdTLvfzWGMbPz
+ iUgfHzHA11MBXvpLFusj8B9ElloNH+E=
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com
+ [209.85.221.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-eTQ5Jb9FPTOl7HQz1jzFKw-1; Fri, 06 Dec 2019 10:04:40 -0500
+Received: by mail-vk1-f197.google.com with SMTP id f73so3146034vka.4
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 07:04:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=BW/J3jm+FIu0jZ+lnGRabY4qIDpfyh3o5lNMb1L7E1I=;
+ b=RBj33wz7tTOdeVj/2MjXx2NCwZYk43dI+Brh0v4i799odIgVDpQh2gR6FfK6erPA4H
+ tG/lv3rQz5gMUssISZZogiAt7f875OIXzrqEphY78netW3bdDfQVEUJbL//gZFfi2WAG
+ /BUIUm1aKjm39+XBYvsGRMiZo4GTv1Dn0DODSNd4Dw8Fj+g/Hi9Anbq/GhNh7RlTGJFT
+ anSbS/BTrvsiIfBNiKSXj0aLxIBlgnfJX6QJH8CWjFAx9BcuDXG02T2v4Jv1RNH5DtWz
+ Vea4BZ1j6VtlRbgtt1U6ZlHPiSybmHijVYAYzR403NoCdLDMqPKj9tcmB5LDP5qZyzJj
+ bdHw==
+X-Gm-Message-State: APjAAAVWAozcfEROM64f98OTyEk9DUrnTn/o6xjS7ENw9MMFa4GSmBAT
+ f+dUSihXGdyHQxrHieQ1m6r0zp1K6bOUiI5k7G0rprBorQoPENm66KpIIo1CSDgP5RQEj1eTmmz
+ 4B/lCYfvBQqzQe4AEXVnMS5bo5tWVLfM=
+X-Received: by 2002:ab0:561c:: with SMTP id y28mr12002822uaa.113.1575644679958; 
+ Fri, 06 Dec 2019 07:04:39 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxPL3HN4d4yLH1u+0bxqEV+Ih8QJpcbEiFodB7AGrWSqdcZi3qT0BxqyIRVkkNvOWAoxyRI7aGWgRIwWwLcr58=
+X-Received: by 2002:ab0:561c:: with SMTP id y28mr12002784uaa.113.1575644679535; 
+ Fri, 06 Dec 2019 07:04:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fe84dba6-5af7-daad-3102-9fa86a90aa4d@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.115
+References: <20191206140012.15517-1-wainersm@redhat.com>
+ <20191206140012.15517-2-wainersm@redhat.com>
+In-Reply-To: <20191206140012.15517-2-wainersm@redhat.com>
+From: Willian Rampazzo <wrampazz@redhat.com>
+Date: Fri, 6 Dec 2019 12:04:28 -0300
+Message-ID: <CAKJDGDbuX10Tsks_KdRyKnyDxLKuDCN2pSJsjh7rxaJkZ2-S8A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] tests/acceptance: Add PVH boot test
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+X-MC-Unique: eTQ5Jb9FPTOl7HQz1jzFKw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,298 +96,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>, "He,
- Shaopeng" <shaopeng.he@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+Cc: fam@euphon.net, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 05, 2019 at 09:05:54PM +0800, Jason Wang wrote:
-> 
-> On 2019/12/5 下午4:51, Yan Zhao wrote:
-> > On Thu, Dec 05, 2019 at 02:33:19PM +0800, Jason Wang wrote:
-> >> Hi:
-> >>
-> >> On 2019/12/5 上午11:24, Yan Zhao wrote:
-> >>> For SRIOV devices, VFs are passthroughed into guest directly without host
-> >>> driver mediation. However, when VMs migrating with passthroughed VFs,
-> >>> dynamic host mediation is required to  (1) get device states, (2) get
-> >>> dirty pages. Since device states as well as other critical information
-> >>> required for dirty page tracking for VFs are usually retrieved from PFs,
-> >>> it is handy to provide an extension in PF driver to centralizingly control
-> >>> VFs' migration.
-> >>>
-> >>> Therefore, in order to realize (1) passthrough VFs at normal time, (2)
-> >>> dynamically trap VFs' bars for dirty page tracking and
-> >>
-> >> A silly question, what's the reason for doing this, is this a must for dirty
-> >> page tracking?
-> >>
-> > For performance consideration. VFs' bars should be passthoughed at
-> > normal time and only enter into trap state on need.
-> 
-> 
-> Right, but how does this matter for the case of dirty page tracking?
+On Fri, Dec 6, 2019 at 11:00 AM Wainer dos Santos Moschetta
+<wainersm@redhat.com> wrote:
 >
-Take NIC as an example, to trap its VF dirty pages, software way is
-required to trap every write of ring tail that resides in BAR0. There's
-still no IOMMU Dirty bit available.
-> 
-> >
-> >>>    (3) centralizing
-> >>> VF critical states retrieving and VF controls into one driver, we propose
-> >>> to introduce mediate ops on top of current vfio-pci device driver.
-> >>>
-> >>>
-> >>>                                      _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-> >>>    __________   register mediate ops|  ___________     ___________    |
-> >>> |          |<-----------------------|     VF    |   |           |
-> >>> | vfio-pci |                      | |  mediate  |   | PF driver |   |
-> >>> |__________|----------------------->|   driver  |   |___________|
-> >>>        |            open(pdev)      |  -----------          |         |
-> >>>        |                                                    |
-> >>>        |                            |_ _ _ _ _ _ _ _ _ _ _ _|_ _ _ _ _|
-> >>>       \|/                                                  \|/
-> >>> -----------                                         ------------
-> >>> |    VF   |                                         |    PF    |
-> >>> -----------                                         ------------
-> >>>
-> >>>
-> >>> VF mediate driver could be a standalone driver that does not bind to
-> >>> any devices (as in demo code in patches 5-6) or it could be a built-in
-> >>> extension of PF driver (as in patches 7-9) .
-> >>>
-> >>> Rather than directly bind to VF, VF mediate driver register a mediate
-> >>> ops into vfio-pci in driver init. vfio-pci maintains a list of such
-> >>> mediate ops.
-> >>> (Note that: VF mediate driver can register mediate ops into vfio-pci
-> >>> before vfio-pci binding to any devices. And VF mediate driver can
-> >>> support mediating multiple devices.)
-> >>>
-> >>> When opening a device (e.g. a VF), vfio-pci goes through the mediate ops
-> >>> list and calls each vfio_pci_mediate_ops->open() with pdev of the opening
-> >>> device as a parameter.
-> >>> VF mediate driver should return success or failure depending on it
-> >>> supports the pdev or not.
-> >>> E.g. VF mediate driver would compare its supported VF devfn with the
-> >>> devfn of the passed-in pdev.
-> >>> Once vfio-pci finds a successful vfio_pci_mediate_ops->open(), it will
-> >>> stop querying other mediate ops and bind the opening device with this
-> >>> mediate ops using the returned mediate handle.
-> >>>
-> >>> Further vfio-pci ops (VFIO_DEVICE_GET_REGION_INFO ioctl, rw, mmap) on the
-> >>> VF will be intercepted into VF mediate driver as
-> >>> vfio_pci_mediate_ops->get_region_info(),
-> >>> vfio_pci_mediate_ops->rw,
-> >>> vfio_pci_mediate_ops->mmap, and get customized.
-> >>> For vfio_pci_mediate_ops->rw and vfio_pci_mediate_ops->mmap, they will
-> >>> further return 'pt' to indicate whether vfio-pci should further
-> >>> passthrough data to hw.
-> >>>
-> >>> when vfio-pci closes the VF, it calls its vfio_pci_mediate_ops->release()
-> >>> with a mediate handle as parameter.
-> >>>
-> >>> The mediate handle returned from vfio_pci_mediate_ops->open() lets VF
-> >>> mediate driver be able to differentiate two opening VFs of the same device
-> >>> id and vendor id.
-> >>>
-> >>> When VF mediate driver exits, it unregisters its mediate ops from
-> >>> vfio-pci.
-> >>>
-> >>>
-> >>> In this patchset, we enable vfio-pci to provide 3 things:
-> >>> (1) calling mediate ops to allow vendor driver customizing default
-> >>> region info/rw/mmap of a region.
-> >>> (2) provide a migration region to support migration
-> >>
-> >> What's the benefit of introducing a region? It looks to me we don't expect
-> >> the region to be accessed directly from guest. Could we simply extend device
-> >> fd ioctl for doing such things?
-> >>
-> > You may take a look on mdev live migration discussions in
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg01763.html
-> >
-> > or previous discussion at
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04908.html,
-> > which has kernel side implemetation https://patchwork.freedesktop.org/series/56876/
-> >
-> > generaly speaking, qemu part of live migration is consistent for
-> > vfio-pci + mediate ops way or mdev way.
-> 
-> 
-> So in mdev, do you still have a mediate driver? Or you expect the parent 
-> to implement the region?
-> 
-No, currently it's only for vfio-pci.
-mdev parent driver is free to customize its regions and hence does not
-requires this mediate ops hooks.
-
-> 
-> > The region is only a channel for
-> > QEMU and kernel to communicate information without introducing IOCTLs.
-> 
-> 
-> Well, at least you introduce new type of region in uapi. So this does 
-> not answer why region is better than ioctl. If the region will only be 
-> used by qemu, using ioctl is much more easier and straightforward.
+> QEMU 4.0 onward is able to boot an uncompressed kernel
+> image by using the x86/HVM direct boot ABI. It needs
+> Linux >=3D 4.21 built with CONFIG_PVH=3Dy.
 >
-It's not introduced by me :)
-mdev live migration is actually using this way, I'm just keeping
-compatible to the uapi.
-
-From my own perspective, my answer is that a region is more flexible
-compared to ioctl. vendor driver can freely define the size, mmap cap of
-its data subregion. Also, there're already too many ioctls in vfio.
-> 
-> >
-> >
-> >>> (3) provide a dynamic trap bar info region to allow vendor driver
-> >>> control trap/untrap of device pci bars
-> >>>
-> >>> This vfio-pci + mediate ops way differs from mdev way in that
-> >>> (1) medv way needs to create a 1:1 mdev device on top of one VF, device
-> >>> specific mdev parent driver is bound to VF directly.
-> >>> (2) vfio-pci + mediate ops way does not create mdev devices and VF
-> >>> mediate driver does not bind to VFs. Instead, vfio-pci binds to VFs.
-> >>>
-> >>> The reason why we don't choose the way of writing mdev parent driver is
-> >>> that
-> >>> (1) VFs are almost all the time directly passthroughed. Directly binding
-> >>> to vfio-pci can make most of the code shared/reused.
-> >>
-> >> Can we split out the common parts from vfio-pci?
-> >>
-> > That's very attractive. but one cannot implement a vfio-pci except
-> > export everything in it as common part :)
-> 
-> 
-> Well, I think there should be not hard to do that. E..g you can route it 
-> back to like:
-> 
-> vfio -> vfio_mdev -> parent -> vfio_pci
+> This introduces an acceptance test which checks an
+> uncompressed Linux kernel image boots properly.
 >
-it's desired for us to have mediate driver binding to PF device.
-so once a VF device is created, only PF driver and vfio-pci are
-required. Just the same as what needs to be done for a normal VF passthrough.
-otherwise, a separate parent driver binding to VF is required.
-Also, this parent driver has many drawbacks as I mentions in this
-cover-letter.
-> 
-> >>>    If we write a
-> >>> vendor specific mdev parent driver, most of the code (like passthrough
-> >>> style of rw/mmap) still needs to be copied from vfio-pci driver, which is
-> >>> actually a duplicated and tedious work.
-> >>
-> >> The mediate ops looks quite similar to what vfio-mdev did. And it looks to
-> >> me we need to consider live migration for mdev as well. In that case, do we
-> >> still expect mediate ops through VFIO directly?
-> >>
-> >>
-> >>> (2) For features like dynamically trap/untrap pci bars, if they are in
-> >>> vfio-pci, they can be available to most people without repeated code
-> >>> copying and re-testing.
-> >>> (3) with a 1:1 mdev driver which passthrough VFs most of the time, people
-> >>> have to decide whether to bind VFs to vfio-pci or mdev parent driver before
-> >>> it runs into a real migration need. However, if vfio-pci is bound
-> >>> initially, they have no chance to do live migration when there's a need
-> >>> later.
-> >>
-> >> We can teach management layer to do this.
-> >>
-> > No. not possible as vfio-pci by default has no migration region and
-> > dirty page tracking needs vendor's mediation at least for most
-> > passthrough devices now.
-> 
-> 
-> I'm not quite sure I get here but in this case, just tech them to use 
-> the driver that has migration support?
-> 
-That's a way, but as more and more passthrough devices have demands and
-caps to do migration, will vfio-pci be used in future any more ?
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>  tests/acceptance/pvh.py | 48 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 48 insertions(+)
+>  create mode 100644 tests/acceptance/pvh.py
+>
+> diff --git a/tests/acceptance/pvh.py b/tests/acceptance/pvh.py
+> new file mode 100644
+> index 0000000000..c68489c273
+> --- /dev/null
+> +++ b/tests/acceptance/pvh.py
+> @@ -0,0 +1,48 @@
+> +# Copyright (c) 2019 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Wainer dos Santos Moschetta <wainersm@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
+> +
+> +"""
+> +x86/HVM direct boot acceptance tests.
+> +"""
+> +
+> +from avocado.utils.kernel import KernelBuild
+> +from avocado_qemu import Test
+> +from avocado_qemu import wait_for_console_pattern
+> +
+> +
+> +class Pvh(Test):
+> +    """
+> +    Test suite for x86/HVM direct boot feature.
+> +
+> +    :avocado: tags=3Dslow,arch=3Dx86_64,machine=3Dq35
+> +    """
+> +    def test_boot_vmlinux(self):
+> +        """
+> +        Boot uncompressed kernel image.
+> +        """
+> +        # QEMU can boot a vmlinux image for kernel >=3D 4.21 built
+> +        # with CONFIG_PVH=3Dy
+> +        kernel_version =3D '5.4.1'
+> +        kbuild =3D KernelBuild(kernel_version, work_dir=3Dself.workdir)
+> +        try:
+> +            kbuild.download()
+> +            kbuild.uncompress()
+> +            kbuild.configure(targets=3D['defconfig', 'kvmconfig'],
+> +                             extra_configs=3D['CONFIG_PVH=3Dy'])
+> +            kbuild.build()
+> +        except:
+> +            self.cancel("Unable to build vanilla kernel %s" % kernel_ver=
+sion)
+> +
+> +        self.vm.set_machine('q35')
+> +        self.vm.set_console()
+> +        kernel_command_line =3D 'printk.time=3D0 console=3DttyS0'
+> +        self.vm.add_args('-kernel', kbuild.vmlinux,
+> +                         '-append', kernel_command_line)
+> +        self.vm.launch()
+> +        wait_for_console_pattern(self, 'Kernel command line: %s' %
+> +                                 kernel_command_line)
+> --
+> 2.21.0
+>
 
-Thanks
-Yan
+Tested-by: Willian Rampazzo <wrampazz@redhat.com>
 
-> Thanks
-> 
-> 
-> >
-> > Thanks
-> > Yn
-> >
-> >> Thanks
-> >>
-> >>
-> >>> In this patchset,
-> >>> - patches 1-4 enable vfio-pci to call mediate ops registered by vendor
-> >>>     driver to mediate/customize region info/rw/mmap.
-> >>>
-> >>> - patches 5-6 provide a standalone sample driver to register a mediate ops
-> >>>     for Intel Graphics Devices. It does not bind to IGDs directly but decides
-> >>>     what devices it supports via its pciidlist. It also demonstrates how to
-> >>>     dynamic trap a device's PCI bars. (by adding more pciids in its
-> >>>     pciidlist, this sample driver actually is not necessarily limited to
-> >>>     support IGDs)
-> >>>
-> >>> - patch 7-9 provide a sample on i40e driver that supports Intel(R)
-> >>>     Ethernet Controller XL710 Family of devices. It supports VF precopy live
-> >>>     migration on Intel's 710 SRIOV. (but we commented out the real
-> >>>     implementation of dirty page tracking and device state retrieving part
-> >>>     to focus on demonstrating framework part. Will send out them in future
-> >>>     versions)
-> >>>     patch 7 registers/unregisters VF mediate ops when PF driver
-> >>>     probes/removes. It specifies its supporting VFs via
-> >>>     vfio_pci_mediate_ops->open(pdev)
-> >>>
-> >>>     patch 8 reports device cap of VFIO_PCI_DEVICE_CAP_MIGRATION and
-> >>>     provides a sample implementation of migration region.
-> >>>     The QEMU part of vfio migration is based on v8
-> >>>     https://lists.gnu.org/archive/html/qemu-devel/2019-08/msg05542.html.
-> >>>     We do not based on recent v9 because we think there are still opens in
-> >>>     dirty page track part in that series.
-> >>>
-> >>>     patch 9 reports device cap of VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR and
-> >>>     provides an example on how to trap part of bar0 when migration starts
-> >>>     and passthrough this part of bar0 again when migration fails.
-> >>>
-> >>> Yan Zhao (9):
-> >>>     vfio/pci: introduce mediate ops to intercept vfio-pci ops
-> >>>     vfio/pci: test existence before calling region->ops
-> >>>     vfio/pci: register a default migration region
-> >>>     vfio-pci: register default dynamic-trap-bar-info region
-> >>>     samples/vfio-pci/igd_dt: sample driver to mediate a passthrough IGD
-> >>>     sample/vfio-pci/igd_dt: dynamically trap/untrap subregion of IGD bar0
-> >>>     i40e/vf_migration: register mediate_ops to vfio-pci
-> >>>     i40e/vf_migration: mediate migration region
-> >>>     i40e/vf_migration: support dynamic trap of bar0
-> >>>
-> >>>    drivers/net/ethernet/intel/Kconfig            |   2 +-
-> >>>    drivers/net/ethernet/intel/i40e/Makefile      |   3 +-
-> >>>    drivers/net/ethernet/intel/i40e/i40e.h        |   2 +
-> >>>    drivers/net/ethernet/intel/i40e/i40e_main.c   |   3 +
-> >>>    .../ethernet/intel/i40e/i40e_vf_migration.c   | 626 ++++++++++++++++++
-> >>>    .../ethernet/intel/i40e/i40e_vf_migration.h   |  78 +++
-> >>>    drivers/vfio/pci/vfio_pci.c                   | 189 +++++-
-> >>>    drivers/vfio/pci/vfio_pci_private.h           |   2 +
-> >>>    include/linux/vfio.h                          |  18 +
-> >>>    include/uapi/linux/vfio.h                     | 160 +++++
-> >>>    samples/Kconfig                               |   6 +
-> >>>    samples/Makefile                              |   1 +
-> >>>    samples/vfio-pci/Makefile                     |   2 +
-> >>>    samples/vfio-pci/igd_dt.c                     | 367 ++++++++++
-> >>>    14 files changed, 1455 insertions(+), 4 deletions(-)
-> >>>    create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.c
-> >>>    create mode 100644 drivers/net/ethernet/intel/i40e/i40e_vf_migration.h
-> >>>    create mode 100644 samples/vfio-pci/Makefile
-> >>>    create mode 100644 samples/vfio-pci/igd_dt.c
-> >>>
-> 
 
