@@ -2,85 +2,93 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8290C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 707ACC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:14:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7330E206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:13:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CAB0206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:14:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UlMiMOXj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7330E206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RixRN66m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CAB0206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idGEg-0007To-Fs
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:13:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48657)
+	id 1idGFT-00008Y-Pf
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:14:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1idF8l-0003SR-Vs
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:03:37 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1idEyN-0007o1-Qq
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:52:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1idF8k-0000of-7y
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:03:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47915
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1idF8k-0000na-3P
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:03:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575644609;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CCYAJx/IIBCLtbXTluUDn5tA+V9Tc3YwcHu39RSQD3E=;
- b=UlMiMOXj7gsPlcx1yD5Ym/GuSl533jlRvreCTaAengSmyfxDlfPK0KgbuG0ur6DPoipwwk
- rn7ohLSKM70w3CuU/kmQgyNDJX4hb4aDHLB3d785EgXlbg8P3FKBhUT2sh7O8irp8pY4+E
- dMzrLLBmgIOeZbczf6+9wSKQrcBDmNM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-QtOnezTVMeCNVSJiBR7SoQ-1; Fri, 06 Dec 2019 04:02:40 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9D501005512;
- Fri,  6 Dec 2019 09:02:39 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-235.ams2.redhat.com
- [10.36.116.235])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B84E65D6BB;
- Fri,  6 Dec 2019 09:02:35 +0000 (UTC)
-Subject: Re: [PATCH v3] qga: fence guest-set-time if hwclock not available
-To: Markus Armbruster <armbru@redhat.com>
-References: <20191205115350.18713-1-cohuck@redhat.com>
- <5aaa7f3a-e3d1-0057-5fe2-07dea4864bc7@redhat.com>
- <a0636a36-60e6-9d18-4643-cea6a1e5e294@redhat.com>
- <87h82dorfn.fsf@dusky.pond.sub.org>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <a568ba8f-7318-cb37-15df-9d75d69a38ed@redhat.com>
-Date: Fri, 6 Dec 2019 10:02:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <alex.bennee@linaro.org>) id 1idEyM-0004bz-DZ
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:52:47 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51443)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1idEyM-0004a1-4v
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:52:46 -0500
+Received: by mail-wm1-x342.google.com with SMTP id g206so8123303wme.1
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:52:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=v6DcG/q6LskpbU7+BFpd5NgSOoqBfxqnbb2+YKX0aUU=;
+ b=RixRN66mTzjNLzw9/wdPdDaNncVowkyByDe/xaqpM/KmZNGasB7wRnpNmfW/4srtur
+ fiqyX5Y7ydd9imOTRThsz9GEvgGWBMOHcV9mBhEe70hAysgwD92CmOXtPqJtUael66LR
+ Rq3YHSgAokb+H//hg+22sXSsDCpOfLLlIvKEFeI3GufhOWcIps03v+pmNxaIQ1wY04m6
+ Cb5duFEAuDk60tFczQ+NZtiImGKLYa1DdjyxOHQ7MuxV8S98T9q3wN4F0DCUbADLbgiE
+ QJ9E4i0O281UfgsFLtS+97xeMq9wS0nkpkoTXgBUwoZxF5N8UF5GP4xZ5U9h0UkO5x9p
+ KCMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=v6DcG/q6LskpbU7+BFpd5NgSOoqBfxqnbb2+YKX0aUU=;
+ b=gE3ENg8Ol8cGtu/B30teSAovOoJDe2wiJpmrljvTWtPaByTkGPtG/2rcwu5o7ifx4U
+ 3Lud4kRDltEx38PEmUtvfjPrcZwDtD5z0aKAyox9vPF4LTgxBq00TqE/cR6B8Bti0bat
+ ZD/ZMIDJi4VqUWBIWd7zxmlKxO+Vq+0UtgctmQZBzZJIFsP5XOPAtuDKYfVzYA4CVOec
+ j6U8v0nfd1i8J65VZtv19Zs0lJ8i2Vg3Da3BMa7cqASbd1kfUlZujbmgAyRuap31C1jJ
+ Bod2aI9afIVcaSauF8+UWMW9iH4OOCLuhmLb7XyNrDkmxwe8Ed0omN4EOrDc1PBoUEw+
+ 7YyA==
+X-Gm-Message-State: APjAAAXyIgla7wg6omx1GYT9ywgvOgLUJ0vZfhY+VSX9OBZ9rxTZ9w0b
+ GUalxwlO6Rj4D48Gj3B5W1iP4Q==
+X-Google-Smtp-Source: APXvYqxg7JhQmObIGzYli6D55JfJngNCGYSXmxKga1NucZL6ha6xidbWhOpKpPcEQG3uFzTnfVZUWw==
+X-Received: by 2002:a1c:7419:: with SMTP id p25mr10546332wmc.129.1575643964831; 
+ Fri, 06 Dec 2019 06:52:44 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n16sm16506771wro.88.2019.12.06.06.52.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 06 Dec 2019 06:52:43 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DF7701FF87;
+ Fri,  6 Dec 2019 14:52:42 +0000 (GMT)
+References: <20191130084602.10818-1-alex.bennee@linaro.org>
+ <20191130084602.10818-12-alex.bennee@linaro.org>
+ <9362663d-6452-39aa-2a8d-1cfd853d7faa@linaro.org>
+ <87o8wm7k6v.fsf@linaro.org>
+ <cc54dbf6-01ed-f92d-5088-efe7e917b870@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 11/14] target/arm: default SVE length to 64 bytes for
+ linux-user
+In-reply-to: <cc54dbf6-01ed-f92d-5088-efe7e917b870@linaro.org>
+Date: Fri, 06 Dec 2019 14:52:42 +0000
+Message-ID: <87fthx7bgl.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87h82dorfn.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: QtOnezTVMeCNVSJiBR7SoQ-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,173 +100,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "=?UTF-8?Q?Daniel_P_._Berrang=c3=a9?=" <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: damien.hedde@greensocs.com, Peter Maydell <peter.maydell@linaro.org>,
+ luis.machado@linaro.org, qemu-devel@nongnu.org,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, alan.hayward@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/06/19 08:15, Markus Armbruster wrote:
-> Laszlo Ersek <lersek@redhat.com> writes:
->=20
->> On 12/05/19 14:05, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Hi Cornelia,
->>>
->>> On 12/5/19 12:53 PM, Cornelia Huck wrote:
->>>> The Posix implementation of guest-set-time invokes hwclock to
->>>> set/retrieve the time to/from the hardware clock. If hwclock
->>>> is not available, the user is currently informed that "hwclock
->>>> failed to set hardware clock to system time", which is quite
->>>> misleading. This may happen e.g. on s390x, which has a different
->>>> timekeeping concept anyway.
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> On 12/5/19 9:31 AM, Alex Benn=C3=A9e wrote:
+>>=20
+>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>=20
+>>> On 11/30/19 8:45 AM, Alex Benn=C3=A9e wrote:
+>>>> The Linux kernel chooses the default of 64 bytes for SVE registers on
+>>>> the basis that it is the largest size that won't grow the signal
+>>>> frame. When debugging larger sizes are also unwieldy in gdb as each
+>>>> zreg will take over a page of terminal to display.
 >>>>
->>>> Let's check for the availability of the hwclock command and
->>>> return QERR_UNSUPPORTED for guest-set-time if it is not available.
+>>>> The user can of course always specify a larger size with the
+>>>> sve-max-vq property on the command line:
 >>>>
->>>> Reviewed-by: Laszlo Ersek <lersek@redhat.com>
->>>> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->>>> Reviewed-by: Michael Roth <mdroth@linux.vnet.ibm.com>
->>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>>>   -cpu max,sve-max-vq=3D16
+>>>>
+>>>> This should not make any difference to SVE enabled software as the SVE
+>>>> is of course vector length agnostic.
+>>>>
+>>>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 >>>> ---
->>>>
->>>> v2->v3:
->>>>    - added 'static' keyword to hwclock_path
->>>>
->>>> Not sure what tree this is going through; if there's no better place,
->>>> I can also take this through the s390 tree.
+>>>>  target/arm/cpu64.c | 3 +++
+>>>>  1 file changed, 3 insertions(+)
 >>>
->>> s390 or trivial trees seems appropriate.
+>>> 6 is the largest size that doesn't grow the signal frame.
+>>> I imagine 4 was chosen because that's the only real hw atm.
 >>>
->>>>
->>>> ---
->>>>   qga/commands-posix.c | 13 ++++++++++++-
->>>>   1 file changed, 12 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
->>>> index 1c1a165daed8..0be301a4ea77 100644
->>>> --- a/qga/commands-posix.c
->>>> +++ b/qga/commands-posix.c
->>>> @@ -156,6 +156,17 @@ void qmp_guest_set_time(bool has_time, int64_t
->>>> time_ns, Error **errp)
->>>>       pid_t pid;
->>>>       Error *local_err =3D NULL;
->>>>       struct timeval tv;
->>>> +    static const char hwclock_path[] =3D "/sbin/hwclock";
->>>> +    static int hwclock_available =3D -1;
->>>> +
->>>> +    if (hwclock_available < 0) {
->>>> +        hwclock_available =3D (access(hwclock_path, X_OK) =3D=3D 0);
->>>> +    }
->>>> +
->>>> +    if (!hwclock_available) {
->>>> +        error_setg(errp, QERR_UNSUPPORTED);
+>>>> +        /* Default sve-max-vq to a reasonable numer */
+>>>> +        cpu->sve_max_vq =3D 4;
 >>>
->>> In include/qapi/qmp/qerror.h we have:
+>>> I also agree that we should match the kernel, but this is not the right=
+ way.
+>>> Changing max vq is not the same as changing the default vq.
 >>>
->>> /*
->>>  * These macros will go away, please don't use in new code, and do not
->>>  * add new ones!
->>>  */
->>
->> Obviously, the last word on this belongs to Markus (CC'd) -- he added
->> that comment. I'd just like to point out *when* that comment was added:
->> approx. four and half years ago. (See commit 4629ed1e9896.)
->=20
-> Yes, with a big push to finally kill qerror_report().  I was too
-> exhausted to finish the job and kill all the remaining QERR_, too.
->=20
-> I'm dead serious on the "do not add new ones" part.
->=20
-> On the "don't use in new code" part, I'm quite willing to tolerate
-> reasonable exceptions, e.g. to maintain consistency with old code.
->=20
-> This one looks like a reasonable exception to me.
->=20
->> I've always associated QERR_UNSUPPORTED with QMP interfaces rejecting
->> invocation due to lack of support. I don't think one more instance of
->> QERR_UNSUPPORTED will matter much, when we'll "finally" :) convert or
->> eliminate the other 35! (Yes, I've counted.)
->>
->> In case it's unacceptable to add one more QERR_UNSUPPORTED: what is the
->> official solution that replaces it?
->>
->> I assume it was explained in the series that included commit
->> 4629ed1e9896, but I can't easily tell. (And, there is no "QERR_" match
->> in docs/.)
->=20
-> See "exhausted" above.
->=20
->> Hmmm, more history digging... In the 4629ed1e9896..v4.2.0-rc4 set of
->> commits, the following commits introduced new instances of
->> QERR_UNSUPPORTED:
->>
->> - e09484efbc9d ("qmp: add QMP interface "query-cpu-model-expansion"", 20=
-16-09-06)
->> - 0031e0d68339 ("qmp: add QMP interface "query-cpu-model-comparison"", 2=
-016-09-06)
->> - b18b6043341d ("qmp: add QMP interface "query-cpu-model-baseline"", 201=
-6-09-06)
->> - 1007a37e2082 ("smbios: filter based on CONFIG_SMBIOS rather than TARGE=
-T", 2017-01-16)
->> - 9f57061c3555 ("acpi: filter based on CONFIG_ACPI_X86 rather than TARGE=
-T", 2017-01-16)
->> - 39164c136cba ("qmp/hmp: add query-vm-generation-id and 'info vm-genera=
-tion-id' commands", 2017-03-02)
->> - 161a56a9065f ("qga: Add 'guest-get-users' command", 2017-04-26)
->> - 53c58e64d0a2 ("qga: Add `guest-get-timezone` command", 2017-04-27)
->> - e674605f9821 ("qemu-ga: check if utmpx.h is available on the system", =
-2017-07-17)
->>
->> I don't claim that all of those additions have stuck with us, to
->> v4.2.0-rc4. Yet, in general, practice doesn't seem to have followed the
->> intended deprecation.
->>
->>>
->>> Maybe we can replace it by "this feature is not supported on this
->>> architecture"? (or without 'on this architecture').
->>
->> I think if we replace QERR_UNSUPPORTED with anything, it should be
->> "similarly standardized". (Lack of support for a given QMP interface is
->> pretty common, I think.)
->=20
-> Here's my the general idea on getting rid of qerror.h.  The QERR_ macros
-> effectively factor out common error message format strings.  DRY is a
-> legitimate concern.  However, I dislike (1) passing anything but string
-> literals as format to printf()-style function, and (2) tempting people
-> to reuse existing error messages where a new error message would be more
-> helpful.
->=20
-> Note that the error_setg() is *also* common.  So take DRY to the next
-> level: factor out the common error_setg(errp, "literal error format
-> string", ...) along with whatever error handling is also common in a
-> helper function, and call that.
+>>> You should change the value of env->vfp.zcr_el[1] in arm_cpu_reset(), a=
+nd the
+>>> user can increase the length with prctl(2) as they would be able to on =
+real
+>>> hardware that would have support for longer vector lengths.
+>>=20
+>> No the intention is to default to a lower max VQ because...
+>>=20
+>>> Also, I don't think you should mix this up with gdb stuff.
+>>=20
+>> it is what we use for sizing the registers for the gdbstub. The other
+>> option would be to use the effective zcr_el1 value at the time of the
+>> gdbstub connecting but then things will go horribly wrong if the user
+>> execute a prctl and widens their size.
+>
+> Why would you care about the size of the registers as passed by default? =
+ You
+> shouldn't need or want to change that default to make gdbstub work.
+>
+> The gdbstub should be passing along the vq value (via the "vg" pseudo-reg=
+ister,
+> iirc), and gdb should be working out what to display based on that.
+>
+> If that isn't happening, and you are only changing the default so that gdb
+> quits displaying massive registers when they aren't in use, then you're d=
+oing
+> something wrong with gdb and gdbstub.
 
-Good point, I didn't think of (e.g.) error_set_qmp_unsupported().
+Currently the upstream gdbserver sends the XML based on the VL at start-up.=
+ It
+doesn't handle changes in the vector size.
 
-Thank you for the details!
-Laszlo
-
->=20
-> However, do that only where the errors are truly common.  Where they're
-> just similar, duplicate the error message, and maybe specialize it for
-> specific error situations.
->=20
->>>> +        return;
->>>> +    }
->>>>         /* If user has passed a time, validate and set it. */
->>>>       if (has_time) {
->>>> @@ -195,7 +206,7 @@ void qmp_guest_set_time(bool has_time, int64_t
->>>> time_ns, Error **errp)
->>>>             /* Use '/sbin/hwclock -w' to set RTC from the system time,
->>>>            * or '/sbin/hwclock -s' to set the system time from RTC. */
->>>> -        execle("/sbin/hwclock", "hwclock", has_time ? "-w" : "-s",
->>>> +        execle(hwclock_path, "hwclock", has_time ? "-w" : "-s",
->>>>                  NULL, environ);
->>>>           _exit(EXIT_FAILURE);
->>>>       } else if (pid < 0) {
->>>>
->>>
-
+--=20
+Alex Benn=C3=A9e
 
