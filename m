@@ -2,65 +2,76 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A94A3C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D96C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:39:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D433206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:39:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D433206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3E88C206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:39:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xx8vKtxv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E88C206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idFhg-0001SX-Mz
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:39:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55255)
+	id 1idFhv-0001gi-3k
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:39:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1idEh0-0004Mp-UW
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:34:52 -0500
+ (envelope-from <gshan@redhat.com>) id 1idEmW-0001tv-Kh
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:40:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1idEgy-0003P0-SN
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:34:50 -0500
-Received: from mga09.intel.com ([134.134.136.24]:17868)
+ (envelope-from <gshan@redhat.com>) id 1idEmS-0003Gd-9e
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:40:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43844
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1idEgy-0003FH-C5
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:34:48 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 05 Dec 2019 22:12:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,283,1571727600"; d="scan'208";a="209359347"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by fmsmga008.fm.intel.com with ESMTP; 05 Dec 2019 22:12:17 -0800
-Date: Fri, 6 Dec 2019 01:04:07 -0500
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [RFC PATCH 4/9] vfio-pci: register default dynamic-trap-bar-info
- region
-Message-ID: <20191206060407.GF31791@joy-OptiPlex-7040>
-References: <20191205032419.29606-1-yan.y.zhao@intel.com>
- <20191205032650.29794-1-yan.y.zhao@intel.com>
- <20191205165530.1f29fe85@x1.home>
+ (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1idEmS-0003CA-4e
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:40:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575643222;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=A8XuLceambYefBTSCkdnVkXxIIwIoRAKWan0w0FFCBM=;
+ b=Xx8vKtxv0q1eJcKM1GNrT3iHaTV37Y6SyPN856xpl26RAPvTfA3lrcVs9IfAzkmAwdwAQM
+ 0wRPxlBWcrDRPmTV0R4gig868CfDbUQoNbHD8sHQaOZ4uK5pPbHmfH2Xh9bdWyh0QOfXZ3
+ 2H7QJ98mtaaS41SGOJGYGV3bSFTNXzA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-Y4MFc_RlNHim89MriW5y7w-1; Fri, 06 Dec 2019 01:36:49 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0603D800D5A
+ for <qemu-devel@nongnu.org>; Fri,  6 Dec 2019 06:36:48 +0000 (UTC)
+Received: from localhost.localdomain.com (vpn2-54-97.bne.redhat.com
+ [10.64.54.97])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BA38E5D9C9;
+ Fri,  6 Dec 2019 06:36:46 +0000 (UTC)
+From: Gavin Shan <gshan@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/core: Fix data type in do_nmi()
+Date: Fri,  6 Dec 2019 17:36:42 +1100
+Message-Id: <20191206063642.40942-1-gshan@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191205165530.1f29fe85@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.24
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: Y4MFc_RlNHim89MriW5y7w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,174 +83,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "He,
- Shaopeng" <shaopeng.he@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+Cc: gshan@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 06, 2019 at 07:55:30AM +0800, Alex Williamson wrote:
-> On Wed,  4 Dec 2019 22:26:50 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > Dynamic trap bar info region is a channel for QEMU and vendor driver to
-> > communicate dynamic trap info. It is of type
-> > VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO and subtype
-> > VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO.
-> > 
-> > This region has two fields: dt_fd and trap.
-> > When QEMU detects a device regions of this type, it will create an
-> > eventfd and write its eventfd id to dt_fd field.
-> > When vendor drivre signals this eventfd, QEMU reads trap field of this
-> > info region.
-> > - If trap is true, QEMU would search the device's PCI BAR
-> > regions and disable all the sparse mmaped subregions (if the sparse
-> > mmaped subregion is disablable).
-> > - If trap is false, QEMU would re-enable those subregions.
-> > 
-> > A typical usage is
-> > 1. vendor driver first cuts its bar 0 into several sections, all in a
-> > sparse mmap array. So initally, all its bar 0 are passthroughed.
-> > 2. vendor driver specifys part of bar 0 sections to be disablable.
-> > 3. on migration starts, vendor driver signals dt_fd and set trap to true
-> > to notify QEMU disabling the bar 0 sections of disablable flags on.
-> > 4. QEMU disables those bar 0 section and hence let vendor driver be able
-> > to trap access of bar 0 registers and make dirty page tracking possible.
-> > 5. on migration failure, vendor driver signals dt_fd to QEMU again.
-> > QEMU reads trap field of this info region which is false and QEMU
-> > re-passthrough the whole bar 0 region.
-> > 
-> > Vendor driver specifies whether it supports dynamic-trap-bar-info region
-> > through cap VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR in
-> > vfio_pci_mediate_ops->open().
-> > 
-> > If vfio-pci detects this cap, it will create a default
-> > dynamic_trap_bar_info region on behalf of vendor driver with region len=0
-> > and region->ops=null.
-> > Vvendor driver should override this region's len, flags, rw, mmap in its
-> > vfio_pci_mediate_ops.
-> 
-> TBH, I don't like this interface at all.  Userspace doesn't pass data
-> to the kernel via INFO ioctls.  We have a SET_IRQS ioctl for
-> configuring user signaling with eventfds.  I think we only need to
-> define an IRQ type that tells the user to re-evaluate the sparse mmap
-> information for a region.  The user would enumerate the device IRQs via
-> GET_IRQ_INFO, find one of this type where the IRQ info would also
-> indicate which region(s) should be re-evaluated on signaling.  The user
-> would enable that signaling via SET_IRQS and simply re-evaluate the
-ok. I'll try to switch to this way. Thanks for this suggestion.
+object_dynamic_cast() should return machine (or GPIO) state instad of NMI
+state in do_nmi(). So it's wrong to convert it to NMI state unconditionally=
+.
 
-> sparse mmap capability for the associated regions when signaled.
+This changes the prototype of NMIClass::nmi_monitor_handler() to accept
+the parent object of NMI state instead of itself. With this, he parent obje=
+ct
+is passed to the function, to avoid potential data corruption.
 
-Do you like the "disablable" flag of sparse mmap ?
-I think it's a lightweight way for user to switch mmap state of a whole region,
-otherwise going through a complete flow of GET_REGION_INFO and re-setup
-region might be too heavy.
+Signed-off-by: Gavin Shan <gshan@redhat.com>
+---
+ hw/core/nmi.c              | 8 ++++----
+ hw/i386/x86.c              | 2 +-
+ hw/misc/macio/gpio.c       | 6 +++---
+ hw/ppc/spapr.c             | 2 +-
+ hw/s390x/s390-virtio-ccw.c | 2 +-
+ include/hw/nmi.h           | 2 +-
+ 6 files changed, 11 insertions(+), 11 deletions(-)
 
-Thanks
-Yan
+diff --git a/hw/core/nmi.c b/hw/core/nmi.c
+index 481c4b3c7e..554708d0db 100644
+--- a/hw/core/nmi.c
++++ b/hw/core/nmi.c
+@@ -37,13 +37,13 @@ static void nmi_children(Object *o, struct do_nmi_s *ns=
+);
+ static int do_nmi(Object *o, void *opaque)
+ {
+     struct do_nmi_s *ns =3D opaque;
+-    NMIState *n =3D (NMIState *) object_dynamic_cast(o, TYPE_NMI);
++    Object *parent =3D object_dynamic_cast(o, TYPE_NMI);
+=20
+-    if (n) {
+-        NMIClass *nc =3D NMI_GET_CLASS(n);
++    if (parent) {
++        NMIClass *nc =3D NMI_GET_CLASS(parent);
+=20
+         ns->handled =3D true;
+-        nc->nmi_monitor_handler(n, ns->cpu_index, &ns->err);
++        nc->nmi_monitor_handler(parent, ns->cpu_index, &ns->err);
+         if (ns->err) {
+             return -1;
+         }
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index 394edc2f72..b98204f104 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -190,7 +190,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(MachineS=
+tate *ms)
+     return ms->possible_cpus;
+ }
+=20
+-static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
++static void x86_nmi(Object *parent, int cpu_index, Error **errp)
+ {
+     /* cpu index isn't used */
+     CPUState *cs;
+diff --git a/hw/misc/macio/gpio.c b/hw/misc/macio/gpio.c
+index 6cca6b27d6..6b4dfcc188 100644
+--- a/hw/misc/macio/gpio.c
++++ b/hw/misc/macio/gpio.c
+@@ -196,10 +196,10 @@ static void macio_gpio_reset(DeviceState *dev)
+     macio_set_gpio(s, 1, true);
+ }
+=20
+-static void macio_gpio_nmi(NMIState *n, int cpu_index, Error **errp)
++static void macio_gpio_nmi(Object *parent, int cpu_index, Error **errp)
+ {
+-    macio_set_gpio(MACIO_GPIO(n), 9, true);
+-    macio_set_gpio(MACIO_GPIO(n), 9, false);
++    macio_set_gpio(MACIO_GPIO(parent), 9, true);
++    macio_set_gpio(MACIO_GPIO(parent), 9, false);
+ }
+=20
+ static void macio_gpio_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index e076f6023c..3b92e4013d 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3377,7 +3377,7 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_o=
+n_cpu_data arg)
+     ppc_cpu_do_system_reset(cs);
+ }
+=20
+-static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
++static void spapr_nmi(Object *parent, int cpu_index, Error **errp)
+ {
+     CPUState *cs;
+=20
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index d3edeef0ad..a49952a8b9 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -431,7 +431,7 @@ static void s390_hot_add_cpu(MachineState *machine,
+     s390x_new_cpu(object_class_get_name(oc), id, errp);
+ }
+=20
+-static void s390_nmi(NMIState *n, int cpu_index, Error **errp)
++static void s390_nmi(Object *parent, int cpu_index, Error **errp)
+ {
+     CPUState *cs =3D qemu_get_cpu(cpu_index);
+=20
+diff --git a/include/hw/nmi.h b/include/hw/nmi.h
+index a1e128724e..75afa67790 100644
+--- a/include/hw/nmi.h
++++ b/include/hw/nmi.h
+@@ -38,7 +38,7 @@ typedef struct NMIState NMIState;
+ typedef struct NMIClass {
+     InterfaceClass parent_class;
+=20
+-    void (*nmi_monitor_handler)(NMIState *n, int cpu_index, Error **errp);
++    void (*nmi_monitor_handler)(Object *parent, int cpu_index, Error **err=
+p);
+ } NMIClass;
+=20
+ void nmi_monitor_handle(int cpu_index, Error **errp);
+--=20
+2.23.0
 
-> Thanks,
-> 
-> Alex
->
-
-
-
-
-> > 
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > 
-> > Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > ---
-> >  drivers/vfio/pci/vfio_pci.c | 16 ++++++++++++++++
-> >  include/linux/vfio.h        |  3 ++-
-> >  include/uapi/linux/vfio.h   | 11 +++++++++++
-> >  3 files changed, 29 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-> > index 059660328be2..62b811ca43e4 100644
-> > --- a/drivers/vfio/pci/vfio_pci.c
-> > +++ b/drivers/vfio/pci/vfio_pci.c
-> > @@ -127,6 +127,19 @@ void init_migration_region(struct vfio_pci_device *vdev)
-> >  		NULL);
-> >  }
-> >  
-> > +/**
-> > + * register a region to hold info for dynamically trap bar regions
-> > + */
-> > +void init_dynamic_trap_bar_info_region(struct vfio_pci_device *vdev)
-> > +{
-> > +	vfio_pci_register_dev_region(vdev,
-> > +		VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO,
-> > +		VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO,
-> > +		NULL, 0,
-> > +		VFIO_REGION_INFO_FLAG_READ | VFIO_REGION_INFO_FLAG_WRITE,
-> > +		NULL);
-> > +}
-> > +
-> >  static void vfio_pci_probe_mmaps(struct vfio_pci_device *vdev)
-> >  {
-> >  	struct resource *res;
-> > @@ -538,6 +551,9 @@ static int vfio_pci_open(void *device_data)
-> >  				if (caps & VFIO_PCI_DEVICE_CAP_MIGRATION)
-> >  					init_migration_region(vdev);
-> >  
-> > +				if (caps & VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR)
-> > +					init_dynamic_trap_bar_info_region(vdev);
-> > +
-> >  				pr_info("vfio pci found mediate_ops %s, caps=%llx, handle=%x for %x:%x\n",
-> >  						vdev->mediate_ops->name, caps,
-> >  						handle, vdev->pdev->vendor,
-> > diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-> > index cddea8e9dcb2..cf8ecf687bee 100644
-> > --- a/include/linux/vfio.h
-> > +++ b/include/linux/vfio.h
-> > @@ -197,7 +197,8 @@ extern void vfio_virqfd_disable(struct virqfd **pvirqfd);
-> >  
-> >  struct vfio_pci_mediate_ops {
-> >  	char	*name;
-> > -#define VFIO_PCI_DEVICE_CAP_MIGRATION (0x01)
-> > +#define VFIO_PCI_DEVICE_CAP_MIGRATION		(0x01)
-> > +#define VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR	(0x02)
-> >  	int	(*open)(struct pci_dev *pdev, u64 *caps, u32 *handle);
-> >  	void	(*release)(int handle);
-> >  	void	(*get_region_info)(int handle,
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index caf8845a67a6..74a2d0b57741 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -258,6 +258,9 @@ struct vfio_region_info {
-> >  struct vfio_region_sparse_mmap_area {
-> >  	__u64	offset;	/* Offset of mmap'able area within region */
-> >  	__u64	size;	/* Size of mmap'able area */
-> > +	__u32	disablable;	/* whether this mmap'able are able to
-> > +				 *  be dynamically disabled
-> > +				 */
-> >  };
-> >  
-> >  struct vfio_region_info_cap_sparse_mmap {
-> > @@ -454,6 +457,14 @@ struct vfio_device_migration_info {
-> >  #define VFIO_DEVICE_DIRTY_PFNS_ALL	(~0ULL)
-> >  } __attribute__((packed));
-> >  
-> > +/* Region type and sub-type to hold info to dynamically trap bars */
-> > +#define VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO		(4)
-> > +#define VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO	(1)
-> > +
-> > +struct vfio_device_dt_bar_info_region {
-> > +	__u32 dt_fd; /* fd of eventfd to notify qemu trap/untrap bars*/
-> > +	__u32 trap;   /* trap/untrap bar regions */
-> > +};
-> >  
-> >  /* sub-types for VFIO_REGION_TYPE_PCI_* */
-> >  
-> 
 
