@@ -2,80 +2,94 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48995C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:43:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D6FC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:48:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1815624670
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:43:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h47tVp+4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1815624670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A709324670
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:48:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A709324670
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idIa4-0001Ad-Am
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:43:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47982)
+	id 1idIe0-00044q-6x
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:48:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51241)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1idHOt-0002GY-B9
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:28:20 -0500
+ (envelope-from <groug@kaod.org>) id 1idIaN-00020w-5L
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:44:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1idHOr-0004VV-Ql
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:28:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24198
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1idHOr-0004TQ-Lo
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:28:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575653297;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uHy6JtDFNgRRZUOE/EOkjvVUEne6jqUvFOy591Cbfrs=;
- b=h47tVp+4Tc3SrZw+tDX0LUm6aXF0pOMfmv17POB1nphloPJPl8RyvKxB8UgODdFdMl/157
- b7UPOFIeD/Mdkuy1hL51B7TskLoDapmRfJEMmseKXOjVsi5NzfbtJjNfibPj0yZZ+5vkXX
- XB+fId0uzLRbyYM3xHahohw5dTrvnQY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-155-BOXZZEcbPF-QJRXfsfQH8w-1; Fri, 06 Dec 2019 12:28:16 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 925BC800EB9;
- Fri,  6 Dec 2019 17:28:14 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 15F6560BF4;
- Fri,  6 Dec 2019 17:28:11 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests RFC 10/10] pmu: Test overflow interrupts
-Date: Fri,  6 Dec 2019 18:27:24 +0100
-Message-Id: <20191206172724.947-11-eric.auger@redhat.com>
-In-Reply-To: <20191206172724.947-1-eric.auger@redhat.com>
-References: <20191206172724.947-1-eric.auger@redhat.com>
+ (envelope-from <groug@kaod.org>) id 1idIaL-0003DO-B4
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:44:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52782)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1idIaJ-00039g-9r
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:44:13 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xB6Ihlho073149
+ for <qemu-devel@nongnu.org>; Fri, 6 Dec 2019 13:44:10 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wq55twfdf-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 13:44:09 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Fri, 6 Dec 2019 18:44:07 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 6 Dec 2019 18:44:01 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+ [9.149.105.60])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xB6IhKxj49152398
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 6 Dec 2019 18:43:20 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 01E2B4203F;
+ Fri,  6 Dec 2019 18:44:01 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 9C60142041;
+ Fri,  6 Dec 2019 18:44:00 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.42.200])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri,  6 Dec 2019 18:44:00 +0000 (GMT)
+Subject: [for-5.0 PATCH 2/3] cpu: Introduce cpu_class_set_parent_reset()
+From: Greg Kurz <groug@kaod.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri, 06 Dec 2019 19:44:00 +0100
+In-Reply-To: <157565782864.3897844.627720481210693346.stgit@bahia.lan>
+References: <157565782864.3897844.627720481210693346.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: BOXZZEcbPF-QJRXfsfQH8w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19120618-4275-0000-0000-0000038C7C40
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19120618-4276-0000-0000-000038A025FE
+Message-Id: <157565784026.3897844.6515055734977835356.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-06_06:2019-12-05,2019-12-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0
+ suspectscore=0 phishscore=0 priorityscore=1501 spamscore=0 malwarescore=0
+ adultscore=0 bulkscore=0 clxscore=1034 mlxlogscore=777 lowpriorityscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912060152
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,226 +101,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, andrew.murray@arm.com, drjones@redhat.com,
- andre.przywara@arm.com
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Test overflows for MEM_ACESS and SW_INCR events. Also tests
-overflows with 64-bit events.
+Similarly to what we already do with qdev, use a helper to overload the
+reset QOM methods of the parent in children classes, for clarity.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- arm/pmu.c         | 133 +++++++++++++++++++++++++++++++++++++++++++++-
- arm/unittests.cfg |   6 +++
- 2 files changed, 138 insertions(+), 1 deletion(-)
+ hw/core/cpu.c         |    8 ++++++++
+ include/hw/core/cpu.h |    4 ++++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 47d46a2..a63b93e 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -45,8 +45,12 @@ struct pmu {
- =09uint32_t pmcr_ro;
- };
-=20
--static struct pmu pmu;
-+struct pmu_stats {
-+=09unsigned long bitmap;
-+=09uint32_t interrupts[32];
-+};
-=20
-+static struct pmu pmu;
-=20
- #if defined(__arm__)
- #define ID_DFR0_PERFMON_SHIFT 24
-@@ -117,6 +121,7 @@ static void test_mem_access(void) {}
- static void test_chained_counters(void) {}
- static void test_chained_sw_incr(void) {}
- static void test_chain_promotion(void) {}
-+static void test_overflow_interrupt(void) {}
-=20
- #elif defined(__aarch64__)
- #define ID_AA64DFR0_PERFMON_SHIFT 8
-@@ -263,6 +268,43 @@ asm volatile(
- =09: );
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index db1a03c6bbb3..6dad2c8488a9 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -239,6 +239,14 @@ void cpu_dump_statistics(CPUState *cpu, int flags)
+     }
  }
-=20
-+static struct pmu_stats pmu_stats;
-+
-+static void irq_handler(struct pt_regs *regs)
+ 
++void cpu_class_set_parent_reset(CPUClass *cc,
++                                CPUReset child_reset,
++                                CPUReset *parent_reset)
 +{
-+        uint32_t irqstat, irqnr;
-+
-+        irqstat =3D gic_read_iar();
-+        irqnr =3D gic_iar_irqnr(irqstat);
-+        gic_write_eoir(irqstat);
-+
-+        if (irqnr =3D=3D 23) {
-+                unsigned long overflows =3D read_sysreg(pmovsclr_el0);
-+=09=09int i;
-+
-+                report_info("--> PMU overflow interrupt %d (counter bitmas=
-k 0x%lx)", irqnr, overflows);
-+=09=09for (i =3D 0; i < 32; i++) {
-+=09=09=09if (test_and_clear_bit(i, &overflows)) {
-+=09=09=09=09pmu_stats.interrupts[i]++;
-+=09=09=09=09pmu_stats.bitmap |=3D 1 << i;
-+=09=09=09}
-+=09=09}
-+                write_sysreg(0xFFFFFFFF, pmovsclr_el0);
-+        } else {
-+                report_info("Unexpected interrupt: %d\n", irqnr);
-+        }
++    *parent_reset = cc->reset;
++    cc->reset = child_reset;
 +}
 +
-+static void pmu_reset_stats(void)
-+{
-+=09int i;
-+
-+=09for (i =3D 0; i < 32; i++) {
-+=09=09pmu_stats.interrupts[i] =3D 0;
-+=09}
-+=09pmu_stats.bitmap =3D 0;
-+}
-+
- static void pmu_reset(void)
+ void cpu_reset(CPUState *cpu)
  {
- =09/* reset all counters, counting disabled at PMCR level*/
-@@ -273,6 +315,7 @@ static void pmu_reset(void)
- =09write_sysreg(0xFFFFFFFF, pmovsclr_el0);
- =09/* disable overflow interrupts on all counters */
- =09write_sysreg(0xFFFFFFFF, pmintenclr_el1);
-+=09pmu_reset_stats();
- =09isb();
- }
-=20
-@@ -691,8 +734,93 @@ static void test_chain_promotion(void)
- =09=09=09read_sysreg(pmovsclr_el0));
- }
-=20
-+static bool expect_interrupts(uint32_t bitmap)
-+{
-+=09int i;
+     CPUClass *klass = CPU_GET_CLASS(cpu);
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 047e3972ecaf..6680f4b047f4 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -1137,6 +1137,10 @@ void cpu_exec_unrealizefn(CPUState *cpu);
+  */
+ bool target_words_bigendian(void);
+ 
++void cpu_class_set_parent_reset(CPUClass *cc,
++                                CPUReset child_reset,
++                                CPUReset *parent_reset);
 +
-+=09if (pmu_stats.bitmap ^ bitmap)
-+=09=09return false;
-+
-+=09for (i =3D 0; i < 32; i++) {
-+=09=09if (test_and_clear_bit(i, &pmu_stats.bitmap))
-+=09=09=09if (pmu_stats.interrupts[i] !=3D 1)
-+=09=09=09=09return false;
-+=09}
-+=09return true;
-+}
-+
-+static void test_overflow_interrupt(void)
-+{
-+=09uint32_t events[] =3D { 0x13 /* MEM_ACCESS */, 0x00 /* SW_INCR */};
-+=09void *addr =3D malloc(PAGE_SIZE);
-+=09int i;
-+
-+=09if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-+=09=09return;
-+
-+=09setup_irq(irq_handler);
-+=09gic_enable_irq(23);
-+
-+=09pmu_reset();
-+
-+        write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-+        write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+=09write_sysreg_s(0x3, PMCNTENSET_EL0);
-+=09write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+=09write_regn(pmevcntr, 1, 0xFFFFFFF0);
-+=09isb();
-+
-+=09/* interrupts are disabled */
-+
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report("no overflow interrupt received", expect_interrupts(0));
-+
-+=09set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-+=09for (i =3D 0; i < 100; i++) {
-+=09=09write_sysreg(0x2, pmswinc_el0);
-+=09}
-+=09set_pmcr(pmu.pmcr_ro);
-+=09report("no overflow interrupt received", expect_interrupts(0));
-+
-+=09/* enable interrupts */
-+
-+=09pmu_reset_stats();
-+
-+=09write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+=09write_regn(pmevcntr, 1, 0xFFFFFFF0);
-+=09write_sysreg(0xFFFFFFFF, pmintenset_el1);
-+=09isb();
-+
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+=09for (i =3D 0; i < 100; i++) {
-+=09=09write_sysreg(0x3, pmswinc_el0);
-+=09}
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro);
-+=09report_info("overflow=3D0x%lx", read_sysreg(pmovsclr_el0));
-+=09report("overflow interrupts expected on #0 and #1", expect_interrupts(0=
-x3));
-+
-+=09/* promote to 64-b */
-+
-+=09pmu_reset_stats();
-+
-+=09events[1] =3D 0x1E /* CHAIN */;
-+        write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+=09write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+=09isb();
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report("no overflow interrupt expected on 32b boundary", expect_interru=
-pts(0));
-+
-+=09/* overflow on odd counter */
-+=09pmu_reset_stats();
-+=09write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+=09write_regn(pmevcntr, 1, 0xFFFFFFFF);
-+=09isb();
-+=09mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-+=09report("expect overflow interrupt on odd counter", expect_interrupts(0x=
-2));
-+}
- #endif
-=20
-+
- /*
-  * As a simple sanity check on the PMCR_EL0, ensure the implementer field =
-isn't
-  * null. Also print out a couple other interesting fields for diagnostic
-@@ -896,6 +1024,9 @@ int main(int argc, char *argv[])
- =09} else if (strcmp(argv[1], "chain-promotion") =3D=3D 0) {
- =09=09report_prefix_push(argv[1]);
- =09=09test_chain_promotion();
-+=09} else if (strcmp(argv[1], "overflow-interrupt") =3D=3D 0) {
-+=09=09report_prefix_push(argv[1]);
-+=09=09test_overflow_interrupt();
- =09} else {
- =09=09report_abort("Unknown subtest '%s'", argv[1]);
- =09}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index eb6e87e..31b4c7a 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -108,6 +108,12 @@ groups =3D pmu
- arch =3D arm64
- extra_params =3D -append 'chain-promotion'
-=20
-+[pmu-chain-promotion]
-+file =3D pmu.flat
-+groups =3D pmu
-+arch =3D arm64
-+extra_params =3D -append 'overflow-interrupt'
-+
- # Test PMU support (TCG) with -icount IPC=3D1
- #[pmu-tcg-icount-1]
- #file =3D pmu.flat
---=20
-2.20.1
+ #ifdef NEED_CPU_H
+ 
+ #ifdef CONFIG_SOFTMMU
 
 
