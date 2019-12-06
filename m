@@ -2,85 +2,81 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2566AC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:39:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 774AFC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:41:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBCF821823
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:39:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4584721823
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:41:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SvE8rFdX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBCF821823
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SHLCQO0F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4584721823
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idHZe-00064X-Hm
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 12:39:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35223)
+	id 1idHbo-0000Vl-WE
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 12:41:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45465)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1idFrF-0004le-VC
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:49:30 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idGwx-0006Cc-J2
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 11:59:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1idFrE-0002Rv-MS
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:49:29 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39997
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1idFrE-0002Qg-G0
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:49:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575647367;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YS4gCNU8emS1GDlvJh6nFStWPdluqDPtOYpzcgiqm6I=;
- b=SvE8rFdXCh6pDS55SBeOHsByFEm/tBj+hR1aNuJn5AginqyLAI0VVAvB5ZwCzPpBrBi21d
- 4Ld5mtzv0dmN823S69ZaNSPJ3L9PIVuUY8z46JDR0+XRKQTEBT26I+IpMf0Z+9bseJ8y+j
- rHKaGD5iv7HbSRgxVGwtbTpa0iIlMLI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-EmNUj4VTM-2lj8OkNNXAKQ-1; Fri, 06 Dec 2019 10:49:26 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 176E5DBBB;
- Fri,  6 Dec 2019 15:49:25 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DC0EB5C1C3;
- Fri,  6 Dec 2019 15:49:24 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 697941138606; Fri,  6 Dec 2019 16:49:22 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v8 03/21] error: make Error **errp const where it is
- appropriate
-References: <20191205174635.18758-1-vsementsov@virtuozzo.com>
- <20191205174635.18758-4-vsementsov@virtuozzo.com>
-Date: Fri, 06 Dec 2019 16:49:22 +0100
-In-Reply-To: <20191205174635.18758-4-vsementsov@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Thu, 5 Dec 2019 20:46:17 +0300")
-Message-ID: <87fthxcv3x.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <peter.maydell@linaro.org>) id 1idGww-0001CS-7j
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 11:59:27 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:40761)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1idGwv-00019f-R7
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 11:59:26 -0500
+Received: by mail-ot1-x343.google.com with SMTP id i15so6364860oto.7
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 08:59:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Ozxco/v0ATIuYp6SAGpa0LpaJs8MiQDfwlnY4cKEoYg=;
+ b=SHLCQO0FmlhFtt5vysY0yR/duk8SdbonpoIqW0pf89HTXBzuAZEeDp5nsBLUfiKlx8
+ nQKThrB42gZ/oPaw4XvE1Eh3TbgDkC9ekoH3tJsKvkk7VewpVF3v4VuFFbGAJxCY3V6c
+ FqlZR5Tm9Jo1u066l0bPqI6cZ1ut0zoamoyHFFKKrw8nUi0hTM85+bAU0PeNUAUFx6Mb
+ ap5+WkjwHli/aKF5wApbRQDVc9wL/stVuJC79RIj3VIyB1zOlDhxySEMzbrjsluBOuWs
+ Z5MOMaO7PsLfzmR8l/bHtWAaQZRbi1WrCQ2L5XP1I3SPkefmeCyzmVZI6LwUO60TxUIC
+ oU+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Ozxco/v0ATIuYp6SAGpa0LpaJs8MiQDfwlnY4cKEoYg=;
+ b=tETWVr7BKBdx3XGTCCx32Ys+HDcat+qlYlrUen6xBetbUvCFJYR2g/IDFXVHnl6Cgo
+ ACL0Qj5zkTwRh0dG59CQdD50MdNZnh8pwXMWsNGVVBzGwBo0uaU8yv/ar+qgg2p8lwpk
+ /9srsvv2KyX9beinmk8hm2Vz7U1vuI1N3k/dG9rVoyLT1oWqXlEwtdM6qxclocIZS+6+
+ nfo8VlhDrPU3skvkoii2GwlPNXvcSThchm2L3vCUnHm4QECPJEdE6xDkhkZNI6378K4n
+ PXR1BzTiHK5wwcMSyEKBigLBwTKLNEDjQ4+LnAT/7FH1R+rCjD0n2WIJl475WfsKyryn
+ NL2w==
+X-Gm-Message-State: APjAAAVwCRuIkeXIRiCV7q7FmQefL3CSn3P1bXfIUP0MY5IG/W+F4nHb
+ KQjic0H1qJCObE1A1Ieke9bSyu5WvChNtP2ap+vFCfP5
+X-Google-Smtp-Source: APXvYqwws4N+eknf6K3KmhOUqqqRohqsJzOl2DvMR2n+sPQauEDq1gpCe0wALo+OePOSEcRHupYZP2VToThNrr4f9sw=
+X-Received: by 2002:a05:6830:13d3:: with SMTP id
+ e19mr11941678otq.135.1575651564776; 
+ Fri, 06 Dec 2019 08:59:24 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: EmNUj4VTM-2lj8OkNNXAKQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-32-richard.henderson@linaro.org>
+In-Reply-To: <20191203022937.1474-32-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Dec 2019 16:59:13 +0000
+Message-ID: <CAFEAcA8DgMK8GR1MHLMKLrxg+H2dEE7yZuYqRfHx-tqa_NwPHg@mail.gmail.com>
+Subject: Re: [PATCH v4 31/40] target/arm: Update arm_phys_excp_target_el for
+ TGE
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,23 +88,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
-
-> Mostly, Error ** is for returning error from the function, so the
-> callee sets it. However these three functions get already filled errp
-> parameter. They dont change the pointer itself, only change the
-> internal state of referenced Error object. So we can make it
-> Error *const * errp, to stress the behavior. It will also help
-> coccinelle script (in future) to distinguish such cases from common
-> errp usage.
+On Tue, 3 Dec 2019 at 02:30, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> The TGE bit routes all asynchronous exceptions to EL2.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index b059d9f81a..e0b8c81c5f 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -8316,6 +8316,12 @@ uint32_t arm_phys_excp_target_el(CPUState *cs, uint32_t excp_idx,
+>          break;
+>      };
+>
+> +    /*
+> +     * For these purposes, TGE and AMO/IMO/FMO both force the
+> +     * interrupt to EL2.  Fold TGE into the bit extracted above.
+> +     */
+> +    hcr |= (hcr_el2 & HCR_TGE) != 0;
+> +
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+This only has an effect if HCR_EL2.E2H is 1, because if
+E2H is 0 then arm_hcr_el2_eff() has already forced
+the AMO/IMO/FMO bits to 1. But it seems to match the
+way the Arm ARM phrases things in section D1.13.1 and
+its accompanying tables.
 
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
 
