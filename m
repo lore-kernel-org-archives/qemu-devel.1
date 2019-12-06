@@ -2,81 +2,82 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D4CC2BD09
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91FA9C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:43:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24F7024679
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:40:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5967224670
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:43:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G3UfLBzY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24F7024679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O2wDGqW9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5967224670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idIWs-0006yu-7r
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:40:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47570)
+	id 1idIZw-00010x-8p
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:43:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39630)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1idHOr-0002Cr-0g
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:28:18 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idIXl-0007mO-4L
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:41:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1idHOp-0004Ms-LU
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:28:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54529
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1idHOp-0004KP-E0
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:28:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575653295;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=19yQ4vp56OlBsL/0IrWKby5/zs2yahEC4NVwVl09/bk=;
- b=G3UfLBzYqlCXsU0y1w7G3tsyPap1TergDLakD7weNcp8zgYg1Do9nWfUNWWeOQtugi1xD1
- w4/Os6hTZ4+WF/9uLYo0DlTrQSeZ4AT43qyS86KAOTua0CTpetsFGOECA9RzSejZW488nn
- kgLdSQugQ6zs28CdteQv+C/zn85jjI8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-K79uiRAXONuXvi2zOw0w7Q-1; Fri, 06 Dec 2019 12:28:14 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B301B1005502;
- Fri,  6 Dec 2019 17:28:11 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A0C1E60BF4;
- Fri,  6 Dec 2019 17:28:06 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests RFC 09/10] arm/arm64: gic: Introduce setup_irq()
- helper
-Date: Fri,  6 Dec 2019 18:27:23 +0100
-Message-Id: <20191206172724.947-10-eric.auger@redhat.com>
-In-Reply-To: <20191206172724.947-1-eric.auger@redhat.com>
-References: <20191206172724.947-1-eric.auger@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1idIXi-0005fy-NF
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:41:32 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:44551)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1idIXg-0005dY-GN
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:41:28 -0500
+Received: by mail-ot1-x341.google.com with SMTP id x3so6607035oto.11
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 10:41:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=y3qrSWJ9tKXnvGZeIDT1ZIZabMRzmWdakCUiKtIRzm8=;
+ b=O2wDGqW9FUCHZH6upZUDAu3Xl3kQkbu0PiYH/bdTEFlGIjkUaYDk1FR4WwrmaVvnK+
+ k5B+W/K9yDdJWgQ86FYsKcNa0ob+RfKw9pICMFZedXoyxEyZgTOQbiPPZqsHO+Ut/wgo
+ XsjJz/vyGyxDyNdy4JOpUcj5SQZIL7zExUBDrfb/b9uwHVcItuPxc5P4wi/EB1y3m8Cb
+ 3cDiPrazD2BYNuWoGG8D6+mbzy4t9SHSe/A9g+moPgZXyDsvE3C6GL6hg23VfQ75K+IX
+ nbFxPjAfXe3daxfd4D2xJeB5qGbLN4VKE1TyRgPTWDZ8IHhql9VdMIOV0fzToJDGlSSc
+ 8JlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=y3qrSWJ9tKXnvGZeIDT1ZIZabMRzmWdakCUiKtIRzm8=;
+ b=kldeczBhExUmvE99f+GVS2SLyQ7iud7Ds9yud5RLku8NVIk3Eg/XiZnyeqg1pbIGDP
+ U0DZRXI5PhysUDPZrc/l22Nv4XxbbfDmXyrx9Tm22D3WYMUt2fwK4HsXiaO93XFkaXYQ
+ bHi2zE1qhhw57yTLLA4ewZJPam0S6l1D+nJFG9WCfrCyp90JeTLMuvjHn6STFoMrF0St
+ MgCr8VqcP+Jzoa2O55LxoNKfcPWufhjK6bgXB+26eO282qt549Xf8uNsAgI6hl50Y5ta
+ Dz4A6sZI6P0UHS3XiDVXSNelSEru6e6VggpGQB3EeTnIHJ66yvQal/Vb/cfPH7vHIDmw
+ NGxg==
+X-Gm-Message-State: APjAAAWPbvrn518dx9lP3V81t8vRHgu9pEeLxbNuwbiR7VO0DIjaHFp5
+ JhZFuA4rzywrV2yb8YDS7urNKgtd5gkRG9EB4Z6aHA==
+X-Google-Smtp-Source: APXvYqyddEknKNbnkRw3u8SFiEBTkX2BuxGO0yJAsmt1h8g7vKqhhrwFYi+rkYA473gpJNW2p/cvbTvPiqWXwNm6EDs=
+X-Received: by 2002:a9d:6745:: with SMTP id w5mr11724931otm.221.1575657687001; 
+ Fri, 06 Dec 2019 10:41:27 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: K79uiRAXONuXvi2zOw0w7Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-28-richard.henderson@linaro.org>
+ <CAFEAcA8taFKOtz0pM-N3KRiQrguh43SNLSM__ZJH5xzVK5YkZg@mail.gmail.com>
+ <ef270139-bca6-e7d9-57b8-b5a7416bbb56@linaro.org>
+In-Reply-To: <ef270139-bca6-e7d9-57b8-b5a7416bbb56@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Dec 2019 18:41:16 +0000
+Message-ID: <CAFEAcA-k9Ay3fEYOK=BKraFMhtm=9SxMqJNHGXZmDjpCeWGLWA@mail.gmail.com>
+Subject: Re: [PATCH v4 27/40] target/arm: Add VHE system register redirection
+ and aliasing
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,109 +89,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, andrew.murray@arm.com, drjones@redhat.com,
- andre.przywara@arm.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ipi_enable() code would be reusable for other interrupts
-than IPI. Let's rename it setup_irq() and pass an interrupt
-handler pointer. We also export it to use it in other tests
-such as the PMU's one.
+On Fri, 6 Dec 2019 at 18:36, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/gic.c         | 24 +++---------------------
- lib/arm/asm/gic.h |  3 +++
- lib/arm/gic.c     | 11 +++++++++++
- 3 files changed, 17 insertions(+), 21 deletions(-)
+> >> +static void el2_e2h_write(CPUARMState *env, const ARMCPRegInfo *ri,
+> >> +                          uint64_t value)
+> >> +{
+> >> +    CPWriteFn *writefn;
+> >> +
+> >> +    if (redirect_for_e2h(env)) {
+> >> +        /* Switch to the saved EL2 version of the register.  */
+> >> +        ri = ri->opaque;
+> >> +        writefn = ri->writefn;
+> >> +    } else {
+> >> +        writefn = ri->orig_writefn;
+> >> +    }
+> >> +    if (writefn == NULL) {
+> >> +        writefn = raw_write;
+> >> +    }
+> >> +    writefn(env, ri, value);
+> >> +}
+> >
+> > I see how this works when we have a readfn or writefn,
+> > but how does the redirection work where the access
+> > goes directly via .fieldoffset ?
+>
+> When there is no .writefn, we use raw_write, which uses fieldoffset.
 
-diff --git a/arm/gic.c b/arm/gic.c
-index adb6aa4..04919ae 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -215,20 +215,9 @@ static void ipi_test_smp(void)
- =09report_prefix_pop();
- }
-=20
--static void ipi_enable(void)
--{
--=09gic_enable_defaults();
--#ifdef __arm__
--=09install_exception_handler(EXCPTN_IRQ, ipi_handler);
--#else
--=09install_irq_handler(EL1H_IRQ, ipi_handler);
--#endif
--=09local_irq_enable();
--}
--
- static void ipi_send(void)
- {
--=09ipi_enable();
-+=09setup_irq(ipi_handler);
- =09wait_on_ready();
- =09ipi_test_self();
- =09ipi_test_smp();
-@@ -238,7 +227,7 @@ static void ipi_send(void)
-=20
- static void ipi_recv(void)
- {
--=09ipi_enable();
-+=09setup_irq(ipi_handler);
- =09cpumask_set_cpu(smp_processor_id(), &ready);
- =09while (1)
- =09=09wfi();
-@@ -295,14 +284,7 @@ static void ipi_clear_active_handler(struct pt_regs *r=
-egs __unused)
- static void run_active_clear_test(void)
- {
- =09report_prefix_push("active");
--=09gic_enable_defaults();
--#ifdef __arm__
--=09install_exception_handler(EXCPTN_IRQ, ipi_clear_active_handler);
--#else
--=09install_irq_handler(EL1H_IRQ, ipi_clear_active_handler);
--#endif
--=09local_irq_enable();
--
-+=09setup_irq(ipi_clear_active_handler);
- =09ipi_test_self();
- =09report_prefix_pop();
- }
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 21cdb58..55dd84b 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -82,5 +82,8 @@ void gic_set_irq_target(int irq, int cpu);
- void gic_set_irq_group(int irq, int group);
- int gic_get_irq_group(int irq);
-=20
-+typedef void (*handler_t)(struct pt_regs *regs __unused);
-+extern void setup_irq(handler_t handler);
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_H_ */
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index aa9cb86..0c5511f 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -236,3 +236,14 @@ int gic_get_irq_group(int irq)
- {
- =09return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
- }
-+
-+void setup_irq(handler_t handler)
-+{
-+        gic_enable_defaults();
-+#ifdef __arm__
-+        install_exception_handler(EXCPTN_IRQ, handler);
-+#else
-+        install_irq_handler(EL1H_IRQ, handler);
-+#endif
-+        local_irq_enable();
-+}
---=20
-2.20.1
+Yes, that's what I mean. There's no 'if redirect then this
+fieldoffset else that fieldoffset' codepath, so how does
+it update the right field?
 
+thanks
+-- PMM
 
