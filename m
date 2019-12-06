@@ -2,102 +2,91 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4140C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D35B4C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:22:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 741DF2173E
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:22:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1F2E2173E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:22:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FQOBdCgZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 741DF2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SMTgyLwG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1F2E2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idIFV-0004rj-9e
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:22:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34052)
+	id 1idIFe-0005Eb-Cr
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:22:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60556)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1idHga-0006NZ-MM
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:46:37 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1idHg1-0005m7-Tt
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:46:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1idHgY-0004tb-9V
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:46:36 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34104
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1idHgW-0004r1-3q
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:46:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575654389;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3RW5iekn261u88V+htHTfTeLvSH0GQFRgCSnUYDL4dU=;
- b=FQOBdCgZJnEBgAxg+kUdeCxg5b3nhM8kGRmC3X8RiCKRegrGScjH+h0Pm8LcFZ8HKsDcVq
- TUFizle581/8P5oUm5oIBAklxNB40ffFt7PRKs16ODCbpITTJtsK/K21kGw1x05eYrj2Yy
- 9R6RiwZTwvDGQ/ow1shsNq1bvFwY4rs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-BHUzw7FkM3WB2Mv686rJDg-1; Fri, 06 Dec 2019 12:46:28 -0500
-Received: by mail-wr1-f70.google.com with SMTP id y7so2694434wrm.3
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 09:46:27 -0800 (PST)
+ (envelope-from <richard.henderson@linaro.org>) id 1idHg0-0004JN-QC
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:46:01 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35363)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1idHg0-0004Gw-CV
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:46:00 -0500
+Received: by mail-pg1-x543.google.com with SMTP id l24so3655718pgk.2
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 09:45:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=+fTMpWPBwCKpCqV8qO6kMVlUDHWzwdoLpiyq66XcwJY=;
+ b=SMTgyLwGgqmK5Lm16vV4iVIS9Sk0krw+MFRSBO+zlMkAZCYLbXBHOe0lsacOUxbmBk
+ 7DL9LjtmKxIb45jq3ai8hgSRFVbVx+5Q3bjlE8OPAZi6OKi3rTRs7Or6Bhyi2UvF4Ax2
+ PHYHioQltXcdwXXBLwPAnoo/xVywvZJXuRXsPRl3uYPCh5ITFgb9HIoy+cgG2E20XXMw
+ enyLxaGx4Ls+relyVAArpS4sjQkwRmKKkPFofzkNy0nf5GRWItC+6qAW/oSjHNBvz5Pj
+ LK3TRoGRf4mh5C/EMtOlEDR3bwWur2jO0VHX2U6H3DFc+BA4fCb2UzcKCgOCUwzcRqEl
+ PZ3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=CKCdT+tlDyeURWzChG1t7XRuJA7azoiw3IC/vqT8Rls=;
- b=gOSrY/mvuTbegzEXXoWGvQNo5tzjM1YMFFk4jjq1/36ad7yAFFnKwNJVoSB7xoR6AW
- tCLm9jRXkvY8KErRVfFWK/yNQE5xaq/yh7k+WrNA8Botd2wyq1wK4UU+lCpC7q6d/kRc
- hOCQIPR28s7cjEdxj1UbjR9e3blJeRbOpyqujd34jFdWoUELylpWE0NuvkxrsMS1Y7qB
- TgO6hPsPvCzzUgmd84tNwS9tpmYSoz++QuutUPGIVl+ILgtZrLUGYLJWBVkqhvNxWrct
- 4nyNV+lpmW7+RFAVsLxluCzaMv8PWz9pt+P19kXW9EI1D8ELvz2K/+l6upvLU07wYTc9
- JiBA==
-X-Gm-Message-State: APjAAAWmfYVaJKqM25HVUMXY8WDodVvUR4FVdZu0yL09jDYQpQKX8T1M
- Tz2ahj1ps/wyJE9JGO1A+PItjV1086PaKYoZCzozjiGIYV41SINfdLQXWGtLgppjLaVOxDwk0i7
- Lz5E8Xjx73KqnEic=
-X-Received: by 2002:a1c:cc01:: with SMTP id h1mr11401988wmb.172.1575654387121; 
- Fri, 06 Dec 2019 09:46:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwIlZpZbQnHFRO3MOFohq+yPqJZ4mwVHWr7bxNDZzs0FThCQuyhoh6STGBPzKKjf75joHLGyQ==
-X-Received: by 2002:a1c:cc01:: with SMTP id h1mr11401970wmb.172.1575654386888; 
- Fri, 06 Dec 2019 09:46:26 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id c17sm16591487wrr.87.2019.12.06.09.46.25
+ bh=+fTMpWPBwCKpCqV8qO6kMVlUDHWzwdoLpiyq66XcwJY=;
+ b=UJGjeVvpIIgL2g7MNn6RAPxtJp3de0PnisaLnEHficPNSebvV2WmMBuCbXLGBZ7gOK
+ jWu1zRqONrj+G00iLwlTj/tEd0OgSo7HDlo7isORf7GrBPlCppA9vyyHRKm+bxWC27Xs
+ FgVLIGEppx7oW9EqEvsmbk+VDf/jXi3LgJviJ6+GC09ImUiAOwSMfoHYJuUN7Y/Mf/sX
+ xRVnDxZgAEHdCXOZL7r5L0gOre4jctO53pth0Xqi1mMpGI+5drYIDlTbuh0TsujOhVa3
+ FMJyPskkRlFn4PMWfIGCmV3OPmVSNlMyWiYSQTObyPj965t6UU+6/2PN4uZM2e181Ttv
+ aG0g==
+X-Gm-Message-State: APjAAAWmiDIJVyPXH6aGqjGTqoCz/SkJcwVb/+LFNRpbjs61TGPc5507
+ 3kDuIg709UrzpPApMWoTZhgpIQ==
+X-Google-Smtp-Source: APXvYqxWsL2vak7Zwd+GIlARGws6peo2c7aLHPenXpKWPsIGxl1JgY13+9ySoDyOIQu2NEE8PeIlbg==
+X-Received: by 2002:a63:4f54:: with SMTP id p20mr4807336pgl.246.1575654358388; 
+ Fri, 06 Dec 2019 09:45:58 -0800 (PST)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id 136sm15746431pgg.74.2019.12.06.09.45.57
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 06 Dec 2019 09:46:26 -0800 (PST)
-Subject: Re: [PATCH v8 15/37] target/mips: Style improvements in mips_malta.c
-To: qemu-devel <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-References: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1566216496-17375-16-git-send-email-aleksandar.markovic@rt-rk.com>
- <DM5PR22MB1658090DD9EF830F43F7957DD2A80@DM5PR22MB1658.namprd22.prod.outlook.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <64460769-1e63-ab16-c58f-79f5f848f3ff@redhat.com>
-Date: Fri, 6 Dec 2019 18:46:25 +0100
+ Fri, 06 Dec 2019 09:45:57 -0800 (PST)
+Subject: Re: [PATCH v2 3/5] target/arm: Handle trapping to EL2 of AArch32 VMRS
+ instructions
+To: Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <maz@kernel.org>
+References: <20191201122018.25808-1-maz@kernel.org>
+ <20191201122018.25808-4-maz@kernel.org>
+ <CAFEAcA_YGBXY4X5KYE_xny1bYtP1fKefT+VubmNYbe8TxdwBOw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <9a13fdd7-9ee8-4b1b-5740-9b6d9488fe9b@linaro.org>
+Date: Fri, 6 Dec 2019 09:45:55 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <DM5PR22MB1658090DD9EF830F43F7957DD2A80@DM5PR22MB1658.namprd22.prod.outlook.com>
+In-Reply-To: <CAFEAcA_YGBXY4X5KYE_xny1bYtP1fKefT+VubmNYbe8TxdwBOw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: BHUzw7FkM3WB2Mv686rJDg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,65 +98,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Aleksandar,
+On 12/6/19 6:08 AM, Peter Maydell wrote:
+>>  DEF_HELPER_FLAGS_3(autdb, TCG_CALL_NO_WG, i64, env, i64, i64)
+>>  DEF_HELPER_FLAGS_2(xpaci, TCG_CALL_NO_RWG_SE, i64, env, i64)
+>>  DEF_HELPER_FLAGS_2(xpacd, TCG_CALL_NO_RWG_SE, i64, env, i64)
+>> +
+>> +DEF_HELPER_3(check_hcr_el2_trap, void, env, i32, i32)
+> 
+> This has to be in helper.h, not helper-a64.h, otherwise
+> the arm-softmmu target won't build. helper-a64.h is for
+> helper functions which only exist in the aarch64 binary.
 
-On 8/19/19 4:47 PM, Aleksandar Rikalo wrote:
-> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
->  > Sent: Monday, August 19, 2019 2:07 PM
->  > To: qemu-devel@nongnu.org <qemu-devel@nongnu.org>
->  > Cc: philmd@redhat.com <philmd@redhat.com>; Aleksandar Markovic=20
-> <amarkovic@wavecomp.com>; Aleksandar Rikalo <arikalo@wavecomp.com>
->  > Subject: [EXTERNAL][PATCH v8 15/37] target/mips: Style improvements=20
-> in mips_malta.c
->  >
->  > From: Aleksandar Markovic <amarkovic@wavecomp.com>
->  >
->  > Fixes mostly errors and warnings reported by 'checkpatch.pl -f'.
->  >
->  > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->  > ---
->  >=A0 hw/mips/mips_malta.c | 216=20
-> ++++++++++++++++++++++++++++++---------------------
->  >=A0 1 file changed, 128 insertions(+), 88 deletions(-)
->  >
->  > diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-[...]>  > @@ -347,7 +362,8 @@ static uint64_t malta_fpga_read(void *opaque,
-> hwaddr addr,
->  >
->  >=A0=A0=A0=A0=A0 /* SWITCH Register */
->  >=A0=A0=A0=A0=A0 case 0x00200:
->  > -=A0=A0=A0=A0=A0=A0=A0 val =3D 0x00000000;=A0=A0=A0=A0=A0=A0=A0=A0=A0=
-=A0=A0=A0=A0 /* All switches closed */
->  > +=A0=A0=A0=A0=A0=A0=A0 /* ori a3, a3, low(ram_low_size) */
+Oh, while we're at it,
 
-I'm not sure what happened here, this change is incorrect.
+  DEF_HELPER_FLAGS_3(..., TCG_CALL_NO_WG, ...)
 
->  > +=A0=A0=A0=A0=A0=A0=A0 val =3D 0x00000000;
->  >=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
->  >
->  >=A0=A0=A0=A0=A0 /* STATUS Register */
->  > @@ -386,10 +402,11 @@ static uint64_t malta_fpga_read(void *opaque,=20
-> hwaddr addr,
->  >=A0=A0=A0=A0=A0 /* GPINP Register */
->  >=A0=A0=A0=A0=A0 case 0x00a08:
->  >=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* IN =3D OUT until a real I2C control is i=
-mplemented */
->  > -=A0=A0=A0=A0=A0=A0=A0 if (s->i2csel)
->  > +=A0=A0=A0=A0=A0=A0=A0 if (s->i2csel) {
->  >=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 val =3D s->i2cout;
->  > -=A0=A0=A0=A0=A0=A0=A0 else
->  > +=A0=A0=A0=A0=A0=A0=A0 } else {
->  >=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 val =3D 0x00;
->  > +=A0=A0=A0=A0=A0=A0=A0 }
->  >=A0=A0=A0=A0=A0=A0=A0=A0=A0 break;
->  >
-[...]
->=20
-> Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
->=20
+The helper does not modify tcg globals (on successful return).
+It does read globals (via the exception path), and of course it has side
+effects (the exception).
 
+
+r~
 
