@@ -2,53 +2,81 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.5 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3F5C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFFB0C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:43:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A510B20706
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:43:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A510B20706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE3F220706
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:43:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L5jOzS15"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE3F220706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idEp8-0004Jz-89
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:43:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34473)
+	id 1idEpA-0004L6-Cw
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:43:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEOo-00021a-2L
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:03 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idEQv-000497-SG
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:18:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEOm-0002PK-Fy
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:01 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:43535 helo=mail.rt-rk.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1idEOm-0000SP-8A
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:00 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 1F0B21A218C;
- Fri,  6 Dec 2019 14:58:14 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
- [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 054191A1D63;
- Fri,  6 Dec 2019 14:58:14 +0100 (CET)
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 0/5] mips: machines: Renovate coding style
-Date: Fri,  6 Dec 2019 14:58:02 +0100
-Message-Id: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+ (envelope-from <peter.maydell@linaro.org>) id 1idEQu-00056u-SM
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:18:13 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42302)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1idEQu-00055c-Mc
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:18:12 -0500
+Received: by mail-ot1-x344.google.com with SMTP id 66so5893020otd.9
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:18:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=O5nsFOtjimTarn9GS+btDv87kUC1vCLmzpNDta2HK4s=;
+ b=L5jOzS155bNCJ4UXbeMy8WfpGFnhylLmy6JTayxrFtoocFrgo2Aw2oRJ0YZKjnn0VJ
+ xeiluYE6eu0Mv5RqFmD/QLeJll5t92+PRB6GFtg3BkX5T8lEjjabwqm4c/ndwt/6kvdt
+ ZmKCfFPgkxQga/F5ExQsqnaobyvDIOUsKBnLYyIHrw2nAfZsaIU0/mqQNaEtKJJ+SE/J
+ pgDUhrpbYxMWfqMx4V4mVn/Su15wtVPPM6S47Gb7VBZJBU0TiCXT5RCB+57+jYoz/Ttp
+ 7j9PmUFQrKXEa1ncKT59cbS5ETBu1HGkIjurDbwzdpb1BdKB9FzKBW00a1zzL7ur9gGE
+ Vghg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=O5nsFOtjimTarn9GS+btDv87kUC1vCLmzpNDta2HK4s=;
+ b=IC3V5SZbadM1bHCcEpOUwtRB18spW2Cu+Kpigw4I8aWP6IetchiloB99TBXeifdibj
+ jm+ZQESQbvswlWQ0IdEZ9jZQS5B0ms4k9Id3LGulXZKuIRk8sc7WOpU6J3dDpRl7EgXN
+ K4GfcC3gMgoV/Jj4vu1XCD5/NhD4GYSkJOUpWc8+8SHLD96CyRbgYpTG2ofCLvffmYtU
+ vGsPTe/rjUs3Mc52KXw8D5JAFtAaj7TwqcgM3x3ADIzttzSCk5BzB3RWLaDc8RAiTUxQ
+ jnDH+K8ZS3QGL8eDBFrEt1FpEm3j8fV6nieF9pz4crQDgffNCOl9gKRaSxXUEXdq5WMM
+ 8LAg==
+X-Gm-Message-State: APjAAAV1csxDItmrGoa9N9EFfNdjanRRn9dwOXabqrzO1Yf/bdr55DQo
+ YyLzQZBakFCa34OqkI7J/DmF6gcd41CrjBAxDAMNxAQZ
+X-Google-Smtp-Source: APXvYqx0mgH1eZdXMJbTSz8/uk5lM8qaVRisD8J7Oy2Nvm8QuC/mlP7MyfC9Gfh/qiuuQgPFvQ56xF0sGkG+97F67Cs=
+X-Received: by 2002:a9d:12d2:: with SMTP id g76mr10680515otg.232.1575625923512; 
+ Fri, 06 Dec 2019 01:52:03 -0800 (PST)
+MIME-Version: 1.0
+References: <20191011134744.2477-1-richard.henderson@linaro.org>
+ <20191011134744.2477-21-richard.henderson@linaro.org>
+ <CAFEAcA93AX9nikuqq9M1jZOxv1a7QJZpiocHnn=n-gSbsGBS7w@mail.gmail.com>
+ <bcc3ff61-e737-2af2-5c0d-a6062cbaf083@linaro.org>
+In-Reply-To: <bcc3ff61-e737-2af2-5c0d-a6062cbaf083@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Dec 2019 09:51:52 +0000
+Message-ID: <CAFEAcA-pB5k6P5RS+BoFghrvGarPAB+OcAN38NouDhu_uEhepQ@mail.gmail.com>
+Subject: Re: [PATCH v5 20/22] target/arm: Create tagged ram when MTE is enabled
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -60,75 +88,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
- amarkovic@wavecomp.com, aurelien@aurel32.net
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The scripts checkpatch.pl located in scripts folder
-was used to check for errors and warnings in fllowing
-mips machines:
+On Thu, 5 Dec 2019 at 19:24, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 12/5/19 10:40 AM, Peter Maydell wrote:
+> > Are there really separate S and NS tag RAMs?
+>
+> Implementation defined, I believe.  As with everything about tag storage, it
+> would seem.  But since there are separate S and NS normal RAMS, I create
+> separate tag spaces to match.
 
-    Jazz
-    Malta
-    Mipssim
-    R4000
-    Fulong 2E
-    Boston
+Yeah, it seems like the obvious design. I just couldn't find anything
+in the spec that said it was possible. I'm probably missing the
+relevant paragraph.
 
-All generated errors and warnings were corrected
-and the script was ran again to make sure there
-are no more errors and warnings
-
-Note:
-
-    Boston machine was already clear of errors
-    and warnings so the boston machine files 
-    were not edited.
-
-Note:
-
-    One error occured due to the machro #IF 0.
-    That error was not corrected beacuse there
-    is some reduntant code within that macro that
-    might be used in future versions.
-
-v2:
-
-    * changed lines in hw/mips/mips_malta.c from 848 to
-      995 so that comments begin at the same line
-
-    * changed line 573 in hw/mips/mips_malta.c to fix
-      the build error due to the function g_new0 that is
-      used for allocating
-
-    * changed lines 103 and 107 in tests/acceptance/mips_malta.c
-      so that splitting lines are aligned vertically 
-      belove the opening brackets
-
-    * changed line 121 in mips_r4k.c so that INITRD_PAGE_MASK so 
-      that it is aligned vertically belove the opening bracket
-
-Filip Bozuta (5):
-  mips: jazz: Renovate coding style
-  mips: malta: Renovate coding style
-  mips: mipssim: Renovate coding style
-  mips: r4000: Renovate coding style
-  mips: fulong 2e: Renovate coding style
-
- hw/display/jazz_led.c                    | 123 +++++++++++-----------
- hw/dma/rc4030.c                          |  12 ++-
- hw/isa/vt82c686.c                        |  23 +++--
- hw/mips/mips_jazz.c                      |  32 +++---
- hw/mips/mips_malta.c                     | 169 ++++++++++++++++---------------
- hw/mips/mips_r4k.c                       |  55 ++++++----
- hw/net/mipsnet.c                         |  44 ++++----
- hw/pci-host/bonito.c                     |  60 ++++++-----
- tests/acceptance/linux_ssh_mips_malta.py |   6 +-
- 9 files changed, 281 insertions(+), 243 deletions(-)
-
--- 
-2.7.4
-
+-- PMM
 
