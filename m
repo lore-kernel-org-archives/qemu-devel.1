@@ -2,80 +2,80 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67818C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E640C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:34:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3572021835
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:33:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4963821835
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:34:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wzOh1GZC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3572021835
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cqur4xSj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4963821835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idIQG-0008WU-1c
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:33:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47601)
+	id 1idIRN-0000j8-CZ
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:34:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50274)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1idIOD-0007MC-GS
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:31:42 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idIOY-0007kX-Pc
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:32:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1idIOC-0004yv-I9
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:31:41 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37011)
+ (envelope-from <peter.maydell@linaro.org>) id 1idIOX-0006WV-GK
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:32:02 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44441)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1idIOC-0004wD-BS
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:31:40 -0500
-Received: by mail-oi1-x241.google.com with SMTP id x195so649753oix.4
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 10:31:40 -0800 (PST)
+ id 1idIOX-0006SF-5P
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:32:01 -0500
+Received: by mail-ot1-x344.google.com with SMTP id x3so6582746oto.11
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 10:32:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WfhvuPbds/YLdg45NFJDaUPOSfgQsOz0YuW97XoiAE8=;
- b=wzOh1GZCC6uRlMeeFne0YY7MeoxZhO338dPIewV/M8axDwVFvJ4DvQ/ozHE6fSAgLj
- U79GVCUkEKTTxgagwQ6OcEorC4yX6CnyisGd1BhhXZdAC2ob/R1t+TW7Av4QALUl1bcr
- yuv14uBLSsn7BGnXlxtPSlbeqbkdiOaPyQqIDzWqQi85igH671lHJypnQKNZy2/cEkER
- p4FbuVQhNlwp9EotWlH3sJUU7DdTTNItl9+MBLor+K7RXI84+yzeJyQOpW9RZJhlyF8+
- AeBfOgE5d1U4veVLfp7J6GATzWV6TYZ497DbHtClXLTM4l4Bm1X2V14N82wgnXUSoYsG
- siLA==
+ :cc; bh=lu07bfsNXvJyLxtguuPL5HrU16xG/Udq7hoIgPta040=;
+ b=Cqur4xSjBaqT4z+15gVgEQaqK0q79JFP7+t69rbf8gp/10G1eJUfd+4n5/MBwMfeZS
+ A2tYGKPON+VeMNwgEVaB7G13PZF2kavckaJe4gh/5reOHQ70OWNEU+zlgbc9PRjJvH/x
+ EF+7czCN7StzbUSBq+vA1GxHOZGi4mYemPVHFQbiCtTPxQf3ih1naeOeuvaRIrX9F7rn
+ 9DD7/BfNyz6GgIGYzz1mNzOSLixtXBK5vKAlBqDeRQiNU4PFNUkbHCObNVWGfSnTj3Mq
+ iWRqAGwjRrJtMNrruNrQ5+lGO3KV5HCGg6wl1pHvdfIXN5EnH9cgiBL2hofhc+2JhFlu
+ R+nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=WfhvuPbds/YLdg45NFJDaUPOSfgQsOz0YuW97XoiAE8=;
- b=YyihF7H8eUV+0IoWdgpwhttvoI7IhQgkMpKhTwiOx1zLZLkkpcrzbJYRjyr9bRBxyW
- 5b3I8e9FHFZIoaHN+c3NCzd29ClPmP2og4XUh5Ya+m9eIp2hrh+1q+KzPwT4LIUaKmXI
- YBCibcLQyZaS/L+LyWaVPXUf4NDDRowW/DTw0Tr+tQIzKlHlZm5Gylb9G4ERpAgDK42u
- XuNdC4oCfQreX8lVv5gX6gY4fI+2BFZ2623MwtoETExAEULpjTlPm3+mQmgmMZzUrviS
- ai+0C+v+R70ZhltoxFSnHewPygWNH7MWVwDViNUlBbfovCduuYfLBT73IFfJcUlBv093
- F8mQ==
-X-Gm-Message-State: APjAAAXDn1HvMb/jQUDfPEa70oOX/i+Icd8/vRKjoqiBHIsUdK/q1H6m
- 3FL2vVpeyIbAErUwtQt5TdKUQfZIoNZQW232ML3TJA==
-X-Google-Smtp-Source: APXvYqybxLl6PeQEuR6peSWmI395y+PGco8HyXac0IuLJGYJNhvUGGAX6OMXztyskr5FF1P6h1pnvnDEnnz5NQ8BMDY=
-X-Received: by 2002:aca:f5cc:: with SMTP id
- t195mr13779767oih.163.1575657099595; 
- Fri, 06 Dec 2019 10:31:39 -0800 (PST)
+ bh=lu07bfsNXvJyLxtguuPL5HrU16xG/Udq7hoIgPta040=;
+ b=BtEsXS7FZ6e9+W4ulhrM/ACLAG2znbmzQmjrz8HwmxV6YHsNfDlq+8tZO+rpiUwRXx
+ RgrXWjwR/QoTD32YvmS9ftT9HVOYZ83RiQyhZSvj0ytsgn7Ft9okK54yvMZ7LNUQ67lm
+ dlned0YSUt3GGB/6c1moFYJ5hRJyKKy0hEdNRjrlUqrDDTbMkh00tvFfwwifc1kR86ro
+ 5KEGfIuQfqLrHflXDXDfwTQ0twhVEmAqbaPxBG2ZP6r5PjK6/kEvX51acon9mldOvdHX
+ 5+b6iNL3UBIuH29a3TIqEn62YORyAFBozpWXw39d3q7kiNUKhEQ3nRWkXDACRHCRl9mm
+ +8hA==
+X-Gm-Message-State: APjAAAWGc8cQZyDaWGcG/YttVPqaaODz9vFovollBq8kjPOPpQAV9IVR
+ yVLZ8zza7TpOnXtsdumtFqAoNQM7cux+DrvGF4vsQw==
+X-Google-Smtp-Source: APXvYqxBNgsG1SRZZ6c0NdwJuTgvB7H7b26gaxmESnegfC+aJ4cogEmlieDedraUbNuuEykX2reiw9pY99QlbGgHjS8=
+X-Received: by 2002:a9d:12d2:: with SMTP id g76mr12646155otg.232.1575657120214; 
+ Fri, 06 Dec 2019 10:32:00 -0800 (PST)
 MIME-Version: 1.0
 References: <20191203234244.9124-1-richard.henderson@linaro.org>
- <20191203234244.9124-4-richard.henderson@linaro.org>
-In-Reply-To: <20191203234244.9124-4-richard.henderson@linaro.org>
+ <20191203234244.9124-5-richard.henderson@linaro.org>
+In-Reply-To: <20191203234244.9124-5-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Dec 2019 18:31:28 +0000
-Message-ID: <CAFEAcA9MVG1=x5LMYYeBZYh8-ZmK_JMe3DhXn1NT9G=iUuuo+Q@mail.gmail.com>
-Subject: Re: [PATCH 3/4] target/arm: Implement UAO semantics
+Date: Fri, 6 Dec 2019 18:31:49 +0000
+Message-ID: <CAFEAcA_iYsgguYyngs_o2WvvRy34Ny8YD_iihpevuVtmPSPijw@mail.gmail.com>
+Subject: Re: [PATCH 4/4] target/arm: Enable ARMv8.2-UAO in -cpu max
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,13 +95,28 @@ Sender: "Qemu-devel"
 On Tue, 3 Dec 2019 at 23:42, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> We need only override the current condition under which
-> TBFLAG_A64.UNPRIV is set.
->
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/arm/helper.c | 41 +++++++++++++++++++++--------------------
->  1 file changed, 21 insertions(+), 20 deletions(-)
+>  target/arm/cpu64.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 9399253b4c..03377084e3 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -674,6 +674,10 @@ static void aarch64_max_initfn(Object *obj)
+>          t = FIELD_DP64(t, ID_AA64MMFR1, PAN, 2); /* ATS1E1 */
+>          cpu->isar.id_aa64mmfr1 = t;
+>
+> +        t = cpu->isar.id_aa64mmfr2;
+> +        t = FIELD_DP64(t, ID_AA64MMFR2, UAO, 1);
+> +        cpu->isar.id_aa64mmfr2 = t;
+> +
+>          /* Replicate the same data to the 32-bit id registers.  */
+>          u = cpu->isar.id_isar5;
+>          u = FIELD_DP32(u, ID_ISAR5, AES, 2); /* AES + PMULL */
+> --
+> 2.17.1
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
