@@ -2,83 +2,82 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45702C2BBE2
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6405BC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:12:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1227920706
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:11:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30E3020706
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 17:12:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hvDggZFj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1227920706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gB31Ta5p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30E3020706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41559 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idH8h-0001Pi-Pi
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 12:11:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60129)
+	id 1idH97-00029N-Pr
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 12:12:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36416)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1idFvc-0001kn-Kj
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:54:02 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idFHi-0005t2-K3
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:12:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1idFva-0001zV-Sd
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:54:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46528
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1idFva-0001yB-KO
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:53:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575647637;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XMyXLnZx1HcSf6nldweKgc+mzWm5UABf0c3JdxyhcTg=;
- b=hvDggZFjzp+rMIWWJPrYC2NVC1IrbnrPYmuTQEZvBprG3LF1eCwfLZgjfzzgOuYjnd0M+7
- EyuOOl4CjNcqLE80E1LNcTgfaQ8g+Vsh9FiublNSjcdlqGx6dJ2HQSR0uL8HPfoCa/GiCd
- JrPW/nS6s8txUzjH8aD8lg/k3LSYf88=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-297-FKOyL7pfOUa6xLnZQhe2ig-1; Fri, 06 Dec 2019 10:53:56 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE284801E76;
- Fri,  6 Dec 2019 15:53:54 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 802B519C7F;
- Fri,  6 Dec 2019 15:53:54 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1203E1138606; Fri,  6 Dec 2019 16:53:53 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v8 06/21] qdev-monitor: well form error hint helpers
-References: <20191205174635.18758-1-vsementsov@virtuozzo.com>
- <20191205174635.18758-7-vsementsov@virtuozzo.com>
-Date: Fri, 06 Dec 2019 16:53:53 +0100
-In-Reply-To: <20191205174635.18758-7-vsementsov@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Thu, 5 Dec 2019 20:46:20 +0300")
-Message-ID: <87blslcuwe.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <peter.maydell@linaro.org>) id 1idFHf-0006CD-N4
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:12:44 -0500
+Received: from mail-oi1-x236.google.com ([2607:f8b0:4864:20::236]:43283)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1idFHf-0006Af-Db
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:12:43 -0500
+Received: by mail-oi1-x236.google.com with SMTP id x14so14974oic.10
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 07:12:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fIBaNeFOZ37BGpa+Pr3035ahuSXMmGbC1qGhADzI+gI=;
+ b=gB31Ta5pICnU8zfpO+0k7SLBFNEgO3Ab6EpYi0fg1MN07w2BCofqsJ+zFLQgFe9BPJ
+ 0IgligFJHriHNc5ePfySog7fwUEcLWE4uuxNVMJJ9NpGmwhlcom+I6Fm5XpWVzm7Dqg8
+ RWMTHDMF73IE29S9ufFAbG90wBbEniHA38vL5OZH9zHxfSHvFKbQCIvCwjXJnTYSSWpS
+ /ziW6p9bfG3j5FOJGNBqq5jQd85oU158aoOIecWm3ZWgFROmKyal0GUbZSWrMYwZoivo
+ g/2BMiatpAvNXpqN39QL/zNnia7T4OhbQkit6GJAzKrwztjVzaD6wazKbwjrYqIf5vwo
+ eCGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fIBaNeFOZ37BGpa+Pr3035ahuSXMmGbC1qGhADzI+gI=;
+ b=fBVrb5ZZ+wOvnV9ohHypJ3LCKaSpFwTd6usSHx0Kd9sIb5ny8z09p0BlGVhBWFO721
+ xh+Veh0+36By9/i5AxHvLr5vsVlbHEtiRbzmMJH2UDa5cs3rN4xrz4UPhfC/q9D3/aT2
+ PYMpBMjgen5ADLbpwjaLBwMobYYwcoF+C34JbpJ6aAKJtw0UbGlu005oDFyZSJnGrTNu
+ +Ft/wDWx1Z4ylTRtMJ/0sbS9lPXGmS/6ybTIdxRNk44L9yi+CKRIKl1nN2KBXvdHCWvS
+ gfc1Lio8a4AAqqIcoDZ5AsX1eI/damHi9trzYkcbEZjyyXds/YznZFsItAFDqylI/NDL
+ +Srg==
+X-Gm-Message-State: APjAAAXN6Wd8PspMLOiqh5SkZ7XvopjmnjE9n+xj2K8zTNYc9eGprvFf
+ G6r2wMoGDckGlBPXQ4U7nfUymi8xBi0o+e7/rxAtHQ==
+X-Google-Smtp-Source: APXvYqwi+ETXGrn5Ju2rH9gezIchib/aRlnHg3SsqgDQTX7+BQ7FXGTu5yfXENANdtBDNxvSjj9OZjrxainv7JIu4lo=
+X-Received: by 2002:aca:f5cc:: with SMTP id
+ t195mr12770833oih.163.1575645162493; 
+ Fri, 06 Dec 2019 07:12:42 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: FKOyL7pfOUa6xLnZQhe2ig-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+References: <20191206150844.20124-1-crosa@redhat.com>
+In-Reply-To: <20191206150844.20124-1-crosa@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Dec 2019 15:12:31 +0000
+Message-ID: <CAFEAcA8ekevaZnwOg5bwJmkFkDFaC_qkrLLESLbSJs=L80viHA@mail.gmail.com>
+Subject: Re: [PULL 0/1] Fix for m68k/q800 acceptance test for QEMU 4.2-rc
+To: Cleber Rosa <crosa@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::236
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,27 +89,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Beraldo Leal <bleal@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
-
-> Make qbus_list_bus and qbus_list_dev hint append helpers well formed:
-> switch errp paramter to Error *const * type, as it has uncommon
-> behavior: not change the pointer to return error, but operate on
-> already existent error object.
-> Rename functions to be error_append_*_hint.
+On Fri, 6 Dec 2019 at 15:09, Cleber Rosa <crosa@redhat.com> wrote:
 >
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> The following changes since commit 1bdc319ab5d289ce6b822e06fb2b13666fd927=
+8e:
+>
+>   Update version for v4.2.0-rc4 release (2019-12-03 17:56:30 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/clebergnu/qemu.git tags/python-next-pull-request
+>
+> for you to fetch changes up to 820649aa00ee343a0d473ad1002c59c70ba8c158:
+>
+>   tests/boot_linux_console: Fetch assets from Debian snapshot archives (2=
+019-12-06 09:48:35 -0500)
+>
+> ----------------------------------------------------------------
+> Fix for m68k/q800 acceptance test (Philippe Mathieu-Daud=C3=A9)
 
-"well form error hint helpers" tells me nothing.  PATCH 03 does the same
-(less function renames), and is titled "make Error **errp const where it
-is appropriate".  I like that better.  No big deal, and certainly not
-worth a respin by itself.  I'm happy to touch up commit messages in my
-tree.
+Any pullreq after about rc2 needs to clearly say
+what it's fixing and why it's justifiable for it to
+go in rather than waiting for the next release.
+Otherwise you get the default response:
+  nope, not at this point in the release cycle.
 
+thanks
+-- PMM
 
