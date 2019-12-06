@@ -2,83 +2,92 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B73CC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2402C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:28:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 298E52173E
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:27:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD3742173E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:28:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NPrSmIT2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 298E52173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="If9fYsHv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD3742173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idIKG-0002Ce-9g
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:27:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42640)
+	id 1idILM-0003gD-R2
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:28:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36287)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1idH5H-0006gE-Hc
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:08:04 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1idIDN-0002Q2-HC
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:20:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1idH5E-0003yv-5d
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:08:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47616
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1idH5B-0003vF-O6
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:07:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575652076;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=p5Dv4GFUOmdHnLB1hh/4DNoFT8nFVXHrpvrwfU+xUc0=;
- b=NPrSmIT2m1fMm0MLw5HjPeM0b5s1YffPHc+uqMU+35AlLbab4ncBTOeGv3//smIMaeSB9A
- tD07DWjeiQH0/0ZDpbrivPMc34dWocGYI9tKwbzX8g8ZC5SXEYzC/h0+wWF7LOEB7kuPgX
- YIuA8PI/fqjoMUkw7AVn6W0XvP6QZYk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-313-mwtoZjKzNSuQQKtLEtaGBg-1; Fri, 06 Dec 2019 12:07:53 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E234A801E76;
- Fri,  6 Dec 2019 17:07:51 +0000 (UTC)
-Received: from redhat.com (ovpn-112-49.ams2.redhat.com [10.36.112.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0210119C4F;
- Fri,  6 Dec 2019 17:07:50 +0000 (UTC)
-Date: Fri, 6 Dec 2019 17:07:47 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Aijaz.Baig@protonmail.com
-Subject: Re: Error compiling Qemu-4.1 on Linux
-Message-ID: <20191206170747.GD3291374@redhat.com>
-References: <003101d5ab71$8424dc40$8c6e94c0$@protonmail.com>
- <20191205143622.GB3080934@redhat.com>
- <000101d5ac55$f8422620$e8c67260$@protonmail.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1idIDM-0006MQ-GK
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:20:29 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42918)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1idIDK-0006K3-Az
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 13:20:26 -0500
+Received: by mail-pl1-x642.google.com with SMTP id x13so3040071plr.9
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 10:20:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=oOzYyprudmU67qFl8SvHvrIwSli35oGOiUxchYjoPpQ=;
+ b=If9fYsHv948uhmP9qb6KQSusBrsi+xsuwyJ09LpzFimh61AkmlRzGONqWUsyM6x7i9
+ ssvvH/FpEXntdaVDP1H69Sf3M9jJq96evNBh0EIdsI7FzFiB6X9XO4pS5FYv0XfaYTTm
+ Q4x41XbKQCHcfF1cxVC6VCOKXidoAgBYk8QPOJdoZWDq/6gxNnL/F2V+SEJCkbo+2JwL
+ F/q68dHhkG1+R2uq0ty6TS8+SipD0/7fI5HLt2Vbl5P+8HWvPgDeWvTrCv16TW7ebZZ9
+ cRaXMmrXKCVnfDetP8vjUJljRNxzHq11NNuYoLXnga/Ujk6e8F4scxHhnNZVHUfLdeSn
+ 7MKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=oOzYyprudmU67qFl8SvHvrIwSli35oGOiUxchYjoPpQ=;
+ b=EnsvPcAqSjtl36oYFLq7bzspPaKhT0+V5y/90TtzRaE/zLyz3uC4mxC9jR8wHC6GZp
+ /8UJaKqzkg1gPmgfEIoo4AYM9C08GjbZssw2pywzxlnfIkYTQyMEXqZ/uAaYGSLbWbfX
+ PlJGs2nCutE1LHtB6yX/92Ne3wEYMkpFM5aGYeIqclB+mMbs3N5lM+fhJV+QMU73GYy0
+ c5tmYURRt6CsNfGbWjnGnFL662LvTbfLKFUNznFGPN7IKO7PPhO+dOR1jYFKDP9vsc3N
+ jAmvpC7ufOY0KHv0NNXtURfvxVvJDqnVXDP5lmzGdysFYdooEm9pyLraGRsdVdgOwveA
+ 240Q==
+X-Gm-Message-State: APjAAAX0QyHmDSeW6dFqOTuaGgUud4ewnVbUwrUGs1mCOm9iUXmqAh7L
+ kcvPpgHDJvMmiDBU6srN4lulwA==
+X-Google-Smtp-Source: APXvYqynv8QzhTBEqBQu8SALhwtbfE0fz7rO7A/MSZbCGw6GUI3pAp5UgZFPrZcoZ3ysKpf6GNQi2w==
+X-Received: by 2002:a17:90a:f0d6:: with SMTP id
+ fa22mr16961918pjb.136.1575656425169; 
+ Fri, 06 Dec 2019 10:20:25 -0800 (PST)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id i9sm17571643pfk.24.2019.12.06.10.20.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 06 Dec 2019 10:20:24 -0800 (PST)
+Subject: Re: [PATCH v4 10/40] target/arm: Rename ARMMMUIdx_S1NSE* to
+ ARMMMUIdx_Stage1_E*
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-11-richard.henderson@linaro.org>
+ <CAFEAcA_Q8foDFHbqLBCewnYPbSz8-VT2OU49tQsX2No+Yn0avw@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <e4e75e1c-7659-37fa-541e-962115526c4f@linaro.org>
+Date: Fri, 6 Dec 2019 10:20:22 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <000101d5ac55$f8422620$e8c67260$@protonmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: mwtoZjKzNSuQQKtLEtaGBg-1
-X-Mimecast-Spam-Score: 0
+In-Reply-To: <CAFEAcA_Q8foDFHbqLBCewnYPbSz8-VT2OU49tQsX2No+Yn0avw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,43 +99,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 06, 2019 at 04:55:37PM +0000, Aijaz.Baig@protonmail.com wrote:
-> Here is the content of config.log: https://pastebin.com/6zrSXWAG
->=20
-> I am configuring it for 'arm-softmmu'  as can be seen from the above past=
-e
+On 12/6/19 7:47 AM, Peter Maydell wrote:
+> On Tue, 3 Dec 2019 at 02:29, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>>
+>> This is part of a reorganization to the set of mmu_idx.
+>> The EL1&0 regime is the only one that uses 2-stage translation.
+>> Spelling out Stage avoids confusion with Secure.
+> 
+> If you didn't delete the 'NS' from the name then it
+> wouldn't be confusing...
 
-Looks like it is failing on
+It is not obvious to my eye how to break up S1NSE0 -- 'NS' is buried in the
+middle.  It might be different if these names were architectural, as if the AT
+names, but they're not.
 
-  $ pkg-config  --atleast-version=3D2.40 gthread-2.0
+I think it is clearer to reserve 'S' for 'Secure', and use it consistently.
+E.g. not the current "S1E3" (stage 1 e3), but "SE3" (secure e3).
 
-returning non-zero exit status.
+I think it is clearer to simply document that, unless "Stage" is present in the
+name, the tlb contains the complete translation.  This makes "S12" redundant
+off of "NSE0", and "S1" off of "E3".
 
-
-This suggests the file:
-
-  /usr/lib/x86_64-linux-gnu/pkgconfig/gthread-2.0.pc
-
-is missing on your install.
-
-Or do you have some PKG_CONFIG_LIBDIR env variable set that
-is mistakenly pointing to a different directory.
+We'll still need a renaming of with SecEL2, since "SE0" is no longer complete;
+we will need to specify "Secure EL1&0" vs "Secure EL2&0".  Thus perhaps
+"SEL10_0" to match the "EL10_0" name that I'm using in this series.
 
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+r~
 
