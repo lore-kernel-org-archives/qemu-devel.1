@@ -2,81 +2,99 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C004C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:12:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ABB5C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:14:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDAA124659
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:12:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25C0D24659
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:14:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VOSYcnF3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDAA124659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AysqhNyg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C0D24659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39460 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idFHt-0005On-Im
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:12:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54298)
+	id 1idFIv-0006UE-72
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:14:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1idETX-0006So-Hd
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:20:57 -0500
+ (envelope-from <philmd@redhat.com>) id 1idEZR-0004u4-Aa
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:27:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1idETP-0000ah-E3
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:20:48 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40021)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1idETO-0000Ys-PB
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:20:46 -0500
-Received: by mail-ot1-x341.google.com with SMTP id i15so5902631oto.7
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:20:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=KhS4gG43qgtC91LEgSVI97VHTZLo7KkC/ba4BqbDDQA=;
- b=VOSYcnF3rR0AwaPLcHqOYQhhO3CElLvh+Rawv3pFS0HhebTxFVXscRXeGD+3CxeQ5O
- huEE8S4lWuSZHvXiHhhZQMqE6E5Bqf+8RXUxPz0ORzaKk/u0V8sw8RVbQMMIyNAj0Mkt
- 27U+/ugbKPZWsjq8RLxImQnin6CsFP3AD+pJA+pCaDXWpJyyRUBCQ8mvI349NvA3WyfF
- f6T++ZZlU4krHslZ20AJcYJ/gkpkakzn4oGd6EnQwnWSyteLe+Y9p+mtwenExiyzDU2+
- bYXGfGq6hoKBfgOpDfUWogzlItmfD+Etro2yOGn5nnc4Ub71Rvo4SY8X82mAfxIna/Uf
- 6Ktg==
+ (envelope-from <philmd@redhat.com>) id 1idEZQ-0003Hr-21
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:27:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42685
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1idEZP-0003E9-Pr
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:26:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575642419;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=drrlUBeRXsH4//fRAOs9Q0PWBLoHnYTTfAGzS/Zfl0M=;
+ b=AysqhNygj4IEzdGIZImvEUJ57eHdtatrH6YYSqeDyjhYYjfpbp7kUFaGow6n7o5S5HkEdD
+ ZAcBxtpXRghbGW9gsBgW3rVt2+/aOlpXOYjBJ4c4EklyfVcDnqKuiidAmwuynl/6HK0Rni
+ 98UP9OdaHTrbENyiRyegb7PIuj+AI8Y=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-334-hNCOUhXaOK202cR_MjAeoQ-1; Fri, 06 Dec 2019 09:26:58 -0500
+Received: by mail-wr1-f71.google.com with SMTP id u12so3212372wrt.15
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:26:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=KhS4gG43qgtC91LEgSVI97VHTZLo7KkC/ba4BqbDDQA=;
- b=mFQodobfohuZdCYBIMELY1K5UyLjqodu/OkoRG5PbXWpBRSH3BM7ZELD50fLNJqAxJ
- GF5C4S/oVCTGwzbIyJ6H5Nbyw6NhXnBgiEHIbIJH/+mYxDfFNT01vy1i16Nnurr1hB8Y
- PzrcKmn7g0b+l7c6SFbC7ksFPDfd8fJDHLt6dD1eYG/eHBMH7k4x7IODPiOsBjh8pymy
- JMhGCF4KeAlTac7WB7vCUGnN6Hjm6JvvCEjf/NLh7VOLoWrHhDbQjQk6IHz0o19xt9QM
- mc8pWgnUkSQ5Eg7mOkpF42smJitqu3Dd/W/q4ZZJogEcZx/U3+7JTTp3Zvxe+8ViHwdl
- +Qrg==
-X-Gm-Message-State: APjAAAVM8HOv4wpU0ebj7J06cbrbMViIqBRYgIdMxqTBflGkgMwScxLK
- EvRlI578SaFmQctToBLbBpmJV4HmI2+w8lfzzdoxlQ==
-X-Google-Smtp-Source: APXvYqzon2R7riMvCbIfmw0eUySY3t+l0thH4e4kjiebly2OpJH162ICKgk240/4T+npqt9OnzSAi+lnq1kejn41kC0=
-X-Received: by 2002:a9d:6745:: with SMTP id w5mr10496157otm.221.1575640246856; 
- Fri, 06 Dec 2019 05:50:46 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=drrlUBeRXsH4//fRAOs9Q0PWBLoHnYTTfAGzS/Zfl0M=;
+ b=rTfLon7zq1F17EGw5BZ7ziBMPFRPM/79kX6GQxBJi7cTvog729OQ5l7AKMxzt83KoC
+ mNADRtkrfiU7oP1LCSmVmAingp+pgHoWz6K3WMabQtMbM4lniUAHzepzcnwpHPnrKXFW
+ G7b+FRdQNsN0JRKVQs08oodh+j0pRp4sGqy2U9L7eiQrZe1UfiHX6DeMK6EfW95YH7OX
+ HfWL9wm9keFxUzz/VQwJTvnO6owx4dglDoX+WTKWDpTf9UCSSv5Bx4EVeFEe+XAWpw+U
+ WcO6fujngRYhp6mtSCj77W79hP9deVoidH/BUJb5AdG20wdNMcOXaBm39hsfcCZVEwIP
+ 5rug==
+X-Gm-Message-State: APjAAAX4a7+lGphH04CL8A7VFiaHlLNhezXyLI0ts/IsAFmctk8F+WWL
+ eVIkD79pe3CS5bmNzulobupvWdab4aVNVbUclzDraNs81oNoLDxaxr4jytHU4vNgZ5/t4XeYdxi
+ YSVV/2lTocXpoci0=
+X-Received: by 2002:a7b:c851:: with SMTP id c17mr9297087wml.71.1575642416829; 
+ Fri, 06 Dec 2019 06:26:56 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzICzQzyAC9nTfuBbYeu+41iRx2AFm5TwOleq1EQSVuLNkCx8pCAq4pXMsBhWBpOhGml4FVzA==
+X-Received: by 2002:a7b:c851:: with SMTP id c17mr9297072wml.71.1575642416652; 
+ Fri, 06 Dec 2019 06:26:56 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id c2sm16462376wrp.46.2019.12.06.06.26.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 06 Dec 2019 06:26:56 -0800 (PST)
+Subject: Re: [PATCH v2] s390x/tcg: clear local interrupts on reset normal
+To: Cornelia Huck <cohuck@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ David Hildenbrand <david@redhat.com>
+References: <20191206135404.16051-1-cohuck@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <2556651d-d5bd-6753-96fd-0bcc1c4df8c3@redhat.com>
+Date: Fri, 6 Dec 2019 15:26:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <1552098649-28341-1-git-send-email-guoheyi@huawei.com>
- <20190312170859.73f0de9d@redhat.com>
- <ca5ccc80-663f-83e6-d9ce-4d5e3749988d@huawei.com>
-In-Reply-To: <ca5ccc80-663f-83e6-d9ce-4d5e3749988d@huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Dec 2019 13:50:35 +0000
-Message-ID: <CAFEAcA_v3bh+1h8+ti_t5Kkp1M9zhEmtsqSQzcHhAobr_+JxMQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/2] arm/acpi: simplify aml code and
- enable SHPC
-To: Guoheyi <guoheyi@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+In-Reply-To: <20191206135404.16051-1-cohuck@redhat.com>
+Content-Language: en-US
+X-MC-Unique: hNCOUhXaOK202cR_MjAeoQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,50 +106,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- wanghaibin.wang@huawei.com, Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 30 Nov 2019 at 03:47, Guoheyi <guoheyi@huawei.com> wrote:
->
-> Hi Peter, Igor,
->
-> I couldn't find these 2 patches in the latest tree. Could you help to
-> merge them?
+On 12/6/19 2:54 PM, Cornelia Huck wrote:
+> We neglected to clean up pending interrupts and emergency signals;
+> fix that.
+> 
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+> 
+> v1->v2:
+> - rebased on top of my s390-next branch; we can now move the fields
+>    to be reset instead of clearing them manually
 
-In future I recommend pinging unapplied patches with a shorter
-delay than nine months :-)  In QEMU's process, unless somebody
-has specifically said they've picked up the patch, it still
-"belongs" to the submitter to chase if it hasn't been
-applied. In this case I simply didn't see Igor's request
-that I take it -- the chances of me actually reading any
-particular list email even if it's cc'd to me are not good.
+Yep, much cleaner than v1 :)
 
-I tried applying them to target-arm.next but unfortunately
-they break 'make check':
+> Further cleanup possible in a follow-up patch.
+> 
+> ---
+>   target/s390x/cpu.h | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 7f5fa1d35b73..e195e5c7c8bb 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -98,10 +98,6 @@ struct CPUS390XState {
+>   
+>       uint64_t cregs[16]; /* control registers */
+>   
+> -    int pending_int;
+> -    uint16_t external_call_addr;
+> -    DECLARE_BITMAP(emergency_signals, S390_MAX_CPUS);
+> -
+>       uint64_t ckc;
+>       uint64_t cputm;
+>       uint32_t todpr;
+> @@ -117,6 +113,10 @@ struct CPUS390XState {
+>       struct {} start_normal_reset_fields;
+>       uint8_t riccb[64];     /* runtime instrumentation control */
+>   
+> +    int pending_int;
+> +    uint16_t external_call_addr;
+> +    DECLARE_BITMAP(emergency_signals, S390_MAX_CPUS);
+> +
+>       /* Fields up to this point are cleared by a CPU reset */
+>       struct {} end_reset_fields;
+>   
+> 
 
-  TEST    check-qtest-aarch64: tests/bios-tables-test
-acpi-test: Warning! DSDT binary file mismatch. Actual
-[aml:/tmp/aml-4IELC0], Expected [aml:tests/data/acpi/virt/DSDT].
-acpi-test: Warning! DSDT mismatch. Actual [asl:/tmp/asl-AOELC0.dsl,
-aml:/tmp/aml-4IELC0], Expected [asl:/tmp/asl-XL7KC0.dsl,
-aml:tests/data/acpi/virt/DSDT].
-**
-ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/tests/bios-tables-test.c:477:test_acpi_asl:
-assertion failed: (all_tables_match)
-ERROR - Bail out!
-ERROR:/home/petmay01/linaro/qemu-from-laptop/qemu/tests/bios-tables-test.c:477:test_acpi_asl:
-assertion failed: (all_tables_match)
-Aborted (core dumped)
-/home/petmay01/linaro/qemu-from-laptop/qemu/tests/Makefile.include:918:
-recipe for target 'check-qtest-aarch64' failed
-
-Could you fix and resubmit, please?
-
-thanks
--- PMM
 
