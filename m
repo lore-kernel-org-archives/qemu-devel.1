@@ -2,56 +2,80 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,PDS_BTC_ID,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_SBL,URIBL_SBL_A,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6582DC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:53:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A955BC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:53:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D91F2075C
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:53:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D91F2075C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
+	by mail.kernel.org (Postfix) with ESMTPS id 74F2424673
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 14:53:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="a0uail9i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F2424673
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idEyb-0007by-QH
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:53:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35386)
+	id 1idEyo-0006xU-2X
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 09:53:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33587)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEP4-0002D9-PX
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:21 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1idEUt-00088R-Sw
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:22:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1idEOt-0002dN-M9
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:12 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:47561 helo=mail.rt-rk.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1idEUs-0003Jg-DK
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:22:19 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:39272)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1idEOs-0002ac-L1
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:16:07 -0500
-Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 9CFA91A219F;
- Fri,  6 Dec 2019 14:58:14 +0100 (CET)
-X-Virus-Scanned: amavisd-new at rt-rk.com
-Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
- [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 739821A1D63;
- Fri,  6 Dec 2019 14:58:14 +0100 (CET)
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1idEUr-0003AK-Qp
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:22:18 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id AD13A96EF0;
+ Fri,  6 Dec 2019 13:42:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1575639748;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=TBW7+cT58E+tpStNNfLAaBdbfCiVU8gjkh1T28tyR3k=;
+ b=a0uail9iVXByj0ettLGJu+EE5QfuZsAV8O6UP/9h2yYFtjelFfxKuZf/1H8da2VzFdw0LT
+ JzI64etG1WrtTsrYZ7KXcieBt68FLnTXCRXm33/vBjufxo6G1ZYh/8xGgB1xZjbu+RkAZz
+ JEG5ZrfBB85vJAidY/DyvltRcJuyYMA=
+From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 5/5] mips: fulong 2e: Renovate coding style
-Date: Fri,  6 Dec 2019 14:58:07 +0100
-Message-Id: <1575640687-20744-6-git-send-email-Filip.Bozuta@rt-rk.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
-References: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 89.216.37.149
+Subject: [PATCH] gdbstub: change GDBState.last_packet to GByteArray
+Date: Fri,  6 Dec 2019 14:42:03 +0100
+Message-Id: <20191206134203.77385-1-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.24.0
+MIME-Version: 1.0
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1575639748;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=TBW7+cT58E+tpStNNfLAaBdbfCiVU8gjkh1T28tyR3k=;
+ b=CekJuR5KB3wIIXQJy5C2jL2ivcsPZ48opNT6AXqBDrLLDMvKoNrCrcaHrxehKbw3IdAjiB
+ +PH/bAkeIZG5L4NUT+SWHohrE69AQtQgyItLcEj32SjecgWCnLaJIAUlRpD0cKl1+C5QIk
+ HBO91gebMiSNqkWOOc24SGn6ui5AemM=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1575639748; a=rsa-sha256; cv=none;
+ b=GdCJd4bLl7Lbfux1s2jXGq8AUD0tXkzwiu+00vB9ambn4uuvdKbc0NkNIn/H3NdLVZgenN
+ xJKj7hUcj0WPVkG+0cpi5/VNnCZMCTJQYu2oFahEJV0141klqpzcydWTbO2vkYSuAFOmEb
+ VOUP0BfZdAZSRjaZ9YTiZ+bwCF+OFBM=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -63,293 +87,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pburton@wavecomp.com, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
- amarkovic@wavecomp.com, aurelien@aurel32.net
+Cc: Damien Hedde <damien.hedde@greensocs.com>, philmd@redhat.com,
+ alex.bennee@linaro.org, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The script checkpatch.pl located in scripts folder was
-used to detect all errors and warrnings in files:
-    hw/mips/mips_fulong2e.c
-    hw/isa/vt82c686.c
-    hw/pci-host/bonito.c
-    include/hw/isa/vt82c686.h
+Remove the packet size upper limit by using a GByteArray
+instead of a statically allocated array for last_packet.
+Thus we can now send big packets.
 
-These mips Fulong 2E machine files were edited and
-all the errors and warrings generated by the checkpatch.pl
-script were corrected and then the script was
-ran again to make sure there are no more errors and warnings.
+Also remove the last_packet_len field and use last_packet->len
+instead.
 
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
 ---
- hw/isa/vt82c686.c    | 23 ++++++++++----------
- hw/pci-host/bonito.c | 60 +++++++++++++++++++++++++++++-----------------------
- 2 files changed, 45 insertions(+), 38 deletions(-)
 
-diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
-index 616f67f..f828708 100644
---- a/hw/isa/vt82c686.c
-+++ b/hw/isa/vt82c686.c
-@@ -27,7 +27,7 @@
- #include "qemu/timer.h"
- #include "exec/address-spaces.h"
- 
--//#define DEBUG_VT82C686B
-+/* #define DEBUG_VT82C686B */
- 
- #ifdef DEBUG_VT82C686B
- #define DPRINTF(fmt, ...) fprintf(stderr, "%s: " fmt, __func__, ##__VA_ARGS__)
-@@ -35,8 +35,7 @@
- #define DPRINTF(fmt, ...)
- #endif
- 
--typedef struct SuperIOConfig
--{
-+typedef struct SuperIOConfig {
-     uint8_t config[0x100];
-     uint8_t index;
-     uint8_t data;
-@@ -102,7 +101,7 @@ static uint64_t superio_ioport_readb(void *opaque, hwaddr addr, unsigned size)
-     SuperIOConfig *superio_conf = opaque;
- 
-     DPRINTF("superio_ioport_readb  address 0x%x\n", addr);
--    return (superio_conf->config[superio_conf->index]);
-+    return superio_conf->config[superio_conf->index];
+This patch is a follow-up of Alex's series about sve registers
+which introduces some GbyteArray/Gstring in the gdbstub.
+It removes the remaining barrier to send big packets.
+
+Based-on <20191130084602.10818-1-alex.bennee@linaro.org>
+---
+ gdbstub.c | 39 +++++++++++++++++++++------------------
+ 1 file changed, 21 insertions(+), 18 deletions(-)
+
+diff --git a/gdbstub.c b/gdbstub.c
+index 7b695bdebe..022edd6bdb 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -351,8 +351,7 @@ typedef struct GDBState {
+     int line_buf_index;
+     int line_sum; /* running checksum */
+     int line_csum; /* checksum at the end of the packet */
+-    uint8_t last_packet[MAX_PACKET_LENGTH + 4];
+-    int last_packet_len;
++    GByteArray *last_packet;
+     int signal;
+ #ifdef CONFIG_USER_ONLY
+     int fd;
+@@ -384,6 +383,7 @@ static void init_gdbserver_state(void)
+     gdbserver_state.init =3D true;
+     gdbserver_state.str_buf =3D g_string_new(NULL);
+     gdbserver_state.mem_buf =3D g_byte_array_sized_new(MAX_PACKET_LENGTH=
+);
++    gdbserver_state.last_packet =3D g_byte_array_sized_new(MAX_PACKET_LE=
+NGTH + 4);
  }
- 
- static const MemoryRegionOps superio_ops = {
-@@ -143,7 +142,7 @@ static void vt82c686b_isa_reset(DeviceState *dev)
- }
- 
- /* write config pci function0 registers. PCI-ISA bridge */
--static void vt82c686b_write_config(PCIDevice * d, uint32_t address,
-+static void vt82c686b_write_config(PCIDevice *d, uint32_t address,
-                                    uint32_t val, int len)
+=20
+ #ifndef CONFIG_USER_ONLY
+@@ -626,28 +626,29 @@ static void hexdump(const char *buf, int len,
+ static int put_packet_binary(const char *buf, int len, bool dump)
  {
-     VT82C686BState *vt686 = VT82C686B_DEVICE(d);
-@@ -365,7 +364,7 @@ static void vt82c686b_pm_realize(PCIDevice *dev, Error **errp)
-     pci_set_long(pci_conf + 0x48, 0x00000001);
- 
-     /* SMB ports:0xeee0~0xeeef */
--    s->smb_io_base =((s->smb_io_base & 0xfff0) + 0x0);
-+    s->smb_io_base = ((s->smb_io_base & 0xfff0) + 0x0);
-     pci_conf[0x90] = s->smb_io_base | 1;
-     pci_conf[0x91] = s->smb_io_base >> 8;
-     pci_conf[0xd2] = 0x90;
-@@ -462,16 +461,18 @@ static void vt82c686b_realize(PCIDevice *d, Error **errp)
- 
-     wmask = d->wmask;
-     for (i = 0x00; i < 0xff; i++) {
--       if (i<=0x03 || (i>=0x08 && i<=0x3f)) {
--           wmask[i] = 0x00;
--       }
-+        if (i <= 0x03 || (i >= 0x08 && i <= 0x3f)) {
-+            wmask[i] = 0x00;
+     int csum, i;
+-    uint8_t *p;
+-    uint8_t *ps =3D &gdbserver_state.last_packet[0];
++    uint8_t footer[3];
+=20
+     if (dump && trace_event_get_state_backends(TRACE_GDBSTUB_IO_BINARYRE=
+PLY)) {
+         hexdump(buf, len, trace_gdbstub_io_binaryreply);
+     }
+=20
+     for(;;) {
+-        p =3D ps;
+-        *(p++) =3D '$';
+-        memcpy(p, buf, len);
+-        p +=3D len;
++        g_byte_array_set_size(gdbserver_state.last_packet, 0);
++        g_byte_array_append(gdbserver_state.last_packet,
++                            (const uint8_t *) "$", 1);
++        g_byte_array_append(gdbserver_state.last_packet,
++                            (const uint8_t *) buf, len);
+         csum =3D 0;
+         for(i =3D 0; i < len; i++) {
+             csum +=3D buf[i];
+         }
+-        *(p++) =3D '#';
+-        *(p++) =3D tohex((csum >> 4) & 0xf);
+-        *(p++) =3D tohex((csum) & 0xf);
++        footer[0] =3D '#';
++        footer[1] =3D tohex((csum >> 4) & 0xf);
++        footer[2] =3D tohex((csum) & 0xf);
++        g_byte_array_append(gdbserver_state.last_packet, footer, 3);
+=20
+-        gdbserver_state.last_packet_len =3D p - ps;
+-        put_buffer(ps, gdbserver_state.last_packet_len);
++        put_buffer(gdbserver_state.last_packet->data,
++                   gdbserver_state.last_packet->len);
+=20
+ #ifdef CONFIG_USER_ONLY
+         i =3D get_char();
+@@ -2812,20 +2813,22 @@ static void gdb_read_byte(GDBState *s, uint8_t ch=
+)
+     uint8_t reply;
+=20
+ #ifndef CONFIG_USER_ONLY
+-    if (gdbserver_state.last_packet_len) {
++    if (gdbserver_state.last_packet->len) {
+         /* Waiting for a response to the last packet.  If we see the sta=
+rt
+            of a new command then abandon the previous response.  */
+         if (ch =3D=3D '-') {
+             trace_gdbstub_err_got_nack();
+-            put_buffer((uint8_t *)gdbserver_state.last_packet, gdbserver=
+_state.last_packet_len);
++            put_buffer(gdbserver_state.last_packet->data,
++                       gdbserver_state.last_packet->len);
+         } else if (ch =3D=3D '+') {
+             trace_gdbstub_io_got_ack();
+         } else {
+             trace_gdbstub_io_got_unexpected(ch);
+         }
+=20
+-        if (ch =3D=3D '+' || ch =3D=3D '$')
+-            gdbserver_state.last_packet_len =3D 0;
++        if (ch =3D=3D '+' || ch =3D=3D '$') {
++            g_byte_array_set_size(gdbserver_state.last_packet, 0);
 +        }
+         if (ch !=3D '$')
+             return;
      }
- 
-     memory_region_init_io(&vt82c->superio, OBJECT(d), &superio_ops,
-                           &vt82c->superio_conf, "superio", 2);
-     memory_region_set_enabled(&vt82c->superio, false);
--    /* The floppy also uses 0x3f0 and 0x3f1.
--     * But we do not emulate a floppy, so just set it here. */
-+    /*
-+     * The floppy also uses 0x3f0 and 0x3f1.
-+     * But we do not emulate a floppy, so just set it here.
-+     */
-     memory_region_add_subregion(isa_bus->address_space_io, 0x3f0,
-                                 &vt82c->superio);
- }
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index ceee463..4692d41 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -14,7 +14,8 @@
-  * fulong 2e mini pc has a bonito north bridge.
-  */
- 
--/* what is the meaning of devfn in qemu and IDSEL in bonito northbridge?
-+/*
-+ * what is the meaning of devfn in qemu and IDSEL in bonito northbridge?
-  *
-  * devfn   pci_slot<<3  + funno
-  * one pci bus can have 32 devices and each device can have 8 functions.
-@@ -49,7 +50,7 @@
- #include "sysemu/runstate.h"
- #include "exec/address-spaces.h"
- 
--//#define DEBUG_BONITO
-+/* #define DEBUG_BONITO */
- 
- #ifdef DEBUG_BONITO
- #define DPRINTF(fmt, ...) fprintf(stderr, "%s: " fmt, __func__, ##__VA_ARGS__)
-@@ -60,45 +61,45 @@
- /* from linux soure code. include/asm-mips/mips-boards/bonito64.h*/
- #define BONITO_BOOT_BASE        0x1fc00000
- #define BONITO_BOOT_SIZE        0x00100000
--#define BONITO_BOOT_TOP         (BONITO_BOOT_BASE+BONITO_BOOT_SIZE-1)
-+#define BONITO_BOOT_TOP         (BONITO_BOOT_BASE + BONITO_BOOT_SIZE - 1)
- #define BONITO_FLASH_BASE       0x1c000000
- #define BONITO_FLASH_SIZE       0x03000000
--#define BONITO_FLASH_TOP        (BONITO_FLASH_BASE+BONITO_FLASH_SIZE-1)
-+#define BONITO_FLASH_TOP        (BONITO_FLASH_BASE + BONITO_FLASH_SIZE - 1)
- #define BONITO_SOCKET_BASE      0x1f800000
- #define BONITO_SOCKET_SIZE      0x00400000
--#define BONITO_SOCKET_TOP       (BONITO_SOCKET_BASE+BONITO_SOCKET_SIZE-1)
-+#define BONITO_SOCKET_TOP       (BONITO_SOCKET_BASE + BONITO_SOCKET_SIZE - 1)
- #define BONITO_REG_BASE         0x1fe00000
- #define BONITO_REG_SIZE         0x00040000
--#define BONITO_REG_TOP          (BONITO_REG_BASE+BONITO_REG_SIZE-1)
-+#define BONITO_REG_TOP          (BONITO_REG_BASE + BONITO_REG_SIZE - 1)
- #define BONITO_DEV_BASE         0x1ff00000
- #define BONITO_DEV_SIZE         0x00100000
--#define BONITO_DEV_TOP          (BONITO_DEV_BASE+BONITO_DEV_SIZE-1)
-+#define BONITO_DEV_TOP          (BONITO_DEV_BASE + BONITO_DEV_SIZE - 1)
- #define BONITO_PCILO_BASE       0x10000000
- #define BONITO_PCILO_BASE_VA    0xb0000000
- #define BONITO_PCILO_SIZE       0x0c000000
--#define BONITO_PCILO_TOP        (BONITO_PCILO_BASE+BONITO_PCILO_SIZE-1)
-+#define BONITO_PCILO_TOP        (BONITO_PCILO_BASE + BONITO_PCILO_SIZE - 1)
- #define BONITO_PCILO0_BASE      0x10000000
- #define BONITO_PCILO1_BASE      0x14000000
- #define BONITO_PCILO2_BASE      0x18000000
- #define BONITO_PCIHI_BASE       0x20000000
- #define BONITO_PCIHI_SIZE       0x20000000
--#define BONITO_PCIHI_TOP        (BONITO_PCIHI_BASE+BONITO_PCIHI_SIZE-1)
-+#define BONITO_PCIHI_TOP        (BONITO_PCIHI_BASE + BONITO_PCIHI_SIZE - 1)
- #define BONITO_PCIIO_BASE       0x1fd00000
- #define BONITO_PCIIO_BASE_VA    0xbfd00000
- #define BONITO_PCIIO_SIZE       0x00010000
--#define BONITO_PCIIO_TOP        (BONITO_PCIIO_BASE+BONITO_PCIIO_SIZE-1)
-+#define BONITO_PCIIO_TOP        (BONITO_PCIIO_BASE + BONITO_PCIIO_SIZE - 1)
- #define BONITO_PCICFG_BASE      0x1fe80000
- #define BONITO_PCICFG_SIZE      0x00080000
--#define BONITO_PCICFG_TOP       (BONITO_PCICFG_BASE+BONITO_PCICFG_SIZE-1)
-+#define BONITO_PCICFG_TOP       (BONITO_PCICFG_BASE + BONITO_PCICFG_SIZE - 1)
- 
- 
- #define BONITO_PCICONFIGBASE    0x00
- #define BONITO_REGBASE          0x100
- 
--#define BONITO_PCICONFIG_BASE   (BONITO_PCICONFIGBASE+BONITO_REG_BASE)
-+#define BONITO_PCICONFIG_BASE   (BONITO_PCICONFIGBASE + BONITO_REG_BASE)
- #define BONITO_PCICONFIG_SIZE   (0x100)
- 
--#define BONITO_INTERNAL_REG_BASE  (BONITO_REGBASE+BONITO_REG_BASE)
-+#define BONITO_INTERNAL_REG_BASE  (BONITO_REGBASE + BONITO_REG_BASE)
- #define BONITO_INTERNAL_REG_SIZE  (0x70)
- 
- #define BONITO_SPCICONFIG_BASE  (BONITO_PCICFG_BASE)
-@@ -111,7 +112,7 @@
- 
- #define BONITO_BONPONCFG        (0x00 >> 2)      /* 0x100 */
- #define BONITO_BONGENCFG_OFFSET 0x4
--#define BONITO_BONGENCFG        (BONITO_BONGENCFG_OFFSET>>2)   /*0x104 */
-+#define BONITO_BONGENCFG        (BONITO_BONGENCFG_OFFSET >> 2)   /*0x104 */
- 
- /* 2. IO & IDE configuration */
- #define BONITO_IODEVCFG         (0x08 >> 2)      /* 0x108 */
-@@ -177,15 +178,15 @@
- /* idsel BIT = pci slot number +12 */
- #define PCI_SLOT_BASE              12
- #define PCI_IDSEL_VIA686B_BIT      (17)
--#define PCI_IDSEL_VIA686B          (1<<PCI_IDSEL_VIA686B_BIT)
-+#define PCI_IDSEL_VIA686B          (1 << PCI_IDSEL_VIA686B_BIT)
- 
--#define PCI_ADDR(busno,devno,funno,regno)  \
--    ((((busno)<<16)&0xff0000) + (((devno)<<11)&0xf800) + (((funno)<<8)&0x700) + (regno))
-+#define PCI_ADDR(busno , devno , funno , regno)  \
-+    ((((busno) << 16) & 0xff0000) + (((devno) << 11) & 0xf800) + \
-+    (((funno) << 8) & 0x700) + (regno))
- 
- typedef struct BonitoState BonitoState;
- 
--typedef struct PCIBonitoState
--{
-+typedef struct PCIBonitoState {
-     PCIDevice dev;
- 
-     BonitoState *pcihost;
-@@ -239,7 +240,8 @@ static void bonito_writel(void *opaque, hwaddr addr,
- 
-     saddr = addr >> 2;
- 
--    DPRINTF("bonito_writel "TARGET_FMT_plx" val %x saddr %x\n", addr, val, saddr);
-+    DPRINTF("bonito_writel "TARGET_FMT_plx" val %x saddr %x\n",
-+            addr, val, saddr);
-     switch (saddr) {
-     case BONITO_BONPONCFG:
-     case BONITO_IODEVCFG:
-@@ -363,7 +365,7 @@ static uint64_t bonito_ldma_readl(void *opaque, hwaddr addr,
-         return 0;
-     }
- 
--    val = ((uint32_t *)(&s->bonldma))[addr/sizeof(uint32_t)];
-+    val = ((uint32_t *)(&s->bonldma))[addr / sizeof(uint32_t)];
- 
-     return val;
- }
-@@ -377,7 +379,7 @@ static void bonito_ldma_writel(void *opaque, hwaddr addr,
-         return;
-     }
- 
--    ((uint32_t *)(&s->bonldma))[addr/sizeof(uint32_t)] = val & 0xffffffff;
-+    ((uint32_t *)(&s->bonldma))[addr / sizeof(uint32_t)] = val & 0xffffffff;
- }
- 
- static const MemoryRegionOps bonito_ldma_ops = {
-@@ -400,7 +402,7 @@ static uint64_t bonito_cop_readl(void *opaque, hwaddr addr,
-         return 0;
-     }
- 
--    val = ((uint32_t *)(&s->boncop))[addr/sizeof(uint32_t)];
-+    val = ((uint32_t *)(&s->boncop))[addr / sizeof(uint32_t)];
- 
-     return val;
- }
-@@ -414,7 +416,7 @@ static void bonito_cop_writel(void *opaque, hwaddr addr,
-         return;
-     }
- 
--    ((uint32_t *)(&s->boncop))[addr/sizeof(uint32_t)] = val & 0xffffffff;
-+    ((uint32_t *)(&s->boncop))[addr / sizeof(uint32_t)] = val & 0xffffffff;
- }
- 
- static const MemoryRegionOps bonito_cop_ops = {
-@@ -446,7 +448,8 @@ static uint32_t bonito_sbridge_pciaddr(void *opaque, hwaddr addr)
-     cfgaddr = addr & 0xffff;
-     cfgaddr |= (s->regs[BONITO_PCIMAP_CFG] & 0xffff) << 16;
- 
--    idsel = (cfgaddr & BONITO_PCICONF_IDSEL_MASK) >> BONITO_PCICONF_IDSEL_OFFSET;
-+    idsel = (cfgaddr & BONITO_PCICONF_IDSEL_MASK) >>
-+             BONITO_PCICONF_IDSEL_OFFSET;
-     devno = ctz32(idsel);
-     funno = (cfgaddr & BONITO_PCICONF_FUN_MASK) >> BONITO_PCICONF_FUN_OFFSET;
-     regno = (cfgaddr & BONITO_PCICONF_REG_MASK) >> BONITO_PCICONF_REG_OFFSET;
-@@ -550,7 +553,7 @@ static void pci_bonito_set_irq(void *opaque, int irq_num, int level)
- }
- 
- /* map the original irq (0~3) to bonito irq (16~47, but 16~31 are unused) */
--static int pci_bonito_map_irq(PCIDevice * pci_dev, int irq_num)
-+static int pci_bonito_map_irq(PCIDevice *pci_dev, int irq_num)
- {
-     int slot;
- 
-@@ -618,7 +621,10 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
-     SysBusDevice *sysbus = SYS_BUS_DEVICE(s->pcihost);
-     PCIHostState *phb = PCI_HOST_BRIDGE(s->pcihost);
- 
--    /* Bonito North Bridge, built on FPGA, VENDOR_ID/DEVICE_ID are "undefined" */
-+    /*
-+     * Bonito North Bridge, built on FPGA,
-+     * VENDOR_ID/DEVICE_ID are "undefined"
-+     */
-     pci_config_set_prog_interface(dev->config, 0x00);
- 
-     /* set the north bridge register mapping */
--- 
-2.7.4
+@@ -3209,7 +3212,7 @@ static int gdb_monitor_write(Chardev *chr, const ui=
+nt8_t *buf, int len)
+     const char *p =3D (const char *)buf;
+     int max_sz;
+=20
+-    max_sz =3D (sizeof(gdbserver_state.last_packet) - 2) / 2;
++    max_sz =3D MAX_PACKET_LENGTH / 2;
+     for (;;) {
+         if (len <=3D max_sz) {
+             gdb_monitor_output(&gdbserver_state, p, len);
+--=20
+2.24.0
 
 
