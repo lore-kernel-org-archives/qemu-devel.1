@@ -2,82 +2,97 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C13BC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C9D9C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:25:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6818520659
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:24:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1653D2464E
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:25:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cqgkvhyT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6818520659
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W2m6DHl5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1653D2464E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idGP5-0002YJ-7b
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:24:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60350)
+	id 1idGPl-0003dl-RM
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:25:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52529)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1idEyt-0000EZ-Ag
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:53:20 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1idF9J-000419-Qq
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:04:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1idEyr-0005ef-WA
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:53:19 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58087
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1idF9I-0001mB-N2
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:04:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24014
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1idEyr-0005dl-Re
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:53:17 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1idF9I-0001jJ-IR
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:04:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575643997;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
+ s=mimecast20190719; t=1575644642;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FkGMdrif3Udb3R3UjvtIPo+bXTEG3UgL8G0h6TAWLHs=;
- b=cqgkvhyTu1MyzyYXaej3FjrbD+PdW/sTNeu7Jm3ErRjeAjJrWYHIYYt5x8GGQiqFOuCuZx
- QETqcWGSwj4loPdSqNC9JWJl7CpR/jSts+prnL92t9dpyekBIRHAHlP/r90gkEaQJ8Y37Q
- FAciGCp/DpgOI0S0vvXKf+xH0oscKh0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-jeeXet6hMNipKSbTXhnq9A-1; Fri, 06 Dec 2019 09:53:13 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2325F8024CA;
- Fri,  6 Dec 2019 14:53:12 +0000 (UTC)
-Received: from redhat.com (ovpn-112-49.ams2.redhat.com [10.36.112.49])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CA9BA1CB;
- Fri,  6 Dec 2019 14:53:07 +0000 (UTC)
-Date: Fri, 6 Dec 2019 14:53:04 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH] qapi: better document NVMe blockdev @device parameter
-Message-ID: <20191206145304.GC3291374@redhat.com>
-References: <20191206143811.3777524-1-berrange@redhat.com>
- <fa41baea-5b86-192d-97ed-6f13caf2fdfa@redhat.com>
+ bh=xu6TG8bRrU5Xm9Ytckrjk+EDTC9su5c/kXa41oBjr74=;
+ b=W2m6DHl5qFI2MxcdCO2XcpdqW372MBmJr5NP+D2KFcF0lb+wVCeNSXK6o3kvB0XYrxMxdU
+ kG10aCPHm7eLDJ+xZOt6IbABpFAy3ehYFdOlST4wcFQGdYSIiLv+uOFLMNm5UPwUn8Ctr1
+ sNEBBe2FTxjJmoOjM2arGp7hp1sd4QA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-95-lZKRn4FzNN6_dJSodWBWZw-1; Fri, 06 Dec 2019 05:02:50 -0500
+Received: by mail-wr1-f72.google.com with SMTP id z15so2954619wrw.0
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 02:02:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xu6TG8bRrU5Xm9Ytckrjk+EDTC9su5c/kXa41oBjr74=;
+ b=AdL72oTgeQKQvJRrGra6Y/ZaPLEFJiwccQ/j7Xra+W/3qRDmylB3G6pNVACtHgW/Pn
+ 9d11fUZeqvvpsffktVK2tKRyYuHP75jSpWTiBt0uN1MqfzHOwOYilsl8wcMRVklFltBY
+ 7KzR/uzIM7i0JbC9bAXkI3DCPnxN88XYrJWuoeK8zecn1J8OBtJRhCX5lTVi7O1n2GI8
+ F5HKrv5ZEBkwDUsAuC43Ba8d+LI6AV8/Zr/dJT6ptI9vK6SR+bPq+k285YJDOfQHejWb
+ J2j4pVoStqdnxMk0tUU47GYtYMroAEVmeJLYJEQKMneV2Gfyt81QtXN7Y7u9YfHR7ili
+ Jcfw==
+X-Gm-Message-State: APjAAAVd32z0GDojVcOUR2tN0u1/vU7ivRcIXozNvr7nOMt9thnOAncI
+ 7Sm4o6RitJuNtbF4DwRHcrD3dwTulUJZbvMXfzF1B8evPyg68TSoT1R71fWqvpZDTIeQPvLWrbW
+ hU9tFmdgdsJo4K4I=
+X-Received: by 2002:adf:f885:: with SMTP id u5mr15133452wrp.359.1575626569065; 
+ Fri, 06 Dec 2019 02:02:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxfjqlBWsnmhtM1edPSxVAKWQK0D6tSoo2KGI386CB0kQXwuZ4cz4Afi10Rfj9JZOMJc4hPaQ==
+X-Received: by 2002:adf:f885:: with SMTP id u5mr15133431wrp.359.1575626568850; 
+ Fri, 06 Dec 2019 02:02:48 -0800 (PST)
+Received: from [10.201.49.168] (nat-pool-mxp-u.redhat.com. [149.6.153.187])
+ by smtp.gmail.com with ESMTPSA id q6sm16604130wrx.72.2019.12.06.02.02.48
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 06 Dec 2019 02:02:48 -0800 (PST)
+Subject: Re: [PATCH] target/i386: disable VMX features if nested=0
+To: Yang Zhong <yang.zhong@intel.com>
+References: <20191206071111.12128-1-yang.zhong@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <5e9a669a-f81d-fbfb-4486-246949dc48c6@redhat.com>
+Date: Fri, 6 Dec 2019 11:02:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <fa41baea-5b86-192d-97ed-6f13caf2fdfa@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: jeeXet6hMNipKSbTXhnq9A-1
+In-Reply-To: <20191206071111.12128-1-yang.zhong@intel.com>
+Content-Language: en-US
+X-MC-Unique: lZKRn4FzNN6_dJSodWBWZw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,68 +104,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-stable <qemu-stable@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 06, 2019 at 08:51:15AM -0600, Eric Blake wrote:
-> On 12/6/19 8:38 AM, Daniel P. Berrang=C3=A9 wrote:
-> > Mention that this is a PCI device address & give the format it is
-> > expected it. Also mention that it must be first unbound from any
->=20
-> maybe s/expected it/expecting/
+On 06/12/19 08:11, Yang Zhong wrote:
+> If kvm does not support VMX feature by nested=0, the kvm_vmx_basic
+> can't get the right value from MSR_IA32_VMX_BASIC register, which
+> make qemu coredump when qemu do KVM_SET_MSRS.
+> 
+> The coredump info:
+> error: failed to set MSR 0x480 to 0x0
+> kvm_put_msrs: Assertion `ret == cpu->kvm_msr_buf->nmsrs' failed.
+> 
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  target/i386/kvm.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index bf1655645b..e8841dcdb9 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -2572,6 +2572,14 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
+>      uint64_t kvm_vmx_basic =
+>          kvm_arch_get_supported_msr_feature(kvm_state,
+>                                             MSR_IA32_VMX_BASIC);
+> +    if (!kvm_vmx_basic) {
+> +        /* If the kernel does't support VMX feature(nested=0 in kvm)
+> +         * and kvm_vmx_basic will be 0. This will set 0 value to
+> +         * MSR_IA32_VMX_BASIC MSR.
+> +         */
+> +        return;
+> +    }
+> +
+>      uint64_t kvm_vmx_misc =
+>          kvm_arch_get_supported_msr_feature(kvm_state,
+>                                             MSR_IA32_VMX_MISC);
+> 
 
-It was supposed to be "in" rather than "it", but your suggestion
-is fine too.
+Queued, thanks.
 
->=20
-> > host kernel driver.
-> >=20
-> > Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> > ---
-> >   qapi/block-core.json | 6 +++++-
-> >   1 file changed, 5 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > index 0cf68fea14..fcb52ec24f 100644
-> > --- a/qapi/block-core.json
-> > +++ b/qapi/block-core.json
-> > @@ -2963,9 +2963,13 @@
-> >   #
-> >   # Driver specific block device options for the NVMe backend.
-> >   #
-> > -# @device:    controller address of the NVMe device.
-> > +# @device:    PCI controller address of the NVMe device in
-> > +#             format hhhh:bb:ss.f (host:bus:slot.function)
-> >   # @namespace: namespace number of the device, starting from 1.
-> >   #
-> > +# Note that the PCI @device must have been unbound from any host
-> > +# kernel driver before instructing QEMU to add the blockdev.
-> > +#
->=20
-> Reviewed-by: Eric Blake <eblake@redhat.com>
->=20
-> Doesn't affect code, but similarly no reason to hurry this into 4.2. 5.0 =
-and
-> qemu-stable (cc'd) is good enough.
->=20
-> --=20
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3226
-> Virtualization:  qemu.org | libvirt.org
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Paolo
 
 
