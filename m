@@ -2,84 +2,81 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PDS_BTC_ID,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED597C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A825C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:02:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC93524670
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:00:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66D7B24670
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 18:02:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="crnmp09F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC93524670
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mJJg6Pnf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66D7B24670
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idHti-0005b5-1k
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:00:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42279)
+	id 1idHvT-0007hG-OF
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 13:01:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1idHdC-0002H6-M7
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:43:09 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idH3Q-0004Vm-5P
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:06:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1idHd8-0006Rg-CM
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:43:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34484
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1idHd8-0006NR-3i
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:43:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575654181;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Dkvrev2wmPbJB9lI76+JG3E561zyQxHjuRmpbIOPn/8=;
- b=crnmp09FCwxrydUiCC5nFnFgQ7rKWkkpTupp6H6U41adMabUXHjUaZmA9QxP6MTm86kPrd
- +eg7d6KweRmKOCQoGAIMmQfZJ/A9ZnMak42b7PYHzOr46tr0mtBmlGF0qSM8UrajRNNeBi
- r3VtCE35Kgzkm/QxxIQM8od+ELrUyo8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-yLVVTb0-OuyIaz5L7-iEpQ-1; Fri, 06 Dec 2019 12:42:57 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 912D91005514;
- Fri,  6 Dec 2019 17:42:55 +0000 (UTC)
-Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 46EA21001B2D;
- Fri,  6 Dec 2019 17:42:51 +0000 (UTC)
-Date: Fri, 6 Dec 2019 10:42:50 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Subject: Re: [RFC PATCH 0/9] Introduce mediate ops in vfio-pci
-Message-ID: <20191206104250.770f2154@x1.home>
-In-Reply-To: <8b97a35c-184c-cc87-4b4f-de5a1fa380a3@redhat.com>
-References: <20191205032419.29606-1-yan.y.zhao@intel.com>
- <8bcf603c-f142-f96d-bb11-834d686f5519@redhat.com>
- <20191205085111.GD31791@joy-OptiPlex-7040>
- <fe84dba6-5af7-daad-3102-9fa86a90aa4d@redhat.com>
- <20191206082232.GH31791@joy-OptiPlex-7040>
- <8b97a35c-184c-cc87-4b4f-de5a1fa380a3@redhat.com>
-Organization: Red Hat
+ (envelope-from <peter.maydell@linaro.org>) id 1idH3O-0007fy-SR
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:06:07 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43956)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1idH3K-0007as-V6
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 12:06:04 -0500
+Received: by mail-oi1-x241.google.com with SMTP id x14so364079oic.10
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 09:06:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=ggQ1kQQIs7cX9AnmY3sr6TzDbLNAqmck3sWzxawrlWc=;
+ b=mJJg6PnfIBXE/g/DJcQ+lWBEOt9fgbvuN66hCtXFDqVo3MXhNNTZn+Ll4SFt9fNtJ3
+ 9he74Hfpgtf5WR/07bWTsXeBowwCGU8fsMBMsz7zm0FCO9hLg3jXWlwAGEiO+xg22I97
+ lr8zjHvIQ9XkFa9kLGYcKXd952hPOuR8cGiN7wmKSZMhiY4G0KPRSU6NPlzriHA9n4aZ
+ 6xuU/Y4/ccS9mO8yQqO2mOL65hlhgDKrVh+kF+diDICK2qT0HABYjXeT/h9oS9kEqLDO
+ qiFYVnrQUDqFQ4RIIjDtk9LQuk2L2be02KqrcG7OqHk7pEYGTN7OdcA0Q8HdrgY4I3GL
+ 1msg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=ggQ1kQQIs7cX9AnmY3sr6TzDbLNAqmck3sWzxawrlWc=;
+ b=p9WvCfKxSjc3YdnybGbkwv+RxL0RbHmyioYkjsHH9deky0daXh/TB40Ld556OmMYe3
+ wBDehvz1iQv6GphvQ0ryWtVqJIfxwr7mPhNi/G0VIOGEMCpqUOpHMGkmgMlYccnlJT8f
+ 1lccTMDuOUu5Si8umENrZEGyHa6i4uCVh+7t/e3/6PWtyvAvSq1jsdMFksrYYKdEhrgZ
+ FkobRM8V+OWPFQ5gBMVakJ4jannHRIFfaxKrg/QSm45iSJaVKKCeuGGLXPPcdb87FP1C
+ 4ScS82C/CvBlUvX2kkfVb173X3TrAc+6cdXctmOhXeAg58sOe1J5/394My63ajiHiqn4
+ qqpg==
+X-Gm-Message-State: APjAAAXcNXsVx9Lg+gpKNpJv9Wpx5JnGWDtf+xInRd7LzV3pzqnffjBF
+ KgXdrdfWRC6GMls8q7sTpSPnWCMXtINDLTPlVyjP/r6Q
+X-Google-Smtp-Source: APXvYqwCSpi8ZDHjpw0FW1pQ7dtjTZNh/Yuju5kvciP/PUFdKghWL07S0+anAatu9TsTdenmXTQ6HVA+02u85oHmWuE=
+X-Received: by 2002:a05:6808:996:: with SMTP id
+ a22mr12599527oic.146.1575651960592; 
+ Fri, 06 Dec 2019 09:06:00 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: yLVVTb0-OuyIaz5L7-iEpQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-30-richard.henderson@linaro.org>
+In-Reply-To: <20191203022937.1474-30-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Dec 2019 17:05:49 +0000
+Message-ID: <CAFEAcA9=4MXFEnVbPpa1CmG8xHx-xuVt8MXwsNGyT+nB2+L1Mw@mail.gmail.com>
+Subject: Re: [PATCH v4 29/40] target/arm: Flush tlb for ASID changes in EL2&0
+ translation regime
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,352 +88,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "He,
- Shaopeng" <shaopeng.he@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 6 Dec 2019 17:40:02 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+On Tue, 3 Dec 2019 at 02:30, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Since we only support a single ASID, flush the tlb when it changes.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/helper.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 9df55a8d6b..2a4d4c2c0d 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3740,6 +3740,15 @@ static void vmsa_ttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>  static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                                      uint64_t value)
+>  {
+> +    /*
+> +     * If we are running with E2&0 regime, then the ASID is active.
+> +     * Flush if that changes.
+> +     */
+> +    if ((arm_hcr_el2_eff(env) & HCR_E2H) &&
+> +        extract64(raw_read(env, ri) ^ value, 48, 16)) {
+> +        tlb_flush_by_mmuidx(env_cpu(env),
+> +                            ARMMMUIdxBit_EL20_2 | ARMMMUIdxBit_EL20_0);
+> +    }
+>      raw_write(env, ri, value);
+>  }
 
-> On 2019/12/6 =E4=B8=8B=E5=8D=884:22, Yan Zhao wrote:
-> > On Thu, Dec 05, 2019 at 09:05:54PM +0800, Jason Wang wrote: =20
-> >> On 2019/12/5 =E4=B8=8B=E5=8D=884:51, Yan Zhao wrote: =20
-> >>> On Thu, Dec 05, 2019 at 02:33:19PM +0800, Jason Wang wrote: =20
-> >>>> Hi:
-> >>>>
-> >>>> On 2019/12/5 =E4=B8=8A=E5=8D=8811:24, Yan Zhao wrote: =20
-> >>>>> For SRIOV devices, VFs are passthroughed into guest directly withou=
-t host
-> >>>>> driver mediation. However, when VMs migrating with passthroughed VF=
-s,
-> >>>>> dynamic host mediation is required to  (1) get device states, (2) g=
-et
-> >>>>> dirty pages. Since device states as well as other critical informat=
-ion
-> >>>>> required for dirty page tracking for VFs are usually retrieved from=
- PFs,
-> >>>>> it is handy to provide an extension in PF driver to centralizingly =
-control
-> >>>>> VFs' migration.
-> >>>>>
-> >>>>> Therefore, in order to realize (1) passthrough VFs at normal time, =
-(2)
-> >>>>> dynamically trap VFs' bars for dirty page tracking and =20
-> >>>> A silly question, what's the reason for doing this, is this a must f=
-or dirty
-> >>>> page tracking?
-> >>>> =20
-> >>> For performance consideration. VFs' bars should be passthoughed at
-> >>> normal time and only enter into trap state on need. =20
-> >>
-> >> Right, but how does this matter for the case of dirty page tracking?
-> >> =20
-> > Take NIC as an example, to trap its VF dirty pages, software way is
-> > required to trap every write of ring tail that resides in BAR0. =20
->=20
->=20
-> Interesting, but it looks like we need:
-> - decode the instruction
-> - mediate all access to BAR0
-> All of which seems a great burden for the VF driver. I wonder whether or=
-=20
-> not doing interrupt relay and tracking head is better in this case.
+For the existing EL1 setup we have separate write functions
+for TTBR registers and for TCR_EL1 (vmsa_tcr_el1_write()
+and vmsa_ttbr_write()), rather than a single one, and they
+don't do the same thing. Why do we use a single writefn
+here? It looks particularly odd because we're actually looking
+at the value written here.
 
-This sounds like a NIC specific solution, I believe the goal here is to
-allow any device type to implement a partial mediation solution, in
-this case to sufficiently track the device while in the migration
-saving state.
-
-> >   There's
-> > still no IOMMU Dirty bit available. =20
-> >>>>>     (3) centralizing
-> >>>>> VF critical states retrieving and VF controls into one driver, we p=
-ropose
-> >>>>> to introduce mediate ops on top of current vfio-pci device driver.
-> >>>>>
-> >>>>>
-> >>>>>                                       _ _ _ _ _ _ _ _ _ _ _ _ _ _ _=
- _ _
-> >>>>>     __________   register mediate ops|  ___________     ___________=
-    |
-> >>>>> |          |<-----------------------|     VF    |   |           |
-> >>>>> | vfio-pci |                      | |  mediate  |   | PF driver |  =
- |
-> >>>>> |__________|----------------------->|   driver  |   |___________|
-> >>>>>         |            open(pdev)      |  -----------          |     =
-    |
-> >>>>>         |                                                    |
-> >>>>>         |                            |_ _ _ _ _ _ _ _ _ _ _ _|_ _ _=
- _ _|
-> >>>>>        \|/                                                  \|/
-> >>>>> -----------                                         ------------
-> >>>>> |    VF   |                                         |    PF    |
-> >>>>> -----------                                         ------------
-> >>>>>
-> >>>>>
-> >>>>> VF mediate driver could be a standalone driver that does not bind t=
-o
-> >>>>> any devices (as in demo code in patches 5-6) or it could be a built=
--in
-> >>>>> extension of PF driver (as in patches 7-9) .
-> >>>>>
-> >>>>> Rather than directly bind to VF, VF mediate driver register a media=
-te
-> >>>>> ops into vfio-pci in driver init. vfio-pci maintains a list of such
-> >>>>> mediate ops.
-> >>>>> (Note that: VF mediate driver can register mediate ops into vfio-pc=
-i
-> >>>>> before vfio-pci binding to any devices. And VF mediate driver can
-> >>>>> support mediating multiple devices.)
-> >>>>>
-> >>>>> When opening a device (e.g. a VF), vfio-pci goes through the mediat=
-e ops
-> >>>>> list and calls each vfio_pci_mediate_ops->open() with pdev of the o=
-pening
-> >>>>> device as a parameter.
-> >>>>> VF mediate driver should return success or failure depending on it
-> >>>>> supports the pdev or not.
-> >>>>> E.g. VF mediate driver would compare its supported VF devfn with th=
-e
-> >>>>> devfn of the passed-in pdev.
-> >>>>> Once vfio-pci finds a successful vfio_pci_mediate_ops->open(), it w=
-ill
-> >>>>> stop querying other mediate ops and bind the opening device with th=
-is
-> >>>>> mediate ops using the returned mediate handle.
-> >>>>>
-> >>>>> Further vfio-pci ops (VFIO_DEVICE_GET_REGION_INFO ioctl, rw, mmap) =
-on the
-> >>>>> VF will be intercepted into VF mediate driver as
-> >>>>> vfio_pci_mediate_ops->get_region_info(),
-> >>>>> vfio_pci_mediate_ops->rw,
-> >>>>> vfio_pci_mediate_ops->mmap, and get customized.
-> >>>>> For vfio_pci_mediate_ops->rw and vfio_pci_mediate_ops->mmap, they w=
-ill
-> >>>>> further return 'pt' to indicate whether vfio-pci should further
-> >>>>> passthrough data to hw.
-> >>>>>
-> >>>>> when vfio-pci closes the VF, it calls its vfio_pci_mediate_ops->rel=
-ease()
-> >>>>> with a mediate handle as parameter.
-> >>>>>
-> >>>>> The mediate handle returned from vfio_pci_mediate_ops->open() lets =
-VF
-> >>>>> mediate driver be able to differentiate two opening VFs of the same=
- device
-> >>>>> id and vendor id.
-> >>>>>
-> >>>>> When VF mediate driver exits, it unregisters its mediate ops from
-> >>>>> vfio-pci.
-> >>>>>
-> >>>>>
-> >>>>> In this patchset, we enable vfio-pci to provide 3 things:
-> >>>>> (1) calling mediate ops to allow vendor driver customizing default
-> >>>>> region info/rw/mmap of a region.
-> >>>>> (2) provide a migration region to support migration =20
-> >>>> What's the benefit of introducing a region? It looks to me we don't =
-expect
-> >>>> the region to be accessed directly from guest. Could we simply exten=
-d device
-> >>>> fd ioctl for doing such things?
-> >>>> =20
-> >>> You may take a look on mdev live migration discussions in
-> >>> https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg01763.html
-> >>>
-> >>> or previous discussion at
-> >>> https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg04908.html,
-> >>> which has kernel side implemetation https://patchwork.freedesktop.org=
-/series/56876/
-> >>>
-> >>> generaly speaking, qemu part of live migration is consistent for
-> >>> vfio-pci + mediate ops way or mdev way. =20
-> >>
-> >> So in mdev, do you still have a mediate driver? Or you expect the pare=
-nt
-> >> to implement the region?
-> >> =20
-> > No, currently it's only for vfio-pci. =20
->=20
-> And specific to PCI.
-
-What's PCI specific?  The implementation, yes, it's done in the bus
-vfio bus driver here but all device access is performed by the bus
-driver.  I'm not sure how we could introduce the intercept at the
-vfio-core level, but I'm open to suggestions.
-
-> > mdev parent driver is free to customize its regions and hence does not
-> > requires this mediate ops hooks.
-> > =20
-> >>> The region is only a channel for
-> >>> QEMU and kernel to communicate information without introducing IOCTLs=
-. =20
-> >>
-> >> Well, at least you introduce new type of region in uapi. So this does
-> >> not answer why region is better than ioctl. If the region will only be
-> >> used by qemu, using ioctl is much more easier and straightforward.
-> >> =20
-> > It's not introduced by me :)
-> > mdev live migration is actually using this way, I'm just keeping
-> > compatible to the uapi. =20
->=20
->=20
-> I meant e.g VFIO_REGION_TYPE_MIGRATION.
->=20
->=20
-> >
-> >  From my own perspective, my answer is that a region is more flexible
-> > compared to ioctl. vendor driver can freely define the size,
-> > =20
->=20
-> Probably not since it's an ABI I think.
-
-I think Kirti's thread proposing the migration interface is a better
-place for this discussion, I believe Yan has already linked to it.  In
-general we prefer to be frugal in our introduction of new ioctls,
-especially when we have existing mechanisms via regions to support the
-interactions.  The interface is designed to be flexible to the vendor
-driver needs, partially thanks to it being a region.
-
-> >   mmap cap of
-> > its data subregion.
-> > =20
->=20
-> It doesn't help much unless it can be mapped into guest (which I don't=20
-> think it was the case here).
->=20
-> >   Also, there're already too many ioctls in vfio. =20
->=20
-> Probably not :) We had a brunch of=C2=A0 subsystems that have much more=
-=20
-> ioctls than VFIO. (e.g DRM)
-
-And this is a good thing?  We can more easily deprecate and revise
-region support than we can take back ioctls that have been previously
-used.  I generally don't like the "let's create a new ioctl for that"
-approach versus trying to fit something within the existing
-architecture and convention.
-
-> >>>>> (3) provide a dynamic trap bar info region to allow vendor driver
-> >>>>> control trap/untrap of device pci bars
-> >>>>>
-> >>>>> This vfio-pci + mediate ops way differs from mdev way in that
-> >>>>> (1) medv way needs to create a 1:1 mdev device on top of one VF, de=
-vice
-> >>>>> specific mdev parent driver is bound to VF directly.
-> >>>>> (2) vfio-pci + mediate ops way does not create mdev devices and VF
-> >>>>> mediate driver does not bind to VFs. Instead, vfio-pci binds to VFs=
-.
-> >>>>>
-> >>>>> The reason why we don't choose the way of writing mdev parent drive=
-r is
-> >>>>> that
-> >>>>> (1) VFs are almost all the time directly passthroughed. Directly bi=
-nding
-> >>>>> to vfio-pci can make most of the code shared/reused. =20
-> >>>> Can we split out the common parts from vfio-pci?
-> >>>> =20
-> >>> That's very attractive. but one cannot implement a vfio-pci except
-> >>> export everything in it as common part :) =20
-> >>
-> >> Well, I think there should be not hard to do that. E..g you can route =
-it
-> >> back to like:
-> >>
-> >> vfio -> vfio_mdev -> parent -> vfio_pci
-> >> =20
-> > it's desired for us to have mediate driver binding to PF device.
-> > so once a VF device is created, only PF driver and vfio-pci are
-> > required. Just the same as what needs to be done for a normal VF passth=
-rough.
-> > otherwise, a separate parent driver binding to VF is required.
-> > Also, this parent driver has many drawbacks as I mentions in this
-> > cover-letter. =20
->=20
-> Well, as discussed, no need to duplicate the code, bar trick should=20
-> still work. The main issues I saw with this proposal is:
->=20
-> 1) PCI specific, other bus may need something similar
-
-Propose how it could be implemented higher in the vfio stack to make it
-device agnostic.
-
-> 2) Function duplicated with mdev and mdev can do even more
-
-mdev also comes with a device lifecycle interface that doesn't really
-make sense when a driver is only trying to partially mediate a single
-physical device rather than multiplex a physical device into virtual
-devices.  mdev would also require vendor drivers to re-implement
-much of vfio-pci for the direct access mechanisms.  Also, do we really
-want users or management tools to decide between binding a device to
-vfio-pci or a separate mdev driver to get this functionality.  We've
-already been burnt trying to use mdev beyond its scope.
-
-> >>>>>     If we write a
-> >>>>> vendor specific mdev parent driver, most of the code (like passthro=
-ugh
-> >>>>> style of rw/mmap) still needs to be copied from vfio-pci driver, wh=
-ich is
-> >>>>> actually a duplicated and tedious work. =20
-> >>>> The mediate ops looks quite similar to what vfio-mdev did. And it lo=
-oks to
-> >>>> me we need to consider live migration for mdev as well. In that case=
-, do we
-> >>>> still expect mediate ops through VFIO directly?
-> >>>>
-> >>>> =20
-> >>>>> (2) For features like dynamically trap/untrap pci bars, if they are=
- in
-> >>>>> vfio-pci, they can be available to most people without repeated cod=
-e
-> >>>>> copying and re-testing.
-> >>>>> (3) with a 1:1 mdev driver which passthrough VFs most of the time, =
-people
-> >>>>> have to decide whether to bind VFs to vfio-pci or mdev parent drive=
-r before
-> >>>>> it runs into a real migration need. However, if vfio-pci is bound
-> >>>>> initially, they have no chance to do live migration when there's a =
-need
-> >>>>> later. =20
-> >>>> We can teach management layer to do this.
-> >>>> =20
-> >>> No. not possible as vfio-pci by default has no migration region and
-> >>> dirty page tracking needs vendor's mediation at least for most
-> >>> passthrough devices now. =20
-> >>
-> >> I'm not quite sure I get here but in this case, just tech them to use
-> >> the driver that has migration support?
-> >> =20
-> > That's a way, but as more and more passthrough devices have demands and
-> > caps to do migration, will vfio-pci be used in future any more ? =20
->=20
->=20
-> This should not be a problem:
-> - If we introduce a common mdev for vfio-pci, we can just bind that=20
-> driver always
-
-There's too much of mdev that doesn't make sense for this usage model,
-this is why Yi's proposed generic mdev PCI wrapper is only a sample
-driver.  I think we do not want to introduce user confusion regarding
-which driver to use and there are outstanding non-singleton group
-issues with mdev that don't seem worthwhile to resolve.
-
-> - The most straightforward way to support dirty page tracking is done by=
-=20
-> IOMMU instead of device specific operations.
-
-Of course, but it doesn't exist yet.  We're attempting to design the
-dirty page tracking in a way that's mostly transparent for current mdev
-drivers, would provide generic support for IOMMU-based dirty tracking,
-and extensible to the inevitability of vendor driver tracking.  Thanks,
-
-Alex
-
+thanks
+-- PMM
 
