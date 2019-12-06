@@ -2,86 +2,80 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DATE_IN_PAST_06_12,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A02C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3247AC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:38:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B8DE2466E
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:36:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF154206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 15:38:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BwEyPHfP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B8DE2466E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zzsj35yd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF154206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idFeC-0005Ql-5P
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:36:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48910)
+	id 1idFgs-0000fa-Ik
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 10:38:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51425)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1idElI-0000mY-8d
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:39:18 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1idErz-0007tT-2d
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:46:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1idElG-0001h5-A8
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:39:16 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38821)
+ (envelope-from <peter.maydell@linaro.org>) id 1idErx-0002Yv-Bp
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:46:10 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35841)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1idElG-0001gE-3n
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:39:14 -0500
-Received: by mail-oi1-x243.google.com with SMTP id b8so6352276oiy.5
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:39:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=tvojVvlszRJsOZIKiDHXWwmX7KNBTuSyKRFi9PCSntc=;
- b=BwEyPHfPpNzON+e9C4cbmCLTeY9ZMkpMK2CvDQRK9UtOOZqlDig8BzH2TQelc/Vo1u
- CPssKwoPvz2NRgI93NqxyVAeW9kjt/I7PBA4vDNjOzizVRkJqSG11Mry/CXGMhCF/Yd+
- AvTk4DhZn5OGFAVlOVnbqNq9/bI3fWs+izlyjhWhImbFIM1jjpdd1qiEhH8RtHndCco+
- ky1ISl/SwvEyg0xcJomc+E9WfCjC3PWwMcNsDwJYakp57AwxlDi7IZH/1+YGGAsozzdg
- 5ondS8rqmN0m97S/rMSUL8evxnSjs3VJvgQ+w86IWi7uDjd1nKjPP8bw+8FEviLwpRHS
- FLsg==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1idErx-0002XO-4U
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 09:46:09 -0500
+Received: by mail-oi1-x244.google.com with SMTP id c16so6378174oic.3
+ for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 06:46:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uhSPlg+i9CiAubF7ClC0ww2vNy2qAmWgFnaNVgQgOxE=;
+ b=zzsj35yd960LbiaSBcl/usD7GRpWOsvW98l1RP+jhOWQfLebIUn2wV2+T9mfupbxch
+ e93nHD4TZJlfhk5O0kSjTqVQ9kAmqFigsdzw6vbxNcKNbYHGBBJR4WtLJnOtCYmfeiWN
+ Oc+Mal+rpJUHvmiVerGR7FkUHafsoCh0ZCI/9hWqOsB9KukvjFnW74gfHF3KczHaYLWp
+ 90mLdshDyOYx7g1tE/o7HSHRWfK5XlNlhEZz7D2BrQGNv608xXmdvKJr0jGdZnhSOT91
+ Ecuk55bLRIX9g6M3EnNxsdA5sxTN0qkNTXzWj7muhFqvRD2MpCWlWU466cSZdN2ZMZ9+
+ 5LRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=tvojVvlszRJsOZIKiDHXWwmX7KNBTuSyKRFi9PCSntc=;
- b=Uj/niqVTVe7olrK+hopIhNzs8zgUOtCuCm/tJcNHwrFk8mC/fWN76l0frtwP8shlOz
- +r6qgk2uhKZRdaoRkKFaV2TICXjYUTBlyJ04bqvSZSSxUZ4Vn1bX9A8dy+d+iZDJi/d3
- NHQljmfQPT3HKZrjnKQxM9fKNPd9rGr1JA5fcYsOZLTdOfmV7V0RPgF3SxVcGIE8CVlY
- voZTII15DhMJrV4zXGhGxNGtQvwGmQybLW5WmhWEpdfn5UgbWmmYQiHy3rHSj24hOWs8
- BXnsUEfB/dGM1H/CUnLlVXLbmo9631H4dzUj3hWJ2LkWrUpIs2FPGjpIs2zziXEuzk1y
- rrhQ==
-X-Gm-Message-State: APjAAAXaWeGstv4GqPzzGfLj3sGfSmkIIyPTtMLuLkUexnuecjZjn9Hn
- y/O0QqmayvCy85sROavZaHzvZOTLLk1sgZwn58X5+w==
-X-Google-Smtp-Source: APXvYqyU2gCSwQhTgLN7Pe3/29Pde4mqvAMK2UKCX0Bzxk7vZJjILp0MwVnWoUt06b081nE7Kju2UGB1FDtolm+4Nys=
-X-Received: by 2002:aca:1b08:: with SMTP id b8mr507653oib.106.1575620665044;
- Fri, 06 Dec 2019 00:24:25 -0800 (PST)
+ bh=uhSPlg+i9CiAubF7ClC0ww2vNy2qAmWgFnaNVgQgOxE=;
+ b=pD+49TxdV3h0pGA4m0BIjQ8lnVoAs3S5N2Rs75BYIt7oYNjdDy+LCx0NnPFzSM3IfA
+ bfQuz0RT1D1pDfdzTA6T/IgcRCWBgmzNwb22mitHmfnwySl6HcdjN5aDobBun9RUBkzG
+ e1EECUxtJR7Xgj07ba/9O/4kyWoiA6LkHxSVfCvFmhIedatUu94UJIBfxEXvha4K19cY
+ O//V3fwDkW4/7mgrJLvXKvrXimaeTzHMZJX23RUhRt+/htwAhHn4jrhuUoHvb3+Eya0q
+ 2uj9RYIeyHfpyVZQP2Nx2dorjuP6MBP0GijoO57UqxhSIE8l+nUSZhVUeRad85dYWV7H
+ yXgg==
+X-Gm-Message-State: APjAAAXzR/fVNT09vOkrMIfwZkD9FNe+Nb49e00rHn580fM6yaPJwil8
+ opGPLcAd3UJsX5GPIrhG19UmtoX3Itvc0Pf64w7gnvfl
+X-Google-Smtp-Source: APXvYqw2gpZf9eGRHwCYCA4+iyO+tNdoHE1d4WU9umvAw5Ya5N+sNHgm4KB59ivtXp+w1i5oD9gVxA0jXOWo5q4I3vU=
+X-Received: by 2002:aca:edd5:: with SMTP id l204mr12121697oih.98.1575632772773; 
+ Fri, 06 Dec 2019 03:46:12 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Fri, 6 Dec 2019 00:24:24 -0800 (PST)
-In-Reply-To: <20191205212729.GA1797@localhost.localdomain>
-References: <1574687098-26689-1-git-send-email-Filip.Bozuta@rt-rk.com>
- <1574687098-26689-3-git-send-email-Filip.Bozuta@rt-rk.com>
- <CAL1e-=jeECJRjOR+Mo79D5VA8q0gSZsf__MOtRhiU0fgDF1DRA@mail.gmail.com>
- <20191202204958.GP14595@habkost.net>
- <20191205212729.GA1797@localhost.localdomain>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 6 Dec 2019 09:24:24 +0100
-Message-ID: <CAL1e-=iTVsTpMy81vVj2H7JQk4AJax+_PoVZZ80vXvzFpoatqg@mail.gmail.com>
-Subject: Re: [PATCH 2/5] mips: malta: Renovate coding style
-To: Cleber Rosa <crosa@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000000a749c059904c6d0"
+References: <20191011134744.2477-1-richard.henderson@linaro.org>
+ <20191011134744.2477-22-richard.henderson@linaro.org>
+In-Reply-To: <20191011134744.2477-22-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 6 Dec 2019 11:46:02 +0000
+Message-ID: <CAFEAcA8aJZRMFEpKaUN_W4U5LXoWvvzYUe0FQYwTd=RiFHeFEQ@mail.gmail.com>
+Subject: Re: [PATCH v5 21/22] target/arm: Add mmu indexes for tag memory
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,247 +87,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pburton@wavecomp.com" <pburton@wavecomp.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Filip Bozuta <Filip.Bozuta@rt-rk.com>,
- "hpoussin@reactos.org" <hpoussin@reactos.org>,
- "amarkovic@wavecomp.com" <amarkovic@wavecomp.com>,
- "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
- "aurelien@aurel32.net" <aurelien@aurel32.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000000a749c059904c6d0
-Content-Type: text/plain; charset="UTF-8"
-
-On Thursday, December 5, 2019, Cleber Rosa <crosa@redhat.com> wrote:
-
-> On Mon, Dec 02, 2019 at 05:49:58PM -0300, Eduardo Habkost wrote:
-> > On Sun, Dec 01, 2019 at 12:46:12AM +0100, Aleksandar Markovic wrote:
-> > > On Monday, November 25, 2019, Filip Bozuta <Filip.Bozuta@rt-rk.com>
-> wrote:
-> > >
-> > > > The script checkpatch.pl located in scripts folder was
-> > > > used to detect all errors and warrnings in files:
-> > > >     hw/mips/mips_malta.c
-> > > >     hw/mips/gt64xxx_pci.c
-> > > >     tests/acceptance/linux_ssh_mips_malta.py
-> > > >
-> > > > All these mips malta machine files were edited and
-> > > > all the errors and warrings generated by the checkpatch.pl
-> > > > script were corrected and then the script was
-> > > > ran again to make sure there are no more errors and warnings.
-> > > >
-> > > > Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-> > > > ---
-> > > >  hw/mips/mips_malta.c                     | 139
-> > > > ++++++++++++++++---------------
-> > > >  tests/acceptance/linux_ssh_mips_malta.py |   6 +-
-> > > >  2 files changed, 75 insertions(+), 70 deletions(-)
-> > > >
-> > > >
-> > > Very good cleanup!
-> > >
-> > > Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > >
-> > > I think this snippet is good, but I am just in case cc-ing Cleber and
-> > > Eduardo to check if it is in accordance with any applicable guidelines
-> of
-> > > our test framework:
-> >
-> > Thanks for CCing us.
-> >
-> > >
-> > >
-> > > > diff --git a/tests/acceptance/linux_ssh_mips_malta.py
-> > > > b/tests/acceptance/linux_ssh_mips_malta.py
-> > > > index fc13f9e..44e1118 100644
-> > > > --- a/tests/acceptance/linux_ssh_mips_malta.py
-> > > > +++ b/tests/acceptance/linux_ssh_mips_malta.py
-> > > > @@ -99,10 +99,12 @@ class LinuxSSH(Test):
-> > > >      def ssh_command(self, command, is_root=True):
-> > > >          self.ssh_logger.info(command)
-> > > >          result = self.ssh_session.cmd(command)
-> > > > -        stdout_lines = [line.rstrip() for line in
-> > > > result.stdout_text.splitlines()]
-> > > > +        stdout_lines = [line.rstrip() for line
-> > > > +        in result.stdout_text.splitlines()]
-> > > >          for line in stdout_lines:
-> > > >              self.ssh_logger.info(line)
-> > > > -        stderr_lines = [line.rstrip() for line in
-> > > > result.stderr_text.splitlines()]
-> > > > +        stderr_lines = [line.rstrip() for line
-> > > > +        in result.stderr_text.splitlines()]
-> >
-> > If you really want to split those lines, please indent them
-> > properly.  e.g.:
-> >
-> >         stdout_lines = [line.rstrip() for line
-> >                         in result.stdout_text.splitlines()]
-> >
-> > See PEP 8 [1] for additional examples.
-> >
-> > Personally, I would just keep the existing
-> > linux_ssh_mips_malta.py code as is.  I don't think splitting
-> > those lines improves readability.
-> >
-> > [1] https://www.python.org/dev/peps/pep-0008/#indentation
-> >
-> > --
-> > Eduardo
+On Fri, 11 Oct 2019 at 14:50, Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> Right.  It only helps when running terminal or editor settings are
-> limited to ~80 cols.  And even in those cases, sometimes such code
-> split across lines needs a lot of gymnastics to not degrade in
-> readability when compared to a longer line.
+> The process by which one goes from an address space plus physical
+> address to a host pointer is complex.  It is easiest to reuse the
+> mechanism already present within cputlb, and letting that cache
+> the results.
 >
-> We're not (yet?) enforcing PEP 8, so either as Eduardo suggested, or
-> with no changes LGTM.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/arm/cpu-param.h |  2 +-
+>  target/arm/cpu.h       | 12 +++++++++---
+>  target/arm/internals.h |  2 ++
+>  target/arm/helper.c    | 25 +++++++++++++++++++++++--
+>  4 files changed, 35 insertions(+), 6 deletions(-)
 >
+> diff --git a/target/arm/cpu-param.h b/target/arm/cpu-param.h
+> index 6e6948e960..18ac562346 100644
+> --- a/target/arm/cpu-param.h
+> +++ b/target/arm/cpu-param.h
+> @@ -29,6 +29,6 @@
+>  # define TARGET_PAGE_BITS_MIN  10
+>  #endif
 >
-Eduardo, Cleber,
-
-I truly appreciate your responses and clarifications.
-
-Best regards,
-Aleksandar
-
-
-
-
-> Cheers,
-> - Cleber.
+> -#define NB_MMU_MODES 8
+> +#define NB_MMU_MODES 9
 >
+>  #endif
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index faca43ea78..c3609ef9d5 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2854,8 +2854,8 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+>  #define ARM_MMU_IDX_M_NEGPRI 0x2
+>  #define ARM_MMU_IDX_M_S 0x4
 >
-
---0000000000000a749c059904c6d0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Thursday, December 5, 2019, Cleber Rosa &lt;<a href=3D"mailto:cr=
-osa@redhat.com">crosa@redhat.com</a>&gt; wrote:<br><blockquote class=3D"gma=
-il_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-lef=
-t:1ex">On Mon, Dec 02, 2019 at 05:49:58PM -0300, Eduardo Habkost wrote:<br>
-&gt; On Sun, Dec 01, 2019 at 12:46:12AM +0100, Aleksandar Markovic wrote:<b=
-r>
-&gt; &gt; On Monday, November 25, 2019, Filip Bozuta &lt;<a href=3D"mailto:=
-Filip.Bozuta@rt-rk.com">Filip.Bozuta@rt-rk.com</a>&gt; wrote:<br>
-&gt; &gt; <br>
-&gt; &gt; &gt; The script <a href=3D"http://checkpatch.pl" target=3D"_blank=
-">checkpatch.pl</a> located in scripts folder was<br>
-&gt; &gt; &gt; used to detect all errors and warrnings in files:<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0hw/mips/mips_malta.c<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0hw/mips/gt64xxx_pci.c<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0tests/acceptance/linux_ssh_<wbr>mips_malt=
-a.py<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; All these mips malta machine files were edited and<br>
-&gt; &gt; &gt; all the errors and warrings generated by the <a href=3D"http=
-://checkpatch.pl" target=3D"_blank">checkpatch.pl</a><br>
-&gt; &gt; &gt; script were corrected and then the script was<br>
-&gt; &gt; &gt; ran again to make sure there are no more errors and warnings=
-.<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt; Signed-off-by: Filip Bozuta &lt;<a href=3D"mailto:Filip.Bozu=
-ta@rt-rk.com">Filip.Bozuta@rt-rk.com</a>&gt;<br>
-&gt; &gt; &gt; ---<br>
-&gt; &gt; &gt;=C2=A0 hw/mips/mips_malta.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 139<br>
-&gt; &gt; &gt; ++++++++++++++++--------------<wbr>-<br>
-&gt; &gt; &gt;=C2=A0 tests/acceptance/linux_ssh_<wbr>mips_malta.py |=C2=A0 =
-=C2=A06 +-<br>
-&gt; &gt; &gt;=C2=A0 2 files changed, 75 insertions(+), 70 deletions(-)<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; &gt;<br>
-&gt; &gt; Very good cleanup!<br>
-&gt; &gt; <br>
-&gt; &gt; Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@=
-wavecomp.com">amarkovic@wavecomp.com</a>&gt;<br>
-&gt; &gt; <br>
-&gt; &gt; I think this snippet is good, but I am just in case cc-ing Cleber=
- and<br>
-&gt; &gt; Eduardo to check if it is in accordance with any applicable guide=
-lines of<br>
-&gt; &gt; our test framework:<br>
-&gt; <br>
-&gt; Thanks for CCing us.<br>
-&gt; <br>
-&gt; &gt; <br>
-&gt; &gt; <br>
-&gt; &gt; &gt; diff --git a/tests/acceptance/linux_ssh_<wbr>mips_malta.py<b=
-r>
-&gt; &gt; &gt; b/tests/acceptance/linux_ssh_<wbr>mips_malta.py<br>
-&gt; &gt; &gt; index fc13f9e..44e1118 100644<br>
-&gt; &gt; &gt; --- a/tests/acceptance/linux_ssh_<wbr>mips_malta.py<br>
-&gt; &gt; &gt; +++ b/tests/acceptance/linux_ssh_<wbr>mips_malta.py<br>
-&gt; &gt; &gt; @@ -99,10 +99,12 @@ class LinuxSSH(Test):<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0 def ssh_command(self, command, is_root=
-=3DTrue):<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"http://self.ssh=
-_logger.info" target=3D"_blank">self.ssh_logger.info</a>(command)<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 result =3D self.ssh_sessio=
-n.cmd(command)<br>
-&gt; &gt; &gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 stdout_lines =3D [line.rstrip()=
- for line in<br>
-&gt; &gt; &gt; result.stdout_text.splitlines(<wbr>)]<br>
-&gt; &gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 stdout_lines =3D [line.rstrip()=
- for line<br>
-&gt; &gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 in result.stdout_text.splitline=
-s(<wbr>)]<br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 for line in stdout_lines:<=
-br>
-&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"h=
-ttp://self.ssh_logger.info" target=3D"_blank">self.ssh_logger.info</a>(line=
-)<br>
-&gt; &gt; &gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 stderr_lines =3D [line.rstrip()=
- for line in<br>
-&gt; &gt; &gt; result.stderr_text.splitlines(<wbr>)]<br>
-&gt; &gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 stderr_lines =3D [line.rstrip()=
- for line<br>
-&gt; &gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 in result.stderr_text.splitline=
-s(<wbr>)]<br>
-&gt; <br>
-&gt; If you really want to split those lines, please indent them<br>
-&gt; properly.=C2=A0 e.g.:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stdout_lines =3D [line.rstrip() for l=
-ine<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0in result.stdout_text.splitlines(<wbr>)]<br>
-&gt; <br>
-&gt; See PEP 8 [1] for additional examples.<br>
-&gt; <br>
-&gt; Personally, I would just keep the existing<br>
-&gt; linux_ssh_mips_malta.py code as is.=C2=A0 I don&#39;t think splitting<=
-br>
-&gt; those lines improves readability.<br>
-&gt;<br>
-&gt; [1] <a href=3D"https://www.python.org/dev/peps/pep-0008/#indentation" =
-target=3D"_blank">https://www.python.org/dev/<wbr>peps/pep-0008/#indentatio=
-n</a><br>
-&gt; <br>
-&gt; -- <br>
-&gt; Eduardo<br>
-<br>
-Right.=C2=A0 It only helps when running terminal or editor settings are<br>
-limited to ~80 cols.=C2=A0 And even in those cases, sometimes such code<br>
-split across lines needs a lot of gymnastics to not degrade in<br>
-readability when compared to a longer line.<br>
-<br>
-We&#39;re not (yet?) enforcing PEP 8, so either as Eduardo suggested, or<br=
+> -#define ARM_MMU_IDX_TYPE_MASK (~0x7)
+> -#define ARM_MMU_IDX_COREIDX_MASK 0x7
+> +#define ARM_MMU_IDX_TYPE_MASK (~0xf)
+> +#define ARM_MMU_IDX_COREIDX_MASK 0xf
 >
-with no changes LGTM.<br>
-<br></blockquote><div><br></div><div>Eduardo, Cleber,</div><div><br></div><=
-div>I truly appreciate your responses and clarifications.</div><div><br></d=
-iv><div>Best regards,</div><div>Aleksandar</div><div><br></div><div><br></d=
-iv><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0=
- .8ex;border-left:1px #ccc solid;padding-left:1ex">
-Cheers,<br>
-- Cleber.<br>
-<br>
-</blockquote>
+>  typedef enum ARMMMUIdx {
+>      ARMMMUIdx_S12NSE0 = 0 | ARM_MMU_IDX_A,
+> @@ -2865,6 +2865,9 @@ typedef enum ARMMMUIdx {
+>      ARMMMUIdx_S1SE0 = 4 | ARM_MMU_IDX_A,
+>      ARMMMUIdx_S1SE1 = 5 | ARM_MMU_IDX_A,
+>      ARMMMUIdx_S2NS = 6 | ARM_MMU_IDX_A,
+> +    ARMMMUIdx_TagNS = 7 | ARM_MMU_IDX_A,
+> +    ARMMMUIdx_TagS = 8 | ARM_MMU_IDX_A,
+> +
+>      ARMMMUIdx_MUser = 0 | ARM_MMU_IDX_M,
+>      ARMMMUIdx_MPriv = 1 | ARM_MMU_IDX_M,
+>      ARMMMUIdx_MUserNegPri = 2 | ARM_MMU_IDX_M,
+> @@ -2891,6 +2894,8 @@ typedef enum ARMMMUIdxBit {
+>      ARMMMUIdxBit_S1SE0 = 1 << 4,
+>      ARMMMUIdxBit_S1SE1 = 1 << 5,
+>      ARMMMUIdxBit_S2NS = 1 << 6,
+> +    ARMMMUIdxBit_TagNS = 1 << 7,
+> +    ARMMMUIdxBit_TagS = 1 << 8,
+>      ARMMMUIdxBit_MUser = 1 << 0,
+>      ARMMMUIdxBit_MPriv = 1 << 1,
+>      ARMMMUIdxBit_MUserNegPri = 1 << 2,
+> @@ -3254,7 +3259,8 @@ enum {
+>  /* Return the address space index to use for a memory access */
+>  static inline int arm_asidx_from_attrs(CPUState *cs, MemTxAttrs attrs)
+>  {
+> -    return attrs.secure ? ARMASIdx_S : ARMASIdx_NS;
+> +    return ((attrs.target_tlb_bit2 ? ARMASIdx_TagNS : ARMASIdx_NS)
+> +            + attrs.secure);
 
---0000000000000a749c059904c6d0--
+If you want to do the "just add attrs.secure" can we have
+a build-time assert that ARMASIdx_S is ARMASIdx_NS + 1, and
+ditto for TagNS/TagS, please? It seems like the kind of thing
+that will catch us out later on.
+
+>  }
+
+>      if (env->cp15.hcr_el2 & HCR_TGE) {
+> @@ -10662,7 +10671,9 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
+>                     target_ulong *page_size,
+>                     ARMMMUFaultInfo *fi, ARMCacheAttrs *cacheattrs)
+>  {
+> -    if (mmu_idx == ARMMMUIdx_S12NSE0 || mmu_idx == ARMMMUIdx_S12NSE1) {
+> +    switch (mmu_idx) {
+> +    case ARMMMUIdx_S12NSE0:
+> +    case ARMMMUIdx_S12NSE1:
+>          /* Call ourselves recursively to do the stage 1 and then stage 2
+>           * translations.
+>           */
+> @@ -10713,6 +10724,16 @@ bool get_phys_addr(CPUARMState *env, target_ulong address,
+>               */
+>              mmu_idx = stage_1_mmu_idx(mmu_idx);
+>          }
+> +        break;
+> +
+> +    case ARMMMUIdx_TagS:
+> +    case ARMMMUIdx_TagNS:
+> +        /* Indicate tag memory to arm_asidx_from_attrs.  */
+> +        attrs->target_tlb_bit2 = true;
+> +        break;
+
+So here we fall through to the "handle a stage 1 lookup" code, which:
+ * sets attrs->secure
+ * sets attrs->user (always false, so we could have left it alone)
+ * skips the FCSE handling (as we're v8)
+ * skips the PMSA handling
+ * hits the regime_translation_disabled() check, which fills in
+   *phys_ptr, *prot and *page_size and returns
+
+Maybe it would be clearer if this case here just did all of that:
+
+    case ARMMMUIdx_TagS:
+        attrs->secure = true;
+        /* fall through */
+    case ARMMMUIdx_TagNS:
+        /* Indicate tag memory to arm_asidx_from_attrs.  */
+        attrs->target_tlb_bit2 = true;
+        *phys_ptr = address;
+        *prot = PAGE_READ | PAGE_WRITE | PAGE_EXEC;
+        *page_size = TARGET_PAGE_SIZE;
+        return 0;
+
+Did I miss anything out?
+Or are we going to want more things which are common between
+the stage 1 codepath and the "just a tag ram access" case
+in future?
+
+thanks
+-- PMM
 
