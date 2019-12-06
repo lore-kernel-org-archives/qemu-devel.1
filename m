@@ -2,81 +2,156 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75326C43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 423C2C43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:12:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 424C121835
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:12:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DA2721835
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 19:12:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UAFq4fmK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 424C121835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FPNjT75G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DA2721835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idJ1X-0000Qf-3E
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 14:12:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41326)
+	id 1idJ1k-0000e7-OO
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 14:12:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1idIzl-00078z-D7
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:10:31 -0500
+ (envelope-from <jsnow@redhat.com>) id 1idIxV-0004vi-Jd
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:08:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1idIzj-0002eB-Rh
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:10:29 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37505)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1idIzj-0002aP-Ji
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:10:27 -0500
-Received: by mail-ot1-x343.google.com with SMTP id k14so6742952otn.4
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 11:10:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=pnyKgOSe9xttApGxB2XbB9t7TxPD4gRMF4RUK0NKM8o=;
- b=UAFq4fmKZvRRbBF2KQwp1TKUvJaHfgUyW5yLXZlmkLVDWriR0Q5rJjl6Xb0KB++eJJ
- PCwlSO0QLaSymIZxxYEEtkBEd9JUT7BEr4VWg0GHVOwMOLZNvRznNYPfYM3t8zwU6spz
- QP8h2cv5vG9mDvXgbji4sbZ6dl2KmjckXeBkqgLFbT5cLwplmA5arqLPtwKi2RhuJRqv
- Bw4Sr7VE0KjyeKHdY/M4tfeLfx6ZpUIXaabGDFAeLagY2aV3LdO/f4iZeRGnYny4L5Tk
- vstYaV8wXvGTCOTLM13apYgTz/5Zv0mju9qrhlBRskEhgNZY7YXLfeo/J/i+Nj6MY1Sh
- Xkeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=pnyKgOSe9xttApGxB2XbB9t7TxPD4gRMF4RUK0NKM8o=;
- b=HFMza5s6Y4ga0f6t9RaGVjtmJ9TudhKW72bV/vG0CvabYLfUa0K82ZluGw58uQmnp6
- 5X6R2+uuAYP6ohJZsiv9tAbBdUeAUBkI4QHXlvYsfCxHPRw81ubqX3jQOTOLz4cYbMw+
- MXfC/2rSGF+ci5PnQk/AJq/lBtcGJHo5UzjzLGJcXBRItK4LK0lz4gGG+HJCrYSSqVm7
- OGxA2IAkXBuVonUKov1+LJ6mnhTdC3/uQhPuIfhvrDdqD5ZLUPIRKllOKMBNleWApmEt
- 4fGdgrRv6XbBQXYcSi7+XGcMwBKzQz/Zi3vMgn7rvFzuIeQb2q4+nqFmhsh6Ma1gsN+K
- ZslQ==
-X-Gm-Message-State: APjAAAV7hZppWclRRzlJ3afVWj3UHGuiGgYxVZa40o/7/79sSkAkzXKt
- PcOjVeb2Goi6/SHNsWr54E9o6uEQagDZREfo5rU/9A==
-X-Google-Smtp-Source: APXvYqyEPXxUXlF586/q9rt3xrtVLMqKhbOnw3DB9N9YzwjXR1tBiA+1b+e6+pfkjoXI//8Vp4lWHNRAM15lar9LJA4=
-X-Received: by 2002:a05:6830:2001:: with SMTP id
- e1mr11475707otp.97.1575659426564; 
- Fri, 06 Dec 2019 11:10:26 -0800 (PST)
+ (envelope-from <jsnow@redhat.com>) id 1idIxU-0004Tw-8x
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:08:09 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31033
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1idIxU-0004PS-3H
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 14:08:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575659287;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=7G8y7phBVdRDJseCch84WFCp3saX3Pd/3eE15PaZ7fQ=;
+ b=FPNjT75GTYQXUB7K+zKhidfDWOZ8goFsypR9JVdn0OV4Z4fpwpD7tolTw9WZo24sBXr41P
+ XK+3fZb93TCroCkQAnYGDmKCv1tnKuA7WXlxcL4McdYM0F3tp+uE40tig457M/x2MbmHTZ
+ QIzQTPTh1pOQIOd5T1UylLzIZSzNcng=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-84-UnLC3wIYNCSznfujdkmoHg-1; Fri, 06 Dec 2019 14:08:04 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1737B18B5FA1;
+ Fri,  6 Dec 2019 19:08:03 +0000 (UTC)
+Received: from [10.10.121.25] (ovpn-121-25.rdu2.redhat.com [10.10.121.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8D0B419C4F;
+ Fri,  6 Dec 2019 19:07:58 +0000 (UTC)
+Subject: Re: Offline manipulation of Dirty Bitmaps by qemu-img
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Qemu-block <qemu-block@nongnu.org>
+References: <4a9e19d1-fe87-e3f5-8faf-18127914b7b4@redhat.com>
+ <d6f89557-d4e5-02f4-3082-37e61447bf87@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <2400b74d-2d63-676f-03f3-eb69e1622fee@redhat.com>
+Date: Fri, 6 Dec 2019 14:07:51 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-References: <20191203225333.17055-1-richard.henderson@linaro.org>
- <20191203225333.17055-7-richard.henderson@linaro.org>
-In-Reply-To: <20191203225333.17055-7-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 6 Dec 2019 19:10:15 +0000
-Message-ID: <CAFEAcA9ncdKmC2nAVtFWU1WAjrki3iM=X9RiO_seBqqTbaiNPw@mail.gmail.com>
-Subject: Re: [PATCH 06/11] target/arm: Update MSR access for PAN
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <d6f89557-d4e5-02f4-3082-37e61447bf87@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: UnLC3wIYNCSznfujdkmoHg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,141 +163,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Nir Soffer <nsoffer@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ "libvirt-list@redhat.com" <libvirt-list@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 3 Dec 2019 at 22:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> For aarch64, there's a dedicated msr (imm, reg) insn.
-> For aarch32, this is done via msr to cpsr; and writes
-> from el0 are ignored.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/cpu.h           |  2 ++
->  target/arm/helper.c        | 22 ++++++++++++++++++++++
->  target/arm/translate-a64.c | 14 ++++++++++++++
->  target/arm/translate.c     |  4 ++++
->  4 files changed, 42 insertions(+)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 170dd5b124..f0e61bf34f 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -1159,6 +1159,7 @@ void pmu_init(ARMCPU *cpu);
->   * We will need to move AArch32 SS somewhere else at that point.
->   */
->  #define CPSR_RESERVED (1U << 21)
-> +#define CPSR_PAN (1U << 22)
->  #define CPSR_J (1U << 24)
->  #define CPSR_IT_0_1 (3U << 25)
->  #define CPSR_Q (1U << 27)
-> @@ -1225,6 +1226,7 @@ void pmu_init(ARMCPU *cpu);
->  #define PSTATE_BTYPE (3U << 10)
->  #define PSTATE_IL (1U << 20)
->  #define PSTATE_SS (1U << 21)
-> +#define PSTATE_PAN (1U << 22)
->  #define PSTATE_V (1U << 28)
->  #define PSTATE_C (1U << 29)
->  #define PSTATE_Z (1U << 30)
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 4e3fe00316..512be5c644 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -4112,6 +4112,17 @@ static void aa64_daif_write(CPUARMState *env, const ARMCPRegInfo *ri,
->      env->daif = value & PSTATE_DAIF;
->  }
->
-> +static uint64_t aa64_pan_read(CPUARMState *env, const ARMCPRegInfo *ri)
-> +{
-> +    return env->pstate & PSTATE_PAN;
-> +}
-> +
-> +static void aa64_pan_write(CPUARMState *env, const ARMCPRegInfo *ri,
-> +                           uint64_t value)
-> +{
-> +    env->pstate = (env->pstate & ~PSTATE_PAN) | (value & PSTATE_PAN);
-> +}
-> +
->  static CPAccessResult aa64_cacheop_access(CPUARMState *env,
->                                            const ARMCPRegInfo *ri,
->                                            bool isread)
-> @@ -7405,6 +7416,17 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->          define_arm_cp_regs(cpu, lor_reginfo);
->      }
->
-> +    if (cpu_isar_feature(aa64_pan, cpu)) {
-> +        static const ARMCPRegInfo pan_reginfo[] = {
-> +            { .name = "PAN", .state = ARM_CP_STATE_AA64,
-> +              .opc0 = 3, .opc1 = 0, .crn = 4, .crm = 2, .opc2 = 3,
-> +              .type = ARM_CP_NO_RAW, .access = PL1_RW,
-> +              .readfn = aa64_pan_read, .writefn = aa64_pan_write, },
-> +            REGINFO_SENTINEL
-> +        };
-
-Same remarks about regdef as for UAO.
-
-> +        define_arm_cp_regs(cpu, pan_reginfo);
-> +    }
-> +
->      if (arm_feature(env, ARM_FEATURE_EL2) && cpu_isar_feature(aa64_vh, cpu)) {
->          static const ARMCPRegInfo vhe_reginfo[] = {
->              { .name = "CONTEXTIDR_EL2", .state = ARM_CP_STATE_AA64,
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index b5c7bc2d76..7f5a68106b 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1601,6 +1601,20 @@ static void handle_msr_i(DisasContext *s, uint32_t insn,
->          s->base.is_jmp = DISAS_NEXT;
->          break;
->
-> +    case 0x04: /* PAN */
-> +        if (!dc_isar_feature(aa64_pan, s) || s->current_el == 0) {
-> +            goto do_unallocated;
-> +        }
-> +        if (crm & 1) {
-> +            set_pstate_bits(PSTATE_PAN);
-> +        } else {
-> +            clear_pstate_bits(PSTATE_PAN);
-> +        }
-> +        t1 = tcg_const_i32(s->current_el);
-> +        gen_helper_rebuild_hflags_a64(cpu_env, t1);
-> +        tcg_temp_free_i32(t1);
-> +        break;
-
-and same question about whether we need to break the TB here.
-
-> +
->      case 0x05: /* SPSel */
->          if (s->current_el == 0) {
->              goto do_unallocated;
-> diff --git a/target/arm/translate.c b/target/arm/translate.c
-> index 47a374b53d..98e6072dd4 100644
-> --- a/target/arm/translate.c
-> +++ b/target/arm/translate.c
-> @@ -2785,6 +2785,10 @@ static int gen_set_psr(DisasContext *s, uint32_t mask, int spsr, TCGv_i32 t0)
->          tcg_gen_or_i32(tmp, tmp, t0);
->          store_cpu_field(tmp, spsr);
->      } else {
-> +        /* Data writes to CPSR.PAN using an MSR insn at EL0 are ignored.  */
-> +        if (IS_USER(s)) {
-> +            mask &= ~CPSR_PAN;
-> +        }
-
-I think we should also ignore the write if the PAN feature
-isn't present (see remark on earlier patch).
-
->          gen_set_cpsr(t0, mask);
->      }
->      tcg_temp_free_i32(t0);
-> --
-> 2.17.1
 
 
+On 12/6/19 5:37 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 06.12.2019 1:37, John Snow wrote:
+>> This has come up in the past, and I believe we discussed this at KVM
+>> Forum, too:
+>>
+>> There have been requests from oVirt (via Nir Soffer) to add some offline
+>> bitmap manipulation functionality. In the past, our stance has generally
+>> been "Use QEMU without an accelerator, and use QMP to manipulate the
+>> images."
+>>
+>> We like this for a few reasons:
+>>
+>> 1. It keeps bitmap management code tightly centralized
+>> 2. It allows for the full suite of bitmap manipulations in either
+>> offline or online mode with one tool
+>> 3. We wouldn't have to write new code.
+>> 4. Or design new CLIs and duplicate our existing work.
+>> 5. Or write even more tests.
+>>
+>> However, tools like oVirt may or may not be fully equipped to launch
+>> QEMU in this context, and there is always a desire for qemu-img to be
+>> able to "do more", so existing management suites could extend
+>> functionality more easily.
+> 
+> I think, all guys, who don't want to use Qemu directly for image manipulations,
+> should hope for Kevin's "[RFC PATCH 00/18] Add qemu-storage-daemon", which is
+> the correct solution of their problem. Still, I'm not one of these guys.
+> 
+>>
+>> (Or so I am imagining.)
+>>
+>> I am still leaning heavily against adding any more CLI commands or
+>> options to qemu-img right now. Even if we do add some of the fundamental
+>> ones like "add" or "remove", it seems only a matter of time before we
+>> have to add "clear", "merge", etc. Is this just a race to code duplication?
+>>
+>> On the other hand, one of the other suggestions is to have qemu-img
+>> check --repair optionally delete corrupted bitmaps. I kind of like this
+>> idea: it's a buyer beware operation that might make management layers
+>> unhappy, but then again ... repair is always something that could make
+>> things worse.
+>>
+>> Plus, if you manage to corrupt bitmaps badly enough that they can't even
+>> be parsed, you might need a heavyweight repair operation.
+>>
+> 
+> Improving "check" is a correct thing, because it's done inside qcow2 driver
+> itself. We just don't have corresponding qmp command or command line option
+> for Qemu to use this thing (or I missed it).
+> 
 
-thanks
--- PMM
+OK, I agree. I made a redhat BZ to track that we want this: 1780416 -
+RFE: qemu-img check --repair should optionally remove any
+corrupted bitmaps
+
+I'll work on a patch and we can debate the details there.
+
+--js
+
 
