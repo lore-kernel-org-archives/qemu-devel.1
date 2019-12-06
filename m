@@ -2,80 +2,73 @@ Return-Path: <SRS0=8N/K=Z4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E0AC43603
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 255FFC43603
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:22:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A40A2464E
-	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:21:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E50CA20659
+	for <qemu-devel@archiver.kernel.org>; Fri,  6 Dec 2019 16:22:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="grFYvvlk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A40A2464E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XXKj6bHw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E50CA20659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idGMe-0007ss-T3
-	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:21:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40768)
+	id 1idGNS-0000jE-3T
+	for qemu-devel@archiver.kernel.org; Fri, 06 Dec 2019 11:22:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1idF6p-0000uQ-T4
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:01:32 -0500
+ (envelope-from <crosa@redhat.com>) id 1idFE9-0000xb-GO
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1idF6k-00075w-FD
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:01:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53030
+ (envelope-from <crosa@redhat.com>) id 1idFE7-0000Vt-F8
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:09:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52178
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1idF6j-00074K-RX
- for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:01:26 -0500
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1idFE7-0000UZ-Ap
+ for qemu-devel@nongnu.org; Fri, 06 Dec 2019 10:09:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575644485;
+ s=mimecast20190719; t=1575644942;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8bFdHkvEJe5jck4uEKZdxjc1onJEQxJM/7zmIC1qTHk=;
- b=grFYvvlkwQ0stbTHDfmkuDplmg67/9tuxxAUDcX+gE2FcUEB2+hULVIEf3G5wyJJMPGNtz
- b8Jxugr7ShMCYDwponReuOYUuHsQxGg497m5w65MbOoW6sWm3JjWgZQFIlxggbVE95QyrX
- GEXhWaMK72h/jwDm3vXWhhltE5ggqS4=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=MNiUvkiM0DD9iKxU0fe0AFvwNGHmzCfP+aLuS5lAodg=;
+ b=XXKj6bHwihQnI/6y/8xDSklfBukpwFwOmSKq+aIVsMqUyGUE4F3OrvIWpQtuosxPWZ2rDD
+ 5NECe5tGxrmh2fE/t/DnNhOfTxYB9mPLCzOATgs2AfyIR6uUfwG7Zdd/A7ak2blzgAjSDV
+ 7Gn3pSMhP2wUthhMoyk+fxbvSB7RUro=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-UafSOqVwNCirLDk2Lndvbw-1; Fri, 06 Dec 2019 02:58:52 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-220-K0Y2f4suOHKEJsLQNdLJ6A-1; Fri, 06 Dec 2019 10:09:01 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFD07DBA5;
- Fri,  6 Dec 2019 07:58:50 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A78C15C1C3;
- Fri,  6 Dec 2019 07:58:50 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 384041138606; Fri,  6 Dec 2019 08:58:49 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 12/21] qga: Fix latent guest-get-fsinfo error handling bug
-References: <20191130194240.10517-1-armbru@redhat.com>
- <20191130194240.10517-13-armbru@redhat.com>
- <c6fef374-f62f-5909-8e3e-d928abba19b2@virtuozzo.com>
-Date: Fri, 06 Dec 2019 08:58:49 +0100
-In-Reply-To: <c6fef374-f62f-5909-8e3e-d928abba19b2@virtuozzo.com> (Vladimir
- Sementsov-Ogievskiy's message of "Thu, 5 Dec 2019 16:29:50 +0000")
-Message-ID: <87lfrpnava.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D825DC29;
+ Fri,  6 Dec 2019 15:09:00 +0000 (UTC)
+Received: from dhcp-17-72.bos.redhat.com (dhcp-17-72.bos.redhat.com
+ [10.18.17.72])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 061425D6C8;
+ Fri,  6 Dec 2019 15:08:45 +0000 (UTC)
+From: Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 0/1] Fix for m68k/q800 acceptance test for QEMU 4.2-rc
+Date: Fri,  6 Dec 2019 10:08:43 -0500
+Message-Id: <20191206150844.20124-1-crosa@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: UafSOqVwNCirLDk2Lndvbw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: K0Y2f4suOHKEJsLQNdLJ6A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -91,51 +84,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+The following changes since commit 1bdc319ab5d289ce6b822e06fb2b13666fd9278e=
+:
 
-> 30.11.2019 22:42, Markus Armbruster wrote:
->> build_guest_fsinfo_for_virtual_device() crashes when
->> build_guest_fsinfo_for_device() fails and its @errp argument is null.
->> Messed up in commit 46d4c5723e "qga: Add guest-get-fsinfo command".
->>=20
->> The bug can't bite as no caller actually passes null.  Fix it anyway.
->>=20
->> Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
->
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->
-> Actually, all such bugs should be fixed by my auto-generated series..
+  Update version for v4.2.0-rc4 release (2019-12-03 17:56:30 +0000)
 
-I see.  I didn't consider that.
+are available in the Git repository at:
 
-One advantage of my manual fixing is a clearer record of the flaws in
-git.  It should also keep your work simpler, which is always a good idea
-for massive, mechanical patches.
+  git://github.com/clebergnu/qemu.git tags/python-next-pull-request
 
-> And, if fixing by hand, it may be better to teach this function to return
-> int, than propagation is not needed.
+for you to fetch changes up to 820649aa00ee343a0d473ad1002c59c70ba8c158:
 
-I went for the minimal fix.
+  tests/boot_linux_console: Fetch assets from Debian snapshot archives (201=
+9-12-06 09:48:35 -0500)
 
-I believe returning something useful is better.  It also matches the
-GError conventions.  Deviating from them in this point was a mistake.
+----------------------------------------------------------------
+Fix for m68k/q800 acceptance test (Philippe Mathieu-Daud=C3=A9)
 
-Touching up functions to return something useful by hand is a lot of
-work, though: functions have many returns, and we have many functions in
-need of this touch-up.  Some clever Coccinellery might be able to pull
-it off.  I haven't tried.
+----------------------------------------------------------------
 
-However, your clever "auto propagation" Coccinellery makes such a change
-less compelling, because it hides the propagation.
+Philippe Mathieu-Daud=C3=A9 (1):
+  tests/boot_linux_console: Fetch assets from Debian snapshot archives
 
-Thanks!
+ tests/acceptance/boot_linux_console.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--=20
+2.21.0
 
 
