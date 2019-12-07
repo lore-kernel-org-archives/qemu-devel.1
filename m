@@ -2,85 +2,99 @@ Return-Path: <SRS0=SuvF=Z5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D31C43603
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 21:57:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB2E2C43603
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 22:00:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A3166206DB
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 21:57:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B659206DB
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 22:00:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sgyNizmw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3166206DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=apple.com header.i=@apple.com header.b="GdP+3YiJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B659206DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idi57-0004GM-No
-	for qemu-devel@archiver.kernel.org; Sat, 07 Dec 2019 16:57:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35334)
+	id 1idi82-0005gK-IO
+	for qemu-devel@archiver.kernel.org; Sat, 07 Dec 2019 17:00:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36224)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bilalwasim676@gmail.com>) id 1idi46-0003mq-RF
- for qemu-devel@nongnu.org; Sat, 07 Dec 2019 16:56:41 -0500
+ (envelope-from <dirty@apple.com>) id 1idi77-00056Q-VE
+ for qemu-devel@nongnu.org; Sat, 07 Dec 2019 16:59:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bilalwasim676@gmail.com>) id 1idi43-0005gO-HW
- for qemu-devel@nongnu.org; Sat, 07 Dec 2019 16:56:37 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:39694)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bilalwasim676@gmail.com>)
- id 1idi41-0005Fs-R9; Sat, 07 Dec 2019 16:56:34 -0500
-Received: by mail-lj1-x243.google.com with SMTP id e10so11418601ljj.6;
- Sat, 07 Dec 2019 13:56:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=rkF2arBD2vxAqqsYBIWf8CfxbPo7WPFbWgGJ6mDwSdQ=;
- b=sgyNizmwe7innVSNyflnpZwewpwCgInXV2ezUxFKajfACIO4yg3JFNMZmwcdi4UlP7
- gE11tzfVLzL+ZyRZFJT9Jhik/Di3/p9xHelajT/yTXuSICQBLt8++nBs/RWxBtzDXLZE
- btoUrehSumXXK7ncttnSZyBQ/KmtDccOncdmhD2VTFbj6Ln5yt/G4/mEQt9RszuAxomg
- YwZUeJdgN6xB8L6mb2d/awNey42EDLLBa1RDmk/Rm4IhtDTxQg7W3Dz9lwFTmVV0BFWY
- YF8bbCrud4jjvNuWY3TLVwpKmS1ddwaiUVXdIo0d4UDG0tcdWlF302+B0wSfU/n9BqLx
- ZPow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=rkF2arBD2vxAqqsYBIWf8CfxbPo7WPFbWgGJ6mDwSdQ=;
- b=jDfKl3id+cPRUiVH3U8uAtJRTpYWY9ym9LB4wfb92GYywEyjvMwZjG/HlaSrxch3fx
- SKvfhmNDfBkk2KpHn+P0P9adP/pG7lPvHJ4ibFBgarFfy5duLAPFLTjSdIkVLCb1gRLJ
- qQ5sbANMcFmb1QjKysBBil4n2x3eBNJg3JnoTwmYMOLD982YAzzI7KZ0TtwMOzi2F0wy
- 9uv3O9k8YnqTsw0KlLwCujvYerNY+MYd7+B6y/MPXo+ahDXDzYQ2aQbvcu5DfTOJ08Q1
- l/mudF8JM8hF1jWziv5n84vnw/gLhmVMkKj1d6eO2y9yAUifEFr/GxJKKsleggnO/DPP
- Kyuw==
-X-Gm-Message-State: APjAAAWp0k13rjJTN2wj4dm3SFaJuLU777hHX+tocVzNDEkCBLKaVw+Q
- 4nsbJy45k87nICOMe3gNfnGa+3famEM=
-X-Google-Smtp-Source: APXvYqzgZy0ykW1OxDWyJM+yJCCsLv4SKlcPX9yVyE8Oeegqd5HVYkjyQdTcS+HcExrsQ8w2+fBTiw==
-X-Received: by 2002:a2e:868c:: with SMTP id l12mr2405751lji.194.1575755790433; 
- Sat, 07 Dec 2019 13:56:30 -0800 (PST)
-Received: from PKL-BWASIM-LT.mgc.mentorg.com
- (static-host202-147-173-53.link.net.pk. [202.147.173.53])
- by smtp.gmail.com with ESMTPSA id s22sm8759229ljm.41.2019.12.07.13.56.27
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 07 Dec 2019 13:56:29 -0800 (PST)
-From: bilalwasim676@gmail.com
+ (envelope-from <dirty@apple.com>) id 1idi76-0005vg-Rj
+ for qemu-devel@nongnu.org; Sat, 07 Dec 2019 16:59:45 -0500
+Received: from nwk-aaemail-lapp03.apple.com ([17.151.62.68]:48122)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dirty@apple.com>)
+ id 1idi73-0005XS-RL; Sat, 07 Dec 2019 16:59:42 -0500
+Received: from pps.filterd (nwk-aaemail-lapp03.apple.com [127.0.0.1])
+ by nwk-aaemail-lapp03.apple.com (8.16.0.27/8.16.0.27) with SMTP id
+ xB7Lqhhu025275; Sat, 7 Dec 2019 13:59:40 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=apple.com;
+ h=sender : from : to :
+ cc : subject : date : message-id : mime-version :
+ content-transfer-encoding; s=20180706;
+ bh=xW05YTkIRCYTxTqOS/to29lMMTs58JaQaauZT+J+ic4=;
+ b=GdP+3YiJE+VoSJG/2P7Hr74tvn609K8ilAbemu5jRlmyyJR53pG+ariwEkB0TgpLS1vV
+ xQAiscDZudM13oupX0W+XaTgI7wnoNwsitfJoyS5zjNVYIGs5Vy5cyTbclUL0tJOkWNF
+ /5pOs+JlEem3HRBAkKg7t70OA8SHPJNeW7HRGU9Q2lKunWIT2GBDO/qCYGTTtw2cXMbd
+ +TOGMzKZYYlJDMeHOPTeXfVP3+7TGKXJYL9YRJCsMMevZh+eXWRQZkLeaTS34hAEqqqG
+ yaazGPZ+8TMQ/zgo6qwlOqwwn6IvnUAlaU2IamL9uIB2UpUzAsz4IshaRA6HqcfOwklu oQ== 
+Received: from ma1-mtap-s01.corp.apple.com (ma1-mtap-s01.corp.apple.com
+ [17.40.76.5])
+ by nwk-aaemail-lapp03.apple.com with ESMTP id 2wr9g77tqy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO);
+ Sat, 07 Dec 2019 13:59:40 -0800
+Received: from nwk-mmpp-sz13.apple.com
+ (nwk-mmpp-sz13.apple.com [17.128.115.216]) by ma1-mtap-s01.corp.apple.com
+ (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
+ 2019)) with ESMTPS id <0Q25002OLX3F3O60@ma1-mtap-s01.corp.apple.com>; Sat,
+ 07 Dec 2019 13:59:39 -0800 (PST)
+Received: from process_milters-daemon.nwk-mmpp-sz13.apple.com by
+ nwk-mmpp-sz13.apple.com
+ (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit (built May  7
+ 2019)) id <0Q2500000WSPHT00@nwk-mmpp-sz13.apple.com>; Sat,
+ 07 Dec 2019 13:59:39 -0800 (PST)
+X-Va-A: 
+X-Va-T-CD: c56cc4374afe9162bf6a337f3d661529
+X-Va-E-CD: 4907c3113c1994319c5a45cf48172c47
+X-Va-R-CD: 049db61aa4ae8bfa4a677129663acd63
+X-Va-CD: 0
+X-Va-ID: 5d11f14b-1ac4-4cee-a4de-65110a386df6
+X-V-A: 
+X-V-T-CD: c56cc4374afe9162bf6a337f3d661529
+X-V-E-CD: 4907c3113c1994319c5a45cf48172c47
+X-V-R-CD: 049db61aa4ae8bfa4a677129663acd63
+X-V-CD: 0
+X-V-ID: a13f7062-f9f5-4c1d-9e0e-b4fa942e2e0d
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,,
+ definitions=2019-12-07_07:,, signatures=0
+Received: from pontoon.com (unknown [17.234.90.1]) by nwk-mmpp-sz13.apple.com
+ (Oracle Communications Messaging Server 8.0.2.4.20190507 64bit
+ (built May 7
+ 2019)) with ESMTPSA id <0Q2500CV0X3ENI70@nwk-mmpp-sz13.apple.com>; Sat,
+ 07 Dec 2019 13:59:39 -0800 (PST)
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2] Adding support for MAC filtering in the FEC IP
- implementation.
-Date: Sun,  8 Dec 2019 02:56:23 +0500
-Message-Id: <20191207215623.16532-1-bilalwasim676@gmail.com>
-X-Mailer: git-send-email 2.19.1.windows.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
+Cc: liran.alon@oracle.com, pbonzini@redhat.com, qemu-trivial@nongnu.org,
+ Stefan Weil <sw@weilnetz.de>
+Subject: [PATCH v2] Fix some comment spelling errors.
+Date: Sat, 07 Dec 2019 13:59:36 -0800
+Message-id: <d3c21b23934809f90350f11c56cabb6ca5041925.1575755966.git.dirty@apple.com>
+X-Mailer: git-send-email 2.24.0
+MIME-version: 1.0
+Content-transfer-encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-12-07_07:, , signatures=0
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 17.151.62.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,221 +106,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, philmd@redhat.com, jasowang@redhat.com,
- qemu-arm@nongnu.org, bilal_wasim@mentor.com,
- Bilal Wasim <bilalwasim676@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Cameron Esfahani <dirty@apple.com>
+From: Cameron Esfahani via <qemu-devel@nongnu.org>
 
-From: Bilal Wasim <bilalwasim676@gmail.com>
-
-This addition ensures that the IP does NOT boot up in
-promiscuous mode by default, and so the software only receives the desired
-packets(Unicast, Broadcast, Unicast / Multicast hashed) by default. The
-software running on-top of QEMU can also modify these settings and disable
-reception of broadcast frames or make the IP receive all packets (PROM mode).
-This patch greatly reduces the number of packets received by the software
-running on-top of the QEMU model. Tested with the armv7-a SABRE_LITE machine.
-Testing included running a custom OS with IPv4 / IPv6 support. Hashing and
-filtering of packets is tested to work well. Skeleton taken from the
-CADENCE_GEM IP and hash generation algorithm from the Linux Kernel.
-
-Signed-off-by: Bilal Wasim <bilalwasim676@gmail.com>
+Signed-off-by: Cameron Esfahani <dirty@apple.com>
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
 ---
- hw/net/imx_fec.c         | 117 ++++++++++++++++++++++++++++++++++++++-
- include/hw/net/imx_fec.h |  12 ++++
- 2 files changed, 128 insertions(+), 1 deletion(-)
+ target/i386/machine.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index bd99236864..cc1572b5fe 100644
---- a/hw/net/imx_fec.c
-+++ b/hw/net/imx_fec.c
-@@ -419,6 +419,87 @@ static void imx_enet_write_bd(IMXENETBufDesc *bd, dma_addr_t addr)
-     dma_memory_write(&address_space_memory, addr, bd, sizeof(*bd));
- }
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 2699eed94e..ee342ddd50 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -261,7 +261,7 @@ static int cpu_pre_save(void *opaque)
+      * intercepted anymore.
+      *
+      * Furthermore, when a L2 exception is intercepted by L1
+-     * hypervisor, it's exception payload (CR2/DR6 on #PF/#DB)
++     * hypervisor, its exception payload (CR2/DR6 on #PF/#DB)
+      * should not be set yet in the respective vCPU register.
+      * Thus, in case an exception is pending, it is
+      * important to save the exception payload seperately.
+@@ -271,9 +271,9 @@ static int cpu_pre_save(void *opaque)
+      * distinguish between a pending and injected exception
+      * and we don't need to store seperately the exception payload.
+      *
+-     * In order to preserve better backwards-compatabile migration,
++     * In order to preserve better backwards-compatible migration,
+      * convert a pending exception to an injected exception in
+-     * case it is not important to distingiush between them
++     * case it is not important to distinguish between them
+      * as described above.
+      */
+     if (env->exception_pending && !(env->hflags & HF_GUEST_MASK)) {
+@@ -415,7 +415,7 @@ static bool exception_info_needed(void *opaque)
  
-+/*
-+ * Calculate a FEC MAC Address hash index
-+ */
-+static unsigned calc_mac_hash(const uint8_t *mac, uint8_t mac_length)
-+{
-+    uint32_t crc = -1;
-+    int i;
-+
-+    while (mac_length--) {
-+        crc ^= *mac++;
-+        for (i = 0; i < 8; i++) {
-+            crc = (crc >> 1) ^ ((crc & 1) ? CRCPOLY_LE : 0);
-+        }
-+    }
-+
-+    /*
-+     * only upper 6 bits (FEC_HASH_BITS) are used
-+     * which point to specific bit in the hash registers
-+     */
-+    return (crc >> (32 - FEC_HASH_BITS)) & 0x3f;
-+}
-+
-+/*
-+ * fec_mac_address_filter:
-+ * Accept or reject this destination address?
-+ */
-+static int fec_mac_address_filter(IMXFECState *s, const uint8_t *packet)
-+{
-+    const uint8_t broadcast_addr[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-+    uint32_t addr1, addr2;
-+    uint8_t  hash;
-+
-+    /* Promiscuous mode? */
-+    if (s->regs[ENET_RCR] & ENET_RCR_PROM) {
-+        /* Accept all packets in promiscuous mode (even if bc_rej is set). */
-+        return FEC_RX_PROMISCUOUS_ACCEPT;
-+    }
-+
-+    /* Broadcast packet? */
-+    if (!memcmp(packet, broadcast_addr, 6)) {
-+        /* Reject broadcast packets? */
-+        if (s->regs[ENET_RCR] & ENET_RCR_BC_REJ) {
-+            return FEC_RX_REJECT;
-+        }
-+        /* Accept packets from broadcast address. */
-+        return FEC_RX_BROADCAST_ACCEPT;
-+    }
-+
-+    /* Accept packets -w- hash match? */
-+    hash = calc_mac_hash(packet, 6);
-+
-+    /* Accept packets -w- multicast hash match? */
-+    if ((packet[0] & 0x01) == 0x01) {
-+        /* Computed hash matches GAUR / GALR register ? */
-+        if (((hash < 32) && (s->regs[ENET_GALR] & (1 << hash)))
-+                || ((hash > 31) && (s->regs[ENET_GAUR] & (1 << (hash - 32))))) {
-+            /* Accept multicast hash enabled address. */
-+            return FEC_RX_MULTICAST_HASH_ACCEPT;
-+        }
-+    } else {
-+        /* Computed hash matches IAUR / IALR register ? */
-+        if (((hash < 32) && (s->regs[ENET_IALR] & (1 << hash)))
-+                || ((hash > 31) && (s->regs[ENET_IAUR] & (1 << (hash - 32))))) {
-+            /* Accept multicast hash enabled address. */
-+            return FEC_RX_UNICAST_HASH_ACCEPT;
-+        }
-+    }
-+
-+    /* Match Unicast address. */
-+    addr1  = g_htonl(s->regs[ENET_PALR]);
-+    addr2  = g_htonl(s->regs[ENET_PAUR]);
-+    if (!(memcmp(packet, (uint8_t *) &addr1, 4) ||
-+          memcmp(packet + 4, (uint8_t *) &addr2, 2))) {
-+        /* Accept packet because it matches my unicast address. */
-+        return FEC_RX_UNICAST_ACCEPT;
-+    }
-+
-+    /* Return -1 because we do NOT support MAC address filtering.. */
-+    return FEC_RX_REJECT;
-+}
-+
- static void imx_eth_update(IMXFECState *s)
- {
      /*
-@@ -984,7 +1065,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
-     case ENET_IALR:
-     case ENET_GAUR:
-     case ENET_GALR:
--        /* TODO: implement MAC hash filtering.  */
-+        s->regs[index] |= value;
-         break;
-     case ENET_TFWR:
-         if (s->is_fec) {
-@@ -1066,8 +1147,15 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
-     uint32_t buf_addr;
-     uint8_t *crc_ptr;
-     unsigned int buf_len;
-+    int maf;
-     size_t size = len;
- 
-+    /* Is this destination MAC address "for us" ? */
-+    maf = fec_mac_address_filter(s, buf);
-+    if (maf == FEC_RX_REJECT) {
-+        return FEC_RX_REJECT;
-+    }
-+
-     FEC_PRINTF("len %d\n", (int)size);
- 
-     if (!s->regs[ENET_RDAR]) {
-@@ -1133,6 +1221,16 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
-         } else {
-             s->regs[ENET_EIR] |= ENET_INT_RXB;
-         }
-+
-+        /* Update descriptor based on the "maf" flag. */
-+        if (maf == FEC_RX_BROADCAST_ACCEPT) {
-+            /* The packet is destined for the "broadcast" address. */
-+            bd.flags |= ENET_BD_BC;
-+        } else if (maf == FEC_RX_MULTICAST_HASH_ACCEPT) {
-+            /* The packet is destined for a "multicast" address. */
-+            bd.flags |= ENET_BD_MC;
-+        }
-+
-         imx_fec_write_bd(&bd, addr);
-         /* Advance to the next descriptor.  */
-         if ((bd.flags & ENET_BD_W) != 0) {
-@@ -1159,8 +1257,15 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
-     uint8_t *crc_ptr;
-     unsigned int buf_len;
-     size_t size = len;
-+    int maf;
-     bool shift16 = s->regs[ENET_RACC] & ENET_RACC_SHIFT16;
- 
-+    /* Is this destination MAC address "for us" ? */
-+    maf = fec_mac_address_filter(s, buf);
-+    if (maf == FEC_RX_REJECT) {
-+        return FEC_RX_REJECT;
-+    }
-+
-     FEC_PRINTF("len %d\n", (int)size);
- 
-     if (!s->regs[ENET_RDAR]) {
-@@ -1254,6 +1359,16 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
-                 s->regs[ENET_EIR] |= ENET_INT_RXB;
-             }
-         }
-+
-+        /* Update descriptor based on the "maf" flag. */
-+        if (maf == FEC_RX_BROADCAST_ACCEPT) {
-+            /* The packet is destined for the "broadcast" address. */
-+            bd.flags |= ENET_BD_BC;
-+        } else if (maf == FEC_RX_MULTICAST_HASH_ACCEPT) {
-+            /* The packet is destined for a "multicast" address. */
-+            bd.flags |= ENET_BD_MC;
-+        }
-+
-         imx_enet_write_bd(&bd, addr);
-         /* Advance to the next descriptor.  */
-         if ((bd.flags & ENET_BD_W) != 0) {
-diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
-index 7b3faa4019..d38c8fe0e8 100644
---- a/include/hw/net/imx_fec.h
-+++ b/include/hw/net/imx_fec.h
-@@ -275,4 +275,16 @@ typedef struct IMXFECState {
-     uint8_t frame[ENET_MAX_FRAME_SIZE];
- } IMXFECState;
- 
-+/* FEC address filtering defines. */
-+#define FEC_RX_REJECT                   (-1)
-+#define FEC_RX_PROMISCUOUS_ACCEPT       (-2)
-+#define FEC_RX_BROADCAST_ACCEPT         (-3)
-+#define FEC_RX_MULTICAST_HASH_ACCEPT    (-4)
-+#define FEC_RX_UNICAST_HASH_ACCEPT      (-5)
-+#define FEC_RX_UNICAST_ACCEPT           (-6)
-+
-+/* FEC hash filtering defines.*/
-+#define CRCPOLY_LE                      0xedb88320
-+#define FEC_HASH_BITS                    6    /* #bits in hash */
-+
- #endif
+      * It is important to save exception-info only in case
+-     * we need to distingiush between a pending and injected
++     * we need to distinguish between a pending and injected
+      * exception. Which is only required in case there is a
+      * pending exception and vCPU is running L2.
+      * For more info, refer to comment in cpu_pre_save().
 -- 
-2.19.1.windows.1
+2.24.0
 
 
