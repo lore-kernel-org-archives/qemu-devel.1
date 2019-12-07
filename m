@@ -2,69 +2,85 @@ Return-Path: <SRS0=SuvF=Z5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEFAEC43603
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 21:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1D31C43603
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 21:57:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86F8124670
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 21:09:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86F8124670
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id A3166206DB
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 21:57:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sgyNizmw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3166206DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idhK4-0004OD-KJ
-	for qemu-devel@archiver.kernel.org; Sat, 07 Dec 2019 16:09:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46116)
+	id 1idi57-0004GM-No
+	for qemu-devel@archiver.kernel.org; Sat, 07 Dec 2019 16:57:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35334)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1idhJO-0003sS-Ug
- for qemu-devel@nongnu.org; Sat, 07 Dec 2019 16:08:24 -0500
+ (envelope-from <bilalwasim676@gmail.com>) id 1idi46-0003mq-RF
+ for qemu-devel@nongnu.org; Sat, 07 Dec 2019 16:56:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1idhJM-0002hL-Cs
- for qemu-devel@nongnu.org; Sat, 07 Dec 2019 16:08:22 -0500
-Resent-Date: Sat, 07 Dec 2019 16:08:21 -0500
-Resent-Message-Id: <E1idhJM-0002hL-Cs@eggs.gnu.org>
-Received: from sender4-of-o50.zoho.com ([136.143.188.50]:21021)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1idhJM-0002Xc-3t; Sat, 07 Dec 2019 16:08:20 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1575752883; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=nWjCJt72UjZpS8WVlkRPFw7lUusK4c9QYxgPVzmhkUwtY0Bd2G0s30r8EeYcPFgF73dEnC31JB7zGOfKjtUMke3bvqQ8C6cUFDGWTKgbEgFM32vTrUhEjlozAkODqKR3OYkBOoWj0g8WhR0uw9miFC/JoBbjUQ4HkH1k2qT394Q=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1575752883;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=QnUPEnrmrRos4pht7sHAediUfj0ILaD9yNFS+AoHBNg=; 
- b=VmDBbXu86Aj5EHz/mkoRxJ/8Lzt9UWlUHqVFa3i9yPqcnIiFf0ajDIJHda/UZqCU09784MQTM1scWNr+cD1gAwnqcVHgAMbThYFmFhMWpYw3r17gfObeaaluRujQAvFtJCf1ob82xOaQrw11Qcndredncaj7zazVfcWOiQLNthA=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1575752882996808.4241966592465;
- Sat, 7 Dec 2019 13:08:02 -0800 (PST)
-In-Reply-To: <20191207203450.6304-1-bilalwasim676@gmail.com>
-Subject: Re: [PATCH] Adding support for MAC filtering in the FEC IP
+ (envelope-from <bilalwasim676@gmail.com>) id 1idi43-0005gO-HW
+ for qemu-devel@nongnu.org; Sat, 07 Dec 2019 16:56:37 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:39694)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bilalwasim676@gmail.com>)
+ id 1idi41-0005Fs-R9; Sat, 07 Dec 2019 16:56:34 -0500
+Received: by mail-lj1-x243.google.com with SMTP id e10so11418601ljj.6;
+ Sat, 07 Dec 2019 13:56:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=rkF2arBD2vxAqqsYBIWf8CfxbPo7WPFbWgGJ6mDwSdQ=;
+ b=sgyNizmwe7innVSNyflnpZwewpwCgInXV2ezUxFKajfACIO4yg3JFNMZmwcdi4UlP7
+ gE11tzfVLzL+ZyRZFJT9Jhik/Di3/p9xHelajT/yTXuSICQBLt8++nBs/RWxBtzDXLZE
+ btoUrehSumXXK7ncttnSZyBQ/KmtDccOncdmhD2VTFbj6Ln5yt/G4/mEQt9RszuAxomg
+ YwZUeJdgN6xB8L6mb2d/awNey42EDLLBa1RDmk/Rm4IhtDTxQg7W3Dz9lwFTmVV0BFWY
+ YF8bbCrud4jjvNuWY3TLVwpKmS1ddwaiUVXdIo0d4UDG0tcdWlF302+B0wSfU/n9BqLx
+ ZPow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=rkF2arBD2vxAqqsYBIWf8CfxbPo7WPFbWgGJ6mDwSdQ=;
+ b=jDfKl3id+cPRUiVH3U8uAtJRTpYWY9ym9LB4wfb92GYywEyjvMwZjG/HlaSrxch3fx
+ SKvfhmNDfBkk2KpHn+P0P9adP/pG7lPvHJ4ibFBgarFfy5duLAPFLTjSdIkVLCb1gRLJ
+ qQ5sbANMcFmb1QjKysBBil4n2x3eBNJg3JnoTwmYMOLD982YAzzI7KZ0TtwMOzi2F0wy
+ 9uv3O9k8YnqTsw0KlLwCujvYerNY+MYd7+B6y/MPXo+ahDXDzYQ2aQbvcu5DfTOJ08Q1
+ l/mudF8JM8hF1jWziv5n84vnw/gLhmVMkKj1d6eO2y9yAUifEFr/GxJKKsleggnO/DPP
+ Kyuw==
+X-Gm-Message-State: APjAAAWp0k13rjJTN2wj4dm3SFaJuLU777hHX+tocVzNDEkCBLKaVw+Q
+ 4nsbJy45k87nICOMe3gNfnGa+3famEM=
+X-Google-Smtp-Source: APXvYqzgZy0ykW1OxDWyJM+yJCCsLv4SKlcPX9yVyE8Oeegqd5HVYkjyQdTcS+HcExrsQ8w2+fBTiw==
+X-Received: by 2002:a2e:868c:: with SMTP id l12mr2405751lji.194.1575755790433; 
+ Sat, 07 Dec 2019 13:56:30 -0800 (PST)
+Received: from PKL-BWASIM-LT.mgc.mentorg.com
+ (static-host202-147-173-53.link.net.pk. [202.147.173.53])
+ by smtp.gmail.com with ESMTPSA id s22sm8759229ljm.41.2019.12.07.13.56.27
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Sat, 07 Dec 2019 13:56:29 -0800 (PST)
+From: bilalwasim676@gmail.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] Adding support for MAC filtering in the FEC IP
  implementation.
-Message-ID: <157575288152.7675.3993315587478720908@37313f22b938>
+Date: Sun,  8 Dec 2019 02:56:23 +0500
+Message-Id: <20191207215623.16532-1-bilalwasim676@gmail.com>
+X-Mailer: git-send-email 2.19.1.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: bilalwasim676@gmail.com
-Date: Sat, 7 Dec 2019 13:08:02 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.50
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,104 +92,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, bilalwasim676@gmail.com, jasowang@redhat.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, bilal_wasim@mentor.com,
- philmd@redhat.com
+Cc: peter.maydell@linaro.org, philmd@redhat.com, jasowang@redhat.com,
+ qemu-arm@nongnu.org, bilal_wasim@mentor.com,
+ Bilal Wasim <bilalwasim676@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTIwNzIwMzQ1MC42MzA0
-LTEtYmlsYWx3YXNpbTY3NkBnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSF0gQWRkaW5nIHN1cHBvcnQgZm9yIE1BQyBm
-aWx0ZXJpbmcgaW4gdGhlIEZFQyBJUCBpbXBsZW1lbnRhdGlvbi4KVHlwZTogc2VyaWVzCk1lc3Nh
-Z2UtaWQ6IDIwMTkxMjA3MjAzNDUwLjYzMDQtMS1iaWxhbHdhc2ltNjc2QGdtYWlsLmNvbQoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAv
-ZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKMTlkZTYzZCBBZGRpbmcgc3VwcG9ydCBmb3IgTUFDIGZpbHRlcmluZyBpbiB0aGUg
-RkVDIElQIGltcGxlbWVudGF0aW9uLgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IHNwYWNl
-IHByb2hpYml0ZWQgYmVmb3JlIHRoYXQgJy0tJyAoY3R4Old4QikKIzM3OiBGSUxFOiBody9uZXQv
-aW14X2ZlYy5jOjQzMDoKKyAgICB3aGlsZSAobWFjX2xlbmd0aCAtLSkgewogICAgICAgICAgICAg
-ICAgICAgICAgIF4KCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24g
-YSBzZXBhcmF0ZSBsaW5lCiM0NDogRklMRTogaHcvbmV0L2lteF9mZWMuYzo0Mzc6CisgICAgLyog
-b25seSB1cHBlciA2IGJpdHMgKEZFQ19IQVNIX0JJVFMpIGFyZSB1c2VkCgpFUlJPUjogcmV0dXJu
-IGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVpcmVkCiM0NzogRklM
-RTogaHcvbmV0L2lteF9mZWMuYzo0NDA6CisgICAgcmV0dXJuICgoY3JjID4+ICgzMiAtIEZFQ19I
-QVNIX0JJVFMpKSAmIDB4M2YpOwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM2Mjog
-RklMRTogaHcvbmV0L2lteF9mZWMuYzo0NTU6CisgICAgICAgIHJldHVybiAoRkVDX1JYX1BST01J
-U0NVT1VTX0FDQ0VQVCk7IC8qIEFjY2VwdCBhbGwgcGFja2V0cyBpbiBwcm9taXNjdW91cyBtb2Rl
-IChldmVuIGlmIGJjX3JlaiBpcyBzZXQpLiAqLwoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5j
-dGlvbiwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojNjk6IEZJTEU6IGh3L25ldC9pbXhf
-ZmVjLmM6NDYyOgorICAgICAgICAgICAgcmV0dXJuIChGRUNfUlhfUkVKRUNUKTsKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3MTogRklMRTogaHcvbmV0L2lteF9mZWMuYzo0NjQ6
-CisgICAgICAgIHJldHVybiAoRkVDX1JYX0JST0FEQ0FTVF9BQ0NFUFQpOyAvKiBBY2NlcHQgcGFj
-a2V0cyBmcm9tIGJyb2FkY2FzdCBhZGRyZXNzLiAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzc5OiBGSUxFOiBody9uZXQvaW14X2ZlYy5jOjQ3MjoKKyAgICAgICAgLyogU2Vl
-IGlmIHRoZSBjb21wdXRlZCBoYXNoIG1hdGNoZXMgYSBzZXQgYml0IGluIGVpdGhlciBHQVVSIC8g
-R0FMUiByZWdpc3Rlci4gKi8KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJy0n
-IChjdHg6VnhWKQojODE6IEZJTEU6IGh3L25ldC9pbXhfZmVjLmM6NDc0OgorICAgICAgICAgICAg
-ICAgIHx8ICgoaGFzaCA+IDMxKSAmJiAocy0+cmVnc1tFTkVUX0dBVVJdICYgKDEgPDwgKGhhc2gt
-MzIpKSkpKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwoj
-ODI6IEZJTEU6IGh3L25ldC9pbXhfZmVjLmM6NDc1OgorICAgICAgICAgICAgcmV0dXJuIChGRUNf
-UlhfTVVMVElDQVNUX0hBU0hfQUNDRVBUKTsgLyogQWNjZXB0IG11bHRpY2FzdCBoYXNoIGVuYWJs
-ZWQgYWRkcmVzcy4gKi8KCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4NTogRklM
-RTogaHcvbmV0L2lteF9mZWMuYzo0Nzg6CisgICAgICAgIC8qIFNlZSBpZiB0aGUgY29tcHV0ZWQg
-aGFzaCBtYXRjaGVzIGEgc2V0IGJpdCBpbiBlaXRoZXIgSUFVUiAvIElBTFIgcmVnaXN0ZXIuICov
-CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzg3OiBG
-SUxFOiBody9uZXQvaW14X2ZlYy5jOjQ4MDoKKyAgICAgICAgICAgICAgICB8fCAoKGhhc2ggPiAz
-MSkgJiYgKHMtPnJlZ3NbRU5FVF9JQVVSXSAmICgxIDw8IChoYXNoLTMyKSkpKSkgewogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzg4OiBGSUxFOiBody9uZXQv
-aW14X2ZlYy5jOjQ4MToKKyAgICAgICAgICAgIHJldHVybiAoRkVDX1JYX1VOSUNBU1RfSEFTSF9B
-Q0NFUFQpOyAvKiBBY2NlcHQgbXVsdGljYXN0IGhhc2ggZW5hYmxlZCBhZGRyZXNzLiAqLwoKRVJS
-T1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiM5NTogRklMRTogaHcvbmV0L2lteF9mZWMuYzo0
-ODg6CisgICAgaWYgKCEobWVtY21wKHBhY2tldCwgKHVpbnQ4X3QgKikgJmFkZHIxLCA0KSB8fCBt
-ZW1jbXAocGFja2V0KzQsICh1aW50OF90ICopICZhZGRyMiwgMikpKSB7CgpFUlJPUjogc3BhY2Vz
-IHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcrJyAoY3R4OlZ4VikKIzk1OiBGSUxFOiBody9uZXQvaW14
-X2ZlYy5jOjQ4ODoKKyAgICBpZiAoIShtZW1jbXAocGFja2V0LCAodWludDhfdCAqKSAmYWRkcjEs
-IDQpIHx8IG1lbWNtcChwYWNrZXQrNCwgKHVpbnQ4X3QgKikgJmFkZHIyLCAyKSkpIHsKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBeCgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzk2OiBGSUxFOiBody9uZXQvaW14
-X2ZlYy5jOjQ4OToKKyAgICAgICAgcmV0dXJuIChGRUNfUlhfVU5JQ0FTVF9BQ0NFUFQpOyAvKiBB
-Y2NlcHQgcGFja2V0IGJlY2F1c2UgaXQgbWF0Y2hlcyBteSB1bmljYXN0IGFkZHJlc3MuICovCgpF
-UlJPUjogcmV0dXJuIGlzIG5vdCBhIGZ1bmN0aW9uLCBwYXJlbnRoZXNlcyBhcmUgbm90IHJlcXVp
-cmVkCiMxMDA6IEZJTEU6IGh3L25ldC9pbXhfZmVjLmM6NDkzOgorICAgIHJldHVybiAoRkVDX1JY
-X1JFSkVDVCk7CgpFUlJPUjogdGhhdCBvcGVuIGJyYWNlIHsgc2hvdWxkIGJlIG9uIHRoZSBwcmV2
-aW91cyBsaW5lCiMxMjQ6IEZJTEU6IGh3L25ldC9pbXhfZmVjLmM6MTE0ODoKKyAgICBpZiAobWFm
-ID09IEZFQ19SWF9SRUpFQ1QpCisgICAgewoKRVJST1I6IHJldHVybiBpcyBub3QgYSBmdW5jdGlv
-biwgcGFyZW50aGVzZXMgYXJlIG5vdCByZXF1aXJlZAojMTI2OiBGSUxFOiBody9uZXQvaW14X2Zl
-Yy5jOjExNTA6CisgICAgICAgIHJldHVybiAoRkVDX1JYX1JFSkVDVCk7CgpFUlJPUjogbGluZSBv
-dmVyIDkwIGNoYXJhY3RlcnMKIzEzOTogRklMRTogaHcvbmV0L2lteF9mZWMuYzoxMjIxOgorICAg
-ICAgICAgICAgYmQuZmxhZ3MgfD0gRU5FVF9CRF9CQzsgLyogVGhlIHBhY2tldCBpcyBkZXN0aW5l
-ZCBmb3IgdGhlICJicm9hZGNhc3QiIGFkZHJlc3MuICovCgpFUlJPUjogbGluZSBvdmVyIDkwIGNo
-YXJhY3RlcnMKIzE0MTogRklMRTogaHcvbmV0L2lteF9mZWMuYzoxMjIzOgorICAgICAgICAgICAg
-YmQuZmxhZ3MgfD0gRU5FVF9CRF9NQzsgLyogVGhlIHBhY2tldCBpcyBkZXN0aW5lZCBmb3IgYSAi
-bXVsdGljYXN0IiBhZGRyZXNzLiAqLwoKRVJST1I6IHRoYXQgb3BlbiBicmFjZSB7IHNob3VsZCBi
-ZSBvbiB0aGUgcHJldmlvdXMgbGluZQojMTU2OiBGSUxFOiBody9uZXQvaW14X2ZlYy5jOjEyNTc6
-CisgICAgaWYgKG1hZiA9PSBGRUNfUlhfUkVKRUNUKQorICAgIHsKCkVSUk9SOiByZXR1cm4gaXMg
-bm90IGEgZnVuY3Rpb24sIHBhcmVudGhlc2VzIGFyZSBub3QgcmVxdWlyZWQKIzE1ODogRklMRTog
-aHcvbmV0L2lteF9mZWMuYzoxMjU5OgorICAgICAgICByZXR1cm4gKEZFQ19SWF9SRUpFQ1QpOwoK
-RVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNzE6IEZJTEU6IGh3L25ldC9pbXhfZmVj
-LmM6MTM1ODoKKyAgICAgICAgICAgIGJkLmZsYWdzIHw9IEVORVRfQkRfQkM7IC8qIFRoZSBwYWNr
-ZXQgaXMgZGVzdGluZWQgZm9yIHRoZSAiYnJvYWRjYXN0IiBhZGRyZXNzLiAqLwoKRVJST1I6IGxp
-bmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNzM6IEZJTEU6IGh3L25ldC9pbXhfZmVjLmM6MTM2MDoK
-KyAgICAgICAgICAgIGJkLmZsYWdzIHw9IEVORVRfQkRfTUM7IC8qIFRoZSBwYWNrZXQgaXMgZGVz
-dGluZWQgZm9yIGEgIm11bHRpY2FzdCIgYWRkcmVzcy4gKi8KCnRvdGFsOiAyMCBlcnJvcnMsIDQg
-d2FybmluZ3MsIDE2NCBsaW5lcyBjaGVja2VkCgpDb21taXQgMTlkZTYzZGE4Y2RlIChBZGRpbmcg
-c3VwcG9ydCBmb3IgTUFDIGZpbHRlcmluZyBpbiB0aGUgRkVDIElQIGltcGxlbWVudGF0aW9uLikg
-aGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9y
-cwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUK
-Q0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1h
-bmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
-cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEyMDcyMDM0NTAuNjMwNC0xLWJpbGFsd2FzaW02NzZA
-Z21haWwuY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+From: Bilal Wasim <bilalwasim676@gmail.com>
+
+This addition ensures that the IP does NOT boot up in
+promiscuous mode by default, and so the software only receives the desired
+packets(Unicast, Broadcast, Unicast / Multicast hashed) by default. The
+software running on-top of QEMU can also modify these settings and disable
+reception of broadcast frames or make the IP receive all packets (PROM mode).
+This patch greatly reduces the number of packets received by the software
+running on-top of the QEMU model. Tested with the armv7-a SABRE_LITE machine.
+Testing included running a custom OS with IPv4 / IPv6 support. Hashing and
+filtering of packets is tested to work well. Skeleton taken from the
+CADENCE_GEM IP and hash generation algorithm from the Linux Kernel.
+
+Signed-off-by: Bilal Wasim <bilalwasim676@gmail.com>
+---
+ hw/net/imx_fec.c         | 117 ++++++++++++++++++++++++++++++++++++++-
+ include/hw/net/imx_fec.h |  12 ++++
+ 2 files changed, 128 insertions(+), 1 deletion(-)
+
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index bd99236864..cc1572b5fe 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -419,6 +419,87 @@ static void imx_enet_write_bd(IMXENETBufDesc *bd, dma_addr_t addr)
+     dma_memory_write(&address_space_memory, addr, bd, sizeof(*bd));
+ }
+ 
++/*
++ * Calculate a FEC MAC Address hash index
++ */
++static unsigned calc_mac_hash(const uint8_t *mac, uint8_t mac_length)
++{
++    uint32_t crc = -1;
++    int i;
++
++    while (mac_length--) {
++        crc ^= *mac++;
++        for (i = 0; i < 8; i++) {
++            crc = (crc >> 1) ^ ((crc & 1) ? CRCPOLY_LE : 0);
++        }
++    }
++
++    /*
++     * only upper 6 bits (FEC_HASH_BITS) are used
++     * which point to specific bit in the hash registers
++     */
++    return (crc >> (32 - FEC_HASH_BITS)) & 0x3f;
++}
++
++/*
++ * fec_mac_address_filter:
++ * Accept or reject this destination address?
++ */
++static int fec_mac_address_filter(IMXFECState *s, const uint8_t *packet)
++{
++    const uint8_t broadcast_addr[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
++    uint32_t addr1, addr2;
++    uint8_t  hash;
++
++    /* Promiscuous mode? */
++    if (s->regs[ENET_RCR] & ENET_RCR_PROM) {
++        /* Accept all packets in promiscuous mode (even if bc_rej is set). */
++        return FEC_RX_PROMISCUOUS_ACCEPT;
++    }
++
++    /* Broadcast packet? */
++    if (!memcmp(packet, broadcast_addr, 6)) {
++        /* Reject broadcast packets? */
++        if (s->regs[ENET_RCR] & ENET_RCR_BC_REJ) {
++            return FEC_RX_REJECT;
++        }
++        /* Accept packets from broadcast address. */
++        return FEC_RX_BROADCAST_ACCEPT;
++    }
++
++    /* Accept packets -w- hash match? */
++    hash = calc_mac_hash(packet, 6);
++
++    /* Accept packets -w- multicast hash match? */
++    if ((packet[0] & 0x01) == 0x01) {
++        /* Computed hash matches GAUR / GALR register ? */
++        if (((hash < 32) && (s->regs[ENET_GALR] & (1 << hash)))
++                || ((hash > 31) && (s->regs[ENET_GAUR] & (1 << (hash - 32))))) {
++            /* Accept multicast hash enabled address. */
++            return FEC_RX_MULTICAST_HASH_ACCEPT;
++        }
++    } else {
++        /* Computed hash matches IAUR / IALR register ? */
++        if (((hash < 32) && (s->regs[ENET_IALR] & (1 << hash)))
++                || ((hash > 31) && (s->regs[ENET_IAUR] & (1 << (hash - 32))))) {
++            /* Accept multicast hash enabled address. */
++            return FEC_RX_UNICAST_HASH_ACCEPT;
++        }
++    }
++
++    /* Match Unicast address. */
++    addr1  = g_htonl(s->regs[ENET_PALR]);
++    addr2  = g_htonl(s->regs[ENET_PAUR]);
++    if (!(memcmp(packet, (uint8_t *) &addr1, 4) ||
++          memcmp(packet + 4, (uint8_t *) &addr2, 2))) {
++        /* Accept packet because it matches my unicast address. */
++        return FEC_RX_UNICAST_ACCEPT;
++    }
++
++    /* Return -1 because we do NOT support MAC address filtering.. */
++    return FEC_RX_REJECT;
++}
++
+ static void imx_eth_update(IMXFECState *s)
+ {
+     /*
+@@ -984,7 +1065,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+     case ENET_IALR:
+     case ENET_GAUR:
+     case ENET_GALR:
+-        /* TODO: implement MAC hash filtering.  */
++        s->regs[index] |= value;
+         break;
+     case ENET_TFWR:
+         if (s->is_fec) {
+@@ -1066,8 +1147,15 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+     uint32_t buf_addr;
+     uint8_t *crc_ptr;
+     unsigned int buf_len;
++    int maf;
+     size_t size = len;
+ 
++    /* Is this destination MAC address "for us" ? */
++    maf = fec_mac_address_filter(s, buf);
++    if (maf == FEC_RX_REJECT) {
++        return FEC_RX_REJECT;
++    }
++
+     FEC_PRINTF("len %d\n", (int)size);
+ 
+     if (!s->regs[ENET_RDAR]) {
+@@ -1133,6 +1221,16 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+         } else {
+             s->regs[ENET_EIR] |= ENET_INT_RXB;
+         }
++
++        /* Update descriptor based on the "maf" flag. */
++        if (maf == FEC_RX_BROADCAST_ACCEPT) {
++            /* The packet is destined for the "broadcast" address. */
++            bd.flags |= ENET_BD_BC;
++        } else if (maf == FEC_RX_MULTICAST_HASH_ACCEPT) {
++            /* The packet is destined for a "multicast" address. */
++            bd.flags |= ENET_BD_MC;
++        }
++
+         imx_fec_write_bd(&bd, addr);
+         /* Advance to the next descriptor.  */
+         if ((bd.flags & ENET_BD_W) != 0) {
+@@ -1159,8 +1257,15 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+     uint8_t *crc_ptr;
+     unsigned int buf_len;
+     size_t size = len;
++    int maf;
+     bool shift16 = s->regs[ENET_RACC] & ENET_RACC_SHIFT16;
+ 
++    /* Is this destination MAC address "for us" ? */
++    maf = fec_mac_address_filter(s, buf);
++    if (maf == FEC_RX_REJECT) {
++        return FEC_RX_REJECT;
++    }
++
+     FEC_PRINTF("len %d\n", (int)size);
+ 
+     if (!s->regs[ENET_RDAR]) {
+@@ -1254,6 +1359,16 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+                 s->regs[ENET_EIR] |= ENET_INT_RXB;
+             }
+         }
++
++        /* Update descriptor based on the "maf" flag. */
++        if (maf == FEC_RX_BROADCAST_ACCEPT) {
++            /* The packet is destined for the "broadcast" address. */
++            bd.flags |= ENET_BD_BC;
++        } else if (maf == FEC_RX_MULTICAST_HASH_ACCEPT) {
++            /* The packet is destined for a "multicast" address. */
++            bd.flags |= ENET_BD_MC;
++        }
++
+         imx_enet_write_bd(&bd, addr);
+         /* Advance to the next descriptor.  */
+         if ((bd.flags & ENET_BD_W) != 0) {
+diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
+index 7b3faa4019..d38c8fe0e8 100644
+--- a/include/hw/net/imx_fec.h
++++ b/include/hw/net/imx_fec.h
+@@ -275,4 +275,16 @@ typedef struct IMXFECState {
+     uint8_t frame[ENET_MAX_FRAME_SIZE];
+ } IMXFECState;
+ 
++/* FEC address filtering defines. */
++#define FEC_RX_REJECT                   (-1)
++#define FEC_RX_PROMISCUOUS_ACCEPT       (-2)
++#define FEC_RX_BROADCAST_ACCEPT         (-3)
++#define FEC_RX_MULTICAST_HASH_ACCEPT    (-4)
++#define FEC_RX_UNICAST_HASH_ACCEPT      (-5)
++#define FEC_RX_UNICAST_ACCEPT           (-6)
++
++/* FEC hash filtering defines.*/
++#define CRCPOLY_LE                      0xedb88320
++#define FEC_HASH_BITS                    6    /* #bits in hash */
++
+ #endif
+-- 
+2.19.1.windows.1
 
 
