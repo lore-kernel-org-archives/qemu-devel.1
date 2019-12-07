@@ -2,87 +2,109 @@ Return-Path: <SRS0=SuvF=Z5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F4BC43603
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 06:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27867C43603
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 07:46:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E58421835
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 06:21:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ix0o3WkC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E58421835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EFFA124670
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 07:46:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFFA124670
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1idTSu-0005Ir-FO
-	for qemu-devel@archiver.kernel.org; Sat, 07 Dec 2019 01:21:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58991)
+	id 1idUn6-0008D0-F6
+	for qemu-devel@archiver.kernel.org; Sat, 07 Dec 2019 02:46:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1idTRv-0004n4-SH
- for qemu-devel@nongnu.org; Sat, 07 Dec 2019 01:20:17 -0500
+ (envelope-from <sw@weilnetz.de>) id 1idUlc-0007Xe-EE
+ for qemu-devel@nongnu.org; Sat, 07 Dec 2019 02:44:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1idTRu-0003SU-5i
- for qemu-devel@nongnu.org; Sat, 07 Dec 2019 01:20:15 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44079)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1idTRt-0003MI-QK
- for qemu-devel@nongnu.org; Sat, 07 Dec 2019 01:20:14 -0500
-Received: by mail-ot1-x344.google.com with SMTP id x3so7758183oto.11
- for <qemu-devel@nongnu.org>; Fri, 06 Dec 2019 22:20:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=WZ1NA1SJUUDKomIW79LFbdbm+NU6HRF31enMrXEFfJA=;
- b=Ix0o3WkCw+IxAr1EMo2ssxGa2DspM1EUZHtURFoGxwGAo/oummKyVy5SkI6MxPX782
- uibUhMP5Va36liT0Ja7LysDth5rDq1oGVzkgrfXe8wwZe+SD4AjwakDJvJUaV3AGQB4s
- xin6jTbyHp0Qx7eAB57Rz9tywo83e6AAI2XjM2PrCght7V8byk8V3+YYumeLtzIqMVQy
- SJCL4N92E22hCZyLne1RZzbl0psrMaer0e9Ur/mkzOVRZ3e1JSiH73QXi5AzXT5tQqNM
- xWGoimN0pCsy0wKGr8JkHc5izd4ysA6DM5YmeamKhRZPE/2DCjpMpvOUeGe55Tg77Xlr
- mNiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=WZ1NA1SJUUDKomIW79LFbdbm+NU6HRF31enMrXEFfJA=;
- b=EG9i8a0JEl3mYE3aVg7YOXI6wIuty/LeePD1GaxxW3StLYeuSLwhqOpmDuhJgnAiAr
- Qt/91z/HUwHZj19lQIAk16SRpurrBSITkiAnInuVKBlZNaVerQrp82NsenR4JY5zf6/E
- NQrH52uWhlurhg55u7zm/0GREbo3CX2Lke11JzMGIe73MwhOhtWc7YigYP8CENnW6ShB
- JRErnhqYowuM88wLt7KqXXVUxsWLgGWh8ZMZ21Zq7q5Lt5Rlz9VP7reQFhRmNC2dalik
- D2PqBATVF0M9qfzN7cnss2FDqkS31sSQX6VvBkVV2LJ0NxTaQszhUBAnuOfZ+2WwQnkW
- hJUg==
-X-Gm-Message-State: APjAAAXMDvV3O/FHEQjzaC4dCx4SfQ4AhGzXztsP6ggKDLvtVlLGa4Ed
- TD+0oS0cK1NSqXoUhKwu9wlaI3L3VGP9zUtggj0=
-X-Google-Smtp-Source: APXvYqx3twOPFeSVSuRQKyJw8tV5I4nv5qp2DD9ICabm8J8ecGvqQSH951EntEWELPCOkcHwvPJb7h0gS22M8pihUEE=
-X-Received: by 2002:a9d:3d05:: with SMTP id a5mr14605492otc.295.1575699612853; 
- Fri, 06 Dec 2019 22:20:12 -0800 (PST)
+ (envelope-from <sw@weilnetz.de>) id 1idUlb-00077t-0n
+ for qemu-devel@nongnu.org; Sat, 07 Dec 2019 02:44:39 -0500
+Received: from mail.weilnetz.de ([37.120.169.71]:55438
+ helo=v2201612906741603.powersrv.de)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sw@weilnetz.de>)
+ id 1idUla-00074H-3o; Sat, 07 Dec 2019 02:44:38 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id BEB57DB1CC4;
+ Sat,  7 Dec 2019 08:44:35 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id rScDA-UNmhT4; Sat,  7 Dec 2019 08:44:34 +0100 (CET)
+Received: from edv-macbook-pro.fritz.box (p57B42DA4.dip0.t-ipconnect.de
+ [87.180.45.164])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 87675DB1B0A;
+ Sat,  7 Dec 2019 08:44:34 +0100 (CET)
+Subject: Re: [PATCH] Fix some comment spelling errors.
+To: Cameron Esfahani <dirty@apple.com>, qemu-devel@nongnu.org
+References: <086c197db928384b8697edfa64755e2cb46c8100.1575685843.git.dirty@apple.com>
+From: Stefan Weil <sw@weilnetz.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=sw@weilnetz.de; keydata=
+ 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
+Message-ID: <543d4015-f043-96c5-39b8-2a37bd78d689@weilnetz.de>
+Date: Sat, 7 Dec 2019 08:44:34 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:60.0)
+ Gecko/20100101 Thunderbird/60.9.1
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Fri, 6 Dec 2019 22:20:12 -0800 (PST)
-In-Reply-To: <CAL1e-=jeE3AgxuqC+uTLzac8Ze4mqup7aH0GM0r-RE7cB_L60g@mail.gmail.com>
-References: <1566216496-17375-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1566216496-17375-16-git-send-email-aleksandar.markovic@rt-rk.com>
- <DM5PR22MB1658090DD9EF830F43F7957DD2A80@DM5PR22MB1658.namprd22.prod.outlook.com>
- <64460769-1e63-ab16-c58f-79f5f848f3ff@redhat.com>
- <CAL1e-=jeE3AgxuqC+uTLzac8Ze4mqup7aH0GM0r-RE7cB_L60g@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 7 Dec 2019 07:20:12 +0100
-Message-ID: <CAL1e-=jfRVmVnmRDA+1q6ywXTeBnXh8v7nYKi1pUqev7yqkaKg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v8 15/37] target/mips: Style improvements in
- mips_malta.c
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000b2699a0599172758"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <086c197db928384b8697edfa64755e2cb46c8100.1575685843.git.dirty@apple.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 37.120.169.71
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,223 +116,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, liran.alon@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b2699a0599172758
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Am 07.12.19 um 03:33 schrieb Cameron Esfahani via:
 
-On Friday, December 6, 2019, Aleksandar Markovic <
-aleksandar.m.mail@gmail.com> wrote:
-
+> Signed-off-by: Cameron Esfahani <dirty@apple.com>
+> ---
+>  target/i386/machine.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
->
-> On Friday, December 6, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
-om>
-> wrote:
->
->> Hi Aleksandar,
->>
->> On 8/19/19 4:47 PM, Aleksandar Rikalo wrote:
->>
->>> From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
->>>  > Sent: Monday, August 19, 2019 2:07 PM
->>>  > To: qemu-devel@nongnu.org <qemu-devel@nongnu.org>
->>>  > Cc: philmd@redhat.com <philmd@redhat.com>; Aleksandar Markovic <
->>> amarkovic@wavecomp.com>; Aleksandar Rikalo <arikalo@wavecomp.com>
->>>  > Subject: [EXTERNAL][PATCH v8 15/37] target/mips: Style improvements
->>> in mips_malta.c
->>>  >
->>>  > From: Aleksandar Markovic <amarkovic@wavecomp.com>
->>>  >
->>>  > Fixes mostly errors and warnings reported by 'checkpatch.pl -f'.
->>>  >
->>>  > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
->>>  > ---
->>>  >  hw/mips/mips_malta.c | 216 ++++++++++++++++++++++++++++++
->>> ---------------------
->>>  >  1 file changed, 128 insertions(+), 88 deletions(-)
->>>  >
->>>  > diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
->>>
->> [...]>  > @@ -347,7 +362,8 @@ static uint64_t malta_fpga_read(void
->> *opaque,
->>
->>> hwaddr addr,
->>>  >
->>>  >      /* SWITCH Register */
->>>  >      case 0x00200:
->>>  > -        val =3D 0x00000000;              /* All switches closed */
->>>  > +        /* ori a3, a3, low(ram_low_size) */
->>>
->>
->> I'm not sure what happened here, this change is incorrect.
->>
->>
-> You are right, a strange case of a stray comment.
->
-> Do you want to send a patch-correction? So that I can select it for the
-> first mips queue...
->
->
-Philippe,
-
-I can merge, while applying, this one-line correction into Filip's patch on
-the same file, no need for a separate patch.
-
-Thanks again,
-Aleksandar
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index 2699eed94e..f21823f179 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -261,7 +261,7 @@ static int cpu_pre_save(void *opaque)
+>       * intercepted anymore.
+>       *
+>       * Furthermore, when a L2 exception is intercepted by L1
+> -     * hypervisor, it's exception payload (CR2/DR6 on #PF/#DB)
+> +     * hypervisor, its exception payload (CR2/DR6 on #PF/#DB)
+>       * should not be set yet in the respective vCPU register.
+>       * Thus, in case an exception is pending, it is
+>       * important to save the exception payload seperately.
+> @@ -273,7 +273,7 @@ static int cpu_pre_save(void *opaque)
+>       *
+>       * In order to preserve better backwards-compatabile migration,
 
 
+s/compatabile/compatible/
 
-> Thanks for spotting it!
-> Aleksandar
->
->  > +        val =3D 0x00000000;
->>>  >          break;
->>>  >
->>>  >      /* STATUS Register */
->>>  > @@ -386,10 +402,11 @@ static uint64_t malta_fpga_read(void *opaque,
->>> hwaddr addr,
->>>  >      /* GPINP Register */
->>>  >      case 0x00a08:
->>>  >          /* IN =3D OUT until a real I2C control is implemented */
->>>  > -        if (s->i2csel)
->>>  > +        if (s->i2csel) {
->>>  >              val =3D s->i2cout;
->>>  > -        else
->>>  > +        } else {
->>>  >              val =3D 0x00;
->>>  > +        }
->>>  >          break;
->>>  >
->>>
->> [...]
->>
->>>
->>> Reviewed-by: Aleksandar Rikalo <arikalo@wavecomp.com>
->>>
->>>
->>
->>
+can perhaps be fixed, too, when merging this commit.
 
---000000000000b2699a0599172758
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-<br><br>On Friday, December 6, 2019, Aleksandar Markovic &lt;<a href=3D"mai=
-lto:aleksandar.m.mail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt; wrote:=
-<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-lef=
-t:1px #ccc solid;padding-left:1ex"><br><br>On Friday, December 6, 2019, Phi=
-lippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com" target=3D=
-"_blank">philmd@redhat.com</a>&gt; wrote:<br><blockquote class=3D"gmail_quo=
-te" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"=
->Hi Aleksandar,<br>
-<br>
-On 8/19/19 4:47 PM, Aleksandar Rikalo wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-From: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.markovic@rt-rk.c=
-om" target=3D"_blank">aleksandar.markovic@rt-rk.com</a><wbr>&gt;<br>
-=C2=A0&gt; Sent: Monday, August 19, 2019 2:07 PM<br>
-=C2=A0&gt; To: <a href=3D"mailto:qemu-devel@nongnu.org" target=3D"_blank">q=
-emu-devel@nongnu.org</a> &lt;<a href=3D"mailto:qemu-devel@nongnu.org" targe=
-t=3D"_blank">qemu-devel@nongnu.org</a>&gt;<br>
-=C2=A0&gt; Cc: <a href=3D"mailto:philmd@redhat.com" target=3D"_blank">philm=
-d@redhat.com</a> &lt;<a href=3D"mailto:philmd@redhat.com" target=3D"_blank"=
->philmd@redhat.com</a>&gt;; Aleksandar Markovic &lt;<a href=3D"mailto:amark=
-ovic@wavecomp.com" target=3D"_blank">amarkovic@wavecomp.com</a>&gt;; Aleksa=
-ndar Rikalo &lt;<a href=3D"mailto:arikalo@wavecomp.com" target=3D"_blank">a=
-rikalo@wavecomp.com</a>&gt;<br>
-=C2=A0&gt; Subject: [EXTERNAL][PATCH v8 15/37] target/mips: Style improveme=
-nts in mips_malta.c<br>
-=C2=A0&gt;<br>
-=C2=A0&gt; From: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@waveco=
-mp.com" target=3D"_blank">amarkovic@wavecomp.com</a>&gt;<br>
-=C2=A0&gt;<br>
-=C2=A0&gt; Fixes mostly errors and warnings reported by &#39;<a href=3D"htt=
-p://checkpatch.pl" target=3D"_blank">checkpatch.pl</a> -f&#39;.<br>
-=C2=A0&gt;<br>
-=C2=A0&gt; Signed-off-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkov=
-ic@wavecomp.com" target=3D"_blank">amarkovic@wavecomp.com</a>&gt;<br>
-=C2=A0&gt; ---<br>
-=C2=A0&gt;=C2=A0 hw/mips/mips_malta.c | 216 ++++++++++++++++++++++++++++++<=
-wbr>---------------------<br>
-=C2=A0&gt;=C2=A0 1 file changed, 128 insertions(+), 88 deletions(-)<br>
-=C2=A0&gt;<br>
-=C2=A0&gt; diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c<br>
-</blockquote>
-[...]&gt;=C2=A0 &gt; @@ -347,7 +362,8 @@ static uint64_t malta_fpga_read(vo=
-id *opaque,<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-hwaddr addr,<br>
-=C2=A0&gt;<br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* SWITCH Register */<br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case 0x00200:<br>
-=C2=A0&gt; -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val =3D 0x00000000;=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 /* All switches closed */<br>
-=C2=A0&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* ori a3, a3, low(r=
-am_low_size) */<br>
-</blockquote>
-<br>
-I&#39;m not sure what happened here, this change is incorrect.<br>
-<br></blockquote><div><br></div><div>You are right, a strange case of a str=
-ay comment.</div><div><br></div><div>Do you want to send a patch-correction=
-? So that I can select it for the first mips queue...</div><div><br></div><=
-/blockquote><div><br></div><div>Philippe,=C2=A0</div><div><br></div><div>I =
-can merge, while applying, this one-line correction into Filip&#39;s patch =
-on the same file, no need for a separate patch.</div><div><br></div><div>Th=
-anks again,</div><div>Aleksandar</div><div><br></div><div>=C2=A0</div><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
-c solid;padding-left:1ex"><div>Thanks for spotting it!</div><div>Aleksandar=
-</div><div><br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 =
-0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-=C2=A0&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val =3D 0x00000000;<=
-br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;<br>
-=C2=A0&gt;<br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* STATUS Register */<br>
-=C2=A0&gt; @@ -386,10 +402,11 @@ static uint64_t malta_fpga_read(void *opaq=
-ue, hwaddr addr,<br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* GPINP Register */<br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case 0x00a08:<br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* IN =3D =
-OUT until a real I2C control is implemented */<br>
-=C2=A0&gt; -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s-&gt;i2csel)<br=
->
-=C2=A0&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (s-&gt;i2csel) {<=
-br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 val =3D s-&gt;i2cout;<br>
-=C2=A0&gt; -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else<br>
-=C2=A0&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {<br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 val =3D 0x00;<br>
-=C2=A0&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }<br>
-=C2=A0&gt;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 break;<br>
-=C2=A0&gt;<br>
-</blockquote>
-[...]<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-<br>
-Reviewed-by: Aleksandar Rikalo &lt;<a href=3D"mailto:arikalo@wavecomp.com" =
-target=3D"_blank">arikalo@wavecomp.com</a>&gt;<br>
-<br>
-</blockquote>
-<br>
-<br>
-</blockquote>
-</blockquote>
+>       * convert a pending exception to an injected exception in
+> -     * case it is not important to distingiush between them
+> +     * case it is not important to distinguish between them
+>       * as described above.
+>       */
+>      if (env->exception_pending && !(env->hflags & HF_GUEST_MASK)) {
+> @@ -415,7 +415,7 @@ static bool exception_info_needed(void *opaque)
+>  
+>      /*
+>       * It is important to save exception-info only in case
+> -     * we need to distingiush between a pending and injected
+> +     * we need to distinguish between a pending and injected
+>       * exception. Which is only required in case there is a
+>       * pending exception and vCPU is running L2.
+>       * For more info, refer to comment in cpu_pre_save().
 
---000000000000b2699a0599172758--
+
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
+
 
