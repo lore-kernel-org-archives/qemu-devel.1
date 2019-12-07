@@ -6,66 +6,64 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFCE9C43603
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 17:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9ABEC43603
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 17:24:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88C8224670
-	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 17:24:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C8224670
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weiser.dinsnail.net
+	by mail.kernel.org (Postfix) with ESMTPS id BF5DC24670
+	for <qemu-devel@archiver.kernel.org>; Sat,  7 Dec 2019 17:24:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF5DC24670
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iddoP-0005Vf-NK
-	for qemu-devel@archiver.kernel.org; Sat, 07 Dec 2019 12:24:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49622)
+	id 1iddoV-0005aU-SU
+	for qemu-devel@archiver.kernel.org; Sat, 07 Dec 2019 12:24:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49647)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iddnQ-0004iK-E4
- for qemu-devel@nongnu.org; Sat, 07 Dec 2019 12:23:09 -0500
+ (envelope-from <bounces@canonical.com>) id 1iddnQ-0004iM-Tw
+ for qemu-devel@nongnu.org; Sat, 07 Dec 2019 12:23:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iddnO-0005Mh-Ob
+ (envelope-from <bounces@canonical.com>) id 1iddnP-0005Nf-Gc
  for qemu-devel@nongnu.org; Sat, 07 Dec 2019 12:23:08 -0500
 Received: from indium.canonical.com ([91.189.90.7]:55870)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iddnO-0005Lk-Ic
- for qemu-devel@nongnu.org; Sat, 07 Dec 2019 12:23:06 -0500
+ id 1iddnP-0005Lk-AP
+ for qemu-devel@nongnu.org; Sat, 07 Dec 2019 12:23:07 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1idZvl-0000H3-S3
- for <qemu-devel@nongnu.org>; Sat, 07 Dec 2019 13:15:29 +0000
+ id 1idZhR-0008Hs-1S
+ for <qemu-devel@nongnu.org>; Sat, 07 Dec 2019 13:00:41 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D170C2E8050
- for <qemu-devel@nongnu.org>; Sat,  7 Dec 2019 13:15:29 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 083B32E8073
+ for <qemu-devel@nongnu.org>; Sat,  7 Dec 2019 13:00:41 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 07 Dec 2019 13:09:52 -0000
-From: Michael Weiser <michael@weiser.dinsnail.net>
+Date: Sat, 07 Dec 2019 12:51:22 -0000
+From: Leonardo <1855535@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: aix fwd port
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h kwolf-redhat lersek mattihami
- michael-weiser psyhomb sej7278
-X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
-X-Launchpad-Bug-Modifier: Michael Weiser (michael-weiser)
-References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
-Message-Id: <157572419241.4362.6145863268209788344.malone@chaenomeles.canonical.com>
-Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+X-Launchpad-Bug-Commenters: leohori
+X-Launchpad-Bug-Reporter: Leonardo (leohori)
+X-Launchpad-Bug-Modifier: Leonardo (leohori)
+Message-Id: <157572308250.7047.10873331100308147678.malonedeb@gac.canonical.com>
+Subject: [Bug 1855535] [NEW] Connection reset by peer when using port fwd
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="c597c3229eb023b1e626162d5947141bf7befb13";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3da6d9984dbd32a31616420b79e5f91981d87614
+X-Launchpad-Hash: c879b6ed5bb217b894b78288e25cd5e73a9c5c2f
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -79,165 +77,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
+Reply-To: Bug 1855535 <1855535@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-FWIW, my VMs run with SATA and Virtio SCSI with discard=3Dunmap and
-detect-zeroes=3Dunmap (among the plethora of options from libvirtd) for
-maximum space savings. No problems since the fix patches went in and had
-no bearing on the bug occurence before that.
+Public bug reported:
 
-/usr/bin/qemu-system-x86_64 -name guest=3Dwin10,debug-threads=3Don -machine
-pc-q35-3.1,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3Doff -m 4096=
- -smp
-2,sockets=3D2,cores=3D1,threads=3D1 -drive
-file=3Dwin10.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-
-sata0-0-2,cache=3Dwriteback,discard=3Dunmap,detect-zeroes=3Dunmap -device i=
-de-
-hd,bus=3Dide.2,drive=3Ddrive-sata0-0-2,id=3Dsata0-0-2,bootindex=3D1,write-
-cache=3Don
+$ qemu-system-ppc64 -cpu POWER8,compat=3Dpower7 -machine pseries -m 8G -smp=
+ cores=3D8 -serial mon:stdio -nographic \
+-drive file=3D/qemu/aix72.img,if=3Dnone,id=3Ddrive-virtio-disk0 \
+-device virtio-scsi-pci,id=3Dscsi -device scsi-hd,drive=3Ddrive-virtio-disk=
+0 \
+-cdrom /qemu/aix72.iso \
+-prom-env boot-command=3D'boot disk:' \
+-name ctsprod -k es \
+-netdev user,id=3Dnetdev0,hostfwd=3Dtcp:127.0.0.1:2222-:22 \
+-device virtio-net-pci,netdev=3Dnetdev0 \
+-netdev bridge,id=3Dhostnet0,br=3Dvirbr0 \
+-device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:96:2f:7a \
+-device virtio-net,netdev=3Dvmnic -netdev tap,id=3Dvmnic,ifname=3Dvnet0,scr=
+ipt=3Dno,downscript=3Dno \
+-monitor telnet:127.0.0.1:5801,server,nowait,nodelay
 
-/usr/bin/qemu-system-x86_64 -name guest=3Ddebian,debug-threads=3Don -machine
-pc-q35-4.0.1,accel=3Dkvm,usb=3Doff,vmport=3Doff,dump-guest-core=3Doff
-capabilities=3Don,ssbd=3Don,xsaves=3Don,pdpe1gb=3Don,hle=3Doff,rtm=3Doff,mp=
-x=3Doff -m
-512 -smp 1,sockets=3D1,cores=3D1,threads=3D1 -device virtio-scsi-
-pci,id=3Dscsi0,bus=3Dpci.8,addr=3D0x0 -drive
-file=3Ddebian.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-
-scsi0-0-0-0,cache=3Dwriteback,discard=3Dunmap,detect-zeroes=3Dunmap -device
-scsi-hd,bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,device_id=3Ddrive-
-scsi0-0-0-0,drive=3Ddrive-scsi0-0-0-0,id=3Dscsi0-0-0-0,bootindex=3D1,write-
-cache=3Don
+
+$ ssh -p 2222 root@127.0.0.1 -v
+
+OpenSSH_7.6p1 Ubuntu-4ubuntu0.3, OpenSSL 1.0.2n  7 Dec 2017
+debug1: Reading configuration data /etc/ssh/ssh_config
+debug1: /etc/ssh/ssh_config line 19: Applying options for *
+debug1: Connecting to 127.0.0.1 [127.0.0.1] port 2222.
+debug1: Connection established.
+debug1: permanently_set_uid: 0/0
+debug1: key_load_public: No such file or directory
+debug1: identity file /root/.ssh/id_rsa type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /root/.ssh/id_rsa-cert type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /root/.ssh/id_dsa type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /root/.ssh/id_dsa-cert type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /root/.ssh/id_ecdsa type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /root/.ssh/id_ecdsa-cert type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /root/.ssh/id_ed25519 type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /root/.ssh/id_ed25519-cert type -1
+debug1: Local version string SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3
+ssh_exchange_identification: read: Connection reset by peer
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: aix fwd port
+
+** Tags added: aix
+
+** Tags added: fwd port
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1846427
+https://bugs.launchpad.net/bugs/1855535
 
 Title:
-  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+  Connection reset by peer when using port fwd
 
 Status in QEMU:
-  Fix Committed
+  New
 
 Bug description:
-  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
-  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
-  savevm/quit/loadvm cycles. I've narrowed it down to the following
-  reproducer (further notes below):
+  $ qemu-system-ppc64 -cpu POWER8,compat=3Dpower7 -machine pseries -m 8G -s=
+mp cores=3D8 -serial mon:stdio -nographic \
+  -drive file=3D/qemu/aix72.img,if=3Dnone,id=3Ddrive-virtio-disk0 \
+  -device virtio-scsi-pci,id=3Dscsi -device scsi-hd,drive=3Ddrive-virtio-di=
+sk0 \
+  -cdrom /qemu/aix72.iso \
+  -prom-env boot-command=3D'boot disk:' \
+  -name ctsprod -k es \
+  -netdev user,id=3Dnetdev0,hostfwd=3Dtcp:127.0.0.1:2222-:22 \
+  -device virtio-net-pci,netdev=3Dnetdev0 \
+  -netdev bridge,id=3Dhostnet0,br=3Dvirbr0 \
+  -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:00:96:2f:7=
+a \
+  -device virtio-net,netdev=3Dvmnic -netdev tap,id=3Dvmnic,ifname=3Dvnet0,s=
+cript=3Dno,downscript=3Dno \
+  -monitor telnet:127.0.0.1:5801,server,nowait,nodelay
 
-  # qemu-img check debian.qcow2
-  No errors were found on the image.
-  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
-  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
-96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
-=3Ddebian.qcow2,id=3Dd -S
-  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
-bus: Did not receive a reply. Possible causes include: the remote applicati=
-on did not send a reply, the message bus security policy blocked the reply,=
- the reply timeout expired, or the network connection was broken.
-  QEMU 4.1.50 monitor - type 'help' for more information
-  (qemu) loadvm foo
-  (qemu) c
-  (qemu) qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  qcow2_free_clusters failed: Invalid argument
-  quit
-  [m@nargothrond:~] qemu-img check debian.qcow2
-  Leaked cluster 85179 refcount=3D2 reference=3D1
-  Leaked cluster 85180 refcount=3D2 reference=3D1
-  ERROR cluster 266150 refcount=3D0 reference=3D2
-  [...]
-  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
+  =
 
-  9493 errors were found on the image.
-  Data may be corrupted, or further writes to the image may corrupt it.
+  $ ssh -p 2222 root@127.0.0.1 -v
 
-  2 leaked clusters were found on the image.
-  This means waste of disk space, but no harm to data.
-  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
-usters
-  Image end offset: 18340446208
-
-  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
-  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
-  similarly current.
-
-  Reproduced with qemu-4.1.0 from distribution package as well as
-  vanilla git checkout of tag v4.1.0 and commit
-  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
-  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
-  sequence:
-
-  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
-mu --disable-werror --disable-docs
-  [...]
-  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
-  [...] (can provide full configure output if helpful)
-  make -j8 install
-
-  The kind of guest OS does not matter: seen with Debian testing 64bit,
-  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
-
-  The virtual storage controller does not seem to matter: seen with
-  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
-
-  Caching modes (none, directsync, writeback), aio mode (threads,
-  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
-  not influence occurence either.
-
-  Having more RAM in the guest seems to increase odds of corruption:
-  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
-  RAM it happens almost instantly.
-
-  An automated reproducer works as follows:
-
-  - the guest *does* mount its root fs and swap with option discard and
-  my testing leaves me with the impression that file deletion rather
-  than reading is causing the issue
-
-  - foo is a snapshot of the running Debian VM which is already running
-  command
-
-  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
-ne
-
-  to produce some I/O to the disk (4GB file with 4GB of RAM).
-
-  - on the host a loop continuously resumes and saves the guest state
-  and quits qemu inbetween:
-
-  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
-  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
-  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
-  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
-  none ; done
-
-  - quitting qemu inbetween saves and loads seems to be necessary for
-  the problem to occur. Just continusouly in one session saving and
-  loading guest state does not trigger it.
-
-  - For me, after about 2 to 6 iterations of above loop the image is
-  corrupted.
-
-  - corruption manifests with other messages from qemu as well, e.g.:
-
-  (qemu) loadvm foo
-  Error: Device 'd' does not have the requested snapshot 'foo'
-
-  Using above reproducer I have to the be best of my ability bisected
-  the introduction of the problem to commit
-  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
-  block_status call if possible). qemu compiled from the commit before
-  does not exhibit the issue, from that commit on it does and reverting
-  the commit off of current master makes it disappear.
+  OpenSSH_7.6p1 Ubuntu-4ubuntu0.3, OpenSSL 1.0.2n  7 Dec 2017
+  debug1: Reading configuration data /etc/ssh/ssh_config
+  debug1: /etc/ssh/ssh_config line 19: Applying options for *
+  debug1: Connecting to 127.0.0.1 [127.0.0.1] port 2222.
+  debug1: Connection established.
+  debug1: permanently_set_uid: 0/0
+  debug1: key_load_public: No such file or directory
+  debug1: identity file /root/.ssh/id_rsa type -1
+  debug1: key_load_public: No such file or directory
+  debug1: identity file /root/.ssh/id_rsa-cert type -1
+  debug1: key_load_public: No such file or directory
+  debug1: identity file /root/.ssh/id_dsa type -1
+  debug1: key_load_public: No such file or directory
+  debug1: identity file /root/.ssh/id_dsa-cert type -1
+  debug1: key_load_public: No such file or directory
+  debug1: identity file /root/.ssh/id_ecdsa type -1
+  debug1: key_load_public: No such file or directory
+  debug1: identity file /root/.ssh/id_ecdsa-cert type -1
+  debug1: key_load_public: No such file or directory
+  debug1: identity file /root/.ssh/id_ed25519 type -1
+  debug1: key_load_public: No such file or directory
+  debug1: identity file /root/.ssh/id_ed25519-cert type -1
+  debug1: Local version string SSH-2.0-OpenSSH_7.6p1 Ubuntu-4ubuntu0.3
+  ssh_exchange_identification: read: Connection reset by peer
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1855535/+subscriptions
 
