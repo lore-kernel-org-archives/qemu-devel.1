@@ -2,85 +2,95 @@ Return-Path: <SRS0=QAbx=Z6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 083CCC43603
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 21:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5592BC43603
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 22:10:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9CC8206D5
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 21:46:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1521C206D5
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 22:10:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XmecZQ0P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9CC8206D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dannf-org.20150623.gappssmtp.com header.i=@dannf-org.20150623.gappssmtp.com header.b="wyieG8pR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1521C206D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dannf.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ie4OI-0001SI-Qy
-	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 16:46:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51137)
+	id 1ie4lM-0000kQ-8Y
+	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 17:10:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32861)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gshan@redhat.com>) id 1ie4NY-0000uu-U4
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 16:46:14 -0500
+ (envelope-from <dannf@dannf.org>) id 1ie0bN-0003CS-DB
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 12:44:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gshan@redhat.com>) id 1ie4NU-00066w-EV
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 16:46:09 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50405
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1ie4NT-00060e-Eo
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 16:46:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575841565;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GzXATSvNIt3xTXUbLkno7z+Dv2yWloNWp5D67T0jvZA=;
- b=XmecZQ0PGxKz2/Qk+kUBKsI5RSdR8OonRIvAMP2yVXC1uNOaz/B6xE3TdSmab7cM4/8LDc
- vLNzujUTvewepxo+0pCPCqYJhyxTSTHqdC9JRTZyMD668ecnOye2rVGMhRX/ufOwWjtMt/
- rywl3Shi9PpxuOnat2MaPuxXN6DIIx8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-eBp9qEbhNeiMUeNfAeELkg-1; Sun, 08 Dec 2019 16:46:01 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFC5C183B700;
- Sun,  8 Dec 2019 21:46:00 +0000 (UTC)
-Received: from localhost.localdomain (vpn2-54-53.bne.redhat.com [10.64.54.53])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 01D035D9E5;
- Sun,  8 Dec 2019 21:45:59 +0000 (UTC)
-Subject: Re: [PATCH] exec: Remove the duplicated check in parse_cpu_option()
-To: Greg Kurz <groug@kaod.org>
-References: <20191206063337.39764-1-gshan@redhat.com>
- <20191206175840.06507c32@bahia.w3ibm.bluemix.net>
- <be362efe-0174-ec14-f16f-87ecfda4203a@redhat.com>
- <20191207175101.2653e7b4@bahia.w3ibm.bluemix.net>
-From: Gavin Shan <gshan@redhat.com>
-Message-ID: <d1c2956d-d6c5-e44b-7926-9c7583d65697@redhat.com>
-Date: Mon, 9 Dec 2019 08:45:56 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (envelope-from <dannf@dannf.org>) id 1ie0bL-00019I-Cr
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 12:44:13 -0500
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:42153)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <dannf@dannf.org>) id 1ie0bJ-0000xZ-0y
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 12:44:10 -0500
+Received: by mail-io1-xd43.google.com with SMTP id f82so12289414ioa.9
+ for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 09:44:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dannf-org.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=9dteYOG07UuUbeX7OBeGTTSEQdtDvBYgIha8KBlE9RQ=;
+ b=wyieG8pRps2+bnd3lpwnAi8obBrJOveAio75MxQi6OGL5NQwY4BNNgxV3vmrzlAefv
+ 7JkNbYRS3uNtx/MPfDb0Md+K/sjZ5EU04l8UeiO/SY5mstipFgn04f8bsnxUEgqLX3op
+ pGlPZu6uGg6JJ3Eb7NgD1a9tdqw7EP083cJhiR7rR+FuRkoLQ1CFgvkLAwE4GyfilLNW
+ 4nqnW6aSaKs4bc7ZamMagahaBsRmLZMrK20U/6XJiAc3rkqJplJM6RunapkeyrBLqFY/
+ yG7bQNPZYVJDoxcLswJXM+1pIduP1LR3q8hdVDNTidermulLEi3UMHua2H7TAbcLTFD/
+ mi3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to:user-agent;
+ bh=9dteYOG07UuUbeX7OBeGTTSEQdtDvBYgIha8KBlE9RQ=;
+ b=Lqf+ktEPVVkLqWBjM2IpRUIklXMhpOeCSUc7IQlO0nC8P/JB5/Ax/ds5Wye1J+B14W
+ aL0x5zmO+DXA3A7AbvN+zrixyreKopq+rqxvaxJIPVYaDY2V07+3NFPlFt6RVoQlGmuA
+ Mk8fVD44az/YzWVaaQgmFefmjFziTeMtxDS6MDlMACpqW56vJnQS+xbvg3xKnfAVF9zq
+ jx5gd8hnv7ZpgjfW9zpd9+LTXD5uj2MgNMzmkZTefhekj/8hqdXjHajLkZzekKm096+w
+ hMYRGed4MlGDwV59llHxw77VhOHirwmo2/4bubhVE4XCzABzlA4I4FKi3zwMh/R3B+vf
+ fvxQ==
+X-Gm-Message-State: APjAAAWoP8L4MFkMMEWzU4dtWdWdMAiTgPtXp2qoKKV2HoqEvdY6FbKe
+ Gs2K01pkA7Rn7w5w08LpeK+CIQ==
+X-Google-Smtp-Source: APXvYqy2EuR8hQsnCwd9pUGPKdDi4T8JF2HjxYp0i/BaY8qTyEHVp5o85kF1eWbGOcuVXTrZJtDmpA==
+X-Received: by 2002:a6b:7708:: with SMTP id n8mr1338120iom.223.1575827044113; 
+ Sun, 08 Dec 2019 09:44:04 -0800 (PST)
+Received: from localhost (c-71-56-235-36.hsd1.co.comcast.net. [71.56.235.36])
+ by smtp.gmail.com with ESMTPSA id
+ f76sm6031151ild.82.2019.12.08.09.44.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 08 Dec 2019 09:44:03 -0800 (PST)
+Date: Sun, 8 Dec 2019 10:44:02 -0700
+From: dann frazier <dannf@dannf.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH-for-5.0] roms/edk2-funcs.sh: Use available GCC for
+ ARM/Aarch64 targets
+Message-ID: <20191208174402.GA335159@xps13.dannf>
+References: <20191204221229.30612-1-philmd@redhat.com>
+ <ecbb6c69-1fc1-a730-db9f-656b0a82c3fd@redhat.com>
+ <90b6b303-2cb7-aeea-8f10-8520de2511c6@redhat.com>
+ <CAKv+Gu8jiAqWWZkUegC40X=967sCpqiKooyaWFGnX5=saf+Duw@mail.gmail.com>
+ <83c551c4-bec0-1a42-4605-d32f6430697e@redhat.com>
+ <92dfa7c7-1001-09bf-18fc-f449136be248@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191207175101.2653e7b4@bahia.w3ibm.bluemix.net>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: eBp9qEbhNeiMUeNfAeELkg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <92dfa7c7-1001-09bf-18fc-f449136be248@redhat.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d43
+X-Mailman-Approved-At: Sun, 08 Dec 2019 17:09:49 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,92 +102,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Gavin Shan <gshan@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Serge Hallyn <serge.hallyn@ubuntu.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Steve Langasek <vorlon@debian.org>,
+ Debian QEMU Team <pkg-qemu-devel@lists.alioth.debian.org>,
+ Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/8/19 3:51 AM, Greg Kurz wrote:
-> On Sat, 7 Dec 2019 23:56:55 +1100
-> Gavin Shan <gshan@redhat.com> wrote:
+On Fri, Dec 06, 2019 at 06:07:58AM +0100, Philippe Mathieu-Daudé wrote:
+> On 12/5/19 8:35 PM, Laszlo Ersek wrote:
+> > On 12/05/19 17:50, Ard Biesheuvel wrote:
+> > > On Thu, 5 Dec 2019 at 16:27, Philippe Mathieu-Daudé <philmd@redhat.com> wrote:
+> > > > 
+> > > > On 12/5/19 5:13 PM, Laszlo Ersek wrote:
+> > > > > Hi Phil,
+> > > > > 
+> > > > > (+Ard)
+> > > > > 
+> > > > > On 12/04/19 23:12, Philippe Mathieu-Daudé wrote:
+> > > > > > Centos 7.7 only provides cross GCC 4.8.5, but the script forces
+> > > > > > us to use GCC5. Since the same machinery is valid to check the
+> > > > > > GCC version, remove the $emulation_target check.
+> > > > > > 
+> > > > > >     $ cat /etc/redhat-release
+> > > > > >     CentOS Linux release 7.7.1908 (Core)
+> > > > > > 
+> > > > > >     $ aarch64-linux-gnu-gcc -v 2>&1 | tail -1
+> > > > > >     gcc version 4.8.5 20150623 (Red Hat 4.8.5-16) (GCC)
+> > > > > 
+> > > > > this patch is not correct, in my opinion. ARM / AARCH64 support in edk2
+> > > > > requires GCC5 as a minimum. It was never tested with an earlier
+> > > > > toolchain, to my understanding. Not on my part, anyway.
+> > > > > 
+> > > > > To be more precise: when I tested cross-gcc toolchains earlier than
+> > > > > that, the ArmVirtQemu builds always failed. Minimally, those toolchains
+> > > > > didn't recognize some of the AARCH64 system registers.
+> > > > > 
+> > > > > If CentOS 7.7 does not provide a suitable (>=GCC5) toolchain, then we
+> > > > > can't build ArmVirtQemu binaries on CentOS 7.7, in my opinion.
+> > > > > 
+> > > > > Personally, on my RHEL7 laptop, over time I've used the following
+> > > > > toolchains, to satisfy the GCC5 requirement of ArmVirtQemu (which
+> > > > > requirement I took as experimental evidence):
+> > > > > 
+> > > > > - Initially (last quarter of 2014), I used binary distributions --
+> > > > >     tarballs -- of cross-binutils and cross-gcc, from Linaro.
+> > > > > 
+> > > > > - Later (last quarter of 2016), I rebuilt some SRPMs that were at the
+> > > > >     time Fedora-only for RHEL7. Namely:
+> > > > > 
+> > > > >     - cross-binutils-2.27-3.fc24
+> > > > >       https://koji.fedoraproject.org/koji/buildinfo?buildID=801348
+> > > > > 
+> > > > >     - gcc-6.1.1-2.fc24
+> > > > >       https://koji.fedoraproject.org/koji/buildinfo?buildID=761767
+> > > > > 
+> > > > > - Most recently, I've been using cross-binutils updated from EPEL7:
+> > > > > 
+> > > > >     - cross-binutils-2.27-9.el7.1
+> > > > >       https://koji.fedoraproject.org/koji/buildinfo?buildID=918474
+> > > > > 
+> > > > > To my knowledge, there is still no suitable cross-compiler available on
+> > > > > RHEL7, from any trustworthy RPM repository. So, to this day, I use
+> > > > > gcc-6.1.1-2 for cross-building ArmVirtQemu, on my RHEL7 laptop.
+> > > > > 
+> > > > > Again: I believe it does not matter if the gcc-4.8.5-based
+> > > > > cross-compiler in CentOS 7 "happens" to work. That's a compiler that I
+> > > > > have never tested with, or vetted for, upstream ArmVirtQemu.
+> > > > > 
+> > > > > Now, I realize that in edk2, we have stuff like
+> > > > > 
+> > > > >     GCC48_AARCH64_CC_FLAGS
+> > > > > 
+> > > > > in "BaseTools/Conf/tools_def.template" -- coming from commit
+> > > > > 7a9dbf2c94d1 ("BaseTools/Conf/tools_def.template: drop ARM/AARCH support
+> > > > > from GCC46/GCC47", 2019-01-08). That doesn't change the fact that I've
+> > > > > never built or tested ArmVirtQemu with such a compiler. And so this
+> > > > > patch makes me quite uncomfortable.
+> > > > > 
+> > > > > If that rules out CentOS 7 as a QEMU project build / CI platform for the
+> > > > > bundled ArmVirtQemu binaries, then we need a more recent platform
+> > > > > (perhaps CentOS 8, not sure).
+> > > > 
+> > > > Unfortunately CentOS 8 is not available as a Docker image, which is a
+> > > > convenient way to build EDK2 in a CI.
+> > > > 
+> > > > > I think it's also educational to check the origin of the code that your
+> > > > > patch proposes to remove. Most recently it was moved around from a
+> > > > > different place, in QEMU commit 65a109ab4b1a ('roms: lift
+> > > > > "edk2-funcs.sh" from "tests/uefi-test-tools/build.sh"', 2019-04-17).
+> > > > > 
+> > > > > In that commit, for some reason I didn't keep the original code comments
+> > > > > (perhaps it would have been too difficult or messy to preserve the
+> > > > > comments sanely with the restructured / factored-out code). But, they
+> > > > > went like this (originally from commit 77db55fc8155,
+> > > > > "tests/uefi-test-tools: add build scripts", 2019-02-21):
+> > > > > 
+> > > > > # Expose cross_prefix (which is possibly empty) to the edk2 tools. While at it,
+> > > > > # determine the suitable edk2 toolchain as well.
+> > > > > # - For ARM and AARCH64, edk2 only offers the GCC5 toolchain tag, which covers
+> > > > > #   the gcc-5+ releases.
+> > > > > # - For IA32 and X64, edk2 offers the GCC44 through GCC49 toolchain tags, in
+> > > > > #   addition to GCC5. Unfortunately, the mapping between the toolchain tags and
+> > > > > #   the actual gcc releases isn't entirely trivial. Run "git-blame" on
+> > > > > #   "OvmfPkg/build.sh" in edk2 for more information.
+> > > > > # And, because the above is too simple, we have to assign cross_prefix to an
+> > > > > # edk2 build variable that is specific to both the toolchain tag and the target
+> > > > > # architecture.
+> > > > > 
+> > > > > So... unless Ard feels it is really totally safe to retro-actively rely
+> > > > > on the gcc-4.8.5-based compiler in CentOS 7, I'd rather we picked a more
+> > > > > recent build platform (OS) instead. For example, we build ArmVirtQemu on
+> > > > > RHEL8 regularly, so that's a reality-based "plus" for CentOS 8.
+> > > > > 
+> > > > > 
+> > > > > Independently of all of the above, the OVMF toolchain selection logic
+> > > > > that this patch proposes to reuse with ArmVirtQemu, is *really*
+> > > > > x86-specific. Please run "git blame" on "OvmfPkg/build.sh" in upstream
+> > > > > edk2, to see where the various branches come from (as the comments in
+> > > > > this shell script suggest as well). There had been mess like commit
+> > > > > 656ac0c7d8ea ('Revert "OvmfPkg/build.sh: select the GCC49 toolchain
+> > > > > settings for gcc-7.*"', 2017-08-25).
+> > > > 
+> > > > Thanks for all the pointers, very educative indeed :)
+> > > > 
+> > > > I'll see other setups I can use with GCC5+ available.
+> > > > 
+> > > > I still have to figure if there are free tier CI with less limitations
+> > > > than Travis/Shippable/GitLab, so we can keep the full EDK2 build output log.
+> > > > 
+> > > 
+> > > My CI job for ArmVirtQemu/EDK2 build tested GCC48 and GCC49 until very
+> > > recently, and I never experienced any issues when running those
+> > > images, although it's been much longer that I actually tried that. So
+> > > I wouldn't recommend against it, and if we do identify any issues, we
+> > > should either deprecate GCC48 (for ArmVirtQemu or for AArch64
+> > > altogether) or fix them.
 > 
->> On 12/7/19 3:58 AM, Greg Kurz wrote:
->>> On Fri,  6 Dec 2019 17:33:37 +1100
->>> Gavin Shan <gshan@redhat.com> wrote:
->>>
->>>> The @cpu_option shouldn't be NULL, otherwise assertion from g_strsplit()
->>>> should be raised as below message indicates. So it's meaningless to validate
->>>> @model_pices[0] in parse_cpu_option() as it shouldn't be NULL either.
->>>>
->>>>      qemu-system-aarch64: GLib: g_strsplit: assertion 'string != NULL' failed
->>>>
->>>> This just removes the check and unused message.
->>>>
->>>
->>> Hrm... the check isn't about @cpu_option being NULL. It is about filtering out
->>> invalid syntaxes like:
->>>
->>> -cpu ''
->>>
->>> or
->>>
->>> -cpu ,some-prop
->>>
->>
->> Greg, Thanks for your review on this trivial patch.
->>
->> @cpu_option[0] is NULL when we have "-cpu ''". We run into assertion raised
->> by subsequent cpu_class_by_name(). However, @cpu_option[0] isn't NULL with
->> something like "-cpu ,xxx", but the CPU model specific class can't be found
->> at last.
->>
-> 
-> You're right, the case with a leading ',' is caught by the other check.
-> 
->> So the validation mostly relies on cpu_class_by_name() if I'm correct. It's
->> fine to remove the check. However, it provides explicit error message, which
->> isn't bad though:
->>
->>      error_report("-cpu option cannot be empty");
->>
-> 
-> It's definitely not fine to remove an error message that clearly explains
-> to the user what he has done wrong in favor of QEMU aborting and printing
-> something cryptic like:
-> 
->      cpu_class_by_name: Assertion `cpu_model && cc->class_by_name' failed.
-> 
-> Assertions are for bugs, not for bad command line usage.
-> 
+> FYI Debian/Ubuntu apparently force to GCC49:
+> https://salsa.debian.org/qemu-team/edk2/blob/debian/debian/rules#L9
 
-Yes, Agree as explained previously. The explicit message is a bonus at least.
-So please ignore this trivial patch and sorry for the noise.
+fyi, that was to avoid shipping pre-compiled binaries:
+https://salsa.debian.org/qemu-team/edk2/commit/d46a08968a1609725215f32230ab1ddd35d8b7fb
 
->>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
->>>> ---
->>>>    exec.c | 5 -----
->>>>    1 file changed, 5 deletions(-)
->>>>
->>>> diff --git a/exec.c b/exec.c
->>>> index ffdb518535..3cff459e43 100644
->>>> --- a/exec.c
->>>> +++ b/exec.c
->>>> @@ -963,11 +963,6 @@ const char *parse_cpu_option(const char *cpu_option)
->>>>        const char *cpu_type;
->>>>    
->>>>        model_pieces = g_strsplit(cpu_option, ",", 2);
->>>> -    if (!model_pieces[0]) {
->>>> -        error_report("-cpu option cannot be empty");
->>>> -        exit(1);
->>>> -    }
->>>> -
->>>>        oc = cpu_class_by_name(CPU_RESOLVING_TYPE, model_pieces[0]);
->>>>        if (oc == NULL) {
->>>>            error_report("unable to find CPU model '%s'", model_pieces[0]);
->>>
+But I just uploaded a new version w/ this change that gets around it:
+https://salsa.debian.org/qemu-team/edk2/commit/bfe4fc20408f35ffaa196817b57df11981eef620
 
-Regards,
-Gavin
+  -dann
 
+> > 
+> > OK, thank you, I'm fully satisfied with this addition. :)
+> > 
+> > Phil, in this case I think we can indeed replace the hard-coded "GCC5"
+> > with a bit of dynamic detection. Two remarks:
+> > 
+> > - Please CC Ard on v2, so he can ACK. I'd like that. :)
+> > 
+> > - Again, we shouldn't blindly reapply the x86 (OVMF) quirk(s). I mean
+> > mainly the special casing of "6.[0-2].*" to GCC49, which comes from
+> > upstream edk2 commit 432f1d83f77a ("OvmfPkg/build.sh: Use GCC49
+> > toolchains with GCC 6.[0-2]", 2016-12-06).
+> > 
+> > ... or is that GCC bug target-independent in fact? I can't really tell;
+> > the upstream GCC bug
+> > <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=70955> is ISA-specific
+> > (x86-64), and so are function calling conventions.
+> > 
+> > I'd suggest *not* applying the quirk for ArmVirtQemu, initially.
+> > 
+> > Thanks
+> > Laszlo
+> > 
+> 
 
