@@ -8,78 +8,81 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02280C43603
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 19:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA9EC43603
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 19:01:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9B2A205F4
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 19:01:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A5C7205F4
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 19:01:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="srWP+Pd5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9B2A205F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qvHI7uy8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A5C7205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ie1o4-0007wb-HZ
-	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 14:01:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37469)
+	id 1ie1o7-00081z-1T
+	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 14:01:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1ie1Ti-0002Cc-Sb
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:29 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1ie1Tz-0002NQ-LE
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1ie1Tc-00038H-Nj
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:18 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38431)
+ (envelope-from <mrolnik@gmail.com>) id 1ie1Tw-0003LF-Pr
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:39 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33148)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ie1Tc-0002z0-4s
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:16 -0500
-Received: by mail-wr1-x442.google.com with SMTP id y17so13536364wrh.5
- for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 10:40:10 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ie1Tw-0003CF-7s
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:36 -0500
+Received: by mail-wr1-x444.google.com with SMTP id b6so13559038wrq.0
+ for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 10:40:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=HFlHW9huHXAAq1OqeA1arZy4zj7ZChbwEh6iZzUvZtY=;
- b=srWP+Pd5e0iPnHsx5plk936P+yPWIzjXqMSkDr7RH0Zlwhp5vw/FU7AhVbEvJTOs+9
- /cfUYAM29Z+69t6hFu4Pdo57lk09pWECWfQTO8fP6ac7R8C1aA6uGUhC9DVQouSiyX8V
- qNOcf1V3a+hJx2+ev5u8ieasY9v8P6+SRkeo+D05yuaWMnRBntzaE138dPemzlgvUNlL
- QKmjB4jUVH9lAMx3l5rxaQDSoJrWG8i0KrqqtuVqTRy6KhzJq7D/MnDDnB5LZLHMpnGG
- 9P5lYH9xbAZfztHlSfiDg9dP5EUe+4lfhtPqmpuvdI/lBJD0mwJHfL3hxrTV8i68m5cg
- ydwg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=oAO0yqb39g2l+jZaNDhLPdo+MAwQzUGJWBl9pLetPtg=;
+ b=qvHI7uy8Imc/0t8YybbZBYQ1ppDI4ygiJnekDhO3bljChKY7KmEh+bjDmswmyPIQki
+ fSHUA+NQHEG4KkoidQp05DoXewvAwbD09TV3mbaTh+hLaSTqHHgSDNM1f7sQmU3ZbP2O
+ nEm43Q8B2n4pmnPQfr2OJ42TmDd732tekdQwBESE866KJ+C9GxV0mZJxJBQQycKHjBtR
+ vretNtX3W7CDyHpUftsuzHyiSzK0f7fjpEEeMQNAqAhHmjjfCkSiRzFYfVLT82n9QtzY
+ KEgdftAOTi3PcWmy2ubTWCIz90JWM9Q/yt9gc3KPCKEAqgtPYFpovqn+6OsvcCx4GCpi
+ X99A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=HFlHW9huHXAAq1OqeA1arZy4zj7ZChbwEh6iZzUvZtY=;
- b=JpkyVhVB2EaIivf6PBRb0s/305pNcmCwq6u9/U/O5xa9UszDW7P0sdFjOhgFPY1Lgs
- BCVW++9iH0+KIAxA7D8AjV6W7LCzJvp9GqkiDj5yqeZuNZzp3N3MR3eG9P7cO7+ga4cJ
- J1ynNutQXEojltJVe9XiDAD9dYadAhYyR2TKJNKkAgZO/bqZWtZIALRQKvU3haSRcRW/
- 1oqWvYkoPltrjvDAodseYfFSK2Wl8gnJDvyEx015pmb+d05AOBXEYqSL+bNMMN9okzsl
- F2mFnqysKtc9qn0sLR119t+JyBjbVjvulsyNegj9BOn4cLxq0rSej9WPuSy9fo3sd/kz
- FrPg==
-X-Gm-Message-State: APjAAAVpYju0YBpT8iBqwGywzckmXQdzn4ySN+FoCCHoeQbyW9cWcIig
- cZEZBc4niTlKnUvC3daKtiY7uMJ81ww9IjEj
-X-Google-Smtp-Source: APXvYqxY7bALJST07pIWXW8RSO/yTHIMOejKSY2IneiLv5OMgi3J0prsL89GR1g7TBP5HP27wW/xJg==
-X-Received: by 2002:adf:f28c:: with SMTP id k12mr26342804wro.360.1575830408834; 
- Sun, 08 Dec 2019 10:40:08 -0800 (PST)
+ :references:mime-version:content-transfer-encoding;
+ bh=oAO0yqb39g2l+jZaNDhLPdo+MAwQzUGJWBl9pLetPtg=;
+ b=MyUd0zOeOHD/M8GXAcMG6BfvY+osWNQG+cHroY0RnSzeBsdUbUzN2yZql8NvmCP4VD
+ rxQK/4MJXk2BcAeiKyOcUEcM9C0oSlo3DvjUliaMb/oWzNkcT6GETEBqqOsFc72T6QgY
+ G9K3f2EjYrh+kqVeQTLrntr6/U18Bjz4pWBIq3j5YWyi+tRGWpFmiMc2/UbY3OFDamkk
+ Lngg5BGBpsiDQ5s9CVrW1+XMYSyxHRZuo6preTnGNsIcmM2JHYLUusstuWjBvlbtYWF+
+ xnxny0jBH5v058zy1oJG3LNxaFlPVAxWTiypOOXaoDgi82cvq0B8hz/FCvWsuAkamZhI
+ AdEQ==
+X-Gm-Message-State: APjAAAUmmNFnlhIT065pCWi65ZGTDJ0CRElU0S/9fz5ypz/5orEufjC5
+ jc8e6smbAiBwvbDpe56QFzBnFqgFyOwxvLt/
+X-Google-Smtp-Source: APXvYqxHSTdVvBdgpq2s57LF4nZmp6oRBACCj/WOcdhPk/KrUOkUtoNqpWu2EISs3TDXC/f0m4rAow==
+X-Received: by 2002:a5d:4e0a:: with SMTP id p10mr26445436wrt.229.1575830420477; 
+ Sun, 08 Dec 2019 10:40:20 -0800 (PST)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-180-52-3.red.bezeqint.net. [79.180.52.3])
- by smtp.gmail.com with ESMTPSA id h17sm25289717wrs.18.2019.12.08.10.40.07
+ by smtp.gmail.com with ESMTPSA id h17sm25289717wrs.18.2019.12.08.10.40.18
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sun, 08 Dec 2019 10:40:08 -0800 (PST)
+ Sun, 08 Dec 2019 10:40:20 -0800 (PST)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v38 08/22] target/avr: Add instruction translation - Bit and
- Bit-test Instructions
-Date: Sun,  8 Dec 2019 20:39:08 +0200
-Message-Id: <20191208183922.13757-9-mrolnik@gmail.com>
+Subject: [PATCH v38 15/22] target/avr: Add example board configuration
+Date: Sun,  8 Dec 2019 20:39:15 +0200
+Message-Id: <20191208183922.13757-16-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191208183922.13757-1-mrolnik@gmail.com>
 References: <20191208183922.13757-1-mrolnik@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,277 +101,451 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This includes:
-    - LSR, ROR
-    - ASR
-    - SWAP
-    - SBI, CBI
-    - BST, BLD
-    - BSET, BCLR
+A simple board setup that configures an AVR CPU to run a given firmware image.
+This is all that's useful to implement without peripheral emulation as AVR CPUs include a lot of on-board peripherals.
+
+NOTE: this is not a real board !!!!
+NOTE: it's used for CPU testing!!!!
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Nacked-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/avr/translate.c | 243 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 243 insertions(+)
+ include/elf.h        |   2 +
+ include/hw/elf_ops.h |   6 +-
+ include/hw/loader.h  |   3 +-
+ hw/avr/sample.c      | 293 +++++++++++++++++++++++++++++++++++++++++++
+ hw/core/loader.c     |  13 +-
+ hw/Kconfig           |   1 +
+ hw/avr/Kconfig       |   6 +
+ hw/avr/Makefile.objs |   1 +
+ 8 files changed, 317 insertions(+), 8 deletions(-)
+ create mode 100644 hw/avr/sample.c
+ create mode 100644 hw/avr/Kconfig
+ create mode 100644 hw/avr/Makefile.objs
 
-diff --git a/target/avr/translate.c b/target/avr/translate.c
-index 031176c9bd..d8d8f11933 100644
---- a/target/avr/translate.c
-+++ b/target/avr/translate.c
-@@ -313,6 +313,15 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
- }
+diff --git a/include/elf.h b/include/elf.h
+index 3501e0c8d0..53cdfa23b7 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -202,6 +202,8 @@ typedef struct mips_elf_abiflags_v0 {
+ #define EM_MOXIE           223     /* Moxie processor family */
+ #define EM_MOXIE_OLD       0xFEED
  
++#define EM_AVR 83 /* AVR 8-bit microcontroller */
++
+ /* This is the info that is needed to parse the dynamic section of the file */
+ #define DT_NULL		0
+ #define DT_NEEDED	1
+diff --git a/include/hw/elf_ops.h b/include/hw/elf_ops.h
+index e07d276df7..9f28c16490 100644
+--- a/include/hw/elf_ops.h
++++ b/include/hw/elf_ops.h
+@@ -316,7 +316,8 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+                               void *translate_opaque,
+                               int must_swab, uint64_t *pentry,
+                               uint64_t *lowaddr, uint64_t *highaddr,
+-                              int elf_machine, int clear_lsb, int data_swab,
++                              int elf_machine, uint32_t *pflags,
++                              int clear_lsb, int data_swab,
+                               AddressSpace *as, bool load_rom,
+                               symbol_fn_t sym_cb)
+ {
+@@ -594,6 +595,9 @@ static int glue(load_elf, SZ)(const char *name, int fd,
+         }
+     }
  
-+static void gen_rshift_ZNVSf(TCGv R)
-+{
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-+    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
-+    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
-+    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
-+}
-+
-+
- /*
-  *  Adds two registers without the C Flag and places the result in the
-  *  destination register Rd.
-@@ -2273,3 +2282,237 @@ static bool trans_LAT(DisasContext *ctx, arg_LAT *a)
++    if (pflags) {
++        *pflags = (uint32_t)(elf_sword)ehdr.e_flags;
++    }
+     if (lowaddr)
+         *lowaddr = (uint64_t)(elf_sword)low;
+     if (highaddr)
+diff --git a/include/hw/loader.h b/include/hw/loader.h
+index 48a96cd559..3dbdd1868d 100644
+--- a/include/hw/loader.h
++++ b/include/hw/loader.h
+@@ -132,7 +132,8 @@ int load_elf_ram_sym(const char *filename,
+                      uint64_t (*translate_fn)(void *, uint64_t),
+                      void *translate_opaque, uint64_t *pentry,
+                      uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
+-                     int elf_machine, int clear_lsb, int data_swab,
++                     int elf_machine, uint32_t *pflags,
++                     int clear_lsb, int data_swab,
+                      AddressSpace *as, bool load_rom, symbol_fn_t sym_cb);
  
-     return true;
- }
-+
+ /** load_elf_ram:
+diff --git a/hw/avr/sample.c b/hw/avr/sample.c
+new file mode 100644
+index 0000000000..6574733b57
+--- /dev/null
++++ b/hw/avr/sample.c
+@@ -0,0 +1,293 @@
++/*
++ * QEMU AVR CPU
++ *
++ * Copyright (c) 2019 Michael Rolnik
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see
++ * <http://www.gnu.org/licenses/lgpl-2.1.html>
++ */
 +
 +/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit 0 is
-+ *  loaded into the C Flag of the SREG. This operation effectively divides an
-+ *  unsigned value by two. The C Flag can be used to round the result.
++ *  NOTE:
++ *      This is not a real AVR board, this is an example!
++ *      The CPU is an approximation of an ATmega2560, but is missing various
++ *      built-in peripherals.
++ *
++ *      This example board loads provided binary file into flash memory and
++ *      executes it from 0x00000000 address in the code memory space.
++ *
++ *      Currently used for AVR CPU validation
++ *
 + */
-+static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
 +
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf = Rd == 0 */
-+    tcg_gen_movi_tl(cpu_Nf, 0);
-+    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
-+    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "cpu.h"
++#include "hw/hw.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/qtest.h"
++#include "ui/console.h"
++#include "hw/boards.h"
++#include "hw/loader.h"
++#include "qemu/error-report.h"
++#include "exec/address-spaces.h"
++#include "include/hw/sysbus.h"
++#include "include/hw/char/avr_usart.h"
++#include "include/hw/timer/avr_timer16.h"
++#include "include/hw/misc/avr_mask.h"
++#include "elf.h"
++#include "hw/misc/unimp.h"
 +
-+    return true;
-+}
-+
-+
++#define SIZE_FLASH 0x00040000
++#define SIZE_SRAM 0x00002000
 +/*
-+ *  Shifts all bits in Rd one place to the right. The C Flag is shifted into
-+ *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation, combined
-+ *  with ASR, effectively divides multi-byte signed values by two. Combined with
-+ *  LSR it effectively divides multi-byte unsigned values by two. The Carry Flag
-+ *  can be used to round the result.
++ * Size of additional "external" memory, as if the AVR were configured to use
++ * an external RAM chip.
++ * Note that the configuration registers that normally enable this feature are
++ * unimplemented.
 + */
-+static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
++#define SIZE_EXMEM 0x00000000
++
++/* Offsets of peripherals in emulated memory space (i.e. not host addresses)  */
++#define PRR0_BASE 0x64
++#define PRR1_BASE 0x65
++#define USART_BASE 0xc0
++#define TIMER1_BASE 0x80
++#define TIMER1_IMSK_BASE 0x6f
++#define TIMER1_IFR_BASE 0x36
++
++/* Interrupt numbers used by peripherals */
++#define USART_RXC_IRQ 24
++#define USART_DRE_IRQ 25
++#define USART_TXC_IRQ 26
++
++#define TIMER1_CAPT_IRQ 15
++#define TIMER1_COMPA_IRQ 16
++#define TIMER1_COMPB_IRQ 17
++#define TIMER1_COMPC_IRQ 18
++#define TIMER1_OVF_IRQ 19
++
++/*  Power reduction     */
++#define PRR1_BIT_PRTIM5     0x05    /*  Timer/Counter5  */
++#define PRR1_BIT_PRTIM4     0x04    /*  Timer/Counter4  */
++#define PRR1_BIT_PRTIM3     0x03    /*  Timer/Counter3  */
++#define PRR1_BIT_PRUSART3   0x02    /*  USART3  */
++#define PRR1_BIT_PRUSART2   0x01    /*  USART2  */
++#define PRR1_BIT_PRUSART1   0x00    /*  USART1  */
++
++#define PRR0_BIT_PRTWI      0x06    /*  TWI */
++#define PRR0_BIT_PRTIM2     0x05    /*  Timer/Counter2  */
++#define PRR0_BIT_PRTIM0     0x04    /*  Timer/Counter0  */
++#define PRR0_BIT_PRTIM1     0x03    /*  Timer/Counter1  */
++#define PRR0_BIT_PRSPI      0x02    /*  Serial Peripheral Interface */
++#define PRR0_BIT_PRUSART0   0x01    /*  USART0  */
++#define PRR0_BIT_PRADC      0x00    /*  ADC */
++
++typedef struct {
++    MachineClass parent;
++} SampleMachineClass;
++
++typedef struct {
++    MachineState parent;
++    MemoryRegion *ram;
++    MemoryRegion *flash;
++    AVRUsartState *usart0;
++    AVRTimer16State *timer1;
++    AVRMaskState *prr[2];
++} SampleMachineState;
++
++#define TYPE_SAMPLE_MACHINE MACHINE_TYPE_NAME("sample")
++
++#define SAMPLE_MACHINE(obj) \
++    OBJECT_CHECK(SampleMachineState, obj, TYPE_SAMPLE_MACHINE)
++#define SAMPLE_MACHINE_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(SampleMachineClass, obj, TYPE_SAMPLE_MACHINE)
++#define SAMPLE_MACHINE_CLASS(klass) \
++    OBJECT_CLASS_CHECK(SampleMachineClass, klass, TYPE_SAMPLE_MACHINE)
++
++static void sample_init(MachineState *machine)
 +{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
++    SampleMachineState *sms = SAMPLE_MACHINE(machine);
++    MemoryRegion *system_memory = get_system_memory();
++    AVRCPU *cpu;
++    const char *firmware = NULL;
++    const char *filename = NULL;
++    const char *cpu_type = NULL;
++    uint32_t flags;
++    int bytes_loaded;
++    SysBusDevice *busdev;
++    DeviceState *cpudev;
 +
-+    tcg_gen_shli_tl(t0, cpu_Cf, 7);
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+    gen_rshift_ZNVSf(Rd);
++    system_memory = get_system_memory();
++    sms->ram = g_new(MemoryRegion, 1);
++    sms->flash = g_new(MemoryRegion, 1);
 +
-+    tcg_temp_free_i32(t0);
++    /* if ELF file is provided, determine CPU type reading ELF flags */
++    cpu_type = machine->cpu_type;
++    firmware = machine->firmware;
++    if (firmware != NULL) {
++        filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, firmware);
++        if (filename == NULL) {
++            error_report("Unable to find %s", firmware);
++            exit(1);
++        }
 +
-+    return true;
-+}
-+
-+
-+/*
-+ *  Shifts all bits in Rd one place to the right. Bit 7 is held constant. Bit 0
-+ *  is loaded into the C Flag of the SREG. This operation effectively divides a
-+ *  signed value by two without changing its sign. The Carry Flag can be used to
-+ *  round the result.
-+ */
-+static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf = Rd(0) */
-+    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd = (Rd & 0x80) | (Rd >> 1) */
-+    tcg_gen_shri_tl(Rd, Rd, 1);
-+    tcg_gen_or_tl(Rd, Rd, t0);
-+
-+    gen_rshift_ZNVSf(Rd);
-+
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Swaps high and low nibbles in a register.
-+ */
-+static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t0 = tcg_temp_new_i32();
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(t0, Rd, 0x0f);
-+    tcg_gen_shli_tl(t0, t0, 4);
-+    tcg_gen_andi_tl(t1, Rd, 0xf0);
-+    tcg_gen_shri_tl(t1, t1, 4);
-+    tcg_gen_or_tl(Rd, t0, t1);
-+
-+    tcg_temp_free_i32(t1);
-+    tcg_temp_free_i32(t0);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Sets a specified bit in an I/O Register. This instruction operates on
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
-+{
-+    TCGv data = tcg_temp_new_i32();
-+    TCGv port = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_ori_tl(data, data, 1 << a->bit);
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(port);
-+    tcg_temp_free_i32(data);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Clears a specified bit in an I/O Register. This instruction operates on
-+ *  the lower 32 I/O Registers -- addresses 0-31.
-+ */
-+static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
-+{
-+    TCGv data = tcg_temp_new_i32();
-+    TCGv port = tcg_const_i32(a->reg);
-+
-+    gen_helper_inb(data, cpu_env, port);
-+    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
-+    gen_helper_outb(cpu_env, port, data);
-+
-+    tcg_temp_free_i32(data);
-+    tcg_temp_free_i32(port);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Stores bit b from Rd to the T Flag in SREG (Status Register).
-+ */
-+static bool trans_BST(DisasContext *ctx, arg_BST *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+
-+    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
-+    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Copies the T Flag in the SREG (Status Register) to bit b in register Rd.
-+ */
-+static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
-+{
-+    TCGv Rd = cpu_r[a->rd];
-+    TCGv t1 = tcg_temp_new_i32();
-+
-+    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
-+    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
-+    tcg_gen_or_tl(Rd, Rd, t1);
-+
-+    tcg_temp_free_i32(t1);
-+
-+    return true;
-+}
-+
-+
-+/*
-+ *  Sets a single Flag or bit in SREG.
-+ */
-+static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
-+{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x01);
-+        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x01);
-+        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x01);
-+        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x01);
-+        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x01);
-+        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x01);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x01);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x01);
-+        break;
++        bytes_loaded = load_elf_ram_sym(filename, NULL, NULL, NULL, NULL, NULL,
++                NULL, 0, EM_AVR, &flags, 0, 0, NULL, 0, 0);
++        if (bytes_loaded > 0) {
++            cpu_type = avr_flags_to_cpu_type(flags, cpu_type);
++        }
 +    }
 +
-+    return true;
-+}
++    cpu = AVR_CPU(cpu_create(cpu_type));
++    cpudev = DEVICE(cpu);
 +
++    memory_region_init_rom(sms->flash, NULL, "avr.flash", SIZE_FLASH,
++            &error_fatal);
++    memory_region_add_subregion(system_memory, OFFSET_CODE, sms->flash);
 +
-+/*
-+ *  Clears a single Flag in SREG.
-+ */
-+static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
-+{
-+    switch (a->bit) {
-+    case 0x00:
-+        tcg_gen_movi_tl(cpu_Cf, 0x00);
-+        break;
-+    case 0x01:
-+        tcg_gen_movi_tl(cpu_Zf, 0x00);
-+        break;
-+    case 0x02:
-+        tcg_gen_movi_tl(cpu_Nf, 0x00);
-+        break;
-+    case 0x03:
-+        tcg_gen_movi_tl(cpu_Vf, 0x00);
-+        break;
-+    case 0x04:
-+        tcg_gen_movi_tl(cpu_Sf, 0x00);
-+        break;
-+    case 0x05:
-+        tcg_gen_movi_tl(cpu_Hf, 0x00);
-+        break;
-+    case 0x06:
-+        tcg_gen_movi_tl(cpu_Tf, 0x00);
-+        break;
-+    case 0x07:
-+        tcg_gen_movi_tl(cpu_If, 0x00);
-+        break;
++    /* following are atmel2560 device */
++    create_unimplemented_device("usart 3", OFFSET_DATA + 0x0130, 0x0007);
++    create_unimplemented_device("timer-counter-16bit 5",
++            OFFSET_DATA + 0x0120, 0x000e);
++    create_unimplemented_device("gpio L", OFFSET_DATA + 0x0109, 0x0003);
++    create_unimplemented_device("gpio K", OFFSET_DATA + 0x0106, 0x0003);
++    create_unimplemented_device("gpio J", OFFSET_DATA + 0x0103, 0x0003);
++    create_unimplemented_device("gpio H", OFFSET_DATA + 0x0100, 0x0003);
++    create_unimplemented_device("usart 2", OFFSET_DATA + 0x00d0, 0x0007);
++    create_unimplemented_device("usart 1", OFFSET_DATA + 0x00c8, 0x0007);
++    create_unimplemented_device("usart 0", OFFSET_DATA + 0x00c0, 0x0007);
++    create_unimplemented_device("twi", OFFSET_DATA + 0x00b8, 0x0006);
++    create_unimplemented_device("timer-counter-async-8bit 2",
++            OFFSET_DATA + 0x00b0, 0x0007);
++    create_unimplemented_device("timer-counter-16bit 4",
++            OFFSET_DATA + 0x00a0, 0x000e);
++    create_unimplemented_device("timer-counter-16bit 3",
++            OFFSET_DATA + 0x0090, 0x000e);
++    create_unimplemented_device("timer-counter-16bit 1",
++            OFFSET_DATA + 0x0080, 0x000e);
++    create_unimplemented_device("ac / adc",
++            OFFSET_DATA + 0x0078, 0x0008);
++    create_unimplemented_device("ext-mem-iface",
++            OFFSET_DATA + 0x0074, 0x0002);
++    create_unimplemented_device("int-controller",
++            OFFSET_DATA + 0x0068, 0x000c);
++    create_unimplemented_device("sys",
++            OFFSET_DATA + 0x0060, 0x0007);
++    create_unimplemented_device("spi",
++            OFFSET_DATA + 0x004c, 0x0003);
++    create_unimplemented_device("ext-mem-iface",
++            OFFSET_DATA + 0x004a, 0x0002);
++    create_unimplemented_device("timer-counter-pwm-8bit 0",
++            OFFSET_DATA + 0x0043, 0x0006);
++    create_unimplemented_device("ext-mem-iface",
++            OFFSET_DATA + 0x003e, 0x0005);
++    create_unimplemented_device("int-controller",
++            OFFSET_DATA + 0x0035, 0x0009);
++    create_unimplemented_device("gpio G", OFFSET_DATA + 0x0032, 0x0003);
++    create_unimplemented_device("gpio F", OFFSET_DATA + 0x002f, 0x0003);
++    create_unimplemented_device("gpio E", OFFSET_DATA + 0x002c, 0x0003);
++    create_unimplemented_device("gpio D", OFFSET_DATA + 0x0029, 0x0003);
++    create_unimplemented_device("gpio C", OFFSET_DATA + 0x0026, 0x0003);
++    create_unimplemented_device("gpio B", OFFSET_DATA + 0x0023, 0x0003);
++    create_unimplemented_device("gpio A", OFFSET_DATA + 0x0020, 0x0003);
++
++    memory_region_allocate_system_memory(
++        sms->ram, NULL, "avr.ram", SIZE_SRAM + SIZE_EXMEM);
++    memory_region_add_subregion(system_memory, OFFSET_DATA + 0x200, sms->ram);
++
++    /* Power Reduction built-in peripheral */
++    sms->prr[0] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
++                    OFFSET_DATA + PRR0_BASE, NULL));
++    sms->prr[1] = AVR_MASK(sysbus_create_simple(TYPE_AVR_MASK,
++                    OFFSET_DATA + PRR1_BASE, NULL));
++
++    /* USART 0 built-in peripheral */
++    sms->usart0 = AVR_USART(object_new(TYPE_AVR_USART));
++    busdev = SYS_BUS_DEVICE(sms->usart0);
++    qdev_prop_set_chr(DEVICE(sms->usart0), "chardev", serial_hd(0));
++    object_property_set_bool(OBJECT(sms->usart0), true, "realized",
++            &error_fatal);
++    sysbus_mmio_map(busdev, 0, OFFSET_DATA + USART_BASE);
++    /*
++     * These IRQ numbers don't match the datasheet because we're counting from
++     * zero and not including reset.
++     */
++    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, USART_RXC_IRQ));
++    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, USART_DRE_IRQ));
++    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, USART_TXC_IRQ));
++    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[1]), PRR1_BIT_PRUSART1,
++            qdev_get_gpio_in(DEVICE(sms->usart0), 0));
++
++    /* Timer 1 built-in periphal */
++    sms->timer1 = AVR_TIMER16(object_new(TYPE_AVR_TIMER16));
++    object_property_set_bool(OBJECT(sms->timer1), true, "realized",
++            &error_fatal);
++    busdev = SYS_BUS_DEVICE(sms->timer1);
++    sysbus_mmio_map(busdev, 0, OFFSET_DATA + TIMER1_BASE);
++    sysbus_mmio_map(busdev, 1, OFFSET_DATA + TIMER1_IMSK_BASE);
++    sysbus_mmio_map(busdev, 2, OFFSET_DATA + TIMER1_IFR_BASE);
++    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(cpudev, TIMER1_CAPT_IRQ));
++    sysbus_connect_irq(busdev, 1, qdev_get_gpio_in(cpudev, TIMER1_COMPA_IRQ));
++    sysbus_connect_irq(busdev, 2, qdev_get_gpio_in(cpudev, TIMER1_COMPB_IRQ));
++    sysbus_connect_irq(busdev, 3, qdev_get_gpio_in(cpudev, TIMER1_COMPC_IRQ));
++    sysbus_connect_irq(busdev, 4, qdev_get_gpio_in(cpudev, TIMER1_OVF_IRQ));
++    sysbus_connect_irq(SYS_BUS_DEVICE(sms->prr[0]), PRR0_BIT_PRTIM1,
++            qdev_get_gpio_in(DEVICE(sms->timer1), 0));
++
++    /* Load firmware (contents of flash) trying to auto-detect format */
++    if (filename != NULL) {
++        bytes_loaded = load_elf(
++            filename, NULL, NULL, NULL, NULL, NULL, NULL, 0, EM_NONE, 0, 0);
++        if (bytes_loaded < 0) {
++            bytes_loaded = load_image_targphys(
++                filename, OFFSET_CODE, SIZE_FLASH);
++        }
++        if (bytes_loaded < 0) {
++            error_report(
++                "Unable to load firmware image %s as ELF or raw binary",
++                firmware);
++            exit(1);
++        }
 +    }
-+
-+    return true;
 +}
++
++static void sample_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++
++    mc->desc = "AVR sample/example board (ATmega2560)";
++    mc->init = sample_init;
++    mc->default_cpus = 1;
++    mc->min_cpus = mc->default_cpus;
++    mc->max_cpus = mc->default_cpus;
++    mc->default_cpu_type = "avr6-avr-cpu"; /* ATmega2560. */
++    mc->is_default = 1;
++}
++
++static const TypeInfo sample_info = {
++    .name = TYPE_SAMPLE_MACHINE,
++    .parent = TYPE_MACHINE,
++    .instance_size = sizeof(SampleMachineState),
++    .class_size = sizeof(SampleMachineClass),
++    .class_init = sample_class_init,
++};
++
++static void sample_machine_init(void)
++{
++    type_register_static(&sample_info);
++}
++
++type_init(sample_machine_init);
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 5099f27dc8..e6511466ba 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -439,7 +439,7 @@ int load_elf_ram(const char *filename,
+     return load_elf_ram_sym(filename, elf_note_fn,
+                             translate_fn, translate_opaque,
+                             pentry, lowaddr, highaddr, big_endian,
+-                            elf_machine, clear_lsb, data_swab, as,
++                            elf_machine, NULL, clear_lsb, data_swab, as,
+                             load_rom, NULL);
+ }
+ 
+@@ -449,7 +449,8 @@ int load_elf_ram_sym(const char *filename,
+                      uint64_t (*translate_fn)(void *, uint64_t),
+                      void *translate_opaque, uint64_t *pentry,
+                      uint64_t *lowaddr, uint64_t *highaddr, int big_endian,
+-                     int elf_machine, int clear_lsb, int data_swab,
++                     int elf_machine, uint32_t *pflags,
++                     int clear_lsb, int data_swab,
+                      AddressSpace *as, bool load_rom, symbol_fn_t sym_cb)
+ {
+     int fd, data_order, target_data_order, must_swab, ret = ELF_LOAD_FAILED;
+@@ -490,13 +491,13 @@ int load_elf_ram_sym(const char *filename,
+     if (e_ident[EI_CLASS] == ELFCLASS64) {
+         ret = load_elf64(filename, fd, elf_note_fn,
+                          translate_fn, translate_opaque, must_swab,
+-                         pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+-                         data_swab, as, load_rom, sym_cb);
++                         pentry, lowaddr, highaddr, elf_machine, pflags,
++                         clear_lsb, data_swab, as, load_rom, sym_cb);
+     } else {
+         ret = load_elf32(filename, fd, elf_note_fn,
+                          translate_fn, translate_opaque, must_swab,
+-                         pentry, lowaddr, highaddr, elf_machine, clear_lsb,
+-                         data_swab, as, load_rom, sym_cb);
++                         pentry, lowaddr, highaddr, elf_machine, pflags,
++                         clear_lsb, data_swab, as, load_rom, sym_cb);
+     }
+ 
+  fail:
+diff --git a/hw/Kconfig b/hw/Kconfig
+index b9685b3944..07b8abb342 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -44,6 +44,7 @@ source watchdog/Kconfig
+ # arch Kconfig
+ source arm/Kconfig
+ source alpha/Kconfig
++source avr/Kconfig
+ source cris/Kconfig
+ source hppa/Kconfig
+ source i386/Kconfig
+diff --git a/hw/avr/Kconfig b/hw/avr/Kconfig
+new file mode 100644
+index 0000000000..92aa1e6afb
+--- /dev/null
++++ b/hw/avr/Kconfig
+@@ -0,0 +1,6 @@
++config AVR_SAMPLE
++    bool
++    select AVR_TIMER16
++    select AVR_USART
++    select AVR_MASK
++    select UNIMP
+diff --git a/hw/avr/Makefile.objs b/hw/avr/Makefile.objs
+new file mode 100644
+index 0000000000..626b7064b3
+--- /dev/null
++++ b/hw/avr/Makefile.objs
+@@ -0,0 +1 @@
++obj-y += sample.o
 -- 
 2.17.2 (Apple Git-113)
 
