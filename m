@@ -8,72 +8,73 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDE5C43603
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 18:52:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2314C43603
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 18:54:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F2B3205F4
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 18:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68CBD205F4
+	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 18:54:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mv+ucCPY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F2B3205F4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CO3cPQbI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68CBD205F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ie1fg-0000Jb-Gm
-	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 13:52:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37499)
+	id 1ie1gx-0001Rs-5j
+	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 13:54:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1ie1Tn-0002Eg-Aq
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:30 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1ie1Ti-0002Ce-TD
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1ie1Tc-00038A-Ni
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:21 -0500
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:46092)
+ (envelope-from <mrolnik@gmail.com>) id 1ie1Tc-00038Z-OX
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:18 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43260)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ie1Tc-00035L-7W
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1ie1Tc-00034L-7H
  for qemu-devel@nongnu.org; Sun, 08 Dec 2019 13:40:16 -0500
-Received: by mail-wr1-x42c.google.com with SMTP id z7so13437122wrl.13
- for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 10:40:14 -0800 (PST)
+Received: by mail-wr1-x443.google.com with SMTP id d16so13489102wre.10
+ for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 10:40:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=oqKi5HzJkp77MgZPrC41hLc2L4061rWL1MLVHU1rrJE=;
- b=Mv+ucCPYRVLrDYgdnXH9ahKmc+KSNSIpyvcU6ql1c6h5yeE4M82nNRctHyk78gfWbp
- ti/6EQUEm+1kpV/beKwfOsl1w8Mpke1wpFp91W8RnT6fzumlfcNbTN/f93hEAxOyUKV4
- mnuxkPMiKb1Aqx2iED9tXD2BFC4PITzUiO5z4TEJSVYV0zGo5s8yzcsdHkIyAETJhYLZ
- Mlwg0mTWtvVXbl5OaSHROS1oPp76absMek2/7xOLi5OGoumYh/Wwq4/RvJw8l33SbGw/
- QuJapgCCygneE1Wb8b+s4HvFYeePYFdtT/k8Bw64v/ZxOHINx0e4UmBedNH0zOihGXLC
- D6SQ==
+ bh=D1CFu45Ji78GInCfgoXCAqlh1vy92VNoeIneSjkFFMU=;
+ b=CO3cPQbIqK1ZwopDErODYVXmdwBvBStHPOTEqz0fgc/6g7c2ueyC2Uu0BWmP2jHvDF
+ YNbgnGJW2Pv1DnTbj2L0L/vcELPSw6uMh2PmfFImTbgHAPpu37kh2tyArzvlPKpGTS3D
+ LrmuLNS5qiB/Xkx7SvSh5Ag51dEYQ8dtdYHGsyPlZPEwZ8IWfPisQimyfj05XVroa/hm
+ Uyyf8LuiY1DeNR29RRa/COmvStO76Wa4DCOngOcmsGPsNn/gF4bvYfC8lm/NTTUUI6Hp
+ cp+2VFyT5XSPvu0U27NO0vwt7cKu5xArFITE1irh8jRAVbGqG9ySj0iPJGSvkrnQEsif
+ FsFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=oqKi5HzJkp77MgZPrC41hLc2L4061rWL1MLVHU1rrJE=;
- b=BXH6Ge6XG2tO+ReYJt97J/2y+MzLJAlBWUJ7NNRokigkGW/Y5N6tCIbwGyvJ7eeHOY
- CC/KK2/7mLuIf5IsQ5gqI/4vtJXKQBitbqXusmv/e1bBxgowOJa/EghgrNvRRbAAy0UY
- BUCRa64jnjgXDz9NWRzfzm6bAVcRdQZYrxDUv2S1D6Q7eqVpXl8r8gBnNZpdebRzHLsd
- H+AB8d0o8fy8VBSZl8zqnWSI6X4f3gHJ6aTO86yruhRDmvAxXW/F56dhJvXjM+W+6FZ2
- bAeSjB5L9XnJZyvkSUxp74sdraLhUcAZN+5wRnNaS9WT2fCdhUirl5ftNtrIaEaLYUIJ
- T8bA==
-X-Gm-Message-State: APjAAAVHS/NHbVJEdpNBth90MQLKShxJlVe56EkHxJTV0LtZIEJ49A65
- i5ZRpYvQHB1K6ZUicKxk2CPRKev2bJHmEiZa
-X-Google-Smtp-Source: APXvYqz6GAPmBlG5K7Q2NJAjKcespBxuz3wwQCCVZyrnlimTUGBkqJiXH+a7DRon2IkRxGaArNLGAw==
-X-Received: by 2002:adf:e74a:: with SMTP id c10mr25916382wrn.386.1575830413557; 
- Sun, 08 Dec 2019 10:40:13 -0800 (PST)
+ bh=D1CFu45Ji78GInCfgoXCAqlh1vy92VNoeIneSjkFFMU=;
+ b=lN/epoid4p9+wDlAlrolRPcRmYZcKYxVM6TuJRUBtMaLSqAdtxnq37iuXIoAvdU6+y
+ cwpAcnBxj9j8yPwYUDhFWzlqp5OXyyi3kJMbfiqQ7hS62Klea2NXsS9k/bJouDt55mGK
+ 4sqPMN7I/ItaU5x45GnHH1/gy7wui2XWcZTpuaPcJ5U7rEmDXaxT4PWp4wL7/4n0wlua
+ zqmdVWHMTZP2aq7P9YsoU8RpdlOxUUJ1mjUvsraWgXag5voYq8CGGACHiDhhcIIk9r90
+ F4o+/QGcL4nYgxSW+bA+U6vMj0TxYBrOUHc74Z2iScmt80Y2qIMBOR7P5yEbbr9Nw8gf
+ 3UWg==
+X-Gm-Message-State: APjAAAU0u9dHu7Ch/wDOe+s3T8ktGF3nb5p7m8AFiluPAqVduSMnTpDb
+ 77/CcR1hzWfwjvKbggRKPbVBcZtheT6XTMuR
+X-Google-Smtp-Source: APXvYqyqwHUfH4sQkaxUhWh7zfiBN6RS4wSAejewFuMYrpM7QJegw8hD4lBEYt9vSjemSaBZVJ8tBw==
+X-Received: by 2002:a5d:52c4:: with SMTP id r4mr9224500wrv.368.1575830411999; 
+ Sun, 08 Dec 2019 10:40:11 -0800 (PST)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-180-52-3.red.bezeqint.net. [79.180.52.3])
- by smtp.gmail.com with ESMTPSA id h17sm25289717wrs.18.2019.12.08.10.40.12
+ by smtp.gmail.com with ESMTPSA id h17sm25289717wrs.18.2019.12.08.10.40.10
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Sun, 08 Dec 2019 10:40:13 -0800 (PST)
+ Sun, 08 Dec 2019 10:40:11 -0800 (PST)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v38 11/22] target/avr: Add instruction disassembly function
-Date: Sun,  8 Dec 2019 20:39:11 +0200
-Message-Id: <20191208183922.13757-12-mrolnik@gmail.com>
+Subject: [PATCH v38 10/22] target/avr: Add instruction translation - CPU main
+ translation function
+Date: Sun,  8 Dec 2019 20:39:10 +0200
+Message-Id: <20191208183922.13757-11-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191208183922.13757-1-mrolnik@gmail.com>
 References: <20191208183922.13757-1-mrolnik@gmail.com>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42c
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,325 +102,257 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Provide function disassembles executed instruction when `-d in_asm` is
-provided
-
-Example:
-`./avr-softmmu/qemu-system-avr -bios free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf -d in_asm` will produce something like the following
-
-```
-    ...
-    IN:
-    0x0000014a:  CALL      0x3808
-
-    IN: main
-    0x00003808:  CALL      0x4b4
-
-    IN: vParTestInitialise
-    0x000004b4:  LDI       r24, 255
-    0x000004b6:  STS       r24, 0
-    0x000004b8:  MULS      r16, r20
-    0x000004ba:  OUT       $1, r24
-    0x000004bc:  LDS       r24, 0
-    0x000004be:  MULS      r16, r20
-    0x000004c0:  OUT       $2, r24
-    0x000004c2:  RET
-    ...
-```
+Co-developed-by: Richard Henderson <richard.henderson@linaro.org>
+Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- target/avr/cpu.h       |   1 +
- target/avr/cpu.c       |   2 +-
- target/avr/disas.c     | 226 +++++++++++++++++++++++++++++++++++++++++
- target/avr/translate.c |  11 ++
- 4 files changed, 239 insertions(+), 1 deletion(-)
- create mode 100644 target/avr/disas.c
+ target/avr/translate.c | 234 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 234 insertions(+)
 
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h
-index c217eefeb4..a8a3e7ade6 100644
---- a/target/avr/cpu.h
-+++ b/target/avr/cpu.h
-@@ -178,6 +178,7 @@ bool avr_cpu_exec_interrupt(CPUState *cpu, int int_req);
- hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
- int avr_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
- int avr_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
-+int avr_print_insn(bfd_vma addr, disassemble_info *info);
- 
- static inline int avr_feature(CPUAVRState *env, int feature)
- {
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c
-index c5cafcae3c..be4b921e4d 100644
---- a/target/avr/cpu.c
-+++ b/target/avr/cpu.c
-@@ -83,7 +83,7 @@ static void avr_cpu_reset(CPUState *cs)
- static void avr_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
- {
-     info->mach = bfd_arch_avr;
--    info->print_insn = NULL;
-+    info->print_insn = avr_print_insn;
- }
- 
- static void avr_cpu_realizefn(DeviceState *dev, Error **errp)
-diff --git a/target/avr/disas.c b/target/avr/disas.c
-new file mode 100644
-index 0000000000..22863d2eb1
---- /dev/null
-+++ b/target/avr/disas.c
-@@ -0,0 +1,226 @@
-+/*
-+ * AVR disassembler
-+ *
-+ * Copyright (c) 2019 Richard Henderson <rth@twiddle.net>
-+ * Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
-+ *
-+ * This program is free software: you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation, either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+
-+typedef struct {
-+    disassemble_info *info;
-+    uint16_t next_word;
-+    bool next_word_used;
-+} DisasContext;
-+
-+static int to_regs_16_31_by_one(DisasContext *ctx, int indx)
-+{
-+    return 16 + (indx % 16);
-+}
-+
-+static int to_regs_16_23_by_one(DisasContext *ctx, int indx)
-+{
-+    return 16 + (indx % 8);
-+}
-+static int to_regs_24_30_by_two(DisasContext *ctx, int indx)
-+{
-+    return 24 + (indx % 4) * 2;
-+}
-+static int to_regs_00_30_by_two(DisasContext *ctx, int indx)
-+{
-+    return (indx % 16) * 2;
-+}
-+
-+static uint16_t next_word(DisasContext *ctx)
-+{
-+    ctx->next_word_used = true;
-+    return ctx->next_word;
-+}
-+
-+static int append_16(DisasContext *ctx, int x)
-+{
-+    return x << 16 | next_word(ctx);
-+}
-+
-+
-+/* Include the auto-generated decoder.  */
-+static bool decode_insn(DisasContext *ctx, uint16_t insn);
-+#include "decode_insn.inc.c"
-+
-+#define output(mnemonic, format, ...) \
-+    (pctx->info->fprintf_func(pctx->info->stream, "%-9s " format, \
-+                        mnemonic, ##__VA_ARGS__))
-+
-+int avr_print_insn(bfd_vma addr, disassemble_info *info)
-+{
-+    DisasContext ctx;
-+    DisasContext *pctx = &ctx;
-+    bfd_byte buffer[4];
-+    uint16_t insn;
-+    int status;
-+
-+    ctx.info = info;
-+
-+    status = info->read_memory_func(addr, buffer, 4, info);
-+    if (status != 0) {
-+        info->memory_error_func(status, addr, info);
-+        return -1;
-+    }
-+    insn = bfd_getl16(buffer);
-+    ctx.next_word = bfd_getl16(buffer + 2);
-+    ctx.next_word_used = false;
-+
-+    if (!decode_insn(&ctx, insn)) {
-+        output(".db", "0x%02x, 0x%02x", buffer[0], buffer[1]);
-+    }
-+
-+    return ctx.next_word_used ? 4 : 2;
-+}
-+
-+
-+#define INSN(opcode, format, ...)                                       \
-+static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)        \
-+{                                                                       \
-+    output(#opcode, format, ##__VA_ARGS__);                             \
-+    return true;                                                        \
-+}
-+
-+#define INSN_MNEMONIC(opcode, mnemonic, format, ...)                    \
-+static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)        \
-+{                                                                       \
-+    output(mnemonic, format, ##__VA_ARGS__);                            \
-+    return true;                                                        \
-+}
-+
-+/*
-+ *   C       Z       N       V       S       H       T       I
-+ *   0       1       2       3       4       5       6       7
-+ */
-+static const char *brbc[] = {
-+    "BRCC", "BRNE", "BRPL", "BRVC", "BRGE", "BRHC", "BRTC", "BRID"
-+};
-+
-+static const char *brbs[] = {
-+    "BRCS", "BREQ", "BRMI", "BRVS", "BRLT", "BRHS", "BRTS", "BRIE"
-+};
-+
-+static const char *bset[] = {
-+    "SEC",  "SEZ",  "SEN",  "SEZ",  "SES",  "SEH",  "SET",  "SEI"
-+};
-+
-+static const char *bclr[] = {
-+    "CLC",  "CLZ",  "CLN",  "CLZ",  "CLS",  "CLH",  "CLT",  "CLI"
-+};
-+
-+INSN(ADC,    "r%d, r%d", a->rd, a->rr)
-+INSN(ADD,    "r%d, r%d", a->rd, a->rr)
-+INSN(ADIW,   "r%d:r%d, %d", a->rd + 1, a->rd, a->imm)
-+INSN(AND,    "r%d, r%d", a->rd, a->rr)
-+INSN(ANDI,   "r%d, %d", a->rd, a->imm)
-+INSN(ASR,    "r%d", a->rd)
-+INSN_MNEMONIC(BCLR,  bclr[a->bit], "")
-+INSN(BLD,    "r%d, %d", a->rd, a->bit)
-+INSN_MNEMONIC(BRBC,  brbc[a->bit], ".%+d", a->imm * 2)
-+INSN_MNEMONIC(BRBS,  brbs[a->bit], ".%+d", a->imm * 2)
-+INSN(BREAK,  "")
-+INSN_MNEMONIC(BSET,  bset[a->bit], "")
-+INSN(BST,    "r%d, %d", a->rd, a->bit)
-+INSN(CALL,   "0x%x", a->imm * 2)
-+INSN(CBI,    "%d, %d", a->reg, a->bit)
-+INSN(COM,    "r%d", a->rd)
-+INSN(CP,     "r%d, r%d", a->rd, a->rr)
-+INSN(CPC,    "r%d, r%d", a->rd, a->rr)
-+INSN(CPI,    "r%d, %d", a->rd, a->imm)
-+INSN(CPSE,   "r%d, r%d", a->rd, a->rr)
-+INSN(DEC,    "r%d", a->rd)
-+INSN(DES,    "%d", a->imm)
-+INSN(EICALL, "")
-+INSN(EIJMP,  "")
-+INSN(ELPM1,  "")
-+INSN(ELPM2,  "r%d, Z", a->rd)
-+INSN(ELPMX,  "r%d, Z+", a->rd)
-+INSN(EOR,    "r%d, r%d", a->rd, a->rr)
-+INSN(FMUL,   "r%d, r%d", a->rd, a->rr)
-+INSN(FMULS,  "r%d, r%d", a->rd, a->rr)
-+INSN(FMULSU, "r%d, r%d", a->rd, a->rr)
-+INSN(ICALL,  "")
-+INSN(IJMP,   "")
-+INSN(IN,     "r%d, $%d", a->rd, a->imm)
-+INSN(INC,    "r%d", a->rd)
-+INSN(JMP,    "0x%x", a->imm * 2)
-+INSN(LAC,    "Z, r%d", a->rd)
-+INSN(LAS,    "Z, r%d", a->rd)
-+INSN(LAT,    "Z, r%d", a->rd)
-+INSN(LDDY,   "r%d, Y+%d", a->rd, a->imm)
-+INSN(LDDZ,   "r%d, Z+%d", a->rd, a->imm)
-+INSN(LDI,    "r%d, %d", a->rd, a->imm)
-+INSN(LDS,    "r%d, %d", a->rd, a->imm)
-+INSN(LDX1,   "r%d, X", a->rd)
-+INSN(LDX2,   "r%d, X+", a->rd)
-+INSN(LDX3,   "r%d, -X", a->rd)
-+INSN(LDY2,   "r%d, Y+", a->rd)
-+INSN(LDY3,   "r%d, -Y", a->rd)
-+INSN(LDZ2,   "r%d, Z+", a->rd)
-+INSN(LDZ3,   "r%d, -Z", a->rd)
-+INSN(LPM1,   "")
-+INSN(LPM2,   "r%d, Z", a->rd)
-+INSN(LPMX,   "r%d, Z+", a->rd)
-+INSN(LSR,    "r%d", a->rd)
-+INSN(MOV,    "r%d, r%d", a->rd, a->rr)
-+INSN(MOVW,   "r%d:r%d, r%d,r:r%d", a->rd + 1, a->rd, a->rr + 1, a->rr)
-+INSN(MUL,    "r%d, r%d", a->rd, a->rr)
-+INSN(MULS,   "r%d, r%d", a->rd, a->rr)
-+INSN(MULSU,  "r%d, r%d", a->rd, a->rr)
-+INSN(NEG,    "r%d", a->rd)
-+INSN(NOP,    "")
-+INSN(OR,     "r%d, r%d", a->rd, a->rr)
-+INSN(ORI,    "r%d, %d", a->rd, a->imm)
-+INSN(OUT,    "$%d, r%d", a->imm, a->rd)
-+INSN(POP,    "r%d", a->rd)
-+INSN(PUSH,   "r%d", a->rd)
-+INSN(RCALL,  ".%+d", a->imm * 2)
-+INSN(RET,    "")
-+INSN(RETI,   "")
-+INSN(RJMP,   ".%+d", a->imm * 2)
-+INSN(ROR,    "r%d", a->rd)
-+INSN(SBC,    "r%d, r%d", a->rd, a->rr)
-+INSN(SBCI,   "r%d, %d", a->rd, a->imm)
-+INSN(SBI,    "$%d, %d", a->reg, a->bit)
-+INSN(SBIC,   "$%d, %d", a->reg, a->bit)
-+INSN(SBIS,   "$%d, %d", a->reg, a->bit)
-+INSN(SBIW,   "r%d:r%d, %d", a->rd + 1, a->rd, a->imm)
-+INSN(SBRC,   "r%d, %d", a->rr, a->bit)
-+INSN(SBRS,   "r%d, %d", a->rr, a->bit)
-+INSN(SLEEP,  "")
-+INSN(SPM,    "")
-+INSN(SPMX,   "Z+")
-+INSN(STDY,   "r%d, Y+%d", a->rd, a->imm)
-+INSN(STDZ,   "r%d, Z+%d", a->rd, a->imm)
-+INSN(STS,    "r%d, %d", a->rd, a->imm)
-+INSN(STX1,   "r%d, X", a->rr)
-+INSN(STX2,   "r%d, X+", a->rr)
-+INSN(STX3,   "r%d, -X", a->rr)
-+INSN(STY2,   "r%d, Y+", a->rd)
-+INSN(STY3,   "r%d, -Y", a->rd)
-+INSN(STZ2,   "r%d, Z+", a->rd)
-+INSN(STZ3,   "r%d, -Z", a->rd)
-+INSN(SUB,    "r%d, r%d", a->rd, a->rr)
-+INSN(SUBI,   "r%d, %d", a->rd, a->imm)
-+INSN(SWAP,   "r%d", a->rd)
-+INSN(WDR,    "")
-+INSN(XCH,    "Z, r%d", a->rd)
-+
 diff --git a/target/avr/translate.c b/target/avr/translate.c
-index c8c6f798bf..a621195817 100644
+index 68025112ff..c8c6f798bf 100644
 --- a/target/avr/translate.c
 +++ b/target/avr/translate.c
-@@ -2917,6 +2917,17 @@ done_generating:
+@@ -2690,3 +2690,237 @@ static bool trans_WDR(DisasContext *ctx, arg_WDR *a)
  
-     tb->size = (ctx.npc - pc_start) * 2;
-     tb->icount = num_insns;
-+
-+#ifdef DEBUG_DISAS
-+    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
-+        && qemu_log_in_addr_range(tb->pc)) {
-+        qemu_log_lock();
-+        qemu_log("IN: %s\n", lookup_symbol(tb->pc));
-+        log_target_disas(cs, tb->pc, tb->size);
-+        qemu_log("\n");
-+        qemu_log_unlock();
-+    }
-+#endif
+     return true;
  }
- 
- void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
++
++
++void avr_cpu_tcg_init(void)
++{
++    int i;
++
++#define AVR_REG_OFFS(x) offsetof(CPUAVRState, x)
++    cpu_pc = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(pc_w), "pc");
++    cpu_Cf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregC), "Cf");
++    cpu_Zf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregZ), "Zf");
++    cpu_Nf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregN), "Nf");
++    cpu_Vf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregV), "Vf");
++    cpu_Sf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregS), "Sf");
++    cpu_Hf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregH), "Hf");
++    cpu_Tf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregT), "Tf");
++    cpu_If = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregI), "If");
++    cpu_rampD = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampD), "rampD");
++    cpu_rampX = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampX), "rampX");
++    cpu_rampY = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampY), "rampY");
++    cpu_rampZ = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampZ), "rampZ");
++    cpu_eind = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(eind), "eind");
++    cpu_sp = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sp), "sp");
++    cpu_skip = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(skip), "skip");
++
++    for (i = 0; i < NUMBER_OF_CPU_REGISTERS; i++) {
++        cpu_r[i] = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(r[i]),
++                                          reg_names[i]);
++    }
++#undef AVR_REG_OFFS
++}
++
++static void translate(DisasContext *ctx)
++{
++    uint32_t opcode = next_word(ctx);
++
++    if (!decode_insn(ctx, opcode)) {
++        gen_helper_unsupported(cpu_env);
++        ctx->bstate = DISAS_NORETURN;
++    }
++}
++
++/* Standardize the cpu_skip condition to NE.  */
++static bool canonicalize_skip(DisasContext *ctx)
++{
++    switch (ctx->skip_cond) {
++    case TCG_COND_NEVER:
++        /* Normal case: cpu_skip is known to be false.  */
++        return false;
++
++    case TCG_COND_ALWAYS:
++        /*
++         * Breakpoint case: cpu_skip is known to be true, via TB_FLAGS_SKIP.
++         * The breakpoint is on the instruction being skipped, at the start
++         * of the TranslationBlock.  No need to update.
++         */
++        return false;
++
++    case TCG_COND_NE:
++        if (ctx->skip_var1 == NULL) {
++            tcg_gen_mov_tl(cpu_skip, ctx->skip_var0);
++        } else {
++            tcg_gen_xor_tl(cpu_skip, ctx->skip_var0, ctx->skip_var1);
++            ctx->skip_var1 = NULL;
++        }
++        break;
++
++    default:
++        /* Convert to a NE condition vs 0. */
++        if (ctx->skip_var1 == NULL) {
++            tcg_gen_setcondi_tl(ctx->skip_cond, cpu_skip, ctx->skip_var0, 0);
++        } else {
++            tcg_gen_setcond_tl(ctx->skip_cond, cpu_skip,
++                               ctx->skip_var0, ctx->skip_var1);
++            ctx->skip_var1 = NULL;
++        }
++        ctx->skip_cond = TCG_COND_NE;
++        break;
++    }
++    if (ctx->free_skip_var0) {
++        tcg_temp_free(ctx->skip_var0);
++        ctx->free_skip_var0 = false;
++    }
++    ctx->skip_var0 = cpu_skip;
++    return true;
++}
++
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
++{
++    CPUAVRState *env = cs->env_ptr;
++    DisasContext ctx = {
++        .tb = tb,
++        .cs = cs,
++        .env = env,
++        .memidx = 0,
++        .bstate = DISAS_NEXT,
++        .skip_cond = TCG_COND_NEVER,
++        .singlestep = cs->singlestep_enabled,
++    };
++    target_ulong pc_start = tb->pc / 2;
++    int num_insns = 0;
++
++    if (tb->flags & TB_FLAGS_FULL_ACCESS) {
++        /*
++         * This flag is set by ST/LD instruction we will regenerate it ONLY
++         * with mem/cpu memory access instead of mem access
++         */
++        max_insns = 1;
++    }
++    if (ctx.singlestep) {
++        max_insns = 1;
++    }
++
++    gen_tb_start(tb);
++
++    ctx.npc = pc_start;
++    if (tb->flags & TB_FLAGS_SKIP) {
++        ctx.skip_cond = TCG_COND_ALWAYS;
++        ctx.skip_var0 = cpu_skip;
++    }
++
++    do {
++        TCGLabel *skip_label = NULL;
++
++        /* translate current instruction */
++        tcg_gen_insn_start(ctx.npc);
++        num_insns++;
++
++        /*
++         * this is due to some strange GDB behavior
++         * let's assume main has address 0x100
++         * b main   - sets breakpoint at address 0x00000100 (code)
++         * b *0x100 - sets breakpoint at address 0x00800100 (data)
++         */
++        if (unlikely(!ctx.singlestep &&
++                (cpu_breakpoint_test(cs, OFFSET_CODE + ctx.npc * 2, BP_ANY) ||
++                 cpu_breakpoint_test(cs, OFFSET_DATA + ctx.npc * 2, BP_ANY)))) {
++            canonicalize_skip(&ctx);
++            tcg_gen_movi_tl(cpu_pc, ctx.npc);
++            gen_helper_debug(cpu_env);
++            goto done_generating;
++        }
++
++        /* Conditionally skip the next instruction, if indicated.  */
++        if (ctx.skip_cond != TCG_COND_NEVER) {
++            skip_label = gen_new_label();
++            if (ctx.skip_var0 == cpu_skip) {
++                /*
++                 * Copy cpu_skip so that we may zero it before the branch.
++                 * This ensures that cpu_skip is non-zero after the label
++                 * if and only if the skipped insn itself sets a skip.
++                 */
++                ctx.free_skip_var0 = true;
++                ctx.skip_var0 = tcg_temp_new();
++                tcg_gen_mov_tl(ctx.skip_var0, cpu_skip);
++                tcg_gen_movi_tl(cpu_skip, 0);
++            }
++            if (ctx.skip_var1 == NULL) {
++                tcg_gen_brcondi_tl(ctx.skip_cond, ctx.skip_var0, 0, skip_label);
++            } else {
++                tcg_gen_brcond_tl(ctx.skip_cond, ctx.skip_var0,
++                                  ctx.skip_var1, skip_label);
++                ctx.skip_var1 = NULL;
++            }
++            if (ctx.free_skip_var0) {
++                tcg_temp_free(ctx.skip_var0);
++                ctx.free_skip_var0 = false;
++            }
++            ctx.skip_cond = TCG_COND_NEVER;
++            ctx.skip_var0 = NULL;
++        }
++
++        translate(&ctx);
++
++        if (skip_label) {
++            canonicalize_skip(&ctx);
++            gen_set_label(skip_label);
++            if (ctx.bstate == DISAS_NORETURN) {
++                ctx.bstate = DISAS_CHAIN;
++            }
++        }
++    } while (ctx.bstate == DISAS_NEXT
++             && num_insns < max_insns
++             && (ctx.npc - pc_start) * 2 < TARGET_PAGE_SIZE - 4
++             && !tcg_op_buf_full());
++
++    if (tb->cflags & CF_LAST_IO) {
++        gen_io_end();
++    }
++
++    bool nonconst_skip = canonicalize_skip(&ctx);
++
++    switch (ctx.bstate) {
++    case DISAS_NORETURN:
++        assert(!nonconst_skip);
++        break;
++    case DISAS_NEXT:
++    case DISAS_TOO_MANY:
++    case DISAS_CHAIN:
++        if (!nonconst_skip) {
++            /* Note gen_goto_tb checks singlestep.  */
++            gen_goto_tb(&ctx, 1, ctx.npc);
++            break;
++        }
++        tcg_gen_movi_tl(cpu_pc, ctx.npc);
++        /* fall through */
++    case DISAS_LOOKUP:
++        if (!ctx.singlestep) {
++            tcg_gen_lookup_and_goto_ptr();
++            break;
++        }
++        /* fall through */
++    case DISAS_EXIT:
++        if (ctx.singlestep) {
++            gen_helper_debug(cpu_env);
++        } else {
++            tcg_gen_exit_tb(NULL, 0);
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++done_generating:
++    gen_tb_end(tb, num_insns);
++
++    tb->size = (ctx.npc - pc_start) * 2;
++    tb->icount = num_insns;
++}
++
++void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
++                            target_ulong *data)
++{
++    env->pc_w = data[0];
++}
 -- 
 2.17.2 (Apple Git-113)
 
