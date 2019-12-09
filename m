@@ -2,79 +2,161 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B78BC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED56C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:46:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D919120726
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:37:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDD462080D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:46:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mGc6FIL1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D919120726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GwvJdpoy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDD462080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieL6F-0001kc-1B
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:37:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54769)
+	id 1ieLFL-0005iA-T4
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:46:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55969)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ieL5L-0001DF-An
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:36:32 -0500
+ (envelope-from <jsnow@redhat.com>) id 1ieLEI-00057x-1h
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:45:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ieL5J-0003EV-Sa
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:36:31 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46996)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ieL5J-0003EK-M7
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:36:29 -0500
-Received: by mail-ot1-x343.google.com with SMTP id g18so12469945otj.13
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 07:36:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=B/DiSn6IfMMoE4lSKlBr9f53VlL1HEB43qNwHBmaFqM=;
- b=mGc6FIL1iPR4gvfsEiF+YLk/SoCjjcew12B9l16kkPcJHVwF0n50iXz+UC7h8uJe9V
- TCjBML3e+7g0BCeNp9A3gXcA4WjW8/eQHB7evaPX7fcMetpGYO+NverK9d/JGPB2oTE/
- K5mTITjl40RLnTfpAhuDl5ZAUuWX1FNAs1mIWw8hdVMiWGIGxJnAOLIqihU9uuIvyuIz
- KMs6XNL4p1lu4oD6p4m/bxHkv8O33n2Ak6twroeqFrN+GrWldt9BrQsLLZLeuR0Rqdzz
- TbZiunXtT4kWY3NG2cK9CNm9BikS+UEl2jQt+B1yJXEZwKcDLJtgWBV2RtRkfwp++1HN
- vBNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=B/DiSn6IfMMoE4lSKlBr9f53VlL1HEB43qNwHBmaFqM=;
- b=NALmFcUBNNeaQFVZOeNAe+xebseGCiB1JMZdekgMaRzOQbtKOThnMj0Nx18vYR0/fr
- qjSQkCfuC4eHkbVCTFhbVcc+Hv00qsHfckv6xhGnVu004DqVQrgDZl/yhgT870MWKOnp
- 0n3dc3qHxJ1DTUeQqwvTel5JsXodB3TJTRRbVIdXyIgUar0/He0vmWqE5eic+WP83zm1
- efpQfoT3NQnSbgSDdf7n48dfwB9TMxOsxLcZ4CE9QASn2yYbRphaszOm5wDxPOjwR1qn
- Vbd3jryaiASDpMi/xo63allCsUj7sZZYIZ0QRpHDzVbogD7RXTpz/XkTBCNYlSZMYR8f
- TXJA==
-X-Gm-Message-State: APjAAAXidQVs1786Mu9DrJicH6XEBvZ1FI7QrbelkMGo7aw0M/7kxVhq
- LDK3GCozQ2AREb9MdGzKmx9DmooyoBFobHEmSKO2zQ==
-X-Google-Smtp-Source: APXvYqyaVyT8YVgCQ74GWWheHkxC5cNqAHPmUaLAQTUKAVg7sFc0eMqJi3U+jU16icL3ksUkjEgmQW2BEEF7N+7bMHI=
-X-Received: by 2002:a05:6830:2001:: with SMTP id
- e1mr20302350otp.97.1575905788255; 
- Mon, 09 Dec 2019 07:36:28 -0800 (PST)
+ (envelope-from <jsnow@redhat.com>) id 1ieLEH-0002HD-4x
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:45:45 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22770
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ieLEH-0002H8-1t
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:45:45 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575906344;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=JN3hVyw7CAGgnOdlI/7RxJMGP74bRlUrJXHLXizkEp0=;
+ b=GwvJdpoymnm9b5RP66gaGkCYt/4NYQhNdDMAWFesKBeN956Z+CNPRsGNe9c3jBvvkF8Fk8
+ 5qxlWBr+7vxRaLO7k3dIlL+rhfLrJxni05f+LXEWbt1HIenIafMS1b5e3MQwFjWlulBqkc
+ 7EbPq0Lr0v2Fd3i5FYhQqKHWSG2wQMk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-411-Kwlj2HOIM1a0DoIqKNyL9Q-1; Mon, 09 Dec 2019 10:45:41 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D84151856A99;
+ Mon,  9 Dec 2019 15:45:39 +0000 (UTC)
+Received: from [10.10.125.40] (ovpn-125-40.rdu2.redhat.com [10.10.125.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 158DB60476;
+ Mon,  9 Dec 2019 15:45:38 +0000 (UTC)
+Subject: Re: [PATCH v2] migration/dirty-bitmaps: change bitmap enumeration
+ method
+From: John Snow <jsnow@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190514201926.10407-1-jsnow@redhat.com>
+ <aab4e1c7-37eb-5b3e-26d2-fca33ba87662@virtuozzo.com>
+ <d164961f-4da7-3678-2f56-5486cee3d07d@redhat.com>
+ <748a473b-07c6-73b1-ab91-40886fb55cd5@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <8b983534-5552-f6e2-b44a-5712817d45f5@redhat.com>
+Date: Mon, 9 Dec 2019 10:45:37 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-References: <20191209152456.977399-1-daniel.thompson@linaro.org>
-In-Reply-To: <20191209152456.977399-1-daniel.thompson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Dec 2019 15:36:17 +0000
-Message-ID: <CAFEAcA-sgFKev2MiOjRAzuE0trNYQoNe6LOFLeghGm73N1h=SA@mail.gmail.com>
-Subject: Re: [PATCH] hw/arm/virt: Second uart for normal-world
-To: Daniel Thompson <daniel.thompson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <748a473b-07c6-73b1-ab91-40886fb55cd5@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Kwlj2HOIM1a0DoIqKNyL9Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,69 +168,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- "patches@linaro.org" <patches@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Dec 2019 at 15:25, Daniel Thompson <daniel.thompson@linaro.org> wrote:
->
-> The virt machine can have two UARTs but the second UART is only
-> registered when secure-mode support is enabled. Change the machine so
-> this UART is always registered bringing the behaviour of the virt
-> machine closer to x86 land, where VMs can be expected to support two
-> UARTs. This approach is also similar to how a TZPC would typically
-> make a UART inaccessible to normal world on physical hardware.
->
-> Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
-> ---
->
-> Notes:
->     It is difficult to add a UART without some kind of odd difference of
->     behaviour somewhere. As far as I could tell the choices are:
->
->     1. Move the secure UART from UART1 to UART2. This is a
->        not-backward-compatible difference of behaviour (will likely break
->        the command lines for existing users of the secure UART).
->
->     2. We tack the new UART on at the end, meaning UART1 will re-enumerates
->        as UART2 when secure mode is enabled/disabled. This is rather
->        surprising for users.
->
->     3. UART1 is registered and inaccessible when secure mode is not enabled
->        (e.g. user must provide a dummy -serial argument to skip the missing
->        UART)
->
->     4. Normal world can only use the second UART if there is no secure mode
->        support.
->
->     5. Don't support an extra UART ;-)
->
->     Of these I concluded that #4 was least worst! Ultimately it is should be
->     unsurprising for users because it is how most physical hardware works
->     (e.g. a trustzone controller is used to make an existing UART
->     inaccessible to normal world).
 
-This change looks simple but it will break booting of UEFI
-in the guest. Unfortunately UEFI enumerates UARTs in the guest
-in the opposite order to the Linux kernel, so whichever way
-round you put the extra UART something will get it wrong and
-stop producing output where the user expects.
 
-I think the conclusion I came to was that the only way to
-avoid breaking existing command lines would be to only
-create the second UART if the user explicitly asked for
-it somehow. (Possibly just looking at "if there really is
-a 2nd serial on the command line" with "if (serial_hd(1)"
-would suffice, or perhaps not.)
+On 12/9/19 10:26 AM, John Snow wrote:
+> (off list)
 
-You also need to do something to add the 2nd UART to the ACPI tables.
+lol, or not. No big deal. all the code goes upstream anyway (:
 
-(Very out of date and broken patchset from last time I looked at this:
-https://lists.gnu.org/archive/html/qemu-arm/2017-12/msg00063.html
-)
-
-thanks
--- PMM
 
