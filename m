@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A79AEC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 05:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A04C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 05:37:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5492120663
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 05:33:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DFB1B206D3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 05:37:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qH5F3FmH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5492120663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MkEq4KNB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFB1B206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieBgA-0001Ud-CS
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 00:33:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48681)
+	id 1ieBjS-0002lA-Tx
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 00:37:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49171)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1ieBfX-00013e-Jz
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 00:33:17 -0500
+ (envelope-from <alistair23@gmail.com>) id 1ieBii-0002Hz-JL
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 00:36:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1ieBfV-00012C-Lt
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 00:33:15 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:35814)
+ (envelope-from <alistair23@gmail.com>) id 1ieBig-0003Cr-Lk
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 00:36:32 -0500
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:34826)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1ieBfV-0000wK-8M
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 00:33:13 -0500
-Received: by mail-lj1-x241.google.com with SMTP id j6so14142346lja.2
- for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 21:33:12 -0800 (PST)
+ id 1ieBig-0003C7-B6
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 00:36:30 -0500
+Received: by mail-lj1-x243.google.com with SMTP id j6so14149267lja.2
+ for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 21:36:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=FoVDq3yMHJdAxtDHx1M5Hk0C1QR4+MJjweLUVJ2RqeQ=;
- b=qH5F3FmHjyptFVmn4Ig1ogFN0qG7zbtVeDO1BILTRjw337xLIWzGmT1wQwjNP83bLE
- ETQXjHdpJ7Sg3FwBPM1JVLRQhWqbQtfBIC1NLo98crMz6cJQ+f7v00CxU9To61KzRAk7
- T3iVUuXmUJJ8fWuABl7P3KIBacFI+OtPC0BbYAT2VEFg+bLveQUHz1Cf7yPfA2k78e3d
- rNMfUR2QnUeXB/aujKgLdKrOAjwdd9/rASEO8KgJLk3TMQzPyGdfpRoehtfhvauVVZiL
- M9WpWBzBzRbCfRhFlxmvAtkW0Y1VqE35jb8PcnUPfPSPvZJcLUj4CEG9MVf8XMKS9BtD
- Arxg==
+ :cc; bh=8IBlYrs29Mvc5Saxd19A6dz7/quzfiITn9s1C0f1IxM=;
+ b=MkEq4KNBGkXNhFdd/As4cgsc6KpFSD9uEbC94FoL9svxn1RwlPApkLdRQ/+iPtGXX8
+ KInFQR+JzuHE0/Whyjk3fSo5WQ4N7Owdqg8MT8c5YCqLOPYkYiqfmofBu8ijVSoQs2/9
+ 58O7eAbOgyss2nZaymxOTck6s00Hpv6fluoUgBDM/AL9kVI429qo06MFPhYbFOkdsEX7
+ 0QQEfldl8kK/CieTFAlubZQtvIX/UwKNSInIRJv/WWoMrjeh1z4qaUBOloTTwzJYtX43
+ iQCximW9UnoP5SmvQdfHXe6hF/hshten2SViHG8kY5Sn6gjPQfJ6+H8/ea1/h78ZTEQF
+ R4+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=FoVDq3yMHJdAxtDHx1M5Hk0C1QR4+MJjweLUVJ2RqeQ=;
- b=fuatQ3T0aN0l7bCKRh1MRz/YDXmrGEj17aPVaucn7kQ92j8//gS9Wna/QxNWn7VZdI
- j3W/jag6URmdsts6ClnhsRpLYflsK7kejuaW3TgRlgaoGRf8UXDQP3wjxn1HcEB6uhlH
- FJ88KSTkKdLgIlV8qpKquynAJEKAWCK27z9n4P4bCMWlz8uJRchVwQoezTQbbmJsGFNW
- yh+FLYEQcc/M2lLZgZG9sFYncjt+fmAl0NRePH7kPJGmKXHcKHM/I7FiONLnzoCDuQ5a
- qZ9nWjZ1GqEcLyU6NcWDeSFN/acPXwBJ+MVPzNRJU7YKZxoQHgx9TtihjADCekknZYB8
- aMXA==
-X-Gm-Message-State: APjAAAXt47VP0Gu+v/gklJIFaJr9Vs+wPCU2AqEK47pdGQZGjZzmteyt
- BifNNe1KkmohcMKP2UGibwKYHH+f5xtQad5svTU=
-X-Google-Smtp-Source: APXvYqyStls4IJ/P5ZfaXRo2/9b6w4TY7WYGJnUsapxq5WoFIBlxqjrShsacYBSPjdBGjSNj6XRjCauacIth7Gkm2io=
-X-Received: by 2002:a2e:8755:: with SMTP id q21mr15580007ljj.156.1575869590186; 
- Sun, 08 Dec 2019 21:33:10 -0800 (PST)
+ bh=8IBlYrs29Mvc5Saxd19A6dz7/quzfiITn9s1C0f1IxM=;
+ b=O7AE5nUtxYzvOLjhtNdNt3kW9n4pfr0nZFvAwoO8wTqIQ6Y8Dan+/959ebKwlfZxOh
+ 6cCZ4mxFZpKANq5QPx1IZRGlmicq4441rJIROqG5chwJaZ12T9MRG53OsNx6balDOffm
+ TUufG9OSH1ZVkNy8kBF155qOeYLDd6UW/lUjvY3NEqSDXEygmsXhRt9/GTZtzu3fOKiU
+ 7w7jcSiXMWUqy3IMD7HiIFXYr0YvaCb3xDT4xOCtYdZadAQX1TBJXt0L2jAxAzY/yZLF
+ OD8lKW2p6ndrTSn7hCcQTfgyNOoGm4g7lIUGljx71GpdRUxs5E/nFBhDSUYSpFh2iXEP
+ J9RA==
+X-Gm-Message-State: APjAAAX0tfbZ4aWLnhRyEqRCV7ORKt9qsG3y9JqpfrD31iGuAEvIJov5
+ HHMo4wNb0QpNZUi/bkQRdnZV9Rbg/Zv90njwyBA=
+X-Google-Smtp-Source: APXvYqwn/C7nBZ5VeaMwEJ83m9AqpCNWUwp6fpJ+RnGx86byqu+NvhCCrvHb6bdx1H5qRK9hA4j6tEm8USI433azwwA=
+X-Received: by 2002:a2e:9b55:: with SMTP id o21mr14069311ljj.147.1575869788927; 
+ Sun, 08 Dec 2019 21:36:28 -0800 (PST)
 MIME-Version: 1.0
 References: <157565782864.3897844.627720481210693346.stgit@bahia.lan>
- <157565783446.3897844.13799667957070272380.stgit@bahia.lan>
-In-Reply-To: <157565783446.3897844.13799667957070272380.stgit@bahia.lan>
+ <157565784603.3897844.16391025294328116481.stgit@bahia.lan>
+In-Reply-To: <157565784603.3897844.16391025294328116481.stgit@bahia.lan>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Sun, 8 Dec 2019 21:32:43 -0800
-Message-ID: <CAKmqyKNy9Jcsy2peir8uTc_MFVWEqzA7Kd-unPgPZkF3hkaEOQ@mail.gmail.com>
-Subject: Re: [for-5.0 PATCH 1/3] cpu: Introduce CPUReset callback typedef
+Date: Sun, 8 Dec 2019 21:36:01 -0800
+Message-ID: <CAKmqyKNHRHGk_zOPT4N3jmv-N2acbFrwF_auCpPSo6t6KOyq4w@mail.gmail.com>
+Subject: Re: [for-5.0 PATCH 3/3] cpu: Use cpu_class_set_parent_reset()
 To: Greg Kurz <groug@kaod.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::241
+X-Received-From: 2a00:1450:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,14 +100,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 6, 2019 at 10:50 AM Greg Kurz <groug@kaod.org> wrote:
+On Fri, Dec 6, 2019 at 10:45 AM Greg Kurz <groug@kaod.org> wrote:
 >
-> Use it in include/hw/core/cpu.h and convert all targets to use it as
-> well with:
+> Convert all targets to use cpu_class_set_parent_reset() with the following
+> coccinelle script:
 >
-> perl -pi \
->  -e 's/void\s+\(\*(parent_reset)\)\(CPUState\s+\*\w+\)/CPUReset \1/;' \
->  $(git ls-files 'target/*.h')
+> @@
+> type CPUParentClass;
+> CPUParentClass *pcc;
+> CPUClass *cc;
+> identifier parent_fn;
+> identifier child_fn;
+> @@
+> +cpu_class_set_parent_reset(cc, child_fn, &pcc->parent_fn);
+> -pcc->parent_fn = cc->reset;
+> ...
+> -cc->reset = child_fn;
 >
 > Signed-off-by: Greg Kurz <groug@kaod.org>
 
@@ -116,311 +124,283 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  include/hw/core/cpu.h       |    4 +++-
->  target/alpha/cpu-qom.h      |    2 +-
->  target/arm/cpu-qom.h        |    2 +-
->  target/cris/cpu-qom.h       |    2 +-
->  target/hppa/cpu-qom.h       |    2 +-
->  target/i386/cpu-qom.h       |    2 +-
->  target/lm32/cpu-qom.h       |    2 +-
->  target/m68k/cpu-qom.h       |    2 +-
->  target/microblaze/cpu-qom.h |    2 +-
->  target/mips/cpu-qom.h       |    2 +-
->  target/moxie/cpu.h          |    2 +-
->  target/nios2/cpu.h          |    2 +-
->  target/openrisc/cpu.h       |    2 +-
->  target/ppc/cpu-qom.h        |    2 +-
->  target/riscv/cpu.h          |    2 +-
->  target/s390x/cpu-qom.h      |    2 +-
->  target/sh4/cpu-qom.h        |    2 +-
->  target/sparc/cpu-qom.h      |    2 +-
->  target/tilegx/cpu.h         |    2 +-
->  target/tricore/cpu-qom.h    |    2 +-
->  target/xtensa/cpu-qom.h     |    2 +-
->  21 files changed, 23 insertions(+), 21 deletions(-)
+>  target/arm/cpu.c                |    3 +--
+>  target/cris/cpu.c               |    3 +--
+>  target/i386/cpu.c               |    3 +--
+>  target/lm32/cpu.c               |    3 +--
+>  target/m68k/cpu.c               |    3 +--
+>  target/microblaze/cpu.c         |    3 +--
+>  target/mips/cpu.c               |    3 +--
+>  target/moxie/cpu.c              |    3 +--
+>  target/nios2/cpu.c              |    3 +--
+>  target/openrisc/cpu.c           |    3 +--
+>  target/ppc/translate_init.inc.c |    3 +--
+>  target/riscv/cpu.c              |    3 +--
+>  target/s390x/cpu.c              |    3 +--
+>  target/sh4/cpu.c                |    3 +--
+>  target/sparc/cpu.c              |    3 +--
+>  target/tilegx/cpu.c             |    3 +--
+>  target/tricore/cpu.c            |    3 +--
+>  target/xtensa/cpu.c             |    3 +--
+>  18 files changed, 18 insertions(+), 36 deletions(-)
 >
-> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-> index 77c6f0529903..047e3972ecaf 100644
-> --- a/include/hw/core/cpu.h
-> +++ b/include/hw/core/cpu.h
-> @@ -74,6 +74,8 @@ typedef struct CPUWatchpoint CPUWatchpoint;
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 7a4ac9339bf9..712a9425fdf5 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -2625,8 +2625,7 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+>                                      &acc->parent_realize);
+>      dc->props = arm_cpu_properties;
 >
->  struct TranslationBlock;
+> -    acc->parent_reset = cc->reset;
+> -    cc->reset = arm_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, arm_cpu_reset, &acc->parent_reset);
 >
-> +typedef void (*CPUReset)(CPUState *cpu);
-> +
->  /**
->   * CPUClass:
->   * @class_by_name: Callback to map -cpu command line model name to an
-> @@ -165,7 +167,7 @@ typedef struct CPUClass {
->      ObjectClass *(*class_by_name)(const char *cpu_model);
->      void (*parse_features)(const char *typename, char *str, Error **errp);
+>      cc->class_by_name = arm_cpu_class_by_name;
+>      cc->has_work = arm_cpu_has_work;
+> diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+> index 7adfd6caf4ed..486675e3822f 100644
+> --- a/target/cris/cpu.c
+> +++ b/target/cris/cpu.c
+> @@ -256,8 +256,7 @@ static void cris_cpu_class_init(ObjectClass *oc, void *data)
+>      device_class_set_parent_realize(dc, cris_cpu_realizefn,
+>                                      &ccc->parent_realize);
 >
-> -    void (*reset)(CPUState *cpu);
-> +    CPUReset reset;
->      int reset_dump_flags;
->      bool (*has_work)(CPUState *cpu);
->      void (*do_interrupt)(CPUState *cpu);
-> diff --git a/target/alpha/cpu-qom.h b/target/alpha/cpu-qom.h
-> index 6f0a0adb9efa..0c974805481b 100644
-> --- a/target/alpha/cpu-qom.h
-> +++ b/target/alpha/cpu-qom.h
-> @@ -44,7 +44,7 @@ typedef struct AlphaCPUClass {
->      /*< public >*/
+> -    ccc->parent_reset = cc->reset;
+> -    cc->reset = cris_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, cris_cpu_reset, &ccc->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } AlphaCPUClass;
+>      cc->class_by_name = cris_cpu_class_by_name;
+>      cc->has_work = cris_cpu_has_work;
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 69f518a21a9b..57d36931725d 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -7049,8 +7049,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+>                                        &xcc->parent_unrealize);
+>      dc->props = x86_cpu_properties;
 >
->  typedef struct AlphaCPU AlphaCPU;
-> diff --git a/target/arm/cpu-qom.h b/target/arm/cpu-qom.h
-> index 7f5b244bde35..aeaa84afcc9a 100644
-> --- a/target/arm/cpu-qom.h
-> +++ b/target/arm/cpu-qom.h
-> @@ -51,7 +51,7 @@ typedef struct ARMCPUClass {
+> -    xcc->parent_reset = cc->reset;
+> -    cc->reset = x86_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, x86_cpu_reset, &xcc->parent_reset);
+>      cc->reset_dump_flags = CPU_DUMP_FPU | CPU_DUMP_CCOP;
 >
->      const ARMCPUInfo *info;
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } ARMCPUClass;
+>      cc->class_by_name = x86_cpu_class_by_name;
+> diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
+> index b35537de6285..687bf35e6588 100644
+> --- a/target/lm32/cpu.c
+> +++ b/target/lm32/cpu.c
+> @@ -218,8 +218,7 @@ static void lm32_cpu_class_init(ObjectClass *oc, void *data)
 >
->  typedef struct ARMCPU ARMCPU;
-> diff --git a/target/cris/cpu-qom.h b/target/cris/cpu-qom.h
-> index 308c1f95bdf6..079ffe6bda0a 100644
-> --- a/target/cris/cpu-qom.h
-> +++ b/target/cris/cpu-qom.h
-> @@ -45,7 +45,7 @@ typedef struct CRISCPUClass {
->      /*< public >*/
+>      device_class_set_parent_realize(dc, lm32_cpu_realizefn,
+>                                      &lcc->parent_realize);
+> -    lcc->parent_reset = cc->reset;
+> -    cc->reset = lm32_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, lm32_cpu_reset, &lcc->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
+>      cc->class_by_name = lm32_cpu_class_by_name;
+>      cc->has_work = lm32_cpu_has_work;
+> diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+> index e6596de29c2c..176d95e6fcfb 100644
+> --- a/target/m68k/cpu.c
+> +++ b/target/m68k/cpu.c
+> @@ -257,8 +257,7 @@ static void m68k_cpu_class_init(ObjectClass *c, void *data)
 >
->      uint32_t vr;
->  } CRISCPUClass;
-> diff --git a/target/hppa/cpu-qom.h b/target/hppa/cpu-qom.h
-> index 6367dc479391..5c129de148a8 100644
-> --- a/target/hppa/cpu-qom.h
-> +++ b/target/hppa/cpu-qom.h
-> @@ -44,7 +44,7 @@ typedef struct HPPACPUClass {
->      /*< public >*/
+>      device_class_set_parent_realize(dc, m68k_cpu_realizefn,
+>                                      &mcc->parent_realize);
+> -    mcc->parent_reset = cc->reset;
+> -    cc->reset = m68k_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, m68k_cpu_reset, &mcc->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } HPPACPUClass;
+>      cc->class_by_name = m68k_cpu_class_by_name;
+>      cc->has_work = m68k_cpu_has_work;
+> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> index 9cfd7445e7da..71d88f603b2e 100644
+> --- a/target/microblaze/cpu.c
+> +++ b/target/microblaze/cpu.c
+> @@ -292,8 +292,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
 >
->  typedef struct HPPACPU HPPACPU;
-> diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-> index 0efab2fc670f..1e962518e68e 100644
-> --- a/target/i386/cpu-qom.h
-> +++ b/target/i386/cpu-qom.h
-> @@ -71,7 +71,7 @@ typedef struct X86CPUClass {
+>      device_class_set_parent_realize(dc, mb_cpu_realizefn,
+>                                      &mcc->parent_realize);
+> -    mcc->parent_reset = cc->reset;
+> -    cc->reset = mb_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, mb_cpu_reset, &mcc->parent_reset);
 >
->      DeviceRealize parent_realize;
->      DeviceUnrealize parent_unrealize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } X86CPUClass;
+>      cc->class_by_name = mb_cpu_class_by_name;
+>      cc->has_work = mb_cpu_has_work;
+> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+> index bbcf7ca4635c..6cd6b9650baa 100644
+> --- a/target/mips/cpu.c
+> +++ b/target/mips/cpu.c
+> @@ -189,8 +189,7 @@ static void mips_cpu_class_init(ObjectClass *c, void *data)
 >
->  typedef struct X86CPU X86CPU;
-> diff --git a/target/lm32/cpu-qom.h b/target/lm32/cpu-qom.h
-> index dc9ac9ac9f7b..e105a315aa3e 100644
-> --- a/target/lm32/cpu-qom.h
-> +++ b/target/lm32/cpu-qom.h
-> @@ -44,7 +44,7 @@ typedef struct LM32CPUClass {
->      /*< public >*/
+>      device_class_set_parent_realize(dc, mips_cpu_realizefn,
+>                                      &mcc->parent_realize);
+> -    mcc->parent_reset = cc->reset;
+> -    cc->reset = mips_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, mips_cpu_reset, &mcc->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } LM32CPUClass;
+>      cc->class_by_name = mips_cpu_class_by_name;
+>      cc->has_work = mips_cpu_has_work;
+> diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+> index 48996d0554f2..cf47bc709b54 100644
+> --- a/target/moxie/cpu.c
+> +++ b/target/moxie/cpu.c
+> @@ -101,8 +101,7 @@ static void moxie_cpu_class_init(ObjectClass *oc, void *data)
 >
->  typedef struct LM32CPU LM32CPU;
-> diff --git a/target/m68k/cpu-qom.h b/target/m68k/cpu-qom.h
-> index b56da8a21374..0a196775e5d1 100644
-> --- a/target/m68k/cpu-qom.h
-> +++ b/target/m68k/cpu-qom.h
-> @@ -44,7 +44,7 @@ typedef struct M68kCPUClass {
->      /*< public >*/
+>      device_class_set_parent_realize(dc, moxie_cpu_realizefn,
+>                                      &mcc->parent_realize);
+> -    mcc->parent_reset = cc->reset;
+> -    cc->reset = moxie_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, moxie_cpu_reset, &mcc->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } M68kCPUClass;
+>      cc->class_by_name = moxie_cpu_class_by_name;
 >
->  typedef struct M68kCPU M68kCPU;
-> diff --git a/target/microblaze/cpu-qom.h b/target/microblaze/cpu-qom.h
-> index 49b07cc697b9..7a4ff4a11e33 100644
-> --- a/target/microblaze/cpu-qom.h
-> +++ b/target/microblaze/cpu-qom.h
-> @@ -44,7 +44,7 @@ typedef struct MicroBlazeCPUClass {
->      /*< public >*/
+> diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
+> index ca9c7a6df5d1..bbdbc0c6fbf0 100644
+> --- a/target/nios2/cpu.c
+> +++ b/target/nios2/cpu.c
+> @@ -188,8 +188,7 @@ static void nios2_cpu_class_init(ObjectClass *oc, void *data)
+>      device_class_set_parent_realize(dc, nios2_cpu_realizefn,
+>                                      &ncc->parent_realize);
+>      dc->props = nios2_properties;
+> -    ncc->parent_reset = cc->reset;
+> -    cc->reset = nios2_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, nios2_cpu_reset, &ncc->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } MicroBlazeCPUClass;
+>      cc->class_by_name = nios2_cpu_class_by_name;
+>      cc->has_work = nios2_cpu_has_work;
+> diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+> index 506aec6bfba5..5cd04dafab69 100644
+> --- a/target/openrisc/cpu.c
+> +++ b/target/openrisc/cpu.c
+> @@ -150,8 +150,7 @@ static void openrisc_cpu_class_init(ObjectClass *oc, void *data)
 >
->  typedef struct MicroBlazeCPU MicroBlazeCPU;
-> diff --git a/target/mips/cpu-qom.h b/target/mips/cpu-qom.h
-> index a430c0fe4bbf..818401a501cb 100644
-> --- a/target/mips/cpu-qom.h
-> +++ b/target/mips/cpu-qom.h
-> @@ -48,7 +48,7 @@ typedef struct MIPSCPUClass {
->      /*< public >*/
+>      device_class_set_parent_realize(dc, openrisc_cpu_realizefn,
+>                                      &occ->parent_realize);
+> -    occ->parent_reset = cc->reset;
+> -    cc->reset = openrisc_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, openrisc_cpu_reset, &occ->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->      const struct mips_def_t *cpu_def;
->  } MIPSCPUClass;
+>      cc->class_by_name = openrisc_cpu_class_by_name;
+>      cc->has_work = openrisc_cpu_has_work;
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
+> index ba726dec4d00..e5773a99fffd 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10614,8 +10614,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
+>      pcc->interrupts_big_endian = ppc_cpu_interrupts_big_endian_always;
+>      dc->props = ppc_cpu_properties;
 >
-> diff --git a/target/moxie/cpu.h b/target/moxie/cpu.h
-> index 01dca548e5d5..20dafc80f6ac 100644
-> --- a/target/moxie/cpu.h
-> +++ b/target/moxie/cpu.h
-> @@ -69,7 +69,7 @@ typedef struct MoxieCPUClass {
->      /*< public >*/
+> -    pcc->parent_reset = cc->reset;
+> -    cc->reset = ppc_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, ppc_cpu_reset, &pcc->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } MoxieCPUClass;
+>      cc->class_by_name = ppc_cpu_class_by_name;
+>      pcc->parent_parse_features = cc->parse_features;
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index d37861a4305b..d6f187272859 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -462,8 +462,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
+>      device_class_set_parent_realize(dc, riscv_cpu_realize,
+>                                      &mcc->parent_realize);
 >
->  /**
-> diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
-> index 361b06ffeb61..59a07a5d0ee0 100644
-> --- a/target/nios2/cpu.h
-> +++ b/target/nios2/cpu.h
-> @@ -50,7 +50,7 @@ typedef struct Nios2CPUClass {
->      /*< public >*/
+> -    mcc->parent_reset = cc->reset;
+> -    cc->reset = riscv_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, riscv_cpu_reset, &mcc->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } Nios2CPUClass;
+>      cc->class_by_name = riscv_cpu_class_by_name;
+>      cc->has_work = riscv_cpu_has_work;
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index 3abe7e80fd0a..cf7cf5655fbc 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -469,13 +469,12 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+>      dc->props = s390x_cpu_properties;
+>      dc->user_creatable = true;
 >
->  #define TARGET_HAS_ICE 1
-> diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
-> index 0ad02eab7946..d77976ccce7f 100644
-> --- a/target/openrisc/cpu.h
-> +++ b/target/openrisc/cpu.h
-> @@ -48,7 +48,7 @@ typedef struct OpenRISCCPUClass {
->      /*< public >*/
+> -    scc->parent_reset = cc->reset;
+> +    cpu_class_set_parent_reset(cc, s390_cpu_full_reset, &scc->parent_reset);
+>  #if !defined(CONFIG_USER_ONLY)
+>      scc->load_normal = s390_cpu_load_normal;
+>  #endif
+>      scc->cpu_reset = s390_cpu_reset;
+>      scc->initial_cpu_reset = s390_cpu_initial_reset;
+> -    cc->reset = s390_cpu_full_reset;
+>      cc->class_by_name = s390_cpu_class_by_name,
+>      cc->has_work = s390_cpu_has_work;
+>  #ifdef CONFIG_TCG
+> diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+> index d0a7707991fe..70c8d8170ff3 100644
+> --- a/target/sh4/cpu.c
+> +++ b/target/sh4/cpu.c
+> @@ -214,8 +214,7 @@ static void superh_cpu_class_init(ObjectClass *oc, void *data)
+>      device_class_set_parent_realize(dc, superh_cpu_realizefn,
+>                                      &scc->parent_realize);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } OpenRISCCPUClass;
+> -    scc->parent_reset = cc->reset;
+> -    cc->reset = superh_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, superh_cpu_reset, &scc->parent_reset);
 >
->  #define TARGET_INSN_START_EXTRA_WORDS 1
-> diff --git a/target/ppc/cpu-qom.h b/target/ppc/cpu-qom.h
-> index e499575dc873..9a20e5a1bfea 100644
-> --- a/target/ppc/cpu-qom.h
-> +++ b/target/ppc/cpu-qom.h
-> @@ -166,7 +166,7 @@ typedef struct PowerPCCPUClass {
+>      cc->class_by_name = superh_cpu_class_by_name;
+>      cc->has_work = superh_cpu_has_work;
+> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+> index bc659295520f..9c306e52717e 100644
+> --- a/target/sparc/cpu.c
+> +++ b/target/sparc/cpu.c
+> @@ -859,8 +859,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
+>                                      &scc->parent_realize);
+>      dc->props = sparc_cpu_properties;
 >
->      DeviceRealize parent_realize;
->      DeviceUnrealize parent_unrealize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->      void (*parent_parse_features)(const char *type, char *str, Error **errp);
+> -    scc->parent_reset = cc->reset;
+> -    cc->reset = sparc_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, sparc_cpu_reset, &scc->parent_reset);
 >
->      uint32_t pvr;
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index e59343e13c02..2246f95b3f33 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -185,7 +185,7 @@ typedef struct RISCVCPUClass {
->      CPUClass parent_class;
->      /*< public >*/
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } RISCVCPUClass;
+>      cc->class_by_name = sparc_cpu_class_by_name;
+>      cc->parse_features = sparc_cpu_parse_features;
+> diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
+> index 2b2a7ccc313f..cd422a0467a0 100644
+> --- a/target/tilegx/cpu.c
+> +++ b/target/tilegx/cpu.c
+> @@ -142,8 +142,7 @@ static void tilegx_cpu_class_init(ObjectClass *oc, void *data)
+>      device_class_set_parent_realize(dc, tilegx_cpu_realizefn,
+>                                      &tcc->parent_realize);
 >
->  /**
-> diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-> index b809ec8418e0..cc23edc92198 100644
-> --- a/target/s390x/cpu-qom.h
-> +++ b/target/s390x/cpu-qom.h
-> @@ -55,7 +55,7 @@ typedef struct S390CPUClass {
->      const char *desc;
+> -    tcc->parent_reset = cc->reset;
+> -    cc->reset = tilegx_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, tilegx_cpu_reset, &tcc->parent_reset);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->      void (*load_normal)(CPUState *cpu);
->      void (*cpu_reset)(CPUState *cpu);
->      void (*initial_cpu_reset)(CPUState *cpu);
-> diff --git a/target/sh4/cpu-qom.h b/target/sh4/cpu-qom.h
-> index 0c56d055bada..35732a367427 100644
-> --- a/target/sh4/cpu-qom.h
-> +++ b/target/sh4/cpu-qom.h
-> @@ -51,7 +51,7 @@ typedef struct SuperHCPUClass {
->      /*< public >*/
+>      cc->class_by_name = tilegx_cpu_class_by_name;
+>      cc->has_work = tilegx_cpu_has_work;
+> diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+> index df807c1d7437..85bc9f03a1ee 100644
+> --- a/target/tricore/cpu.c
+> +++ b/target/tricore/cpu.c
+> @@ -153,8 +153,7 @@ static void tricore_cpu_class_init(ObjectClass *c, void *data)
+>      device_class_set_parent_realize(dc, tricore_cpu_realizefn,
+>                                      &mcc->parent_realize);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
+> -    mcc->parent_reset = cc->reset;
+> -    cc->reset = tricore_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, tricore_cpu_reset, &mcc->parent_reset);
+>      cc->class_by_name = tricore_cpu_class_by_name;
+>      cc->has_work = tricore_cpu_has_work;
 >
->      uint32_t pvr;
->      uint32_t prr;
-> diff --git a/target/sparc/cpu-qom.h b/target/sparc/cpu-qom.h
-> index 7442e2768e88..93165bd24f1c 100644
-> --- a/target/sparc/cpu-qom.h
-> +++ b/target/sparc/cpu-qom.h
-> @@ -49,7 +49,7 @@ typedef struct SPARCCPUClass {
->      /*< public >*/
+> diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+> index c65dcf9dd782..4856aee8eca6 100644
+> --- a/target/xtensa/cpu.c
+> +++ b/target/xtensa/cpu.c
+> @@ -184,8 +184,7 @@ static void xtensa_cpu_class_init(ObjectClass *oc, void *data)
+>      device_class_set_parent_realize(dc, xtensa_cpu_realizefn,
+>                                      &xcc->parent_realize);
 >
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->      sparc_def_t *cpu_def;
->  } SPARCCPUClass;
+> -    xcc->parent_reset = cc->reset;
+> -    cc->reset = xtensa_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, xtensa_cpu_reset, &xcc->parent_reset);
 >
-> diff --git a/target/tilegx/cpu.h b/target/tilegx/cpu.h
-> index 9cbec247d238..68bd509898d4 100644
-> --- a/target/tilegx/cpu.h
-> +++ b/target/tilegx/cpu.h
-> @@ -118,7 +118,7 @@ typedef struct TileGXCPUClass {
->      /*< public >*/
->
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } TileGXCPUClass;
->
->  /**
-> diff --git a/target/tricore/cpu-qom.h b/target/tricore/cpu-qom.h
-> index 7c1e130b4ede..f613452b00e0 100644
-> --- a/target/tricore/cpu-qom.h
-> +++ b/target/tricore/cpu-qom.h
-> @@ -36,7 +36,7 @@ typedef struct TriCoreCPUClass {
->      /*< public >*/
->
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->  } TriCoreCPUClass;
->
->  typedef struct TriCoreCPU TriCoreCPU;
-> diff --git a/target/xtensa/cpu-qom.h b/target/xtensa/cpu-qom.h
-> index 9ac54241bd69..685d7b8d823a 100644
-> --- a/target/xtensa/cpu-qom.h
-> +++ b/target/xtensa/cpu-qom.h
-> @@ -56,7 +56,7 @@ typedef struct XtensaCPUClass {
->      /*< public >*/
->
->      DeviceRealize parent_realize;
-> -    void (*parent_reset)(CPUState *cpu);
-> +    CPUReset parent_reset;
->
->      const XtensaConfig *config;
->  } XtensaCPUClass;
+>      cc->class_by_name = xtensa_cpu_class_by_name;
+>      cc->has_work = xtensa_cpu_has_work;
 >
 >
 
