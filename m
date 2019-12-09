@@ -1,88 +1,96 @@
-Return-Path: <SRS0=QAbx=Z6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21172C43603
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 22:39:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4369AC43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 00:27:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEF0420637
-	for <qemu-devel@archiver.kernel.org>; Sun,  8 Dec 2019 22:38:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F22C920637
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 00:27:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oJoEzkbG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEF0420637
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BSJaBm2e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F22C920637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ie5Cd-0005tO-2W
-	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 17:38:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36456)
+	id 1ie6tO-0007af-6m
+	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 19:27:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groeck7@gmail.com>) id 1ie5Bz-0005Qo-0e
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 17:38:20 -0500
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1ie6rl-0006cq-S5
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 19:25:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groeck7@gmail.com>) id 1ie5Bx-0003MG-U3
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 17:38:18 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:35222)
+ (envelope-from <prashantbhole.linux@gmail.com>) id 1ie6rk-0006qp-SL
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 19:25:33 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37434)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1ie5Bx-0003Ei-Km
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 17:38:17 -0500
-Received: by mail-pl1-x641.google.com with SMTP id s10so4967148plp.2
- for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 14:38:17 -0800 (PST)
+ (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
+ id 1ie6rk-0006on-MD
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 19:25:32 -0500
+Received: by mail-pg1-x544.google.com with SMTP id q127so6211642pga.4
+ for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 16:25:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=MnvBbRT5iVZH0+Nzu+hGknTgiT+FwnkKwwLBbL9Zn4g=;
- b=oJoEzkbGwyMIJYmVqOV2vuz/nVqn5wdKUiDyDWQnIBOMICxwbI9aDzJfCuB9Y5iz7A
- cYjrttcvemVXPD6YhJnYemHbQ/Naq7G9isQY0oR6+07H8S2b4eBvagZc9RclbtVo5Oxt
- EEtgMLcfs3J/3c7VT8SDTP1NT7EG5oWzUt6oghdywy2GuZgCnU0DBs9lHL3YueZxCnll
- opyw7vdw3nGJ0w3W/tQsa3eFJx47fu5QCfnzoGRI1NK5i0R/BNV9XbBvqda9vMcGJmJV
- RUEUm6WbjWXlqrwxY6MUbY7tVH+4k0/AzXb47fspet8I73nnbz2lmJO3yvHxVkHo66SO
- GwXg==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=54pMROPZSZfXX7jRTCLEYndLEfmz7nGR8IgouL3KZTc=;
+ b=BSJaBm2ePbXg4/8QJEoez2M+93ZFU9CFwMm/wY/y3fH5J2FICxXg8f4R5L+w9xefYo
+ PTGQ5sPuVVu1AV7xJKYeCg6mPH6PVz6KvEF8AbZ9eS+0NQxwvSeZoSJ0gsdnjh5e3mZd
+ 4OV2ibZ7dlTjDdmWZs9VKt9th1QoncUz5eCiV15AFzTuuUzDIycxQz83ZjnnSyOHTLvG
+ gNhSKdu3VCuezUFhphqXSBBClXUtu5jz8Eox0dKJp7rCb00Jjm9tpLfrC1ESWJfUKiB3
+ fcljUfI7jtssvTxptrRqIjOtU4i3FJLBvy518UbNZPY3iY5ZWRC+AEUvH9qqTosHGlXb
+ ywvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=MnvBbRT5iVZH0+Nzu+hGknTgiT+FwnkKwwLBbL9Zn4g=;
- b=GhGQpJ2CGYtZnVUBxLijBGwNs3MEBWFoWLfOcsb826STqojVHz4TV6ZVtS1C2rWKzQ
- 3yrFBM3vOVA1ihJUusF63CSW6SApx1dPwz7BnqHup3BUA56mntin4ETTc8d7I3+Rkpd4
- /WALx+oADiC6x5s40aJ3YGZR/9OZSx2nQRMJqqVDxKA49Ay/RFl2qkWSxhLfCYM86j4t
- Ss6Ynhdjr3S+DsYbh8kfK/qmjwKUYfoduw1Cy4DiQqpAY8zjoc0cF66LXu5OBbW5i/yW
- 9HjT/Fp3PjZCe8TsNlCK5+0p8aLagRhYazpUT6jPWohx5PcsxEzGfB0ELGrOMV6oVI/B
- UKmA==
-X-Gm-Message-State: APjAAAVhFa9zwz7ZeHscy8TsO4YVFngp2ajIsU+zYygtbRlghxtfVqKY
- 108FJ72cESbfeql7dNavgbA=
-X-Google-Smtp-Source: APXvYqyTH+955DDw+6USZnKhGT30ibfdBdfKpDWuHsUCEHkmZ+v1u36m47xK1OHv9GIbrg7P55OpWA==
-X-Received: by 2002:a17:902:c58e:: with SMTP id
- p14mr26026826plx.202.1575844696307; 
- Sun, 08 Dec 2019 14:38:16 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id u2sm22210820pgc.19.2019.12.08.14.38.14
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Sun, 08 Dec 2019 14:38:15 -0800 (PST)
-Date: Sun, 8 Dec 2019 14:38:14 -0800
-From: Guenter Roeck <linux@roeck-us.net>
-To: Michael Tretter <m.tretter@pengutronix.de>
-Subject: Re: [PATCH 1/5] arm64: zynqmp: Add firmware DT node
-Message-ID: <20191208223814.GA21260@roeck-us.net>
-References: <20191018160735.15658-1-m.tretter@pengutronix.de>
- <20191018160735.15658-2-m.tretter@pengutronix.de>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=54pMROPZSZfXX7jRTCLEYndLEfmz7nGR8IgouL3KZTc=;
+ b=VeL89uLcqM0Hclm+wUM/bqLKjt8MCzILiwteuB9ZxMDJDAiY5xri9GU+qVQ7nnQLeq
+ 4aOy2njebQxAwg1q7wpTVMzbnkPdrHqXiDvYB8HuQWUqsteMpuclUvwAhsdkq2JmdvNX
+ nOtTBL6CJ/0H6kgz3Gj+ntiBUUvd/M9KFm3sZlMdy0KhsqwlMuQM/9VT0TLN951PyyTB
+ hQD0uYU3zPRqbC4/FoWLcXnXg+m6J+30fF3COeQ+bXcxeeFYYQplZbwDXFGG+ke7CI6v
+ zOgMosxrEOdfdSN/rbBFeQA7888eiecOVjGanBDkkhRQo9Z2PNrpysd5AXf4rXX8rQqN
+ UQtQ==
+X-Gm-Message-State: APjAAAVJ/qCkSR/XkMSL6Pch8G1wTLNXdeRLr51I/+WVrVSPlIAr9YN5
+ elf2wXfCYnlX9RV2bk/kM94=
+X-Google-Smtp-Source: APXvYqyLOx/NbgYchmoB1mb0Ueb/tUuLtaKFry8cwej7RBw1g78+6E329FnE4TSyZJDGD6IMKOF7vQ==
+X-Received: by 2002:a62:6381:: with SMTP id x123mr26519913pfb.75.1575851131060; 
+ Sun, 08 Dec 2019 16:25:31 -0800 (PST)
+Received: from [172.20.20.156] ([222.151.198.97])
+ by smtp.gmail.com with ESMTPSA id o3sm9802750pju.13.2019.12.08.16.25.26
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sun, 08 Dec 2019 16:25:30 -0800 (PST)
+Subject: Re: [RFC net-next 07/18] tun: set offloaded xdp program
+To: Jason Wang <jasowang@redhat.com>, David Ahern <dsahern@gmail.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Jakub Kicinski <jakub.kicinski@netronome.com>
+References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
+ <20191126100744.5083-8-prashantbhole.linux@gmail.com>
+ <3ff23a11-c979-32ed-b55d-9213c2c64bc4@gmail.com>
+ <8d575940-ba31-8780-ae4d-6edbe1b2b15a@redhat.com>
+From: Prashant Bhole <prashantbhole.linux@gmail.com>
+Message-ID: <ba0c0d5f-fbb4-ff92-c7d8-403dbb757758@gmail.com>
+Date: Mon, 9 Dec 2019 09:24:34 +0900
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191018160735.15658-2-m.tretter@pengutronix.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <8d575940-ba31-8780-ae4d-6edbe1b2b15a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,62 +102,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mark.rutland@arm.com, devicetree@vger.kernel.org,
- Rajan Vaja <rajan.vaja@xilinx.com>, michal.simek@xilinx.com,
- qemu-devel@nongnu.org, Rajan Vaja <rajanv@xilinx.com>, robh+dt@kernel.org,
- linux-arm-kernel@lists.infradead.org
+Cc: Song Liu <songliubraving@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+ John Fastabend <john.fastabend@gmail.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, Yonghong Song <yhs@fb.com>,
+ Andrii Nakryiko <andriin@fb.com>, Martin KaFai Lau <kafai@fb.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 18, 2019 at 06:07:31PM +0200, Michael Tretter wrote:
-> From: Rajan Vaja <rajan.vaja@xilinx.com>
+
+
+On 12/2/19 11:47 AM, Jason Wang wrote:
 > 
-> Add firmware DT node in ZynqMP device tree. This node
-> uses bindings as per new firmware interface driver.
+> On 2019/12/2 上午12:45, David Ahern wrote:
+>> On 11/26/19 4:07 AM, Prashant Bhole wrote:
+>>> From: Jason Wang <jasowang@redhat.com>
+>>>
+>>> This patch introduces an ioctl way to set an offloaded XDP program
+>>> to tun driver. This ioctl will be used by qemu to offload XDP program
+>>> from virtio_net in the guest.
+>>>
+>> Seems like you need to set / reset the SOCK_XDP flag on tfile->sk since
+>> this is an XDP program.
+>>
+>> Also, why not add this program using netlink instead of ioctl? e.g., as
+>> part of a generic XDP in the egress path like I am looking into for the
+>> host side.
 > 
-> Signed-off-by: Rajan Vaja <rajanv@xilinx.com>
-> Signed-off-by: Michal Simek <michal.simek@xilinx.com>
-> Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
+> 
+> Maybe both, otherwise, qemu may need netlink as a dependency.
+> 
+> Thanks
+> 
 
-With this patch applied in the mainline kernel, the qemu xlnx-zcu102
-emulation crashes (see below). Any idea what it might take to get
-qemu back to working ?
+Thank you all for reviewing. We will continue to improve this set.
 
-Thanks,
-Guenter
+If we split this work, Tx path XDP is one of the necessary part
+which can be developed first. As suggested by David Ahern it will be
+a netlink way but we will still need ioctl way for tap. I will try
+to come up with Tx path XDP set next time.
 
----
-[   30.719268] ------------[ cut here ]------------
-[   30.719403] kernel BUG at arch/arm64/kernel/traps.c:406!
-[   30.719971] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
-[   30.720358] Modules linked in:
-[   30.720741] CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.4.0-13331-g9455d25f4e3b #1
-[   30.720852] Hardware name: ZynqMP ZCU102 Rev1.0 (DT)
-[   30.721157] pstate: 00000005 (nzcv daif -PAN -UAO)
-[   30.721261] pc : do_undefinstr+0x2f4/0x318
-[   30.721336] lr : do_undefinstr+0x1fc/0x318
-[   30.721410] sp : ffff80001003b930
-[   30.721486] x29: ffff80001003b930 x28: ffff00007d178040
-[   30.721597] x27: 0000000000000000 x26: ffff8000117d0514
-[   30.721683] x25: ffff8000118c90d0 x24: 0000000000000000
-[   30.721769] x23: 0000000040000005 x22: 00000000d4000003
-[   30.721854] x21: ffff800011e1c850 x20: ffff80001003b990
-[   30.721940] x19: ffff800011e0fa08 x18: 0000000000000001
-[   30.722025] x17: ffff800010c0f1d8 x16: ffff800010c11fb8
-[   30.722111] x15: ffffffffffffffff x14: ffffffffffffffff
-[   30.722196] x13: 0000000000000018 x12: 0101010101010101
-[   30.722281] x11: 0000000000000000 x10: 00000000628e21fa
-[   30.722384] x9 : ffff00007d178858 x8 : ffff00007d178880
-[   30.722471] x7 : ffff80001003b8b0 x6 : 0000000000000001
-[   30.722560] x5 : 0000000000000001 x4 : 0000000000000001
-[   30.722646] x3 : 0000000000000000 x2 : 00000000000174b1
-[   30.722730] x1 : ffff00007d178040 x0 : 0000000040000005
-[   30.722913] Call trace:
-[   30.722993]  do_undefinstr+0x2f4/0x318
-[   30.723070]  el1_sync_handler+0xb0/0x108
-[   30.723138]  el1_sync+0x7c/0x100
-[   30.723201]  __arm_smccc_smc+0x0/0x2c
-[   30.723272]  zynqmp_pm_get_api_version.part.1+0x40/0x68
-[   30.723352]  zynqmp_firmware_probe+0xbc/0x298
+Thanks.
 
