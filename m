@@ -2,107 +2,82 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F27C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B786DC04E30
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:20:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BE3D2077B
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:20:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 854742077B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:20:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iPOsSBvj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE3D2077B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UL9W1/hB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 854742077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieKpO-0005bB-FY
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:20:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52190)
+	id 1ieKpR-0005eN-Jy
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:20:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ieKlN-0002Ly-Rm
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:15:54 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ieKY5-0003di-4Y
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:02:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ieKlM-00088d-PX
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:15:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55644
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ieKlM-00088R-Ks
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:15:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575904552;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=lM3vbnTw/RZ0LpQNSnN4/xGO7PbENAg1XD3JVe3vFGQ=;
- b=iPOsSBvjkPF70aKqWtPWT6FwtBgDydcPKnlR/UrqI3/J1lrSXGuD/JYuFiZCVd98Ib2pj2
- FBE8/hWhtA63bBUaOq7tdJA66jQcJqyjhgJsYmy/JiA+v5NZy0qQNaWudktJw0SR8EWoI1
- m+1f9BBpp8qUpDnjk66Vbhqo1QbzJ7I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-un1AhD1GN--VxcMF_7wjrA-1; Mon, 09 Dec 2019 10:15:48 -0500
-X-MC-Unique: un1AhD1GN--VxcMF_7wjrA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A98C4107ACC4;
- Mon,  9 Dec 2019 15:15:47 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2CDBD5D9D6;
- Mon,  9 Dec 2019 15:15:45 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v2 19/23] iotests: Resolve TODOs in 041
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191111160216.197086-1-mreitz@redhat.com>
- <20191111160216.197086-20-mreitz@redhat.com>
- <2416e1d8-c1c3-4c88-6e7b-52670eb23c0e@virtuozzo.com>
- <3be97c8b-fbee-a183-0cd8-dc2e5824efbc@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <e21bfadf-670f-9c17-71b8-c14a1ed3727c@redhat.com>
-Date: Mon, 9 Dec 2019 16:15:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <3be97c8b-fbee-a183-0cd8-dc2e5824efbc@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9FGwwd22GCPnwstyvaOqcarZw2eh3E71G"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ieKY3-0001aC-Ee
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:02:09 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43663)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1ieKY3-0001Z7-6m
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:02:07 -0500
+Received: by mail-wr1-x442.google.com with SMTP id d16so16529010wre.10
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 07:02:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=2obtCf3Vea6+0Qq3n8fYhTNc8P7aN6TGdrLYdh2+Zcc=;
+ b=UL9W1/hBlvr0O21n2ShBLrfqzvB/KcZiCn/d2ClZ6PyMXUDPID76gtGixDzuG6KmWu
+ 9vozsF6dMiCoHTVl+Ymb0f33kUoYtDNGT1LQcbSgKovvpviJP/zjscqCQLGFZYvFV4j/
+ hGRj25ZTHBAyDOYQ2TZL+tiG+efA4XeQCHeV8kngEDGkq3jtKvtqT4/Yjrn9VvQ1W49D
+ +ESlTse551KUMQzHstHb1V1bqOloelpaMnTbBUt++cnTfTiLlJ7L4Q02G9yX8N9WsqU0
+ h2nyqsr9IQ6MjQMXlrAuudlWeTio6PCTsg4sHRzVwXD3tGodcvntZIfqMCDJRXBievvJ
+ VJOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=2obtCf3Vea6+0Qq3n8fYhTNc8P7aN6TGdrLYdh2+Zcc=;
+ b=ZX5LGV07EPRx6XECq62BF+rU0OEONKCaF4/360euX/S7zW2zvglq7Ez5UWZU0iFhu+
+ DAIBc9tEw2TN4eRj160LY03tBEpeO693CEHYRTd/HhQ2l3bhmFPaj0n915exE9EktYo+
+ 1a24jSEiUC+4gIX1PgraPPCUKIxpQSMgq21KYQp0QlIlLlnv03XNJEkQhMGj6s3QU+JM
+ pTjuhniPdawKNEd5tIPQFxo5HmiclIp6h9Xp6vEPy8372qrlaAZOPRS4kcx0nw3RdYgk
+ vnu4gyPPbU8Ri1hdwMBk0zTkcn7LwChpJoUHCO9S9m/uumefgk01UN5AHnsD/68NjZZG
+ V2uA==
+X-Gm-Message-State: APjAAAVWfcYI75LrwX5/BHONL5VkWW6xsaDu/pva+v6Dr+KjtnnQNM8F
+ l8uiMM+UuwC/2O/gL4Ra+Nx1GqK8
+X-Google-Smtp-Source: APXvYqwEX7FD0SY2L3zjoQMM7924kawAnuVbvALn1044sRnzwC/Yt66txa/IQsvIprx2x1IgDg4OIw==
+X-Received: by 2002:adf:e40f:: with SMTP id g15mr2761553wrm.223.1575903725987; 
+ Mon, 09 Dec 2019 07:02:05 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id g9sm27219371wro.67.2019.12.09.07.02.05
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 09 Dec 2019 07:02:05 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 17/18] kvm: introduce kvm_kernel_irqchip_* functions
+Date: Mon,  9 Dec 2019 16:01:44 +0100
+Message-Id: <1575903705-12925-18-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
+References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,58 +89,247 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: thuth@redhat.com, elmarco@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9FGwwd22GCPnwstyvaOqcarZw2eh3E71G
-Content-Type: multipart/mixed; boundary="sFlrZw2gE0RFjQtRfBX9TEKyrWv3jNJaU"
+The KVMState struct is opaque, so provide accessors for the fields
+that will be moved from current_machine to the accelerator.  For now
+they just forward to the machine object, but this will change.
 
---sFlrZw2gE0RFjQtRfBX9TEKyrWv3jNJaU
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ accel/kvm/kvm-all.c  | 23 +++++++++++++++++++----
+ hw/ppc/e500.c        |  4 ++--
+ hw/ppc/spapr_irq.c   | 10 +++++-----
+ include/sysemu/kvm.h |  7 +++++--
+ target/arm/kvm.c     |  8 ++++----
+ target/i386/kvm.c    |  4 ++--
+ target/mips/kvm.c    |  2 +-
+ target/ppc/kvm.c     |  2 +-
+ target/s390x/kvm.c   |  2 +-
+ 9 files changed, 40 insertions(+), 22 deletions(-)
 
-On 03.12.19 14:33, Vladimir Sementsov-Ogievskiy wrote:
-> 03.12.2019 16:32, Vladimir Sementsov-Ogievskiy wrote:
->> 11.11.2019 19:02, Max Reitz wrote:
->>> Signed-off-by: Max Reitz<mreitz@redhat.com>
->>
->>
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->=20
->=20
-> Oops, stop. Why do you remove line "self.vm.shutdown()" ?
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index f0b9294..c0a6351 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -1760,7 +1760,7 @@ void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi)
+     g_hash_table_insert(s->gsimap, irq, GINT_TO_POINTER(gsi));
+ }
+ 
+-static void kvm_irqchip_create(MachineState *machine, KVMState *s)
++static void kvm_irqchip_create(KVMState *s)
+ {
+     int ret;
+ 
+@@ -1778,9 +1778,9 @@ static void kvm_irqchip_create(MachineState *machine, KVMState *s)
+ 
+     /* First probe and see if there's a arch-specific hook to create the
+      * in-kernel irqchip for us */
+-    ret = kvm_arch_irqchip_create(machine, s);
++    ret = kvm_arch_irqchip_create(s);
+     if (ret == 0) {
+-        if (machine_kernel_irqchip_split(machine)) {
++        if (kvm_kernel_irqchip_split()) {
+             perror("Split IRQ chip mode not supported.");
+             exit(1);
+         } else {
+@@ -2052,7 +2052,7 @@ static int kvm_init(MachineState *ms)
+     }
+ 
+     if (machine_kernel_irqchip_allowed(ms)) {
+-        kvm_irqchip_create(ms, s);
++        kvm_irqchip_create(s);
+     }
+ 
+     if (kvm_eventfds_allowed) {
+@@ -2969,6 +2969,21 @@ static void kvm_set_kvm_shadow_mem(Object *obj, Visitor *v,
+     s->kvm_shadow_mem = value;
+ }
+ 
++bool kvm_kernel_irqchip_allowed(void)
++{
++    return machine_kernel_irqchip_allowed(current_machine);
++}
++
++bool kvm_kernel_irqchip_required(void)
++{
++    return machine_kernel_irqchip_required(current_machine);
++}
++
++bool kvm_kernel_irqchip_split(void)
++{
++    return machine_kernel_irqchip_split(current_machine);
++}
++
+ static void kvm_accel_instance_init(Object *obj)
+ {
+     KVMState *s = KVM_STATE(obj);
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index 91cd4c2..928efaa 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -801,10 +801,10 @@ static DeviceState *ppce500_init_mpic(PPCE500MachineState *pms,
+     if (kvm_enabled()) {
+         Error *err = NULL;
+ 
+-        if (machine_kernel_irqchip_allowed(machine)) {
++        if (kvm_kernel_irqchip_allowed()) {
+             dev = ppce500_init_mpic_kvm(pmc, irqs, &err);
+         }
+-        if (machine_kernel_irqchip_required(machine) && !dev) {
++        if (kvm_kernel_irqchip_required() && !dev) {
+             error_reportf_err(err,
+                               "kernel_irqchip requested but unavailable: ");
+             exit(1);
+diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+index d6bb7fd..c3f8870 100644
+--- a/hw/ppc/spapr_irq.c
++++ b/hw/ppc/spapr_irq.c
+@@ -77,9 +77,9 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptController *, Error **),
+     MachineState *machine = MACHINE(qdev_get_machine());
+     Error *local_err = NULL;
+ 
+-    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
++    if (kvm_enabled() && kvm_kernel_irqchip_allowed()) {
+         if (fn(intc, &local_err) < 0) {
+-            if (machine_kernel_irqchip_required(machine)) {
++            if (kvm_kernel_irqchip_required()) {
+                 error_prepend(&local_err,
+                               "kernel_irqchip requested but unavailable: ");
+                 error_propagate(errp, local_err);
+@@ -184,7 +184,7 @@ static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
+      */
+     if (kvm_enabled() &&
+         spapr->irq == &spapr_irq_dual &&
+-        machine_kernel_irqchip_required(machine) &&
++        kvm_kernel_irqchip_required() &&
+         xics_kvm_has_broken_disconnect(spapr)) {
+         error_setg(errp, "KVM is too old to support ic-mode=dual,kernel-irqchip=on");
+         return -1;
+@@ -290,12 +290,12 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+     MachineState *machine = MACHINE(spapr);
+     SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
+ 
+-    if (machine_kernel_irqchip_split(machine)) {
++    if (kvm_enabled() && kvm_kernel_irqchip_split()) {
+         error_setg(errp, "kernel_irqchip split mode not supported on pseries");
+         return;
+     }
+ 
+-    if (!kvm_enabled() && machine_kernel_irqchip_required(machine)) {
++    if (!kvm_enabled() && kvm_kernel_irqchip_required()) {
+         error_setg(errp,
+                    "kernel_irqchip requested but only available with KVM");
+         return;
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 9fe233b..aaf2a50 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -519,10 +519,13 @@ void kvm_pc_gsi_handler(void *opaque, int n, int level);
+ void kvm_pc_setup_irq_routing(bool pci_enabled);
+ void kvm_init_irq_routing(KVMState *s);
+ 
++bool kvm_kernel_irqchip_allowed(void);
++bool kvm_kernel_irqchip_required(void);
++bool kvm_kernel_irqchip_split(void);
++
+ /**
+  * kvm_arch_irqchip_create:
+  * @KVMState: The KVMState pointer
+- * @MachineState: The MachineState pointer
+  *
+  * Allow architectures to create an in-kernel irq chip themselves.
+  *
+@@ -530,7 +533,7 @@ void kvm_init_irq_routing(KVMState *s);
+  *            0: irq chip was not created
+  *          > 0: irq chip was created
+  */
+-int kvm_arch_irqchip_create(MachineState *ms, KVMState *s);
++int kvm_arch_irqchip_create(KVMState *s);
+ 
+ /**
+  * kvm_set_one_reg - set a register value in KVM via KVM_SET_ONE_REG ioctl
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 5b82cef..b87b59a 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -741,11 +741,11 @@ void kvm_arch_init_irq_routing(KVMState *s)
+ {
+ }
+ 
+-int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
++int kvm_arch_irqchip_create(KVMState *s)
+ {
+-     if (machine_kernel_irqchip_split(ms)) {
+-         perror("-machine kernel_irqchip=split is not supported on ARM.");
+-         exit(1);
++    if (kvm_kernel_irqchip_split()) {
++        perror("-machine kernel_irqchip=split is not supported on ARM.");
++        exit(1);
+     }
+ 
+     /* If we can create the VGIC using the newer device control API, we
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 62ce681..ef63f3a 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -4494,10 +4494,10 @@ void kvm_arch_init_irq_routing(KVMState *s)
+     }
+ }
+ 
+-int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
++int kvm_arch_irqchip_create(KVMState *s)
+ {
+     int ret;
+-    if (machine_kernel_irqchip_split(ms)) {
++    if (kvm_kernel_irqchip_split()) {
+         ret = kvm_vm_enable_cap(s, KVM_CAP_SPLIT_IRQCHIP, 0, 24);
+         if (ret) {
+             error_report("Could not enable split irqchip mode: %s",
+diff --git a/target/mips/kvm.c b/target/mips/kvm.c
+index 578bc14..de3e26e 100644
+--- a/target/mips/kvm.c
++++ b/target/mips/kvm.c
+@@ -57,7 +57,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     return 0;
+ }
+ 
+-int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
++int kvm_arch_irqchip_create(KVMState *s)
+ {
+     return 0;
+ }
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index c77f984..461dc6d 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -152,7 +152,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     return 0;
+ }
+ 
+-int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
++int kvm_arch_irqchip_create(KVMState *s)
+ {
+     return 0;
+ }
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 0c9d14b..f3a742b 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -374,7 +374,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     return 0;
+ }
+ 
+-int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
++int kvm_arch_irqchip_create(KVMState *s)
+ {
+     return 0;
+ }
+-- 
+1.8.3.1
 
-Because we don=92t need it.  tearDown() does it anyway.  I suppose I
-should mention it in the commit message.
-
-Max
-
-
---sFlrZw2gE0RFjQtRfBX9TEKyrWv3jNJaU--
-
---9FGwwd22GCPnwstyvaOqcarZw2eh3E71G
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3uZSAACgkQ9AfbAGHV
-z0AFcAf+IHRFQIttXm9ya1inb26StvR800Jh29WVA21skhRbGyqNgjTbIobUFxph
-vhlk1VTcl7gibkiZEM2vmMZ1JeZQm/oZ1WX+SSr9s3pwmrr8SESDCkcjZEd57Xio
-2ZUYj0ThQYGdxZ8+Kxl/rxwK8mniWvumVV5cus5LJLdIa+gMBEtSxf37HSwuHeNj
-zYUHiiGa69JzNAsybRfjUR8uCT8dRAmOJuGtsW1SHDXz2n/12ex/rcVe/x2ImP1w
-AZyAQlm7f7PeehxXqZ1Mu0sp6Z/3+0PgRWTbYzbmj62OtD3pLVkezsS323ImvnQw
-YC04NETPbfFS3EhUwT2Yp/Yyc0avxQ==
-=Vrai
------END PGP SIGNATURE-----
-
---9FGwwd22GCPnwstyvaOqcarZw2eh3E71G--
 
 
