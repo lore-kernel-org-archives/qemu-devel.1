@@ -2,100 +2,103 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EBF9C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 10:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B45AEC43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 10:40:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 497AF207FF
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 10:38:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DD4A20828
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 10:40:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Juewnd68"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 497AF207FF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="No6Bd196"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DD4A20828
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieGQZ-00021l-FP
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 05:38:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57235)
+	id 1ieGSb-0003EA-J6
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 05:40:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57797)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ieGPn-0001aZ-Qq
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:37:21 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ieGRw-0002et-2a
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ieGPl-0006mg-8S
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:37:18 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33017
+ (envelope-from <pbonzini@redhat.com>) id 1ieGRu-0000dc-SQ
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:39:32 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29883
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ieGPl-0006lm-4N
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:37:17 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ieGRu-0000dK-P9
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:39:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575887835;
+ s=mimecast20190719; t=1575887970;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VeBdhe+Q8f+LG3+KdoyBWiBrWYLd8cih8pXLi+eIdpw=;
- b=Juewnd68Lh9oRwFqWj7zEwY7CqnQ6JTpwQXOCaiepY2TWaZepXbeS5IhP1vaBcb4q3AA9Y
- I+tCXBBdavWNHnf+oftrxWgg3kZFV7wQ95jMCWysJTQpy0na/FTwaHNbJ6V94ZJZSMwShJ
- WamxiaOw7fi+gx8O47lvelGHWfEGh9U=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-Y6KFBVa-NO2jcvdpRudbHw-1; Mon, 09 Dec 2019 05:37:10 -0500
-Received: by mail-wm1-f70.google.com with SMTP id o135so2894848wme.2
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 02:37:10 -0800 (PST)
+ bh=5WlPLQEtspZUkNR0y4t+3P/dWfqO1encB2iQTeCfS9I=;
+ b=No6Bd196SVYrv3OC+SD7YkDB47Lhj11Bztov530H/RX6djpdjFvEatewhrkCVChGRnZA0M
+ 9W9+T2A2t2KYjgcey7UcksmYuzfKVi5Grv5yV88d5dZhSBRC3ePRg0m9kqJoJI0E+yP5F4
+ K6oMvdu63zgxb8CsCyleAOXngxPkLSc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-337-wUAURK0zM5WM8M5NcFxEwA-1; Mon, 09 Dec 2019 05:39:25 -0500
+Received: by mail-wr1-f70.google.com with SMTP id y7so6562017wrm.3
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 02:39:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=VeBdhe+Q8f+LG3+KdoyBWiBrWYLd8cih8pXLi+eIdpw=;
- b=PbE5RdhzPRgz4rxjvdI1vhB7FkRy33iLWCNe+bo+VTbWVx+FXZVuoUFTEKdTkPK4ex
- mwkfxJBM+dUQLYN0H+UmOGAWruHZQq1posztiZnjJXdOqmGTGEny/CDG1hE1BjXLK1E5
- hm4/conYAVU4kmJSrtawby5ED2YFAIvV99iHweAfYdSVZWe1/MMFolbilR6e7iY95eY5
- K9kIf6T6YsLVEZKl9uuACXolM7m6J/4qxPWGbKzNn8LBlXMmKQpfpU3YXmEPNw1l7hPw
- RxNxh4oKAXL6IjVZKrIuO5jIo/VnUAt68IRZP+d9H3tK8LukHI9U9Mv3qeO4ow6Fo7XU
- OxXw==
-X-Gm-Message-State: APjAAAWYK1hQqllpJPDoN2gwejjEctsMcSVOBtA/lMxf5iQfZZT5YMc1
- kkeUlXqZGl4JEs58GxfhV+GQK16yRB3FEG9TvFX82jzuJKB8NG8EEZ+CpVeL/mT5OFOgQCPzZLQ
- nmPgfiIKhE3UIWSY=
-X-Received: by 2002:adf:e812:: with SMTP id o18mr1263428wrm.127.1575887828984; 
- Mon, 09 Dec 2019 02:37:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzPJXx8k4ZgFQSOG7pnPfUJZsAYZHfGUXEJW5oqYzuQWppM1rtlPdjhfZ6/gdbk5LCXSF/h8w==
-X-Received: by 2002:adf:e812:: with SMTP id o18mr1263399wrm.127.1575887828682; 
- Mon, 09 Dec 2019 02:37:08 -0800 (PST)
+ bh=37PzRRb96EmE565UKk5K5Sle2KLqEF/Osq1v4/uQF1U=;
+ b=res+gw7PjD4wYs0ro6U4Lly7R4JPzX38oV/7GtdXsz9p1XCdB3jtQh7acSiFD+14jt
+ Pe16mgJj9pFp4CHwSq+zywFnr12frd4WPyV+MTPsj06t7ALl1k12ERUtfyj3WQGpbGaK
+ SB7UjDwZUs7fiNGxInyYinUYNGpSepq2INNEnjliAhGX3IYGYN52lxIqaQQXhECsrXbU
+ IBsY+qvNUD3zcVd8qFdLEvwVVxAFtQapNszYKgYFKPlG8VtNN2xHdInZ9E5FrKkAen1Q
+ JGgd7URMjbdwdVEKFwxInkIISADTxbedfOLvfHlk6+U2q/mTc17Dc2wmH2krf1RqAxHy
+ hxTw==
+X-Gm-Message-State: APjAAAUa6VungBxTsry8eWdex7Skzi78LtEHthyoO+EyICm8734rzVV+
+ ahsP+xYC3Rc9iuh/0r2BKgg0bNEsva8mAu4Op2gcxCUF5w8UbaqWpem1WUCC9EZhxC1dtFYXrQN
+ Q1UJecnHJtieAqXo=
+X-Received: by 2002:a1c:2e91:: with SMTP id
+ u139mr22884113wmu.154.1575887964364; 
+ Mon, 09 Dec 2019 02:39:24 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyfP6BHvCad51bpoAe7dzTInHZw6capU81LLD9rqlQDM7kuvwLPfzyGGVsC9nfgYCgVqKFnWw==
+X-Received: by 2002:a1c:2e91:: with SMTP id
+ u139mr22884071wmu.154.1575887964061; 
+ Mon, 09 Dec 2019 02:39:24 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9?
  ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
- by smtp.gmail.com with ESMTPSA id h2sm27318583wrv.66.2019.12.09.02.37.07
+ by smtp.gmail.com with ESMTPSA id v188sm13618269wma.10.2019.12.09.02.39.23
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 09 Dec 2019 02:37:08 -0800 (PST)
-Subject: Re: [RFC] Use of the Nacked-by tag by CI scripts
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <4cbaadf8-ae4f-d086-2137-b83d61a5e9a5@redhat.com>
- <CAL1e-=ja7sdqC6sm_AxYkN-m_R__4dofj-WsYreHZB813OG9OA@mail.gmail.com>
- <9f71601e-de90-86d9-7c6b-352d923bbc06@redhat.com>
- <CAL1e-=iRWsWde18AffTOwTesAbGcb5fZWeRytaOsHg5iCQpBgA@mail.gmail.com>
+ Mon, 09 Dec 2019 02:39:23 -0800 (PST)
+Subject: Re: [PATCH-for-5.0 v3 6/6] hw/pci-host: Add Kconfig entry to select
+ the IGD Passthrough Host Bridge
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191209095002.32194-1-philmd@redhat.com>
+ <20191209095002.32194-7-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <efe5a839-96a6-b80f-1452-bb43c7bc3ebd@redhat.com>
-Date: Mon, 9 Dec 2019 11:37:13 +0100
+Message-ID: <0b4c7637-ffc1-102e-7f29-2568831eb20c@redhat.com>
+Date: Mon, 9 Dec 2019 11:39:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=iRWsWde18AffTOwTesAbGcb5fZWeRytaOsHg5iCQpBgA@mail.gmail.com>
+In-Reply-To: <20191209095002.32194-7-philmd@redhat.com>
 Content-Language: en-US
-X-MC-Unique: Y6KFBVa-NO2jcvdpRudbHw-1
+X-MC-Unique: wUAURK0zM5WM8M5NcFxEwA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,26 +110,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paul Durrant <paul@xen.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/12/19 11:12, Aleksandar Markovic wrote:
-> I'm afraid this would be opening a Pandora's box. For such rare cases, a
-> message from a person: "Please hold on this patch until I am back from
-> vacation.", "Please wait until I merge my series acting on the same
-> files", or similar, would perfectly do the job, as it did in the past.
+On 09/12/19 10:50, Philippe Mathieu-Daud=C3=A9 wrote:
+> Add the XEN_IGD_PASSTHROUGH Kconfig option.
+>=20
+> Xen build has that option selected by default. Non-Xen builds now
+> have to select this feature manually.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> v3: Only default with Xen (Alex Williamson)
+>=20
+> I did not used 'depends on XEN' as suggested by Alex but
+> 'default y if XEN', so one can build XEN without this feature
+> (for example, on other ARCH than X86).
+> ---
+>  hw/pci-host/Kconfig       | 5 +++++
+>  hw/pci-host/Makefile.objs | 2 +-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+> index b0aa8351c4..24ba8ea046 100644
+> --- a/hw/pci-host/Kconfig
+> +++ b/hw/pci-host/Kconfig
+> @@ -1,6 +1,11 @@
+>  config PAM
+>      bool
+> =20
+> +config XEN_IGD_PASSTHROUGH
+> +    bool
+> +    default y if XEN
+> +    select PCI_I440FX
 
-The point is when you don't see the patch until it gets in a pull
-request.  It's not particularly common so I'm okay with no change (and I
-agree that Philippe's patch, as is, doesn't solve *this* particular
-case) but I also don't see this as causing problems in the future.
+Maybe "depends on PCI_I440FX" (so if somebody builds a Xen+KVM, q35-only
+machine they don't get IGD passthrough).  I can do this when applying.
 
 Paolo
+
+> +
+>  config PREP_PCI
+>      bool
+>      select PCI
+> diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+> index fa6d1556c0..9c466fab01 100644
+> --- a/hw/pci-host/Makefile.objs
+> +++ b/hw/pci-host/Makefile.objs
+> @@ -14,7 +14,7 @@ common-obj-$(CONFIG_VERSATILE_PCI) +=3D versatile.o
+>  common-obj-$(CONFIG_PCI_SABRE) +=3D sabre.o
+>  common-obj-$(CONFIG_FULONG) +=3D bonito.o
+>  common-obj-$(CONFIG_PCI_I440FX) +=3D i440fx.o
+> -common-obj-$(CONFIG_PCI_I440FX) +=3D xen_igd_pt.o
+> +common-obj-$(CONFIG_XEN_IGD_PASSTHROUGH) +=3D xen_igd_pt.o
+>  common-obj-$(CONFIG_PCI_EXPRESS_Q35) +=3D q35.o
+>  common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) +=3D gpex.o
+>  common-obj-$(CONFIG_PCI_EXPRESS_XILINX) +=3D xilinx-pcie.o
+>=20
 
 
