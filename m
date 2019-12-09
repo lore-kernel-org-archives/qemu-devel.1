@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2679C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 09:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85177C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 09:53:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D48A2072D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 09:53:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E1562072D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 09:53:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JZcTbs3P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D48A2072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U3HV4rr7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E1562072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieFj7-0003Q1-EG
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 04:53:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49311)
+	id 1ieFjm-0004PL-G0
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 04:53:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ieFhH-0000o9-57
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 04:51:20 -0500
+ (envelope-from <philmd@redhat.com>) id 1ieFgj-0008T5-K2
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 04:50:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ieFhC-0000uX-9B
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 04:51:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49542
+ (envelope-from <philmd@redhat.com>) id 1ieFgi-0000mB-Kg
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 04:50:45 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56797
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ieFhC-0000uN-5q
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 04:51:14 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ieFgi-0000ly-HE
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 04:50:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575885073;
+ s=mimecast20190719; t=1575885044;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JyTRNBIq6COiBd2fUeZp5zZWcFeEuRMkF4nfuRBiSRw=;
- b=JZcTbs3PF0xO/xC1dXClOoh7i1EPQ1awNiUBIRkpb6S6T0CVxGRqGLL1/ZjURrvfkf16Wy
- hL2z5O6wVYBiALm91gDSG55Ftc1dGjrJGkCqmPw2ADjtpN2/zn2FSxG+aT3kmh6E9eOfN4
- +0mvtKIKw610iK9I6gykigMLTShAhA0=
+ bh=nQooNv4KuAJbOCpnZQESZEyWieR/hAlT1WGgxUjJTpQ=;
+ b=U3HV4rr7iW79bGAKPiRi+Rd8YGmb53rNOOlxOe+UHSKPEVZ738PbEKBO8bIpRz5lfJh0jK
+ an7mObpz0dFn/6F2SSK9+ASkaRL37n/Q03TPIi2j1AnvKFP34dt/boOSB0hKd+mWi1p8K3
+ isCGQuhhBlUuc4rzv0aJ1TfETmYZ/Lw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-LSW49e5NNvasJ4mh1-Fhgw-1; Mon, 09 Dec 2019 04:51:03 -0500
+ us-mta-13-gfa2tifNPLWJqkaOzwt-IQ-1; Mon, 09 Dec 2019 04:50:41 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47580800C74;
- Mon,  9 Dec 2019 09:51:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A7CD800D53;
+ Mon,  9 Dec 2019 09:50:40 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-205-142.brq.redhat.com [10.40.205.142])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 72AB919C5B;
- Mon,  9 Dec 2019 09:50:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5472519C5B;
+ Mon,  9 Dec 2019 09:50:27 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.0 v3 6/6] hw/pci-host: Add Kconfig entry to select the
- IGD Passthrough Host Bridge
-Date: Mon,  9 Dec 2019 10:50:02 +0100
-Message-Id: <20191209095002.32194-7-philmd@redhat.com>
+Subject: [PATCH-for-5.0 v3 3/6] hw/pci-host/i440fx: Use size_t to iterate over
+ ARRAY_SIZE()
+Date: Mon,  9 Dec 2019 10:49:59 +0100
+Message-Id: <20191209095002.32194-4-philmd@redhat.com>
 In-Reply-To: <20191209095002.32194-1-philmd@redhat.com>
 References: <20191209095002.32194-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: LSW49e5NNvasJ4mh1-Fhgw-1
+X-MC-Unique: gfa2tifNPLWJqkaOzwt-IQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,52 +96,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add the XEN_IGD_PASSTHROUGH Kconfig option.
+We don't enforce the -Wsign-conversion CPPFLAG, but it doesn't hurt
+to avoid this warning:
 
-Xen build has that option selected by default. Non-Xen builds now
-have to select this feature manually.
+  warning: implicit conversion changes signedness: 'int' to 'size_t' (aka '=
+unsigned long') [-Wsign-conversion]
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v3: Only default with Xen (Alex Williamson)
+ hw/pci-host/i440fx.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-I did not used 'depends on XEN' as suggested by Alex but
-'default y if XEN', so one can build XEN without this feature
-(for example, on other ARCH than X86).
----
- hw/pci-host/Kconfig       | 5 +++++
- hw/pci-host/Makefile.objs | 2 +-
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
-index b0aa8351c4..24ba8ea046 100644
---- a/hw/pci-host/Kconfig
-+++ b/hw/pci-host/Kconfig
-@@ -1,6 +1,11 @@
- config PAM
-     bool
+diff --git a/hw/pci-host/i440fx.c b/hw/pci-host/i440fx.c
+index fbdc563599..0cc80b276d 100644
+--- a/hw/pci-host/i440fx.c
++++ b/hw/pci-host/i440fx.c
+@@ -419,12 +419,11 @@ out:
+ static void igd_pt_i440fx_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     uint32_t val =3D 0;
+-    int i, num;
++    size_t i;
+     int pos, len;
+     Error *local_err =3D NULL;
 =20
-+config XEN_IGD_PASSTHROUGH
-+    bool
-+    default y if XEN
-+    select PCI_I440FX
-+
- config PREP_PCI
-     bool
-     select PCI
-diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
-index fa6d1556c0..9c466fab01 100644
---- a/hw/pci-host/Makefile.objs
-+++ b/hw/pci-host/Makefile.objs
-@@ -14,7 +14,7 @@ common-obj-$(CONFIG_VERSATILE_PCI) +=3D versatile.o
- common-obj-$(CONFIG_PCI_SABRE) +=3D sabre.o
- common-obj-$(CONFIG_FULONG) +=3D bonito.o
- common-obj-$(CONFIG_PCI_I440FX) +=3D i440fx.o
--common-obj-$(CONFIG_PCI_I440FX) +=3D xen_igd_pt.o
-+common-obj-$(CONFIG_XEN_IGD_PASSTHROUGH) +=3D xen_igd_pt.o
- common-obj-$(CONFIG_PCI_EXPRESS_Q35) +=3D q35.o
- common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) +=3D gpex.o
- common-obj-$(CONFIG_PCI_EXPRESS_XILINX) +=3D xilinx-pcie.o
+-    num =3D ARRAY_SIZE(igd_host_bridge_infos);
+-    for (i =3D 0; i < num; i++) {
++    for (i =3D 0; i < ARRAY_SIZE(igd_host_bridge_infos); i++) {
+         pos =3D igd_host_bridge_infos[i].offset;
+         len =3D igd_host_bridge_infos[i].len;
+         host_pci_config_read(pos, len, &val, &local_err);
 --=20
 2.21.0
 
