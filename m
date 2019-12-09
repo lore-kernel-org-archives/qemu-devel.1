@@ -6,61 +6,57 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B74C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 02:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B19E5C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 03:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6C5D206F4
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 02:48:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6C5D206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8703B20663
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 03:06:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8703B20663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ie96T-0007aE-Vn
-	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 21:48:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44035)
+	id 1ie9NF-0001qy-LT
+	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 22:06:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43795)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1ie95Y-00077K-2Y
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 21:47:56 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1ie9MH-0001KW-KN
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 22:05:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1ie95X-0002Rg-0a
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 21:47:55 -0500
-Received: from mga02.intel.com ([134.134.136.20]:44007)
+ (envelope-from <pannengyuan@huawei.com>) id 1ie9MG-0006i9-Ba
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 22:05:13 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2219 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1ie95W-0002JP-LS
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 21:47:54 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 08 Dec 2019 18:47:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,294,1571727600"; d="scan'208";a="237602583"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.197.115])
- ([10.239.197.115])
- by fmsmga004.fm.intel.com with ESMTP; 08 Dec 2019 18:47:52 -0800
-Subject: Re: [PATCH RESEND 4/4] target/i386: Add notes for versioned CPU models
-To: Xiaoyao Li <xiaoyao.li@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20191202063233.28523-1-tao3.xu@intel.com>
- <20191202063233.28523-5-tao3.xu@intel.com>
- <689d3cc9-5325-1664-76fa-6f2a2b2b4c04@intel.com>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <4b703ba2-b395-9c7c-bb19-87590dd0716c@intel.com>
-Date: Mon, 9 Dec 2019 10:47:51 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1ie9MD-00066A-Pf
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 22:05:12 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id D6E8BA78CFA171FFB855;
+ Mon,  9 Dec 2019 11:05:03 +0800 (CST)
+Received: from [127.0.0.1] (10.120.177.99) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Mon, 9 Dec 2019
+ 11:04:54 +0800
+Subject: Re: [PATCH v3 1/3] virtio: add ability to delete vq through a pointer
+To: <mst@redhat.com>
+References: <1575856810-9388-1-git-send-email-pannengyuan@huawei.com>
+ <1575856810-9388-2-git-send-email-pannengyuan@huawei.com>
+From: Pan Nengyuan <pannengyuan@huawei.com>
+Message-ID: <7fa88bda-b36a-c8e1-fed9-a1d4c26963ab@huawei.com>
+Date: Mon, 9 Dec 2019 11:04:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <689d3cc9-5325-1664-76fa-6f2a2b2b4c04@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <1575856810-9388-2-git-send-email-pannengyuan@huawei.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.20
+X-Originating-IP: [10.120.177.99]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,43 +68,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: liyiting@huawei.com, kuhn.chenqun@huawei.com, Amit Shah <amit@kernel.org>,
+ qemu-devel@nongnu.org, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/5/2019 4:44 PM, Xiaoyao Li wrote:
-> On 12/2/2019 2:32 PM, Tao Xu wrote:
->> Add which features are added or removed in this version. Remove the
->> changed model-id in versioned CPU models.
->>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> ---
->>    target/i386/cpu.c | 50 +++++++++++++++++++++++------------------------
->>    1 file changed, 25 insertions(+), 25 deletions(-)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index 7b3bd6d4db..c82fbfd02e 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
-> 
-> [...]
-> 
->> @@ -3141,6 +3133,7 @@ static X86CPUDefinition builtin_x86_defs[] = {
->>            .versions = (X86CPUVersionDefinition[]) {
->>                { .version = 1 },
->>                { .version = 2,
->> +              .note = "ARCH_CAPABILITIES",
-> 
-> Here ARCH_CAPABILITIES doesn't tell what bits in
-> MSR_IA32_ARCH_CAPABILITIES this version has, which makes it meaningless.
-> 
-> Maybe
->          .note = "ARCH_CAPABLITIES(rdctl-no, ibrs-all, skip-l1dfl-vmentry, mds-no)",
-> 
-> is better?
-> 
 
-But it is too long for -cpu help, break the info into 2 lines.
 
+On 2019/12/9 10:00, pannengyuan@huawei.com wrote:
+> From: Michael S. Tsirkin <mst@redhat.com> 
+> 
+> Devices tend to maintain vq pointers, allow deleting them through a vq
+> pointer.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> [PMM: change function name to virtio_queue_cleanup; set used_elems to NULL after free]
+
+Oh. I'm sorry. Here is PNM (not PMM).
+
+> Cc: Amit Shah <amit@kernel.org>
+> Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
+> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> ---
+> Changes v2 to v1:
+> - use virtio_delete_queue to cleanup vq through a vq pointer
+> ---
+> Changes v3 to v2:
+> - change function name from virtio_delete_queue to virtio_queue_cleanup
+> ---
+>  hw/virtio/virtio.c         | 16 +++++++++++-----
+>  include/hw/virtio/virtio.h |  2 ++
+>  2 files changed, 13 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 04716b5..2743258 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2330,17 +2330,23 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, int queue_size,
+>      return &vdev->vq[i];
+>  }
+>  
+> +void virtio_queue_cleanup(VirtQueue *vq)
+> +{
+> +    vq->vring.num = 0;
+> +    vq->vring.num_default = 0;
+> +    vq->handle_output = NULL;
+> +    vq->handle_aio_output = NULL;
+> +    g_free(vq->used_elems);
+> +    vq->used_elems = NULL;
+> +}
+> +
+>  void virtio_del_queue(VirtIODevice *vdev, int n)
+>  {
+>      if (n < 0 || n >= VIRTIO_QUEUE_MAX) {
+>          abort();
+>      }
+>  
+> -    vdev->vq[n].vring.num = 0;
+> -    vdev->vq[n].vring.num_default = 0;
+> -    vdev->vq[n].handle_output = NULL;
+> -    vdev->vq[n].handle_aio_output = NULL;
+> -    g_free(vdev->vq[n].used_elems);
+> +    virtio_queue_cleanup(&vdev->vq[n]);
+>  }
+>  
+>  static void virtio_set_isr(VirtIODevice *vdev, int value)
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index c32a815..cc0b3f0 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -183,6 +183,8 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, int queue_size,
+>  
+>  void virtio_del_queue(VirtIODevice *vdev, int n);
+>  
+> +void virtio_queue_cleanup(VirtQueue *vq);
+> +
+>  void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
+>                      unsigned int len);
+>  void virtqueue_flush(VirtQueue *vq, unsigned int count);
+> 
 
 
