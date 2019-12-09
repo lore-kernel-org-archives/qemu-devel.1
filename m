@@ -2,162 +2,84 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50525C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51481C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:18:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C4CA206D3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:17:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B75C2080D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:18:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ejv2eNrB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C4CA206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XL8FnAMK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B75C2080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieNb3-00075d-Oj
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 13:17:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34211)
+	id 1ieNbm-0007qA-Ki
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 13:18:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34286)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1ieNZg-0005xa-1p
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:01 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ieNZv-0006BF-V3
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1ieNZd-0006lt-9j
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:15:58 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34502
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ieNZd-0006lD-5B
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:15:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575915355;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=XCWM7xHu/heROb1ZZPkxzycSpdfgIGsMIkQxuM510h0=;
- b=ejv2eNrBjh934we1TOo3nx1Wl5+x7qysc0YbvgW5lMT07LlkfuranmpQgRFS/y0LmEqX8C
- bjB2CHLiZ0olUIVftoh1fBiYsmpoN8LV6Rt/DkFDIRkXCcxxNiutzfnq+r7qSOt7zr5AVS
- S2b2zEWKA3Q98x7mQGvu8T4kCD66GvY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-socO--E9NyiLVZ07g8SOPw-1; Mon, 09 Dec 2019 13:15:54 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FA2FDBE5;
- Mon,  9 Dec 2019 18:15:53 +0000 (UTC)
-Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E02D95D9D6;
- Mon,  9 Dec 2019 18:15:52 +0000 (UTC)
-Subject: Re: [PATCH v2] migration/dirty-bitmaps: change bitmap enumeration
- method
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190514201926.10407-1-jsnow@redhat.com>
- <aab4e1c7-37eb-5b3e-26d2-fca33ba87662@virtuozzo.com>
- <d164961f-4da7-3678-2f56-5486cee3d07d@redhat.com>
- <748a473b-07c6-73b1-ab91-40886fb55cd5@redhat.com>
- <44c32a7a-daf4-41ec-66d8-4f79288c01e0@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <8f213e2a-5006-3f2a-e1dc-0374858c31d5@redhat.com>
-Date: Mon, 9 Dec 2019 13:15:52 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ieNZu-0006vz-Hx
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:15 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35156)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ieNZu-0006vQ-9f
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:14 -0500
+Received: by mail-ot1-x341.google.com with SMTP id o9so13053790ote.2
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 10:16:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=CB1KjF3ZOT0dJgFx5/rOjrc7b02VK8tpDKAvB4NS60E=;
+ b=XL8FnAMKMZwOwQm9O83ZMGUERbua4XP7KpF7b68IPgy4PpOcor39bmaEPr54JdXsXW
+ eiuuWSKkacCjhcJ2eYKR5EqAhTmFEa4KMq28GwRq6k6ZNq8LsozGlSsULwGBzYr+nHhK
+ UPOTE8N8GYg4BLosaTZxuUREb/G7Pl1DWYRHp6TOz+lnrgoYwZunSlLUtGsAIvIa9uTK
+ SP+MaBOWlCdbf/7ZLRcbt/O5x0zLsg4LoFWpAJC34D2LTlgvRIPrZ/kmUfDm3UTf7Lup
+ uQiXkNG2CVmC9Hyw2MLqenbTAUEJfPp+md/PZ5hF/vpRZ73HKHbANxO2Wb1DYoIPScAB
+ KEtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=CB1KjF3ZOT0dJgFx5/rOjrc7b02VK8tpDKAvB4NS60E=;
+ b=J8Or8U6N/q2XztH/735mL7c/UVLC2nseuX4q2boRXs4oIWsd5F0TcFwVEvdppcoxZw
+ 2Zl7ibMHLPLjYRSSbHVWXmTJfd4nbEbmjBwKLMVqoxUIMWaCYY8/Uek68jst3Mkiu/RE
+ tO5DNixC/3aEAXXuQ9wpM5ucnWwZFl88Zod0slnmJo7mn7L51BogsGVXgWRoELoo1nTQ
+ P45W65Yppt7X/LEYEDp7Nl9ltJtwYQzg1NtL5vRUqtQnlilqHTaAg06jHcuPXZ139NJ4
+ oNhQ6BHbGg5qs7DYy+bAOMyo1scUKuf6WVSVNABZvL43r1uWCa/p6RpzNq+j14Lk8+IQ
+ klyg==
+X-Gm-Message-State: APjAAAXZRVlUDx9GFRucSdhy59IYENiXFrzNpSeIIy9LqTORClIacK8/
+ tmCTDDG6FBVU17fq5w63Z2aye3JgQ85nVrkJfL4=
+X-Google-Smtp-Source: APXvYqw2tu35+4zamET+3exp6Iq6vHplTOu+7ufm0JC4Dhn/QR5O5NEBVOCvqGiCze0F3dUJwWuRAjtmdmI6ppXzAFQ=
+X-Received: by 2002:a9d:7305:: with SMTP id e5mr21692006otk.64.1575915373490; 
+ Mon, 09 Dec 2019 10:16:13 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <44c32a7a-daf4-41ec-66d8-4f79288c01e0@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: socO--E9NyiLVZ07g8SOPw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
+ Mon, 9 Dec 2019 10:16:13 -0800 (PST)
+In-Reply-To: <20191208183922.13757-18-mrolnik@gmail.com>
+References: <20191208183922.13757-1-mrolnik@gmail.com>
+ <20191208183922.13757-18-mrolnik@gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 9 Dec 2019 19:16:13 +0100
+Message-ID: <CAL1e-=guE3xT3n2P5j0=UVoVDw8WKqbK02=otf+Pf90Mi8hfmQ@mail.gmail.com>
+Subject: Re: [PATCH v38 17/22] target/avr: Register AVR support with the rest
+ of QEMU
+To: Michael Rolnik <mrolnik@gmail.com>
+Content-Type: multipart/alternative; boundary="00000000000008754d05994964d0"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -169,89 +91,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--00000000000008754d05994964d0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Sunday, December 8, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
+
+> Add AVR related definitions into QEMU
+>
+> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  qapi/machine.json          | 3 ++-
+>  include/disas/dis-asm.h    | 6 ++++++
+>  include/sysemu/arch_init.h | 1 +
+>  arch_init.c                | 2 ++
+>  4 files changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/qapi/machine.json b/qapi/machine.json
+> index ca26779f1a..8c6df54921 100644
+> --- a/qapi/machine.json
+> +++ b/qapi/machine.json
+> @@ -21,11 +21,12 @@
+>  #        is true even for "qemu-system-x86_64".
+>  #
+>  # ppcemb: dropped in 3.1
+> +# avr: since 5.0
+>  #
+>  # Since: 3.0
+>  ##
+>  { 'enum' : 'SysEmuTarget',
+> -  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
+> +  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386',
+> 'lm32',
+
+              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
+>               'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
+>               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
+> diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
+> index e9c7dd8eb4..8bedce17ac 100644
+> --- a/include/disas/dis-asm.h
+> +++ b/include/disas/dis-asm.h
+> @@ -211,6 +211,12 @@ enum bfd_architecture
+>  #define bfd_mach_m32r          0  /* backwards compatibility */
+>    bfd_arch_mn10200,    /* Matsushita MN10200 */
+>    bfd_arch_mn10300,    /* Matsushita MN10300 */
+> +  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
+> +#define bfd_mach_avr1          1
+> +#define bfd_mach_avr2          2
+> +#define bfd_mach_avr3          3
+> +#define bfd_mach_avr4          4
+> +#define bfd_mach_avr5          5
 
 
-On 12/9/19 12:17 PM, Vladimir Sementsov-Ogievskiy wrote:
-> 09.12.2019 18:26, John Snow wrote:
->> (off list)
->>
+Incomplete list. I already explained why in reply to v37.
 
-Well, it isn't now, but oh well. :)
 
->> On 12/9/19 10:22 AM, John Snow wrote:
->>>
->>>
->>> On 12/6/19 5:31 PM, Vladimir Sementsov-Ogievskiy wrote:
->>>> 14.05.2019 23:19, John Snow wrote:
->>>>> Shift from looking at every root BDS to *every* BDS. This will migrat=
-e
->>>>> bitmaps that are attached to blockdev created nodes instead of just o=
-nes
->>>>> attached to emulated storage devices.
->>>>>
->>>>> Note that this will not migrate anonymous or internal-use bitmaps, as
->>>>> those are defined as having no name.
->>>>>
->>>>> This will also fix the Coverity issues Peter Maydell has been asking
->>>>> about for the past several releases, as well as fixing a real bug.
->>>>>
->>>>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
->>>>> Reported-by: Coverity =F0=9F=98=85
->>>>
->>>> What was the coverity number (I don't believe that it was smile:)?
->>>>
->>>
->>>      Reported-by: Peter Maydell <peter.maydell@linaro.org>
->>>      Reported-by: Coverity =F0=9F=98=85
->>>      Reported-by: aihua liang <aliang@redhat.com>
->>>      Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.co=
-m>
->>>      Signed-off-by: John Snow <jsnow@redhat.com>
->>>      Message-id: 20190514201926.10407-1-jsnow@redhat.com
->>>      Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1652490
->>>      Fixes: Coverity CID 1390625
->=20
-> Ah, missed it, sorry.
->=20
 
-No problem -- it got added for the PR instead of the patch.
+>    bfd_arch_cris,       /* Axis CRIS */
+>  #define bfd_mach_cris_v0_v10   255
+>  #define bfd_mach_cris_v32      32
+> diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+> index 62c6fe4cf1..893df26ce2 100644
+> --- a/include/sysemu/arch_init.h
+> +++ b/include/sysemu/arch_init.h
+> @@ -24,6 +24,7 @@ enum {
+>      QEMU_ARCH_NIOS2 =3D (1 << 17),
+>      QEMU_ARCH_HPPA =3D (1 << 18),
+>      QEMU_ARCH_RISCV =3D (1 << 19),
+> +    QEMU_ARCH_AVR =3D (1 << 20),
+>  };
+>
+>  extern const uint32_t arch_type;
+> diff --git a/arch_init.c b/arch_init.c
+> index 705d0b94ad..6a741165b2 100644
+> --- a/arch_init.c
+> +++ b/arch_init.c
+> @@ -89,6 +89,8 @@ int graphic_depth =3D 32;
+>  #define QEMU_ARCH QEMU_ARCH_UNICORE32
+>  #elif defined(TARGET_XTENSA)
+>  #define QEMU_ARCH QEMU_ARCH_XTENSA
+> +#elif defined(TARGET_AVR)
+> +#define QEMU_ARCH QEMU_ARCH_AVR
+>  #endif
+>
+>  const uint32_t arch_type =3D QEMU_ARCH;
+> --
+> 2.17.2 (Apple Git-113)
+>
+>
 
->>>      CC: Stefan Hajnoczi <stefanha@redhat.com>
->>>      Signed-off-by: John Snow <jsnow@redhat.com>
->>>
->>>
->>>> Do someone know, that this patch fixes very-very-very terrible bug?
->>>>
->>>> Before this patch, here were bdrv_next-based loop, with exists from it=
-,
->>>> but not using bdrv_next_cleanup(). This leads to leaked (incremented) =
-refcnt of
->>>> bds on any failure during this loop!
->>>>
->>>> Now we faced this bug, in Rhel-based Qemu, so I strongly recommend to =
-fix it in Rhel.
->>>
->>> OK, this was fixed for 4.1, and was introduced in b35ebdf076d for
->>> 2.12.0, so all versions between have the problem.
->>>
->>
->> As far as I know, we don't "support" incremental backup for RHEL based
->> packages, because we only support what you can do directly through
->> libvirt. And since RHEL libvirt doesn't have incremental backup, ...
->>
->> I can try to fix it anyway, though, if it makes your life easier especia=
-lly.
->=20
-> No, actually, it's no real difference, now we fixed it in our branch.
-> So, it's up to you.
->=20
+--00000000000008754d05994964d0
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-OK, thanks for the report, then!
+<br><br>On Sunday, December 8, 2019, Michael Rolnik &lt;<a href=3D"mailto:m=
+rolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=3D"=
+gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-=
+left:1ex">Add AVR related definitions into QEMU<br>
+<br>
+Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com">mrol=
+nik@gmail.com</a>&gt;<br>
+Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
+com">philmd@redhat.com</a>&gt;<br>
+Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.c=
+om">amarkovic@wavecomp.com</a>&gt;<br>
+---<br>
+=C2=A0qapi/machine.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 3 ++-<br>
+=C2=A0include/disas/dis-asm.h=C2=A0 =C2=A0 | 6 ++++++<br>
+=C2=A0include/sysemu/arch_init.h | 1 +<br>
+=C2=A0arch_init.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =
+2 ++<br>
+=C2=A04 files changed, 11 insertions(+), 1 deletion(-)<br>
+<br>
+diff --git a/qapi/machine.json b/qapi/machine.json<br>
+index ca26779f1a..8c6df54921 100644<br>
+--- a/qapi/machine.json<br>
++++ b/qapi/machine.json<br>
+@@ -21,11 +21,12 @@<br>
+=C2=A0#=C2=A0 =C2=A0 =C2=A0 =C2=A0 is true even for &quot;qemu-system-x86_6=
+4&quot;.<br>
+=C2=A0#<br>
+=C2=A0# ppcemb: dropped in 3.1<br>
++# avr: since 5.0<br>
+=C2=A0#<br>
+=C2=A0# Since: 3.0<br>
+=C2=A0##<br>
+=C2=A0{ &#39;enum&#39; : &#39;SysEmuTarget&#39;,<br>
+-=C2=A0 &#39;data&#39; : [ &#39;aarch64&#39;, &#39;alpha&#39;, &#39;arm&#39=
+;, &#39;cris&#39;, &#39;hppa&#39;, &#39;i386&#39;, &#39;lm32&#39;,<br>
++=C2=A0 &#39;data&#39; : [ &#39;aarch64&#39;, &#39;alpha&#39;, &#39;arm&#39=
+;, &#39;avr&#39;, &#39;cris&#39;, &#39;hppa&#39;, &#39;i386&#39;, &#39;lm32=
+&#39;,</blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 =
+.8ex;border-left:1px #ccc solid;padding-left:1ex">
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;m68k&#39;, &#39;micro=
+blaze&#39;, &#39;microblazeel&#39;, &#39;mips&#39;, &#39;mips64&#39;,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;mips64el&#39;, &#39;m=
+ipsel&#39;, &#39;moxie&#39;, &#39;nios2&#39;, &#39;or1k&#39;, &#39;ppc&#39;=
+,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;ppc64&#39;, &#39;risc=
+v32&#39;, &#39;riscv64&#39;, &#39;s390x&#39;, &#39;sh4&#39;,<br>
+diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h<br>
+index e9c7dd8eb4..8bedce17ac 100644<br>
+--- a/include/disas/dis-asm.h<br>
++++ b/include/disas/dis-asm.h<br>
+@@ -211,6 +211,12 @@ enum bfd_architecture<br>
+=C2=A0#define bfd_mach_m32r=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0=C2=A0 /* ba=
+ckwards compatibility */<br>
+=C2=A0 =C2=A0bfd_arch_mn10200,=C2=A0 =C2=A0 /* Matsushita MN10200 */<br>
+=C2=A0 =C2=A0bfd_arch_mn10300,=C2=A0 =C2=A0 /* Matsushita MN10300 */<br>
++=C2=A0 bfd_arch_avr,=C2=A0 =C2=A0 =C2=A0 =C2=A0/* Atmel AVR microcontrolle=
+rs.=C2=A0 */<br>
++#define bfd_mach_avr1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1<br>
++#define bfd_mach_avr2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 2<br>
++#define bfd_mach_avr3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 3<br>
++#define bfd_mach_avr4=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 4<br>
++#define bfd_mach_avr5=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 5</blockquote><div=
+><br></div><div>Incomplete list. I already explained why in reply to v37.</=
+div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+=C2=A0 =C2=A0bfd_arch_cris,=C2=A0 =C2=A0 =C2=A0 =C2=A0/* Axis CRIS */<br>
+=C2=A0#define bfd_mach_cris_v0_v10=C2=A0 =C2=A0255<br>
+=C2=A0#define bfd_mach_cris_v32=C2=A0 =C2=A0 =C2=A0 32<br>
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h<br>
+index 62c6fe4cf1..893df26ce2 100644<br>
+--- a/include/sysemu/arch_init.h<br>
++++ b/include/sysemu/arch_init.h<br>
+@@ -24,6 +24,7 @@ enum {<br>
+=C2=A0 =C2=A0 =C2=A0QEMU_ARCH_NIOS2 =3D (1 &lt;&lt; 17),<br>
+=C2=A0 =C2=A0 =C2=A0QEMU_ARCH_HPPA =3D (1 &lt;&lt; 18),<br>
+=C2=A0 =C2=A0 =C2=A0QEMU_ARCH_RISCV =3D (1 &lt;&lt; 19),<br>
++=C2=A0 =C2=A0 QEMU_ARCH_AVR =3D (1 &lt;&lt; 20),<br>
+=C2=A0};<br>
+<br>
+=C2=A0extern const uint32_t arch_type;<br>
+diff --git a/arch_init.c b/arch_init.c<br>
+index 705d0b94ad..6a741165b2 100644<br>
+--- a/arch_init.c<br>
++++ b/arch_init.c<br>
+@@ -89,6 +89,8 @@ int graphic_depth =3D 32;<br>
+=C2=A0#define QEMU_ARCH QEMU_ARCH_UNICORE32<br>
+=C2=A0#elif defined(TARGET_XTENSA)<br>
+=C2=A0#define QEMU_ARCH QEMU_ARCH_XTENSA<br>
++#elif defined(TARGET_AVR)<br>
++#define QEMU_ARCH QEMU_ARCH_AVR<br>
+=C2=A0#endif<br>
+<br>
+=C2=A0const uint32_t arch_type =3D QEMU_ARCH;<br>
+-- <br>
+2.17.2 (Apple Git-113)<br>
+<br>
+</blockquote>
 
---js
-
+--00000000000008754d05994964d0--
 
