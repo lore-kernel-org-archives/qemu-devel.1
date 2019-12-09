@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0551BC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:18:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA376C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:20:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2A6D206D3
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3FB4206D3
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:20:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="kKpAzn8M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2A6D206D3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="W5u6z9Kj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3FB4206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieNcB-0008Uq-HJ
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 13:18:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34414)
+	id 1ieNdi-0002dQ-8W
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 13:20:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34339)
  by lists.gnu.org with esmtp (Exim 4.90_1)
  (envelope-from <prvs=23948302b=alistair.francis@wdc.com>)
- id 1ieNaB-0006Wn-OJ
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:32 -0500
+ id 1ieNa8-0006Rm-25
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
  (envelope-from <prvs=23948302b=alistair.francis@wdc.com>)
- id 1ieNaA-00075r-NX
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:31 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:57632)
+ id 1ieNa6-000737-PP
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:27 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:57627)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <prvs=23948302b=alistair.francis@wdc.com>)
- id 1ieNaA-00073h-Fb; Mon, 09 Dec 2019 13:16:30 -0500
+ id 1ieNa6-00072D-3T; Mon, 09 Dec 2019 13:16:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1575915390; x=1607451390;
+ t=1575915386; x=1607451386;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=eZ4GmpjmK0ndi25FbF/XUvsZz/5T+5wl/pA8my/wzRw=;
- b=kKpAzn8MM2jWaJhHs+fbAMB9dKuaGJCq3mxjC2TnMx3M+BSaRY3+3Uad
- jYJF0IZ6Pw/DZAzo6uuvsCi4otkvdJb+R16Wave7N7H4mKBG1ynO7LBxD
- PkUMan+JijfH74flmhVUvgCRsXv6liAmtNST/8m9IyPzN6ldP5dWfqJIy
- lJR8hPUxKw6BWvLS9oWeldxBamWm9iHsXan+/39HsPt2XRe/3yb/LzCqM
- lBLwjXQJgge7mPe0iRhAn2RVsy04qeoOmgWrTdJ9BrDW5GDkONv9rUGAH
- EhqWtqvIASbjt/AF4DWeTDZIfKCvzQW2QLH1VuOhYc8Sb5l/gaQVRaohG Q==;
-IronPort-SDR: OBs0RUQfunrWkWIXrzKERZk/fjr7at1ewSK54plXENsmGzcW5PW5p42Gx4x3K3UoeOeTLrCOF7
- JktsMy+dQrRo+m+fKjaWMxmRu1JMjIiaFS5ntmNrl0KLDYNwxGHvb3ty+4FeMYSSB3P6d157St
- udRTRGc7O/Di/QlILfYZUxvN32Z97PPd4dRCFGmo7L3l9Jam6CuiOr1V587RPqQuNEEylddcFU
- cYzx9JJJsyIK7K2Kmi2M6bkpci508on8DBgKEvnGtHfvUKCbAL4VYTaXAhn5yzt1KGN+Qp2koN
- Paw=
-X-IronPort-AV: E=Sophos;i="5.69,296,1571673600"; d="scan'208";a="129370408"
+ bh=vQ0Qc2m9OoP+JuOdf45hxQEXAivSiOJH4JVyasN8uls=;
+ b=W5u6z9Kj8dQnA4bbHD2XW0Vio/qyZx/eu9VadHrgur5YZEuQtVW3na03
+ 60Q6BHNsm78YUfegbUBE1jYlUfpLJktWGW4ZbZNs7RP+E6Hqa1dWL+Bn9
+ qtx1ZEV3c4TJPAGsLkiX73Tn7ITr4DkzeeE35gx+aSNdEIajsborB45tn
+ QBAvlcOGJ4cPd4xUi0ZGAVNID0k2j/7eKx7JqrCFO7KcT5IY9E4KffdV8
+ bMTj8YqnYxCbUW+rWtNtvNZohDStmip+EcCZGzDCRBles6CSiteqadTIb
+ fjcH7yijvDhQtxrYewVNMw3Ugyc/w/xaMF/xiirWglvq3/rBWE4ms3lZS Q==;
+IronPort-SDR: GvkjpfjA42fzO/IMzrXJKCIKj/AuDU2gYaZpcthUPMR0Om7bQeC/hc9K9swnhdntwSbgBKHBB0
+ yoFquwtOLXkuWaNgselpNonG0ShUlzXdtfMDu3H2YK6k4gTsjOEij/9pwxwTc5wJkX4+28LLly
+ gdtmWymcuTbzdajHlo3m9A5C9WKR/ZMXfg+WDumiQ19iQ9D/sGzyEQR3wkMo9bg2/YWctLymg9
+ B2oW/Dxp7rphA8Fl8h0B2djsuDOwASExRMWkxgDzDjPLMY95dwPNxkTDj5xAeEAu3ajIfDaV+c
+ DqI=
+X-IronPort-AV: E=Sophos;i="5.69,296,1571673600"; d="scan'208";a="129370397"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 10 Dec 2019 02:16:30 +0800
-IronPort-SDR: OE+ts604FoKWxfFugpaJUAEo6RC7Z2ZJBsxqE8wRmtNL9XMBWFdOoJP3eBSZcXrfx3H1v3sPO8
- 2hutSIhAUIj0AceDIhhHMhke1MXMoOv3eCxmBKXOkkEgfROa9tBjdbTFtnP1Z1OiUuSFvnTPpq
- OkuLfols19kyWjXAwfdX1PNnWNJWI5Pg+oTJySn5VAi1kpbBTwxRGs+J+QlLicXXZZm4oviLfY
- 1yHJhOG2Y78UPW2ZeCHxpJZai0weLU+rspasLlOPJJys2BvVCgZJ3wm1s5Tc1/Ae/StOVSh6h5
- 4AcDEuuCuw8leCqVaSMO/vsb
+ by ob1.hgst.iphmx.com with ESMTP; 10 Dec 2019 02:16:24 +0800
+IronPort-SDR: /ksCScIUzaOpEdCPJX1Z2rvp20Pt09Uc5NrAyYABMRQw3LrNRLn1cAX32cZSpqNPOhNcLD+U0A
+ Udh3zWMYvhGPFE9M3WDk5ydGoeY3AJ5Ntxq9RZpVu4t7ivXVQzxC5onfDZQ6T0byH1assP86Qe
+ c17ZxFlspVWFhf/0J6e7eofvA8gAvGkBlFxTCeudYRPzaYlMZw5O0O/Q5rZH15HJZ+labK8hEu
+ dFWFkcHpBAbKDVTHLObpDcYbwsd+80P+rK3hK/n/fcxi/BurZ3bIneL0Pd1iPgAJ6Ajb97NTqJ
+ AA2w8/EphSalj7vBqnfEclDR
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 09 Dec 2019 10:10:46 -0800
-IronPort-SDR: sDtIlTbk+iY7m3S/zqRBW2DRxC0hKC2VcJeIK/W+Qq9mk9A8P3WLcohlgDdioWxkDha1vOVh1u
- z9xP7LQ0XigHMdCLUITBhGQG2Tg9ICY3iNt5G1pmyndFC9GOk6ITIuo+8o8A+r4ybgHm4by52r
- WPyOHxqb9lgzPQzsz1IU0mT1k9MyjvkHLFk6uJD0gw6Os5PFATCMtUsY2T2c+BAnKhCTStLJDp
- IC3SqKtQlQTd8OSrVUelfsoOGgJ+ZIIZOt0KgCHIqY75KIKhzVLLYiz4LG6ZaKLwzdG3vHruxo
- NFM=
+ 09 Dec 2019 10:10:41 -0800
+IronPort-SDR: 4nq7+TJHNO/s9ZdE38Gi2P//me/LcmH91d3R5Yo96/UNQHvM7J5W5b+MOfCTaEA/9ZXYxA5bhD
+ xStIox1Ocps/pX2kp9DduGtwOC/UcQsiWux0jP+E4ks4EbX0JtOnPuFE+5MiaXsAiXxZBYTnSZ
+ ZDvB0D/zdtdBceJ1CnMkrQhGKToPzrK3N8CRUrf++yIn9reiGAAE0Phcf4duHM7UUQZIERuFP6
+ i9PZGJ88N8l3QVLmbBCTLObRJFgpAxzlABIr+TB52hMrnonPmk1Ri4xdVt3Z8rhR0Oeinm8hEG
+ 2u8=
 WDCIronportException: Internal
 Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
  risc6-mainframe.int.fusionio.com) ([10.196.158.235])
- by uls-op-cesaip01.wdc.com with ESMTP; 09 Dec 2019 10:16:30 -0800
+ by uls-op-cesaip01.wdc.com with ESMTP; 09 Dec 2019 10:16:25 -0800
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v1 03/36] target/riscv: Add the Hypervisor extension
-Date: Mon,  9 Dec 2019 10:10:48 -0800
-Message-Id: <a61a1739c01c587a5e65a93398317ae644426aff.1575914822.git.alistair.francis@wdc.com>
+Subject: [PATCH v1 01/36] target/riscv: Convert MIP CSR to target_ulong
+Date: Mon,  9 Dec 2019 10:10:43 -0800
+Message-Id: <aa8557d53c1f6d3265e2b2c9bc4e127eddb995ea.1575914822.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <cover.1575914822.git.alistair.francis@wdc.com>
 References: <cover.1575914822.git.alistair.francis@wdc.com>
@@ -104,25 +104,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Chih-Min Chao <chihmin.chao@sifive.com>
-Reviewed-by: Palmer Dabbelt <palmer@sifive.com>
----
- target/riscv/cpu.h | 1 +
- 1 file changed, 1 insertion(+)
+The MIP CSR is a xlen CSR, it was only 32-bits to allow atomic access.
+Now that we don't use atomics for MIP we can change this back to a xlen
+CSR.
 
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/cpu.c | 2 +-
+ target/riscv/cpu.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index d37861a430..e521ebe2e1 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -224,7 +224,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+ #ifndef CONFIG_USER_ONLY
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
+-    qemu_fprintf(f, " %s 0x%x\n", "mip     ", env->mip);
++    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ", env->mip);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
+     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
 diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index f889427869..91e1c56fc4 100644
+index e59343e13c..f889427869 100644
 --- a/target/riscv/cpu.h
 +++ b/target/riscv/cpu.h
-@@ -67,6 +67,7 @@
- #define RVC RV('C')
- #define RVS RV('S')
- #define RVU RV('U')
-+#define RVH RV('H')
+@@ -121,7 +121,7 @@ struct CPURISCVState {
+     target_ulong mhartid;
+     target_ulong mstatus;
  
- /* S extension denotes that Supervisor mode exists, however it is possible
-    to have a core that support S mode but does not have an MMU and there
+-    uint32_t mip;
++    target_ulong mip;
+     uint32_t miclaim;
+ 
+     target_ulong mie;
 -- 
 2.24.0
 
