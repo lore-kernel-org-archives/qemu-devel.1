@@ -2,65 +2,102 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A736BC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 10:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7BD1C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 10:58:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6907A207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 10:55:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6907A207FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8D60120726
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 10:58:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QaS+FZCh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D60120726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieGho-0000hI-IC
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 05:55:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36308)
+	id 1ieGjr-00025E-ML
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 05:58:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37263)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ieGh7-00009S-64
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:55:15 -0500
+ (envelope-from <philmd@redhat.com>) id 1ieGip-0001Kd-Cr
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:57:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ieGh4-0001ro-Ql
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:55:12 -0500
-Received: from 3.mo4.mail-out.ovh.net ([46.105.57.129]:50571)
+ (envelope-from <philmd@redhat.com>) id 1ieGin-0005e1-3K
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:56:58 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60015
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ieGh4-0001ip-KE
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:55:10 -0500
-Received: from player795.ha.ovh.net (unknown [10.108.54.13])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id BB70021ACCC
- for <qemu-devel@nongnu.org>; Mon,  9 Dec 2019 11:55:07 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player795.ha.ovh.net (Postfix) with ESMTPSA id 8DD32CDD57A5;
- Mon,  9 Dec 2019 10:55:05 +0000 (UTC)
-Date: Mon, 9 Dec 2019 11:55:03 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH] hw/core: Fix data type in do_nmi()
-Message-ID: <20191209115503.6b7bcf59@bahia.w3ibm.bluemix.net>
-In-Reply-To: <d4d6efdd-62d4-c5e5-adff-999caca8fe7b@redhat.com>
-References: <20191206063642.40942-1-gshan@redhat.com>
- <20191206175031.66f62929@bahia.w3ibm.bluemix.net>
- <8b4e97d1-eddb-b7d2-1069-453ec4a4263a@redhat.com>
- <20191209093645.091c9e4b@bahia.w3ibm.bluemix.net>
- <d4d6efdd-62d4-c5e5-adff-999caca8fe7b@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ieGim-0005c2-Le
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 05:56:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575889015;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MyLNwJy5spN/uUGKJwSwII6IVS9lQ48y4YIQ5w8/IR4=;
+ b=QaS+FZCh3vlA9J7hYm4hDlWn/hY86rH6I5VSGlPLmcwhQ1e6lOqXWFfUaFD13YZu2fWVIq
+ 02gjekXQB31uM/lQF4eNLM5PQqCFcijgEoJcQt0pjH1clWb8uJ268QgSgzRyV54F4mLcEf
+ 5vRmGir2ZKlfB9Qu60LhlqZtAuSwg6I=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-OTjYOWx2O-2ubTzDx2D5Dg-1; Mon, 09 Dec 2019 05:56:52 -0500
+Received: by mail-wr1-f72.google.com with SMTP id l20so7362317wrc.13
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 02:56:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WjNJQQkZsO+8a1bmft+Oyorvw86PENBNNrPDsjmoKus=;
+ b=trnAxCQp2HlLrrNVjuVhD7z7Hcc+A0vp15RDnvFOj+FlpPrakQM1CTW+vPVVL2aC4r
+ YPp8IrlZix/5uPXf/YE0lEtk+FcAglJ8n0ClDhWqjBsj7r54StGxHuFL6dJG/+DqKMsy
+ GnNNECWJnTvCWJ+YQKa5ZmpLXlw2rGnntHwyz9Ap9LUKX0t8BM2Acti+YUbmqdv3/9z3
+ 99k8x/bzg3sQNxNsKPzEzIOXY/E4f5JzCbhi9LA/JpwVbzXlTqBqSyC6KdmZ8YBM1Xbw
+ vDHlQtXPGXS1HqspVdpormMJzX0D6Uo1r+BbOK68x/hcx2Lsp6jBBrotK5u2rL0GX+P5
+ LjUw==
+X-Gm-Message-State: APjAAAXGcJcrbJRiAsvbgdMC4QaPmoFvTD2MYhbnmGi7l5WvKXYqShr4
+ 6mQl9e4yFBsui1PAWVZQsTwqVA+Xk/9dqC7d3d2+IKzJN3dnkP/Bxs94cGbJw5OY3fhuZ6SSxCp
+ lw00ie/WbHO0o67Y=
+X-Received: by 2002:a5d:4b8f:: with SMTP id b15mr1520254wrt.100.1575889011312; 
+ Mon, 09 Dec 2019 02:56:51 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy8/NxkJgUssuIKetq74Jwb56vwNb32qApCH3ThHTiCxkbweCvCG/vldgScvR32sdud2xIfBA==
+X-Received: by 2002:a5d:4b8f:: with SMTP id b15mr1520226wrt.100.1575889011060; 
+ Mon, 09 Dec 2019 02:56:51 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id l4sm12624415wml.33.2019.12.09.02.56.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Dec 2019 02:56:50 -0800 (PST)
+Subject: Re: [Xen-devel] [PATCH-for-5.0 v3 6/6] hw/pci-host: Add Kconfig entry
+ to select the IGD Passthrough Host Bridge
+To: Paolo Bonzini <pbonzini@redhat.com>, "Durrant, Paul"
+ <pdurrant@amazon.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20191209095002.32194-1-philmd@redhat.com>
+ <20191209095002.32194-7-philmd@redhat.com>
+ <3f1702b0765841b19328366af11fd3ed@EX13D32EUC003.ant.amazon.com>
+ <083d0d7f-766d-9e72-5395-b4e82858ef4d@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4e9dee3e-05b5-640d-33df-4341c2e01b8b@redhat.com>
+Date: Mon, 9 Dec 2019 11:56:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <083d0d7f-766d-9e72-5395-b4e82858ef4d@redhat.com>
+Content-Language: en-US
+X-MC-Unique: OTjYOWx2O-2ubTzDx2D5Dg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 2885399988850563478
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeltddgvddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuffhomhgrihhnpehoiihlrggsshdrohhrghenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.57.129
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,323 +109,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Paul Durrant <paul@xen.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Dec 2019 20:12:09 +1100
-Gavin Shan <gshan@redhat.com> wrote:
-
-> On 12/9/19 7:36 PM, Greg Kurz wrote:
-> > On Sun, 8 Dec 2019 00:14:00 +1100
-> > Gavin Shan <gshan@redhat.com> wrote:
-> >=20
-> >> On 12/7/19 3:50 AM, Greg Kurz wrote:
-> >>> On Fri,  6 Dec 2019 17:36:42 +1100
-> >>> Gavin Shan <gshan@redhat.com> wrote:
-> >>>
-> >>>> object_dynamic_cast() should return machine (or GPIO) state instad o=
-f NMI
-> >>>> state in do_nmi(). So it's wrong to convert it to NMI state uncondit=
-ionally.
-> >>>>
-> >>>
-> >>> object_dynamic_cast() returns either its first argument if it can be =
-cast
-> >>> to the given typename or NULL. Since the x86, ccw and spapr machines =
-and
-> >>> the PowerMac GPIO implement the NMI interface, nothing is wrong here.
-> >>>
-> >>> The do_nmi() function is called for all objects in the QOM tree and s=
-imply
-> >>> filters out the ones that don't implement the NMI interface.
-> >>>
-> >>> I do agree that this isn't super obvious though. It would be clearer =
-to
-> >>> do the filtering in the foreach() function. Something like:
-> >>>
-> >>> https://patchwork.ozlabs.org/patch/1182232/
-> >>>
-> >>
-> >> Greg, Thanks for the review and comments. I think we're talking about
-> >> different issues. I do agree it's worthy to simplify the code with the
-> >> object_child_foreach_type(), but later.
-> >>
-> >> When we have below parameters to qemu, object_dynamic_cast(o, TYPE_NMI)
-> >> returns object of "pc-q35-4.2-machine", which is passed to the subquent
-> >> NMIClass::nmi_monitor_handler(). However, the function expects a NMISt=
-ate
-> >> from its prototype as below. This patch changes the prototype to fill =
-the
-> >> gap.
-> >>
-> >>      void (*nmi_monitor_handler)(NMIState *n, int cpu_index, Error **e=
-rrp);
-> >>
-> >=20
-> > Hmm... the "pc-q35-4.2-machine" type inherits from the TYPE_PC_MACHINE,
-> > which in turns inherits from TYPE_X86_MACHINE, which implements the
-> > TYPE_NMI interface. It thus seems okay to pass this object to x86_nmi().
-> >=20
-> > What are you trying to fix here ?
-> >=20
+On 12/9/19 11:42 AM, Paolo Bonzini wrote:
+> On 09/12/19 11:10, Durrant, Paul wrote:
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>> v3: Only default with Xen (Alex Williamson)
+>>>
+>>> I did not used 'depends on XEN' as suggested by Alex but
+>>> 'default y if XEN', so one can build XEN without this feature
+>>> (for example, on other ARCH than X86).
 >=20
-> There is no valid instance associated with interface class. For this spec=
-ific
-> case, there is no NMIState instance. I don't understand how we can pass a
-> valid NMIState to the function.
-
-Ah I get it. Please read the include/qom/object.h to understand what QOM
-interfaces are about. Especially this paragraph:
-
- * # Interfaces #
- *
- * Interfaces allow a limited form of multiple inheritance.  Instances are
- * similar to normal types except for the fact that are only defined by
- * their classes and never carry any state.  You can dynamically cast an ob=
-ject
- * to one of its #Interface types and vice versa.
-
-> Furthermore, below code returns "pc-q35-4.2-machine"
-> object instead of NMIState. It's not safe to do the forced conversion her=
-e.
+> I think what you want is achieved by
 >=20
->     /* It returns "pc-q35-4.2-machine" instance */
->     NMIState *n =3D (NMIState *) object_dynamic_cast(o, TYPE_NMI);
->       :
->     nc->nmi_monitor_handler(n, ns->cpu_index, &ns->err);
+> =09default y
+> =09depends on XEN && PC_I440FX
 
-As explained in my previous mail, this _forced conversion_ is the current
-way to implement object_child_foreach_type(). It is ugly and confusing for
-newcomers but it is safe since the pointer is either TYPE_NMI or NULL, in
-which case the handler isn't called.
+I think so, but with PC_I440FX -> PCI_I440FX ;)
 
->=20
->=20
-> If "struct NMIState" is declared and the data struct is written in the fu=
-nction.
-> We will run into data corruption if I'm correct.
->=20
+It would be cleaner to pass the CONFIG_XEN_PCI_PASSTHROUGH variable to=20
+Kconfig and use it (use 'depends on XEN_PCI_PASSTHROUGH').
 
-The 'struct NMIState' isn't defined on purpose, but I agree this isn't docu=
-mented
-anywhere except in this changelog:
+This can be another step, so if this series looks OK to you so far, do=20
+you mind fixing this and the comment in the previous patch noticed by=20
+Thomas:
 
-commit 00ed3da9b5c2e66e796a172df3e19545462b9c90
-Author: David Gibson <david@gibson.dropbear.id.au>
-Date:   Tue Sep 24 16:00:33 2019 +1000
+- Extract it into a new file, 'hw/pci-host/igd_pt.c'.
++ Extract it into a new file, 'hw/pci-host/xen_igd_pt.c'.
 
-    xics: Minor fixes for XICSFabric interface
-   =20
-    Interface instances should never be directly dereferenced.  So, the com=
-mon
-    practice is to make them incomplete types to make sure no-one does that.
-    XICSFrabric, however, had a dummy type which is less safe.
-   =20
-    We were also using OBJECT_CHECK() where we should have been using
-    INTERFACE_CHECK().
-   =20
-    Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-    Reviewed-by: Greg Kurz <groug@kaod.org>
-    Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Thanks!
 
-Maybe the NMIState naming was a poor choice since there's no associated
-state with QOM interfaces. But we do want to keep a typedef though: it
-is more precise and hence safer to pass an NMIState * than an Object *.
-
-> I'm pasting the message I had. Hope this helps for understanding the issu=
-e:
->=20
-> --- a/hw/core/nmi.c
-> +++ b/hw/core/nmi.c
-> @@ -42,6 +42,10 @@ static int do_nmi(Object *o, void *opaque)
->       if (n) {
->           NMIClass *nc =3D NMI_GET_CLASS(n);
->  =20
-> +       fprintf(stdout, "%s: o=3D%s, n=3D%s\n",
-> +                __func__, object_get_typename(OBJECT(o)),
-> +                object_get_typename(OBJECT(n)));
-> +
->=20
-
-object_get_typename() returns the type of the instance, which is either
-a machine or a GPIO in the current code base. This is different from
-object_dynamic_cast() which just tells if a given object can be cast
-to a give type (either regular QOM type or QOM interface).
-
-It is up to the various NMIClass::nmi_monitor_handler() to make sure
-they're being passed the right object.
-
-macio_gpio_nmi() explicitly does that with MACIO_GPIO(n). The other
-ones only need to access the CPU state and end up checking it is
-valid: s390_nmi() checks S390_CPU(cs), x86_nmi() checks X86_CPU(cs)
-and
-
-spapr_nmi()
- ->async_run_on_cpu()
-   ->spapr_do_system_reset_on_cpu()
-     ->ppc_cpu_do_system_reset() checks POWERPC_CPU(cs)
-
-but they could maybe assert(object_dynamic_cast()) as well for
-clarity.
-
->=20
-> # QEMU 4.1.93 monitor - type 'help' for more information
-> (qemu) nmi
-> do_nmi: o=3Dpc-q35-4.2-machine, n=3Dpc-q35-4.2-machine
->=20
->=20
-> >>      Changed to:
-> >>
-> >>      void (*nmi_monitor_handler)(Object *parent, int cpu_index, Error =
-**errp);
-> >>
-> >>      ~/sandbox/src/qemu/qemu.main.x86/x86_64-softmmu/qemu-system-x86_6=
-4              \
-> >>      --enable-kvm -machine type=3Dq35,accel=3Dkvm,kernel-irqchip=3Don =
--cpu host -smp 2 -m 1G    \
-> >>      -monitor none -serial mon:stdio -nographic -s                    =
-                    \
-> >>      -bios ~/sandbox/src/firmware/seabios/out/bios.bin                =
-                    \
-> >>      -kernel ~/sandbox/src/linux/linux.main.x86/arch/x86/boot/bzImage =
-                    \
-> >>      -initrd ~/sandbox/src/util/buildroot/output/images/rootfs.cpio.xz=
-                    \
-> >>      -append "earlyprintk=3DttyS0 console=3DttyS0 debug"              =
-                        \
-> >>      -device virtio-net-pci,netdev=3Dunet,mac=3D52:54:00:f1:26:a6     =
-                        \
-> >>      -netdev user,id=3Dunet,hostfwd=3Dtcp::50959-:22                  =
-                        \
-> >>      -drive file=3D~/sandbox/images/vm.img,if=3Dnone,format=3Draw,id=
-=3Dnvme0                      \
-> >>      -device nvme,drive=3Dnvme0,serial=3Dfoo                          =
-                        \
-> >>      -drive file=3D~/sandbox/images/vm1.img,if=3Dnone,format=3Draw,id=
-=3Dnvme1                     \
-> >>      -device nvme,drive=3Dnvme1,serial=3Dfoo1
-> >>
-> >>>> This changes the prototype of NMIClass::nmi_monitor_handler() to acc=
-ept
-> >>>> the parent object of NMI state instead of itself. With this, he pare=
-nt object
-> >>>> is passed to the function, to avoid potential data corruption.
-> >>>>
-> >>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> >>>> ---
-> >>>>    hw/core/nmi.c              | 8 ++++----
-> >>>>    hw/i386/x86.c              | 2 +-
-> >>>>    hw/misc/macio/gpio.c       | 6 +++---
-> >>>>    hw/ppc/spapr.c             | 2 +-
-> >>>>    hw/s390x/s390-virtio-ccw.c | 2 +-
-> >>>>    include/hw/nmi.h           | 2 +-
-> >>>>    6 files changed, 11 insertions(+), 11 deletions(-)
-> >>>>
-> >>>> diff --git a/hw/core/nmi.c b/hw/core/nmi.c
-> >>>> index 481c4b3c7e..554708d0db 100644
-> >>>> --- a/hw/core/nmi.c
-> >>>> +++ b/hw/core/nmi.c
-> >>>> @@ -37,13 +37,13 @@ static void nmi_children(Object *o, struct do_nm=
-i_s *ns);
-> >>>>    static int do_nmi(Object *o, void *opaque)
-> >>>>    {
-> >>>>        struct do_nmi_s *ns =3D opaque;
-> >>>> -    NMIState *n =3D (NMIState *) object_dynamic_cast(o, TYPE_NMI);
-> >>>> +    Object *parent =3D object_dynamic_cast(o, TYPE_NMI);
-> >>>>   =20
-> >>>> -    if (n) {
-> >>>> -        NMIClass *nc =3D NMI_GET_CLASS(n);
-> >>>> +    if (parent) {
-> >>>> +        NMIClass *nc =3D NMI_GET_CLASS(parent);
-> >>>>   =20
-> >>>>            ns->handled =3D true;
-> >>>> -        nc->nmi_monitor_handler(n, ns->cpu_index, &ns->err);
-> >>>> +        nc->nmi_monitor_handler(parent, ns->cpu_index, &ns->err);
-> >>>>            if (ns->err) {
-> >>>>                return -1;
-> >>>>            }
-> >>>> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-> >>>> index 394edc2f72..b98204f104 100644
-> >>>> --- a/hw/i386/x86.c
-> >>>> +++ b/hw/i386/x86.c
-> >>>> @@ -190,7 +190,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(M=
-achineState *ms)
-> >>>>        return ms->possible_cpus;
-> >>>>    }
-> >>>>   =20
-> >>>> -static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
-> >>>> +static void x86_nmi(Object *parent, int cpu_index, Error **errp)
-> >>>>    {
-> >>>>        /* cpu index isn't used */
-> >>>>        CPUState *cs;
-> >>>> diff --git a/hw/misc/macio/gpio.c b/hw/misc/macio/gpio.c
-> >>>> index 6cca6b27d6..6b4dfcc188 100644
-> >>>> --- a/hw/misc/macio/gpio.c
-> >>>> +++ b/hw/misc/macio/gpio.c
-> >>>> @@ -196,10 +196,10 @@ static void macio_gpio_reset(DeviceState *dev)
-> >>>>        macio_set_gpio(s, 1, true);
-> >>>>    }
-> >>>>   =20
-> >>>> -static void macio_gpio_nmi(NMIState *n, int cpu_index, Error **errp)
-> >>>> +static void macio_gpio_nmi(Object *parent, int cpu_index, Error **e=
-rrp)
-> >>>>    {
-> >>>> -    macio_set_gpio(MACIO_GPIO(n), 9, true);
-> >>>> -    macio_set_gpio(MACIO_GPIO(n), 9, false);
-> >>>> +    macio_set_gpio(MACIO_GPIO(parent), 9, true);
-> >>>> +    macio_set_gpio(MACIO_GPIO(parent), 9, false);
-> >>>>    }
-> >>>>   =20
-> >>>>    static void macio_gpio_class_init(ObjectClass *oc, void *data)
-> >>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> >>>> index e076f6023c..3b92e4013d 100644
-> >>>> --- a/hw/ppc/spapr.c
-> >>>> +++ b/hw/ppc/spapr.c
-> >>>> @@ -3377,7 +3377,7 @@ void spapr_do_system_reset_on_cpu(CPUState *cs=
-, run_on_cpu_data arg)
-> >>>>        ppc_cpu_do_system_reset(cs);
-> >>>>    }
-> >>>>   =20
-> >>>> -static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
-> >>>> +static void spapr_nmi(Object *parent, int cpu_index, Error **errp)
-> >>>>    {
-> >>>>        CPUState *cs;
-> >>>>   =20
-> >>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> >>>> index d3edeef0ad..a49952a8b9 100644
-> >>>> --- a/hw/s390x/s390-virtio-ccw.c
-> >>>> +++ b/hw/s390x/s390-virtio-ccw.c
-> >>>> @@ -431,7 +431,7 @@ static void s390_hot_add_cpu(MachineState *machi=
-ne,
-> >>>>        s390x_new_cpu(object_class_get_name(oc), id, errp);
-> >>>>    }
-> >>>>   =20
-> >>>> -static void s390_nmi(NMIState *n, int cpu_index, Error **errp)
-> >>>> +static void s390_nmi(Object *parent, int cpu_index, Error **errp)
-> >>>>    {
-> >>>>        CPUState *cs =3D qemu_get_cpu(cpu_index);
-> >>>>   =20
-> >>>> diff --git a/include/hw/nmi.h b/include/hw/nmi.h
-> >>>> index a1e128724e..75afa67790 100644
-> >>>> --- a/include/hw/nmi.h
-> >>>> +++ b/include/hw/nmi.h
-> >>>> @@ -38,7 +38,7 @@ typedef struct NMIState NMIState;
-> >>>>    typedef struct NMIClass {
-> >>>>        InterfaceClass parent_class;
-> >>>>   =20
-> >>>> -    void (*nmi_monitor_handler)(NMIState *n, int cpu_index, Error *=
-*errp);
-> >>>> +    void (*nmi_monitor_handler)(Object *parent, int cpu_index, Erro=
-r **errp);
-> >>>>    } NMIClass;
-> >>>>   =20
-> >>>>    void nmi_monitor_handle(int cpu_index, Error **errp);
-> >>>
->=20
-> Regards,
-> Gavin
->=20
+Phil.
 
 
