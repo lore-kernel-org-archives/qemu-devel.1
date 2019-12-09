@@ -2,68 +2,66 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53AC1C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFA9C00454
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:33:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2054C20692
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:32:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B56520692
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:33:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SEfHVEPt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2054C20692
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CP4gMcrM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B56520692
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieLxR-0005ST-76
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 11:32:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35198)
+	id 1ieLyh-0006WY-Dl
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 11:33:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35321)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1ieLwE-0004tz-2t
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:31:15 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ieLxd-0005lG-9n
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:32:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1ieLwB-0003uQ-8h
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:31:08 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29562
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1ieLxc-00047R-7R
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:32:37 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21932
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ieLwA-0003tb-Hb
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:31:07 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ieLxc-00047J-2Y
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:32:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575909065;
+ s=mimecast20190719; t=1575909155;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=YqObK6gCNF6Bp18bNjz5/bXvoSgdWAnxakfKwv2Iw1w=;
- b=SEfHVEPtouL7IAU2bJ6qAlTT67cPAYFOXBbSu+0L+oZaxXx2S0zpplmfZ/FwrILqUh2MQt
- CDED2wlErUAuX9mekBzzl/ByeTgSJYutaFEt3A/2E6PJ04OnpEdL6swcOy7w8qjaH1cPT1
- ciqycVb1WBaHu8wF1QCezNvKHe9zsIU=
+ bh=2ZylJ2lpIos/+unDmmnSXuFumwd0nhZ8to3fTUCz+38=;
+ b=CP4gMcrM2KBDGBbfGfkBcEqUOBZKxLMHuUfn54zuPCxmRpzNoV0FrEXnMK1x9OFOSeOSR+
+ EncIxABZca2DQI1VjYGgYIju75wzSh8uSdxGS4f7w/N+LJ3jZYPPO7P70UxDSOVX3zcppY
+ Mcgvaj5jpJBcpCz4fvMwmhjUfl/emRc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-208-Zmy-3sQnPbqH_vErbJ3Kzw-1; Mon, 09 Dec 2019 11:31:00 -0500
-X-MC-Unique: Zmy-3sQnPbqH_vErbJ3Kzw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-324-aRU2bjnHO2qSf1gXQ35R_g-1; Mon, 09 Dec 2019 11:32:33 -0500
+X-MC-Unique: aRU2bjnHO2qSf1gXQ35R_g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B71596FA4;
- Mon,  9 Dec 2019 16:30:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C102E1097AE8;
+ Mon,  9 Dec 2019 16:32:31 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.36.118.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C63AD5D6B7;
- Mon,  9 Dec 2019 16:30:53 +0000 (UTC)
-Subject: Re: [bugfix ping2] Re: [PATCH v2 0/2] fix
- qcow2_can_store_new_dirty_bitmap
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F254C5DA60;
+ Mon,  9 Dec 2019 16:32:26 +0000 (UTC)
+Subject: Re: [PATCH v2 1/2] qcow2-bitmaps: fix qcow2_can_store_new_dirty_bitmap
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+ qemu-block@nongnu.org
 References: <20191014115126.15360-1-vsementsov@virtuozzo.com>
- <e89b8844-26c7-0768-f6dd-6faa814551e2@virtuozzo.com>
- <0db82122-ee0d-a346-cb49-d902d5d66b77@virtuozzo.com>
+ <20191014115126.15360-2-vsementsov@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -89,20 +87,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <cbba2b12-da7d-eed8-1f6b-fc2412f82ff8@redhat.com>
-Date: Mon, 9 Dec 2019 17:30:51 +0100
+Message-ID: <8c47bc33-4300-ddff-c07e-0ffbc0fd0a4f@redhat.com>
+Date: Mon, 9 Dec 2019 17:32:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <0db82122-ee0d-a346-cb49-d902d5d66b77@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20191014115126.15360-2-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="95PDfmjC02SFfGtNaXiFzQKHdQX8S867a"
+ boundary="8wrSZTuqjEGHlALNf9xJJkf5p8twZCz9h"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,69 +112,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---95PDfmjC02SFfGtNaXiFzQKHdQX8S867a
-Content-Type: multipart/mixed; boundary="65CUYlj3l5Cs3rhj7JvWCRInyPhYjQ66U"
+--8wrSZTuqjEGHlALNf9xJJkf5p8twZCz9h
+Content-Type: multipart/mixed; boundary="exqDO3O5Y00RoBAr931qdRgRZgVXtfZ4k"
 
---65CUYlj3l5Cs3rhj7JvWCRInyPhYjQ66U
+--exqDO3O5Y00RoBAr931qdRgRZgVXtfZ4k
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 02.12.19 15:09, Vladimir Sementsov-Ogievskiy wrote:
-> Hi again!
+On 14.10.19 13:51, Vladimir Sementsov-Ogievskiy wrote:
+> qcow2_can_store_new_dirty_bitmap works wrong, as it considers only
+> bitmaps already stored in the qcow2 image and ignores persistent
+> BdrvDirtyBitmap objects.
 >=20
-> Still forgotten bug-fix :(
+> So, let's instead count persistent BdrvDirtyBitmaps. We load all qcow2
+> bitmaps on open, so there should not be any bitmap in the image for
+> which we don't have BdrvDirtyBitmaps version. If it is - it's a kind of
+> corruption, and no reason to check for corruptions here (open() and
+> close() are better places for it).
 >=20
-> Is it too late for 4.2?
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/qcow2-bitmap.c | 41 ++++++++++++++++++-----------------------
+>  1 file changed, 18 insertions(+), 23 deletions(-)
 
-Sorry. :-/
+Thanks, applied to my block-next branch:
 
-Yes, I think I just forgot it.  I don=E2=80=99t think it=E2=80=99s too impo=
-rtant for
-4.2, so, well, it isn=E2=80=99t too bad, but...  Sorry.
-
-> I can't imagine better test, and it tests exactly what written in
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1712636
->=20
-> (Hmm, actually, I doubt that it is real use-case, more probably it's a bu=
-g in management layer)
->=20
-> So, take this with test or without test, to 4.2 or 5.0.
-
-I was thinking of seeing whether I could write a quicker test, but of
-course we should take the patch either way.
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block-next
 
 Max
 
 
---65CUYlj3l5Cs3rhj7JvWCRInyPhYjQ66U--
+--exqDO3O5Y00RoBAr931qdRgRZgVXtfZ4k--
 
---95PDfmjC02SFfGtNaXiFzQKHdQX8S867a
+--8wrSZTuqjEGHlALNf9xJJkf5p8twZCz9h
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3udrsACgkQ9AfbAGHV
-z0BclAf9E+4xIuUAE94nylgCyCE/l63OvacboFF1xc16xYb1D4Egulj6NZkrr3SK
-l5YDGsWzxyqtcb9Z2rRx4a9QBo8Y4P6sTHNfcn9GVY8/0YtXgPtrUkS/NRVsmybI
-xSh/j17gIPsUvRhr7grE8cbTMWT1EoBRV3eL5+bF5SZJ7VtVM5NTvdnLdVS8hx3t
-ecwY0+SEF25k12ObCM+IE78mClcuMDdFEruitR1NOO5QcQLoCHT1crnf/NepOp2c
-wS8Lj5wpSX7ec+LQtnOGNrfNq/nLZwsEkzPNPc1czyGgIeEwlpCzLgC97qokCRE/
-Drv3j9QNuAjkInplwa3EyDbkZX4LKQ==
-=vLY/
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3udxgACgkQ9AfbAGHV
+z0CjgQf9G4TFE6u4fdsICC+UZTO0LdpY8PJM+EHEuYZlRGuyZGNGGKwVh840U/3A
+NBuI8trQlmo+ieyhcGscUlmiYsyag9XbTKTOyJ5UKXSlon9yjm7UMmGeXw5337To
+mlS8ahg15XxOY2QP37n9wLGCIUXHDuTFOWl21SnUt99gBlWS74eDxWEAzCjyXBCd
+3jyWR9/+FfUeSWKEXp06sSDTl3go9JCpUzCp0IdW7mQCyeKtg8nmqPw7ocyLqx0q
+pmYOFakaPXw3+FryX80XPMTZx21fEJoJAjIUIjJ/FxISwi7UMbXjs5a5BroGV/qx
+H5kspx+/RhCU4DTBWThOExQ2QAvPBA==
+=/FPA
 -----END PGP SIGNATURE-----
 
---95PDfmjC02SFfGtNaXiFzQKHdQX8S867a--
+--8wrSZTuqjEGHlALNf9xJJkf5p8twZCz9h--
 
 
