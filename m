@@ -2,137 +2,158 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FC9FC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7CF4C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2983E2068E
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:24:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92C362068E
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:25:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="XR4UYR3W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2983E2068E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aBezcMdD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92C362068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieKtj-0001ss-8v
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:24:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48093)
+	id 1ieKuy-0003Lg-On
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:25:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53224)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <michals@xilinx.com>) id 1ieKZB-0004vw-T8
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:03:19 -0500
+ (envelope-from <jsnow@redhat.com>) id 1ieKsJ-0000jW-DQ
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:23:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <michals@xilinx.com>) id 1ieKZ6-00035b-P8
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:03:17 -0500
-Received: from mail-co1nam11on2077.outbound.protection.outlook.com
- ([40.107.220.77]:33544 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <michals@xilinx.com>) id 1ieKZ6-0002zh-Bi
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:03:12 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gFB3hcVaAGIUbxUMObw/Loe7Or7jx+zzHXu2MnzS4JwEVDWxVKyWhteEd81A1X7Xq0gY7P5KHiG8dBDr5RAdxsMtZH6oypAWF7giJffiz3oVk+8owUR/sOqgJw8qDQqJuJOd3dUlJtNH4969oJwjmgXY3foivP2YEBhq+wYINCaJJz4AgwNsvlYkGZpEWRmCOyo30vWo4B61rwKatxGfyvn5SOgfvlvDhsfh+gL7/6U/41c3kwcMoz71HzHcSufQrD0BIWmddsbfq7cfR3NPLbWaxXQ15luRFyAHf0/TxpOlTaFYS4sNVHy4kJMWGxet8nh/bwaNdRiCt4tpeHeonw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DktADPHNdKbivPRd1Ij5JPxIOd5MKDhmodedl4y8O+g=;
- b=YQvIVoSSfBKgO5t8AVrdl0f5RIWbVlimTBeOX1OYjRCUBXjCiS4FhGlZU9CmRUrB5rGkPh/ckwEVPt6o5buy3G79lBEs73OhAz0JaPp/u4MH9RZCKZuBVSzEEm3HhcfUqEk/mLGTTHehsPARpZ/3Q0Ugm2aQmT/IXpQU+h9jGTSng+aBpE8o1LO6kPkefZLPG6J9J84nq4A/UWHzbhlvk8riN/x8I467h6qhxkXdaFk/rWQ7Q1kTG8HFjzJSSD/zARFB/2t2Di/AAsuLgh8WCOXnCy4dGStrgaQwLYIAsdPecaWOxtWeYgSMBFmm/fMUy0Lfe34gLdK8z08SEN4sFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DktADPHNdKbivPRd1Ij5JPxIOd5MKDhmodedl4y8O+g=;
- b=XR4UYR3WY9/IoxDC4Cb1fMfRkLz4uoj1/psue1891JwA8GwKxQEp+Cm1MjqP+RoCi5SIizj8JeIdqmois89GkvwDEFfRxhajpTNrG+taC/shbpFe4OgVIy9NUZmwzbhKG55MFpX/HJRnLxseqPqL9lsMacUc7BDRnaXwiScRqjA=
-Received: from CY4PR02CA0009.namprd02.prod.outlook.com (2603:10b6:903:18::19)
- by BN7PR02MB5233.namprd02.prod.outlook.com (2603:10b6:408:25::27)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2516.13; Mon, 9 Dec
- 2019 15:03:09 +0000
-Received: from BL2NAM02FT013.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e46::204) by CY4PR02CA0009.outlook.office365.com
- (2603:10b6:903:18::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2516.12 via Frontend
- Transport; Mon, 9 Dec 2019 15:03:08 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT013.mail.protection.outlook.com (10.152.77.19) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2495.26
- via Frontend Transport; Mon, 9 Dec 2019 15:03:08 +0000
-Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
- (envelope-from <michal.simek@xilinx.com>)
- id 1ieKZ1-0007xe-Q8; Mon, 09 Dec 2019 07:03:07 -0800
-Received: from [127.0.0.1] (helo=localhost)
- by xsj-pvapsmtp01 with smtp (Exim 4.63)
- (envelope-from <michal.simek@xilinx.com>)
- id 1ieKYw-0006Ik-MU; Mon, 09 Dec 2019 07:03:02 -0800
-Received: from [172.30.17.107] by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <michals@xilinx.com>)
- id 1ieKYv-0006Hp-8i; Mon, 09 Dec 2019 07:03:01 -0800
-Subject: Re: [PATCH 1/5] arm64: zynqmp: Add firmware DT node
-To: Guenter Roeck <linux@roeck-us.net>,
- "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-References: <20191018160735.15658-1-m.tretter@pengutronix.de>
- <20191018160735.15658-2-m.tretter@pengutronix.de>
- <20191208223814.GA21260@roeck-us.net>
- <dbba2a25-cbf7-60f4-99f7-056512e28d00@xilinx.com>
- <4821742f-2d60-b722-b954-263de975bf2e@roeck-us.net>
- <20191209074840.GP32392@toto>
- <d2e63acb-c076-7bfb-c492-0355ec106cbf@roeck-us.net>
-From: Michal Simek <michal.simek@xilinx.com>
-Message-ID: <fa36a9e9-9e44-d1ff-cfdc-22d0484318ff@xilinx.com>
-Date: Mon, 9 Dec 2019 16:02:58 +0100
+ (envelope-from <jsnow@redhat.com>) id 1ieKsH-0004I6-RQ
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:23:03 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26990)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ieKsH-0004I0-MP
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:23:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575904981;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=NmK5lq0j47d1h89UVEjNvsUpTjkiKYaC6TdMTeQnILI=;
+ b=aBezcMdDZleySR4VZYCsvmMktp0tvWQ26l6h7YOF7/4A/FoPu4uUzZRYlQknmVAZcTzsuc
+ LcEK7ooh+t9W8qFzGB8/51TfD2mSp7OQu4DALPqr2HoyzC0ztV4TOScWaxOv+nXUijjUEH
+ NCo/Ih4YeirGXr/zDRFwgHeZZEDqzew=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-4-aBR55WaLOPuyKr_CbwkpAA-1; Mon, 09 Dec 2019 10:22:59 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13C39800EC0;
+ Mon,  9 Dec 2019 15:22:58 +0000 (UTC)
+Received: from [10.10.125.40] (ovpn-125-40.rdu2.redhat.com [10.10.125.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 679C26058A;
+ Mon,  9 Dec 2019 15:22:52 +0000 (UTC)
+Subject: Re: [PATCH v2] migration/dirty-bitmaps: change bitmap enumeration
+ method
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20190514201926.10407-1-jsnow@redhat.com>
+ <aab4e1c7-37eb-5b3e-26d2-fca33ba87662@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <d164961f-4da7-3678-2f56-5486cee3d07d@redhat.com>
+Date: Mon, 9 Dec 2019 10:22:49 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ Thunderbird/68.3.0
 MIME-Version: 1.0
-In-Reply-To: <d2e63acb-c076-7bfb-c492-0355ec106cbf@roeck-us.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <aab4e1c7-37eb-5b3e-26d2-fca33ba87662@virtuozzo.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83; IPV:NLI; CTRY:US; EFV:NLI;
- SFV:NSPM;
- SFS:(10009020)(4636009)(346002)(396003)(39860400002)(136003)(376002)(189003)(199004)(70206006)(2616005)(9786002)(81156014)(31696002)(4326008)(36756003)(70586007)(44832011)(5660300002)(229853002)(6636002)(31686004)(230700001)(53546011)(478600001)(8936002)(305945005)(336012)(26005)(356004)(8676002)(6666004)(54906003)(110136005)(316002)(186003)(81166006)(426003)(2906002);
- DIR:OUT; SFP:1101; SCL:1; SRVR:BN7PR02MB5233; H:xsj-pvapsmtpgw01; FPR:;
- SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; MX:1; A:1; 
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 76127af6-71f5-4b80-a4a5-08d77cb8e6df
-X-MS-TrafficTypeDiagnostic: BN7PR02MB5233:
-X-Microsoft-Antispam-PRVS: <BN7PR02MB523349D866F89A8EEF87D36BC6580@BN7PR02MB5233.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 02462830BE
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8jC1l0FuAK6gV7mZiVHHeEiP4D50WWmiRH7MViIAOVB8fiqDBtrkNJIL3CZQh8XGS8ve8l7yiKNf4/Xf580pVgowz+Nsx7udYnz161a3FJIUROwThm9jo1+HNwf9Wyt0ROV4dDLNmEiLxIt3R5g5t55Dqb3wbP+v/BtO7qTAKG3rr2A7hCi0qTjhAYgPd2zR5Gc/pk7xj+56UAlS8wvrrVoM/fbB+yUlKImrQxC8aMOk9HveSToE1VO1JXV825rsr19owB8ZWdrIGV3921DQ3dlLYmpMv1GVyTA96uBvhiCwncs+WgUhB7RCM36nyPJXIVPZ+430iQFTVwk7OZd8ZCq7OAT1DMZTVDM8Yipm/oSWfnclNmiH5p/JcrqSJF0JSXolUnbL4lSYBzmWIVMEB+hGkfhXgBN5TCx7/LuNCwf60qbKPsTjCmsgb2SVM0Mu
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2019 15:03:08.3716 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76127af6-71f5-4b80-a4a5-08d77cb8e6df
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB5233
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.220.77
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: aBR55WaLOPuyKr_CbwkpAA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -144,56 +165,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mark.rutland@arm.com, devicetree@vger.kernel.org,
- Rajan Vaja <rajan.vaja@xilinx.com>, qemu-devel@nongnu.org,
- Michal Simek <michal.simek@xilinx.com>,
- Michael Tretter <m.tretter@pengutronix.de>, Edgar Iglesias <edgari@xilinx.com>,
- robh+dt@kernel.org, Rajan Vaja <rajanv@xilinx.com>,
- linux-arm-kernel@lists.infradead.org
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ aihua liang <aliang@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09. 12. 19 15:32, Guenter Roeck wrote:
-> On 12/8/19 11:48 PM, Edgar E. Iglesias wrote:
->> On Sun, Dec 08, 2019 at 11:19:33PM -0800, Guenter Roeck wrote:
->>> On 12/8/19 10:42 PM, Michal Simek wrote:
->>>> Hi, +Edgar
->>>>
->>>>
->>>> On 08. 12. 19 23:38, Guenter Roeck wrote:
->>>>> On Fri, Oct 18, 2019 at 06:07:31PM +0200, Michael Tretter wrote:
->>>>>> From: Rajan Vaja <rajan.vaja@xilinx.com>
->>>>>>
->>>>>> Add firmware DT node in ZynqMP device tree. This node
->>>>>> uses bindings as per new firmware interface driver.
->>>>>>
->>>>>> Signed-off-by: Rajan Vaja <rajanv@xilinx.com>
->>>>>> Signed-off-by: Michal Simek <michal.simek@xilinx.com>
->>>>>> Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
->>>>>
->>>>> With this patch applied in the mainline kernel, the qemu xlnx-zcu102
->>>>> emulation crashes (see below). Any idea what it might take to get
->>>>> qemu back to working ?
->>>>
->>>> Driver talks through ATF to PMU unit(microblaze). I don't think A53+MB
->>>> concept is working with mainline qemu. But crash is too hard. It should
->>
->> Yes, QEMU doesn't support the Cortex-A53s along with the PMU MicroBlaze.
->>
->> My workaround when using upstream QEMU is a modified DT without the
->> PMU firmware
->> and with fixed-clock nodes.
->>
-> 
-> I can't do that for my boot tests. Normally I would just disable
-> ZYNQMP_FIRMWARE,
-> but that is hard enabled with ARCH_ZYNQMP. I'll have to drop those tests,
-> unfortunately, if the firmware driver is considered mandatory.
 
-We can make it optional.
-Rajan: please send a patch for it.
 
-M
+On 12/6/19 5:31 PM, Vladimir Sementsov-Ogievskiy wrote:
+> 14.05.2019 23:19, John Snow wrote:
+>> Shift from looking at every root BDS to *every* BDS. This will migrate
+>> bitmaps that are attached to blockdev created nodes instead of just ones
+>> attached to emulated storage devices.
+>>
+>> Note that this will not migrate anonymous or internal-use bitmaps, as
+>> those are defined as having no name.
+>>
+>> This will also fix the Coverity issues Peter Maydell has been asking
+>> about for the past several releases, as well as fixing a real bug.
+>>
+>> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+>> Reported-by: Coverity =F0=9F=98=85
+>=20
+> What was the coverity number (I don't believe that it was smile:)?
+>=20
+
+    Reported-by: Peter Maydell <peter.maydell@linaro.org>
+    Reported-by: Coverity =F0=9F=98=85
+    Reported-by: aihua liang <aliang@redhat.com>
+    Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+    Signed-off-by: John Snow <jsnow@redhat.com>
+    Message-id: 20190514201926.10407-1-jsnow@redhat.com
+    Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1652490
+    Fixes: Coverity CID 1390625
+    CC: Stefan Hajnoczi <stefanha@redhat.com>
+    Signed-off-by: John Snow <jsnow@redhat.com>
+
+
+> Do someone know, that this patch fixes very-very-very terrible bug?
+>=20
+> Before this patch, here were bdrv_next-based loop, with exists from it,
+> but not using bdrv_next_cleanup(). This leads to leaked (incremented) ref=
+cnt of
+> bds on any failure during this loop!
+>=20
+> Now we faced this bug, in Rhel-based Qemu, so I strongly recommend to fix=
+ it in Rhel.
+
+OK, this was fixed for 4.1, and was introduced in b35ebdf076d for
+2.12.0, so all versions between have the problem.
+
+>=20
+>> Reported-by: aihua liang <aliang@redhat.com>
+>> Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=3D1652490
+>> Fixes: Coverity CID 1390625
+>> CC: Stefan Hajnoczi <stefanha@redhat.com>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
+>> ---
+>>   migration/block-dirty-bitmap.c | 14 ++++----------
+>>   1 file changed, 4 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitm=
+ap.c
+>> index d1bb863cb6..4a896a09eb 100644
+>> --- a/migration/block-dirty-bitmap.c
+>> +++ b/migration/block-dirty-bitmap.c
+>> @@ -273,7 +273,6 @@ static int init_dirty_bitmap_migration(void)
+>>       BlockDriverState *bs;
+>>       BdrvDirtyBitmap *bitmap;
+>>       DirtyBitmapMigBitmapState *dbms;
+>> -    BdrvNextIterator it;
+>>       Error *local_err =3D NULL;
+>>  =20
+>>       dirty_bitmap_mig_state.bulk_completed =3D false;
+>> @@ -281,13 +280,8 @@ static int init_dirty_bitmap_migration(void)
+>>       dirty_bitmap_mig_state.prev_bitmap =3D NULL;
+>>       dirty_bitmap_mig_state.no_bitmaps =3D false;
+>>  =20
+>> -    for (bs =3D bdrv_first(&it); bs; bs =3D bdrv_next(&it)) {
+>> -        const char *drive_name =3D bdrv_get_device_or_node_name(bs);
+>> -
+>> -        /* skip automatically inserted nodes */
+>> -        while (bs && bs->drv && bs->implicit) {
+>> -            bs =3D backing_bs(bs);
+>> -        }
+>> +    for (bs =3D bdrv_next_all_states(NULL); bs; bs =3D bdrv_next_all_st=
+ates(bs)) {
+>> +        const char *name =3D bdrv_get_device_or_node_name(bs);
+>>  =20
+>>           for (bitmap =3D bdrv_dirty_bitmap_next(bs, NULL); bitmap;
+>>                bitmap =3D bdrv_dirty_bitmap_next(bs, bitmap))
+>> @@ -296,7 +290,7 @@ static int init_dirty_bitmap_migration(void)
+>>                   continue;
+>>               }
+>>  =20
+>> -            if (drive_name =3D=3D NULL) {
+>> +            if (!name || strcmp(name, "") =3D=3D 0) {
+>>                   error_report("Found bitmap '%s' in unnamed node %p. It=
+ can't "
+>>                                "be migrated", bdrv_dirty_bitmap_name(bit=
+map), bs);
+>>                   goto fail;
+>> @@ -313,7 +307,7 @@ static int init_dirty_bitmap_migration(void)
+>>  =20
+>>               dbms =3D g_new0(DirtyBitmapMigBitmapState, 1);
+>>               dbms->bs =3D bs;
+>> -            dbms->node_name =3D drive_name;
+>> +            dbms->node_name =3D name;
+>>               dbms->bitmap =3D bitmap;
+>>               dbms->total_sectors =3D bdrv_nb_sectors(bs);
+>>               dbms->sectors_per_chunk =3D CHUNK_SIZE * 8 *
+>>
+>=20
+>=20
 
 
