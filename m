@@ -2,75 +2,82 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AFFC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 13:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1770BC43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 13:06:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 755EC2077B
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 13:06:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 755EC2077B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C18932077B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 13:06:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="feb5SHfG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C18932077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieIjr-00035j-Hj
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 08:06:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42819)
+	id 1ieIkG-0003cG-Rp
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 08:06:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42895)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1ieIiu-0002EC-2H
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 08:05:13 -0500
+ (envelope-from <beata.michalska@linaro.org>) id 1ieIjG-0002bl-Vj
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 08:05:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1ieIis-0001WX-61
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 08:05:12 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2055 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1ieIio-0001T4-5I; Mon, 09 Dec 2019 08:05:06 -0500
-Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.108])
- by Forcepoint Email with ESMTP id EF84DEC8CF68C3FF54C9;
- Mon,  9 Dec 2019 13:04:51 +0000 (GMT)
-Received: from lhreml709-chm.china.huawei.com (10.201.108.58) by
- lhreml701-cah.china.huawei.com (10.201.108.42) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Mon, 9 Dec 2019 13:04:51 +0000
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml709-chm.china.huawei.com (10.201.108.58) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Mon, 9 Dec 2019 13:04:51 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Mon, 9 Dec 2019 13:04:51 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Subject: RE: [PATCH 1/5] hw/arm: Align ACPI blob len to PAGE size
-Thread-Topic: [PATCH 1/5] hw/arm: Align ACPI blob len to PAGE size
-Thread-Index: AQHVeswOt9Cm/mHIvkOjMvan5ZmmMqeBqoOAgAR2W8CALAlAoA==
-Date: Mon, 9 Dec 2019 13:04:51 +0000
-Message-ID: <323aa74a92934b6a989e6e4dbe0dfe21@huawei.com>
-References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
- <20191004155302.4632-2-shameerali.kolothum.thodi@huawei.com>
- <20191108171745.1465295b@redhat.com>
- <3ae89f87a5d64f57bea7246772c41301@huawei.com>
-In-Reply-To: <3ae89f87a5d64f57bea7246772c41301@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <beata.michalska@linaro.org>) id 1ieIjE-0001dg-2j
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 08:05:34 -0500
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:44216)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
+ id 1ieIjD-0001dB-RG
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 08:05:32 -0500
+Received: by mail-il1-x143.google.com with SMTP id z12so12609999iln.11
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 05:05:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Pq1VnlfgzcHCQJUO32Frg0EdLNprnm9eqLtuA42zu7k=;
+ b=feb5SHfGA+O42Pfi3xXO9Rqt5xYzZjznx9mrRC+eUdR2sFjzJRgk6UQfC4n8tb1G7W
+ zO+OYzrw7xC4wXhLbgCq9V4ZJ5XfC92+xl95paRQbBBsbz43qudQl9+BVOKkzW6aQdXI
+ FZbaKxe4igjH0EOSDjaXODalaVs949GmPhs7c53qjjkbPOra0wvHs4ROlevvToLzbxzb
+ e49MJb3Yp7vLNcCNmwfG0Pwdd5Mpfou4XfAYvlw1vgS2s1ok0shCE4PI7p/mZS7hbadp
+ bR2jzT5sjyPssQttlC7kt+g3tb+/DjQouBAjEhALtKNAhrPRlpyAOo+bS19M43MeF+hy
+ hVMg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Pq1VnlfgzcHCQJUO32Frg0EdLNprnm9eqLtuA42zu7k=;
+ b=LlL8b6fmcTjgWL56e6MOJxuKjdyoFjdTlqjBgj6x6uswS1Ll2wpuZ6LCtBvMyiAGJM
+ uLTKzUORuD2E0lNHXYFaD/HI9+m24hg5ALQo7YOF/gTTMbvOuXowU+GJKdOnxB6QT+DE
+ G5M1KqYTd7dMl9z5q9ndXTbltPSvbLe3dARQSPH8VNavmoI48nJ/9j6jIrLUkX0Oxthj
+ U+Dxxc4ee4kWsmRLFv0V6kKXBlYZlw9jAUdvH9TgG8G0w1ixdud89tYxw1tSJ7N04Feu
+ e5KybsjYXqYRCqAmIpmovPaZt+qV37mCfL06hZ5fOP8x1sXQw3wLS7U9qUK4Ppsj1J/c
+ C2lA==
+X-Gm-Message-State: APjAAAVdZHxEIj5QvSWU3bjPobZ5wzIpNqgCGul7mYbkViLjpld5zioA
+ kxrFUznx76E//lboslqmmlT0jtrSi3pGSapUvy8/Ug==
+X-Google-Smtp-Source: APXvYqzRysTxu6BAnyOdhlOugs6B0yiBfWcE+8peBNltmDcf3EYuCxWSNBXWuukvL1Afr5eHIQI8kAb6QfwN/XraZg0=
+X-Received: by 2002:a92:5b5b:: with SMTP id p88mr9272188ilb.307.1575896730283; 
+ Mon, 09 Dec 2019 05:05:30 -0800 (PST)
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 185.176.76.210
+References: <20191111014048.21296-1-zhengxiang9@huawei.com>
+ <20191111014048.21296-6-zhengxiang9@huawei.com>
+ <CADSWDztF=eaUDNnq8bhnPyTKW1YjAWm4UBaH-NBPkzjnzx0bxg@mail.gmail.com>
+ <238ea7b3-9d6d-e3f7-40c9-e3e62b5fb477@huawei.com>
+In-Reply-To: <238ea7b3-9d6d-e3f7-40c9-e3e62b5fb477@huawei.com>
+From: Beata Michalska <beata.michalska@linaro.org>
+Date: Mon, 9 Dec 2019 13:05:19 +0000
+Message-ID: <CADSWDzvFvS6mYiMhXu2J+u+sUxZaKcCE78EuSggv-VOY7zEN_w@mail.gmail.com>
+Subject: Re: [RESEND PATCH v21 5/6] target-arm: kvm64: handle SIGBUS signal
+ from kernel or KVM
+To: gengdongjiu <gengdongjiu@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,241 +89,551 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- Linuxarm <linuxarm@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, ehabkost@redhat.com,
+ kvm@vger.kernel.org, mst@redhat.com, wanghaibin.wang@huawei.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, linuxarm@huawei.com,
+ shannon.zhaosl@gmail.com, Xiang Zheng <zhengxiang9@huawei.com>,
+ qemu-arm@nongnu.org, james.morse@arm.com, jonathan.cameron@huawei.com,
+ Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, xuwei5@huawei.com,
+ Laszlo Ersek <lersek@redhat.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Igor/ Michael,
+On Sat, 7 Dec 2019 at 09:33, gengdongjiu <gengdongjiu@huawei.com> wrote:
+>
+>
+>
+> On 2019/11/22 23:47, Beata Michalska wrote:
+> > Hi,
+> >
+> > On Mon, 11 Nov 2019 at 01:48, Xiang Zheng <zhengxiang9@huawei.com> wrote:
+> >>
+> >> From: Dongjiu Geng <gengdongjiu@huawei.com>
+> >>
+> >> Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+> >> translates the host VA delivered by host to guest PA, then fills this PA
+> >> to guest APEI GHES memory, then notifies guest according to the SIGBUS
+> >> type.
+> >>
+> >> When guest accesses the poisoned memory, it will generate a Synchronous
+> >> External Abort(SEA). Then host kernel gets an APEI notification and calls
+> >> memory_failure() to unmapped the affected page in stage 2, finally
+> >> returns to guest.
+> >>
+> >> Guest continues to access the PG_hwpoison page, it will trap to KVM as
+> >> stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
+> >> Qemu, Qemu records this error address into guest APEI GHES memory and
+> >> notifes guest using Synchronous-External-Abort(SEA).
+> >>
+> >> In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
+> >> in which we can setup the type of exception and the syndrome information.
+> >> When switching to guest, the target vcpu will jump to the synchronous
+> >> external abort vector table entry.
+> >>
+> >> The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
+> >> ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
+> >> not valid and hold an UNKNOWN value. These values will be set to KVM
+> >> register structures through KVM_SET_ONE_REG IOCTL.
+> >>
+> >> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> >> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+> >> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> >> ---
+> >>  hw/acpi/acpi_ghes.c         | 297 ++++++++++++++++++++++++++++++++++++
+> >>  include/hw/acpi/acpi_ghes.h |   4 +
+> >>  include/sysemu/kvm.h        |   3 +-
+> >>  target/arm/cpu.h            |   4 +
+> >>  target/arm/helper.c         |   2 +-
+> >>  target/arm/internals.h      |   5 +-
+> >>  target/arm/kvm64.c          |  64 ++++++++
+> >>  target/arm/tlb_helper.c     |   2 +-
+> >>  target/i386/cpu.h           |   2 +
+> >>  9 files changed, 377 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
+> >> index 42c00ff3d3..f5b54990c0 100644
+> >> --- a/hw/acpi/acpi_ghes.c
+> >> +++ b/hw/acpi/acpi_ghes.c
+> >> @@ -39,6 +39,34 @@
+> >>  /* The max size in bytes for one error block */
+> >>  #define ACPI_GHES_MAX_RAW_DATA_LENGTH       0x1000
+> >>
+> >> +/*
+> >> + * The total size of Generic Error Data Entry
+> >> + * ACPI 6.1/6.2: 18.3.2.7.1 Generic Error Data,
+> >> + * Table 18-343 Generic Error Data Entry
+> >> + */
+> >> +#define ACPI_GHES_DATA_LENGTH               72
+> >> +
+> >> +/*
+> >> + * The memory section CPER size,
+> >> + * UEFI 2.6: N.2.5 Memory Error Section
+> >> + */
+> >> +#define ACPI_GHES_MEM_CPER_LENGTH           80
+> >> +
+> >> +/*
+> >> + * Masks for block_status flags
+> >> + */
+> >> +#define ACPI_GEBS_UNCORRECTABLE         1
+> >
+> > Why not listing all supported statuses ? Similar to error severity below ?
+> >
+> >> +
+> >> +/*
+> >> + * Values for error_severity field
+> >> + */
+> >> +enum AcpiGenericErrorSeverity {
+> >> +    ACPI_CPER_SEV_RECOVERABLE,
+> >> +    ACPI_CPER_SEV_FATAL,
+> >> +    ACPI_CPER_SEV_CORRECTED,
+> >> +    ACPI_CPER_SEV_NONE,
+> >> +};
+> >> +
+> >>  /*
+> >>   * Now only support ARMv8 SEA notification type error source
+> >>   */
+> >> @@ -49,6 +77,16 @@
+> >>   */
+> >>  #define ACPI_GHES_SOURCE_GENERIC_ERROR_V2   10
+> >>
+> >> +#define UUID_BE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)        \
+> >> +    {{{ ((a) >> 24) & 0xff, ((a) >> 16) & 0xff, ((a) >> 8) & 0xff, (a) & 0xff, \
+> >> +    ((b) >> 8) & 0xff, (b) & 0xff,                   \
+> >> +    ((c) >> 8) & 0xff, (c) & 0xff,                    \
+> >> +    (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) } } }
+> >> +
+> >> +#define UEFI_CPER_SEC_PLATFORM_MEM                   \
+> >> +    UUID_BE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
+> >> +    0xED, 0x7C, 0x83, 0xB1)
+> >> +
+> >>  /*
+> >>   * | +--------------------------+ 0
+> >>   * | |        Header            |
+> >> @@ -77,6 +115,174 @@ typedef struct AcpiGhesState {
+> >>      uint64_t ghes_addr_le;
+> >>  } AcpiGhesState;
+> >>
+> >> +/*
+> >> + * Total size for Generic Error Status Block
+> >> + * ACPI 6.2: 18.3.2.7.1 Generic Error Data,
+> >> + * Table 18-380 Generic Error Status Block
+> >> + */
+> >> +#define ACPI_GHES_GESB_SIZE                 20
+> >
+> > Minor: This is not entirely correct: GEDE is part of GESB so the total length
+> > would be ACPI_GHES_GESB_SIZE + n* sizeof(GEDE)
+> yes, the comments needs to correct.
+>
+> >
+> >> +/* The offset of Data Length in Generic Error Status Block */
+> >> +#define ACPI_GHES_GESB_DATA_LENGTH_OFFSET   12
+> >> +
+> >
+> > If those were nicely represented as structures you get the offsets easily
+> > without having number of defines. That could simplify the code and make it
+> > more readable - see comments below
+> >
+> >> +/*
+> >> + * Record the value of data length for each error status block to avoid getting
+> >> + * this value from guest.
+> >> + */
+> >> +static uint32_t acpi_ghes_data_length[ACPI_GHES_ERROR_SOURCE_COUNT];
+> >> +
+> >> +/*
+> >> + * Generic Error Data Entry
+> >> + * ACPI 6.1: 18.3.2.7.1 Generic Error Data
+> >> + */
+> >> +static void acpi_ghes_generic_error_data(GArray *table, QemuUUID section_type,
+> >> +                uint32_t error_severity, uint16_t revision,
+> >> +                uint8_t validation_bits, uint8_t flags,
+> >> +                uint32_t error_data_length, QemuUUID fru_id,
+> >> +                uint8_t *fru_text, uint64_t time_stamp)
+> >
+> > Why not just defining a struct that represents the GED entry?
+>
+> This is due to address Igor's comments. there are two reasons:
+> 1. avoid define many structures about APEI/GHES/CPER, so you can see it has very little structures definition in acpi_ghes.h
+> 2. using build_append_int_noprefix() to compose the table can avoid considering endian
+>
+> >
+> >> +{
+> >> +    QemuUUID uuid_le;
+> >> +
+> >> +    /* Section Type */
+> >> +    uuid_le = qemu_uuid_bswap(section_type);
+> >> +    g_array_append_vals(table, uuid_le.data, ARRAY_SIZE(uuid_le.data));
+> >> +
+> >> +    /* Error Severity */
+> >> +    build_append_int_noprefix(table, error_severity, 4);
+> >> +    /* Revision */
+> >> +    build_append_int_noprefix(table, revision, 2);
+> >
+> > Minor: According to the spec it seems that the revision number is
+> > a fixed value so you could drop that from the parameters....
+> > or ... use a struct to represent the data
+> >
+> >> +    /* Validation Bits */
+> >> +    build_append_int_noprefix(table, validation_bits, 1);
+> >> +    /* Flags */
+> >> +    build_append_int_noprefix(table, flags, 1);
+> >> +    /* Error Data Length */
+> >> +    build_append_int_noprefix(table, error_data_length, 4);
+> >> +
+> >> +    /* FRU Id */
+> >> +    uuid_le = qemu_uuid_bswap(fru_id);
+> >> +    g_array_append_vals(table, uuid_le.data, ARRAY_SIZE(uuid_le.data));
+> >> +
+> >> +    /* FRU Text */
+> >> +    g_array_append_vals(table, fru_text, 20);
+> >> +    /* Timestamp */
+> >> +    build_append_int_noprefix(table, time_stamp, 8);
+> >> +}
+> >> +
+> >> +/*
+> >> + * Generic Error Status Block
+> >> + * ACPI 6.1: 18.3.2.7.1 Generic Error Data
+> >> + */
+> >> +static void acpi_ghes_generic_error_status(GArray *table, uint32_t block_status,
+> >> +                uint32_t raw_data_offset, uint32_t raw_data_length,
+> >> +                uint32_t data_length, uint32_t error_severity)
+> >
+> > Same as the above
+> >
+> >> +{
+> >> +    /* Block Status */
+> >> +    build_append_int_noprefix(table, block_status, 4);
+> >> +    /* Raw Data Offset */
+> >> +    build_append_int_noprefix(table, raw_data_offset, 4);
+> >> +    /* Raw Data Length */
+> >> +    build_append_int_noprefix(table, raw_data_length, 4);
+> >> +    /* Data Length */
+> >> +    build_append_int_noprefix(table, data_length, 4);
+> >> +    /* Error Severity */
+> >> +    build_append_int_noprefix(table, error_severity, 4);
+> >> +}
+> >> +
+> >> +/* UEFI 2.6: N.2.5 Memory Error Section */
+> >> +static void acpi_ghes_build_append_mem_cper(GArray *table,
+> >> +                                            uint64_t error_physical_addr)
+> >> +{
+> >> +    /*
+> >> +     * Memory Error Record
+> >> +     */
+> >> +
+> >> +    /* Validation Bits */
+> >> +    build_append_int_noprefix(table,
+> >> +                              (1UL << 14) | /* Type Valid */
+> >> +                              (1UL << 1) /* Physical Address Valid */,
+> >> +                              8);
+> >> +    /* Error Status */
+> >> +    build_append_int_noprefix(table, 0, 8);
+> >
+> > Just wondering whether it would be worth to specify the Error Type
+> > through the Error Status ?
+> >
+> >> +    /* Physical Address */
+> >> +    build_append_int_noprefix(table, error_physical_addr, 8);
+> >> +    /* Skip all the detailed information normally found in such a record */
+> >> +    build_append_int_noprefix(table, 0, 48);
+> >> +    /* Memory Error Type */
+> >> +    build_append_int_noprefix(table, 0 /* Unknown error */, 1);
+> >> +    /* Skip all the detailed information normally found in such a record */
+> >> +    build_append_int_noprefix(table, 0, 7);
+> >> +}
+> >> +
+> >> +static int acpi_ghes_record_mem_error(uint64_t error_block_address,
+> >> +                                      uint64_t error_physical_addr,
+> >> +                                      uint32_t data_length)
+> >> +{
+> >> +    GArray *block;
+> >> +    uint64_t current_block_length;
+> >> +    /* Memory Error Section Type */
+> >> +    QemuUUID mem_section_id_le = UEFI_CPER_SEC_PLATFORM_MEM;
+> >
+> > As already mentioned - mixing LE /w BE
+> >
+> >> +    QemuUUID fru_id = {};
+> >> +    uint8_t fru_text[20] = {};
+> >> +
+> >> +    /*
+> >> +     * Generic Error Status Block
+> >> +     * | +---------------------+
+> >> +     * | |     block_status    |
+> >> +     * | +---------------------+
+> >> +     * | |    raw_data_offset  |
+> >> +     * | +---------------------+
+> >> +     * | |    raw_data_length  |
+> >> +     * | +---------------------+
+> >> +     * | |     data_length     |
+> >> +     * | +---------------------+
+> >> +     * | |   error_severity    |
+> >> +     * | +---------------------+
+> >> +     */
+> >> +    block = g_array_new(false, true /* clear */, 1);
+> >> +
+> >> +    /* The current whole length of the generic error status block */
+> >> +    current_block_length = ACPI_GHES_GESB_SIZE + data_length;
+> >> +
+> >> +    /* This is the length if adding a new generic error data entry*/
+> >> +    data_length += ACPI_GHES_DATA_LENGTH;
+> >> +    data_length += ACPI_GHES_MEM_CPER_LENGTH;
+> >> +
+> >> +    /*
+> >> +     * Check whether it will run out of the preallocated memory if adding a new
+> >> +     * generic error data entry
+> >> +     */
+> >> +    if ((data_length + ACPI_GHES_GESB_SIZE) > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
+> >> +        error_report("Record CPER out of boundary!!!");
+> >
+> > Minor: The error message could be made more accurate, like:
+> >     "Not enough memory to record new CPER"
+> >
+> >> +        return ACPI_GHES_CPER_FAIL;
+> >> +    }
+> >> +
+> >> +    /* Build the new generic error status block header */
+> >> +    acpi_ghes_generic_error_status(block, cpu_to_le32(ACPI_GEBS_UNCORRECTABLE),
+> >> +        0, 0, cpu_to_le32(data_length), cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE));
+> >> +
+> >> +    /* Write back above generic error status block header to guest memory */
+> >> +    cpu_physical_memory_write(error_block_address, block->data,
+> >> +                              block->len);
+> >> +
+> >> +    /* Add a new generic error data entry */
+> >> +
+> >> +    data_length = block->len;
+> >> +    /* Build this new generic error data entry header */
+> >> +    acpi_ghes_generic_error_data(block, mem_section_id_le,
+> >> +        cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE), cpu_to_le32(0x300), 0, 0,
+> >> +        cpu_to_le32(ACPI_GHES_MEM_CPER_LENGTH), fru_id, fru_text, 0);
+> >> +
+> >> +    /* Build the memory section CPER for above new generic error data entry */
+> >> +    acpi_ghes_build_append_mem_cper(block, error_physical_addr);
+> >> +
+> >> +    /* Write back above this new generic error data entry to guest memory */
+> >> +    cpu_physical_memory_write(error_block_address + current_block_length,
+> >> +        block->data + data_length, block->len - data_length);
+> >> +
+> >
+> > As already mentioned and unless I have missed smth (which is highly possible)
+> > this will append new records while the GESB is kept 'in-place'. So the
+> > used space is
+> > only growing.
+> >
+> >> +    g_array_free(block, true);
+> >> +
+> >> +    return ACPI_GHES_CPER_OK;
+> >> +}
+> >> +
+> >>  /*
+> >>   * Hardware Error Notification
+> >>   * ACPI 4.0: 17.3.2.7 Hardware Error Notification
+> >> @@ -265,3 +471,94 @@ void acpi_ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_error)
+> >>      fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
+> >>          NULL, &ges.ghes_addr_le, sizeof(ges.ghes_addr_le), false);
+> >>  }
+> >> +
+> >> +bool acpi_ghes_record_errors(uint32_t notify, uint64_t physical_address)
+> >> +{
+> >> +    uint64_t error_block_addr, read_ack_register_addr, read_ack_register = 0;
+> >> +    int loop = 0;
+> >> +    uint64_t start_addr = le64_to_cpu(ges.ghes_addr_le);
+> >> +    bool ret = ACPI_GHES_CPER_FAIL;
+> >> +    uint8_t source_id;
+> >> +    const uint8_t error_source_id[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+> >> +                                        0xff, 0xff,    0, 0xff, 0xff, 0xff};
+> >> +
+> >
+> > I'm not entirely sure why this is needed - se below
+> >
+> >> +    /*
+> >> +     * | +---------------------+ ges.ghes_addr_le
+> >> +     * | |error_block_address0 |
+> >> +     * | +---------------------+ --+--
+> >> +     * | |    .............    | ACPI_GHES_ADDRESS_SIZE
+> >> +     * | +---------------------+ --+--
+> >> +     * | |error_block_addressN |
+> >> +     * | +---------------------+
+> >> +     * | | read_ack_register0  |
+> >> +     * | +---------------------+ --+--
+> >> +     * | |   .............     | ACPI_GHES_ADDRESS_SIZE
+> >> +     * | +---------------------+ --+--
+> >> +     * | | read_ack_registerN  |
+> >> +     * | +---------------------+ --+--
+> >> +     * | |      CPER           |   |
+> >> +     * | |      ....           | ACPI_GHES_MAX_RAW_DATA_LENGT
+> >> +     * | |      CPER           |   |
+> >> +     * | +---------------------+ --+--
+> >> +     * | |    ..........       |
+> >> +     * | +---------------------+
+> >> +     * | |      CPER           |
+> >> +     * | |      ....           |
+> >> +     * | |      CPER           |
+> >> +     * | +---------------------+
+> >> +     */
+> >> +    if (physical_address && notify < ACPI_GHES_NOTIFY_RESERVED) {
+> >> +        /* Find and check the source id for this new CPER */
+> >> +        source_id = error_source_id[notify];
+> >
+> > Why not using switch case for supported source types ?
+> > For the time being only one is being supported. And you only use that to
+> > verify that support - seems a bit unnecessary.
+>
+> Afterwards May be we will many source types to support, so Igor's suggestion is better as shown below.
+>
+> static const uint8_t ghes_notify2source_id_map[] = {
+>     ACPI_HEST_SRC_ID_SEA,
+>     ACPI_HEST_SRC_ID_RESERVED
+> }
+>
+>
+> >
+> >> +        if (source_id != 0xff) {
+> >> +            start_addr += source_id * ACPI_GHES_ADDRESS_SIZE;
+> >> +        } else {
+> >> +            goto out;
+> >> +        }
+> >> +
+> [...]
+> >>
+> >> +/* Callers must hold the iothread mutex lock */
+> >> +static void kvm_inject_arm_sea(CPUState *c)
+> >
+> > We could enclose this function along with the kvm_arch_on_sigbus_vcpu
+> > within ifdef switch for KVM_HAVE_MCE_INJECTION
+> >
+> >> +{
+> >> +    ARMCPU *cpu = ARM_CPU(c);
+> >> +    CPUARMState *env = &cpu->env;
+> >> +    CPUClass *cc = CPU_GET_CLASS(c);
+> >> +    uint32_t esr;
+> >> +    bool same_el;
+> >> +
+> >> +    c->exception_index = EXCP_DATA_ABORT;
+> >> +    env->exception.target_el = 1;
+> >> +
+> >> +    /*
+> >> +     * Set the DFSC to synchronous external abort and set FnV to not valid,
+> >> +     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
+> >> +     */
+> >> +    same_el = arm_current_el(env) == env->exception.target_el;
+> >> +    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
+> >
+> > IINM this is the only use case when FnV is considered to be valid
+> > so I'm not convinced it is worth to modify the syn_data_abort_no_iss
+> > just for this.
+>
+> Here we set the FnV to not valid, not to set it to valid.
+> because Guest will use the physical address that recorded in APEI table.
+>
+To be precise : the FnV is  giving the status of FAR - so what you are setting
+here is status of 0b0 which means FAR is valid, not FnV on it's own.
+And my point was that you are changing the prototype for syn_data_abort_no_iss
+just for this case only so I was just thinking that it might not be
+worth that, instead
+you could just set it here ... or to be more flexible , provide a way
+to set specific bits
+on demand.
 
-> -----Original Message-----
-> From: Linuxarm [mailto:linuxarm-bounces@huawei.com] On Behalf Of
-> Shameerali Kolothum Thodi
-> Sent: 11 November 2019 12:47
-> To: Igor Mammedov <imammedo@redhat.com>
-> Cc: peter.maydell@linaro.org; shannon.zhaosl@gmail.com; Michael S. Tsirki=
-n
-> <mst@redhat.com>; qemu-devel@nongnu.org; Linuxarm
-> <linuxarm@huawei.com>; eric.auger@redhat.com; qemu-arm@nongnu.org;
-> xuwei (O) <xuwei5@huawei.com>; lersek@redhat.com
-> Subject: RE: [PATCH 1/5] hw/arm: Align ACPI blob len to PAGE size
->=20
-> Hi Igor,
->=20
-> > -----Original Message-----
-> > From: Igor Mammedov [mailto:imammedo@redhat.com]
-> > Sent: 08 November 2019 16:18
-> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > Cc: qemu-devel@nongnu.org; qemu-arm@nongnu.org;
-> > eric.auger@redhat.com; peter.maydell@linaro.org;
-> > shannon.zhaosl@gmail.com; xuwei (O) <xuwei5@huawei.com>;
-> > lersek@redhat.com; Linuxarm <linuxarm@huawei.com>; Michael S. Tsirkin
-> > <mst@redhat.com>
-> > Subject: Re: [PATCH 1/5] hw/arm: Align ACPI blob len to PAGE size
-> >
-> > On Fri, 4 Oct 2019 16:52:58 +0100
-> > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
-> >
-> > > If ACPI blob length modifications happens after the initial
-> > > virt_acpi_build() call, and the changed blob length is within
-> > > the PAGE size boundary, then the revised size is not seen by
-> > > the firmware on Guest reboot. The is because in the
-> > > virt_acpi_build_update() -> acpi_ram_update() -> qemu_ram_resize()
-> > > path, qemu_ram_resize() uses ram_block size which is aligned
-> > > to PAGE size and the "resize callback" to update the size seen
-> > > by firmware is not getting invoked. Hence align ACPI blob sizes
-> > > to PAGE boundary.
-> > >
-> > > Signed-off-by: Shameer Kolothum
-> <shameerali.kolothum.thodi@huawei.com>
-> > > ---
-> > > More details on this issue can be found here,
-> > > https://patchwork.kernel.org/patch/11154757/
-> > re-read it again and it seems to me that this patch is workaround
-> > rather than a solution to the problem.
->=20
-> Thanks for taking a look at this. Yes, I was also not very sure about thi=
-s
-> approach
-> as the root cause of the issue is in qemu_ram_resize().
->=20
-> > CCing Michael as an author this code.
-> > on x86 we have crazy history of manually aligning acpi blobs, see code =
-under
-> > comment
-> >
-> >   /* We'll expose it all to Guest so we want to reduce
-> >
-> > so used_length endups with over-sized value which includes table and
-> padding
-> > and it happens that ACPI_BUILD_TABLE_SIZE is much bigger than host page
-> > size
-> > so if on reboot we happen to exceed ACPI_BUILD_TABLE_SIZE, the next
-> padded
-> > table
-> > size (used_length) would be  2 x ACPI_BUILD_TABLE_SIZE which doesn't
-> > trigger
-> >   block->used_length =3D=3D HOST_PAGE_ALIGN(newsize)
-> > condition so fwcfg gets updated value.
->=20
-> Yes, this is the reason why the issue is not visible on x86.
->=20
-> >
-> > > ---
-> > >  hw/arm/virt-acpi-build.c | 14 ++++++++++++++
-> > >  1 file changed, 14 insertions(+)
-> > >
-> > > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> > > index 4cd50175e0..074e0c858e 100644
-> > > --- a/hw/arm/virt-acpi-build.c
-> > > +++ b/hw/arm/virt-acpi-build.c
-> > > @@ -790,6 +790,7 @@ void virt_acpi_build(VirtMachineState *vms,
-> > AcpiBuildTables *tables)
-> > >      GArray *table_offsets;
-> > >      unsigned dsdt, xsdt;
-> > >      GArray *tables_blob =3D tables->table_data;
-> > > +    GArray *cmd_blob =3D tables->linker->cmd_blob;
-> > >      MachineState *ms =3D MACHINE(vms);
-> > >
-> > >      table_offsets =3D g_array_new(false, true /* clear */,
-> > > @@ -854,6 +855,19 @@ void virt_acpi_build(VirtMachineState *vms,
-> > AcpiBuildTables *tables)
-> > >          build_rsdp(tables->rsdp, tables->linker, &rsdp_data);
-> > >      }
-> > >
-> > > +    /*
-> > > +     * Align the ACPI blob lengths to PAGE size so that on ACPI tabl=
-e
-> > > +     * regeneration, the length that firmware sees really gets updat=
-ed
-> > > +     * through 'resize' callback in qemu_ram_resize() in the
-> > > +     * virt_acpi_build_update() -> acpi_ram_update() ->
-> > qemu_ram_resize()
-> > > +     * path.
-> > > +     */
-> > > +    g_array_set_size(tables_blob,
-> > > +
-> > TARGET_PAGE_ALIGN(acpi_data_len(tables_blob)));
-> > here it would depend on TARGET_PAGE_ALIGN vs HOST_PAGE_ALIGN
-> relation
-> > so depending on host it could flip it's behavior to opposite.
->=20
-> Ok.
->=20
-> >
-> > one thing we could do is dropping (block->used_length =3D=3D newsize) c=
-ondition
->=20
-> I tried this before and strangely for some reason on reboot path,
->=20
-> virt_acpi_build_update() is called with build_state being NULL and no
-> acpi_ram_update()
-> happens. Not sure what causes this behavior when we drop the above
-> condition.
->=20
-> > another is to use value of block->used_length for s->files->f[index].si=
-ze.
->=20
-> I just tried this by passing block->used_length to fw_cfg_add_file_callba=
-ck() .
-> This could work for this case. But not sure there will be any corner case=
-s
-> and also there isn't any easy way to access the mr->ram_balck->used_lengt=
-h
-> from
-> hw/core/loader.c.
->=20
-> >
-> > Michael,
-> > what's your take in this?
->=20
 
-This is how(below) I tried to use the RAMBlock used_length for s->files->f[=
-index].size.
-As used_length is abstracted here, I had to introduce a new api to retrieve=
- the
-same. Please take a look and let me know if there is a better way of achiev=
-ing this.
+BR
+Beata
 
-Thanks.
-Shameer
-
-
----8---
-
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 5099f27dc8..e862c8c0e1 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1055,6 +1055,7 @@ MemoryRegion *rom_add_blob(const char *name, const vo=
-id *blob, size_t len,
-     if (fw_file_name && fw_cfg) {
-         char devpath[100];
-         void *data;
-+        size_t size;
-=20
-         if (read_only) {
-             snprintf(devpath, sizeof(devpath), "/rom@%s", fw_file_name);
-@@ -1065,13 +1066,15 @@ MemoryRegion *rom_add_blob(const char *name, const =
-void *blob, size_t len,
-         if (mc->rom_file_has_mr) {
-             data =3D rom_set_mr(rom, OBJECT(fw_cfg), devpath, read_only);
-             mr =3D rom->mr;
-+            size =3D memory_region_get_used_length(mr);
-         } else {
-             data =3D rom->data;
-+            size =3D rom->datasize;
-         }
-=20
-         fw_cfg_add_file_callback(fw_cfg, fw_file_name,
-                                  fw_callback, NULL, callback_opaque,
--                                 data, rom->datasize, read_only);
-+                                 data, size, read_only);
-     }
-     return mr;
- }
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index e499dc215b..c51e6cdb9a 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -1584,6 +1584,12 @@ void memory_region_add_subregion_overlap(MemoryRegio=
-n *mr,
-  */
- ram_addr_t memory_region_get_ram_addr(MemoryRegion *mr);
-=20
-+/**
-+ * memory_region_get_used_length: Get the used length associated with a me=
-mory
-+ *                             region
-+ */
-+ram_addr_t memory_region_get_used_length(MemoryRegion *mr);
-+
- uint64_t memory_region_get_alignment(const MemoryRegion *mr);
- /**
-  * memory_region_del_subregion: Remove a subregion.
-diff --git a/memory.c b/memory.c
-index 06484c2bff..d1f60c0c9a 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2200,6 +2200,11 @@ ram_addr_t memory_region_get_ram_addr(MemoryRegion *=
-mr)
-     return mr->ram_block ? mr->ram_block->offset : RAM_ADDR_INVALID;
- }
-=20
-+ram_addr_t memory_region_get_used_length(MemoryRegion *mr)
-+{
-+    return mr->ram_block ? mr->ram_block->used_length : RAM_ADDR_INVALID;
-+}
-+
- void memory_region_ram_resize(MemoryRegion *mr, ram_addr_t newsize, Error =
-**errp)
- {
-     assert(mr->ram_block);
----8--
+> >
+> >> +
+> >> +    env->exception.syndrome = esr;
+> >> +
+> >> +    cc->do_interrupt(c);
+> >> +}
+> >> +
+> >>  #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+> >>                   KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+> >>
+> >> @@ -1036,6 +1062,44 @@ int kvm_arch_get_registers(CPUState *cs)
+> >>      return ret;
+> >>  }
+> >>
+> >> +void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
+> >> +{
+> >> +    ram_addr_t ram_addr;
+> >> +    hwaddr paddr;
+> >> +
+> >> +    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
+> >> +
+> >> +    if (acpi_enabled && addr &&
+> >> +            object_property_get_bool(qdev_get_machine(), "ras", NULL)) {
+> >> +        ram_addr = qemu_ram_addr_from_host(addr);
+> >> +        if (ram_addr != RAM_ADDR_INVALID &&
+> >> +            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
+> >> +            kvm_hwpoison_page_add(ram_addr);
+> >> +            /*
+> >> +             * Asynchronous signal will be masked by main thread, so
+> >> +             * only handle synchronous signal.
+> >> +             */
+> >
+> > I'm not entirely sure that the comment above is correct (it has been
+> > pointed out before). I would expect the AO signal to be handled here as
+> > well. Not having proper support to do that just yet is another story but
+> > the comment might be bit misleading.
+> >
+> >
+> >> +            if (code == BUS_MCEERR_AR) {
+> >> +                kvm_cpu_synchronize_state(c);
+> >> +                if (ACPI_GHES_CPER_FAIL !=
+> >> +                    acpi_ghes_record_errors(ACPI_GHES_NOTIFY_SEA, paddr)) {
+> >> +                    kvm_inject_arm_sea(c);
+> >> +                } else {
+> >> +                    fprintf(stderr, "failed to record the error\n");
+> >> +                }
+> >> +            }
+> >> +            return;
+> >> +        }
+> >> +        fprintf(stderr, "Hardware memory error for memory used by "
+> >> +                "QEMU itself instead of guest system!\n");
+> >> +    }
+> >> +
+> >> +    if (code == BUS_MCEERR_AR) {
+> >> +        fprintf(stderr, "Hardware memory error!\n");
+> >> +        exit(1);
+> >> +    }
+> >> +}
+> >> +
+> >>  /* C6.6.29 BRK instruction */
+> >>  static const uint32_t brk_insn = 0xd4200000;
+> >>
+> >> diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+> >> index 5feb312941..499672ebbc 100644
+> >> --- a/target/arm/tlb_helper.c
+> >> +++ b/target/arm/tlb_helper.c
+> >> @@ -33,7 +33,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+> >>       * ISV field.
+> >>       */
+> >>      if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
+> >> -        syn = syn_data_abort_no_iss(same_el,
+> >> +        syn = syn_data_abort_no_iss(same_el, 0,
+> >>                                      ea, 0, s1ptw, is_write, fsc);
+> >>      } else {
+> >>          /*
+> >> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> >> index 5352c9ff55..f75a210f96 100644
+> >> --- a/target/i386/cpu.h
+> >> +++ b/target/i386/cpu.h
+> >> @@ -29,6 +29,8 @@
+> >>  /* The x86 has a strong memory model with some store-after-load re-ordering */
+> >>  #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
+> >>
+> >> +#define KVM_HAVE_MCE_INJECTION 1
+> >> +
+> >>  /* Maximum instruction code size */
+> >>  #define TARGET_MAX_INSN_SIZE 16
+> >>
+> >> --
+> >> 2.19.1
+> >>
+> >>
+> >>
+> > .
+> >
+>
 
