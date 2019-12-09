@@ -2,78 +2,62 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B83C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED29C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:28:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8396620692
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:19:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WZAlwbKs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8396620692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7054320692
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:28:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7054320692
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieLko-0000dx-J6
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 11:19:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60656)
+	id 1ieLtR-0003rv-H8
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 11:28:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34193)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1ieLjp-000076-4t
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:18:22 -0500
+ (envelope-from <groug@kaod.org>) id 1ieLsh-0003N4-Ro
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:27:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1ieLjn-0005mR-HD
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:18:20 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45429
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1ieLsg-00057A-GK
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:27:31 -0500
+Received: from 7.mo178.mail-out.ovh.net ([46.105.58.91]:36929)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ieLjn-0005mF-DT
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:18:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575908299;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OYU2bFdV8HYp/Dkfz+XS+7aelHvN6sGn5+i1ejOekLo=;
- b=WZAlwbKsORpdENazYT8Ft1W5eGQ8k2ZEq2yWZ0dpdAILP+ahvHewSTCUM9e8Zd9+xfXf6I
- Xkpz54zO2fnKdXHagzwKEkOzfSNz7op4bFNTw3puDUa4axmqD8bshGyRBOP6yI4M/x0r6Q
- WSXfDvzPX42aASVxqlRiRmxCNf0cv64=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-315-dQ4xN_jfO_inN6XfBoJBqw-1; Mon, 09 Dec 2019 11:16:14 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA727802592;
- Mon,  9 Dec 2019 16:16:12 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-171.phx2.redhat.com [10.3.116.171])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 98FAC46;
- Mon,  9 Dec 2019 16:16:09 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH for 4.2-rc5 1/1] block/qcow2-bitmap: fix crash bug in
- qcow2_co_remove_persistent_dirty_bitmap
-Date: Mon,  9 Dec 2019 10:16:07 -0600
-Message-Id: <20191209161607.20894-1-eblake@redhat.com>
-In-Reply-To: <20191209160015.20253-1-eblake@redhat.com>
-References: <20191209160015.20253-1-eblake@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ieLsg-00054j-9Q
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:27:30 -0500
+Received: from player698.ha.ovh.net (unknown [10.108.16.135])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id DAD69846B9
+ for <qemu-devel@nongnu.org>; Mon,  9 Dec 2019 17:27:27 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player698.ha.ovh.net (Postfix) with ESMTPSA id 821B8D0FFA17;
+ Mon,  9 Dec 2019 16:27:18 +0000 (UTC)
+Date: Mon, 9 Dec 2019 17:27:16 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: [for-5.0 PATCH] ppc: Make PPCVirtualHypervisor an incomplete type
+Message-ID: <20191209172716.175a86b5@bahia.w3ibm.bluemix.net>
+In-Reply-To: <bf095dc0-321e-0d19-9d18-309317654050@redhat.com>
+References: <157589808041.21182.18121655959115011353.stgit@bahia.lan>
+ <bf095dc0-321e-0d19-9d18-309317654050@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: dQ4xN_jfO_inN6XfBoJBqw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 8498011025946220835
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeltddgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelkedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.58.91
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,97 +69,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org,
- vsementsov@virtuozzo.com, "open list:qcow2" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, jsnow@redhat.com
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-ppc@nongnu.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Mon, 9 Dec 2019 15:02:38 +0100
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
 
-Here is double bug:
+> On 12/9/19 2:28 PM, Greg Kurz wrote:
+> > PPCVirtualHypervisor is an interface instance. It should never be
+> > dereferenced. Drop the dummy type definition for extra safety, which
+> > is the common practice with QOM interfaces.
+>=20
+> This "common practice" is also referenced in commit 00ed3da9b5:
+>=20
+>      xics: Minor fixes for XICSFabric interface
+>=20
+>      Interface instances should never be directly dereferenced.  So, the=
+=20
+> common
+>      practice is to make them incomplete types to make sure no-one does=20
+> that.
+>      XICSFrabric, however, had a dummy type which is less safe.
+>=20
+>      We were also using OBJECT_CHECK() where we should have been using
+>      INTERFACE_CHECK().
+>=20
+> This indeed follow the changes from commit aa1b35b975d8:
+>=20
+>      qom: make interface types abstract
+>=20
+>      Interfaces don't have instance, let's make the interface type really
+>      abstract to avoid confusion.
+>=20
+> Now I can't find guidelines for this. If you don't know about it and use=
+=20
+> 'git-grep', it is very confusing to see we use structures we never define.
+>=20
 
-First, return error but not set errp. This may lead to:
-qmp block-dirty-bitmap-remove may report success when actually failed
+I agree that this deliberate usage of incomplete types isn't common.
 
-block-dirty-bitmap-remove used in a transaction will crash, as
-qmp_transaction will think that it returned success and will call
-block_dirty_bitmap_remove_commit which will crash, as state->bitmap is
-NULL
+> Can we document this use please?
+>=20
 
-Second (like in anecdote), this case is not an error at all. As it is
-documented in the comment above bdrv_co_remove_persistent_dirty_bitmap
-definition, absence of bitmap is not an error, and similar case handled
-at start of qcow2_co_remove_persistent_dirty_bitmap, it returns 0 when
-there is no bitmaps at all.
+Probably we could amend the related section in the object.h header file.
+Something like:
 
-But when there are some bitmaps, but not the requested one, it return
-error with errp unset.
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -200,8 +200,11 @@ typedef struct InterfaceInfo InterfaceInfo;
+  *
+  * Interfaces allow a limited form of multiple inheritance.  Instances are
+  * similar to normal types except for the fact that are only defined by
+- * their classes and never carry any state.  You can dynamically cast an o=
+bject
+- * to one of its #Interface types and vice versa.
++ * their classes and never carry any state.  As a consequence, a pointer to
++ * an interface instance should always be of incomplete type in order to be
++ * sure it cannot be dereferenced.
++ * You can dynamically cast an object to one of its #Interface types and v=
+ice
++ * versa.
+  *
+  * # Methods #
+  *
 
-Fix that.
+And even better, we could maybe come up with a way to detect that a type
+was wrongly defined with coccinelle ?
 
-Trigger:
-1. create persistent bitmap A
-2. shutdown vm  (bitmap A is synced)
-3. start vm
-4. create persistent bitmap B
-5. remove bitmap B - it fails (and crashes if in transaction)
-
-Potential workaround (rather invasive to ask clients to implement it):
-1. create persistent bitmap A
-2. shutdown vm
-3. start vm
-4. create persistent bitmap B
-5. remember, that we want to remove bitmap B after vm shutdown
-...
-  some other operations
-...
-6. vm shutdown
-7. start vm in stopped mode, and remove all bitmaps marked for removing
-8. stop vm
-
-Fixes: b56a1e31759b750
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-Id: <20191205193049.30666-1-vsementsov@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-[eblake: commit message tweaks]
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- block/qcow2-bitmap.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 8abaf632fc7d..c6c8ebbe89d4 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1469,8 +1469,10 @@ int coroutine_fn qcow2_co_remove_persistent_dirty_bi=
-tmap(BlockDriverState *bs,
-     Qcow2BitmapList *bm_list;
-
-     if (s->nb_bitmaps =3D=3D 0) {
--        /* Absence of the bitmap is not an error: see explanation above
--         * bdrv_remove_persistent_dirty_bitmap() definition. */
-+        /*
-+         * Absence of the bitmap is not an error: see explanation above
-+         * bdrv_co_remove_persistent_dirty_bitmap() definition.
-+         */
-         return 0;
-     }
-
-@@ -1485,7 +1487,8 @@ int coroutine_fn qcow2_co_remove_persistent_dirty_bit=
-map(BlockDriverState *bs,
-
-     bm =3D find_bitmap_by_name(bm_list, name);
-     if (bm =3D=3D NULL) {
--        ret =3D -EINVAL;
-+        /* Absence of the bitmap is not an error, see above. */
-+        ret =3D 0;
-         goto out;
-     }
-
---=20
-2.21.0
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >   target/ppc/cpu.h |    4 ----
+> >   1 file changed, 4 deletions(-)
+> >=20
+> > diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> > index e3e82327b723..ab7d07d66047 100644
+> > --- a/target/ppc/cpu.h
+> > +++ b/target/ppc/cpu.h
+> > @@ -1220,10 +1220,6 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr(uint32_t p=
+vr);
+> >   PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr);
+> >   PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc);
+> >  =20
+> > -struct PPCVirtualHypervisor {
+> > -    Object parent;
+> > -};
+> > -
+> >   struct PPCVirtualHypervisorClass {
+> >       InterfaceClass parent;
+> >       void (*hypercall)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
+> >=20
+> >=20
+>=20
 
 
