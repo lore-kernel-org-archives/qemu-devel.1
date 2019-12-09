@@ -2,157 +2,87 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E38AC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 17:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42287C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 17:09:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0509207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 17:04:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 089BB20692
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 17:09:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h4T5K70X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0509207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mTTDgD2+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 089BB20692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieMSi-0007XG-7A
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 12:04:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42027)
+	id 1ieMXF-0000fq-2a
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 12:09:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43841)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1ieMRT-0006BV-DN
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:03:28 -0500
+ (envelope-from <daniel.thompson@linaro.org>) id 1ieMWR-0000Fc-4p
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:08:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1ieMRQ-00068G-HR
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:03:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42334
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ieMRQ-00067c-Ab
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:03:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575911003;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=YPBnBapfcPfB2ZAOuQYGRjP/Bzj5s0mPrzfueU30+zE=;
- b=h4T5K70XxGV8sItr7y4VkhpYeaqK5m/xc5NeSEv+xkaB/HMMwIKeGVTpmRDS+KcXOwdPp5
- 1ju5/Nm2dM8LkBYRdbsskGDjQtxv9lQGLBFp9ZWJ1SucqA/PcmiM0rUYzcXi7H1x3PsepI
- SRqdVN3NJpo+drc2CcGNqH/fvK6/oh4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-O_OgsJjqMPyieUy87plaJA-1; Mon, 09 Dec 2019 12:03:20 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F9EC2F2E;
- Mon,  9 Dec 2019 17:03:19 +0000 (UTC)
-Received: from [10.10.125.40] (ovpn-125-40.rdu2.redhat.com [10.10.125.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ECCEB5C541;
- Mon,  9 Dec 2019 17:03:17 +0000 (UTC)
-Subject: Re: [PATCH for 4.2-rc5 1/1] block/qcow2-bitmap: fix crash bug in
- qcow2_co_remove_persistent_dirty_bitmap
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20191209160015.20253-1-eblake@redhat.com>
- <20191209161607.20894-1-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <aa4571a2-2386-a9f0-a9a2-a51dbf6b146f@redhat.com>
-Date: Mon, 9 Dec 2019 12:03:15 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <daniel.thompson@linaro.org>) id 1ieMWP-0002O3-KF
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:08:34 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36201)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <daniel.thompson@linaro.org>)
+ id 1ieMWP-0002LX-7m
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:08:33 -0500
+Received: by mail-wr1-x442.google.com with SMTP id z3so17090333wru.3
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 09:08:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=ioF9gOYZwQRQay1Cw3ZQd95BcX21otjmgrUHOTzhRPc=;
+ b=mTTDgD2+Iw1cBbT3UDV1VWZMAnWhJm0s734NqNT55Za2NLBygIFdPeBj7n0URp2OpP
+ AjpZ+eMJCJFTbPR9d6xxUjExAlK34HbmYOih6iAYV06l9OlPvdI5hm2PP0ggKvZ2XOox
+ HtzH7p4LgLUu6b9azxElwjaYnkASTWoW+7nK7P8zUCqTVgzbV6GMKCekKZq8u1eA01Cl
+ CMNtLHfO/Y7EP/2iP+QPUbPONHZjBCp5vNUlTAFvUpoUcyyw1bluxGZ76AeMFtrpgTcI
+ I9kR7WkMK0xsMLKomSfQYYGBMvWT9m+wdFdLsvBsgJ/a2ZLz+To2n8WbGSVGPuVGRtEd
+ FFFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=ioF9gOYZwQRQay1Cw3ZQd95BcX21otjmgrUHOTzhRPc=;
+ b=ZAy1ICp0mBEDUxgGnNLmc09Hd0tMXnu2fRKEbL4KsshTFstHaGDx2GRa67scSHBDGX
+ 8wKAgP2TDXTp3iKCFW91r3AIyDtlabDQSpH2jHg1XvcJFrgVjmU6vsRgI04pXz8xw4Vg
+ fkIZ/WST/41artYsNmwByhYTZDrkXE0Wdy8WA0zHAD/nfomO3IvHAUcietE82U/ryGaN
+ gB8bcesiQWqo6iSogQHqZ6hliAi20kclNQNtVcIu1wuWKzsVtdDr9atM4YfUerYMTAil
+ 1swFSzUNuzrzV9jE2X9YFZ0qWZsTkOJfrSdGXkWbAWMqpKvBEFXJ3befEc54o60RF4Im
+ FMmA==
+X-Gm-Message-State: APjAAAUq9jOEOlZnHquR9lz6CstUOxvsu/SwK/V+cmr5B0kjIk8lAjAq
+ /bIkf4V7Sl6IanZDmOBWFWQ6rg==
+X-Google-Smtp-Source: APXvYqyBab0ty4M+7hsxV+0ALRG1YL6lMBRIkB4UmNU5BJRlAwYcYvmcpES7LAMjhsG11JO4iafvGQ==
+X-Received: by 2002:adf:ee82:: with SMTP id b2mr3465705wro.194.1575911309788; 
+ Mon, 09 Dec 2019 09:08:29 -0800 (PST)
+Received: from holly.lan (cpc141214-aztw34-2-0-cust773.18-1.cable.virginm.net.
+ [86.9.19.6])
+ by smtp.gmail.com with ESMTPSA id b185sm428329wme.36.2019.12.09.09.08.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 09 Dec 2019 09:08:29 -0800 (PST)
+Date: Mon, 9 Dec 2019 17:08:27 +0000
+From: Daniel Thompson <daniel.thompson@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] hw/arm/virt: Second uart for normal-world
+Message-ID: <20191209170827.yojyts6qdvpxbkp4@holly.lan>
+References: <20191209152456.977399-1-daniel.thompson@linaro.org>
+ <CAFEAcA-sgFKev2MiOjRAzuE0trNYQoNe6LOFLeghGm73N1h=SA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191209161607.20894-1-eblake@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: O_OgsJjqMPyieUy87plaJA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-sgFKev2MiOjRAzuE0trNYQoNe6LOFLeghGm73N1h=SA@mail.gmail.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -164,101 +94,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org,
- vsementsov@virtuozzo.com, "open list:qcow2" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ "patches@linaro.org" <patches@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Did you mean to mark this as [PULL] ?
+On Mon, Dec 09, 2019 at 03:36:17PM +0000, Peter Maydell wrote:
+> On Mon, 9 Dec 2019 at 15:25, Daniel Thompson <daniel.thompson@linaro.org> wrote:
+> >
+> > The virt machine can have two UARTs but the second UART is only
+> > registered when secure-mode support is enabled. Change the machine so
+> > this UART is always registered bringing the behaviour of the virt
+> > machine closer to x86 land, where VMs can be expected to support two
+> > UARTs. This approach is also similar to how a TZPC would typically
+> > make a UART inaccessible to normal world on physical hardware.
+> >
+> > Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
+> > ---
+> >
+> > Notes:
+> >     It is difficult to add a UART without some kind of odd difference of
+> >     behaviour somewhere. As far as I could tell the choices are:
+> >
+> >     1. Move the secure UART from UART1 to UART2. This is a
+> >        not-backward-compatible difference of behaviour (will likely break
+> >        the command lines for existing users of the secure UART).
+> >
+> >     2. We tack the new UART on at the end, meaning UART1 will re-enumerates
+> >        as UART2 when secure mode is enabled/disabled. This is rather
+> >        surprising for users.
+> >
+> >     3. UART1 is registered and inaccessible when secure mode is not enabled
+> >        (e.g. user must provide a dummy -serial argument to skip the missing
+> >        UART)
+> >
+> >     4. Normal world can only use the second UART if there is no secure mode
+> >        support.
+> >
+> >     5. Don't support an extra UART ;-)
+> >
+> >     Of these I concluded that #4 was least worst! Ultimately it is should be
+> >     unsurprising for users because it is how most physical hardware works
+> >     (e.g. a trustzone controller is used to make an existing UART
+> >     inaccessible to normal world).
+> 
+> This change looks simple but it will break booting of UEFI
+> in the guest. Unfortunately UEFI enumerates UARTs in the guest
+> in the opposite order to the Linux kernel, so whichever way
+> round you put the extra UART something will get it wrong and
+> stop producing output where the user expects.
+> 
+> I think the conclusion I came to was that the only way to
+> avoid breaking existing command lines would be to only
+> create the second UART if the user explicitly asked for
+> it somehow. (Possibly just looking at "if there really is
+> a 2nd serial on the command line" with "if (serial_hd(1)"
+> would suffice, or perhaps not.)
 
-On 12/9/19 11:16 AM, Eric Blake wrote:
-> From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->=20
-> Here is double bug:
->=20
-> First, return error but not set errp. This may lead to:
-> qmp block-dirty-bitmap-remove may report success when actually failed
->=20
-> block-dirty-bitmap-remove used in a transaction will crash, as
-> qmp_transaction will think that it returned success and will call
-> block_dirty_bitmap_remove_commit which will crash, as state->bitmap is
-> NULL
->=20
-> Second (like in anecdote), this case is not an error at all. As it is
-> documented in the comment above bdrv_co_remove_persistent_dirty_bitmap
-> definition, absence of bitmap is not an error, and similar case handled
-> at start of qcow2_co_remove_persistent_dirty_bitmap, it returns 0 when
-> there is no bitmaps at all.
->=20
-> But when there are some bitmaps, but not the requested one, it return
-> error with errp unset.
->=20
-> Fix that.
->=20
-> Trigger:
-> 1. create persistent bitmap A
-> 2. shutdown vm  (bitmap A is synced)
-> 3. start vm
-> 4. create persistent bitmap B
-> 5. remove bitmap B - it fails (and crashes if in transaction)
->=20
-> Potential workaround (rather invasive to ask clients to implement it):
-> 1. create persistent bitmap A
-> 2. shutdown vm
-> 3. start vm
-> 4. create persistent bitmap B
-> 5. remember, that we want to remove bitmap B after vm shutdown
-> ...
->   some other operations
-> ...
-> 6. vm shutdown
-> 7. start vm in stopped mode, and remove all bitmaps marked for removing
-> 8. stop vm
->=20
-> Fixes: b56a1e31759b750
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> Message-Id: <20191205193049.30666-1-vsementsov@virtuozzo.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> [eblake: commit message tweaks]
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  block/qcow2-bitmap.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
->=20
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index 8abaf632fc7d..c6c8ebbe89d4 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -1469,8 +1469,10 @@ int coroutine_fn qcow2_co_remove_persistent_dirty_=
-bitmap(BlockDriverState *bs,
->      Qcow2BitmapList *bm_list;
->=20
->      if (s->nb_bitmaps =3D=3D 0) {
-> -        /* Absence of the bitmap is not an error: see explanation above
-> -         * bdrv_remove_persistent_dirty_bitmap() definition. */
-> +        /*
-> +         * Absence of the bitmap is not an error: see explanation above
-> +         * bdrv_co_remove_persistent_dirty_bitmap() definition.
-> +         */
->          return 0;
->      }
->=20
-> @@ -1485,7 +1487,8 @@ int coroutine_fn qcow2_co_remove_persistent_dirty_b=
-itmap(BlockDriverState *bs,
->=20
->      bm =3D find_bitmap_by_name(bm_list, name);
->      if (bm =3D=3D NULL) {
-> -        ret =3D -EINVAL;
-> +        /* Absence of the bitmap is not an error, see above. */
-> +        ret =3D 0;
->          goto out;
->      }
->=20
+I don't object to making it command line dependant (it is certainly
+lower risk) but, out of interest, has using /aliases to force the
+kernel to enumerate the serial nodes in the existing order been ruled
+out for any reason.
 
---=20
-=E2=80=94js
+With something like the patch below we can give /dev/ttyAMA0
+with a stable device number regardless of the order of the UARTs
+within the DT:
 
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index a5cca04dba7f..7078cfc0c106 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -225,8 +225,12 @@ static void create_fdt(VirtMachineState *vms)
+     qemu_fdt_setprop_cell(fdt, "/", "#address-cells", 0x2);
+     qemu_fdt_setprop_cell(fdt, "/", "#size-cells", 0x2);
+ 
+-    /* /chosen must exist for load_dtb to fill in necessary properties later */
++    /*
++     * /chosen and /aliases must exist for load_dtb to fill in
++     * necessary properties later
++     */
+     qemu_fdt_add_subnode(fdt, "/chosen");
++    qemu_fdt_add_subnode(fdt, "/aliases");
+ 
+     /* Clock node, for the benefit of the UART. The kernel device tree
+      * binding documentation claims the PL011 node clock properties are
+@@ -754,6 +758,9 @@ static void create_uart(const VirtMachineState *vms,
+qemu_irq *pic, int uart,
+ 
+     if (uart == VIRT_UART) {
+         qemu_fdt_setprop_string(vms->fdt, "/chosen", "stdout-path", nodename);
++	qemu_fdt_setprop_string(vms->fdt, "/aliases", "serial0", nodename);
++    } else if (!vms->secure) {
++	qemu_fdt_setprop_string(vms->fdt, "/aliases", "serial1", nodename);
+     } else {
+         /* Mark as not usable by the normal world */
+         qemu_fdt_setprop_string(vms->fdt, nodename, "status", "disabled");
+
+
+> You also need to do something to add the 2nd UART to the ACPI tables.
+> 
+> (Very out of date and broken patchset from last time I looked at this:
+> https://lists.gnu.org/archive/html/qemu-arm/2017-12/msg00063.html
+> )
+
+Thanks for the heads up. I'll have to do a bit of reading/testing
+before I get back to you on that!
+
+
+Daniel.
 
