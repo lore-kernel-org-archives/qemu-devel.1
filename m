@@ -2,95 +2,64 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4369AC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 00:27:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0091CC3F68F
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 01:05:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F22C920637
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 00:27:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC1422070A
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 01:05:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BSJaBm2e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F22C920637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OtgD0o/w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC1422070A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ie6tO-0007af-6m
-	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 19:27:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50932)
+	id 1ie7UM-0000pj-Ku
+	for qemu-devel@archiver.kernel.org; Sun, 08 Dec 2019 20:05:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46019)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1ie6rl-0006cq-S5
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 19:25:34 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ie7QV-0007n7-BN
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 20:01:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prashantbhole.linux@gmail.com>) id 1ie6rk-0006qp-SL
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 19:25:33 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37434)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <prashantbhole.linux@gmail.com>)
- id 1ie6rk-0006on-MD
- for qemu-devel@nongnu.org; Sun, 08 Dec 2019 19:25:32 -0500
-Received: by mail-pg1-x544.google.com with SMTP id q127so6211642pga.4
- for <qemu-devel@nongnu.org>; Sun, 08 Dec 2019 16:25:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=54pMROPZSZfXX7jRTCLEYndLEfmz7nGR8IgouL3KZTc=;
- b=BSJaBm2ePbXg4/8QJEoez2M+93ZFU9CFwMm/wY/y3fH5J2FICxXg8f4R5L+w9xefYo
- PTGQ5sPuVVu1AV7xJKYeCg6mPH6PVz6KvEF8AbZ9eS+0NQxwvSeZoSJ0gsdnjh5e3mZd
- 4OV2ibZ7dlTjDdmWZs9VKt9th1QoncUz5eCiV15AFzTuuUzDIycxQz83ZjnnSyOHTLvG
- gNhSKdu3VCuezUFhphqXSBBClXUtu5jz8Eox0dKJp7rCb00Jjm9tpLfrC1ESWJfUKiB3
- fcljUfI7jtssvTxptrRqIjOtU4i3FJLBvy518UbNZPY3iY5ZWRC+AEUvH9qqTosHGlXb
- ywvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=54pMROPZSZfXX7jRTCLEYndLEfmz7nGR8IgouL3KZTc=;
- b=VeL89uLcqM0Hclm+wUM/bqLKjt8MCzILiwteuB9ZxMDJDAiY5xri9GU+qVQ7nnQLeq
- 4aOy2njebQxAwg1q7wpTVMzbnkPdrHqXiDvYB8HuQWUqsteMpuclUvwAhsdkq2JmdvNX
- nOtTBL6CJ/0H6kgz3Gj+ntiBUUvd/M9KFm3sZlMdy0KhsqwlMuQM/9VT0TLN951PyyTB
- hQD0uYU3zPRqbC4/FoWLcXnXg+m6J+30fF3COeQ+bXcxeeFYYQplZbwDXFGG+ke7CI6v
- zOgMosxrEOdfdSN/rbBFeQA7888eiecOVjGanBDkkhRQo9Z2PNrpysd5AXf4rXX8rQqN
- UQtQ==
-X-Gm-Message-State: APjAAAVJ/qCkSR/XkMSL6Pch8G1wTLNXdeRLr51I/+WVrVSPlIAr9YN5
- elf2wXfCYnlX9RV2bk/kM94=
-X-Google-Smtp-Source: APXvYqyLOx/NbgYchmoB1mb0Ueb/tUuLtaKFry8cwej7RBw1g78+6E329FnE4TSyZJDGD6IMKOF7vQ==
-X-Received: by 2002:a62:6381:: with SMTP id x123mr26519913pfb.75.1575851131060; 
- Sun, 08 Dec 2019 16:25:31 -0800 (PST)
-Received: from [172.20.20.156] ([222.151.198.97])
- by smtp.gmail.com with ESMTPSA id o3sm9802750pju.13.2019.12.08.16.25.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 08 Dec 2019 16:25:30 -0800 (PST)
-Subject: Re: [RFC net-next 07/18] tun: set offloaded xdp program
-To: Jason Wang <jasowang@redhat.com>, David Ahern <dsahern@gmail.com>,
- "David S . Miller" <davem@davemloft.net>,
- "Michael S . Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Jakub Kicinski <jakub.kicinski@netronome.com>
-References: <20191126100744.5083-1-prashantbhole.linux@gmail.com>
- <20191126100744.5083-8-prashantbhole.linux@gmail.com>
- <3ff23a11-c979-32ed-b55d-9213c2c64bc4@gmail.com>
- <8d575940-ba31-8780-ae4d-6edbe1b2b15a@redhat.com>
-From: Prashant Bhole <prashantbhole.linux@gmail.com>
-Message-ID: <ba0c0d5f-fbb4-ff92-c7d8-403dbb757758@gmail.com>
-Date: Mon, 9 Dec 2019 09:24:34 +0900
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (envelope-from <dgibson@ozlabs.org>) id 1ie7QT-0007P3-9I
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 20:01:27 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:55685 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ie7QS-0007Io-2t
+ for qemu-devel@nongnu.org; Sun, 08 Dec 2019 20:01:25 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47WPyg3JMLz9sPK; Mon,  9 Dec 2019 12:01:15 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1575853275;
+ bh=3JOmfTneeQAuPZzC01REtE0YWyxM/qdYZUDCTq5d804=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=OtgD0o/wSefa4mtZH9xe+7wHVEWql2bElzNz0CV5dIm3RC0PFYWKhZLLQqWHgLrSU
+ LXF0dPGbhcsKbl7ghIi1rTqeZbvAayZtQZcytSDcZj17uRVEZbLFEpy8c2OuVCVCs+
+ PX7fbnvvUZdjYgjTR7QuMVpYvBqwtkh9nKPnt9S8=
+Date: Mon, 9 Dec 2019 11:51:57 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [for-5.0 PATCH 3/3] cpu: Use cpu_class_set_parent_reset()
+Message-ID: <20191209005157.GD2482@umbus.fritz.box>
+References: <157565782864.3897844.627720481210693346.stgit@bahia.lan>
+ <157565784603.3897844.16391025294328116481.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <8d575940-ba31-8780-ae4d-6edbe1b2b15a@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="PHCdUe6m4AxPMzOu"
+Content-Disposition: inline
+In-Reply-To: <157565784603.3897844.16391025294328116481.stgit@bahia.lan>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,46 +71,371 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Song Liu <songliubraving@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
- John Fastabend <john.fastabend@gmail.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org, Yonghong Song <yhs@fb.com>,
- Andrii Nakryiko <andriin@fb.com>, Martin KaFai Lau <kafai@fb.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
+--PHCdUe6m4AxPMzOu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 12/2/19 11:47 AM, Jason Wang wrote:
-> 
-> On 2019/12/2 上午12:45, David Ahern wrote:
->> On 11/26/19 4:07 AM, Prashant Bhole wrote:
->>> From: Jason Wang <jasowang@redhat.com>
->>>
->>> This patch introduces an ioctl way to set an offloaded XDP program
->>> to tun driver. This ioctl will be used by qemu to offload XDP program
->>> from virtio_net in the guest.
->>>
->> Seems like you need to set / reset the SOCK_XDP flag on tfile->sk since
->> this is an XDP program.
->>
->> Also, why not add this program using netlink instead of ioctl? e.g., as
->> part of a generic XDP in the egress path like I am looking into for the
->> host side.
-> 
-> 
-> Maybe both, otherwise, qemu may need netlink as a dependency.
-> 
-> Thanks
-> 
+On Fri, Dec 06, 2019 at 07:44:06PM +0100, Greg Kurz wrote:
+> Convert all targets to use cpu_class_set_parent_reset() with the following
+> coccinelle script:
+>=20
+> @@
+> type CPUParentClass;
+> CPUParentClass *pcc;
+> CPUClass *cc;
+> identifier parent_fn;
+> identifier child_fn;
+> @@
+> +cpu_class_set_parent_reset(cc, child_fn, &pcc->parent_fn);
+> -pcc->parent_fn =3D cc->reset;
+> ...
+> -cc->reset =3D child_fn;
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Thank you all for reviewing. We will continue to improve this set.
+ppc parts
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
-If we split this work, Tx path XDP is one of the necessary part
-which can be developed first. As suggested by David Ahern it will be
-a netlink way but we will still need ioctl way for tap. I will try
-to come up with Tx path XDP set next time.
+> ---
+>  target/arm/cpu.c                |    3 +--
+>  target/cris/cpu.c               |    3 +--
+>  target/i386/cpu.c               |    3 +--
+>  target/lm32/cpu.c               |    3 +--
+>  target/m68k/cpu.c               |    3 +--
+>  target/microblaze/cpu.c         |    3 +--
+>  target/mips/cpu.c               |    3 +--
+>  target/moxie/cpu.c              |    3 +--
+>  target/nios2/cpu.c              |    3 +--
+>  target/openrisc/cpu.c           |    3 +--
+>  target/ppc/translate_init.inc.c |    3 +--
+>  target/riscv/cpu.c              |    3 +--
+>  target/s390x/cpu.c              |    3 +--
+>  target/sh4/cpu.c                |    3 +--
+>  target/sparc/cpu.c              |    3 +--
+>  target/tilegx/cpu.c             |    3 +--
+>  target/tricore/cpu.c            |    3 +--
+>  target/xtensa/cpu.c             |    3 +--
+>  18 files changed, 18 insertions(+), 36 deletions(-)
+>=20
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 7a4ac9339bf9..712a9425fdf5 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -2625,8 +2625,7 @@ static void arm_cpu_class_init(ObjectClass *oc, voi=
+d *data)
+>                                      &acc->parent_realize);
+>      dc->props =3D arm_cpu_properties;
+> =20
+> -    acc->parent_reset =3D cc->reset;
+> -    cc->reset =3D arm_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, arm_cpu_reset, &acc->parent_reset);
+> =20
+>      cc->class_by_name =3D arm_cpu_class_by_name;
+>      cc->has_work =3D arm_cpu_has_work;
+> diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+> index 7adfd6caf4ed..486675e3822f 100644
+> --- a/target/cris/cpu.c
+> +++ b/target/cris/cpu.c
+> @@ -256,8 +256,7 @@ static void cris_cpu_class_init(ObjectClass *oc, void=
+ *data)
+>      device_class_set_parent_realize(dc, cris_cpu_realizefn,
+>                                      &ccc->parent_realize);
+> =20
+> -    ccc->parent_reset =3D cc->reset;
+> -    cc->reset =3D cris_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, cris_cpu_reset, &ccc->parent_reset);
+> =20
+>      cc->class_by_name =3D cris_cpu_class_by_name;
+>      cc->has_work =3D cris_cpu_has_work;
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 69f518a21a9b..57d36931725d 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -7049,8 +7049,7 @@ static void x86_cpu_common_class_init(ObjectClass *=
+oc, void *data)
+>                                        &xcc->parent_unrealize);
+>      dc->props =3D x86_cpu_properties;
+> =20
+> -    xcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D x86_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, x86_cpu_reset, &xcc->parent_reset);
+>      cc->reset_dump_flags =3D CPU_DUMP_FPU | CPU_DUMP_CCOP;
+> =20
+>      cc->class_by_name =3D x86_cpu_class_by_name;
+> diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
+> index b35537de6285..687bf35e6588 100644
+> --- a/target/lm32/cpu.c
+> +++ b/target/lm32/cpu.c
+> @@ -218,8 +218,7 @@ static void lm32_cpu_class_init(ObjectClass *oc, void=
+ *data)
+> =20
+>      device_class_set_parent_realize(dc, lm32_cpu_realizefn,
+>                                      &lcc->parent_realize);
+> -    lcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D lm32_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, lm32_cpu_reset, &lcc->parent_reset);
+> =20
+>      cc->class_by_name =3D lm32_cpu_class_by_name;
+>      cc->has_work =3D lm32_cpu_has_work;
+> diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+> index e6596de29c2c..176d95e6fcfb 100644
+> --- a/target/m68k/cpu.c
+> +++ b/target/m68k/cpu.c
+> @@ -257,8 +257,7 @@ static void m68k_cpu_class_init(ObjectClass *c, void =
+*data)
+> =20
+>      device_class_set_parent_realize(dc, m68k_cpu_realizefn,
+>                                      &mcc->parent_realize);
+> -    mcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D m68k_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, m68k_cpu_reset, &mcc->parent_reset);
+> =20
+>      cc->class_by_name =3D m68k_cpu_class_by_name;
+>      cc->has_work =3D m68k_cpu_has_work;
+> diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+> index 9cfd7445e7da..71d88f603b2e 100644
+> --- a/target/microblaze/cpu.c
+> +++ b/target/microblaze/cpu.c
+> @@ -292,8 +292,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *=
+data)
+> =20
+>      device_class_set_parent_realize(dc, mb_cpu_realizefn,
+>                                      &mcc->parent_realize);
+> -    mcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D mb_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, mb_cpu_reset, &mcc->parent_reset);
+> =20
+>      cc->class_by_name =3D mb_cpu_class_by_name;
+>      cc->has_work =3D mb_cpu_has_work;
+> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+> index bbcf7ca4635c..6cd6b9650baa 100644
+> --- a/target/mips/cpu.c
+> +++ b/target/mips/cpu.c
+> @@ -189,8 +189,7 @@ static void mips_cpu_class_init(ObjectClass *c, void =
+*data)
+> =20
+>      device_class_set_parent_realize(dc, mips_cpu_realizefn,
+>                                      &mcc->parent_realize);
+> -    mcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D mips_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, mips_cpu_reset, &mcc->parent_reset);
+> =20
+>      cc->class_by_name =3D mips_cpu_class_by_name;
+>      cc->has_work =3D mips_cpu_has_work;
+> diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+> index 48996d0554f2..cf47bc709b54 100644
+> --- a/target/moxie/cpu.c
+> +++ b/target/moxie/cpu.c
+> @@ -101,8 +101,7 @@ static void moxie_cpu_class_init(ObjectClass *oc, voi=
+d *data)
+> =20
+>      device_class_set_parent_realize(dc, moxie_cpu_realizefn,
+>                                      &mcc->parent_realize);
+> -    mcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D moxie_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, moxie_cpu_reset, &mcc->parent_reset);
+> =20
+>      cc->class_by_name =3D moxie_cpu_class_by_name;
+> =20
+> diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
+> index ca9c7a6df5d1..bbdbc0c6fbf0 100644
+> --- a/target/nios2/cpu.c
+> +++ b/target/nios2/cpu.c
+> @@ -188,8 +188,7 @@ static void nios2_cpu_class_init(ObjectClass *oc, voi=
+d *data)
+>      device_class_set_parent_realize(dc, nios2_cpu_realizefn,
+>                                      &ncc->parent_realize);
+>      dc->props =3D nios2_properties;
+> -    ncc->parent_reset =3D cc->reset;
+> -    cc->reset =3D nios2_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, nios2_cpu_reset, &ncc->parent_reset);
+> =20
+>      cc->class_by_name =3D nios2_cpu_class_by_name;
+>      cc->has_work =3D nios2_cpu_has_work;
+> diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+> index 506aec6bfba5..5cd04dafab69 100644
+> --- a/target/openrisc/cpu.c
+> +++ b/target/openrisc/cpu.c
+> @@ -150,8 +150,7 @@ static void openrisc_cpu_class_init(ObjectClass *oc, =
+void *data)
+> =20
+>      device_class_set_parent_realize(dc, openrisc_cpu_realizefn,
+>                                      &occ->parent_realize);
+> -    occ->parent_reset =3D cc->reset;
+> -    cc->reset =3D openrisc_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, openrisc_cpu_reset, &occ->parent_rese=
+t);
+> =20
+>      cc->class_by_name =3D openrisc_cpu_class_by_name;
+>      cc->has_work =3D openrisc_cpu_has_work;
+> diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.=
+inc.c
+> index ba726dec4d00..e5773a99fffd 100644
+> --- a/target/ppc/translate_init.inc.c
+> +++ b/target/ppc/translate_init.inc.c
+> @@ -10614,8 +10614,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, v=
+oid *data)
+>      pcc->interrupts_big_endian =3D ppc_cpu_interrupts_big_endian_always;
+>      dc->props =3D ppc_cpu_properties;
+> =20
+> -    pcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D ppc_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, ppc_cpu_reset, &pcc->parent_reset);
+> =20
+>      cc->class_by_name =3D ppc_cpu_class_by_name;
+>      pcc->parent_parse_features =3D cc->parse_features;
+> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> index d37861a4305b..d6f187272859 100644
+> --- a/target/riscv/cpu.c
+> +++ b/target/riscv/cpu.c
+> @@ -462,8 +462,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void=
+ *data)
+>      device_class_set_parent_realize(dc, riscv_cpu_realize,
+>                                      &mcc->parent_realize);
+> =20
+> -    mcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D riscv_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, riscv_cpu_reset, &mcc->parent_reset);
+> =20
+>      cc->class_by_name =3D riscv_cpu_class_by_name;
+>      cc->has_work =3D riscv_cpu_has_work;
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index 3abe7e80fd0a..cf7cf5655fbc 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -469,13 +469,12 @@ static void s390_cpu_class_init(ObjectClass *oc, vo=
+id *data)
+>      dc->props =3D s390x_cpu_properties;
+>      dc->user_creatable =3D true;
+> =20
+> -    scc->parent_reset =3D cc->reset;
+> +    cpu_class_set_parent_reset(cc, s390_cpu_full_reset, &scc->parent_res=
+et);
+>  #if !defined(CONFIG_USER_ONLY)
+>      scc->load_normal =3D s390_cpu_load_normal;
+>  #endif
+>      scc->cpu_reset =3D s390_cpu_reset;
+>      scc->initial_cpu_reset =3D s390_cpu_initial_reset;
+> -    cc->reset =3D s390_cpu_full_reset;
+>      cc->class_by_name =3D s390_cpu_class_by_name,
+>      cc->has_work =3D s390_cpu_has_work;
+>  #ifdef CONFIG_TCG
+> diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+> index d0a7707991fe..70c8d8170ff3 100644
+> --- a/target/sh4/cpu.c
+> +++ b/target/sh4/cpu.c
+> @@ -214,8 +214,7 @@ static void superh_cpu_class_init(ObjectClass *oc, vo=
+id *data)
+>      device_class_set_parent_realize(dc, superh_cpu_realizefn,
+>                                      &scc->parent_realize);
+> =20
+> -    scc->parent_reset =3D cc->reset;
+> -    cc->reset =3D superh_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, superh_cpu_reset, &scc->parent_reset);
+> =20
+>      cc->class_by_name =3D superh_cpu_class_by_name;
+>      cc->has_work =3D superh_cpu_has_work;
+> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+> index bc659295520f..9c306e52717e 100644
+> --- a/target/sparc/cpu.c
+> +++ b/target/sparc/cpu.c
+> @@ -859,8 +859,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, voi=
+d *data)
+>                                      &scc->parent_realize);
+>      dc->props =3D sparc_cpu_properties;
+> =20
+> -    scc->parent_reset =3D cc->reset;
+> -    cc->reset =3D sparc_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, sparc_cpu_reset, &scc->parent_reset);
+> =20
+>      cc->class_by_name =3D sparc_cpu_class_by_name;
+>      cc->parse_features =3D sparc_cpu_parse_features;
+> diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
+> index 2b2a7ccc313f..cd422a0467a0 100644
+> --- a/target/tilegx/cpu.c
+> +++ b/target/tilegx/cpu.c
+> @@ -142,8 +142,7 @@ static void tilegx_cpu_class_init(ObjectClass *oc, vo=
+id *data)
+>      device_class_set_parent_realize(dc, tilegx_cpu_realizefn,
+>                                      &tcc->parent_realize);
+> =20
+> -    tcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D tilegx_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, tilegx_cpu_reset, &tcc->parent_reset);
+> =20
+>      cc->class_by_name =3D tilegx_cpu_class_by_name;
+>      cc->has_work =3D tilegx_cpu_has_work;
+> diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+> index df807c1d7437..85bc9f03a1ee 100644
+> --- a/target/tricore/cpu.c
+> +++ b/target/tricore/cpu.c
+> @@ -153,8 +153,7 @@ static void tricore_cpu_class_init(ObjectClass *c, vo=
+id *data)
+>      device_class_set_parent_realize(dc, tricore_cpu_realizefn,
+>                                      &mcc->parent_realize);
+> =20
+> -    mcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D tricore_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, tricore_cpu_reset, &mcc->parent_reset=
+);
+>      cc->class_by_name =3D tricore_cpu_class_by_name;
+>      cc->has_work =3D tricore_cpu_has_work;
+> =20
+> diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+> index c65dcf9dd782..4856aee8eca6 100644
+> --- a/target/xtensa/cpu.c
+> +++ b/target/xtensa/cpu.c
+> @@ -184,8 +184,7 @@ static void xtensa_cpu_class_init(ObjectClass *oc, vo=
+id *data)
+>      device_class_set_parent_realize(dc, xtensa_cpu_realizefn,
+>                                      &xcc->parent_realize);
+> =20
+> -    xcc->parent_reset =3D cc->reset;
+> -    cc->reset =3D xtensa_cpu_reset;
+> +    cpu_class_set_parent_reset(cc, xtensa_cpu_reset, &xcc->parent_reset);
+> =20
+>      cc->class_by_name =3D xtensa_cpu_class_by_name;
+>      cc->has_work =3D xtensa_cpu_has_work;
+>=20
 
-Thanks.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--PHCdUe6m4AxPMzOu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3tmqwACgkQbDjKyiDZ
+s5Loxw//Txge5Adv9f7o3qF7CLd4HusfHlCfga6+Z26HZYqGJkurcq3I4EPMzKWg
+mFXhLPMNKKe9IusYcaKXZRcujljG+XZA4KLPXaj7j1l/vIVlH0WGUcKR+v1Bv67h
+6MnOn1Mxi6+WGj8dkRwfH0GFP8XYWaCJkqTnDufeKpP1msCUlMsZ5pC75dk1AFNj
+0DpP8oQ4lDX74mEwkiR0AdSzePwcgYD5K4uMNf97VcOUflKb9yT3DtPo9eqcABys
+gI7bEJAFUIpE6We7ppSuUckgUBBT0g3igSCKUxXjcxn3d63qILNp4z3YwuZdrU61
+80ubIh0OK1/gZp6DFV3QP9vCllVwxlD70YX7z+EE3X7mfVKymhuSPnU9SG1T66VU
+5+BU8KBOENS7jd1ubiSuZxHGAsRZSWME4F64VqOpnlw55vtBhwwrqIgbRednGi/b
+EG36jTQat10iDj3A0CPI1OksfTfjTmNpnA1jhkE8iDqmikuPVIbbXtYsAAApXBMv
+Asj8Tg5iT4/5xqvI6wWiVrJUuxx4T2oy0jy6pNZOzl6onFngOGuCnCN/Mudq2c3J
+373VqbocRwocs6JLnkxvj0LjRXEMJYwcSfF1eBGNQnzChgFcNlDuTVd649Q2FHDu
+qa6AZRUFrEEi6BBm5y1vhI4FSGhQvkS8iA/eFtL30DyPL7aP8ag=
+=XtPV
+-----END PGP SIGNATURE-----
+
+--PHCdUe6m4AxPMzOu--
 
