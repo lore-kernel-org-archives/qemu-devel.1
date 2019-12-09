@@ -2,161 +2,100 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED56C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1C1C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:49:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDD462080D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:46:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6C5E207FF
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:49:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GwvJdpoy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDD462080D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dlq9ZeQa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C5E207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieLFL-0005iA-T4
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:46:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55969)
+	id 1ieLHp-000711-PC
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:49:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1ieLEI-00057x-1h
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:45:46 -0500
+ (envelope-from <philmd@redhat.com>) id 1ieLGu-0006JW-HU
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:48:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1ieLEH-0002HD-4x
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:45:45 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22770
+ (envelope-from <philmd@redhat.com>) id 1ieLGt-0000qT-1J
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:48:28 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23787
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1ieLEH-0002H8-1t
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:45:45 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ieLGs-0000lo-S7
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:48:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575906344;
+ s=mimecast20190719; t=1575906506;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=JN3hVyw7CAGgnOdlI/7RxJMGP74bRlUrJXHLXizkEp0=;
- b=GwvJdpoymnm9b5RP66gaGkCYt/4NYQhNdDMAWFesKBeN956Z+CNPRsGNe9c3jBvvkF8Fk8
- 5qxlWBr+7vxRaLO7k3dIlL+rhfLrJxni05f+LXEWbt1HIenIafMS1b5e3MQwFjWlulBqkc
- 7EbPq0Lr0v2Fd3i5FYhQqKHWSG2wQMk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-411-Kwlj2HOIM1a0DoIqKNyL9Q-1; Mon, 09 Dec 2019 10:45:41 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D84151856A99;
- Mon,  9 Dec 2019 15:45:39 +0000 (UTC)
-Received: from [10.10.125.40] (ovpn-125-40.rdu2.redhat.com [10.10.125.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 158DB60476;
- Mon,  9 Dec 2019 15:45:38 +0000 (UTC)
-Subject: Re: [PATCH v2] migration/dirty-bitmaps: change bitmap enumeration
- method
-From: John Snow <jsnow@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20190514201926.10407-1-jsnow@redhat.com>
- <aab4e1c7-37eb-5b3e-26d2-fca33ba87662@virtuozzo.com>
- <d164961f-4da7-3678-2f56-5486cee3d07d@redhat.com>
- <748a473b-07c6-73b1-ab91-40886fb55cd5@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <8b983534-5552-f6e2-b44a-5712817d45f5@redhat.com>
-Date: Mon, 9 Dec 2019 10:45:37 -0500
+ in-reply-to:in-reply-to:references:references;
+ bh=cKFum2NqapLS9dJIe2nqX+2wB4rxnOUF4CE5lGPi2bA=;
+ b=dlq9ZeQaUUg2/vwRr2VOOasnkxcJ0fRo15c3jOFMQn2WfII6ffns1xtLF2tgXZ214GubdM
+ AyETmXuz384f5q/CvAEEj/f2egPb2PXQ/m772aWLi3SvPEvAN7khAK6vFZ0tswZmYRygAw
+ L3UlZ4+mLI0khIyKfsgyLuLwujNKHeM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-72-__6zeh-BMteHHaGqM8MZ4w-1; Mon, 09 Dec 2019 10:48:25 -0500
+Received: by mail-wr1-f69.google.com with SMTP id z10so7606145wrt.21
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 07:48:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=cKFum2NqapLS9dJIe2nqX+2wB4rxnOUF4CE5lGPi2bA=;
+ b=JKAAWs/SD3fX0Z0eKGq3DpITF87BFsunIxR+je2dYQ8/rnqc3bT7GaIJj9/GwEfPUp
+ TB+xPT1tFfRKzNykoTiJoorkGFo90DatYgV+MCzhynWbgYA9lAGgLiUL5wPj18GgV+Ph
+ aLjYAs1KVg/oDwiZ/EB5w1xsBp14HgaeOU/iGfx+fjYHqQb5/2HqABMqvZQNoLqNE0q/
+ hRJXiKMX+aE4H8rmUpZ5lwzT1yQzTWElsYN1phxjZMSYC0w42QAK6BvoV4T4N5cCgBYZ
+ RIagh0a9A5MDz7xaEFZAFvckoRputfAnwb6fnmN+zqteFz1GaaAQl16eIooO6410gEcU
+ t6iQ==
+X-Gm-Message-State: APjAAAWAabhU/08kitUdgeeicgzWiNqGX2gAOre477BxhomalJheElg/
+ gQe3IP88kkk/0Rx+pAW1nzDZT/gXe6U7ILCvBuMOxXeM8UscErC3r/wDN20g0R2mJZfhqxKaYxR
+ VAtc1isOJ4hqoZBw=
+X-Received: by 2002:adf:f606:: with SMTP id t6mr2812372wrp.85.1575906503993;
+ Mon, 09 Dec 2019 07:48:23 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzPLXw+YwHMvrySi606y5I18W+jaai3xi6AWIiylUBhOkpQgO1YrxyKpPdV0CkFhqfCr2/8mg==
+X-Received: by 2002:adf:f606:: with SMTP id t6mr2812341wrp.85.1575906503599;
+ Mon, 09 Dec 2019 07:48:23 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id u189sm128678wmg.40.2019.12.09.07.48.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Dec 2019 07:48:23 -0800 (PST)
+Subject: Re: [PATCH v2 15/18] xen: convert "-machine igd-passthru" to an
+ accelerator property
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
+ <1575903705-12925-16-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1647db84-31e5-d1ba-79f1-eb56f6788ec0@redhat.com>
+Date: Mon, 9 Dec 2019 16:48:22 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <748a473b-07c6-73b1-ab91-40886fb55cd5@redhat.com>
+In-Reply-To: <1575903705-12925-16-git-send-email-pbonzini@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Kwlj2HOIM1a0DoIqKNyL9Q-1
+X-MC-Unique: __6zeh-BMteHHaGqM8MZ4w-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -168,15 +107,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: thuth@redhat.com, elmarco@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 12/9/19 4:01 PM, Paolo Bonzini wrote:
+> The first machine property to fall is Xen's Intel integrated graphics
+> passthrough.  The "-machine igd-passthru" option does not set anymore
+> a property on the machine object, but desugars to a GlobalProperty on
+> accelerator objects.
+> 
+> The setter is very simple, since the value ends up in a
+> global variable, so this patch also provides an example before the more
+> complicated cases that follow it.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   hw/core/machine.c   | 20 --------------------
+>   hw/xen/xen-common.c | 16 ++++++++++++++++
+>   include/hw/boards.h |  1 -
+>   qemu-options.hx     |  7 ++++---
+>   vl.c                | 14 ++++----------
+>   5 files changed, 24 insertions(+), 34 deletions(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 45ddfb6..d7a0356 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -412,20 +412,6 @@ static void machine_set_graphics(Object *obj, bool value, Error **errp)
+>       ms->enable_graphics = value;
+>   }
+>   
+> -static bool machine_get_igd_gfx_passthru(Object *obj, Error **errp)
+> -{
+> -    MachineState *ms = MACHINE(obj);
+> -
+> -    return ms->igd_gfx_passthru;
+> -}
+> -
+> -static void machine_set_igd_gfx_passthru(Object *obj, bool value, Error **errp)
+> -{
+> -    MachineState *ms = MACHINE(obj);
+> -
+> -    ms->igd_gfx_passthru = value;
+> -}
+> -
+>   static char *machine_get_firmware(Object *obj, Error **errp)
+>   {
+>       MachineState *ms = MACHINE(obj);
+> @@ -862,12 +848,6 @@ static void machine_class_init(ObjectClass *oc, void *data)
+>       object_class_property_set_description(oc, "graphics",
+>           "Set on/off to enable/disable graphics emulation", &error_abort);
+>   
+> -    object_class_property_add_bool(oc, "igd-passthru",
+> -        machine_get_igd_gfx_passthru, machine_set_igd_gfx_passthru,
+> -        &error_abort);
+> -    object_class_property_set_description(oc, "igd-passthru",
+> -        "Set on/off to enable/disable igd passthrou", &error_abort);
 
+So before this option was available in builds/targets ...
 
-On 12/9/19 10:26 AM, John Snow wrote:
-> (off list)
+> -
+>       object_class_property_add_str(oc, "firmware",
+>           machine_get_firmware, machine_set_firmware,
+>           &error_abort);
+> diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+> index 5284b0d..6cba30c 100644
+> --- a/hw/xen/xen-common.c
+> +++ b/hw/xen/xen-common.c
+> @@ -124,6 +124,16 @@ static void xen_change_state_handler(void *opaque, int running,
+>       }
+>   }
+>   
+> +static bool xen_get_igd_gfx_passthru(Object *obj, Error **errp)
+> +{
+> +    return has_igd_gfx_passthru;
+> +}
+> +
+> +static void xen_set_igd_gfx_passthru(Object *obj, bool value, Error **errp)
+> +{
+> +    has_igd_gfx_passthru = value;
+> +}
+> +
+>   static void xen_setup_post(MachineState *ms, AccelState *accel)
+>   {
+>       int rc;
+> @@ -177,6 +187,12 @@ static void xen_accel_class_init(ObjectClass *oc, void *data)
+>       ac->compat_props = g_ptr_array_new();
+>   
+>       compat_props_add(ac->compat_props, compat, G_N_ELEMENTS(compat));
+> +
+> +    object_class_property_add_bool(oc, "igd-passthru",
+> +        xen_get_igd_gfx_passthru, xen_set_igd_gfx_passthru,
+> +        &error_abort);
+> +    object_class_property_set_description(oc, "igd-passthru",
+> +        "Set on/off to enable/disable igd passthrou", &error_abort);
 
-lol, or not. No big deal. all the code goes upstream anyway (:
+... and now it is only available when building with --enable-xen.
+
+This is a good cleanup.
+
+I wonder if ppl uses 'igd-passthru=off' without Xen, won't it break 
+their command line?
+
+>   }
+>   
+>   #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index 36fcbda..cdcf481 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -287,7 +287,6 @@ struct MachineState {
+>       bool mem_merge;
+>       bool usb;
+>       bool usb_disabled;
+> -    bool igd_gfx_passthru;
+>       char *firmware;
+>       bool iommu;
+>       bool suppress_vmdesc;
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9775258..6f12b31 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -37,7 +37,6 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+>       "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
+>       "                dump-guest-core=on|off include guest memory in a core dump (default=on)\n"
+>       "                mem-merge=on|off controls memory merge support (default: on)\n"
+> -    "                igd-passthru=on|off controls IGD GFX passthrough support (default=off)\n"
+>       "                aes-key-wrap=on|off controls support for AES key wrapping (default=on)\n"
+>       "                dea-key-wrap=on|off controls support for DEA key wrapping (default=on)\n"
+>       "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
+> @@ -71,8 +70,6 @@ more than one accelerator specified, the next one is used if the previous one
+>   fails to initialize.
+>   @item kernel_irqchip=on|off
+>   Controls in-kernel irqchip support for the chosen accelerator when available.
+> -@item gfx_passthru=on|off
+> -Enables IGD GFX passthrough support for the chosen machine when available.
+>   @item vmport=on|off|auto
+>   Enables emulation of VMWare IO port, for vmmouse etc. auto says to select the
+>   value based on accel. For accel=xen the default is off otherwise the default
+> @@ -120,6 +117,7 @@ ETEXI
+>   DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+>       "-accel [accel=]accelerator[,prop[=value][,...]]\n"
+>       "                select accelerator (kvm, xen, hax, hvf, whpx or tcg; use 'help' for a list)\n"
+
+Here we could use:
+
+#ifdef CONFIG_XEN_BACKEND
+
+(not sure we want such #ifdefry although)
+
+> +    "                igd-passthru=on|off (enable Xen integrated Intel graphics passthrough, default=off)\n"
+
+#endif
+
+>       "                tb-size=n (TCG translation block cache size)\n"
+>       "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+>   STEXI
+> @@ -130,6 +128,9 @@ kvm, xen, hax, hvf, whpx or tcg can be available. By default, tcg is used. If th
+>   more than one accelerator specified, the next one is used if the previous one
+>   fails to initialize.
+>   @table @option
+> +@item igd-passthru=on|off
+> +When Xen is in use, this option controls whether Intel integrated graphics
+> +devices can be passed through to the guest (default=off)
+>   @item tb-size=@var{n}
+>   Controls the size (in MiB) of the TCG translation block cache.
+>   @item thread=single|multi
+> diff --git a/vl.c b/vl.c
+> index e6ff56b..ee872f2 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -1257,13 +1257,6 @@ static void configure_msg(QemuOpts *opts)
+>   }
+>   
+>   
+> -/* Now we still need this for compatibility with XEN. */
+> -bool has_igd_gfx_passthru;
+> -static void igd_gfx_passthru(void)
+> -{
+> -    has_igd_gfx_passthru = current_machine->igd_gfx_passthru;
+> -}
+> -
+>   /***********************************************************/
+>   /* USB devices */
+>   
+> @@ -2642,6 +2635,10 @@ static int machine_set_property(void *opaque,
+>       if (g_str_equal(qom_name, "accel")) {
+>           return 0;
+>       }
+
+Similarly:
+
+#ifdef CONFIG_XEN_BACKEND
+
+> +    if (g_str_equal(qom_name, "igd-passthru")) {
+> +        object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, value);
+> +        return 0;
+> +    }
+
+#endif
+
+>   
+>       return object_parse_property_opt(opaque, name, value, "type", errp);
+>   }
+> @@ -4456,9 +4453,6 @@ int main(int argc, char **argv, char **envp)
+>               exit(1);
+>       }
+>   
+> -    /* Check if IGD GFX passthrough. */
+> -    igd_gfx_passthru();
+> -
+>       /* init generic devices */
+>       rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
+>       qemu_opts_foreach(qemu_find_opts("device"),
+> 
 
 
