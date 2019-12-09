@@ -2,64 +2,53 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=DATE_IN_PAST_96_XX,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2645DC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 01:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE952C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 01:57:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7F482176D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 01:36:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7F482176D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 86C452082E
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 01:57:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86C452082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih1md-0007Vc-3j
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 20:36:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33300)
+	id 1ih26k-0003Lb-CH
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 20:57:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38570)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1ih1lw-00073F-UA
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:35:38 -0500
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1ih25g-0002E7-Kq
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:56:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1ih1lv-0006Km-4R
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:35:36 -0500
-Received: from mga06.intel.com ([134.134.136.31]:27288)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1ih1lu-00064x-Rl
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:35:35 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 16 Dec 2019 17:35:24 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,323,1571727600"; d="scan'208";a="240238481"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.238])
- ([10.239.196.238])
- by fmsmga004.fm.intel.com with ESMTP; 16 Dec 2019 17:35:23 -0800
-Subject: Re: [PATCH v2 0/4] Add extra information to versioned CPU models
-From: Tao Xu <tao3.xu@intel.com>
-To: "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "rth@twiddle.net" <rth@twiddle.net>
-References: <20191209071303.24303-1-tao3.xu@intel.com>
-Message-ID: <f7ee32e2-2d70-469b-7420-1305c25f93f8@intel.com>
-Date: Tue, 17 Dec 2019 09:35:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
-MIME-Version: 1.0
-In-Reply-To: <20191209071303.24303-1-tao3.xu@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.31
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1ih25e-0001RU-PK
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:55:59 -0500
+Received: from [192.146.154.1] (port=8940 helo=mcp01.nutanix.com)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1ih25e-0001QA-K9
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:55:58 -0500
+Received: from localhost.corp.nutanix.com (unknown [10.40.33.233])
+ by mcp01.nutanix.com (Postfix) with ESMTP id 4450E1008B75;
+ Tue, 17 Dec 2019 01:55:57 +0000 (UTC)
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+To: mst@redhat.com,
+	qemu-devel@nongnu.org
+Subject: [RFC PATCH 1/3] Fixed Error Handling in
+ vhost_user_set_mem_table_postcopy
+Date: Mon,  9 Dec 2019 02:00:45 -0500
+Message-Id: <1575874847-5792-2-git-send-email-raphael.norwitz@nutanix.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1575874847-5792-1-git-send-email-raphael.norwitz@nutanix.com>
+References: <1575874847-5792-1-git-send-email-raphael.norwitz@nutanix.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 192.146.154.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,61 +60,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: raphael.s.norwitz@gmail.com, Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping for comments.
+The current vhost_user_set_mem_table_postcopy() implementation
+populates each region of the VHOST_USER_SET_MEM_TABLE
+message without first checking if there are more than
+VHOST_MEMORY_MAX_NREGIONS already populated. This can
+cause memory corruption and potentially a crash if too many
+regions are added to the message during the postcopy step.
 
-On 12/9/2019 3:12 PM, Tao Xu wrote:
-> This series of patches will remove MPX from Denverton, remove Remove
-> monitor from some CPU models. Add additional information for -cpu help
-> to indicate the changes in this version of CPU model.
-> 
-> The output is as follows:
-> ./x86_64-softmmu/qemu-system-x86_64 -cpu help | grep "\["
-> x86 Broadwell-v2          Intel Core Processor (Broadwell) [no TSX]
-> x86 Broadwell-v3          Intel Core Processor (Broadwell) [IBRS]
-> x86 Broadwell-v4          Intel Core Processor (Broadwell) [no TSX, IBRS]
-> x86 Cascadelake-Server-v2  Intel Xeon Processor (Cascadelake) [ARCH_CAPABILITIES]
-> x86 Cascadelake-Server-v3  Intel Xeon Processor (Cascadelake) [ARCH_CAPABILITIES, no TSX]
-> x86 Denverton-v2          Intel Atom Processor (Denverton) [no MPX, no MONITOR]
-> x86 Dhyana-v2             Hygon Dhyana Processor [no MONITOR]
-> x86 EPYC-v2               AMD EPYC Processor [IBPB]
-> x86 EPYC-v3               AMD EPYC Processor [IBPB, no MONITOR]
-> x86 Haswell-v2            Intel Core Processor (Haswell) [no TSX]
-> x86 Haswell-v3            Intel Core Processor (Haswell) [IBRS]
-> x86 Haswell-v4            Intel Core Processor (Haswell) [no TSX, IBRS]
-> x86 Icelake-Client-v2     Intel Core Processor (Icelake) [no TSX]
-> x86 Icelake-Server-v2     Intel Xeon Processor (Icelake) [no TSX]
-> x86 IvyBridge-v2          Intel Xeon E3-12xx v2 (Ivy Bridge) [IBRS]
-> x86 Nehalem-v2            Intel Core i7 9xx (Nehalem Class Core i7) [IBRS]
-> x86 Opteron_G3-v2         AMD Opteron 23xx (Gen 3 Class Opteron) [no MONITOR]
-> x86 SandyBridge-v2        Intel Xeon E312xx (Sandy Bridge) [IBRS]
-> x86 Skylake-Client-v2     Intel Core Processor (Skylake) [IBRS]
-> x86 Skylake-Client-v3     Intel Core Processor (Skylake) [no TSX, IBRS]
-> x86 Skylake-Server-v2     Intel Xeon Processor (Skylake) [IBRS]
-> x86 Skylake-Server-v3     Intel Xeon Processor (Skylake) [no TSX, IBRS]
-> x86 Snowridge-v2          Intel Atom Processor (SnowRidge) [no MPX]
-> x86 Snowridge-v3          Intel Atom Processor (SnowRidge) [no MPX, no MONITOR]
-> x86 Westmere-v2           Westmere E56xx/L56xx/X56xx (Nehalem-C) [IBRS]
-> 
-> Changes in v2:
->      - correct the note of Cascadelake v3 (Xiaoyao)
-> 
-> Tao Xu (4):
->    target/i386: Add Denverton-v2 (no MPX) CPU model
->    target/i386: Remove monitor from some CPU models
->    target/i386: Add new property note to versioned CPU models
->    target/i386: Add notes for versioned CPU models
-> 
->   target/i386/cpu.c | 112 +++++++++++++++++++++++++++++++++++-----------
->   1 file changed, 85 insertions(+), 27 deletions(-)
-> 
-> --
-> 2.20.1
-> 
-> 
+Additionally, after populating each region, the current
+implementation asserts that the current region index is less than
+VHOST_MEMORY_MAX_NREGIONS. Thus, even if the aforementioned
+bug is fixed by moving the existing assert up, too many hot-adds
+during the postcopy step will bring down qemu instead of
+gracefully propogating up the error as in
+vhost_user_set_mem_table().
+
+This change cleans up error handling in
+vhost_user_set_mem_table_postcopy() such that it handles
+an unsupported number of memory hot-adds like
+vhost_user_set_mem_table(), gracefully propogating an error
+up instead of corrupting memory and crashing qemu.
+
+Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
+---
+ hw/virtio/vhost-user.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+index 02a9b25..f74ff3b 100644
+--- a/hw/virtio/vhost-user.c
++++ b/hw/virtio/vhost-user.c
+@@ -441,6 +441,10 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
+                                      &offset);
+         fd = memory_region_get_fd(mr);
+         if (fd > 0) {
++            if (fd_num == VHOST_MEMORY_MAX_NREGIONS) {
++                error_report("Failed preparing vhost-user memory table msg");
++                return -1;
++            }
+             trace_vhost_user_set_mem_table_withfd(fd_num, mr->name,
+                                                   reg->memory_size,
+                                                   reg->guest_phys_addr,
+@@ -453,7 +457,6 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
+             msg.payload.memory.regions[fd_num].guest_phys_addr =
+                 reg->guest_phys_addr;
+             msg.payload.memory.regions[fd_num].mmap_offset = offset;
+-            assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
+             fds[fd_num++] = fd;
+         } else {
+             u->region_rb_offset[i] = 0;
+-- 
+1.8.3.1
 
 
