@@ -2,65 +2,95 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5247C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 14:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2ED4C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 14:33:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9403F2073D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 14:13:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9403F2073D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D2FA2077B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 14:33:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+6OgH3w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D2FA2077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieJnK-00032A-Po
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 09:13:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34604)
+	id 1ieK6b-0000Uu-Io
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 09:33:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39439)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1ieJmd-0002Sx-JP
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 09:13:08 -0500
+ (envelope-from <groeck7@gmail.com>) id 1ieK5u-0008Tz-V5
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 09:33:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1ieJmc-0007XT-JF
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 09:13:07 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:53060 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1ieJmZ-0007E9-Fr; Mon, 09 Dec 2019 09:13:04 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id D162478339045A5766C6;
- Mon,  9 Dec 2019 22:12:42 +0800 (CST)
-Received: from [127.0.0.1] (10.142.68.147) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Mon, 9 Dec 2019
- 22:12:37 +0800
-Subject: Re: [RESEND PATCH v21 5/6] target-arm: kvm64: handle SIGBUS signal
- from kernel or KVM
-To: Beata Michalska <beata.michalska@linaro.org>
-References: <20191111014048.21296-1-zhengxiang9@huawei.com>
- <20191111014048.21296-6-zhengxiang9@huawei.com>
- <CADSWDztF=eaUDNnq8bhnPyTKW1YjAWm4UBaH-NBPkzjnzx0bxg@mail.gmail.com>
- <238ea7b3-9d6d-e3f7-40c9-e3e62b5fb477@huawei.com>
- <CADSWDzvFvS6mYiMhXu2J+u+sUxZaKcCE78EuSggv-VOY7zEN_w@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <650e26cf-e007-1e31-cd0a-4042bb9fa6a8@huawei.com>
-Date: Mon, 9 Dec 2019 22:12:33 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ (envelope-from <groeck7@gmail.com>) id 1ieK5t-000571-MA
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 09:33:02 -0500
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:39694)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <groeck7@gmail.com>) id 1ieK5t-00056m-EL
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 09:33:01 -0500
+Received: by mail-pj1-x1041.google.com with SMTP id v93so5983973pjb.6
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 06:33:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=uGbO5eA/EvkEthYW5iN8u16ydFfTV3nGR0kns1YSEq8=;
+ b=P+6OgH3wRjDpQ2U5Q0rrRheWAfDz6brjGOolhAYrfI+XHpr9AJQXkrzLt5mnTANHHe
+ 6kjX5lrvWFn+Kzh7mCA2waxwenvqV2z7zOjWnVxPg5kZzDGIzdDBKdauuIKS687GFel4
+ lK7kd6xWyU7bCZUz7nx79DGRRGBGE8rneh8ccRlEgXlT9lqhlgFzNMThTeTMquZgkga1
+ 77j618VNUcC6v9kkNAgOgrstKBJQc/7I2f1rcIHJiSrZfm+by5G7EgSWAtKROXXhSxqu
+ kN/3KOK/W8oKCvmZHZjenE/aAPytUZ0+q/o31lIBe87UNs4W3H4i0sbAltwNvF26dfMu
+ VmmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uGbO5eA/EvkEthYW5iN8u16ydFfTV3nGR0kns1YSEq8=;
+ b=QJNNGLyZ5d/rXRsFomnepalxxOkXSTu1dSNvTP04vUHgHua0O2bvEGRfIt/q8il9vy
+ GkxMi4y9zSazmSALjFHT2FpGsONIAlRutV0ZWHwl8trNlwglSsZp7KcEQtuSyTq0e3n+
+ zvaoQa7BwRWBy7KhRzVcsp+Y0SByil9dpFKqHi6ny1P8rB0HM+100KlMWXRTQb6Epwpg
+ dkxHOZLziPWvXTWoqJO4X9mKB53plzgZB5sp8wyVN49jteNFFo9YrA+xX3NCj7m1RsWu
+ kbpKNxATilbng3oYZnaxGSiYJ+BYcx9LR+e8k8PNqdVvWbGwbi0NPVKEGl0A1SVRlFC/
+ zwxA==
+X-Gm-Message-State: APjAAAXqfTeVDMYMYVLMO4DYTGxep730qDJPooEuJxUw61fi+ncue3RJ
+ uSFTWPgUXlIsCfT2b2viBYIDLTSV
+X-Google-Smtp-Source: APXvYqy4RVacHM5VEz6sKAsm+VK1Q9vv8Q+gX/BUj6bRNoFploDMVpcSqufihDBKA8rygFotaghXYQ==
+X-Received: by 2002:a17:90b:8c6:: with SMTP id
+ ds6mr18053912pjb.33.1575901980001; 
+ Mon, 09 Dec 2019 06:33:00 -0800 (PST)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+ by smtp.gmail.com with ESMTPSA id
+ h3sm12682121pfr.15.2019.12.09.06.32.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Dec 2019 06:32:58 -0800 (PST)
+Subject: Re: [PATCH 1/5] arm64: zynqmp: Add firmware DT node
+To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+References: <20191018160735.15658-1-m.tretter@pengutronix.de>
+ <20191018160735.15658-2-m.tretter@pengutronix.de>
+ <20191208223814.GA21260@roeck-us.net>
+ <dbba2a25-cbf7-60f4-99f7-056512e28d00@xilinx.com>
+ <4821742f-2d60-b722-b954-263de975bf2e@roeck-us.net>
+ <20191209074840.GP32392@toto>
+From: Guenter Roeck <linux@roeck-us.net>
+Message-ID: <d2e63acb-c076-7bfb-c492-0355ec106cbf@roeck-us.net>
+Date: Mon, 9 Dec 2019 06:32:56 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <CADSWDzvFvS6mYiMhXu2J+u+sUxZaKcCE78EuSggv-VOY7zEN_w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20191209074840.GP32392@toto>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.142.68.147]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.35
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,42 +102,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, ehabkost@redhat.com,
- kvm@vger.kernel.org, mst@redhat.com, wanghaibin.wang@huawei.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org, linuxarm@huawei.com,
- shannon.zhaosl@gmail.com, Xiang Zheng <zhengxiang9@huawei.com>,
- qemu-arm@nongnu.org, james.morse@arm.com, jonathan.cameron@huawei.com,
- Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, xuwei5@huawei.com,
- Laszlo Ersek <lersek@redhat.com>, rth@twiddle.net
+Cc: mark.rutland@arm.com, devicetree@vger.kernel.org,
+ Rajan Vaja <rajan.vaja@xilinx.com>, qemu-devel@nongnu.org,
+ Michal Simek <michal.simek@xilinx.com>,
+ Michael Tretter <m.tretter@pengutronix.de>, Edgar Iglesias <edgari@xilinx.com>,
+ robh+dt@kernel.org, Rajan Vaja <rajanv@xilinx.com>,
+ linux-arm-kernel@lists.infradead.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2019/12/9 21:05, Beata Michalska wrote:
->> Here we set the FnV to not valid, not to set it to valid.
->> because Guest will use the physical address that recorded in APEI table.
->>
-> To be precise : the FnV is  giving the status of FAR - so what you are setting
-> here is status of 0b0 which means FAR is valid, not FnV on it's own.
-> And my point was that you are changing the prototype for syn_data_abort_no_iss
-> just for this case only so I was just thinking that it might not be
-> worth that, instead
-> you could just set it here ... or to be more flexible , provide a way
-> to set specific bits
-> on demand.
-
-No, I set the FnV to 0b1, not 0b0, the whole esr_el1's value is 0x96000410, as shown below log:
-I remember changing the prototype for syn_data_abort_no_iss is suggested by Peter Maydell.
-
-
-[1]:
-[   62.851830] Internal error: synchronous external abort: 96000410 [#1] PREEMPT SMP
-[   62.854465] Modules linked in:
-
-
-
+On 12/8/19 11:48 PM, Edgar E. Iglesias wrote:
+> On Sun, Dec 08, 2019 at 11:19:33PM -0800, Guenter Roeck wrote:
+>> On 12/8/19 10:42 PM, Michal Simek wrote:
+>>> Hi, +Edgar
+>>>
+>>>
+>>> On 08. 12. 19 23:38, Guenter Roeck wrote:
+>>>> On Fri, Oct 18, 2019 at 06:07:31PM +0200, Michael Tretter wrote:
+>>>>> From: Rajan Vaja <rajan.vaja@xilinx.com>
+>>>>>
+>>>>> Add firmware DT node in ZynqMP device tree. This node
+>>>>> uses bindings as per new firmware interface driver.
+>>>>>
+>>>>> Signed-off-by: Rajan Vaja <rajanv@xilinx.com>
+>>>>> Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+>>>>> Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
+>>>>
+>>>> With this patch applied in the mainline kernel, the qemu xlnx-zcu102
+>>>> emulation crashes (see below). Any idea what it might take to get
+>>>> qemu back to working ?
+>>>
+>>> Driver talks through ATF to PMU unit(microblaze). I don't think A53+MB
+>>> concept is working with mainline qemu. But crash is too hard. It should
+> 
+> Yes, QEMU doesn't support the Cortex-A53s along with the PMU MicroBlaze.
+> 
+> My workaround when using upstream QEMU is a modified DT without the PMU firmware
+> and with fixed-clock nodes.
 > 
 
+I can't do that for my boot tests. Normally I would just disable ZYNQMP_FIRMWARE,
+but that is hard enabled with ARCH_ZYNQMP. I'll have to drop those tests,
+unfortunately, if the firmware driver is considered mandatory.
+
+Guenter
 
