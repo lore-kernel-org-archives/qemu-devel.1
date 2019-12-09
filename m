@@ -2,83 +2,108 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD27C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6BBEC43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03D502068E
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:21:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B06E32068E
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:22:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bl4Yk6rX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03D502068E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b7PiLLb5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B06E32068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieKr6-0007Y4-TI
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:21:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47298)
+	id 1ieKrc-000867-QF
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:22:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ieKY4-0003cu-US
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:02:14 -0500
+ (envelope-from <mreitz@redhat.com>) id 1ieKmm-0003LD-HJ
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:17:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ieKY3-0001ZS-3T
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:02:08 -0500
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:53187)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ieKY2-0001YW-Sf
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:02:07 -0500
-Received: by mail-wm1-x32e.google.com with SMTP id p9so15827962wmc.2
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 07:02:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ylzcvlP2ozbD0HAsIyPi1y+3NrZwIrQQ1hXTxu0zBY0=;
- b=bl4Yk6rXeyOFlqEEvxiUoO400Rtp0gyFUxoJwSD4M7bn7ubT+599lu4X7PIoJHT/XR
- PJwZaC4Ni0MNuUTjgZERaua2xMLYrusxwoBGEhGM3aUFN3oh5IPA4eSJ2tdq5pGMgtz9
- 5NC9QuHNEY+caHL8/nb8mI+oh6qqalP2b97R7mSLxYejRdpEbFNOdM7+PlYObZLZ2dla
- EdWEaX8ZU90IUxoGF10FXpKicwK/ouWRlq6SZaurGgc5ORwIkeLIUhLpORYt8c9yhWl7
- 0uAvo+V3j52p8lxXGyk5CpWWvszX7I9Ja6sJi6dh5xq5RiXoTndawzDqHwPONwIfarKJ
- yCYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=ylzcvlP2ozbD0HAsIyPi1y+3NrZwIrQQ1hXTxu0zBY0=;
- b=qRHH9VlmqNI+ncpu8Z3tjOibGElcjoIheS+dIxMd2B3S2VTaG70dez4bIz6KakdCc9
- 1g1OU6NWvIwL0w1c+LZxEjB/bDINrQwhZPdzEUaJs/jvXTO4FXCVWF6iuLBCEx6uy7o8
- ANKRCGfyNJO+E2g67qTg9UxzsJWr61dGJWInsaR3wg3H+/Xji8LdAhv5ZvRE2rJbnmJy
- l2GyNSHC2eab5WxuiUZJpzGRMzdu/IRg04+GWClixkXOCwo6IRa0OSLE9YKJH17YqeKx
- 0/tHLMMKyLU9CToZgArKC3/dMv1zYIWsjAV0OBSSs6yaJZ76YCscC0T1U6poupEWPnZJ
- z7Ww==
-X-Gm-Message-State: APjAAAXZub30apdjxm/5zvO+COgJliN3sBJbU7DKXoTr2v0DLJzFvnwm
- vAXBF4xo7oolpHX/rye4suwB50fb
-X-Google-Smtp-Source: APXvYqw9upMJ3R4hmA5nEZslrDr+7wNW9+sVYWfVPPjrgoL0wyFYuFAgs5MTHG5BsnH/ncIGg8IT3g==
-X-Received: by 2002:a1c:8153:: with SMTP id c80mr24775007wmd.58.1575903725108; 
- Mon, 09 Dec 2019 07:02:05 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g9sm27219371wro.67.2019.12.09.07.02.04
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 09 Dec 2019 07:02:04 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 16/18] kvm: convert "-machine kvm_shadow_mem" to an
- accelerator property
-Date: Mon,  9 Dec 2019 16:01:43 +0100
-Message-Id: <1575903705-12925-17-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
-References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::32e
+ (envelope-from <mreitz@redhat.com>) id 1ieKml-0000Xz-GF
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:17:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55625
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1ieKml-0000Xr-C7
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:17:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575904638;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=TnwAA5xuFcM139Mz/syaLe5To6oPEnOlY9bKigmo+yM=;
+ b=b7PiLLb5mmq9tLr9dBVluIqegC1IYlUHPGmFJKnwfy9YQ1n7feO8v5VQ1KY4L8X0bsryWJ
+ /NwQWnm0PWydHzYOVneUqAiN2Mpyfoz0kJsEyxY134zq9XQhX0PFl5GUFAloTCzuF7ZPyD
+ +qqqhcy+bkVGVAMUG8O6aPeHaFgd5Rs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-232-v7vCR0iHPMKXb3r8sF_qfw-1; Mon, 09 Dec 2019 10:17:14 -0500
+X-MC-Unique: v7vCR0iHPMKXb3r8sF_qfw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F29F1800D45;
+ Mon,  9 Dec 2019 15:17:12 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.36.118.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BC4C5D9D6;
+ Mon,  9 Dec 2019 15:17:06 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v2 22/23] iotests: Check that @replaces can
+ replace filters
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20191111160216.197086-1-mreitz@redhat.com>
+ <20191111160216.197086-23-mreitz@redhat.com>
+ <c75475a4-f2ab-bd99-1c26-463c48c4d94c@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <fabdd02a-391e-b37e-3b76-6cf3d268d52c@redhat.com>
+Date: Mon, 9 Dec 2019 16:17:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <c75475a4-f2ab-bd99-1c26-463c48c4d94c@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="zT6Y8UEZrJHUug0Sc4NTwbxLI2fQc3nFM"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,260 +115,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, elmarco@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- accel/kvm/kvm-all.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- hw/core/machine.c   | 39 ---------------------------------------
- include/hw/boards.h |  2 --
- qemu-options.hx     |  6 +++---
- target/i386/kvm.c   |  2 +-
- vl.c                |  4 ++++
- 6 files changed, 51 insertions(+), 45 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--zT6Y8UEZrJHUug0Sc4NTwbxLI2fQc3nFM
+Content-Type: multipart/mixed; boundary="6fXBeBQE9dJ629Pff7TPY3ml04Fp2NcbD"
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index ca00daa..f0b9294 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -41,6 +41,7 @@
- #include "hw/irq.h"
- #include "sysemu/sev.h"
- #include "sysemu/balloon.h"
-+#include "qapi/visitor.h"
- 
- #include "hw/boards.h"
- 
-@@ -92,6 +93,7 @@ struct KVMState
-     int max_nested_state_len;
-     int many_ioeventfds;
-     int intx_set_mask;
-+    int kvm_shadow_mem;
-     bool sync_mmu;
-     bool manual_dirty_log_protect;
-     /* The man page (and posix) say ioctl numbers are signed int, but
-@@ -2940,6 +2942,40 @@ static bool kvm_accel_has_memory(MachineState *ms, AddressSpace *as,
-     return false;
- }
- 
-+static void kvm_get_kvm_shadow_mem(Object *obj, Visitor *v,
-+                                   const char *name, void *opaque,
-+                                   Error **errp)
-+{
-+    KVMState *s = KVM_STATE(obj);
-+    int64_t value = s->kvm_shadow_mem;
-+
-+    visit_type_int(v, name, &value, errp);
-+}
-+
-+static void kvm_set_kvm_shadow_mem(Object *obj, Visitor *v,
-+                                   const char *name, void *opaque,
-+                                   Error **errp)
-+{
-+    KVMState *s = KVM_STATE(obj);
-+    Error *error = NULL;
-+    int64_t value;
-+
-+    visit_type_int(v, name, &value, &error);
-+    if (error) {
-+        error_propagate(errp, error);
-+        return;
-+    }
-+
-+    s->kvm_shadow_mem = value;
-+}
-+
-+static void kvm_accel_instance_init(Object *obj)
-+{
-+    KVMState *s = KVM_STATE(obj);
-+
-+    s->kvm_shadow_mem = -1;
-+}
-+
- static void kvm_accel_class_init(ObjectClass *oc, void *data)
- {
-     AccelClass *ac = ACCEL_CLASS(oc);
-@@ -2947,11 +2983,18 @@ static void kvm_accel_class_init(ObjectClass *oc, void *data)
-     ac->init_machine = kvm_init;
-     ac->has_memory = kvm_accel_has_memory;
-     ac->allowed = &kvm_allowed;
-+
-+    object_class_property_add(oc, "kvm-shadow-mem", "int",
-+        kvm_get_kvm_shadow_mem, kvm_set_kvm_shadow_mem,
-+        NULL, NULL, &error_abort);
-+    object_class_property_set_description(oc, "kvm-shadow-mem",
-+        "KVM shadow MMU size", &error_abort);
- }
- 
- static const TypeInfo kvm_accel_type = {
-     .name = TYPE_KVM_ACCEL,
-     .parent = TYPE_ACCEL,
-+    .instance_init = kvm_accel_instance_init,
-     .class_init = kvm_accel_class_init,
-     .instance_size = sizeof(KVMState),
- };
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index d7a0356..bfb5f6f 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -211,33 +211,6 @@ static void machine_set_kernel_irqchip(Object *obj, Visitor *v,
-     }
- }
- 
--static void machine_get_kvm_shadow_mem(Object *obj, Visitor *v,
--                                       const char *name, void *opaque,
--                                       Error **errp)
--{
--    MachineState *ms = MACHINE(obj);
--    int64_t value = ms->kvm_shadow_mem;
--
--    visit_type_int(v, name, &value, errp);
--}
--
--static void machine_set_kvm_shadow_mem(Object *obj, Visitor *v,
--                                       const char *name, void *opaque,
--                                       Error **errp)
--{
--    MachineState *ms = MACHINE(obj);
--    Error *error = NULL;
--    int64_t value;
--
--    visit_type_int(v, name, &value, &error);
--    if (error) {
--        error_propagate(errp, error);
--        return;
--    }
--
--    ms->kvm_shadow_mem = value;
--}
--
- static char *machine_get_kernel(Object *obj, Error **errp)
- {
-     MachineState *ms = MACHINE(obj);
-@@ -785,12 +758,6 @@ static void machine_class_init(ObjectClass *oc, void *data)
-     object_class_property_set_description(oc, "kernel-irqchip",
-         "Configure KVM in-kernel irqchip", &error_abort);
- 
--    object_class_property_add(oc, "kvm-shadow-mem", "int",
--        machine_get_kvm_shadow_mem, machine_set_kvm_shadow_mem,
--        NULL, NULL, &error_abort);
--    object_class_property_set_description(oc, "kvm-shadow-mem",
--        "KVM shadow MMU size", &error_abort);
--
-     object_class_property_add_str(oc, "kernel",
-         machine_get_kernel, machine_set_kernel, &error_abort);
-     object_class_property_set_description(oc, "kernel",
-@@ -892,7 +859,6 @@ static void machine_initfn(Object *obj)
- 
-     ms->kernel_irqchip_allowed = true;
-     ms->kernel_irqchip_split = mc->default_kernel_irqchip_split;
--    ms->kvm_shadow_mem = -1;
-     ms->dump_guest_core = true;
-     ms->mem_merge = true;
-     ms->enable_graphics = true;
-@@ -963,11 +929,6 @@ bool machine_kernel_irqchip_split(MachineState *machine)
-     return machine->kernel_irqchip_split;
- }
- 
--int machine_kvm_shadow_mem(MachineState *machine)
--{
--    return machine->kvm_shadow_mem;
--}
--
- int machine_phandle_start(MachineState *machine)
- {
-     return machine->phandle_start;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index cdcf481..46119eb 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -66,7 +66,6 @@ bool machine_usb(MachineState *machine);
- bool machine_kernel_irqchip_allowed(MachineState *machine);
- bool machine_kernel_irqchip_required(MachineState *machine);
- bool machine_kernel_irqchip_split(MachineState *machine);
--int machine_kvm_shadow_mem(MachineState *machine);
- int machine_phandle_start(MachineState *machine);
- bool machine_dump_guest_core(MachineState *machine);
- bool machine_mem_merge(MachineState *machine);
-@@ -278,7 +277,6 @@ struct MachineState {
-     bool kernel_irqchip_allowed;
-     bool kernel_irqchip_required;
-     bool kernel_irqchip_split;
--    int kvm_shadow_mem;
-     char *dtb;
-     char *dumpdtb;
-     int phandle_start;
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 6f12b31..779c8af 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -34,7 +34,6 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "                supported accelerators are kvm, xen, hax, hvf, whpx or tcg (default: tcg)\n"
-     "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
-     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
--    "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
-     "                dump-guest-core=on|off include guest memory in a core dump (default=on)\n"
-     "                mem-merge=on|off controls memory merge support (default: on)\n"
-     "                aes-key-wrap=on|off controls support for AES key wrapping (default=on)\n"
-@@ -74,8 +73,6 @@ Controls in-kernel irqchip support for the chosen accelerator when available.
- Enables emulation of VMWare IO port, for vmmouse etc. auto says to select the
- value based on accel. For accel=xen the default is off otherwise the default
- is on.
--@item kvm_shadow_mem=size
--Defines the size of the KVM shadow MMU.
- @item dump-guest-core=on|off
- Include guest memory in a core dump. The default is on.
- @item mem-merge=on|off
-@@ -118,6 +115,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-     "-accel [accel=]accelerator[,prop[=value][,...]]\n"
-     "                select accelerator (kvm, xen, hax, hvf, whpx or tcg; use 'help' for a list)\n"
-     "                igd-passthru=on|off (enable Xen integrated Intel graphics passthrough, default=off)\n"
-+    "                kvm-shadow-mem=size of KVM shadow MMU in bytes\n"
-     "                tb-size=n (TCG translation block cache size)\n"
-     "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
- STEXI
-@@ -131,6 +129,8 @@ fails to initialize.
- @item igd-passthru=on|off
- When Xen is in use, this option controls whether Intel integrated graphics
- devices can be passed through to the guest (default=off)
-+@item kvm-shadow-mem=size
-+Defines the size of the KVM shadow MMU.
- @item tb-size=@var{n}
- Controls the size (in MiB) of the TCG translation block cache.
- @item thread=single|multi
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 1d10046..62ce681 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2163,7 +2163,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     }
-     qemu_register_reset(kvm_unpoison_all, NULL);
- 
--    shadow_mem = machine_kvm_shadow_mem(ms);
-+    shadow_mem = object_property_get_int(OBJECT(s), "kvm-shadow-mem", &error_abort);
-     if (shadow_mem != -1) {
-         shadow_mem /= 4096;
-         ret = kvm_vm_ioctl(s, KVM_SET_NR_MMU_PAGES, shadow_mem);
-diff --git a/vl.c b/vl.c
-index ee872f2..3678522 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2639,6 +2639,10 @@ static int machine_set_property(void *opaque,
-         object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, value);
-         return 0;
-     }
-+    if (g_str_equal(qom_name, "kvm-shadow-mem")) {
-+        object_register_sugar_prop(ACCEL_CLASS_NAME("kvm"), qom_name, value);
-+        return 0;
-+    }
- 
-     return object_parse_property_opt(opaque, name, value, "type", errp);
- }
--- 
-1.8.3.1
+--6fXBeBQE9dJ629Pff7TPY3ml04Fp2NcbD
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
+On 03.12.19 16:58, Vladimir Sementsov-Ogievskiy wrote:
+> 11.11.2019 19:02, Max Reitz wrote:
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>   tests/qemu-iotests/041     | 46 ++++++++++++++++++++++++++++++++++++++
+>>   tests/qemu-iotests/041.out |  4 ++--
+>>   2 files changed, 48 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+>> index ab0cb5b42f..9a00cf6f7b 100755
+>> --- a/tests/qemu-iotests/041
+>> +++ b/tests/qemu-iotests/041
+>> @@ -1200,6 +1200,52 @@ class TestOrphanedSource(iotests.QMPTestCase):
+>>           self.assertFalse('mirror-filter' in nodes,
+>>                            'Mirror filter node did not disappear')
+>>  =20
+>> +# Test cases for @replaces that do not necessarily involve Quorum
+>> +class TestReplaces(iotests.QMPTestCase):
+>> +    # Each of these test cases needs their own block graph, so do not
+>> +    # create any nodes here
+>> +    def setUp(self):
+>> +        self.vm =3D iotests.VM()
+>> +        self.vm.launch()
+>> +
+>> +    def tearDown(self):
+>> +        self.vm.shutdown()
+>> +        for img in (test_img, target_img):
+>> +            try:
+>> +                os.remove(img)
+>> +            except OSError:
+>> +                pass
+>> +
+>> +    """
+>> +    Check that we can replace filter nodes.
+>> +    """
+>=20
+> PEP8 says, that doc string should appear after "def" line.
+> (this applies to previous patch too)
+
+OK.  I just noticed that in some previous patch I also left them having
+single quotes, which I should fix.
+
+Max
+
+
+--6fXBeBQE9dJ629Pff7TPY3ml04Fp2NcbD--
+
+--zT6Y8UEZrJHUug0Sc4NTwbxLI2fQc3nFM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3uZXAACgkQ9AfbAGHV
+z0BVwAf/UFEKXfGHxjYxDzYCxjSP1ZsuSq260doEidKWyHXc0qZkWdNJjoHwOb0N
+AtMJOqm8r5Fl5/ZT2jQpY93U1LqjolmY/OG6Uaqe54MWTvP6cQeZlwGKZtu3U+cK
+C7X0/8P4IhXNJwg8bJzdYMyu6q/kW293HZ7iXQ23YcPjrdZ0B1fFOejJaXAu49vJ
+Z5l2e8lAd8SejGSdHyDE6H+1GZ8hRcjZNZm6nHj+66MuNhR8A4+Bz2AZO6pp/kUe
+MmyK75+SQUphzd2SRos5jVYhsL9b3hXhE0WWePqqnpJ7c8BKMSA4I94Ve2apNzAw
+CjZXN+ekJGIqxOjRKedw8cAIVecOFA==
+=eH4+
+-----END PGP SIGNATURE-----
+
+--zT6Y8UEZrJHUug0Sc4NTwbxLI2fQc3nFM--
 
 
