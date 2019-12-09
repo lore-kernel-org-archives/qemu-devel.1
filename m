@@ -2,89 +2,82 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1EE9C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:04:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8322BC00454
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:07:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 89B862077B
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:04:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D67020692
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 16:07:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MeGRWJOj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89B862077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TbS67out"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D67020692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieLWp-0000B2-LD
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 11:04:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57990)
+	id 1ieLYp-0002Xr-Ec
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 11:06:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1ieLSn-0004BA-G5
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:00:46 -0500
+ (envelope-from <kwolf@redhat.com>) id 1ieLY5-0001rJ-3u
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1ieLSi-0002Lu-Ds
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:00:45 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41441)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1ieLSi-0002Jp-5f
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:00:40 -0500
-Received: by mail-wr1-x443.google.com with SMTP id c9so16797760wrw.8
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 08:00:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=cJ5tC38qdbylHz6Ukz5CSrO7+ZUQTXXN8j03HEEov2s=;
- b=MeGRWJOj200Uu7rHuzwpplBuRH7Q9GvxIWKTOfljP1sayybMS7xowlhEGv1E6wQR56
- avcwuJPNe/nOIS81trv4ake8nDeXYXsi/xeYkAfp+Gy3Uq85PmRaaeDUx/jIBde37bV4
- CWECw69ZSYk8H5S4jHFHlYQMtvqFbLuM+oUCNkgKE0jGNzvDrtBo7BOB8U0OpaqEBwN0
- YzJyxCwks+WT72XBvYxK5OH/PRWIekLROUPOl2m7D8hvAM3VgaIAP6+sdlXviLZUYOQN
- u3HNkgJM9njUcDU+qpOVxxH1DthYsHKtdtMOZyYpNUllXa3vqS0vZkaEkM9/nUHPCzep
- 0R8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=cJ5tC38qdbylHz6Ukz5CSrO7+ZUQTXXN8j03HEEov2s=;
- b=QobLsP9YbxPo3LHGAeGkrFyh6m8g36wQ71rH7Z1fz7El1vsqKuBhRFXvWvJUQ9CzVT
- QY+EFGa8AETBTMLf9tGLVI5/QSUjPANQUO4kzXXwcHG9oW/HuvsEhez1VjLqBHoJVuzV
- DwhzJsM87h0kQAx/guq6d6bXQoyce2n7B6DplmCHmM2x+epKCeG7UVNaKISGqASCvV5v
- y4jROrL9XEjlYT8hDuKEndmG8M0yOw1cdwgFbM0ChJnlO5H0+wosi7Sc5OokOmJbs+3q
- lasXCcGMEmi1mKIUm4yVlumiXTnaB6wx4lqD9y/VslJkKGpM4ZdiaCsc+BQelBYjMJih
- IpHQ==
-X-Gm-Message-State: APjAAAWJc3+ijfFpYwQtZ1x5sJH+eEImKWHDxxwGp1W7hpO/c+9XcQOE
- K9MPsX0cBKMKxmfFRi+e4Fnuuw==
-X-Google-Smtp-Source: APXvYqwxwVDnpCx4in1YK2Qeeh7X/ju/e/aZVEZPADcS/++kleEZ3Hc2tZ/JEw2cJwQ5w6ShvXU/aQ==
-X-Received: by 2002:a05:6000:1248:: with SMTP id
- j8mr2921073wrx.44.1575907238651; 
- Mon, 09 Dec 2019 08:00:38 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v22sm63170wml.11.2019.12.09.08.00.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Dec 2019 08:00:37 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 86D401FF87;
- Mon,  9 Dec 2019 16:00:36 +0000 (GMT)
-References: <20191209134552.27733-1-philmd@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] target/arm: Display helpful message when hflags mismatch
-In-reply-to: <20191209134552.27733-1-philmd@redhat.com>
-Date: Mon, 09 Dec 2019 16:00:36 +0000
-Message-ID: <87d0cx32vv.fsf@linaro.org>
+ (envelope-from <kwolf@redhat.com>) id 1ieLY2-00089O-5H
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:06:11 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56463
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ieLY1-00088b-JN
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 11:06:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575907568;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+RbFC4eEhTNJHx837P7drSLdPkMBBSzO7Ars7IuAwP0=;
+ b=TbS67outPcWbvXxndLiLluu/L4D+5jip+gaMdZDerC2U+HocJ+AkGraW53D5etkBZRhj0r
+ 9g/nIi5r/18+8QACFl1q7UokQPpeTOcMFBWIURIHl8C1DSNS04ZDf71EWeUea3uL0LQSvj
+ vxtPTnuPQNIBqxW8vo5439CUsx5nU3Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-K4Pr2tYPPv2KII3Mft9F_Q-1; Mon, 09 Dec 2019 11:06:07 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B8A4107ACC5;
+ Mon,  9 Dec 2019 16:06:06 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-116.ams2.redhat.com [10.36.117.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DE5A646;
+ Mon,  9 Dec 2019 16:06:02 +0000 (UTC)
+Date: Mon, 9 Dec 2019 17:06:01 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Sergio Lopez <slp@redhat.com>
+Subject: Re: [PATCH v5 4/4] blockdev: honor bdrv_try_set_aio_context()
+ context requirements
+Message-ID: <20191209160601.GB6715@linux.fritz.box>
+References: <20191128104129.250206-1-slp@redhat.com>
+ <20191128104129.250206-5-slp@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191128104129.250206-5-slp@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: K4Pr2tYPPv2KII3Mft9F_Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,72 +89,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
-
-> Instead of crashing in a confuse way, give some hint to the user
-> about why we aborted. He might report the issue without having
-> to use a debugger.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Am 28.11.2019 um 11:41 hat Sergio Lopez geschrieben:
+> bdrv_try_set_aio_context() requires that the old context is held, and
+> the new context is not held. Fix all the occurrences where it's not
+> done this way.
+>=20
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Sergio Lopez <slp@redhat.com>
 > ---
->  target/arm/helper.c | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 0bf8f53d4b..6bfb62672b 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -11348,6 +11348,20 @@ void HELPER(rebuild_hflags_a64)(CPUARMState *env=
-, int el)
->      env->hflags =3D rebuild_hflags_a64(env, el, fp_el, mmu_idx);
->  }
->=20=20
-> +static inline void assert_hflags_rebuild_correctly(CPUARMState *env)
-> +{
-> +#ifdef CONFIG_DEBUG_TCG
-> +    uint32_t env_flags_current =3D env->hflags;
-> +    uint32_t env_flags_rebuilt =3D rebuild_hflags_internal(env);
+>  blockdev.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 62 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/blockdev.c b/blockdev.c
+> index 152a0f7454..e33abd7fd2 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -1535,6 +1535,7 @@ static void external_snapshot_prepare(BlkActionStat=
+e *common,
+>                               DO_UPCAST(ExternalSnapshotState, common, co=
+mmon);
+>      TransactionAction *action =3D common->action;
+>      AioContext *aio_context;
+> +    AioContext *old_context;
+>      int ret;
+> =20
+>      /* 'blockdev-snapshot' and 'blockdev-snapshot-sync' have similar
+> @@ -1675,7 +1676,16 @@ static void external_snapshot_prepare(BlkActionSta=
+te *common,
+>          goto out;
+>      }
+> =20
+> +    /* Honor bdrv_try_set_aio_context() context acquisition requirements=
+. */
+> +    old_context =3D bdrv_get_aio_context(state->new_bs);
+> +    aio_context_release(aio_context);
+> +    aio_context_acquire(old_context);
 > +
-> +    if (unlikely(env_flags_current !=3D env_flags_rebuilt)) {
-> +        fprintf(stderr, "TCG hflags mismatch (current:0x%08x rebuilt:0x%=
-08x)\n",
-> +                env_flags_current, env_flags_rebuilt);
-> +        abort();
+>      ret =3D bdrv_try_set_aio_context(state->new_bs, aio_context, errp);
+> +
+> +    aio_context_release(old_context);
+> +    aio_context_acquire(aio_context);
+> +
+>      if (ret < 0) {
+>          goto out;
+>      }
+> @@ -1775,11 +1785,13 @@ static void drive_backup_prepare(BlkActionState *=
+common, Error **errp)
+>      BlockDriverState *target_bs;
+>      BlockDriverState *source =3D NULL;
+>      AioContext *aio_context;
+> +    AioContext *old_context;
+>      QDict *options;
+>      Error *local_err =3D NULL;
+>      int flags;
+>      int64_t size;
+>      bool set_backing_hd =3D false;
+> +    int ret;
+> =20
+>      assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_DRIVE_BAC=
+KUP);
+>      backup =3D common->action->u.drive_backup.data;
+> @@ -1868,6 +1880,20 @@ static void drive_backup_prepare(BlkActionState *c=
+ommon, Error **errp)
+>          goto out;
+>      }
+> =20
+> +    /* Honor bdrv_try_set_aio_context() context acquisition requirements=
+. */
+> +    old_context =3D bdrv_get_aio_context(target_bs);
+> +    aio_context_release(aio_context);
+> +    aio_context_acquire(old_context);
+> +
+> +    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
+> +    aio_context_release(old_context);
+> +    aio_context_acquire(aio_context);
+> +
+> +    if (ret < 0) {
+> +        goto out;
+
+I think this needs to be 'goto unref'.
+
+Or in fact, I think you need to hold the AioContext of a bs to
+bdrv_unref() it, so maybe 'goto out' is right, but you need to unref
+target_bs while you still hold old_context.
+
 > +    }
-> +#endif
-> +}
 > +
->  void cpu_get_tb_cpu_state(CPUARMState *env, target_ulong *pc,
->                            target_ulong *cs_base, uint32_t *pflags)
->  {
-> @@ -11355,9 +11369,7 @@ void cpu_get_tb_cpu_state(CPUARMState *env, targe=
-t_ulong *pc,
->      uint32_t pstate_for_ss;
->=20=20
->      *cs_base =3D 0;
-> -#ifdef CONFIG_DEBUG_TCG
-> -    assert(flags =3D=3D rebuild_hflags_internal(env));
-> -#endif
-> +    assert_hflags_rebuild_correctly(env);
+>      if (set_backing_hd) {
+>          bdrv_set_backing_hd(target_bs, source, &local_err);
+>          if (local_err) {
+> @@ -1947,6 +1973,8 @@ static void blockdev_backup_prepare(BlkActionState =
+*common, Error **errp)
+>      BlockDriverState *bs;
+>      BlockDriverState *target_bs;
+>      AioContext *aio_context;
+> +    AioContext *old_context;
+> +    int ret;
+> =20
+>      assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_BLOCKDEV_=
+BACKUP);
+>      backup =3D common->action->u.blockdev_backup.data;
+> @@ -1961,7 +1989,18 @@ static void blockdev_backup_prepare(BlkActionState=
+ *common, Error **errp)
+>          return;
+>      }
+> =20
+> +    /* Honor bdrv_try_set_aio_context() context acquisition requirements=
+. */
+>      aio_context =3D bdrv_get_aio_context(bs);
+> +    old_context =3D bdrv_get_aio_context(target_bs);
+> +    aio_context_acquire(old_context);
+> +
+> +    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
+> +    if (ret < 0) {
+> +        aio_context_release(old_context);
+> +        return;
+> +    }
+> +
+> +    aio_context_release(old_context);
+>      aio_context_acquire(aio_context);
+>      state->bs =3D bs;
+> =20
+> @@ -3562,7 +3601,6 @@ static BlockJob *do_backup_common(BackupCommon *bac=
+kup,
+>      BlockJob *job =3D NULL;
+>      BdrvDirtyBitmap *bmap =3D NULL;
+>      int job_flags =3D JOB_DEFAULT;
+> -    int ret;
+> =20
+>      if (!backup->has_speed) {
+>          backup->speed =3D 0;
+> @@ -3586,11 +3624,6 @@ static BlockJob *do_backup_common(BackupCommon *ba=
+ckup,
+>          backup->compress =3D false;
+>      }
+> =20
+> -    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
+> -    if (ret < 0) {
+> -        return NULL;
+> -    }
+> -
+>      if ((backup->sync =3D=3D MIRROR_SYNC_MODE_BITMAP) ||
+>          (backup->sync =3D=3D MIRROR_SYNC_MODE_INCREMENTAL)) {
+>          /* done before desugaring 'incremental' to print the right messa=
+ge */
+> @@ -3825,6 +3858,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **err=
+p)
+>      BlockDriverState *bs;
+>      BlockDriverState *source, *target_bs;
+>      AioContext *aio_context;
+> +    AioContext *old_context;
+>      BlockMirrorBackingMode backing_mode;
+>      Error *local_err =3D NULL;
+>      QDict *options =3D NULL;
+> @@ -3937,10 +3971,19 @@ void qmp_drive_mirror(DriveMirror *arg, Error **e=
+rrp)
+>                     (arg->mode =3D=3D NEW_IMAGE_MODE_EXISTING ||
+>                      !bdrv_has_zero_init(target_bs)));
+> =20
+> +
+> +    /* Honor bdrv_try_set_aio_context() context acquisition requirements=
+. */
+> +    old_context =3D bdrv_get_aio_context(target_bs);
+> +    aio_context_release(aio_context);
+> +    aio_context_acquire(old_context);
+> +
+>      ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
+> +
+> +    aio_context_release(old_context);
+> +    aio_context_acquire(aio_context);
+> +
+>      if (ret < 0) {
+> -        bdrv_unref(target_bs);
+> -        goto out;
+> +        goto unref;
+>      }
 
-I'm trying to recall why we don't just use:
+Here you don't forget to unref target_bs, but it has still the same
+problem as above that you need to hold old_context during bdrv_unref().
 
-  g_assert_cmphex(flags, =3D, rebuild_hflags_internal(env))
+Kevin
 
-I think it came up in one of the reviews.
-
->=20=20
->      if (FIELD_EX32(flags, TBFLAG_ANY, AARCH64_STATE)) {
->          *pc =3D env->pc;
-
-
---=20
-Alex Benn=C3=A9e
 
