@@ -7,76 +7,77 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AABC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AD7C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:56:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CA9B20726
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:41:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3362C2077B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:56:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n5pQcQ60"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CA9B20726
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KxLt3fcT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3362C2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieHPv-0008GB-FX
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 06:41:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49436)
+	id 1ieHef-0002tj-CI
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 06:56:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51858)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ieHPB-0007qD-Bw
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:40:46 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ieHe0-0002Sc-Uf
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:56:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ieHP9-0000Cq-Rx
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:40:44 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37535)
+ (envelope-from <peter.maydell@linaro.org>) id 1ieHdz-00071j-KJ
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:56:04 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39257)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ieHP6-0000C4-PG
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:40:43 -0500
-Received: by mail-oi1-x244.google.com with SMTP id x195so6027661oix.4
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 03:40:40 -0800 (PST)
+ id 1ieHdz-00071a-Ee
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:56:03 -0500
+Received: by mail-ot1-x342.google.com with SMTP id 77so11917037oty.6
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 03:56:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=uklKMZzISOoJyufLSLUTrhbnWXigIY3UMs+4Jn0DM1E=;
- b=n5pQcQ60Gj7PE6UUN/BB428JpdIho+hYjVm8tlj6ASDg8ZU7IS5o8tHgtlnqGD2eeH
- PdkxUxwO0IllbTYrTh7GGsHbnhRFsGHG9hDgyleEQ39isxGfZZTsW5KKNpvVM4t7sqNI
- Sm8grpNmrw/4OXI6NqbKP8FetzmtNeks6/GANfOgrwfsTk6iHx8Pso27sFXnwMteD5RA
- qS0aPNtMIlxwwOlDhlew+EzHuo/7RBXhJ0fsENPav+y3tvGtXe2n+q+J687l/9W/WqI9
- ObGdIwYxFcv8idEUpsEOqJ0RqDwLxoklt6I40hqJYKTTo3nIoF7pCWVsrYS6vnN8ty8z
- TwYw==
+ :cc; bh=9gloapw0kyjezAxEQ00KyaSuLjlFyKDrbSj/v7FrhQ0=;
+ b=KxLt3fcTrUTSeBlsF54U317/nrlaoAOqK9tvQXAXh+ajVelwLPIT/y5LiiNJgLHXi9
+ RPYT1gdrt6hGnc6ZFm103AdsIezHFaikUMDjsSJerThCKniPB7LXODk5UOOi4wYVeIVV
+ JAbIxFDiE26JP21Z9isQ5Asx25sEWn9RZvY75hIZ49vKvHYC0ywG9CE9xS3HQOJ5VkY6
+ E5WDYtuU+Mj4GhHu+xIaTUdwg+Dhn0yowKsRGDM+EaS37SvCtIuunv5YG2MCCBa9ALnM
+ Ozoylk63VFTs6iA72CfQXI1nhL009MF1pR+kLKDf/Lk9bU9V1npgIHMn+jgI9KNCRdLA
+ f9Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=uklKMZzISOoJyufLSLUTrhbnWXigIY3UMs+4Jn0DM1E=;
- b=RjrTrfk4NVUCwbE8zrbZnq4FLB542uErb5xCJgwI0izckvWfgrCQO2yow+/RZ95U+N
- ELY92/Zp2WweHSkoygsu1jNIALmo/tMUlsDXpOzIoHqkrNSSa+EzJyDMU8Rp4415Gw0i
- feLrnvJbnQRfPlUtXAoaMUgp0FCUkiPFZOJZTziQL2vuq6pflnyKW6gE65s2VBKE108b
- upscWB/JdpSPHz3sfPkF20AVCLKdGuSQINgBDHJ19CE1T05HzuqPbN5pKirh6EEOO2Ts
- XBFdVsnAaej73t9KUFxRUCHrMgV57gNPWK/3pmRaE51EswuickCT6kuqS5QULPvkUniT
- 1RjA==
-X-Gm-Message-State: APjAAAV/lsNfPTvF6RyOX9Ci/IstS57LXv+dDIzyTTE+Fy8AHLjTShVK
- l9wXurZHaLE/2uEICvrjAOjMRZK4xqDaQJMzKHplWA==
-X-Google-Smtp-Source: APXvYqwNlfHTtoQ/KAr+gzwTYnlPz/fmjsIwF1Rjc1h7bWA6Ye4YxqIemmyFJpKevAmdhv6c32gA+XZ8k1VQl06ixjo=
-X-Received: by 2002:aca:edd5:: with SMTP id l204mr24267683oih.98.1575891639638; 
- Mon, 09 Dec 2019 03:40:39 -0800 (PST)
+ bh=9gloapw0kyjezAxEQ00KyaSuLjlFyKDrbSj/v7FrhQ0=;
+ b=UiGeOlZcgaNqByibSaOciklEzTPmf5ZfZwU8tAQHCcBLjM81iODePZSshn6R/iebd4
+ g+gbOgpFIWtkrDczZ8hQNFBXGY44bqwrwGSjpu/7FvQb0WCCJfrKwseuFk7H1v3aLy+N
+ y/sn4j1BRFc8dOa6OBohTPSbpnB/pQYlWf67ETja/am38EdDjSfneRExRiisnz1AbPhr
+ C5gC2yyGtEYnIU2xu/zBdE59PmSMPu0VoSRVKaUJ5EaD31reR1vSZCLgUCle1Zp2np6R
+ mexC3dqhazJ3HzzPqIGoWuGmdxT1v6ekGi7Pr+VTYvtlPO/R7dybOYqbYYvApH8teZyr
+ NLlw==
+X-Gm-Message-State: APjAAAW87xOPuE7qWEUkW96M7JY3FdAJ4LL0rgno2E12vwAp+PsbDveN
+ 5EzvKu4iEyl+U7zmhqTMRLU26MoTRUD7W+SdU2K3OA==
+X-Google-Smtp-Source: APXvYqxrgORXbuIyiXPfP+zU74a5aSgJVZWvgV7wW2atNzSyIgKw1KXOG4abBxnc3oWzobU8mZpG83lRPuFYuWIp9S8=
+X-Received: by 2002:a05:6830:13d3:: with SMTP id
+ e19mr21510383otq.135.1575892562538; 
+ Mon, 09 Dec 2019 03:56:02 -0800 (PST)
 MIME-Version: 1.0
 References: <20191203225333.17055-1-richard.henderson@linaro.org>
- <20191203225333.17055-4-richard.henderson@linaro.org>
-In-Reply-To: <20191203225333.17055-4-richard.henderson@linaro.org>
+ <20191203225333.17055-10-richard.henderson@linaro.org>
+In-Reply-To: <20191203225333.17055-10-richard.henderson@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Dec 2019 11:40:28 +0000
-Message-ID: <CAFEAcA8Cb+wXbbSppEV86eJO0D9TpkwKRbMdqfnu71ag5zhmnw@mail.gmail.com>
-Subject: Re: [PATCH 03/11] target/arm: Add mmu_idx for EL1 and EL2 w/ PAN
- enabled
+Date: Mon, 9 Dec 2019 11:55:51 +0000
+Message-ID: <CAFEAcA_zCfPZMoi6oMyoXRYaCpaGC28FK7MxgbaCe3i078WGtw@mail.gmail.com>
+Subject: Re: [PATCH 09/11] target/arm: Set PAN bit as required on exception
+ entry
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,83 +97,60 @@ Sender: "Qemu-devel"
 On Tue, 3 Dec 2019 at 22:53, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
-> To implement PAN, we will want to swap, for short periods
-> of time, to a different privileged mmu_idx.  In addition,
-> we cannot do this with flushing alone, because the AT*
-> instructions have both PAN and PAN-less versions.
->
-> Add the ARMMMUIdx*_PAN constants where necessary next to
-> the corresponding ARMMMUIdx* constant.
+> The PAN bit is preserved, or set as per SCTLR_ELx.SPAN,
+> plus several other conditions listed in the ARM ARM.
 >
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 22935e4433..22c5706835 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -2715,20 +2715,22 @@ bool write_cpustate_to_list(ARMCPU *cpu, bool kvm_sync);
->   *  5. we want to be able to use the TLB for accesses done as part of a
->   *     stage1 page table walk, rather than having to walk the stage2 page
->   *     table over and over.
-> + *  6. we need separate EL1/EL2 mmu_idx for handling the Priviledged Access
+> ---
+>  target/arm/helper.c | 42 +++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 39 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index a1dbafb9b2..043e44d73d 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -8634,8 +8634,12 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
+>                                     uint32_t mask, uint32_t offset,
+>                                     uint32_t newpc)
+>  {
+> +    int new_el;
+> +
+>      /* Change the CPU state so as to actually take the exception. */
+>      switch_mode(env, new_mode);
+> +    new_el = arm_current_el(env);
+> +
+>      /*
+>       * For exceptions taken to AArch32 we must clear the SS bit in both
+>       * PSTATE and in the old-state value we save to SPSR_<mode>, so zero it now.
+> @@ -8648,7 +8652,7 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
+>      env->uncached_cpsr = (env->uncached_cpsr & ~CPSR_M) | new_mode;
+>      /* Set new mode endianness */
+>      env->uncached_cpsr &= ~CPSR_E;
+> -    if (env->cp15.sctlr_el[arm_current_el(env)] & SCTLR_EE) {
+> +    if (env->cp15.sctlr_el[new_el] & SCTLR_EE) {
+>          env->uncached_cpsr |= CPSR_E;
+>      }
+>      /* J and IL must always be cleared for exception entry */
+> @@ -8659,6 +8663,14 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
+>          env->thumb = (env->cp15.sctlr_el[2] & SCTLR_TE) != 0;
+>          env->elr_el[2] = env->regs[15];
+>      } else {
+> +        /* CPSR.PAN is preserved unless target is EL1 and SCTLR.SPAN == 0. */
+> +        if (cpu_isar_feature(aa64_pan, env_archcpu(env))) {
+> +            env->uncached_cpsr |=
+> +                (new_el == 1 &&
+> +                 (env->cp15.sctlr_el[1] & SCTLR_SPAN) == 0
+> +                 ? CPSR_PAN
+> +                 : env->spsr & CPSR_PAN);
 
-"Privileged" (no 'd')
+env->uncached_cpsr isn't wiped by this function, so the default
+behaviour is "same as it was previously" without needing to fish
+the bit out of env->spsr again, I think.
 
-> + *     Never (PAN) bit within PSTATE.
->   *
->   * This gives us the following list of cases:
->   *
->   * NS EL0 (aka NS PL0) EL1&0 stage 1+2
-> - * NS EL1 (aka NS PL1) EL1&0 stage 1+2
-> + * NS EL1 (aka NS PL1) EL1&0 stage 1+2 (+PAN)
->   * NS EL0 EL2&0
-> - * NS EL2 EL2&0
-> + * NS EL2 EL2&0 (+PAN)
->   * NS EL2 (aka NS PL2)
->   * S EL0 (aka S PL0)
-> - * S EL1 (not used if EL3 is 32 bit)
-> + * S EL1 (not used if EL3 is 32 bit) (+PAN)
->   * S EL3 (aka S PL1)
->   * NS EL0&1 stage 2
->   *
-> - * for a total of 9 different mmu_idx.
-> + * for a total of 12 different mmu_idx.
->   *
-> @@ -11886,11 +11924,14 @@ static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
->      /* TODO: ARMv8.2-UAO */
->      switch (mmu_idx) {
->      case ARMMMUIdx_EL10_1:
-> +    case ARMMMUIdx_EL10_1_PAN:
->      case ARMMMUIdx_SE1:
-> +    case ARMMMUIdx_SE1_PAN:
->          /* TODO: ARMv8.3-NV */
->          flags = FIELD_DP32(flags, TBFLAG_A64, UNPRIV, 1);
->          break;
->      case ARMMMUIdx_EL20_2:
-> +    case ARMMMUIdx_EL20_2_PAN:
->          /* TODO: ARMv8.4-SecEL2 */
+> +        }
 >          /*
->           * Note that EL20_2 is gated by HCR_EL2.E2H == 1, but EL20_0 is
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index fe492bea90..b5c7bc2d76 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -124,9 +124,11 @@ static int get_a64_user_mem_index(DisasContext *s)
->           */
->          switch (useridx) {
->          case ARMMMUIdx_EL10_1:
-> +        case ARMMMUIdx_EL10_1_PAN:
->              useridx = ARMMMUIdx_EL10_0;
->              break;
->          case ARMMMUIdx_EL20_2:
-> +        case ARMMMUIdx_EL20_2_PAN:
->              useridx = ARMMMUIdx_EL20_0;
->              break;
->          case ARMMMUIdx_SE1:
-
-Why doesn't this switch need also a case for ARMMMUIdx_SE1_PAN ?
-
-otherwise
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>           * this is a lie, as there was no c1_sys on V4T/V5, but who cares
+>           * and we should just guard the thumb mode on V4
 
 thanks
 -- PMM
