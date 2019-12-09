@@ -2,81 +2,74 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E49C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 21:07:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13EFDC43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 21:11:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CE3620692
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 21:07:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFDBF206D5
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 21:11:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=koconnor.net header.i=@koconnor.net header.b="LqcXhaZ5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CE3620692
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=koconnor.net
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQ6JoTLl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFDBF206D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieQFJ-0008Mv-HE
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 16:07:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44225)
+	id 1ieQJ7-0002O9-Vp
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 16:11:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45890)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kevin@koconnor.net>) id 1ieQEc-0007vp-6L
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 16:06:27 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ieQIE-0001Jc-Bs
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 16:10:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin@koconnor.net>) id 1ieQEa-0007oV-NR
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 16:06:25 -0500
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:37697)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1ieQEa-0007n8-FX
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 16:06:24 -0500
-Received: by mail-qk1-x742.google.com with SMTP id m188so14472225qkc.4
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 13:06:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=koconnor.net; s=google;
- h=date:from:to:subject:message-id:mime-version:content-disposition
- :content-transfer-encoding:user-agent;
- bh=kB8/lHcdu6D0WpY2Fk8gtBWr4qptuj9p44dCcRYl7AM=;
- b=LqcXhaZ5UXw7kXv6gi1lrhd+PIZZmfUd0lhX2U7Cny8Qah3lYpY7hsgyQQQVsjFx02
- 3eXThrERZAWxRZiWeqalt32bR1EJ5/xlAEW3LF+5aJL2FR70lKg5o4v2moU/atHluGXD
- idOd5LHXb/7iOSMKcl9Rhfufhp4fWlB08M4LQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:subject:message-id:mime-version
- :content-disposition:content-transfer-encoding:user-agent;
- bh=kB8/lHcdu6D0WpY2Fk8gtBWr4qptuj9p44dCcRYl7AM=;
- b=SqVa3Z5lrnvQOBBOZ41hrJPIneyMYvqmwgB45Ho6WbGjPdee2F1lRv+8k5ECHyPVb9
- RgUybH8MgRVE9WKHubVFwElC4wXPD2Pq+6WWuqpy1kuc3bfQ0MRSjKYPsqAEnukzZkXG
- eKCAikK3DOroj8ptKP/+fQDR62eBe/ql2elqnU77uhyqkf+YfwwI+VZVP3fNW4D/SUi4
- hCn7y5v4uLSEIIOqsQkDMGydRk9Kq9flHIcOfxanYxnSJB07SgOt5up5QQIDdFp7Vy06
- wI1cRTiiGYsGfMK7nhwB3f1JCiIWCRykekVq/stAInece3UqqvzX9nbLbMzH/mCxmciO
- TtqA==
-X-Gm-Message-State: APjAAAVDcOJybbj6PdTiYWnV6VpkQ/W6rcTPrlqRxwOMbXZs8GR7dolQ
- +nxgp7l4gaI4nJhLIfgOIUg7Hg==
-X-Google-Smtp-Source: APXvYqwdwZ/+EwEVdSHN74vbE9RW9WN0dqXKo8VPcBU1PimgqvJ6Rsh8+6/gYUCF6tq3IF3JUu2VZg==
-X-Received: by 2002:a37:85c4:: with SMTP id
- h187mr29493437qkd.223.1575925583161; 
- Mon, 09 Dec 2019 13:06:23 -0800 (PST)
-Received: from localhost ([64.9.249.143])
- by smtp.gmail.com with ESMTPSA id e123sm215605qkf.80.2019.12.09.13.06.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Dec 2019 13:06:22 -0800 (PST)
-Date: Mon, 9 Dec 2019 16:06:21 -0500
-From: Kevin O'Connor <kevin@koconnor.net>
-To: seabios@seabios.org, qemu-devel@nongnu.org, coreboot@coreboot.org
-Subject: [ANNOUNCE] SeaBIOS 1.13.0
-Message-ID: <20191209210621.GA29750@morn.lan>
+ (envelope-from <stefanha@redhat.com>) id 1ieQIB-0003wn-7c
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 16:10:08 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33724
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ieQIA-0003vp-Tr
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 16:10:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575925806;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=WjwYewrQx8afdzqFEuQfzgMCUexMrR4VqnnB31nNCkU=;
+ b=CQ6JoTLlp48Xg4ES2Xqz3NwdUe+46MVu5nU+zMvqTVwa+HWGTdytH3lCNtxHUlSpsl1pGV
+ cZ8Mmf9YAhbz2D6zVq4hNrKu4uWqzgnFFnBPgPec8/BLsWduzd/XR/tNs3pcDv57KR+Ud9
+ XGpNRJtSiIaSOAtuOI8Hyw1cqTD/qWs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-SkF7iaFuMwKDemCGjlL3PQ-1; Mon, 09 Dec 2019 16:10:05 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D066A800D4C;
+ Mon,  9 Dec 2019 21:10:03 +0000 (UTC)
+Received: from localhost (ovpn-117-247.ams2.redhat.com [10.36.117.247])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6ADE06BF9A;
+ Mon,  9 Dec 2019 21:09:58 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtio: don't enable notifications during polling
+Date: Mon,  9 Dec 2019 21:09:57 +0000
+Message-Id: <20191209210957.65087-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::742
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: SkF7iaFuMwKDemCGjlL3PQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,111 +81,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 1.13.0 version of SeaBIOS has now been released.  For more
-information on the release, please see:
+Virtqueue notifications are not necessary during polling, so we disable
+them.  This allows the guest driver to avoid MMIO vmexits.
+Unfortunately the virtio-blk and virtio-scsi handler functions re-enable
+notifications, defeating this optimization.
 
-http://seabios.org/Releases
+Fix virtio-blk and virtio-scsi emulation so they leave notifications
+disabled.  The key thing to remember for correctness is that polling
+always checks one last time after ending its loop, therefore it's safe
+to lose the race when re-enabling notifications at the end of polling.
 
+There is a measurable performance improvement of 5-10% with the null-co
+block driver.  Real-life storage configurations will see a smaller
+improvement because the MMIO vmexit overhead contributes less to
+latency.
 
-New in this release:
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ hw/block/virtio-blk.c      |  9 +++++++--
+ hw/scsi/virtio-scsi.c      |  9 +++++++--
+ hw/virtio/virtio.c         | 12 ++++++------
+ include/hw/virtio/virtio.h |  1 +
+ 4 files changed, 21 insertions(+), 10 deletions(-)
 
-* Support for reading logical CHS drive information from QEMU
-* Workaround added for misbehaving optionroms that grab "int19"
-* The TPM 2 "PCR bank" option can now be set from the TPM menu
-* SeaVGABIOS support for QEMU "atiext" display
-* Several bug fixes and code cleanups
+diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
+index 4c357d2928..c4e55fb3de 100644
+--- a/hw/block/virtio-blk.c
++++ b/hw/block/virtio-blk.c
+@@ -764,13 +764,16 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *=
+vq)
+ {
+     VirtIOBlockReq *req;
+     MultiReqBuffer mrb =3D {};
++    bool suppress_notifications =3D virtio_queue_get_notification(vq);
+     bool progress =3D false;
+=20
+     aio_context_acquire(blk_get_aio_context(s->blk));
+     blk_io_plug(s->blk);
+=20
+     do {
+-        virtio_queue_set_notification(vq, 0);
++        if (suppress_notifications) {
++            virtio_queue_set_notification(vq, 0);
++        }
+=20
+         while ((req =3D virtio_blk_get_request(s, vq))) {
+             progress =3D true;
+@@ -781,7 +784,9 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *vq=
+)
+             }
+         }
+=20
+-        virtio_queue_set_notification(vq, 1);
++        if (suppress_notifications) {
++            virtio_queue_set_notification(vq, 1);
++        }
+     } while (!virtio_queue_empty(vq));
+=20
+     if (mrb.num_reqs) {
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index e8b2b64d09..f080545f48 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -597,12 +597,15 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQue=
+ue *vq)
+ {
+     VirtIOSCSIReq *req, *next;
+     int ret =3D 0;
++    bool suppress_notifications =3D virtio_queue_get_notification(vq);
+     bool progress =3D false;
+=20
+     QTAILQ_HEAD(, VirtIOSCSIReq) reqs =3D QTAILQ_HEAD_INITIALIZER(reqs);
+=20
+     do {
+-        virtio_queue_set_notification(vq, 0);
++        if (suppress_notifications) {
++            virtio_queue_set_notification(vq, 0);
++        }
+=20
+         while ((req =3D virtio_scsi_pop_req(s, vq))) {
+             progress =3D true;
+@@ -622,7 +625,9 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQueue=
+ *vq)
+             }
+         }
+=20
+-        virtio_queue_set_notification(vq, 1);
++        if (suppress_notifications) {
++            virtio_queue_set_notification(vq, 1);
++        }
+     } while (ret !=3D -EINVAL && !virtio_queue_empty(vq));
+=20
+     QTAILQ_FOREACH_SAFE(req, &reqs, next, next) {
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 762df12f4c..78e5852296 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -431,6 +431,11 @@ static void virtio_queue_packed_set_notification(VirtQ=
+ueue *vq, int enable)
+     }
+ }
+=20
++bool virtio_queue_get_notification(VirtQueue *vq)
++{
++    return vq->notification;
++}
++
+ void virtio_queue_set_notification(VirtQueue *vq, int enable)
+ {
+     vq->notification =3D enable;
+@@ -3382,17 +3387,12 @@ static bool virtio_queue_host_notifier_aio_poll(voi=
+d *opaque)
+ {
+     EventNotifier *n =3D opaque;
+     VirtQueue *vq =3D container_of(n, VirtQueue, host_notifier);
+-    bool progress;
+=20
+     if (!vq->vring.desc || virtio_queue_empty(vq)) {
+         return false;
+     }
+=20
+-    progress =3D virtio_queue_notify_aio_vq(vq);
+-
+-    /* In case the handler function re-enabled notifications */
+-    virtio_queue_set_notification(vq, 0);
+-    return progress;
++    return virtio_queue_notify_aio_vq(vq);
+ }
+=20
+ static void virtio_queue_host_notifier_aio_poll_end(EventNotifier *n)
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index 3448d67d2a..8ee93873a4 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -224,6 +224,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int ve=
+rsion_id);
+=20
+ void virtio_notify_config(VirtIODevice *vdev);
+=20
++bool virtio_queue_get_notification(VirtQueue *vq);
+ void virtio_queue_set_notification(VirtQueue *vq, int enable);
+=20
+ int virtio_queue_ready(VirtQueue *vq);
+--=20
+2.23.0
 
-
-For information on obtaining SeaBIOS, please see:
-
-http://seabios.org/Download
-
-
-===== git shortlog -n rel-1.12.0..rel-1.13.0 =====
-
-Gerd Hoffmann (25):
-      vga: move modelist from bochsvga.c to new svgamodes.c
-      vga: make memcpy_high() public
-      vga: add atiext driver
-      vga: add ati bios tables
-      vbe: add edid support.
-      ati: add edid support.
-      bochsvga: add edid support.
-      bochsdisplay: add edid support.
-      bochsdisplay: parse resolution from edid.
-      add get_keystroke_full() helper
-      bootmenu: add support for more than 9 entries
-      optionrom: disallow int19 redirect for pnp roms.
-      ati-vga: make less verbose
-      ati-vga: fix ati_read()
-      ati-vga: make i2c register and bits configurable
-      ati-vga: try vga ddc first
-      ati-vga: add rage128 edid support
-      bochsdisplay: add copyright and license to bochsdisplay.c
-      ramfb: add copyright and license to ramfb.c
-      cp437: add license to cp437.c
-      ahci: zero-initialize port struct
-      Revert "geometry: Apply LCHS values for boot devices"
-      Revert "config: Add toggle for bootdevice information"
-      Revert "geometry: Add boot_lchs_find_*() utility functions"
-      Revert "geometry: Read LCHS from fw_cfg"
-
-Kevin O'Connor (11):
-      output: Avoid thunking to 16bit mode in printf() if no vgabios
-      docs: Update mailing list archive links
-      docs: Fix cut-and-paste error in Mailinglist.md archive link
-      usb-ehci: Clear pipe token on pipe reallocate
-      pciinit: Use %pP shorthand for printing device ids in intel_igd_setup()
-      virtio-pci: Use %pP format in dprintf() calls
-      Makefile: Build with -Wno-address-of-packed-member
-      svgamodes: Add copyright notice to vgasrc/svgamodes.c
-      docs: Add developer-certificate-of-origin
-      docs: Note release date for v1.12.1
-      docs: Note v1.13.0 release
-
-Sam Eiderman (10):
-      smbios: Add missing zero byte to Type 0
-      geometry: Read LCHS from fw_cfg
-      boot: Reorder functions in boot.c
-      geometry: Add boot_lchs_find_*() utility functions
-      config: Add toggle for bootdevice information
-      geometry: Apply LCHS values for boot devices
-      geometry: Read LCHS from fw_cfg
-      boot: Build ata and scsi paths in function
-      geometry: Add boot_lchs_find_*() utility functions
-      geometry: Apply LCHS values for boot devices
-
-Stefan Berger (4):
-      tcgbios: Use table to convert hash to buffer size
-      tcgbios: Implement TPM 2.0 menu item to activate and deactivate PCR banks
-      tpm: Require a response to have minimum size of a valid response header
-      tcgbios: Check for enough bytes returned from TPM2_GetCapability
-
-Uwe Kleine-König (3):
-      cbvga: reuse svga modes definitions from svgamodes.c
-      Add additional resolutions for 16:9 displays: 1600x900 and 2560x1440
-      Remove dos line endings introduced in the last two commits
-
-David Woodhouse (2):
-      csm: Sanitise alignment constraint in Legacy16GetTableAddress
-      csm: Fix boot priority translation
-
-Denis Plotnikov (1):
-      virtio: extend virtio queue size to 256
-
-Joseph Pacheco-Corwin (1):
-      bootsplash: Added support for 16/24/32bpp in one function
-
-Liran Alon (1):
-      pvscsi: ring_desc do not have to be page aligned
-
-Stefano Garzarella (1):
-      qemu: avoid debug prints if debugcon is not enabled
-
-Stephen Douthit (1):
-      tpm: Check for TPM related ACPI tables before attempting hw probe
 
