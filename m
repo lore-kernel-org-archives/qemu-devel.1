@@ -2,86 +2,81 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B974EC43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AABC43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:41:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 849182073D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:34:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CA9B20726
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:41:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+khCbmB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 849182073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n5pQcQ60"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CA9B20726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieHJU-0005Q0-Kf
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 06:34:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48586)
+	id 1ieHPv-0008GB-FX
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 06:41:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ieHIk-0004q4-JT
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:34:08 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1ieHPB-0007qD-Bw
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:40:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ieHIh-0003dE-MO
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:34:04 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42648
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ieHIh-0003bv-G6
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:34:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575891242;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=EY/fATiPKDkm8fDu5FGZAKmXxcDIJLthd9cEYLWDags=;
- b=N+khCbmB9/ClawUmgTm18qtWhy4AHnU7BjN/7NAVjNgpAWId8hbEAJjkG2h2Q5Oa5yXsXH
- mJDJneunnc1GoDTSG8N6ZfDTK5aeRSMdAc6DyJOl6sXAlNFsME/J+MVXiekvcLFWuutw9z
- QqaG0kncm51ZzW2KP/hyjbyvM3DFogY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-x3_krS9mMOWEcL8Cu48nvw-1; Mon, 09 Dec 2019 06:34:01 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 248BA107ACC5
- for <qemu-devel@nongnu.org>; Mon,  9 Dec 2019 11:34:00 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-121.ams2.redhat.com [10.36.116.121])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ADEA41001B03;
- Mon,  9 Dec 2019 11:33:56 +0000 (UTC)
-Subject: Re: [PATCH 2/2] net: Drop the NetLegacy structure, always use Netdev
- instead
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org,
- Jason Wang <jasowang@redhat.com>, Markus Armbruster <armbru@redhat.com>
-References: <20191206053640.29368-1-thuth@redhat.com>
- <20191206053640.29368-3-thuth@redhat.com>
- <bac8635c-b38c-51e0-2478-ec14d96aedbb@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <9f69161b-69f3-0dc6-59d0-54441fe664e2@redhat.com>
-Date: Mon, 9 Dec 2019 12:33:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1ieHP9-0000Cq-Rx
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:40:44 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37535)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1ieHP6-0000C4-PG
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:40:43 -0500
+Received: by mail-oi1-x244.google.com with SMTP id x195so6027661oix.4
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 03:40:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uklKMZzISOoJyufLSLUTrhbnWXigIY3UMs+4Jn0DM1E=;
+ b=n5pQcQ60Gj7PE6UUN/BB428JpdIho+hYjVm8tlj6ASDg8ZU7IS5o8tHgtlnqGD2eeH
+ PdkxUxwO0IllbTYrTh7GGsHbnhRFsGHG9hDgyleEQ39isxGfZZTsW5KKNpvVM4t7sqNI
+ Sm8grpNmrw/4OXI6NqbKP8FetzmtNeks6/GANfOgrwfsTk6iHx8Pso27sFXnwMteD5RA
+ qS0aPNtMIlxwwOlDhlew+EzHuo/7RBXhJ0fsENPav+y3tvGtXe2n+q+J687l/9W/WqI9
+ ObGdIwYxFcv8idEUpsEOqJ0RqDwLxoklt6I40hqJYKTTo3nIoF7pCWVsrYS6vnN8ty8z
+ TwYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=uklKMZzISOoJyufLSLUTrhbnWXigIY3UMs+4Jn0DM1E=;
+ b=RjrTrfk4NVUCwbE8zrbZnq4FLB542uErb5xCJgwI0izckvWfgrCQO2yow+/RZ95U+N
+ ELY92/Zp2WweHSkoygsu1jNIALmo/tMUlsDXpOzIoHqkrNSSa+EzJyDMU8Rp4415Gw0i
+ feLrnvJbnQRfPlUtXAoaMUgp0FCUkiPFZOJZTziQL2vuq6pflnyKW6gE65s2VBKE108b
+ upscWB/JdpSPHz3sfPkF20AVCLKdGuSQINgBDHJ19CE1T05HzuqPbN5pKirh6EEOO2Ts
+ XBFdVsnAaej73t9KUFxRUCHrMgV57gNPWK/3pmRaE51EswuickCT6kuqS5QULPvkUniT
+ 1RjA==
+X-Gm-Message-State: APjAAAV/lsNfPTvF6RyOX9Ci/IstS57LXv+dDIzyTTE+Fy8AHLjTShVK
+ l9wXurZHaLE/2uEICvrjAOjMRZK4xqDaQJMzKHplWA==
+X-Google-Smtp-Source: APXvYqwNlfHTtoQ/KAr+gzwTYnlPz/fmjsIwF1Rjc1h7bWA6Ye4YxqIemmyFJpKevAmdhv6c32gA+XZ8k1VQl06ixjo=
+X-Received: by 2002:aca:edd5:: with SMTP id l204mr24267683oih.98.1575891639638; 
+ Mon, 09 Dec 2019 03:40:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <bac8635c-b38c-51e0-2478-ec14d96aedbb@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: x3_krS9mMOWEcL8Cu48nvw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191203225333.17055-1-richard.henderson@linaro.org>
+ <20191203225333.17055-4-richard.henderson@linaro.org>
+In-Reply-To: <20191203225333.17055-4-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 9 Dec 2019 11:40:28 +0000
+Message-ID: <CAFEAcA8Cb+wXbbSppEV86eJO0D9TpkwKRbMdqfnu71ag5zhmnw@mail.gmail.com>
+Subject: Re: [PATCH 03/11] target/arm: Add mmu_idx for EL1 and EL2 w/ PAN
+ enabled
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,128 +88,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 06/12/2019 16.14, Eric Blake wrote:
-> On 12/5/19 11:36 PM, Thomas Huth wrote:
->> Now that the "name" parameter is gone, there is hardly any difference
->> between NetLegacy and Netdev anymore. Drop NetLegacy and always use
->> Netdev to simplify the code quite a bit.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->=20
-> Initial focus on the QAPI change:
->=20
->> +++ b/qapi/net.json
->> @@ -467,7 +467,7 @@
->> =C2=A0 # 'l2tpv3' - since 2.1
->> =C2=A0 ##
->> =C2=A0 { 'union': 'Netdev',
->> -=C2=A0 'base': { 'id': 'str', 'type': 'NetClientDriver' },
->> +=C2=A0 'base': { '*id': 'str', 'type': 'NetClientDriver' },
->=20
-> Making id optional here...
->=20
->> =C2=A0=C2=A0=C2=A0 'discriminator': 'type',
->> =C2=A0=C2=A0=C2=A0 'data': {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'nic':=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'Net=
-LegacyNicOptions',
->> @@ -481,55 +481,6 @@
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'netmap':=C2=A0=C2=A0 'NetdevNetmapOption=
-s',
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'vhost-user': 'NetdevVhostUserOptions' } =
-}
->> =C2=A0 -##
->> -# @NetLegacy:
->> -#
->> -# Captures the configuration of a network device; legacy.
->> -#
->> -# @id: identifier for monitor commands
->> -#
->> -# @opts: device type specific properties (legacy)
->> -#
->> -# Since: 1.2
->> -#
->> -# 'vlan': dropped in 3.0
->> -# 'name': dropped in 5.0
->> -##
->> -{ 'struct': 'NetLegacy',
->> -=C2=A0 'data': {
->> -=C2=A0=C2=A0=C2=A0 '*id':=C2=A0=C2=A0 'str',
->> -=C2=A0=C2=A0=C2=A0 'opts':=C2=A0 'NetLegacyOptions' } }
->=20
-> to match how it was here.=C2=A0 Should 'id' have been made mandatory in 1=
-/2,
-> when deleting 'name' (after all, id was optional only when name was in
-> use)?
+On Tue, 3 Dec 2019 at 22:53, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> To implement PAN, we will want to swap, for short periods
+> of time, to a different privileged mmu_idx.  In addition,
+> we cannot do this with flushing alone, because the AT*
+> instructions have both PAN and PAN-less versions.
+>
+> Add the ARMMMUIdx*_PAN constants where necessary next to
+> the corresponding ARMMMUIdx* constant.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 22935e4433..22c5706835 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -2715,20 +2715,22 @@ bool write_cpustate_to_list(ARMCPU *cpu, bool kvm_sync);
+>   *  5. we want to be able to use the TLB for accesses done as part of a
+>   *     stage1 page table walk, rather than having to walk the stage2 page
+>   *     table over and over.
+> + *  6. we need separate EL1/EL2 mmu_idx for handling the Priviledged Access
 
-No, since "id" is still not mandatory for "-net". In case it is missing,
-the code creates an id internally (see assign_name() in net/net.c).
+"Privileged" (no 'd')
 
->> -
->> -##
->> -# @NetLegacyOptionsType:
->> -#
->> -# Since: 1.2
->> -##
->> -{ 'enum': 'NetLegacyOptionsType',
->> -=C2=A0 'data': ['none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde'=
-,
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'bridge', =
-'netmap', 'vhost-user'] }
->=20
-> Comparing this to the branches of Netdev:
->=20
-> We are losing 'none', while gaining 'hubport'.=C2=A0 The gain is not
-> problematic, and I guess you are declaring that the use of 'none' has
-> been deprecated long enough to not be a problem.
+> + *     Never (PAN) bit within PSTATE.
+>   *
+>   * This gives us the following list of cases:
+>   *
+>   * NS EL0 (aka NS PL0) EL1&0 stage 1+2
+> - * NS EL1 (aka NS PL1) EL1&0 stage 1+2
+> + * NS EL1 (aka NS PL1) EL1&0 stage 1+2 (+PAN)
+>   * NS EL0 EL2&0
+> - * NS EL2 EL2&0
+> + * NS EL2 EL2&0 (+PAN)
+>   * NS EL2 (aka NS PL2)
+>   * S EL0 (aka S PL0)
+> - * S EL1 (not used if EL3 is 32 bit)
+> + * S EL1 (not used if EL3 is 32 bit) (+PAN)
+>   * S EL3 (aka S PL1)
+>   * NS EL0&1 stage 2
+>   *
+> - * for a total of 9 different mmu_idx.
+> + * for a total of 12 different mmu_idx.
+>   *
+> @@ -11886,11 +11924,14 @@ static uint32_t rebuild_hflags_a64(CPUARMState *env, int el, int fp_el,
+>      /* TODO: ARMv8.2-UAO */
+>      switch (mmu_idx) {
+>      case ARMMMUIdx_EL10_1:
+> +    case ARMMMUIdx_EL10_1_PAN:
+>      case ARMMMUIdx_SE1:
+> +    case ARMMMUIdx_SE1_PAN:
+>          /* TODO: ARMv8.3-NV */
+>          flags = FIELD_DP32(flags, TBFLAG_A64, UNPRIV, 1);
+>          break;
+>      case ARMMMUIdx_EL20_2:
+> +    case ARMMMUIdx_EL20_2_PAN:
+>          /* TODO: ARMv8.4-SecEL2 */
+>          /*
+>           * Note that EL20_2 is gated by HCR_EL2.E2H == 1, but EL20_0 is
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index fe492bea90..b5c7bc2d76 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -124,9 +124,11 @@ static int get_a64_user_mem_index(DisasContext *s)
+>           */
+>          switch (useridx) {
+>          case ARMMMUIdx_EL10_1:
+> +        case ARMMMUIdx_EL10_1_PAN:
+>              useridx = ARMMMUIdx_EL10_0;
+>              break;
+>          case ARMMMUIdx_EL20_2:
+> +        case ARMMMUIdx_EL20_2_PAN:
+>              useridx = ARMMMUIdx_EL20_0;
+>              break;
+>          case ARMMMUIdx_SE1:
 
-'none' still continues to work, it's also a member of NetClientDriver
-and was handled later in the patch:
+Why doesn't this switch need also a case for ARMMMUIdx_SE1_PAN ?
 
-+        if (netdev->type =3D=3D NET_CLIENT_DRIVER_NONE) {
-             return 0; /* nothing to do */
+otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-'hubport' is blocked in the code now instead:
-
-+        if (netdev->type =3D=3D NET_CLIENT_DRIVER_HUBPORT ||
-+            !net_client_init_fun[netdev->type]) {
-             error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "type",
-                        "a net backend type (maybe it is not compiled "
-                        "into this binary)");
-
->> -
->> -##
->> -# @NetLegacyOptions:
->> -#
->> -# Like Netdev, but for use only by the legacy command line options
->> -#
->> -# Since: 1.2
->> -##
->> -{ 'union': 'NetLegacyOptions',
->> -=C2=A0 'base': { 'type': 'NetLegacyOptionsType' },
->> -=C2=A0 'discriminator': 'type',
->> -=C2=A0 'data': {
->> -=C2=A0=C2=A0=C2=A0 'nic':=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 'NetLegacyNicOp=
-tions',
->=20
-> Should we rename this to NetdevNicOptions, now that we are getting rid
-> of other NetLegacy names?
-
-I still consider "-net nic" as a legacy option that we should remove one
-day in the future, so I'd rather keep that name.
-
->=20
-> But I concur that all branches of the Netdev union have the same types
-> as what you are removing here from NetLegacyOptions, so the
-> consolidation looks sane.
-
-Ok, thanks for your review!
-
- Thomas
-
+thanks
+-- PMM
 
