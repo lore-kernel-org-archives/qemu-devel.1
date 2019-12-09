@@ -2,82 +2,84 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AD7C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 297E1C00454
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 12:03:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3362C2077B
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 11:56:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECF2A2077B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 12:03:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KxLt3fcT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3362C2077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vz7CR2vt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECF2A2077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieHef-0002tj-CI
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 06:56:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51858)
+	id 1ieHl5-0004Ve-0m
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 07:03:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52913)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ieHe0-0002Sc-Uf
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:56:06 -0500
+ (envelope-from <thuth@redhat.com>) id 1ieHkJ-00044t-OC
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 07:02:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ieHdz-00071j-KJ
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:56:04 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:39257)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ieHdz-00071a-Ee
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 06:56:03 -0500
-Received: by mail-ot1-x342.google.com with SMTP id 77so11917037oty.6
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 03:56:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9gloapw0kyjezAxEQ00KyaSuLjlFyKDrbSj/v7FrhQ0=;
- b=KxLt3fcTrUTSeBlsF54U317/nrlaoAOqK9tvQXAXh+ajVelwLPIT/y5LiiNJgLHXi9
- RPYT1gdrt6hGnc6ZFm103AdsIezHFaikUMDjsSJerThCKniPB7LXODk5UOOi4wYVeIVV
- JAbIxFDiE26JP21Z9isQ5Asx25sEWn9RZvY75hIZ49vKvHYC0ywG9CE9xS3HQOJ5VkY6
- E5WDYtuU+Mj4GhHu+xIaTUdwg+Dhn0yowKsRGDM+EaS37SvCtIuunv5YG2MCCBa9ALnM
- Ozoylk63VFTs6iA72CfQXI1nhL009MF1pR+kLKDf/Lk9bU9V1npgIHMn+jgI9KNCRdLA
- f9Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9gloapw0kyjezAxEQ00KyaSuLjlFyKDrbSj/v7FrhQ0=;
- b=UiGeOlZcgaNqByibSaOciklEzTPmf5ZfZwU8tAQHCcBLjM81iODePZSshn6R/iebd4
- g+gbOgpFIWtkrDczZ8hQNFBXGY44bqwrwGSjpu/7FvQb0WCCJfrKwseuFk7H1v3aLy+N
- y/sn4j1BRFc8dOa6OBohTPSbpnB/pQYlWf67ETja/am38EdDjSfneRExRiisnz1AbPhr
- C5gC2yyGtEYnIU2xu/zBdE59PmSMPu0VoSRVKaUJ5EaD31reR1vSZCLgUCle1Zp2np6R
- mexC3dqhazJ3HzzPqIGoWuGmdxT1v6ekGi7Pr+VTYvtlPO/R7dybOYqbYYvApH8teZyr
- NLlw==
-X-Gm-Message-State: APjAAAW87xOPuE7qWEUkW96M7JY3FdAJ4LL0rgno2E12vwAp+PsbDveN
- 5EzvKu4iEyl+U7zmhqTMRLU26MoTRUD7W+SdU2K3OA==
-X-Google-Smtp-Source: APXvYqxrgORXbuIyiXPfP+zU74a5aSgJVZWvgV7wW2atNzSyIgKw1KXOG4abBxnc3oWzobU8mZpG83lRPuFYuWIp9S8=
-X-Received: by 2002:a05:6830:13d3:: with SMTP id
- e19mr21510383otq.135.1575892562538; 
- Mon, 09 Dec 2019 03:56:02 -0800 (PST)
+ (envelope-from <thuth@redhat.com>) id 1ieHkG-0001R3-SI
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 07:02:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31849
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ieHkG-0001Qc-Nt
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 07:02:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575892951;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=1NatJ/zvUfiFU/nzbRkmGj2Ai63mjky2WdyB7uJZPgA=;
+ b=Vz7CR2vtjK1US+iN6qL+0bGiyVeLLlTtQQA2OMXO/c0UlveLX34y+cp2K08vvLtd8C8yAh
+ Ji54NQiJ6t0RMxfmxTHStDZ4q4K8I8rGVoH9puRcCCcMEXY9eGEyiALD9dCqVJ9CJOuOLC
+ nLWdveFPYzesgr7pe2Lz+h1GcDhzjxU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-45-h8amcT1FNxSSpOGY-2by9w-1; Mon, 09 Dec 2019 07:02:30 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 368BF18543A7;
+ Mon,  9 Dec 2019 12:02:29 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-121.ams2.redhat.com [10.36.116.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A87D660BEC;
+ Mon,  9 Dec 2019 12:02:20 +0000 (UTC)
+Subject: Re: [PATCH v6 02/21] libqos: Rename i2c_send and i2c_recv
+To: "Oleinik, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20191129213424.6290-1-alxndr@bu.edu>
+ <20191129213424.6290-3-alxndr@bu.edu>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <8a74a941-b646-3708-c6cc-5dcb0fb1fbca@redhat.com>
+Date: Mon, 9 Dec 2019 13:02:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20191203225333.17055-1-richard.henderson@linaro.org>
- <20191203225333.17055-10-richard.henderson@linaro.org>
-In-Reply-To: <20191203225333.17055-10-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 9 Dec 2019 11:55:51 +0000
-Message-ID: <CAFEAcA_zCfPZMoi6oMyoXRYaCpaGC28FK7MxgbaCe3i078WGtw@mail.gmail.com>
-Subject: Re: [PATCH 09/11] target/arm: Set PAN bit as required on exception
- entry
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+In-Reply-To: <20191129213424.6290-3-alxndr@bu.edu>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: h8amcT1FNxSSpOGY-2by9w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,69 +91,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "bsd@redhat.com" <bsd@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 3 Dec 2019 at 22:53, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The PAN bit is preserved, or set as per SCTLR_ELx.SPAN,
-> plus several other conditions listed in the ARM ARM.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 29/11/2019 22.34, Oleinik, Alexander wrote:
+> The names i2c_send and i2c_recv collide with functions defined in
+> hw/i2c/core.c. This causes an error when linking against libqos and
+> softmmu simultaneously (for example when using qtest inproc). Rename the
+> libqos functions to avoid this.
+> 
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 > ---
->  target/arm/helper.c | 42 +++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 39 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index a1dbafb9b2..043e44d73d 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -8634,8 +8634,12 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
->                                     uint32_t mask, uint32_t offset,
->                                     uint32_t newpc)
+>  tests/libqos/i2c.c   | 10 +++++-----
+>  tests/libqos/i2c.h   |  4 ++--
+>  tests/pca9552-test.c | 10 +++++-----
+>  3 files changed, 12 insertions(+), 12 deletions(-)
+> 
+> diff --git a/tests/libqos/i2c.c b/tests/libqos/i2c.c
+> index 156114e745..38f800dbab 100644
+> --- a/tests/libqos/i2c.c
+> +++ b/tests/libqos/i2c.c
+> @@ -10,12 +10,12 @@
+>  #include "libqos/i2c.h"
+>  #include "libqtest.h"
+>  
+> -void i2c_send(QI2CDevice *i2cdev, const uint8_t *buf, uint16_t len)
+> +void qi2c_send(QI2CDevice *i2cdev, const uint8_t *buf, uint16_t len)
 >  {
-> +    int new_el;
-> +
->      /* Change the CPU state so as to actually take the exception. */
->      switch_mode(env, new_mode);
-> +    new_el = arm_current_el(env);
-> +
->      /*
->       * For exceptions taken to AArch32 we must clear the SS bit in both
->       * PSTATE and in the old-state value we save to SPSR_<mode>, so zero it now.
-> @@ -8648,7 +8652,7 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
->      env->uncached_cpsr = (env->uncached_cpsr & ~CPSR_M) | new_mode;
->      /* Set new mode endianness */
->      env->uncached_cpsr &= ~CPSR_E;
-> -    if (env->cp15.sctlr_el[arm_current_el(env)] & SCTLR_EE) {
-> +    if (env->cp15.sctlr_el[new_el] & SCTLR_EE) {
->          env->uncached_cpsr |= CPSR_E;
->      }
->      /* J and IL must always be cleared for exception entry */
-> @@ -8659,6 +8663,14 @@ static void take_aarch32_exception(CPUARMState *env, int new_mode,
->          env->thumb = (env->cp15.sctlr_el[2] & SCTLR_TE) != 0;
->          env->elr_el[2] = env->regs[15];
->      } else {
-> +        /* CPSR.PAN is preserved unless target is EL1 and SCTLR.SPAN == 0. */
-> +        if (cpu_isar_feature(aa64_pan, env_archcpu(env))) {
-> +            env->uncached_cpsr |=
-> +                (new_el == 1 &&
-> +                 (env->cp15.sctlr_el[1] & SCTLR_SPAN) == 0
-> +                 ? CPSR_PAN
-> +                 : env->spsr & CPSR_PAN);
+>      i2cdev->bus->send(i2cdev->bus, i2cdev->addr, buf, len);
+>  }
+>  
+> -void i2c_recv(QI2CDevice *i2cdev, uint8_t *buf, uint16_t len)
+> +void qi2c_recv(QI2CDevice *i2cdev, uint8_t *buf, uint16_t len)
+>  {
+>      i2cdev->bus->recv(i2cdev->bus, i2cdev->addr, buf, len);
+>  }
 
-env->uncached_cpsr isn't wiped by this function, so the default
-behaviour is "same as it was previously" without needing to fish
-the bit out of env->spsr again, I think.
+I'd prefer qos_i2c_send and qos_i2c_recv instead ... but that's just a
+matter of taste.
 
-> +        }
->          /*
->           * this is a lie, as there was no c1_sys on V4T/V5, but who cares
->           * and we should just guard the thumb mode on V4
+Acked-by: Thomas Huth <thuth@redhat.com>
 
-thanks
--- PMM
 
