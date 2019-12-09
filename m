@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79752C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 20:28:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95353C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 20:38:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AD422068E
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 20:28:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DF5320637
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 20:38:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H2rl36Lx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AD422068E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iqthEyjc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DF5320637
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iePdT-0002sZ-BE
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 15:28:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60214)
+	id 1iePnz-0007Wn-Fp
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 15:38:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iePcf-0002P1-Se
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 15:27:15 -0500
+ (envelope-from <lersek@redhat.com>) id 1iePmE-0006eS-JS
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 15:37:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iePce-0002Fa-1A
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 15:27:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38167
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <lersek@redhat.com>) id 1iePmB-00023w-8y
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 15:37:04 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:53397
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iePcd-0002Ef-7T
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 15:27:11 -0500
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iePmA-000233-R1
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 15:37:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575923230;
+ s=mimecast20190719; t=1575923821;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=77kKAknUb1gZKtXDYqDqY3kTt0ru/oBlOhGOpXq6z8E=;
- b=H2rl36LxaWFLqGmN08eaVe4vhmraLEv3TdRimLO9y7t/JNiMVTZA9lz0Pd5HAJPthlGLxQ
- 3wSv560uioC84dxPKD+4QjCrmD6+1AyRS5hAWezMu81HdNlLOoFhiy76um87QAoPjBk/D5
- 2fJ0cBuqeaVbgTFc5mYyyDCxP+uAoYw=
+ bh=Pa5OdNCzqTPDx5Dw3abGWF+DS9VsBsiFmWMQXu3PmcI=;
+ b=iqthEyjcOqx337pz8LAaukQLuqEAodXB/newB7rr78IgyPSnlOks69cEMzikd+U6+Hz3iC
+ jsYELwFMGqcYm2hEB8+YSsbvnlfjxJ8RUse9GSw0Hanitd1kPucgsy2iyotywVDX1jUhms
+ YpJAO4PVXegs/EgHFRqcbsfXOtB++9U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-xGQKhs1JOXa-ePJ3iDHVjw-1; Mon, 09 Dec 2019 15:27:09 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-323-pe-EpsEWMRi-UtjoTYAsUw-1; Mon, 09 Dec 2019 15:37:00 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 333C41005502
- for <qemu-devel@nongnu.org>; Mon,  9 Dec 2019 20:27:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86C0B2F2B
+ for <qemu-devel@nongnu.org>; Mon,  9 Dec 2019 20:36:59 +0000 (UTC)
 Received: from lacos-laptop-7.usersys.redhat.com (unknown [10.36.118.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3762A6055E;
- Mon,  9 Dec 2019 20:27:01 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v2 7/9] acpi: cpuhp: introduce 'Command data 2'
- field
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CA4035D6B7;
+ Mon,  9 Dec 2019 20:36:52 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v2 8/9] acpi: cpuhp: spec: add typical usecases
 To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
 References: <1575896942-331151-1-git-send-email-imammedo@redhat.com>
- <1575896942-331151-8-git-send-email-imammedo@redhat.com>
+ <1575896942-331151-9-git-send-email-imammedo@redhat.com>
 From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <bf02e00c-3150-9fc6-f6ab-4d4233ff6143@redhat.com>
-Date: Mon, 9 Dec 2019 21:27:00 +0100
+Message-ID: <f45bbebf-b2a2-f4d1-45d5-f277f609f98a@redhat.com>
+Date: Mon, 9 Dec 2019 21:36:51 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
  Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <1575896942-331151-8-git-send-email-imammedo@redhat.com>
+In-Reply-To: <1575896942-331151-9-git-send-email-imammedo@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: xGQKhs1JOXa-ePJ3iDHVjw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: pe-EpsEWMRi-UtjoTYAsUw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,89 +95,113 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 12/09/19 14:09, Igor Mammedov wrote:
-> No functional change in practice, patch only aims to properly
-> document (in spec and code) intended usage of the reserved space.
-> 
-> The new field is to be used for 2 purposes:
->   - detection of modern CPU hotplug interface using
->     CPHP_GET_NEXT_CPU_WITH_EVENT_CMD command.
->     procedure will be described in follow up patch:
->       "acpi: cpuhp: spec: add typical usecases"
->   - for returning upper 32 bits of architecture specific CPU ID,
->     for new CPHP_GET_CPU_ID_CMD command added by follow up patch:
->       "acpi: cpuhp: add CPHP_GET_CPU_ID_CMD command"
-> 
-> Change is backward compatible with 4.2 and older machines, as field was
-> unconditionally reserved and always returned 0x0 if modern CPU hotplug
-> interface was enabled.
+> Document work-flows for
+>   * enabling/detecting modern CPU hotplug interface
+>   * finding a CPU with pending 'insert/remove' event
+>   * enumerating present and possible CPUs
 > 
 > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  docs/specs/acpi_cpu_hotplug.txt |  5 ++++-
->  hw/acpi/cpu.c                   | 11 +++++++++++
->  hw/acpi/trace-events            |  1 +
->  3 files changed, 16 insertions(+), 1 deletion(-)
+> v2:
+>  - fix indent of "other values" that's just above
+>    being added "Typical usecases:" section
+>  - unindent "Typical usecases" to put it into right scope
+>    (Laszlo)
+>  - squash in ammended (using CPHP_GET_NEXT_CPU_WITH_EVENT_CMD)
+>    "acpi: cpuhp: spec: document procedure for  enabling modern CPU hotplug"
+>    (Laszlo)
+> ---
+>  docs/specs/acpi_cpu_hotplug.txt | 51 ++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 48 insertions(+), 3 deletions(-)
 > 
 > diff --git a/docs/specs/acpi_cpu_hotplug.txt b/docs/specs/acpi_cpu_hotplug.txt
-> index 8fb9ad2..9879f9e 100644
+> index 9879f9e..cb99cf3 100644
 > --- a/docs/specs/acpi_cpu_hotplug.txt
 > +++ b/docs/specs/acpi_cpu_hotplug.txt
-> @@ -44,7 +44,10 @@ keeps the current value.
+> @@ -15,14 +15,14 @@ CPU present bitmap for:
+>    PIIX-PM  (IO port 0xaf00-0xaf1f, 1-byte access)
+>    One bit per CPU. Bit position reflects corresponding CPU APIC ID. Read-only.
+>    The first DWORD in bitmap is used in write mode to switch from legacy
+> -  to new CPU hotplug interface, write 0 into it to do switch.
+> +  to modern CPU hotplug interface, write 0 into it to do switch.
+>  ---------------------------------------------------------------
+>  QEMU sets corresponding CPU bit on hot-add event and issues SCI
+>  with GPE.2 event set. CPU present map is read by ACPI BIOS GPE.2 handler
+>  to notify OS about CPU hot-add events. CPU hot-remove isn't supported.
 >  
->  read access:
->      offset:
-> -    [0x0-0x3] reserved
-> +    [0x0-0x3] Command data 2: (DWORD access)
-> +              if value last stored in 'Command field':
-> +                0: reads as 0x0
-> +                other values: reserved
->      [0x4] CPU device status fields: (1 byte access)
+>  =====================================
+> -ACPI CPU hotplug interface registers:
+> +Modern ACPI CPU hotplug interface registers:
+>  -------------------------------------
+
+(1) If you need to post a v3 for other reasons, please consider
+adjusting the "===" and "---" lines that surround the new heading.
+
+Otherwise, don't bother.
+
+>  Register block base address:
+>      ICH9-LPC IO port 0x0cd8
+> @@ -67,6 +67,7 @@ write access:
+>      [0x0-0x3] CPU selector: (DWORD access)
+>                selects active CPU device. All following accesses to other
+>                registers will read/store data from/to selected CPU.
+> +              Valid values: [0 .. max_cpus)
+>      [0x4] CPU device control fields: (1 byte access)
 >          bits:
->             0: Device is enabled and may be used by guest
-> diff --git a/hw/acpi/cpu.c b/hw/acpi/cpu.c
-> index 87f30a3..d475c06 100644
-> --- a/hw/acpi/cpu.c
-> +++ b/hw/acpi/cpu.c
-> @@ -12,6 +12,7 @@
->  #define ACPI_CPU_FLAGS_OFFSET_RW 4
->  #define ACPI_CPU_CMD_OFFSET_WR 5
->  #define ACPI_CPU_CMD_DATA_OFFSET_RW 8
-> +#define ACPI_CPU_CMD_DATA2_OFFSET_R 0
->  
->  enum {
->      CPHP_GET_NEXT_CPU_WITH_EVENT_CMD = 0,
-> @@ -79,6 +80,16 @@ static uint64_t cpu_hotplug_rd(void *opaque, hwaddr addr, unsigned size)
->          }
->          trace_cpuhp_acpi_read_cmd_data(cpu_st->selector, val);
->          break;
-> +    case ACPI_CPU_CMD_DATA2_OFFSET_R:
-> +        switch (cpu_st->command) {
-> +        case CPHP_GET_NEXT_CPU_WITH_EVENT_CMD:
-> +           val = 0;
-> +           break;
-> +        default:
-> +           break;
-> +        }
-> +        trace_cpuhp_acpi_read_cmd_data2(cpu_st->selector, val);
-> +        break;
->      default:
->          break;
->      }
-> diff --git a/hw/acpi/trace-events b/hw/acpi/trace-events
-> index 96b8273..afbc77d 100644
-> --- a/hw/acpi/trace-events
-> +++ b/hw/acpi/trace-events
-> @@ -23,6 +23,7 @@ cpuhp_acpi_read_flags(uint32_t idx, uint8_t flags) "idx[0x%"PRIx32"] flags: 0x%"
->  cpuhp_acpi_write_idx(uint32_t idx) "set active cpu idx: 0x%"PRIx32
->  cpuhp_acpi_write_cmd(uint32_t idx, uint8_t cmd) "idx[0x%"PRIx32"] cmd: 0x%"PRIx8
->  cpuhp_acpi_read_cmd_data(uint32_t idx, uint32_t data) "idx[0x%"PRIx32"] data: 0x%"PRIx32
-> +cpuhp_acpi_read_cmd_data2(uint32_t idx, uint32_t data) "idx[0x%"PRIx32"] data: 0x%"PRIx32
->  cpuhp_acpi_cpu_has_events(uint32_t idx, bool ins, bool rm) "idx[0x%"PRIx32"] inserting: %d, removing: %d"
->  cpuhp_acpi_clear_inserting_evt(uint32_t idx) "idx[0x%"PRIx32"]"
->  cpuhp_acpi_clear_remove_evt(uint32_t idx) "idx[0x%"PRIx32"]"
+>              0: reserved, OSPM must clear it before writing to register.
+> @@ -98,4 +99,48 @@ write access:
+>                2: stores value into OST status register, triggers
+>                   ACPI_DEVICE_OST QMP event from QEMU to external applications
+>                   with current values of OST event and status registers.
+> -            other values: reserved
+> +              other values: reserved
+> +
+> +Typical usecases:
+> +    - (x86) Detecting and enabling modern CPU hotplug interface.
+> +      QEMU starts with legacy CPU hotplug interface enabled. Detecting and
+> +      switching to modern interface is based on the 2 legacy CPU hotplug features:
+> +        1. Writes into CPU bitmap are ignored.
+> +        2. CPU bitmap always has bit#0 set, corresponding to boot CPU.
+> +
+> +      Use following steps to detect and enable modern CPU hotplug interface:
+> +        1. Store 0x0 to the 'CPU selector' register,
+> +           attempting to switch to modern mode
+> +        2. Store 0x0 to the 'CPU selector' register,
+> +           to ensure valid selector value
+> +        3. Store 0x0 to the 'Command field' register,
+> +        4. Read the 'Command data 2' register.
+> +           If read value is 0x0, the modern interface is enabled.
+> +           Otherwise legacy or no CPU hotplug interface available
+> +
+> +    - Get a cpu with pending event
+> +      1. Store 0x0 to the 'CPU selector' register.
+> +      2. Store 0x0 to the 'Command field' register.
+> +      3. Read the 'CPU device status fields' register.
+> +      4. If both bit#1 and bit#2 are clear in the value read, there is no CPU
+> +         with a pending event and selected CPU remains unchanged.
+> +      5. Otherwise, read the 'Command data' register. The value read is the
+> +         selector of the CPU with the pending event (which is already
+> +         selected).
+> +
+> +    - Enumerate CPUs present/non present CPUs
+> +      01. Set the present CPU count to 0.
+> +      02. Set the iterator to 0.
+> +      03. Store 0x0 to the 'CPU selector' register, to ensure that it's in
+> +          a valid state and that access to other registers won't be ignored.
+> +      04. Store 0x0 to the 'Command field' register to make 'Command data'
+> +          register return 'CPU selector' value of selected CPU
+> +      05. Read the 'CPU device status fields' register.
+> +      06. If bit#0 is set, increment the present CPU count.
+> +      07. Increment the iterator.
+> +      08. Store the iterator to the 'CPU selector' register.
+> +      09. Read the 'Command data' register.
+> +      10. If the value read is not zero, goto 05.
+> +      11. Otherwise store 0x0 to the 'CPU selector' register, to put it
+> +          into a valid state and exit.
+> +          The iterator at this point equals "max_cpus".
 > 
 
-Neat. :)
+Awesome!
 
 Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 
