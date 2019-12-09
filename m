@@ -2,50 +2,49 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=DATE_IN_PAST_96_XX,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.7 required=3.0 tests=DATE_IN_PAST_96_XX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE952C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 01:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28947C2D0C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 01:57:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86C452082E
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 01:57:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86C452082E
+	by mail.kernel.org (Postfix) with ESMTPS id 0101C2082E
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 01:57:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0101C2082E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih26k-0003Lb-CH
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 20:57:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38570)
+	id 1ih26r-0003Sf-0A
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 20:57:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38577)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <raphael.norwitz@nutanix.com>) id 1ih25g-0002E7-Kq
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1ih25g-0002E9-Iu
  for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:56:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <raphael.norwitz@nutanix.com>) id 1ih25e-0001RU-PK
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:55:59 -0500
-Received: from [192.146.154.1] (port=8940 helo=mcp01.nutanix.com)
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1ih25f-0001SM-5h
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:56:00 -0500
+Received: from [192.146.154.1] (port=53222 helo=mcp01.nutanix.com)
  by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <raphael.norwitz@nutanix.com>) id 1ih25e-0001QA-K9
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:55:58 -0500
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1ih25e-0001Oj-UO
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 20:55:59 -0500
 Received: from localhost.corp.nutanix.com (unknown [10.40.33.233])
- by mcp01.nutanix.com (Postfix) with ESMTP id 4450E1008B75;
- Tue, 17 Dec 2019 01:55:57 +0000 (UTC)
+ by mcp01.nutanix.com (Postfix) with ESMTP id 563BE1008B6E;
+ Tue, 17 Dec 2019 01:55:54 +0000 (UTC)
 From: Raphael Norwitz <raphael.norwitz@nutanix.com>
 To: mst@redhat.com,
 	qemu-devel@nongnu.org
-Subject: [RFC PATCH 1/3] Fixed Error Handling in
- vhost_user_set_mem_table_postcopy
-Date: Mon,  9 Dec 2019 02:00:45 -0500
-Message-Id: <1575874847-5792-2-git-send-email-raphael.norwitz@nutanix.com>
+Subject: [RFC PATCH 0/3] vhost-user: Lift Max Ram Slots Limitation
+Date: Mon,  9 Dec 2019 02:00:44 -0500
+Message-Id: <1575874847-5792-1-git-send-email-raphael.norwitz@nutanix.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1575874847-5792-1-git-send-email-raphael.norwitz@nutanix.com>
-References: <1575874847-5792-1-git-send-email-raphael.norwitz@nutanix.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 192.146.154.1
@@ -65,56 +64,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current vhost_user_set_mem_table_postcopy() implementation
-populates each region of the VHOST_USER_SET_MEM_TABLE
-message without first checking if there are more than
-VHOST_MEMORY_MAX_NREGIONS already populated. This can
-cause memory corruption and potentially a crash if too many
-regions are added to the message during the postcopy step.
+In QEMU today, a VM with a vhost-user device can hot add memory a
+maximum of 8 times. See these threads, among others:
 
-Additionally, after populating each region, the current
-implementation asserts that the current region index is less than
-VHOST_MEMORY_MAX_NREGIONS. Thus, even if the aforementioned
-bug is fixed by moving the existing assert up, too many hot-adds
-during the postcopy step will bring down qemu instead of
-gracefully propogating up the error as in
-vhost_user_set_mem_table().
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01046.html
+    https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg01236.html
 
-This change cleans up error handling in
-vhost_user_set_mem_table_postcopy() such that it handles
-an unsupported number of memory hot-adds like
-vhost_user_set_mem_table(), gracefully propogating an error
-up instead of corrupting memory and crashing qemu.
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04656.html
 
-Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
----
- hw/virtio/vhost-user.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+This RFC/patch set introduces a new protocol feature
+VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS which, when enabled, lifts the
+restriction on the maximum number RAM slots imposed by vhost-user.
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 02a9b25..f74ff3b 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -441,6 +441,10 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-                                      &offset);
-         fd = memory_region_get_fd(mr);
-         if (fd > 0) {
-+            if (fd_num == VHOST_MEMORY_MAX_NREGIONS) {
-+                error_report("Failed preparing vhost-user memory table msg");
-+                return -1;
-+            }
-             trace_vhost_user_set_mem_table_withfd(fd_num, mr->name,
-                                                   reg->memory_size,
-                                                   reg->guest_phys_addr,
-@@ -453,7 +457,6 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-             msg.payload.memory.regions[fd_num].guest_phys_addr =
-                 reg->guest_phys_addr;
-             msg.payload.memory.regions[fd_num].mmap_offset = offset;
--            assert(fd_num < VHOST_MEMORY_MAX_NREGIONS);
-             fds[fd_num++] = fd;
-         } else {
-             u->region_rb_offset[i] = 0;
--- 
+The patch consists of 3 changes:
+1. Fixed Error Handling in vhost_user_set_mem_table_postcopy:
+   This is a bug fix in the postcopy migration path
+2. vhost-user: Refactor vhost_user_set_mem_table Functions:
+   This is a non-functional change refractoring the
+   vhost_user_set_mem_table and vhost_user_set_mem_table_postcopy
+   functions such that the feature can be more cleanly added.
+3. Introduce Configurable Number of Memory Slots Exposed by vhost-user:
+   This change introduces the new protocol feature
+   VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS.
+
+The implementation details are explained in more detail in the commit
+messages, but at a high level the new protocol feature works as follows:
+- If the VHOST_USER_PROTCOL_F_CONFIGURE_SLOTS feature is enabled, QEMU wi=
+ll
+  send multiple VHOST_USER_ADD_MEM_REG and VHOST_USER_REM_MEM_REG
+  messages to map and unmap individual memory regions instead of one larg=
+e
+  VHOST_USER_SET_MEM_TABLE message containing all memory regions.
+- The vhost-user struct maintains a =E2=80=99shadow state=E2=80=99 of mem=
+ory regions
+  already sent to the guest. Each time vhost_user_set_mem_table is called=
+,
+  the shadow state is compared with the new device state. A
+  VHOST_USER_REM_MEM_REG will be sent for each region in the shadow state
+  not in the device state. Then, a VHOST_USER_ADD_MEM_REG will be sent
+  for each region in the device state but not the shadow state. After
+  these messages have been sent, the shadow state will be updated to
+  reflect the new device state.
+
+The VHOST_USER_SET_MEM_TABLE message was not reused because as the number=
+ of
+regions grows, the message becomes very large. In practice, such large
+messages caused problems (truncated messages) and in the past it seems th=
+e
+community has opted for smaller fixed size messages where possible. VRING=
+s,
+for example, are sent to the backend individually instead of in one massi=
+ve
+message.
+
+Current Limitations:
+- postcopy migration is not supported when the
+  VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS has been negotiated.=20
+- VHOST_USER_PROTOCOL_F_CONFIGURE_SLOTS cannot be negotiated when
+  VHOST_USER_PROTOCOL_F_REPLY_ACK has also been negotiated.
+
+Both of these limitations are due to resource contraints. They are not
+imposed for technical reasons.
+
+Questions:
+- In the event transmitting a VHOST_USER_ADD_MEM_REG or
+  VHOST_USER_REM_REG message fails, is there any reason the error handlin=
+g
+  should differ from when transmitting VHOST_USER_SET_MEM_TABLE message f=
+ails?
+- Is there a cleaner way to ensure to ensure a postcopy migration cannot =
+be
+  started with this protocol feature enabled?
+
+Best,
+Raphael
+
+Raphael Norwitz (3):
+  Fixed Error Handling in vhost_user_set_mem_table_postcopy
+  vhost-user: Refactor vhost_user_set_mem_table Functions
+  Introduce Configurable Number of Memory Slots Exposed by vhost-user:
+
+ docs/interop/vhost-user.rst |  43 +++++
+ hw/virtio/vhost-user.c      | 384 +++++++++++++++++++++++++++++++++-----=
+------
+ 2 files changed, 335 insertions(+), 92 deletions(-)
+
+--=20
 1.8.3.1
 
 
