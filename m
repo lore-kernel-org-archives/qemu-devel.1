@@ -2,84 +2,90 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51481C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E05C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:18:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B75C2080D
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:18:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A672A2080D
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 18:18:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XL8FnAMK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B75C2080D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="nyy26ppO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A672A2080D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieNbm-0007qA-Ki
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 13:18:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34286)
+	id 1ieNc8-0008Ou-Ap
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 13:18:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34345)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ieNZv-0006BF-V3
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:17 -0500
+ (envelope-from <prvs=23948302b=alistair.francis@wdc.com>)
+ id 1ieNa8-0006SK-9Q
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ieNZu-0006vz-Hx
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:15 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:35156)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ieNZu-0006vQ-9f
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:14 -0500
-Received: by mail-ot1-x341.google.com with SMTP id o9so13053790ote.2
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 10:16:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=CB1KjF3ZOT0dJgFx5/rOjrc7b02VK8tpDKAvB4NS60E=;
- b=XL8FnAMKMZwOwQm9O83ZMGUERbua4XP7KpF7b68IPgy4PpOcor39bmaEPr54JdXsXW
- eiuuWSKkacCjhcJ2eYKR5EqAhTmFEa4KMq28GwRq6k6ZNq8LsozGlSsULwGBzYr+nHhK
- UPOTE8N8GYg4BLosaTZxuUREb/G7Pl1DWYRHp6TOz+lnrgoYwZunSlLUtGsAIvIa9uTK
- SP+MaBOWlCdbf/7ZLRcbt/O5x0zLsg4LoFWpAJC34D2LTlgvRIPrZ/kmUfDm3UTf7Lup
- uQiXkNG2CVmC9Hyw2MLqenbTAUEJfPp+md/PZ5hF/vpRZ73HKHbANxO2Wb1DYoIPScAB
- KEtw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=CB1KjF3ZOT0dJgFx5/rOjrc7b02VK8tpDKAvB4NS60E=;
- b=J8Or8U6N/q2XztH/735mL7c/UVLC2nseuX4q2boRXs4oIWsd5F0TcFwVEvdppcoxZw
- 2Zl7ibMHLPLjYRSSbHVWXmTJfd4nbEbmjBwKLMVqoxUIMWaCYY8/Uek68jst3Mkiu/RE
- tO5DNixC/3aEAXXuQ9wpM5ucnWwZFl88Zod0slnmJo7mn7L51BogsGVXgWRoELoo1nTQ
- P45W65Yppt7X/LEYEDp7Nl9ltJtwYQzg1NtL5vRUqtQnlilqHTaAg06jHcuPXZ139NJ4
- oNhQ6BHbGg5qs7DYy+bAOMyo1scUKuf6WVSVNABZvL43r1uWCa/p6RpzNq+j14Lk8+IQ
- klyg==
-X-Gm-Message-State: APjAAAXZRVlUDx9GFRucSdhy59IYENiXFrzNpSeIIy9LqTORClIacK8/
- tmCTDDG6FBVU17fq5w63Z2aye3JgQ85nVrkJfL4=
-X-Google-Smtp-Source: APXvYqw2tu35+4zamET+3exp6Iq6vHplTOu+7ufm0JC4Dhn/QR5O5NEBVOCvqGiCze0F3dUJwWuRAjtmdmI6ppXzAFQ=
-X-Received: by 2002:a9d:7305:: with SMTP id e5mr21692006otk.64.1575915373490; 
- Mon, 09 Dec 2019 10:16:13 -0800 (PST)
+ (envelope-from <prvs=23948302b=alistair.francis@wdc.com>)
+ id 1ieNa6-00073C-QA
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 13:16:28 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:57622)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <prvs=23948302b=alistair.francis@wdc.com>)
+ id 1ieNa6-000707-2y; Mon, 09 Dec 2019 13:16:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1575915386; x=1607451386;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=07+2TT8Mqx2a4MyDwcPbMvE1bAlmDWGUW17SRPcc+k8=;
+ b=nyy26ppO5e4KeaSQev4lwNqegeyWLvSOFawwLgE6A39eQUZe/36xY5OD
+ pc0hHwzxLYdsIkONNFCb2cs+NCxX+8gan/j9z6d7PAo9WRxaPpcCQPlX2
+ ft+LTyEl8NhICmSBOd2FITw9lW2iRuLYnxzo0lOVoJWgTyLPJZhIDUrG7
+ CHrZbY19QVqCu3C0GYZHR3UQQn/UpO0xfNlA5IIuE4mDhT+1pnsOOzN0V
+ 58/wVMZAOKztxreTkgeQq1ygzrYdwco8cTE9QhW2UubxIX4/o2b7DxvE4
+ bKrhFaphSfv7T/J5oFjYIUjYeFbmh+EECBd4oxCVfh4lJASbKfZ3eKhv4 w==;
+IronPort-SDR: 3BzXAH71wiZ43jPdeuonY5znbKDr9MzJBHzFqQjBzp00ebogvaoSbyOu7MfJ0vCrWG0ojEGruA
+ X3D9Mal3Zu0IqjS7ahjE+E81/z33UYclOPAwGScSl857+wpvciO6yiiYspUjL7iftAqOklYtMS
+ mIRCHP/zMC2TGYBISXPxvfgJgDonilSMXLtYfCETgAkrL2mefktNEUVG7SccX4KUReY4PzBCC/
+ u4/a5HMBwR8EInK+PeBhV0nPQyDW6Xk94YoDnil50HfgyojVJjFTXbeUQXGTw5oHikIUY4TpeO
+ Dhc=
+X-IronPort-AV: E=Sophos;i="5.69,296,1571673600"; d="scan'208";a="129370392"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 10 Dec 2019 02:16:22 +0800
+IronPort-SDR: +f4hhphK+ZiVtwQZ58BrdyetXdzcaRNLtmcD4pdVuOj6Gv7xntdTcJ6o1vinLOyD91PhO/597e
+ P23GT2v/axDs4HP5rZ+RFe2auMn+lqIrakHiwroPzmnCachrTSFFndBDTXLe7OTC/xm+I95geS
+ bZo3HZ/sPPE2n/mcu/TpnanCPue5THJxo0U4glxnDk1MWPNPkovpmzYRCjEXzeqQ1om/fm6ryv
+ +NxDVJs6eJoMsu/trGaIRzDi1aOnEPeyZ2pnOaJWJdou80WVsyWgyQy051PRZANRc6ksT0/6UO
+ bx+d0XL2LmKr81WnfN2Nmc+P
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 09 Dec 2019 10:10:38 -0800
+IronPort-SDR: NgCjCnERLlMjJ4CbnGdpGX6OxuBwnkB0ucx5W7J9bR4wTYq58mjvSz9/n59WmCo1OedkkYYi0f
+ DXQy/w4KgnWhFw/1BoDQstwSkMHa7+VNAZF4L9EkX8wZlyybzManmOJQAygSXVhuBeMR+liaHj
+ snKCO6l3WN3noFznIxiY9cvr2QFheUsy+zzjzMiGdafXh1MW5CDXf9UK55746aDDj92eH1+in9
+ 8gt8CcfVBNzp10vka4IQrWqZNXanlhJUveNriLoVjdFXzoB+Y7Ue256J6FdIebLxrrJ4Xg8LgG
+ xB4=
+WDCIronportException: Internal
+Received: from risc6-mainframe.sdcorp.global.sandisk.com (HELO
+ risc6-mainframe.int.fusionio.com) ([10.196.158.235])
+ by uls-op-cesaip01.wdc.com with ESMTP; 09 Dec 2019 10:16:22 -0800
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v1 00/36]  Add RISC-V Hypervisor Extension v0.5
+Date: Mon,  9 Dec 2019 10:10:40 -0800
+Message-Id: <cover.1575914822.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Mon, 9 Dec 2019 10:16:13 -0800 (PST)
-In-Reply-To: <20191208183922.13757-18-mrolnik@gmail.com>
-References: <20191208183922.13757-1-mrolnik@gmail.com>
- <20191208183922.13757-18-mrolnik@gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 9 Dec 2019 19:16:13 +0100
-Message-ID: <CAL1e-=guE3xT3n2P5j0=UVoVDw8WKqbK02=otf+Pf90Mi8hfmQ@mail.gmail.com>
-Subject: Re: [PATCH v38 17/22] target/avr: Register AVR support with the rest
- of QEMU
-To: Michael Rolnik <mrolnik@gmail.com>
-Content-Type: multipart/alternative; boundary="00000000000008754d05994964d0"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 216.71.153.141
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,209 +97,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>
+Cc: alistair.francis@wdc.com, palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000008754d05994964d0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+This patch series adds the RISC-V Hypervisor extension v0.5. This is the
+latest draft spec of the Hypervisor extension.
 
-On Sunday, December 8, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
+The Hypervisor extension is disabled by default, so this series should
+result in no changes to anyone using QEMU unless they enable the
+extension. The extention can be enabled with the -cpu property (see
+below).
 
-> Add AVR related definitions into QEMU
->
-> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> ---
->  qapi/machine.json          | 3 ++-
->  include/disas/dis-asm.h    | 6 ++++++
->  include/sysemu/arch_init.h | 1 +
->  arch_init.c                | 2 ++
->  4 files changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/qapi/machine.json b/qapi/machine.json
-> index ca26779f1a..8c6df54921 100644
-> --- a/qapi/machine.json
-> +++ b/qapi/machine.json
-> @@ -21,11 +21,12 @@
->  #        is true even for "qemu-system-x86_64".
->  #
->  # ppcemb: dropped in 3.1
-> +# avr: since 5.0
->  #
->  # Since: 3.0
->  ##
->  { 'enum' : 'SysEmuTarget',
-> -  'data' : [ 'aarch64', 'alpha', 'arm', 'cris', 'hppa', 'i386', 'lm32',
-> +  'data' : [ 'aarch64', 'alpha', 'arm', 'avr', 'cris', 'hppa', 'i386',
-> 'lm32',
+Testing of this implementation has been done by using the baremetal
+Xvisor Hypervisor. We are able to run two Linux guests (that's all I
+have tried) as guests in 64-bit. In 32-bit so far I can only run
+baremetal guests, but I think this is a baremetal boot loader issue and
+not an issue in QEMU.
 
-              'm68k', 'microblaze', 'microblazeel', 'mips', 'mips64',
->               'mips64el', 'mipsel', 'moxie', 'nios2', 'or1k', 'ppc',
->               'ppc64', 'riscv32', 'riscv64', 's390x', 'sh4',
-> diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h
-> index e9c7dd8eb4..8bedce17ac 100644
-> --- a/include/disas/dis-asm.h
-> +++ b/include/disas/dis-asm.h
-> @@ -211,6 +211,12 @@ enum bfd_architecture
->  #define bfd_mach_m32r          0  /* backwards compatibility */
->    bfd_arch_mn10200,    /* Matsushita MN10200 */
->    bfd_arch_mn10300,    /* Matsushita MN10300 */
-> +  bfd_arch_avr,       /* Atmel AVR microcontrollers.  */
-> +#define bfd_mach_avr1          1
-> +#define bfd_mach_avr2          2
-> +#define bfd_mach_avr3          3
-> +#define bfd_mach_avr4          4
-> +#define bfd_mach_avr5          5
+The RISC-V KVM implementation was also written using these patches. The
+KVM implementation is currently under review.
+
+At the moment this spec is in a draft state and is subject to change. As
+QEMU is extreamly useful in early bring up I think it makes sense for
+QEMU to support non-frozen extensions.
+
+Thanks to Anup for doing the initial port of Xvisor. The port is avaliable here:
+https://github.com/avpatel/xvisor-next and will run on QEMU.
+
+Also thanks to Atish for implementing the SBI call support in Xvisor and
+for lots of help debugging.
+
+To run this yourself:
+ 1. Apply this patch series to QEMU. The latest branch can be found here:
+      https://github.com/alistair23/qemu/tree/mainline/alistair/riscv-hyp-ext-v0.5.next
+ 2. Get the version of OpenSBI that supports the H extension. This can
+    be found here:
+      https://github.com/avpatel/opensbi/tree/riscv_hyp_ext_0_5_v1
+ 3. Build the next release of Xvisor. It is available here:
+      https://github.com/avpatel/xvisor-next
+ 4. Make sure you build the Xvisor tests, see here for details:
+      https://github.com/avpatel/xvisor-next/tree/master/tests/riscv/virt64/linux
+ 5. Run QEMU:
+     ./riscv64-softmmu/qemu-system-riscv64 -nographic \
+       -machine virt -cpu rv64,x-h=true \
+       -serial mon:stdio -serial null -m 4G \
+       -device loader,file=vmm.bin,addr=0x80200000 \
+       -kernel fw_jump.elf \
+       -initrd vmm-disk-linux.img \
+       -append "vmm.console=uart@10000000 vmm.bootcmd=\"vfs mount initrd /;vfs run /boot.xscript;vfs cat /system/banner.txt\""
+
+   Once you get to the prompt you can start the geust by running:
+     guest kick guest0
+   You can then bind to the serial port using:
+     vserial bind guest0/uart0
+   Then you can start Linux using:
+     autoexec
+
+ This was all tested with the mainline 5.2/5.3 kernels.
+
+There is very early work on a Xen port as well which is avaliable here:
+https://github.com/alistair23/xen/tree/alistair/riscv-port
+
+ToDo/Issues
+ - Get 32-bit fully working
 
 
-Incomplete list. I already explained why in reply to v37.
 
+Alistair Francis (36):
+  target/riscv: Convert MIP CSR to target_ulong
+  target/riscv: Don't set write permissions on dirty PTEs
+  target/riscv: Add the Hypervisor extension
+  target/riscv: Add the Hypervisor CSRs to CPUState
+  target/riscv: Add support for the new execption numbers
+  target/riscv: Rename the H irqs to VS irqs
+  target/riscv: Add the virtulisation mode
+  target/riscv: Add the force HS exception mode
+  target/riscv: Fix CSR perm checking for HS mode
+  target/riscv: Print priv and virt in disas log
+  target/riscv: Dump Hypervisor registers if enabled
+  target/riscv: Add Hypervisor CSR access functions
+  target/riscv: Add Hypervisor virtual CSRs accesses
+  target/riscv: Add Hypervisor virtual CSRs accesses
+  target/riscv: Convert mstatus to pointers
+  target/riscv: Add virtual register swapping function
+  target/riscv: Set VS bits in mideleg for Hyp extension
+  target/riscv: Extend the MIE CSR to support virtulisation
+  target/riscv: Extend the SIP CSR to support virtulisation
+  target/riscv: Add support for virtual interrupt setting
+  target/ricsv: Flush the TLB on virtulisation mode changes
+  target/riscv: Generate illegal instruction on WFI when V=1
+  target/riscv: Add hypvervisor trap support
+  target/riscv: Add Hypervisor trap return support
+  target/riscv: Add hfence instructions
+  target/riscv: Remove the hret instruction
+  target/riscv: Disable guest FP support based on virtual status
+  target/riscv: Mark both sstatus and vsstatus as dirty
+  target/riscv: Respect MPRV and SPRV for floating point ops
+  target/riscv: Allow specifying MMU stage
+  target/riscv: Implement second stage MMU
+  target/riscv: Raise the new execptions when 2nd stage translation
+    fails
+  target/riscv: Set htval and mtval2 on execptions
+  target/riscv: Add support for the 32-bit MSTATUSH CSR
+  target/riscv: Add the MSTATUS_MPV_ISSET helper macro
+  target/riscv: Allow enabling the Hypervisor extension
 
+ target/riscv/cpu.c                            |  71 ++-
+ target/riscv/cpu.h                            |  58 +-
+ target/riscv/cpu_bits.h                       | 111 ++--
+ target/riscv/cpu_helper.c                     | 501 +++++++++++++++---
+ target/riscv/csr.c                            | 389 +++++++++++++-
+ target/riscv/gdbstub.c                        |  11 +-
+ target/riscv/insn32.decode                    |  22 +-
+ .../riscv/insn_trans/trans_privileged.inc.c   |  45 +-
+ target/riscv/op_helper.c                      |  81 ++-
+ target/riscv/translate.c                      |  34 ++
+ 10 files changed, 1161 insertions(+), 162 deletions(-)
 
->    bfd_arch_cris,       /* Axis CRIS */
->  #define bfd_mach_cris_v0_v10   255
->  #define bfd_mach_cris_v32      32
-> diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-> index 62c6fe4cf1..893df26ce2 100644
-> --- a/include/sysemu/arch_init.h
-> +++ b/include/sysemu/arch_init.h
-> @@ -24,6 +24,7 @@ enum {
->      QEMU_ARCH_NIOS2 =3D (1 << 17),
->      QEMU_ARCH_HPPA =3D (1 << 18),
->      QEMU_ARCH_RISCV =3D (1 << 19),
-> +    QEMU_ARCH_AVR =3D (1 << 20),
->  };
->
->  extern const uint32_t arch_type;
-> diff --git a/arch_init.c b/arch_init.c
-> index 705d0b94ad..6a741165b2 100644
-> --- a/arch_init.c
-> +++ b/arch_init.c
-> @@ -89,6 +89,8 @@ int graphic_depth =3D 32;
->  #define QEMU_ARCH QEMU_ARCH_UNICORE32
->  #elif defined(TARGET_XTENSA)
->  #define QEMU_ARCH QEMU_ARCH_XTENSA
-> +#elif defined(TARGET_AVR)
-> +#define QEMU_ARCH QEMU_ARCH_AVR
->  #endif
->
->  const uint32_t arch_type =3D QEMU_ARCH;
-> --
-> 2.17.2 (Apple Git-113)
->
->
+-- 
+2.24.0
 
---00000000000008754d05994964d0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Sunday, December 8, 2019, Michael Rolnik &lt;<a href=3D"mailto:m=
-rolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=3D"=
-gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-=
-left:1ex">Add AVR related definitions into QEMU<br>
-<br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com">mrol=
-nik@gmail.com</a>&gt;<br>
-Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
-com">philmd@redhat.com</a>&gt;<br>
-Reviewed-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.c=
-om">amarkovic@wavecomp.com</a>&gt;<br>
----<br>
-=C2=A0qapi/machine.json=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 3 ++-<br>
-=C2=A0include/disas/dis-asm.h=C2=A0 =C2=A0 | 6 ++++++<br>
-=C2=A0include/sysemu/arch_init.h | 1 +<br>
-=C2=A0arch_init.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =
-2 ++<br>
-=C2=A04 files changed, 11 insertions(+), 1 deletion(-)<br>
-<br>
-diff --git a/qapi/machine.json b/qapi/machine.json<br>
-index ca26779f1a..8c6df54921 100644<br>
---- a/qapi/machine.json<br>
-+++ b/qapi/machine.json<br>
-@@ -21,11 +21,12 @@<br>
-=C2=A0#=C2=A0 =C2=A0 =C2=A0 =C2=A0 is true even for &quot;qemu-system-x86_6=
-4&quot;.<br>
-=C2=A0#<br>
-=C2=A0# ppcemb: dropped in 3.1<br>
-+# avr: since 5.0<br>
-=C2=A0#<br>
-=C2=A0# Since: 3.0<br>
-=C2=A0##<br>
-=C2=A0{ &#39;enum&#39; : &#39;SysEmuTarget&#39;,<br>
--=C2=A0 &#39;data&#39; : [ &#39;aarch64&#39;, &#39;alpha&#39;, &#39;arm&#39=
-;, &#39;cris&#39;, &#39;hppa&#39;, &#39;i386&#39;, &#39;lm32&#39;,<br>
-+=C2=A0 &#39;data&#39; : [ &#39;aarch64&#39;, &#39;alpha&#39;, &#39;arm&#39=
-;, &#39;avr&#39;, &#39;cris&#39;, &#39;hppa&#39;, &#39;i386&#39;, &#39;lm32=
-&#39;,</blockquote><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 =
-.8ex;border-left:1px #ccc solid;padding-left:1ex">
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;m68k&#39;, &#39;micro=
-blaze&#39;, &#39;microblazeel&#39;, &#39;mips&#39;, &#39;mips64&#39;,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;mips64el&#39;, &#39;m=
-ipsel&#39;, &#39;moxie&#39;, &#39;nios2&#39;, &#39;or1k&#39;, &#39;ppc&#39;=
-,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;ppc64&#39;, &#39;risc=
-v32&#39;, &#39;riscv64&#39;, &#39;s390x&#39;, &#39;sh4&#39;,<br>
-diff --git a/include/disas/dis-asm.h b/include/disas/dis-asm.h<br>
-index e9c7dd8eb4..8bedce17ac 100644<br>
---- a/include/disas/dis-asm.h<br>
-+++ b/include/disas/dis-asm.h<br>
-@@ -211,6 +211,12 @@ enum bfd_architecture<br>
-=C2=A0#define bfd_mach_m32r=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 0=C2=A0 /* ba=
-ckwards compatibility */<br>
-=C2=A0 =C2=A0bfd_arch_mn10200,=C2=A0 =C2=A0 /* Matsushita MN10200 */<br>
-=C2=A0 =C2=A0bfd_arch_mn10300,=C2=A0 =C2=A0 /* Matsushita MN10300 */<br>
-+=C2=A0 bfd_arch_avr,=C2=A0 =C2=A0 =C2=A0 =C2=A0/* Atmel AVR microcontrolle=
-rs.=C2=A0 */<br>
-+#define bfd_mach_avr1=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 1<br>
-+#define bfd_mach_avr2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 2<br>
-+#define bfd_mach_avr3=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 3<br>
-+#define bfd_mach_avr4=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 4<br>
-+#define bfd_mach_avr5=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 5</blockquote><div=
-><br></div><div>Incomplete list. I already explained why in reply to v37.</=
-div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-=C2=A0 =C2=A0bfd_arch_cris,=C2=A0 =C2=A0 =C2=A0 =C2=A0/* Axis CRIS */<br>
-=C2=A0#define bfd_mach_cris_v0_v10=C2=A0 =C2=A0255<br>
-=C2=A0#define bfd_mach_cris_v32=C2=A0 =C2=A0 =C2=A0 32<br>
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h<br>
-index 62c6fe4cf1..893df26ce2 100644<br>
---- a/include/sysemu/arch_init.h<br>
-+++ b/include/sysemu/arch_init.h<br>
-@@ -24,6 +24,7 @@ enum {<br>
-=C2=A0 =C2=A0 =C2=A0QEMU_ARCH_NIOS2 =3D (1 &lt;&lt; 17),<br>
-=C2=A0 =C2=A0 =C2=A0QEMU_ARCH_HPPA =3D (1 &lt;&lt; 18),<br>
-=C2=A0 =C2=A0 =C2=A0QEMU_ARCH_RISCV =3D (1 &lt;&lt; 19),<br>
-+=C2=A0 =C2=A0 QEMU_ARCH_AVR =3D (1 &lt;&lt; 20),<br>
-=C2=A0};<br>
-<br>
-=C2=A0extern const uint32_t arch_type;<br>
-diff --git a/arch_init.c b/arch_init.c<br>
-index 705d0b94ad..6a741165b2 100644<br>
---- a/arch_init.c<br>
-+++ b/arch_init.c<br>
-@@ -89,6 +89,8 @@ int graphic_depth =3D 32;<br>
-=C2=A0#define QEMU_ARCH QEMU_ARCH_UNICORE32<br>
-=C2=A0#elif defined(TARGET_XTENSA)<br>
-=C2=A0#define QEMU_ARCH QEMU_ARCH_XTENSA<br>
-+#elif defined(TARGET_AVR)<br>
-+#define QEMU_ARCH QEMU_ARCH_AVR<br>
-=C2=A0#endif<br>
-<br>
-=C2=A0const uint32_t arch_type =3D QEMU_ARCH;<br>
--- <br>
-2.17.2 (Apple Git-113)<br>
-<br>
-</blockquote>
-
---00000000000008754d05994964d0--
 
