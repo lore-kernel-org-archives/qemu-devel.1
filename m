@@ -2,69 +2,86 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7E5C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 22:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33257C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 23:21:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34611206D5
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 22:59:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34611206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id DE54A2068E
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 23:21:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TSagJ5g/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE54A2068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieRzu-00046T-7G
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 17:59:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39192)
+	id 1ieSKp-0008MU-UN
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 18:20:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1ieRz9-0003h4-L2
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 17:58:37 -0500
+ (envelope-from <gshan@redhat.com>) id 1ieSJw-0007qJ-6T
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 18:20:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1ieRz7-0007ph-Ph
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 17:58:35 -0500
-Resent-Date: Mon, 09 Dec 2019 17:58:35 -0500
-Resent-Message-Id: <E1ieRz7-0007ph-Ph@eggs.gnu.org>
-Received: from sender4-of-o50.zoho.com ([136.143.188.50]:21052)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1ieRz7-0007nY-I3
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 17:58:33 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1575932306; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=eNDEFRIhK3mhfdWsNs4ZiWnMYXvm3VD1VkqRosRbve6p2loS6EwaGtlU/YqReWm89dSLtFWX4x6WoINaZy4i17D6JoosGyEIZXc7Yvoaz6x/WaB2+ImROKVepBKkxg0PA2u8fwOTK9PiFcvjgvPSm+g3pAOOgfX5m+SGflr3sSE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1575932306;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=WBZmA++vd/6Ckrmtauq7DIzeFS7lZWj0Rg/yQhP9Rkk=; 
- b=VyRZhrzkBE5549PVPaMg9eWZNZeCwKKl3RSyvAtbuUqb0q58X0+55HXKvLUUciV/KpSStU9Ec05WH17IKbpwLPEoVjOYnmFCTiH0XJllt/H1KgtnGQJV4Z29Tre+dJggXFnuVBQ9mup8XT+oLhbiTOEEqHDt/BjaM39t5r0FX3U=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1575932305314470.42331718350397;
- Mon, 9 Dec 2019 14:58:25 -0800 (PST)
-In-Reply-To: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
-Subject: Re: [PATCH v2 00/18] Complete the implementation of -accel
-Message-ID: <157593230433.7675.14777048512232643228@37313f22b938>
+ (envelope-from <gshan@redhat.com>) id 1ieSJr-0005qX-U4
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 18:20:02 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46747)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <gshan@redhat.com>) id 1ieSJr-0005pK-PE
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 18:19:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575933598;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ai73ZmWTcdjnwtOz6dA5BAWD5B6RDXOCZIWWmz6lB+U=;
+ b=TSagJ5g/Gt9NSQpCTc2DsBw4p4MNncCapPMRzoZT9toeEPtfoIK7wSKxlvKrigaP7m4zTW
+ dSyGoEgVyejnV5x6xKny9Cj3X4YyfLAGlKIOV7EgT7yvpugbDmajRnnWO1NTiMYTVOyryf
+ vysck9+pQKNxj36+e7Tw6W4Gr/oe4CU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-11-_duuQW6iO7eyIMJKNl6_qA-1; Mon, 09 Dec 2019 18:19:54 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF27A1005502;
+ Mon,  9 Dec 2019 23:19:52 +0000 (UTC)
+Received: from localhost.localdomain (vpn2-54-52.bne.redhat.com [10.64.54.52])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A266E5C21A;
+ Mon,  9 Dec 2019 23:19:51 +0000 (UTC)
+Subject: Re: [PATCH] hw/core: Fix data type in do_nmi()
+To: Greg Kurz <groug@kaod.org>
+References: <20191206063642.40942-1-gshan@redhat.com>
+ <20191206175031.66f62929@bahia.w3ibm.bluemix.net>
+ <8b4e97d1-eddb-b7d2-1069-453ec4a4263a@redhat.com>
+ <20191209093645.091c9e4b@bahia.w3ibm.bluemix.net>
+ <d4d6efdd-62d4-c5e5-adff-999caca8fe7b@redhat.com>
+ <20191209115503.6b7bcf59@bahia.w3ibm.bluemix.net>
+From: Gavin Shan <gshan@redhat.com>
+Message-ID: <296eda90-f3c2-5ab6-d3a4-9aa0f121e103@redhat.com>
+Date: Tue, 10 Dec 2019 10:19:48 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: pbonzini@redhat.com
-Date: Mon, 9 Dec 2019 14:58:25 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20191209115503.6b7bcf59@bahia.w3ibm.bluemix.net>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: _duuQW6iO7eyIMJKNl6_qA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.50
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,119 +93,358 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, qemu-devel@nongnu.org, elmarco@redhat.com
+Reply-To: Gavin Shan <gshan@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc1OTAzNzA1LTEyOTI1LTEt
-Z2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
-ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
-IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYyIDAwLzE4XSBDb21wbGV0
-ZSB0aGUgaW1wbGVtZW50YXRpb24gb2YgLWFjY2VsClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAx
-NTc1OTAzNzA1LTEyOTI1LTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbQoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAv
-ZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
-aCAndGVzdCcKZmFiYjhiMyBrdm06IGNvbnZlcnQgIi1tYWNoaW5lIGtlcm5lbF9pcnFjaGlwIiB0
-byBhbiBhY2NlbGVyYXRvciBwcm9wZXJ0eQo2YTFkYmVlIGt2bTogaW50cm9kdWNlIGt2bV9rZXJu
-ZWxfaXJxY2hpcF8qIGZ1bmN0aW9ucwo4MDBjOTU4IGt2bTogY29udmVydCAiLW1hY2hpbmUga3Zt
-X3NoYWRvd19tZW0iIHRvIGFuIGFjY2VsZXJhdG9yIHByb3BlcnR5CmQ3MmQzZWEgeGVuOiBjb252
-ZXJ0ICItbWFjaGluZSBpZ2QtcGFzc3RocnUiIHRvIGFuIGFjY2VsZXJhdG9yIHByb3BlcnR5CjI0
-MDY3YjIgdGNnOiBhZGQgIi1hY2NlbCB0Y2csIHRiLXNpemUiIGFuZCBkZXByZWNhdGUgIi10Yi1z
-aXplIgo4YjQyYTdlIHRjZzogY29udmVydCAiLWFjY2VsIHRocmVhZHMiIHRvIGEgUU9NIHByb3Bl
-cnR5CjNlYmQ1MWQgYWNjZWw6IHBhc3Mgb2JqZWN0IHRvIGFjY2VsX2luaXRfbWFjaGluZQo0MzUx
-NTk0IHFvbTogYWRkIG9iamVjdF9uZXdfd2l0aF9jbGFzcwozMTRmYjgwIHFvbTogaW50cm9kdWNl
-IG9iamVjdF9yZWdpc3Rlcl9zdWdhcl9wcm9wCjA5OTU2NTQgdmw6IHdhcm4gZm9yIHVuYXZhaWxh
-YmxlIGFjY2VsZXJhdG9ycywgY2xhcmlmeSBtZXNzYWdlcwo1YzdiOTA0IHZsOiBjb25maWd1cmUg
-YWNjZWxlcmF0b3JzIGZyb20gLWFjY2VsIG9wdGlvbnMKNmE0ZGE5MyB2bDogaW50cm9kdWNlIG9i
-amVjdF9wYXJzZV9wcm9wZXJ0eV9vcHQKYTRiOTg4MCBhY2NlbDogY29tcGlsZSBhY2NlbC9hY2Nl
-bC5jIGp1c3Qgb25jZQo2MmNkYzc5IHZsOiBtZXJnZSAtYWNjZWwgcHJvY2Vzc2luZyBpbnRvIGNv
-bmZpZ3VyZV9hY2NlbGVyYXRvcnMKNjI0NjM1NyB2bDogZXh0cmFjdCBhY2NlbGVyYXRvciBvcHRp
-b24gcHJvY2Vzc2luZyB0byBhIHNlcGFyYXRlIGZ1bmN0aW9uCjYzODc3YjkgdGNnOiBtb3ZlIHFl
-bXVfdGNnX2NvbmZpZ3VyZSB0byBhY2NlbC90Y2cvdGNnLWFsbC5jCjFiZDAxZTYgdmw6IG1vdmUg
-aWNvdW50IGNvbmZpZ3VyYXRpb24gZWFybGllcgo4NmQ0MTRkIG1lbW9yeTogZG8gbm90IGxvb2sg
-YXQgY3VycmVudF9tYWNoaW5lLT5hY2NlbAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xOCBDaGVj
-a2luZyBjb21taXQgODZkNDE0ZDg2NTEzIChtZW1vcnk6IGRvIG5vdCBsb29rIGF0IGN1cnJlbnRf
-bWFjaGluZS0+YWNjZWwpCjIvMTggQ2hlY2tpbmcgY29tbWl0IDFiZDAxZTYyY2NhZiAodmw6IG1v
-dmUgaWNvdW50IGNvbmZpZ3VyYXRpb24gZWFybGllcikKMy8xOCBDaGVja2luZyBjb21taXQgNjM4
-NzdiOTRhZDE1ICh0Y2c6IG1vdmUgcWVtdV90Y2dfY29uZmlndXJlIHRvIGFjY2VsL3RjZy90Y2ct
-YWxsLmMpCjQvMTggQ2hlY2tpbmcgY29tbWl0IDYyNDYzNTc5YzI4ZiAodmw6IGV4dHJhY3QgYWNj
-ZWxlcmF0b3Igb3B0aW9uIHByb2Nlc3NpbmcgdG8gYSBzZXBhcmF0ZSBmdW5jdGlvbikKNS8xOCBD
-aGVja2luZyBjb21taXQgNjJjZGM3OTg2Zjg5ICh2bDogbWVyZ2UgLWFjY2VsIHByb2Nlc3Npbmcg
-aW50byBjb25maWd1cmVfYWNjZWxlcmF0b3JzKQo2LzE4IENoZWNraW5nIGNvbW1pdCBhNGI5ODgw
-MGU2YTIgKGFjY2VsOiBjb21waWxlIGFjY2VsL2FjY2VsLmMganVzdCBvbmNlKQo3LzE4IENoZWNr
-aW5nIGNvbW1pdCA2YTRkYTkzYjE1YjAgKHZsOiBpbnRyb2R1Y2Ugb2JqZWN0X3BhcnNlX3Byb3Bl
-cnR5X29wdCkKOC8xOCBDaGVja2luZyBjb21taXQgNWM3YjkwNGJmMzQ0ICh2bDogY29uZmlndXJl
-IGFjY2VsZXJhdG9ycyBmcm9tIC1hY2NlbCBvcHRpb25zKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
-Y2hhcmFjdGVycwojMjA2OiBGSUxFOiB2bC5jOjI5MDk6CisgICAgICAgICAgICBlcnJvcl9yZXBv
-cnQoIlRoZSAtYWNjZWwgYW5kIFwiLW1hY2hpbmUgYWNjZWw9XCIgb3B0aW9ucyBhcmUgaW5jb21w
-YXRpYmxlIik7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjE0OiBGSUxFOiB2
-bC5jOjI5MTU6CisgICAgICAgICAgICAgICAgICAgICAgICAgICBkb19jb25maWd1cmVfYWNjZWxl
-cmF0b3IsICZpbml0X2ZhaWxlZCwgJmVycm9yX2ZhdGFsKSkgewoKdG90YWw6IDAgZXJyb3JzLCAy
-IHdhcm5pbmdzLCAxOTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xOCBoYXMgc3R5bGUgcHJvYmxl
-bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
-dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
-SU5UQUlORVJTLgo5LzE4IENoZWNraW5nIGNvbW1pdCAwOTk1NjU0NTA0ODcgKHZsOiB3YXJuIGZv
-ciB1bmF2YWlsYWJsZSBhY2NlbGVyYXRvcnMsIGNsYXJpZnkgbWVzc2FnZXMpCjEwLzE4IENoZWNr
-aW5nIGNvbW1pdCAzMTRmYjgwZDlhMmMgKHFvbTogaW50cm9kdWNlIG9iamVjdF9yZWdpc3Rlcl9z
-dWdhcl9wcm9wKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IGlu
-Y2x1ZGUvcW9tL29iamVjdC5oOjY4MjoKK3ZvaWQgb2JqZWN0X3JlZ2lzdGVyX3N1Z2FyX3Byb3Ao
-Y29uc3QgY2hhciAqZHJpdmVyLCBjb25zdCBjaGFyICpwcm9wLCBjb25zdCBjaGFyICp2YWx1ZSk7
-CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDg6IEZJTEU6IHFvbS9vYmplY3Qu
-Yzo0Mjg6Cit2b2lkIG9iamVjdF9yZWdpc3Rlcl9zdWdhcl9wcm9wKGNvbnN0IGNoYXIgKmRyaXZl
-ciwgY29uc3QgY2hhciAqcHJvcCwgY29uc3QgY2hhciAqdmFsdWUpCgp0b3RhbDogMCBlcnJvcnMs
-IDIgd2FybmluZ3MsIDYxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEwLzE4IGhhcyBzdHlsZSBwcm9i
-bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
-c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
-TUFJTlRBSU5FUlMuCjExLzE4IENoZWNraW5nIGNvbW1pdCA0MzUxNTk0MTkyYzAgKHFvbTogYWRk
-IG9iamVjdF9uZXdfd2l0aF9jbGFzcykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzE0MjogRklMRTogdmwuYzozOTkyOgorICAgIGN1cnJlbnRfbWFjaGluZSA9IE1BQ0hJTkUob2Jq
-ZWN0X25ld193aXRoX2NsYXNzKE9CSkVDVF9DTEFTUyhtYWNoaW5lX2NsYXNzKSkpOwoKdG90YWw6
-IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA5NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMS8xOCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoxMi8xOCBDaGVja2luZyBjb21taXQgM2ViZDUxZGMzODkz
-IChhY2NlbDogcGFzcyBvYmplY3QgdG8gYWNjZWxfaW5pdF9tYWNoaW5lKQoxMy8xOCBDaGVja2lu
-ZyBjb21taXQgOGI0MmE3ZTI1ZjNmICh0Y2c6IGNvbnZlcnQgIi1hY2NlbCB0aHJlYWRzIiB0byBh
-IFFPTSBwcm9wZXJ0eSkKMTQvMTggQ2hlY2tpbmcgY29tbWl0IDI0MDY3YjJkNzdkNiAodGNnOiBh
-ZGQgIi1hY2NlbCB0Y2csIHRiLXNpemUiIGFuZCBkZXByZWNhdGUgIi10Yi1zaXplIikKRVJST1I6
-IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxODk6IEZJTEU6IHZsLmM6Mzc1MDoKKyAgICAgICAg
-ICAgICAgICB3YXJuX3JlcG9ydCgiVGhlIC10Yi1zaXplIG9wdGlvbiBpcyBkZXByZWNhdGVkLCB1
-c2UgLWFjY2VsIHRjZyx0Yi1zaXplIGluc3RlYWQiKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
-aGFyYWN0ZXJzCiMxOTA6IEZJTEU6IHZsLmM6Mzc1MToKKyAgICAgICAgICAgICAgICBvYmplY3Rf
-cmVnaXN0ZXJfc3VnYXJfcHJvcChBQ0NFTF9DTEFTU19OQU1FKCJ0Y2ciKSwgInRiLXNpemUiLCBv
-cHRhcmcpOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDggbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMTQvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjE1LzE4IENoZWNraW5nIGNv
-bW1pdCBkNzJkM2VhNWU3ZTQgKHhlbjogY29udmVydCAiLW1hY2hpbmUgaWdkLXBhc3N0aHJ1IiB0
-byBhbiBhY2NlbGVyYXRvciBwcm9wZXJ0eSkKMTYvMTggQ2hlY2tpbmcgY29tbWl0IDgwMGM5NTgx
-OWJhNyAoa3ZtOiBjb252ZXJ0ICItbWFjaGluZSBrdm1fc2hhZG93X21lbSIgdG8gYW4gYWNjZWxl
-cmF0b3IgcHJvcGVydHkpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMjg6IEZJ
-TEU6IHRhcmdldC9pMzg2L2t2bS5jOjIxNjY6CisgICAgc2hhZG93X21lbSA9IG9iamVjdF9wcm9w
-ZXJ0eV9nZXRfaW50KE9CSkVDVChzKSwgImt2bS1zaGFkb3ctbWVtIiwgJmVycm9yX2Fib3J0KTsK
-CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTk3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2
-LzE4IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzE4IENoZWNraW5nIGNvbW1pdCA2YTFk
-YmVlN2Y2MTAgKGt2bTogaW50cm9kdWNlIGt2bV9rZXJuZWxfaXJxY2hpcF8qIGZ1bmN0aW9ucykK
-MTgvMTggQ2hlY2tpbmcgY29tbWl0IGZhYmI4YjMwYTcxMSAoa3ZtOiBjb252ZXJ0ICItbWFjaGlu
-ZSBrZXJuZWxfaXJxY2hpcCIgdG8gYW4gYWNjZWxlcmF0b3IgcHJvcGVydHkpCldBUk5JTkc6IEJs
-b2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM4NTogRklM
-RTogYWNjZWwva3ZtL2t2bS1hbGwuYzozMDA3OgorICAgICAgICAgICAgLyogVGhlIHZhbHVlIHdh
-cyBjaGVja2VkIGluIHZpc2l0X3R5cGVfT25PZmZTcGxpdCgpIGFib3ZlLiBJZgoKdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAyNDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTgvMTggaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
-dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
-dGNoZXcub3JnL2xvZ3MvMTU3NTkwMzcwNS0xMjkyNS0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5p
-QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
-ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
-ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 12/9/19 9:55 PM, Greg Kurz wrote:
+> On Mon, 9 Dec 2019 20:12:09 +1100
+> Gavin Shan <gshan@redhat.com> wrote:
+>=20
+>> On 12/9/19 7:36 PM, Greg Kurz wrote:
+>>> On Sun, 8 Dec 2019 00:14:00 +1100
+>>> Gavin Shan <gshan@redhat.com> wrote:
+>>>
+>>>> On 12/7/19 3:50 AM, Greg Kurz wrote:
+>>>>> On Fri,  6 Dec 2019 17:36:42 +1100
+>>>>> Gavin Shan <gshan@redhat.com> wrote:
+>>>>>
+>>>>>> object_dynamic_cast() should return machine (or GPIO) state instad o=
+f NMI
+>>>>>> state in do_nmi(). So it's wrong to convert it to NMI state uncondit=
+ionally.
+>>>>>>
+>>>>>
+>>>>> object_dynamic_cast() returns either its first argument if it can be =
+cast
+>>>>> to the given typename or NULL. Since the x86, ccw and spapr machines =
+and
+>>>>> the PowerMac GPIO implement the NMI interface, nothing is wrong here.
+>>>>>
+>>>>> The do_nmi() function is called for all objects in the QOM tree and s=
+imply
+>>>>> filters out the ones that don't implement the NMI interface.
+>>>>>
+>>>>> I do agree that this isn't super obvious though. It would be clearer =
+to
+>>>>> do the filtering in the foreach() function. Something like:
+>>>>>
+>>>>> https://patchwork.ozlabs.org/patch/1182232/
+>>>>>
+>>>>
+>>>> Greg, Thanks for the review and comments. I think we're talking about
+>>>> different issues. I do agree it's worthy to simplify the code with the
+>>>> object_child_foreach_type(), but later.
+>>>>
+>>>> When we have below parameters to qemu, object_dynamic_cast(o, TYPE_NMI=
+)
+>>>> returns object of "pc-q35-4.2-machine", which is passed to the subquen=
+t
+>>>> NMIClass::nmi_monitor_handler(). However, the function expects a NMISt=
+ate
+>>>> from its prototype as below. This patch changes the prototype to fill =
+the
+>>>> gap.
+>>>>
+>>>>       void (*nmi_monitor_handler)(NMIState *n, int cpu_index, Error **=
+errp);
+>>>>
+>>>
+>>> Hmm... the "pc-q35-4.2-machine" type inherits from the TYPE_PC_MACHINE,
+>>> which in turns inherits from TYPE_X86_MACHINE, which implements the
+>>> TYPE_NMI interface. It thus seems okay to pass this object to x86_nmi()=
+.
+>>>
+>>> What are you trying to fix here ?
+>>>
+>>
+>> There is no valid instance associated with interface class. For this spe=
+cific
+>> case, there is no NMIState instance. I don't understand how we can pass =
+a
+>> valid NMIState to the function.
+>=20
+> Ah I get it. Please read the include/qom/object.h to understand what QOM
+> interfaces are about. Especially this paragraph:
+>=20
+>   * # Interfaces #
+>   *
+>   * Interfaces allow a limited form of multiple inheritance.  Instances a=
+re
+>   * similar to normal types except for the fact that are only defined by
+>   * their classes and never carry any state.  You can dynamically cast an=
+ object
+>   * to one of its #Interface types and vice versa.
+>=20
+
+Thanks, Greg. The statements here clarify the forced conversion (casting) i=
+s
+allowed, even I don't think it's safe to do so.
+
+>> Furthermore, below code returns "pc-q35-4.2-machine"
+>> object instead of NMIState. It's not safe to do the forced conversion he=
+re.
+>>
+>>      /* It returns "pc-q35-4.2-machine" instance */
+>>      NMIState *n =3D (NMIState *) object_dynamic_cast(o, TYPE_NMI);
+>>        :
+>>      nc->nmi_monitor_handler(n, ns->cpu_index, &ns->err);
+>=20
+> As explained in my previous mail, this _forced conversion_ is the current
+> way to implement object_child_foreach_type(). It is ugly and confusing fo=
+r
+> newcomers but it is safe since the pointer is either TYPE_NMI or NULL, in
+> which case the handler isn't called.
+>=20
+
+Yes, as above statements said.
+
+>>
+>>
+>> If "struct NMIState" is declared and the data struct is written in the f=
+unction.
+>> We will run into data corruption if I'm correct.
+>>
+>=20
+> The 'struct NMIState' isn't defined on purpose, but I agree this isn't do=
+cumented
+> anywhere except in this changelog:
+>=20
+> commit 00ed3da9b5c2e66e796a172df3e19545462b9c90
+> Author: David Gibson <david@gibson.dropbear.id.au>
+> Date:   Tue Sep 24 16:00:33 2019 +1000
+>=20
+>      xics: Minor fixes for XICSFabric interface
+>     =20
+>      Interface instances should never be directly dereferenced.  So, the =
+common
+>      practice is to make them incomplete types to make sure no-one does t=
+hat.
+>      XICSFrabric, however, had a dummy type which is less safe.
+>     =20
+>      We were also using OBJECT_CHECK() where we should have been using
+>      INTERFACE_CHECK().
+>     =20
+>      Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>      Reviewed-by: Greg Kurz <groug@kaod.org>
+>      Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>=20
+> Maybe the NMIState naming was a poor choice since there's no associated
+> state with QOM interfaces. But we do want to keep a typedef though: it
+> is more precise and hence safer to pass an NMIState * than an Object *.>=
+=20
+
+It's arguable to be correct enough. The NMIClass and the associated callbac=
+k
+(nmi_monitor_handler()) are attached to the parent class, which is "pc-q35-=
+4.2-machine"
+in our example. The interface is strongly associated with the parent class.=
+ From
+this perspective, it also makes sense to pass the parent object.
+
+However, we didn't run into any issue so far. Maybe the code can be revisit=
+ed
+when it needs to be improved later, or never :)
+
+>> I'm pasting the message I had. Hope this helps for understanding the iss=
+ue:
+>>
+>> --- a/hw/core/nmi.c
+>> +++ b/hw/core/nmi.c
+>> @@ -42,6 +42,10 @@ static int do_nmi(Object *o, void *opaque)
+>>        if (n) {
+>>            NMIClass *nc =3D NMI_GET_CLASS(n);
+>>   =20
+>> +       fprintf(stdout, "%s: o=3D%s, n=3D%s\n",
+>> +                __func__, object_get_typename(OBJECT(o)),
+>> +                object_get_typename(OBJECT(n)));
+>> +
+>>
+>=20
+> object_get_typename() returns the type of the instance, which is either
+> a machine or a GPIO in the current code base. This is different from
+> object_dynamic_cast() which just tells if a given object can be cast
+> to a give type (either regular QOM type or QOM interface).
+>=20
+> It is up to the various NMIClass::nmi_monitor_handler() to make sure
+> they're being passed the right object.
+>=20
+> macio_gpio_nmi() explicitly does that with MACIO_GPIO(n). The other
+> ones only need to access the CPU state and end up checking it is
+> valid: s390_nmi() checks S390_CPU(cs), x86_nmi() checks X86_CPU(cs)
+> and
+>=20
+> spapr_nmi()
+>   ->async_run_on_cpu()
+>     ->spapr_do_system_reset_on_cpu()
+>       ->ppc_cpu_do_system_reset() checks POWERPC_CPU(cs)
+>=20
+> but they could maybe assert(object_dynamic_cast()) as well for
+> clarity.
+>=20
+
+Yeah, nothing is wrong currently. macio_gpio_nmi() is the only case
+where the NMIState is consumed after correct casting is applied.
+
+>>
+>> # QEMU 4.1.93 monitor - type 'help' for more information
+>> (qemu) nmi
+>> do_nmi: o=3Dpc-q35-4.2-machine, n=3Dpc-q35-4.2-machine
+>>
+>>
+>>>>       Changed to:
+>>>>
+>>>>       void (*nmi_monitor_handler)(Object *parent, int cpu_index, Error=
+ **errp);
+>>>>
+>>>>       ~/sandbox/src/qemu/qemu.main.x86/x86_64-softmmu/qemu-system-x86_=
+64              \
+>>>>       --enable-kvm -machine type=3Dq35,accel=3Dkvm,kernel-irqchip=3Don=
+ -cpu host -smp 2 -m 1G    \
+>>>>       -monitor none -serial mon:stdio -nographic -s                   =
+                     \
+>>>>       -bios ~/sandbox/src/firmware/seabios/out/bios.bin               =
+                     \
+>>>>       -kernel ~/sandbox/src/linux/linux.main.x86/arch/x86/boot/bzImage=
+                     \
+>>>>       -initrd ~/sandbox/src/util/buildroot/output/images/rootfs.cpio.x=
+z                    \
+>>>>       -append "earlyprintk=3DttyS0 console=3DttyS0 debug"             =
+                         \
+>>>>       -device virtio-net-pci,netdev=3Dunet,mac=3D52:54:00:f1:26:a6    =
+                         \
+>>>>       -netdev user,id=3Dunet,hostfwd=3Dtcp::50959-:22                 =
+                         \
+>>>>       -drive file=3D~/sandbox/images/vm.img,if=3Dnone,format=3Draw,id=
+=3Dnvme0                      \
+>>>>       -device nvme,drive=3Dnvme0,serial=3Dfoo                         =
+                         \
+>>>>       -drive file=3D~/sandbox/images/vm1.img,if=3Dnone,format=3Draw,id=
+=3Dnvme1                     \
+>>>>       -device nvme,drive=3Dnvme1,serial=3Dfoo1
+>>>>
+>>>>>> This changes the prototype of NMIClass::nmi_monitor_handler() to acc=
+ept
+>>>>>> the parent object of NMI state instead of itself. With this, he pare=
+nt object
+>>>>>> is passed to the function, to avoid potential data corruption.
+>>>>>>
+>>>>>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>>>>>> ---
+>>>>>>     hw/core/nmi.c              | 8 ++++----
+>>>>>>     hw/i386/x86.c              | 2 +-
+>>>>>>     hw/misc/macio/gpio.c       | 6 +++---
+>>>>>>     hw/ppc/spapr.c             | 2 +-
+>>>>>>     hw/s390x/s390-virtio-ccw.c | 2 +-
+>>>>>>     include/hw/nmi.h           | 2 +-
+>>>>>>     6 files changed, 11 insertions(+), 11 deletions(-)
+>>>>>>
+>>>>>> diff --git a/hw/core/nmi.c b/hw/core/nmi.c
+>>>>>> index 481c4b3c7e..554708d0db 100644
+>>>>>> --- a/hw/core/nmi.c
+>>>>>> +++ b/hw/core/nmi.c
+>>>>>> @@ -37,13 +37,13 @@ static void nmi_children(Object *o, struct do_nm=
+i_s *ns);
+>>>>>>     static int do_nmi(Object *o, void *opaque)
+>>>>>>     {
+>>>>>>         struct do_nmi_s *ns =3D opaque;
+>>>>>> -    NMIState *n =3D (NMIState *) object_dynamic_cast(o, TYPE_NMI);
+>>>>>> +    Object *parent =3D object_dynamic_cast(o, TYPE_NMI);
+>>>>>>    =20
+>>>>>> -    if (n) {
+>>>>>> -        NMIClass *nc =3D NMI_GET_CLASS(n);
+>>>>>> +    if (parent) {
+>>>>>> +        NMIClass *nc =3D NMI_GET_CLASS(parent);
+>>>>>>    =20
+>>>>>>             ns->handled =3D true;
+>>>>>> -        nc->nmi_monitor_handler(n, ns->cpu_index, &ns->err);
+>>>>>> +        nc->nmi_monitor_handler(parent, ns->cpu_index, &ns->err);
+>>>>>>             if (ns->err) {
+>>>>>>                 return -1;
+>>>>>>             }
+>>>>>> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+>>>>>> index 394edc2f72..b98204f104 100644
+>>>>>> --- a/hw/i386/x86.c
+>>>>>> +++ b/hw/i386/x86.c
+>>>>>> @@ -190,7 +190,7 @@ const CPUArchIdList *x86_possible_cpu_arch_ids(M=
+achineState *ms)
+>>>>>>         return ms->possible_cpus;
+>>>>>>     }
+>>>>>>    =20
+>>>>>> -static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
+>>>>>> +static void x86_nmi(Object *parent, int cpu_index, Error **errp)
+>>>>>>     {
+>>>>>>         /* cpu index isn't used */
+>>>>>>         CPUState *cs;
+>>>>>> diff --git a/hw/misc/macio/gpio.c b/hw/misc/macio/gpio.c
+>>>>>> index 6cca6b27d6..6b4dfcc188 100644
+>>>>>> --- a/hw/misc/macio/gpio.c
+>>>>>> +++ b/hw/misc/macio/gpio.c
+>>>>>> @@ -196,10 +196,10 @@ static void macio_gpio_reset(DeviceState *dev)
+>>>>>>         macio_set_gpio(s, 1, true);
+>>>>>>     }
+>>>>>>    =20
+>>>>>> -static void macio_gpio_nmi(NMIState *n, int cpu_index, Error **errp=
+)
+>>>>>> +static void macio_gpio_nmi(Object *parent, int cpu_index, Error **e=
+rrp)
+>>>>>>     {
+>>>>>> -    macio_set_gpio(MACIO_GPIO(n), 9, true);
+>>>>>> -    macio_set_gpio(MACIO_GPIO(n), 9, false);
+>>>>>> +    macio_set_gpio(MACIO_GPIO(parent), 9, true);
+>>>>>> +    macio_set_gpio(MACIO_GPIO(parent), 9, false);
+>>>>>>     }
+>>>>>>    =20
+>>>>>>     static void macio_gpio_class_init(ObjectClass *oc, void *data)
+>>>>>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>>>>>> index e076f6023c..3b92e4013d 100644
+>>>>>> --- a/hw/ppc/spapr.c
+>>>>>> +++ b/hw/ppc/spapr.c
+>>>>>> @@ -3377,7 +3377,7 @@ void spapr_do_system_reset_on_cpu(CPUState *cs=
+, run_on_cpu_data arg)
+>>>>>>         ppc_cpu_do_system_reset(cs);
+>>>>>>     }
+>>>>>>    =20
+>>>>>> -static void spapr_nmi(NMIState *n, int cpu_index, Error **errp)
+>>>>>> +static void spapr_nmi(Object *parent, int cpu_index, Error **errp)
+>>>>>>     {
+>>>>>>         CPUState *cs;
+>>>>>>    =20
+>>>>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>>>>>> index d3edeef0ad..a49952a8b9 100644
+>>>>>> --- a/hw/s390x/s390-virtio-ccw.c
+>>>>>> +++ b/hw/s390x/s390-virtio-ccw.c
+>>>>>> @@ -431,7 +431,7 @@ static void s390_hot_add_cpu(MachineState *machi=
+ne,
+>>>>>>         s390x_new_cpu(object_class_get_name(oc), id, errp);
+>>>>>>     }
+>>>>>>    =20
+>>>>>> -static void s390_nmi(NMIState *n, int cpu_index, Error **errp)
+>>>>>> +static void s390_nmi(Object *parent, int cpu_index, Error **errp)
+>>>>>>     {
+>>>>>>         CPUState *cs =3D qemu_get_cpu(cpu_index);
+>>>>>>    =20
+>>>>>> diff --git a/include/hw/nmi.h b/include/hw/nmi.h
+>>>>>> index a1e128724e..75afa67790 100644
+>>>>>> --- a/include/hw/nmi.h
+>>>>>> +++ b/include/hw/nmi.h
+>>>>>> @@ -38,7 +38,7 @@ typedef struct NMIState NMIState;
+>>>>>>     typedef struct NMIClass {
+>>>>>>         InterfaceClass parent_class;
+>>>>>>    =20
+>>>>>> -    void (*nmi_monitor_handler)(NMIState *n, int cpu_index, Error *=
+*errp);
+>>>>>> +    void (*nmi_monitor_handler)(Object *parent, int cpu_index, Erro=
+r **errp);
+>>>>>>     } NMIClass;
+>>>>>>    =20
+>>>>>>     void nmi_monitor_handle(int cpu_index, Error **errp);
+>>>>>
+
+
+Regards,
+Gavin
 
 
