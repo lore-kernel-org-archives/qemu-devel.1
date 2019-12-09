@@ -2,59 +2,136 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 247A3C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 08:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C95F7C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 08:34:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD58420726
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 08:31:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD58420726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 940AC206E0
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 08:34:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="hWJm3iN1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 940AC206E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieESG-0004mN-3l
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 03:31:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33688)
+	id 1ieEV0-0005ys-QX
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 03:34:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34412)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1ieERe-0004KV-Tb
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 03:31:08 -0500
+ (envelope-from <michals@xilinx.com>) id 1ieEUL-0005RH-8z
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 03:33:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1ieERc-0006es-ED
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 03:31:06 -0500
-Received: from mga12.intel.com ([192.55.52.136]:28281)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1ieERc-0006eD-54
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 03:31:04 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 09 Dec 2019 00:30:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,294,1571727600"; d="scan'208";a="237671592"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga004.fm.intel.com with ESMTP; 09 Dec 2019 00:30:55 -0800
-From: Tao Xu <tao3.xu@intel.com>
-To: armbru@redhat.com,
-	mdroth@linux.vnet.ibm.com,
-	ehabkost@redhat.com
-Subject: [PATCH RESEND v2] util/cutils: Expand do_strtosz parsing precision to
- 64 bits
-Date: Mon,  9 Dec 2019 16:30:53 +0800
-Message-Id: <20191209083053.16402-1-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <michals@xilinx.com>) id 1ieEUJ-0007WX-JW
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 03:33:52 -0500
+Received: from mail-eopbgr700075.outbound.protection.outlook.com
+ ([40.107.70.75]:41408 helo=NAM04-SN1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <michals@xilinx.com>) id 1ieEUJ-0007W7-9f
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 03:33:51 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Lw56ADF2OagahoWIm4V2+MkID+OEs1khluR1789TyWmEJc9DHa8sTUu+nLG6OSjluBtGc4DLx7rMzJe0mtfcxJva64Y7XSN5RPnXBDpKWiLy6uiVOrN1RiBXT+FmNzigykL64PkvXs7fLDynyOZnVyp2SH5t/EO2z3Aq+5UW1g1vPqIY/UzFe0pha2y65kmxCGZg/zXbFZxaWraK4ZWmiDESdZ1psEAzfnS0amUfhO0RDBIa/pjLPxpH06P3JY3/9JPQL5IUV5HmZ5JeYLgclkhq/hKmm1Li2VuQcWqLjwwYbvIRg9fmdVSfAjm1IUnbL6lSZOUMfItJzyqvJGLkwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9I86StYEjr6zuNW3Goe8nOXDlCOuFt8CDvVA0zgAUYM=;
+ b=M7Bd9/BLDGXq5zHn8RFD5wTyom0QUwDR5Cn0NgkBxiA4Gl+fT2mplmygPtPdrsrLJ5eagGMtIP/zD7AVvH3qryKaIdBS1boxqulfGdnfAojKMw3ansHlOvQU2UkM4Pkx0r2HnH4Sa427fi1wOtaoTaISOiraz3TErnOV5ZiU9GNR/lEcAQGOOGJ7tUGeSEStWw/kIHAkN+ZH1fKOj1NEMoUeP980ZI78HMCt/LsnNF3zPOC8OOXLbSCuXn4o7Q4uHi4RfnzCpcVfXOgUQsthSzHDI0UhU3ZNQ5je9WVhbRCvIklXpPWF4kCYOOBPUm/5/e243HtiBWewVMhx9IZ2lQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9I86StYEjr6zuNW3Goe8nOXDlCOuFt8CDvVA0zgAUYM=;
+ b=hWJm3iN1EPq0E3jwLFVRZGMBifzdej273IBylAnoENweisrFncSh4Cc+Pt6g2xHaPgA28eJk8rpFvgr4JVeN2sJC1vPP7xpnQhBJsvs1+J1JQo1rxuG8Bp0elKVPPQqbxoR6NLCv6wUZyM8+edKfRZMZ1LW1vu8O0rG5h8NFiaM=
+Received: from SN4PR0201CA0051.namprd02.prod.outlook.com
+ (2603:10b6:803:20::13) by MN2PR02MB7022.namprd02.prod.outlook.com
+ (2603:10b6:208:1f4::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2516.12; Mon, 9 Dec
+ 2019 08:33:46 +0000
+Received: from SN1NAM02FT018.eop-nam02.prod.protection.outlook.com
+ (2a01:111:f400:7e44::204) by SN4PR0201CA0051.outlook.office365.com
+ (2603:10b6:803:20::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2516.12 via Frontend
+ Transport; Mon, 9 Dec 2019 08:33:46 +0000
+Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ SN1NAM02FT018.mail.protection.outlook.com (10.152.72.122) with Microsoft SMTP
+ Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2495.26
+ via Frontend Transport; Mon, 9 Dec 2019 08:33:46 +0000
+Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
+ (envelope-from <michal.simek@xilinx.com>)
+ id 1ieEUD-0005Gc-MQ; Mon, 09 Dec 2019 00:33:45 -0800
+Received: from [127.0.0.1] (helo=localhost)
+ by xsj-pvapsmtp01 with smtp (Exim 4.63)
+ (envelope-from <michal.simek@xilinx.com>)
+ id 1ieEU8-0002oE-JB; Mon, 09 Dec 2019 00:33:40 -0800
+Received: from [172.30.17.107] by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <michals@xilinx.com>)
+ id 1ieEU4-0002nD-4V; Mon, 09 Dec 2019 00:33:36 -0800
+Subject: Re: [PATCH 1/5] arm64: zynqmp: Add firmware DT node
+To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
+ Guenter Roeck <linux@roeck-us.net>
+References: <20191018160735.15658-1-m.tretter@pengutronix.de>
+ <20191018160735.15658-2-m.tretter@pengutronix.de>
+ <20191208223814.GA21260@roeck-us.net>
+ <dbba2a25-cbf7-60f4-99f7-056512e28d00@xilinx.com>
+ <4821742f-2d60-b722-b954-263de975bf2e@roeck-us.net>
+ <20191209074840.GP32392@toto>
+From: Michal Simek <michal.simek@xilinx.com>
+Message-ID: <8052c6d7-f447-0977-6e2a-4e2f6ec9ded8@xilinx.com>
+Date: Mon, 9 Dec 2019 09:33:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.136
+In-Reply-To: <20191209074840.GP32392@toto>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:149.199.60.83; IPV:NLI; CTRY:US; EFV:NLI;
+ SFV:NSPM;
+ SFS:(10009020)(4636009)(376002)(39860400002)(396003)(136003)(346002)(189003)(199004)(36756003)(2616005)(31686004)(229853002)(54906003)(110136005)(305945005)(966005)(70586007)(336012)(70206006)(31696002)(478600001)(58126008)(5660300002)(316002)(53546011)(36386004)(8936002)(65956001)(76176011)(186003)(44832011)(426003)(4326008)(230700001)(26005)(8676002)(9786002)(356004)(6666004)(50466002)(2906002)(81166006)(81156014);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:MN2PR02MB7022; H:xsj-pvapsmtpgw01; FPR:;
+ SPF:Pass; LANG:en; PTR:unknown-60-83.xilinx.com; MX:1; A:1; 
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 664e8391-e3fd-44f9-7aa3-08d77c8281d4
+X-MS-TrafficTypeDiagnostic: MN2PR02MB7022:
+X-Microsoft-Antispam-PRVS: <MN2PR02MB7022D54DE7C520DA218E98C0C6580@MN2PR02MB7022.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Forefront-PRVS: 02462830BE
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9jKajiT+D028EolmSF2l3s0ueIaqLlqu220yKyfo7vnxxq/XvAdAGcU06ZoZRIwTchM1Xsaw4MAs1N/ZHKyDRogK5j1Z00KA0EqX4TY8iSf+rzRjTw1S0jdzwkS2NGbTwHm4kie+xQ2jLLziMBS+4kpX3/mo/Q+fXci3hW2XigvOZaWwOFqi9wGGEvh50MdeSFvyyLHZ1r5cdlXMWXTM29mRuiRRqBwBwqLUJmSSlpOMvSCcTgbNHxMHDNFsZAeFNgUhhQUhHcbeA1dn8mdcuEDaa5SGiwL7h1n0/fg1PyabMTZ6lMgKcAfSsZGvk+Ibc2cjIuUJgFqHgGHAKh++CT8CUeM+qDhYbuW+jH8BOvVhGv0akad1bcTh/ND7oVrqvkyVY9GB6TianJXMq/Fvt58ngvE6jYq+iv09o+yx/sR6DwFFbW615k09ChY6uAcR2oAozXWt2ZqW0C4b3vV96ntMnE/ywuW3ezBHBcPetT0=
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2019 08:33:46.0862 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 664e8391-e3fd-44f9-7aa3-08d77c8281d4
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB7022
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.70.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,332 +143,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tao Xu <tao3.xu@intel.com>, qemu-devel@nongnu.org
+Cc: mark.rutland@arm.com, devicetree@vger.kernel.org,
+ Rajan Vaja <rajan.vaja@xilinx.com>, qemu-devel@nongnu.org,
+ Michal Simek <michal.simek@xilinx.com>,
+ Michael Tretter <m.tretter@pengutronix.de>, Edgar Iglesias <edgari@xilinx.com>,
+ robh+dt@kernel.org, Rajan Vaja <rajanv@xilinx.com>,
+ linux-arm-kernel@lists.infradead.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Parse input string both as a double and as a uint64_t, then use the
-method which consumes more characters. Update the related test cases.
+On 09. 12. 19 8:48, Edgar E. Iglesias wrote:
+> On Sun, Dec 08, 2019 at 11:19:33PM -0800, Guenter Roeck wrote:
+>> On 12/8/19 10:42 PM, Michal Simek wrote:
+>>> Hi, +Edgar
+>>>
+>>>
+>>> On 08. 12. 19 23:38, Guenter Roeck wrote:
+>>>> On Fri, Oct 18, 2019 at 06:07:31PM +0200, Michael Tretter wrote:
+>>>>> From: Rajan Vaja <rajan.vaja@xilinx.com>
+>>>>>
+>>>>> Add firmware DT node in ZynqMP device tree. This node
+>>>>> uses bindings as per new firmware interface driver.
+>>>>>
+>>>>> Signed-off-by: Rajan Vaja <rajanv@xilinx.com>
+>>>>> Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+>>>>> Signed-off-by: Michael Tretter <m.tretter@pengutronix.de>
+>>>>
+>>>> With this patch applied in the mainline kernel, the qemu xlnx-zcu102
+>>>> emulation crashes (see below). Any idea what it might take to get
+>>>> qemu back to working ?
+>>>
+>>> Driver talks through ATF to PMU unit(microblaze). I don't think A53+MB
+>>> concept is working with mainline qemu. But crash is too hard. It should
+> 
+> Yes, QEMU doesn't support the Cortex-A53s along with the PMU MicroBlaze.
+> 
+> My workaround when using upstream QEMU is a modified DT without the PMU firmware
+> and with fixed-clock nodes.
 
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
+IIRC you said that there is still discussion how to upstream this.
+Fixed clock should work for u-boot too. But SPL reads that registers
+directly. Are you implementing them with any default values?
 
-Changes in v2:
-    - Resend to use double small than DBL_MIN
-    - Add more test case for double overflow and underflow.
-    - Set mul as int64_t (Markus)
-    - Restore endptr (Markus)
----
- tests/test-cutils.c    | 37 +++++++----------------
- tests/test-keyval.c    | 47 +++++------------------------
- tests/test-qemu-opts.c | 39 +++++-------------------
- util/cutils.c          | 67 +++++++++++++++++++++++++++++++-----------
- 4 files changed, 75 insertions(+), 115 deletions(-)
+> 
+> 
+>>> be no response from PMU and then this panic.
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/firmware/xilinx/zynqmp.c?h=v5.5-rc1#n728
+>>>
+>>
+>> Isn't that a bit harsh too ? Normally one would print an error message
+>> and abort driver instantiation.
+> 
+> I agree, it would be nice if ATF & kernel drivers would somehow handle
+> this more gracefully.
 
-diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-index 1aa8351520..49e495b8ba 100644
---- a/tests/test-cutils.c
-+++ b/tests/test-cutils.c
-@@ -1970,40 +1970,25 @@ static void test_qemu_strtosz_simple(void)
-     g_assert_cmpint(err, ==, 0);
-     g_assert_cmpint(res, ==, 12345);
- 
--    /* Note: precision is 53 bits since we're parsing with strtod() */
--
--    str = "9007199254740991"; /* 2^53-1 */
--    err = qemu_strtosz(str, &endptr, &res);
--    g_assert_cmpint(err, ==, 0);
--    g_assert_cmpint(res, ==, 0x1fffffffffffff);
--    g_assert(endptr == str + 16);
--
--    str = "9007199254740992"; /* 2^53 */
--    err = qemu_strtosz(str, &endptr, &res);
--    g_assert_cmpint(err, ==, 0);
--    g_assert_cmpint(res, ==, 0x20000000000000);
--    g_assert(endptr == str + 16);
-+    /* Note: precision is 64 bits (UINT64_MAX) */
- 
-     str = "9007199254740993"; /* 2^53+1 */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, 0);
--    g_assert_cmpint(res, ==, 0x20000000000000); /* rounded to 53 bits */
-+    g_assert_cmpint(res, ==, 0x20000000000001);
-     g_assert(endptr == str + 16);
- 
--    str = "18446744073709549568"; /* 0xfffffffffffff800 (53 msbs set) */
-+    str = "18446744073709550591"; /* 0xfffffffffffffbff */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, 0);
--    g_assert_cmpint(res, ==, 0xfffffffffffff800);
-+    g_assert_cmpint(res, ==, 0xfffffffffffffbff);
-     g_assert(endptr == str + 20);
- 
--    str = "18446744073709550591"; /* 0xfffffffffffffbff */
-+    str = "18446744073709551615"; /* 2^64-1 (UINT64_MAX) */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, 0);
--    g_assert_cmpint(res, ==, 0xfffffffffffff800); /* rounded to 53 bits */
-+    g_assert_cmpint(res, ==, 0xffffffffffffffff);
-     g_assert(endptr == str + 20);
--
--    /* 0x7ffffffffffffe00..0x7fffffffffffffff get rounded to
--     * 0x8000000000000000, thus -ERANGE; see test_qemu_strtosz_erange() */
- }
- 
- static void test_qemu_strtosz_units(void)
-@@ -2145,20 +2130,20 @@ static void test_qemu_strtosz_erange(void)
-     g_assert_cmpint(err, ==, -ERANGE);
-     g_assert(endptr == str + 2);
- 
--    str = "18446744073709550592"; /* 0xfffffffffffffc00 */
-+    str = "18446744073709551616"; /* 2^64 */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, -ERANGE);
-     g_assert(endptr == str + 20);
- 
--    str = "18446744073709551615"; /* 2^64-1 */
-+    str = "1.7976931348623158e+308"; /* DBL_MAX, double overflows */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, -ERANGE);
--    g_assert(endptr == str + 20);
-+    g_assert(endptr == str + 23);
- 
--    str = "18446744073709551616"; /* 2^64 */
-+    str = "2.225e-308"; /* Small than DBL_MIN, double underflows */
-     err = qemu_strtosz(str, &endptr, &res);
-     g_assert_cmpint(err, ==, -ERANGE);
--    g_assert(endptr == str + 20);
-+    g_assert(endptr == str + 10);
- 
-     str = "20E";
-     err = qemu_strtosz(str, &endptr, &res);
-diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-index 09b0ae3c68..fad941fcb8 100644
---- a/tests/test-keyval.c
-+++ b/tests/test-keyval.c
-@@ -383,59 +383,26 @@ static void test_keyval_visit_size(void)
-     visit_end_struct(v, NULL);
-     visit_free(v);
- 
--    /* Note: precision is 53 bits since we're parsing with strtod() */
-+    /* Note: precision is 64 bits (UINT64_MAX) */
- 
--    /* Around limit of precision: 2^53-1, 2^53, 2^53+1 */
--    qdict = keyval_parse("sz1=9007199254740991,"
--                         "sz2=9007199254740992,"
--                         "sz3=9007199254740993",
-+    /* Around limit of precision: UINT64_MAX - 1, UINT64_MAX */
-+    qdict = keyval_parse("sz1=18446744073709551614,"
-+                         "sz2=18446744073709551615",
-                          NULL, &error_abort);
-     v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-     qobject_unref(qdict);
-     visit_start_struct(v, NULL, NULL, 0, &error_abort);
-     visit_type_size(v, "sz1", &sz, &error_abort);
--    g_assert_cmphex(sz, ==, 0x1fffffffffffff);
-+    g_assert_cmphex(sz, ==, 0xfffffffffffffffe);
-     visit_type_size(v, "sz2", &sz, &error_abort);
--    g_assert_cmphex(sz, ==, 0x20000000000000);
--    visit_type_size(v, "sz3", &sz, &error_abort);
--    g_assert_cmphex(sz, ==, 0x20000000000000);
--    visit_check_struct(v, &error_abort);
--    visit_end_struct(v, NULL);
--    visit_free(v);
--
--    /* Close to signed upper limit 0x7ffffffffffffc00 (53 msbs set) */
--    qdict = keyval_parse("sz1=9223372036854774784," /* 7ffffffffffffc00 */
--                         "sz2=9223372036854775295", /* 7ffffffffffffdff */
--                         NULL, &error_abort);
--    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
--    qobject_unref(qdict);
--    visit_start_struct(v, NULL, NULL, 0, &error_abort);
--    visit_type_size(v, "sz1", &sz, &error_abort);
--    g_assert_cmphex(sz, ==, 0x7ffffffffffffc00);
--    visit_type_size(v, "sz2", &sz, &error_abort);
--    g_assert_cmphex(sz, ==, 0x7ffffffffffffc00);
--    visit_check_struct(v, &error_abort);
--    visit_end_struct(v, NULL);
--    visit_free(v);
--
--    /* Close to actual upper limit 0xfffffffffffff800 (53 msbs set) */
--    qdict = keyval_parse("sz1=18446744073709549568," /* fffffffffffff800 */
--                         "sz2=18446744073709550591", /* fffffffffffffbff */
--                         NULL, &error_abort);
--    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
--    qobject_unref(qdict);
--    visit_start_struct(v, NULL, NULL, 0, &error_abort);
--    visit_type_size(v, "sz1", &sz, &error_abort);
--    g_assert_cmphex(sz, ==, 0xfffffffffffff800);
--    visit_type_size(v, "sz2", &sz, &error_abort);
--    g_assert_cmphex(sz, ==, 0xfffffffffffff800);
-+    g_assert_cmphex(sz, ==, 0xffffffffffffffff);
-     visit_check_struct(v, &error_abort);
-     visit_end_struct(v, NULL);
-     visit_free(v);
- 
-     /* Beyond limits */
-     qdict = keyval_parse("sz1=-1,"
--                         "sz2=18446744073709550592", /* fffffffffffffc00 */
-+                         "sz2=18446744073709551616", /* 2^64 */
-                          NULL, &error_abort);
-     v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-     qobject_unref(qdict);
-diff --git a/tests/test-qemu-opts.c b/tests/test-qemu-opts.c
-index ef96e84aed..3a8b8c0168 100644
---- a/tests/test-qemu-opts.c
-+++ b/tests/test-qemu-opts.c
-@@ -650,50 +650,25 @@ static void test_opts_parse_size(void)
-     g_assert_cmpuint(opts_count(opts), ==, 1);
-     g_assert_cmpuint(qemu_opt_get_size(opts, "size1", 1), ==, 0);
- 
--    /* Note: precision is 53 bits since we're parsing with strtod() */
-+    /* Note: precision is 64 bits (UINT64_MAX) */
- 
--    /* Around limit of precision: 2^53-1, 2^53, 2^54 */
-+    /* Around limit of precision: UINT64_MAX - 1, UINT64_MAX */
-     opts = qemu_opts_parse(&opts_list_02,
--                           "size1=9007199254740991,"
--                           "size2=9007199254740992,"
--                           "size3=9007199254740993",
--                           false, &error_abort);
--    g_assert_cmpuint(opts_count(opts), ==, 3);
--    g_assert_cmphex(qemu_opt_get_size(opts, "size1", 1),
--                     ==, 0x1fffffffffffff);
--    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 1),
--                     ==, 0x20000000000000);
--    g_assert_cmphex(qemu_opt_get_size(opts, "size3", 1),
--                     ==, 0x20000000000000);
--
--    /* Close to signed upper limit 0x7ffffffffffffc00 (53 msbs set) */
--    opts = qemu_opts_parse(&opts_list_02,
--                           "size1=9223372036854774784," /* 7ffffffffffffc00 */
--                           "size2=9223372036854775295", /* 7ffffffffffffdff */
--                           false, &error_abort);
--    g_assert_cmpuint(opts_count(opts), ==, 2);
--    g_assert_cmphex(qemu_opt_get_size(opts, "size1", 1),
--                     ==, 0x7ffffffffffffc00);
--    g_assert_cmphex(qemu_opt_get_size(opts, "size2", 1),
--                     ==, 0x7ffffffffffffc00);
--
--    /* Close to actual upper limit 0xfffffffffffff800 (53 msbs set) */
--    opts = qemu_opts_parse(&opts_list_02,
--                           "size1=18446744073709549568," /* fffffffffffff800 */
--                           "size2=18446744073709550591", /* fffffffffffffbff */
-+                           "size1=18446744073709551614,"
-+                           "size2=18446744073709551615",
-                            false, &error_abort);
-     g_assert_cmpuint(opts_count(opts), ==, 2);
-     g_assert_cmphex(qemu_opt_get_size(opts, "size1", 1),
--                     ==, 0xfffffffffffff800);
-+                     ==, 0xfffffffffffffffe);
-     g_assert_cmphex(qemu_opt_get_size(opts, "size2", 1),
--                     ==, 0xfffffffffffff800);
-+                     ==, 0xffffffffffffffff);
- 
-     /* Beyond limits */
-     opts = qemu_opts_parse(&opts_list_02, "size1=-1", false, &err);
-     error_free_or_abort(&err);
-     g_assert(!opts);
-     opts = qemu_opts_parse(&opts_list_02,
--                           "size1=18446744073709550592", /* fffffffffffffc00 */
-+                           "size1=18446744073709551616", /* 2^64 */
-                            false, &err);
-     error_free_or_abort(&err);
-     g_assert(!opts);
-diff --git a/util/cutils.c b/util/cutils.c
-index 77acadc70a..7c94ff2f0b 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -212,19 +212,39 @@ static int do_strtosz(const char *nptr, const char **end,
-                       const char default_suffix, int64_t unit,
-                       uint64_t *result)
- {
--    int retval;
--    const char *endptr;
-+    int retval, retd, retu;
-+    const char *endptr, *suffixd, *suffixu;
-     unsigned char c;
-     int mul_required = 0;
--    double val, mul, integral, fraction;
-+    bool use_strtod;
-+    uint64_t valu;
-+    int64_t mul;
-+    double vald, integral, fraction;
-+
-+    /*
-+     * Parse @nptr both as a double and as a uint64_t, then use the method
-+     * which consumes more characters.
-+     */
-+    retd = qemu_strtod_finite(nptr, &suffixd, &vald);
-+    retu = qemu_strtou64(nptr, &suffixu, 0, &valu);
-+    use_strtod = strlen(suffixd) < strlen(suffixu);
-+
-+    if (use_strtod) {
-+        endptr = suffixd;
-+        retval = retd;
-+    } else {
-+        endptr = suffixu;
-+        retval = retu;
-+    }
- 
--    retval = qemu_strtod_finite(nptr, &endptr, &val);
-     if (retval) {
-         goto out;
-     }
--    fraction = modf(val, &integral);
--    if (fraction != 0) {
--        mul_required = 1;
-+    if (use_strtod) {
-+        fraction = modf(vald, &integral);
-+        if (fraction != 0) {
-+            mul_required = 1;
-+        }
-     }
-     c = *endptr;
-     mul = suffix_mul(c, unit);
-@@ -238,17 +258,30 @@ static int do_strtosz(const char *nptr, const char **end,
-         retval = -EINVAL;
-         goto out;
-     }
--    /*
--     * Values near UINT64_MAX overflow to 2**64 when converting to double
--     * precision.  Compare against the maximum representable double precision
--     * value below 2**64, computed as "the next value after 2**64 (0x1p64) in
--     * the direction of 0".
--     */
--    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
--        retval = -ERANGE;
--        goto out;
-+
-+    if (use_strtod) {
-+        /*
-+         * Values near UINT64_MAX overflow to 2**64 when converting to double
-+         * precision. Compare against the maximum representable double precision
-+         * value below 2**64, computed as "the next value after 2**64 (0x1p64)
-+         * in the direction of 0".
-+         */
-+        if ((vald * mul > nextafter(0x1p64, 0)) || vald < 0) {
-+            retval = -ERANGE;
-+            goto out;
-+        }
-+        *result = vald * mul;
-+    } else {
-+        /* Reject negative input and overflow output */
-+        while (qemu_isspace(*nptr)) {
-+            nptr++;
-+        }
-+        if (*nptr == '-' || UINT64_MAX / mul < valu) {
-+            retval = -ERANGE;
-+            goto out;
-+        }
-+        *result = valu * mul;
-     }
--    *result = val * mul;
-     retval = 0;
- 
- out:
--- 
-2.20.1
+Rajan: can you please take a look at it?
 
+Thanks,
+Michal
 
