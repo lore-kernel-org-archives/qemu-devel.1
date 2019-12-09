@@ -2,61 +2,77 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8425C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 17:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 892A4C00454
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 17:40:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD45420828
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 17:35:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD45420828
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 646512077B
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 17:40:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 646512077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieMwk-0004V7-Pr
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 12:35:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51365)
+	id 1ieN0s-0006I4-Gz
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 12:40:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52255)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ieMvk-0003l8-Ie
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:34:45 -0500
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ieN0F-0005ju-BO
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:39:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ieMvj-0004fS-78
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:34:44 -0500
-Received: from 8.mo7.mail-out.ovh.net ([46.105.77.114]:49755)
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ieN0E-0006Mq-4p
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:39:23 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2056 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ieMvj-0004ei-11
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 12:34:43 -0500
-Received: from player756.ha.ovh.net (unknown [10.108.57.44])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 91CE9141F6F
- for <qemu-devel@nongnu.org>; Mon,  9 Dec 2019 18:34:40 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player756.ha.ovh.net (Postfix) with ESMTPSA id 17361C42DB58;
- Mon,  9 Dec 2019 17:34:36 +0000 (UTC)
-Date: Mon, 9 Dec 2019 18:34:30 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] virtfs: Remove the deprecated "-virtfs_synth" option
-Message-ID: <20191209183430.46ec8137@bahia.w3ibm.bluemix.net>
-In-Reply-To: <20191209145240.9271-1-thuth@redhat.com>
-References: <20191209145240.9271-1-thuth@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ieN0B-0006Je-DP; Mon, 09 Dec 2019 12:39:19 -0500
+Received: from lhreml703-cah.china.huawei.com (unknown [172.18.7.107])
+ by Forcepoint Email with ESMTP id 6CD5060A903E0C8C1D2D;
+ Mon,  9 Dec 2019 17:39:16 +0000 (GMT)
+Received: from lhreml704-chm.china.huawei.com (10.201.108.53) by
+ lhreml703-cah.china.huawei.com (10.201.108.44) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Mon, 9 Dec 2019 17:39:16 +0000
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml704-chm.china.huawei.com (10.201.108.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Mon, 9 Dec 2019 17:39:15 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1713.004; Mon, 9 Dec 2019 17:39:16 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Igor Mammedov <imammedo@redhat.com>, "xiaoguangrong.eric@gmail.com"
+ <xiaoguangrong.eric@gmail.com>
+Subject: RE: [PATCH 0/5] ARM virt: Add NVDIMM support
+Thread-Topic: [PATCH 0/5] ARM virt: Add NVDIMM support
+Thread-Index: AQHVeswdQv2zL2ZjnU2+5S1CywnCCKdgnucAgAYn2ECANV3CUIAANK6AgAADjLCAARyUgIADW0wAgBGftAA=
+Date: Mon, 9 Dec 2019 17:39:15 +0000
+Message-ID: <c2bb0be09e244ee59d27c7aaab1783a9@huawei.com>
+References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
+ <a133d4c4-3f60-2bb1-a7d7-35cdb06af265@redhat.com>
+ <441c818f24084b4191315cf2a6267cef@huawei.com>
+ <20191125164541.3f0a593f@redhat.com>
+ <444efcb441fe42e5aff58b3af3ab14b4@huawei.com>
+ <20191126095655.27227f59@redhat.com> 
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.237]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 9633199603446159666
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeltddguddtfecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejheeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.77.114
+X-Received-From: 185.176.76.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,97 +84,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "drjones@redhat.com" <drjones@redhat.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ Linuxarm <linuxarm@huawei.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Auger Eric <eric.auger@redhat.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
+ "lersek@redhat.com" <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon,  9 Dec 2019 15:52:40 +0100
-Thomas Huth <thuth@redhat.com> wrote:
+Hi Igor/ xiaoguangrong,
 
-> It's been marked as deprecated since QEMU v4.1, time to remove it now.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
+> -----Original Message-----
+> From: Shameerali Kolothum Thodi
+> Sent: 28 November 2019 12:36
+> To: 'Igor Mammedov' <imammedo@redhat.com>;
+> xiaoguangrong.eric@gmail.com
+> Cc: peter.maydell@linaro.org; drjones@redhat.com;
+> shannon.zhaosl@gmail.com; qemu-devel@nongnu.org; Linuxarm
+> <linuxarm@huawei.com>; Auger Eric <eric.auger@redhat.com>;
+> qemu-arm@nongnu.org; xuwei (O) <xuwei5@huawei.com>;
+> lersek@redhat.com
+> Subject: RE: [PATCH 0/5] ARM virt: Add NVDIMM support
+>=20
+>=20
+>=20
+> > -----Original Message-----
+> > From: Qemu-devel
+> >
+> [mailto:qemu-devel-bounces+shameerali.kolothum.thodi=3Dhuawei.com@nongn
+> > u.org] On Behalf Of Igor Mammedov
+> > Sent: 26 November 2019 08:57
+> > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> > Cc: peter.maydell@linaro.org; drjones@redhat.com;
+> > xiaoguangrong.eric@gmail.com; shannon.zhaosl@gmail.com;
+> > qemu-devel@nongnu.org; Linuxarm <linuxarm@huawei.com>; Auger Eric
+> > <eric.auger@redhat.com>; qemu-arm@nongnu.org; xuwei (O)
+> > <xuwei5@huawei.com>; lersek@redhat.com
+> > Subject: Re: [PATCH 0/5] ARM virt: Add NVDIMM support
+>=20
+> [..]
+>=20
+> > > > 0xb8 Dirty No.  -->Another read is attempted
+> > > > > [Qemu]NVDIMM:nvdimm_dsm_func_read_fit: read_fit_out buf size 0x8
+> > > > func_ret_status 3  --> Error status returned
+> > > >
+> > > > status 3 means that QEMU didn't like content of NRAM, and there is =
+only
+> > > > 1 place like this in nvdimm_dsm_func_read_fit()
+> > > >     if (read_fit->offset > fit->len) {
+> > > >         func_ret_status =3D NVDIMM_DSM_RET_STATUS_INVALID;
+> > > >         goto exit;
+> > > >     }
+> > > >
+> > > > so I'd start looking from here and check that QEMU gets expected da=
+ta
+> > > > in nvdimm_dsm_write(). In other words I'd try to trace/compare
+> > > > content of DSM buffer (from qemu side).
+> > >
+> > > I had printed the DSM buffer previously and it looked same, I will do=
+uble
+> check
+> > > that.
+>=20
+> Tried printing the buffer in both Qemu/AML code.
+>=20
+> On Amr64,
 
-Pushed to 9p-next.
+[...]
+=20
+> Attached the SSDT.dsl used for debugging. I am still not clear why on ARM=
+64,
+> 2nd iteration case, the created buffer size in NCAL and RFIT methods have
+> additional 4 bytes!.
+>=20
+>     CreateField (ODAT, Zero, Local1, OBUF)
+>     Concatenate (Buffer (Zero){}, OBUF, Local7)
+>=20
+> Please let me know if you have any clue.
+>=20
 
->  qemu-deprecated.texi |  5 -----
->  qemu-options.hx      | 10 ----------
->  vl.c                 | 23 -----------------------
->  3 files changed, 38 deletions(-)
-> 
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 2f9efb45ba..3745334e80 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -84,11 +84,6 @@ error in the future.
->  The @code{-realtime mlock=on|off} argument has been replaced by the
->  @code{-overcommit mem-lock=on|off} argument.
->  
-> -@subsection -virtfs_synth (since 4.1)
-> -
-> -The ``-virtfs_synth'' argument is now deprecated. Please use ``-fsdev synth''
-> -and ``-device virtio-9p-...'' instead.
-> -
->  @subsection -numa node,mem=@var{size} (since 4.1)
->  
->  The parameter @option{mem} of @option{-numa node} is used to assign a part of
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 65c9473b73..4cf7751ade 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -1468,16 +1468,6 @@ would still return entries from other devices).
->  @end table
->  ETEXI
->  
-> -DEF("virtfs_synth", 0, QEMU_OPTION_virtfs_synth,
-> -    "-virtfs_synth Create synthetic file system image\n",
-> -    QEMU_ARCH_ALL)
-> -STEXI
-> -@item -virtfs_synth
-> -@findex -virtfs_synth
-> -Create synthetic file system image. Note that this option is now deprecated.
-> -Please use @code{-fsdev synth} and @code{-device virtio-9p-...} instead.
-> -ETEXI
-> -
->  DEF("iscsi", HAS_ARG, QEMU_OPTION_iscsi,
->      "-iscsi [user=user][,password=password]\n"
->      "       [,header-digest=CRC32C|CR32C-NONE|NONE-CRC32C|NONE\n"
-> diff --git a/vl.c b/vl.c
-> index 6a65a64bfd..c0904b365b 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3374,29 +3374,6 @@ int main(int argc, char **argv, char **envp)
->                               qemu_opt_get(opts, "mount_tag"), &error_abort);
->                  break;
->              }
-> -            case QEMU_OPTION_virtfs_synth: {
-> -                QemuOpts *fsdev;
-> -                QemuOpts *device;
-> -
-> -                warn_report("'-virtfs_synth' is deprecated, please use "
-> -                             "'-fsdev synth' and '-device virtio-9p-...' "
-> -                            "instead");
-> -
-> -                fsdev = qemu_opts_create(qemu_find_opts("fsdev"), "v_synth",
-> -                                         1, NULL);
-> -                if (!fsdev) {
-> -                    error_report("duplicate option: %s", "virtfs_synth");
-> -                    exit(1);
-> -                }
-> -                qemu_opt_set(fsdev, "fsdriver", "synth", &error_abort);
-> -
-> -                device = qemu_opts_create(qemu_find_opts("device"), NULL, 0,
-> -                                          &error_abort);
-> -                qemu_opt_set(device, "driver", "virtio-9p-pci", &error_abort);
-> -                qemu_opt_set(device, "fsdev", "v_synth", &error_abort);
-> -                qemu_opt_set(device, "mount_tag", "v_synth", &error_abort);
-> -                break;
-> -            }
->              case QEMU_OPTION_serial:
->                  add_device_config(DEV_SERIAL, optarg);
->                  default_serial = 0;
+I couldn't figure out yet, why this extra 4 bytes are added by aml code on =
+ARM64
+when the nvdimm_dsm_func_read_fit() returns NvdimmFuncReadFITOut without
+any FIT data. ie, when the FIT buffer len (read_len) is zero.
+
+But the below will fix this issue,
+
+diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+index f91eea3802..cddf95f4c1 100644
+--- a/hw/acpi/nvdimm.c
++++ b/hw/acpi/nvdimm.c
+@@ -588,7 +588,7 @@ static void nvdimm_dsm_func_read_fit(NVDIMMState *state=
+, NvdimmDsmIn *in,
+     nvdimm_debug("Read FIT: offset %#x FIT size %#x Dirty %s.\n",
+                  read_fit->offset, fit->len, fit_buf->dirty ? "Yes" : "No"=
+);
+
+-    if (read_fit->offset > fit->len) {
++    if (read_fit->offset >=3D fit->len) {
+         func_ret_status =3D NVDIMM_DSM_RET_STATUS_INVALID;
+         goto exit;
+     }
+
+
+This will return error code to aml in the second iteration when there is no=
+ further
+FIT data to report. But, I am not sure why this check was omitted in the fi=
+rst place.
+
+Please let me know if this is acceptable and then probably I can look into =
+a v2 of this
+series.
+
+Thanks,
+Shameer
+
+
 
 
