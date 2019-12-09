@@ -2,81 +2,69 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28607C2D0C4
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 22:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7E5C43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 22:59:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBF832071E
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 22:56:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C6+puMvg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBF832071E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 34611206D5
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 22:59:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34611206D5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieRxJ-0002wW-0z
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 17:56:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38527)
+	id 1ieRzu-00046T-7G
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 17:59:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39192)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ieRwf-0002Pl-Uz
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 17:56:04 -0500
+ (envelope-from <no-reply@patchew.org>) id 1ieRz9-0003h4-L2
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 17:58:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ieRwd-0006lE-PI
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 17:56:01 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35784)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ieRwd-0006kp-Ha; Mon, 09 Dec 2019 17:55:59 -0500
-Received: by mail-ot1-x342.google.com with SMTP id o9so13801395ote.2;
- Mon, 09 Dec 2019 14:55:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=qNIButN8xfU6H2RHDrQjQv1vuyGbA4BSQ6aIrfPqbsw=;
- b=C6+puMvg8uTrpN6aZTe5Czbi5br2zEL5wFBdFmXLkTwy/1iRH4ljcRtHH3b++xHDgi
- Ec2/57JgGfUzafjvfUcNRrqU82mvkDlljJv0meEJHBZ4jfdgqME7sCPtkCfSmUxDagAs
- vwSxxYkyv3WadPXTzg9sNLm0vfn7hIkeEteWBFZpsNjGMQ/OQ/vukNOkz8f8CNfFOqLK
- 7cbdJr0+UjtVYFVFYBxu0KWHq8EfRwf8T1JGxAaOy8R5/mXPYFONlzzkTVrynVxZOjri
- SQnM4exJZHyTAiS2pT+ZpxZFduWTwd6GW+/0uA+v6yOEEpVZ33JIXkAGBC1H5zP3qqvp
- ctjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=qNIButN8xfU6H2RHDrQjQv1vuyGbA4BSQ6aIrfPqbsw=;
- b=YWeSLxW5LBEitiq+4z5yn11Z0qtwZIhJ7XzTzikfWDzOiRqIGmVTt9dWJawVUE0ZUu
- QxL31/HOGh6hXUcLXQi6n99suFn70tWSXKQhrilflH2EQ+ULf5iAhCQ1TwtEagqc9qHR
- D1CMMLwjXJXIBNyjwgxTAsihyVKGw5Ee1NklMPQnt3CP2MWS27nDBGu3yApjHn641Xmf
- DYd+fH+gcUBj7hLJM709kAKdZFbjX6qqD3rpUHyNyqAUQBcdpRXsBenlDymf5KITbWFr
- t636dXc020WrY+l9TFtQ5cLDiItH6zHuT7epQxxt7La7Ce2uz/L72PFrTpdWTxJZyVx/
- 0kUQ==
-X-Gm-Message-State: APjAAAXxnHuGZoEj0+yT1IIdh45GU5F8agMx1KyCljhrSz00AMxjVLLb
- JDiAvzs492eJkwAGyFqLzCTMj9SaLd0T5KG7FJA=
-X-Google-Smtp-Source: APXvYqxMdS9qFHcxLULeHrMk/B6371hsohXuTKKVKsSjGPqlbzInzs/FCnA2nQ5lGRUu0wKPmewNny5RL+8PWKr6Biw=
-X-Received: by 2002:a9d:7c8f:: with SMTP id q15mr14354241otn.341.1575932158664; 
- Mon, 09 Dec 2019 14:55:58 -0800 (PST)
+ (envelope-from <no-reply@patchew.org>) id 1ieRz7-0007ph-Ph
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 17:58:35 -0500
+Resent-Date: Mon, 09 Dec 2019 17:58:35 -0500
+Resent-Message-Id: <E1ieRz7-0007ph-Ph@eggs.gnu.org>
+Received: from sender4-of-o50.zoho.com ([136.143.188.50]:21052)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1ieRz7-0007nY-I3
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 17:58:33 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1575932306; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=eNDEFRIhK3mhfdWsNs4ZiWnMYXvm3VD1VkqRosRbve6p2loS6EwaGtlU/YqReWm89dSLtFWX4x6WoINaZy4i17D6JoosGyEIZXc7Yvoaz6x/WaB2+ImROKVepBKkxg0PA2u8fwOTK9PiFcvjgvPSm+g3pAOOgfX5m+SGflr3sSE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1575932306;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=WBZmA++vd/6Ckrmtauq7DIzeFS7lZWj0Rg/yQhP9Rkk=; 
+ b=VyRZhrzkBE5549PVPaMg9eWZNZeCwKKl3RSyvAtbuUqb0q58X0+55HXKvLUUciV/KpSStU9Ec05WH17IKbpwLPEoVjOYnmFCTiH0XJllt/H1KgtnGQJV4Z29Tre+dJggXFnuVBQ9mup8XT+oLhbiTOEEqHDt/BjaM39t5r0FX3U=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1575932305314470.42331718350397;
+ Mon, 9 Dec 2019 14:58:25 -0800 (PST)
+In-Reply-To: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
+Subject: Re: [PATCH v2 00/18] Complete the implementation of -accel
+Message-ID: <157593230433.7675.14777048512232643228@37313f22b938>
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Mon, 9 Dec 2019 14:55:58 -0800 (PST)
-In-Reply-To: <cover.1575914822.git.alistair.francis@wdc.com>
-References: <cover.1575914822.git.alistair.francis@wdc.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 9 Dec 2019 23:55:58 +0100
-Message-ID: <CAL1e-=gCcvYeRw0=vpC0QGcO_UzOtKJVLnLkAuETZ+KgoLO-iA@mail.gmail.com>
-Subject: Re: [PATCH v1 00/36] Add RISC-V Hypervisor Extension v0.5
-To: Alistair Francis <alistair.francis@wdc.com>
-Content-Type: multipart/alternative; boundary="00000000000081e4a205994d4c0f"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: pbonzini@redhat.com
+Date: Mon, 9 Dec 2019 14:58:25 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,343 +76,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "palmer@dabbelt.com" <palmer@dabbelt.com>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "alistair23@gmail.com" <alistair23@gmail.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, qemu-devel@nongnu.org, elmarco@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000081e4a205994d4c0f
-Content-Type: text/plain; charset="UTF-8"
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc1OTAzNzA1LTEyOTI1LTEt
+Z2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
+ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
+IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYyIDAwLzE4XSBDb21wbGV0
+ZSB0aGUgaW1wbGVtZW50YXRpb24gb2YgLWFjY2VsClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAx
+NTc1OTAzNzA1LTEyOTI1LTEtZ2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbQoKPT09
+IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAv
+ZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBk
+aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
+ayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5j
+aCAndGVzdCcKZmFiYjhiMyBrdm06IGNvbnZlcnQgIi1tYWNoaW5lIGtlcm5lbF9pcnFjaGlwIiB0
+byBhbiBhY2NlbGVyYXRvciBwcm9wZXJ0eQo2YTFkYmVlIGt2bTogaW50cm9kdWNlIGt2bV9rZXJu
+ZWxfaXJxY2hpcF8qIGZ1bmN0aW9ucwo4MDBjOTU4IGt2bTogY29udmVydCAiLW1hY2hpbmUga3Zt
+X3NoYWRvd19tZW0iIHRvIGFuIGFjY2VsZXJhdG9yIHByb3BlcnR5CmQ3MmQzZWEgeGVuOiBjb252
+ZXJ0ICItbWFjaGluZSBpZ2QtcGFzc3RocnUiIHRvIGFuIGFjY2VsZXJhdG9yIHByb3BlcnR5CjI0
+MDY3YjIgdGNnOiBhZGQgIi1hY2NlbCB0Y2csIHRiLXNpemUiIGFuZCBkZXByZWNhdGUgIi10Yi1z
+aXplIgo4YjQyYTdlIHRjZzogY29udmVydCAiLWFjY2VsIHRocmVhZHMiIHRvIGEgUU9NIHByb3Bl
+cnR5CjNlYmQ1MWQgYWNjZWw6IHBhc3Mgb2JqZWN0IHRvIGFjY2VsX2luaXRfbWFjaGluZQo0MzUx
+NTk0IHFvbTogYWRkIG9iamVjdF9uZXdfd2l0aF9jbGFzcwozMTRmYjgwIHFvbTogaW50cm9kdWNl
+IG9iamVjdF9yZWdpc3Rlcl9zdWdhcl9wcm9wCjA5OTU2NTQgdmw6IHdhcm4gZm9yIHVuYXZhaWxh
+YmxlIGFjY2VsZXJhdG9ycywgY2xhcmlmeSBtZXNzYWdlcwo1YzdiOTA0IHZsOiBjb25maWd1cmUg
+YWNjZWxlcmF0b3JzIGZyb20gLWFjY2VsIG9wdGlvbnMKNmE0ZGE5MyB2bDogaW50cm9kdWNlIG9i
+amVjdF9wYXJzZV9wcm9wZXJ0eV9vcHQKYTRiOTg4MCBhY2NlbDogY29tcGlsZSBhY2NlbC9hY2Nl
+bC5jIGp1c3Qgb25jZQo2MmNkYzc5IHZsOiBtZXJnZSAtYWNjZWwgcHJvY2Vzc2luZyBpbnRvIGNv
+bmZpZ3VyZV9hY2NlbGVyYXRvcnMKNjI0NjM1NyB2bDogZXh0cmFjdCBhY2NlbGVyYXRvciBvcHRp
+b24gcHJvY2Vzc2luZyB0byBhIHNlcGFyYXRlIGZ1bmN0aW9uCjYzODc3YjkgdGNnOiBtb3ZlIHFl
+bXVfdGNnX2NvbmZpZ3VyZSB0byBhY2NlbC90Y2cvdGNnLWFsbC5jCjFiZDAxZTYgdmw6IG1vdmUg
+aWNvdW50IGNvbmZpZ3VyYXRpb24gZWFybGllcgo4NmQ0MTRkIG1lbW9yeTogZG8gbm90IGxvb2sg
+YXQgY3VycmVudF9tYWNoaW5lLT5hY2NlbAoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xOCBDaGVj
+a2luZyBjb21taXQgODZkNDE0ZDg2NTEzIChtZW1vcnk6IGRvIG5vdCBsb29rIGF0IGN1cnJlbnRf
+bWFjaGluZS0+YWNjZWwpCjIvMTggQ2hlY2tpbmcgY29tbWl0IDFiZDAxZTYyY2NhZiAodmw6IG1v
+dmUgaWNvdW50IGNvbmZpZ3VyYXRpb24gZWFybGllcikKMy8xOCBDaGVja2luZyBjb21taXQgNjM4
+NzdiOTRhZDE1ICh0Y2c6IG1vdmUgcWVtdV90Y2dfY29uZmlndXJlIHRvIGFjY2VsL3RjZy90Y2ct
+YWxsLmMpCjQvMTggQ2hlY2tpbmcgY29tbWl0IDYyNDYzNTc5YzI4ZiAodmw6IGV4dHJhY3QgYWNj
+ZWxlcmF0b3Igb3B0aW9uIHByb2Nlc3NpbmcgdG8gYSBzZXBhcmF0ZSBmdW5jdGlvbikKNS8xOCBD
+aGVja2luZyBjb21taXQgNjJjZGM3OTg2Zjg5ICh2bDogbWVyZ2UgLWFjY2VsIHByb2Nlc3Npbmcg
+aW50byBjb25maWd1cmVfYWNjZWxlcmF0b3JzKQo2LzE4IENoZWNraW5nIGNvbW1pdCBhNGI5ODgw
+MGU2YTIgKGFjY2VsOiBjb21waWxlIGFjY2VsL2FjY2VsLmMganVzdCBvbmNlKQo3LzE4IENoZWNr
+aW5nIGNvbW1pdCA2YTRkYTkzYjE1YjAgKHZsOiBpbnRyb2R1Y2Ugb2JqZWN0X3BhcnNlX3Byb3Bl
+cnR5X29wdCkKOC8xOCBDaGVja2luZyBjb21taXQgNWM3YjkwNGJmMzQ0ICh2bDogY29uZmlndXJl
+IGFjY2VsZXJhdG9ycyBmcm9tIC1hY2NlbCBvcHRpb25zKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMjA2OiBGSUxFOiB2bC5jOjI5MDk6CisgICAgICAgICAgICBlcnJvcl9yZXBv
+cnQoIlRoZSAtYWNjZWwgYW5kIFwiLW1hY2hpbmUgYWNjZWw9XCIgb3B0aW9ucyBhcmUgaW5jb21w
+YXRpYmxlIik7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjE0OiBGSUxFOiB2
+bC5jOjI5MTU6CisgICAgICAgICAgICAgICAgICAgICAgICAgICBkb19jb25maWd1cmVfYWNjZWxl
+cmF0b3IsICZpbml0X2ZhaWxlZCwgJmVycm9yX2ZhdGFsKSkgewoKdG90YWw6IDAgZXJyb3JzLCAy
+IHdhcm5pbmdzLCAxOTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8xOCBoYXMgc3R5bGUgcHJvYmxl
+bXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3Np
+dGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1B
+SU5UQUlORVJTLgo5LzE4IENoZWNraW5nIGNvbW1pdCAwOTk1NjU0NTA0ODcgKHZsOiB3YXJuIGZv
+ciB1bmF2YWlsYWJsZSBhY2NlbGVyYXRvcnMsIGNsYXJpZnkgbWVzc2FnZXMpCjEwLzE4IENoZWNr
+aW5nIGNvbW1pdCAzMTRmYjgwZDlhMmMgKHFvbTogaW50cm9kdWNlIG9iamVjdF9yZWdpc3Rlcl9z
+dWdhcl9wcm9wKQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjQ6IEZJTEU6IGlu
+Y2x1ZGUvcW9tL29iamVjdC5oOjY4MjoKK3ZvaWQgb2JqZWN0X3JlZ2lzdGVyX3N1Z2FyX3Byb3Ao
+Y29uc3QgY2hhciAqZHJpdmVyLCBjb25zdCBjaGFyICpwcm9wLCBjb25zdCBjaGFyICp2YWx1ZSk7
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNDg6IEZJTEU6IHFvbS9vYmplY3Qu
+Yzo0Mjg6Cit2b2lkIG9iamVjdF9yZWdpc3Rlcl9zdWdhcl9wcm9wKGNvbnN0IGNoYXIgKmRyaXZl
+ciwgY29uc3QgY2hhciAqcHJvcCwgY29uc3QgY2hhciAqdmFsdWUpCgp0b3RhbDogMCBlcnJvcnMs
+IDIgd2FybmluZ3MsIDYxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDEwLzE4IGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCjExLzE4IENoZWNraW5nIGNvbW1pdCA0MzUxNTk0MTkyYzAgKHFvbTogYWRk
+IG9iamVjdF9uZXdfd2l0aF9jbGFzcykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzE0MjogRklMRTogdmwuYzozOTkyOgorICAgIGN1cnJlbnRfbWFjaGluZSA9IE1BQ0hJTkUob2Jq
+ZWN0X25ld193aXRoX2NsYXNzKE9CSkVDVF9DTEFTUyhtYWNoaW5lX2NsYXNzKSkpOwoKdG90YWw6
+IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCA5NiBsaW5lcyBjaGVja2VkCgpQYXRjaCAxMS8xOCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoxMi8xOCBDaGVja2luZyBjb21taXQgM2ViZDUxZGMzODkz
+IChhY2NlbDogcGFzcyBvYmplY3QgdG8gYWNjZWxfaW5pdF9tYWNoaW5lKQoxMy8xOCBDaGVja2lu
+ZyBjb21taXQgOGI0MmE3ZTI1ZjNmICh0Y2c6IGNvbnZlcnQgIi1hY2NlbCB0aHJlYWRzIiB0byBh
+IFFPTSBwcm9wZXJ0eSkKMTQvMTggQ2hlY2tpbmcgY29tbWl0IDI0MDY3YjJkNzdkNiAodGNnOiBh
+ZGQgIi1hY2NlbCB0Y2csIHRiLXNpemUiIGFuZCBkZXByZWNhdGUgIi10Yi1zaXplIikKRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxODk6IEZJTEU6IHZsLmM6Mzc1MDoKKyAgICAgICAg
+ICAgICAgICB3YXJuX3JlcG9ydCgiVGhlIC10Yi1zaXplIG9wdGlvbiBpcyBkZXByZWNhdGVkLCB1
+c2UgLWFjY2VsIHRjZyx0Yi1zaXplIGluc3RlYWQiKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBj
+aGFyYWN0ZXJzCiMxOTA6IEZJTEU6IHZsLmM6Mzc1MToKKyAgICAgICAgICAgICAgICBvYmplY3Rf
+cmVnaXN0ZXJfc3VnYXJfcHJvcChBQ0NFTF9DTEFTU19OQU1FKCJ0Y2ciKSwgInRiLXNpemUiLCBv
+cHRhcmcpOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNDggbGluZXMgY2hlY2tlZAoK
+UGF0Y2ggMTQvMTggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjE1LzE4IENoZWNraW5nIGNv
+bW1pdCBkNzJkM2VhNWU3ZTQgKHhlbjogY29udmVydCAiLW1hY2hpbmUgaWdkLXBhc3N0aHJ1IiB0
+byBhbiBhY2NlbGVyYXRvciBwcm9wZXJ0eSkKMTYvMTggQ2hlY2tpbmcgY29tbWl0IDgwMGM5NTgx
+OWJhNyAoa3ZtOiBjb252ZXJ0ICItbWFjaGluZSBrdm1fc2hhZG93X21lbSIgdG8gYW4gYWNjZWxl
+cmF0b3IgcHJvcGVydHkpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMjg6IEZJ
+TEU6IHRhcmdldC9pMzg2L2t2bS5jOjIxNjY6CisgICAgc2hhZG93X21lbSA9IG9iamVjdF9wcm9w
+ZXJ0eV9nZXRfaW50KE9CSkVDVChzKSwgImt2bS1zaGFkb3ctbWVtIiwgJmVycm9yX2Fib3J0KTsK
+CnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTk3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2
+LzE4IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzE4IENoZWNraW5nIGNvbW1pdCA2YTFk
+YmVlN2Y2MTAgKGt2bTogaW50cm9kdWNlIGt2bV9rZXJuZWxfaXJxY2hpcF8qIGZ1bmN0aW9ucykK
+MTgvMTggQ2hlY2tpbmcgY29tbWl0IGZhYmI4YjMwYTcxMSAoa3ZtOiBjb252ZXJ0ICItbWFjaGlu
+ZSBrZXJuZWxfaXJxY2hpcCIgdG8gYW4gYWNjZWxlcmF0b3IgcHJvcGVydHkpCldBUk5JTkc6IEJs
+b2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM4NTogRklM
+RTogYWNjZWwva3ZtL2t2bS1hbGwuYzozMDA3OgorICAgICAgICAgICAgLyogVGhlIHZhbHVlIHdh
+cyBjaGVja2VkIGluIHZpc2l0X3R5cGVfT25PZmZTcGxpdCgpIGFib3ZlLiBJZgoKdG90YWw6IDAg
+ZXJyb3JzLCAxIHdhcm5pbmdzLCAyNDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTgvMTggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhp
+dGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3Bh
+dGNoZXcub3JnL2xvZ3MvMTU3NTkwMzcwNS0xMjkyNS0xLWdpdC1zZW5kLWVtYWlsLXBib256aW5p
+QHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBn
+ZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10u
+ClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-On Monday, December 9, 2019, Alistair Francis <alistair.francis@wdc.com>
-wrote:
-
-> This patch series adds the RISC-V Hypervisor extension v0.5. This is the
-> latest draft spec of the Hypervisor extension.
->
->
-Hi, Alistair,
-
-I have a question for you:
-
-Let's say this series is accepted. And let's say, next year, the draft spec
-of RISC-V Hypervisor extension v0.6 is released, and you or somebody else
-comes up with series on QEMU support for it, and that series is accepted
-too. What would happen afterwards:
-
-A. Both support for v0.5 and v0.6 would continue to coexist perpetually
-
-B. Support for v0.5 would be deprecated according to QEMU deprecation
-rules, and in two cycle would disappear
-
-C. Support for v0.5 would abruptly stop existing
-
-D. Something else
-
-?
-
-Thanks,
-Aleksandar
-
-
-
-> The Hypervisor extension is disabled by default, so this series should
-> result in no changes to anyone using QEMU unless they enable the
-> extension. The extention can be enabled with the -cpu property (see
-> below).
->
-> Testing of this implementation has been done by using the baremetal
-> Xvisor Hypervisor. We are able to run two Linux guests (that's all I
-> have tried) as guests in 64-bit. In 32-bit so far I can only run
-> baremetal guests, but I think this is a baremetal boot loader issue and
-> not an issue in QEMU.
->
-> The RISC-V KVM implementation was also written using these patches. The
-> KVM implementation is currently under review.
->
-> At the moment this spec is in a draft state and is subject to change. As
-> QEMU is extreamly useful in early bring up I think it makes sense for
-> QEMU to support non-frozen extensions.
->
-> Thanks to Anup for doing the initial port of Xvisor. The port is avaliable
-> here:
-> https://github.com/avpatel/xvisor-next and will run on QEMU.
->
-> Also thanks to Atish for implementing the SBI call support in Xvisor and
-> for lots of help debugging.
->
-> To run this yourself:
->  1. Apply this patch series to QEMU. The latest branch can be found here:
->       https://github.com/alistair23/qemu/tree/mainline/alistair/
-> riscv-hyp-ext-v0.5.next
->  2. Get the version of OpenSBI that supports the H extension. This can
->     be found here:
->       https://github.com/avpatel/opensbi/tree/riscv_hyp_ext_0_5_v1
->  3. Build the next release of Xvisor. It is available here:
->       https://github.com/avpatel/xvisor-next
->  4. Make sure you build the Xvisor tests, see here for details:
->       https://github.com/avpatel/xvisor-next/tree/master/tests/
-> riscv/virt64/linux
->  5. Run QEMU:
->      ./riscv64-softmmu/qemu-system-riscv64 -nographic \
->        -machine virt -cpu rv64,x-h=true \
->        -serial mon:stdio -serial null -m 4G \
->        -device loader,file=vmm.bin,addr=0x80200000 \
->        -kernel fw_jump.elf \
->        -initrd vmm-disk-linux.img \
->        -append "vmm.console=uart@10000000 vmm.bootcmd=\"vfs mount initrd
-> /;vfs run /boot.xscript;vfs cat /system/banner.txt\""
->
->    Once you get to the prompt you can start the geust by running:
->      guest kick guest0
->    You can then bind to the serial port using:
->      vserial bind guest0/uart0
->    Then you can start Linux using:
->      autoexec
->
->  This was all tested with the mainline 5.2/5.3 kernels.
->
-> There is very early work on a Xen port as well which is avaliable here:
-> https://github.com/alistair23/xen/tree/alistair/riscv-port
->
-> ToDo/Issues
->  - Get 32-bit fully working
->
->
->
-> Alistair Francis (36):
->   target/riscv: Convert MIP CSR to target_ulong
->   target/riscv: Don't set write permissions on dirty PTEs
->   target/riscv: Add the Hypervisor extension
->   target/riscv: Add the Hypervisor CSRs to CPUState
->   target/riscv: Add support for the new execption numbers
->   target/riscv: Rename the H irqs to VS irqs
->   target/riscv: Add the virtulisation mode
->   target/riscv: Add the force HS exception mode
->   target/riscv: Fix CSR perm checking for HS mode
->   target/riscv: Print priv and virt in disas log
->   target/riscv: Dump Hypervisor registers if enabled
->   target/riscv: Add Hypervisor CSR access functions
->   target/riscv: Add Hypervisor virtual CSRs accesses
->   target/riscv: Add Hypervisor virtual CSRs accesses
->   target/riscv: Convert mstatus to pointers
->   target/riscv: Add virtual register swapping function
->   target/riscv: Set VS bits in mideleg for Hyp extension
->   target/riscv: Extend the MIE CSR to support virtulisation
->   target/riscv: Extend the SIP CSR to support virtulisation
->   target/riscv: Add support for virtual interrupt setting
->   target/ricsv: Flush the TLB on virtulisation mode changes
->   target/riscv: Generate illegal instruction on WFI when V=1
->   target/riscv: Add hypvervisor trap support
->   target/riscv: Add Hypervisor trap return support
->   target/riscv: Add hfence instructions
->   target/riscv: Remove the hret instruction
->   target/riscv: Disable guest FP support based on virtual status
->   target/riscv: Mark both sstatus and vsstatus as dirty
->   target/riscv: Respect MPRV and SPRV for floating point ops
->   target/riscv: Allow specifying MMU stage
->   target/riscv: Implement second stage MMU
->   target/riscv: Raise the new execptions when 2nd stage translation
->     fails
->   target/riscv: Set htval and mtval2 on execptions
->   target/riscv: Add support for the 32-bit MSTATUSH CSR
->   target/riscv: Add the MSTATUS_MPV_ISSET helper macro
->   target/riscv: Allow enabling the Hypervisor extension
->
->  target/riscv/cpu.c                            |  71 ++-
->  target/riscv/cpu.h                            |  58 +-
->  target/riscv/cpu_bits.h                       | 111 ++--
->  target/riscv/cpu_helper.c                     | 501 +++++++++++++++---
->  target/riscv/csr.c                            | 389 +++++++++++++-
->  target/riscv/gdbstub.c                        |  11 +-
->  target/riscv/insn32.decode                    |  22 +-
->  .../riscv/insn_trans/trans_privileged.inc.c   |  45 +-
->  target/riscv/op_helper.c                      |  81 ++-
->  target/riscv/translate.c                      |  34 ++
->  10 files changed, 1161 insertions(+), 162 deletions(-)
->
-> --
-> 2.24.0
->
->
->
-
---00000000000081e4a205994d4c0f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Monday, December 9, 2019, Alistair Francis &lt;<a href=3D"mailto=
-:alistair.francis@wdc.com">alistair.francis@wdc.com</a>&gt; wrote:<br><bloc=
-kquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #cc=
-c solid;padding-left:1ex">This patch series adds the RISC-V Hypervisor exte=
-nsion v0.5. This is the<br>
-latest draft spec of the Hypervisor extension.<br>
-<br></blockquote><div><br></div><div>Hi, Alistair,</div><div><br></div><div=
->I have a question for you:</div><div><br></div><div>Let&#39;s say this ser=
-ies is accepted. And let&#39;s say, next year, the draft spec of RISC-V Hyp=
-ervisor extension v0.6 is released, and you or somebody else comes up with =
-series on QEMU support for it, and that series is accepted too. What would =
-happen afterwards:</div><div><br></div><div>A. Both support for v0.5 and v0=
-.6 would continue to coexist perpetually</div><div><br></div><div>B. Suppor=
-t for v0.5 would be deprecated according to QEMU deprecation rules, and in =
-two cycle would disappear</div><div><br></div><div>C. Support for v0.5 woul=
-d abruptly stop existing</div><div><br></div><div>D. Something else</div><d=
-iv><br></div><div>?</div><div><br></div><div>Thanks,</div><div>Aleksandar</=
-div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-The Hypervisor extension is disabled by default, so this series should<br>
-result in no changes to anyone using QEMU unless they enable the<br>
-extension. The extention can be enabled with the -cpu property (see<br>
-below).<br>
-<br>
-Testing of this implementation has been done by using the baremetal<br>
-Xvisor Hypervisor. We are able to run two Linux guests (that&#39;s all I<br=
->
-have tried) as guests in 64-bit. In 32-bit so far I can only run<br>
-baremetal guests, but I think this is a baremetal boot loader issue and<br>
-not an issue in QEMU.<br>
-<br>
-The RISC-V KVM implementation was also written using these patches. The<br>
-KVM implementation is currently under review.<br>
-<br>
-At the moment this spec is in a draft state and is subject to change. As<br=
->
-QEMU is extreamly useful in early bring up I think it makes sense for<br>
-QEMU to support non-frozen extensions.<br>
-<br>
-Thanks to Anup for doing the initial port of Xvisor. The port is avaliable =
-here:<br>
-<a href=3D"https://github.com/avpatel/xvisor-next" target=3D"_blank">https:=
-//github.com/avpatel/<wbr>xvisor-next</a> and will run on QEMU.<br>
-<br>
-Also thanks to Atish for implementing the SBI call support in Xvisor and<br=
->
-for lots of help debugging.<br>
-<br>
-To run this yourself:<br>
-=C2=A01. Apply this patch series to QEMU. The latest branch can be found he=
-re:<br>
-=C2=A0 =C2=A0 =C2=A0 <a href=3D"https://github.com/alistair23/qemu/tree/mai=
-nline/alistair/riscv-hyp-ext-v0.5.next" target=3D"_blank">https://github.co=
-m/alistair23/<wbr>qemu/tree/mainline/alistair/<wbr>riscv-hyp-ext-v0.5.next<=
-/a><br>
-=C2=A02. Get the version of OpenSBI that supports the H extension. This can=
-<br>
-=C2=A0 =C2=A0 be found here:<br>
-=C2=A0 =C2=A0 =C2=A0 <a href=3D"https://github.com/avpatel/opensbi/tree/ris=
-cv_hyp_ext_0_5_v1" target=3D"_blank">https://github.com/avpatel/<wbr>opensb=
-i/tree/riscv_hyp_ext_0_<wbr>5_v1</a><br>
-=C2=A03. Build the next release of Xvisor. It is available here:<br>
-=C2=A0 =C2=A0 =C2=A0 <a href=3D"https://github.com/avpatel/xvisor-next" tar=
-get=3D"_blank">https://github.com/avpatel/<wbr>xvisor-next</a><br>
-=C2=A04. Make sure you build the Xvisor tests, see here for details:<br>
-=C2=A0 =C2=A0 =C2=A0 <a href=3D"https://github.com/avpatel/xvisor-next/tree=
-/master/tests/riscv/virt64/linux" target=3D"_blank">https://github.com/avpa=
-tel/<wbr>xvisor-next/tree/master/tests/<wbr>riscv/virt64/linux</a><br>
-=C2=A05. Run QEMU:<br>
-=C2=A0 =C2=A0 =C2=A0./riscv64-softmmu/qemu-system-<wbr>riscv64 -nographic \=
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0-machine virt -cpu rv64,x-h=3Dtrue \<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0-serial mon:stdio -serial null -m 4G \<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0-device loader,file=3Dvmm.bin,addr=3D<wbr>0x8020=
-0000 \<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0-kernel fw_jump.elf \<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0-initrd vmm-disk-linux.img \<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0-append &quot;vmm.console=3Duart@10000000 vmm.bo=
-otcmd=3D\&quot;vfs mount initrd /;vfs run /boot.xscript;vfs cat /system/ban=
-ner.txt\&quot;&quot;<br>
-<br>
-=C2=A0 =C2=A0Once you get to the prompt you can start the geust by running:=
-<br>
-=C2=A0 =C2=A0 =C2=A0guest kick guest0<br>
-=C2=A0 =C2=A0You can then bind to the serial port using:<br>
-=C2=A0 =C2=A0 =C2=A0vserial bind guest0/uart0<br>
-=C2=A0 =C2=A0Then you can start Linux using:<br>
-=C2=A0 =C2=A0 =C2=A0autoexec<br>
-<br>
-=C2=A0This was all tested with the mainline 5.2/5.3 kernels.<br>
-<br>
-There is very early work on a Xen port as well which is avaliable here:<br>
-<a href=3D"https://github.com/alistair23/xen/tree/alistair/riscv-port" targ=
-et=3D"_blank">https://github.com/alistair23/<wbr>xen/tree/alistair/riscv-po=
-rt</a><br>
-<br>
-ToDo/Issues<br>
-=C2=A0- Get 32-bit fully working<br>
-<br>
-<br>
-<br>
-Alistair Francis (36):<br>
-=C2=A0 target/riscv: Convert MIP CSR to target_ulong<br>
-=C2=A0 target/riscv: Don&#39;t set write permissions on dirty PTEs<br>
-=C2=A0 target/riscv: Add the Hypervisor extension<br>
-=C2=A0 target/riscv: Add the Hypervisor CSRs to CPUState<br>
-=C2=A0 target/riscv: Add support for the new execption numbers<br>
-=C2=A0 target/riscv: Rename the H irqs to VS irqs<br>
-=C2=A0 target/riscv: Add the virtulisation mode<br>
-=C2=A0 target/riscv: Add the force HS exception mode<br>
-=C2=A0 target/riscv: Fix CSR perm checking for HS mode<br>
-=C2=A0 target/riscv: Print priv and virt in disas log<br>
-=C2=A0 target/riscv: Dump Hypervisor registers if enabled<br>
-=C2=A0 target/riscv: Add Hypervisor CSR access functions<br>
-=C2=A0 target/riscv: Add Hypervisor virtual CSRs accesses<br>
-=C2=A0 target/riscv: Add Hypervisor virtual CSRs accesses<br>
-=C2=A0 target/riscv: Convert mstatus to pointers<br>
-=C2=A0 target/riscv: Add virtual register swapping function<br>
-=C2=A0 target/riscv: Set VS bits in mideleg for Hyp extension<br>
-=C2=A0 target/riscv: Extend the MIE CSR to support virtulisation<br>
-=C2=A0 target/riscv: Extend the SIP CSR to support virtulisation<br>
-=C2=A0 target/riscv: Add support for virtual interrupt setting<br>
-=C2=A0 target/ricsv: Flush the TLB on virtulisation mode changes<br>
-=C2=A0 target/riscv: Generate illegal instruction on WFI when V=3D1<br>
-=C2=A0 target/riscv: Add hypvervisor trap support<br>
-=C2=A0 target/riscv: Add Hypervisor trap return support<br>
-=C2=A0 target/riscv: Add hfence instructions<br>
-=C2=A0 target/riscv: Remove the hret instruction<br>
-=C2=A0 target/riscv: Disable guest FP support based on virtual status<br>
-=C2=A0 target/riscv: Mark both sstatus and vsstatus as dirty<br>
-=C2=A0 target/riscv: Respect MPRV and SPRV for floating point ops<br>
-=C2=A0 target/riscv: Allow specifying MMU stage<br>
-=C2=A0 target/riscv: Implement second stage MMU<br>
-=C2=A0 target/riscv: Raise the new execptions when 2nd stage translation<br=
->
-=C2=A0 =C2=A0 fails<br>
-=C2=A0 target/riscv: Set htval and mtval2 on execptions<br>
-=C2=A0 target/riscv: Add support for the 32-bit MSTATUSH CSR<br>
-=C2=A0 target/riscv: Add the MSTATUS_MPV_ISSET helper macro<br>
-=C2=A0 target/riscv: Allow enabling the Hypervisor extension<br>
-<br>
-=C2=A0target/riscv/cpu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 71 ++-<br>
-=C2=A0target/riscv/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 58 +-<br>
-=C2=A0target/riscv/cpu_bits.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 111 ++--<br>
-=C2=A0target/riscv/cpu_helper.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 501 +++++++++++++++---<br>
-=C2=A0target/riscv/csr.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 389 +++++++++++++-<br>
-=C2=A0target/riscv/gdbstub.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 11 +-<br>
-=C2=A0target/riscv/insn32.decode=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 22 +-<br>
-=C2=A0.../riscv/insn_trans/trans_<wbr>privileged.inc.c=C2=A0 =C2=A0|=C2=A0 =
-45 +-<br>
-=C2=A0target/riscv/op_helper.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 81 ++-<br>
-=C2=A0target/riscv/translate.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 34 ++<br>
-=C2=A010 files changed, 1161 insertions(+), 162 deletions(-)<br>
-<br>
--- <br>
-2.24.0<br>
-<br>
-<br>
-</blockquote>
-
---00000000000081e4a205994d4c0f--
 
