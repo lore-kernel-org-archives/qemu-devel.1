@@ -2,75 +2,86 @@ Return-Path: <SRS0=fi8h=Z7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F19C43603
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 14:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E2AC43603
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:04:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF894207FD
-	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 14:53:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F1E220726
+	for <qemu-devel@archiver.kernel.org>; Mon,  9 Dec 2019 15:04:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GNnV3LJH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF894207FD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sk1JqgRj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F1E220726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieKPl-000116-Ts
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 09:53:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44229)
+	id 1ieKaC-0005El-Su
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 10:04:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47018)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ieKP5-0000Tm-As
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 09:52:52 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ieKXn-0003Kl-S0
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:01:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ieKP3-00035v-T0
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 09:52:50 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38505
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ieKP3-00035Z-PX
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 09:52:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575903169;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=iq86KGxLR6UTYXmMeKI1ArfzDy3UjI2qkFgCjrf2gXY=;
- b=GNnV3LJHlvcY+zLk0DvcJCGJ1GL+EfNxUJEuhy5PbEej3CTZhYNG9Q5IKEF+Tou5wnqegD
- FWzOtlJ7nzEbqSUwtu6IKE0uEoIj+hg1PipqwVJS72XNhtiNJNNR1uEGZwPB8u6TZHsdCV
- hwSmriGLTioyIgXYaKZ0Pyqn7fRHROU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-280-MQfb8sPxN6yLSrYgTqbD9Q-1; Mon, 09 Dec 2019 09:52:45 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA285800D4E;
- Mon,  9 Dec 2019 14:52:44 +0000 (UTC)
-Received: from thuth.com (ovpn-116-121.ams2.redhat.com [10.36.116.121])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1D3EC10372C0;
- Mon,  9 Dec 2019 14:52:42 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Greg Kurz <groug@kaod.org>,
-	qemu-devel@nongnu.org
-Subject: [PATCH] virtfs: Remove the deprecated "-virtfs_synth" option
-Date: Mon,  9 Dec 2019 15:52:40 +0100
-Message-Id: <20191209145240.9271-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: MQfb8sPxN6yLSrYgTqbD9Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ieKXm-0001Cj-SQ
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:01:51 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52828)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1ieKXm-0001CC-LQ
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 10:01:50 -0500
+Received: by mail-wm1-x344.google.com with SMTP id p9so15826614wmc.2
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 07:01:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=aB/U/Tf7guynfrwJbWpfYI+QRcweDccxGqmzLn8iwE8=;
+ b=sk1JqgRjhOOTr/dRvGHkiH1p7uHgB+CVM18UIPOXrpZhbYnRlrbR7qYmXbJm+NqPh5
+ HOW7KUy+BTldeVw34HHJD4t5H41DSio7UNdj1dP6I84U0A8d641c5Em57lHw+nUhIP9l
+ UwQ+Tf7gSymC86/GYraCe6iUrLEpwJr65S4gJPNHg0RzEXU/z4kYHcKCdNdI9bUDR2ve
+ 2+Hg1EWjXJ1448TVrpezcLXX8nP25fqRqw97ABQOZHY6YLRrOhWbkcwC34Q9MlYazABe
+ XfogqzsAWw0YVerOGgXFBrSHn++wfFLSPbTO875k28077a3VI1QpWg4ys7kCbjlpR7oW
+ obZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=aB/U/Tf7guynfrwJbWpfYI+QRcweDccxGqmzLn8iwE8=;
+ b=o5JC25k4ShpkiwLXI37B+e4ibUHNm8veo+B6leYJDsz87LbDaQiT5ieshwQXHFdR4V
+ i+ZeQ3LdCFXXjBb7xGMyiLdORu5eAX2Kge98pCIryu6fqfrV8CK+GZcjd67RGmDCUbbj
+ yCg7agNKiNQnerSMua9RmsWSiBZnyuvP9z051jJ/ORRU+m7HLMlA7a536+ntFc3UUd08
+ isdeovKT4kHihBe6Is8gEot1QxiDUc6vnOJNZsehkyjYsetqzNqHJOYyyNNyiJUyE9LK
+ wCbHoaDThIan3kHPPGJaTEQv6CBVLzWkqAOxYqO42z2O2vbizD4oRT+kaFcytJwN9w6p
+ ZOxQ==
+X-Gm-Message-State: APjAAAV6Zdo/xNG7rBNj7gk8Mn0AUT4hs0o21iYnhbuFDpNE1lpLgH8s
+ Nua8cKUkcDF9UaPLIOHOsyog+pA/
+X-Google-Smtp-Source: APXvYqyQRF5WjfoEOlGUpyWr04KG4TTpEclG8hBiFJIoujG7eRKtcSBbMSGw79YhtW6i8GmzZiVs5A==
+X-Received: by 2002:a1c:750f:: with SMTP id o15mr25987309wmc.161.1575903708518; 
+ Mon, 09 Dec 2019 07:01:48 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id g9sm27219371wro.67.2019.12.09.07.01.47
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 09 Dec 2019 07:01:47 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 01/18] memory: do not look at current_machine->accel
+Date: Mon,  9 Dec 2019 16:01:28 +0100
+Message-Id: <1575903705-12925-2-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
+References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,100 +93,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: thuth@redhat.com, elmarco@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's been marked as deprecated since QEMU v4.1, time to remove it now.
+"info mtree -f" prints the wrong accelerator name if used with for example
+"-machine accel=kvm:tcg".  The right thing to do is to fetch the name
+from the AccelClass, which will also work nicely once
+current_machine->accel stops existing.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- qemu-deprecated.texi |  5 -----
- qemu-options.hx      | 10 ----------
- vl.c                 | 23 -----------------------
- 3 files changed, 38 deletions(-)
+ memory.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 2f9efb45ba..3745334e80 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -84,11 +84,6 @@ error in the future.
- The @code{-realtime mlock=3Don|off} argument has been replaced by the
- @code{-overcommit mem-lock=3Don|off} argument.
-=20
--@subsection -virtfs_synth (since 4.1)
--
--The ``-virtfs_synth'' argument is now deprecated. Please use ``-fsdev synt=
-h''
--and ``-device virtio-9p-...'' instead.
--
- @subsection -numa node,mem=3D@var{size} (since 4.1)
-=20
- The parameter @option{mem} of @option{-numa node} is used to assign a part=
- of
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 65c9473b73..4cf7751ade 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -1468,16 +1468,6 @@ would still return entries from other devices).
- @end table
- ETEXI
-=20
--DEF("virtfs_synth", 0, QEMU_OPTION_virtfs_synth,
--    "-virtfs_synth Create synthetic file system image\n",
--    QEMU_ARCH_ALL)
--STEXI
--@item -virtfs_synth
--@findex -virtfs_synth
--Create synthetic file system image. Note that this option is now deprecate=
-d.
--Please use @code{-fsdev synth} and @code{-device virtio-9p-...} instead.
--ETEXI
--
- DEF("iscsi", HAS_ARG, QEMU_OPTION_iscsi,
-     "-iscsi [user=3Duser][,password=3Dpassword]\n"
-     "       [,header-digest=3DCRC32C|CR32C-NONE|NONE-CRC32C|NONE\n"
-diff --git a/vl.c b/vl.c
-index 6a65a64bfd..c0904b365b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3374,29 +3374,6 @@ int main(int argc, char **argv, char **envp)
-                              qemu_opt_get(opts, "mount_tag"), &error_abort=
-);
-                 break;
+diff --git a/memory.c b/memory.c
+index 06484c2..6d79cf1 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2979,7 +2979,6 @@ struct FlatViewInfo {
+     bool dispatch_tree;
+     bool owner;
+     AccelClass *ac;
+-    const char *ac_name;
+ };
+ 
+ static void mtree_print_flatview(gpointer key, gpointer value,
+@@ -3049,7 +3048,7 @@ static void mtree_print_flatview(gpointer key, gpointer value,
+                 if (fvi->ac->has_memory(current_machine, as,
+                                         int128_get64(range->addr.start),
+                                         MR_SIZE(range->addr.size) + 1)) {
+-                    qemu_printf(" %s", fvi->ac_name);
++                    qemu_printf(" %s", fvi->ac->name);
+                 }
              }
--            case QEMU_OPTION_virtfs_synth: {
--                QemuOpts *fsdev;
--                QemuOpts *device;
--
--                warn_report("'-virtfs_synth' is deprecated, please use "
--                             "'-fsdev synth' and '-device virtio-9p-...' "
--                            "instead");
--
--                fsdev =3D qemu_opts_create(qemu_find_opts("fsdev"), "v_syn=
-th",
--                                         1, NULL);
--                if (!fsdev) {
--                    error_report("duplicate option: %s", "virtfs_synth");
--                    exit(1);
--                }
--                qemu_opt_set(fsdev, "fsdriver", "synth", &error_abort);
--
--                device =3D qemu_opts_create(qemu_find_opts("device"), NULL=
-, 0,
--                                          &error_abort);
--                qemu_opt_set(device, "driver", "virtio-9p-pci", &error_abo=
-rt);
--                qemu_opt_set(device, "fsdev", "v_synth", &error_abort);
--                qemu_opt_set(device, "mount_tag", "v_synth", &error_abort)=
-;
--                break;
--            }
-             case QEMU_OPTION_serial:
-                 add_device_config(DEV_SERIAL, optarg);
-                 default_serial =3D 0;
---=20
-2.18.1
+         }
+@@ -3097,8 +3096,6 @@ void mtree_info(bool flatview, bool dispatch_tree, bool owner)
+ 
+         if (ac->has_memory) {
+             fvi.ac = ac;
+-            fvi.ac_name = current_machine->accel ? current_machine->accel :
+-                object_class_get_name(OBJECT_CLASS(ac));
+         }
+ 
+         /* Gather all FVs in one table */
+-- 
+1.8.3.1
+
 
 
