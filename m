@@ -2,101 +2,82 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB80C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 13:33:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F1E1C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 13:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBA962073B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 13:33:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF1D22073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 13:34:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VRDLrXqa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBA962073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UEsOVkCC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF1D22073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iefdo-0002kY-Lw
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 08:33:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38891)
+	id 1iefem-0003hT-1o
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 08:34:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39053)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iefct-0002LI-IF
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 08:32:32 -0500
+ (envelope-from <drjones@redhat.com>) id 1iefdU-0002jt-6a
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 08:33:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iefcs-0001uI-7i
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 08:32:31 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48950
+ (envelope-from <drjones@redhat.com>) id 1iefdP-00029C-Oo
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 08:33:08 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52106
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iefcs-0001uB-4F
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 08:32:30 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iefdP-00028e-Kj
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 08:33:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575984749;
+ s=mimecast20190719; t=1575984783;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6UOlvLt8ueS4279h2ZCjk2hDIPDPl9NF+jnphhKpw8k=;
- b=VRDLrXqanNRArb8RQt/FvpkZCSZNniwpkxiKyAYQ8FVVSFb7uD5/pODzVSjuTaoGZcZOzv
- 1fUO0UA0wf8/OTzkFBZyYm+d/NIrDB13SkHsUd30Wr15/Prc2tuJWum/C/jUhp1GjoiIaB
- 01jZeof+3vl9WSUSR9IZByU//QnBdd8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-49-MSnHPhIJMNKW-8uPV0MBFA-1; Tue, 10 Dec 2019 08:32:28 -0500
-Received: by mail-wr1-f71.google.com with SMTP id z15so9017778wrw.0
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 05:32:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=NplI3KVoD13rv+gBpXWGLlYYCili7TnLQtpvV8kFHaQ=;
- b=T3QHXW55B4C50atRNMZVsGxVUo0cLsziBkvLD8xuIl8oI4KNFwKvhrxXPp/kosnuNu
- SW+/eZ9OC9fh/5ZYnRkBX2+kXnaQowzfqaw4War1RKj0KzzeM56y97Xag1PalP4vQw8e
- SFr1PmBTJdmefVtuuiM+nMK9CcCn1dHtnzmmQT8+T2Lwtj5Yp+010C9pzNnKAUkkD+P4
- Nt4h2CKiLSLjQmqqYmJHPLn9MveT9rC3mPwHHg+x1GJ2eYwQYt6GQBjp4gDUnGCu5/5M
- aST+UjJsZlCL4ETPQNszYf4wbUFkLEO1T1UVZEROSsVEvCPsuusVMsqEH+ChIE99Ma48
- Kblg==
-X-Gm-Message-State: APjAAAV/ZrGavuoxJ8ETijGh/TIBte+NCk0h61ovP6VjuXDBjAyYD279
- M65/d7mAlJdhECb+Y7g22KIDqvMXSkwRcect5VIuK4/vzxQtav0oYJez+wktS6PwnHy52PSkB/Q
- lG//5vdo86ZCsvOs=
-X-Received: by 2002:adf:e74a:: with SMTP id c10mr3226237wrn.386.1575984746921; 
- Tue, 10 Dec 2019 05:32:26 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy80jOJJybpW9FFZuLr3Lyj856nFfW81hkQcjfy5OgwYwWb1F0SIC6DipIKKbXvY94HcC46Vw==
-X-Received: by 2002:adf:e74a:: with SMTP id c10mr3226215wrn.386.1575984746641; 
- Tue, 10 Dec 2019 05:32:26 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9?
- ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
- by smtp.gmail.com with ESMTPSA id g9sm3380511wro.67.2019.12.10.05.32.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Dec 2019 05:32:26 -0800 (PST)
-Subject: Re: [PATCH] hw/usb: Introduce Kconfig switches for the CCID card
- devices
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191210072048.15603-1-thuth@redhat.com>
- <c402f822-bbbc-7ece-2fb4-1a37484be05e@redhat.com>
- <ab65b73a-0c09-925f-054b-c8ddea8b5476@redhat.com>
- <20772e61-a66d-93ad-7728-dcd3b3fdeb31@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <b084a0fe-e3c5-5096-9c71-870fe0ee1ddc@redhat.com>
-Date: Tue, 10 Dec 2019 14:32:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=BXbA/XQp8OOzgFhmZ81cZEkMdjXPRMSfTmZl+9K0WPo=;
+ b=UEsOVkCCsOl5/FD/eX6KcgLF8xpaWdpE1woApVQQvkN4+WfOncBsXAzRGcFD3GMH/VbUPY
+ BwwX/RkvfziBifdk5YnGPHFyl/tDBEwcfVeNzV6Mho6dHKBi3q6YjuBTphpIU7k3IJ8G/7
+ KUGRSttYUTJ6Z5ldN3MFWa3hMF0a2EY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-217-DpCF9hjAPVSXaf81I2sYTQ-1; Tue, 10 Dec 2019 08:32:59 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B339800C76;
+ Tue, 10 Dec 2019 13:32:58 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 998255DA70;
+ Tue, 10 Dec 2019 13:32:56 +0000 (UTC)
+Date: Tue, 10 Dec 2019 14:32:54 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
+ virtual time
+Message-ID: <20191210133254.22vcpvr3eabcnthe@kamzik.brq.redhat.com>
+References: <20191016143410.5023-1-drjones@redhat.com>
+ <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
+ <20191206155327.7adiyjjkjh56mg2t@kamzik.brq.redhat.com>
+ <596d07e933cb4da48dbba5b492e81a2438e78a2f.camel@redhat.com>
+ <CAFEAcA9+G0jprsHRQp8g=Aso+2-_GhoWkDGx4WWxoC88maOKEg@mail.gmail.com>
+ <20191210110531.psjzlikir2ep2omo@kamzik.brq.redhat.com>
+ <CAFEAcA_M61hTzU=qCiUbR4V9Mnwd0phFNqTJG9pCWKreVmjy6A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20772e61-a66d-93ad-7728-dcd3b3fdeb31@redhat.com>
-Content-Language: en-US
-X-MC-Unique: MSnHPhIJMNKW-8uPV0MBFA-1
+In-Reply-To: <CAFEAcA_M61hTzU=qCiUbR4V9Mnwd0phFNqTJG9pCWKreVmjy6A@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: DpCF9hjAPVSXaf81I2sYTQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -111,120 +92,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>
+Cc: bijan.mottahedeh@oracle.com, Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Andrea Bolognani <abologna@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/12/19 14:27, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 12/10/19 9:11 AM, Thomas Huth wrote:
->> On 10/12/2019 08.43, Philippe Mathieu-Daud=C3=A9 wrote:
->>> On 12/10/19 8:20 AM, Thomas Huth wrote:
->>>> In our downstream distribution of QEMU, we need more fine-grained
->>>> control on the set of CCID card devices that we want to include.
->>>> So let's introduce some proper Kconfig switches that it is easier
->>>> to disable them without modifying the corresponding Makefile.objs.
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>> ---
->>>> =C2=A0=C2=A0 hw/usb/Kconfig=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 10 +=
-+++++++++
->>>> =C2=A0=C2=A0 hw/usb/Makefile.objs |=C2=A0 7 +++++--
->>>> =C2=A0=C2=A0 2 files changed, 15 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
->>>> index 555e09377b..1358847eba 100644
->>>> --- a/hw/usb/Kconfig
->>>> +++ b/hw/usb/Kconfig
->>>> @@ -96,3 +96,13 @@ config USB_STORAGE_MTP
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 default y
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 depends on USB
->>>> +
->>>> +config CCID_PASSTHRU
->>>> +=C2=A0=C2=A0=C2=A0 bool
->>>> +=C2=A0=C2=A0=C2=A0 default y
->>>> +=C2=A0=C2=A0=C2=A0 depends on USB_SMARTCARD
->>>> +
->>>> +config CCID_EMULATED
->>>> +=C2=A0=C2=A0=C2=A0 bool
->>>> +=C2=A0=C2=A0=C2=A0 default y
->>>> +=C2=A0=C2=A0=C2=A0 depends on USB_SMARTCARD
->>>> diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
->>>> index 303ac084a0..ebe103fb3d 100644
->>>> --- a/hw/usb/Makefile.objs
->>>> +++ b/hw/usb/Makefile.objs
->>>> @@ -29,11 +29,14 @@ common-obj-$(CONFIG_USB_BLUETOOTH)=C2=A0=C2=A0=C2=
-=A0 +=3D
->>>> dev-bluetooth.o
->>>> =C2=A0=C2=A0 =C2=A0 ifeq ($(CONFIG_USB_SMARTCARD),y)
->>>> =C2=A0=C2=A0 common-obj-y=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 +=3D dev-smartcard-reader.o
->>>> -common-obj-$(CONFIG_SMARTCARD)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 +=3D smartcard.mo
->>>> -smartcard.mo-objs :=3D ccid-card-passthru.o ccid-card-emulated.o
->>>> +ifeq ($(CONFIG_SMARTCARD),y)
->>>
->>> We don't need the 'ifeq ($(CONFIG_SMARTCARD),y)' ... endif anymore.
->>
->> I think we do. Both files #include <libcacard.h> thus can only be
->> compiled if CONFIG_SMARTCARD has been set.
->> Don't mix CONFIG_SMARTCARD up with CONFIG_USB_SMARTCARD - these are two
->> different switches!
+On Tue, Dec 10, 2019 at 11:48:38AM +0000, Peter Maydell wrote:
+> On Tue, 10 Dec 2019 at 11:05, Andrew Jones <drjones@redhat.com> wrote:
+> > x86 developers could easily add this feature if/when they need a way to
+> > disable their current default behavior. But, since the kvm-adjvtime
+> > default would likely be 'on' for them, then they'd probably prefer the
+> > feature be named kvm-no-adjvtime, and default 'off'. Should we try to
+> > anticipate what x86 might want when naming this feature? IMO, we should
+> > not, especially because I'm doubtful that x86 will ever want to impleme=
+nt
+> > it. Also, what about the other KVM capable architectures? Which default=
+s
+> > do they have now? And do we expect them to want to expose a switch to t=
+he
+> > user to change it?
 >=20
-> OK I missed SMARTCARD is not in Kconfig.host.
->=20
-> What about adding that to your patch and remove the ifeq():
->=20
-> -- >8 --
-> diff --git a/Kconfig.host b/Kconfig.host
-> index bb6e116e2a..b532358854 100644
-> --- a/Kconfig.host
-> +++ b/Kconfig.host
-> @@ -35,3 +35,6 @@ config VIRTFS
->=20
-> =C2=A0config PVRDMA
-> =C2=A0=C2=A0=C2=A0=C2=A0 bool
-> +
-> +config SMARTCARD
-> +=C2=A0=C2=A0=C2=A0 bool
-> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
-> index 555e09377b..b3292a5cc9 100644
-> --- a/hw/usb/Kconfig
-> +++ b/hw/usb/Kconfig
-> @@ -90,7 +90,7 @@ config USB_BLUETOOTH
-> =C2=A0config USB_SMARTCARD
-> =C2=A0=C2=A0=C2=A0=C2=A0 bool
-> =C2=A0=C2=A0=C2=A0=C2=A0 default y
-> -=C2=A0=C2=A0=C2=A0 depends on USB
-> +=C2=A0=C2=A0=C2=A0 depends on SMARTCARD && USB
->=20
-> =C2=A0config USB_STORAGE_MTP
-> =C2=A0=C2=A0=C2=A0=C2=A0 bool
+> My perspective here is mostly that I don't really understand
+> the ins and outs of KVM and in particular handling of
+> time in VMs, beyond knowing that it's complicated. So I
+> prefer approaches that push back to "do everything the same
+> for all architectures rather than having something that's
+> arm-specific", because then things get more review from
+> the larger mass of non-arm KVM/QEMU developers. Arm-specific
+> switches/interfaces/designs just make arm more of a
+> special-snowflake. I don't really have a basis to be able
+> to review the patchset beyond those general biases.
+>
 
-Yes, this is a good idea.
+So the ins and outs of this particular timekeeping issue (to the best of
+my knowledge) is that x86 has implemented this behavior since
+00f4d64ee76e ("kvmclock: clock should count only if vm is running"), which
+was committed over six years ago. Possibly x86 VM time would behave more
+like arm VM time if kvmclock was disabled, but that's not a recommended
+configuration.
 
-Paolo
+PPC got an equivalent patch to the x86 one in 2017, 42043e4f1241 ("spapr:
+clock should count only if vm is running"), but when stopping time during
+pause on spapr they actually *keep* 'date' and 'hwclock' in synch. I guess
+whatever clocksource 'hwclock' uses on spapr was already stopping when
+paused? For x86 those values diverge, and for arm without this series they
+stay the same but experience jumps, and with this series they diverge like
+x86. I don't see any way to disable the behaviour 42043e4f1241 introduces.
 
-> ---
->=20
->>>> +common-obj-$(call
->>>> lor,$(CONFIG_CCID_PASSTHRU),$(CONFIG_CCID_EMULATED)) +=3D smartcard.mo
->>>> +smartcard.mo-objs :=3D $(call
->>>> lif,$(CONFIG_CCID_PASSTHRU),ccid-card-passthru.o) \
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 $(call
->>>> lif,$(CONFIG_CCID_EMULATED),ccid-card-emulated.o)
->>>> =C2=A0=C2=A0 smartcard.mo-cflags :=3D $(SMARTCARD_CFLAGS)
->>>> =C2=A0=C2=A0 smartcard.mo-libs :=3D $(SMARTCARD_LIBS)
->>>> =C2=A0=C2=A0 endif
->>>> +endif
->>>> =C2=A0=C2=A0 =C2=A0 ifeq ($(CONFIG_POSIX),y)
->>>> =C2=A0=C2=A0 common-obj-$(CONFIG_USB_STORAGE_MTP)=C2=A0 +=3D dev-mtp.o
->>>>
->>>
->>
->=20
+s390x got what appears to be its equivalent patch last year 9bc9d3d1ae3b
+("s390x/tod: Properly stop the KVM TOD while the guest is not running").
+The commit message doesn't state how hwclock and date values change /
+don't change, and I don't see any way to disable the behavior.
+
+MIPS has had this implemented since KVM support was introduced. No way
+to disable it that I know of.
+
+So why is this arm-specific? arm is just trying to catch up, but also
+offer a switch allowing the current behavior to be selected. If other
+architectures see value in the switch then they're free to adopt it too.
+After having done this git mining, it looks more and more like we should
+at least consider naming this feature 'kvm-no-adjvtime' and probably
+also change arm's default.
+
+Thanks,
+drew
 
 
