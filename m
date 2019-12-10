@@ -6,79 +6,88 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 684C0C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1945C2D0BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:35:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F64C2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:30:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8BFD52073D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:35:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wjwluSQ1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F64C2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iSlaNMM0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BFD52073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52982 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iecmU-0001Bd-9u
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 05:30:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40301)
+	id 1iecrk-0002pT-LT
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 05:35:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iecls-0000gp-8Q
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:29:37 -0500
+ (envelope-from <armbru@redhat.com>) id 1iecqu-0002Bp-5V
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:34:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ieclr-0005qX-1Q
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:29:36 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36721)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ieclq-0005q8-SX
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:29:34 -0500
-Received: by mail-oi1-x242.google.com with SMTP id c16so9333026oic.3
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 02:29:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ti24g5Ml8cfyB8YPNcyhO9AecXFyWAWKkXXMl7FXl00=;
- b=wjwluSQ1qNM2r8wY1O0DiAsyN6DHzdrop036iklOQCL7dzWdo29Cj8x1Ol/AtaHO5/
- +9kRzICtxLb+WThzB/a65Sk6undmRl5SSUI+DbnhdwVvhtzDmikD+DKi72BaXdgLF0ge
- D2D5j5bB1wHy9IeXZ9IGPYZh8A+BGQlE/9LMIATDsHXTA1wNiLevnalEOoW9LKbTGwF3
- kEIHx/vH1mDTMaRaCK9ZF4yB49D2t/8J+39O9CrhgIaNgzcWe4RZqBvrugCBq3ADCzT1
- ydCdq156Nql2O7q0wriHO2zpNXbZt7nPSUKJoihE5Hj33YLDgPypt+LlBWfx0ryokIXC
- dV2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ti24g5Ml8cfyB8YPNcyhO9AecXFyWAWKkXXMl7FXl00=;
- b=mXW53SJxb3BvDadsnRT4vniNxTrRLLvWrYKROWWx7EPt+2YPap8n9gNE7qh3sBA+af
- 0vGV/jDW34fUvUxX/u/WN5zokD6O9L+CLGAMpOioBZYiF53V4O2/OTdbVPR3SWYYwGTL
- afsfZ6YQ2tRs3/mumc0jKxykGUdfO2jbxrtSc3rC58rYc1PGhkW+QXpwZnSQOYeD+Ela
- V4YMNecCpzcSBnTFboOpp4X6soeAAMoipc48xMOn4uzf99sUtHROnMUje3EzsO5TEUMi
- 11ywbIoU1xqZQt0u8gz0rIKHsv0q/TziIR2LLILTZoBWk4sWt6AGObiZIOXJoDWfqFLT
- ZICw==
-X-Gm-Message-State: APjAAAV37wrp5vX7BJOywwjerXjOB9zLUhCp9QBq4ndPnrLHgpDBu9go
- 2DAiR1RQv33aHNUmkv6c43Ebo3TM0ePzUzuPFaA9Mw==
-X-Google-Smtp-Source: APXvYqx4rTi+YVEJMvNpW3CY+zwgfAxZ7qsdv3+IMUaFdB7N0TsvxXWY3Pp0jrCrXoe0fmpiKY5zTgzFtaO3RH+TTk0=
-X-Received: by 2002:a05:6808:996:: with SMTP id
- a22mr3143457oic.146.1575973773941; 
- Tue, 10 Dec 2019 02:29:33 -0800 (PST)
+ (envelope-from <armbru@redhat.com>) id 1iecqr-0007KI-2W
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:34:46 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29702
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iecqq-0007JY-Hd
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:34:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575974082;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TmTl8vVzDstJfwTs/KiCzHtcND47IpjWsKd4fkRatA4=;
+ b=iSlaNMM0T3lmonsTYpN0rE6RjKoUadGEqnJEtgWo92bfs8UtlVXcW7vrKjJxrL3BMAs8NO
+ N0eHWPBdp+KSHL8FCHGGq2mRdaL5aelk7nvFiHSzRRO3ZLtG429Cib57m76fNSUPpACfBC
+ 48b5EhRGIM00VKHfz937FdJvlgi+Pik=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-yTDVnDjiMKmsrxp4wgnVsw-1; Tue, 10 Dec 2019 05:34:39 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5481E107ACC9;
+ Tue, 10 Dec 2019 10:34:38 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-181.ams2.redhat.com
+ [10.36.116.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 81D361001938;
+ Tue, 10 Dec 2019 10:34:33 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 1470711386A7; Tue, 10 Dec 2019 11:34:32 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH 2/2] Add -mem-shared option
+References: <20191128172807.788e6aeb@redhat.com>
+ <CAJ+F1CLZxhMf-bOAB4sVfuB1yaUMqiO70-ogpKVS3CqfC7y5KA@mail.gmail.com>
+ <20191129110703.2b15c541@redhat.com>
+ <04dadf85-cd35-fd37-9642-8087cba625bd@redhat.com>
+ <20191129131652.6683b769@redhat.com>
+ <528bb183-3d44-e541-8765-9c0e01f23157@redhat.com>
+ <20191202083948.3e8bb134@redhat.com>
+ <20191202210057.GQ14595@habkost.net>
+ <1ff4cc6a-0ec8-96ff-1e39-e682429852e4@redhat.com>
+ <20191203154303.035c33b3@redhat.com>
+ <20191209205840.GJ498046@habkost.net>
+Date: Tue, 10 Dec 2019 11:34:32 +0100
+In-Reply-To: <20191209205840.GJ498046@habkost.net> (Eduardo Habkost's message
+ of "Mon, 9 Dec 2019 17:58:40 -0300")
+Message-ID: <87tv6831vr.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-References: <20191016143410.5023-1-drjones@redhat.com>
- <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
- <20191206155327.7adiyjjkjh56mg2t@kamzik.brq.redhat.com>
- <596d07e933cb4da48dbba5b492e81a2438e78a2f.camel@redhat.com>
-In-Reply-To: <596d07e933cb4da48dbba5b492e81a2438e78a2f.camel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Dec 2019 10:29:22 +0000
-Message-ID: <CAFEAcA9+G0jprsHRQp8g=Aso+2-_GhoWkDGx4WWxoC88maOKEg@mail.gmail.com>
-Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
- virtual time
-To: Andrea Bolognani <abologna@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: yTDVnDjiMKmsrxp4wgnVsw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,54 +99,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, bijan.mottahedeh@oracle.com,
- Marc Zyngier <maz@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, libvir-list@redhat.com,
+ QEMU <qemu-devel@nongnu.org>,
+ =?utf-8?Q?Marc-A?= =?utf-8?Q?ndr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Dec 2019 at 09:51, Andrea Bolognani <abologna@redhat.com> wrote:
->
-> On Fri, 2019-12-06 at 16:53 +0100, Andrew Jones wrote:
-> > On Fri, Dec 06, 2019 at 03:22:58PM +0000, Peter Maydell wrote:
-> > > On Wed, 16 Oct 2019 at 15:34, Andrew Jones <drjones@redhat.com> wrote:
-> > > > This series is inspired by a series[1] posted by Bijan Mottahedeh about
-> > > > a year ago.  The problem described in the cover letter of [1] is easily
-> > > > reproducible and some users would like to have the option to avoid it.
-> > > > However the solution, which is to adjust the virtual counter offset each
-> > > > time the VM transitions to the running state, introduces a different
-> > > > problem, which is that the virtual and physical counters diverge.  As
-> > > > described in the cover letter of [1] this divergence is easily observed
-> > > > when comparing the output of `date` and `hwclock` after suspending the
-> > > > guest, waiting a while, and then resuming it.  Because this different
-> > > > problem may actually be worse for some users, unlike [1], the series
-> > > > posted here makes the virtual counter offset adjustment optional and not
-> > > > even enabled by default.  Besides the adjustment being optional, this
-> > > > series approaches the needed changes differently to apply them in more
-> > > > appropriate locations.  Finally, unlike [1], this series doesn't attempt
-> > > > to measure "pause time" itself.  Simply using QEMU_CLOCK_VIRTUAL, which
-> > > > only ticks when the VM is not stopped, is sufficient.
-> > >
-> > > So I guess my overall question is "what is the x86 solution to
-> > > this problem, and why is this all arm-specific?" It would also
-> >
-> > x86 adjusts the counter offset by default, and I don't think there's any
-> > way to turn that behavior off. I think it's too late to follow that
-> > default for arm, but this series provides a way to opt into the same
-> > behavior.
->
-> My understanding is that turning kvm-adjvtime either on or off
-> results in a different set of advantages and drawbacks, with neither
-> begin a one-size-fits-all solution. So it's good that we offer a way
-> for the user to pick one or the other based on their specific needs.
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-If this is the case, shouldn't we be looking at having the
-option exist for all architectures, not just arm? Obviously
-pre-existing behaviour would imply having the default have
-to differ for some archs/machines.
+> +Markus
+>
+> On Tue, Dec 03, 2019 at 03:43:03PM +0100, Igor Mammedov wrote:
+>> On Tue, 3 Dec 2019 09:56:15 +0100
+>> Thomas Huth <thuth@redhat.com> wrote:
+>>=20
+>> > On 02/12/2019 22.00, Eduardo Habkost wrote:
+>> > > On Mon, Dec 02, 2019 at 08:39:48AM +0100, Igor Mammedov wrote: =20
+>> > >> On Fri, 29 Nov 2019 18:46:12 +0100
+>> > >> Paolo Bonzini <pbonzini@redhat.com> wrote:
+>> > >> =20
+>> > >>> On 29/11/19 13:16, Igor Mammedov wrote: =20
+>> > >>>> As for "-m", I'd make it just an alias that translates
+>> > >>>>  -m/mem-path/mem-prealloc   =20
+>> > >>>
+>> > >>> I think we should just deprecate -mem-path/-mem-prealloc in 5.0.  =
+CCing
+>> > >>> Thomas as mister deprecation. :) =20
+>> > >>
+>> > >> I'll add that to my series =20
+>> > >=20
+>> > > Considering that the plan is to eventually reimplement those
+>> > > options as syntactic sugar for memory backend options (hopefully
+>> > > in less than 2 QEMU releases), what's the point of deprecating
+>> > > them? =20
+>> >=20
+>> > Well, it depends on the "classification" [1] of the parameter...
+>> >=20
+>> > Let's ask: What's the main purpose of the option?
+>> >=20
+>> > Is it easier to use than the "full" option, and thus likely to be used
+>> > by a lot of people who run QEMU directly from the CLI? In that case it
+>> > should stay as "convenience option" and not be deprecated.
+>> >=20
+>> > Or is the option merely there to give the upper layers like libvirt or
+>> > some few users and their scripts some more grace period to adapt their
+>> > code, but we all agree that the options are rather ugly and should
+>> > finally go away? Then it's rather a "legacy option" and the deprecatio=
+n
+>> > process is the right way to go. Our QEMU interface is still way=20
+>> > overcrowded, we should try to keep it as clean as possible.
+>>=20
+>> After switching to memdev for main RAM, users could use relatively
+>> short global options
+>>  -global memory-backend.prealloc|share=3Don
+>> and
+>>  -global memory-backend-file.mem-path=3DX|prealloc|share=3Don
+>>=20
+>> instead of us adding and maintaining slightly shorter
+>>  -mem-shared/-mem-path/-mem-prealloc
+>
+> Global properties are a convenient way to expose knobs through
+> the command line with little effort, but we have no documentation
+> on which QOM properties are really supposed to be touched by
+> users using -global.
+>
+> Unless we fix the lack of documentation, I'd prefer to have
+> syntactic sugar translated to -global instead of recommending
+> direct usage of -global.
 
-thanks
--- PMM
+Fair point.
+
+I'd take QOM property documentation over still more sugar.
+
+Sometimes, the practical way to make simple things simple is sugar.  I
+can accept that.  This doesn't look like such a case, though.
+
 
