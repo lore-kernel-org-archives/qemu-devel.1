@@ -2,69 +2,63 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D744C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 21:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB0EC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 21:25:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33F7A206D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 21:24:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33F7A206D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3252820838
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 21:25:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3252820838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iemzX-0000aL-9r
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 16:24:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39328)
+	id 1ien0a-0001WO-MY
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 16:25:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39496)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iemys-0000AH-HS
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 16:23:43 -0500
+ (envelope-from <groug@kaod.org>) id 1iemzm-0000yo-Qh
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 16:24:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iemyr-0001ym-1Q
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 16:23:42 -0500
-Resent-Date: Tue, 10 Dec 2019 16:23:42 -0500
-Resent-Message-Id: <E1iemyr-0001ym-1Q@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21197)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iemyq-0001yA-Q7
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 16:23:40 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1576013013; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=gEjjBMzRi6A3qQw8hSsE5RCkGZ8fUiCqGWq3XM5/I5W0EvGR8SBQABExZJW6tnf5TOMW0ziptdroruztWzsjbdMr8H8TbZ8JF6embUpClAWaCwcKJzMXvw0udSclNMwZUcEbFpGAXO02G49toRrBbOcbM6ZHdAyR91yEbQtOcwM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1576013013;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=nPK+cn5CSEJgiJ+wwXl+1Dc0ST6DkPpY0vrcFage5t8=; 
- b=f6wwyPjmKuBk40VKUxPF+QzYn4EygSaSKlUoVT3X5pX3gC+FqcQYSbsjhCZrI3LDACcRLxscS4gOg8Mf5gDmZUQLK0ocKiL4zKNu+VF3BWW0v0SiMPw95yZwViGEF4ohPn1UiSCy/4Hj+AJURjb9t2MeybmDqXtBzPBRrnCdf8o=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1576013011960625.0511011015284;
- Tue, 10 Dec 2019 13:23:31 -0800 (PST)
-In-Reply-To: <cover.1576012190.git.dirty@apple.com>
-Subject: Re: [PATCH v1 0/1] Fix bochs memory leak
-Message-ID: <157601301109.7675.10031550330342927267@37313f22b938>
+ (envelope-from <groug@kaod.org>) id 1iemzl-0002FB-MI
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 16:24:38 -0500
+Received: from 18.mo4.mail-out.ovh.net ([188.165.54.143]:45949)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iemzl-0002EG-Fx
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 16:24:37 -0500
+Received: from player738.ha.ovh.net (unknown [10.108.54.13])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id EFD1321672C
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 22:24:33 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player738.ha.ovh.net (Postfix) with ESMTPSA id 4263FD4205E1;
+ Tue, 10 Dec 2019 21:24:27 +0000 (UTC)
+Date: Tue, 10 Dec 2019 22:24:26 +0100
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 1/2] ppc/pnv: Loop on the whole hierarchy to populate
+ the DT with the XSCOM nodes
+Message-ID: <20191210222426.0c70918e@bahia.tlslab.ibm.com>
+In-Reply-To: <20191210135845.19773-2-clg@kaod.org>
+References: <20191210135845.19773-1-clg@kaod.org>
+ <20191210135845.19773-2-clg@kaod.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: qemu-devel@nongnu.org
-Date: Tue, 10 Dec 2019 13:23:31 -0800 (PST)
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 941533800825330059
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelfedgudegkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.51
+X-Received-From: 188.165.54.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,33 +70,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTc2MDEyMTkwLmdp
-dC5kaXJ0eUBhcHBsZS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21l
-IGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1h
-dGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MSAwLzFdIEZpeCBib2NocyBtZW1vcnkgbGVhawpUeXBl
-OiBzZXJpZXMKTWVzc2FnZS1pZDogY292ZXIuMTU3NjAxMjE5MC5naXQuZGlydHlAYXBwbGUuY29t
-Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFz
-ZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
-aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcg
-YnJhbmNoICd0ZXN0JwphM2M5ZTVkIGRpc3BsYXkvYm9jaHMtZGlzcGxheTogZml4IG1lbW9yeSBs
-ZWFrCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogTWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBs
-aW5lKHMpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDggbGluZXMgY2hlY2tlZAoKQ29t
-bWl0IGEzYzllNWRjOGMzMiAoZGlzcGxheS9ib2Nocy1kaXNwbGF5OiBmaXggbWVtb3J5IGxlYWsp
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21t
-YW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0
-dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL2NvdmVyLjE1NzYwMTIxOTAuZ2l0LmRpcnR5QGFwcGxlLmNv
-bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Tue, 10 Dec 2019 14:58:44 +0100
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+
+> Some PnvXScomInterface objects lie a bit deeper (PnvPBCQState) than
+> the first layer, so we need to loop on the whole object hierarchy to
+> catch them.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  hw/ppc/pnv_xscom.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> index bed41840845e..006d87e970d9 100644
+> --- a/hw/ppc/pnv_xscom.c
+> +++ b/hw/ppc/pnv_xscom.c
+> @@ -326,7 +326,12 @@ int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_=
+offset)
+>      args.fdt =3D fdt;
+>      args.xscom_offset =3D xscom_offset;
+> =20
+> -    object_child_foreach(OBJECT(chip), xscom_dt_child, &args);
+> +    /*
+> +     * Loop on the whole object hierarchy to catch all
+> +     * PnvXScomInterface objects which can lie a bit deeper the first
+> +     * layer.
+> +     */
+> +    object_child_foreach_recursive(OBJECT(chip), xscom_dt_child, &args);
+>      return 0;
+>  }
+> =20
 
 
