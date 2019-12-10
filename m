@@ -2,164 +2,89 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A1BC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 20:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 965CFC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 20:42:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6D5220652
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 20:28:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HDZTZmI0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6D5220652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6A2922053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 20:42:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A2922053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iem7r-0003aa-Uq
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 15:28:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49834)
+	id 1iemKl-0007ZU-Ho
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 15:42:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54710)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iem72-00031k-RR
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:28:06 -0500
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iemK8-00079M-Ki
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:41:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iem6z-000555-Ei
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:28:02 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30224
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iem6z-00054A-AZ
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:28:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576009680;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=k8UC/4pQhgXaRc4o/elYnYwcng1J5nFSVeBCf+OInT4=;
- b=HDZTZmI0lGgIL5t2W9bJ6rHTMILPHbVml+2FO60P1mY36I3R5tStGk0VSogyUxOnP5lRnx
- LOC+LvMM12AOLkXUwxQqaLQhaKW+4UHowyqF9n9tdP66vGQ843eNLYB6U3n1nNpqL6ANwr
- 4ow/xqa3VbBxaRVXXaDK/cvrL6NnOmA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-uwD3js-oOVyR1fOwj84bPQ-1; Tue, 10 Dec 2019 15:27:56 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CDAE801E77;
- Tue, 10 Dec 2019 20:27:55 +0000 (UTC)
-Received: from [10.18.17.145] (dhcp-17-145.bos.redhat.com [10.18.17.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9FB7C5D6A5;
- Tue, 10 Dec 2019 20:27:54 +0000 (UTC)
-Subject: Re: [bugfix ping2] Re: [PATCH v2 0/2] fix
- qcow2_can_store_new_dirty_bitmap
-To: Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191014115126.15360-1-vsementsov@virtuozzo.com>
- <e89b8844-26c7-0768-f6dd-6faa814551e2@virtuozzo.com>
- <0db82122-ee0d-a346-cb49-d902d5d66b77@virtuozzo.com>
- <cbba2b12-da7d-eed8-1f6b-fc2412f82ff8@redhat.com>
- <a67b4a16-773c-52c8-288a-0e9e032b4589@redhat.com>
- <466a95d3-e808-02d1-94df-27bf1e4e13ee@redhat.com>
- <a7f98c9a-6b3e-c6a5-fd6d-96db14ed612f@redhat.com>
- <3f84b0c2-c95d-f42e-9494-8d67ff3ebc28@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <ea123cb2-4a4f-4321-723e-b0d12ab52657@redhat.com>
-Date: Tue, 10 Dec 2019 15:27:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iemK7-0004rb-A7
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:41:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60060
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+ id 1iemK7-0004qV-5S
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:41:35 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBAKZI31100077; Tue, 10 Dec 2019 15:41:32 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wtcd0t1xe-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 10 Dec 2019 15:41:32 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBAKeVMO015575;
+ Tue, 10 Dec 2019 20:41:31 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma02dal.us.ibm.com with ESMTP id 2wr3q6psv3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 10 Dec 2019 20:41:31 +0000
+Received: from b03ledav002.gho.boulder.ibm.com
+ (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBAKfUwr35782918
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 10 Dec 2019 20:41:30 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8CE3D136053;
+ Tue, 10 Dec 2019 20:41:30 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 64E37136055;
+ Tue, 10 Dec 2019 20:41:30 +0000 (GMT)
+Received: from localhost (unknown [9.53.179.218])
+ by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 10 Dec 2019 20:41:30 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <3f84b0c2-c95d-f42e-9494-8d67ff3ebc28@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: uwD3js-oOVyR1fOwj84bPQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+User-Agent: alot/0.7
+To: qemu-devel@nongnu.org
+Message-ID: <157601048672.32150.11808263059605506302@sif>
+Subject: [ANNOUNCE] QEMU 4.2.0-rc5 is now available
+Date: Tue, 10 Dec 2019 14:41:26 -0600
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-10_06:2019-12-10,2019-12-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 spamscore=0
+ lowpriorityscore=0 bulkscore=0 mlxscore=0 impostorscore=0 malwarescore=0
+ mlxlogscore=999 adultscore=0 clxscore=1015 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912100169
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -171,103 +96,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hello,
 
+On behalf of the QEMU Team, I'd like to announce the availability of the
+sixth release candidate for the QEMU 4.2 release.  This release is meant
+for testing purposes and should not be used in a production environment.
 
-On 12/10/19 8:24 AM, Max Reitz wrote:
-> On 10.12.19 09:11, Max Reitz wrote:
->> On 09.12.19 23:03, Eric Blake wrote:
->>> On 12/9/19 11:58 AM, Max Reitz wrote:
->>>> On 09.12.19 17:30, Max Reitz wrote:
->>>>> On 02.12.19 15:09, Vladimir Sementsov-Ogievskiy wrote:
->>>>>> Hi again!
->>>>>>
->>>>>> Still forgotten bug-fix :(
->>>>>>
->>>>>> Is it too late for 4.2?
->>>>>
->>>>> Sorry. :-/
->>>>>
->>>>> Yes, I think I just forgot it.=C2=A0 I don=E2=80=99t think it=E2=80=
-=99s too important for
->>>>> 4.2, so, well, it isn=E2=80=99t too bad, but...=C2=A0 Sorry.
->>>>>
->>>>>> I can't imagine better test, and it tests exactly what written in
->>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=3D1712636
->>>>>>
->>>>>> (Hmm, actually, I doubt that it is real use-case, more probably it's
->>>>>> a bug in management layer)
->>>>>>
->>>>>> So, take this with test or without test, to 4.2 or 5.0.
->>>>>
->>>>> I was thinking of seeing whether I could write a quicker test, but of
->>>>> course we should take the patch either way.
->>>>
->>>> OK, I give up.=C2=A0 It=E2=80=99s very much possible to create an imag=
-e with 65535
->>>> bitmaps very quickly (like, under a second) outside of qemu, but just
->>>> opening it takes 2:30 min (because of the quadratic complexity of
->>>> checking whether a bitmap of the same name already exists).
->>>
->>> Can we fix that to use a hash table for amortized O(1) lookup rather
->>> than the current O(n) lookup?
->>
->> Not unreasonable, considering that this is probably what we would=E2=80=
-=99ve
->> done from the start in any language where hash tables are built in.
->>
->> But OTOH when you have 66k bitmaps, you probably have other problems.
->> Like, writes being incredibly slow, because all those bitmaps have to be
->> updated.
->>
->> (Well, you can technically have 99 % of them disabled, but who=E2=80=99d=
- do such
->> a thing?)
->>
->> ((Maybe I=E2=80=99ll look into it.))
->=20
-> Hmm, now I did.  This gets the test down to 24 s.  Still not sure
-> whether it=E2=80=99s worth it, though...
->=20
-> Max
->=20
+  http://download.qemu-project.org/qemu-4.2.0-rc5.tar.xz
+  http://download.qemu-project.org/qemu-4.2.0-rc5.tar.xz.sig
 
-I agree we very likely have other problems once we reach resource usage
-of this level.
+A note from the maintainer:
 
+  rc5 contains three fixes for late-breaking release critical bugs:
+   * a QEMU crash when using KVM with an x86 host kernel with nested=3D0
+   * a guest crash in PPC spapr machines with pci bridges
+   * a crash involving bitmap handling in the qcow2 image format
+  =
 
-Still, if we want to make this blazing fast for the love of doing so:
+  We now plan to make the final release with no further
+  changes on Thursday, 2019-12-12.
 
-(1) Read in the directory *once*, and cache it. We have avoided doing
-this largely to feel more confident that the code is correct and is
-never working on an "outdated" version of the directory.
+You can help improve the quality of the QEMU 4.2 release by testing this
+release and reporting bugs on Launchpad:
 
-[On cache invalidation, we can write the directory back out to the
-bitmap, and delete our cache. The next time we need the list, we can
-reload it. This should alleviate consistency concerns.]
+  https://bugs.launchpad.net/qemu/
 
+The release plan, as well a documented known issues for release
+candidates, are available at:
 
-(2) Store the entries in an rbtree! 65536 entries is only ~16 lookups
-maximum in the worst case. I took a look at the linux rbtree
-implementation and did a very quick back-of-the-envelope benchmarking
-for inserting strings (len=3D32) into a tree:
+  http://wiki.qemu.org/Planning/4.2
 
-name generation 53151 usec
-insert [0-10] 5 usec
-insert [10-100] 14 usec
-insert [100-1000] 195 usec
-insert [1000-10000] 2919 usec
-insert [10000-65536] 41485 usec
+Please add entries to the ChangeLog for the 4.2 release below:
 
-This seems fast enough that we're likely going to be eclipsed just by
-other string handling concerns.
+  http://wiki.qemu.org/ChangeLog/4.2
 
---js
+Thank you to everyone involved!
+
+Changes since rc4:
+
+52901abf94: Update version for v4.2.0-rc5 release (Peter Maydell)
+f56281abd9: block/qcow2-bitmap: fix crash bug in qcow2_co_remove_persistent=
+_dirty_bitmap (Vladimir Sementsov-Ogievskiy)
+a2fad86497: pseries: Update SLOF firmware image (Alexey Kardashevskiy)
+2605188240: target/i386: disable VMX features if nested=3D0 (Yang Zhong)
 
 
