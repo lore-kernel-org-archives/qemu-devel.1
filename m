@@ -2,98 +2,82 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1613CC2D0BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 09:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E75FC2D0CB
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 09:15:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D772B206E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 09:11:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46E4D2073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 09:15:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FrR3lMwd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D772B206E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rf+lVwMA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E4D2073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iebYL-0003RL-UU
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 04:11:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59453)
+	id 1iebc3-00057L-Ej
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 04:15:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59794)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iebXg-0002ud-Tl
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:10:54 -0500
+ (envelope-from <laurent.desnogues@gmail.com>) id 1iebbL-0004hp-SC
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:14:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iebXf-00047z-Qn
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:10:52 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37549
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iebXf-00047X-NG
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:10:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575969051;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RXhaKz5t0SnmdGGWEp19gAGZ5Jhfzdl8xxTalkAiyCM=;
- b=FrR3lMwdT27jnGWmkBAqofznitoDSqTZsXL0E1lyVR7NDDsLYb601arlz71SgKbuJfvpI3
- a4QaP12mbkPYVG60bxZol+CL1nBCX6gLgocCb/U4F5CkdvjqUiHaeuTVENki7gHcbFvFOE
- M2bynN/gzdkbi53aMzzB2qDsF9jyn0w=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-cRy1oV7FNJqrlE1ptafbFw-1; Tue, 10 Dec 2019 04:10:50 -0500
-Received: by mail-wr1-f70.google.com with SMTP id v17so8661437wrm.17
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 01:10:50 -0800 (PST)
+ (envelope-from <laurent.desnogues@gmail.com>) id 1iebbK-0008JU-G2
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:14:39 -0500
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:32920)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
+ id 1iebbK-0008ID-BK
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:14:38 -0500
+Received: by mail-io1-xd41.google.com with SMTP id s25so3316240iob.0
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 01:14:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=4YGWiQYlzj8DlpvgbyfAyMasu3Ce5XpNh/eMVwQ71r8=;
+ b=rf+lVwMATLqzjds6z8Tuz58jRA3+yS0pD8fjTp230+M3U1Nk5i5oDhS9Gk8E2BlQI0
+ TwQ9qB1N1eVlaJ0UlXPdfCtwqyr/N5ukLzCNctVNINHKkV+0WYnfvFDMH2JRkGLadvq4
+ crwAPNdyw8FHxh7v3meN7ZH4oBrbgnCS57kLzvrVPyvcr1h5WpyFeNNsbq+X1xh5tMSZ
+ GsEcF+BCTwBaDAOeeH10wHnOVbJX/NrFM8asZKhJfDK33iWpiVf/fDtkUBBLWZPS12zi
+ Jju/WTjLgJWkF1AGbIqIWhn9H9OggGyXH7iVG+zADhF5e+y6qubjGj+/bH0nyd02LslW
+ pgWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=F8EemnXVmh3q0qbc4kn14DfmQcPahbm4unXi1nZ9NCc=;
- b=Ii0ug5LHy92iUomapGo+18ttEpJLr2ykQ4nr5JLjvgIh5sekuf8n4Ltc5Vy1Sergmq
- lfRbbREVIUWgcaRh14PqKR5OISb9vjfoQ/ULpqFNdXqVxKAy5JypmBWdy6rNw7ATy61a
- SnD/q7tNGPSbN2JyLvk4+QeijwpTaG90mbXRu6jx3CM2oN18Q+soQ3EDtAgcUhpuao3w
- FOVB95kgFrvfJdgk1OiQ4uuGF/T5bwqkoEpmGqwiuF8F4YP/JTTTUWrMHNslyOotX+cq
- gMgG3G02Tq9S/yrCtheQWla6J3Bd+VxufssnHWU2DzRWg/9nJcTWcwjojB5HD5Wi9gVm
- OqAw==
-X-Gm-Message-State: APjAAAWhr/xWPyCRFYb+gWx+gxGrbsQgGJq3CTDx9zMv3BaRhubxFt1w
- zFT0OlYtZvyWjIi8BoDz3jAriRS1jK/qXdSvOGKfmd03pwljud2dyrXimxRGDS3d1qut05oZWFC
- F2lNGZ3qvsuNAHCY=
-X-Received: by 2002:adf:ee45:: with SMTP id w5mr1867370wro.352.1575969048584; 
- Tue, 10 Dec 2019 01:10:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzR9lo1IU2hc4RwXyb2OWIY3dWQOIEHWCmgxi3Wn0LP+FuJOdDyNSPuyRA9X8RdvHG17r6jYQ==
-X-Received: by 2002:adf:ee45:: with SMTP id w5mr1867348wro.352.1575969048362; 
- Tue, 10 Dec 2019 01:10:48 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id z6sm2660313wrw.36.2019.12.10.01.10.47
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Dec 2019 01:10:47 -0800 (PST)
-Subject: Re: [PATCH] ppc: Drop useless extern annotation for functions
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <157596536058.115682.18155243603867418789.stgit@bahia.lan>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <49c6ac09-d047-0b51-147f-1e07a27adf22@redhat.com>
-Date: Tue, 10 Dec 2019 10:10:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=4YGWiQYlzj8DlpvgbyfAyMasu3Ce5XpNh/eMVwQ71r8=;
+ b=P82hRUjHHrDkdMzBQ2PqOd7pRbWw2meh4FwKspp9UAP5/lBsGwgQw2Nazo+ekezYgE
+ 3jaDl76RORxLEMA0718mPftCnFSsdX68QUiYQRgVZYCMfsVE/Saq1BQ2NmGyHn9eWWmk
+ 7HhmUiBFju9rjs4PW/mVx6cfA7IJf081ONS0lbfWqlA8QtePGPwv/vlTnIhPe1nQ5nB+
+ TfBkMQmKDD/88nP1yn7euEi0zkL1+TCzmazbN4IBX17FDg56uQ55uUoPRU7en39ym8Po
+ Wzn85PkDO+izp3b33GbE1yWBatR2mtuVi8ZDeP8eDNVdbUWYnfZgbxVmCaUMqjS5lQ2N
+ ILyQ==
+X-Gm-Message-State: APjAAAWwZhexk/Bhdjy+KsrbIvqizQL4AIl77KCWXrM2VP2WVAlfCamd
+ iV7XuZpRQJaReXQTariUjatSndXzcL9kjjy6XxQ=
+X-Google-Smtp-Source: APXvYqxOWTehnTxgIoZTNQSQ/GJuuKqqUAXfL2EKok31Az7B9etoD+umU3SHTO47Of8xWrSkykk5KsNLlAiGkqTejvI=
+X-Received: by 2002:a5e:df06:: with SMTP id f6mr24080351ioq.84.1575969276909; 
+ Tue, 10 Dec 2019 01:14:36 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <157596536058.115682.18155243603867418789.stgit@bahia.lan>
-Content-Language: en-US
-X-MC-Unique: cRy1oV7FNJqrlE1ptafbFw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <20191203022937.1474-1-richard.henderson@linaro.org>
+ <20191203022937.1474-5-richard.henderson@linaro.org>
+In-Reply-To: <20191203022937.1474-5-richard.henderson@linaro.org>
+From: Laurent Desnogues <laurent.desnogues@gmail.com>
+Date: Tue, 10 Dec 2019 10:14:26 +0100
+Message-ID: <CABoDooNO--7ABzKexAy7__2ED4sfyeA08ai5jxXBjy_DT+bzgw@mail.gmail.com>
+Subject: Re: [PATCH v4 04/40] target/arm: Add TTBR1_EL2
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,73 +89,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/10/19 9:09 AM, Greg Kurz wrote:
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Hi Richard,
+
+On Tue, Dec 3, 2019 at 3:35 AM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> At the same time, add writefn to TTBR0_EL2 and TCR_EL2.
+> A later patch will update any ASID therein.
+>
+> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->   include/hw/ppc/pnv_xscom.h |   22 +++++++++++-----------
->   include/hw/ppc/spapr_vio.h |    6 +++---
->   2 files changed, 14 insertions(+), 14 deletions(-)
->=20
-> diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
-> index a40d2a2a2a98..1c1d76bf9be5 100644
-> --- a/include/hw/ppc/pnv_xscom.h
-> +++ b/include/hw/ppc/pnv_xscom.h
-> @@ -109,16 +109,16 @@ typedef struct PnvXScomInterfaceClass {
->   #define PNV10_XSCOM_PSIHB_BASE     0x3011D00
->   #define PNV10_XSCOM_PSIHB_SIZE     0x100
->  =20
-> -extern void pnv_xscom_realize(PnvChip *chip, uint64_t size, Error **errp=
-);
-> -extern int pnv_dt_xscom(PnvChip *chip, void *fdt, int offset);
-> -
-> -extern void pnv_xscom_add_subregion(PnvChip *chip, hwaddr offset,
-> -                                    MemoryRegion *mr);
-> -extern void pnv_xscom_region_init(MemoryRegion *mr,
-> -                                  struct Object *owner,
-> -                                  const MemoryRegionOps *ops,
-> -                                  void *opaque,
-> -                                  const char *name,
-> -                                  uint64_t size);
-> +void pnv_xscom_realize(PnvChip *chip, uint64_t size, Error **errp);
-> +int pnv_dt_xscom(PnvChip *chip, void *fdt, int offset);
+>  target/arm/helper.c | 18 +++++++++++++-----
+>  1 file changed, 13 insertions(+), 5 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index b4d774632d..06ec4641f3 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3484,6 +3484,12 @@ static void vmsa_ttbr_write(CPUARMState *env, cons=
+t ARMCPRegInfo *ri,
+>      raw_write(env, ri, value);
+>  }
+>
+> +static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo=
+ *ri,
+> +                                    uint64_t value)
+> +{
+> +    raw_write(env, ri, value);
+> +}
 > +
-> +void pnv_xscom_add_subregion(PnvChip *chip, hwaddr offset,
-> +                             MemoryRegion *mr);
-> +void pnv_xscom_region_init(MemoryRegion *mr,
-> +                           struct Object *owner,
-> +                           const MemoryRegionOps *ops,
-> +                           void *opaque,
-> +                           const char *name,
-> +                           uint64_t size);
->  =20
->   #endif /* PPC_PNV_XSCOM_H */
-> diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
-> index 72762ed16b70..ce6d9b0c6605 100644
-> --- a/include/hw/ppc/spapr_vio.h
-> +++ b/include/hw/ppc/spapr_vio.h
-> @@ -80,10 +80,10 @@ struct SpaprVioBus {
->       uint32_t next_reg;
->   };
->  =20
-> -extern SpaprVioBus *spapr_vio_bus_init(void);
-> -extern SpaprVioDevice *spapr_vio_find_by_reg(SpaprVioBus *bus, uint32_t =
-reg);
-> +SpaprVioBus *spapr_vio_bus_init(void);
-> +SpaprVioDevice *spapr_vio_find_by_reg(SpaprVioBus *bus, uint32_t reg);
->   void spapr_dt_vdevice(SpaprVioBus *bus, void *fdt);
-> -extern gchar *spapr_vio_stdout_path(SpaprVioBus *bus);
-> +gchar *spapr_vio_stdout_path(SpaprVioBus *bus);
->  =20
->   static inline void spapr_vio_irq_pulse(SpaprVioDevice *dev)
->   {
->=20
->=20
+>  static void vttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
+>                          uint64_t value)
+>  {
+> @@ -4893,10 +4899,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
+>        .resetvalue =3D 0 },
+>      { .name =3D "TCR_EL2", .state =3D ARM_CP_STATE_BOTH,
+>        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 2, .crm =3D 0, .opc2 =3D 2,
+> -      .access =3D PL2_RW,
+> -      /* no .writefn needed as this can't cause an ASID change;
+> -       * no .raw_writefn or .resetfn needed as we never use mask/base_ma=
+sk
+> -       */
+> +      .access =3D PL2_RW, .writefn =3D vmsa_tcr_ttbr_el2_write,
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Are you sure you should call vmsa_tcr_ttbr_el2_write for a tcr_el2
+write?  As far as I can see, tcr_el2 has no ASID field in bits
+[63:48]. On the other hand there are various other bits in TCR_EL2
+that might require a TLB flush; for instance the A1 bit [22] that
+defines where to pick ASID from.
 
+Thanks,
+
+Laurent
+
+> +      /* no .raw_writefn or .resetfn needed as we never use mask/base_ma=
+sk */
+>        .fieldoffset =3D offsetof(CPUARMState, cp15.tcr_el[2]) },
+>      { .name =3D "VTCR", .state =3D ARM_CP_STATE_AA32,
+>        .cp =3D 15, .opc1 =3D 4, .crn =3D 2, .crm =3D 1, .opc2 =3D 2,
+> @@ -4930,7 +4934,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
+>        .fieldoffset =3D offsetof(CPUARMState, cp15.tpidr_el[2]) },
+>      { .name =3D "TTBR0_EL2", .state =3D ARM_CP_STATE_AA64,
+>        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 2, .crm =3D 0, .opc2 =3D 0,
+> -      .access =3D PL2_RW, .resetvalue =3D 0,
+> +      .access =3D PL2_RW, .resetvalue =3D 0, .writefn =3D vmsa_tcr_ttbr_=
+el2_write,
+>        .fieldoffset =3D offsetof(CPUARMState, cp15.ttbr0_el[2]) },
+>      { .name =3D "HTTBR", .cp =3D 15, .opc1 =3D 4, .crm =3D 2,
+>        .access =3D PL2_RW, .type =3D ARM_CP_64BIT | ARM_CP_ALIAS,
+> @@ -6959,6 +6963,10 @@ void register_cp_regs_for_features(ARMCPU *cpu)
+>                .opc0 =3D 3, .opc1 =3D 4, .crn =3D 13, .crm =3D 0, .opc2 =
+=3D 1,
+>                .access =3D PL2_RW,
+>                .fieldoffset =3D offsetof(CPUARMState, cp15.contextidr_el[=
+2]) },
+> +            { .name =3D "TTBR1_EL2", .state =3D ARM_CP_STATE_AA64,
+> +              .opc0 =3D 3, .opc1 =3D 4, .crn =3D 2, .crm =3D 0, .opc2 =
+=3D 1,
+> +              .access =3D PL2_RW, .writefn =3D vmsa_tcr_ttbr_el2_write,
+> +              .fieldoffset =3D offsetof(CPUARMState, cp15.ttbr1_el[2]) }=
+,
+>              REGINFO_SENTINEL
+>          };
+>          define_arm_cp_regs(cpu, vhe_reginfo);
+> --
+> 2.17.1
+>
+>
 
