@@ -2,64 +2,63 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0538BC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 04:16:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76257C2D0BE
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 04:16:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C37C22077B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 04:16:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44F152077B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 04:16:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="B34k2Y/v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C37C22077B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ghZw/RLp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44F152077B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieWwT-0008Kk-Sf
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 23:16:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59460)
+	id 1ieWwV-0008Lg-AR
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 23:16:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ieWvQ-0007K8-00
+ (envelope-from <dgibson@ozlabs.org>) id 1ieWvQ-0007K9-2J
  for qemu-devel@nongnu.org; Mon, 09 Dec 2019 23:15:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ieWvO-0007ya-OX
+ (envelope-from <dgibson@ozlabs.org>) id 1ieWvO-0007yV-Ny
  for qemu-devel@nongnu.org; Mon, 09 Dec 2019 23:15:03 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:60353 helo=ozlabs.org)
+Received: from ozlabs.org ([203.11.71.1]:53069)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ieWvN-0007vU-Lh; Mon, 09 Dec 2019 23:15:02 -0500
+ id 1ieWvN-0007vP-NE; Mon, 09 Dec 2019 23:15:02 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47X6Cj5MjPz9sP6; Tue, 10 Dec 2019 15:14:57 +1100 (AEDT)
+ id 47X6Cj4YV7z9sR8; Tue, 10 Dec 2019 15:14:57 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1575951297;
- bh=1RV5HCKYRZdkfpMExGY1W0h+9hklz0+HBY4S17Kw7pc=;
+ bh=svulIjJ5zf0/JraVL0RtsV6/IZHWwIZFaVe9UqWzXDk=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=B34k2Y/vj1bqSUyHJ6DQ81F4mQsdyWqktEGf8VNoZlp+4gU2bJl+JrfoQCCF5u8fX
- o9rzgbmO+tRbe0ADYQpVPrKBytnQKOVIU2g2wTb8+TtC5CSvcrslW6+EgByQn1QJBy
- xBfNCQOVc+PcxaSUNzpc9DPNGyb2eeXK9sJ47OVA=
-Date: Tue, 10 Dec 2019 14:58:56 +1100
+ b=ghZw/RLpXXRBJCOvDBLj4QqrLJn7Fg04gBTtrcmNQ0g864TvZ8oEzqDwg2zkzlSU+
+ aV7T5pOcu4Nd+2wHTJnHUWFLO3bmQMjHrjzLlyySSSte99qoWp59Gg9T5H4aHd3Ts4
+ 7ahC4tLoCdE/9hN7Bddkyg2xpr63C+HzNB8JYWHQ=
+Date: Tue, 10 Dec 2019 14:51:13 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [for-5.0 1/4] spapr,ppc: Simplify signature of kvmppc_rma_size()
-Message-ID: <20191210035856.GG207300@umbus.fritz.box>
-References: <20191129013504.145455-1-david@gibson.dropbear.id.au>
- <20191129013504.145455-2-david@gibson.dropbear.id.au>
- <375755db-f76f-508b-6b8e-f8ae19d83aff@kaod.org>
+Subject: Re: [PATCH 0/7] target/ppc: Implement KVM support under TCG (final
+ steps)
+Message-ID: <20191210035113.GF207300@umbus.fritz.box>
+References: <20191128134700.16091-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="cyV/sMl4KAhiehtf"
+ protocol="application/pgp-signature"; boundary="cpvLTH7QU4gwfq3S"
 Content-Disposition: inline
-In-Reply-To: <375755db-f76f-508b-6b8e-f8ae19d83aff@kaod.org>
+In-Reply-To: <20191128134700.16091-1-clg@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,46 +70,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aik@ozlabs.ru, lvivier@redhat.com, qemu-ppc@nongnu.org, groug@kaod.org,
- qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---cyV/sMl4KAhiehtf
+--cpvLTH7QU4gwfq3S
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 02, 2019 at 07:18:52PM +0100, C=E9dric Le Goater wrote:
-> > diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> > index c77f9848ec..09b3bd6443 100644
-> > --- a/target/ppc/kvm.c
-> > +++ b/target/ppc/kvm.c
-> > @@ -2101,7 +2101,7 @@ void kvmppc_hint_smt_possible(Error **errp)
-> > =20
-> > =20
-> >  #ifdef TARGET_PPC64
-> > -uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shif=
-t)
-> > +uint64_t kvmppc_vrma_limit(unsigned int hash_shift)
-> >  {
-> >      struct kvm_ppc_smmu_info info;
-> >      long rampagesize, best_page_shift;
-> > @@ -2128,8 +2128,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, u=
-nsigned int hash_shift)
-> >          }
-> >      }
-> > =20
-> > -    return MIN(current_size,
-> > -               1ULL << (best_page_shift + hash_shift - 7));
-> > +    return 1ULL << (best_page_shift + hash_shift - 7));
+On Thu, Nov 28, 2019 at 02:46:53PM +0100, C=E9dric Le Goater wrote:
+> Hello,
 >=20
-> The closing ')' should be removed.
+> This is a resend of Suraj's series adding KVM support to the QEMU
+> PowerNV machine under TCG :
+>=20
+>   http://patchwork.ozlabs.org/cover/1094658/
+>  =20
+> I have addressed the comments and kept for later the final patch
+> adding partition scoped radix tree translation. I need to educate
+> myself a bit more on the topic first.
 
-Oops, that's embarrassing.
+I've applied 1..4 to ppc-for-5.0, the rest I'm still trying to look at
+more closely.
 
+
+>=20
+> Thanks,
+>=20
+> C.=20
+>=20
+> C=E9dric Le Goater (1):
+>   target/ppc: add support for Hypervisor Facility Unavailable Exception
+>=20
+> Suraj Jitindar Singh (6):
+>   target/ppc: Implement the VTB for HV access
+>   target/ppc: Work [S]PURR implementation and add HV support
+>   target/ppc: Add SPR ASDR
+>   target/ppc: Add SPR TBU40
+>   target/ppc: Add privileged message send facilities
+>   target/ppc: Enforce that the root page directory size must be at least 5
+>=20
+>  include/hw/ppc/ppc.h            |   4 +-
+>  target/ppc/cpu.h                |  11 ++++
+>  target/ppc/helper.h             |   9 +++
+>  hw/ppc/ppc.c                    |  46 +++++++++++---
+>  linux-user/ppc/cpu_loop.c       |   5 ++
+>  target/ppc/excp_helper.c        |  52 ++++++++++++++--
+>  target/ppc/misc_helper.c        |  46 ++++++++++++++
+>  target/ppc/mmu-radix64.c        |   3 +
+>  target/ppc/timebase_helper.c    |  20 ++++++
+>  target/ppc/translate.c          |  30 +++++++++
+>  target/ppc/translate_init.inc.c | 105 +++++++++++++++++++++++++++-----
+>  11 files changed, 297 insertions(+), 34 deletions(-)
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -118,25 +133,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---cyV/sMl4KAhiehtf
+--cpvLTH7QU4gwfq3S
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3vGAAACgkQbDjKyiDZ
-s5Kuiw/9H95x40SpKBr2HPbXg1YTuptbH++I4j7odQeckkaTHm/2LwHsd4PxEXkP
-1sfRCF0SReMQnoq8jfHdy/HcaNNYAbtWnNEcXqJWX4OvbJ8hd4Rsg/VQTCOpdH7H
-kDNhUUbeUbl4EUopc02RQ2IumnvRRkjDX56o/8t+59M2HrPTZQvmadGNh/j1dg8E
-/8vDTGnw+h0ggmLLuUNJ7SP64nlp7HTeXzyrR6ojRclTRy8Cgo7Do/6QtSEkGi3q
-TWUIdV3sUbbHBj5mSjlRl3GdTQ1rzMhvLJZ/SGbyCh6cJMWRd6jR1dPedkOi8Yqq
-JndFknpaiSGMWuMj2YWURINsFrxrygzAi2IygPqUOU9JWkFAgM0c+ZtOmSz7c0SD
-jLH9amBp6lyxalETKv0rdFDX6nptlUkUUFYX8bNfnMBj9NiRZFtZYXs77BirK8yh
-D3JBnGqjuU3RKb1ySL9C65ktumOywLFS766vbIbhLpLlAUDhJtoBEue5alXcPGVN
-wsXYwzn/uN87v8idS5Ld/T+b/PDQwND/CkqqVz2I/I9FpGIt1nLk4azX+8w18pJP
-QnMbnqvkljljeq7P/vMZZ9NJ8D6csIFy1InwS8X+B47ZZvra7qBN7IntkI/zcE8U
-8gA0ORiYLR/4WJJ56fToWvW0894srvXpF/rx0e0xTpiYM0u4tYo=
-=EFpU
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3vFiwACgkQbDjKyiDZ
+s5LRGxAAmLzxod9pPP4+abCGVArs8r5cbEKn16AjMenUbj2AVa62nL11DNerwPIa
+ncalxhTGt5z8hxbXGjV4eYpR0L6ieNu7hs/RzxieiZ01Qdp3cJwjb7OtiLgT6g3T
+sqzhV05GxXryC+p7Pqimsc9uETVKrpZZ57lsTODsexIZD8PylqJGX29YsGZngclY
+Ci6MLbUoCHcritsRH9Oqgz43a61w8yvUZ1y9Lk5ideSnSDCjvti3HFO0/N8cwgBR
+dEfZmxP+sm16P5iVqO5YyGaj+xCBmNiTycw8vX+djVw+EjLzXtyIV9/FZWaDibD3
+aHCGh060N3OizY6NQlasF+xVk61/s4m2GIpx4d2ftgvejoD/5eqxL5yTInnW469B
+mFWomTlUQJQVO2P3Lwwpe/ScIzyuQpP4LF3FfVN6yaAUWwf2moZl9MZkGNMXkaqA
+fAzh3iCp39I3LtlZBmTE43TbSg8RsgJ4Jpnpko4EA/uT7H0oF53DFKGEILBBRsQx
+kVle4Ed7UFzMwk8EGeZPpj/wYfImllF/F/lqLpNOjEbbwJGSy2TUHkESVy5K7xht
+rAaVi9Vh3HbSmL69Mc2e7fdWZMQl8sBK10dScEWnrVUawgYYCma96qzbOSftfhiP
+55AWleo94ZsBzG2egZYZYSzQsyUHBUSs5nQwM8ovdxb2onvrOJ4=
+=L8x9
 -----END PGP SIGNATURE-----
 
---cyV/sMl4KAhiehtf--
+--cpvLTH7QU4gwfq3S--
 
