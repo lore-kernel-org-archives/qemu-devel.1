@@ -6,75 +6,84 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F4C1C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 15:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F406EC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 16:09:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67F3C2053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 15:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDC3F2077B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 16:09:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KuFGnYt/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67F3C2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J9/xtnlV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDC3F2077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iehr5-0008KD-8L
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 10:55:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46775)
+	id 1iei4q-0005lQ-0H
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 11:09:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49790)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iehqB-0007av-V3
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 10:54:25 -0500
+ (envelope-from <drjones@redhat.com>) id 1iei3v-00055h-QE
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:08:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iehqA-0008JF-RG
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 10:54:23 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:46737)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iehqA-0008Iy-LZ
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 10:54:22 -0500
-Received: by mail-oi1-x244.google.com with SMTP id a124so10186725oii.13
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 07:54:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qkvXH55G+iv0yZ4areBM4JInh6uKCzUpqm+YCgqvJbg=;
- b=KuFGnYt/t268MsTXofoQshaYJr/nAShbCt+AOCnnzl96R8uRChzhjFXZN5CMtqb7Xr
- pxY21NtQsyPc8qWeSj36a/J7SC56DecORnLahkTeDyelNgVzR8wtuLGlvptJLsT1DWnY
- b+37dw4vio4cT+HWLqfeh+BTveDbM/SkVpXUtH+gdvfEuJcquhdK/8O9UF2iA/Jr5onx
- OsIhWk+j3bD7fxvViXxNgHWZN2+7n5hzdwHT1lDLjXeNrqTqd0MpYE6ADUTDAYATeM6Y
- GYx/j74CL0yipW+ERJ5B/GRI+HakWcD9/S+FgHXY5Ae4woqoc+itArFHecIwL3MtLEx2
- 15Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qkvXH55G+iv0yZ4areBM4JInh6uKCzUpqm+YCgqvJbg=;
- b=SwPFA8bz8q3XPtVZs/utBoVikAo4xLFyOpkW+ucrxRTiFIiu14Ca8vxLncHAzESa4V
- 1LfSHnTb+S3ODKJAJ73dQPo51jdw8wwczMR6GBgplq/BwnpuChJwaIVROBmqhl0lBcti
- Uz04p0/bhDbTpLV66FwZuY16IRgXvDIzg++7R3Q/5O8m9Zo77KzRsYQgQh/0gnRbiCuv
- OZON93uyNS+t0msl4jSmGRkft3Oc5D9NIiGWL43Nx1MQIhcG0F3/1lYw8rB4qZNzzX2L
- qVrCZBA0hVxoNtPy1rYddezgBgWjN5TRIoE/Ckq+aPUHX/CDzmyDNs6Eu9bGDLeyLOWo
- c+4Q==
-X-Gm-Message-State: APjAAAUStJaXQUsxhNVUwYHo1xoEu5af/VzA4n+M6QaOE7d6u9hys+6O
- E28urUIejI4NTHq0dhutVLVfDyXG0tilEVwiKbgAbQ==
-X-Google-Smtp-Source: APXvYqxlLGNk8aLVogO0zZkyoe+jfnwIR09cEFRD/p9gfWAP77vgqEJcSYX924cfMdQy/KubluT2raGTjGSR2xd8veI=
-X-Received: by 2002:aca:3182:: with SMTP id x124mr4651766oix.170.1575993261791; 
- Tue, 10 Dec 2019 07:54:21 -0800 (PST)
+ (envelope-from <drjones@redhat.com>) id 1iei3t-00068B-5e
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:08:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49519
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iei3t-00067y-1H
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:08:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575994112;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=omvEPFgMa0ImghPBOD0QaB8/kVCMWZVlsLSkdCnszF4=;
+ b=J9/xtnlVc6uYxfk9Q/xvovWVwqaj/zqkCRF2ukMAMws5eGbzi2jKVwSC4AdnMEYqn0AIm9
+ 2IxKMMQ5m9Kg7BrqH7ikgP/8KHF1wn1RFtaVTQyko7UPCLpnq7ALZNZd+SeZzivvhD1e8e
+ zx3/QgFKIdmlkC4jvqHfR4A4E4VOjWY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-qYuj1O5nOgqp6Uz9pr90jA-1; Tue, 10 Dec 2019 11:08:30 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3148610054E3;
+ Tue, 10 Dec 2019 16:08:29 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 811FD5C1B0;
+ Tue, 10 Dec 2019 16:08:27 +0000 (UTC)
+Date: Tue, 10 Dec 2019 17:08:25 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Andrea Bolognani <abologna@redhat.com>
+Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
+ virtual time
+Message-ID: <20191210160825.ioah26u36eu2i3z2@kamzik.brq.redhat.com>
+References: <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
+ <20191206155327.7adiyjjkjh56mg2t@kamzik.brq.redhat.com>
+ <596d07e933cb4da48dbba5b492e81a2438e78a2f.camel@redhat.com>
+ <CAFEAcA9+G0jprsHRQp8g=Aso+2-_GhoWkDGx4WWxoC88maOKEg@mail.gmail.com>
+ <20191210110531.psjzlikir2ep2omo@kamzik.brq.redhat.com>
+ <CAFEAcA_M61hTzU=qCiUbR4V9Mnwd0phFNqTJG9pCWKreVmjy6A@mail.gmail.com>
+ <20191210133254.22vcpvr3eabcnthe@kamzik.brq.redhat.com>
+ <29add42daba074ab5bdbd462b2d377115fec7c3c.camel@redhat.com>
+ <20191210143311.4sen6blhfhzop6zw@kamzik.brq.redhat.com>
+ <e0f86b200d0b3c08769cdbaa080569c3ec3db3ab.camel@redhat.com>
 MIME-Version: 1.0
-References: <20191016143410.5023-1-drjones@redhat.com>
- <20191016143410.5023-4-drjones@redhat.com>
-In-Reply-To: <20191016143410.5023-4-drjones@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Dec 2019 15:54:11 +0000
-Message-ID: <CAFEAcA-uP9eAMu=S98hv7Ge_3GU42acpfvWDMmcMSKagnD9rsQ@mail.gmail.com>
-Subject: Re: [PATCH v1 3/5] target/arm/kvm: Implement cpu feature kvm-adjvtime
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <e0f86b200d0b3c08769cdbaa080569c3ec3db3ab.camel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: qYuj1O5nOgqp6Uz9pr90jA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,59 +95,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc Zyngier <maz@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, bijan.mottahedeh@oracle.com,
+ Marc Zyngier <maz@kernel.org>,
  Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, bijan.mottahedeh@oracle.com
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 16 Oct 2019 at 15:34, Andrew Jones <drjones@redhat.com> wrote:
+On Tue, Dec 10, 2019 at 04:47:49PM +0100, Andrea Bolognani wrote:
+> On Tue, 2019-12-10 at 15:33 +0100, Andrew Jones wrote:
+> > On Tue, Dec 10, 2019 at 03:21:02PM +0100, Andrea Bolognani wrote:
+> > > I agree with everything except the naming: why would
+> > >=20
+> > >   kvm-no-adjvtime=3Doff  vtime is adjusted      (default)
+> > >   kvm-no-adjvtime=3Don   vtime is not adjusted
+> > >=20
+> > > be better than
+> > >=20
+> > >   kvm-adjvtime=3Don   vtime is adjusted      (default)
+> > >   kvm-adjvtime=3Doff  vtime is not adjusted
+> > >=20
+> > > ? Both offer the exact same amount of flexibility, but the latter has
+> > > the advantage of not introducing any unwieldy double negatives.
+> >=20
+> > A default of 'off' =3D=3D 0 means not setting anything at all. There's
+> > already precedent for 'kvm-no*' prefixed cpu features,
+> >=20
+> > kvm-no-smi-migration
+> > kvm-nopiodelay
+>=20
+> Sorry, I'm not sure I understand. Do you mean that the array where
+> you store CPU features is 0-inizialized, so it's more convenient to
+> have off (0) as the default because it means you don't have to touch
+> it beforehand? Or something different?
 >
-> When kvm-adjvtime is enabled the guest's cntvct[_el0] won't count
-> the time when the VM is stopped. That time is skipped by updating
-> cntvoff[_el2] on each transition to vm_running using the current
-> QEMU_CLOCK_VIRTUAL time. QEMU_CLOCK_VIRTUAL only ticks when the VM
-> is running.
->
-> This patch only provides the implementation. A subsequent patch
-> will provide the CPU property allowing the feature to be enabled.
 
+Right. The CPU feature flag (a boolean member of the CPU state) will
+be zero by default because C. It's not a big deal, though, because the
+property default can easily be set to true while it's added to a cpu
+type.
 
-> +void kvm_arm_set_virtual_time(CPUState *cs)
-> +{
-> +    uint64_t cnt;
-> +    struct kvm_one_reg reg = {
-> +        .id = KVM_REG_ARM_TIMER_CNT,
-> +        .addr = (uintptr_t)&cnt,
-> +    };
-> +    int ret;
-> +
-> +    cnt = muldiv64(qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL),
-> +                   cpu_get_host_tick_frequency(),
-> +                   NANOSECONDS_PER_SECOND);
-> +
-> +    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-> +    if (ret) {
-> +        error_report("Failed to set KVM_REG_ARM_TIMER_CNT");
-> +        abort();
-> +    }
+I don't have a strong enough opinion about kvm-adjvtime vs.
+kvm-no-adjvtime to insist one way or another. I agree double inversions
+are easier to mess up, but I also like the way the '-no-' better
+communicates that the default is [probably] 'yes'.
 
-The commit message (and the doc comment for this function)
-say that we're updating the counter offset, but the
-kvm_one_reg operation here is updating the timer count
-(and relying on the kernel's handling of "if we update
-the timer count implement that by changing the offset").
-That seems a bit confusing.
+All interested parties, please vote. I'll be sending v2 soon and I can
+call this thing anything the majority (or the dominate minority) prefer.
 
-Would it be possible to implement "cntvct should not change while the
-VM is stopped" with "read cntvct when the VM stops, and just write
-back that value when the VM is restarted", rather than
-"write back a new value calculated from QEMU_CLOCK_VIRTUAL"?
-If I understand commit 00f4d64ee76e873be8 correctly, that's
-basically how x86 is doing it. It would also let you sidestep
-the need to know the tick frequency of the counter.
+Thanks,
+drew
 
-thanks
--- PMM
 
