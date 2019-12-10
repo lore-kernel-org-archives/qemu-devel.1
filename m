@@ -2,83 +2,82 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B91C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 16:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12441C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 16:45:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADF582073D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 16:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0E1C2073D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 16:45:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lLCV/4Kj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADF582073D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Aonj25m5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0E1C2073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieibd-0001hA-U2
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 11:43:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58295)
+	id 1ieidF-0003W9-BL
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 11:45:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58635)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jean-philippe@linaro.org>) id 1ieiaL-0000mZ-FM
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:42:06 -0500
+ (envelope-from <jean-philippe@linaro.org>) id 1ieibo-0002Df-2P
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:43:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jean-philippe@linaro.org>) id 1ieiaK-0003he-BB
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:42:05 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35070)
+ (envelope-from <jean-philippe@linaro.org>) id 1ieibn-00042L-0L
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:43:35 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44377)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <jean-philippe@linaro.org>)
- id 1ieiaK-0003hP-3L
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:42:04 -0500
-Received: by mail-wr1-x441.google.com with SMTP id g17so20886806wro.2
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 08:42:04 -0800 (PST)
+ id 1ieibm-000427-QC
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:43:34 -0500
+Received: by mail-wr1-x441.google.com with SMTP id q10so20870086wrm.11
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 08:43:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to;
- bh=gqtOT5wE759za0LpbvnxJtRB0nZSfy/DZcdzVo4pDRI=;
- b=lLCV/4KjY237HMPohF0mo2sSICkE5JBX794nSpAY+rZx6y/ynvDvsy48mtIzV4pzHS
- xbgVZ9JUDviRDv3KleVVmodHwqH1Bh5TDjOMb3MmhmE1J67RYHFtoDb4NH75EcJ90R4u
- q5wlb+wIMNeFVqYpnamEzMOO9IrIS78NeAUBrhFk0WxqlFuj8dipHRszGbzZU0wmfLLc
- s93pqsexqAAf1dNG0RrRmoeMnB4GVeb0459lyZE9Qqru4HBz709oEsuca58h++gMGB+O
- jwx30o5OzVspUdv36R5YLjTU9EYZts1t80PIRbShq5L3Ph7whBKvhj1BR8o/HAV/b0GS
- 3U+g==
+ bh=WtaxfLDwEq+CPxRUbY/7JAvtoC2bGMlKZ7QdRWbKMnU=;
+ b=Aonj25m5O3NG/3YcvFJ7MZMjqL8o4JwlSte53sfRkiPZx+v23ru9AtaLADs4js3iGV
+ 4MX7HKiQdzzpyYebZIgbHCkIvBrbNiObRbVj6g4cpmsqKvcJCFozuI+bTaMM+M4ZnrfH
+ josRRWe4AelRKAVFN5Clv420QFrxzvr5TiXC/Ab8FR/Pnx0URxdbC0cAKMKSnXmSWmcN
+ zrrDeMQuXCsJpGxf0P9buODS3QUfo+E7YRMIaLzUNrTBs626ZMqcU8fmzfN+qO52JRHw
+ 7htGYPYi+5gv3Tuw9edHiSG5EjX9lvBn+dhg6ZtHzZmB/TnA5P5g4cTFnH5R/lMyvjYY
+ W7mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=gqtOT5wE759za0LpbvnxJtRB0nZSfy/DZcdzVo4pDRI=;
- b=sMv1lRDTmhkOegQ+HsUyKdW1r2/hJmz/PBzEeV/2Ft6FxHyu9ZTx2tVyQpMmT7Bu2x
- yowqcIVppVMeK9VkJugT7/eM/8+TfHWVQjrumrmvUQKKeQIksRM069OfGrVEXJEMxynU
- 2EFiWR/Ftk6Z+WHSi96JlS5TPXRmsuXD8mKQ293z+pNqowWQkAGNufZkbIf/ERxakB1i
- heNEeft6Wse5O+z1v6z5AsqLTP+ZbucafkCSP7CfTncoTi1qy/GrIsWHTXyKwZ/sNqzp
- D7xWNfaszLTFHjdzP1BQi7pH63MZu8bn+3//1W09I7o0LpMB3zzXID13lmsgkW1UJdjM
- YVUw==
-X-Gm-Message-State: APjAAAUAjlfP0Qdqxwot2JBp/MCCHWHtITygDgFRnVqZcmXBM2DRclfI
- +TdgGLQMyEmFrYH4gHXI+mLPGA==
-X-Google-Smtp-Source: APXvYqxT7TVZrWdQ7EPo9+cnmXvelYTJSYnHtDJVmDN5yg+cQRjFtKjdQagIL6g3hKz/i7pxIFhN+A==
-X-Received: by 2002:a5d:4cc9:: with SMTP id c9mr4213902wrt.70.1575996123027;
- Tue, 10 Dec 2019 08:42:03 -0800 (PST)
+ bh=WtaxfLDwEq+CPxRUbY/7JAvtoC2bGMlKZ7QdRWbKMnU=;
+ b=NptKKTUfPo/jjpBCX4IEY8JJ4A3WazKGnCk0POeBchnH3PvZmR8FnotqwLX6UzghVD
+ kBkCXC/McPdC4B/YPDDFXEYF6uFZSEfw4gHYpOHgzQ6/CnIqMfSMdgNji5NryviuFwEW
+ Gjy25hnSzAeMYReqq1VhThdJm5i4lN2mshcSnoDYr2rV1RaRwe9eIqy4Qvsj3jGeeoWM
+ YmfFUDMhVj/dMGULQkiGVR28IlUs7S7Us5EHv9d2fkqA5DGHv5ueliJ5W3EjCWSDJHCe
+ wyRJQ0ZO6J3PQMBZcatDiv6MgNOlpjI13ClOHCZIEo5JkuQC/LgVT3pgVAO7fWN6DZ1A
+ lkAQ==
+X-Gm-Message-State: APjAAAWgNlIZZKgi00I8LGIFK6QNZZUOAvCE23R3v6hNYHWxaDElvLUS
+ 1B1TEzEoQ4jtVeFUKHbseqwXBg==
+X-Google-Smtp-Source: APXvYqyPt+8Jwb4gmCEufCkJ6i1T6iyNXkzmBu7FhNUtTYJ2P6ft4BOk8HS6kvcWauPXhDluGd9hOw==
+X-Received: by 2002:a5d:6ac5:: with SMTP id u5mr4284808wrw.271.1575996213730; 
+ Tue, 10 Dec 2019 08:43:33 -0800 (PST)
 Received: from myrica (adsl-84-227-176-239.adslplus.ch. [84.227.176.239])
- by smtp.gmail.com with ESMTPSA id e8sm3824236wrt.7.2019.12.10.08.42.00
+ by smtp.gmail.com with ESMTPSA id n14sm3689719wmi.26.2019.12.10.08.43.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Dec 2019 08:42:02 -0800 (PST)
-Date: Tue, 10 Dec 2019 17:41:56 +0100
+ Tue, 10 Dec 2019 08:43:33 -0800 (PST)
+Date: Tue, 10 Dec 2019 17:43:28 +0100
 From: Jean-Philippe Brucker <jean-philippe@linaro.org>
 To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH for-5.0 v11 06/20] virtio-iommu: Implement attach/detach
- command
-Message-ID: <20191210164156.GE277340@myrica>
+Subject: Re: [PATCH for-5.0 v11 07/20] virtio-iommu: Implement map/unmap
+Message-ID: <20191210164328.GF277340@myrica>
 References: <20191122182943.4656-1-eric.auger@redhat.com>
- <20191122182943.4656-7-eric.auger@redhat.com>
+ <20191122182943.4656-8-eric.auger@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191122182943.4656-7-eric.auger@redhat.com>
+In-Reply-To: <20191122182943.4656-8-eric.auger@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2a00:1450:4864:20::441
@@ -102,67 +101,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 22, 2019 at 07:29:29PM +0100, Eric Auger wrote:
-> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> index 235bde2203..138d5b2a9c 100644
-> --- a/hw/virtio/virtio-iommu.c
-> +++ b/hw/virtio/virtio-iommu.c
-> @@ -77,11 +77,12 @@ static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
->  static void virtio_iommu_detach_endpoint_from_domain(viommu_endpoint *ep)
->  {
->      QLIST_REMOVE(ep, next);
-> +    g_tree_unref(ep->domain->mappings);
->      ep->domain = NULL;
->  }
->  
-> -viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s, uint32_t ep_id);
-> -viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s, uint32_t ep_id)
-> +static viommu_endpoint *virtio_iommu_get_endpoint(VirtIOIOMMU *s,
-> +                                                  uint32_t ep_id)
->  {
->      viommu_endpoint *ep;
->  
-> @@ -102,15 +103,14 @@ static void virtio_iommu_put_endpoint(gpointer data)
->  
->      if (ep->domain) {
->          virtio_iommu_detach_endpoint_from_domain(ep);
-> -        g_tree_unref(ep->domain->mappings);
->      }
->  
->      trace_virtio_iommu_put_endpoint(ep->id);
->      g_free(ep);
->  }
->  
-> -viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s, uint32_t domain_id);
-> -viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s, uint32_t domain_id)
-> +static viommu_domain *virtio_iommu_get_domain(VirtIOIOMMU *s,
-> +                                              uint32_t domain_id)
+On Fri, Nov 22, 2019 at 07:29:30PM +0100, Eric Auger wrote:
+> @@ -238,10 +244,35 @@ static int virtio_iommu_map(VirtIOIOMMU *s,
+>      uint64_t virt_start = le64_to_cpu(req->virt_start);
+>      uint64_t virt_end = le64_to_cpu(req->virt_end);
+>      uint32_t flags = le32_to_cpu(req->flags);
+> +    viommu_domain *domain;
+> +    viommu_interval *interval;
+> +    viommu_mapping *mapping;
 
-Looks like the above change belong to patch 5?
+Additional checks would be good. Most importantly we need to return
+S_INVAL if we don't recognize a bit in flags (a MUST in the spec). It
+might be good to check that addresses are aligned on the page granule as
+well, and return S_RANGE if they aren't (a SHOULD in the spec), but I
+don't care as much.
 
->  {
->      viommu_domain *domain;
->  
-> @@ -137,7 +137,6 @@ static void virtio_iommu_put_domain(gpointer data)
->      QLIST_FOREACH_SAFE(iter, &domain->endpoint_list, next, tmp) {
->          virtio_iommu_detach_endpoint_from_domain(iter);
->      }
-> -    g_tree_destroy(domain->mappings);
+> +
+> +    interval = g_malloc0(sizeof(*interval));
+> +
+> +    interval->low = virt_start;
+> +    interval->high = virt_end;
+> +
+> +    domain = g_tree_lookup(s->domains, GUINT_TO_POINTER(domain_id));
+> +    if (!domain) {
+> +        return VIRTIO_IOMMU_S_NOENT;
 
-When created by virtio_iommu_get_domain(), mappings has one reference.
-Then for each attach (including the first one) an additional reference is
-taken, and freed by virtio_iommu_detach_endpoint_from_domain(). So I think
-there are two problems:
-
-* virtio_iommu_put_domain() drops one ref for each endpoint, but we still
-  have one reference to mappings, so they're not freed. We do need this
-  g_tree_destroy()
-
-* After detaching all the endpoints, the guest may reuse the domain ID for
-  another domain, but the previous mappings haven't been erased. Not sure
-  how to fix this using the g_tree refs, because dropping all the
-  references will free the internal tree data and it won't be reusable.
+Leaks interval, I guess you could allocate it after this block.
 
 Thanks,
 Jean
+
+> +    }
+> +
+> +    mapping = g_tree_lookup(domain->mappings, (gpointer)interval);
+> +    if (mapping) {
+> +        g_free(interval);
+> +        return VIRTIO_IOMMU_S_INVAL;
+> +    }
+>  
+>      trace_virtio_iommu_map(domain_id, virt_start, virt_end, phys_start, flags);
+>  
+> -    return VIRTIO_IOMMU_S_UNSUPP;
+> +    mapping = g_malloc0(sizeof(*mapping));
+> +    mapping->phys_addr = phys_start;
+> +    mapping->flags = flags;
+> +
+> +    g_tree_insert(domain->mappings, interval, mapping);
+> +
+> +    return VIRTIO_IOMMU_S_OK;
 
