@@ -2,80 +2,84 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6271CC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E408C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:15:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B9752053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:14:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBD932053B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:15:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YTwJLSAd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B9752053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pZg5a4+Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBD932053B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iecX8-0005O9-8Z
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 05:14:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38295)
+	id 1iecXx-0006Me-0w
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 05:15:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38408)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iecWR-0004rX-Qq
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:13:41 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iecXK-0005qc-30
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:14:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iecWQ-0007gL-MU
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:13:39 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34029
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iecWQ-0007fv-J6
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:13:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575972818;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3wCO3GuM2moFcAks0xXtIp9Oxy/EmVQGKpZZV5ENJBE=;
- b=YTwJLSAdcbADMtYbi5ZrlRnn2VvuDELoP7YoYUwkfF1LZ288LTOSIHNuEDZmyQpaNNBOpq
- CB4W1nEB3rwaARCwMMudJ8bpOPLzegikTyEk7SA1/MtsdYMbYarc2rQ7zD8hmaWm3enTea
- 3aZg3UeXxQWS+fw5A1qW+lBm2liR2nc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-Sv9F--SmMlq1LqAvEJt_rA-1; Tue, 10 Dec 2019 05:13:34 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62D31107ACC4;
- Tue, 10 Dec 2019 10:13:33 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5004760561;
- Tue, 10 Dec 2019 10:13:26 +0000 (UTC)
-Date: Tue, 10 Dec 2019 11:13:23 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: "Zengtao (B)" <prime.zeng@hisilicon.com>
-Subject: Re: [Qemu-devel] [RFC PATCH 0/6] hw/arm/virt: Introduce cpu topology
- support
-Message-ID: <20191210101323.q7dn2f3pkx3ya5s4@kamzik.brq.redhat.com>
-References: <20180704124923.32483-1-drjones@redhat.com>
- <678F3D1BB717D949B966B68EAEB446ED3405A26F@dggemm526-mbx.china.huawei.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iecXJ-0008HC-0j
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:14:34 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36235)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iecXI-0008Gx-Or
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:14:32 -0500
+Received: by mail-wr1-x443.google.com with SMTP id z3so19368927wru.3
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 02:14:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=zAruH4m0uOqegwQDdstHAGXXPe8xIAwTv1lZVctd5bo=;
+ b=pZg5a4+Q21HZz01Qsxmjq4y7qVYk91hPkTmH5QchyDQpIq9+L7CipPFdlJ0hjVQDCy
+ PK0E+7elwH2iOhh2G0u/R3A7m38YHc6vizFHPsIGvr4pxgLyPMI8RBHTJqiqxVkPnxDN
+ aYNZ5sWT843tl+/woH/pOTwCJPihIWcsleLOtDXCAgW0Wz+YbCqzBMfHiIUDORWltPeP
+ 0ypXulORlkP6Bw8TsReB4F6ddbMgWqY/xG2xwl44G0K9XQzwCpLa+98hCnML9/d/C9mc
+ Xc4qxLhFxroI/qlZmuwXHB1tTSumbJZ8QjvpJBvKqWY0UpMXwOS7emwLirQvv7/hUAe0
+ 4kzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=zAruH4m0uOqegwQDdstHAGXXPe8xIAwTv1lZVctd5bo=;
+ b=LvDiJGs+gxl3SAOHhcAhZ/Uw4a/55bsB7VaWU7Gz79bNNsv8oqTOa7yIM7X7+yKFuk
+ tVupzTkP+a7n9ftCZbiMlnMXyOJmRkFDps7Wg4/6as/1zzwrpYi+kWxEdvIFIAoSUFkO
+ btgLjbx3T6jAW92j6DsLFKjqVdhrQ9sBGwoaWi4D5IYMZU0uut1EW7OqiX1FaS9pLHcj
+ jbElXz8GLLW7DStxX/ddKqvCPE0oYVs89uCRAX48gcNhTqe9XWhCBa73zIiRj00zvU3y
+ wAksonG3ntlDO7IWqG5jYLVK2E264XhElbopGmShSZ/hp1+FEEXfKALNNwWFk9h2RPmO
+ ExNg==
+X-Gm-Message-State: APjAAAVv5p2GoA8zjH3lohFttbhrbYaG0Wb17GpBx/Ps25xyMvQURXNf
+ 2t/5XScXRtOwzKQLM918IObI5X0oec/Cex38xDs=
+X-Google-Smtp-Source: APXvYqwukrj7R55O3vvxQnCokPcB0BkM4hVbIi0AoJfiOW2ylIFXWgFFfQ2HbXpHYSHUaRTvpQyRM5wfh1p7OdLniYs=
+X-Received: by 2002:adf:ff8a:: with SMTP id j10mr2340314wrr.312.1575972871207; 
+ Tue, 10 Dec 2019 02:14:31 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED3405A26F@dggemm526-mbx.china.huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: Sv9F--SmMlq1LqAvEJt_rA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+References: <20191127101038.327080-1-marcandre.lureau@redhat.com>
+ <20191127101038.327080-3-marcandre.lureau@redhat.com>
+ <20191206142723.GA5020@dhcp-17-72.bos.redhat.com>
+ <20191210025857.GQ498046@habkost.net>
+In-Reply-To: <20191210025857.GQ498046@habkost.net>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 10 Dec 2019 14:14:18 +0400
+Message-ID: <CAJ+F1CL_0ytd2O4m1FcqQbFSLh3S5v=fLY=FyUZa4zg47uCOQA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] analyze-migration.py: replace numpy with python 3.2
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,106 +91,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "wei@redhat.com" <wei@redhat.com>,
- "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- huangdaode <huangdaode@huawei.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Dec 09, 2019 at 02:14:09AM +0000, Zengtao (B) wrote:
-> Hi Andrew:
->=20
-> Any update for this patch series? I have met the same issue, and if the=
-=20
-> topology guessed by linux MPIDR conflicts with qemu specified numa, it
-> will failed to boot (sched domain initialization will fall into deadloop)=
-.
+Hi
 
-Hi Zeng,
+On Tue, Dec 10, 2019 at 6:59 AM Eduardo Habkost <ehabkost@redhat.com> wrote=
+:
+>
+> On Fri, Dec 06, 2019 at 09:27:23AM -0500, Cleber Rosa wrote:
+> > On Wed, Nov 27, 2019 at 02:10:38PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> > > Use int.from_bytes() from python 3.2 instead.
+> > >
+> > > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > > ---
+> > >  scripts/analyze-migration.py | 35 +++++++++++++++++++---------------=
+-
+> > >  1 file changed, 19 insertions(+), 16 deletions(-)
+> > >
+> > > diff --git a/scripts/analyze-migration.py b/scripts/analyze-migration=
+.py
+> > > index 2b835d9b70..96a31d3974 100755
+> > > --- a/scripts/analyze-migration.py
+> > > +++ b/scripts/analyze-migration.py
+> > > @@ -1,4 +1,4 @@
+> > > -#!/usr/bin/env python
+> > > +#!/usr/bin/env python3
+> [...]
+> >
+> > Marc-Andr=C3=A9, I couldn't yet pinpoint the reason yet, but this patch
+> > changes the parsing of bool fields.  This is a diff between the output
+> > pre/post this patch on the same images:
+> >
+> > $ diff -u out_x8664_pre out_x8664_post
+> > --- out_x8664_pre       2019-12-06 09:14:16.128943264 -0500
+> > +++ out_x8664_post      2019-12-06 09:23:35.861378600 -0500
+> > @@ -3039,7 +3039,7 @@
+> >              "mac_reg[RADV]": "0x00000000",
+> >              "mac_reg[TADV]": "0x00000000",
+> >              "mac_reg[ITR]": "0x00000000",
+> > -            "mit_irq_level": true
+> > +            "mit_irq_level": false
+> >          },
+> >          "e1000/full_mac_state": {
+> >              "mac_reg": [
+> > @@ -36010,10 +36010,10 @@
+> >              ],
+> >              "smb_auxctl": "0x02",
+> >              "smb_blkdata": "0x00",
+> > -            "i2c_enable": true,
+> > +            "i2c_enable": false,
+> >              "op_done": true,
+> > -            "in_i2c_block_read": true,
+> > -            "start_transaction_on_status_read": true
+> > +            "in_i2c_block_read": false,
+> > +            "start_transaction_on_status_read": false
+> >          },
+> >          "ar.tmr.timer": "ff ff ff ff ff ff ff ff",
+> >          "ar.tmr.overflow_time": "0x0000000000000000",
+> >
+> > This true/false flipping is consistent across various images (tried on
+> > images generated on a few other targets).
+>
+> It looks like moving to python3 accidentally fixes a bug.
+>
+> This is VMSDFieldBool.read:
+>
+>     def read(self):
+>         super(VMSDFieldBool, self).read()
+>         if self.data[0] =3D=3D 0:
+>             self.data =3D False
+>         else:
+>             self.data =3D True
+>         return self.data
+>
+> On python2, MigrationFile.readvar() returned a string, so the
+> (self.data[0] =3D=3D 0) check was never true.  This means all boolean
+> fields were always initialized to True.
+>
+> On python3, MigrationFile.readvar() returns a bytearray, so the
+> (self.data[0] =3D=3D 0) check now works as expected.
 
-This has been on my TODO list a long time, but it keeps getting preempted.
-We need to start by giving userspace control over the MPIDRs, including
-when KVM is in use. The earliest I can return to this will be mid/late
-January. If you'd like to jump in on it now, then feel free.
+Ah! nice surprise. Do you mind updating the commit message on commit?
+Or should I resend?
 
-Thanks,
-drew
+thanks
 
->=20
-> Thanks.
->=20
-> > -----Original Message-----
-> > From: Qemu-devel
-> > [mailto:qemu-devel-bounces+incoming=3Dpatchwork.ozlabs.org@nongnu.or
-> > g] On Behalf Of Andrew Jones
-> > Sent: Thursday, July 05, 2018 4:49 AM
-> > To: qemu-devel@nongnu.org; qemu-arm@nongnu.org
-> > Cc: wei@redhat.com; peter.maydell@linaro.org; eric.auger@redhat.com;
-> > imammedo@redhat.com
-> > Subject: [Qemu-devel] [RFC PATCH 0/6] hw/arm/virt: Introduce cpu
-> > topology support
-> >=20
-> > This series provides support for booting mach-virt machines with
-> > non-flat cpu topology, i.e. enabling the extended options of the
-> > '-smp' command line parameter (sockets,cores,threads). Both DT and
-> > ACPI description generators are added. We only apply the new feature
-> > to 3.1 and later machine types, as the change is guest visible, even
-> > when no command line change is made. This is because the basic
-> > '-smp <N>' parameter makes the assumption that <N> refers to the
-> > number of sockets, but when no topology description is provided,
-> > Linux will use the MPIDR to guess. Neither the MPIDR exposed to
-> > the guest when running with KVM nor TCG currently provides socket
-> > information, leaving Linux to assume all processing elements are
-> > cores in the same socket. For example, before this series '-smp 4'
-> > would show up in the guest as
-> >=20
-> >  CPU(s):                4
-> >  On-line CPU(s) list:   0-3
-> >  Thread(s) per core:    1
-> >  Core(s) per socket:    4
-> >  Socket(s):             1
-> >=20
-> > and after it shows up as
-> >=20
-> >  CPU(s):                4
-> >  On-line CPU(s) list:   0-3
-> >  Thread(s) per core:    1
-> >  Core(s) per socket:    1
-> >  Socket(s):             4
-> >=20
-> > It's not expected that this should be a problem, but it's worth
-> > considering. The only way to avoid the silent change is for QEMU to
-> > provide boards a way to override the default '-smp' parsing function.
-> > Otherwise, if a user wants to avoid a guest visible change, but still
-> > use a 3.1 or later mach-virt machine type, then they must ensure the
-> > command line specifies a single socket, e.g. '-smp sockets=3D1,cores=3D=
-4'
-> >=20
-> > Thanks,
-> > drew
-> >=20
-> >=20
-> > Andrew Jones (6):
-> >   hw/arm/virt: Add virt-3.1 machine type
-> >   device_tree: add qemu_fdt_add_path
-> >   hw/arm/virt: DT: add cpu-map
-> >   hw/arm/virt-acpi-build: distinguish possible and present cpus
-> >   virt-acpi-build: add PPTT table
-> >   hw/arm/virt: cpu topology: don't allow threads
-> >=20
-> >  device_tree.c                | 24 +++++++++++++
-> >  hw/acpi/aml-build.c          | 50 ++++++++++++++++++++++++++
-> >  hw/arm/virt-acpi-build.c     | 25 ++++++++++---
-> >  hw/arm/virt.c                | 69
-> > +++++++++++++++++++++++++++++++++---
-> >  include/hw/acpi/aml-build.h  |  2 ++
-> >  include/hw/arm/virt.h        |  1 +
-> >  include/sysemu/device_tree.h |  1 +
-> >  7 files changed, 162 insertions(+), 10 deletions(-)
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
