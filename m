@@ -2,86 +2,81 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B131C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 04:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19276C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 05:18:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B76620637
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 04:22:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D723F20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 05:18:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJUGYYi+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B76620637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="amMiqEwK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D723F20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieX2a-0002QG-83
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 23:22:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59953)
+	id 1ieXuU-0001wO-0X
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 00:18:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ieX1O-0001T8-LR
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 23:21:17 -0500
+ (envelope-from <crosa@redhat.com>) id 1ieXtr-0001XT-VS
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 00:17:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ieX1L-0001vR-J0
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 23:21:14 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45711)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ieX1L-0001v7-9g
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 23:21:11 -0500
-Received: by mail-oi1-x244.google.com with SMTP id v10so8558909oiv.12
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 20:21:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=I/9wV4TqjOddrtJc4guZNdL/IrumIAuNmqqF7yfpjyc=;
- b=NJUGYYi+2bJmhi1y+4e6/w7Fs7vDw1rS6rAKFWnveLjp1ndGQ91zjkgoq05617Y/MF
- LVvPb9CLEuKpjxTuChmXK69G4Jwg6946iU8jNw113McBh3fQjcLeXFcBtAIR+WfoOwTv
- zpiCK63CVp2zNtxobLy6D0HyUGmCQ4lmJ4lLSfZMGdw7kBBJl+9S9GPSyPYk2lmN/G1+
- YlJgwDB75BMz4gfWbK/BeofMEqpx2QDVkrEB2dwK7GQ/D4CuDDfdAPALwPl6AlfjfWOo
- FmprIBdoGNAewTlffPRAVYGTQXMyzMWnfVZ5pZng/otmoF0tVGo27BFZunxpjRvL02rr
- ZrEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=I/9wV4TqjOddrtJc4guZNdL/IrumIAuNmqqF7yfpjyc=;
- b=YVpzZj9cVMl7WSnHCzrZvTYN2FMLv5ueGy05jfFTrm3Z/qs1rcWmqOyivxCP8pbnVu
- 67+7EHvVIR5xF1crzPBCRYHTSE641L+Z3iIGc+wpLZjGpA5L085yGU/ccGrd73O4XC1k
- a9kDnASCyXKooZlqUKVeY7IwAS7ysH0dgk8afw+Q8ni0EDF6Cu0pqeyRNeI6aWgMlQkW
- sn86kXIt0VCEzDhUft97N7hoZEwD0NuvnUCMeu38g7752WPXR8xptRqjbh/FI5zIQjHj
- d/JT1xonH8UtOnQF1rjfzz2E5r4KUPORROjrUmYxEJzAdNCt2fbh++nx1uItHrprXS2B
- iEqA==
-X-Gm-Message-State: APjAAAUkx8AJvu6RS5JXvCnUgrAAcr+11zqJbxAiFUJoeiIp4HudVyvG
- xgvDdQewHlMzxC82UKFte7vwSgx3sGxt9skovq4=
-X-Google-Smtp-Source: APXvYqw597IMO9qt84ETMybG0rQ2eT0TwwUCw8g8ILmc9mujVQcU5tId8Dx23AbbKa5+6oljrPrr+d+TiuKnq7GYoF4=
-X-Received: by 2002:a05:6808:98b:: with SMTP id
- a11mr2437405oic.62.1575951670344; 
- Mon, 09 Dec 2019 20:21:10 -0800 (PST)
+ (envelope-from <crosa@redhat.com>) id 1ieXto-0000VM-WE
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 00:17:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32047
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ieXto-0000UY-9l
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 00:17:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575955047;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=o0rLMjHQyXZgAzgSQEjl19TI4TtGmHyl5QXEq0zoz84=;
+ b=amMiqEwK8gRBL3YkooOoBrfRFbXrQkY0ZthimmCPbYp7wN2znz/GEoKvAu5MmerR6B0aXQ
+ n3VD5u8/j+x+eKzRD7Z8xddA3q6Gb0buGaF7W/iyW6BeJkOm5/OqnBbcczpDQrI7ntiDQo
+ f0/1Cj/Qhny3/kzh2DPqgG+wbaEk6XI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-256-6E4eLNyeM4Shz0hubf1xUQ-1; Tue, 10 Dec 2019 00:17:25 -0500
+X-MC-Unique: 6E4eLNyeM4Shz0hubf1xUQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1B84800D41
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 05:17:24 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-125-99.rdu2.redhat.com
+ [10.10.125.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B92045C21B;
+ Tue, 10 Dec 2019 05:17:19 +0000 (UTC)
+Date: Tue, 10 Dec 2019 00:17:17 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Subject: Re: [PATCH 1/2] python/qemu: Add set_qmp_monitor() to QEMUMachine
+Message-ID: <20191210051717.GG31990@localhost.localdomain>
+References: <20191112135801.854-1-wainersm@redhat.com>
+ <20191112135801.854-2-wainersm@redhat.com>
 MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Mon, 9 Dec 2019 20:21:09 -0800 (PST)
-In-Reply-To: <CAK4993ipego3-ELy82A85Rcd=PDiqCF0M5-COpHPUTL6UjVQZQ@mail.gmail.com>
-References: <20191208183922.13757-1-mrolnik@gmail.com>
- <20191208183922.13757-12-mrolnik@gmail.com>
- <CAL1e-=iPsFgtEmvT2xt-Fm8AiQBxq48_veVDcnnyMEqghF16hw@mail.gmail.com>
- <CAK4993ipego3-ELy82A85Rcd=PDiqCF0M5-COpHPUTL6UjVQZQ@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 10 Dec 2019 05:21:09 +0100
-Message-ID: <CAL1e-=gkGa0GCjSMm1QK+KrsnSts_1ZgvcjjP6acCVt7xP3ZpQ@mail.gmail.com>
-Subject: Re: [PATCH v38 11/22] target/avr: Add instruction disassembly function
-To: Michael Rolnik <mrolnik@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000007e8319059951d7a7"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <20191112135801.854-2-wainersm@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="5UGlQXeG3ziZS81+"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,830 +88,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>
+Cc: philmd@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000007e8319059951d7a7
-Content-Type: text/plain; charset="UTF-8"
+--5UGlQXeG3ziZS81+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Monday, December 9, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
+On Tue, Nov 12, 2019 at 08:58:00AM -0500, Wainer dos Santos Moschetta wrote=
+:
+> The QEMUMachine VM has a monitor setup on which an QMP
+> connection is always attempted on _post_launch() (executed
+> by launch()). In case the QEMU process immediatly exits
+> then the qmp.accept() (used to establish the connection) stalls
+> until it reaches timeout and consequently an exception raises.
+>=20
+> That behavior is undesirable when, for instance, it needs to
+> gather information from the QEMU binary ($ qemu -cpu list) or a
+> test which launches the VM expecting its failure.
+>=20
+> This patch adds the set_qmp_monitor() method to QEMUMachine that
+> allows turn off the creation of the monitor machinery on VM launch.
+>=20
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>  python/qemu/machine.py | 68 ++++++++++++++++++++++++++++--------------
+>  1 file changed, 45 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+> index a4631d6934..04ee86e1ba 100644
+> --- a/python/qemu/machine.py
+> +++ b/python/qemu/machine.py
+> @@ -104,6 +104,7 @@ class QEMUMachine(object):
+>          self._events =3D []
+>          self._iolog =3D None
+>          self._socket_scm_helper =3D socket_scm_helper
+> +        self._qmp_set =3D True   # Enable QMP monitor by default.
+>          self._qmp =3D None
+>          self._qemu_full_args =3D None
+>          self._test_dir =3D test_dir
+> @@ -228,15 +229,16 @@ class QEMUMachine(object):
+>                  self._iolog =3D iolog.read()
+> =20
+>      def _base_args(self):
+> -        if isinstance(self._monitor_address, tuple):
+> -            moncdev =3D "socket,id=3Dmon,host=3D%s,port=3D%s" % (
+> +        args =3D ['-display', 'none', '-vga', 'none']
+> +        if self._qmp_set:
+> +            if isinstance(self._monitor_address, tuple):
+> +                moncdev =3D "socket,id=3Dmon,host=3D%s,port=3D%s" % (
+>                  self._monitor_address[0],
+>                  self._monitor_address[1])
+> -        else:
+> -            moncdev =3D 'socket,id=3Dmon,path=3D%s' % self._vm_monitor
+> -        args =3D ['-chardev', moncdev,
+> -                '-mon', 'chardev=3Dmon,mode=3Dcontrol',
+> -                '-display', 'none', '-vga', 'none']
+> +            else:
+> +                moncdev =3D 'socket,id=3Dmon,path=3D%s' % self._vm_monit=
+or
+> +            args.extend(['-chardev', moncdev, '-mon',
+> +                         'chardev=3Dmon,mode=3Dcontrol'])
+>          if self._machine is not None:
+>              args.extend(['-machine', self._machine])
+>          if self._console_set:
+> @@ -255,20 +257,21 @@ class QEMUMachine(object):
+> =20
+>      def _pre_launch(self):
+>          self._temp_dir =3D tempfile.mkdtemp(dir=3Dself._test_dir)
+> -        if self._monitor_address is not None:
+> -            self._vm_monitor =3D self._monitor_address
+> -        else:
+> -            self._vm_monitor =3D os.path.join(self._sock_dir,
+> -                                            self._name + "-monitor.sock"=
+)
+> -            self._remove_files.append(self._vm_monitor)
+>          self._qemu_log_path =3D os.path.join(self._temp_dir, self._name =
++ ".log")
+>          self._qemu_log_file =3D open(self._qemu_log_path, 'wb')
+> =20
+> -        self._qmp =3D qmp.QEMUMonitorProtocol(self._vm_monitor,
+> -                                            server=3DTrue)
+> +        if self._qmp_set:
+> +            if self._monitor_address is not None:
+> +                self._vm_monitor =3D self._monitor_address
+> +            else:
+> +                self._vm_monitor =3D os.path.join(self._sock_dir,
+> +                                                self._name + "-monitor.s=
+ock")
+> +                self._remove_files.append(self._vm_monitor)
+> +            self._qmp =3D qmp.QEMUMonitorProtocol(self._vm_monitor, serv=
+er=3DTrue)
+> =20
+>      def _post_launch(self):
+> -        self._qmp.accept()
+> +        if self._qmp:
+> +            self._qmp.accept()
+> =20
+>      def _post_shutdown(self):
+>          if self._qemu_log_file is not None:
+> @@ -330,7 +333,8 @@ class QEMUMachine(object):
+>          Wait for the VM to power off
+>          """
+>          self._popen.wait()
+> -        self._qmp.close()
+> +        if self._qmp:
+> +            self._qmp.close()
+>          self._load_io_log()
+>          self._post_shutdown()
+> =20
+> @@ -346,12 +350,13 @@ class QEMUMachine(object):
+>              self._console_socket =3D None
+> =20
+>          if self.is_running():
+> -            try:
+> -                if not has_quit:
+> -                    self._qmp.cmd('quit')
+> -                self._qmp.close()
+> -            except:
+> -                self._popen.kill()
+> +            if self._qmp:
+> +                try:
+> +                    if not has_quit:
+> +                        self._qmp.cmd('quit')
+> +                    self._qmp.close()
+> +                except:
+> +                    self._popen.kill()
+>              self._popen.wait()
+> =20
+>          self._load_io_log()
+> @@ -368,6 +373,23 @@ class QEMUMachine(object):
+> =20
+>          self._launched =3D False
+> =20
+> +    def set_qmp_monitor(self, disabled=3DFalse, monitor_address=3DNone):
+> +        """
+> +        Set the QMP monitor.
+> +
+> +        @param disabled: if True, qmp monitor options will be removed fr=
+om the
+> +                         base arguments of the resulting QEMU command li=
+ne.
 
-> Hi Aleksandar.
->
-> 1. all instructions are 16 bit long except CALL & JMP they are 32 bit lon=
-g
->
+I personally tend avoid double negatives as long as I'm aware of them.
+Wouldn't "enabled=3DTrue" be more straightforward?  Just my personal
+preference though.
 
-Accordingto the doc, LDS and STS also have 32-bit coding.
+> +        @param monitor_address: address for the QMP monitor.
 
+Do you have a use case for passing the monitor address here too, in
+addition to also being available as a parameter to __init__()?  In the
+next patch, I don't see it being used (or here for that matter).
 
+> +        @note: call this function before launch().
+> +        """
+> +        if disabled:
+> +            self._qmp_set =3D False
+> +            self._qmp =3D None
+> +        else:
+> +            self._qmp_set =3D True
+> +            if monitor_address:
+> +                self._monitor_address =3D monitor_address
+> +
+>      def qmp(self, cmd, conv_keys=3DTrue, **args):
+>          """
+>          Invoke a QMP command and return the response dict
+> --=20
+> 2.18.1
+>=20
 
-> 2. next_word_used is set to true by next_word when called by append_16
-> when CALL & JMP are parsed
->
-> Regards,
-> Michael Rolnik
->
-> On Mon, Dec 9, 2019 at 8:10 PM Aleksandar Markovic <
-> aleksandar.m.mail@gmail.com> wrote:
->
->>
->>
->> On Sunday, December 8, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
->>
->>> Provide function disassembles executed instruction when `-d in_asm` is
->>> provided
->>>
->>> Example:
->>> `./avr-softmmu/qemu-system-avr -bios free-rtos/Demo/AVR_ATMega2560_GCC/=
-demo.elf
->>> -d in_asm` will produce something like the following
->>>
->>> ```
->>>     ...
->>>     IN:
->>>     0x0000014a:  CALL      0x3808
->>>
->>>     IN: main
->>>     0x00003808:  CALL      0x4b4
->>>
->>>     IN: vParTestInitialise
->>>     0x000004b4:  LDI       r24, 255
->>>     0x000004b6:  STS       r24, 0
->>>     0x000004b8:  MULS      r16, r20
->>>     0x000004ba:  OUT       $1, r24
->>>     0x000004bc:  LDS       r24, 0
->>>     0x000004be:  MULS      r16, r20
->>>     0x000004c0:  OUT       $2, r24
->>>     0x000004c2:  RET
->>>     ...
->>> ```
->>>
->>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
->>> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
->>> Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>> ---
->>>  target/avr/cpu.h       |   1 +
->>>  target/avr/cpu.c       |   2 +-
->>>  target/avr/disas.c     | 226 +++++++++++++++++++++++++++++++++++++++++
->>>  target/avr/translate.c |  11 ++
->>>  4 files changed, 239 insertions(+), 1 deletion(-)
->>>  create mode 100644 target/avr/disas.c
->>>
->>> diff --git a/target/avr/cpu.h b/target/avr/cpu.h
->>> index c217eefeb4..a8a3e7ade6 100644
->>> --- a/target/avr/cpu.h
->>> +++ b/target/avr/cpu.h
->>> @@ -178,6 +178,7 @@ bool avr_cpu_exec_interrupt(CPUState *cpu, int
->>> int_req);
->>>  hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
->>>  int avr_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
->>>  int avr_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
->>> +int avr_print_insn(bfd_vma addr, disassemble_info *info);
->>>
->>>  static inline int avr_feature(CPUAVRState *env, int feature)
->>>  {
->>> diff --git a/target/avr/cpu.c b/target/avr/cpu.c
->>> index c5cafcae3c..be4b921e4d 100644
->>> --- a/target/avr/cpu.c
->>> +++ b/target/avr/cpu.c
->>> @@ -83,7 +83,7 @@ static void avr_cpu_reset(CPUState *cs)
->>>  static void avr_cpu_disas_set_info(CPUState *cpu, disassemble_info
->>> *info)
->>>  {
->>>      info->mach =3D bfd_arch_avr;
->>> -    info->print_insn =3D NULL;
->>> +    info->print_insn =3D avr_print_insn;
->>>  }
->>>
->>>  static void avr_cpu_realizefn(DeviceState *dev, Error **errp)
->>> diff --git a/target/avr/disas.c b/target/avr/disas.c
->>> new file mode 100644
->>> index 0000000000..22863d2eb1
->>> --- /dev/null
->>> +++ b/target/avr/disas.c
->>> @@ -0,0 +1,226 @@
->>> +/*
->>> + * AVR disassembler
->>> + *
->>> + * Copyright (c) 2019 Richard Henderson <rth@twiddle.net>
->>> + * Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
->>> + *
->>> + * This program is free software: you can redistribute it and/or modif=
-y
->>> + * it under the terms of the GNU General Public License as published b=
-y
->>> + * the Free Software Foundation, either version 2 of the License, or
->>> + * (at your option) any later version.
->>> + *
->>> + * This program is distributed in the hope that it will be useful,
->>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>> + * GNU General Public License for more details.
->>> + *
->>> + * You should have received a copy of the GNU General Public License
->>> + * along with this program.  If not, see <http://www.gnu.org/licenses/=
->
->>> .
->>> + */
->>> +
->>> +#include "qemu/osdep.h"
->>> +#include "cpu.h"
->>> +
->>> +typedef struct {
->>> +    disassemble_info *info;
->>> +    uint16_t next_word;
->>> +    bool next_word_used;
->>> +} DisasContext;
->>> +
->>> +static int to_regs_16_31_by_one(DisasContext *ctx, int indx)
->>> +{
->>> +    return 16 + (indx % 16);
->>> +}
->>> +
->>> +static int to_regs_16_23_by_one(DisasContext *ctx, int indx)
->>> +{
->>> +    return 16 + (indx % 8);
->>> +}
->>> +static int to_regs_24_30_by_two(DisasContext *ctx, int indx)
->>> +{
->>> +    return 24 + (indx % 4) * 2;
->>> +}
->>> +static int to_regs_00_30_by_two(DisasContext *ctx, int indx)
->>> +{
->>> +    return (indx % 16) * 2;
->>> +}
->>> +
->>> +static uint16_t next_word(DisasContext *ctx)
->>> +{
->>> +    ctx->next_word_used =3D true;
->>> +    return ctx->next_word;
->>> +}
->>> +
->>> +static int append_16(DisasContext *ctx, int x)
->>> +{
->>> +    return x << 16 | next_word(ctx);
->>> +}
->>> +
->>> +
->>> +/* Include the auto-generated decoder.  */
->>> +static bool decode_insn(DisasContext *ctx, uint16_t insn);
->>> +#include "decode_insn.inc.c"
->>> +
->>> +#define output(mnemonic, format, ...) \
->>> +    (pctx->info->fprintf_func(pctx->info->stream, "%-9s " format, \
->>> +                        mnemonic, ##__VA_ARGS__))
->>> +
->>> +int avr_print_insn(bfd_vma addr, disassemble_info *info)
->>> +{
->>> +    DisasContext ctx;
->>> +    DisasContext *pctx =3D &ctx;
->>> +    bfd_byte buffer[4];
->>> +    uint16_t insn;
->>> +    int status;
->>> +
->>> +    ctx.info =3D info;
->>> +
->>> +    status =3D info->read_memory_func(addr, buffer, 4, info);
->>> +    if (status !=3D 0) {
->>> +        info->memory_error_func(status, addr, info);
->>> +        return -1;
->>> +    }
->>> +    insn =3D bfd_getl16(buffer);
->>> +    ctx.next_word =3D bfd_getl16(buffer + 2);
->>> +    ctx.next_word_used =3D false;
->>> +
->>> +    if (!decode_insn(&ctx, insn)) {
->>> +        output(".db", "0x%02x, 0x%02x", buffer[0], buffer[1]);
->>> +    }
->>> +
->>> +    return ctx.next_word_used ? 4 : 2;
->>> +}
->>
->>
->> Hi, Michael,
->>
->> What is the role of ctx.next_word_used, if it looks it is always "false"=
-?
->>
->> Related to this, how do you disassemble 32-bit-coded instructions? From
->> this patch, it looks you treat all AVR instructions as 16-bit-coded?
->>
->> Thanks,
->> Aleksandar
->>
->>
->>> +
->>> +
->>> +#define INSN(opcode, format, ...)
->>>  \
->>> +static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)
->>> \
->>> +{
->>>  \
->>> +    output(#opcode, format, ##__VA_ARGS__);
->>>  \
->>> +    return true;
->>> \
->>> +}
->>> +
->>> +#define INSN_MNEMONIC(opcode, mnemonic, format, ...)
->>> \
->>> +static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)
->>> \
->>> +{
->>>  \
->>> +    output(mnemonic, format, ##__VA_ARGS__);
->>> \
->>> +    return true;
->>> \
->>> +}
->>> +
->>> +/*
->>> + *   C       Z       N       V       S       H       T       I
->>> + *   0       1       2       3       4       5       6       7
->>> + */
->>> +static const char *brbc[] =3D {
->>> +    "BRCC", "BRNE", "BRPL", "BRVC", "BRGE", "BRHC", "BRTC", "BRID"
->>> +};
->>> +
->>> +static const char *brbs[] =3D {
->>> +    "BRCS", "BREQ", "BRMI", "BRVS", "BRLT", "BRHS", "BRTS", "BRIE"
->>> +};
->>> +
->>> +static const char *bset[] =3D {
->>> +    "SEC",  "SEZ",  "SEN",  "SEZ",  "SES",  "SEH",  "SET",  "SEI"
->>> +};
->>> +
->>> +static const char *bclr[] =3D {
->>> +    "CLC",  "CLZ",  "CLN",  "CLZ",  "CLS",  "CLH",  "CLT",  "CLI"
->>> +};
->>> +
->>> +INSN(ADC,    "r%d, r%d", a->rd, a->rr)
->>> +INSN(ADD,    "r%d, r%d", a->rd, a->rr)
->>> +INSN(ADIW,   "r%d:r%d, %d", a->rd + 1, a->rd, a->imm)
->>> +INSN(AND,    "r%d, r%d", a->rd, a->rr)
->>> +INSN(ANDI,   "r%d, %d", a->rd, a->imm)
->>> +INSN(ASR,    "r%d", a->rd)
->>> +INSN_MNEMONIC(BCLR,  bclr[a->bit], "")
->>> +INSN(BLD,    "r%d, %d", a->rd, a->bit)
->>> +INSN_MNEMONIC(BRBC,  brbc[a->bit], ".%+d", a->imm * 2)
->>> +INSN_MNEMONIC(BRBS,  brbs[a->bit], ".%+d", a->imm * 2)
->>> +INSN(BREAK,  "")
->>> +INSN_MNEMONIC(BSET,  bset[a->bit], "")
->>> +INSN(BST,    "r%d, %d", a->rd, a->bit)
->>> +INSN(CALL,   "0x%x", a->imm * 2)
->>> +INSN(CBI,    "%d, %d", a->reg, a->bit)
->>> +INSN(COM,    "r%d", a->rd)
->>> +INSN(CP,     "r%d, r%d", a->rd, a->rr)
->>> +INSN(CPC,    "r%d, r%d", a->rd, a->rr)
->>> +INSN(CPI,    "r%d, %d", a->rd, a->imm)
->>> +INSN(CPSE,   "r%d, r%d", a->rd, a->rr)
->>> +INSN(DEC,    "r%d", a->rd)
->>> +INSN(DES,    "%d", a->imm)
->>> +INSN(EICALL, "")
->>> +INSN(EIJMP,  "")
->>> +INSN(ELPM1,  "")
->>> +INSN(ELPM2,  "r%d, Z", a->rd)
->>> +INSN(ELPMX,  "r%d, Z+", a->rd)
->>> +INSN(EOR,    "r%d, r%d", a->rd, a->rr)
->>> +INSN(FMUL,   "r%d, r%d", a->rd, a->rr)
->>> +INSN(FMULS,  "r%d, r%d", a->rd, a->rr)
->>> +INSN(FMULSU, "r%d, r%d", a->rd, a->rr)
->>> +INSN(ICALL,  "")
->>> +INSN(IJMP,   "")
->>> +INSN(IN,     "r%d, $%d", a->rd, a->imm)
->>> +INSN(INC,    "r%d", a->rd)
->>> +INSN(JMP,    "0x%x", a->imm * 2)
->>> +INSN(LAC,    "Z, r%d", a->rd)
->>> +INSN(LAS,    "Z, r%d", a->rd)
->>> +INSN(LAT,    "Z, r%d", a->rd)
->>> +INSN(LDDY,   "r%d, Y+%d", a->rd, a->imm)
->>> +INSN(LDDZ,   "r%d, Z+%d", a->rd, a->imm)
->>> +INSN(LDI,    "r%d, %d", a->rd, a->imm)
->>> +INSN(LDS,    "r%d, %d", a->rd, a->imm)
->>> +INSN(LDX1,   "r%d, X", a->rd)
->>> +INSN(LDX2,   "r%d, X+", a->rd)
->>> +INSN(LDX3,   "r%d, -X", a->rd)
->>> +INSN(LDY2,   "r%d, Y+", a->rd)
->>> +INSN(LDY3,   "r%d, -Y", a->rd)
->>> +INSN(LDZ2,   "r%d, Z+", a->rd)
->>> +INSN(LDZ3,   "r%d, -Z", a->rd)
->>> +INSN(LPM1,   "")
->>> +INSN(LPM2,   "r%d, Z", a->rd)
->>> +INSN(LPMX,   "r%d, Z+", a->rd)
->>> +INSN(LSR,    "r%d", a->rd)
->>> +INSN(MOV,    "r%d, r%d", a->rd, a->rr)
->>> +INSN(MOVW,   "r%d:r%d, r%d,r:r%d", a->rd + 1, a->rd, a->rr + 1, a->rr)
->>> +INSN(MUL,    "r%d, r%d", a->rd, a->rr)
->>> +INSN(MULS,   "r%d, r%d", a->rd, a->rr)
->>> +INSN(MULSU,  "r%d, r%d", a->rd, a->rr)
->>> +INSN(NEG,    "r%d", a->rd)
->>> +INSN(NOP,    "")
->>> +INSN(OR,     "r%d, r%d", a->rd, a->rr)
->>> +INSN(ORI,    "r%d, %d", a->rd, a->imm)
->>> +INSN(OUT,    "$%d, r%d", a->imm, a->rd)
->>> +INSN(POP,    "r%d", a->rd)
->>> +INSN(PUSH,   "r%d", a->rd)
->>> +INSN(RCALL,  ".%+d", a->imm * 2)
->>> +INSN(RET,    "")
->>> +INSN(RETI,   "")
->>> +INSN(RJMP,   ".%+d", a->imm * 2)
->>> +INSN(ROR,    "r%d", a->rd)
->>> +INSN(SBC,    "r%d, r%d", a->rd, a->rr)
->>> +INSN(SBCI,   "r%d, %d", a->rd, a->imm)
->>> +INSN(SBI,    "$%d, %d", a->reg, a->bit)
->>> +INSN(SBIC,   "$%d, %d", a->reg, a->bit)
->>> +INSN(SBIS,   "$%d, %d", a->reg, a->bit)
->>> +INSN(SBIW,   "r%d:r%d, %d", a->rd + 1, a->rd, a->imm)
->>> +INSN(SBRC,   "r%d, %d", a->rr, a->bit)
->>> +INSN(SBRS,   "r%d, %d", a->rr, a->bit)
->>> +INSN(SLEEP,  "")
->>> +INSN(SPM,    "")
->>> +INSN(SPMX,   "Z+")
->>> +INSN(STDY,   "r%d, Y+%d", a->rd, a->imm)
->>> +INSN(STDZ,   "r%d, Z+%d", a->rd, a->imm)
->>> +INSN(STS,    "r%d, %d", a->rd, a->imm)
->>> +INSN(STX1,   "r%d, X", a->rr)
->>> +INSN(STX2,   "r%d, X+", a->rr)
->>> +INSN(STX3,   "r%d, -X", a->rr)
->>> +INSN(STY2,   "r%d, Y+", a->rd)
->>> +INSN(STY3,   "r%d, -Y", a->rd)
->>> +INSN(STZ2,   "r%d, Z+", a->rd)
->>> +INSN(STZ3,   "r%d, -Z", a->rd)
->>> +INSN(SUB,    "r%d, r%d", a->rd, a->rr)
->>> +INSN(SUBI,   "r%d, %d", a->rd, a->imm)
->>> +INSN(SWAP,   "r%d", a->rd)
->>> +INSN(WDR,    "")
->>> +INSN(XCH,    "Z, r%d", a->rd)
->>> +
->>> diff --git a/target/avr/translate.c b/target/avr/translate.c
->>> index c8c6f798bf..a621195817 100644
->>> --- a/target/avr/translate.c
->>> +++ b/target/avr/translate.c
->>> @@ -2917,6 +2917,17 @@ done_generating:
->>>
->>>      tb->size =3D (ctx.npc - pc_start) * 2;
->>>      tb->icount =3D num_insns;
->>> +
->>> +#ifdef DEBUG_DISAS
->>> +    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
->>> +        && qemu_log_in_addr_range(tb->pc)) {
->>> +        qemu_log_lock();
->>> +        qemu_log("IN: %s\n", lookup_symbol(tb->pc));
->>> +        log_target_disas(cs, tb->pc, tb->size);
->>> +        qemu_log("\n");
->>> +        qemu_log_unlock();
->>> +    }
->>> +#endif
->>>  }
->>>
->>>  void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
->>> --
->>> 2.17.2 (Apple Git-113)
->>>
->>>
->
-> --
-> Best Regards,
-> Michael Rolnik
->
+Other than those comments, it LGTM.
 
---0000000000007e8319059951d7a7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+- Cleber.
 
-<br><br>On Monday, December 9, 2019, Michael Rolnik &lt;<a href=3D"mailto:m=
-rolnik@gmail.com">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=3D"=
-gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-=
-left:1ex"><div dir=3D"ltr">Hi Aleksandar.<div><br></div><div>1. all instruc=
-tions are 16 bit long except CALL &amp; JMP they are 32 bit long</div></div=
-></blockquote><div><br></div><div>Accordingto the doc, LDS and STS also hav=
-e 32-bit coding.</div><div><br></div><div>=C2=A0</div><blockquote class=3D"=
-gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-=
-left:1ex"><div dir=3D"ltr"><div>2.=C2=A0next_word_used is set to true by=C2=
-=A0next_word when called by=C2=A0append_16 when CALL &amp; JMP are parsed</=
-div><div><br></div><div>Regards,</div><div>Michael Rolnik</div></div><br><d=
-iv class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Dec =
-9, 2019 at 8:10 PM Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.m=
-ail@gmail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt; wrote:=
-<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8=
-ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"><br><br>On Sund=
-ay, December 8, 2019, Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.co=
-m" target=3D"_blank">mrolnik@gmail.com</a>&gt; wrote:<br><blockquote class=
-=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
-b(204,204,204);padding-left:1ex">Provide function disassembles executed ins=
-truction when `-d in_asm` is<br>
-provided<br>
-<br>
-Example:<br>
-`./avr-softmmu/qemu-system-avr -bios free-rtos/Demo/AVR_ATMega2560_<wbr>GCC=
-/demo.elf -d in_asm` will produce something like the following<br>
-<br>
-```<br>
-=C2=A0 =C2=A0 ...<br>
-=C2=A0 =C2=A0 IN:<br>
-=C2=A0 =C2=A0 0x0000014a:=C2=A0 CALL=C2=A0 =C2=A0 =C2=A0 0x3808<br>
-<br>
-=C2=A0 =C2=A0 IN: main<br>
-=C2=A0 =C2=A0 0x00003808:=C2=A0 CALL=C2=A0 =C2=A0 =C2=A0 0x4b4<br>
-<br>
-=C2=A0 =C2=A0 IN: vParTestInitialise<br>
-=C2=A0 =C2=A0 0x000004b4:=C2=A0 LDI=C2=A0 =C2=A0 =C2=A0 =C2=A0r24, 255<br>
-=C2=A0 =C2=A0 0x000004b6:=C2=A0 STS=C2=A0 =C2=A0 =C2=A0 =C2=A0r24, 0<br>
-=C2=A0 =C2=A0 0x000004b8:=C2=A0 MULS=C2=A0 =C2=A0 =C2=A0 r16, r20<br>
-=C2=A0 =C2=A0 0x000004ba:=C2=A0 OUT=C2=A0 =C2=A0 =C2=A0 =C2=A0$1, r24<br>
-=C2=A0 =C2=A0 0x000004bc:=C2=A0 LDS=C2=A0 =C2=A0 =C2=A0 =C2=A0r24, 0<br>
-=C2=A0 =C2=A0 0x000004be:=C2=A0 MULS=C2=A0 =C2=A0 =C2=A0 r16, r20<br>
-=C2=A0 =C2=A0 0x000004c0:=C2=A0 OUT=C2=A0 =C2=A0 =C2=A0 =C2=A0$2, r24<br>
-=C2=A0 =C2=A0 0x000004c2:=C2=A0 RET<br>
-=C2=A0 =C2=A0 ...<br>
-```<br>
-<br>
-Signed-off-by: Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.com" targ=
-et=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-Suggested-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@lin=
-aro.org" target=3D"_blank">richard.henderson@linaro.org</a>&gt;<br>
-Suggested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redh=
-at.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-Suggested-by: Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.m.mail@g=
-mail.com" target=3D"_blank">aleksandar.m.mail@gmail.com</a>&gt;<br>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redha=
-t.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
-Tested-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.=
-com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
----<br>
-=C2=A0target/avr/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A01 +<br>
-=C2=A0target/avr/cpu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A02 +-<br>
-=C2=A0target/avr/disas.c=C2=A0 =C2=A0 =C2=A0| 226 +++++++++++++++++++++++++=
-+++++<wbr>+++++++++++<br>
-=C2=A0target/avr/translate.c |=C2=A0 11 ++<br>
-=C2=A04 files changed, 239 insertions(+), 1 deletion(-)<br>
-=C2=A0create mode 100644 target/avr/disas.c<br>
-<br>
-diff --git a/target/avr/cpu.h b/target/avr/cpu.h<br>
-index c217eefeb4..a8a3e7ade6 100644<br>
---- a/target/avr/cpu.h<br>
-+++ b/target/avr/cpu.h<br>
-@@ -178,6 +178,7 @@ bool avr_cpu_exec_interrupt(<wbr>CPUState *cpu, int int=
-_req);<br>
-=C2=A0hwaddr avr_cpu_get_phys_page_debug(<wbr>CPUState *cpu, vaddr addr);<b=
-r>
-=C2=A0int avr_cpu_gdb_read_register(<wbr>CPUState *cpu, uint8_t *buf, int r=
-eg);<br>
-=C2=A0int avr_cpu_gdb_write_register(<wbr>CPUState *cpu, uint8_t *buf, int =
-reg);<br>
-+int avr_print_insn(bfd_vma addr, disassemble_info *info);<br>
-<br>
-=C2=A0static inline int avr_feature(CPUAVRState *env, int feature)<br>
-=C2=A0{<br>
-diff --git a/target/avr/cpu.c b/target/avr/cpu.c<br>
-index c5cafcae3c..be4b921e4d 100644<br>
---- a/target/avr/cpu.c<br>
-+++ b/target/avr/cpu.c<br>
-@@ -83,7 +83,7 @@ static void avr_cpu_reset(CPUState *cs)<br>
-=C2=A0static void avr_cpu_disas_set_info(<wbr>CPUState *cpu, disassemble_in=
-fo *info)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0info-&gt;mach =3D bfd_arch_avr;<br>
--=C2=A0 =C2=A0 info-&gt;print_insn =3D NULL;<br>
-+=C2=A0 =C2=A0 info-&gt;print_insn =3D avr_print_insn;<br>
-=C2=A0}<br>
-<br>
-=C2=A0static void avr_cpu_realizefn(DeviceState *dev, Error **errp)<br>
-diff --git a/target/avr/disas.c b/target/avr/disas.c<br>
-new file mode 100644<br>
-index 0000000000..22863d2eb1<br>
---- /dev/null<br>
-+++ b/target/avr/disas.c<br>
-@@ -0,0 +1,226 @@<br>
-+/*<br>
-+ * AVR disassembler<br>
-+ *<br>
-+ * Copyright (c) 2019 Richard Henderson &lt;<a href=3D"mailto:rth@twiddle.=
-net" target=3D"_blank">rth@twiddle.net</a>&gt;<br>
-+ * Copyright (c) 2019 Michael Rolnik &lt;<a href=3D"mailto:mrolnik@gmail.c=
-om" target=3D"_blank">mrolnik@gmail.com</a>&gt;<br>
-+ *<br>
-+ * This program is free software: you can redistribute it and/or modify<br=
->
-+ * it under the terms of the GNU General Public License as published by<br=
->
-+ * the Free Software Foundation, either version 2 of the License, or<br>
-+ * (at your option) any later version.<br>
-+ *<br>
-+ * This program is distributed in the hope that it will be useful,<br>
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of<br>
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.=C2=A0 See the<br>
-+ * GNU General Public License for more details.<br>
-+ *<br>
-+ * You should have received a copy of the GNU General Public License<br>
-+ * along with this program.=C2=A0 If not, see &lt;<a href=3D"http://www.gn=
-u.org/licenses/" target=3D"_blank">http://www.gnu.org/licenses/</a>&gt;<wbr=
->.<br>
-+ */<br>
-+<br>
-+#include &quot;qemu/osdep.h&quot;<br>
-+#include &quot;cpu.h&quot;<br>
-+<br>
-+typedef struct {<br>
-+=C2=A0 =C2=A0 disassemble_info *info;<br>
-+=C2=A0 =C2=A0 uint16_t next_word;<br>
-+=C2=A0 =C2=A0 bool next_word_used;<br>
-+} DisasContext;<br>
-+<br>
-+static int to_regs_16_31_by_one(<wbr>DisasContext *ctx, int indx)<br>
-+{<br>
-+=C2=A0 =C2=A0 return 16 + (indx % 16);<br>
-+}<br>
-+<br>
-+static int to_regs_16_23_by_one(<wbr>DisasContext *ctx, int indx)<br>
-+{<br>
-+=C2=A0 =C2=A0 return 16 + (indx % 8);<br>
-+}<br>
-+static int to_regs_24_30_by_two(<wbr>DisasContext *ctx, int indx)<br>
-+{<br>
-+=C2=A0 =C2=A0 return 24 + (indx % 4) * 2;<br>
-+}<br>
-+static int to_regs_00_30_by_two(<wbr>DisasContext *ctx, int indx)<br>
-+{<br>
-+=C2=A0 =C2=A0 return (indx % 16) * 2;<br>
-+}<br>
-+<br>
-+static uint16_t next_word(DisasContext *ctx)<br>
-+{<br>
-+=C2=A0 =C2=A0 ctx-&gt;next_word_used =3D true;<br>
-+=C2=A0 =C2=A0 return ctx-&gt;next_word;<br>
-+}<br>
-+<br>
-+static int append_16(DisasContext *ctx, int x)<br>
-+{<br>
-+=C2=A0 =C2=A0 return x &lt;&lt; 16 | next_word(ctx);<br>
-+}<br>
-+<br>
-+<br>
-+/* Include the auto-generated decoder.=C2=A0 */<br>
-+static bool decode_insn(DisasContext *ctx, uint16_t insn);<br>
-+#include &quot;decode_insn.inc.c&quot;<br>
-+<br>
-+#define output(mnemonic, format, ...) \<br>
-+=C2=A0 =C2=A0 (pctx-&gt;info-&gt;fprintf_func(<wbr>pctx-&gt;info-&gt;strea=
-m, &quot;%-9s &quot; format, \<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 mnemonic, ##__VA_ARGS__))<br>
-+<br>
-+int avr_print_insn(bfd_vma addr, disassemble_info *info)<br>
-+{<br>
-+=C2=A0 =C2=A0 DisasContext ctx;<br>
-+=C2=A0 =C2=A0 DisasContext *pctx =3D &amp;ctx;<br>
-+=C2=A0 =C2=A0 bfd_byte buffer[4];<br>
-+=C2=A0 =C2=A0 uint16_t insn;<br>
-+=C2=A0 =C2=A0 int status;<br>
-+<br>
-+=C2=A0 =C2=A0 <a href=3D"http://ctx.info" target=3D"_blank">ctx.info</a> =
-=3D info;<br>
-+<br>
-+=C2=A0 =C2=A0 status =3D info-&gt;read_memory_func(addr, buffer, 4, info);=
-<br>
-+=C2=A0 =C2=A0 if (status !=3D 0) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 info-&gt;memory_error_func(<wbr>status, addr, =
-info);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return -1;<br>
-+=C2=A0 =C2=A0 }<br>
-+=C2=A0 =C2=A0 insn =3D bfd_getl16(buffer);<br>
-+=C2=A0 =C2=A0 ctx.next_word =3D bfd_getl16(buffer + 2);<br>
-+=C2=A0 =C2=A0 ctx.next_word_used =3D false;<br>
-+<br>
-+=C2=A0 =C2=A0 if (!decode_insn(&amp;ctx, insn)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 output(&quot;.db&quot;, &quot;0x%02x, 0x%02x&q=
-uot;, buffer[0], buffer[1]);<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 return ctx.next_word_used ? 4 : 2;<br>
-+}</blockquote><div><br></div><div>Hi, Michael,</div><div><br></div><div>Wh=
-at is the role of ctx.next_word_used, if it looks it is always &quot;false&=
-quot;?</div><div><br></div><div>Related to this, how do you disassemble 32-=
-bit-coded instructions? From this patch, it looks you treat all AVR instruc=
-tions as 16-bit-coded?</div><div><br></div><div>Thanks,</div><div>Aleksanda=
-r</div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0=
-px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-+<br>
-+<br>
-+#define INSN(opcode, format, ...)=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0\<br>
-+static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \<br>
-+{=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
-+=C2=A0 =C2=A0 output(#opcode, format, ##__VA_ARGS__);=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0\<br>
-+=C2=A0 =C2=A0 return true;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \=
-<br>
-+}<br>
-+<br>
-+#define INSN_MNEMONIC(opcode, mnemonic, format, ...)=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \<br>
-+static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 \<br>
-+{=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0\<br>
-+=C2=A0 =C2=A0 output(mnemonic, format, ##__VA_ARGS__);=C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 \<br>
-+=C2=A0 =C2=A0 return true;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 \=
-<br>
-+}<br>
-+<br>
-+/*<br>
-+ *=C2=A0 =C2=A0C=C2=A0 =C2=A0 =C2=A0 =C2=A0Z=C2=A0 =C2=A0 =C2=A0 =C2=A0N=
-=C2=A0 =C2=A0 =C2=A0 =C2=A0V=C2=A0 =C2=A0 =C2=A0 =C2=A0S=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0H=C2=A0 =C2=A0 =C2=A0 =C2=A0T=C2=A0 =C2=A0 =C2=A0 =C2=A0I<br>
-+ *=C2=A0 =C2=A00=C2=A0 =C2=A0 =C2=A0 =C2=A01=C2=A0 =C2=A0 =C2=A0 =C2=A02=
-=C2=A0 =C2=A0 =C2=A0 =C2=A03=C2=A0 =C2=A0 =C2=A0 =C2=A04=C2=A0 =C2=A0 =C2=
-=A0 =C2=A05=C2=A0 =C2=A0 =C2=A0 =C2=A06=C2=A0 =C2=A0 =C2=A0 =C2=A07<br>
-+ */<br>
-+static const char *brbc[] =3D {<br>
-+=C2=A0 =C2=A0 &quot;BRCC&quot;, &quot;BRNE&quot;, &quot;BRPL&quot;, &quot;=
-BRVC&quot;, &quot;BRGE&quot;, &quot;BRHC&quot;, &quot;BRTC&quot;, &quot;BRI=
-D&quot;<br>
-+};<br>
-+<br>
-+static const char *brbs[] =3D {<br>
-+=C2=A0 =C2=A0 &quot;BRCS&quot;, &quot;BREQ&quot;, &quot;BRMI&quot;, &quot;=
-BRVS&quot;, &quot;BRLT&quot;, &quot;BRHS&quot;, &quot;BRTS&quot;, &quot;BRI=
-E&quot;<br>
-+};<br>
-+<br>
-+static const char *bset[] =3D {<br>
-+=C2=A0 =C2=A0 &quot;SEC&quot;,=C2=A0 &quot;SEZ&quot;,=C2=A0 &quot;SEN&quot=
-;,=C2=A0 &quot;SEZ&quot;,=C2=A0 &quot;SES&quot;,=C2=A0 &quot;SEH&quot;,=C2=
-=A0 &quot;SET&quot;,=C2=A0 &quot;SEI&quot;<br>
-+};<br>
-+<br>
-+static const char *bclr[] =3D {<br>
-+=C2=A0 =C2=A0 &quot;CLC&quot;,=C2=A0 &quot;CLZ&quot;,=C2=A0 &quot;CLN&quot=
-;,=C2=A0 &quot;CLZ&quot;,=C2=A0 &quot;CLS&quot;,=C2=A0 &quot;CLH&quot;,=C2=
-=A0 &quot;CLT&quot;,=C2=A0 &quot;CLI&quot;<br>
-+};<br>
-+<br>
-+INSN(ADC,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ADD,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ADIW,=C2=A0 =C2=A0&quot;r%d:r%d, %d&quot;, a-&gt;rd + 1, a-&gt;rd, a-=
-&gt;imm)<br>
-+INSN(AND,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ANDI,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(ASR,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN_MNEMONIC(BCLR,=C2=A0 bclr[a-&gt;bit], &quot;&quot;)<br>
-+INSN(BLD,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;bit)<br>
-+INSN_MNEMONIC(BRBC,=C2=A0 brbc[a-&gt;bit], &quot;.%+d&quot;, a-&gt;imm * 2=
-)<br>
-+INSN_MNEMONIC(BRBS,=C2=A0 brbs[a-&gt;bit], &quot;.%+d&quot;, a-&gt;imm * 2=
-)<br>
-+INSN(BREAK,=C2=A0 &quot;&quot;)<br>
-+INSN_MNEMONIC(BSET,=C2=A0 bset[a-&gt;bit], &quot;&quot;)<br>
-+INSN(BST,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;bit)<br>
-+INSN(CALL,=C2=A0 =C2=A0&quot;0x%x&quot;, a-&gt;imm * 2)<br>
-+INSN(CBI,=C2=A0 =C2=A0 &quot;%d, %d&quot;, a-&gt;reg, a-&gt;bit)<br>
-+INSN(COM,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(CP,=C2=A0 =C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(CPC,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(CPI,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(CPSE,=C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(DEC,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(DES,=C2=A0 =C2=A0 &quot;%d&quot;, a-&gt;imm)<br>
-+INSN(EICALL, &quot;&quot;)<br>
-+INSN(EIJMP,=C2=A0 &quot;&quot;)<br>
-+INSN(ELPM1,=C2=A0 &quot;&quot;)<br>
-+INSN(ELPM2,=C2=A0 &quot;r%d, Z&quot;, a-&gt;rd)<br>
-+INSN(ELPMX,=C2=A0 &quot;r%d, Z+&quot;, a-&gt;rd)<br>
-+INSN(EOR,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(FMUL,=C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(FMULS,=C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(FMULSU, &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ICALL,=C2=A0 &quot;&quot;)<br>
-+INSN(IJMP,=C2=A0 =C2=A0&quot;&quot;)<br>
-+INSN(IN,=C2=A0 =C2=A0 =C2=A0&quot;r%d, $%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(INC,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(JMP,=C2=A0 =C2=A0 &quot;0x%x&quot;, a-&gt;imm * 2)<br>
-+INSN(LAC,=C2=A0 =C2=A0 &quot;Z, r%d&quot;, a-&gt;rd)<br>
-+INSN(LAS,=C2=A0 =C2=A0 &quot;Z, r%d&quot;, a-&gt;rd)<br>
-+INSN(LAT,=C2=A0 =C2=A0 &quot;Z, r%d&quot;, a-&gt;rd)<br>
-+INSN(LDDY,=C2=A0 =C2=A0&quot;r%d, Y+%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(LDDZ,=C2=A0 =C2=A0&quot;r%d, Z+%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(LDI,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(LDS,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(LDX1,=C2=A0 =C2=A0&quot;r%d, X&quot;, a-&gt;rd)<br>
-+INSN(LDX2,=C2=A0 =C2=A0&quot;r%d, X+&quot;, a-&gt;rd)<br>
-+INSN(LDX3,=C2=A0 =C2=A0&quot;r%d, -X&quot;, a-&gt;rd)<br>
-+INSN(LDY2,=C2=A0 =C2=A0&quot;r%d, Y+&quot;, a-&gt;rd)<br>
-+INSN(LDY3,=C2=A0 =C2=A0&quot;r%d, -Y&quot;, a-&gt;rd)<br>
-+INSN(LDZ2,=C2=A0 =C2=A0&quot;r%d, Z+&quot;, a-&gt;rd)<br>
-+INSN(LDZ3,=C2=A0 =C2=A0&quot;r%d, -Z&quot;, a-&gt;rd)<br>
-+INSN(LPM1,=C2=A0 =C2=A0&quot;&quot;)<br>
-+INSN(LPM2,=C2=A0 =C2=A0&quot;r%d, Z&quot;, a-&gt;rd)<br>
-+INSN(LPMX,=C2=A0 =C2=A0&quot;r%d, Z+&quot;, a-&gt;rd)<br>
-+INSN(LSR,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(MOV,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(MOVW,=C2=A0 =C2=A0&quot;r%d:r%d, r%d,r:r%d&quot;, a-&gt;rd + 1, a-&gt=
-;rd, a-&gt;rr + 1, a-&gt;rr)<br>
-+INSN(MUL,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(MULS,=C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(MULSU,=C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(NEG,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(NOP,=C2=A0 =C2=A0 &quot;&quot;)<br>
-+INSN(OR,=C2=A0 =C2=A0 =C2=A0&quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(ORI,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(OUT,=C2=A0 =C2=A0 &quot;$%d, r%d&quot;, a-&gt;imm, a-&gt;rd)<br>
-+INSN(POP,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(PUSH,=C2=A0 =C2=A0&quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(RCALL,=C2=A0 &quot;.%+d&quot;, a-&gt;imm * 2)<br>
-+INSN(RET,=C2=A0 =C2=A0 &quot;&quot;)<br>
-+INSN(RETI,=C2=A0 =C2=A0&quot;&quot;)<br>
-+INSN(RJMP,=C2=A0 =C2=A0&quot;.%+d&quot;, a-&gt;imm * 2)<br>
-+INSN(ROR,=C2=A0 =C2=A0 &quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(SBC,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(SBCI,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(SBI,=C2=A0 =C2=A0 &quot;$%d, %d&quot;, a-&gt;reg, a-&gt;bit)<br>
-+INSN(SBIC,=C2=A0 =C2=A0&quot;$%d, %d&quot;, a-&gt;reg, a-&gt;bit)<br>
-+INSN(SBIS,=C2=A0 =C2=A0&quot;$%d, %d&quot;, a-&gt;reg, a-&gt;bit)<br>
-+INSN(SBIW,=C2=A0 =C2=A0&quot;r%d:r%d, %d&quot;, a-&gt;rd + 1, a-&gt;rd, a-=
-&gt;imm)<br>
-+INSN(SBRC,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rr, a-&gt;bit)<br>
-+INSN(SBRS,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rr, a-&gt;bit)<br>
-+INSN(SLEEP,=C2=A0 &quot;&quot;)<br>
-+INSN(SPM,=C2=A0 =C2=A0 &quot;&quot;)<br>
-+INSN(SPMX,=C2=A0 =C2=A0&quot;Z+&quot;)<br>
-+INSN(STDY,=C2=A0 =C2=A0&quot;r%d, Y+%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(STDZ,=C2=A0 =C2=A0&quot;r%d, Z+%d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(STS,=C2=A0 =C2=A0 &quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(STX1,=C2=A0 =C2=A0&quot;r%d, X&quot;, a-&gt;rr)<br>
-+INSN(STX2,=C2=A0 =C2=A0&quot;r%d, X+&quot;, a-&gt;rr)<br>
-+INSN(STX3,=C2=A0 =C2=A0&quot;r%d, -X&quot;, a-&gt;rr)<br>
-+INSN(STY2,=C2=A0 =C2=A0&quot;r%d, Y+&quot;, a-&gt;rd)<br>
-+INSN(STY3,=C2=A0 =C2=A0&quot;r%d, -Y&quot;, a-&gt;rd)<br>
-+INSN(STZ2,=C2=A0 =C2=A0&quot;r%d, Z+&quot;, a-&gt;rd)<br>
-+INSN(STZ3,=C2=A0 =C2=A0&quot;r%d, -Z&quot;, a-&gt;rd)<br>
-+INSN(SUB,=C2=A0 =C2=A0 &quot;r%d, r%d&quot;, a-&gt;rd, a-&gt;rr)<br>
-+INSN(SUBI,=C2=A0 =C2=A0&quot;r%d, %d&quot;, a-&gt;rd, a-&gt;imm)<br>
-+INSN(SWAP,=C2=A0 =C2=A0&quot;r%d&quot;, a-&gt;rd)<br>
-+INSN(WDR,=C2=A0 =C2=A0 &quot;&quot;)<br>
-+INSN(XCH,=C2=A0 =C2=A0 &quot;Z, r%d&quot;, a-&gt;rd)<br>
-+<br>
-diff --git a/target/avr/translate.c b/target/avr/translate.c<br>
-index c8c6f798bf..a621195817 100644<br>
---- a/target/avr/translate.c<br>
-+++ b/target/avr/translate.c<br>
-@@ -2917,6 +2917,17 @@ done_generating:<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0tb-&gt;size =3D (ctx.npc - pc_start) * 2;<br>
-=C2=A0 =C2=A0 =C2=A0tb-&gt;icount =3D num_insns;<br>
-+<br>
-+#ifdef DEBUG_DISAS<br>
-+=C2=A0 =C2=A0 if (qemu_loglevel_mask(CPU_LOG_<wbr>TB_IN_ASM)<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 &amp;&amp; qemu_log_in_addr_range(tb-&gt;pc)<w=
-br>) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_lock();<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;IN: %s\n&quot;, lookup_symbol(t=
-b-&gt;pc));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 log_target_disas(cs, tb-&gt;pc, tb-&gt;size);<=
-br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log(&quot;\n&quot;);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_unlock();<br>
-+=C2=A0 =C2=A0 }<br>
-+#endif<br>
-=C2=A0}<br>
-<br>
-=C2=A0void restore_state_to_opc(<wbr>CPUAVRState *env, TranslationBlock *tb=
-,<br>
--- <br>
-2.17.2 (Apple Git-113)<br>
-<br>
-</blockquote>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
->Best Regards,<br>Michael Rolnik</div>
-</blockquote>
+--5UGlQXeG3ziZS81+
+Content-Type: application/pgp-signature; name="signature.asc"
 
---0000000000007e8319059951d7a7--
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl3vKloACgkQZX6NM6Xy
+CfMGbQ//TczliLO0M8BYDRKl8nVYBFEoKUvnh713rMeXxcPIj55AATJs5VPvSltS
+4Nf8PWL8i731VT2R5tm4J2xd+ETeUf3+CvOT/80CdEvo6Gi8+3zEp6rNTYYPjTOO
+nnCqQtXB9MpkkPTfb0VDbjIf8O9mTlSYiJl1UMPhc23eAKABVde7OT/xi+CZsaIy
+JWazf85E1IRaVLB5CDM9nBzdqaHzTJrd052A8ClnjbET+fSl8CWEWVpcwHp/SWki
+xpNpeCEFTI40cKLGFQPPJtRmJgR1GTqb+7tyxEOw8wVZH4VTJFmLCznVX7ga5o+J
+EHPIo5Wh6FW+G+vcjO1ThKILPGfWz9d/IeOueN8uyY0LixO+RMg11sIBr6VxT/LW
+g+0N1/odOn8aozP+69PNDxDWT1rqulKaKBMHFVWxwsDvSoj5Th98PvG0VjmsreFJ
+6nECeC0cxqJsOONtHa/oGSXiEOfsrcJgURadUnHUul9uwwfvOagjZUf8n0AISjhH
+3nrgHd4mHZEhvot+WOf0EyEqckkqs13LjLfw+RqZywLz4IIjUjbrVzqHLZ9MdWld
+G9K7Ze2LhQM23p3+GY0qabMGOtDOYJ8nItlLl1Px9yNYLBDvXGmS+jPA+pi/ht/Z
+9N38nAf38l2dWZeoqmf9+oXT79HwE1NYkp12ttq2MskuL1qw8wk=
+=gxdn
+-----END PGP SIGNATURE-----
+
+--5UGlQXeG3ziZS81+--
+
 
