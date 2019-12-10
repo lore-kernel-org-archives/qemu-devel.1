@@ -2,89 +2,81 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 965CFC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 20:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C8DAC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 20:45:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A2922053B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 20:42:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A2922053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id DAD6D2073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 20:45:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nixYjW+/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAD6D2073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iemKl-0007ZU-Ho
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 15:42:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54710)
+	id 1iemNn-0000aX-VC
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 15:45:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iemK8-00079M-Ki
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:41:37 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iemMo-0008DT-Np
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:44:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iemK7-0004rb-A7
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:41:36 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60060
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iemK7-0004qV-5S
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:41:35 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBAKZI31100077; Tue, 10 Dec 2019 15:41:32 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wtcd0t1xe-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 10 Dec 2019 15:41:32 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBAKeVMO015575;
- Tue, 10 Dec 2019 20:41:31 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma02dal.us.ibm.com with ESMTP id 2wr3q6psv3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 10 Dec 2019 20:41:31 +0000
-Received: from b03ledav002.gho.boulder.ibm.com
- (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBAKfUwr35782918
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 10 Dec 2019 20:41:30 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8CE3D136053;
- Tue, 10 Dec 2019 20:41:30 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 64E37136055;
- Tue, 10 Dec 2019 20:41:30 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.218])
- by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 10 Dec 2019 20:41:30 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iemMn-0006RI-Nk
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:44:22 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:33166)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iemMn-0006R7-Ho
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 15:44:21 -0500
+Received: by mail-oi1-x241.google.com with SMTP id v140so11188753oie.0
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 12:44:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=E6V8tIqevgVlwbTdy9dCUQL/0odOgZs4rdR5xp3G7sI=;
+ b=nixYjW+/lmjwDcos1nP9S114bDWQGfseH2UInld0abLTzZ7l1mFqEoyT/LIr/hWwtZ
+ KyS6nDmGZ9utrp5pcjq+PJHBVE83ves15ULoBmg1kxFdF8fUoUC6820n6m26zUE/kSse
+ y+LYrjlLK6wt6TbQShsHiCRSXjYlazXIwv/va8ZpLW2Ys95IojsdZyPfjZ2DQA4I4cTG
+ 9oMxKnRSIgd578KcC6ayX8Qhtqs3y6aAFhVS0kJ6YwvR+VNdxe64raBcRhtz0fgTbkm2
+ MEueSAIjCxozLGYODbiV4KBT5d1VDxXzbLv/ozXBZU6jhzBLP92OdyVTLc5l7JHvwd5V
+ BNxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=E6V8tIqevgVlwbTdy9dCUQL/0odOgZs4rdR5xp3G7sI=;
+ b=KpCJ3Lwhha1OEimYMSc6ywYT6jYPpZU7PTtcgNYBn2N7FLXqfrzuP7QaPU8RkBzAvp
+ oKlRdaTg8HyTugwXROdX6jAKTE3GUDKZ2D7jcq6uUydIr4CwHus36myVrzc3m1KUWi9q
+ rFCS3qPQEze1vcwc9PoaBMNv3XfSKddSVDzE+G5I5dp7ubi8PM3oo3ILVvwL64zvEBkJ
+ IGPy8nSniS4r+cyO2FCOht2+cAMVcg/syAB0kMp6VgkU8EnCfbi5/hbMHi3TwKO8OF0U
+ bs2gU9uUGPojbYcPs/688dJ/GMZ4SBzPSLmAQdJFrorKfqJZBM1qh95scO1hNx3mQzSd
+ ISsg==
+X-Gm-Message-State: APjAAAXNrnpTuMeZqAWGJ8HQdTUUz7T7riRgNWz63I5YomdzCrwF8jS3
+ EdxLw49RFOs7trIxUlpyKrrzhuPVIENRTMPeE24=
+X-Google-Smtp-Source: APXvYqy43HnLk8aqlTvnLxyK6QdsdG/Ynh8gTTeW7+ZhflxiKjBU2TU9flJUnMZ0kOMVeWT9/X8w9L1xW/5+ll+oItk=
+X-Received: by 2002:aca:bbc6:: with SMTP id l189mr739306oif.53.1576010660581; 
+ Tue, 10 Dec 2019 12:44:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-User-Agent: alot/0.7
-To: qemu-devel@nongnu.org
-Message-ID: <157601048672.32150.11808263059605506302@sif>
-Subject: [ANNOUNCE] QEMU 4.2.0-rc5 is now available
-Date: Tue, 10 Dec 2019 14:41:26 -0600
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-10_06:2019-12-10,2019-12-10 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 spamscore=0
- lowpriorityscore=0 bulkscore=0 mlxscore=0 impostorscore=0 malwarescore=0
- mlxlogscore=999 adultscore=0 clxscore=1015 priorityscore=1501
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912100169
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+References: <20191208183922.13757-1-mrolnik@gmail.com>
+ <20191208183922.13757-6-mrolnik@gmail.com>
+In-Reply-To: <20191208183922.13757-6-mrolnik@gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 10 Dec 2019 21:44:09 +0100
+Message-ID: <CAL1e-=jWz5KEma9w-MvOHf6k9vzo1_FAV39d_S=NiDUYx_-bQQ@mail.gmail.com>
+Subject: Re: [PATCH v38 05/22] target/avr: Add instruction translation -
+ Arithmetic and Logic Instructions
+To: Michael Rolnik <mrolnik@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,53 +88,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Thomas Huth <thuth@redhat.com>, Joaquin de Andres <me@xcancerberox.com.ar>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+On Sun, Dec 8, 2019 at 7:40 PM Michael Rolnik <mrolnik@gmail.com> wrote:
 
-On behalf of the QEMU Team, I'd like to announce the availability of the
-sixth release candidate for the QEMU 4.2 release.  This release is meant
-for testing purposes and should not be used in a production environment.
+> +
+> +/*
+> + *  Performs the logical AND between the contents of register Rd and register
+> + *  Rr and places the result in the destination register Rd.
+> + */
+> +static bool trans_AND(DisasContext *ctx, arg_AND *a)
+> +{
+> +    TCGv Rd = cpu_r[a->rd];
+> +    TCGv Rr = cpu_r[a->rr];
+> +    TCGv R = tcg_temp_new_i32();
+> +
+> +    tcg_gen_and_tl(R, Rd, Rr); /* Rd = Rd and Rr */
+> +    tcg_gen_movi_tl(cpu_Vf, 0); /* Vf = 0 */
+> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
+> +    gen_ZNSf(R);
+> +    tcg_gen_mov_tl(Rd, R);
+> +
+> +    tcg_temp_free_i32(R);
+> +
+> +    return true;
+> +}
+> +
+> +
 
-  http://download.qemu-project.org/qemu-4.2.0-rc5.tar.xz
-  http://download.qemu-project.org/qemu-4.2.0-rc5.tar.xz.sig
+In the v37 comment I suggested to you make "update status register"
+portions more compact (but also to mark it with an one-line comment),
+but you overdid it and extended this compacting all the way to the
+main part of the handler. And now it is still hard to discern the core
+of the handler ("and" operation) and the update-status-register
+portion.
 
-A note from the maintainer:
-
-  rc5 contains three fixes for late-breaking release critical bugs:
-   * a QEMU crash when using KVM with an x86 host kernel with nested=3D0
-   * a guest crash in PPC spapr machines with pci bridges
-   * a crash involving bitmap handling in the qcow2 image format
-  =
-
-  We now plan to make the final release with no further
-  changes on Thursday, 2019-12-12.
-
-You can help improve the quality of the QEMU 4.2 release by testing this
-release and reporting bugs on Launchpad:
-
-  https://bugs.launchpad.net/qemu/
-
-The release plan, as well a documented known issues for release
-candidates, are available at:
-
-  http://wiki.qemu.org/Planning/4.2
-
-Please add entries to the ChangeLog for the 4.2 release below:
-
-  http://wiki.qemu.org/ChangeLog/4.2
-
-Thank you to everyone involved!
-
-Changes since rc4:
-
-52901abf94: Update version for v4.2.0-rc5 release (Peter Maydell)
-f56281abd9: block/qcow2-bitmap: fix crash bug in qcow2_co_remove_persistent=
-_dirty_bitmap (Vladimir Sementsov-Ogievskiy)
-a2fad86497: pseries: Update SLOF firmware image (Alexey Kardashevskiy)
-2605188240: target/i386: disable VMX features if nested=3D0 (Yang Zhong)
-
+Yours,
+Aleksandar
 
