@@ -2,84 +2,99 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A212C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 11:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57630C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 11:54:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 179E32073B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 11:49:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2174920726
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 11:54:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tE2Bm7qH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 179E32073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="APQF3pV0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2174920726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iee1I-00045P-5G
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 06:49:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33523)
+	id 1iee6O-0005bQ-5Y
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 06:54:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34929)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iee0Z-0003YS-KQ
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:48:52 -0500
+ (envelope-from <philmd@redhat.com>) id 1iee5d-00056N-Uu
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:54:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iee0Y-0006qN-EH
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:48:51 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35061)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iee0Y-0006pT-8I
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:48:50 -0500
-Received: by mail-ot1-x344.google.com with SMTP id o9so15233614ote.2
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 03:48:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SfXh7eKZqdpO2LGEgz3P0HSgLknLGqn+asJn+CHcrPI=;
- b=tE2Bm7qH6GjY2mQXj1MWvgEieR2tcKUidD2+T4ja754WnhBE5poHvZhfvZk96rQ5S2
- ot2BaTtcY3DY42tK0z50hv406f57UoY7CIRrVDAwSk7/+YmaqNynl8/s0807+AgmdMcN
- qeKd5mpmh42vcCbxaUjAGhnzH+Fyp2gcCkdi9bAIAHhg+LdQd1EwriUvZeRcmZ1YteRK
- tlb/ayBCDE1x3f4pJyCP/RXMcyH7YTwW2dU5RF5ec/8ws3xgfU72zeJqC41XuS6IuSI/
- KwF0F7NrVQc+czEmGXwgkIIL9YLUS2x1tu6eu6kBkzMN9shDKY8aYc3+91OXMdGyoYFA
- MhhQ==
+ (envelope-from <philmd@redhat.com>) id 1iee5a-0001pl-Oi
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:54:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32990
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iee5a-0001pG-AV
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:54:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575978841;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZpJdsIGeUaFlhK4GRp6HzFJ//qS+0uxiv6XuY5vv3dI=;
+ b=APQF3pV0mAX9fpYJtSGc4GEa6YxNaziiD1bAKsuv3aIAwmi1hd2sp1p0MU4vht4fWD3mDz
+ VEXCMMBt9h/At2I+Y26OrXmT3wZkNpzEofrUo9c6nK6hsVCSoUcck2kzF5Gpqar2RL6nJI
+ S/U0NmLk559ltSmoeubKF/3DetTwC24=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-wkW0JMEVOYe5ZygfZBX6Ww-1; Tue, 10 Dec 2019 06:53:58 -0500
+Received: by mail-wm1-f70.google.com with SMTP id l13so904528wmj.8
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 03:53:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SfXh7eKZqdpO2LGEgz3P0HSgLknLGqn+asJn+CHcrPI=;
- b=cZKk8Z/T12E5C373+JopOI/wtkqVccDHzvNnPMAyt3mqVDKJAIbwvPP9JdzBNqjB9o
- 2ZD5LKhrnCK1d/9ERgEA6hIS9hXiet80QGDU14RmDklEqqVf+4ZSk9aHOntWgNdpiJtI
- 2IsVJ+HgqHg/1D8mkp+EbmxY+hcPC8ymaYv1Y8D3uufhaB07R5oAilQuicUhexB+IHSy
- 8myVbsOND/kHRoRjCEJcqFfqqghfEE76nmFtkJRX6bKS9s3JTKiOC7mcyOwtEgOZ48hT
- iq02nGJ4d1B9D/mEz9AXmvOSrbfNDV7D4ccq3QBhQBr5CyvKC6KNuOJAUuowGcyU8+Id
- lS/g==
-X-Gm-Message-State: APjAAAUfHZn8aaCZkaVy/1BsF5csACoun6YKDWpQikyAZY7KAuWbsRm4
- yiyG1QrOCrzNt5Iyp9q/JEcbm9gaPFlXQA4NlOCueQ==
-X-Google-Smtp-Source: APXvYqx16K1ZVv4gv8fQvB3f5jY1DQINqwMflWH7jrq9BnIDUnmN6ak6Qlo+A9+K9Zeo9StUIhpvspJu/yxV93Rchq8=
-X-Received: by 2002:a9d:4d8a:: with SMTP id u10mr10486979otk.232.1575978529096; 
- Tue, 10 Dec 2019 03:48:49 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=oj5xwjLd1gtZg6O1NgqsP3cBJczDsHthJUQyQa0qg8c=;
+ b=GH3cRF2KzHIuZzN0VNGhWFV0Yv7CcCI0VSCQbD4jh4euqqBopgsfBvVNxeBZzskw+v
+ U046LiEfFX86yyKP90fsEBsv/y6aGuLhvXNl7f8su5L4914Ju7zGlm/GgJCMEKWAevSq
+ 2KrVUboPShvyOo/mnYaUPhdW5MS9K2JE4YH3xugD9enF5lTkBt5xLRrcGoM2nuw++15d
+ 2hTbWlWpABPQFBhzRNzgOU+MYzDxoRESfTa2T/wmp+SVFlVTF6kRfYyADBQcPktjrW3t
+ u2V85xGf+QKU/sTEOEs0Q4L8C/Vz69uaDAHSXkAZ2cLiUVdbmCpTDMgxEhP2gRA4JL6V
+ 6qog==
+X-Gm-Message-State: APjAAAVV1LcKd6u0nb0RLq2L1z87R8k9PHwhz+jLCJAJGA6zQH/FQTAh
+ E85S1w+kBVvEPhS9Jh+vX33NtregDwDR5g3jZdJAaVcjYMG2hcJ124FIRba+ZKlrKeN4tyEFpFz
+ eOusIBMGrLC/jE9M=
+X-Received: by 2002:a1c:e90e:: with SMTP id q14mr2635702wmc.108.1575978837042; 
+ Tue, 10 Dec 2019 03:53:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxldvopJJhem9YTUm9izE2+g+NbJGd8ayqv86Y2FwEUdCZl7hd4BsHrWUp9/Ic2Q+b4NYJfBg==
+X-Received: by 2002:a1c:e90e:: with SMTP id q14mr2635686wmc.108.1575978836808; 
+ Tue, 10 Dec 2019 03:53:56 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id p5sm2980274wrt.79.2019.12.10.03.53.55
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 10 Dec 2019 03:53:56 -0800 (PST)
+Subject: Re: [PATCH v2 07/18] vl: introduce object_parse_property_opt
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
+ <1575903705-12925-8-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <74c59c68-2314-d1c0-014d-1fb9cb911f87@redhat.com>
+Date: Tue, 10 Dec 2019 12:53:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20191016143410.5023-1-drjones@redhat.com>
- <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
- <20191206155327.7adiyjjkjh56mg2t@kamzik.brq.redhat.com>
- <596d07e933cb4da48dbba5b492e81a2438e78a2f.camel@redhat.com>
- <CAFEAcA9+G0jprsHRQp8g=Aso+2-_GhoWkDGx4WWxoC88maOKEg@mail.gmail.com>
- <20191210110531.psjzlikir2ep2omo@kamzik.brq.redhat.com>
-In-Reply-To: <20191210110531.psjzlikir2ep2omo@kamzik.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Dec 2019 11:48:38 +0000
-Message-ID: <CAFEAcA_M61hTzU=qCiUbR4V9Mnwd0phFNqTJG9pCWKreVmjy6A@mail.gmail.com>
-Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
- virtual time
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <1575903705-12925-8-git-send-email-pbonzini@redhat.com>
+Content-Language: en-US
+X-MC-Unique: wkW0JMEVOYe5ZygfZBX6Ww-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,36 +106,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: bijan.mottahedeh@oracle.com, Marc Zyngier <maz@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Andrea Bolognani <abologna@redhat.com>, qemu-arm <qemu-arm@nongnu.org>
+Cc: thuth@redhat.com, elmarco@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Dec 2019 at 11:05, Andrew Jones <drjones@redhat.com> wrote:
-> x86 developers could easily add this feature if/when they need a way to
-> disable their current default behavior. But, since the kvm-adjvtime
-> default would likely be 'on' for them, then they'd probably prefer the
-> feature be named kvm-no-adjvtime, and default 'off'. Should we try to
-> anticipate what x86 might want when naming this feature? IMO, we should
-> not, especially because I'm doubtful that x86 will ever want to implement
-> it. Also, what about the other KVM capable architectures? Which defaults
-> do they have now? And do we expect them to want to expose a switch to the
-> user to change it?
+On 12/9/19 4:01 PM, Paolo Bonzini wrote:
+> We will reuse the parsing loop of machine_set_property soon for "-accel",
+> but we do not want the "_" -> "-" conversion since "-accel" can just
+> standardize on dashes.  We will also add a bunch of legacy option handlin=
+g
+> to keep the QOM machine object clean.  Extract the loop into a separate
+> function, and keep the legacy handling in machine_set_property.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   vl.c | 35 ++++++++++++++++++++---------------
+>   1 file changed, 20 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/vl.c b/vl.c
+> index 19c77b4..66dff1b 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2615,27 +2615,17 @@ static MachineClass *select_machine(void)
+>       return machine_class;
+>   }
+>  =20
+> -static int machine_set_property(void *opaque,
+> -                                const char *name, const char *value,
+> -                                Error **errp)
+> +static int object_parse_property_opt(Object *obj,
+> +                                     const char *name, const char *value=
+,
+> +                                     const char *skip, Error **errp)
 
-My perspective here is mostly that I don't really understand
-the ins and outs of KVM and in particular handling of
-time in VMs, beyond knowing that it's complicated. So I
-prefer approaches that push back to "do everything the same
-for all architectures rather than having something that's
-arm-specific", because then things get more review from
-the larger mass of non-arm KVM/QEMU developers. Arm-specific
-switches/interfaces/designs just make arm more of a
-special-snowflake. I don't really have a basis to be able
-to review the patchset beyond those general biases.
+Can you document the 'skip' argument?
 
-thanks
--- PMM
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+
+>   {
+> -    Object *obj =3D OBJECT(opaque);
+>       Error *local_err =3D NULL;
+> -    char *p, *qom_name;
+>  =20
+> -    if (strcmp(name, "type") =3D=3D 0) {
+> +    if (g_str_equal(name, skip)) {
+>           return 0;
+>       }
+>  =20
+> -    qom_name =3D g_strdup(name);
+> -    for (p =3D qom_name; *p; p++) {
+> -        if (*p =3D=3D '_') {
+> -            *p =3D '-';
+> -        }
+> -    }
+> -
+> -    object_property_parse(obj, value, qom_name, &local_err);
+> -    g_free(qom_name);
+> +    object_property_parse(obj, value, name, &local_err);
+>  =20
+>       if (local_err) {
+>           error_propagate(errp, local_err);
+> @@ -2645,6 +2635,21 @@ static int machine_set_property(void *opaque,
+>       return 0;
+>   }
+>  =20
+> +static int machine_set_property(void *opaque,
+> +                                const char *name, const char *value,
+> +                                Error **errp)
+> +{
+> +    g_autofree char *qom_name =3D g_strdup(name);
+> +    char *p;
+> +
+> +    for (p =3D qom_name; *p; p++) {
+> +        if (*p =3D=3D '_') {
+> +            *p =3D '-';
+> +        }
+> +    }
+> +
+> +    return object_parse_property_opt(opaque, name, value, "type", errp);
+> +}
+>  =20
+>   /*
+>    * Initial object creation happens before all other
+>=20
+
 
