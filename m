@@ -2,65 +2,90 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 198C6C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A19C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:17:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E34C32073B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:09:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E34C32073B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1168E2073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:17:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZ+PI0Yv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1168E2073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iej1E-0002FG-3M
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 12:09:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36726)
+	id 1iej8e-0005tY-72
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 12:17:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38703)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iej06-0001AE-Ug
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:08:43 -0500
+ (envelope-from <abologna@redhat.com>) id 1iej7u-0005I5-HC
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:16:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iej05-0003zA-U7
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:08:42 -0500
-Received: from 13.mo7.mail-out.ovh.net ([87.98.150.175]:60897)
+ (envelope-from <abologna@redhat.com>) id 1iej7s-0000Np-8z
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:16:45 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46040
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iej05-0003yo-Nf
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:08:41 -0500
-Received: from player786.ha.ovh.net (unknown [10.109.146.166])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 1F7981420DC
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 18:08:40 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player786.ha.ovh.net (Postfix) with ESMTPSA id A48FED35C620;
- Tue, 10 Dec 2019 17:08:34 +0000 (UTC)
-Subject: Re: [PATCH 2/2] ppc/pnv: populate the DT with realized XSCOM devices
-To: Greg Kurz <groug@kaod.org>
-References: <20191210135845.19773-1-clg@kaod.org>
- <20191210135845.19773-3-clg@kaod.org>
- <20191210175323.76e77bcb@bahia.tlslab.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <377f830f-e667-7447-9e7f-867eef9091b2@kaod.org>
-Date: Tue, 10 Dec 2019 18:08:32 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <abologna@redhat.com>) id 1iej7s-0000NT-4l
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:16:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575998202;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vbeUY1tYvNFELFptAI6NyGsSXcrw+gBajlhVpD0Q4A8=;
+ b=BZ+PI0Yve6YUFxGhX3ScR18hMtmJEfV8o4YPydQFhN+r53KDoaxQk/Z1MiZcKOBk5f9ZuD
+ TRjvdSUUBKdeq6m/LusBvW8apHsFP/kKqLW2aziARaO4EYlZAyvwn3zBgfoSo7L2WYt6eO
+ 9js+RRe6tYW6Hhj1rLvrImVHk5SYVas=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-m-J_QNgtMqWr3h-gqil5nQ-1; Tue, 10 Dec 2019 12:16:40 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 623BC10054E3;
+ Tue, 10 Dec 2019 17:16:39 +0000 (UTC)
+Received: from ovpn-205-189.brq.redhat.com (ovpn-205-189.brq.redhat.com
+ [10.40.205.189])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 907081001B03;
+ Tue, 10 Dec 2019 17:16:36 +0000 (UTC)
+Message-ID: <ca3212971a456fe8bfb15bdd718dce5aa821daf1.camel@redhat.com>
+Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
+ virtual time
+From: Andrea Bolognani <abologna@redhat.com>
+To: Andrew Jones <drjones@redhat.com>
+Date: Tue, 10 Dec 2019 18:16:33 +0100
+In-Reply-To: <20191210160825.ioah26u36eu2i3z2@kamzik.brq.redhat.com>
+References: <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
+ <20191206155327.7adiyjjkjh56mg2t@kamzik.brq.redhat.com>
+ <596d07e933cb4da48dbba5b492e81a2438e78a2f.camel@redhat.com>
+ <CAFEAcA9+G0jprsHRQp8g=Aso+2-_GhoWkDGx4WWxoC88maOKEg@mail.gmail.com>
+ <20191210110531.psjzlikir2ep2omo@kamzik.brq.redhat.com>
+ <CAFEAcA_M61hTzU=qCiUbR4V9Mnwd0phFNqTJG9pCWKreVmjy6A@mail.gmail.com>
+ <20191210133254.22vcpvr3eabcnthe@kamzik.brq.redhat.com>
+ <29add42daba074ab5bdbd462b2d377115fec7c3c.camel@redhat.com>
+ <20191210143311.4sen6blhfhzop6zw@kamzik.brq.redhat.com>
+ <e0f86b200d0b3c08769cdbaa080569c3ec3db3ab.camel@redhat.com>
+ <20191210160825.ioah26u36eu2i3z2@kamzik.brq.redhat.com>
+User-Agent: Evolution 3.34.2 (3.34.2-1.fc31)
 MIME-Version: 1.0
-In-Reply-To: <20191210175323.76e77bcb@bahia.tlslab.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 15066511080464943936
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelfedgleeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedu
-Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: m-J_QNgtMqWr3h-gqil5nQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.150.175
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,53 +97,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>, bijan.mottahedeh@oracle.com,
+ Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/12/2019 17:53, Greg Kurz wrote:
-> On Tue, 10 Dec 2019 14:58:45 +0100
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> Some devices could be initialized in the instance_init handler but not
->> realized for configuration reasons. Nodes should not be added in the D=
-T
->> for such devices.
->>
->=20
-> Do you have examples of such devices to share ?
+On Tue, 2019-12-10 at 17:08 +0100, Andrew Jones wrote:
+> I don't have a strong enough opinion about kvm-adjvtime vs.
+> kvm-no-adjvtime to insist one way or another. I agree double inversions
+> are easier to mess up, but I also like the way the '-no-' better
+> communicates that the default is [probably] 'yes'.
+> 
+> All interested parties, please vote. I'll be sending v2 soon and I can
+> call this thing anything the majority (or the dominate minority) prefer.
 
-PHB4 again.=20
+I like kvm-adjvtime better because it avoids the double negative,
+but on the other hand if the new default is be to adjust the time
+then I don't expect many people will actually need to use the
+parameter, so the name doesn't matter that much after all :)
 
-C.=20
-
-
->=20
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/ppc/pnv_xscom.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
->> index 006d87e970d9..6d3745a49e50 100644
->> --- a/hw/ppc/pnv_xscom.c
->> +++ b/hw/ppc/pnv_xscom.c
->> @@ -272,7 +272,10 @@ static int xscom_dt_child(Object *child, void *op=
-aque)
->>          PnvXScomInterface *xd =3D PNV_XSCOM_INTERFACE(child);
->>          PnvXScomInterfaceClass *xc =3D PNV_XSCOM_INTERFACE_GET_CLASS(=
-xd);
->> =20
->> -        if (xc->dt_xscom) {
->> +        /*
->> +         * Only "realized" devices should be configured in the DT
->> +         */
->> +        if (xc->dt_xscom && DEVICE(child)->realized) {
->>              _FDT((xc->dt_xscom(xd, args->fdt, args->xscom_offset)));
->>          }
->>      }
->=20
+-- 
+Andrea Bolognani / Red Hat / Virtualization
 
 
