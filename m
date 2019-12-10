@@ -2,100 +2,83 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1536C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF919C00454
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:08:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8D8A20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:07:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D299207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:08:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eh2Xg94x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8D8A20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBO+bkCW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D299207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieeIT-00075y-LJ
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 07:07:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38081)
+	id 1ieeJN-00081N-Oz
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 07:08:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37936)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ieeH0-0005f4-Mc
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:05:52 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ieeGd-0005Ou-Sh
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:05:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ieeGy-0002f4-QT
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:05:50 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52938
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ieeGy-0002Yj-Eo
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:05:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575979545;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pH06kxAA6/MFRQa8xQzBLaJRjuJw0dsx5yg1BHU2ac0=;
- b=eh2Xg94xef+5GjZO+8SVn0OZSCt+B1CdukXUay8hAqhOwenRIqM5Mb7bHoVuB1uL9+vwbz
- v3WCjXS+MXztWGU06vziE4/Y8u5nIQaIbVv6ieZIwVHQdBaTeWHvm88KaZ9v1kPQdFZKU3
- spb8zGmCBafDvOeM1vvTeX4iQstkA58=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-410-NuBzTdztMlaTdDNtsDnjew-1; Tue, 10 Dec 2019 07:05:44 -0500
-Received: by mail-wr1-f71.google.com with SMTP id u12so8863653wrt.15
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 04:05:44 -0800 (PST)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ieeGY-0001nK-DU
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:05:27 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35352)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1ieeGY-0001l9-5O
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:05:22 -0500
+Received: by mail-wm1-x341.google.com with SMTP id c20so2872492wmb.0
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 04:05:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Do9M480OiF/mV/TsI463XjiLYTz9AZejk7h01p6crbI=;
+ b=QBO+bkCWrT4cPXgBC7HeeLvZIIyUCkvQuGmELzIsdJjwyxkZKehm1WcEDl85JQgCcz
+ w02coZu6tixVG0Nn3cR3Mbj687aYZiJPYNFt6QV0u2XwxjmzjVk6hDmYsCs1pqzdOZJY
+ yAT/nqK9es2XBx0tmNbWnvCIgSp9jSr2fKrf4RXTI6yXGTdJm8kxakIWhCJcopX5clp4
+ Y2TTijc6qWRSQP+UmQ/c9U2D4ksQJoNPGAHIO8d69LztyGB7BSFOqGWhvkBGYAkz2frJ
+ Px2kR/6MwS2jWOJDYi9rDZRiQu1bouPcsyYbin45lf6vGmJkq7cgBHJDSamznsSWUEYL
+ nctg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=cY5ICv2/WNfGIoyhYkBKtlW1CFBrO3U9rx2DuqOugpQ=;
- b=eH34Ye722LPWPfPSUjQTBTUwAm6GDoHsphWXBJxM8Sam/7goWWc8QpysU6KAdu/1mu
- lBOJL3zYoq08YB+lv/9kJlAjBIkre673c8B6NJe7aXklAo+LkRfXWLJsTnlDYVmS3PNB
- QakB3g3Ojs/CgYVfGfeaj6uSbStc2Iq6uiSU+FtvCutfCl5sGqZPYhc9rP8RLpjvu6An
- w/4zc41oHusKnXGBV+oOHiMAfoeG7FccKFNw/ZJ1kolXD+dTCZeDIDKsrfqDYr8Btiij
- Mvykd216tOQHursnsxOWLb5QcgY/tFEUJvgXDWYOOExzPQGshcA2RO5LHZ2bMMfu/qcG
- 1eiA==
-X-Gm-Message-State: APjAAAUbsH82q6hwSD4knOfe/YdhvmkzwJ2jtBCKgMnRiU1V2du6oN/D
- 5KL8uriJ77JqClFsVrCKKV37AnhZ71LV9k5gWPZi3aIienOL9o9bR+n8tq9pGNshPr4Y2Q7KENP
- zNfHgxADNtH2jzuI=
-X-Received: by 2002:a5d:5708:: with SMTP id a8mr3022726wrv.79.1575979543134;
- Tue, 10 Dec 2019 04:05:43 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxLnSyDQq3tvGgR43UCVOc8yxqalm9X//pEn9zLYY0kxgGUDbY1EXXnux+pI6eLrgdajg7d7A==
-X-Received: by 2002:a5d:5708:: with SMTP id a8mr3022685wrv.79.1575979542824;
- Tue, 10 Dec 2019 04:05:42 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id k11sm2769361wmc.20.2019.12.10.04.05.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Dec 2019 04:05:42 -0800 (PST)
-Subject: Re: [PATCH v2 18/18] kvm: convert "-machine kernel_irqchip" to an
- accelerator property
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
- <1575903705-12925-19-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <295b4845-5577-68af-8c00-598632ae0cad@redhat.com>
-Date: Tue, 10 Dec 2019 13:05:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Do9M480OiF/mV/TsI463XjiLYTz9AZejk7h01p6crbI=;
+ b=H+wUjI6rNoyINDGyRUrdc4P0IlYWCaouq2Zo7MCBkw4cToO7vWtxlOwyl+WoyHWDqU
+ mfZHa9JHvHNzRsAekR+HuewUiUO5BBc4TjOvln7jgnyyroHe/0jBMPZoRRbbPoxxkMYK
+ OG/oBOMZ4pkUGRz3Xyg7fXsCIW/wfHbBdoNHabQmqxadmcTLBys8l8m6cQ68TSBTmHWm
+ 0yiNVSWsujLwvZBpuo9mwzUEZXzCvhnzFcWZI/0KvbxwqvV5hoF6ULMRqIXMkzhUPg5A
+ 3A3bpdXthSgU7XCDoBXeSmwW1aoMyRdl6bTyqqYokuDOocGYHuGQrpa5Tyj5wxFZxQtN
+ outA==
+X-Gm-Message-State: APjAAAWm9Ew+/aeEImt7BqXAfRHSt9h/642+37d4B9u1uBN/oiCEeCX/
+ 5bdkv+/aYwXAEH25ruXpymKVTPdzettP5969i1s=
+X-Google-Smtp-Source: APXvYqxabEBpy8JUXDQZOSMgVGvxGAM9E6l1lDHjM6inLpw4n4NHjuw3fYkRWi1I7xFj6VRp2r0LU9wCccitPcn3pMI=
+X-Received: by 2002:a1c:1dc4:: with SMTP id d187mr4939294wmd.46.1575979520796; 
+ Tue, 10 Dec 2019 04:05:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1575903705-12925-19-git-send-email-pbonzini@redhat.com>
-Content-Language: en-US
-X-MC-Unique: NuBzTdztMlaTdDNtsDnjew-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
+ <1575903705-12925-4-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1575903705-12925-4-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 10 Dec 2019 16:05:08 +0400
+Message-ID: <CAJ+F1CJ45KA-=46CvHR6Xo1iGRVa1hpYcY6KvC-g2opo5KdLwA@mail.gmail.com>
+Subject: Re: [PATCH v2 03/18] tcg: move qemu_tcg_configure to
+ accel/tcg/tcg-all.c
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,334 +90,250 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, elmarco@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ elmarco@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/9/19 4:01 PM, Paolo Bonzini wrote:
+Hi
+
+On Mon, Dec 9, 2019 at 7:07 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> Move everything related to mttcg_enabled in accel/tcg/tcg-all.c,
+> which will make even more sense when "thread" becomes a QOM property.
+>
+> For now, initializing mttcg_enabled in the instance_init function
+> prepares for the next patch, which will only invoke qemu_tcg_configure
+> when the command line includes a -accel option.
+>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->   accel/kvm/kvm-all.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++=
------
->   hw/core/machine.c   | 61 ----------------------------------------------=
--------
->   include/hw/boards.h |  3 ---
->   qemu-options.hx     |  9 +++++---
->   vl.c                |  3 ++-
->   5 files changed, 62 insertions(+), 73 deletions(-)
->=20
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index c0a6351..b0adbb2 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -42,6 +42,8 @@
->   #include "sysemu/sev.h"
->   #include "sysemu/balloon.h"
->   #include "qapi/visitor.h"
-> +#include "qapi/qapi-types-common.h"
-> +#include "qapi/qapi-visit-common.h"
->  =20
->   #include "hw/boards.h"
->  =20
-> @@ -94,6 +96,9 @@ struct KVMState
->       int many_ioeventfds;
->       int intx_set_mask;
->       int kvm_shadow_mem;
-> +    bool kernel_irqchip_allowed;
-> +    bool kernel_irqchip_required;
-> +    bool kernel_irqchip_split;
->       bool sync_mmu;
->       bool manual_dirty_log_protect;
->       /* The man page (and posix) say ioctl numbers are signed int, but
-> @@ -1780,7 +1785,7 @@ static void kvm_irqchip_create(KVMState *s)
->        * in-kernel irqchip for us */
->       ret =3D kvm_arch_irqchip_create(s);
->       if (ret =3D=3D 0) {
-> -        if (kvm_kernel_irqchip_split()) {
-> +        if (s->kernel_irqchip_split) {
->               perror("Split IRQ chip mode not supported.");
->               exit(1);
->           } else {
-> @@ -2051,7 +2056,7 @@ static int kvm_init(MachineState *ms)
->           goto err;
->       }
->  =20
-> -    if (machine_kernel_irqchip_allowed(ms)) {
-> +    if (s->kernel_irqchip_allowed) {
->           kvm_irqchip_create(s);
->       }
->  =20
-> @@ -2969,19 +2974,57 @@ static void kvm_set_kvm_shadow_mem(Object *obj, V=
-isitor *v,
->       s->kvm_shadow_mem =3D value;
->   }
->  =20
-> +static void kvm_set_kernel_irqchip(Object *obj, Visitor *v,
-> +                                   const char *name, void *opaque,
-> +                                   Error **errp)
-> +{
-> +    Error *err =3D NULL;
-> +    KVMState *s =3D KVM_STATE(obj);
-> +    OnOffSplit mode;
+>  accel/tcg/tcg-all.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  cpus.c              | 72 ---------------------------------------------
+>  2 files changed, 85 insertions(+), 72 deletions(-)
+>
+> diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+> index c59d5b0..78a0ab5 100644
+> --- a/accel/tcg/tcg-all.c
+> +++ b/accel/tcg/tcg-all.c
+> @@ -30,6 +30,11 @@
+>  #include "cpu.h"
+>  #include "sysemu/cpus.h"
+>  #include "qemu/main-loop.h"
+> +#include "tcg/tcg.h"
+> +#include "include/qapi/error.h"
+> +#include "include/qemu/error-report.h"
+> +#include "include/hw/boards.h"
+> +#include "qemu/option.h"
+>
+>  unsigned long tcg_tb_size;
+>
+> @@ -58,6 +63,55 @@ static void tcg_handle_interrupt(CPUState *cpu, int ma=
+sk)
+>      }
+>  }
+>
+> +/*
+> + * We default to false if we know other options have been enabled
+> + * which are currently incompatible with MTTCG. Otherwise when each
+> + * guest (target) has been updated to support:
+> + *   - atomic instructions
+> + *   - memory ordering primitives (barriers)
+> + * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
+> + *
+> + * Once a guest architecture has been converted to the new primitives
+> + * there are two remaining limitations to check.
+> + *
+> + * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
+> + * - The host must have a stronger memory order than the guest
+> + *
+> + * It may be possible in future to support strong guests on weak hosts
+> + * but that will require tagging all load/stores in a guest with their
+> + * implicit memory order requirements which would likely slow things
+> + * down a lot.
+> + */
 > +
-> +    visit_type_OnOffSplit(v, name, &mode, &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
+> +static bool check_tcg_memory_orders_compatible(void)
+> +{
+> +#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
+> +    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) =3D=3D 0;
+> +#else
+> +    return false;
+> +#endif
+> +}
+> +
+> +static bool default_mttcg_enabled(void)
+> +{
+> +    if (use_icount || TCG_OVERSIZED_GUEST) {
+> +        return false;
 > +    } else {
-> +        switch (mode) {
-> +        case ON_OFF_SPLIT_ON:
-> +            s->kernel_irqchip_allowed =3D true;
-> +            s->kernel_irqchip_required =3D true;
-> +            s->kernel_irqchip_split =3D false;
-> +            break;
-> +        case ON_OFF_SPLIT_OFF:
-> +            s->kernel_irqchip_allowed =3D false;
-> +            s->kernel_irqchip_required =3D false;
-> +            s->kernel_irqchip_split =3D false;
-> +            break;
-> +        case ON_OFF_SPLIT_SPLIT:
-> +            s->kernel_irqchip_allowed =3D true;
-> +            s->kernel_irqchip_required =3D true;
-> +            s->kernel_irqchip_split =3D true;
-> +            break;
-> +        default:
-> +            /* The value was checked in visit_type_OnOffSplit() above. I=
-f
-
-With recent style enforcement you now need to split this comment in 2 lines=
-.
-
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-> +             * we get here, then something is wrong in QEMU.
-> +             */
-> +            abort();
-> +        }
+> +#ifdef TARGET_SUPPORTS_MTTCG
+> +        return check_tcg_memory_orders_compatible();
+> +#else
+> +        return false;
+> +#endif
 > +    }
 > +}
 > +
->   bool kvm_kernel_irqchip_allowed(void)
->   {
-> -    return machine_kernel_irqchip_allowed(current_machine);
-> +    return kvm_state->kernel_irqchip_allowed;
->   }
->  =20
->   bool kvm_kernel_irqchip_required(void)
->   {
-> -    return machine_kernel_irqchip_required(current_machine);
-> +    return kvm_state->kernel_irqchip_required;
->   }
->  =20
->   bool kvm_kernel_irqchip_split(void)
->   {
-> -    return machine_kernel_irqchip_split(current_machine);
-> +    return kvm_state->kernel_irqchip_split;
->   }
->  =20
->   static void kvm_accel_instance_init(Object *obj)
-> @@ -2999,6 +3042,12 @@ static void kvm_accel_class_init(ObjectClass *oc, =
-void *data)
->       ac->has_memory =3D kvm_accel_has_memory;
->       ac->allowed =3D &kvm_allowed;
->  =20
-> +    object_class_property_add(oc, "kernel-irqchip", "on|off|split",
-> +        NULL, kvm_set_kernel_irqchip,
-> +        NULL, NULL, &error_abort);
-> +    object_class_property_set_description(oc, "kernel-irqchip",
-> +        "Configure KVM in-kernel irqchip", &error_abort);
+> +static void tcg_accel_instance_init(Object *obj)
+> +{
+> +    TCGState *s =3D TCG_STATE(obj);
+
+It breaks compilation:
+
+accel/tcg/tcg-all.c:110:19: error: implicit declaration of function
+=E2=80=98TCG_STATE=E2=80=99 [-Werror=3Dimplicit-function-declaration]
+  110 |     TCGState *s =3D TCG_STATE(obj);
+
 > +
->       object_class_property_add(oc, "kvm-shadow-mem", "int",
->           kvm_get_kvm_shadow_mem, kvm_set_kvm_shadow_mem,
->           NULL, NULL, &error_abort);
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index bfb5f6f..c1cad2c 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -173,44 +173,6 @@ GlobalProperty hw_compat_2_1[] =3D {
->   };
->   const size_t hw_compat_2_1_len =3D G_N_ELEMENTS(hw_compat_2_1);
->  =20
-> -static void machine_set_kernel_irqchip(Object *obj, Visitor *v,
-> -                                       const char *name, void *opaque,
-> -                                       Error **errp)
-> -{
-> -    Error *err =3D NULL;
-> -    MachineState *ms =3D MACHINE(obj);
-> -    OnOffSplit mode;
+> +    mttcg_enabled =3D default_mttcg_enabled();
+> +}
+> +
+>  static int tcg_init(MachineState *ms)
+>  {
+>      tcg_exec_init(tcg_tb_size * 1024 * 1024);
+> @@ -65,6 +119,36 @@ static int tcg_init(MachineState *ms)
+>      return 0;
+>  }
+>
+> +void qemu_tcg_configure(QemuOpts *opts, Error **errp)
+> +{
+> +    const char *t =3D qemu_opt_get(opts, "thread");
+> +    if (!t) {
+> +        return;
+> +    }
+> +    if (strcmp(t, "multi") =3D=3D 0) {
+> +        if (TCG_OVERSIZED_GUEST) {
+> +            error_setg(errp, "No MTTCG when guest word size > hosts");
+> +        } else if (use_icount) {
+> +            error_setg(errp, "No MTTCG when icount is enabled");
+> +        } else {
+> +#ifndef TARGET_SUPPORTS_MTTCG
+> +            warn_report("Guest not yet converted to MTTCG - "
+> +                        "you may get unexpected results");
+> +#endif
+> +            if (!check_tcg_memory_orders_compatible()) {
+> +                warn_report("Guest expects a stronger memory ordering "
+> +                            "than the host provides");
+> +                error_printf("This may cause strange/hard to debug error=
+s\n");
+> +            }
+> +            mttcg_enabled =3D true;
+> +        }
+> +    } else if (strcmp(t, "single") =3D=3D 0) {
+> +        mttcg_enabled =3D false;
+> +    } else {
+> +        error_setg(errp, "Invalid 'thread' setting %s", t);
+> +    }
+> +}
+> +
+>  static void tcg_accel_class_init(ObjectClass *oc, void *data)
+>  {
+>      AccelClass *ac =3D ACCEL_CLASS(oc);
+> @@ -78,6 +162,7 @@ static void tcg_accel_class_init(ObjectClass *oc, void=
+ *data)
+>  static const TypeInfo tcg_accel_type =3D {
+>      .name =3D TYPE_TCG_ACCEL,
+>      .parent =3D TYPE_ACCEL,
+> +    .instance_init =3D tcg_accel_instance_init,
+>      .class_init =3D tcg_accel_class_init,
+>  };
+>
+> diff --git a/cpus.c b/cpus.c
+> index 63bda15..b472378 100644
+> --- a/cpus.c
+> +++ b/cpus.c
+> @@ -166,78 +166,6 @@ typedef struct TimersState {
+>  static TimersState timers_state;
+>  bool mttcg_enabled;
+>
+> -/*
+> - * We default to false if we know other options have been enabled
+> - * which are currently incompatible with MTTCG. Otherwise when each
+> - * guest (target) has been updated to support:
+> - *   - atomic instructions
+> - *   - memory ordering primitives (barriers)
+> - * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
+> - *
+> - * Once a guest architecture has been converted to the new primitives
+> - * there are two remaining limitations to check.
+> - *
+> - * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
+> - * - The host must have a stronger memory order than the guest
+> - *
+> - * It may be possible in future to support strong guests on weak hosts
+> - * but that will require tagging all load/stores in a guest with their
+> - * implicit memory order requirements which would likely slow things
+> - * down a lot.
+> - */
 > -
-> -    visit_type_OnOffSplit(v, name, &mode, &err);
-> -    if (err) {
-> -        error_propagate(errp, err);
-> -        return;
+> -static bool check_tcg_memory_orders_compatible(void)
+> -{
+> -#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
+> -    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) =3D=3D 0;
+> -#else
+> -    return false;
+> -#endif
+> -}
+> -
+> -static bool default_mttcg_enabled(void)
+> -{
+> -    if (use_icount || TCG_OVERSIZED_GUEST) {
+> -        return false;
 > -    } else {
-> -        switch (mode) {
-> -        case ON_OFF_SPLIT_ON:
-> -            ms->kernel_irqchip_allowed =3D true;
-> -            ms->kernel_irqchip_required =3D true;
-> -            ms->kernel_irqchip_split =3D false;
-> -            break;
-> -        case ON_OFF_SPLIT_OFF:
-> -            ms->kernel_irqchip_allowed =3D false;
-> -            ms->kernel_irqchip_required =3D false;
-> -            ms->kernel_irqchip_split =3D false;
-> -            break;
-> -        case ON_OFF_SPLIT_SPLIT:
-> -            ms->kernel_irqchip_allowed =3D true;
-> -            ms->kernel_irqchip_required =3D true;
-> -            ms->kernel_irqchip_split =3D true;
-> -            break;
-> -        default:
-> -            /* The value was checked in visit_type_OnOffSplit() above. I=
-f
-> -             * we get here, then something is wrong in QEMU.
-> -             */
-> -            abort();
-> -        }
+> -#ifdef TARGET_SUPPORTS_MTTCG
+> -        return check_tcg_memory_orders_compatible();
+> -#else
+> -        return false;
+> -#endif
 > -    }
 > -}
 > -
->   static char *machine_get_kernel(Object *obj, Error **errp)
->   {
->       MachineState *ms =3D MACHINE(obj);
-> @@ -752,12 +714,6 @@ static void machine_class_init(ObjectClass *oc, void=
- *data)
->       mc->numa_mem_align_shift =3D 23;
->       mc->numa_auto_assign_ram =3D numa_default_auto_assign_ram;
->  =20
-> -    object_class_property_add(oc, "kernel-irqchip", "on|off|split",
-> -        NULL, machine_set_kernel_irqchip,
-> -        NULL, NULL, &error_abort);
-> -    object_class_property_set_description(oc, "kernel-irqchip",
-> -        "Configure KVM in-kernel irqchip", &error_abort);
-> -
->       object_class_property_add_str(oc, "kernel",
->           machine_get_kernel, machine_set_kernel, &error_abort);
->       object_class_property_set_description(oc, "kernel",
-> @@ -857,8 +813,6 @@ static void machine_initfn(Object *obj)
->       MachineState *ms =3D MACHINE(obj);
->       MachineClass *mc =3D MACHINE_GET_CLASS(obj);
->  =20
-> -    ms->kernel_irqchip_allowed =3D true;
-> -    ms->kernel_irqchip_split =3D mc->default_kernel_irqchip_split;
->       ms->dump_guest_core =3D true;
->       ms->mem_merge =3D true;
->       ms->enable_graphics =3D true;
-> @@ -914,21 +868,6 @@ bool machine_usb(MachineState *machine)
->       return machine->usb;
->   }
->  =20
-> -bool machine_kernel_irqchip_allowed(MachineState *machine)
+> -void qemu_tcg_configure(QemuOpts *opts, Error **errp)
 > -{
-> -    return machine->kernel_irqchip_allowed;
+> -    const char *t =3D qemu_opt_get(opts, "thread");
+> -    if (t) {
+> -        if (strcmp(t, "multi") =3D=3D 0) {
+> -            if (TCG_OVERSIZED_GUEST) {
+> -                error_setg(errp, "No MTTCG when guest word size > hosts"=
+);
+> -            } else if (use_icount) {
+> -                error_setg(errp, "No MTTCG when icount is enabled");
+> -            } else {
+> -#ifndef TARGET_SUPPORTS_MTTCG
+> -                warn_report("Guest not yet converted to MTTCG - "
+> -                            "you may get unexpected results");
+> -#endif
+> -                if (!check_tcg_memory_orders_compatible()) {
+> -                    warn_report("Guest expects a stronger memory orderin=
+g "
+> -                                "than the host provides");
+> -                    error_printf("This may cause strange/hard to debug e=
+rrors\n");
+> -                }
+> -                mttcg_enabled =3D true;
+> -            }
+> -        } else if (strcmp(t, "single") =3D=3D 0) {
+> -            mttcg_enabled =3D false;
+> -        } else {
+> -            error_setg(errp, "Invalid 'thread' setting %s", t);
+> -        }
+> -    } else {
+> -        mttcg_enabled =3D default_mttcg_enabled();
+> -    }
 > -}
-> -
-> -bool machine_kernel_irqchip_required(MachineState *machine)
-> -{
-> -    return machine->kernel_irqchip_required;
-> -}
-> -
-> -bool machine_kernel_irqchip_split(MachineState *machine)
-> -{
-> -    return machine->kernel_irqchip_split;
-> -}
-> -
->   int machine_phandle_start(MachineState *machine)
->   {
->       return machine->phandle_start;
-> diff --git a/include/hw/boards.h b/include/hw/boards.h
-> index 46119eb..b42fedd 100644
-> --- a/include/hw/boards.h
-> +++ b/include/hw/boards.h
-> @@ -63,9 +63,6 @@ extern MachineState *current_machine;
->  =20
->   void machine_run_board_init(MachineState *machine);
->   bool machine_usb(MachineState *machine);
-> -bool machine_kernel_irqchip_allowed(MachineState *machine);
-> -bool machine_kernel_irqchip_required(MachineState *machine);
-> -bool machine_kernel_irqchip_split(MachineState *machine);
->   int machine_phandle_start(MachineState *machine);
->   bool machine_dump_guest_core(MachineState *machine);
->   bool machine_mem_merge(MachineState *machine);
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 779c8af..945fc4a 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -32,7 +32,6 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
->       "                selects emulated machine ('-machine help' for list=
-)\n"
->       "                property accel=3Daccel1[:accel2[:...]] selects acc=
-elerator\n"
->       "                supported accelerators are kvm, xen, hax, hvf, whp=
-x or tcg (default: tcg)\n"
-> -    "                kernel_irqchip=3Don|off|split controls accelerated =
-irqchip support (default=3Doff)\n"
->       "                vmport=3Don|off|auto controls emulation of vmport =
-(default: auto)\n"
->       "                dump-guest-core=3Don|off include guest memory in a=
- core dump (default=3Don)\n"
->       "                mem-merge=3Don|off controls memory merge support (=
-default: on)\n"
-> @@ -67,8 +66,6 @@ This is used to enable an accelerator. Depending on the=
- target architecture,
->   kvm, xen, hax, hvf, whpx or tcg can be available. By default, tcg is us=
-ed. If there is
->   more than one accelerator specified, the next one is used if the previo=
-us one
->   fails to initialize.
-> -@item kernel_irqchip=3Don|off
-> -Controls in-kernel irqchip support for the chosen accelerator when avail=
-able.
->   @item vmport=3Don|off|auto
->   Enables emulation of VMWare IO port, for vmmouse etc. auto says to sele=
-ct the
->   value based on accel. For accel=3Dxen the default is off otherwise the =
-default
-> @@ -115,6 +112,7 @@ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
->       "-accel [accel=3D]accelerator[,prop[=3Dvalue][,...]]\n"
->       "                select accelerator (kvm, xen, hax, hvf, whpx or tc=
-g; use 'help' for a list)\n"
->       "                igd-passthru=3Don|off (enable Xen integrated Intel=
- graphics passthrough, default=3Doff)\n"
-> +    "                kernel-irqchip=3Don|off|split controls accelerated =
-irqchip support (default=3Don)\n"
->       "                kvm-shadow-mem=3Dsize of KVM shadow MMU in bytes\n=
-"
->       "                tb-size=3Dn (TCG translation block cache size)\n"
->       "                thread=3Dsingle|multi (enable multi-threaded TCG)\=
-n", QEMU_ARCH_ALL)
-> @@ -129,6 +127,11 @@ fails to initialize.
->   @item igd-passthru=3Don|off
->   When Xen is in use, this option controls whether Intel integrated graph=
-ics
->   devices can be passed through to the guest (default=3Doff)
-> +@item kernel-irqchip=3Don|off|split
-> +Controls KVM in-kernel irqchip support.  The default is full acceleratio=
-n of the
-> +interrupt controllers.  On x86, split irqchip reduces the kernel attack
-> +surface, at a performance cost for non-MSI interrupts.  Disabling the in=
--kernel
-> +irqchip completely is not recommended except for debugging purposes.
->   @item kvm-shadow-mem=3Dsize
->   Defines the size of the KVM shadow MMU.
->   @item tb-size=3D@var{n}
-> diff --git a/vl.c b/vl.c
-> index 3678522..53e4ff6 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2639,7 +2639,8 @@ static int machine_set_property(void *opaque,
->           object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, v=
-alue);
->           return 0;
->       }
-> -    if (g_str_equal(qom_name, "kvm-shadow-mem")) {
-> +    if (g_str_equal(qom_name, "kvm-shadow-mem") ||
-> +        g_str_equal(qom_name, "kernel-irqchip")) {
->           object_register_sugar_prop(ACCEL_CLASS_NAME("kvm"), qom_name, v=
-alue);
->           return 0;
->       }
->=20
+>
+>  /* The current number of executed instructions is based on what we
+>   * originally budgeted minus the current state of the decrementing
+> --
+> 1.8.3.1
+>
+>
+>
 
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
