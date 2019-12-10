@@ -2,88 +2,84 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11A0C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 14:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 454E9C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 14:07:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 386A120652
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 14:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 113612073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 14:07:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OWxG9rO/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 386A120652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMUOdv/4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 113612073B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieg8k-0004st-9L
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 09:05:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48022)
+	id 1iegAk-00061S-6a
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 09:07:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ieg5Z-0002oN-J6
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:02:10 -0500
+ (envelope-from <bilalwasim676@gmail.com>) id 1ieg9n-0005Wy-Pm
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:06:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ieg5S-0004k7-Ar
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:02:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31964
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ieg5O-0004iV-NS
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:02:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575986518;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=K82ZiSjL4mKlDlw2aY+UZqQVPLiDSmYOFzfv2vBLUVs=;
- b=OWxG9rO/dTPbZ/Ofk1B3hwp7Tt9molzC8CZLXiYCECnAGsgytcEkcjykb956uKIUaIDMia
- SU9JSdyfNOUrYTcq/KTMUmlMP1I3leKQUaEji1eYlpkcaZeU26B8BXk5or1Q3f2+zZ6xoL
- ThMtseNm3pWcAeCLWuZb8v2Wp9FumKA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-n7sBLUT0OKuVLRPAyHERbA-1; Tue, 10 Dec 2019 09:01:54 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 037891858E72;
- Tue, 10 Dec 2019 14:01:54 +0000 (UTC)
-Received: from work-vm (ovpn-117-166.ams2.redhat.com [10.36.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5495B66FE3;
- Tue, 10 Dec 2019 14:01:53 +0000 (UTC)
-Date: Tue, 10 Dec 2019 14:01:50 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Lin Ma <LMa@suse.com>
-Subject: Re: =?utf-8?B?5Zue5aSNOiDlm57lpI06IOetlA==?=
- =?utf-8?B?5aSNOiBbUWVtdS1kZXZlbF0gbWlncmF0ZV9zZXRfc3BlZQ==?= =?utf-8?Q?d?=
- has no effect if the guest is using hugepages.
-Message-ID: <20191210140150.GA3542@work-vm>
-References: <BY5PR18MB3313E1E22A22D236D4C2680DC5F30@BY5PR18MB3313.namprd18.prod.outlook.com>
- <20190711102410.GH3971@work-vm>
- <BY5PR18MB331347C441DA068E32BFDE53C5F20@BY5PR18MB3313.namprd18.prod.outlook.com>
- <20190712123400.GJ2730@work-vm>
- <BY5PR18MB3313850D2845C27026891170C5CF0@BY5PR18MB3313.namprd18.prod.outlook.com>
- <20191205103159.GC2824@work-vm>
- <BY5PR18MB331333470C356200DDF0A8DAC55B0@BY5PR18MB3313.namprd18.prod.outlook.com>
+ (envelope-from <bilalwasim676@gmail.com>) id 1ieg9i-0006Mp-DI
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:06:31 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36469)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bilalwasim676@gmail.com>)
+ id 1ieg9i-0006Lw-6g; Tue, 10 Dec 2019 09:06:26 -0500
+Received: by mail-wm1-x341.google.com with SMTP id p17so3352482wma.1;
+ Tue, 10 Dec 2019 06:06:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=hFqtim+9HHduFLwD+2dEusU1yjl817nJKs7Wo98MEgE=;
+ b=jMUOdv/4vkzCnEKeawJsCaVi+Lbjd2XAaHGdZ8MFuLCEzIggZVuTB0JOO6iu2Qa3m6
+ w7GF+iDZciJEIG650S+BFnThIV6mm62foubsEofJfklqn7OcfNn30Gmy8WqWiVH0nk6L
+ AOWSx6JUP9rPubFybEFuKEbceJ3M1OrFcMjAwRMA1cYHFZerCujZDfLc+aCW9B8r9D32
+ 4tXw4Gi+dJq2ntdoPNds7uHcPC/GMe0QH41R8TGnMIySVkrDVgYloQcCd0pye5ZNxfpe
+ /llg3LC8pWA1YeIAJki2pc1p23WZi8qyQBrZZ3smx3Xfm5p6lbWJYjVxE3dfWUefNKpr
+ oNkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=hFqtim+9HHduFLwD+2dEusU1yjl817nJKs7Wo98MEgE=;
+ b=fnj5WGVsP/+7+GAcjtJ0imbl/p4WwiEnT04QEUshEtLQcnOhwzZX/X33s9+POtk6TJ
+ N000sXT4IelTiUNE0VibJruPWRsaQa5vn2XZ7BDJGvLRSlrIpH8VZo+vgx89Y53Tkb9z
+ yAtS2suwB0AvrRfzz9h9VeVPRlsOz6ucP9QAQm69H40oLfQrVOJITLZK+rwx79btUEnO
+ 8HQRM5UmCXrGmlw5NwjGRZHWmNjlzmMqUvOkWJvXmhKKyTvBP7wajwZO9jVmB8siXScp
+ 6BLT5J5wzB7nwlERovt7zmxVIs8Wcut1HgRJcU2ozXcDLkmdWXHIRZGan5dN0U9IHVoX
+ Qfsg==
+X-Gm-Message-State: APjAAAX7ceEPx7xkWN1+7IocKhUsMli427oU1UK3WRlcgemXabTBk/Db
+ 3/9PGg2uKEgg8wjHHiF9wQE48DX71rk=
+X-Google-Smtp-Source: APXvYqwtA7VVHVotAEReY74Dbkn0vnsGgNqQ075JMMKF0EFSVWinb1Ye7UVp6qKoXgqlotsAQZ/YyQ==
+X-Received: by 2002:a7b:c19a:: with SMTP id y26mr5433570wmi.152.1575986784103; 
+ Tue, 10 Dec 2019 06:06:24 -0800 (PST)
+Received: from PKL-BWASIM-LT.mgc.mentorg.com ([110.93.212.98])
+ by smtp.gmail.com with ESMTPSA id n188sm3514002wme.14.2019.12.10.06.06.21
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 10 Dec 2019 06:06:23 -0800 (PST)
+From: bilalwasim676@gmail.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3] net/imx_fec: Adding support for MAC filtering in the FEC
+ IP implementation.
+Date: Tue, 10 Dec 2019 19:06:17 +0500
+Message-Id: <20191210140617.16656-1-bilalwasim676@gmail.com>
+X-Mailer: git-send-email 2.19.1.windows.1
 MIME-Version: 1.0
-In-Reply-To: <BY5PR18MB331333470C356200DDF0A8DAC55B0@BY5PR18MB3313.namprd18.prod.outlook.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: n7sBLUT0OKuVLRPAyHERbA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,45 +91,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, philmd@redhat.com, jasowang@redhat.com,
+ mark.cave-ayland@ilande.co.uk, qemu-arm@nongnu.org,
+ bwasim <bilalwasim676@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Lin Ma (LMa@suse.com) wrote:
-> Hi Dave,
->=20
-> The patch fixed the issue, The rate limit with hugepages works well.
-> Thanks for your help!
+From: bwasim <bilalwasim676@gmail.com>
 
-No problem; thank you for reporting and testing it.
+This addition ensures that the IP does NOT boot up in promiscuous mode
+by default, and so the software only receives the desired
+packets(Unicast, Broadcast, Unicast / Multicast hashed) by default.
+The software running on-top of QEMU can also modify these settings and
+disable reception of broadcast frames or make the IP receive all packets (PROM mode).
+This patch greatly reduces the number of packets received by the
+software running on-top of the QEMU model. Tested with the armv7-a SABRE_LITE machine.
+Testing included running a custom OS with IPv4 / IPv6 support. Hashing
+and filtering of packets is tested to work well. Skeleton taken from
+the CADENCE_GEM IP and hash generation algorithm from the Linux Kernel.
 
-Dave
+Signed-off-by: Bilal Wasim <bilalwasim676@gmail.com>
+---
+ hw/net/imx_fec.c         | 109 ++++++++++++++++++++++++++++++++++++++-
+ include/hw/net/imx_fec.h |  10 ++++
+ 2 files changed, 118 insertions(+), 1 deletion(-)
 
-> Lin
->=20
-> > -----=E9=82=AE=E4=BB=B6=E5=8E=9F=E4=BB=B6-----
-> > =E5=8F=91=E4=BB=B6=E4=BA=BA: Dr. David Alan Gilbert <dgilbert@redhat.co=
-m>
-> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4: 2019=E5=B9=B412=E6=9C=885=E6=97=
-=A5 18:32
-> > =E6=94=B6=E4=BB=B6=E4=BA=BA: Lin Ma <LMa@suse.com>
-> > =E6=8A=84=E9=80=81: qemu-devel@nongnu.org
-> > =E4=B8=BB=E9=A2=98: Re: =E5=9B=9E=E5=A4=8D: =E7=AD=94=E5=A4=8D: [Qemu-d=
-evel] migrate_set_speed has no effect if the
-> > guest is using hugepages.
-> >=20
-> > Hi Lin,
-> >   I've just posted 'migration: Rate limit inside host pages'; please le=
-t me know if
-> > it helps for you.
-> >=20
-> > Dave
-> >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+index bd99236864..d248f39fb0 100644
+--- a/hw/net/imx_fec.c
++++ b/hw/net/imx_fec.c
+@@ -419,6 +419,79 @@ static void imx_enet_write_bd(IMXENETBufDesc *bd, dma_addr_t addr)
+     dma_memory_write(&address_space_memory, addr, bd, sizeof(*bd));
+ }
+ 
++/*
++ * Calculate a FEC MAC Address hash index
++ */
++static unsigned calc_mac_hash(const uint8_t *mac, uint8_t mac_length)
++{
++    uint32_t crc = net_crc32_le(mac, mac_length);
++
++    /*
++     * only upper 6 bits (FEC_HASH_BITS) are used
++     * which point to specific bit in the hash registers
++     */
++    return (crc >> (32 - FEC_HASH_BITS)) & 0x3f;
++}
++
++/*
++ * fec_mac_address_filter:
++ * Accept or reject this destination address?
++ */
++static int fec_mac_address_filter(IMXFECState *s, const uint8_t *packet)
++{
++    const uint8_t broadcast_addr[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
++    uint32_t addr1, addr2;
++    uint8_t  hash;
++
++    /* Promiscuous mode? */
++    if (s->regs[ENET_RCR] & ENET_RCR_PROM) {
++        /* Accept all packets in promiscuous mode (even if bc_rej is set). */
++        return FEC_RX_PROMISCUOUS_ACCEPT;
++    }
++
++    /* Broadcast packet? */
++    if (!memcmp(packet, broadcast_addr, 6)) {
++        /* Reject broadcast packets? */
++        if (s->regs[ENET_RCR] & ENET_RCR_BC_REJ) {
++            return FEC_RX_REJECT;
++        }
++        /* Accept packets from broadcast address. */
++        return FEC_RX_BROADCAST_ACCEPT;
++    }
++
++    /* Accept packets -w- hash match? */
++    hash = calc_mac_hash(packet, 6);
++
++    /* Accept packets -w- multicast hash match? */
++    if ((packet[0] & 0x01) == 0x01) {
++        /* Computed hash matches GAUR / GALR register ? */
++        if (((hash < 32) && (s->regs[ENET_GALR] & (1 << hash)))
++                || ((hash > 31) && (s->regs[ENET_GAUR] & (1 << (hash - 32))))) {
++            /* Accept multicast hash enabled address. */
++            return FEC_RX_MULTICAST_HASH_ACCEPT;
++        }
++    } else {
++        /* Computed hash matches IAUR / IALR register ? */
++        if (((hash < 32) && (s->regs[ENET_IALR] & (1 << hash)))
++                || ((hash > 31) && (s->regs[ENET_IAUR] & (1 << (hash - 32))))) {
++            /* Accept multicast hash enabled address. */
++            return FEC_RX_UNICAST_HASH_ACCEPT;
++        }
++    }
++
++    /* Match Unicast address. */
++    addr1  = g_htonl(s->regs[ENET_PALR]);
++    addr2  = g_htonl(s->regs[ENET_PAUR]);
++    if (!(memcmp(packet, (uint8_t *) &addr1, 4) ||
++          memcmp(packet + 4, (uint8_t *) &addr2, 2))) {
++        /* Accept packet because it matches my unicast address. */
++        return FEC_RX_UNICAST_ACCEPT;
++    }
++
++    /* Return -1 because we do NOT support MAC address filtering.. */
++    return FEC_RX_REJECT;
++}
++
+ static void imx_eth_update(IMXFECState *s)
+ {
+     /*
+@@ -984,7 +1057,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
+     case ENET_IALR:
+     case ENET_GAUR:
+     case ENET_GALR:
+-        /* TODO: implement MAC hash filtering.  */
++        s->regs[index] |= value;
+         break;
+     case ENET_TFWR:
+         if (s->is_fec) {
+@@ -1066,8 +1139,15 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+     uint32_t buf_addr;
+     uint8_t *crc_ptr;
+     unsigned int buf_len;
++    int maf;
+     size_t size = len;
+ 
++    /* Is this destination MAC address "for us" ? */
++    maf = fec_mac_address_filter(s, buf);
++    if (maf == FEC_RX_REJECT) {
++        return FEC_RX_REJECT;
++    }
++
+     FEC_PRINTF("len %d\n", (int)size);
+ 
+     if (!s->regs[ENET_RDAR]) {
+@@ -1133,6 +1213,16 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
+         } else {
+             s->regs[ENET_EIR] |= ENET_INT_RXB;
+         }
++
++        /* Update descriptor based on the "maf" flag. */
++        if (maf == FEC_RX_BROADCAST_ACCEPT) {
++            /* The packet is destined for the "broadcast" address. */
++            bd.flags |= ENET_BD_BC;
++        } else if (maf == FEC_RX_MULTICAST_HASH_ACCEPT) {
++            /* The packet is destined for a "multicast" address. */
++            bd.flags |= ENET_BD_MC;
++        }
++
+         imx_fec_write_bd(&bd, addr);
+         /* Advance to the next descriptor.  */
+         if ((bd.flags & ENET_BD_W) != 0) {
+@@ -1159,8 +1249,15 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+     uint8_t *crc_ptr;
+     unsigned int buf_len;
+     size_t size = len;
++    int maf;
+     bool shift16 = s->regs[ENET_RACC] & ENET_RACC_SHIFT16;
+ 
++    /* Is this destination MAC address "for us" ? */
++    maf = fec_mac_address_filter(s, buf);
++    if (maf == FEC_RX_REJECT) {
++        return FEC_RX_REJECT;
++    }
++
+     FEC_PRINTF("len %d\n", (int)size);
+ 
+     if (!s->regs[ENET_RDAR]) {
+@@ -1254,6 +1351,16 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+                 s->regs[ENET_EIR] |= ENET_INT_RXB;
+             }
+         }
++
++        /* Update descriptor based on the "maf" flag. */
++        if (maf == FEC_RX_BROADCAST_ACCEPT) {
++            /* The packet is destined for the "broadcast" address. */
++            bd.flags |= ENET_BD_BC;
++        } else if (maf == FEC_RX_MULTICAST_HASH_ACCEPT) {
++            /* The packet is destined for a "multicast" address. */
++            bd.flags |= ENET_BD_MC;
++        }
++
+         imx_enet_write_bd(&bd, addr);
+         /* Advance to the next descriptor.  */
+         if ((bd.flags & ENET_BD_W) != 0) {
+diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
+index 7b3faa4019..f9cfcf6af5 100644
+--- a/include/hw/net/imx_fec.h
++++ b/include/hw/net/imx_fec.h
+@@ -275,4 +275,14 @@ typedef struct IMXFECState {
+     uint8_t frame[ENET_MAX_FRAME_SIZE];
+ } IMXFECState;
+ 
++/* FEC address filtering defines. */
++#define FEC_RX_REJECT                   (-1)
++#define FEC_RX_PROMISCUOUS_ACCEPT       (-2)
++#define FEC_RX_BROADCAST_ACCEPT         (-3)
++#define FEC_RX_MULTICAST_HASH_ACCEPT    (-4)
++#define FEC_RX_UNICAST_HASH_ACCEPT      (-5)
++#define FEC_RX_UNICAST_ACCEPT           (-6)
++
++#define FEC_HASH_BITS                    6    /* #bits in hash */
++
+ #endif
+-- 
+2.19.1.windows.1
 
 
