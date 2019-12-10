@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF919C00454
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFBBC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:37:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D299207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:08:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8698F2073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:37:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBO+bkCW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D299207FF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DCIlIbwp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8698F2073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieeJN-00081N-Oz
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 07:08:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37936)
+	id 1ieela-0004SP-K3
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 07:37:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1ieeGd-0005Ou-Sh
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:05:29 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ieekw-000434-5F
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:36:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1ieeGY-0001nK-DU
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:05:27 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35352)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1ieekt-0006Sj-Uz
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:36:46 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46800)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1ieeGY-0001l9-5O
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:05:22 -0500
-Received: by mail-wm1-x341.google.com with SMTP id c20so2872492wmb.0
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 04:05:22 -0800 (PST)
+ id 1ieekt-0006PU-OP
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:36:43 -0500
+Received: by mail-wr1-x443.google.com with SMTP id z7so19789811wrl.13
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 04:36:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=Do9M480OiF/mV/TsI463XjiLYTz9AZejk7h01p6crbI=;
- b=QBO+bkCWrT4cPXgBC7HeeLvZIIyUCkvQuGmELzIsdJjwyxkZKehm1WcEDl85JQgCcz
- w02coZu6tixVG0Nn3cR3Mbj687aYZiJPYNFt6QV0u2XwxjmzjVk6hDmYsCs1pqzdOZJY
- yAT/nqK9es2XBx0tmNbWnvCIgSp9jSr2fKrf4RXTI6yXGTdJm8kxakIWhCJcopX5clp4
- Y2TTijc6qWRSQP+UmQ/c9U2D4ksQJoNPGAHIO8d69LztyGB7BSFOqGWhvkBGYAkz2frJ
- Px2kR/6MwS2jWOJDYi9rDZRiQu1bouPcsyYbin45lf6vGmJkq7cgBHJDSamznsSWUEYL
- nctg==
+ bh=gAfZ0HqdKQx2gkWX6YIiiAzgEs6wRB7F/m+vAiGTvBo=;
+ b=DCIlIbwp/Dbw+RhkOSzlYY7Bdi26r8AVLCfYdHqtyCC4+tfB44NLak4U/TF+6w23u8
+ k0skol+W458Ys+lQKjJcbTc0b8UP3Prhpm+014v8+XOPd6mnzxRfND07vVZd1B149Ijm
+ S0ZBwIZWxZLqQ0RT3Zdrc1Zw7Bg1FL76x5lmn7KBn0NGTZQ0XludC20LdUDVMoITD8i5
+ MgK6fCVx1/53V0uQ/SrHqfwBiEAtlkBQFw0v79BbzG6Z2ipTzzyRjednqlk6WXKVihVl
+ fWUP38XmeZtdFzpn5zjuhLFgz3u1dsli3T/zvfCFrWdQR0xwf9B2HDbJQTLerN6SdkxZ
+ 392g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=Do9M480OiF/mV/TsI463XjiLYTz9AZejk7h01p6crbI=;
- b=H+wUjI6rNoyINDGyRUrdc4P0IlYWCaouq2Zo7MCBkw4cToO7vWtxlOwyl+WoyHWDqU
- mfZHa9JHvHNzRsAekR+HuewUiUO5BBc4TjOvln7jgnyyroHe/0jBMPZoRRbbPoxxkMYK
- OG/oBOMZ4pkUGRz3Xyg7fXsCIW/wfHbBdoNHabQmqxadmcTLBys8l8m6cQ68TSBTmHWm
- 0yiNVSWsujLwvZBpuo9mwzUEZXzCvhnzFcWZI/0KvbxwqvV5hoF6ULMRqIXMkzhUPg5A
- 3A3bpdXthSgU7XCDoBXeSmwW1aoMyRdl6bTyqqYokuDOocGYHuGQrpa5Tyj5wxFZxQtN
- outA==
-X-Gm-Message-State: APjAAAWm9Ew+/aeEImt7BqXAfRHSt9h/642+37d4B9u1uBN/oiCEeCX/
- 5bdkv+/aYwXAEH25ruXpymKVTPdzettP5969i1s=
-X-Google-Smtp-Source: APXvYqxabEBpy8JUXDQZOSMgVGvxGAM9E6l1lDHjM6inLpw4n4NHjuw3fYkRWi1I7xFj6VRp2r0LU9wCccitPcn3pMI=
-X-Received: by 2002:a1c:1dc4:: with SMTP id d187mr4939294wmd.46.1575979520796; 
- Tue, 10 Dec 2019 04:05:20 -0800 (PST)
+ bh=gAfZ0HqdKQx2gkWX6YIiiAzgEs6wRB7F/m+vAiGTvBo=;
+ b=Bn/xeVFEka0g/E3MVB/jRZs6+VA5tBFQA6xxvM7wxj40oXYnhIVMc0HeJebtTUyQ3p
+ LfrKft/wCgslGU7letyfSFmT+HoMhgNUtk529AgGCjN/QkT6X9NbnCcghVv67gR7IX8o
+ IdEabeMAzp2MfmiqbcJA9CVQLynp69x1W0XNL5GUEb4EzUH8RIPIu9sY/lNgYKVqAQWg
+ l0kmvrmrYjoAoAD/OuBZifgIkJvSrXXI52E5oGchIrSFAiUXvtKFXzBT4V1y9F4BpWzk
+ ajaZR3wJ1yP7lb58vn0b0/ezChIEwjKJ/Ps/gRuVh9lmvngwH7qixRLIoJDFSsRpB+nt
+ B/8A==
+X-Gm-Message-State: APjAAAV+eHNMLwAYVgNdZhadrC64Va3mHIGZvaogVrDOaIaLyaq5G6dD
+ HIXUOVgTGlwps0lBc61FOEcFiRAcaHyHNRjEyaY=
+X-Google-Smtp-Source: APXvYqyG5LJEJ6m7xFT5WEY6fPmt9sR524LNN/hrwXhOA0vI678cqPp0HOh2DTgGdO+1byUNDQ+Q00MHn6FVNTOIyzk=
+X-Received: by 2002:a5d:4a84:: with SMTP id o4mr3021719wrq.396.1575981402067; 
+ Tue, 10 Dec 2019 04:36:42 -0800 (PST)
 MIME-Version: 1.0
 References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
- <1575903705-12925-4-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1575903705-12925-4-git-send-email-pbonzini@redhat.com>
+ <1575903705-12925-11-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1575903705-12925-11-git-send-email-pbonzini@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 10 Dec 2019 16:05:08 +0400
-Message-ID: <CAJ+F1CJ45KA-=46CvHR6Xo1iGRVa1hpYcY6KvC-g2opo5KdLwA@mail.gmail.com>
-Subject: Re: [PATCH v2 03/18] tcg: move qemu_tcg_configure to
- accel/tcg/tcg-all.c
+Date: Tue, 10 Dec 2019 16:36:29 +0400
+Message-ID: <CAJ+F1C+Qx+B9h0fz=FvoZ438Z3S2N57idhN+y2TeXorAuXvQDA@mail.gmail.com>
+Subject: Re: [PATCH v2 10/18] qom: introduce object_register_sugar_prop
 To: Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,240 +97,116 @@ Sender: "Qemu-devel"
 
 Hi
 
-On Mon, Dec 9, 2019 at 7:07 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Mon, Dec 9, 2019 at 7:10 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> Move everything related to mttcg_enabled in accel/tcg/tcg-all.c,
-> which will make even more sense when "thread" becomes a QOM property.
->
-> For now, initializing mttcg_enabled in the instance_init function
-> prepares for the next patch, which will only invoke qemu_tcg_configure
-> when the command line includes a -accel option.
+> Similar to the existing "-rtc driftfix" option, we will convert some
+> legacy "-machine" command line options to global properties on accelerato=
+rs.
+> Because accelerators are not devices, we cannot use qdev_prop_register_gl=
+obal.
+> Instead, provide a slot in the generic object_compat_props arrays for
+> command line syntactic sugar.
 >
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  accel/tcg/tcg-all.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  cpus.c              | 72 ---------------------------------------------
->  2 files changed, 85 insertions(+), 72 deletions(-)
+>  include/qom/object.h |  1 +
+>  qom/object.c         | 23 +++++++++++++++++++++--
+>  vl.c                 | 10 +++-------
+>  3 files changed, 25 insertions(+), 9 deletions(-)
 >
-> diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-> index c59d5b0..78a0ab5 100644
-> --- a/accel/tcg/tcg-all.c
-> +++ b/accel/tcg/tcg-all.c
-> @@ -30,6 +30,11 @@
->  #include "cpu.h"
->  #include "sysemu/cpus.h"
->  #include "qemu/main-loop.h"
-> +#include "tcg/tcg.h"
-> +#include "include/qapi/error.h"
-> +#include "include/qemu/error-report.h"
-> +#include "include/hw/boards.h"
-> +#include "qemu/option.h"
+> diff --git a/include/qom/object.h b/include/qom/object.h
+> index 128d00c..230b18f 100644
+> --- a/include/qom/object.h
+> +++ b/include/qom/object.h
+> @@ -679,6 +679,7 @@ void object_apply_global_props(Object *obj, const GPt=
+rArray *props,
+>                                 Error **errp);
+>  void object_set_machine_compat_props(GPtrArray *compat_props);
+>  void object_set_accelerator_compat_props(GPtrArray *compat_props);
+> +void object_register_sugar_prop(const char *driver, const char *prop, co=
+nst char *value);
+>  void object_apply_compat_props(Object *obj);
 >
->  unsigned long tcg_tb_size;
+>  /**
+> diff --git a/qom/object.c b/qom/object.c
+> index d51b57f..bfb4413 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -414,10 +414,29 @@ void object_apply_global_props(Object *obj, const G=
+PtrArray *props, Error **errp
+>   * Global property defaults
+>   * Slot 0: accelerator's global property defaults
+>   * Slot 1: machine's global property defaults
+> + * Slot 2: global properties from legacy command line option
+>   * Each is a GPtrArray of of GlobalProperty.
+>   * Applied in order, later entries override earlier ones.
+>   */
+> -static GPtrArray *object_compat_props[2];
+> +static GPtrArray *object_compat_props[3];
+> +
+> +/*
+> + * Retrieve @GPtrArray for global property defined with options
+> + * other than "-global".  These are generally used for syntactic
+> + * sugar and legacy command line options.
+> + */
+> +void object_register_sugar_prop(const char *driver, const char *prop, co=
+nst char *value)
+> +{
+> +    GlobalProperty *g;
+> +    if (!object_compat_props[2]) {
+> +        object_compat_props[2] =3D g_ptr_array_new();
+> +    }
+> +    g =3D g_new(GlobalProperty, 1);
+> +    g->driver =3D g_strdup(driver);
+> +    g->property =3D g_strdup(prop);
+> +    g->value =3D g_strdup(value);
+> +    g_ptr_array_add(object_compat_props[2], g);
+> +}
 >
-> @@ -58,6 +63,55 @@ static void tcg_handle_interrupt(CPUState *cpu, int ma=
-sk)
+>  /*
+>   * Set machine's global property defaults to @compat_props.
+> @@ -445,7 +464,7 @@ void object_apply_compat_props(Object *obj)
+>
+>      for (i =3D 0; i < ARRAY_SIZE(object_compat_props); i++) {
+>          object_apply_global_props(obj, object_compat_props[i],
+> -                                  &error_abort);
+> +                                  i =3D=3D 2 ? &error_fatal : &error_abo=
+rt);
 >      }
 >  }
 >
-> +/*
-> + * We default to false if we know other options have been enabled
-> + * which are currently incompatible with MTTCG. Otherwise when each
-> + * guest (target) has been updated to support:
-> + *   - atomic instructions
-> + *   - memory ordering primitives (barriers)
-> + * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
-> + *
-> + * Once a guest architecture has been converted to the new primitives
-> + * there are two remaining limitations to check.
-> + *
-> + * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
-> + * - The host must have a stronger memory order than the guest
-> + *
-> + * It may be possible in future to support strong guests on weak hosts
-> + * but that will require tagging all load/stores in a guest with their
-> + * implicit memory order requirements which would likely slow things
-> + * down a lot.
-> + */
-> +
-> +static bool check_tcg_memory_orders_compatible(void)
-> +{
-> +#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
-> +    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) =3D=3D 0;
-> +#else
-> +    return false;
-> +#endif
-> +}
-> +
-> +static bool default_mttcg_enabled(void)
-> +{
-> +    if (use_icount || TCG_OVERSIZED_GUEST) {
-> +        return false;
-> +    } else {
-> +#ifdef TARGET_SUPPORTS_MTTCG
-> +        return check_tcg_memory_orders_compatible();
-> +#else
-> +        return false;
-> +#endif
-> +    }
-> +}
-> +
-> +static void tcg_accel_instance_init(Object *obj)
-> +{
-> +    TCGState *s =3D TCG_STATE(obj);
-
-It breaks compilation:
-
-accel/tcg/tcg-all.c:110:19: error: implicit declaration of function
-=E2=80=98TCG_STATE=E2=80=99 [-Werror=3Dimplicit-function-declaration]
-  110 |     TCGState *s =3D TCG_STATE(obj);
-
-> +
-> +    mttcg_enabled =3D default_mttcg_enabled();
-> +}
-> +
->  static int tcg_init(MachineState *ms)
->  {
->      tcg_exec_init(tcg_tb_size * 1024 * 1024);
-> @@ -65,6 +119,36 @@ static int tcg_init(MachineState *ms)
->      return 0;
->  }
->
-> +void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-> +{
-> +    const char *t =3D qemu_opt_get(opts, "thread");
-> +    if (!t) {
-> +        return;
-> +    }
-> +    if (strcmp(t, "multi") =3D=3D 0) {
-> +        if (TCG_OVERSIZED_GUEST) {
-> +            error_setg(errp, "No MTTCG when guest word size > hosts");
-> +        } else if (use_icount) {
-> +            error_setg(errp, "No MTTCG when icount is enabled");
-> +        } else {
-> +#ifndef TARGET_SUPPORTS_MTTCG
-> +            warn_report("Guest not yet converted to MTTCG - "
-> +                        "you may get unexpected results");
-> +#endif
-> +            if (!check_tcg_memory_orders_compatible()) {
-> +                warn_report("Guest expects a stronger memory ordering "
-> +                            "than the host provides");
-> +                error_printf("This may cause strange/hard to debug error=
-s\n");
-> +            }
-> +            mttcg_enabled =3D true;
-> +        }
-> +    } else if (strcmp(t, "single") =3D=3D 0) {
-> +        mttcg_enabled =3D false;
-> +    } else {
-> +        error_setg(errp, "Invalid 'thread' setting %s", t);
-> +    }
-> +}
-> +
->  static void tcg_accel_class_init(ObjectClass *oc, void *data)
->  {
->      AccelClass *ac =3D ACCEL_CLASS(oc);
-> @@ -78,6 +162,7 @@ static void tcg_accel_class_init(ObjectClass *oc, void=
- *data)
->  static const TypeInfo tcg_accel_type =3D {
->      .name =3D TYPE_TCG_ACCEL,
->      .parent =3D TYPE_ACCEL,
-> +    .instance_init =3D tcg_accel_instance_init,
->      .class_init =3D tcg_accel_class_init,
->  };
->
-> diff --git a/cpus.c b/cpus.c
-> index 63bda15..b472378 100644
-> --- a/cpus.c
-> +++ b/cpus.c
-> @@ -166,78 +166,6 @@ typedef struct TimersState {
->  static TimersState timers_state;
->  bool mttcg_enabled;
->
-> -/*
-> - * We default to false if we know other options have been enabled
-> - * which are currently incompatible with MTTCG. Otherwise when each
-> - * guest (target) has been updated to support:
-> - *   - atomic instructions
-> - *   - memory ordering primitives (barriers)
-> - * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
-> - *
-> - * Once a guest architecture has been converted to the new primitives
-> - * there are two remaining limitations to check.
-> - *
-> - * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
-> - * - The host must have a stronger memory order than the guest
-> - *
-> - * It may be possible in future to support strong guests on weak hosts
-> - * but that will require tagging all load/stores in a guest with their
-> - * implicit memory order requirements which would likely slow things
-> - * down a lot.
-> - */
+> diff --git a/vl.c b/vl.c
+> index 58aad4f..d6c77bc 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -897,13 +897,9 @@ static void configure_rtc(QemuOpts *opts)
+>      value =3D qemu_opt_get(opts, "driftfix");
+>      if (value) {
+>          if (!strcmp(value, "slew")) {
+> -            static GlobalProperty slew_lost_ticks =3D {
+> -                .driver   =3D "mc146818rtc",
+> -                .property =3D "lost_tick_policy",
+> -                .value    =3D "slew",
+> -            };
 > -
-> -static bool check_tcg_memory_orders_compatible(void)
-> -{
-> -#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
-> -    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) =3D=3D 0;
-> -#else
-> -    return false;
-> -#endif
-> -}
-> -
-> -static bool default_mttcg_enabled(void)
-> -{
-> -    if (use_icount || TCG_OVERSIZED_GUEST) {
-> -        return false;
-> -    } else {
-> -#ifdef TARGET_SUPPORTS_MTTCG
-> -        return check_tcg_memory_orders_compatible();
-> -#else
-> -        return false;
-> -#endif
-> -    }
-> -}
-> -
-> -void qemu_tcg_configure(QemuOpts *opts, Error **errp)
-> -{
-> -    const char *t =3D qemu_opt_get(opts, "thread");
-> -    if (t) {
-> -        if (strcmp(t, "multi") =3D=3D 0) {
-> -            if (TCG_OVERSIZED_GUEST) {
-> -                error_setg(errp, "No MTTCG when guest word size > hosts"=
-);
-> -            } else if (use_icount) {
-> -                error_setg(errp, "No MTTCG when icount is enabled");
-> -            } else {
-> -#ifndef TARGET_SUPPORTS_MTTCG
-> -                warn_report("Guest not yet converted to MTTCG - "
-> -                            "you may get unexpected results");
-> -#endif
-> -                if (!check_tcg_memory_orders_compatible()) {
-> -                    warn_report("Guest expects a stronger memory orderin=
-g "
-> -                                "than the host provides");
-> -                    error_printf("This may cause strange/hard to debug e=
-rrors\n");
-> -                }
-> -                mttcg_enabled =3D true;
-> -            }
-> -        } else if (strcmp(t, "single") =3D=3D 0) {
-> -            mttcg_enabled =3D false;
-> -        } else {
-> -            error_setg(errp, "Invalid 'thread' setting %s", t);
-> -        }
-> -    } else {
-> -        mttcg_enabled =3D default_mttcg_enabled();
-> -    }
-> -}
->
->  /* The current number of executed instructions is based on what we
->   * originally budgeted minus the current state of the decrementing
+> -            qdev_prop_register_global(&slew_lost_ticks);
+> +            object_register_sugar_prop("mc146818rtc",
+> +                                       "lost_tick_policy",
+> +                                       "slew");
+>          } else if (!strcmp(value, "none")) {
+>              /* discard is default */
+>          } else {
 > --
 > 1.8.3.1
 >
 >
 >
+
+
+I am not too happy about the change, but the "global properties"
+handling is an area that can be improved later.
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 --=20
