@@ -2,81 +2,99 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96045C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 11:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00747C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 11:17:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5492D20726
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 11:10:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BF35320726
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 11:17:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FN2jT5eQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5492D20726
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VUglSBoT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF35320726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iedPD-0004p1-GY
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 06:10:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54511)
+	id 1iedWH-0006jQ-QQ
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 06:17:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iedOZ-0004QE-L2
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:09:36 -0500
+ (envelope-from <philmd@redhat.com>) id 1iedVY-0006J6-4E
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:16:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iedOU-00061M-NZ
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:09:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41207
+ (envelope-from <philmd@redhat.com>) id 1iedVW-0001o2-W9
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:16:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35377
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iedOU-000615-KA
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:09:30 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iedVW-0001ns-S8
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 06:16:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575976169;
+ s=mimecast20190719; t=1575976606;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XF2EAoRnH7Zk6En+wnujpU0WtI9JqWpxOzHgsFlWBFA=;
- b=FN2jT5eQm0cWmXD1EsSqYhopYna1oK/mfr+oX8Lz3DSMqOYhw5SU+hCoIYeAYQMcdx1V/v
- moUg0cm5mNQDrsz685GsSVFVGJGHTnxFWEatFHf5lpFEpQAvzKzLewynGBFfHai758vrmQ
- XSNmdZec4lbJgug6+DhAl+b72JUQDD8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-392-h2320vPUOPK4eUb88tlFsA-1; Tue, 10 Dec 2019 06:09:28 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8AB018A6EC0
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 11:09:27 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-181.ams2.redhat.com
- [10.36.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D0F95D9D6;
- Tue, 10 Dec 2019 11:09:25 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id F0FA511386A7; Tue, 10 Dec 2019 12:09:23 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 2/2] net: Drop the NetLegacy structure,
- always use Netdev instead
-References: <20191206053640.29368-1-thuth@redhat.com>
- <20191206053640.29368-3-thuth@redhat.com>
-Date: Tue, 10 Dec 2019 12:09:23 +0100
-In-Reply-To: <20191206053640.29368-3-thuth@redhat.com> (Thomas Huth's message
- of "Fri, 6 Dec 2019 06:36:40 +0100")
-Message-ID: <874ky8309o.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ bh=JOQmc2e6sBlnB4Wve06oJXdUGtOMK3MPY7atrnV51RA=;
+ b=VUglSBoTeSb+kDisKRnmDVkoU4tNrgbL3LihnZxd9vNTqfbhACGdAF+wKPl76P9fEPyzc1
+ VuAM1KY1ei8LvHCjWkj9fi35USwxLFVBNgz4R/bGEAnqahdHcJbh09ZRy2uWLQu/8SFL/P
+ URC8QPTw4y+fvo4I6/7uzYkf5ZqWzB4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-7PIirCXpONOVH9dSQE5vKg-1; Tue, 10 Dec 2019 06:16:45 -0500
+Received: by mail-wm1-f69.google.com with SMTP id o135so509034wme.2
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 03:16:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=JOQmc2e6sBlnB4Wve06oJXdUGtOMK3MPY7atrnV51RA=;
+ b=N/xy2408dhSngS3idaCkVyT+h+akxGAOuurM0eMprFxPY0MXMFe0WV0/V9pB/1eiby
+ AdFLOdZ0ZVsPx+Tc9B9kfA9PmraNi5/245caf8xEIh4o62HbHylDajUe3nlaJY8cUcKX
+ astPQfxHNKU1eJ/zjWVVbLe/QTDdqHyrnPmTknwhQqcy7ICzFEFZcmaLVxzpeDU7HhV5
+ R+o643U1JtYvz5IRhs5jsLtE5qw91TAaF2/jEQqMsZ4KTi2zS1v31TuGXfLowsumbTsq
+ AAy+jMUc9/TNjq2d6+40zqS5s5MSYaj9/dVSgy8bjwE7yPPiiKY/2FalkMC9V/oi4Qrw
+ hjCQ==
+X-Gm-Message-State: APjAAAVJx+l8QxZlsQjQek3NEM8N+HHS2rtcaCZmfpRUEJzU1aEyCTeA
+ d0yZPvL+MzhJJpJKX48GMqKZDYtAoyWtxCLNEQkUuf/gGzh7APoILzsP4U7rCFgv5cCwUHqdLyC
+ FEPoNE83q9O4RK6A=
+X-Received: by 2002:a05:600c:2283:: with SMTP id
+ 3mr4675026wmf.100.1575976603775; 
+ Tue, 10 Dec 2019 03:16:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxhCULSqy8h7yq9ZzPgZE6PWBhLLxIeqn+Ny+46+CJvRRz9YQofOJshjDwMavyhGlF+wVZGjA==
+X-Received: by 2002:a05:600c:2283:: with SMTP id
+ 3mr4674996wmf.100.1575976603522; 
+ Tue, 10 Dec 2019 03:16:43 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id p9sm2707849wmg.45.2019.12.10.03.16.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 10 Dec 2019 03:16:43 -0800 (PST)
+Subject: Re: [PATCH 1/2] tests/acceptance: Add PVH boot test
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org, 
+ crosa@redhat.com
+References: <20191206140012.15517-1-wainersm@redhat.com>
+ <20191206140012.15517-2-wainersm@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3a53263f-944e-9d5d-4360-96a77212f999@redhat.com>
+Date: Tue, 10 Dec 2019 12:16:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: h2320vPUOPK4eUb88tlFsA-1
+In-Reply-To: <20191206140012.15517-2-wainersm@redhat.com>
+Content-Language: en-US
+X-MC-Unique: 7PIirCXpONOVH9dSQE5vKg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -91,68 +109,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org
+Cc: fam@euphon.net, alex.bennee@linaro.org, wrampazz@redhat.com,
+ sgarzare@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> writes:
+On 12/6/19 3:00 PM, Wainer dos Santos Moschetta wrote:
+> QEMU 4.0 onward is able to boot an uncompressed kernel
+> image by using the x86/HVM direct boot ABI. It needs
+> Linux >= 4.21 built with CONFIG_PVH=y.
+> 
+> This introduces an acceptance test which checks an
+> uncompressed Linux kernel image boots properly.
+> 
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> ---
+>   tests/acceptance/pvh.py | 48 +++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 48 insertions(+)
+>   create mode 100644 tests/acceptance/pvh.py
+> 
+> diff --git a/tests/acceptance/pvh.py b/tests/acceptance/pvh.py
+> new file mode 100644
+> index 0000000000..c68489c273
+> --- /dev/null
+> +++ b/tests/acceptance/pvh.py
+> @@ -0,0 +1,48 @@
+> +# Copyright (c) 2019 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Wainer dos Santos Moschetta <wainersm@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
+> +
+> +"""
+> +x86/HVM direct boot acceptance tests.
+> +"""
+> +
+> +from avocado.utils.kernel import KernelBuild
+> +from avocado_qemu import Test
+> +from avocado_qemu import wait_for_console_pattern
+> +
+> +
+> +class Pvh(Test):
+> +    """
+> +    Test suite for x86/HVM direct boot feature.
+> +
+> +    :avocado: tags=slow,arch=x86_64,machine=q35
 
-> Now that the "name" parameter is gone, there is hardly any difference
-> between NetLegacy and Netdev anymore. Drop NetLegacy and always use
-> Netdev to simplify the code quite a bit.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+Why is it slow? Because of the time spent to build the kernel?
 
-Took me a minute to see the actual difference.
+This should be split in "prepare test" (here: slow) VS "run test", like 
+we do when downloading assets.
 
-Here's Netdev:
+> +    """
+> +    def test_boot_vmlinux(self):
+> +        """
+> +        Boot uncompressed kernel image.
+> +        """
+> +        # QEMU can boot a vmlinux image for kernel >= 4.21 built
+> +        # with CONFIG_PVH=y
+> +        kernel_version = '5.4.1'
+> +        kbuild = KernelBuild(kernel_version, work_dir=self.workdir)
+> +        try:
+> +            kbuild.download()
+> +            kbuild.uncompress()
+> +            kbuild.configure(targets=['defconfig', 'kvmconfig'],
+> +                             extra_configs=['CONFIG_PVH=y'])
+> +            kbuild.build()
 
-    { 'union': 'Netdev',
-      'base': { 'id': 'str', 'type': 'NetClientDriver' },
-      'discriminator': 'type',
-      'data': {
-        'nic':      'NetLegacyNicOptions',
-        'user':     'NetdevUserOptions',
-        'tap':      'NetdevTapOptions',
-        'l2tpv3':   'NetdevL2TPv3Options',
-        'socket':   'NetdevSocketOptions',
-        'vde':      'NetdevVdeOptions',
-        'bridge':   'NetdevBridgeOptions',
-        'hubport':  'NetdevHubPortOptions',
-        'netmap':   'NetdevNetmapOptions',
-        'vhost-user': 'NetdevVhostUserOptions' } }
+I like this feature, but I don't think it should be default for all 
+users, they might start complaining, such:
+- test drained battery while using laptop on the move
+- test filled $HOME
 
-    { 'enum': 'NetClientDriver',
-      'data': [ 'none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
-                'bridge', 'hubport', 'netmap', 'vhost-user' ] }
+This should be configurable, like users suggested they don't want the 
+"download required assets from internet" feature.
 
-Here's NetLegacy:
+Is it possible to build this once (ideally on some CI) and add the 
+result binary + SHA1 hash in the Avocado assets public repository?
 
-    { 'struct': 'NetLegacy',
-      'data': {
-        '*id':   'str',
-        'opts':  'NetLegacyOptions' } }
+So users can fetch the prebuilt image, and are free to rebuild it.
 
-    { 'union': 'NetLegacyOptions',
-      'base': { 'type': 'NetLegacyOptionsType' },
-      'discriminator': 'type',
-      'data': {
-        'nic':      'NetLegacyNicOptions',
-        'user':     'NetdevUserOptions',
-        'tap':      'NetdevTapOptions',
-        'l2tpv3':   'NetdevL2TPv3Options',
-        'socket':   'NetdevSocketOptions',
-        'vde':      'NetdevVdeOptions',
-        'bridge':   'NetdevBridgeOptions',
-        'netmap':   'NetdevNetmapOptions',
-        'vhost-user': 'NetdevVhostUserOptions' } }
-
-    { 'enum': 'NetLegacyOptionsType',
-      'data': ['none', 'nic', 'user', 'tap', 'l2tpv3', 'socket', 'vde',
-               'bridge', 'netmap', 'vhost-user'] }
-
-Difference: NetLegacy wraps the union in @opts.
+> +        except:
+> +            self.cancel("Unable to build vanilla kernel %s" % kernel_version)
+> +
+> +        self.vm.set_machine('q35')
+> +        self.vm.set_console()
+> +        kernel_command_line = 'printk.time=0 console=ttyS0'
+> +        self.vm.add_args('-kernel', kbuild.vmlinux,
+> +                         '-append', kernel_command_line)
+> +        self.vm.launch()
+> +        wait_for_console_pattern(self, 'Kernel command line: %s' %
+> +                                 kernel_command_line)
+> 
 
 
