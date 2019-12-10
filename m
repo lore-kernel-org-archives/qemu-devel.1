@@ -2,101 +2,126 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLACK
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28BB4C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 532CBC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:06:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D571920836
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:05:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C79820828
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 12:06:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M2okRH6l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D571920836
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="HFsAwexr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C79820828
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieeH6-0005Ma-9S
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 07:05:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37327)
+	id 1ieeHF-0005XA-Rh
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 07:06:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37719)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ieeEL-0003Ct-SZ
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:03:07 -0500
+ (envelope-from <felipe@nutanix.com>) id 1ieeFn-0004NO-US
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:04:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ieeEK-0006Xd-2z
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:03:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24903
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ieeEJ-0006XR-Uo
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:03:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575979383;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ej1cdd1/2ywnJqbbosqKTJd3QuKXRmJNCa1lj7lJqwc=;
- b=M2okRH6leblZHUj4Suou38CY6s0QGigHae0nwYOebi85tgq2EksbyOAuR96x4Pa+0yYUG9
- bSQMEmNJbInjuKaBBqnsciUZwdFaW6WPYxfnGSe/HH3bh6wNHEqqCiRWu8aYKtsjtZQSPC
- k6uuyPIWssqotoBiqeegHFfTl/eTwjE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-I9-__mq0OMGK56e8eVnX5Q-1; Tue, 10 Dec 2019 07:02:59 -0500
-Received: by mail-wr1-f69.google.com with SMTP id r2so8858670wrp.7
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 04:02:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Q/92MHNYSrImkYBzVjq219u37Spket10BC1Q9Cli2ik=;
- b=FdGTUdb+HjZbWqfuqDbYyZus9wdykAqLN3uMwlZN9SP6NY1pcD7CFhjepjUWGAe4gN
- DofT2U5q+8hJTSefGtDKcrGyyfMOVYpfQbx1KfTPuPtoQBDIObBsU/qjJy+TV5bZbR+N
- KclRFvlIAjCD6bnalxBD6mQpH2WIji/2yD/mxnX1myt8htPhj9JSnnL8hrt0GZwSKO+6
- AVOMaZ7Y6i+z5uVAWzXVlY26X4Lg2tHrdT0ltbg4za2nwQisQC5OLvVuUuEn20WpPwtb
- rGWnHMppiopQAmakyY+hrx7vEWQt6tVHB3kZ+FyQeua6A1eladZVoRkCj6/8U+XHhLP0
- CJpQ==
-X-Gm-Message-State: APjAAAWRQMqV8S+9PRuHtLk96AeoQO3mjpQsd0nk5AFKALV2eif3QpCP
- 3fVli0zKqCjWgAPDd8B5MvR9T8TF1DYcymNkPtOuZLH2TAQ7HeltFMAjRB+AJUJpkxXNqGuOyT5
- IrQxhhB7gnPPpgAk=
-X-Received: by 2002:a05:6000:1052:: with SMTP id
- c18mr2866123wrx.268.1575979378200; 
- Tue, 10 Dec 2019 04:02:58 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz9mAelTnNOfipbUYURVsw69dsESAWKUsLiBBvOGFCtcfMR1FNeiexie1L5boUTE9ge2d3H5A==
-X-Received: by 2002:a05:6000:1052:: with SMTP id
- c18mr2866093wrx.268.1575979377903; 
- Tue, 10 Dec 2019 04:02:57 -0800 (PST)
-Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
- [88.21.103.182])
- by smtp.gmail.com with ESMTPSA id n10sm3011845wrt.14.2019.12.10.04.02.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Dec 2019 04:02:57 -0800 (PST)
-Subject: Re: [PATCH v2 17/18] kvm: introduce kvm_kernel_irqchip_* functions
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
- <1575903705-12925-18-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <e2aa550a-1012-092d-aa1c-816f5e7a4b6c@redhat.com>
-Date: Tue, 10 Dec 2019 13:02:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <1575903705-12925-18-git-send-email-pbonzini@redhat.com>
+ (envelope-from <felipe@nutanix.com>) id 1ieeFk-0000Kd-Ed
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:04:35 -0500
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:11248)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1ieeFk-0000GO-18
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 07:04:32 -0500
+Received: from pps.filterd (m0127838.ppops.net [127.0.0.1])
+ by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBAC45oC030412; Tue, 10 Dec 2019 04:04:28 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
+ h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version;
+ s=proofpoint20171006; bh=noQUPaVNwXD4Mvmk9QxWqydAbjDR2Sz5vaGWQ8N4lH8=;
+ b=HFsAwexrbR1CIm1SLaMmkZhoyhmqV5bu19CdtN2IZy8SKzAb+jsYlfdx6IUrIg9eCQ/B
+ dlyc4O6RTpRzTWav4NVEAuWkwinAwv5AiDsU3yH+xIEy1LRvaYXIMQq7urmp+xUnCx+r
+ i1OS4aWuL4ZFVs6e/iAedPtvaayF+BsZXGdaSElg3dMo8iskIFI7/B6l5WTorGoNXg/W
+ +i5dueom8vabJfKwC4ZqFhk1JT8rcB7Fx8ei7gWGwJQIIq1GZ6Pu2bzBnkJji0lnqQKk
+ IkywHFn5zcZsJj9mGMDHVWAz/qA9RHwqnlkdi3k37+iOd4oTi5FkDGeMjxLeAW789N7y Fg== 
+Received: from nam04-co1-obe.outbound.protection.outlook.com
+ (mail-co1nam04lp2058.outbound.protection.outlook.com [104.47.45.58])
+ by mx0a-002c1b01.pphosted.com with ESMTP id 2wrch2namj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 10 Dec 2019 04:04:28 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=legS67GIq9PX8GEVtyPpgx2uLXij/39ILUiUCnTsVgipR6g8uVPrVveRbu8bXwKtgiYsewmUf0ChbTaKw4VFAVLcsr84jv4yEkwvHdHUGYSv7u9evarA6tFsEjV+Ie01iTlUOazRM92ZevKDW2kI0gggTNoC2tTrG2oNnQekHcwdTn42/2WntppyTfujJKrRf0sSDRts/YsY1+6z0QlddYxMk70WlqviK5/mUNfcWsFhxFLqJxhESsocIsu7+6IBQ+UUwuT5FW/l3JPRpfh/sqXaoJjhfM3+lR7Nhmkolm7+kbEFw00qmU1ao9UoK8Ol6oNl5QLez/WbdILNqjiF2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=noQUPaVNwXD4Mvmk9QxWqydAbjDR2Sz5vaGWQ8N4lH8=;
+ b=O4cs9JzJxjXRCM2bD7XJrYbVorTc+GqrIgweAMf8juHD2QE/DswYubSotGXi/9laiA5tzCGTygaMwkVEsVJ/aqnk+/TnqroVPE+PKnQPevPS3Bnt9adY9pcM6IVWqHDujk0+KC/5N0BblQQ8NGMPD5oSdvxRLuNUrOIhuafRt171eQJC4Jp5EkHTkSC+a13nvw257CJP9C4jVrzxZKE/6fMsdkmsdRibs9ItFgUI9QSRe1zjKYQb66wzJfZ2bzPOHD8VHJ/g9GdjWRNWVTZyxTB+1YS3WM7H5CgtVcsq5Fbpx5gGm/YmyMWdk7I/QHl6CeUdonCB0B5DYnVB8M85Ww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
+ MWHPR02MB2573.namprd02.prod.outlook.com (10.168.206.11) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2516.17; Tue, 10 Dec 2019 12:04:24 +0000
+Received: from MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::f801:763d:e7fc:6bf]) by MWHPR02MB2656.namprd02.prod.outlook.com
+ ([fe80::f801:763d:e7fc:6bf%7]) with mapi id 15.20.2516.018; Tue, 10 Dec 2019
+ 12:04:24 +0000
+From: Felipe Franciosi <felipe@nutanix.com>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Subject: Re: [PATCH v3 4/4] qom/object: Use common get/set uint helpers
+Thread-Topic: [PATCH v3 4/4] qom/object: Use common get/set uint helpers
+Thread-Index: AQHVptz985oxjq8vNkWSjwigP/vuiqemZqeAgAzvioA=
+Date: Tue, 10 Dec 2019 12:04:24 +0000
+Message-ID: <894244E2-85E3-4779-A6A2-EC5192D504B7@nutanix.com>
+References: <20191129174630.6922-1-felipe@nutanix.com>
+ <20191129174630.6922-5-felipe@nutanix.com>
+ <ef90cc03-7e72-2238-72c5-b531032208e2@ozlabs.ru>
+In-Reply-To: <ef90cc03-7e72-2238-72c5-b531032208e2@ozlabs.ru>
+Accept-Language: en-GB, en-US
 Content-Language: en-US
-X-MC-Unique: I9-__mq0OMGK56e8eVnX5Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [62.254.189.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: de51739e-ac83-4fad-f1fa-08d77d691961
+x-ms-traffictypediagnostic: MWHPR02MB2573:
+x-microsoft-antispam-prvs: <MWHPR02MB2573D11CCFE220F618489F06D75B0@MWHPR02MB2573.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 02475B2A01
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(346002)(396003)(136003)(376002)(39860400002)(199004)(189003)(316002)(8676002)(26005)(5660300002)(966005)(4326008)(2616005)(66946007)(2906002)(186003)(81166006)(33656002)(71200400001)(36756003)(91956017)(66476007)(76116006)(66446008)(66556008)(6916009)(64756008)(6512007)(8936002)(6506007)(53546011)(86362001)(81156014)(6486002)(478600001)(54906003)(30864003)(64030200001)(579004);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB2573;
+ H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: nutanix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JEozyyl5SnHr0mE8K34hKuGp4ePPY07h88+RaamuaPT6V9ObgZC/dtoiUnr3wswe2do/SHx1dJyWJtfzrbDMOSWxUFSvFFXkhVsXsp/9tBIaMN50sBC76Gs59nhcF/1eVktCsuub3y6HOU4CIaHhdAKF4SVdxLElPgop1e7hnATeqGm3V5pBTyvN/B85f+bO8MuwxNyH6zxbwpQLo2JD5VJ18Y4uL4apBuNcJ2BJckHA0pwYzjVed4JZAdTTs0Ysrak4Xcd0XW70jpb/EZlNoC5MpWd64EnRtE7oL+2Y9E3+qOHq/VKIARe72gC5bBu2EAl7ekB60NgbewC6DXszwgUmo+OSxnHgp5GmhnLpoV3dZdlEESgd9OdN0wLgluwmx0s21ifuKctDfo72YGveOsBh7AIW092fmxWPy950+hDhiBbHw7puWaVB8E+1YR+JgsBfOU2qAXGj/UFj/8d4gb/dglvSX76Tca2/IuhOdAhpcpEMVoHWhPB0ztDgJRWcOd/FuG9J2ljEIlQEJM+Vtl/kRVrUq9yZia9Jc79D80Q=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <11203B3188A2204B99C12819519259C4@namprd02.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+MIME-Version: 1.0
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: de51739e-ac83-4fad-f1fa-08d77d691961
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Dec 2019 12:04:24.4393 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: w4JTeNo7nlR2/US+UR1QsRHOy6F9n85Toab618xJ2ZA/A8s80k5wDjoSsDLjsY6Hyr9Ugd5mA7EYIN4Dh9iOBtUM+BcnZWotFjlb/zs5WJk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2573
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-10_02:2019-12-10,2019-12-10 signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.151.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,266 +133,622 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, elmarco@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Marc-Andre Lureau <marcandre.lureau@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Philippe Mathieu-Daude <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/9/19 4:01 PM, Paolo Bonzini wrote:
-> The KVMState struct is opaque, so provide accessors for the fields
-> that will be moved from current_machine to the accelerator.  For now
-> they just forward to the machine object, but this will change.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Hi
 
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-
-> ---
->   accel/kvm/kvm-all.c  | 23 +++++++++++++++++++----
->   hw/ppc/e500.c        |  4 ++--
->   hw/ppc/spapr_irq.c   | 10 +++++-----
->   include/sysemu/kvm.h |  7 +++++--
->   target/arm/kvm.c     |  8 ++++----
->   target/i386/kvm.c    |  4 ++--
->   target/mips/kvm.c    |  2 +-
->   target/ppc/kvm.c     |  2 +-
->   target/s390x/kvm.c   |  2 +-
->   9 files changed, 40 insertions(+), 22 deletions(-)
+> On Dec 2, 2019, at 6:31 AM, Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
 >=20
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index f0b9294..c0a6351 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -1760,7 +1760,7 @@ void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_=
-irq irq, int gsi)
->       g_hash_table_insert(s->gsimap, irq, GINT_TO_POINTER(gsi));
->   }
->  =20
-> -static void kvm_irqchip_create(MachineState *machine, KVMState *s)
-> +static void kvm_irqchip_create(KVMState *s)
->   {
->       int ret;
->  =20
-> @@ -1778,9 +1778,9 @@ static void kvm_irqchip_create(MachineState *machin=
-e, KVMState *s)
->  =20
->       /* First probe and see if there's a arch-specific hook to create th=
-e
->        * in-kernel irqchip for us */
-> -    ret =3D kvm_arch_irqchip_create(machine, s);
-> +    ret =3D kvm_arch_irqchip_create(s);
->       if (ret =3D=3D 0) {
-> -        if (machine_kernel_irqchip_split(machine)) {
-> +        if (kvm_kernel_irqchip_split()) {
->               perror("Split IRQ chip mode not supported.");
->               exit(1);
->           } else {
-> @@ -2052,7 +2052,7 @@ static int kvm_init(MachineState *ms)
->       }
->  =20
->       if (machine_kernel_irqchip_allowed(ms)) {
-> -        kvm_irqchip_create(ms, s);
-> +        kvm_irqchip_create(s);
->       }
->  =20
->       if (kvm_eventfds_allowed) {
-> @@ -2969,6 +2969,21 @@ static void kvm_set_kvm_shadow_mem(Object *obj, Vi=
-sitor *v,
->       s->kvm_shadow_mem =3D value;
->   }
->  =20
-> +bool kvm_kernel_irqchip_allowed(void)
-> +{
-> +    return machine_kernel_irqchip_allowed(current_machine);
-> +}
-> +
-> +bool kvm_kernel_irqchip_required(void)
-> +{
-> +    return machine_kernel_irqchip_required(current_machine);
-> +}
-> +
-> +bool kvm_kernel_irqchip_split(void)
-> +{
-> +    return machine_kernel_irqchip_split(current_machine);
-> +}
-> +
->   static void kvm_accel_instance_init(Object *obj)
->   {
->       KVMState *s =3D KVM_STATE(obj);
-> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-> index 91cd4c2..928efaa 100644
-> --- a/hw/ppc/e500.c
-> +++ b/hw/ppc/e500.c
-> @@ -801,10 +801,10 @@ static DeviceState *ppce500_init_mpic(PPCE500Machin=
-eState *pms,
->       if (kvm_enabled()) {
->           Error *err =3D NULL;
->  =20
-> -        if (machine_kernel_irqchip_allowed(machine)) {
-> +        if (kvm_kernel_irqchip_allowed()) {
->               dev =3D ppce500_init_mpic_kvm(pmc, irqs, &err);
->           }
-> -        if (machine_kernel_irqchip_required(machine) && !dev) {
-> +        if (kvm_kernel_irqchip_required() && !dev) {
->               error_reportf_err(err,
->                                 "kernel_irqchip requested but unavailable=
-: ");
->               exit(1);
-> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-> index d6bb7fd..c3f8870 100644
-> --- a/hw/ppc/spapr_irq.c
-> +++ b/hw/ppc/spapr_irq.c
-> @@ -77,9 +77,9 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptControll=
-er *, Error **),
->       MachineState *machine =3D MACHINE(qdev_get_machine());
->       Error *local_err =3D NULL;
->  =20
-> -    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-> +    if (kvm_enabled() && kvm_kernel_irqchip_allowed()) {
->           if (fn(intc, &local_err) < 0) {
-> -            if (machine_kernel_irqchip_required(machine)) {
-> +            if (kvm_kernel_irqchip_required()) {
->                   error_prepend(&local_err,
->                                 "kernel_irqchip requested but unavailable=
-: ");
->                   error_propagate(errp, local_err);
-> @@ -184,7 +184,7 @@ static int spapr_irq_check(SpaprMachineState *spapr, =
-Error **errp)
->        */
->       if (kvm_enabled() &&
->           spapr->irq =3D=3D &spapr_irq_dual &&
-> -        machine_kernel_irqchip_required(machine) &&
-> +        kvm_kernel_irqchip_required() &&
->           xics_kvm_has_broken_disconnect(spapr)) {
->           error_setg(errp, "KVM is too old to support ic-mode=3Ddual,kern=
-el-irqchip=3Don");
->           return -1;
-> @@ -290,12 +290,12 @@ void spapr_irq_init(SpaprMachineState *spapr, Error=
+>=20
+>=20
+> On 30/11/2019 04:46, Felipe Franciosi wrote:
+>> Several objects implemented their own uint property getters and setters,
+>> despite them being straightforward (without any checks/validations on
+>> the values themselves) and identical across objects. This makes use of
+>> an enhanced API for object_property_add_uintXX_ptr() which offers
+>> default setters.
+>>=20
+>> Some of these setters used to update the value even if the type visit
+>> failed (eg. because the value being set overflowed over the given type).
+>> The new setter introduces a check for these errors, not updating the
+>> value if an error occurred. The error is propagated.
+>>=20
+>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+>> ---
+>> hw/acpi/ich9.c       |  95 ++++----------------------------------
+>> hw/isa/lpc_ich9.c    |  12 +----
+>> hw/misc/edu.c        |  13 ++----
+>> hw/pci-host/q35.c    |  14 ++----
+>> hw/ppc/spapr.c       |  18 ++------
+>> hw/vfio/pci-quirks.c |  20 +++-----
+>> memory.c             |  15 +-----
+>> target/arm/cpu.c     |  22 ++-------
+>> target/i386/sev.c    | 106 ++++---------------------------------------
+>> 9 files changed, 40 insertions(+), 275 deletions(-)
+>>=20
+>> diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
+>> index 742fb78226..d9305be891 100644
+>> --- a/hw/acpi/ich9.c
+>> +++ b/hw/acpi/ich9.c
+>> @@ -357,81 +357,6 @@ static void ich9_pm_set_cpu_hotplug_legacy(Object *=
+obj, bool value,
+>>     s->pm.cpu_hotplug_legacy =3D value;
+>> }
+>>=20
+>> -static void ich9_pm_get_disable_s3(Object *obj, Visitor *v, const char =
+*name,
+>> -                                   void *opaque, Error **errp)
+>> -{
+>> -    ICH9LPCPMRegs *pm =3D opaque;
+>> -    uint8_t value =3D pm->disable_s3;
+>> -
+>> -    visit_type_uint8(v, name, &value, errp);
+>> -}
+>> -
+>> -static void ich9_pm_set_disable_s3(Object *obj, Visitor *v, const char =
+*name,
+>> -                                   void *opaque, Error **errp)
+>> -{
+>> -    ICH9LPCPMRegs *pm =3D opaque;
+>> -    Error *local_err =3D NULL;
+>> -    uint8_t value;
+>> -
+>> -    visit_type_uint8(v, name, &value, &local_err);
+>> -    if (local_err) {
+>> -        goto out;
+>> -    }
+>> -    pm->disable_s3 =3D value;
+>> -out:
+>> -    error_propagate(errp, local_err);
+>> -}
+>> -
+>> -static void ich9_pm_get_disable_s4(Object *obj, Visitor *v, const char =
+*name,
+>> -                                   void *opaque, Error **errp)
+>> -{
+>> -    ICH9LPCPMRegs *pm =3D opaque;
+>> -    uint8_t value =3D pm->disable_s4;
+>> -
+>> -    visit_type_uint8(v, name, &value, errp);
+>> -}
+>> -
+>> -static void ich9_pm_set_disable_s4(Object *obj, Visitor *v, const char =
+*name,
+>> -                                   void *opaque, Error **errp)
+>> -{
+>> -    ICH9LPCPMRegs *pm =3D opaque;
+>> -    Error *local_err =3D NULL;
+>> -    uint8_t value;
+>> -
+>> -    visit_type_uint8(v, name, &value, &local_err);
+>> -    if (local_err) {
+>> -        goto out;
+>> -    }
+>> -    pm->disable_s4 =3D value;
+>> -out:
+>> -    error_propagate(errp, local_err);
+>> -}
+>> -
+>> -static void ich9_pm_get_s4_val(Object *obj, Visitor *v, const char *nam=
+e,
+>> -                               void *opaque, Error **errp)
+>> -{
+>> -    ICH9LPCPMRegs *pm =3D opaque;
+>> -    uint8_t value =3D pm->s4_val;
+>> -
+>> -    visit_type_uint8(v, name, &value, errp);
+>> -}
+>> -
+>> -static void ich9_pm_set_s4_val(Object *obj, Visitor *v, const char *nam=
+e,
+>> -                               void *opaque, Error **errp)
+>> -{
+>> -    ICH9LPCPMRegs *pm =3D opaque;
+>> -    Error *local_err =3D NULL;
+>> -    uint8_t value;
+>> -
+>> -    visit_type_uint8(v, name, &value, &local_err);
+>> -    if (local_err) {
+>> -        goto out;
+>> -    }
+>> -    pm->s4_val =3D value;
+>> -out:
+>> -    error_propagate(errp, local_err);
+>> -}
+>> -
+>> static bool ich9_pm_get_enable_tco(Object *obj, Error **errp)
+>> {
+>>     ICH9LPCState *s =3D ICH9_LPC_DEVICE(obj);
+>> @@ -468,18 +393,14 @@ void ich9_pm_add_properties(Object *obj, ICH9LPCPM=
+Regs *pm, Error **errp)
+>>                              ich9_pm_get_cpu_hotplug_legacy,
+>>                              ich9_pm_set_cpu_hotplug_legacy,
+>>                              NULL);
+>> -    object_property_add(obj, ACPI_PM_PROP_S3_DISABLED, "uint8",
+>> -                        ich9_pm_get_disable_s3,
+>> -                        ich9_pm_set_disable_s3,
+>> -                        NULL, pm, NULL);
+>> -    object_property_add(obj, ACPI_PM_PROP_S4_DISABLED, "uint8",
+>> -                        ich9_pm_get_disable_s4,
+>> -                        ich9_pm_set_disable_s4,
+>> -                        NULL, pm, NULL);
+>> -    object_property_add(obj, ACPI_PM_PROP_S4_VAL, "uint8",
+>> -                        ich9_pm_get_s4_val,
+>> -                        ich9_pm_set_s4_val,
+>> -                        NULL, pm, NULL);
+>> +    object_property_add_uint8_ptr(obj, ACPI_PM_PROP_S3_DISABLED,
+>> +                                  &pm->disable_s3, OBJ_PROP_FLAG_READWR=
+ITE,
+>> +                                  NULL);
+>> +    object_property_add_uint8_ptr(obj, ACPI_PM_PROP_S4_DISABLED,
+>> +                                  &pm->disable_s4, OBJ_PROP_FLAG_READWR=
+ITE,
+>> +                                  NULL);
+>> +    object_property_add_uint8_ptr(obj, ACPI_PM_PROP_S4_VAL,
+>> +                                  &pm->s4_val, OBJ_PROP_FLAG_READWRITE,=
+ NULL);
+>>     object_property_add_bool(obj, ACPI_PM_PROP_TCO_ENABLED,
+>>                              ich9_pm_get_enable_tco,
+>>                              ich9_pm_set_enable_tco,
+>> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+>> index c40bb3c420..b99a613954 100644
+>> --- a/hw/isa/lpc_ich9.c
+>> +++ b/hw/isa/lpc_ich9.c
+>> @@ -627,13 +627,6 @@ static const MemoryRegionOps ich9_rst_cnt_ops =3D {
+>>     .endianness =3D DEVICE_LITTLE_ENDIAN
+>> };
+>>=20
+>> -static void ich9_lpc_get_sci_int(Object *obj, Visitor *v, const char *n=
+ame,
+>> -                                 void *opaque, Error **errp)
+>> -{
+>> -    ICH9LPCState *lpc =3D ICH9_LPC_DEVICE(obj);
+>> -    visit_type_uint8(v, name, &lpc->sci_gsi, errp);
+>> -}
+>> -
+>> static void ich9_lpc_initfn(Object *obj)
+>> {
+>>     ICH9LPCState *lpc =3D ICH9_LPC_DEVICE(obj);
+>> @@ -641,9 +634,8 @@ static void ich9_lpc_initfn(Object *obj)
+>>     static const uint8_t acpi_enable_cmd =3D ICH9_APM_ACPI_ENABLE;
+>>     static const uint8_t acpi_disable_cmd =3D ICH9_APM_ACPI_DISABLE;
+>>=20
+>> -    object_property_add(obj, ACPI_PM_PROP_SCI_INT, "uint8",
+>> -                        ich9_lpc_get_sci_int,
+>> -                        NULL, NULL, NULL, NULL);
+>> +    object_property_add_uint8_ptr(obj, ACPI_PM_PROP_SCI_INT,
+>> +                                  &lpc->sci_gsi, OBJ_PROP_FLAG_READ, NU=
+LL);
+>>     object_property_add_uint8_ptr(OBJECT(lpc), ACPI_PM_PROP_ACPI_ENABLE_=
+CMD,
+>>                                   &acpi_enable_cmd, OBJ_PROP_FLAG_READ, =
+NULL);
+>>     object_property_add_uint8_ptr(OBJECT(lpc), ACPI_PM_PROP_ACPI_DISABLE=
+_CMD,
+>> diff --git a/hw/misc/edu.c b/hw/misc/edu.c
+>> index d5e2bdbb57..ff10f5b794 100644
+>> --- a/hw/misc/edu.c
+>> +++ b/hw/misc/edu.c
+>> @@ -396,21 +396,14 @@ static void pci_edu_uninit(PCIDevice *pdev)
+>>     msi_uninit(pdev);
+>> }
+>>=20
+>> -static void edu_obj_uint64(Object *obj, Visitor *v, const char *name,
+>> -                           void *opaque, Error **errp)
+>> -{
+>> -    uint64_t *val =3D opaque;
+>> -
+>> -    visit_type_uint64(v, name, val, errp);
+>> -}
+>> -
+>> static void edu_instance_init(Object *obj)
+>> {
+>>     EduState *edu =3D EDU(obj);
+>>=20
+>>     edu->dma_mask =3D (1UL << 28) - 1;
+>> -    object_property_add(obj, "dma_mask", "uint64", edu_obj_uint64,
+>> -                    edu_obj_uint64, NULL, &edu->dma_mask, NULL);
+>> +    object_property_add_uint64_ptr(obj, "dma_mask",
+>> +                                   &edu->dma_mask, OBJ_PROP_FLAG_READWR=
+ITE,
+>> +                                   NULL);
+>> }
+>>=20
+>> static void edu_class_init(ObjectClass *class, void *data)
+>> diff --git a/hw/pci-host/q35.c b/hw/pci-host/q35.c
+>> index 158d270b9f..f384ab95c6 100644
+>> --- a/hw/pci-host/q35.c
+>> +++ b/hw/pci-host/q35.c
+>> @@ -165,14 +165,6 @@ static void q35_host_get_pci_hole64_end(Object *obj=
+, Visitor *v,
+>>     visit_type_uint64(v, name, &value, errp);
+>> }
+>>=20
+>> -static void q35_host_get_mmcfg_size(Object *obj, Visitor *v, const char=
+ *name,
+>> -                                    void *opaque, Error **errp)
+>> -{
+>> -    PCIExpressHost *e =3D PCIE_HOST_BRIDGE(obj);
+>> -
+>> -    visit_type_uint64(v, name, &e->size, errp);
+>> -}
+>> -
+>> /*
+>>  * NOTE: setting defaults for the mch.* fields in this table
+>>  * doesn't work, because mch is a separate QOM object that is
+>> @@ -213,6 +205,7 @@ static void q35_host_initfn(Object *obj)
+>> {
+>>     Q35PCIHost *s =3D Q35_HOST_DEVICE(obj);
+>>     PCIHostState *phb =3D PCI_HOST_BRIDGE(obj);
+>> +    PCIExpressHost *pehb =3D PCIE_HOST_BRIDGE(obj);
+>>=20
+>>     memory_region_init_io(&phb->conf_mem, obj, &pci_host_conf_le_ops, ph=
+b,
+>>                           "pci-conf-idx", 4);
+>> @@ -242,9 +235,8 @@ static void q35_host_initfn(Object *obj)
+>>                         q35_host_get_pci_hole64_end,
+>>                         NULL, NULL, NULL, NULL);
+>>=20
+>> -    object_property_add(obj, PCIE_HOST_MCFG_SIZE, "uint64",
+>> -                        q35_host_get_mmcfg_size,
+>> -                        NULL, NULL, NULL, NULL);
+>> +    object_property_add_uint64_ptr(obj, PCIE_HOST_MCFG_SIZE,
+>> +                                   &pehb->size, OBJ_PROP_FLAG_READ, NUL=
+L);
+>>=20
+>>     object_property_add_link(obj, MCH_HOST_PROP_RAM_MEM, TYPE_MEMORY_REG=
+ION,
+>>                              (Object **) &s->mch.ram_memory,
+>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+>> index e076f6023c..668f045023 100644
+>> --- a/hw/ppc/spapr.c
+>> +++ b/hw/ppc/spapr.c
+>> @@ -3227,18 +3227,6 @@ static void spapr_set_resize_hpt(Object *obj, con=
+st char *value, Error **errp)
+>>     }
+>> }
+>>=20
+>> -static void spapr_get_vsmt(Object *obj, Visitor *v, const char *name,
+>> -                                   void *opaque, Error **errp)
+>> -{
+>> -    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+>> -}
+>> -
+>> -static void spapr_set_vsmt(Object *obj, Visitor *v, const char *name,
+>> -                                   void *opaque, Error **errp)
+>> -{
+>> -    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
+>> -}
+>> -
+>> static char *spapr_get_ic_mode(Object *obj, Error **errp)
+>> {
+>>     SpaprMachineState *spapr =3D SPAPR_MACHINE(obj);
+>> @@ -3336,8 +3324,10 @@ static void spapr_instance_init(Object *obj)
+>>     object_property_set_description(obj, "resize-hpt",
+>>                                     "Resizing of the Hash Page Table (en=
+abled, disabled, required)",
+>>                                     NULL);
+>> -    object_property_add(obj, "vsmt", "uint32", spapr_get_vsmt,
+>> -                        spapr_set_vsmt, NULL, &spapr->vsmt, &error_abor=
+t);
+>> +    object_property_add_uint32_ptr(obj, "vsmt",
+>> +                                   &spapr->vsmt, OBJ_PROP_FLAG_READWRIT=
+E,
+>> +                                   &error_abort);
+>=20
+>=20
+> Ths looks alright but...
+
+Ok.
+
+>=20
+>=20
+>> +
+>>     object_property_set_description(obj, "vsmt",
+>>                                     "Virtual SMT: KVM behaves as if this=
+ were"
+>>                                     " the host's SMT mode", &error_abort=
+);
+>> diff --git a/hw/vfio/pci-quirks.c b/hw/vfio/pci-quirks.c
+>> index 136f3a9ad6..d769c99bde 100644
+>> --- a/hw/vfio/pci-quirks.c
+>> +++ b/hw/vfio/pci-quirks.c
+>> @@ -2187,14 +2187,6 @@ int vfio_add_virt_caps(VFIOPCIDevice *vdev, Error=
  **errp)
->       MachineState *machine =3D MACHINE(spapr);
->       SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->  =20
-> -    if (machine_kernel_irqchip_split(machine)) {
-> +    if (kvm_enabled() && kvm_kernel_irqchip_split()) {
->           error_setg(errp, "kernel_irqchip split mode not supported on ps=
-eries");
->           return;
->       }
->  =20
-> -    if (!kvm_enabled() && machine_kernel_irqchip_required(machine)) {
-> +    if (!kvm_enabled() && kvm_kernel_irqchip_required()) {
->           error_setg(errp,
->                      "kernel_irqchip requested but only available with KV=
-M");
->           return;
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 9fe233b..aaf2a50 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -519,10 +519,13 @@ void kvm_pc_gsi_handler(void *opaque, int n, int le=
-vel);
->   void kvm_pc_setup_irq_routing(bool pci_enabled);
->   void kvm_init_irq_routing(KVMState *s);
->  =20
-> +bool kvm_kernel_irqchip_allowed(void);
-> +bool kvm_kernel_irqchip_required(void);
-> +bool kvm_kernel_irqchip_split(void);
-> +
->   /**
->    * kvm_arch_irqchip_create:
->    * @KVMState: The KVMState pointer
-> - * @MachineState: The MachineState pointer
->    *
->    * Allow architectures to create an in-kernel irq chip themselves.
->    *
-> @@ -530,7 +533,7 @@ void kvm_init_irq_routing(KVMState *s);
->    *            0: irq chip was not created
->    *          > 0: irq chip was created
->    */
-> -int kvm_arch_irqchip_create(MachineState *ms, KVMState *s);
-> +int kvm_arch_irqchip_create(KVMState *s);
->  =20
->   /**
->    * kvm_set_one_reg - set a register value in KVM via KVM_SET_ONE_REG io=
-ctl
-> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-> index 5b82cef..b87b59a 100644
-> --- a/target/arm/kvm.c
-> +++ b/target/arm/kvm.c
-> @@ -741,11 +741,11 @@ void kvm_arch_init_irq_routing(KVMState *s)
->   {
->   }
->  =20
-> -int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-> +int kvm_arch_irqchip_create(KVMState *s)
->   {
-> -     if (machine_kernel_irqchip_split(ms)) {
-> -         perror("-machine kernel_irqchip=3Dsplit is not supported on ARM=
-.");
-> -         exit(1);
-> +    if (kvm_kernel_irqchip_split()) {
-> +        perror("-machine kernel_irqchip=3Dsplit is not supported on ARM.=
-");
-> +        exit(1);
->       }
->  =20
->       /* If we can create the VGIC using the newer device control API, we
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 62ce681..ef63f3a 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -4494,10 +4494,10 @@ void kvm_arch_init_irq_routing(KVMState *s)
->       }
->   }
->  =20
-> -int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-> +int kvm_arch_irqchip_create(KVMState *s)
->   {
->       int ret;
-> -    if (machine_kernel_irqchip_split(ms)) {
-> +    if (kvm_kernel_irqchip_split()) {
->           ret =3D kvm_vm_enable_cap(s, KVM_CAP_SPLIT_IRQCHIP, 0, 24);
->           if (ret) {
->               error_report("Could not enable split irqchip mode: %s",
-> diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-> index 578bc14..de3e26e 100644
-> --- a/target/mips/kvm.c
-> +++ b/target/mips/kvm.c
-> @@ -57,7 +57,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->       return 0;
->   }
->  =20
-> -int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-> +int kvm_arch_irqchip_create(KVMState *s)
->   {
->       return 0;
->   }
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index c77f984..461dc6d 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -152,7 +152,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->       return 0;
->   }
->  =20
-> -int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-> +int kvm_arch_irqchip_create(KVMState *s)
->   {
->       return 0;
->   }
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 0c9d14b..f3a742b 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -374,7 +374,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->       return 0;
->   }
->  =20
-> -int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-> +int kvm_arch_irqchip_create(KVMState *s)
->   {
->       return 0;
->   }
+>>     return 0;
+>> }
+>>=20
+>> -static void vfio_pci_nvlink2_get_tgt(Object *obj, Visitor *v,
+>> -                                     const char *name,
+>> -                                     void *opaque, Error **errp)
+>> -{
+>> -    uint64_t tgt =3D (uintptr_t) opaque;
+>> -    visit_type_uint64(v, name, &tgt, errp);
+>> -}
+>> -
+>> static void vfio_pci_nvlink2_get_link_speed(Object *obj, Visitor *v,
+>>                                                  const char *name,
+>>                                                  void *opaque, Error **e=
+rrp)
+>> @@ -2240,9 +2232,9 @@ int vfio_pci_nvidia_v100_ram_init(VFIOPCIDevice *v=
+dev, Error **errp)
+>>                                nv2reg->size, p);
+>>     QLIST_INSERT_HEAD(&vdev->bars[0].quirks, quirk, next);
+>>=20
+>> -    object_property_add(OBJECT(vdev), "nvlink2-tgt", "uint64",
+>> -                        vfio_pci_nvlink2_get_tgt, NULL, NULL,
+>> -                        (void *) (uintptr_t) cap->tgt, NULL);
+>> +    object_property_add_uint64_ptr(OBJECT(vdev), "nvlink2-tgt",
+>> +                                   (void *)(uintptr_t)cap->tgt,
 >=20
+>=20
+> ... this does not seem equalent. The getter will assume cap->tgt is an
+> userspace address which it is not. &cap->tgt would be QOM-correct but
+> won't work because of the lifetime of @cap but this is another story.
+
+Maybe I just don't understand where this value comes from. It sounds
+like you know what you are talking about :) so I'll send a v4 and
+leave this method untouched, unless you have a chance to test this and
+tell me that it still works.
+
+>=20
+> btw what is this patchset based on? I tried applying it on top of 3 week
+> old and today upstream and it failed. Thanks,
+
+I'm not sure why there were problems. I just rebased my branch on top
+of latest master (without issues). I pushed it to Github so you can
+have a look. Let me know if you want to try it out or if I should just
+send a v4 straight away dropping the changes immediately above.
+
+https://github.com/franciozzy/qemu
+
+Thanks!
+F.
+
+>=20
+>=20
+>=20
+>=20
+>=20
+>> +                                   OBJ_PROP_FLAG_READ, NULL);
+>>     trace_vfio_pci_nvidia_gpu_setup_quirk(vdev->vbasedev.name, cap->tgt,
+>>                                           nv2reg->size);
+>> free_exit:
+>> @@ -2301,9 +2293,9 @@ int vfio_pci_nvlink2_init(VFIOPCIDevice *vdev, Err=
+or **errp)
+>>         QLIST_INSERT_HEAD(&vdev->bars[0].quirks, quirk, next);
+>>     }
+>>=20
+>> -    object_property_add(OBJECT(vdev), "nvlink2-tgt", "uint64",
+>> -                        vfio_pci_nvlink2_get_tgt, NULL, NULL,
+>> -                        (void *) (uintptr_t) captgt->tgt, NULL);
+>> +    object_property_add_uint64_ptr(OBJECT(vdev), "nvlink2-tgt",
+>> +                                   (void *)(uintptr_t)captgt->tgt,
+>> +                                   OBJ_PROP_FLAG_READ, NULL);
+>>     trace_vfio_pci_nvlink2_setup_quirk_ssatgt(vdev->vbasedev.name, captg=
+t->tgt,
+>>                                               atsdreg->size);
+>>=20
+>> diff --git a/memory.c b/memory.c
+>> index 06484c2bff..7dac2aa059 100644
+>> --- a/memory.c
+>> +++ b/memory.c
+>> @@ -1158,15 +1158,6 @@ void memory_region_init(MemoryRegion *mr,
+>>     memory_region_do_init(mr, owner, name, size);
+>> }
+>>=20
+>> -static void memory_region_get_addr(Object *obj, Visitor *v, const char =
+*name,
+>> -                                   void *opaque, Error **errp)
+>> -{
+>> -    MemoryRegion *mr =3D MEMORY_REGION(obj);
+>> -    uint64_t value =3D mr->addr;
+>> -
+>> -    visit_type_uint64(v, name, &value, errp);
+>> -}
+>> -
+>> static void memory_region_get_container(Object *obj, Visitor *v,
+>>                                         const char *name, void *opaque,
+>>                                         Error **errp)
+>> @@ -1230,10 +1221,8 @@ static void memory_region_initfn(Object *obj)
+>>                              NULL, NULL, &error_abort);
+>>     op->resolve =3D memory_region_resolve_container;
+>>=20
+>> -    object_property_add(OBJECT(mr), "addr", "uint64",
+>> -                        memory_region_get_addr,
+>> -                        NULL, /* memory_region_set_addr */
+>> -                        NULL, NULL, &error_abort);
+>> +    object_property_add_uint64_ptr(OBJECT(mr), "addr",
+>> +                                   &mr->addr, OBJ_PROP_FLAG_READ, &erro=
+r_abort);
+>>     object_property_add(OBJECT(mr), "priority", "uint32",
+>>                         memory_region_get_priority,
+>>                         NULL, /* memory_region_set_priority */
+>> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+>> index 7a4ac9339b..bbe25a73c4 100644
+>> --- a/target/arm/cpu.c
+>> +++ b/target/arm/cpu.c
+>> @@ -1039,22 +1039,6 @@ static void arm_set_pmu(Object *obj, bool value, =
+Error **errp)
+>>     cpu->has_pmu =3D value;
+>> }
+>>=20
+>> -static void arm_get_init_svtor(Object *obj, Visitor *v, const char *nam=
+e,
+>> -                               void *opaque, Error **errp)
+>> -{
+>> -    ARMCPU *cpu =3D ARM_CPU(obj);
+>> -
+>> -    visit_type_uint32(v, name, &cpu->init_svtor, errp);
+>> -}
+>> -
+>> -static void arm_set_init_svtor(Object *obj, Visitor *v, const char *nam=
+e,
+>> -                               void *opaque, Error **errp)
+>> -{
+>> -    ARMCPU *cpu =3D ARM_CPU(obj);
+>> -
+>> -    visit_type_uint32(v, name, &cpu->init_svtor, errp);
+>> -}
+>> -
+>> void arm_cpu_post_init(Object *obj)
+>> {
+>>     ARMCPU *cpu =3D ARM_CPU(obj);
+>> @@ -1165,9 +1149,9 @@ void arm_cpu_post_init(Object *obj)
+>>          * a simple DEFINE_PROP_UINT32 for this because we want to permi=
+t
+>>          * the property to be set after realize.
+>>          */
+>> -        object_property_add(obj, "init-svtor", "uint32",
+>> -                            arm_get_init_svtor, arm_set_init_svtor,
+>> -                            NULL, NULL, &error_abort);
+>> +        object_property_add_uint32_ptr(obj, "init-svtor",
+>> +                                       &cpu->init_svtor,
+>> +                                       OBJ_PROP_FLAG_READWRITE, &error_=
+abort);
+>>     }
+>>=20
+>>     qdev_property_add_static(DEVICE(obj), &arm_cpu_cfgend_property,
+>> diff --git a/target/i386/sev.c b/target/i386/sev.c
+>> index 024bb24e51..846018a12d 100644
+>> --- a/target/i386/sev.c
+>> +++ b/target/i386/sev.c
+>> @@ -266,94 +266,6 @@ qsev_guest_class_init(ObjectClass *oc, void *data)
+>>             "guest owners session parameters (encoded with base64)", NUL=
+L);
+>> }
+>>=20
+>> -static void
+>> -qsev_guest_set_handle(Object *obj, Visitor *v, const char *name,
+>> -                      void *opaque, Error **errp)
+>> -{
+>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>> -    uint32_t value;
+>> -
+>> -    visit_type_uint32(v, name, &value, errp);
+>> -    sev->handle =3D value;
+>> -}
+>> -
+>> -static void
+>> -qsev_guest_set_policy(Object *obj, Visitor *v, const char *name,
+>> -                      void *opaque, Error **errp)
+>> -{
+>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>> -    uint32_t value;
+>> -
+>> -    visit_type_uint32(v, name, &value, errp);
+>> -    sev->policy =3D value;
+>> -}
+>> -
+>> -static void
+>> -qsev_guest_set_cbitpos(Object *obj, Visitor *v, const char *name,
+>> -                       void *opaque, Error **errp)
+>> -{
+>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>> -    uint32_t value;
+>> -
+>> -    visit_type_uint32(v, name, &value, errp);
+>> -    sev->cbitpos =3D value;
+>> -}
+>> -
+>> -static void
+>> -qsev_guest_set_reduced_phys_bits(Object *obj, Visitor *v, const char *n=
+ame,
+>> -                                   void *opaque, Error **errp)
+>> -{
+>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>> -    uint32_t value;
+>> -
+>> -    visit_type_uint32(v, name, &value, errp);
+>> -    sev->reduced_phys_bits =3D value;
+>> -}
+>> -
+>> -static void
+>> -qsev_guest_get_policy(Object *obj, Visitor *v, const char *name,
+>> -                      void *opaque, Error **errp)
+>> -{
+>> -    uint32_t value;
+>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>> -
+>> -    value =3D sev->policy;
+>> -    visit_type_uint32(v, name, &value, errp);
+>> -}
+>> -
+>> -static void
+>> -qsev_guest_get_handle(Object *obj, Visitor *v, const char *name,
+>> -                      void *opaque, Error **errp)
+>> -{
+>> -    uint32_t value;
+>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>> -
+>> -    value =3D sev->handle;
+>> -    visit_type_uint32(v, name, &value, errp);
+>> -}
+>> -
+>> -static void
+>> -qsev_guest_get_cbitpos(Object *obj, Visitor *v, const char *name,
+>> -                       void *opaque, Error **errp)
+>> -{
+>> -    uint32_t value;
+>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>> -
+>> -    value =3D sev->cbitpos;
+>> -    visit_type_uint32(v, name, &value, errp);
+>> -}
+>> -
+>> -static void
+>> -qsev_guest_get_reduced_phys_bits(Object *obj, Visitor *v, const char *n=
+ame,
+>> -                                   void *opaque, Error **errp)
+>> -{
+>> -    uint32_t value;
+>> -    QSevGuestInfo *sev =3D QSEV_GUEST_INFO(obj);
+>> -
+>> -    value =3D sev->reduced_phys_bits;
+>> -    visit_type_uint32(v, name, &value, errp);
+>> -}
+>> -
+>> static void
+>> qsev_guest_init(Object *obj)
+>> {
+>> @@ -361,15 +273,15 @@ qsev_guest_init(Object *obj)
+>>=20
+>>     sev->sev_device =3D g_strdup(DEFAULT_SEV_DEVICE);
+>>     sev->policy =3D DEFAULT_GUEST_POLICY;
+>> -    object_property_add(obj, "policy", "uint32", qsev_guest_get_policy,
+>> -                        qsev_guest_set_policy, NULL, NULL, NULL);
+>> -    object_property_add(obj, "handle", "uint32", qsev_guest_get_handle,
+>> -                        qsev_guest_set_handle, NULL, NULL, NULL);
+>> -    object_property_add(obj, "cbitpos", "uint32", qsev_guest_get_cbitpo=
+s,
+>> -                        qsev_guest_set_cbitpos, NULL, NULL, NULL);
+>> -    object_property_add(obj, "reduced-phys-bits", "uint32",
+>> -                        qsev_guest_get_reduced_phys_bits,
+>> -                        qsev_guest_set_reduced_phys_bits, NULL, NULL, N=
+ULL);
+>> +    object_property_add_uint32_ptr(obj, "policy", &sev->policy,
+>> +                                   OBJ_PROP_FLAG_READWRITE, NULL);
+>> +    object_property_add_uint32_ptr(obj, "handle", &sev->handle,
+>> +                                   OBJ_PROP_FLAG_READWRITE, NULL);
+>> +    object_property_add_uint32_ptr(obj, "cbitpos", &sev->cbitpos,
+>> +                                   OBJ_PROP_FLAG_READWRITE, NULL);
+>> +    object_property_add_uint32_ptr(obj, "reduced-phys-bits",
+>> +                                   &sev->reduced_phys_bits,
+>> +                                   OBJ_PROP_FLAG_READWRITE, NULL);
+>> }
+>>=20
+>> /* sev guest info */
+>>=20
+>=20
+> --=20
+> Alexey
 
 
