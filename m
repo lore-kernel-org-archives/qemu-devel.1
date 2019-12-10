@@ -6,96 +6,76 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6113DC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1BBC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:47:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 308F52073D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:45:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DCF8E205ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:47:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aH22U9/P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308F52073D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NwIgl8XZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCF8E205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iejZw-00037k-7A
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 12:45:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47346)
+	id 1iejbx-0004HV-0d
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 12:47:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47996)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iejZ4-0002bb-TK
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:44:51 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iejb5-0003hs-6e
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:46:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iejZ2-0002mI-QX
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:44:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49774
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1iejb4-0003tN-7K
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:46:55 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40007
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iejZ2-0002li-Ms
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:44:48 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iejb4-0003t5-3a
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 12:46:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575999887;
+ s=mimecast20190719; t=1576000013;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/dFNy2ufcLZZVwOl22pvq6jcog3rf3tPjjOm8HTU3zA=;
- b=aH22U9/P4Sl8SjFP0dyYorYtTT+dMInjy0sIox5824w0v/rAKusdgcPW4MzuZeynopP5gR
- Kp49uCBXPCeWCjMLVpmZb2OX4DgGfvtc/PzAqe05lTy4vvbjIH//IcJPypPy+xonY98y8F
- +C+3fYYySWYbdeGJzFhImQf3y9KQ4ww=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-nAlY2uPcOOGpTlyyOWMnsA-1; Tue, 10 Dec 2019 12:44:46 -0500
-Received: by mail-wm1-f70.google.com with SMTP id q21so1275940wmc.7
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 09:44:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=rdb3htqVxF/97hBOyXD18SU5vkFYnRj8kFnYmJCpbTY=;
- b=Z7uqHKfDwz08ZbCzHEr1jNjyHvJ37NSwoRkY2jQq1/vG7gePueUUbczMi6tv3nCA2b
- apzzt7jMMX6r+5+IXwPjyHsFMqOL3AjFuhS4OkFwa6fg3Z8MZyF4NE40kUOo2DQrMHTP
- FxQMCDzqXm4MnXEd2XqNsaykEhhW9snojkyEDvt8mg9gQkx9hYna4KDwvzV0NKz2wGMz
- IaOUXhSaU281PZtcxtmPdnqe2ebP9W/gUIQv6iZwyPehKQS1QipPl2+2AmoNE0xAgmxu
- hF9vDKXBL7Us1Bka0QUZ4ccLKItpGWhjqEKsOThjBJlRRTW0QFJBNcccLeal+gNKhcub
- awVQ==
-X-Gm-Message-State: APjAAAWOuzpV1LxF5E5fgBQOUFBgDuoSN/1d0Ge8BW2LStVLsdqTSiO3
- FssWKLr6xNG6JVctmxDalV0ZmMNf4D+1GU5Bc6Q5/GNGerZ8udIIbMMEHflvkHxJKoO6GPkX0b2
- /encZdw3oR9r1uZ0=
-X-Received: by 2002:a7b:ca4e:: with SMTP id m14mr6219956wml.120.1575999885159; 
- Tue, 10 Dec 2019 09:44:45 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz+A+XMGJNyo2H8g38oj1rCr9YinOJwgtvaXcdBLMPgALQ1l6+PQPL2h+ZgdEWy8BUMFNqgTA==
-X-Received: by 2002:a7b:ca4e:: with SMTP id m14mr6219937wml.120.1575999884939; 
- Tue, 10 Dec 2019 09:44:44 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9?
- ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
- by smtp.gmail.com with ESMTPSA id b185sm4149291wme.36.2019.12.10.09.44.43
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 10 Dec 2019 09:44:44 -0800 (PST)
-Subject: Re: [PATCH v2 15/18] xen: convert "-machine igd-passthru" to an
- accelerator property
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
- <1575903705-12925-16-git-send-email-pbonzini@redhat.com>
- <CAJ+F1C+hZhubMWE47URc38R=2d6GEg=TK8=dKpE_1XNs4txQfA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a62c25d9-059a-6709-250e-498ecfc443b1@redhat.com>
-Date: Tue, 10 Dec 2019 18:44:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=MS000ukHE/2kUXiFGEFx8u0mi9hvakVasMFeFWduJXs=;
+ b=NwIgl8XZL7gtr9qOz1rbDxfYvV8PwU2yb4TYQpsKQIGvmlSuG2ye6leIf5aJDq5kdGO2MU
+ Gf1uziT5Ib9SycbxjIGQUANwo49wj5uEZylKmM3jXfeBIhIAYOuXlx0BFneg7X64zv6nAP
+ BJh+Xsu7OVnhNkxFfq7vFsH9HaqSxCo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-kcl-31U9MFGVFLiKESgQLw-1; Tue, 10 Dec 2019 12:46:50 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 444C710054E3;
+ Tue, 10 Dec 2019 17:46:49 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-11.ams2.redhat.com [10.36.117.11])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A11ED605B4;
+ Tue, 10 Dec 2019 17:46:45 +0000 (UTC)
+Date: Tue, 10 Dec 2019 18:46:44 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: Re: [PATCH for-4.2? v3 0/8] block: Fix resize (extending) of short
+ overlays
+Message-ID: <20191210174644.GC7103@linux.fritz.box>
+References: <20191122160511.8377-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+hZhubMWE47URc38R=2d6GEg=TK8=dKpE_1XNs4txQfA@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: nAlY2uPcOOGpTlyyOWMnsA-1
+In-Reply-To: <20191122160511.8377-1-kwolf@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: kcl-31U9MFGVFLiKESgQLw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,23 +87,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- elmarco@redhat.com
+Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/12/19 13:56, Marc-Andr=C3=A9 Lureau wrote:
->> +    if (g_str_equal(qom_name, "igd-passthru")) {
->> +        object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, v=
-alue);
->=20
-> shouldn't it warn about deprecation?
+Am 22.11.2019 um 17:05 hat Kevin Wolf geschrieben:
+> See patch 4 for the description of the bug fixed.
 
-The old version is not deprecated (I'm only deprecating -tb-size because
-it's a toplevel option, but not the -machine versions; they have been
-there forever and probably have too many users).
+I'm applying patches 3 and 5-7 to the block branch because they make
+sense on their own.
 
-Paolo
+The real fix will need another approach because the error handling is
+broken in this one: If zeroing out fails (either because of NO_FALLBACK
+or because of some other I/O error), bdrv_co_truncate() will return
+failure, but the image size has already been increased, with potentially
+incorrect data in the new area.
+
+To fix this, we need to make sure that zeros will be read before we
+commit the new image size to the image file (e.g. qcow2 header) and to
+bs->total_sectors. In other words, it must become the responsibility of
+the block driver.
+
+To this effect, I'm planning to introduce a PREALLOC_MODE_ZERO_INIT flag
+that can be or'ed to the preallocation mode. This will fail by default
+because it looks like just another unimplemented preallocation mode to
+block drivers. It will be requested explicitly by commit jobs and
+automatically added by bdrv_co_truncate() if the backing file would
+become visible (like in this series, but now for all preallocation
+modes). I'm planning to implement it for qcow2 and file-posix for now,
+which should cover most interesting cases.
+
+Does this make sense to you?
+
+Kevin
 
 
