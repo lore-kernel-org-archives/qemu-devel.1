@@ -2,92 +2,65 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1945C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:35:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED139C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:36:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8BFD52073D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:35:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iSlaNMM0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BFD52073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C11762073B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 10:36:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C11762073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=adacore.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iecrk-0002pT-LT
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 05:35:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40962)
+	id 1iecsB-0003Vc-Ok
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 05:36:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41021)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iecqu-0002Bp-5V
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:34:49 -0500
+ (envelope-from <frederic.konrad@adacore.com>) id 1iecrI-0002Uj-6O
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:35:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iecqr-0007KI-2W
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:34:46 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29702
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <frederic.konrad@adacore.com>) id 1iecrG-0007Oc-HF
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:35:12 -0500
+Received: from mel.act-europe.fr ([2a02:2ab8:224:1::a0a:d2]:41065
+ helo=smtp.eu.adacore.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iecqq-0007JY-Hd
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 05:34:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575974082;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TmTl8vVzDstJfwTs/KiCzHtcND47IpjWsKd4fkRatA4=;
- b=iSlaNMM0T3lmonsTYpN0rE6RjKoUadGEqnJEtgWo92bfs8UtlVXcW7vrKjJxrL3BMAs8NO
- N0eHWPBdp+KSHL8FCHGGq2mRdaL5aelk7nvFiHSzRRO3ZLtG429Cib57m76fNSUPpACfBC
- 48b5EhRGIM00VKHfz937FdJvlgi+Pik=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-yTDVnDjiMKmsrxp4wgnVsw-1; Tue, 10 Dec 2019 05:34:39 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <frederic.konrad@adacore.com>)
+ id 1iecr8-0007MP-P2; Tue, 10 Dec 2019 05:35:03 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by filtered-smtp.eu.adacore.com (Postfix) with ESMTP id 1D4798138C;
+ Tue, 10 Dec 2019 11:34:59 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at eu.adacore.com
+Received: from smtp.eu.adacore.com ([127.0.0.1])
+ by localhost (smtp.eu.adacore.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id aBl5xW3mX5DS; Tue, 10 Dec 2019 11:34:59 +0100 (CET)
+Received: from localhost.localdomain (lfbn-tou-1-352-33.w86-206.abo.wanadoo.fr
+ [86.206.184.33])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5481E107ACC9;
- Tue, 10 Dec 2019 10:34:38 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-181.ams2.redhat.com
- [10.36.116.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 81D361001938;
- Tue, 10 Dec 2019 10:34:33 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 1470711386A7; Tue, 10 Dec 2019 11:34:32 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 2/2] Add -mem-shared option
-References: <20191128172807.788e6aeb@redhat.com>
- <CAJ+F1CLZxhMf-bOAB4sVfuB1yaUMqiO70-ogpKVS3CqfC7y5KA@mail.gmail.com>
- <20191129110703.2b15c541@redhat.com>
- <04dadf85-cd35-fd37-9642-8087cba625bd@redhat.com>
- <20191129131652.6683b769@redhat.com>
- <528bb183-3d44-e541-8765-9c0e01f23157@redhat.com>
- <20191202083948.3e8bb134@redhat.com>
- <20191202210057.GQ14595@habkost.net>
- <1ff4cc6a-0ec8-96ff-1e39-e682429852e4@redhat.com>
- <20191203154303.035c33b3@redhat.com>
- <20191209205840.GJ498046@habkost.net>
-Date: Tue, 10 Dec 2019 11:34:32 +0100
-In-Reply-To: <20191209205840.GJ498046@habkost.net> (Eduardo Habkost's message
- of "Mon, 9 Dec 2019 17:58:40 -0300")
-Message-ID: <87tv6831vr.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by smtp.eu.adacore.com (Postfix) with ESMTPSA id C928881388;
+ Tue, 10 Dec 2019 11:34:58 +0100 (CET)
+Subject: Re: [PATCH 00/10] Add Allwinner H3 SoC and Orange Pi PC Machine
+To: Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-devel@nongnu.org
+References: <20191202210947.3603-1-nieklinnenbank@gmail.com>
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-ID: <6d774864-2bea-ecd6-0b14-a28d0756bfbc@adacore.com>
+Date: Tue, 10 Dec 2019 11:34:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: yTDVnDjiMKmsrxp4wgnVsw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain
+In-Reply-To: <20191202210947.3603-1-nieklinnenbank@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x
+X-Received-From: 2a02:2ab8:224:1::a0a:d2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,82 +72,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, libvir-list@redhat.com,
- QEMU <qemu-devel@nongnu.org>,
- =?utf-8?Q?Marc-A?= =?utf-8?Q?ndr=C3=A9?= Lureau <marcandre.lureau@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: b.galvani@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eduardo Habkost <ehabkost@redhat.com> writes:
 
-> +Markus
->
-> On Tue, Dec 03, 2019 at 03:43:03PM +0100, Igor Mammedov wrote:
->> On Tue, 3 Dec 2019 09:56:15 +0100
->> Thomas Huth <thuth@redhat.com> wrote:
->>=20
->> > On 02/12/2019 22.00, Eduardo Habkost wrote:
->> > > On Mon, Dec 02, 2019 at 08:39:48AM +0100, Igor Mammedov wrote: =20
->> > >> On Fri, 29 Nov 2019 18:46:12 +0100
->> > >> Paolo Bonzini <pbonzini@redhat.com> wrote:
->> > >> =20
->> > >>> On 29/11/19 13:16, Igor Mammedov wrote: =20
->> > >>>> As for "-m", I'd make it just an alias that translates
->> > >>>>  -m/mem-path/mem-prealloc   =20
->> > >>>
->> > >>> I think we should just deprecate -mem-path/-mem-prealloc in 5.0.  =
-CCing
->> > >>> Thomas as mister deprecation. :) =20
->> > >>
->> > >> I'll add that to my series =20
->> > >=20
->> > > Considering that the plan is to eventually reimplement those
->> > > options as syntactic sugar for memory backend options (hopefully
->> > > in less than 2 QEMU releases), what's the point of deprecating
->> > > them? =20
->> >=20
->> > Well, it depends on the "classification" [1] of the parameter...
->> >=20
->> > Let's ask: What's the main purpose of the option?
->> >=20
->> > Is it easier to use than the "full" option, and thus likely to be used
->> > by a lot of people who run QEMU directly from the CLI? In that case it
->> > should stay as "convenience option" and not be deprecated.
->> >=20
->> > Or is the option merely there to give the upper layers like libvirt or
->> > some few users and their scripts some more grace period to adapt their
->> > code, but we all agree that the options are rather ugly and should
->> > finally go away? Then it's rather a "legacy option" and the deprecatio=
-n
->> > process is the right way to go. Our QEMU interface is still way=20
->> > overcrowded, we should try to keep it as clean as possible.
->>=20
->> After switching to memdev for main RAM, users could use relatively
->> short global options
->>  -global memory-backend.prealloc|share=3Don
->> and
->>  -global memory-backend-file.mem-path=3DX|prealloc|share=3Don
->>=20
->> instead of us adding and maintaining slightly shorter
->>  -mem-shared/-mem-path/-mem-prealloc
->
-> Global properties are a convenient way to expose knobs through
-> the command line with little effort, but we have no documentation
-> on which QOM properties are really supposed to be touched by
-> users using -global.
->
-> Unless we fix the lack of documentation, I'd prefer to have
-> syntactic sugar translated to -global instead of recommending
-> direct usage of -global.
 
-Fair point.
+Le 12/2/19 =C3=A0 10:09 PM, Niek Linnenbank a =C3=A9crit=C2=A0:
+> Dear QEMU developers,
+>=20
+> Hereby I would like to contribute the following set of patches to QEMU
+> which add support for the Allwinner H3 System on Chip and the
+> Orange Pi PC machine. The following features and devices are supported:
+>=20
+>   * SMP (Quad Core Cortex A7)
+>   * Generic Interrupt Controller configuration
+>   * SRAM mappings
+>   * Timer device (re-used from Allwinner A10)
+>   * UART
+>   * SD/MMC storage controller
+>   * EMAC ethernet connectivity
+>   * USB 2.0 interfaces
+>   * Clock Control Unit
+>   * System Control module
+>   * Security Identifier device
+>=20
+> Functionality related to graphical output such as HDMI, GPU,
+> Display Engine and audio are not included. Recently released
+> mainline Linux kernels (4.19 up to latest master) and mainline U-Boot
+> are known to work. The SD/MMC code is tested using bonnie++ and
+> various tools such as fsck, dd and fdisk. The EMAC is verified with ipe=
+rf3
+> using -netdev socket.
+>=20
+> To build a Linux mainline kernel that can be booted by the Orange Pi PC
+> machine, simply configure the kernel using the sunxi_defconfig configur=
+ation:
+>   $ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make mrproper
+>   $ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make sunxi_defconfig
+>=20
+> To be able to use USB storage, you need to manually enable the correspo=
+nding
+> configuration item. Start the kconfig configuration tool:
+>   $ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make menuconfig
+>=20
+> Navigate to the following item, enable it and save your configuration:
+>   Device Drivers > USB support > USB Mass Storage support
+>=20
+> Build the Linux kernel with:
+>   $ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make -j5
+>=20
+> To boot the newly build linux kernel in QEMU with the Orange Pi PC mach=
+ine, use:
+>   $ qemu-system-arm -M orangepi -m 512 -nic user -nographic \
+>       -kernel /path/to/linux/arch/arm/boot/zImage \
+>       -append 'console=3DttyS0,115200' \
+>       -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb
+>=20
+> Note that this kernel does not have a root filesystem. You may provide =
+it
+> with an official Orange Pi PC image [1] either as an SD card or as
+> USB mass storage. To boot using the Orange Pi PC Debian image on SD car=
+d,
+> simply add the -sd argument and provide the proper root=3D kernel param=
+eter:
+>   $ qemu-system-arm -M orangepi -m 512 -nic user -nographic \
+>       -kernel /path/to/linux/arch/arm/boot/zImage \
+>       -append 'console=3DttyS0,115200 root=3D/dev/mmcblk0p2' \
+>       -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb \
+>       -sd OrangePi_pc_debian_stretch_server_linux5.3.5_v1.0.img
+>=20
+> Alternatively, you can also choose to build and boot a recent buildroot=
+ [2]
+> using the orangepi_pc_defconfig or Armbian image [3] for Orange Pi PC.
+> To attach an USB mass storage device to the machine, simply append to t=
+he command:
+>   -drive if=3Dnone,id=3Dstick,file=3Dmyimage.img \
+>   -device usb-storage,bus=3Dusb-bus.0,drive=3Dstick
+>=20
+> U-Boot mainline can be build and configured using the orangepi_pc_defco=
+nfig
+> using similar commands as describe above for Linux. To start U-Boot usi=
+ng
+> the Orange Pi PC machine, provide the u-boot binary to the -kernel argu=
+ment:
+>   $ qemu-system-arm -M orangepi -m 512 -nic user -nographic \
+>       -kernel /path/to/uboot/u-boot -sd disk.img
+>=20
+> Use the following U-boot commands to load and boot a Linux kernel from =
+SD card:
+>   -> setenv bootargs console=3DttyS0,115200
+>   -> ext2load mmc 0 0x42000000 zImage
+>   -> ext2load mmc 0 0x43000000 sun8i-h2-plus-orangepi-zero.dtb
+>   -> bootz 0x42000000 - 0x43000000
+>=20
+> Looking forward to your review comments. I will do my best
+> to update the patches where needed.
+>=20
+> With kind regards,
+>=20
+> Niek Linnenbank
+>=20
+> [1] http://www.orangepi.org/downloadresources/
+> [2] https://buildroot.org/download.html
+> [3] https://www.armbian.com/orange-pi-pc/
 
-I'd take QOM property documentation over still more sugar.
+Works well on my side with vanilla linux-4.9.13 built with gcc-8.3.0 + bu=
+sybox
+and sun8i-h3-orangepi-one.dtb.
 
-Sometimes, the practical way to make simple things simple is sugar.  I
-can accept that.  This doesn't look like such a case, though.
+Tested-by: KONRAD Frederic <frederic.konrad@adacore.com>
 
+>=20
+> Niek Linnenbank (10):
+>    hw: arm: add Allwinner H3 System-on-Chip
+>    hw: arm: add Xunlong Orange Pi PC machine
+>    arm: allwinner-h3: add Clock Control Unit
+>    arm: allwinner-h3: add USB host controller
+>    arm: allwinner-h3: add System Control module
+>    arm/arm-powerctl: set NSACR.{CP11,CP10} bits in arm_set_cpu_on()
+>    arm: allwinner-h3: add CPU Configuration module
+>    arm: allwinner-h3: add Security Identifier device
+>    arm: allwinner-h3: add SD/MMC host controller
+>    arm: allwinner-h3: add EMAC ethernet device
+>=20
+>   MAINTAINERS                           |   8 +
+>   default-configs/arm-softmmu.mak       |   1 +
+>   hw/arm/Kconfig                        |   9 +
+>   hw/arm/Makefile.objs                  |   1 +
+>   hw/arm/allwinner-h3.c                 | 316 ++++++++++
+>   hw/arm/orangepi.c                     | 114 ++++
+>   hw/misc/Makefile.objs                 |   4 +
+>   hw/misc/allwinner-h3-clk.c            | 227 ++++++++
+>   hw/misc/allwinner-h3-cpucfg.c         | 280 +++++++++
+>   hw/misc/allwinner-h3-sid.c            | 162 ++++++
+>   hw/misc/allwinner-h3-syscon.c         | 139 +++++
+>   hw/misc/trace-events                  |   5 +
+>   hw/net/Kconfig                        |   3 +
+>   hw/net/Makefile.objs                  |   1 +
+>   hw/net/allwinner-h3-emac.c            | 786 +++++++++++++++++++++++++
+>   hw/net/trace-events                   |  10 +
+>   hw/sd/Makefile.objs                   |   1 +
+>   hw/sd/allwinner-h3-sdhost.c           | 791 +++++++++++++++++++++++++=
++
+>   hw/sd/trace-events                    |   7 +
+>   hw/usb/hcd-ehci-sysbus.c              |  17 +
+>   hw/usb/hcd-ehci.h                     |   1 +
+>   include/hw/arm/allwinner-h3.h         | 130 +++++
+>   include/hw/misc/allwinner-h3-clk.h    |  41 ++
+>   include/hw/misc/allwinner-h3-cpucfg.h |  44 ++
+>   include/hw/misc/allwinner-h3-sid.h    |  42 ++
+>   include/hw/misc/allwinner-h3-syscon.h |  43 ++
+>   include/hw/net/allwinner-h3-emac.h    |  69 +++
+>   include/hw/sd/allwinner-h3-sdhost.h   |  73 +++
+>   target/arm/arm-powerctl.c             |   3 +
+>   29 files changed, 3328 insertions(+)
+>   create mode 100644 hw/arm/allwinner-h3.c
+>   create mode 100644 hw/arm/orangepi.c
+>   create mode 100644 hw/misc/allwinner-h3-clk.c
+>   create mode 100644 hw/misc/allwinner-h3-cpucfg.c
+>   create mode 100644 hw/misc/allwinner-h3-sid.c
+>   create mode 100644 hw/misc/allwinner-h3-syscon.c
+>   create mode 100644 hw/net/allwinner-h3-emac.c
+>   create mode 100644 hw/sd/allwinner-h3-sdhost.c
+>   create mode 100644 include/hw/arm/allwinner-h3.h
+>   create mode 100644 include/hw/misc/allwinner-h3-clk.h
+>   create mode 100644 include/hw/misc/allwinner-h3-cpucfg.h
+>   create mode 100644 include/hw/misc/allwinner-h3-sid.h
+>   create mode 100644 include/hw/misc/allwinner-h3-syscon.h
+>   create mode 100644 include/hw/net/allwinner-h3-emac.h
+>   create mode 100644 include/hw/sd/allwinner-h3-sdhost.h
+>=20
 
