@@ -2,79 +2,84 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D19C4C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 07:11:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C7CC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 07:15:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A663220663
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 07:11:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A663220663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
+	by mail.kernel.org (Postfix) with ESMTPS id 0455220663
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 07:15:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cjbfj9ef"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0455220663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieZg7-0004Eq-Ok
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 02:11:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46225)
+	id 1ieZjn-0005O1-S8
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 02:15:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46601)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <emacsray@gmail.com>) id 1ieZfH-0003Oq-4F
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:10:36 -0500
+ (envelope-from <armbru@redhat.com>) id 1ieZj5-0004vE-HQ
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:14:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <emacsray@gmail.com>) id 1ieZfF-0002OT-I2
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:10:34 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:35938)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1ieZfF-0002NX-C0
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:10:33 -0500
-Received: by mail-pg1-f196.google.com with SMTP id k3so7784993pgc.3
- for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 23:10:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=kWkIagtUUlefoRjDUpFiDRcQatW8hD5XxFBhqbVTIAM=;
- b=DjsJbN743/jVspaNWlZVB9QgelFC9XTYT9IcFIA0gNnPvBcUPGbBqOLgeNm5uA+yhJ
- vwjQuQDliCshIW0OnVzJiARMpU5SSzbtZOproBMOePyVcOuWtPUdA29hcvKhgIxTYR02
- bJYiivIKxGl8p0SVbhAMkhz+FoljWBzF/U63Y0HiFApEfXmxUVvYTHpMoucgDspyBbLm
- 3F8/U3R2doHpIT+AmIgOztBV1RGUKLyvY4nV2lF9LIvQMzoTMfrXWSLlvxNcxuSWoeNr
- 2CWoW2aZBLUy/dVh0SOFyXawpxmV9P9PN9ypdcIDqrruYW4fij4qFBJtPkCqdFojLGV8
- BS1w==
-X-Gm-Message-State: APjAAAU2/VVkCrPbZ175cFe2D4Gt+AJV8mNwwd+K4DAO9/6xofJCembj
- 49/hv4jDyoJBaC58Qzz73lw=
-X-Google-Smtp-Source: APXvYqwGEJsZeVdTairyCi9ZoBGQ7Yt3uSiFItJHhlm7kthKlvhNSxWOnQamCNgonSxoXSMo8ycvCg==
-X-Received: by 2002:a63:334f:: with SMTP id z76mr22670572pgz.277.1575961831965; 
- Mon, 09 Dec 2019 23:10:31 -0800 (PST)
-Received: from localhost (c-71-204-169-238.hsd1.ca.comcast.net.
- [71.204.169.238])
- by smtp.gmail.com with ESMTPSA id u190sm1868493pfb.60.2019.12.09.23.10.30
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 09 Dec 2019 23:10:31 -0800 (PST)
-Date: Mon, 9 Dec 2019 23:10:30 -0800
-From: Fangrui Song <i@maskray.me>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH] configure: Use lld --image-base for --disable-pie user
- mode binaries
-Message-ID: <20191210071030.c5igsbxf3v7pzrwn@gmail.com>
-References: <20191116052815.nop3xkmd4umqsdsb@google.com>
- <20191120210200.hvwlfuzo2vy5d5n4@gmail.com>
- <20191127183631.n3kfz7k5szri27b3@gmail.com>
- <e5bf2584-bae2-8dda-a2b2-8930ee17ea86@linaro.org>
- <20191202040103.p5ywvxixglmt6oqx@google.com>
+ (envelope-from <armbru@redhat.com>) id 1ieZj2-0004RQ-A8
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:14:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47652
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ieZj1-0004Qg-Ry
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:14:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575962066;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gpXescD7BewFGQPvuCvklwbzxsORHJD58Q5HNfKcflA=;
+ b=cjbfj9efNBDhIicQvcPulGoEjNrcOJu6tCEIrWHqrwiadzy8/KQRvhGNytrqNlNUOIY4u2
+ TDzRRiSi5dtlwKuaSSYMR8dvw8bxYzll2A2lkpPbRNioigeyJwqyVTe4OUdPmbPyszwLZi
+ 3yM0gitN/GhSzYGtRJzqoi++90c0rYA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-P4kWV-f9NiS31vRyN8HCdA-1; Tue, 10 Dec 2019 02:14:23 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73A2118C35A9;
+ Tue, 10 Dec 2019 07:14:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-181.ams2.redhat.com
+ [10.36.116.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 401DF5D726;
+ Tue, 10 Dec 2019 07:14:22 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C5D2411386A7; Tue, 10 Dec 2019 08:14:20 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+Subject: Re: [PATCH v8 06/21] qdev-monitor: well form error hint helpers
+References: <20191205174635.18758-1-vsementsov@virtuozzo.com>
+ <20191205174635.18758-7-vsementsov@virtuozzo.com>
+ <87blslcuwe.fsf@dusky.pond.sub.org>
+Date: Tue, 10 Dec 2019 08:14:20 +0100
+In-Reply-To: <87blslcuwe.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Fri, 06 Dec 2019 16:53:53 +0100")
+Message-ID: <87r21codo3.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191202040103.p5ywvxixglmt6oqx@google.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: P4kWV-f9NiS31vRyN8HCdA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.215.196
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,108 +91,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-12-01, Fangrui Song wrote:
->
->Thanks for reviewing this patch!
->
->On 2019-12-01, Richard Henderson wrote:
->>On 11/27/19 6:36 PM, Fangrui Song wrote:
->>>On 2019-11-20, Fangrui Song wrote:
->>>>On 2019-11-15, Fangrui Song wrote:
->>>>>For lld, --image-base is the preferred way to set the base address.
->>>>>lld does not actually implement -Ttext-segment, but treats it as an alias for
->>>>>-Ttext. -Ttext-segment=0x60000000 combined with --no-rosegment can
->>>>>create a 1.6GB executable.
->>>>>
->>>>>Fix the problem by using --image-base for lld. GNU ld and gold will
->>>>>still get -Ttext-segment. Also delete the ld --verbose fallback introduced
->>>>>in 2013, which is no longer relevant or correct (the default linker
->>>>>script has changed).
->>>>>
->>>>>Signed-off-by: Fangrui Song <i@maskray.me>
->>>>>---
->>>>>configure | 33 ++++++++++++---------------------
->>>>>1 file changed, 12 insertions(+), 21 deletions(-)
->>>>>
->>>>>diff --git a/configure b/configure
->>>>>index 6099be1d84..2d45af0d09 100755
->>>>>--- a/configure
->>>>>+++ b/configure
->>>>>@@ -6336,43 +6336,34 @@ fi
->>>>>
->>>>># Probe for the need for relocating the user-only binary.
->>>>>if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ];
->>>>>then
->>>>>-  textseg_addr=
->>>>>+  image_base=
->>>>>  case "$cpu" in
->>>>>    arm | i386 | ppc* | s390* | sparc* | x86_64 | x32)
->>>>>-      # ??? Rationale for choosing this address
->>>>>-      textseg_addr=0x60000000
->>>>>+      # An arbitrary address that makes it unlikely to collide with user
->>>>>+      # programs.
->>
->>Please don't replace this ??? with an arbitrary rationale, which clearly
->>doesn't apply to all of these hosts.
->
->In
->https://lists.nongnu.org/archive/html/qemu-devel/2019-11/msg04646.html
->it was suggested to move the comment around a bit.
->I am not puzzled where and what I should say in the comment.
->Can you (or other maintainers) kindly edit the comment for me?
->I do not know enough about qemu to provide a good rationale here.
->
->>>>>+      image_base=0x60000000
->>>>>      ;;
->>>>>    mips)
->>>>>      # A 256M aligned address, high in the address space, with enough
->>>>>      # room for the code_gen_buffer above it before the stack.
->>
->>This is the only one with a proper rationale.
->>
->>That said, I'm not sure that the proper way to handle this issue with lld is to
->>drop this code entirely.
->
->The patch changes a feature that lld does not support: -Ttext-segment,
->to use --image-base instead.
->
->Due to the prevalence of -z separate-code in GNU ld, -Ttext-segment is
->no longer appropriate. I suggested that GNU linkers implement the
->feature https://sourceware.org/bugzilla/show_bug.cgi?id=25207 .
->
->What gets deleted is the sed script. As I explained in the commit
->message, it is no longer relevant. It probably applies to an old GNU ld
->that FreeBSD used. FreeBSD has switched to lld now.
->
->>The best way to handle the underlying issue -- address conflict between
->>interpreter and guest binary -- is PIE, for which this code is skipped.
->>
->>After that, we go to some pain to choose a guest_base address that allows the
->>guest binary to load around the interpreter's reserved addresses.
->>
->>So what's left that this messing about with link addresses buys us?
->
->I agree that --enable-pie will be a better solution, but dropping the
->support now will break at least FreeBSD. Its kernel supports running an
->ET_DYN executable but it does not perform address randomization.
->--disable-pie also appears to be used by ChromeOS developers who
->reported https://bugs.llvm.org/show_bug.cgi?id=43997 . I can communicate
->to them that migrating to --enable-pie is the way going forward.
+Markus Armbruster <armbru@redhat.com> writes:
 
-Ping? There is another very good reason that we need to keep
---disable-pie for a while. Many users build statically linked qemu user
-mode binaries. -static-pie requires newer toolchain:
+> Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> writes:
+>
+>> Make qbus_list_bus and qbus_list_dev hint append helpers well formed:
+>> switch errp paramter to Error *const * type, as it has uncommon
+>> behavior: not change the pointer to return error, but operate on
+>> already existent error object.
+>> Rename functions to be error_append_*_hint.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>
+> "well form error hint helpers" tells me nothing.  PATCH 03 does the same
+> (less function renames), and is titled "make Error **errp const where it
+> is appropriate".  I like that better.  No big deal, and certainly not
+> worth a respin by itself.  I'm happy to touch up commit messages in my
+> tree.
 
-* GCC 8 or clang 9
-* binutils>=2.29
-* glibc>=2.27 or musl
+Let's adapt PATCH 03's commit message, like this:
 
-Dropping support for GCC<8 does not sound a good idea in the year of 2019. (It may be in a few years.)
+  qdev-monitor: make Error **errp const where it is appropriate
+
+  Mostly, Error ** is for returning error from the function, so the
+  callee sets it. However qbus_list_bus and qbus_list_dev get already
+  filled errp parameter. They don't change the pointer itself, only
+  change the internal state of referenced Error object. So we can make
+  it Error *const * errp, to stress the behavior. It will also help
+  coccinelle script (in future) to distinguish such cases from common
+  errp usage.
+
+  While there, rename the functions to
+  qbus_error_append_bus_list_hint(), qbus_error_append_dev_list_hint().
+
+With something like that:
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+
 
