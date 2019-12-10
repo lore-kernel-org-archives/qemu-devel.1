@@ -2,80 +2,86 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F185C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 15:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA25C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 15:46:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A443207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 15:03:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9D4F207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 15:46:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFdWfmxx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A443207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZBCDTLuH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9D4F207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieh2R-0005kJ-7k
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 10:02:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34971)
+	id 1iehiM-0004GS-Td
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 10:46:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ieh1g-0005DS-J5
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 10:02:13 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iehhT-0003dr-9j
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 10:45:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ieh1b-0004HY-JQ
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 10:02:12 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28867
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ieh1b-0004HM-Fm
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 10:02:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575990127;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=lReS2R0aRIReKgjC6upRWpB4x00FQ45qJ1Kl5Di3O2I=;
- b=CFdWfmxxqfHUC5Hb8A4x+a/A3GLFOVaQhk4xa95S47ToOIGbVz0woPWxDUmbfcHeoWcedg
- pnoloPbZwMbjKeoIwZGf+qAMH/M+LW7dEAhNTaYBm9LY9V8rICPxc73JP+opdrbU9NbPU9
- PFABDOGJf74y3OySmisXs/fbJqaVEog=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-lAfNpCI6M3e-SolHHtTdEQ-1; Tue, 10 Dec 2019 10:02:03 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E3759798D;
- Tue, 10 Dec 2019 15:02:02 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-11.ams2.redhat.com [10.36.117.11])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7352B5C1B0;
- Tue, 10 Dec 2019 15:02:01 +0000 (UTC)
-Date: Tue, 10 Dec 2019 16:02:00 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH] qemu-img: fix info --backing-chain --image-opts
-Message-ID: <20191210150200.GB7103@linux.fritz.box>
-References: <20191205134646.445427-1-stefanha@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iehhR-0001GN-TI
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 10:45:23 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45680)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iehhR-0001FD-Mc
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 10:45:21 -0500
+Received: by mail-ot1-x344.google.com with SMTP id 59so15858582otp.12
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 07:45:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=BzYMi4o5tnM8+8TW8stcvngRLupsDB7APP25/5NOis8=;
+ b=ZBCDTLuHsRqqPhpnw4ZnsfkALAysJLqfOnpMBc3TMKRYD6D1NyxSzRa5jCvEh7L+iF
+ NTcF7Ca5X9bszyyN+jiD/YOS2ElDgIjzAWxZSLn6LLGnQjuHjPGJM8Z5z+7Y80WO+qc5
+ KJ86U98SQSBQm5fxuXJiElNJOjpvZpQKCXRURRAXPuLvYCwxJWQtzatrv4SbO3hQFB3d
+ 3/qeOX2T0cjjO85pDILjRiIryKDVheA2ebR10xvGL+pq/z4Ud85QaYCQf62qJou/AOiH
+ brk5EaJAKmJrm4vQHf1x+azvax3X1wegaq1YPieQDb19N9BLvkHmCFYNYGethOlLNCnP
+ yapQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=BzYMi4o5tnM8+8TW8stcvngRLupsDB7APP25/5NOis8=;
+ b=q1qI7Xj9p3er57iT7Ud9EMmacliPFBYIPaxLm/ttFM00FqUonELpLXAoYN1bH6jChp
+ SZpfzU9SSKqEuYPCt/T64pKUoFx3X9lf8xrvCCZg9cmUM21Lma5oR0YqWFXOvphTBmv3
+ ooWJQull025bx3LPm9GuKgdfXtvSuBObyy01ZA0Kr+2NClbIDueNQo0u2Wii+i89hh9n
+ mHi3PzQFERHqpGY8UoVCvFi3oD5cu/lnRDIyGUJdo9hXLYCUVbKWf3RdKGxre7XND4TA
+ xkWA5MMju3DFQcYkuTmITtJu2N8xN9QCGaL7X67x8LhRjFe4oKRGvbBg52X688PisyUx
+ cGTg==
+X-Gm-Message-State: APjAAAXSpdbYyAuq9hiOOD4dSda5wVcxlr0hywP4M+dpi16WRGx8uprL
+ 1EArRsQHfj+uEssufp4K6sgwhxbwkeJMJpyjM13C6w==
+X-Google-Smtp-Source: APXvYqySfmyrxjXFPAv0TQJndI2bCGuPYwLb/lA4co49/ecx4y6IXbDUXIiyWa+65VdfYYCTM6v6c8pNaUGcNJlSOoo=
+X-Received: by 2002:a9d:6745:: with SMTP id w5mr25113617otm.221.1575992720459; 
+ Tue, 10 Dec 2019 07:45:20 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191205134646.445427-1-stefanha@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: lAfNpCI6M3e-SolHHtTdEQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191016143410.5023-1-drjones@redhat.com>
+ <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
+ <20191206155327.7adiyjjkjh56mg2t@kamzik.brq.redhat.com>
+ <596d07e933cb4da48dbba5b492e81a2438e78a2f.camel@redhat.com>
+ <CAFEAcA9+G0jprsHRQp8g=Aso+2-_GhoWkDGx4WWxoC88maOKEg@mail.gmail.com>
+ <20191210110531.psjzlikir2ep2omo@kamzik.brq.redhat.com>
+ <CAFEAcA_M61hTzU=qCiUbR4V9Mnwd0phFNqTJG9pCWKreVmjy6A@mail.gmail.com>
+ <20191210133254.22vcpvr3eabcnthe@kamzik.brq.redhat.com>
+In-Reply-To: <20191210133254.22vcpvr3eabcnthe@kamzik.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 10 Dec 2019 15:45:09 +0000
+Message-ID: <CAFEAcA_Y0bX4mg7PyTgcfKtZQkPw+DEibW6OjVRGyA29mC7TiQ@mail.gmail.com>
+Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
+ virtual time
+To: Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,76 +93,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: bijan.mottahedeh@oracle.com, Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Andrea Bolognani <abologna@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 05.12.2019 um 14:46 hat Stefan Hajnoczi geschrieben:
-> Only apply --image-opts to the topmost image when listing an entire
-> backing chain.  It is incorrect to treat backing filenames as image
-> options.  Assuming we have the backing chain t.IMGFMT.base <-
-> t.IMGFMT.mid <- t.IMGFMT, qemu-img info fails as follows:
->=20
->   $ qemu-img info --backing-chain --image-opts \
->       driver=3Dqcow2,file.driver=3Dfile,file.filename=3Dt.IMGFMT
->   qemu-img: Could not open 'TEST_DIR/t.IMGFMT.mid': Cannot find device=3D=
-TEST_DIR/t.IMGFMT.mid nor node_name=3DTEST_DIR/t.IMGFMT.mid
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Tue, 10 Dec 2019 at 13:33, Andrew Jones <drjones@redhat.com> wrote:
+> So the ins and outs of this particular timekeeping issue (to the best of
+> my knowledge) is that x86 has implemented this behavior since
+> 00f4d64ee76e ("kvmclock: clock should count only if vm is running"), which
+> was committed over six years ago. Possibly x86 VM time would behave more
+> like arm VM time if kvmclock was disabled, but that's not a recommended
+> configuration.
+>
+> PPC got an equivalent patch to the x86 one in 2017, 42043e4f1241 ("spapr:
+> clock should count only if vm is running"), but when stopping time during
+> pause on spapr they actually *keep* 'date' and 'hwclock' in synch. I guess
+> whatever clocksource 'hwclock' uses on spapr was already stopping when
+> paused? For x86 those values diverge, and for arm without this series they
+> stay the same but experience jumps, and with this series they diverge like
+> x86. I don't see any way to disable the behaviour 42043e4f1241 introduces.
+>
+> s390x got what appears to be its equivalent patch last year 9bc9d3d1ae3b
+> ("s390x/tod: Properly stop the KVM TOD while the guest is not running").
+> The commit message doesn't state how hwclock and date values change /
+> don't change, and I don't see any way to disable the behavior.
+>
+> MIPS has had this implemented since KVM support was introduced. No way
+> to disable it that I know of.
+>
+> So why is this arm-specific? arm is just trying to catch up, but also
+> offer a switch allowing the current behavior to be selected. If other
+> architectures see value in the switch then they're free to adopt it too.
+> After having done this git mining, it looks more and more like we should
+> at least consider naming this feature 'kvm-no-adjvtime' and probably
+> also change arm's default.
 
-> diff --git a/tests/qemu-iotests/279 b/tests/qemu-iotests/279
-> new file mode 100755
-> index 0000000000..b555a92859
-> --- /dev/null
-> +++ b/tests/qemu-iotests/279
-> @@ -0,0 +1,56 @@
-> +#!/usr/bin/env bash
-> +#
-> +# Test qemu-img --backing-chain --image-opts
-> +#
-> +# Copyright (C) 2019 Red Hat, Inc.
-> +#
-> +# This program is free software; you can redistribute it and/or modify
-> +# it under the terms of the GNU General Public License as published by
-> +# the Free Software Foundation; either version 2 of the License, or
-> +# (at your option) any later version.
-> +#
-> +# This program is distributed in the hope that it will be useful,
-> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> +# GNU General Public License for more details.
-> +#
-> +# You should have received a copy of the GNU General Public License
-> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> +#
-> +
-> +seq=3D$(basename "$0")
-> +echo "QA output created by $seq"
-> +
-> +status=3D1=09# failure is the default!
-> +
-> +_cleanup()
-> +{
-> +    _cleanup_test_img
+Thanks for pulling up the handling by other architectures.
+I think I agree that we should change the arm default (ie
+we should just call this a bug fix, since the old behaviour
+seems unhelpful generally and is more random accident than
+a deliberate choice), with a switch provided just in case
+anybody had something depending on the old behaviour.
 
-I'm squashing in this fixup:
-
-diff --git a/tests/qemu-iotests/279 b/tests/qemu-iotests/279
-index b555a92859..6682376808 100755
---- a/tests/qemu-iotests/279
-+++ b/tests/qemu-iotests/279
-@@ -26,6 +26,7 @@ status=3D1      # failure is the default!
- _cleanup()
- {
-     _cleanup_test_img
-+    rm -f "$TEST_IMG.mid"
- }
- trap "_cleanup; exit \$status" 0 1 2 3 15
-
-
-Thanks, applied to the block branch.
-
-Kevin
-
+-- PMM
 
