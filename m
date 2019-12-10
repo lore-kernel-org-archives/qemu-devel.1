@@ -2,87 +2,62 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D33C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79ECDC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:01:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EE972077B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:01:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrvvEQqZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE972077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 214CA2073D
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:01:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 214CA2073D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieisi-0002l1-5r
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 12:01:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34278)
+	id 1ieitZ-0003Up-TG
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 12:01:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33073)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1ieiqN-0001Fs-UY
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:58:41 -0500
+ (envelope-from <groug@kaod.org>) id 1ieilT-0003Xh-TA
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:53:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1ieiqK-0000Vg-5o
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:58:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30057
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1ieilS-0007XI-Oh
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:53:35 -0500
+Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:40691)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1ieiqK-0000VH-10
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:58:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575997114;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kloBvw8RGWK1lP3SGtf1eARoYVSiVMuq6V2S364vtNA=;
- b=MrvvEQqZ9IjHgdWhnGrLfZ9sNtPcN7QYa1fx9SLjWFrM5vYLWv2tHPpYLgVrzVzLR9Mt93
- oF0QnKIa1ktTt5G6g2N8U99IPbE+/LcM4C1oABEXzZOzmIG2EYg/Ty5figCyC44hy41q/G
- mZ4DYI5GFbu5TfY51ILoUVQvk2rjFJA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-a3Q0C6xYPXGoFovyHN5gSQ-1; Tue, 10 Dec 2019 11:58:31 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38AA41005512;
- Tue, 10 Dec 2019 16:58:30 +0000 (UTC)
-Received: from x1.home (ovpn04.gateway.prod.ext.phx2.redhat.com [10.5.9.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3154360BE1;
- Tue, 10 Dec 2019 16:58:25 +0000 (UTC)
-Date: Tue, 10 Dec 2019 09:58:24 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [RFC PATCH 1/9] vfio/pci: introduce mediate ops to intercept
- vfio-pci ops
-Message-ID: <20191210095824.5c4cdad7@x1.home>
-In-Reply-To: <20191210024422.GA27331@joy-OptiPlex-7040>
-References: <20191205032419.29606-1-yan.y.zhao@intel.com>
- <20191205032536.29653-1-yan.y.zhao@intel.com>
- <20191205165519.106bd210@x1.home>
- <20191206075655.GG31791@joy-OptiPlex-7040>
- <20191206142226.2698a2be@x1.home>
- <20191209034225.GK31791@joy-OptiPlex-7040>
- <20191209170339.2cb3d06e@x1.home>
- <20191210024422.GA27331@joy-OptiPlex-7040>
-Organization: Red Hat
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ieilS-0007X0-Ig
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:53:34 -0500
+Received: from player693.ha.ovh.net (unknown [10.108.1.161])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 77FF57480C
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 17:53:32 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: groug@kaod.org)
+ by player693.ha.ovh.net (Postfix) with ESMTPSA id CF43BD1B2159;
+ Tue, 10 Dec 2019 16:53:25 +0000 (UTC)
+Date: Tue, 10 Dec 2019 17:53:23 +0100
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH 2/2] ppc/pnv: populate the DT with realized XSCOM devices
+Message-ID: <20191210175323.76e77bcb@bahia.tlslab.ibm.com>
+In-Reply-To: <20191210135845.19773-3-clg@kaod.org>
+References: <20191210135845.19773-1-clg@kaod.org>
+ <20191210135845.19773-3-clg@kaod.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: a3Q0C6xYPXGoFovyHN5gSQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 14811213274579507595
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelfedgledvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdduleehrddvuddvrddvledrudeiieenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelfedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.50.107
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,119 +69,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "He, 
- Shaopeng" <shaopeng.he@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Dec 2019 21:44:23 -0500
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Tue, 10 Dec 2019 14:58:45 +0100
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-> > > > > Currently, yes, i40e has build dependency on vfio-pci.
-> > > > > It's like this, if i40e decides to support SRIOV and compiles in vf
-> > > > > related code who depends on vfio-pci, it will also have build dependency
-> > > > > on vfio-pci. isn't it natural?    
-> > > > 
-> > > > No, this is not natural.  There are certainly i40e VF use cases that
-> > > > have no interest in vfio and having dependencies between the two
-> > > > modules is unacceptable.  I think you probably want to modularize the
-> > > > i40e vfio support code and then perhaps register a table in vfio-pci
-> > > > that the vfio-pci code can perform a module request when using a
-> > > > compatible device.  Just and idea, there might be better options.  I
-> > > > will not accept a solution that requires unloading the i40e driver in
-> > > > order to unload the vfio-pci driver.  It's inconvenient with just one
-> > > > NIC driver, imagine how poorly that scales.
-> > > >     
-> > > what about this way:
-> > > mediate driver registers a module notifier and every time when
-> > > vfio_pci is loaded, register to vfio_pci its mediate ops?
-> > > (Just like in below sample code)
-> > > This way vfio-pci is free to unload and this registering only gives
-> > > vfio-pci a name of what module to request.
-> > > After that,
-> > > in vfio_pci_open(), vfio-pci requests the mediate driver. (or puts
-> > > the mediate driver when mediate driver does not support mediating the
-> > > device)
-> > > in vfio_pci_release(), vfio-pci puts the mediate driver.
-> > > 
-> > > static void register_mediate_ops(void)
-> > > {
-> > >         int (*func)(struct vfio_pci_mediate_ops *ops) = NULL;
-> > > 
-> > >         func = symbol_get(vfio_pci_register_mediate_ops);
-> > > 
-> > >         if (func) {
-> > >                 func(&igd_dt_ops);
-> > >                 symbol_put(vfio_pci_register_mediate_ops);
-> > >         }
-> > > }
-> > > 
-> > > static int igd_module_notify(struct notifier_block *self,
-> > >                               unsigned long val, void *data)
-> > > {
-> > >         struct module *mod = data;
-> > >         int ret = 0;
-> > > 
-> > >         switch (val) {
-> > >         case MODULE_STATE_LIVE:
-> > >                 if (!strcmp(mod->name, "vfio_pci"))
-> > >                         register_mediate_ops();
-> > >                 break;
-> > >         case MODULE_STATE_GOING:
-> > >                 break;
-> > >         default:
-> > >                 break;
-> > >         }
-> > >         return ret;
-> > > }
-> > > 
-> > > static struct notifier_block igd_module_nb = {
-> > >         .notifier_call = igd_module_notify,
-> > >         .priority = 0,
-> > > };
-> > > 
-> > > 
-> > > 
-> > > static int __init igd_dt_init(void)
-> > > {
-> > > 	...
-> > > 	register_mediate_ops();
-> > > 	register_module_notifier(&igd_module_nb);
-> > > 	...
-> > > 	return 0;
-> > > }  
-> > 
-> > 
-> > No, this is bad.  Please look at MODULE_ALIAS() and request_module() as
-> > used in the vfio-platform for loading reset driver modules.  I think
-> > the correct approach is that vfio-pci should perform a request_module()
-> > based on the device being probed.  Having the mediation provider
-> > listening for vfio-pci and registering itself regardless of whether we
-> > intend to use it assumes that we will want to use it and assumes that
-> > the mediation provider module is already loaded.  We should be able to
-> > support demand loading of modules that may serve no other purpose than
-> > providing this mediation.  Thanks,  
-> hi Alex
-> Thanks for this message.
-> So is it good to create a separate module as mediation provider driver,
-> and alias its module name to "vfio-pci-mediate-vid-did".
-> Then when vfio-pci probes the device, it requests module of that name ?
+> Some devices could be initialized in the instance_init handler but not
+> realized for configuration reasons. Nodes should not be added in the DT
+> for such devices.
+>=20
 
-I think this would give us an option to have the mediator as a separate
-module, but not require it.  Maybe rather than a request_module(),
-where if we follow the platform reset example we'd then expect the init
-code for the module to register into a list, we could do a
-symbol_request().  AIUI, this would give us a reference to the symbol
-if the module providing it is already loaded, and request a module
-(perhaps via an alias) if it's not already load.  Thanks,
+Do you have examples of such devices to share ?
 
-Alex
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/ppc/pnv_xscom.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> index 006d87e970d9..6d3745a49e50 100644
+> --- a/hw/ppc/pnv_xscom.c
+> +++ b/hw/ppc/pnv_xscom.c
+> @@ -272,7 +272,10 @@ static int xscom_dt_child(Object *child, void *opaqu=
+e)
+>          PnvXScomInterface *xd =3D PNV_XSCOM_INTERFACE(child);
+>          PnvXScomInterfaceClass *xc =3D PNV_XSCOM_INTERFACE_GET_CLASS(xd);
+> =20
+> -        if (xc->dt_xscom) {
+> +        /*
+> +         * Only "realized" devices should be configured in the DT
+> +         */
+> +        if (xc->dt_xscom && DEVICE(child)->realized) {
+>              _FDT((xc->dt_xscom(xd, args->fdt, args->xscom_offset)));
+>          }
+>      }
 
 
