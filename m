@@ -2,82 +2,98 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E75FC2D0CB
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 09:15:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97C0BC2D0BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 09:25:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46E4D2073B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 09:15:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6422B20726
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 09:25:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rf+lVwMA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E4D2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+fvlw6l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6422B20726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iebc3-00057L-Ej
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 04:15:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59794)
+	id 1ieblb-0006wN-Fs
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 04:25:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60690)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent.desnogues@gmail.com>) id 1iebbL-0004hp-SC
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:14:41 -0500
+ (envelope-from <philmd@redhat.com>) id 1iebks-0006X5-Ds
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:24:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent.desnogues@gmail.com>) id 1iebbK-0008JU-G2
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:14:39 -0500
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:32920)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent.desnogues@gmail.com>)
- id 1iebbK-0008ID-BK
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:14:38 -0500
-Received: by mail-io1-xd41.google.com with SMTP id s25so3316240iob.0
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 01:14:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=4YGWiQYlzj8DlpvgbyfAyMasu3Ce5XpNh/eMVwQ71r8=;
- b=rf+lVwMATLqzjds6z8Tuz58jRA3+yS0pD8fjTp230+M3U1Nk5i5oDhS9Gk8E2BlQI0
- TwQ9qB1N1eVlaJ0UlXPdfCtwqyr/N5ukLzCNctVNINHKkV+0WYnfvFDMH2JRkGLadvq4
- crwAPNdyw8FHxh7v3meN7ZH4oBrbgnCS57kLzvrVPyvcr1h5WpyFeNNsbq+X1xh5tMSZ
- GsEcF+BCTwBaDAOeeH10wHnOVbJX/NrFM8asZKhJfDK33iWpiVf/fDtkUBBLWZPS12zi
- Jju/WTjLgJWkF1AGbIqIWhn9H9OggGyXH7iVG+zADhF5e+y6qubjGj+/bH0nyd02LslW
- pgWA==
+ (envelope-from <philmd@redhat.com>) id 1iebkq-0004wf-Mf
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:24:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57596
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iebkq-0004wG-Ai
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 04:24:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575969867;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sjxp5a68YVCtiwizlTqtDQkHPmpmKkCAg8Yt1oxCIm0=;
+ b=H+fvlw6l39pruJn+7/7E05lVS4EFzw4KHpO3G+Z/ba8QQQgHRL5jH+T/RMat29FZdhPX/Y
+ 94FByBvvFq1EPTO29FYFJCEgL/vbFDaBI6GaNS+DpB7CYjY23on8wUk+MEDLRFDVZKurNl
+ ByYKpzo/baW6HVUIESEuCKQgNvsBlfk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-bhRYqubWPPyIZgwmHOUzhg-1; Tue, 10 Dec 2019 04:24:23 -0500
+Received: by mail-wr1-f69.google.com with SMTP id u12so8700073wrt.15
+ for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 01:24:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=4YGWiQYlzj8DlpvgbyfAyMasu3Ce5XpNh/eMVwQ71r8=;
- b=P82hRUjHHrDkdMzBQ2PqOd7pRbWw2meh4FwKspp9UAP5/lBsGwgQw2Nazo+ekezYgE
- 3jaDl76RORxLEMA0718mPftCnFSsdX68QUiYQRgVZYCMfsVE/Saq1BQ2NmGyHn9eWWmk
- 7HhmUiBFju9rjs4PW/mVx6cfA7IJf081ONS0lbfWqlA8QtePGPwv/vlTnIhPe1nQ5nB+
- TfBkMQmKDD/88nP1yn7euEi0zkL1+TCzmazbN4IBX17FDg56uQ55uUoPRU7en39ym8Po
- Wzn85PkDO+izp3b33GbE1yWBatR2mtuVi8ZDeP8eDNVdbUWYnfZgbxVmCaUMqjS5lQ2N
- ILyQ==
-X-Gm-Message-State: APjAAAWwZhexk/Bhdjy+KsrbIvqizQL4AIl77KCWXrM2VP2WVAlfCamd
- iV7XuZpRQJaReXQTariUjatSndXzcL9kjjy6XxQ=
-X-Google-Smtp-Source: APXvYqxOWTehnTxgIoZTNQSQ/GJuuKqqUAXfL2EKok31Az7B9etoD+umU3SHTO47Of8xWrSkykk5KsNLlAiGkqTejvI=
-X-Received: by 2002:a5e:df06:: with SMTP id f6mr24080351ioq.84.1575969276909; 
- Tue, 10 Dec 2019 01:14:36 -0800 (PST)
+ h=x-gm-message-state:subject:to:references:from:cc:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=sjxp5a68YVCtiwizlTqtDQkHPmpmKkCAg8Yt1oxCIm0=;
+ b=b6/aN5PjzYa2KGXokQOoyt3504L//PuYKwhYqkM79+PyvkINOGPWUyfMbfEejnQvPw
+ E8zp0uEz3nyz1CJZQsFAR7NDH/qppPGp4UklHXnC6utzBGcddRkw7SX/8VZx9yKfN9pS
+ 3ZKsnuXz6RcBEVhzOt0OkHyWnb9fLbscMGzq1YBDe5/PtnfGR5jOYCvXdPlrcN6WMZAR
+ 6P7W3Su6PUoQKZucH7C5aL360fs7hrKLyBCrLLxL9KN/afulm1uSlIQyvwLWVhzxIXZT
+ xK+90yE9gnvicEdm4lMnkK+Pq/L1re3IejsDQY5hhWvWkbMU0Fv/111BBBN+hu2xr06X
+ syYg==
+X-Gm-Message-State: APjAAAVLJDj2opEK5Kkf1qNTQGm529dYupcLJdOtI5dtfngmZ1wQ34fp
+ i19mld565rYbAfemhrPOJlMHdJCdyk52d7WJUYQdxBhp5+k6YOvIZQuJKa16/AqapTB7B4dGOOz
+ jwhEjfAtQwX66blY=
+X-Received: by 2002:a7b:ce98:: with SMTP id q24mr3701669wmj.41.1575969862660; 
+ Tue, 10 Dec 2019 01:24:22 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyIg5Q6mrKd1RbtKIWuDeLfgQwGKl0Hh5RwuIYi1D4moI+bv4YigsHHt9e1D2iauKd0ionMdg==
+X-Received: by 2002:a7b:ce98:: with SMTP id q24mr3701655wmj.41.1575969862410; 
+ Tue, 10 Dec 2019 01:24:22 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id i8sm2541920wro.47.2019.12.10.01.24.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 10 Dec 2019 01:24:21 -0800 (PST)
+Subject: Re: [PATCH v26 00/21] Add RX archtecture support
+To: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>
+References: <20191014115757.51866-1-ysato@users.sourceforge.jp>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <0ce0b621-48d0-63ac-86ee-07c2fab455d0@redhat.com>
+Date: Tue, 10 Dec 2019 10:24:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20191203022937.1474-1-richard.henderson@linaro.org>
- <20191203022937.1474-5-richard.henderson@linaro.org>
-In-Reply-To: <20191203022937.1474-5-richard.henderson@linaro.org>
-From: Laurent Desnogues <laurent.desnogues@gmail.com>
-Date: Tue, 10 Dec 2019 10:14:26 +0100
-Message-ID: <CABoDooNO--7ABzKexAy7__2ED4sfyeA08ai5jxXBjy_DT+bzgw@mail.gmail.com>
-Subject: Re: [PATCH v4 04/40] target/arm: Add TTBR1_EL2
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::d41
+In-Reply-To: <20191014115757.51866-1-ysato@users.sourceforge.jp>
+Content-Language: en-US
+X-MC-Unique: bhRYqubWPPyIZgwmHOUzhg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,99 +105,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Hi Richard,
 
-On Tue, Dec 3, 2019 at 3:35 AM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> At the same time, add writefn to TTBR0_EL2 and TCR_EL2.
-> A later patch will update any ASID therein.
->
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/helper.c | 18 +++++++++++++-----
->  1 file changed, 13 insertions(+), 5 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index b4d774632d..06ec4641f3 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -3484,6 +3484,12 @@ static void vmsa_ttbr_write(CPUARMState *env, cons=
-t ARMCPRegInfo *ri,
->      raw_write(env, ri, value);
->  }
->
-> +static void vmsa_tcr_ttbr_el2_write(CPUARMState *env, const ARMCPRegInfo=
- *ri,
-> +                                    uint64_t value)
-> +{
-> +    raw_write(env, ri, value);
-> +}
-> +
->  static void vttbr_write(CPUARMState *env, const ARMCPRegInfo *ri,
->                          uint64_t value)
->  {
-> @@ -4893,10 +4899,8 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
->        .resetvalue =3D 0 },
->      { .name =3D "TCR_EL2", .state =3D ARM_CP_STATE_BOTH,
->        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 2, .crm =3D 0, .opc2 =3D 2,
-> -      .access =3D PL2_RW,
-> -      /* no .writefn needed as this can't cause an ASID change;
-> -       * no .raw_writefn or .resetfn needed as we never use mask/base_ma=
-sk
-> -       */
-> +      .access =3D PL2_RW, .writefn =3D vmsa_tcr_ttbr_el2_write,
+On 10/14/19 1:57 PM, Yoshinori Sato wrote:
+> Hello.
+> This patch series is added Renesas RX target emulation.
 
-Are you sure you should call vmsa_tcr_ttbr_el2_write for a tcr_el2
-write?  As far as I can see, tcr_el2 has no ASID field in bits
-[63:48]. On the other hand there are various other bits in TCR_EL2
-that might require a TLB flush; for instance the A1 bit [22] that
-defines where to pick ASID from.
+If you are OK to take this series, few janitor tasks I noted while 
+reviewing again:
+
+- Remove Message-Id in commit descriptions (various patches)
+- Remove version notes in commit description of patch 17
+- Remove 'pick $sha1' in in commit description of patch 20
+- Remove Based-on in commit description of patch 21
 
 Thanks,
 
-Laurent
+Phil.
 
-> +      /* no .raw_writefn or .resetfn needed as we never use mask/base_ma=
-sk */
->        .fieldoffset =3D offsetof(CPUARMState, cp15.tcr_el[2]) },
->      { .name =3D "VTCR", .state =3D ARM_CP_STATE_AA32,
->        .cp =3D 15, .opc1 =3D 4, .crn =3D 2, .crm =3D 1, .opc2 =3D 2,
-> @@ -4930,7 +4934,7 @@ static const ARMCPRegInfo el2_cp_reginfo[] =3D {
->        .fieldoffset =3D offsetof(CPUARMState, cp15.tpidr_el[2]) },
->      { .name =3D "TTBR0_EL2", .state =3D ARM_CP_STATE_AA64,
->        .opc0 =3D 3, .opc1 =3D 4, .crn =3D 2, .crm =3D 0, .opc2 =3D 0,
-> -      .access =3D PL2_RW, .resetvalue =3D 0,
-> +      .access =3D PL2_RW, .resetvalue =3D 0, .writefn =3D vmsa_tcr_ttbr_=
-el2_write,
->        .fieldoffset =3D offsetof(CPUARMState, cp15.ttbr0_el[2]) },
->      { .name =3D "HTTBR", .cp =3D 15, .opc1 =3D 4, .crm =3D 2,
->        .access =3D PL2_RW, .type =3D ARM_CP_64BIT | ARM_CP_ALIAS,
-> @@ -6959,6 +6963,10 @@ void register_cp_regs_for_features(ARMCPU *cpu)
->                .opc0 =3D 3, .opc1 =3D 4, .crn =3D 13, .crm =3D 0, .opc2 =
-=3D 1,
->                .access =3D PL2_RW,
->                .fieldoffset =3D offsetof(CPUARMState, cp15.contextidr_el[=
-2]) },
-> +            { .name =3D "TTBR1_EL2", .state =3D ARM_CP_STATE_AA64,
-> +              .opc0 =3D 3, .opc1 =3D 4, .crn =3D 2, .crm =3D 0, .opc2 =
-=3D 1,
-> +              .access =3D PL2_RW, .writefn =3D vmsa_tcr_ttbr_el2_write,
-> +              .fieldoffset =3D offsetof(CPUARMState, cp15.ttbr1_el[2]) }=
-,
->              REGINFO_SENTINEL
->          };
->          define_arm_cp_regs(cpu, vhe_reginfo);
-> --
-> 2.17.1
->
->
 
