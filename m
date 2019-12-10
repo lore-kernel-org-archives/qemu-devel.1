@@ -2,81 +2,88 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F65C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 14:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B11A0C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 14:05:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DC45207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 14:03:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 386A120652
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 14:05:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ONRmAizk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DC45207FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OWxG9rO/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 386A120652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieg7A-0003mE-MH
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 09:03:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47933)
+	id 1ieg8k-0004st-9L
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 09:05:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48022)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ieg5D-0002ap-RA
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:01:48 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ieg5Z-0002oN-J6
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:02:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ieg5C-0004dv-EB
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:01:47 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:44607)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ieg5C-0004ce-7Z
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:01:46 -0500
-Received: by mail-ot1-x344.google.com with SMTP id x3so15515621oto.11
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 06:01:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=30l090qRempxAQzWf4nBrff/DdGwPwgmUiqdyPb2KYc=;
- b=ONRmAizkqbJm3R6WGB70ZV/jttGViISia5PR8I9bebhYGd1Q/p8FaqOLWWYKoGrmWG
- 2v9RtUw2I1EufJwlC6S/T4Gv8ezsrTC79Som+z3I4SWmlSSAIfmcOAujeAWcU1kbS6IP
- kbYxDyQWKFQ5750gUU5VNRXNaoeYiRrj47e7FaSaFvstCQJ2I4S1JBP/wGmfL+FLCwDs
- 0AV8bo5TA7556zo9Etcx8tE97CtCxllWdy/At8vUxXdyXH8kiEQFNz8URdWfIs9AJtp/
- sDCYYKh2rtEqvC3EOOcq1QS6+621kcDKhaDb+F08XW7fdmMrzA2cJ/Jh5wbfCdp13/b+
- xB9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=30l090qRempxAQzWf4nBrff/DdGwPwgmUiqdyPb2KYc=;
- b=L0finDEAAY2APNHL2yj0R12CF4SJPvMOhyeGp1ZbHQsBcp7TxYmvFO67/qjofi6Oe7
- jKXxGCXcuc+i/8/x0BsYRByUtjWDh5MNxTr9X586Fquv80vUC2cNfy9PdZz0Zr5w0Nv3
- 4NvoQpdpZjfphV5qGmKIaJvpiWefF1CQ5Q/+kHRm3HPWmdjwNJ8/HLLzvQu3ndHp26lY
- A+sPs/Q9QLszuuJ1GDq/0tLzwyKPXtyH8ma/RrsFnGY9ljSwKKN7ZxCw8wkLrj1QK6V5
- ZQD2iyPoNPbE9K8l0XOtC1oCVnkel79L9h38tanNIsp9clGc0owAk7PR7lK7o+uHoU2Z
- v90g==
-X-Gm-Message-State: APjAAAU/dZ431u3weKvv7ExA1+UAaH1BR29iM1ZwRJ2de4+K9R3MtiYR
- gTytAz3W/3ZoEsr4/+48vOJ0lCopFPEwXfkJ/u280w==
-X-Google-Smtp-Source: APXvYqwbhAyU9JAibpwvBzzSxpsIiVjf+RAiPd4IG7VzhaqKPa5tnPjSVRFojYVHfLVpu04JbMCBEfqHTXVWtfZnpBM=
-X-Received: by 2002:a05:6830:4a4:: with SMTP id
- l4mr20181236otd.91.1575986503065; 
- Tue, 10 Dec 2019 06:01:43 -0800 (PST)
+ (envelope-from <dgilbert@redhat.com>) id 1ieg5S-0004k7-Ar
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:02:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31964
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ieg5O-0004iV-NS
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 09:02:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575986518;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=K82ZiSjL4mKlDlw2aY+UZqQVPLiDSmYOFzfv2vBLUVs=;
+ b=OWxG9rO/dTPbZ/Ofk1B3hwp7Tt9molzC8CZLXiYCECnAGsgytcEkcjykb956uKIUaIDMia
+ SU9JSdyfNOUrYTcq/KTMUmlMP1I3leKQUaEji1eYlpkcaZeU26B8BXk5or1Q3f2+zZ6xoL
+ ThMtseNm3pWcAeCLWuZb8v2Wp9FumKA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-n7sBLUT0OKuVLRPAyHERbA-1; Tue, 10 Dec 2019 09:01:54 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 037891858E72;
+ Tue, 10 Dec 2019 14:01:54 +0000 (UTC)
+Received: from work-vm (ovpn-117-166.ams2.redhat.com [10.36.117.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5495B66FE3;
+ Tue, 10 Dec 2019 14:01:53 +0000 (UTC)
+Date: Tue, 10 Dec 2019 14:01:50 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Lin Ma <LMa@suse.com>
+Subject: Re: =?utf-8?B?5Zue5aSNOiDlm57lpI06IOetlA==?=
+ =?utf-8?B?5aSNOiBbUWVtdS1kZXZlbF0gbWlncmF0ZV9zZXRfc3BlZQ==?= =?utf-8?Q?d?=
+ has no effect if the guest is using hugepages.
+Message-ID: <20191210140150.GA3542@work-vm>
+References: <BY5PR18MB3313E1E22A22D236D4C2680DC5F30@BY5PR18MB3313.namprd18.prod.outlook.com>
+ <20190711102410.GH3971@work-vm>
+ <BY5PR18MB331347C441DA068E32BFDE53C5F20@BY5PR18MB3313.namprd18.prod.outlook.com>
+ <20190712123400.GJ2730@work-vm>
+ <BY5PR18MB3313850D2845C27026891170C5CF0@BY5PR18MB3313.namprd18.prod.outlook.com>
+ <20191205103159.GC2824@work-vm>
+ <BY5PR18MB331333470C356200DDF0A8DAC55B0@BY5PR18MB3313.namprd18.prod.outlook.com>
 MIME-Version: 1.0
-References: <20191209063719.23086-1-guoheyi@huawei.com>
- <CAFEAcA_cP1pW=WC=0M7S37TRi_4uwaA_kQRTJ_xRkqbq48eLTg@mail.gmail.com>
- <20191210144906.14e41c7a@redhat.com>
-In-Reply-To: <20191210144906.14e41c7a@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 10 Dec 2019 14:01:31 +0000
-Message-ID: <CAFEAcA8BvqAD_QGJk_y1NxiHYcdZ3qR41jNnddsTYs=1tkCuJQ@mail.gmail.com>
-Subject: Re: [PATCH v6 0/2] arm/acpi: simplify aml code and enable SHPC
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <BY5PR18MB331333470C356200DDF0A8DAC55B0@BY5PR18MB3313.namprd18.prod.outlook.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: n7sBLUT0OKuVLRPAyHERbA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,59 +95,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Heyi Guo <guoheyi@huawei.com>, wanghaibin.wang@huawei.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 10 Dec 2019 at 13:49, Igor Mammedov <imammedo@redhat.com> wrote:
->
-> On Mon, 9 Dec 2019 17:51:10 +0000
-> Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> > On Mon, 9 Dec 2019 at 06:38, Heyi Guo <guoheyi@huawei.com> wrote:
-> > >
-> > > After the introduction of generic PCIe root port and PCIe-PCI bridge, we will
-> > > also have SHPC controller on ARM, and we don't support ACPI hot plug, so just
-> > > enable SHPC native hot plug.
-> > >
-> > > Igor also spotted the store operation outside of bit and/or is not necessary, so
-> > > simply the code at first.
-> > >
-> > > v6:
-> > > - Fix "make check" errors by updating tests/data/acpi/virt/DSDT*.
-> > >
-> > > v5:
-> > > - Refine commit message of patch 1/2
-> > >
-> > > v4:
-> > > - Improve the code indention.
-> > >
-> > > Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> > > Cc: Peter Maydell <peter.maydell@linaro.org>
-> > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > Cc: Igor Mammedov <imammedo@redhat.com>
-> >
-> > Thanks, applied to target-arm.next. (it's a bit awkward that acpi
-> > table updates require also updating a bunch of binary test files,
-> > but I suppose trying to make the golden-reference be some textual
-> > format would be not very feasible.)
->
-> Michael tried document it (commit 30c63d4fbd69)
-> so that binary blobs would not be required (trusted).
->
-> Problem is usually in blobs being un-review-able and
-> unresolvable merge conflicts, that's why Michael
-> updates tables manually for all changes in pull req.
+* Lin Ma (LMa@suse.com) wrote:
+> Hi Dave,
+>=20
+> The patch fixed the issue, The rate limit with hugepages works well.
+> Thanks for your help!
 
-A workflow that requires me to do a blob update when I
-apply patches to target-arm.next isn't going to work for me.
-If Michael wants the blobs to be handled like that, then all
-patches which need to touch them will have to go via his tree.
+No problem; thank you for reporting and testing it.
 
-thanks
--- PMM
+Dave
+
+> Lin
+>=20
+> > -----=E9=82=AE=E4=BB=B6=E5=8E=9F=E4=BB=B6-----
+> > =E5=8F=91=E4=BB=B6=E4=BA=BA: Dr. David Alan Gilbert <dgilbert@redhat.co=
+m>
+> > =E5=8F=91=E9=80=81=E6=97=B6=E9=97=B4: 2019=E5=B9=B412=E6=9C=885=E6=97=
+=A5 18:32
+> > =E6=94=B6=E4=BB=B6=E4=BA=BA: Lin Ma <LMa@suse.com>
+> > =E6=8A=84=E9=80=81: qemu-devel@nongnu.org
+> > =E4=B8=BB=E9=A2=98: Re: =E5=9B=9E=E5=A4=8D: =E7=AD=94=E5=A4=8D: [Qemu-d=
+evel] migrate_set_speed has no effect if the
+> > guest is using hugepages.
+> >=20
+> > Hi Lin,
+> >   I've just posted 'migration: Rate limit inside host pages'; please le=
+t me know if
+> > it helps for you.
+> >=20
+> > Dave
+> >=20
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
