@@ -2,83 +2,89 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C5DC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 00:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4520AC3F68F
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 00:52:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B70A20637
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 00:52:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FB5220726
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 00:52:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="EGANWB7O";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dUBePxy4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B70A20637
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="kzpsk9a+";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kuB49+zX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FB5220726
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieTlR-0002TC-SS
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 19:52:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59229)
+	id 1ieTlf-0002nW-8C
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 19:52:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59249)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrew@aj.id.au>) id 1ieTkS-0001WF-A2
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 19:51:33 -0500
+ (envelope-from <andrew@aj.id.au>) id 1ieTkT-0001Yf-LA
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 19:51:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrew@aj.id.au>) id 1ieTkR-0000Mo-E9
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 19:51:32 -0500
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:57901)
+ (envelope-from <andrew@aj.id.au>) id 1ieTkS-0000N8-Ah
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 19:51:33 -0500
+Received: from out3-smtp.messagingengine.com ([66.111.4.27]:41529)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <andrew@aj.id.au>)
- id 1ieTkO-0000LK-Nt; Mon, 09 Dec 2019 19:51:29 -0500
+ id 1ieTkP-0000Ll-Lf; Mon, 09 Dec 2019 19:51:29 -0500
 Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.nyi.internal (Postfix) with ESMTP id 609A522721;
- Mon,  9 Dec 2019 19:51:26 -0500 (EST)
+ by mailout.nyi.internal (Postfix) with ESMTP id 0AB3B2274C;
+ Mon,  9 Dec 2019 19:51:28 -0500 (EST)
 Received: from mailfrontend2 ([10.202.2.163])
- by compute4.internal (MEProxy); Mon, 09 Dec 2019 19:51:26 -0500
+ by compute4.internal (MEProxy); Mon, 09 Dec 2019 19:51:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=from
- :to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding; s=fm1; bh=d1dmNORHMlpfYt+AMVjS4Tn/Y9
- CmVlh1D4pT80hKJvA=; b=EGANWB7Okcu9K8aWsEYz4CRdtDGQsxLuLligsRB6ti
- JFImEmY7kDlEp+Aea0styf6bZIaEQIUIfsfOBTnpcnKgy766YU35QCrtAzGFmh01
- d8Yd0wrGpQYPl6/QvidlH51VzQmLxQekMrvuStk3Ar7J9QkzZbQYmvSqLjiGu8kU
- JaDnSrvWwGuVMq4JLNPylWzL64wm2xLkvicumQPal0rYjMO8pbbYNcNtK8bgBXvo
- Sp8yqctwnpO0up5Z5dwWk0Roa3mwziCMRQm+6dQD5MKsZDfgn7LUZf4RwSHXqpp5
- F3e5sTmDtKAAqHa4qDevny6NDncOtOr1lSu5T/Cgk/9A==
+ :to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding; s=fm1; bh=rUFlEnpp1Xzck
+ M6kcV2NqxDXgI9i9LAVjGAQGY512Q8=; b=kzpsk9a+FMdyP9JOh+u46xMxCCOWX
+ /WJVA7FRXvTxX4shCMAb208r7cjsPxtelke/dA/6NurHBF6c3BEN3UIBtqKxrBLC
+ x6MybfmPjyVazd3q3UjY2GPPkZoxD7V7+cFrY5jTpmllfP2/J6hqtw0HWUHxdkXo
+ OMkrWBCy137S4mqTwMIbO18jL/Ud1cgh33BXJ6bWAazquZ8asPSPoBgIqw6J7ike
+ 9BeBnIwcDRIPTgEAN9Zfugs0LBdugix4QPfj/+QQQ0Hh1Z6ljwU/StBTOQmCns//
+ VH6hlN1sD+aBVz0GPaZbvSZPUbOaihM/XVZ7aEWjYvJqyWdLq3itIbimw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-transfer-encoding:date:from
- :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
- :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=d1dmNORHMlpfYt+AM
- VjS4Tn/Y9CmVlh1D4pT80hKJvA=; b=dUBePxy4jB+2eJ8N6BIpIwWSdW60BtDH5
- f8GLISfI0IrWei4Zm7/FDjRCuLV7vVnCHkQnE2dRQ9kj+ppmyEK2M9oyhUsvNhmD
- hIKL8oi/Kd9RxgcxKOcj8tYl8Io6VPlPqsyjZzTK709I8fwGziQrzEeUZvFcsY/M
- RNNyAsgJvUS5uHnJka6ta02UT5LCJl0s0qxQSzBY86iqViXIL2ogdlnyqYnpLI49
- jb6XquB8VHtD1+VyfD5G2EDLO+PKHNHdx+tvl2ty3RcOg1zTkLn58mB9D2Yxobwx
- mo9y/QJp/uVkwtsScTlqz77jn2Q2REgEQR54d3Oiy7sxHgjuhkUgw==
-X-ME-Sender: <xms:DezuXTDyjHNFYywOLvVtVNjEn483YPNwMxUDr2RuAAu8TtNN-of8TQ>
+ :in-reply-to:message-id:mime-version:references:subject:to
+ :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+ fm1; bh=rUFlEnpp1XzckM6kcV2NqxDXgI9i9LAVjGAQGY512Q8=; b=kuB49+zX
+ TByF//kQfk8ML5iLwfoo2LgALJGu0CGBDN5gGRxO1l9z/JRHo6EdImNLORc/CYhy
+ HKiWxi3IIT5P1XR7vTaiI2G/VUpwkyf5wLxgyfH5w2khXYU2hbcVybsC8fmHMrCS
+ pksc3WhGOXBwybnBPxRWGzu7bXYj7g3i7V5D1eMbzee1PIBKw/Jk6+V6jLhCnqDk
+ sa5GX7TlOIuo4SJeLBQL9tBofrAQulV50gHwFuTZ4mqTQHt544YqRYAbYHqI1MhP
+ GxRQaoMI9gYiSQBhEnbxwfhnSGJQZ9of8WenFUQsLBy03trzYnvEl7JGi/PrvbeG
+ 0WxkQ2aA865CQw==
+X-ME-Sender: <xms:D-zuXW5GEG9LcH7SWK3E05iueKt3PWfEUL70_1NbeUJlQM8LYzfRBA>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrudelvddgvddvucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucenucfjughrpefhvffufffkofgggfestdekredtre
- dttdenucfhrhhomheptehnughrvgifucflvghffhgvrhihuceorghnughrvgifsegrjhdr
- ihgurdgruheqnecukfhppedvtddvrdekuddrudekrdeftdenucfrrghrrghmpehmrghilh
- hfrhhomheprghnughrvgifsegrjhdrihgurdgruhenucevlhhushhtvghrufhiiigvpedt
-X-ME-Proxy: <xmx:DezuXQkEf9j6xlgs_gHLWNuS4aW5NgSMIvJbWAeJgG8bjHLR073G3A>
- <xmx:DezuXS1_N2GIT4MIlmUigbvPnfx5x9rFXc0-C5wlD_VaIIuOyvi7lA>
- <xmx:DezuXYhw5BQe376ss99gDzmAOv-EjEEKpq_wmDe0KEygLkqhIqjfTQ>
- <xmx:DuzuXbCX0R4rOKucipTRUdBpaOgbl3c-3hGioVMizG1Pv2JMoskDAQ>
+ uceurghilhhouhhtmecufedttdenucenucfjughrpefhvffufffkofgjfhgggfestdekre
+ dtredttdenucfhrhhomheptehnughrvgifucflvghffhgvrhihuceorghnughrvgifsegr
+ jhdrihgurdgruheqnecukfhppedvtddvrdekuddrudekrdeftdenucfrrghrrghmpehmrg
+ hilhhfrhhomheprghnughrvgifsegrjhdrihgurdgruhenucevlhhushhtvghrufhiiigv
+ pedt
+X-ME-Proxy: <xmx:D-zuXW0g6V7YfBIjP9qqAfp78rvSKx-q8jtDx-raMWK4JBIqOcjiNA>
+ <xmx:D-zuXanYpwi4dEmKK6wFd08XQr678ArJtAizBEFtNSe5bLhOppicmQ>
+ <xmx:D-zuXXikA3uRldeLDF-buaPJ7pliYAe8PzAqROZGsuUZgKXqc3gV-A>
+ <xmx:EOzuXfyZPIhwjS3AGamOOU38ooHwgf9rYZnTHMEMIR9AzhkWNDnM6A>
 Received: from mistburn.au.ibm.com (bh02i525f01.au.ibm.com [202.81.18.30])
- by mail.messagingengine.com (Postfix) with ESMTPA id 145E830600BD;
- Mon,  9 Dec 2019 19:51:22 -0500 (EST)
+ by mail.messagingengine.com (Postfix) with ESMTPA id BE98B30600D4;
+ Mon,  9 Dec 2019 19:51:25 -0500 (EST)
 From: Andrew Jeffery <andrew@aj.id.au>
 To: qemu-arm@nongnu.org
-Subject: [PATCH 0/2] hw/arm: ast2600: Wire up eMMC controller
-Date: Tue, 10 Dec 2019 11:22:49 +1030
-Message-Id: <cover.da2612e7c1835c563b20851f0ac26c7b175428fc.1575938234.git-series.andrew@aj.id.au>
+Subject: [PATCH 1/2] hw/sd: Configure number of slots exposed by the ASPEED
+ SDHCI model
+Date: Tue, 10 Dec 2019 11:22:50 +1030
+Message-Id: <11e1d38d2374a48996a3496c906db215de246583.1575938234.git-series.andrew@aj.id.au>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <cover.da2612e7c1835c563b20851f0ac26c7b175428fc.1575938234.git-series.andrew@aj.id.au>
+References: <cover.da2612e7c1835c563b20851f0ac26c7b175428fc.1575938234.git-series.andrew@aj.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -101,29 +107,125 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+The AST2600 includes a second cut-down version of the SD/MMC controller
+found in the AST2500, named the eMMC controller. It's cut down in the
+sense that it only supports one slot rather than two, but it brings the
+total number of slots supported by the AST2600 to three.
 
-The AST2600 has an additional SDHCI intended for use as an eMMC boot source.
-These two patches rework the existing ASPEED SDHCI model to accommodate the
-single-slot nature of the eMMC controller and wire it into the AST2600 SoC.
+The existing code assumed that the SD controller always provided two
+slots. Rework the SDHCI object to expose the number of slots as a
+property to be set by the SoC configuration.
 
-Please review!
-
-Andrew
-
-Andrew Jeffery (2):
-  hw/sd: Configure number of slots exposed by the ASPEED SDHCI model
-  hw/arm: ast2600: Wire up the eMMC controller
-
- hw/arm/aspeed.c              | 15 ++++++++++++++-
- hw/arm/aspeed_ast2600.c      | 23 +++++++++++++++++++++++
+Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+---
+ hw/arm/aspeed.c              |  2 +-
+ hw/arm/aspeed_ast2600.c      |  2 ++
  hw/arm/aspeed_soc.c          |  3 +++
  hw/sd/aspeed_sdhci.c         | 11 +++++++++--
- include/hw/arm/aspeed_soc.h  |  2 ++
  include/hw/sd/aspeed_sdhci.h |  1 +
- 6 files changed, 52 insertions(+), 3 deletions(-)
+ 5 files changed, 16 insertions(+), 3 deletions(-)
 
-base-commit: 6a4ef4e5d1084ce41fafa7d470a644b0fd3d9317
+diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+index 028191ff36fc..862549b1f3a9 100644
+--- a/hw/arm/aspeed.c
++++ b/hw/arm/aspeed.c
+@@ -259,7 +259,7 @@ static void aspeed_board_init(MachineState *machine,
+         cfg->i2c_init(bmc);
+     }
+ 
+-    for (i = 0; i < ARRAY_SIZE(bmc->soc.sdhci.slots); i++) {
++    for (i = 0; i < bmc->soc.sdhci.num_slots; i++) {
+         SDHCIState *sdhci = &bmc->soc.sdhci.slots[i];
+         DriveInfo *dinfo = drive_get_next(IF_SD);
+         BlockBackend *blk;
+diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+index 931887ac681f..931ee5aae183 100644
+--- a/hw/arm/aspeed_ast2600.c
++++ b/hw/arm/aspeed_ast2600.c
+@@ -208,6 +208,8 @@ static void aspeed_soc_ast2600_init(Object *obj)
+     sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdhci),
+                           TYPE_ASPEED_SDHCI);
+ 
++    object_property_set_int(OBJECT(&s->sdhci), 2, "num-slots", &error_abort);
++
+     /* Init sd card slot class here so that they're under the correct parent */
+     for (i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
+         sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[i]),
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index f4fe243458fd..3498f55603f2 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -215,6 +215,9 @@ static void aspeed_soc_init(Object *obj)
+     sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdhci),
+                           TYPE_ASPEED_SDHCI);
+ 
++    object_property_set_int(OBJECT(&s->sdhci), ASPEED_SDHCI_NUM_SLOTS,
++                            "num-slots", &error_abort);
++
+     /* Init sd card slot class here so that they're under the correct parent */
+     for (i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
+         sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[i]),
+diff --git a/hw/sd/aspeed_sdhci.c b/hw/sd/aspeed_sdhci.c
+index cff3eb7dd21e..939d1510dedb 100644
+--- a/hw/sd/aspeed_sdhci.c
++++ b/hw/sd/aspeed_sdhci.c
+@@ -13,6 +13,7 @@
+ #include "qapi/error.h"
+ #include "hw/irq.h"
+ #include "migration/vmstate.h"
++#include "hw/qdev-properties.h"
+ 
+ #define ASPEED_SDHCI_INFO            0x00
+ #define  ASPEED_SDHCI_INFO_RESET     0x00030000
+@@ -120,14 +121,14 @@ static void aspeed_sdhci_realize(DeviceState *dev, Error **errp)
+ 
+     /* Create input irqs for the slots */
+     qdev_init_gpio_in_named_with_opaque(DEVICE(sbd), aspeed_sdhci_set_irq,
+-                                        sdhci, NULL, ASPEED_SDHCI_NUM_SLOTS);
++                                        sdhci, NULL, sdhci->num_slots);
+ 
+     sysbus_init_irq(sbd, &sdhci->irq);
+     memory_region_init_io(&sdhci->iomem, OBJECT(sdhci), &aspeed_sdhci_ops,
+                           sdhci, TYPE_ASPEED_SDHCI, 0x1000);
+     sysbus_init_mmio(sbd, &sdhci->iomem);
+ 
+-    for (int i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
++    for (int i = 0; i < sdhci->num_slots; ++i) {
+         Object *sdhci_slot = OBJECT(&sdhci->slots[i]);
+         SysBusDevice *sbd_slot = SYS_BUS_DEVICE(&sdhci->slots[i]);
+ 
+@@ -174,6 +175,11 @@ static const VMStateDescription vmstate_aspeed_sdhci = {
+     },
+ };
+ 
++static Property aspeed_sdhci_properties[] = {
++    DEFINE_PROP_UINT8("num-slots", AspeedSDHCIState, num_slots, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(classp);
+@@ -181,6 +187,7 @@ static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
+     dc->realize = aspeed_sdhci_realize;
+     dc->reset = aspeed_sdhci_reset;
+     dc->vmsd = &vmstate_aspeed_sdhci;
++    dc->props = aspeed_sdhci_properties;
+ }
+ 
+ static TypeInfo aspeed_sdhci_info = {
+diff --git a/include/hw/sd/aspeed_sdhci.h b/include/hw/sd/aspeed_sdhci.h
+index dfdab4379021..dffbb46946b9 100644
+--- a/include/hw/sd/aspeed_sdhci.h
++++ b/include/hw/sd/aspeed_sdhci.h
+@@ -24,6 +24,7 @@ typedef struct AspeedSDHCIState {
+     SysBusDevice parent;
+ 
+     SDHCIState slots[ASPEED_SDHCI_NUM_SLOTS];
++    uint8_t num_slots;
+ 
+     MemoryRegion iomem;
+     qemu_irq irq;
 -- 
 git-series 0.9.1
 
