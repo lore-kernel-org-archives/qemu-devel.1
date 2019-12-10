@@ -7,76 +7,74 @@ X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D4DC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 19:52:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF27C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 19:56:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D185207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 19:52:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 478362077B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 19:56:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MhFJzc0o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D185207FF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DiSWpiIo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 478362077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ielYw-0002ls-6Z
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 14:52:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35820)
+	id 1ielch-0004AV-D3
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 14:56:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37007)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ielY1-0002JG-GI
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 14:51:55 -0500
+ (envelope-from <nieklinnenbank@gmail.com>) id 1ielbu-0003Xe-Pd
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 14:55:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ielXz-0005yb-EZ
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 14:51:53 -0500
-Received: from mail-il1-x134.google.com ([2607:f8b0:4864:20::134]:34594)
+ (envelope-from <nieklinnenbank@gmail.com>) id 1ielbs-00079i-A0
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 14:55:54 -0500
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:33410)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1ielXz-0005yM-7O
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 14:51:51 -0500
-Received: by mail-il1-x134.google.com with SMTP id w13so17259870ilo.1
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 11:51:51 -0800 (PST)
+ id 1ielbs-00079L-2S; Tue, 10 Dec 2019 14:55:52 -0500
+Received: by mail-il1-x142.google.com with SMTP id r81so17288070ilk.0;
+ Tue, 10 Dec 2019 11:55:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BQPvZkAfJc6/DvtvBY0aA3cFm5f7sBNgD3+uQgn9Ows=;
- b=MhFJzc0osKA2KzmLRy3m6VL0g3zijjfAnPdmSnPtMXqDUcEVIPm/MPNlYGQu4mlZW4
- E8TM5AcUHZEWIwm4GfL/cMzhqZRUYCaMIWaQIrsmMFvrxrbpK/WErlFc6SHxKd6xsgVj
- X7OVlOOd9tek0mowRH7a2YeXfG/+1DpnmhpP+6FVlHrZb/Y1XH6+w2ap7HKWApXlYq/7
- h9Qw7EmilTzAQBd5FwHM+TjaRNifjBA0ztLcDQV5irBF2Wg4R7059iM1trzlHxjLj/cS
- AGnObtWCYBPfZCuEy1YjjS/a6eHBw32qQzpmQarWCOcgWBg950s9a/SXM8FADIkv1NGk
- lYSw==
+ :cc; bh=1dIZZM/9ov80ebOhF4v5HlOS5BwOWDRL3nqtdeKRMI4=;
+ b=DiSWpiIooBSFWqTa8eHBGcond2A+qeITtzPcTmfiDp+Ux1wv6hN+sfDVVyCqyDLvAi
+ nPlmRkwahNsh9D57sUHJ1miIgprEYMpUKNhcm5pJJh18TnJPzVPKEFCWn/PYoapkr+f+
+ U7e78xdwswsxmhtnBFQKLM4ye/JMwtPoXgNAD5nqRWxtH5oyIB6OpkHMW8GBifbbrQnE
+ dnuMsZ+Dx2se09OVaEqli8PKc31ddZyMTIJ5Sphm/y3mWPFud7UgoSElCxixqfMbjgIp
+ N9PCWOQuRX0vAw5PKubRCSj5Ab/KgDGiElcyOSLpGlNXO6jvX2IeQVNjehG7nLikfhiZ
+ GKAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=BQPvZkAfJc6/DvtvBY0aA3cFm5f7sBNgD3+uQgn9Ows=;
- b=mqUqYWoL/bsPrJeor5MoH2uGPSbwSduihbOEBtQOw8pZB17YF9zZpAdcmmOcFyNuAs
- oBili4ctkxXy3nc4eXZrP191w3oNLwPkcXkkOKHz1Z8+hEOZO+WvtyD9AdyoZsh4LKS1
- wxOcgPstXpBajGrAbtgMkhrJKxz2BJdXsYlQfDr0cEkYUhlrEk4UETXTzDibsT7p2QjG
- uVnWuoksiF8DIy7Z+5KX/ebzhZEczUynq6ieywbO+nAdALdhhsf+0qTiXojumh99DT+r
- Q6SSR9JZXPwdpNBeKb8rDqKUwXyioUgfEHa7z1yAU9rjVHif0JZZh4RVB5h6l4BNOiye
- 6ctg==
-X-Gm-Message-State: APjAAAVwRXgfk+9hIHRqAZWWpbkZklgBEF+KbvgBhqwYh4CXqSdbe8iz
- v7/wX1TEYYgXeBB0Jo92PQhYlDbVH3Sii3vCmi0=
-X-Google-Smtp-Source: APXvYqw4tkV8jum/H+Ans6V6ZvkvYQTtNVBVtFw4WJwJDnywbYWhVyotMy2EYCKDXJP791G6kLB592jmcIDeegkQvSA=
-X-Received: by 2002:a92:af08:: with SMTP id n8mr34345726ili.217.1576007510405; 
- Tue, 10 Dec 2019 11:51:50 -0800 (PST)
+ bh=1dIZZM/9ov80ebOhF4v5HlOS5BwOWDRL3nqtdeKRMI4=;
+ b=AaXfVdlhQfn+DCDr+lgKe7d3/v2OVGlN04cZmzd+vDxDozG6OGg4lQZVH7UNBgFfL5
+ fW5mjbIHBLNLh+Xwxex3VxkMxi1FPoULniVLKu5Sx5rout1eyWOuF9xG9tImIKWuX3EH
+ aAbBW0nBEy8+A5hIWdpvUIP/+C87UEamcQY4JdBzjyOkLdcjiMuZqSR/tQ565sv1MR5W
+ 6ri8sfX8H1ZiDXe1hF+GMn4mTT11nvkAPsZTYGu4RyteilPUTMdBopEtOrjAFC12W3bL
+ hMibxrlSzd3aNcxHtAM/CzXC/OqZYZfSVYj0rbHo+FXFXk3gRlC+fpdRw+z/pw7wpZ4h
+ Ma0Q==
+X-Gm-Message-State: APjAAAVVG/eHpUhoqZ3yQSVJtVtVDqNy5Oivyw6l77CuRtdUoPcOboAX
+ jgum/SgZI3dAnhx11TzFSJwmUHyBFoA4D22CpTE=
+X-Google-Smtp-Source: APXvYqwkSAa+qCJICiNlJ3ueqeehm7sglbISd92hpmdB7F/CMx4P0nEmmZD9GCiCXQP6dlXK+TO2Id0Gydi2ZpVcUEc=
+X-Received: by 2002:a92:d084:: with SMTP id h4mr36000622ilh.265.1576007750959; 
+ Tue, 10 Dec 2019 11:55:50 -0800 (PST)
 MIME-Version: 1.0
-References: <CAGbAg_CAh-U-xRh+d6wNLQVWoHXEA0xcW6021Qd4WsMJBGfgOg@mail.gmail.com>
- <CAGbAg_A5G2trFWEuAL2da169v=XFrS44g64F6yZo5phLC+T=PQ@mail.gmail.com>
- <a579e1c4-fe3f-d8d0-3064-96473eb24e3a@redhat.com>
-In-Reply-To: <a579e1c4-fe3f-d8d0-3064-96473eb24e3a@redhat.com>
+References: <20191202210947.3603-1-nieklinnenbank@gmail.com>
+ <6d774864-2bea-ecd6-0b14-a28d0756bfbc@adacore.com>
+In-Reply-To: <6d774864-2bea-ecd6-0b14-a28d0756bfbc@adacore.com>
 From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Tue, 10 Dec 2019 20:51:39 +0100
-Message-ID: <CAPan3Wq=ru496SOb93YA6ytTJJbSFtTuXC_B-MPETC5_ipdE6A@mail.gmail.com>
-Subject: Re: BeagleBone support, omap1, omap2, omap3, etc.
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000d2374d05995ed72d"
+Date: Tue, 10 Dec 2019 20:55:39 +0100
+Message-ID: <CAPan3Wq8Hs-qV=S_esth-Fyp8VsrO2WhC3khJUZ2-UghAWkZUw@mail.gmail.com>
+Subject: Re: [PATCH 00/10] Add Allwinner H3 SoC and Orange Pi PC Machine
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Content-Type: multipart/alternative; boundary="00000000000028c75e05995ee654"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::134
+X-Received-From: 2607:f8b0:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,323 +86,445 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Joaquin de Andres <me@xcancerberox.com.ar>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Esteban Bosse <estebanbosse@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Beniamino Galvani <b.galvani@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d2374d05995ed72d
+--00000000000028c75e05995ee654
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hello Philippe and Esteban,
+Hi Frederic,
 
-On Tue, Dec 10, 2019 at 10:55 AM Philippe Mathieu-Daud=C3=A9 <philmd@redhat=
-.com>
-wrote:
+On Tue, Dec 10, 2019 at 11:34 AM KONRAD Frederic <
+frederic.konrad@adacore.com> wrote:
 
-> Hi Esteban,
 >
-> On 12/3/19 4:24 PM, Esteban Bosse wrote:
-> > Ping
-> >
-> > El mi=C3=A9., 6 nov. 2019 16:04, Esteban Bosse <estebanbosse@gmail.com
-> > <mailto:estebanbosse@gmail.com>> escribi=C3=B3:
-> >
-> >     Hello!
-> >
-> >     Some months ago I started to work trying to port the Beaglebone
-> >     support from the old qemu-linaro fork to the new QEMU mainstream.
-> >
-> >     During my work I found that the Beaglebone have an OMAP3 mpu this
-> >     mpu has very strong relation with the OMAP2 and OMAP1 in qemu, they
-> >     implement a lot of functions in common.
-> >
-> >     Then I understood that the omap1 and omap2 don't implement things
-> >     like QOM and needs a lot of work to upgrade it, at the same time
-> >     they are some boards like: omap1_sx, palm, nseries that implement
-> >     this mpus.
-> >
-> >     Looking the datasheet of the omap1 I realized that it's an very old
-> >     device and some questions like "make sense work with this old
-> >     device?" comes to my mind.
 >
-> The OMAP3 reuse various components of the OMAP1/2.
-> Although in old shape, the OMAP1/2 are in the codebase and work.
-> It make sense to me to start upgrading the OMAP1/2 to new QOM standard,
-> then add the OMAP3 missing parts.
->
-> The previous recommendations from Peter are still valid:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg636936.html
->
-> Or you can use the schema followed by Niek when adding the Allwinner H3:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg662591.html
->
-> That is:
->
-> - Add tests using old code (booting Linux, network access in guest)
-> - Add an empty board
-> - Plug an empty OMAP SoC into the board, add the PoP LPDRAM
-> - Add a ARM926 core into the SoC
-> - Add most of the devices as UnimplementedDevice
-> - Add the interrupt controller in the SoC
-> - Add the UART in the SoC
-> - Add the Timers in the SoC
-> - Try to boot a Linux kernel (UART, TMR, then IRQ tested)
-> - Add the SD controller in the SoC
-> - Plug a drive to the SD in the board
-> - Try to boot u-boot
-> - You can now start the OMAP2 using a ARM1136 core
-> - Add the missing UNIMP devices (loop to previous steps)
-> - Add network controller
-> - Run tests (booting Linux, network access in guest)
-> - Remove old code
->
-> >     When I went to the KVM Forum the last week I talked with some of
-> >     you, and you help my with different ideas and proposal to make this
-> >     task, but I can't see the right way to make this work because it is
-> >     a lot of work.
+> Le 12/2/19 =C3=A0 10:09 PM, Niek Linnenbank a =C3=A9crit :
+> > Dear QEMU developers,
 > >
-> >     My motivation is learn more about embedded devices, architecture,
-> >     kernel, etc. and of course contribute to the community.
+> > Hereby I would like to contribute the following set of patches to QEMU
+> > which add support for the Allwinner H3 System on Chip and the
+> > Orange Pi PC machine. The following features and devices are supported:
 > >
-> >     I would love to hear your opinions about this 3 related devices wit=
-h
-> >     they respected boards.
+> >   * SMP (Quad Core Cortex A7)
+> >   * Generic Interrupt Controller configuration
+> >   * SRAM mappings
+> >   * Timer device (re-used from Allwinner A10)
+> >   * UART
+> >   * SD/MMC storage controller
+> >   * EMAC ethernet connectivity
+> >   * USB 2.0 interfaces
+> >   * Clock Control Unit
+> >   * System Control module
+> >   * Security Identifier device
 > >
-> >     Maybe someone is interested to work with me.
-> >     I dream to make this work beautiful (like the musca board with the
-> >     armsse and armv7m modules) with a good variety of tests. And in the
-> >     same time I would like to write some documentation about the proces=
-s
-> >     with the final idea to "make an easier way for new contributors".
+> > Functionality related to graphical output such as HDMI, GPU,
+> > Display Engine and audio are not included. Recently released
+> > mainline Linux kernels (4.19 up to latest master) and mainline U-Boot
+> > are known to work. The SD/MMC code is tested using bonnie++ and
+> > various tools such as fsck, dd and fdisk. The EMAC is verified with
+> iperf3
+> > using -netdev socket.
+> >
+> > To build a Linux mainline kernel that can be booted by the Orange Pi PC
+> > machine, simply configure the kernel using the sunxi_defconfig
+> configuration:
+> >   $ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make mrproper
+> >   $ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make sunxi_defconfig
+> >
+> > To be able to use USB storage, you need to manually enable the
+> corresponding
+> > configuration item. Start the kconfig configuration tool:
+> >   $ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make menuconfig
+> >
+> > Navigate to the following item, enable it and save your configuration:
+> >   Device Drivers > USB support > USB Mass Storage support
+> >
+> > Build the Linux kernel with:
+> >   $ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make -j5
+> >
+> > To boot the newly build linux kernel in QEMU with the Orange Pi PC
+> machine, use:
+> >   $ qemu-system-arm -M orangepi -m 512 -nic user -nographic \
+> >       -kernel /path/to/linux/arch/arm/boot/zImage \
+> >       -append 'console=3DttyS0,115200' \
+> >       -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb
+> >
+> > Note that this kernel does not have a root filesystem. You may provide =
+it
+> > with an official Orange Pi PC image [1] either as an SD card or as
+> > USB mass storage. To boot using the Orange Pi PC Debian image on SD car=
+d,
+> > simply add the -sd argument and provide the proper root=3D kernel
+> parameter:
+> >   $ qemu-system-arm -M orangepi -m 512 -nic user -nographic \
+> >       -kernel /path/to/linux/arch/arm/boot/zImage \
+> >       -append 'console=3DttyS0,115200 root=3D/dev/mmcblk0p2' \
+> >       -dtb /path/to/linux/arch/arm/boot/dts/sun8i-h3-orangepi-pc.dtb \
+> >       -sd OrangePi_pc_debian_stretch_server_linux5.3.5_v1.0.img
+> >
+> > Alternatively, you can also choose to build and boot a recent buildroot
+> [2]
+> > using the orangepi_pc_defconfig or Armbian image [3] for Orange Pi PC.
+> > To attach an USB mass storage device to the machine, simply append to
+> the command:
+> >   -drive if=3Dnone,id=3Dstick,file=3Dmyimage.img \
+> >   -device usb-storage,bus=3Dusb-bus.0,drive=3Dstick
+> >
+> > U-Boot mainline can be build and configured using the
+> orangepi_pc_defconfig
+> > using similar commands as describe above for Linux. To start U-Boot usi=
+ng
+> > the Orange Pi PC machine, provide the u-boot binary to the -kernel
+> argument:
+> >   $ qemu-system-arm -M orangepi -m 512 -nic user -nographic \
+> >       -kernel /path/to/uboot/u-boot -sd disk.img
+> >
+> > Use the following U-boot commands to load and boot a Linux kernel from
+> SD card:
+> >   -> setenv bootargs console=3DttyS0,115200
+> >   -> ext2load mmc 0 0x42000000 zImage
+> >   -> ext2load mmc 0 0x43000000 sun8i-h2-plus-orangepi-zero.dtb
+> >   -> bootz 0x42000000 - 0x43000000
+> >
+> > Looking forward to your review comments. I will do my best
+> > to update the patches where needed.
+> >
+> > With kind regards,
+> >
+> > Niek Linnenbank
+> >
+> > [1] http://www.orangepi.org/downloadresources/
+> > [2] https://buildroot.org/download.html
+> > [3] https://www.armbian.com/orange-pi-pc/
 >
-> Very good idea.
->
-> Niek, since you recently did the same, do you mind sharing your
-> experience, tell us what was not clear or hard to understand, so we can
-> have a better idea what part of the documentation/process we should
-> improve first, to help and welcome new contributors?
+> Works well on my side with vanilla linux-4.9.13 built with gcc-8.3.0 +
+> busybox
+> and sun8i-h3-orangepi-one.dtb.
 >
 
-Sure! Based on my own experience with the Allwinner H3, I can fully
-recommend the steps
-described above by Philippe to get the work done. Those are mostly the
-things I did as well.
-
-I think the best advice I can give you to get started is, start with the
-bare minimum: kernel output.
-What I mean by that is, get the linux source and compile it for your target
-machine. Next, take the QEMU source and choose
-any existing machine that come closest to the machine or SoC that you want
-to implement.
-Then, just try to get the kernel output working via the serial console by
-loading it with -kernel, -append and -dtb arguments.
-
-If you are lucky, serial output already works since the machine is similar
-to the one you want to implement. If not,
-you may need to check for things like the load address and DRAM addresses
-first and try to get output
-by reading the kernel dmesg via GDB [1]. If you start QEMU with -s -S
-arguments, connect with gdb
-and give the 'lx-dmesg' command you'll read the kernel output before it
-goes to the serial device.
-If you at least selected the right processor and things like the load
-address are OK, chances are good
-that you at least get some logging.  And then, you have a starting point to
-start the real work using the
-steps described above by Philippe.
+> Tested-by: KONRAD Frederic <frederic.konrad@adacore.com>
+>
+> Thank you for testing! Great, I'll add the tag for the next v2 of the
+patches.
 
 Regards,
 Niek
 
-[1]
-https://www.kernel.org/doc/html/v4.10/dev-tools/gdb-kernel-debugging.html
 
+> >
+> > Niek Linnenbank (10):
+> >    hw: arm: add Allwinner H3 System-on-Chip
+> >    hw: arm: add Xunlong Orange Pi PC machine
+> >    arm: allwinner-h3: add Clock Control Unit
+> >    arm: allwinner-h3: add USB host controller
+> >    arm: allwinner-h3: add System Control module
+> >    arm/arm-powerctl: set NSACR.{CP11,CP10} bits in arm_set_cpu_on()
+> >    arm: allwinner-h3: add CPU Configuration module
+> >    arm: allwinner-h3: add Security Identifier device
+> >    arm: allwinner-h3: add SD/MMC host controller
+> >    arm: allwinner-h3: add EMAC ethernet device
+> >
+> >   MAINTAINERS                           |   8 +
+> >   default-configs/arm-softmmu.mak       |   1 +
+> >   hw/arm/Kconfig                        |   9 +
+> >   hw/arm/Makefile.objs                  |   1 +
+> >   hw/arm/allwinner-h3.c                 | 316 ++++++++++
+> >   hw/arm/orangepi.c                     | 114 ++++
+> >   hw/misc/Makefile.objs                 |   4 +
+> >   hw/misc/allwinner-h3-clk.c            | 227 ++++++++
+> >   hw/misc/allwinner-h3-cpucfg.c         | 280 +++++++++
+> >   hw/misc/allwinner-h3-sid.c            | 162 ++++++
+> >   hw/misc/allwinner-h3-syscon.c         | 139 +++++
+> >   hw/misc/trace-events                  |   5 +
+> >   hw/net/Kconfig                        |   3 +
+> >   hw/net/Makefile.objs                  |   1 +
+> >   hw/net/allwinner-h3-emac.c            | 786 +++++++++++++++++++++++++
+> >   hw/net/trace-events                   |  10 +
+> >   hw/sd/Makefile.objs                   |   1 +
+> >   hw/sd/allwinner-h3-sdhost.c           | 791 +++++++++++++++++++++++++=
++
+> >   hw/sd/trace-events                    |   7 +
+> >   hw/usb/hcd-ehci-sysbus.c              |  17 +
+> >   hw/usb/hcd-ehci.h                     |   1 +
+> >   include/hw/arm/allwinner-h3.h         | 130 +++++
+> >   include/hw/misc/allwinner-h3-clk.h    |  41 ++
+> >   include/hw/misc/allwinner-h3-cpucfg.h |  44 ++
+> >   include/hw/misc/allwinner-h3-sid.h    |  42 ++
+> >   include/hw/misc/allwinner-h3-syscon.h |  43 ++
+> >   include/hw/net/allwinner-h3-emac.h    |  69 +++
+> >   include/hw/sd/allwinner-h3-sdhost.h   |  73 +++
+> >   target/arm/arm-powerctl.c             |   3 +
+> >   29 files changed, 3328 insertions(+)
+> >   create mode 100644 hw/arm/allwinner-h3.c
+> >   create mode 100644 hw/arm/orangepi.c
+> >   create mode 100644 hw/misc/allwinner-h3-clk.c
+> >   create mode 100644 hw/misc/allwinner-h3-cpucfg.c
+> >   create mode 100644 hw/misc/allwinner-h3-sid.c
+> >   create mode 100644 hw/misc/allwinner-h3-syscon.c
+> >   create mode 100644 hw/net/allwinner-h3-emac.c
+> >   create mode 100644 hw/sd/allwinner-h3-sdhost.c
+> >   create mode 100644 include/hw/arm/allwinner-h3.h
+> >   create mode 100644 include/hw/misc/allwinner-h3-clk.h
+> >   create mode 100644 include/hw/misc/allwinner-h3-cpucfg.h
+> >   create mode 100644 include/hw/misc/allwinner-h3-sid.h
+> >   create mode 100644 include/hw/misc/allwinner-h3-syscon.h
+> >   create mode 100644 include/hw/net/allwinner-h3-emac.h
+> >   create mode 100644 include/hw/sd/allwinner-h3-sdhost.h
+> >
+>
 
-
->
-> >
-> >     If someone want to work with me in this task, should know that I
-> >     don't have to much experience and I'm doing this job in my free tim=
-e
-> >     (this means that I work only in my free time).
-> >
-> >     I appreciate any kind of comment or advice.
-> >
-> >     Thanks for your time ;)
-> >     EstebanB
-> >
->
->
 
 --=20
 Niek Linnenbank
 
---000000000000d2374d05995ed72d
+--00000000000028c75e05995ee654
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div dir=3D"ltr"><div>Hello Philippe and Esteban,</div><di=
-v><br></div></div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmai=
-l_attr">On Tue, Dec 10, 2019 at 10:55 AM Philippe Mathieu-Daud=C3=A9 &lt;<a=
- href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br></di=
-v><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;borde=
-r-left:1px solid rgb(204,204,204);padding-left:1ex">Hi Esteban,<br>
+<div dir=3D"ltr"><div>Hi Frederic,<br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Dec 10, 2019 at 11:34 AM KONR=
+AD Frederic &lt;<a href=3D"mailto:frederic.konrad@adacore.com">frederic.kon=
+rad@adacore.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" s=
+tyle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pad=
+ding-left:1ex"><br>
 <br>
-On 12/3/19 4:24 PM, Esteban Bosse wrote:<br>
-&gt; Ping<br>
+Le 12/2/19 =C3=A0 10:09 PM, Niek Linnenbank a =C3=A9crit=C2=A0:<br>
+&gt; Dear QEMU developers,<br>
 &gt; <br>
-&gt; El mi=C3=A9., 6 nov. 2019 16:04, Esteban Bosse &lt;<a href=3D"mailto:e=
-stebanbosse@gmail.com" target=3D"_blank">estebanbosse@gmail.com</a> <br>
-&gt; &lt;mailto:<a href=3D"mailto:estebanbosse@gmail.com" target=3D"_blank"=
->estebanbosse@gmail.com</a>&gt;&gt; escribi=C3=B3:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Hello!<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Some months ago I started to work trying to port th=
-e Beaglebone<br>
-&gt;=C2=A0 =C2=A0 =C2=A0support from the old qemu-linaro fork to the new QE=
-MU mainstream.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0During my work I found that the Beaglebone have an =
-OMAP3 mpu this<br>
-&gt;=C2=A0 =C2=A0 =C2=A0mpu has very strong relation with the OMAP2 and OMA=
-P1 in qemu, they<br>
-&gt;=C2=A0 =C2=A0 =C2=A0implement a lot of functions in common.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Then I understood that the omap1 and omap2 don&#39;=
-t implement things<br>
-&gt;=C2=A0 =C2=A0 =C2=A0like QOM and needs a lot of work to upgrade it, at =
-the same time<br>
-&gt;=C2=A0 =C2=A0 =C2=A0they are some boards like: omap1_sx, palm, nseries =
-that implement<br>
-&gt;=C2=A0 =C2=A0 =C2=A0this mpus.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Looking the datasheet of the omap1 I realized that =
-it&#39;s an very old<br>
-&gt;=C2=A0 =C2=A0 =C2=A0device and some questions like &quot;make sense wor=
-k with this old<br>
-&gt;=C2=A0 =C2=A0 =C2=A0device?&quot; comes to my mind.<br>
+&gt; Hereby I would like to contribute the following set of patches to QEMU=
 <br>
-The OMAP3 reuse various components of the OMAP1/2.<br>
-Although in old shape, the OMAP1/2 are in the codebase and work.<br>
-It make sense to me to start upgrading the OMAP1/2 to new QOM standard, <br=
+&gt; which add support for the Allwinner H3 System on Chip and the<br>
+&gt; Orange Pi PC machine. The following features and devices are supported=
+:<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0* SMP (Quad Core Cortex A7)<br>
+&gt;=C2=A0 =C2=A0* Generic Interrupt Controller configuration<br>
+&gt;=C2=A0 =C2=A0* SRAM mappings<br>
+&gt;=C2=A0 =C2=A0* Timer device (re-used from Allwinner A10)<br>
+&gt;=C2=A0 =C2=A0* UART<br>
+&gt;=C2=A0 =C2=A0* SD/MMC storage controller<br>
+&gt;=C2=A0 =C2=A0* EMAC ethernet connectivity<br>
+&gt;=C2=A0 =C2=A0* USB 2.0 interfaces<br>
+&gt;=C2=A0 =C2=A0* Clock Control Unit<br>
+&gt;=C2=A0 =C2=A0* System Control module<br>
+&gt;=C2=A0 =C2=A0* Security Identifier device<br>
+&gt; <br>
+&gt; Functionality related to graphical output such as HDMI, GPU,<br>
+&gt; Display Engine and audio are not included. Recently released<br>
+&gt; mainline Linux kernels (4.19 up to latest master) and mainline U-Boot<=
+br>
+&gt; are known to work. The SD/MMC code is tested using bonnie++ and<br>
+&gt; various tools such as fsck, dd and fdisk. The EMAC is verified with ip=
+erf3<br>
+&gt; using -netdev socket.<br>
+&gt; <br>
+&gt; To build a Linux mainline kernel that can be booted by the Orange Pi P=
+C<br>
+&gt; machine, simply configure the kernel using the sunxi_defconfig configu=
+ration:<br>
+&gt;=C2=A0 =C2=A0$ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make mrpro=
+per<br>
+&gt;=C2=A0 =C2=A0$ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make sunxi=
+_defconfig<br>
+&gt; <br>
+&gt; To be able to use USB storage, you need to manually enable the corresp=
+onding<br>
+&gt; configuration item. Start the kconfig configuration tool:<br>
+&gt;=C2=A0 =C2=A0$ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make menuc=
+onfig<br>
+&gt; <br>
+&gt; Navigate to the following item, enable it and save your configuration:=
+<br>
+&gt;=C2=A0 =C2=A0Device Drivers &gt; USB support &gt; USB Mass Storage supp=
+ort<br>
+&gt; <br>
+&gt; Build the Linux kernel with:<br>
+&gt;=C2=A0 =C2=A0$ ARCH=3Darm CROSS_COMPILE=3Darm-linux-gnueabi- make -j5<b=
+r>
+&gt; <br>
+&gt; To boot the newly build linux kernel in QEMU with the Orange Pi PC mac=
+hine, use:<br>
+&gt;=C2=A0 =C2=A0$ qemu-system-arm -M orangepi -m 512 -nic user -nographic =
+\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0-kernel /path/to/linux/arch/arm/boot/zImage =
+\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0-append &#39;console=3DttyS0,115200&#39; \<b=
+r>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0-dtb /path/to/linux/arch/arm/boot/dts/sun8i-=
+h3-orangepi-pc.dtb<br>
+&gt; <br>
+&gt; Note that this kernel does not have a root filesystem. You may provide=
+ it<br>
+&gt; with an official Orange Pi PC image [1] either as an SD card or as<br>
+&gt; USB mass storage. To boot using the Orange Pi PC Debian image on SD ca=
+rd,<br>
+&gt; simply add the -sd argument and provide the proper root=3D kernel para=
+meter:<br>
+&gt;=C2=A0 =C2=A0$ qemu-system-arm -M orangepi -m 512 -nic user -nographic =
+\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0-kernel /path/to/linux/arch/arm/boot/zImage =
+\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0-append &#39;console=3DttyS0,115200 root=3D/=
+dev/mmcblk0p2&#39; \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0-dtb /path/to/linux/arch/arm/boot/dts/sun8i-=
+h3-orangepi-pc.dtb \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0-sd OrangePi_pc_debian_stretch_server_linux5=
+.3.5_v1.0.img<br>
+&gt; <br>
+&gt; Alternatively, you can also choose to build and boot a recent buildroo=
+t [2]<br>
+&gt; using the orangepi_pc_defconfig or Armbian image [3] for Orange Pi PC.=
+<br>
+&gt; To attach an USB mass storage device to the machine, simply append to =
+the command:<br>
+&gt;=C2=A0 =C2=A0-drive if=3Dnone,id=3Dstick,file=3Dmyimage.img \<br>
+&gt;=C2=A0 =C2=A0-device usb-storage,bus=3Dusb-bus.0,drive=3Dstick<br>
+&gt; <br>
+&gt; U-Boot mainline can be build and configured using the orangepi_pc_defc=
+onfig<br>
+&gt; using similar commands as describe above for Linux. To start U-Boot us=
+ing<br>
+&gt; the Orange Pi PC machine, provide the u-boot binary to the -kernel arg=
+ument:<br>
+&gt;=C2=A0 =C2=A0$ qemu-system-arm -M orangepi -m 512 -nic user -nographic =
+\<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0-kernel /path/to/uboot/u-boot -sd disk.img<b=
+r>
+&gt; <br>
+&gt; Use the following U-boot commands to load and boot a Linux kernel from=
+ SD card:<br>
+&gt;=C2=A0 =C2=A0-&gt; setenv bootargs console=3DttyS0,115200<br>
+&gt;=C2=A0 =C2=A0-&gt; ext2load mmc 0 0x42000000 zImage<br>
+&gt;=C2=A0 =C2=A0-&gt; ext2load mmc 0 0x43000000 sun8i-h2-plus-orangepi-zer=
+o.dtb<br>
+&gt;=C2=A0 =C2=A0-&gt; bootz 0x42000000 - 0x43000000<br>
+&gt; <br>
+&gt; Looking forward to your review comments. I will do my best<br>
+&gt; to update the patches where needed.<br>
+&gt; <br>
+&gt; With kind regards,<br>
+&gt; <br>
+&gt; Niek Linnenbank<br>
+&gt; <br>
+&gt; [1] <a href=3D"http://www.orangepi.org/downloadresources/" rel=3D"nore=
+ferrer" target=3D"_blank">http://www.orangepi.org/downloadresources/</a><br=
 >
-then add the OMAP3 missing parts.<br>
+&gt; [2] <a href=3D"https://buildroot.org/download.html" rel=3D"noreferrer"=
+ target=3D"_blank">https://buildroot.org/download.html</a><br>
+&gt; [3] <a href=3D"https://www.armbian.com/orange-pi-pc/" rel=3D"noreferre=
+r" target=3D"_blank">https://www.armbian.com/orange-pi-pc/</a><br>
 <br>
-The previous recommendations from Peter are still valid:<br>
-<a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg636936.htm=
-l" rel=3D"noreferrer" target=3D"_blank">https://www.mail-archive.com/qemu-d=
-evel@nongnu.org/msg636936.html</a><br>
+Works well on my side with vanilla linux-4.9.13 built with gcc-8.3.0 + busy=
+box<br>
+and sun8i-h3-orangepi-one.dtb.<br></blockquote><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,2=
+04);padding-left:1ex">
 <br>
-Or you can use the schema followed by Niek when adding the Allwinner H3:<br=
->
-<a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg662591.htm=
-l" rel=3D"noreferrer" target=3D"_blank">https://www.mail-archive.com/qemu-d=
-evel@nongnu.org/msg662591.html</a><br>
-<br>
-That is:<br>
-<br>
-- Add tests using old code (booting Linux, network access in guest)<br>
-- Add an empty board<br>
-- Plug an empty OMAP SoC into the board, add the PoP LPDRAM<br>
-- Add a ARM926 core into the SoC<br>
-- Add most of the devices as UnimplementedDevice<br>
-- Add the interrupt controller in the SoC<br>
-- Add the UART in the SoC<br>
-- Add the Timers in the SoC<br>
-- Try to boot a Linux kernel (UART, TMR, then IRQ tested)<br>
-- Add the SD controller in the SoC<br>
-- Plug a drive to the SD in the board<br>
-- Try to boot u-boot<br>
-- You can now start the OMAP2 using a ARM1136 core<br>
-- Add the missing UNIMP devices (loop to previous steps)<br>
-- Add network controller<br>
-- Run tests (booting Linux, network access in guest)<br>
-- Remove old code<br>
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0When I went to the KVM Forum the last week I talked=
- with some of<br>
-&gt;=C2=A0 =C2=A0 =C2=A0you, and you help my with different ideas and propo=
-sal to make this<br>
-&gt;=C2=A0 =C2=A0 =C2=A0task, but I can&#39;t see the right way to make thi=
-s work because it is<br>
-&gt;=C2=A0 =C2=A0 =C2=A0a lot of work.<br>
+Tested-by: KONRAD Frederic &lt;<a href=3D"mailto:frederic.konrad@adacore.co=
+m" target=3D"_blank">frederic.konrad@adacore.com</a>&gt;<br>
+<br></blockquote><div>Thank you for testing! Great, I&#39;ll add the tag fo=
+r the next v2 of the patches.</div><div><br></div><div>Regards,</div><div>N=
+iek<br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
+1ex">
 &gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0My motivation is learn more about embedded devices,=
- architecture,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0kernel, etc. and of course contribute to the commun=
-ity.<br>
+&gt; Niek Linnenbank (10):<br>
+&gt;=C2=A0 =C2=A0 hw: arm: add Allwinner H3 System-on-Chip<br>
+&gt;=C2=A0 =C2=A0 hw: arm: add Xunlong Orange Pi PC machine<br>
+&gt;=C2=A0 =C2=A0 arm: allwinner-h3: add Clock Control Unit<br>
+&gt;=C2=A0 =C2=A0 arm: allwinner-h3: add USB host controller<br>
+&gt;=C2=A0 =C2=A0 arm: allwinner-h3: add System Control module<br>
+&gt;=C2=A0 =C2=A0 arm/arm-powerctl: set NSACR.{CP11,CP10} bits in arm_set_c=
+pu_on()<br>
+&gt;=C2=A0 =C2=A0 arm: allwinner-h3: add CPU Configuration module<br>
+&gt;=C2=A0 =C2=A0 arm: allwinner-h3: add Security Identifier device<br>
+&gt;=C2=A0 =C2=A0 arm: allwinner-h3: add SD/MMC host controller<br>
+&gt;=C2=A0 =C2=A0 arm: allwinner-h3: add EMAC ethernet device<br>
 &gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0I would love to hear your opinions about this 3 rel=
-ated devices with<br>
-&gt;=C2=A0 =C2=A0 =C2=A0they respected boards.<br>
+&gt;=C2=A0 =C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A08 +<br>
+&gt;=C2=A0 =C2=A0default-configs/arm-softmmu.mak=C2=A0 =C2=A0 =C2=A0 =C2=A0=
+|=C2=A0 =C2=A01 +<br>
+&gt;=C2=A0 =C2=A0hw/arm/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A09 +<br>
+&gt;=C2=A0 =C2=A0hw/arm/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
+&gt;=C2=A0 =C2=A0hw/arm/allwinner-h3.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0| 316 ++++++++++<br>
+&gt;=C2=A0 =C2=A0hw/arm/orangepi.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 114 ++++<br>
+&gt;=C2=A0 =C2=A0hw/misc/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A04 +<br>
+&gt;=C2=A0 =C2=A0hw/misc/allwinner-h3-clk.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 | 227 ++++++++<br>
+&gt;=C2=A0 =C2=A0hw/misc/allwinner-h3-cpucfg.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0| 280 +++++++++<br>
+&gt;=C2=A0 =C2=A0hw/misc/allwinner-h3-sid.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 | 162 ++++++<br>
+&gt;=C2=A0 =C2=A0hw/misc/allwinner-h3-syscon.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0| 139 +++++<br>
+&gt;=C2=A0 =C2=A0hw/misc/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A05 +<br>
+&gt;=C2=A0 =C2=A0hw/net/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A03 +<br>
+&gt;=C2=A0 =C2=A0hw/net/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
+&gt;=C2=A0 =C2=A0hw/net/allwinner-h3-emac.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 | 786 +++++++++++++++++++++++++<br>
+&gt;=C2=A0 =C2=A0hw/net/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 10 +<br>
+&gt;=C2=A0 =C2=A0hw/sd/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A01 +<br>
+&gt;=C2=A0 =C2=A0hw/sd/allwinner-h3-sdhost.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0| 791 ++++++++++++++++++++++++++<br>
+&gt;=C2=A0 =C2=A0hw/sd/trace-events=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A07 +<br>
+&gt;=C2=A0 =C2=A0hw/usb/hcd-ehci-sysbus.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 |=C2=A0 17 +<br>
+&gt;=C2=A0 =C2=A0hw/usb/hcd-ehci.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A01 +<br>
+&gt;=C2=A0 =C2=A0include/hw/arm/allwinner-h3.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0| 130 +++++<br>
+&gt;=C2=A0 =C2=A0include/hw/misc/allwinner-h3-clk.h=C2=A0 =C2=A0 |=C2=A0 41=
+ ++<br>
+&gt;=C2=A0 =C2=A0include/hw/misc/allwinner-h3-cpucfg.h |=C2=A0 44 ++<br>
+&gt;=C2=A0 =C2=A0include/hw/misc/allwinner-h3-sid.h=C2=A0 =C2=A0 |=C2=A0 42=
+ ++<br>
+&gt;=C2=A0 =C2=A0include/hw/misc/allwinner-h3-syscon.h |=C2=A0 43 ++<br>
+&gt;=C2=A0 =C2=A0include/hw/net/allwinner-h3-emac.h=C2=A0 =C2=A0 |=C2=A0 69=
+ +++<br>
+&gt;=C2=A0 =C2=A0include/hw/sd/allwinner-h3-sdhost.h=C2=A0 =C2=A0|=C2=A0 73=
+ +++<br>
+&gt;=C2=A0 =C2=A0target/arm/arm-powerctl.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A03 +<br>
+&gt;=C2=A0 =C2=A029 files changed, 3328 insertions(+)<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/arm/allwinner-h3.c<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/arm/orangepi.c<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/misc/allwinner-h3-clk.c<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/misc/allwinner-h3-cpucfg.c<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/misc/allwinner-h3-sid.c<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/misc/allwinner-h3-syscon.c<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/net/allwinner-h3-emac.c<br>
+&gt;=C2=A0 =C2=A0create mode 100644 hw/sd/allwinner-h3-sdhost.c<br>
+&gt;=C2=A0 =C2=A0create mode 100644 include/hw/arm/allwinner-h3.h<br>
+&gt;=C2=A0 =C2=A0create mode 100644 include/hw/misc/allwinner-h3-clk.h<br>
+&gt;=C2=A0 =C2=A0create mode 100644 include/hw/misc/allwinner-h3-cpucfg.h<b=
+r>
+&gt;=C2=A0 =C2=A0create mode 100644 include/hw/misc/allwinner-h3-sid.h<br>
+&gt;=C2=A0 =C2=A0create mode 100644 include/hw/misc/allwinner-h3-syscon.h<b=
+r>
+&gt;=C2=A0 =C2=A0create mode 100644 include/hw/net/allwinner-h3-emac.h<br>
+&gt;=C2=A0 =C2=A0create mode 100644 include/hw/sd/allwinner-h3-sdhost.h<br>
 &gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Maybe someone is interested to work with me.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0I=C2=A0dream to make this work beautiful (like the =
-musca board with the<br>
-&gt;=C2=A0 =C2=A0 =C2=A0armsse and armv7m modules) with a good variety of t=
-ests. And in the<br>
-&gt;=C2=A0 =C2=A0 =C2=A0same time I would like to write some documentation =
-about the process<br>
-&gt;=C2=A0 =C2=A0 =C2=A0with the final idea to &quot;make an easier way for=
- new contributors&quot;.<br>
-<br>
-Very good idea.<br>
-<br>
-Niek, since you recently did the same, do you mind sharing your <br>
-experience, tell us what was not clear or hard to understand, so we can <br=
->
-have a better idea what part of the documentation/process we should <br>
-improve first, to help and welcome new contributors?<br></blockquote><div><=
-br></div><div>Sure! Based on my own experience with the Allwinner H3, I can=
- fully recommend the steps</div><div>described above by Philippe to get the=
- work done. Those are mostly the things I did as well.</div><div><br></div>=
-<div>I think the best advice I can give you to get started is, start with t=
-he bare minimum: kernel output.</div><div>What I mean by that is, get the l=
-inux source and compile it for your target machine. Next, take the QEMU sou=
-rce and choose</div><div>any existing machine that come closest to the mach=
-ine or SoC that you want to implement.</div><div>Then, just try to get the =
-kernel output working via the serial console by loading it with -kernel, -a=
-ppend and -dtb arguments.</div><div><br></div><div>If you are lucky, serial=
- output already works since the machine is similar to the one you want to i=
-mplement. If not,</div><div>you may need to check for things like the load =
-address and DRAM addresses first and try to get output</div><div>by reading=
- the kernel dmesg via GDB [1]. If you start QEMU with -s -S arguments, conn=
-ect with gdb</div><div>and give the &#39;lx-dmesg&#39; command you&#39;ll r=
-ead the kernel output before it goes to the serial device.</div><div>If you=
- at least selected the right processor and things like the load address are=
- OK, chances are good</div><div>that you at least get some logging.=C2=A0 A=
-nd then, you have a starting point to start the real work using the</div><d=
-iv>steps described above by Philippe.<br></div><div><br></div><div>Regards,=
-</div><div>Niek<br></div><div><br></div><div>[1] <a href=3D"https://www.ker=
-nel.org/doc/html/v4.10/dev-tools/gdb-kernel-debugging.html">https://www.ker=
-nel.org/doc/html/v4.10/dev-tools/gdb-kernel-debugging.html</a></div><div><b=
-r></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:=
-0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0If someone want to work with me in this task, shoul=
-d know that I<br>
-&gt;=C2=A0 =C2=A0 =C2=A0don&#39;t have to much experience and I&#39;m doing=
- this job in my free time<br>
-&gt;=C2=A0 =C2=A0 =C2=A0(this means that I work only in my free time).<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0I appreciate any kind of comment or advice.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Thanks for your time ;)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0EstebanB<br>
-&gt; <br>
-<br>
 </blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
 mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
 div></div>
 
---000000000000d2374d05995ed72d--
+--00000000000028c75e05995ee654--
 
