@@ -2,81 +2,62 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2FFC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 01:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B26ACC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 02:09:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E253C2077B
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 01:19:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qa9KYVQO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E253C2077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 88B8020726
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 02:09:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88B8020726
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieUB8-0000V4-2t
-	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 20:19:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34156)
+	id 1ieUy0-0007Ow-ID
+	for qemu-devel@archiver.kernel.org; Mon, 09 Dec 2019 21:09:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1ieUAP-0008VC-47
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 20:18:22 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1ieUxP-0006x4-Gx
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 21:09:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1ieUAN-0002od-I5
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 20:18:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59330
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pannengyuan@huawei.com>) id 1ieUxO-0003dW-83
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 21:08:59 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2220 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ieUAN-0002oP-B6
- for qemu-devel@nongnu.org; Mon, 09 Dec 2019 20:18:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1575940698;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=bnAerfd+U62iSqu20JMfYP7bOnvv1Pad0WP0GzjH0BQ=;
- b=Qa9KYVQOWxzzXeWxcTj0mX/avCV/zpVrcFtLkNInjbflTkOpUpEX4ClFnRBffOZWGBe77v
- fd7/8S7HVSq1Q+E9AERR0b/VwcbCDwyJiKN8YPKQH35PirPlXSm2rzCsfxT8Z4lZzJBnKU
- JW03UkK6ibBDCQGfzQZhi2qP8JinJUE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-104-H8zCTnZTP8yP5fJ3qNcyHg-1; Mon, 09 Dec 2019 20:18:14 -0500
-X-MC-Unique: H8zCTnZTP8yP5fJ3qNcyHg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B04CF107ACC4;
- Tue, 10 Dec 2019 01:18:13 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-125-99.rdu2.redhat.com
- [10.10.125.99])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EFD4019C5B;
- Tue, 10 Dec 2019 01:18:05 +0000 (UTC)
-Date: Mon, 9 Dec 2019 20:18:03 -0500
-From: Cleber Rosa <crosa@redhat.com>
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Subject: Re: [PATCH v2 4/4] python/qemu: accel: Add tcg_available() method
-Message-ID: <20191210011803.GE31990@localhost.localdomain>
-References: <20191206213433.11305-1-wainersm@redhat.com>
- <20191206213433.11305-5-wainersm@redhat.com>
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1ieUxN-0003ba-Rh
+ for qemu-devel@nongnu.org; Mon, 09 Dec 2019 21:08:58 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 5B65ABA68B9D237322A9;
+ Tue, 10 Dec 2019 10:08:50 +0800 (CST)
+Received: from [127.0.0.1] (10.120.177.99) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Tue, 10 Dec 2019
+ 10:08:42 +0800
+Subject: Re: [PATCH v2 1/3] virtio: add ability to delete vq through a pointer
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <1575444716-17632-1-git-send-email-pannengyuan@huawei.com>
+ <20191209114042-mutt-send-email-mst@kernel.org>
+ <20191209115829-mutt-send-email-mst@kernel.org>
+From: Pan Nengyuan <pannengyuan@huawei.com>
+Message-ID: <5628c5a0-538a-8c84-f06e-84acb2b75378@huawei.com>
+Date: Tue, 10 Dec 2019 10:08:41 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191206213433.11305-5-wainersm@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="10jrOL3x2xqLmOsH"
-Content-Disposition: inline
+In-Reply-To: <20191209115829-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.120.177.99]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,73 +69,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, ehabkost@redhat.com, alex.bennee@linaro.org,
- qemu-devel@nongnu.org, philmd@redhat.com, jsnow@redhat.com
+Cc: liyiting@huawei.com, kuhn.chenqun@huawei.com, qemu-devel@nongnu.org,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---10jrOL3x2xqLmOsH
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Dec 06, 2019 at 04:34:33PM -0500, Wainer dos Santos Moschetta wrote=
-:
-> This adds a method to check if the tcg accelerator is enabled
-> in the QEMU binary.
->=20
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  python/qemu/accel.py | 8 ++++++++
->  1 file changed, 8 insertions(+)
->=20
-> diff --git a/python/qemu/accel.py b/python/qemu/accel.py
-> index 9fecffb44b..f4ff31825d 100644
-> --- a/python/qemu/accel.py
-> +++ b/python/qemu/accel.py
-> @@ -67,3 +67,11 @@ def kvm_available(target_arch=3DNone, qemu_bin=3DNone)=
-:
->      if qemu_bin and "kvm" not in list_accel(qemu_bin):
->          return False
->      return True
-> +
-> +def tcg_available(qemu_bin):
-> +    """
-> +    Check if TCG is available.
-> +
-> +    @param qemu_bin (str): path to the QEMU binary
-> +    """
-> +    return 'tcg' in list_accel(qemu_bin)
-> --=20
-> 2.21.0
->=20
 
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
+On 2019/12/10 0:58, Michael S. Tsirkin wrote:
+> On Mon, Dec 09, 2019 at 11:43:20AM -0500, Michael S. Tsirkin wrote:
+>> On Wed, Dec 04, 2019 at 03:31:54PM +0800, pannengyuan@huawei.com wrote:
+>>> From: Pan Nengyuan <pannengyuan@huawei.com>
+>>>
+>>> Devices tend to maintain vq pointers, allow deleting them trough a vq pointer.
+>>
+>> You want to also mention something about clearing
+>> .used_elems to avoid chances of double free.
+>>
+>>> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>>
+>>
+>> So let's just name the new one virtio_del_queue then,
+>> and drop the old one.
+> 
+> I tried but it seems like too much work.
 
---10jrOL3x2xqLmOsH
-Content-Type: application/pgp-signature; name="signature.asc"
+Yes, some of them do not maintain the vq pointer, so can we just rename
+the virtio_delete_queue to avoid confusion?
 
------BEGIN PGP SIGNATURE-----
+I have sent a new version before your reply, can you check whether it's
+appropriate or not?
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl3u8kcACgkQZX6NM6Xy
-CfPcFQ/+Itv9+qcyo7AlTScK2q2bGjUjeuHzzdmcu/fRqU/+UtlXIJZBJ1QVvdbD
-ZA9WqM4JEBepJt4i+Xv/CRUcb+GpPSDcKdOD4X+Q54pMcA0kq7mTZO5NX6z7hq3u
-ugbfgTpgHhhq5hQEpyL4jBqPIw9vg9LyXQmok5eXD8vBKvsGD8TCfKZBAmAGGcY1
-jZaY4XuRi15ef4Xh4WYkWg+rmh9hIaTzOgfqkPFJRD7LUhUABD6IXY6HjSncc8PR
-X9KcURwQy3FY6Od89dDUopO8WhYprtwgUw8O9/MLPNqryZPTaSd0DD61RYRTv8vp
-vEUYahjAobjz+mxYatTBprW/11OU4vE+IN3+jVGdY6Y5kURcMVdl0gpqZmnV03FH
-vesJUoxtqce6NeauX25CmfkR6XdU4A7LxT9yJZRMcghcwM4+dADWUTtuyO8PB12v
-6c4f7H+jOlIomY83LbUFmSLEAeL0e+sDVEDzbIJkPgA0/1zYKbyqZneX7OUiE61g
-giJ6Lgk/KRbSs4jBDZN0GG7gm1CHqlgfsSeUyhyA5bexGlOuVxkkuH1fxN2sLL3a
-qghPo42vawxVgTHks3syCJV3pGEjOuuTgvzhxSNiANA+RW4sz6LDWnOcyNuhPVYi
-vH8kElHznZLIDXie8K1dcJ0zbnnKnsXllsNCeJOe5TlA0HTAGc8=
-=YOgg
------END PGP SIGNATURE-----
-
---10jrOL3x2xqLmOsH--
+> 
+>>
+>>> ---
+>>> Changes v2 to v1:
+>>> - add a new function virtio_delete_queue to cleanup vq through a vq pointer
+>>> ---
+>>>  hw/virtio/virtio.c         | 16 +++++++++++-----
+>>>  include/hw/virtio/virtio.h |  2 ++
+>>>  2 files changed, 13 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+>>> index 04716b5..6de3cfd 100644
+>>> --- a/hw/virtio/virtio.c
+>>> +++ b/hw/virtio/virtio.c
+>>> @@ -2330,17 +2330,23 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, int queue_size,
+>>>      return &vdev->vq[i];
+>>>  }
+>>>  
+>>> +void virtio_delete_queue(VirtQueue *vq)
+>>> +{
+>>> +    vq->vring.num = 0;
+>>> +    vq->vring.num_default = 0;
+>>> +    vq->handle_output = NULL;
+>>> +    vq->handle_aio_output = NULL;
+>>> +    g_free(vq->used_elems);
+>>> +    vq->used_elems = NULL;
+>>> +}
+>>> +
+>>>  void virtio_del_queue(VirtIODevice *vdev, int n)
+>>>  {
+>>>      if (n < 0 || n >= VIRTIO_QUEUE_MAX) {
+>>>          abort();
+>>>      }
+>>>  
+>>> -    vdev->vq[n].vring.num = 0;
+>>> -    vdev->vq[n].vring.num_default = 0;
+>>> -    vdev->vq[n].handle_output = NULL;
+>>> -    vdev->vq[n].handle_aio_output = NULL;
+>>> -    g_free(vdev->vq[n].used_elems);
+>>> +    virtio_delete_queue(&vdev->vq[n]);
+>>>  }
+>>>  
+>>>  static void virtio_set_isr(VirtIODevice *vdev, int value)
+>>> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+>>> index c32a815..e18756d 100644
+>>> --- a/include/hw/virtio/virtio.h
+>>> +++ b/include/hw/virtio/virtio.h
+>>> @@ -183,6 +183,8 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, int queue_size,
+>>>  
+>>>  void virtio_del_queue(VirtIODevice *vdev, int n);
+>>>  
+>>> +void virtio_delete_queue(VirtQueue *vq);
+>>> +
+>>>  void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
+>>>                      unsigned int len);
+>>>  void virtqueue_flush(VirtQueue *vq, unsigned int count);
+>>> -- 
+>>> 2.7.2.windows.1
+>>>
+> 
+> 
+> .
+> 
 
 
