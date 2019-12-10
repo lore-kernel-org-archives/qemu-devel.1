@@ -2,69 +2,100 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF26FC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 07:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A04FC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 07:56:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9031B20663
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 07:54:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9031B20663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4588E20663
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 07:56:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ByJixM8Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4588E20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieaLY-0003yW-M9
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 02:54:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51293)
+	id 1ieaO9-0005Ty-GL
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 02:56:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51506)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1ieaKt-0003Z5-6t
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:53:37 -0500
+ (envelope-from <philmd@redhat.com>) id 1ieaNO-0004w6-MY
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:56:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1ieaKq-0006qu-Da
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:53:34 -0500
-Received: from mga14.intel.com ([192.55.52.115]:42167)
+ (envelope-from <philmd@redhat.com>) id 1ieaNN-0008H2-5x
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:56:10 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38487
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1ieaKq-0006os-3b
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:53:32 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 09 Dec 2019 23:52:58 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,299,1571727600"; d="scan'208";a="203100969"
-Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
- ([10.239.13.9])
- by orsmga007.jf.intel.com with ESMTP; 09 Dec 2019 23:52:55 -0800
-Date: Tue, 10 Dec 2019 02:44:44 -0500
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [RFC PATCH 4/9] vfio-pci: register default dynamic-trap-bar-info
- region
-Message-ID: <20191210074444.GA28339@joy-OptiPlex-7040>
-References: <20191205032419.29606-1-yan.y.zhao@intel.com>
- <20191205032650.29794-1-yan.y.zhao@intel.com>
- <20191205165530.1f29fe85@x1.home>
- <20191206060407.GF31791@joy-OptiPlex-7040>
- <20191206082038.2b1078d9@x1.home>
- <20191209062212.GL31791@joy-OptiPlex-7040>
- <20191209141608.310520fc@x1.home>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ieaNN-0008Gs-30
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 02:56:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575964568;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=oLmwHHyHcbG03UjZlQhw3ftszHY2lolMAFMILWOXSaI=;
+ b=ByJixM8ZLV/mD8n0mv0hecao7d2MBrjklwo8AfsqZ002VnlFa1BrsXlRQ/vRpYnitlOUhW
+ uadIsQ5mYyKHRDXe5FysenQz8czcKhO7/j688gAS4ArM564j7QanGyx9GMMuERY8vYKmg3
+ 8n/yce30jV3WO95fspD8koVM1SBwB60=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-161-Z0mvdxtZPRGijalvowmR5Q-1; Tue, 10 Dec 2019 02:56:05 -0500
+Received: by mail-wm1-f72.google.com with SMTP id g1so686941wmg.4
+ for <qemu-devel@nongnu.org>; Mon, 09 Dec 2019 23:56:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7lKFvmIk1ckH9ho4BOT62MUH7tKFHMTUn/IZ+AcP/SE=;
+ b=h/O/g4d2Fnu56rXszL0oHN2mLg3Y7T4D40J4XPmBBEoYpIQ2F+/z+29iE6N/jqX0Rk
+ 1WguhVqf6x8wnEu6oxYZYgQAwzREc89f5VW520aJAkHu3wW2fqzISWaEramkgp/1UaRt
+ mo8EpZCGmCNuRt9QZ9rfi1RsHYMjHyN5rgK9y/R/XyRl0btnhoxyqPrWsMw26WUCT+uZ
+ btpGELc+8t4t8r0gJVxahImbIxkokNVXK7SrHMAP9Lvgl/R2Fshyo1OYPOWPKzTF8+fN
+ oX4HcbOAElYtCvrn+MECiUO5ycFmRv+MPv2stE5PdNCn3jst4ykr+0k/wEPvFF7vx6ET
+ tCeg==
+X-Gm-Message-State: APjAAAU3aI00cTmumSVp3LBvVQaTBj+Ao9XFkOLUgq3Ff2JOL2dEI7Hy
+ nhnmiYMLdcIZoJBsejcreZopOSX3AYaDJ4gbUbI8AzmCsQtAOwmtAQEfsVULxdSkhYhvW3h73Ep
+ PH5h89HwuLUwku9I=
+X-Received: by 2002:a1c:20d6:: with SMTP id g205mr3594421wmg.38.1575964563899; 
+ Mon, 09 Dec 2019 23:56:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzpuD27zieSAWnmK5k7ErZ7Gf8lH2qXwKSBhTNv5mTzYEYTN7YvYLy+bt2UXvFMiX9hDPsXZQ==
+X-Received: by 2002:a1c:20d6:: with SMTP id g205mr3594407wmg.38.1575964563677; 
+ Mon, 09 Dec 2019 23:56:03 -0800 (PST)
+Received: from [192.168.1.35] (182.red-88-21-103.staticip.rima-tde.net.
+ [88.21.103.182])
+ by smtp.gmail.com with ESMTPSA id g69sm2283097wmg.13.2019.12.09.23.56.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 09 Dec 2019 23:56:03 -0800 (PST)
+Subject: Re: [PATCH 04/10] arm: allwinner-h3: add USB host controller
+To: Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
+References: <20191202210947.3603-1-nieklinnenbank@gmail.com>
+ <20191202210947.3603-5-nieklinnenbank@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <4a900e8d-d803-5c58-5a4b-879cce5970b4@redhat.com>
+Date: Tue, 10 Dec 2019 08:56:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191209141608.310520fc@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.115
+In-Reply-To: <20191202210947.3603-5-nieklinnenbank@gmail.com>
+Content-Language: en-US
+X-MC-Unique: Z0mvdxtZPRGijalvowmR5Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,215 +107,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "libvir-list@redhat.com" <libvir-list@redhat.com>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "He,
- Shaopeng" <shaopeng.he@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
+Cc: b.galvani@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Dec 10, 2019 at 05:16:08AM +0800, Alex Williamson wrote:
-> On Mon, 9 Dec 2019 01:22:12 -0500
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > On Fri, Dec 06, 2019 at 11:20:38PM +0800, Alex Williamson wrote:
-> > > On Fri, 6 Dec 2019 01:04:07 -0500
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >   
-> > > > On Fri, Dec 06, 2019 at 07:55:30AM +0800, Alex Williamson wrote:  
-> > > > > On Wed,  4 Dec 2019 22:26:50 -0500
-> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > > >     
-> > > > > > Dynamic trap bar info region is a channel for QEMU and vendor driver to
-> > > > > > communicate dynamic trap info. It is of type
-> > > > > > VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO and subtype
-> > > > > > VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO.
-> > > > > > 
-> > > > > > This region has two fields: dt_fd and trap.
-> > > > > > When QEMU detects a device regions of this type, it will create an
-> > > > > > eventfd and write its eventfd id to dt_fd field.
-> > > > > > When vendor drivre signals this eventfd, QEMU reads trap field of this
-> > > > > > info region.
-> > > > > > - If trap is true, QEMU would search the device's PCI BAR
-> > > > > > regions and disable all the sparse mmaped subregions (if the sparse
-> > > > > > mmaped subregion is disablable).
-> > > > > > - If trap is false, QEMU would re-enable those subregions.
-> > > > > > 
-> > > > > > A typical usage is
-> > > > > > 1. vendor driver first cuts its bar 0 into several sections, all in a
-> > > > > > sparse mmap array. So initally, all its bar 0 are passthroughed.
-> > > > > > 2. vendor driver specifys part of bar 0 sections to be disablable.
-> > > > > > 3. on migration starts, vendor driver signals dt_fd and set trap to true
-> > > > > > to notify QEMU disabling the bar 0 sections of disablable flags on.
-> > > > > > 4. QEMU disables those bar 0 section and hence let vendor driver be able
-> > > > > > to trap access of bar 0 registers and make dirty page tracking possible.
-> > > > > > 5. on migration failure, vendor driver signals dt_fd to QEMU again.
-> > > > > > QEMU reads trap field of this info region which is false and QEMU
-> > > > > > re-passthrough the whole bar 0 region.
-> > > > > > 
-> > > > > > Vendor driver specifies whether it supports dynamic-trap-bar-info region
-> > > > > > through cap VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR in
-> > > > > > vfio_pci_mediate_ops->open().
-> > > > > > 
-> > > > > > If vfio-pci detects this cap, it will create a default
-> > > > > > dynamic_trap_bar_info region on behalf of vendor driver with region len=0
-> > > > > > and region->ops=null.
-> > > > > > Vvendor driver should override this region's len, flags, rw, mmap in its
-> > > > > > vfio_pci_mediate_ops.    
-> > > > > 
-> > > > > TBH, I don't like this interface at all.  Userspace doesn't pass data
-> > > > > to the kernel via INFO ioctls.  We have a SET_IRQS ioctl for
-> > > > > configuring user signaling with eventfds.  I think we only need to
-> > > > > define an IRQ type that tells the user to re-evaluate the sparse mmap
-> > > > > information for a region.  The user would enumerate the device IRQs via
-> > > > > GET_IRQ_INFO, find one of this type where the IRQ info would also
-> > > > > indicate which region(s) should be re-evaluated on signaling.  The user
-> > > > > would enable that signaling via SET_IRQS and simply re-evaluate the    
-> > > > ok. I'll try to switch to this way. Thanks for this suggestion.
-> > > >   
-> > > > > sparse mmap capability for the associated regions when signaled.    
-> > > > 
-> > > > Do you like the "disablable" flag of sparse mmap ?
-> > > > I think it's a lightweight way for user to switch mmap state of a whole region,
-> > > > otherwise going through a complete flow of GET_REGION_INFO and re-setup
-> > > > region might be too heavy.  
-> > > 
-> > > No, I don't like the disable-able flag.  At what frequency do we expect
-> > > regions to change?  It seems like we'd only change when switching into
-> > > and out of the _SAVING state, which is rare.  It seems easy for
-> > > userspace, at least QEMU, to drop the entire mmap configuration and  
-> > ok. I'll try this way.
-> > 
-> > > re-read it.  Another concern here is how do we synchronize the event?
-> > > Are we assuming that this event would occur when a user switch to
-> > > _SAVING mode on the device?  That operation is synchronous, the device
-> > > must be in saving mode after the write to device state completes, but
-> > > it seems like this might be trying to add an asynchronous dependency.
-> > > Will the write to device_state only complete once the user handles the
-> > > eventfd?  How would the kernel know when the mmap re-evaluation is
-> > > complete.  It seems like there are gaps here that the vendor driver
-> > > could miss traps required for migration because the user hasn't
-> > > completed the mmap transition yet.  Thanks,
-> > > 
-> > > Alex  
-> > 
-> > yes, this asynchronous event notification will cause vendor driver miss
-> > traps. But it's supposed to be of very short period time. That's also a
-> > reason for us to wish the re-evaluation to be lightweight. E.g. if it's
-> > able to be finished before the first iterate, it's still safe.
-> 
-> Making the re-evaluation lightweight cannot solve the race, it only
-> masks it.
-> 
-> > But I agree, the timing is not guaranteed, and so it's best for kernel
-> > to wait for mmap re-evaluation to complete. 
-> > 
-> > migration_thread
-> >     |->qemu_savevm_state_setup
-> >     |   |->ram_save_setup
-> >     |   |   |->migration_bitmap_sync
-> >     |   |       |->kvm_log_sync
-> >     |   |       |->vfio_log_sync
-> >     |   |
-> >     |   |->vfio_save_setup
-> >     |       |->set_device_state(_SAVING)
-> >     |
-> >     |->qemu_savevm_state_pending
-> >     |   |->ram_save_pending
-> >     |   |   |->migration_bitmap_sync 
-> >     |   |      |->kvm_log_sync
-> >     |   |      |->vfio_log_sync
-> >     |   |->vfio_save_pending
-> >     |
-> >     |->qemu_savevm_state_iterate
-> >     |   |->ram_save_iterate //send pages
-> >     |   |->vfio_save_iterate
-> >     ...
-> > 
-> > 
-> > Actually, we previously let qemu trigger the re-evaluation when migration starts.
-> > And now the reason for we to wish kernel to trigger the mmap re-evaluation is that
-> > there're other two possible use cases:
-> > (1) keep passing through devices when migration starts and track dirty pages
-> >     using hardware IOMMU. Then when migration is about to complete, stop the
-> >     device and start trap PCI BARs for software emulation. (we made some
-> >     changes to let device stop ahead of vcpu )
-> 
-> How is that possible?  I/O devices need to continue to work until the
-> vCPU stops otherwise the vCPU can get blocked on the device.  Maybe QEMU
-hi Alex
-For devices like DSA [1], it can support SVM mode. In this mode, when a
-page fault happens, the Intel DSA device blocks until the page fault is
-resolved, if PRS is enabled; otherwise it is reported as an error.
+On 12/2/19 10:09 PM, Niek Linnenbank wrote:
+> The Allwinner H3 System on Chip contains multiple USB 2.0 bus
+> connections which provide software access using the Enhanced
+> Host Controller Interface (EHCI) and Open Host Controller
+> Interface (OHCI) interfaces. This commit adds support for
+> both interfaces in the Allwinner H3 System on Chip.
+>=20
+> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+> ---
+>   hw/arm/allwinner-h3.c    | 20 ++++++++++++++++++++
+>   hw/usb/hcd-ehci-sysbus.c | 17 +++++++++++++++++
+>   hw/usb/hcd-ehci.h        |  1 +
 
-Therefore, to pass through DSA into guest and do live migration with it,
-it is desired to stop DSA before stopping vCPU, as there may be an
-outstanding page fault to be resolved.
+Cc'ing Gerd, the maintainer of these files.
 
-During the period when DSA is stopped and vCPUs are still running, all the
-pass-through resources are trapped and emulated by host mediation driver until
-vCPUs stop.
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
+>   3 files changed, 38 insertions(+)
+>=20
+> diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
+> index 5566e979ec..afeb49c0ac 100644
+> --- a/hw/arm/allwinner-h3.c
+> +++ b/hw/arm/allwinner-h3.c
+> @@ -26,6 +26,7 @@
+>   #include "hw/sysbus.h"
+>   #include "hw/arm/allwinner-h3.h"
+>   #include "hw/misc/unimp.h"
+> +#include "hw/usb/hcd-ehci.h"
+>   #include "sysemu/sysemu.h"
+>  =20
+>   static void aw_h3_init(Object *obj)
+> @@ -183,6 +184,25 @@ static void aw_h3_realize(DeviceState *dev, Error **=
+errp)
+>       }
+>       sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccu), 0, AW_H3_CCU_BASE);
+>  =20
+> +    /* Universal Serial Bus */
+> +    sysbus_create_simple(TYPE_AW_H3_EHCI, AW_H3_EHCI0_BASE,
+> +                         s->irq[AW_H3_GIC_SPI_EHCI0]);
+> +    sysbus_create_simple(TYPE_AW_H3_EHCI, AW_H3_EHCI1_BASE,
+> +                         s->irq[AW_H3_GIC_SPI_EHCI1]);
+> +    sysbus_create_simple(TYPE_AW_H3_EHCI, AW_H3_EHCI2_BASE,
+> +                         s->irq[AW_H3_GIC_SPI_EHCI2]);
+> +    sysbus_create_simple(TYPE_AW_H3_EHCI, AW_H3_EHCI3_BASE,
+> +                         s->irq[AW_H3_GIC_SPI_EHCI3]);
+> +
+> +    sysbus_create_simple("sysbus-ohci", AW_H3_OHCI0_BASE,
+> +                         s->irq[AW_H3_GIC_SPI_OHCI0]);
+> +    sysbus_create_simple("sysbus-ohci", AW_H3_OHCI1_BASE,
+> +                         s->irq[AW_H3_GIC_SPI_OHCI1]);
+> +    sysbus_create_simple("sysbus-ohci", AW_H3_OHCI2_BASE,
+> +                         s->irq[AW_H3_GIC_SPI_OHCI2]);
+> +    sysbus_create_simple("sysbus-ohci", AW_H3_OHCI3_BASE,
+> +                         s->irq[AW_H3_GIC_SPI_OHCI3]);
+> +
+>       /* UART */
+>       if (serial_hd(0)) {
+>           serial_mm_init(get_system_memory(), AW_H3_UART0_REG_BASE, 2,
+> diff --git a/hw/usb/hcd-ehci-sysbus.c b/hw/usb/hcd-ehci-sysbus.c
+> index 020211fd10..174c3446ef 100644
+> --- a/hw/usb/hcd-ehci-sysbus.c
+> +++ b/hw/usb/hcd-ehci-sysbus.c
+> @@ -145,6 +145,22 @@ static const TypeInfo ehci_exynos4210_type_info =3D =
+{
+>       .class_init    =3D ehci_exynos4210_class_init,
+>   };
+>  =20
+> +static void ehci_aw_h3_class_init(ObjectClass *oc, void *data)
+> +{
+> +    SysBusEHCIClass *sec =3D SYS_BUS_EHCI_CLASS(oc);
+> +    DeviceClass *dc =3D DEVICE_CLASS(oc);
+> +
+> +    sec->capsbase =3D 0x0;
+> +    sec->opregbase =3D 0x10;
+> +    set_bit(DEVICE_CATEGORY_USB, dc->categories);
+> +}
+> +
+> +static const TypeInfo ehci_aw_h3_type_info =3D {
+> +    .name          =3D TYPE_AW_H3_EHCI,
+> +    .parent        =3D TYPE_SYS_BUS_EHCI,
+> +    .class_init    =3D ehci_aw_h3_class_init,
+> +};
+> +
+>   static void ehci_tegra2_class_init(ObjectClass *oc, void *data)
+>   {
+>       SysBusEHCIClass *sec =3D SYS_BUS_EHCI_CLASS(oc);
+> @@ -267,6 +283,7 @@ static void ehci_sysbus_register_types(void)
+>       type_register_static(&ehci_platform_type_info);
+>       type_register_static(&ehci_xlnx_type_info);
+>       type_register_static(&ehci_exynos4210_type_info);
+> +    type_register_static(&ehci_aw_h3_type_info);
+>       type_register_static(&ehci_tegra2_type_info);
+>       type_register_static(&ehci_ppc4xx_type_info);
+>       type_register_static(&ehci_fusbh200_type_info);
+> diff --git a/hw/usb/hcd-ehci.h b/hw/usb/hcd-ehci.h
+> index 0298238f0b..edb59311c4 100644
+> --- a/hw/usb/hcd-ehci.h
+> +++ b/hw/usb/hcd-ehci.h
+> @@ -342,6 +342,7 @@ typedef struct EHCIPCIState {
+>   #define TYPE_SYS_BUS_EHCI "sysbus-ehci-usb"
+>   #define TYPE_PLATFORM_EHCI "platform-ehci-usb"
+>   #define TYPE_EXYNOS4210_EHCI "exynos4210-ehci-usb"
+> +#define TYPE_AW_H3_EHCI "aw-h3-ehci-usb"
+>   #define TYPE_TEGRA2_EHCI "tegra2-ehci-usb"
+>   #define TYPE_PPC4xx_EHCI "ppc4xx-ehci-usb"
+>   #define TYPE_FUSBH200_EHCI "fusbh200-ehci-usb"
+>=20
 
-[1] https://software.intel.com/sites/default/files/341204-intel-data-streaming-accelerator-spec.pdf
-
-
-> should assume all mmaps should be dropped on vfio device after we pass
-> some point of the migration process.
-> 
-yes, it should be workable for the use case of DSA.
-
-> If there are a fixed set of mmap settings for a region and discrete
-> conditions under which they become active (ex. switch device to SAVING
-> mode) then QEMU could choose the right mapping itself and we wouldn't
-> need to worry about this asynchronous signaling problem, it would just
-> be defined as part of the protocol userspace needs to use.
->
-It's ok to let QEMU trigger dynamic trap on certain condition (like switching
-device to SAVING mode), but it seems that there's no fixed set of mmap settings
-for a region.
-For example, some devices may want to trap the whole BARs, but some devices
-only requires to trap a range of pages in a BAR for performance consideration.
-
-If the "disable-able" flag is not preferable, maybe re-evaluation way is
-the only choice? But it is a burden to ask for re-evaluation if they are
-not required.
-
-What about introducing a "region_bitmask" in ctl header of the migration region?
-when QEMU writes a region index to the "region_bitmask", it can read back
-from this field a bitmask to know which mmap to disable.
-
-> > (2) performance optimization. There's an example in GVT (mdev case): 
-> >     PCI BARs are passed through on vGPU initialization and are mmaped to a host
-> >     dummy buffer. Then after initialization done, start trap of PCI BARs of
-> >     vGPUs and start normal host mediation. The initial pass-through can save
-> >     1000000 times of mmio trap.
-> 
-> Much of this discussion has me worried that many assumptions are being
-> made about the user and device interaction.  Backwards compatible
-> behavior is required.  If a mdev device presents an initial sparse mmap
-> capability for this acceleration, how do you support an existing
-> userspace that doesn't understand the new dynamic mmap semantics and
-> continues to try to operate with the initial sparse mmap?  Doesn't this
-> introduce another example of the raciness of the device trying to
-> switch mmaps?  Seems that if QEMU doesn't handle the eventfd with
-> sufficient timeliness the switch back to trap behavior could miss an
-> important transaction.  This also seems like an optimization targeted
-> at VMs running for only a short time, where it's not obvious to me that
-> GVT-g overlaps those sorts of use cases.  How much initialization time
-> is actually being saved with such a hack?  Thanks,
->
-It can save about 4s initialization time with such a hack. But you are
-right, the backward compatibility is a problem and we are not going to
-upstream that. Just an example to show the usage.
-It's fine if we drop the way of asynchronous kernel notification.
-
-Thanks
-Yan
 
