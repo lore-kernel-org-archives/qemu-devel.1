@@ -2,85 +2,87 @@ Return-Path: <SRS0=2P1T=2A=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29EE2C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 16:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D33C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:01:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5F4F2073D
-	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 16:57:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EE972077B
+	for <qemu-devel@archiver.kernel.org>; Tue, 10 Dec 2019 17:01:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qGezvISl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5F4F2073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrvvEQqZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE972077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieipd-0008Ig-07
-	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 11:57:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60416)
+	id 1ieisi-0002l1-5r
+	for qemu-devel@archiver.kernel.org; Tue, 10 Dec 2019 12:01:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34278)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jean-philippe@linaro.org>) id 1ieiid-0000AB-PF
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:50:40 -0500
+ (envelope-from <alex.williamson@redhat.com>) id 1ieiqN-0001Fs-UY
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:58:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jean-philippe@linaro.org>) id 1ieiic-0006de-PE
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:50:39 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41111)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jean-philippe@linaro.org>)
- id 1ieiic-0006dL-Hw
- for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:50:38 -0500
-Received: by mail-wr1-x444.google.com with SMTP id c9so20910124wrw.8
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 08:50:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=OlfjqJ3/LjH+g5cdCQ/k0akt9iUKtH6iUQLY+fs5ZCM=;
- b=qGezvISlVmrWMXOA1mS735B4gad1o68cfJ+LwEuX+V7e9Ev0R/9siXzsfbfyApCFhK
- 1c5UXBmu/OT1IRn2lzF9Ao6FnzmgAbRfjFglthbVYHBmvDoEc6b+UDgwe24L9OX5uvi+
- w+6galaekwHD0liVsafcK1mIZpzBnYsZrCbd3Lzp6rZlKxb3y0Av52pgMurWs2pkP684
- 1mWNs//a1A5jEyP/THJACCanF4h1ZtxhcvLKGzouyufnyIxavZCmcMOF9Z6NkwC14k3G
- GACHLLra0EDvtO9pdbVknKaKZtlTl/qcHXYtSsSSu8tYHpGO9xPShjLujukG2cBKsGqs
- tLdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=OlfjqJ3/LjH+g5cdCQ/k0akt9iUKtH6iUQLY+fs5ZCM=;
- b=Ili4IucCKZtoYovQlIDUt4xwp9/SazBKwF7dSQLuCdI74DTK2Z847Y8dEV/gthOhkq
- 2BnUL4DycNnsWiDrSRQNE48iuHb/whEtsswOTdkUN5JS4ZL1Tpph4+0oFc6ZF5H2tLVv
- Vsmkh0kEmvk4OT+Z+lYWVIq7hkirZycFkcX4Nc0MjVJ99Dv346ghKfNAeEXRwA0X1wVT
- vWMEIQI4wGPqg4gAv8JejQVVMRn2+8bmpQInYdaMRGCQvuSSy0eOJnyJOD/er9z/hhon
- Mbw3l4F/BgQDzM5QTdsRzpMSduYun+ixk2x03ZjHOdrmDRuDmjzksVQ/xnAcQm2SgCMu
- vbRg==
-X-Gm-Message-State: APjAAAWo/zLSKdU996Tb433NGnrNWdHgmMg7E7RzFl0Ms2msugmt90FB
- rGXwVH6P7FS/3/jg7R8hjqVBKA==
-X-Google-Smtp-Source: APXvYqxutjvagaAitDymFgNYzAxJjxXMx8MD/eBp205r+vchYhXoEY+d33R7oUoTyIsZmQ87JFx7jw==
-X-Received: by 2002:a5d:5308:: with SMTP id e8mr4359722wrv.77.1575996637592;
- Tue, 10 Dec 2019 08:50:37 -0800 (PST)
-Received: from myrica (adsl-84-227-176-239.adslplus.ch. [84.227.176.239])
- by smtp.gmail.com with ESMTPSA id j12sm3978809wrw.54.2019.12.10.08.50.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 10 Dec 2019 08:50:37 -0800 (PST)
-Date: Tue, 10 Dec 2019 17:50:32 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Eric Auger <eric.auger@redhat.com>
-Subject: Re: [PATCH for-5.0 v11 19/20] pc: Add support for virtio-iommu-pci
-Message-ID: <20191210165032.GQ277340@myrica>
-References: <20191122182943.4656-1-eric.auger@redhat.com>
- <20191122182943.4656-20-eric.auger@redhat.com>
+ (envelope-from <alex.williamson@redhat.com>) id 1ieiqK-0000Vg-5o
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:58:37 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30057
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1ieiqK-0000VH-10
+ for qemu-devel@nongnu.org; Tue, 10 Dec 2019 11:58:36 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1575997114;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kloBvw8RGWK1lP3SGtf1eARoYVSiVMuq6V2S364vtNA=;
+ b=MrvvEQqZ9IjHgdWhnGrLfZ9sNtPcN7QYa1fx9SLjWFrM5vYLWv2tHPpYLgVrzVzLR9Mt93
+ oF0QnKIa1ktTt5G6g2N8U99IPbE+/LcM4C1oABEXzZOzmIG2EYg/Ty5figCyC44hy41q/G
+ mZ4DYI5GFbu5TfY51ILoUVQvk2rjFJA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-a3Q0C6xYPXGoFovyHN5gSQ-1; Tue, 10 Dec 2019 11:58:31 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38AA41005512;
+ Tue, 10 Dec 2019 16:58:30 +0000 (UTC)
+Received: from x1.home (ovpn04.gateway.prod.ext.phx2.redhat.com [10.5.9.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3154360BE1;
+ Tue, 10 Dec 2019 16:58:25 +0000 (UTC)
+Date: Tue, 10 Dec 2019 09:58:24 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [RFC PATCH 1/9] vfio/pci: introduce mediate ops to intercept
+ vfio-pci ops
+Message-ID: <20191210095824.5c4cdad7@x1.home>
+In-Reply-To: <20191210024422.GA27331@joy-OptiPlex-7040>
+References: <20191205032419.29606-1-yan.y.zhao@intel.com>
+ <20191205032536.29653-1-yan.y.zhao@intel.com>
+ <20191205165519.106bd210@x1.home>
+ <20191206075655.GG31791@joy-OptiPlex-7040>
+ <20191206142226.2698a2be@x1.home>
+ <20191209034225.GK31791@joy-OptiPlex-7040>
+ <20191209170339.2cb3d06e@x1.home>
+ <20191210024422.GA27331@joy-OptiPlex-7040>
+Organization: Red Hat
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191122182943.4656-20-eric.auger@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: a3Q0C6xYPXGoFovyHN5gSQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,29 +94,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
- tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
- quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
- armbru@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- dgilbert@redhat.com, eric.auger.pro@gmail.com
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "He, 
+ Shaopeng" <shaopeng.he@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 22, 2019 at 07:29:42PM +0100, Eric Auger wrote:
-> The virtio-iommu-pci is instantiated through the -device QEMU
-> option. However if instantiated it also requires an IORT ACPI table
-> to describe the ID mappings between the root complex and the iommu.
-> 
-> This patch adds the generation of the IORT table if the
-> virtio-iommu-pci device is instantiated.
-> 
-> We also declare the [0xfee00000 - 0xfeefffff] MSI reserved region
-> so that it gets bypassed by the IOMMU.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+On Mon, 9 Dec 2019 21:44:23 -0500
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-It would be nice to factor the IORT code with arm, but this looks OK.
+> > > > > Currently, yes, i40e has build dependency on vfio-pci.
+> > > > > It's like this, if i40e decides to support SRIOV and compiles in vf
+> > > > > related code who depends on vfio-pci, it will also have build dependency
+> > > > > on vfio-pci. isn't it natural?    
+> > > > 
+> > > > No, this is not natural.  There are certainly i40e VF use cases that
+> > > > have no interest in vfio and having dependencies between the two
+> > > > modules is unacceptable.  I think you probably want to modularize the
+> > > > i40e vfio support code and then perhaps register a table in vfio-pci
+> > > > that the vfio-pci code can perform a module request when using a
+> > > > compatible device.  Just and idea, there might be better options.  I
+> > > > will not accept a solution that requires unloading the i40e driver in
+> > > > order to unload the vfio-pci driver.  It's inconvenient with just one
+> > > > NIC driver, imagine how poorly that scales.
+> > > >     
+> > > what about this way:
+> > > mediate driver registers a module notifier and every time when
+> > > vfio_pci is loaded, register to vfio_pci its mediate ops?
+> > > (Just like in below sample code)
+> > > This way vfio-pci is free to unload and this registering only gives
+> > > vfio-pci a name of what module to request.
+> > > After that,
+> > > in vfio_pci_open(), vfio-pci requests the mediate driver. (or puts
+> > > the mediate driver when mediate driver does not support mediating the
+> > > device)
+> > > in vfio_pci_release(), vfio-pci puts the mediate driver.
+> > > 
+> > > static void register_mediate_ops(void)
+> > > {
+> > >         int (*func)(struct vfio_pci_mediate_ops *ops) = NULL;
+> > > 
+> > >         func = symbol_get(vfio_pci_register_mediate_ops);
+> > > 
+> > >         if (func) {
+> > >                 func(&igd_dt_ops);
+> > >                 symbol_put(vfio_pci_register_mediate_ops);
+> > >         }
+> > > }
+> > > 
+> > > static int igd_module_notify(struct notifier_block *self,
+> > >                               unsigned long val, void *data)
+> > > {
+> > >         struct module *mod = data;
+> > >         int ret = 0;
+> > > 
+> > >         switch (val) {
+> > >         case MODULE_STATE_LIVE:
+> > >                 if (!strcmp(mod->name, "vfio_pci"))
+> > >                         register_mediate_ops();
+> > >                 break;
+> > >         case MODULE_STATE_GOING:
+> > >                 break;
+> > >         default:
+> > >                 break;
+> > >         }
+> > >         return ret;
+> > > }
+> > > 
+> > > static struct notifier_block igd_module_nb = {
+> > >         .notifier_call = igd_module_notify,
+> > >         .priority = 0,
+> > > };
+> > > 
+> > > 
+> > > 
+> > > static int __init igd_dt_init(void)
+> > > {
+> > > 	...
+> > > 	register_mediate_ops();
+> > > 	register_module_notifier(&igd_module_nb);
+> > > 	...
+> > > 	return 0;
+> > > }  
+> > 
+> > 
+> > No, this is bad.  Please look at MODULE_ALIAS() and request_module() as
+> > used in the vfio-platform for loading reset driver modules.  I think
+> > the correct approach is that vfio-pci should perform a request_module()
+> > based on the device being probed.  Having the mediation provider
+> > listening for vfio-pci and registering itself regardless of whether we
+> > intend to use it assumes that we will want to use it and assumes that
+> > the mediation provider module is already loaded.  We should be able to
+> > support demand loading of modules that may serve no other purpose than
+> > providing this mediation.  Thanks,  
+> hi Alex
+> Thanks for this message.
+> So is it good to create a separate module as mediation provider driver,
+> and alias its module name to "vfio-pci-mediate-vid-did".
+> Then when vfio-pci probes the device, it requests module of that name ?
 
-Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+I think this would give us an option to have the mediator as a separate
+module, but not require it.  Maybe rather than a request_module(),
+where if we follow the platform reset example we'd then expect the init
+code for the module to register into a list, we could do a
+symbol_request().  AIUI, this would give us a reference to the symbol
+if the module providing it is already loaded, and request a module
+(perhaps via an alias) if it's not already load.  Thanks,
+
+Alex
+
 
