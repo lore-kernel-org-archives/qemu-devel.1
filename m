@@ -2,81 +2,63 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F49AC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 15:28:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C65ACC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 15:36:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B663222C4
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 15:28:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YRP5QjVp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B663222C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9C7042077B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 15:36:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C7042077B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if3ud-0005uE-6m
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 10:28:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59973)
+	id 1if42i-0007sw-Qq
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 10:36:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40407)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <coiby.xu@gmail.com>) id 1if3tc-0004st-6c
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:27:25 -0500
+ (envelope-from <clg@kaod.org>) id 1if41v-0007S1-W9
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:36:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <coiby.xu@gmail.com>) id 1if3ta-0007pu-K9
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:27:23 -0500
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:40415)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1if3ta-0007n3-9m
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:27:22 -0500
-Received: by mail-lj1-x244.google.com with SMTP id s22so24527153ljs.7
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 07:27:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=le6qsglN4BF7awIWgtFI0HxiVdmLA446rknNqRYCMAE=;
- b=YRP5QjVpDxVBROKYjDVhJTIae6XlvZSjxToO7u+DdQbidDVpmLz4PTBzU/645Vg8SD
- ZMKlRpmyt3Jay5EdA65Sz9xhi570c+gjCcfWbc7bBBRBho6bY89BN8WXuuJ3XGMvFnx0
- uVVCBw/i4t/pys5ON/SWcoqx6J6fBDcdH0gMoCECzFkbWbU9Hv28V6wlf+w9nfl6rFnJ
- aBjX5gu3uohy95w5Ql6p6nuKE7JGhMfR2407dmCRVjQ4YXOqknFjJy4hpIcOCdULyLh8
- fZsXTCtbAABvcG2paKORE4Y3zZJVJ9tpQMoAq+IR+SbGK+nKziTlSvrwb6EbedlHQQYl
- rEbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=le6qsglN4BF7awIWgtFI0HxiVdmLA446rknNqRYCMAE=;
- b=gVA7fu7/AHAPtd2CphDvbqH+01xSwRNG20vR2ve/OWcHXHpOpDFZ9b32BpelguNpcR
- ZHnabjfEEEvCMCmhoYo7gSr5wdYC/umgK7d5d+3rZgl78bQ+s4cl+tepnkNf/9N3vA9C
- YdiRWzZmAQ0qWqo/hWs3qnVVrpha+ymbFruEWJ3wOmCZ4q1mAZHVQbeh4r+JFbUKlECs
- 2zhUkzKgzKCudWpnKFgN1K2eTQ4C1IlFYjY2Y1VIGMUkfPitbzPtofZttL0bRJHl0ho5
- +bkGagIY/DGIxXtCJvcevLoSiQRZyOQMEs8nMFJr2pwMLXiiw/gWekIHO3npmt9pIUa3
- 1MXw==
-X-Gm-Message-State: APjAAAVoaXiFgC9xuW82K/h6GDgj/LPpN221YqCTk/thEd5jk2gUI82w
- D9Pm4vlHMw+wBQLqA0hqBTlCI7YFbNCo2+edd40=
-X-Google-Smtp-Source: APXvYqxBaYBhsEHZopKc7fm6jpJ7p0eK+d34zSqttrG6Q9nAowL7Su4dwzgt1j6wKpHAjBtZhLNAepoWzB0QrocrDpA=
-X-Received: by 2002:a05:651c:239:: with SMTP id
- z25mr2545171ljn.48.1576078040283; 
- Wed, 11 Dec 2019 07:27:20 -0800 (PST)
+ (envelope-from <clg@kaod.org>) id 1if41u-0002Z9-Rj
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:35:59 -0500
+Received: from 14.mo5.mail-out.ovh.net ([188.165.51.82]:59248)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1if41u-0002Og-Lw
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:35:58 -0500
+Received: from player690.ha.ovh.net (unknown [10.108.42.176])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id D24D7262628
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 16:35:48 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player690.ha.ovh.net (Postfix) with ESMTPSA id 1717AD0F4835;
+ Wed, 11 Dec 2019 15:35:41 +0000 (UTC)
+Subject: Re: [PATCH] ppc/pnv: Make PnvXScomInterface an incomplete type
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <157607473444.179018.14127987124523137347.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <c66981b1-0be1-6f59-8dd7-5f4744c506e1@kaod.org>
+Date: Wed, 11 Dec 2019 16:35:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <CAJAkqrXyeVn4iy7NzkR__BS9q9xT4ZWcjJszNBaSKH0U57c4hw@mail.gmail.com>
- <20191114111429.GC580024@stefanha-x1.localdomain>
-In-Reply-To: <20191114111429.GC580024@stefanha-x1.localdomain>
-From: Coiby Xu <coiby.xu@gmail.com>
-Date: Wed, 11 Dec 2019 23:25:32 +0800
-Message-ID: <CAJAkqrULM=wjDEVV8kZBU4u1ag4ERiKq3z5yzRus3vqwsx_a4A@mail.gmail.com>
-Subject: Re: How to extend QEMU's vhost-user tests after implementing
- vhost-user-blk device backend
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::244
+In-Reply-To: <157607473444.179018.14127987124523137347.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 924363826463017811
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelhedgjeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledtrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 188.165.51.82
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,90 +70,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+On 11/12/2019 15:32, Greg Kurz wrote:
+> PnvXScomInterface is an interface instance. It should never be
+> dereferenced. Drop the dummy type definition for extra safety,
+> which is the common practice with QOM interfaces.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  include/hw/ppc/pnv_xscom.h |    4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+> index 1c1d76bf9be5..b738011ab205 100644
+> --- a/include/hw/ppc/pnv_xscom.h
+> +++ b/include/hw/ppc/pnv_xscom.h
+> @@ -22,9 +22,7 @@
+>  
+>  #include "qom/object.h"
+>  
+> -typedef struct PnvXScomInterface {
+> -    Object parent;
+> -} PnvXScomInterface;
+> +typedef struct PnvXScomInterface PnvXScomInterface;
+>  
+>  #define TYPE_PNV_XSCOM_INTERFACE "pnv-xscom-interface"
+>  #define PNV_XSCOM_INTERFACE(obj) \
 
-I'm now writing the tests for vhost-user-blk device based on
-tests/virtio-blk-test.c. But block_resize command doesn't apply to
-vhost-user-blk device.
+We should use INTERFACE_CHECK() here.
 
-After launching vhost-user backend server, I type the following
-command to connect to it
+C.
 
-(qemu) chardev-add socket,id=char1,path=/tmp/vhost-user-blk_vhost.socket
-(qemu) object_add memory-backend-memfd,id=mem,size=256M,share=on
-(qemu) device_add vhost-user-blk-pci,id=blk0,chardev=char1
-(qemu) block_resize blk0 512
-Error: Cannot find device=blk0 nor node_name=
+ 
 
-QEMU can't find the device although in the guest OS I can already
-mount /dev/vda. And `info block` doesn't list the newly added
-vhost-user-blk device,
-(qemu) info block
-disk (#block154): dpdk.img (raw)
-    Attached to:      /machine/peripheral-anon/device[0]
-    Cache mode:       writeback
-
-floppy0: [not inserted]
-    Attached to:      /machine/unattached/device[17]
-    Removable device: not locked, tray closed
-
-sd0: [not inserted]
-    Removable device: not locked, tray close
-
-It seems `info block` and `block_resize` only work with `drive_add`
-which is not necessary for vhost-user-blk device. Should I let QEMU
-support adding vhost-user backend device in the way similar to adding
-NBD device(`drive_add -n buddy
-file.driver=nbd,file.host=localhost,file.port=49153,file.export=disk,node-name=nbd_client1`),
-i.e., a drive can be added via `drive_add -n buddy
-file.driver=vhost-user,file.sock=/tmp/vhost-user-blk_vhost.socket,node-name=vhost_user_client1`?
-
-Thank you!
-
-
-On Thu, Nov 14, 2019 at 7:14 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> On Wed, Nov 13, 2019 at 05:23:46PM +0800, Coiby Xu wrote:
-> > I've implemented vhost-user-blk device backend by following
-> > https://wiki.qemu.org/Google_Summer_of_Code_2019#vhost-user-blk_device_backend.
-> > But I'm not sure what kind of tests I should write or to extend to
-> > take advantage of implemented vhost-user-blk device backend. The
-> > existing two tests related to vhost user are tests/vhost-user-bridge.c
-> > and tests/vhost-user-test.c both of which act as vhost user server to
-> > test QEMU's implementation of vhost user client. Am I supposed to
-> > extend these two tests? Could you elaborate on the final step "Extend
-> > QEMU's vhost-user tests to take advantage of your vhost-user-blk
-> > device backend"?
->
-> Hi Coiby,
-> The following tests/virtio-blk-test.c test cases will also work with
-> vhost-user-blk: basic, indirect, idx, nxvirtq.  The other test cases
-> may require more work because they send QMP commands like block_resize
-> or device_add virtio-blk-pci.
->
-> In theory block_resize should work because the vhost-user-blk device
-> backend can send a VIRTIO Configuration Space changed interrupt
-> (VHOST_USER_SLAVE_CONFIG_CHANGE_MSG), but I haven't checked if this code
-> path is fully implemented.
->
-> In order to reuse existing test cases you could add new initialization
-> code to virtio-blk-test.c that:
-> 1. Starts the vhost-user-blk device backend
-> 2. Adds a -device vhost-user-blk-pci connected to that device backend
->
-> Please post your patches to qemu-devel even if you don't have test cases
-> yet.  That way you can get review feedback earlier.
->
-> Stefan
-
-
-
--- 
-Best regards,
-Coiby
 
