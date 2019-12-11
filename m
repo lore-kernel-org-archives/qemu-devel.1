@@ -3,43 +3,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D51C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63566C00454
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:55:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00EFD214AF
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:54:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00EFD214AF
+	by mail.kernel.org (Postfix) with ESMTPS id 36D10214AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:55:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D10214AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if3O1-0001xo-2K
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:54:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54479)
+	id 1if3OX-0002jR-BI
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:55:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58482)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1if3NB-00010R-NP
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:53:54 -0500
+ (envelope-from <laurent@vivier.eu>) id 1if3Ng-0001m7-TY
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:54:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1if3NA-000571-Gb
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:53:53 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:38719)
+ (envelope-from <laurent@vivier.eu>) id 1if3Nf-0005o9-Ry
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:54:24 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:52701)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1if3NA-00054V-27
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:53:52 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1if3Nf-0005lv-HB
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:54:23 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
  (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MRn0U-1iHVvv3tJC-00TCYh; Wed, 11 Dec 2019 15:53:38 +0100
-Subject: Re: [PATCH v2 4/6] linux-user: log page table changes under -d page
+ 1MD9jV-1iW0pu3DSz-009COU; Wed, 11 Dec 2019 15:54:12 +0100
+Subject: Re: [PATCH v2 5/6] linux-user: convert target_munmap debug to a
+ tracepoint
 To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
 References: <20191205122518.10010-1-alex.bennee@linaro.org>
- <20191205122518.10010-5-alex.bennee@linaro.org>
+ <20191205122518.10010-6-alex.bennee@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +84,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <2431ddc6-8d8a-8151-426f-8284701362c0@vivier.eu>
-Date: Wed, 11 Dec 2019 15:53:28 +0100
+Message-ID: <0dbd7631-2258-83e8-fc96-3265cbd8d8d1@vivier.eu>
+Date: Wed, 11 Dec 2019 15:54:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191205122518.10010-5-alex.bennee@linaro.org>
+In-Reply-To: <20191205122518.10010-6-alex.bennee@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Ezm/6GMHOZEEdbRUb7KNI44d0Wg6c3nPKBZn0rfJJy/9mlGwW5w
- wRM3L41siP8+AfgXlmuoXuNHySYfaMFHlfbZB8xRre5jG54HXXi3e0RjWVty8ONLRtZqr5p
- 1J9+SK0BpOnH39Dxc6dZCLU1svCEvFxrucH5XgKIPtJIHxVrSZWr1SUUxqNQAIqc7zOT0nr
- dAaaUqQF0aZ/OxLUrIqug==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6o/iOmtGVkw=:cHNhxb3KG2gcuVnd93XWN8
- kca8zLxh/fWga0yDvyBbcAjsaZ4rx4iWgTjDTcEa0+Z40z/wfvhOrjySNnfY9cYCtDzrkeS5H
- 9qLvnG3JEPXN899a5oSJTwWhWaBS6AM1iQ4AhqnQ03MKYuWdsa4gxeIdTRrCPf8G0nDNhelUC
- CRIoO48OhcwJzGbCHdtkNEtEJJzaMHV4kD1j+qOryBIqbnW5i/WbkDmFfnf9ysO+czcEvHRw8
- CMuRecs0b8kvZoiWU0cN8BENA+IPVStsMslImEnPOogXsohloWC2PgZLKxOUTPP20WrFSFzq8
- FDrppReQgK54rYzkGJG7qCrV/vbdcClohVeeszUhHEQDtaALrT8YhopgsDVQf5i9s0F8EbO5n
- wnazywU5yRlUVkowxn57lnRopppvfotTF7R5p6KK5PcVp7Q9gugjKUvhpyzo+NdoIoPfg0quy
- E0bMraYq26XeJwsnieR9PZzLPitlzSjJ82Ui3sa59gY9DP5DoFcHxjA+wLXbAaiufZEAMjQbr
- nxHYk3bSNl8EDv4dyGm8JAZu1quQQwaLtiPxBX9iH3Q9OFgKMwQGyA6bE8ry3QWYIpbsuP0Gn
- YC8lYoPtF/ot2km0rFLlMMH+v71ZwxSBgZdNACZ6Su8VdN0RyZM9LXwj42Vd/nRfkq6Y1aXdA
- cLeuOT9GeKr6eoobMNfCSodWTtndcAwlPKVz5z83f05cNAWa10oa0caw+DPFXYHNabAyREN9m
- 8EEDKYV++sEc/GBmEF+Asrw3O+KYFOh4yzcrKZ6kcSdt58jovMYWsr7CX613TC6fySgkP7Bh0
- SsdiZoUKutv936yD/0CA+7xQ6dv3cfuJuBkfFthJI/h56A+xE71hwCnmeRfu7VUMsZX0PXjDy
- x1MJXzEjfnbiME/VdZQavAXixA+CVwp2M5FhlfGJs=
+X-Provags-ID: V03:K1:ijAoMNHuLinYlIzmu89C3X46VfT+qfDBQvJqK9p0AfQD5JQKwpH
+ zgRXVYGH+G6vb6A0JvG/Eh+pSeMtus6BEWUxAJc7My+i3TQZpL63+5+YdplgXMlle9sxdnj
+ nA6U52HZxUKluMk/hjzNIjg/1qUGPmJVW5QznoQRJoBkvLONGPZG1EuYEI2+BoxMIrIVaNK
+ VHma5cyREYorEkO4BceGA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/v0vA8yhAyo=:fnd/sIrJwrwGOpJtcjEGOr
+ sWsP86YaSAqwNyA9v5y6gzmDaLbgaL2I3ZPQv80W7PtvcaIJNnzPFEZTk/LmeDWzr1jLvLFMF
+ jLsSOguyBQSF6v1sSQ0t2f65sZlUc90IijuTBUu1ye4XHrCTF7IMZTz57+hwWGGWhKsOJ8y6L
+ EXpfNjhhGrD8D7rYMbySxys6SefWnkD2EKIdlxM7m6/8kkLsW2jAIppTs0JnSBr/ATfwb/yHc
+ SB0rMqK6xqj8izzvQuPe8Td+iMCPAqyegEPNsGqGpLoEmLcRv8TY0T+cUb/n2lhPb6nU+gr3o
+ bIKhl8O9V7/bx+B7FKmbXEzl2jyi2hdYvUtJ8cPklXbOQ5m7r5f+uKmnjb+X8Cn13VLg0CYaF
+ gbdXXWYxB77aLREtALCD2UiPu32Z+p5zif06EEFGi/p3Ii/hRe9UU9wBw8nmsJZRE/DU5BHDq
+ jWkfpoukQrKOB5QcKXzwNaOtqbPysdhlmFc9mo5RQhDJ+28AUjusbsSL859fn8HJAfja1H6QI
+ bNByr73y60xNNZ8JXpVfkfQHT16Gz32r1tpvTW+ax3LvJNuk9SxDd2VxRUpzThHap5fSVI1bF
+ c/aI0ElClKD2jTrBYjqaWHmzu4NMTTC/FoR8mMzphI8ABEbo6Og3ijG1lR9Hzwww6w//njAj1
+ gT1BDUEIPJBbPR5p55lxVmaVBu5kNT4F3Nah5tLpc6HMd+RetON8tZMtCr/VxgXwivVuZItFG
+ 5enRQYNsAgUyG6P3B1lhRaAREXC5cA8zFZhiDzxGDud7OoiLt0Lh8TpfOlnMxvcjYfrijtL0G
+ eC7hvBOMCeH0rQ7Zz3drHv2WdVU7cR7wm2uqd4aiYNUpt/gf+Hb23ByQVkVSDZMJ95mmfUyad
+ 5tbWF2BOy4XpzjFSs1QA==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.135
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,32 +125,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>
+Cc: Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 05/12/2019 à 13:25, Alex Bennée a écrit :
-> The CPU_LOG_PAGE flag is woefully underused and could stand to do
-> extra duty tracking page changes. If the user doesn't want to see the
-> details as things change they still have the tracepoints available.
-> 
-> We push the locking into log_page_dump and pass a reason for the
-> banner text.
+> Convert the final bit of DEBUG_MMAP to a tracepoint and remove the
+> last remanents of the #ifdef hackery.
 > 
 > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  linux-user/mmap.c       | 9 ++-------
+>  linux-user/trace-events | 1 +
+>  2 files changed, 3 insertions(+), 7 deletions(-)
 > 
-> ---
->   v2
->     - reworded banner text
->     - moved locking into helper
->     - converted stray calls of page_dump
-> ---
->  include/exec/log.h | 5 ++++-
->  bsd-user/main.c    | 2 +-
->  linux-user/main.c  | 2 +-
->  linux-user/mmap.c  | 8 ++++----
->  4 files changed, 10 insertions(+), 7 deletions(-)
 
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
