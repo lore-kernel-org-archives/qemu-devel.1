@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74462C2D0C6
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:08:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3914C00454
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:09:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 438DA20836
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:08:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1F0220836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:09:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="ACwC6clb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 438DA20836
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="tO6TuIoq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1F0220836
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if4Xg-0005VR-9l
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:08:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42535)
+	id 1if4YU-0005zL-P5
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:09:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1if4UQ-0002wq-Nm
+ (envelope-from <damien.hedde@greensocs.com>) id 1if4UQ-0002wV-He
  for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1if4UP-0003wx-CA
+ (envelope-from <damien.hedde@greensocs.com>) id 1if4UP-0003wX-8u
  for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:26 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:49348)
+Received: from beetle.greensocs.com ([5.135.226.135]:49364)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1if4UP-0003uV-1u
+ id 1if4UO-0003uk-Nq
  for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:25 -0500
 Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
  [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPS id 08FC196EF2;
- Wed, 11 Dec 2019 16:05:22 +0000 (UTC)
+ by beetle.greensocs.com (Postfix) with ESMTPS id 8239096F50;
+ Wed, 11 Dec 2019 16:05:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
  s=mail; t=1576080323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+9uqqC7MBXJw6x4IMhmhvrJzByBygJmHS8WnEfIWnkU=;
- b=ACwC6clbcuEOwrEfPBzMD69UTGdGLofoUDJBLdIHtqZju3UkkhAiORNbXsZjE7AS+QTZ05
- PDWcen6SW/I/UsisZ0d8MaMlm4soEtqewoHko953/55MLymC8wmmLL9vK2Ireq5grBQrdW
- 8KD3LlCNAPvDcVVgEfZfkJ7kjfOfwp8=
+ bh=7sPz7oVBNzeMeWcyKT2i75rgmDRiD8IxeGkrlkSUefk=;
+ b=tO6TuIoqsuJcG0Qc4C8CRMlBenX1SW8Auq7TFTlGz2DfpQSVKkq6oPpEkaWssh5nlUfbf2
+ PgTUCAb/FHa7O8+s5meRXLEFVoV0E2RZnSNHB8TixrW5MPb0V/GaQyerOmEqN30RC2p8rz
+ MgMXetSJWilzMxoxUXXkgh1BKIKgavU=
 From: Damien Hedde <damien.hedde@greensocs.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/2] gdbstub: change GDBState.last_packet to GByteArray
-Date: Wed, 11 Dec 2019 17:05:13 +0100
-Message-Id: <20191211160514.58373-2-damien.hedde@greensocs.com>
+Subject: [PATCH v2 2/2] gdbstub: do not split gdb_monitor_write payload
+Date: Wed, 11 Dec 2019 17:05:14 +0100
+Message-Id: <20191211160514.58373-3-damien.hedde@greensocs.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191211160514.58373-1-damien.hedde@greensocs.com>
 References: <20191211160514.58373-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
  s=mail; t=1576080323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+9uqqC7MBXJw6x4IMhmhvrJzByBygJmHS8WnEfIWnkU=;
- b=aodmYFp5OTDeUF/hTmi362bA6KisxaxaMKl0zfgqBT4yH/d+v4+H3TlmB7xwcmGaNrthIf
- XCou0Ah6tSkkugerdNzIUkS5CkarlVtcK8zrdoE8MyJUXH+AlEDRuZnPAANJ0ihAebsgYx
- sJj2AQyJm+/fnIP6GpXVHjX8wBOiA+U=
+ bh=7sPz7oVBNzeMeWcyKT2i75rgmDRiD8IxeGkrlkSUefk=;
+ b=nmZ3hG3qqt7z5vFCxYkXsa/goAF3gscl1bdHWnrvElG1mKrOaxiXe9dcPCp5RTIl0x254V
+ RhP9u/QXtag5fiVYRZTLYfO1sLZM4E5udmUr5x0CCw1uMfJmUZB17AjWwLRos8HXp/pXMk
+ yYI5H+HCMfcwA7cy1AeZY9AtCj6JJ88=
 ARC-Seal: i=1; s=mail; d=greensocs.com; t=1576080323; a=rsa-sha256; cv=none;
- b=Woo/Ifp7V3ks/DeOsZnXSvVoElNOvV3Z/gBFUfeSbS8dX1mLsVEtEGG0YnZpz94COCsjdc
- v2TeLKtIdtv4794K/StIERDZENxDARAS8wcW+SsELDG1JxxBrx3x7ZQcU3Sfd5q6DLqvLp
- nxkEKkA1GMV1ft+rkdB4ZxCISO+4Hn4=
+ b=oUiOrjgLa0JI0Gol9epSdIW9Fb/jdE3T/Ruy6vGj5Get1tPvdkDBCCyb83RIAEx9LhLFdp
+ VCZQkOp/IlKy3HgCmZ3cF4hbl2v3JcOiRnHsXtXaf3UdrIWJvp57tFJJ7lgW0iGVt4VMRr
+ tLdXmcrIWk+Ur+MuIjfVXPoSgBwnI2Y=
 ARC-Authentication-Results: i=1;
 	beetle.greensocs.com;
 	none
@@ -98,125 +97,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove the packet size upper limit by using a GByteArray
-instead of a statically allocated array for last_packet.
-Thus we can now send big packets.
+Since we can now send packets of arbitrary length:
+simplify gdb_monitor_write() and send the whole payload
+in one packet.
 
-Also remove the last_packet_len field and use last_packet->len
-instead.
-
+Suggested-by: Luc Michel <luc.michel@greensocs.com>
 Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- gdbstub.c | 39 +++++++++++++++++++++------------------
- 1 file changed, 21 insertions(+), 18 deletions(-)
+ gdbstub.c | 23 +++--------------------
+ 1 file changed, 3 insertions(+), 20 deletions(-)
 
 diff --git a/gdbstub.c b/gdbstub.c
-index 7b695bdebe..93b26f1b86 100644
+index 93b26f1b86..ef999abee2 100644
 --- a/gdbstub.c
 +++ b/gdbstub.c
-@@ -351,8 +351,7 @@ typedef struct GDBState {
-     int line_buf_index;
-     int line_sum; /* running checksum */
-     int line_csum; /* checksum at the end of the packet */
--    uint8_t last_packet[MAX_PACKET_LENGTH + 4];
--    int last_packet_len;
-+    GByteArray *last_packet;
-     int signal;
- #ifdef CONFIG_USER_ONLY
-     int fd;
-@@ -384,6 +383,7 @@ static void init_gdbserver_state(void)
-     gdbserver_state.init =3D true;
-     gdbserver_state.str_buf =3D g_string_new(NULL);
-     gdbserver_state.mem_buf =3D g_byte_array_sized_new(MAX_PACKET_LENGTH=
-);
-+    gdbserver_state.last_packet =3D g_byte_array_sized_new(MAX_PACKET_LE=
-NGTH + 4);
+@@ -3200,28 +3200,11 @@ static void gdb_chr_event(void *opaque, int event=
+)
+     }
  }
 =20
- #ifndef CONFIG_USER_ONLY
-@@ -626,28 +626,29 @@ static void hexdump(const char *buf, int len,
- static int put_packet_binary(const char *buf, int len, bool dump)
+-static void gdb_monitor_output(GDBState *s, const char *msg, int len)
+-{
+-    g_autoptr(GString) buf =3D g_string_new("O");
+-    memtohex(buf, (uint8_t *)msg, len);
+-    put_packet(buf->str);
+-}
+-
+ static int gdb_monitor_write(Chardev *chr, const uint8_t *buf, int len)
  {
-     int csum, i;
--    uint8_t *p;
--    uint8_t *ps =3D &gdbserver_state.last_packet[0];
-+    uint8_t footer[3];
+-    const char *p =3D (const char *)buf;
+-    int max_sz;
+-
+-    max_sz =3D (MAX_PACKET_LENGTH / 2) + 1;
+-    for (;;) {
+-        if (len <=3D max_sz) {
+-            gdb_monitor_output(&gdbserver_state, p, len);
+-            break;
+-        }
+-        gdb_monitor_output(&gdbserver_state, p, max_sz);
+-        p +=3D max_sz;
+-        len -=3D max_sz;
+-    }
++    g_autoptr(GString) hex_buf =3D g_string_new("O");
++    memtohex(hex_buf, buf, len);
++    put_packet(hex_buf->str);
+     return len;
+ }
 =20
-     if (dump && trace_event_get_state_backends(TRACE_GDBSTUB_IO_BINARYRE=
-PLY)) {
-         hexdump(buf, len, trace_gdbstub_io_binaryreply);
-     }
-=20
-     for(;;) {
--        p =3D ps;
--        *(p++) =3D '$';
--        memcpy(p, buf, len);
--        p +=3D len;
-+        g_byte_array_set_size(gdbserver_state.last_packet, 0);
-+        g_byte_array_append(gdbserver_state.last_packet,
-+                            (const uint8_t *) "$", 1);
-+        g_byte_array_append(gdbserver_state.last_packet,
-+                            (const uint8_t *) buf, len);
-         csum =3D 0;
-         for(i =3D 0; i < len; i++) {
-             csum +=3D buf[i];
-         }
--        *(p++) =3D '#';
--        *(p++) =3D tohex((csum >> 4) & 0xf);
--        *(p++) =3D tohex((csum) & 0xf);
-+        footer[0] =3D '#';
-+        footer[1] =3D tohex((csum >> 4) & 0xf);
-+        footer[2] =3D tohex((csum) & 0xf);
-+        g_byte_array_append(gdbserver_state.last_packet, footer, 3);
-=20
--        gdbserver_state.last_packet_len =3D p - ps;
--        put_buffer(ps, gdbserver_state.last_packet_len);
-+        put_buffer(gdbserver_state.last_packet->data,
-+                   gdbserver_state.last_packet->len);
-=20
- #ifdef CONFIG_USER_ONLY
-         i =3D get_char();
-@@ -2812,20 +2813,22 @@ static void gdb_read_byte(GDBState *s, uint8_t ch=
-)
-     uint8_t reply;
-=20
- #ifndef CONFIG_USER_ONLY
--    if (gdbserver_state.last_packet_len) {
-+    if (gdbserver_state.last_packet->len) {
-         /* Waiting for a response to the last packet.  If we see the sta=
-rt
-            of a new command then abandon the previous response.  */
-         if (ch =3D=3D '-') {
-             trace_gdbstub_err_got_nack();
--            put_buffer((uint8_t *)gdbserver_state.last_packet, gdbserver=
-_state.last_packet_len);
-+            put_buffer(gdbserver_state.last_packet->data,
-+                       gdbserver_state.last_packet->len);
-         } else if (ch =3D=3D '+') {
-             trace_gdbstub_io_got_ack();
-         } else {
-             trace_gdbstub_io_got_unexpected(ch);
-         }
-=20
--        if (ch =3D=3D '+' || ch =3D=3D '$')
--            gdbserver_state.last_packet_len =3D 0;
-+        if (ch =3D=3D '+' || ch =3D=3D '$') {
-+            g_byte_array_set_size(gdbserver_state.last_packet, 0);
-+        }
-         if (ch !=3D '$')
-             return;
-     }
-@@ -3209,7 +3212,7 @@ static int gdb_monitor_write(Chardev *chr, const ui=
-nt8_t *buf, int len)
-     const char *p =3D (const char *)buf;
-     int max_sz;
-=20
--    max_sz =3D (sizeof(gdbserver_state.last_packet) - 2) / 2;
-+    max_sz =3D (MAX_PACKET_LENGTH / 2) + 1;
-     for (;;) {
-         if (len <=3D max_sz) {
-             gdb_monitor_output(&gdbserver_state, p, len);
 --=20
 2.24.0
 
