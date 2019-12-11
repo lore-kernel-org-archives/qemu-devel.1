@@ -2,86 +2,96 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E358C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 20:38:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EA05C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 20:41:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38FF4206A5
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 20:38:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36CEA206A5
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 20:41:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ks56PShp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38FF4206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D0aL2d7U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36CEA206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50430 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if8kT-0005iz-6D
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 15:38:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47878)
+	id 1if8o0-0007x8-95
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 15:41:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1if8id-0003sz-Jd
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 15:36:25 -0500
+ (envelope-from <mst@redhat.com>) id 1if8nJ-0007OU-P0
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 15:41:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1if8ic-0001Zt-Ab
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 15:36:23 -0500
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34077)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1if8ia-0001X9-Vq
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 15:36:21 -0500
-Received: by mail-pf1-x441.google.com with SMTP id l127so1095144pfl.1
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 12:36:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=eEjzZu+b1EAOlLfnxc4p5LFc5cBn/iUEwgDu7STmKhM=;
- b=Ks56PShpgIs2pIK1PyMHU1X5QpshUBNExs8hq6x+gdgShiOCX1zY8qF5Cgr2sC9s82
- zKzOejgloeQI/RMATxHtcCNhp1LmAdaOaqIwXktsTynSOyjOQlBuj5r+hLQCepdW/ZXG
- 4HscQ0f1lrcUZP1a5FEvbAgSC603rKKe9FlTXaxQgvSukB24Zc2wX3+Bk8ieUP5IEK5z
- 9RiogIQyamxEz42rlU1JmbDVgsaxqt0Li39Uqa+NehFDv4GowXK9Ljczx8+s/LFseEue
- gNkNZbMeMC0xqUi1LQqwfh9e/fbrg1Kf0QvQF+qj9irA6KLLHZkvaKMK+vj9j7mlJPI9
- JhRA==
+ (envelope-from <mst@redhat.com>) id 1if8nG-0001Tb-8G
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 15:41:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56741
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1if8nG-0001R6-2p
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 15:41:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576096869;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NrRrUhPU5kiDD/Je7tTZRhRQoriKSeToJdEWZeFSjE0=;
+ b=D0aL2d7UggIdNwXVre23iYahNtqqGD/5oYLqbn/iadQ/hDyHWkShTDAabVTKwWskqneG9R
+ hI7iSpBkXClqye1o7oSXJz6R9j5q8SWziFhmqxgmS712KOxA+3BM1PYYSh9jRFIdxaUSen
+ q22fgjHeXirCC1WEwkSyGoHiFCQ4UkE=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-203-h4axlDv4Oj-mbm7EQ5ihQQ-1; Wed, 11 Dec 2019 15:41:05 -0500
+Received: by mail-qt1-f197.google.com with SMTP id l25so5276107qtu.0
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 12:41:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=eEjzZu+b1EAOlLfnxc4p5LFc5cBn/iUEwgDu7STmKhM=;
- b=lKw1lsQNgPxtr7+hWO0Zz04xccWmhKKKqwkiSJVxLf59+fMTi8wfImtJP1UOqx0Vos
- +Fkc68qjxQFygNKeCzM/NjM6Qu8zqT8l5hg2ysVj5VA5+Wq7cA2li1PJsdMtJLI2HsJZ
- KtCs9+PLfAuKbcZLlcZGzy2rKOcnLmiY68W7VxIPxjMPD6kLwX/dYz2YQkgoyKGD/uB+
- 545plpIcFgJqXi4LUwb4jl3hCG5G7eDligJl9Zdnn2KMwrZbpH3ip9zHWMDf6nmpFsui
- D82TbR2gP5uXLr2xN6aZzrR7GJs2ic33kt7xLYeDVs03FjdVK6eAa0TfZGxFrYfYU2l2
- 3CxA==
-X-Gm-Message-State: APjAAAUB9CvpgrqCf9EcRJyV+1NlYmqrn76CRTjzm2OD50/YbVJNubG5
- V2bChQP9XCPpDB9KzJTmjdTQfMWzMfA=
-X-Google-Smtp-Source: APXvYqxT401U+IJb3oP4nYUVQzq4FUmBescrZYoywfjFx8dQYE6wJ5Frkrd+trQuRUmY0mJRyJOsKA==
-X-Received: by 2002:aa7:968b:: with SMTP id f11mr5924537pfk.209.1576096578548; 
- Wed, 11 Dec 2019 12:36:18 -0800 (PST)
-Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
- [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id b21sm4280335pfp.0.2019.12.11.12.36.17
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=17CziYo9wQH3o4D35my+SN1e465XkC882Y9erLC41dA=;
+ b=KoymSY48jQBrG2vG0OvwHHbiiVEgeKQsYYq0iFrwlOmII1ttJWaQoY0rTA+DO5awox
+ WXv1F1pzgsAOJPcFHjuQ+TlNYHqbpfum19KXqUTBa+aU3ZLRwv1OxABv6Rp5V60SpVF/
+ BqgrD6YCvMcW083zlzSbSKnoGYuReUJeAKfgUtL8gAOpY4AhmOyhji3motYYyNC+KGZi
+ oifGAHOAzk+ZvA8e5tQCfwKakx1PS08uFlHccXcK62m7cuaJYSTecA7iuyw9QWuHlt4w
+ p7PUA2osYOyc9VnnSKQFAgq7kIeT3cQmWKcwHcUG3fOpO6JliVbd2+U2+6f+rUQcymLq
+ lWtw==
+X-Gm-Message-State: APjAAAVvMaFVmL+LSFoBfxjweSG90z8Rgn4RkQNbMuHPDOMZxHxlRkJD
+ dsqEDmzFSTWSl62OZ4Nvw4g8naOJUSceQSaD6Obp5onjWoAm9Z2vcXGTi8F1U62teB8ow0E6/b/
+ 1BMuGkS0aVBb/jWo=
+X-Received: by 2002:ac8:5059:: with SMTP id h25mr4466641qtm.20.1576096864666; 
+ Wed, 11 Dec 2019 12:41:04 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwIw+ouDKA+L73QWSsYEStrfyRNzi2vxMTQDKpPNdfi5lSecPd2GRAY6aPqmQTa3AKiSKXDgA==
+X-Received: by 2002:ac8:5059:: with SMTP id h25mr4466610qtm.20.1576096864336; 
+ Wed, 11 Dec 2019 12:41:04 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+ by smtp.gmail.com with ESMTPSA id e2sm1017385qkb.112.2019.12.11.12.40.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Dec 2019 12:36:17 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] target/s390x: Implement LOAD/STORE TO REAL ADDRESS inline
-Date: Wed, 11 Dec 2019 12:36:14 -0800
-Message-Id: <20191211203614.15611-3-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191211203614.15611-1-richard.henderson@linaro.org>
-References: <20191211203614.15611-1-richard.henderson@linaro.org>
+ Wed, 11 Dec 2019 12:41:03 -0800 (PST)
+Date: Wed, 11 Dec 2019 15:40:56 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH for-5.0 v11 00/20] VIRTIO-IOMMU device
+Message-ID: <20191211154027-mutt-send-email-mst@kernel.org>
+References: <20191122182943.4656-1-eric.auger@redhat.com>
+ <20191211113936-mutt-send-email-mst@kernel.org>
+ <306e4e92-4e86-7a82-3777-fd85ffd0303c@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::441
+In-Reply-To: <306e4e92-4e86-7a82-3777-fd85ffd0303c@redhat.com>
+X-MC-Unique: h4axlDv4Oj-mbm7EQ5ihQQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,139 +103,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, david@redhat.com
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
+ tnowicki@marvell.com, quintela@redhat.com, jean-philippe.brucker@arm.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, armbru@redhat.com,
+ bharatb.linux@gmail.com, qemu-arm@nongnu.org, dgilbert@redhat.com,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These are trivially done by performing a memory operation
-with the correct mmu_idx.  The only tricky part is using
-get_address directly in order to get the address wrapped;
-we cannot use la2 because of the format.
+On Wed, Dec 11, 2019 at 05:48:05PM +0100, Auger Eric wrote:
+> Hi Michael,
+>=20
+> On 12/11/19 5:40 PM, Michael S. Tsirkin wrote:
+> > On Fri, Nov 22, 2019 at 07:29:23PM +0100, Eric Auger wrote:
+> >> This series implements the QEMU virtio-iommu device.
+> >>
+> >> This matches the v0.12 spec and the corresponding virtio-iommu
+> >> driver upstreamed in 5.3.
+> >>
+> >> The pci proxy for the virtio-iommu device is instantiated using
+> >> "-device virtio-iommu-pci". This series still relies on ACPI IORT/DT
+> >> integration. Note the ACPI IORT integration is not yet upstreamed
+> >> and testing needs to be based on Jean-Philippe's additional
+> >> kernel patches [1].
+> >=20
+> > Or the config space approach? I really liked that one.
+> Yes this corresponds to the paragraph below.
+> >=20
+> >>
+> >> Work is ongoing to remove IORT adherence and allow the
+> >> bindings between the IOMMU and the root complex to be defined
+> >> and written into the PCI device configuration space. The outcome
+> >> of this work is uncertain at this stage though. See [2].
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/s390x/helper.h      |  4 ----
- target/s390x/mem_helper.c  | 22 ----------------------
- target/s390x/translate.c   | 21 ++++-----------------
- target/s390x/insn-data.def |  8 ++++----
- 4 files changed, 8 insertions(+), 47 deletions(-)
+Oh right. Why is it uncertain? Anything can be done to help?
 
-diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-index f5b4bb6a31..b5813c2ac2 100644
---- a/target/s390x/helper.h
-+++ b/target/s390x/helper.h
-@@ -324,10 +324,6 @@ DEF_HELPER_FLAGS_4(ipte, TCG_CALL_NO_RWG, void, env, i64, i64, i32)
- DEF_HELPER_FLAGS_1(ptlb, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_FLAGS_1(purge, TCG_CALL_NO_RWG, void, env)
- DEF_HELPER_2(lra, i64, env, i64)
--DEF_HELPER_FLAGS_2(lura, TCG_CALL_NO_WG, i64, env, i64)
--DEF_HELPER_FLAGS_2(lurag, TCG_CALL_NO_WG, i64, env, i64)
--DEF_HELPER_FLAGS_3(stura, TCG_CALL_NO_WG, void, env, i64, i64)
--DEF_HELPER_FLAGS_3(sturg, TCG_CALL_NO_WG, void, env, i64, i64)
- DEF_HELPER_1(per_check_exception, void, env)
- DEF_HELPER_FLAGS_3(per_branch, TCG_CALL_NO_RWG, void, env, i64, i64)
- DEF_HELPER_FLAGS_2(per_ifetch, TCG_CALL_NO_RWG, void, env, i64)
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index b1b3f406c9..2921419c27 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -2329,28 +2329,6 @@ void HELPER(purge)(CPUS390XState *env)
-     tlb_flush_all_cpus_synced(env_cpu(env));
- }
- 
--/* load using real address */
--uint64_t HELPER(lura)(CPUS390XState *env, uint64_t addr)
--{
--    return cpu_ldl_real_ra(env, wrap_address(env, addr), GETPC());
--}
--
--uint64_t HELPER(lurag)(CPUS390XState *env, uint64_t addr)
--{
--    return cpu_ldq_real_ra(env, wrap_address(env, addr), GETPC());
--}
--
--/* store using real address */
--void HELPER(stura)(CPUS390XState *env, uint64_t addr, uint64_t v1)
--{
--    cpu_stl_real_ra(env, wrap_address(env, addr), (uint32_t)v1, GETPC());
--}
--
--void HELPER(sturg)(CPUS390XState *env, uint64_t addr, uint64_t v1)
--{
--    cpu_stq_real_ra(env, wrap_address(env, addr), v1, GETPC());
--}
--
- /* load real address */
- uint64_t HELPER(lra)(CPUS390XState *env, uint64_t addr)
- {
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index ef751fefa4..4292bb0dd0 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3272,13 +3272,8 @@ static DisasJumpType op_lpq(DisasContext *s, DisasOps *o)
- #ifndef CONFIG_USER_ONLY
- static DisasJumpType op_lura(DisasContext *s, DisasOps *o)
- {
--    gen_helper_lura(o->out, cpu_env, o->in2);
--    return DISAS_NEXT;
--}
--
--static DisasJumpType op_lurag(DisasContext *s, DisasOps *o)
--{
--    gen_helper_lurag(o->out, cpu_env, o->in2);
-+    o->addr1 = get_address(s, 0, get_field(s->fields, r2), 0);
-+    tcg_gen_qemu_ld_tl(o->out, o->addr1, MMU_REAL_IDX, s->insn->data);
-     return DISAS_NEXT;
- }
- #endif
-@@ -4506,17 +4501,9 @@ static DisasJumpType op_stnosm(DisasContext *s, DisasOps *o)
- 
- static DisasJumpType op_stura(DisasContext *s, DisasOps *o)
- {
--    gen_helper_stura(cpu_env, o->in2, o->in1);
--    if (s->base.tb->flags & FLAG_MASK_PER) {
--        update_psw_addr(s);
--        gen_helper_per_store_real(cpu_env);
--    }
--    return DISAS_NEXT;
--}
-+    o->addr1 = get_address(s, 0, get_field(s->fields, r2), 0);
-+    tcg_gen_qemu_st_tl(o->in1, o->addr1, MMU_REAL_IDX, s->insn->data);
- 
--static DisasJumpType op_sturg(DisasContext *s, DisasOps *o)
--{
--    gen_helper_sturg(cpu_env, o->in2, o->in1);
-     if (s->base.tb->flags & FLAG_MASK_PER) {
-         update_psw_addr(s);
-         gen_helper_per_store_real(cpu_env);
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 449eee1662..2bc77f0871 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -1275,8 +1275,8 @@
-     F(0xe313, LRAY,    RXY_a, LD,  0, a2, r1, 0, lra, 0, IF_PRIV)
-     F(0xe303, LRAG,    RXY_a, Z,   0, a2, r1, 0, lra, 0, IF_PRIV)
- /* LOAD USING REAL ADDRESS */
--    F(0xb24b, LURA,    RRE,   Z,   0, r2, new, r1_32, lura, 0, IF_PRIV)
--    F(0xb905, LURAG,   RRE,   Z,   0, r2, r1, 0, lurag, 0, IF_PRIV)
-+    E(0xb24b, LURA,    RRE,   Z,   0, 0, new, r1_32, lura, 0, MO_TEUL, IF_PRIV)
-+    E(0xb905, LURAG,   RRE,   Z,   0, 0, r1, 0, lura, 0, MO_TEQ, IF_PRIV)
- /* MOVE TO PRIMARY */
-     F(0xda00, MVCP,    SS_d,  Z,   la1, a2, 0, 0, mvcp, 0, IF_PRIV)
- /* MOVE TO SECONDARY */
-@@ -1329,8 +1329,8 @@
- /* STORE THEN OR SYSTEM MASK */
-     F(0xad00, STOSM,   SI,    Z,   la1, 0, 0, 0, stnosm, 0, IF_PRIV)
- /* STORE USING REAL ADDRESS */
--    F(0xb246, STURA,   RRE,   Z,   r1_o, r2_o, 0, 0, stura, 0, IF_PRIV)
--    F(0xb925, STURG,   RRE,   Z,   r1_o, r2_o, 0, 0, sturg, 0, IF_PRIV)
-+    E(0xb246, STURA,   RRE,   Z,   r1_o, 0, 0, 0, stura, 0, MO_TEUL, IF_PRIV)
-+    E(0xb925, STURG,   RRE,   Z,   r1_o, 0, 0, 0, stura, 0, MO_TEQ, IF_PRIV)
- /* TEST BLOCK */
-     F(0xb22c, TB,      RRE,   Z,   0, r2_o, 0, 0, testblock, 0, IF_PRIV)
- /* TEST PROTECTION */
--- 
-2.20.1
+> Thanks
+>=20
+> Eric
+>=20
+> >>
+> >> So only patches 1-11 fully rely on upstreamed kernel code. Others
+> >> should be considered as RFC.
+> >>
+> >> This respin allows people to test on ARM and x86. It also
+> >> brings migration support (tested on ARM) and various cleanups.
+> >> Reserved regions are now passed through an array of properties.
+> >> A libqos test also is introduced to test the virtio-iommu API.
+> >>
+> >> Note integration with vhost devices and vfio devices is not part
+> >> of this series. Please follow Bharat's respins [3].
+> >>
+> >> The 1st Patch ("migration: Support QLIST migration") was sent
+> >> separately [4].
+> >>
+> >> Best Regards
+> >>
+> >> Eric
+> >>
+> >> This series can be found at:
+> >> https://github.com/eauger/qemu/tree/v4.2-rc2-virtio-iommu-v11
+> >>
+> >> [1] kernel branch to be used for guest
+> >>     https://github.com/eauger/linux/tree/v5.4-rc8-virtio-iommu-iort
+> >> [2] [RFC 00/13] virtio-iommu on non-devicetree platforms
+> >> [3] VFIO/VHOST integration is not part of this series. Please follow
+> >>     [PATCH RFC v5 0/5] virtio-iommu: VFIO integration respins
+> >> [4] [PATCH v6] migration: Support QLIST migration
+> >>
+> >> Testing:
+> >> - tested with guest using virtio-net-pci
+> >>   (,vhost=3Doff,iommu_platform,disable-modern=3Doff,disable-legacy=3Do=
+n)
+> >>   and virtio-blk-pci
+> >> - migration on ARM
+> >> - on x86 PC machine I get some AHCI non translated transactions,
+> >>   very early. This does not prevent the guest from boot and behaving
+> >>   properly. Warnings look like:
+> >> qemu-system-x86_64: virtio_iommu_translate sid=3D250 is not known!!
+> >> qemu-system-x86_64: no buffer available in event queue to report event
+> >> qemu-system-x86_64: AHCI: Failed to start FIS receive engine: bad FIS
+> >> receive buffer address
+> >>
+> >> History:
+> >>
+> >> v10 -> v11:
+> >> - introduce virtio_iommu_handle_req macro
+> >> - migration support
+> >> - introduce DEFINE_PROP_INTERVAL and pass reserved regions
+> >>   through an array of those
+> >> - domain gtree simplification
+> >>
+> >> v9 -> v10:
+> >> - rebase on 4.1.0-rc2, compliance with 0.12 spec
+> >> - removed ACPI part
+> >> - cleanup (see individual change logs)
+> >> - moved to a PATCH series
+> >>
+> >> v8 -> v9:
+> >> - virtio-iommu-pci device needs to be instantiated from the command
+> >>   line (RID is not imposed anymore).
+> >> - tail structure properly initialized
+> >>
+> >> v7 -> v8:
+> >> - virtio-iommu-pci added
+> >> - virt instantiation modified
+> >> - DT and ACPI modified to exclude the iommu RID from the mapping
+> >> - VIRTIO_IOMMU_F_BYPASS, VIRTIO_F_VERSION_1 features exposed
+> >>
+> >> v6 -> v7:
+> >> - rebase on qemu 3.0.0-rc3
+> >> - minor update against v0.7
+> >> - fix issue with EP not on pci.0 and ACPI probing
+> >> - change the instantiation method
+> >>
+> >> v5 -> v6:
+> >> - minor update against v0.6 spec
+> >> - fix g_hash_table_lookup in virtio_iommu_find_add_as
+> >> - replace some error_reports by qemu_log_mask(LOG_GUEST_ERROR, ...)
+> >>
+> >> v4 -> v5:
+> >> - event queue and fault reporting
+> >> - we now return the IOAPIC MSI region if the virtio-iommu is instantia=
+ted
+> >>   in a PC machine.
+> >> - we bypass transactions on MSI HW region and fault on reserved ones.
+> >> - We support ACPI boot with mach-virt (based on IORT proposal)
+> >> - We moved to the new driver naming conventions
+> >> - simplified mach-virt instantiation
+> >> - worked around the disappearing of pci_find_primary_bus
+> >> - in virtio_iommu_translate, check the dev->as is not NULL
+> >> - initialize as->device_list in virtio_iommu_get_as
+> >> - initialize bufstate.error to false in virtio_iommu_probe
+> >>
+> >> v3 -> v4:
+> >> - probe request support although no reserved region is returned at
+> >>   the moment
+> >> - unmap semantics less strict, as specified in v0.4
+> >> - device registration, attach/detach revisited
+> >> - split into smaller patches to ease review
+> >> - propose a way to inform the IOMMU mr about the page_size_mask
+> >>   of underlying HW IOMMU, if any
+> >> - remove warning associated with the translation of the MSI doorbell
+> >>
+> >> v2 -> v3:
+> >> - rebase on top of 2.10-rc0 and especially
+> >>   [PATCH qemu v9 0/2] memory/iommu: QOM'fy IOMMU MemoryRegion
+> >> - add mutex init
+> >> - fix as->mappings deletion using g_tree_ref/unref
+> >> - when a dev is attached whereas it is already attached to
+> >>   another address space, first detach it
+> >> - fix some error values
+> >> - page_sizes =3D TARGET_PAGE_MASK;
+> >> - I haven't changed the unmap() semantics yet, waiting for the
+> >>   next virtio-iommu spec revision.
+> >>
+> >> v1 -> v2:
+> >> - fix redefinition of viommu_as typedef
+> >>
+> >>
+> >>
+> >> Eric Auger (20):
+> >>   migration: Support QLIST migration
+> >>   virtio-iommu: Add skeleton
+> >>   virtio-iommu: Decode the command payload
+> >>   virtio-iommu: Add the iommu regions
+> >>   virtio-iommu: Endpoint and domains structs and helpers
+> >>   virtio-iommu: Implement attach/detach command
+> >>   virtio-iommu: Implement map/unmap
+> >>   virtio-iommu: Implement translate
+> >>   virtio-iommu: Implement fault reporting
+> >>   virtio-iommu-pci: Add virtio iommu pci support
+> >>   hw/arm/virt: Add the virtio-iommu device tree mappings
+> >>   qapi: Introduce DEFINE_PROP_INTERVAL
+> >>   virtio-iommu: Implement probe request
+> >>   virtio-iommu: Handle reserved regions in the translation process
+> >>   virtio-iommu-pci: Add array of Interval properties
+> >>   hw/arm/virt-acpi-build: Introduce fill_iort_idmap helper
+> >>   hw/arm/virt-acpi-build: Add virtio-iommu node in IORT table
+> >>   virtio-iommu: Support migration
+> >>   pc: Add support for virtio-iommu-pci
+> >>   tests: Add virtio-iommu test
+> >>
+> >>  hw/arm/virt-acpi-build.c         |  91 ++-
+> >>  hw/arm/virt.c                    |  53 +-
+> >>  hw/core/qdev-properties.c        |  90 +++
+> >>  hw/i386/acpi-build.c             |  72 +++
+> >>  hw/i386/pc.c                     |  15 +-
+> >>  hw/virtio/Kconfig                |   5 +
+> >>  hw/virtio/Makefile.objs          |   2 +
+> >>  hw/virtio/trace-events           |  22 +
+> >>  hw/virtio/virtio-iommu-pci.c     |  91 +++
+> >>  hw/virtio/virtio-iommu.c         | 952 ++++++++++++++++++++++++++++++=
++
+> >>  include/exec/memory.h            |   6 +
+> >>  include/hw/acpi/acpi-defs.h      |  21 +-
+> >>  include/hw/arm/virt.h            |   2 +
+> >>  include/hw/i386/pc.h             |   2 +
+> >>  include/hw/pci/pci.h             |   1 +
+> >>  include/hw/qdev-properties.h     |   3 +
+> >>  include/hw/virtio/virtio-iommu.h |  67 +++
+> >>  include/migration/vmstate.h      |  21 +
+> >>  include/qemu/queue.h             |  39 ++
+> >>  include/qemu/typedefs.h          |   1 +
+> >>  migration/trace-events           |   5 +
+> >>  migration/vmstate-types.c        |  70 +++
+> >>  qdev-monitor.c                   |   1 +
+> >>  tests/Makefile.include           |   2 +
+> >>  tests/libqos/virtio-iommu.c      | 177 ++++++
+> >>  tests/libqos/virtio-iommu.h      |  45 ++
+> >>  tests/test-vmstate.c             | 170 ++++++
+> >>  tests/virtio-iommu-test.c        | 261 +++++++++
+> >>  28 files changed, 2253 insertions(+), 34 deletions(-)
+> >>  create mode 100644 hw/virtio/virtio-iommu-pci.c
+> >>  create mode 100644 hw/virtio/virtio-iommu.c
+> >>  create mode 100644 include/hw/virtio/virtio-iommu.h
+> >>  create mode 100644 tests/libqos/virtio-iommu.c
+> >>  create mode 100644 tests/libqos/virtio-iommu.h
+> >>  create mode 100644 tests/virtio-iommu-test.c
+> >>
+> >> --=20
+> >> 2.20.1
+> >=20
+> >=20
 
 
