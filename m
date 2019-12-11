@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADC6C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A84FC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:30:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A3B320836
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0749B20836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:30:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WEfaMqGC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A3B320836
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ilpQS7Vg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0749B20836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if2yo-0002Ml-Cf
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:28:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33693)
+	id 1if30w-0004KK-1V
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:30:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33694)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2tv-0005Pl-CW
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:41 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1if2tv-0005Pm-CX
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2tt-0003Ce-FZ
+ (envelope-from <paolo.bonzini@gmail.com>) id 1if2tt-0003D8-Tq
  for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:39 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52735)
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41492)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1if2ts-0003AT-OP; Wed, 11 Dec 2019 09:23:37 -0500
-Received: by mail-wm1-x342.google.com with SMTP id p9so7296955wmc.2;
- Wed, 11 Dec 2019 06:23:36 -0800 (PST)
+ id 1if2tt-0003CA-Nw; Wed, 11 Dec 2019 09:23:37 -0500
+Received: by mail-wr1-x443.google.com with SMTP id c9so24247094wrw.8;
+ Wed, 11 Dec 2019 06:23:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=WjRgIZ5qePVVbis5wVrr7iekZjJDuuFlCCqKYtN7ZTM=;
- b=WEfaMqGCuUlAbbxFYkO+RkiTtHeG8X+1D2/TZe01d5Pv6HxDHUMHO7tONfyG/qNnsr
- bUQr07YzwT2kbYLCEfwMGfwKeWlhZFtXeaUSgjTs3evCS2EfQPhkL5vrEeu7om4ojIDU
- +qnuMwqTi/wWRnHXpTBDjo7bDePQgZ7m3btSrwNuwaRARrS3XqwG8cfItcX5uhal7R4f
- vZrTd8KSmnwJuj857261waDF07emNMPDHrmFVflNUwZdyFdC0avK7IGH3pB8JXSO5Zy7
- puChf/BUoNmptO/iKvzWeFiAJwy8UHGsUuW6MU1PjvHuCFALw9PLrPagpp7RBgoAE54L
- AF0Q==
+ bh=SnbM4HZb29FsG4J6fiW5WwWfE0ShjwYvCK5bmD3CYRU=;
+ b=ilpQS7Vg1VgZDqrE/uEczkUIFtJqrxecCgvPQcP2+fNZ5Y0wDu4jdpg7IfL4WqKzB4
+ w11BCNJ1sBFfapPPasdZzfqplIrJcK8lU3EDh+CSsEOp0m2BQIF+/EcocnNH9SZOFcbn
+ u777YwftnULQEd18vrH5v34hGR16r+J8XZvylHWg0nC3gjuv12z1UVRGTaqokTR/4SeT
+ EEmUTtG8q+GzxkR1ELvB1DhmVIaNFqA3+hxXGfdj3gQ39AlXjF1cBmrbVZ1YBtuRA8El
+ WP3IDdnWkjbxuejYkljwSHjGhM42tHLpT1CDcB/76+Vdl2d1Bpnq6MENWIYGqQWh3Cbb
+ oKCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :mime-version:content-transfer-encoding;
- bh=WjRgIZ5qePVVbis5wVrr7iekZjJDuuFlCCqKYtN7ZTM=;
- b=ZFxIeI5CkfdmrpxRjUdujnRPCizSvPyRFiNwPUI31eaXLUrT092Zww9iILjYQWFWtc
- Mv8IvP7PscWJDcO3kK2l63S0SUshBc2Io6XxbgsHo7TJ2wBkPE9IgVMVqYVwqhIsAVo0
- 5msAiMM3EVyMig9oNuEfXP8wtNaILpYMzoyZdPdNRbz93Dovs+nWkkiIyoWQl7usAIJg
- FOO9G5CJocQA2ARWmbiuVzlQNtIQ+DYomJGgayTfenkNKNEb2+XfmQyfd3U6p8olCwXA
- V+0+q9lqytJaMi31hO0BIrhXy94fEf4drxk/jsrwWToR9+lknS2uNOQbEHO8wgiD8ICl
- Cw5w==
-X-Gm-Message-State: APjAAAX475TJDVySAIGNzmKS7lADGLZqTswznXJ1wETVMke8QoIt+ht1
- prQybbRMNsrzPIXKZfAup/CearLS
-X-Google-Smtp-Source: APXvYqySPGzmde3Kor2ZWDovZXS+gGeYpLbPi2/kwDQHXfKGMj44DpLt7N6V05b9T5++KqtYRUznZQ==
-X-Received: by 2002:a1c:1f51:: with SMTP id f78mr83046wmf.60.1576074215437;
- Wed, 11 Dec 2019 06:23:35 -0800 (PST)
+ bh=SnbM4HZb29FsG4J6fiW5WwWfE0ShjwYvCK5bmD3CYRU=;
+ b=kHOP9PtpwAuv2Fqb37kttZzt4kFMKazhqyu+8AvwrmkCelj3J+D6WBFInUIU9SCvOO
+ O/Oqu1G363dotmp/H6LYwRRtGzZ2WGF2FcvJRWHrDP0ys23tME7fBwgQ3abUr2GLF8Nu
+ zJE2k5WXA0h6bhT6JJgHuNhhG7uHMua9/cDNifhTYT9vwe4Ce6GXkwmluBbyjpirIVcd
+ FXHshE1sutVhKxd36bbj+GPor0aQcIwm7yNtrEYYpMje0WKLwDV1XZ2h/iJpToJ72FpA
+ vNlrlt1zvq7DiRRAfWW0EjH7dnZDmww+Qs3olkRCLNFLzfHpVyslDXT5P3SwPawQbBKV
+ AIVQ==
+X-Gm-Message-State: APjAAAUObBYvx5t8byiTHDud2aeoMnhBYzXV0SBFBSsEAj8xUuLkIjO4
+ CsL1z/9+QX/SUxppXZoBQs4H2Drm
+X-Google-Smtp-Source: APXvYqyezu+o4TaFOOsMQboqUbLhkRRiaWSUS1F+/DK+51nKA+uRVWg+uUeo2CzNKamq6QxK7V1x7Q==
+X-Received: by 2002:a05:6000:cb:: with SMTP id q11mr92237wrx.14.1576074216464; 
+ Wed, 11 Dec 2019 06:23:36 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g23sm2503783wmk.14.2019.12.11.06.23.34
+ by smtp.gmail.com with ESMTPSA id g23sm2503783wmk.14.2019.12.11.06.23.35
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Dec 2019 06:23:34 -0800 (PST)
+ Wed, 11 Dec 2019 06:23:35 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] migration: fix maybe-uninitialized warning
-Date: Wed, 11 Dec 2019 15:23:25 +0100
-Message-Id: <1576074210-52834-4-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH] monitor: fix maybe-uninitialized
+Date: Wed, 11 Dec 2019 15:23:26 +0100
+Message-Id: <1576074210-52834-5-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,51 +98,41 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-../migration/ram.c: In function ‘multifd_recv_thread’:
-/home/elmarco/src/qq/include/qapi/error.h:165:5: error: ‘block’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  165 |     error_setg_internal((errp), __FILE__, __LINE__, __func__,   \
-      |     ^~~~~~~~~~~~~~~~~~~
-../migration/ram.c:818:15: note: ‘block’ was declared here
-  818 |     RAMBlock *block;
-      |               ^~~~~
+../monitor/misc.c: In function ‘mon_get_cpu_sync’:
+/home/elmarco/src/qq/include/sysemu/hw_accel.h:22:9: error: ‘cpu’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+   22 |         kvm_cpu_synchronize_state(cpu);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../monitor/misc.c:397:15: note: ‘cpu’ was declared here
+  397 |     CPUState *cpu;
+      |               ^~~
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- migration/ram.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ monitor/misc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 5078f94..7dd7f81 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -864,15 +864,17 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
-     p->next_packet_size = be32_to_cpu(packet->next_packet_size);
-     p->packet_num = be64_to_cpu(packet->packet_num);
+diff --git a/monitor/misc.c b/monitor/misc.c
+index 3baa15f..a74cff3 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -394,7 +394,7 @@ int monitor_set_cpu(int cpu_index)
+ /* Callers must hold BQL. */
+ static CPUState *mon_get_cpu_sync(bool synchronize)
+ {
+-    CPUState *cpu;
++    CPUState *cpu = NULL;
  
--    if (p->pages->used) {
--        /* make sure that ramblock is 0 terminated */
--        packet->ramblock[255] = 0;
--        block = qemu_ram_block_by_name(packet->ramblock);
--        if (!block) {
--            error_setg(errp, "multifd: unknown ram block %s",
--                       packet->ramblock);
--            return -1;
--        }
-+    if (p->pages->used == 0) {
-+        return 0;
-+    }
-+
-+    /* make sure that ramblock is 0 terminated */
-+    packet->ramblock[255] = 0;
-+    block = qemu_ram_block_by_name(packet->ramblock);
-+    if (!block) {
-+        error_setg(errp, "multifd: unknown ram block %s",
-+                   packet->ramblock);
-+        return -1;
+     if (cur_mon->mon_cpu_path) {
+         cpu = (CPUState *) object_resolve_path_type(cur_mon->mon_cpu_path,
+@@ -411,6 +411,7 @@ static CPUState *mon_get_cpu_sync(bool synchronize)
+         monitor_set_cpu(first_cpu->cpu_index);
+         cpu = first_cpu;
      }
- 
-     for (i = 0; i < p->pages->used; i++) {
++    assert(cpu != NULL);
+     if (synchronize) {
+         cpu_synchronize_state(cpu);
+     }
 -- 
 1.8.3.1
 
