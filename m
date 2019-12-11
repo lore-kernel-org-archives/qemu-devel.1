@@ -2,91 +2,93 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D1F3C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6275C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:06:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3338F2073D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:06:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3338F2073D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 84555208C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:06:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WPteukQT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84555208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if4Uy-0003Ng-2Z
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:06:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39981)
+	id 1if4Ve-0004IT-LV
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:06:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43488)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1if4U6-0002XQ-BD
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:07 -0500
+ (envelope-from <mst@redhat.com>) id 1if4UY-0003AN-42
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1if4U5-0003O7-4q
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36628)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1if4U4-0003LM-VR
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:05 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBBG3VN8037864
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 11:05:03 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wtf6yj1wm-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 11:05:01 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Wed, 11 Dec 2019 16:04:19 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 11 Dec 2019 16:04:17 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xBBG3Y2A46793114
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 11 Dec 2019 16:03:34 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1FD3442049;
- Wed, 11 Dec 2019 16:04:16 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D368742041;
- Wed, 11 Dec 2019 16:04:15 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.152.115])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 11 Dec 2019 16:04:15 +0000 (GMT)
-Subject: [PATCH v2] ppc/pnv: Make PnvXScomInterface an incomplete type
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Wed, 11 Dec 2019 17:04:15 +0100
-User-Agent: StGit/unknown-version
+ (envelope-from <mst@redhat.com>) id 1if4UW-00048r-FL
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:33 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40150
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1if4UW-00047y-9y
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576080331;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UV6nopb1zc62kP2n1lxTmW0LC7jeDzFSNycoALyvH0w=;
+ b=WPteukQTsnonPXU5lpSq0yXKBPZKzKPLLFkAYB7kQX4pZ/0YO8kRBOi9q3PiQxVARxylCP
+ /wqBqdNW8zXSJRS06EQjgBRYUBYXcVcfP2HKbuim81JpgM/FTCkjyBj0f6j/LqtQn4cUPf
+ Yx74JTDe+TmH92e+I6j0uAGhNfarQEg=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-25-yiNwXglGPOiM197wW9lpRw-1; Wed, 11 Dec 2019 11:05:22 -0500
+Received: by mail-qt1-f199.google.com with SMTP id e37so4681346qtk.7
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 08:05:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=fsSJ+LS6x0r1qCD4dGVRbbZsMZSPf90DyUEncvctSbo=;
+ b=N9P93UuHiAz0NFbX+7KXRz6jWxUB+mc2yR8QTPstZhswt3jOqcRV220UKoxPG6kzhY
+ SZPZwuJs012dHQkqjRrb7jwC2yxh1CDP1IrqSqehDoHxXaO9mx1trGilDwvaDrIgAQBp
+ 83s6UNEnnDhMyVOdMaZMzGs+3QzBxv3Wb4iFUetczOu/jtZ7bylfn6xQioWSD1gRy4bE
+ 3/r2+sRgpkayzoLeXhLXdM4E2XmxOM7kmV8oaaBTRBPWVT+yTliEKpIAMRfpC8yAjjDC
+ K2mL88vwnzqGDz1pav9LiHp9BQngadVHlQdxtDrYs5UHBTUyUsWt4xTpUUIDl/R4TxcF
+ WnQA==
+X-Gm-Message-State: APjAAAWq7Pu1PDUpUEmqvwsPqXHvMaql+RtanXNSeZzIBB7mEdlOwf8D
+ cga/JH0xPEUg2QS2Zm6tzYTbUMgOjhzpflxOSGhc6EgzGseChlnQZM8bgTmxVG61CMLegaS7Bm6
+ b9y7JbzBVWbZQ1Ig=
+X-Received: by 2002:a37:8b85:: with SMTP id n127mr3702110qkd.353.1576080322470; 
+ Wed, 11 Dec 2019 08:05:22 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwQltV6PHLtPIrxgLqnMmQeew1hakDwLMvsr8lSdsjO7Eez8OfUohXLpj4Gn8fUkiy2gER8gw==
+X-Received: by 2002:a37:8b85:: with SMTP id n127mr3702086qkd.353.1576080322250; 
+ Wed, 11 Dec 2019 08:05:22 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+ by smtp.gmail.com with ESMTPSA id h28sm793145qkk.48.2019.12.11.08.05.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 11 Dec 2019 08:05:21 -0800 (PST)
+Date: Wed, 11 Dec 2019 11:05:17 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH] virtio-fs: fix MSI-X nvectors calculation
+Message-ID: <20191211110504-mutt-send-email-mst@kernel.org>
+References: <20191209110759.35227-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121116-0008-0000-0000-0000033FDB77
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121116-0009-0000-0000-00004A5F1264
-Message-Id: <157608025541.186670.1577861507610404326.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-11_04:2019-12-11,2019-12-11 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- priorityscore=1501 adultscore=0 clxscore=1034 malwarescore=0
- suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0 spamscore=0
- mlxscore=0 mlxlogscore=738 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912110135
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+In-Reply-To: <20191209110759.35227-1-stefanha@redhat.com>
+X-MC-Unique: yiNwXglGPOiM197wW9lpRw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,44 +100,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, Vivek Goyal <vgoyal@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PnvXScomInterface is an interface instance. It should never be
-dereferenced. Drop the dummy type definition for extra safety,
-which is the common practice with QOM interfaces.
+On Mon, Dec 09, 2019 at 11:07:59AM +0000, Stefan Hajnoczi wrote:
+> The following MSI-X vectors are required:
+>  * VIRTIO Configuration Change
+>  * hiprio virtqueue
+>  * requests virtqueues
+>=20
+> Fix the calculation to reserve enough MSI-X vectors.  Otherwise guest
+> drivers fall back to a sub-optional configuration where all virtqueues
+> share a single vector.
+>=20
+> This change does not break live migration compatibility since
+> vhost-user-fs-pci devices are not migratable yet.
+>=20
+> Reported-by: Vivek Goyal <vgoyal@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-While here also convert the bogus OBJECT_CHECK() to INTERFACE_CHECK().
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v2: convert OBJECT_CHECK() to INTERFACE_CHECK()
----
- include/hw/ppc/pnv_xscom.h |    6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
-index 1c1d76bf9be5..306c22461587 100644
---- a/include/hw/ppc/pnv_xscom.h
-+++ b/include/hw/ppc/pnv_xscom.h
-@@ -22,13 +22,11 @@
- 
- #include "qom/object.h"
- 
--typedef struct PnvXScomInterface {
--    Object parent;
--} PnvXScomInterface;
-+typedef struct PnvXScomInterface PnvXScomInterface;
- 
- #define TYPE_PNV_XSCOM_INTERFACE "pnv-xscom-interface"
- #define PNV_XSCOM_INTERFACE(obj) \
--     OBJECT_CHECK(PnvXScomInterface, (obj), TYPE_PNV_XSCOM_INTERFACE)
-+    INTERFACE_CHECK(PnvXScomInterface, (obj), TYPE_PNV_XSCOM_INTERFACE)
- #define PNV_XSCOM_INTERFACE_CLASS(klass)                \
-     OBJECT_CLASS_CHECK(PnvXScomInterfaceClass, (klass), \
-                        TYPE_PNV_XSCOM_INTERFACE)
+> ---
+>  hw/virtio/vhost-user-fs-pci.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pci.=
+c
+> index 933a3f265b..e3a649d4a6 100644
+> --- a/hw/virtio/vhost-user-fs-pci.c
+> +++ b/hw/virtio/vhost-user-fs-pci.c
+> @@ -40,7 +40,8 @@ static void vhost_user_fs_pci_realize(VirtIOPCIProxy *v=
+pci_dev, Error **errp)
+>      DeviceState *vdev =3D DEVICE(&dev->vdev);
+> =20
+>      if (vpci_dev->nvectors =3D=3D DEV_NVECTORS_UNSPECIFIED) {
+> -        vpci_dev->nvectors =3D dev->vdev.conf.num_request_queues + 1;
+> +        /* Also reserve config change and hiprio queue vectors */
+> +        vpci_dev->nvectors =3D dev->vdev.conf.num_request_queues + 2;
+>      }
+> =20
+>      qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
+> --=20
+> 2.23.0
 
 
