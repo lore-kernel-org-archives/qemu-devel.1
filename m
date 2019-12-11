@@ -2,82 +2,104 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4703C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 05:09:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF32C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 05:09:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E78C20652
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 05:09:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fQhbo4CZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E78C20652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTPS id E4A5920652
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 05:09:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4A5920652
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieuFU-0008IM-Hk
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 00:09:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57013)
+	id 1ieuFj-0000Ce-0i
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 00:09:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stevensd@chromium.org>) id 1ieuEa-0007X1-89
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 00:08:26 -0500
+ (envelope-from <bharata@linux.ibm.com>) id 1ieuEm-0007iO-Pg
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 00:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stevensd@chromium.org>) id 1ieuEY-000230-JD
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 00:08:24 -0500
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:40353)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stevensd@chromium.org>)
- id 1ieuEY-00021l-Cy
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 00:08:22 -0500
-Received: by mail-qk1-x742.google.com with SMTP id c17so8680595qkg.7
- for <qemu-devel@nongnu.org>; Tue, 10 Dec 2019 21:08:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=13NpB549RTiez4xpnMDT0FGVuUUTjC2Z6ZWN3TT4Vxw=;
- b=fQhbo4CZTZAKQQi+k4zC2vXK+P/7YfcBdIbGqWp+n3T84MYmrEQN8S5jjxuYUQixxm
- ZsN5Yo/+TueJH+arp4tchOKiSc3RoqDtbaucWLigYyUZ4lmKlWsv8syyzuYdjOfdS/qc
- 0oU6lnSXOTVAbhh3i0ED9CDobfxWBaQqzqBww=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=13NpB549RTiez4xpnMDT0FGVuUUTjC2Z6ZWN3TT4Vxw=;
- b=sDl3Qh3Xlm5SoTSkU9qmgvxAf4CdjxF6eTNAediSMn8pi9/XcpNIijq2uBTJj+jQTV
- hcx8y1gYhGr1oakyIgn2IagsMAXHDfZnBfrdUr8WqNAI+dCxyIXwNJLNSyB53BcQamem
- RFndtL09c11HrH2KeAER5KBJ0MwqLhLpbQffpXeW4GYomq8QrwoB7RmIGgnu8nML5/ip
- Sz5vpRvOjqAvuY8OlA4ZH6Mk+lfjsRtCC+ktm1CAOWGLZ2ldgA2nwbSjicSYUS5pAdJ1
- DHjGIzhtm5WWpfDZrzDkePqHRvoOcX0WWvbvmajwUoJFhvQCISOUAmW+Qb7u3NoWqPbL
- rkCg==
-X-Gm-Message-State: APjAAAW3JnmyA+x9Ss0iTDZnGPc2QPcTHJ2yz826EgN6Mo9EFW4547ic
- zJOAC3xCq5t0Idgah+1cxLCcgGfQEvXkKo4Xh3d5wg==
-X-Google-Smtp-Source: APXvYqxgElEEBnxsuMOS8vYNVs3ziV7cgJhHrroNDr9xuYZhJF+2TSpKtR6UBQgzp3nGIhuQ8EWaol/dHsfhtQK+opk=
-X-Received: by 2002:a37:a68f:: with SMTP id p137mr1246162qke.328.1576040900973; 
- Tue, 10 Dec 2019 21:08:20 -0800 (PST)
+ (envelope-from <bharata@linux.ibm.com>) id 1ieuEl-0002G0-E8
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 00:08:36 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45386
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bharata@linux.ibm.com>)
+ id 1ieuEl-0002Eg-8T
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 00:08:35 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBB56wq2047822
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 00:08:33 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wtf83601v-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 00:08:33 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bharata@linux.ibm.com>;
+ Wed, 11 Dec 2019 05:08:31 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 11 Dec 2019 05:08:28 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBB58SbN59572338
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 11 Dec 2019 05:08:28 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EBC69A4062;
+ Wed, 11 Dec 2019 05:08:27 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B6BD4A405C;
+ Wed, 11 Dec 2019 05:08:26 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.85.95.219])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Wed, 11 Dec 2019 05:08:26 +0000 (GMT)
+Date: Wed, 11 Dec 2019 10:38:24 +0530
+From: Bharata B Rao <bharata@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v1 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
+ pseries guest
+References: <20191209070012.14766-1-bharata@linux.ibm.com>
+ <20191209070012.14766-3-bharata@linux.ibm.com>
+ <20191210032851.GC207300@umbus.fritz.box>
+ <20191210035038.GB17552@in.ibm.com>
+ <dd94f089-7df8-1a13-f4a6-631e765f6339@ozlabs.ru>
+ <20191210050536.GH207300@umbus.fritz.box>
+ <20191210065007.GD17552@in.ibm.com>
+ <20191210234132.GL207300@umbus.fritz.box>
 MIME-Version: 1.0
-References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
- <CAD=HUj7EsxrkSubmY6HE4aYJOykVKtmGXjMjeGqnoJw1KZUc5Q@mail.gmail.com>
- <20191106124101.fsfxibdkypo4rswv@sirius.home.kraxel.org>
- <72712fe048af1489368f7416faa92c45@hostfission.com>
- <CAAFQd5Cpb=3HRL3NbgxP+S259nkNEuA=u75ew1JQTzvVUU5NeQ@mail.gmail.com>
- <d65bec5074eda5f389668e28922c1609@hostfission.com>
- <CAAFQd5AWqYaNWfYQ2hepjg7OD8y8ehHn0guusAR8JYefc+BNaw@mail.gmail.com>
- <CAEUnVG77y2DrV5kLTHDy1xio+yzMGv9j=M0c4388vH_LUaiXLg@mail.gmail.com>
-In-Reply-To: <CAEUnVG77y2DrV5kLTHDy1xio+yzMGv9j=M0c4388vH_LUaiXLg@mail.gmail.com>
-From: David Stevens <stevensd@chromium.org>
-Date: Wed, 11 Dec 2019 14:08:10 +0900
-Message-ID: <CAD=HUj40Jb2cy8EP=24coO-CPUvq6ib+01bvXHn1G9GD8KuenA@mail.gmail.com>
-Subject: Re: guest / host buffer sharing ...
-To: Dylan Reid <dgreid@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::742
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191210234132.GL207300@umbus.fritz.box>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-TM-AS-GCONF: 00
+x-cbid: 19121105-0028-0000-0000-000003C76926
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121105-0029-0000-0000-0000248A9B9B
+Message-Id: <20191211050824.GE17552@in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-10_08:2019-12-10,2019-12-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 impostorscore=0
+ spamscore=0 priorityscore=1501 suspectscore=18 mlxscore=0 adultscore=0
+ clxscore=1015 lowpriorityscore=0 malwarescore=0 mlxlogscore=999
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912110044
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,168 +111,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Geoffrey McRae <geoff@hostfission.com>, Hans Verkuil <hverkuil@xs4all.nl>,
- Zach Reizner <zachr@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
- virtio-dev@lists.oasis-open.org, qemu-devel <qemu-devel@nongnu.org>,
- Alex Lau <alexlau@chromium.org>, Tomasz Figa <tfiga@chromium.org>,
- Keiichi Watanabe <keiichiw@chromium.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Daniel Vetter <daniel@ffwll.ch>,
- =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Reply-To: bharata@linux.ibm.com
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
+ linuxram@us.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are three issues being discussed here that aren't being clearly
-delineated: sharing guest allocated memory with the host, sharing host
-allocated memory with the guest, and sharing buffers between devices.
+On Wed, Dec 11, 2019 at 10:41:32AM +1100, David Gibson wrote:
+> On Tue, Dec 10, 2019 at 12:20:07PM +0530, Bharata B Rao wrote:
+> > On Tue, Dec 10, 2019 at 04:05:36PM +1100, David Gibson wrote:
+> > > On Tue, Dec 10, 2019 at 03:03:01PM +1100, Alexey Kardashevskiy wrote:
+> > > > 
+> > > > 
+> > > > On 10/12/2019 14:50, Bharata B Rao wrote:
+> > > > > On Tue, Dec 10, 2019 at 02:28:51PM +1100, David Gibson wrote:
+> > > > >> On Mon, Dec 09, 2019 at 12:30:12PM +0530, Bharata B Rao wrote:
+> > > > >>> A pseries guest can be run as a secure guest on Ultravisor-enabled
+> > > > >>> POWER platforms. When such a secure guest is reset, we need to
+> > > > >>> release/reset a few resources both on ultravisor and hypervisor side.
+> > > > >>> This is achieved by invoking this new ioctl KVM_PPC_SVM_OFF from the
+> > > > >>> machine reset path.
+> > > > >>>
+> > > > >>> As part of this ioctl, the secure guest is essentially transitioned
+> > > > >>> back to normal mode so that it can reboot like a regular guest and
+> > > > >>> become secure again.
+> > > > >>>
+> > > > >>> This ioctl has no effect when invoked for a normal guest.
+> > > > >>>
+> > > > >>> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+> > > > >>> ---
+> > > > >>>  hw/ppc/spapr.c       | 1 +
+> > > > >>>  target/ppc/kvm.c     | 7 +++++++
+> > > > >>>  target/ppc/kvm_ppc.h | 6 ++++++
+> > > > >>>  3 files changed, 14 insertions(+)
+> > > > >>>
+> > > > >>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > > >>> index f11422fc41..4c7ad3400d 100644
+> > > > >>> --- a/hw/ppc/spapr.c
+> > > > >>> +++ b/hw/ppc/spapr.c
+> > > > >>> @@ -1597,6 +1597,7 @@ static void spapr_machine_reset(MachineState *machine)
+> > > > >>>      void *fdt;
+> > > > >>>      int rc;
+> > > > >>>  
+> > > > >>> +    kvmppc_svm_off();
+> > > > >>
+> > > > >> If you're going to have this return an error value, you should really
+> > > > >> check it here.
+> > > > > 
+> > > > > I could, by spapr_machine_reset() and the callers don't propagate the
+> > > > > errors up. So may be I could print a warning instead when ioctl fails?
+> > > > 
+> > > > An error here means you cannot restart the machine and should probably
+> > > > suspend, or try until it is not EBUSY (==all threads have stopped?).
+> > > 
+> > > Right, if this fails, something has gone badly wrong.  You should
+> > > absolutely print a message, and in fact it might be appropriate to
+> > > quit outright.  IIUC the way PEF resets work, a failure here means you
+> > > won't be able to boot after the reset, since the guest memory will
+> > > still be inaccessible to the host.
+> > 
+> > Correct. I will send next version with a message and abort() added in
+> > the ioctl failure path.
+> 
+> abort() or assert() isn't right either - that's reserved for things
+> that are definitely caused by a qemu code bug.  This should be an
+> exit(EXIT_FAILURE).
 
-Right now, guest allocated memory can be shared with the host through
-the virtqueues or by passing a scatterlist in the virtio payload (i.e.
-what virtio-gpu does). Host memory can be shared with the guest using
-the new shared memory regions. As far as I can tell, these mechanisms
-should be sufficient for sharing memory between the guest and host and
-vice versa.
+Ok, but I see a problem with checking the return value of this
+ioctl from userspace. If this ioctl is run on older kernels that don't
+support this ioctl, we get -ENOTTY as return value. We shouldn't be
+exiting in that case.
 
-Where things are not sufficient is when we talk about sharing buffers
-between devices. For starters, a 'buffer' as we're discussing here is
-not something that is currently defined by the virtio spec. The
-original proposal defines a buffer as a generic object that is guest
-ram+id+metadata, and is created by a special buffer allocation device.
-With this approach, buffers can be cleanly shared between devices.
+It looks like we may need a new KVM capability to advertise the presence
+of KVM_PPC_SVM_OFF ioctl (or more generally, to advertise host kernel's
+capability to support secure guests). 
 
-An alternative that Tomasz suggested would be to avoid defining a
-generic buffer object, and instead state that the scatterlist which
-virtio-gpu currently uses is the 'correct' way for virtio device
-protocols to define buffers. With this approach, sharing buffers
-between devices potentially requires the host to map different
-scatterlists back to a consistent representation of a buffer.
+Paul - Do you think we should add such a KVM capability? Here is the
+summary of the problem:
 
-None of the proposals directly address the use case of sharing host
-allocated buffers between devices, but I think they can be extended to
-support it. Host buffers can be identified by the following tuple:
-(transport type enum, transport specific device address, shmid,
-offset). I think this is sufficient even for host-allocated buffers
-that aren't visible to the guest (e.g. protected memory, vram), since
-they can still be given address space in some shared memory region,
-even if those addresses are actually inaccessible to the guest. At
-this point, the host buffer identifier can simply be passed in place
-of the guest ram scatterlist with either proposed buffer sharing
-mechanism.
+1. QEMU invokes KVM_PPC_SVM_OFF ioctl from machine reset path and currently
+   we don't check for its return value.
+2. On host kernels that support secure guests,
+   2a. this ioctl returns 0 for regular guests and has no effect.
+   2b. the ioctl can fail for secure guests and here we could check the
+       return value and exit the guest right away.
+3. On host kernels that don't support secure guests, ioctl returns -ENOTTY
+   but we ignore the return value and continue the reset as this is
+   for a non-secure guest.
 
-I think the main question here is whether or not the complexity of
-generic buffers and a buffer sharing device is worth it compared to
-the more implicit definition of buffers. Personally, I lean towards
-the implicit definition of buffers, since a buffer sharing device
-brings a lot of complexity and there aren't any clear clients of the
-buffer metadata feature.
+If we have such a KVM capability, we could invoke the ioctl only if it
+is supported and handle the return value appropriately.
 
-Cheers,
-David
+Regards,
+Bharata.
 
-On Thu, Dec 5, 2019 at 7:22 AM Dylan Reid <dgreid@chromium.org> wrote:
->
-> On Thu, Nov 21, 2019 at 4:59 PM Tomasz Figa <tfiga@chromium.org> wrote:
-> >
-> > On Thu, Nov 21, 2019 at 6:41 AM Geoffrey McRae <geoff@hostfission.com> wrote:
-> > >
-> > >
-> > >
-> > > On 2019-11-20 23:13, Tomasz Figa wrote:
-> > > > Hi Geoffrey,
-> > > >
-> > > > On Thu, Nov 7, 2019 at 7:28 AM Geoffrey McRae <geoff@hostfission.com>
-> > > > wrote:
-> > > >>
-> > > >>
-> > > >>
-> > > >> On 2019-11-06 23:41, Gerd Hoffmann wrote:
-> > > >> > On Wed, Nov 06, 2019 at 05:36:22PM +0900, David Stevens wrote:
-> > > >> >> > (1) The virtio device
-> > > >> >> > =====================
-> > > >> >> >
-> > > >> >> > Has a single virtio queue, so the guest can send commands to register
-> > > >> >> > and unregister buffers.  Buffers are allocated in guest ram.  Each buffer
-> > > >> >> > has a list of memory ranges for the data. Each buffer also has some
-> > > >> >>
-> > > >> >> Allocating from guest ram would work most of the time, but I think
-> > > >> >> it's insufficient for many use cases. It doesn't really support things
-> > > >> >> such as contiguous allocations, allocations from carveouts or <4GB,
-> > > >> >> protected buffers, etc.
-> > > >> >
-> > > >> > If there are additional constrains (due to gpu hardware I guess)
-> > > >> > I think it is better to leave the buffer allocation to virtio-gpu.
-> > > >>
-> > > >> The entire point of this for our purposes is due to the fact that we
-> > > >> can
-> > > >> not allocate the buffer, it's either provided by the GPU driver or
-> > > >> DirectX. If virtio-gpu were to allocate the buffer we might as well
-> > > >> forget
-> > > >> all this and continue using the ivshmem device.
-> > > >
-> > > > I don't understand why virtio-gpu couldn't allocate those buffers.
-> > > > Allocation doesn't necessarily mean creating new memory. Since the
-> > > > virtio-gpu device on the host talks to the GPU driver (or DirectX?),
-> > > > why couldn't it return one of the buffers provided by those if
-> > > > BIND_SCANOUT is requested?
-> > > >
-> > >
-> > > Because in our application we are a user-mode application in windows
-> > > that is provided with buffers that were allocated by the video stack in
-> > > windows. We are not using a virtual GPU but a physical GPU via vfio
-> > > passthrough and as such we are limited in what we can do. Unless I have
-> > > completely missed what virtio-gpu does, from what I understand it's
-> > > attempting to be a virtual GPU in its own right, which is not at all
-> > > suitable for our requirements.
-> >
-> > Not necessarily. virtio-gpu in its basic shape is an interface for
-> > allocating frame buffers and sending them to the host to display.
-> >
-> > It sounds to me like a PRIME-based setup similar to how integrated +
-> > discrete GPUs are handled on regular systems could work for you. The
-> > virtio-gpu device would be used like the integrated GPU that basically
-> > just drives the virtual screen. The guest component that controls the
-> > display of the guest (typically some sort of a compositor) would
-> > allocate the frame buffers using virtio-gpu and then import those to
-> > the vfio GPU when using it for compositing the parts of the screen.
-> > The parts of the screen themselves would be rendered beforehand by
-> > applications into local buffers managed fully by the vfio GPU, so
-> > there wouldn't be any need to involve virtio-gpu there. Only the
-> > compositor would have to be aware of it.
-> >
-> > Of course if your guest is not Linux, I have no idea if that can be
-> > handled in any reasonable way. I know those integrated + discrete GPU
-> > setups do work on Windows, but things are obviously 100% proprietary,
-> > so I don't know if one could make them work with virtio-gpu as the
-> > integrated GPU.
-> >
-> > >
-> > > This discussion seems to have moved away completely from the original
-> > > simple feature we need, which is to share a random block of guest
-> > > allocated ram with the host. While it would be nice if it's contiguous
-> > > ram, it's not an issue if it's not, and with udmabuf (now I understand
-> > > it) it can be made to appear contigous if it is so desired anyway.
-> > >
-> > > vhost-user could be used for this if it is fixed to allow dynamic
-> > > remapping, all the other bells and whistles that are virtio-gpu are
-> > > useless to us.
-> > >
-> >
-> > As far as I followed the thread, my impression is that we don't want
-> > to have an ad-hoc interface just for sending memory to the host. The
-> > thread was started to look for a way to create identifiers for guest
-> > memory, which proper virtio devices could use to refer to the memory
-> > within requests sent to the host.
-> >
-> > That said, I'm not really sure if there is any benefit of making it
-> > anything other than just the specific virtio protocol accepting
-> > scatterlist of guest pages directly.
-> >
-> > Putting the ability to obtain the shared memory itself, how do you
-> > trigger a copy from the guest frame buffer to the shared memory?
->
-> Adding Zach for more background on virtio-wl particular use cases.
 
