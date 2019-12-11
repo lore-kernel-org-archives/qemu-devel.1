@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F49C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB516C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:37:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA8DA20836
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:37:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E6F920836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:37:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mMSjB4Xq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA8DA20836
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l0uNsFNf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E6F920836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if37A-0001ow-E9
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:37:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43618)
+	id 1if37F-0001tM-Cx
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:37:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40185)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2vB-00072w-Gp
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:24:58 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1if2uk-0006SP-V9
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:24:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2vA-0005JN-Di
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:24:57 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43249)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1if2uj-0004UR-M4
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:24:30 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42836)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1if2vA-0005IL-5z; Wed, 11 Dec 2019 09:24:56 -0500
-Received: by mail-wr1-x443.google.com with SMTP id d16so24212132wre.10;
- Wed, 11 Dec 2019 06:24:56 -0800 (PST)
+ id 1if2uj-0004SB-Fc
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:24:29 -0500
+Received: by mail-wr1-x443.google.com with SMTP id q6so2749234wro.9
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 06:24:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=34Nd+ALMHwz8bW3VQb5UBosP3gUl7lWCXti3VJM7gaI=;
- b=mMSjB4XqPMx/gZEN4gf2TK9ZPPVCFIS9BSumJRdt/kt+2nyatWRiRflTcczACbahq1
- CP/jgPPfrGAZoqc7W1hgvU7eE4e4PSVI+GjWHLVaSnq3kN9NoRwOWYb2f+/WaSRQoIFz
- SQVX0ztzP356XGF607qTIS2xj5mqBRZHyWa9S0CMol9kavXGy8D/3f5VrrMfcZPkGEVD
- tHJQiz7UtloZ5BLwFYz9U4p91PqXa9fegHqaPOaH547YfSCkTlmmPO2zwKTn9UZm3ktH
- EvHZZaNOfu5s2c22TbdNXxU5Q35erMhxRvuVzcmEXUswn0aMgVJHaHEjRfmoUKoQESwu
- Zafw==
+ bh=6P+O7fP7RdRxtrVlibSaBNIUsO6tN03n2SE/FwGlPpk=;
+ b=l0uNsFNfQ2lywr02LWYhFULRgQI+/K+QVKVG/VwAgpMz2+vS0ef7h+40S5IHvN0nnE
+ PuIgzhTMfrU2f86pw2fAE9WOGlvRDGX6AROERAenwZcgKsIQbIfOXjgDjn8f88BxYpjO
+ 9F3a4f0uFMONQKErc8t9VCOD/PxwM9m0haWg9XRTr1SV99ovEgtakwUqD9Gjuw3Afxf/
+ 37nk/UKaSx3UamtmuD/JNHMTLZb1g73K3fsIE+cjkJW73qDdYZlWX9cjTrT5BXmJVfzJ
+ M933phMnMrRZj7zxC39n4slMi7l8f5PEeWIv7POtWIxwXxpqeRbY1b7OvdmDMmQW65Ub
+ 2Mvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :mime-version:content-transfer-encoding;
- bh=34Nd+ALMHwz8bW3VQb5UBosP3gUl7lWCXti3VJM7gaI=;
- b=RLh+LqTEE3JtMiEQ2Jm67lngyfWDDdzdoLUwJl19lz+3ki57G5VcEjWkj3zn2dNKZw
- hnLAG8MfRzyG7Ul7Yjl5bEqgOf5gZSd+OUwq0t+qZlqvoRhtrbgdj95D80AuTnZaKQHG
- aqcAkyxwYsmqZBoqu56VsqwplEtH2NS6YOP1a9ZaUUNMN6INYVx3bxT+iCPaUf2v9W2i
- AKy+4d7cutwSVf8my1f0vCye77wDEgQ4riDlNoTVpWOU2XUwTwsvgGiZiT51JhQH3hrH
- F8Cu/yejRSr5BV6kmI7TaZfEMOgWz1H19eC05BwORjxFwY0OYXyicuu0RCz5sTISLpcs
- dE/g==
-X-Gm-Message-State: APjAAAU8GzNxRhd/2ojTmxbom5wpKhAW301lAeDapU6Nhz3lad+8I8Pd
- /hFYb+dGO3mbS8EGBPayiym6aMXK
-X-Google-Smtp-Source: APXvYqzrlIyf8O0Aw0bvmwSgPH0PUoEkTMmgJbV3R8D0ZwEq4tlNu3Gm4WtSk3EE3ocSkdTuYryNcg==
-X-Received: by 2002:a05:6000:11c3:: with SMTP id
- i3mr68020wrx.244.1576074294987; 
- Wed, 11 Dec 2019 06:24:54 -0800 (PST)
+ bh=6P+O7fP7RdRxtrVlibSaBNIUsO6tN03n2SE/FwGlPpk=;
+ b=GHZEphoKBAUK6zWYEtDfT6Mjf7qwJtT0Od3w1+5yCjqVkatZS7jz4QU24ytb5+zAWZ
+ 2G4Q/Rhok7vKT+wAhKNjV2Ut6978uMJEgO6Icsve5f4uTTDg1m3LWcI5xemn4R5iEco3
+ qLqZwwWYdnr8FgMAPiMR1Yq5z3Z79NZgJ/1tHG0d8HqDcI+hEaqEVYS4wN/FsSdN8OkP
+ 71PtH2CDWJoyaqqS44GIkBK+5gzQA9MEGN0mapvY/06+pByhaQEZtAW1JlRc88mZw7aZ
+ YAbpYb1S4cdU65Kqa1fTlvFk8zBW11qdoyLKuIv5gWITH2xlnpcoSXKNFlVhcPGum1KA
+ Da1Q==
+X-Gm-Message-State: APjAAAV6zQ5oaZIh1wa9OfR9o9ZdHMJ38fwQ396BS5DJlcWPi0LgDCC/
+ dgneezRnXS6s1Y20Obz5MqXNVX0i
+X-Google-Smtp-Source: APXvYqzj5dN64kbSxo0CFeODPpIH1dEJvzzW2C0PBbdUO+/aiSgWWBbwdzIAb8l0cxg2sl4rYQ9eUQ==
+X-Received: by 2002:a5d:4cc9:: with SMTP id c9mr96260wrt.70.1576074268281;
+ Wed, 11 Dec 2019 06:24:28 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id 4sm2428473wmg.22.2019.12.11.06.24.54
+ by smtp.gmail.com with ESMTPSA id b10sm2391123wrt.90.2019.12.11.06.24.27
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Dec 2019 06:24:54 -0800 (PST)
+ Wed, 11 Dec 2019 06:24:27 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] tests: skip block layer tests if !CONFIG_TOOLS
-Date: Wed, 11 Dec 2019 15:24:53 +0100
-Message-Id: <1576074293-53357-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH] os-posix: simplify os_find_datadir
+Date: Wed, 11 Dec 2019 15:24:26 +0100
+Message-Id: <1576074266-53158-1-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -91,47 +91,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- qemu-block@nongnu.org
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-The block tests, as well as ahci-test needs qemu-img.  Do not run
-them if it wasn't built.
+Use g_build_filename instead of sprintf, and g_autofree instead of
+manual freeing.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include | 4 ++++
- 1 file changed, 4 insertions(+)
+ os-posix.c | 41 +++++++++++++----------------------------
+ 1 file changed, 13 insertions(+), 28 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 8566f5f..f07c761 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -169,7 +169,9 @@ check-qtest-pci-$(CONFIG_IVSHMEM_DEVICE) += tests/ivshmem-test$(EXESUF)
- check-qtest-i386-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
- check-qtest-i386-y += tests/fdc-test$(EXESUF)
- check-qtest-i386-y += tests/ide-test$(EXESUF)
-+ifeq ($(CONFIG_TOOLS),y)
- check-qtest-i386-y += tests/ahci-test$(EXESUF)
-+endif
- check-qtest-i386-y += tests/hd-geo-test$(EXESUF)
- check-qtest-i386-y += tests/boot-order-test$(EXESUF)
- check-qtest-i386-y += tests/bios-tables-test$(EXESUF)
-@@ -1193,7 +1195,9 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
- .PHONY: check-block check-qapi-schema check-qtest check-unit check check-clean
- check-qapi-schema: check-tests/qapi-schema/frontend check-tests/qapi-schema/doc-good.texi
- check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
-+ifeq ($(CONFIG_TOOLS),y)
- check-block: $(patsubst %,check-%, $(check-block-y))
-+endif
- check: check-block check-qapi-schema check-unit check-softfloat check-qtest check-decodetree
- check-clean:
- 	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
+diff --git a/os-posix.c b/os-posix.c
+index 86cffd2..3cd52e1 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -80,41 +80,26 @@ void os_setup_signal_handling(void)
+     sigaction(SIGTERM, &act, NULL);
+ }
+ 
+-/* Find a likely location for support files using the location of the binary.
+-   For installed binaries this will be "$bindir/../share/qemu".  When
+-   running from the build tree this will be "$bindir/../pc-bios".  */
+-#define SHARE_SUFFIX "/share/qemu"
+-#define BUILD_SUFFIX "/pc-bios"
++/*
++ * Find a likely location for support files using the location of the binary.
++ * When running from the build tree this will be "$bindir/../pc-bios".
++ * Otherwise, this is CONFIG_QEMU_DATADIR.
++ */
+ char *os_find_datadir(void)
+ {
+-    char *dir, *exec_dir;
+-    char *res;
+-    size_t max_len;
++    g_autofree char *exec_dir = NULL;
++    g_autofree char *dir = NULL;
+ 
+     exec_dir = qemu_get_exec_dir();
+-    if (exec_dir == NULL) {
+-        return NULL;
+-    }
+-    dir = g_path_get_dirname(exec_dir);
+-
+-    max_len = strlen(dir) +
+-        MAX(strlen(SHARE_SUFFIX), strlen(BUILD_SUFFIX)) + 1;
+-    res = g_malloc0(max_len);
+-    snprintf(res, max_len, "%s%s", dir, SHARE_SUFFIX);
+-    if (access(res, R_OK)) {
+-        snprintf(res, max_len, "%s%s", dir, BUILD_SUFFIX);
+-        if (access(res, R_OK)) {
+-            g_free(res);
+-            res = NULL;
+-        }
++    g_return_val_if_fail(exec_dir != NULL, NULL);
++
++    dir = g_build_filename(exec_dir, "..", "pc-bios", NULL);
++    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
++        return g_steal_pointer(&dir);
+     }
+ 
+-    g_free(dir);
+-    g_free(exec_dir);
+-    return res;
++    return g_strdup(CONFIG_QEMU_DATADIR);
+ }
+-#undef SHARE_SUFFIX
+-#undef BUILD_SUFFIX
+ 
+ void os_set_proc_name(const char *s)
+ {
 -- 
 1.8.3.1
 
