@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0407C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB93C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:28:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69BF720836
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:27:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4696421556
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:28:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q9JX01Zp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69BF720836
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oN8qPj0j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4696421556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if2xb-0000r4-F3
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:27:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43932)
+	id 1if2yk-0002Hc-Cn
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:28:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33371)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2vE-00076B-3f
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:25:01 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1if2ts-0005PV-Gx
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2vD-0005NG-3I
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:24:59 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54334)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1if2tq-000391-NG
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:35 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33214)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1if2vC-0005MC-T1
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:24:59 -0500
-Received: by mail-wm1-x343.google.com with SMTP id b11so7305254wmj.4
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 06:24:58 -0800 (PST)
+ id 1if2tq-00037k-HE; Wed, 11 Dec 2019 09:23:34 -0500
+Received: by mail-wr1-x444.google.com with SMTP id b6so24267647wrq.0;
+ Wed, 11 Dec 2019 06:23:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=X8hK4OmxbRe74okeViqqk8QWGsS7awYMg615kR03rjI=;
- b=q9JX01ZpYzSX+ZiU9W7RiB0KJj8CQXR+Cn4W3GdXBwgxNKtmXkr8iJRVgdgVMNIleh
- 3kygUOT0ZyBTjgRpFFYDdTNMuHzu81xTbnmQ7NXqYzPbFTXu7+bgxP9SPD5nHAu3Tcrs
- iP2EJH9hI+lj46AS/8pS8B1Da+9ZWbOwVq6aftzIMZCIFPVRCA2DLGzZUxDz4e/23AVm
- VCHFaJuI8nbmI+tch+rJIKs6u3agQVXSY67qdGafNU9GhW4myIIUyEeaDHZ+KvNyPemU
- +gVzdxTtJGKmhvlXgqP/d8/cjVBdoDfbsVYZd52Dv7M3+jYZTWRoSgRz7Km3EPM+HUfB
- 3sGQ==
+ bh=KTbcScOLjXllpK9umoeqVc/PDjmIqMW5fTameWTBrIo=;
+ b=oN8qPj0jT+uo3AMAXS8VqupwT9RelTzEQBqYUNqK0iIKnznELXzRwmquB1uunWzg5g
+ IsMBvDiPFXpLxyaqhRE/aMbHjLrIvb+14saNSGOeuuga3uNtM0tfYjPm452SA0+JASfS
+ mP5ExkHo2pPLqmS2V156WMbX9Zf+VjTY/j+trOBrx17JkthX5sz8b5LpzoOpDSuT7U4k
+ UP5QtJ1Z6XRLvJrAFJdO0HzMQ+dKAMB6Z9/qobqOsgK5XkBGx8h1niM31c99ZT8RrtNS
+ nrtUQ9a3FN8JkUiGFI/6j3bUqk0fqcAly8Nk6i41oNO0/P0BSrvCdcS/N5XmKjl/OnIi
+ D+vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :mime-version:content-transfer-encoding;
- bh=X8hK4OmxbRe74okeViqqk8QWGsS7awYMg615kR03rjI=;
- b=ZkKxhMJ8N0J7cKk+riRuLb8Wawcjk3S5oICp4fZFs24seBBc6TdQADl101Na7whVV+
- GZnrV5BDTemWbQaGUlV+nC6+iKJQKr9AET/hyRfrJRCv45Qz08ncnJVDQxmgPiat7uIy
- BlqWXUSZ4WVKeY/4nMUijLAK2IHhxrIQlYNuQCTs45D2x2LDtEEGarDwLGkQPdDwwyQ0
- 0S6KcgiI+OrqaZxjYHAxrD2zEAyeZk2Ff1o38M4DgIqoNtNfVPra4EhtyFpbv2pxqVU0
- fpGzykvuzHuv5qg8XvYHjGxuSx6Pag2qDNf10zXdIKIdjbZ+FIzLX71VxoDpXinksRUR
- Xp3w==
-X-Gm-Message-State: APjAAAUOkq6JDtEqS/3o48SsSksNC4sWV3GEDEpM+td55jhOTa0c6AKz
- bTsjVUefPrYKQw0KK8XQPz54gokC
-X-Google-Smtp-Source: APXvYqz2kerJEsLYxSigGFjDoeoBwFJG6tBMqTSTi4vvs2LOE6qOUSoXXU5Ef+gHTwjlInau7p+4YQ==
-X-Received: by 2002:a1c:9e0d:: with SMTP id h13mr71941wme.110.1576074297670;
- Wed, 11 Dec 2019 06:24:57 -0800 (PST)
+ bh=KTbcScOLjXllpK9umoeqVc/PDjmIqMW5fTameWTBrIo=;
+ b=Ucu+ICvnl9pZnhOQ6H808sCBnoLjS+vGfZ8uvUW72KqSbfdOEFi4Sk+r6bja4l3SvI
+ apy+e7W0W5X5g73R7t1DTgDn5pDA2I3N5HwXm7qIYWyjzfaz3U9khop2CqxXmVeqnnlr
+ 0oIFf+NdemB3wbnPGGGrFv6FJbTcbEBQl7fWUn56nkg1Y0SEXwAfi/etRwyPZNQ3ceZA
+ vsp9M9onLY7Z69wRKQ5OGsikT/Y4CP3MEKdTSru4t2X45xh3q2xp4qVXJHQ+chOvElA9
+ XitHlCc3vKnoxjY5RUR/ZfCuflc9h09IXFeFTrSFGyK1P2/WDm3W2/QMvPa6Wu4msl1B
+ 2Exg==
+X-Gm-Message-State: APjAAAXSNtnAy6qbddzJdsAeZU9O93khNy2ko+HliNGjp+SDUdDh/50z
+ q7GPXTFeCqPZ7Ng8Roq89T46mY5c
+X-Google-Smtp-Source: APXvYqyJReA0qZLK4zO4VcBN0cU/v+F2bAwpe1awnganCfX8fr2Zi2UeuPOcHS90qWNi7if78+sPxg==
+X-Received: by 2002:adf:fd87:: with SMTP id d7mr70174wrr.226.1576074213202;
+ Wed, 11 Dec 2019 06:23:33 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id l22sm2340980wmj.42.2019.12.11.06.24.56
+ by smtp.gmail.com with ESMTPSA id g23sm2503783wmk.14.2019.12.11.06.23.32
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Dec 2019 06:24:57 -0800 (PST)
+ Wed, 11 Dec 2019 06:23:32 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] configure: simplify vhost condition with Kconfig
-Date: Wed, 11 Dec 2019 15:24:56 +0100
-Message-Id: <1576074296-53617-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH] build-sys: do not include Windows SLIRP dependencies in $LIBS
+Date: Wed, 11 Dec 2019 15:23:23 +0100
+Message-Id: <1576074210-52834-2-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,63 +90,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+When including the internal SLIRP library, we should add all the libraries that
+it needs for the build.  Right now they are all included by QEMU, but -liphlpapi
+is not needed without slirp.  Move it from LIBS to slirp_libs.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Based on a patch by Marc-André Lureau.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Kconfig.host            | 5 +++++
- hw/virtio/Kconfig       | 3 +++
- hw/virtio/Makefile.objs | 4 ++--
- 3 files changed, 10 insertions(+), 2 deletions(-)
+ configure | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/Kconfig.host b/Kconfig.host
-index bb6e116..55136e0 100644
---- a/Kconfig.host
-+++ b/Kconfig.host
-@@ -25,6 +25,11 @@ config TPM
+diff --git a/configure b/configure
+index 6099be1..d16dad2 100755
+--- a/configure
++++ b/configure
+@@ -926,7 +926,7 @@ if test "$mingw32" = "yes" ; then
+   DSOSUF=".dll"
+   # MinGW needs -mthreads for TLS and macro _MT.
+   QEMU_CFLAGS="-mthreads $QEMU_CFLAGS"
+-  LIBS="-lwinmm -lws2_32 -liphlpapi $LIBS"
++  LIBS="-lwinmm -lws2_32 $LIBS"
+   write_c_skeleton;
+   if compile_prog "" "-liberty" ; then
+     LIBS="-liberty $LIBS"
+@@ -6069,6 +6069,9 @@ case "$slirp" in
+     mkdir -p slirp
+     slirp_cflags="-I\$(SRC_PATH)/slirp/src -I\$(BUILD_DIR)/slirp/src"
+     slirp_libs="-L\$(BUILD_DIR)/slirp -lslirp"
++    if test "$mingw32" = "yes" ; then
++      slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
++    fi
+     ;;
  
- config VHOST_USER
-     bool
-+    select VHOST
-+
-+config VHOST_KERNEL
-+    bool
-+    select VHOST
- 
- config XEN
-     bool
-diff --git a/hw/virtio/Kconfig b/hw/virtio/Kconfig
-index 3724ff8..f87def2 100644
---- a/hw/virtio/Kconfig
-+++ b/hw/virtio/Kconfig
-@@ -1,3 +1,6 @@
-+config VHOST
-+    bool
-+
- config VIRTIO
-     bool
- 
-diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
-index e2f70fb..de0f5fc 100644
---- a/hw/virtio/Makefile.objs
-+++ b/hw/virtio/Makefile.objs
-@@ -2,8 +2,8 @@ ifeq ($(CONFIG_VIRTIO),y)
- common-obj-y += virtio-bus.o
- obj-y += virtio.o
- 
--obj-$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_VHOST_KERNEL)) += vhost.o vhost-backend.o
--common-obj-$(call lnot,$(call lor,$(CONFIG_VHOST_USER),$(CONFIG_VHOST_KERNEL))) += vhost-stub.o
-+obj-$(CONFIG_VHOST) += vhost.o vhost-backend.o
-+common-obj-$(call lnot,$(CONFIG_VHOST)) += vhost-stub.o
- obj-$(CONFIG_VHOST_USER) += vhost-user.o
- 
- common-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng.o
+   system)
 -- 
 1.8.3.1
 
