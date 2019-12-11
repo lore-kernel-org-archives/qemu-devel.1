@@ -2,84 +2,80 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08332C00454
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:13:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42460C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:14:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAB88206A5
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:13:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DF87205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:14:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U13DC7el"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAB88206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="uuyk14+P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DF87205C9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if4cQ-0000I5-0h
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:13:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54508)
+	id 1if4dI-0000If-SW
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:14:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42480)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1if4W1-00052c-2s
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:07:06 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1if4UQ-0002wR-Hi
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1if4Vz-0006H4-TR
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:07:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44583
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1if4UP-0003wl-Ag
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:26 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:49342)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1if4Vz-0006Fv-O9
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:07:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576080423;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1if4UO-0003uC-Nx
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:25 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 9510096EF0;
+ Wed, 11 Dec 2019 16:05:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1576080322;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7CeAOTEYzW24NlGHuOXnqDkyN3cAUcG/0+13t+1KJkY=;
- b=U13DC7elbxlMx6NU48G/66jAv33ED1L1C11INGcOIuzCCLavbjrfoEbMPQxBp9nsd5GovO
- nRwTkKsJ/+yPyvxZt1EBGmWY2wTimQUkRKukzhvpZ9MhqEzb1Go5b5KTMkNXSmh3HUlBb2
- 2Rkf+muoHyA3zF7cBPp1+8f1alaWoOc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-xKkEARg7M6qPPSTAemwKxw-1; Wed, 11 Dec 2019 11:07:00 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C6FA9124D
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 16:06:59 +0000 (UTC)
-Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D4FE5DA7B;
- Wed, 11 Dec 2019 16:06:56 +0000 (UTC)
-Subject: Re: [PATCH 25/26] qapi/qmp: add ObjectPropertyInfo.default-value
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191201111531.1136947-1-marcandre.lureau@redhat.com>
- <20191201111531.1136947-26-marcandre.lureau@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <fdf74ec2-5916-b885-c251-c768e9810584@redhat.com>
-Date: Wed, 11 Dec 2019 10:06:56 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ content-transfer-encoding:content-transfer-encoding;
+ bh=7ZbBjtI4dr6fjhdNdYGM+WXuaoVgIRl6Ax5D6XSQADc=;
+ b=uuyk14+PBQQF54KDIehtjdPAEVAhzLefQIvK+0OwynIWtFtfO55cv/cCz9IzlH0+8QZLcC
+ yVt1PbudVx1LkjCnQU+35QCt4i+kXrPszA11fKL/CbE11tdtWSkMSr3CGQec2kgcPE0LGo
+ elrIoSddy6dkxjZAyVA0O1ezCjFg+e0=
+From: Damien Hedde <damien.hedde@greensocs.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/2] gdbstub: allow sending packet of arbitrary length
+Date: Wed, 11 Dec 2019 17:05:12 +0100
+Message-Id: <20191211160514.58373-1-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-In-Reply-To: <20191201111531.1136947-26-marcandre.lureau@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: xKkEARg7M6qPPSTAemwKxw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1576080322;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=7ZbBjtI4dr6fjhdNdYGM+WXuaoVgIRl6Ax5D6XSQADc=;
+ b=M0YQVGFpjMdkuK1ZLPL0HVk/LN+A9afpjO+aVzY9VY1ZXzngAcrBTxLL/+0Uk/foOyZKWV
+ ew08S73y+LHMF3XOVxqtAvRk0ap03tFQ6KysuQGxwjkqesMxiEi2eB3CsNjWP1Jz56H14O
+ YDM5qDdT+g4LKq6399Mggrvid91QSwI=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1576080322; a=rsa-sha256; cv=none;
+ b=HjtCvj9FlJokZBsCiOYul7BSGDr9DVI1tHSW8P6zy30Ffco7133XMiJq/tj+iOfaSdFFRj
+ uEMPl+435q6yWCBuT65uGWUJ7/ydQLe81/ko+Y5bh5GY7+uGC+xKeP0Unu2+VuasVX5oWw
+ dCwTBU5nAR2C/s6npheLZba9FxlYULY=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,46 +87,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com
+Cc: Damien Hedde <damien.hedde@greensocs.com>, philmd@redhat.com,
+ alex.bennee@linaro.org, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/1/19 5:15 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Report the default value associated with a property.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->   qapi/qom.json      | 7 ++++++-
->   qom/qom-qmp-cmds.c | 4 ++++
->   2 files changed, 10 insertions(+), 1 deletion(-)
->=20
-> diff --git a/qapi/qom.json b/qapi/qom.json
-> index 32db96ffc4..471e4b484b 100644
-> --- a/qapi/qom.json
-> +++ b/qapi/qom.json
-> @@ -26,10 +26,15 @@
->   #
->   # @description: if specified, the description of the property.
->   #
-> +# @default-value: the default value, if any (since 5.0)
-> +#
->   # Since: 1.2
->   ##
->   { 'struct': 'ObjectPropertyInfo',
-> -  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
-> +  'data': { 'name': 'str',
-> +            'type': 'str',
-> +            '*description': 'str',
-> +            '*default-value': 'str' } }
+Hi All,
 
-Do we always want to output the stringized value, or would it be wise to=20
-make this 'any' and output integers where that makes sense?
+This series is a follow-up of Alex's series about sve registers
+which introduces some GbyteArray/Gstring in the gdbstub.
 
+It removes the remaining barrier to send big packets.
+
+In consequence, we can slso simply gdb_monitor_write().
+
+Based-on <20191130084602.10818-1-alex.bennee@linaro.org>
+
+v2:
++ patch 1: fix gdb_monitor_write() max_sz error (Luc)
++ patch 2: new patch (Luc)
+
+--
+Damien
+
+Damien Hedde (2):
+  gdbstub: change GDBState.last_packet to GByteArray
+  gdbstub: do not split gdb_monitor_write payload
+
+ gdbstub.c | 60 +++++++++++++++++++++----------------------------------
+ 1 file changed, 23 insertions(+), 37 deletions(-)
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.24.0
 
 
