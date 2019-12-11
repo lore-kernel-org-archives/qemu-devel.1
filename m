@@ -2,78 +2,101 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C44F2C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3DF6C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D9BF214D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:54:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C0ADE21556
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:54:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A9dBz4a9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D9BF214D8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RweEJ7b2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0ADE21556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42782 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if2RZ-0001hY-Vu
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 08:54:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58356)
+	id 1if2Rf-0001lV-5x
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 08:54:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33517)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1if2Jz-0001La-Az
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:46:32 -0500
+ (envelope-from <philmd@redhat.com>) id 1if2PP-0007fD-3Y
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:52:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1if2Jy-0003tF-6W
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:46:31 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22656
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1if2PN-0001WF-Ah
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:52:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38907
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1if2Jy-0003sd-2f
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:46:30 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1if2PN-0001V4-74
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:52:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576071989;
+ s=mimecast20190719; t=1576072324;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XYw7Pw/6IF/ighon5Aps9PAq9JjdtynN+aLLx23yyN4=;
- b=A9dBz4a9Dwcbj0s39kQoAqFy4NtF5pqpN7FpbMeUXIP6QcttZgbaqEIl52jDWx2C0u9pm7
- QepUdbJo4z3CC6t8SUyLpAvVJP/Ju3myDMkANizuU+Pb0mht5Fd5B9VuJcRr1pwiDL5gPE
- Ai72qgmGyuFyr+XFhYosBmKnC5hbl0Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-yXMIfx-3PVurFnAKNojjUQ-1; Wed, 11 Dec 2019 08:46:26 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F983107ACC4
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 13:46:25 +0000 (UTC)
-Received: from localhost (ovpn-112-63.ams2.redhat.com [10.36.112.63])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B09C95C1BB;
- Wed, 11 Dec 2019 13:46:21 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 6/8] configure: add GDBUS_CODEGEN
-Date: Wed, 11 Dec 2019 17:45:04 +0400
-Message-Id: <20191211134506.1803403-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20191211134506.1803403-1-marcandre.lureau@redhat.com>
-References: <20191211134506.1803403-1-marcandre.lureau@redhat.com>
+ bh=imZREeAJbmsKRfpVD9WfILTxvWQGZ+trG2dKpVByNTw=;
+ b=RweEJ7b25X/juF6opE5mtkPemCrXKu42YZikpgWoAY64OYMgJzVmoJ4W9+Ff3X5BguVQ78
+ ++/7+O3oHF2pswXVmhZhF1tE6p+BALmR42l8T+CUjlea/cTreuKI/lX3e8oetANOSGZMvE
+ havCPCCRrSZRPMJsb0ohV2uQCVk/ot8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-JYl0e_6CNxWzkcFM-62ejg-1; Wed, 11 Dec 2019 06:51:14 -0500
+Received: by mail-wm1-f72.google.com with SMTP id g26so1647437wmk.6
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 03:51:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=byrRNTyQi11YCfRwvlmUEIKq7+oiaHZkCiOdUY2Ubw0=;
+ b=r/P78EO4lcL6Jl7MLLsmjqIaCKuFvRT4fvn1U+fnBlnadg0Tg4x0b3LEtWZLvF5/Lq
+ Nz7xGan9h0iwzhoF3YASjnfcF6kMuAn51R7o0yHBXdpeEtzXazmK9hsBqDHQc/RpYtcM
+ a1AX96O9FhjYswTFIABJoIrMFhuJ4XdtrAMCYy+Ul8auqdNikUtK88zYwGC8qFXVc0tO
+ vaTEs+lBeMLe0lWQysw5Q7/NB41oMjgHIIa/c1mvXaA8phEbAOpYgCSud2PdLBQwCXMS
+ CKYklk90kYk7Ezr778zJDrbJrCOjWNARrTm0CS0U9qIohDaHWlrMcANMeoHrHNqxcroo
+ m34Q==
+X-Gm-Message-State: APjAAAXfk/3sq2A/sKiOdXgExfdibOn4RNntlYXXv0TZMAaMjMN3me88
+ WjpqVo8m0CqqcWS9oVlQXpLVmMy9S4woZRDLI4srZCvb32aVKL0IAAx3A7t+siJteVIbUVxbCjh
+ hkqywsMR2zE8FPAM=
+X-Received: by 2002:a05:600c:24b:: with SMTP id
+ 11mr3177707wmj.19.1576065073194; 
+ Wed, 11 Dec 2019 03:51:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyClRK4qcpxhTuQIpdAMujKMXQ8ecFl8AKfJYeXN2yJaQPbVymUZ5DxTcB2l2eHGmgz35jHyg==
+X-Received: by 2002:a05:600c:24b:: with SMTP id
+ 11mr3177684wmj.19.1576065072966; 
+ Wed, 11 Dec 2019 03:51:12 -0800 (PST)
+Received: from [10.201.33.164] ([195.166.127.210])
+ by smtp.gmail.com with ESMTPSA id v188sm2033314wma.10.2019.12.11.03.51.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 11 Dec 2019 03:51:12 -0800 (PST)
+Subject: Re: [PATCH v2] hw/usb: Introduce Kconfig switches for the CCID card
+ devices
+To: Thomas Huth <thuth@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191211102029.1772-1-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <70300510-b621-b021-74a3-f3e4ffb06ec3@redhat.com>
+Date: Wed, 11 Dec 2019 12:51:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: yXMIfx-3PVurFnAKNojjUQ-1
+In-Reply-To: <20191211102029.1772-1-thuth@redhat.com>
+Content-Language: en-US
+X-MC-Unique: JYl0e_6CNxWzkcFM-62ejg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,53 +108,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, quintela@redhat.com, mprivozn@redhat.com,
- dgilbert@redhat.com,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- pbonzini@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-gdbus-codegen generated code requires gio-unix on Unix, so add it to
-GIO libs/cflags.
+On 12/11/19 11:20 AM, Thomas Huth wrote:
+> In our downstream distribution of QEMU, we need more fine-grained
+> control on the set of CCID card devices that we want to include.
+> So let's introduce some proper Kconfig switches that it is easier
+> to disable them without modifying the corresponding Makefile.objs.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   v2: Use CONFIG_SMARTCARD in Kconfig.host as suggested by Philippe
+>=20
+>   Kconfig.host         |  3 +++
+>   Makefile             |  3 ++-
+>   hw/usb/Kconfig       | 12 +++++++++++-
+>   hw/usb/Makefile.objs |  9 ++++-----
+>   4 files changed, 20 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/Kconfig.host b/Kconfig.host
+> index bb6e116e2a..b532358854 100644
+> --- a/Kconfig.host
+> +++ b/Kconfig.host
+> @@ -35,3 +35,6 @@ config VIRTFS
+>  =20
+>   config PVRDMA
+>       bool
+> +
+> +config SMARTCARD
+> +    bool
+> diff --git a/Makefile b/Makefile
+> index b437a346d7..287cda35cb 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -388,7 +388,8 @@ MINIKCONF_ARGS =3D \
+>       CONFIG_VHOST_USER=3D$(CONFIG_VHOST_USER) \
+>       CONFIG_VIRTFS=3D$(CONFIG_VIRTFS) \
+>       CONFIG_LINUX=3D$(CONFIG_LINUX) \
+> -    CONFIG_PVRDMA=3D$(CONFIG_PVRDMA)
+> +    CONFIG_PVRDMA=3D$(CONFIG_PVRDMA) \
+> +    CONFIG_SMARTCARD=3D$(CONFIG_SMARTCARD)
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- configure | 7 +++++++
- 1 file changed, 7 insertions(+)
+Oh I missed this detail :)
 
-diff --git a/configure b/configure
-index 6099be1d84..68a7705df7 100755
---- a/configure
-+++ b/configure
-@@ -3720,10 +3720,16 @@ if $pkg_config --atleast-version=3D$glib_req_ver gi=
-o-2.0; then
-     gio=3Dyes
-     gio_cflags=3D$($pkg_config --cflags gio-2.0)
-     gio_libs=3D$($pkg_config --libs gio-2.0)
-+    gdbus_codegen=3D$($pkg_config --variable=3Dgdbus_codegen gio-2.0)
- else
-     gio=3Dno
- fi
-=20
-+if $pkg_config --atleast-version=3D$glib_req_ver gio-unix-2.0; then
-+    gio_cflags=3D"$gio_cflags $($pkg_config --cflags gio-unix-2.0)"
-+    gio_libs=3D"$gio_libs $($pkg_config --libs gio-unix-2.0)"
-+fi
-+
- # Sanity check that the current size_t matches the
- # size that glib thinks it should be. This catches
- # problems on multi-arch where people try to build
-@@ -6949,6 +6955,7 @@ if test "$gio" =3D "yes" ; then
-     echo "CONFIG_GIO=3Dy" >> $config_host_mak
-     echo "GIO_CFLAGS=3D$gio_cflags" >> $config_host_mak
-     echo "GIO_LIBS=3D$gio_libs" >> $config_host_mak
-+    echo "GDBUS_CODEGEN=3D$gdbus_codegen" >> $config_host_mak
- fi
- echo "CONFIG_TLS_PRIORITY=3D\"$tls_priority\"" >> $config_host_mak
- if test "$gnutls" =3D "yes" ; then
---=20
-2.24.0.308.g228f53135a
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+>  =20
+>   MINIKCONF_INPUTS =3D $(SRC_PATH)/Kconfig.host $(SRC_PATH)/hw/Kconfig \
+>                      $(wildcard $(SRC_PATH)/hw/*/Kconfig)
+> diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+> index 555e09377b..da3026586f 100644
+> --- a/hw/usb/Kconfig
+> +++ b/hw/usb/Kconfig
+> @@ -90,9 +90,19 @@ config USB_BLUETOOTH
+>   config USB_SMARTCARD
+>       bool
+>       default y
+> -    depends on USB
+> +    depends on USB && SMARTCARD
+>  =20
+>   config USB_STORAGE_MTP
+>       bool
+>       default y
+>       depends on USB
+> +
+> +config CCID_PASSTHRU
+> +    bool
+> +    default y
+> +    depends on USB_SMARTCARD
+> +
+> +config CCID_EMULATED
+> +    bool
+> +    default y
+> +    depends on USB_SMARTCARD
+> diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+> index 303ac084a0..478e6d5752 100644
+> --- a/hw/usb/Makefile.objs
+> +++ b/hw/usb/Makefile.objs
+> @@ -27,13 +27,12 @@ common-obj-$(CONFIG_USB_SERIAL)       +=3D dev-serial=
+.o
+>   common-obj-$(CONFIG_USB_NETWORK)      +=3D dev-network.o
+>   common-obj-$(CONFIG_USB_BLUETOOTH)    +=3D dev-bluetooth.o
+>  =20
+> -ifeq ($(CONFIG_USB_SMARTCARD),y)
+> -common-obj-y                          +=3D dev-smartcard-reader.o
+> -common-obj-$(CONFIG_SMARTCARD)        +=3D smartcard.mo
+> -smartcard.mo-objs :=3D ccid-card-passthru.o ccid-card-emulated.o
+> +common-obj-$(CONFIG_USB_SMARTCARD)    +=3D dev-smartcard-reader.o
+> +common-obj-$(call lor,$(CONFIG_CCID_PASSTHRU),$(CONFIG_CCID_EMULATED)) +=
+=3D smartcard.mo
+> +smartcard.mo-objs :=3D $(call lif,$(CONFIG_CCID_PASSTHRU),ccid-card-pass=
+thru.o) \
+> +                     $(call lif,$(CONFIG_CCID_EMULATED),ccid-card-emulat=
+ed.o)
+>   smartcard.mo-cflags :=3D $(SMARTCARD_CFLAGS)
+>   smartcard.mo-libs :=3D $(SMARTCARD_LIBS)
+> -endif
+>  =20
+>   ifeq ($(CONFIG_POSIX),y)
+>   common-obj-$(CONFIG_USB_STORAGE_MTP)  +=3D dev-mtp.o
+>=20
 
 
