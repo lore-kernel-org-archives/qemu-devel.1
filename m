@@ -2,86 +2,88 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99525C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04C98C00454
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:02:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FE5D20836
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:00:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C74502073D
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:01:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PEj8FUwm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FE5D20836
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5bcBplO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C74502073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if4PI-00064d-EU
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:00:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60699)
+	id 1if4R4-0007es-Ja
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:01:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1if4O5-0004xe-Ns
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:58:55 -0500
+ (envelope-from <mst@redhat.com>) id 1if4Oy-00060N-NW
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:59:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1if4O3-0004Jo-Pu
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:58:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47355
+ (envelope-from <mst@redhat.com>) id 1if4Ox-0005XI-3C
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:59:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25693
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1if4O3-0004IF-KH
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:58:51 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1if4Ow-0005Wj-UM
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:59:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576079930;
+ s=mimecast20190719; t=1576079986;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LF1dOPkkuTUY5WR7kOVA1ZNEZ5JHPt+fMBamAfWIrSg=;
- b=PEj8FUwmD0Dveu/4ew7lZGNTxxA0UifcdNDe2w9w1pHnif+fHwyZYoFobvxEkVhjdVx19e
- uIxHrsDsnu1pyLIsnMylOfPM/N2oYdDKoUVf8cv1IaP2NwZj8lz8CAiGJbwAR3aeWEEALI
- zXjP9cf7HNkqk0LvctOoQP2uLiM7J6M=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-_XS8jHSkPGKI9Ba8rIfW5g-1; Wed, 11 Dec 2019 10:58:49 -0500
-Received: by mail-qt1-f200.google.com with SMTP id l4so4627830qte.18
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 07:58:49 -0800 (PST)
+ bh=gtMHkdFg9el+TZC9Ty4EySCbSaf+M0hWeUGCmxKyr1k=;
+ b=N5bcBplOVfr1uR/NiBSlwuWd+5RimNscZRH1XaePpbupAedpPMZKLjsSPGqfyXcWK6LRAb
+ wabsJtPkeB67/KkrlO0va6L6wA8EItybMdh8YxzDUiheaHFdBPuDfnUtTivnUFOcf9sSiM
+ wJQb0M99A77Zdymw/Gm//5Y+ERZM/JM=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-420-7nBYftxPOGK4wVlLDcD9uw-1; Wed, 11 Dec 2019 10:59:45 -0500
+Received: by mail-qv1-f70.google.com with SMTP id g15so9348315qvq.20
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 07:59:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=KwCuLFWJsKQ6wKycOKyImtLIXvkiiq6BW4T0+BojfLE=;
- b=BGT64qg9FquEdkWz4AGGuIItQ8oa+wIeYgc5d3Vs1BF5ju+zvSFLlkyUk1rxCKzvdb
- 4AW8zgBA1NsQFa8hqGW7Pmhl29USMHJPtt3bL0eBS45MSxNpBQ+hYcR7P56gHUZYGFe0
- zU7kDOXnyQPQfWyxS9y33I0XhMErgWtQFzi1EUc4RPuw/m+4r0hbrDRT9KkM4K978O2E
- OUfApuS/HnnBZPNiUMZodAo6YL0fDNS1ApVtPzTAyTZq4Qkd+9MqtfDAZazp3kIWT4JO
- hJU//UmGg0nhQKCqVJ0dhFcSr0nG9+AWrIJVGlenx/0CZpUJ6QAxPsBWOitCoQKc/06u
- PVPQ==
-X-Gm-Message-State: APjAAAU98rfBvlXKFSpGHm+deQOd1vuX1+0w6MqLxyBZfuywUjHQO2jW
- Md0C26uslhK2QZgZIbEktyuI7D1a9HEjCdvqrZ/sLBGRg1wDF7kUYd+REuszUUzz1loYs131i2m
- VzyQL/H9uqmvelS8=
-X-Received: by 2002:a0c:ad35:: with SMTP id u50mr3781570qvc.158.1576079928833; 
- Wed, 11 Dec 2019 07:58:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwfmDlKyetk+xQcaztQVA4F2qBN65e3FW7N9W2pqhI60L9kBCRjYK46vLDuqZPI0BJA/mmCmg==
-X-Received: by 2002:a0c:ad35:: with SMTP id u50mr3781543qvc.158.1576079928521; 
- Wed, 11 Dec 2019 07:58:48 -0800 (PST)
+ bh=wbENiEGzH6MA0xqiUoIWB82AkIC5fLaqVGVHU1z/V8I=;
+ b=fpLJknH8uWixIFEO1XDPDFqFEzB4vumywYm5sP0E0pfBCj30YpbbUBpeoShzDut+uK
+ V8wp6xXie8tiYydMAlE/U4KIJukBAEyOln3zRWQ/4ofACVl6n3+1n6v03c/nFqyJRXUL
+ S04rPkdiEW8+b78DKB2O2hGC8QbknJCwJuzB+o1hOTtqoESz4yBcjmf+yJb9CmMsTkAF
+ F1c1JxS5d47dalesUGrPm9a7uMHt8t30PBNnJa7j4wIop2d6zWB1iDYDvfxEB3/BLi9R
+ HNlZ9UOR+PGexWimiW1Ga5V/QUpcx0DDXX7VEZVHSeKqaQmCPrhRmtrav5VCZ/Ion1Cc
+ BhPQ==
+X-Gm-Message-State: APjAAAWV/K5yVId9cyJWo1ocJWktRYrMI25Ogl1nSL7tk2tSax8Xodvh
+ f6eSjSYD1jLlMnFGTJftSX8zC3MOxnDEap88ZaE0yJwA6IvzPS3wNhwo6UiWYZcvwUCFU1/wcB9
+ FtAQtijsKR1Zgep8=
+X-Received: by 2002:ac8:34d0:: with SMTP id x16mr3499396qtb.127.1576079983272; 
+ Wed, 11 Dec 2019 07:59:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx4KYdm6JO/gJIZMrVLILoV+tcazevzybZRpfbpaLLl7Njn2iKmCRoQ8vmpObqjLua9rRSOAw==
+X-Received: by 2002:ac8:34d0:: with SMTP id x16mr3499381qtb.127.1576079982998; 
+ Wed, 11 Dec 2019 07:59:42 -0800 (PST)
 Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id k184sm793573qke.2.2019.12.11.07.58.45
+ by smtp.gmail.com with ESMTPSA id i8sm1026968qtr.24.2019.12.11.07.59.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Dec 2019 07:58:47 -0800 (PST)
-Date: Wed, 11 Dec 2019 10:58:43 -0500
+ Wed, 11 Dec 2019 07:59:42 -0800 (PST)
+Date: Wed, 11 Dec 2019 10:59:38 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH] virtio: don't enable notifications during polling
-Message-ID: <20191211105755-mutt-send-email-mst@kernel.org>
-References: <20191209210957.65087-1-stefanha@redhat.com>
+To: "Micky Yun Chan(michiboo)" <chanmickyyun@gmail.com>
+Subject: Re: [PATCH v8] Implement backend program convention command for
+ vhost-user-blk
+Message-ID: <20191211105916-mutt-send-email-mst@kernel.org>
+References: <20191209015331.5455-1-chanmickyyun@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191209210957.65087-1-stefanha@redhat.com>
-X-MC-Unique: _XS8jHSkPGKI9Ba8rIfW5g-1
+In-Reply-To: <20191209015331.5455-1-chanmickyyun@gmail.com>
+X-MC-Unique: 7nBYftxPOGK4wVlLDcD9uw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
@@ -100,164 +102,249 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Dec 09, 2019 at 09:09:57PM +0000, Stefan Hajnoczi wrote:
-> Virtqueue notifications are not necessary during polling, so we disable
-> them.  This allows the guest driver to avoid MMIO vmexits.
-> Unfortunately the virtio-blk and virtio-scsi handler functions re-enable
-> notifications, defeating this optimization.
+On Mon, Dec 09, 2019 at 09:53:31AM +0800, Micky Yun Chan(michiboo) wrote:
+> From: Micky Yun Chan <chanmickyyun@gmail.com>
 >=20
-> Fix virtio-blk and virtio-scsi emulation so they leave notifications
-> disabled.  The key thing to remember for correctness is that polling
-> always checks one last time after ending its loop, therefore it's safe
-> to lose the race when re-enabling notifications at the end of polling.
+> This patch is to add standard commands defined in docs/interop/vhost-user=
+.rst
+> For vhost-user-* program
 >=20
-> There is a measurable performance improvement of 5-10% with the null-co
-> block driver.  Real-life storage configurations will see a smaller
-> improvement because the MMIO vmexit overhead contributes less to
-> latency.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
 
-
-Thanks! I'll queue it for merge after the release. If possible please ping =
-me
+Thanks!
+I'll queue it for merge after the release. If possible please ping me
 after the release to help make sure it didn't get dropped.
 
-
 > ---
->  hw/block/virtio-blk.c      |  9 +++++++--
->  hw/scsi/virtio-scsi.c      |  9 +++++++--
->  hw/virtio/virtio.c         | 12 ++++++------
->  include/hw/virtio/virtio.h |  1 +
->  4 files changed, 21 insertions(+), 10 deletions(-)
+>  contrib/vhost-user-blk/vhost-user-blk.c | 108 ++++++++++++++----------
+>  docs/interop/vhost-user.json            |  31 +++++++
+>  docs/interop/vhost-user.rst             |  17 ++++
+>  3 files changed, 112 insertions(+), 44 deletions(-)
 >=20
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 4c357d2928..c4e55fb3de 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -764,13 +764,16 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue=
- *vq)
->  {
->      VirtIOBlockReq *req;
->      MultiReqBuffer mrb =3D {};
-> +    bool suppress_notifications =3D virtio_queue_get_notification(vq);
->      bool progress =3D false;
-> =20
->      aio_context_acquire(blk_get_aio_context(s->blk));
->      blk_io_plug(s->blk);
-> =20
->      do {
-> -        virtio_queue_set_notification(vq, 0);
-> +        if (suppress_notifications) {
-> +            virtio_queue_set_notification(vq, 0);
-> +        }
-> =20
->          while ((req =3D virtio_blk_get_request(s, vq))) {
->              progress =3D true;
-> @@ -781,7 +784,9 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *=
-vq)
->              }
->          }
-> =20
-> -        virtio_queue_set_notification(vq, 1);
-> +        if (suppress_notifications) {
-> +            virtio_queue_set_notification(vq, 1);
-> +        }
->      } while (!virtio_queue_empty(vq));
-> =20
->      if (mrb.num_reqs) {
-> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> index e8b2b64d09..f080545f48 100644
-> --- a/hw/scsi/virtio-scsi.c
-> +++ b/hw/scsi/virtio-scsi.c
-> @@ -597,12 +597,15 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQ=
-ueue *vq)
->  {
->      VirtIOSCSIReq *req, *next;
->      int ret =3D 0;
-> +    bool suppress_notifications =3D virtio_queue_get_notification(vq);
->      bool progress =3D false;
-> =20
->      QTAILQ_HEAD(, VirtIOSCSIReq) reqs =3D QTAILQ_HEAD_INITIALIZER(reqs);
-> =20
->      do {
-> -        virtio_queue_set_notification(vq, 0);
-> +        if (suppress_notifications) {
-> +            virtio_queue_set_notification(vq, 0);
-> +        }
-> =20
->          while ((req =3D virtio_scsi_pop_req(s, vq))) {
->              progress =3D true;
-> @@ -622,7 +625,9 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQue=
-ue *vq)
->              }
->          }
-> =20
-> -        virtio_queue_set_notification(vq, 1);
-> +        if (suppress_notifications) {
-> +            virtio_queue_set_notification(vq, 1);
-> +        }
->      } while (ret !=3D -EINVAL && !virtio_queue_empty(vq));
-> =20
->      QTAILQ_FOREACH_SAFE(req, &reqs, next, next) {
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 762df12f4c..78e5852296 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -431,6 +431,11 @@ static void virtio_queue_packed_set_notification(Vir=
-tQueue *vq, int enable)
->      }
+> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user=
+-blk/vhost-user-blk.c
+> index ae61034656..6fd91c7e99 100644
+> --- a/contrib/vhost-user-blk/vhost-user-blk.c
+> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
+> @@ -576,70 +576,90 @@ vub_new(char *blk_file)
+>      return vdev_blk;
 >  }
 > =20
-> +bool virtio_queue_get_notification(VirtQueue *vq)
+> +static int opt_fdnum =3D -1;
+> +static char *opt_socket_path;
+> +static char *opt_blk_file;
+> +static gboolean opt_print_caps;
+> +static gboolean opt_read_only;
+> +
+> +static GOptionEntry entries[] =3D {
+> +    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
+> +      "Print capabilities", NULL },
+> +    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
+> +      "Use inherited fd socket", "FDNUM" },
+> +    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
+> +      "Use UNIX socket path", "PATH" },
+> +    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
+> +     "block device or file path", "PATH"},
+> +    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
+> +      "Enable read-only", NULL }
+> +};
+> +
+>  int main(int argc, char **argv)
+>  {
+> -    int opt;
+> -    char *unix_socket =3D NULL;
+> -    char *blk_file =3D NULL;
+> -    bool enable_ro =3D false;
+>      int lsock =3D -1, csock =3D -1;
+>      VubDev *vdev_blk =3D NULL;
+> +    GError *error =3D NULL;
+> +    GOptionContext *context;
+> =20
+> -    while ((opt =3D getopt(argc, argv, "b:rs:h")) !=3D -1) {
+> -        switch (opt) {
+> -        case 'b':
+> -            blk_file =3D g_strdup(optarg);
+> -            break;
+> -        case 's':
+> -            unix_socket =3D g_strdup(optarg);
+> -            break;
+> -        case 'r':
+> -            enable_ro =3D true;
+> -            break;
+> -        case 'h':
+> -        default:
+> -            printf("Usage: %s [ -b block device or file, -s UNIX domain =
+socket"
+> -                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+> -            return 0;
+> +    context =3D g_option_context_new(NULL);
+> +    g_option_context_add_main_entries(context, entries, NULL);
+> +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+> +        g_printerr("Option parsing failed: %s\n", error->message);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +    if (opt_print_caps) {
+> +        g_print("{\n");
+> +        g_print("  \"type\": \"block\",\n");
+> +        g_print("  \"features\": [\n");
+> +        g_print("    \"read-only\",\n");
+> +        g_print("    \"blk-file\"\n");
+> +        g_print("  ]\n");
+> +        g_print("}\n");
+> +        exit(EXIT_SUCCESS);
+> +    }
+> +
+> +    if (!opt_blk_file) {
+> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    if (opt_socket_path) {
+> +        lsock =3D unix_sock_new(opt_socket_path);
+> +        if (lsock < 0) {
+> +            exit(EXIT_FAILURE);
+>          }
+> +    } else if (opt_fdnum < 0) {
+> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
+> +        exit(EXIT_FAILURE);
+> +    } else {
+> +        lsock =3D opt_fdnum;
+>      }
+> =20
+> -    if (!unix_socket || !blk_file) {
+> -        printf("Usage: %s [ -b block device or file, -s UNIX domain sock=
+et"
+> -               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+> -        return -1;
+> -    }
+> -
+> -    lsock =3D unix_sock_new(unix_socket);
+> -    if (lsock < 0) {
+> -        goto err;
+> -    }
+> -
+> -    csock =3D accept(lsock, (void *)0, (void *)0);
+> +    csock =3D accept(lsock, NULL, NULL);
+>      if (csock < 0) {
+> -        fprintf(stderr, "Accept error %s\n", strerror(errno));
+> -        goto err;
+> +        g_printerr("Accept error %s\n", strerror(errno));
+> +        exit(EXIT_FAILURE);
+>      }
+> =20
+> -    vdev_blk =3D vub_new(blk_file);
+> +    vdev_blk =3D vub_new(opt_blk_file);
+>      if (!vdev_blk) {
+> -        goto err;
+> +        exit(EXIT_FAILURE);
+>      }
+> -    if (enable_ro) {
+> +    if (opt_read_only) {
+>          vdev_blk->enable_ro =3D true;
+>      }
+> =20
+>      if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
+>                    vub_panic_cb, &vub_iface)) {
+> -        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
+> -        goto err;
+> +        g_printerr("Failed to initialize libvhost-user-glib\n");
+> +        exit(EXIT_FAILURE);
+>      }
+> =20
+>      g_main_loop_run(vdev_blk->loop);
+> -
+> +    g_main_loop_unref(vdev_blk->loop);
+> +    g_option_context_free(context);
+>      vug_deinit(&vdev_blk->parent);
+> -
+> -err:
+>      vub_free(vdev_blk);
+>      if (csock >=3D 0) {
+>          close(csock);
+> @@ -647,8 +667,8 @@ err:
+>      if (lsock >=3D 0) {
+>          close(lsock);
+>      }
+> -    g_free(unix_socket);
+> -    g_free(blk_file);
+> +    g_free(opt_socket_path);
+> +    g_free(opt_blk_file);
+> =20
+>      return 0;
+>  }
+> diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
+> index da6aaf51c8..ce0ef74db5 100644
+> --- a/docs/interop/vhost-user.json
+> +++ b/docs/interop/vhost-user.json
+> @@ -54,6 +54,37 @@
+>    ]
+>  }
+> =20
+> +##
+> +# @VHostUserBackendBlockFeature:
+> +#
+> +# List of vhost user "block" features.
+> +#
+> +# @read-only: The --read-only command line option is supported.
+> +# @blk-file: The --blk-file command line option is supported.
+> +#
+> +# Since: 5.0
+> +##
 > +{
-> +    return vq->notification;
+> +  'enum': 'VHostUserBackendBlockFeature',
+> +  'data': [ 'read-only', 'blk-file' ]
 > +}
 > +
->  void virtio_queue_set_notification(VirtQueue *vq, int enable)
->  {
->      vq->notification =3D enable;
-> @@ -3382,17 +3387,12 @@ static bool virtio_queue_host_notifier_aio_poll(v=
-oid *opaque)
->  {
->      EventNotifier *n =3D opaque;
->      VirtQueue *vq =3D container_of(n, VirtQueue, host_notifier);
-> -    bool progress;
+> +##
+> +# @VHostUserBackendCapabilitiesBlock:
+> +#
+> +# Capabilities reported by vhost user "block" backends
+> +#
+> +# @features: list of supported features.
+> +#
+> +# Since: 5.0
+> +##
+> +{
+> +  'struct': 'VHostUserBackendCapabilitiesBlock',
+> +  'data': {
+> +    'features': [ 'VHostUserBackendBlockFeature' ]
+> +  }
+> +}
+> +
+>  ##
+>  # @VHostUserBackendInputFeature:
+>  #
+> diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+> index 7827b710aa..015ac08177 100644
+> --- a/docs/interop/vhost-user.rst
+> +++ b/docs/interop/vhost-user.rst
+> @@ -1376,3 +1376,20 @@ Command line options:
+>    Enable virgl rendering support.
 > =20
->      if (!vq->vring.desc || virtio_queue_empty(vq)) {
->          return false;
->      }
-> =20
-> -    progress =3D virtio_queue_notify_aio_vq(vq);
-> -
-> -    /* In case the handler function re-enabled notifications */
-> -    virtio_queue_set_notification(vq, 0);
-> -    return progress;
-> +    return virtio_queue_notify_aio_vq(vq);
->  }
-> =20
->  static void virtio_queue_host_notifier_aio_poll_end(EventNotifier *n)
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 3448d67d2a..8ee93873a4 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -224,6 +224,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int =
-version_id);
-> =20
->  void virtio_notify_config(VirtIODevice *vdev);
-> =20
-> +bool virtio_queue_get_notification(VirtQueue *vq);
->  void virtio_queue_set_notification(VirtQueue *vq, int enable);
-> =20
->  int virtio_queue_ready(VirtQueue *vq);
+>    (optional)
+> +
+> +vhost-user-blk
+> +--------------
+> +
+> +Command line options:
+> +
+> +--blk-file=3DPATH
+> +
+> +  Specify block device or file path.
+> +
+> +  (optional)
+> +
+> +--read-only
+> +
+> +  Enable read-only.
+> +
+> +  (optional)
 > --=20
-> 2.23.0
+> 2.21.0
 
 
