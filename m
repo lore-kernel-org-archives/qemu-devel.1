@@ -2,72 +2,71 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECFD5C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 05:46:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C360DC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 06:34:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B837F20836
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 05:46:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Z2wAby1h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B837F20836
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 8817F20836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 06:34:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8817F20836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ieupF-0004d5-Qx
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 00:46:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55871)
+	id 1ievaK-00047p-K1
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 01:34:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32863)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ieuo2-0003xy-8f
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 00:45:04 -0500
+ (envelope-from <yan.y.zhao@intel.com>) id 1ievZh-0003fF-DM
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 01:34:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ieuo0-0005m0-Ak
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 00:45:01 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:37485 helo=ozlabs.org)
+ (envelope-from <yan.y.zhao@intel.com>) id 1ievZe-0004NW-D9
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 01:34:16 -0500
+Received: from mga18.intel.com ([134.134.136.126]:27873)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ieunz-0005ck-6Q; Wed, 11 Dec 2019 00:45:00 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47Xm900wH7z9sR8; Wed, 11 Dec 2019 16:44:51 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576043092;
- bh=TDTJ4nQZ8x5jcjQXWnHx4fdbw2HpL1Rw5bSDtg9CrS4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Z2wAby1hYbzftXCwO6L+Ahl6S3MloQ2dyCtNsLlg6WpuJbZcB1tW8AY37ekf/TZVf
- TMLFYT3DtgJ77aEv5FVNbmVGewFiu3Syb/vwhNaYqJTqPI9B8VOe39P4gdM8OFLwEZ
- BvnTMTnEoUBxKcDniiOFS3yvlAe0ZfE7b0UVnKmE=
-Date: Wed, 11 Dec 2019 16:27:42 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Bharata B Rao <bharata@linux.ibm.com>
-Subject: Re: [PATCH v1 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
- pseries guest
-Message-ID: <20191211052742.GQ207300@umbus.fritz.box>
-References: <20191209070012.14766-1-bharata@linux.ibm.com>
- <20191209070012.14766-3-bharata@linux.ibm.com>
- <20191210032851.GC207300@umbus.fritz.box>
- <20191210035038.GB17552@in.ibm.com>
- <dd94f089-7df8-1a13-f4a6-631e765f6339@ozlabs.ru>
- <20191210050536.GH207300@umbus.fritz.box>
- <20191210065007.GD17552@in.ibm.com>
- <20191210234132.GL207300@umbus.fritz.box>
- <20191211050824.GE17552@in.ibm.com>
+ (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
+ id 1ievZd-0004Ex-Sy
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 01:34:14 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 10 Dec 2019 22:34:08 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,301,1571727600"; d="scan'208";a="215670067"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.9])
+ by orsmga006.jf.intel.com with ESMTP; 10 Dec 2019 22:34:06 -0800
+Date: Wed, 11 Dec 2019 01:25:55 -0500
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RFC PATCH 4/9] vfio-pci: register default dynamic-trap-bar-info
+ region
+Message-ID: <20191211062555.GC28339@joy-OptiPlex-7040>
+References: <20191205032419.29606-1-yan.y.zhao@intel.com>
+ <20191205032650.29794-1-yan.y.zhao@intel.com>
+ <20191205165530.1f29fe85@x1.home>
+ <20191206060407.GF31791@joy-OptiPlex-7040>
+ <20191206082038.2b1078d9@x1.home>
+ <20191209062212.GL31791@joy-OptiPlex-7040>
+ <20191209141608.310520fc@x1.home>
+ <20191210074444.GA28339@joy-OptiPlex-7040>
+ <20191210093805.36a5b443@x1.home>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="oN4OvwWIcd1E23D1"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191211050824.GE17552@in.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+In-Reply-To: <20191210093805.36a5b443@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,153 +78,254 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
- linuxram@us.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "He,
+ Shaopeng" <shaopeng.he@intel.com>, "Wang, Zhi A" <zhi.a.wang@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Dec 11, 2019 at 12:38:05AM +0800, Alex Williamson wrote:
+> On Tue, 10 Dec 2019 02:44:44 -0500
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> 
+> > On Tue, Dec 10, 2019 at 05:16:08AM +0800, Alex Williamson wrote:
+> > > On Mon, 9 Dec 2019 01:22:12 -0500
+> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > >   
+> > > > On Fri, Dec 06, 2019 at 11:20:38PM +0800, Alex Williamson wrote:  
+> > > > > On Fri, 6 Dec 2019 01:04:07 -0500
+> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > >     
+> > > > > > On Fri, Dec 06, 2019 at 07:55:30AM +0800, Alex Williamson wrote:    
+> > > > > > > On Wed,  4 Dec 2019 22:26:50 -0500
+> > > > > > > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > > > > > >       
+> > > > > > > > Dynamic trap bar info region is a channel for QEMU and vendor driver to
+> > > > > > > > communicate dynamic trap info. It is of type
+> > > > > > > > VFIO_REGION_TYPE_DYNAMIC_TRAP_BAR_INFO and subtype
+> > > > > > > > VFIO_REGION_SUBTYPE_DYNAMIC_TRAP_BAR_INFO.
+> > > > > > > > 
+> > > > > > > > This region has two fields: dt_fd and trap.
+> > > > > > > > When QEMU detects a device regions of this type, it will create an
+> > > > > > > > eventfd and write its eventfd id to dt_fd field.
+> > > > > > > > When vendor drivre signals this eventfd, QEMU reads trap field of this
+> > > > > > > > info region.
+> > > > > > > > - If trap is true, QEMU would search the device's PCI BAR
+> > > > > > > > regions and disable all the sparse mmaped subregions (if the sparse
+> > > > > > > > mmaped subregion is disablable).
+> > > > > > > > - If trap is false, QEMU would re-enable those subregions.
+> > > > > > > > 
+> > > > > > > > A typical usage is
+> > > > > > > > 1. vendor driver first cuts its bar 0 into several sections, all in a
+> > > > > > > > sparse mmap array. So initally, all its bar 0 are passthroughed.
+> > > > > > > > 2. vendor driver specifys part of bar 0 sections to be disablable.
+> > > > > > > > 3. on migration starts, vendor driver signals dt_fd and set trap to true
+> > > > > > > > to notify QEMU disabling the bar 0 sections of disablable flags on.
+> > > > > > > > 4. QEMU disables those bar 0 section and hence let vendor driver be able
+> > > > > > > > to trap access of bar 0 registers and make dirty page tracking possible.
+> > > > > > > > 5. on migration failure, vendor driver signals dt_fd to QEMU again.
+> > > > > > > > QEMU reads trap field of this info region which is false and QEMU
+> > > > > > > > re-passthrough the whole bar 0 region.
+> > > > > > > > 
+> > > > > > > > Vendor driver specifies whether it supports dynamic-trap-bar-info region
+> > > > > > > > through cap VFIO_PCI_DEVICE_CAP_DYNAMIC_TRAP_BAR in
+> > > > > > > > vfio_pci_mediate_ops->open().
+> > > > > > > > 
+> > > > > > > > If vfio-pci detects this cap, it will create a default
+> > > > > > > > dynamic_trap_bar_info region on behalf of vendor driver with region len=0
+> > > > > > > > and region->ops=null.
+> > > > > > > > Vvendor driver should override this region's len, flags, rw, mmap in its
+> > > > > > > > vfio_pci_mediate_ops.      
+> > > > > > > 
+> > > > > > > TBH, I don't like this interface at all.  Userspace doesn't pass data
+> > > > > > > to the kernel via INFO ioctls.  We have a SET_IRQS ioctl for
+> > > > > > > configuring user signaling with eventfds.  I think we only need to
+> > > > > > > define an IRQ type that tells the user to re-evaluate the sparse mmap
+> > > > > > > information for a region.  The user would enumerate the device IRQs via
+> > > > > > > GET_IRQ_INFO, find one of this type where the IRQ info would also
+> > > > > > > indicate which region(s) should be re-evaluated on signaling.  The user
+> > > > > > > would enable that signaling via SET_IRQS and simply re-evaluate the      
+> > > > > > ok. I'll try to switch to this way. Thanks for this suggestion.
+> > > > > >     
+> > > > > > > sparse mmap capability for the associated regions when signaled.      
+> > > > > > 
+> > > > > > Do you like the "disablable" flag of sparse mmap ?
+> > > > > > I think it's a lightweight way for user to switch mmap state of a whole region,
+> > > > > > otherwise going through a complete flow of GET_REGION_INFO and re-setup
+> > > > > > region might be too heavy.    
+> > > > > 
+> > > > > No, I don't like the disable-able flag.  At what frequency do we expect
+> > > > > regions to change?  It seems like we'd only change when switching into
+> > > > > and out of the _SAVING state, which is rare.  It seems easy for
+> > > > > userspace, at least QEMU, to drop the entire mmap configuration and    
+> > > > ok. I'll try this way.
+> > > >   
+> > > > > re-read it.  Another concern here is how do we synchronize the event?
+> > > > > Are we assuming that this event would occur when a user switch to
+> > > > > _SAVING mode on the device?  That operation is synchronous, the device
+> > > > > must be in saving mode after the write to device state completes, but
+> > > > > it seems like this might be trying to add an asynchronous dependency.
+> > > > > Will the write to device_state only complete once the user handles the
+> > > > > eventfd?  How would the kernel know when the mmap re-evaluation is
+> > > > > complete.  It seems like there are gaps here that the vendor driver
+> > > > > could miss traps required for migration because the user hasn't
+> > > > > completed the mmap transition yet.  Thanks,
+> > > > > 
+> > > > > Alex    
+> > > > 
+> > > > yes, this asynchronous event notification will cause vendor driver miss
+> > > > traps. But it's supposed to be of very short period time. That's also a
+> > > > reason for us to wish the re-evaluation to be lightweight. E.g. if it's
+> > > > able to be finished before the first iterate, it's still safe.  
+> > > 
+> > > Making the re-evaluation lightweight cannot solve the race, it only
+> > > masks it.
+> > >   
+> > > > But I agree, the timing is not guaranteed, and so it's best for kernel
+> > > > to wait for mmap re-evaluation to complete. 
+> > > > 
+> > > > migration_thread
+> > > >     |->qemu_savevm_state_setup
+> > > >     |   |->ram_save_setup
+> > > >     |   |   |->migration_bitmap_sync
+> > > >     |   |       |->kvm_log_sync
+> > > >     |   |       |->vfio_log_sync
+> > > >     |   |
+> > > >     |   |->vfio_save_setup
+> > > >     |       |->set_device_state(_SAVING)
+> > > >     |
+> > > >     |->qemu_savevm_state_pending
+> > > >     |   |->ram_save_pending
+> > > >     |   |   |->migration_bitmap_sync 
+> > > >     |   |      |->kvm_log_sync
+> > > >     |   |      |->vfio_log_sync
+> > > >     |   |->vfio_save_pending
+> > > >     |
+> > > >     |->qemu_savevm_state_iterate
+> > > >     |   |->ram_save_iterate //send pages
+> > > >     |   |->vfio_save_iterate
+> > > >     ...
+> > > > 
+> > > > 
+> > > > Actually, we previously let qemu trigger the re-evaluation when migration starts.
+> > > > And now the reason for we to wish kernel to trigger the mmap re-evaluation is that
+> > > > there're other two possible use cases:
+> > > > (1) keep passing through devices when migration starts and track dirty pages
+> > > >     using hardware IOMMU. Then when migration is about to complete, stop the
+> > > >     device and start trap PCI BARs for software emulation. (we made some
+> > > >     changes to let device stop ahead of vcpu )  
+> > > 
+> > > How is that possible?  I/O devices need to continue to work until the
+> > > vCPU stops otherwise the vCPU can get blocked on the device.  Maybe QEMU  
+> > hi Alex
+> > For devices like DSA [1], it can support SVM mode. In this mode, when a
+> > page fault happens, the Intel DSA device blocks until the page fault is
+> > resolved, if PRS is enabled; otherwise it is reported as an error.
+> > 
+> > Therefore, to pass through DSA into guest and do live migration with it,
+> > it is desired to stop DSA before stopping vCPU, as there may be an
+> > outstanding page fault to be resolved.
+> > 
+> > During the period when DSA is stopped and vCPUs are still running, all the
+> > pass-through resources are trapped and emulated by host mediation driver until
+> > vCPUs stop.
+> 
+> If the DSA is stopped and resources are trapped and emulated, then is
+> the device really stopped from a QEMU perspective or has it simply
+> switched modes underneath QEMU?  If the device is truly stopped, then
+> I'd like to understand how a vCPU doing a PIO read from the device
+> wouldn't wedge the VM.
+>
+It doesn't matter if the device is truly stopped or not (although from
+my point of view, just draining commands and keeping device running is
+better as it handles live migration failure better).
+PIOs also need to be trapped and emulated if a vCPU accesses them. 
 
---oN4OvwWIcd1E23D1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> > [1] https://software.intel.com/sites/default/files/341204-intel-data-streaming-accelerator-spec.pdf
+> > 
+> > 
+> > > should assume all mmaps should be dropped on vfio device after we pass
+> > > some point of the migration process.
+> > >   
+> > yes, it should be workable for the use case of DSA.
+> > 
+> > > If there are a fixed set of mmap settings for a region and discrete
+> > > conditions under which they become active (ex. switch device to SAVING
+> > > mode) then QEMU could choose the right mapping itself and we wouldn't
+> > > need to worry about this asynchronous signaling problem, it would just
+> > > be defined as part of the protocol userspace needs to use.
+> > >  
+> > It's ok to let QEMU trigger dynamic trap on certain condition (like switching
+> > device to SAVING mode), but it seems that there's no fixed set of mmap settings
+> > for a region.
+> > For example, some devices may want to trap the whole BARs, but some devices
+> > only requires to trap a range of pages in a BAR for performance consideration.
+> > 
+> > If the "disable-able" flag is not preferable, maybe re-evaluation way is
+> > the only choice? But it is a burden to ask for re-evaluation if they are
+> > not required.
+> > 
+> > What about introducing a "region_bitmask" in ctl header of the migration region?
+> > when QEMU writes a region index to the "region_bitmask", it can read back
+> > from this field a bitmask to know which mmap to disable.
+> 
+> If a vendor driver wanted to have a migration sparse mmap that's
+> different from its runtime sparse mmap, we could simply add a new
+> capability in the region_info.  Userspace would only need to switch to
+> a different mapping for regions which advertise a new migration sparse
+> mmap capability.  Doesn't that serve the same purpose as the proposed
+> bitmap?
 
-On Wed, Dec 11, 2019 at 10:38:24AM +0530, Bharata B Rao wrote:
-> On Wed, Dec 11, 2019 at 10:41:32AM +1100, David Gibson wrote:
-> > On Tue, Dec 10, 2019 at 12:20:07PM +0530, Bharata B Rao wrote:
-> > > On Tue, Dec 10, 2019 at 04:05:36PM +1100, David Gibson wrote:
-> > > > On Tue, Dec 10, 2019 at 03:03:01PM +1100, Alexey Kardashevskiy wrot=
-e:
-> > > > >=20
-> > > > >=20
-> > > > > On 10/12/2019 14:50, Bharata B Rao wrote:
-> > > > > > On Tue, Dec 10, 2019 at 02:28:51PM +1100, David Gibson wrote:
-> > > > > >> On Mon, Dec 09, 2019 at 12:30:12PM +0530, Bharata B Rao wrote:
-> > > > > >>> A pseries guest can be run as a secure guest on Ultravisor-en=
-abled
-> > > > > >>> POWER platforms. When such a secure guest is reset, we need to
-> > > > > >>> release/reset a few resources both on ultravisor and hypervis=
-or side.
-> > > > > >>> This is achieved by invoking this new ioctl KVM_PPC_SVM_OFF f=
-rom the
-> > > > > >>> machine reset path.
-> > > > > >>>
-> > > > > >>> As part of this ioctl, the secure guest is essentially transi=
-tioned
-> > > > > >>> back to normal mode so that it can reboot like a regular gues=
-t and
-> > > > > >>> become secure again.
-> > > > > >>>
-> > > > > >>> This ioctl has no effect when invoked for a normal guest.
-> > > > > >>>
-> > > > > >>> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
-> > > > > >>> ---
-> > > > > >>>  hw/ppc/spapr.c       | 1 +
-> > > > > >>>  target/ppc/kvm.c     | 7 +++++++
-> > > > > >>>  target/ppc/kvm_ppc.h | 6 ++++++
-> > > > > >>>  3 files changed, 14 insertions(+)
-> > > > > >>>
-> > > > > >>> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > > > > >>> index f11422fc41..4c7ad3400d 100644
-> > > > > >>> --- a/hw/ppc/spapr.c
-> > > > > >>> +++ b/hw/ppc/spapr.c
-> > > > > >>> @@ -1597,6 +1597,7 @@ static void spapr_machine_reset(Machine=
-State *machine)
-> > > > > >>>      void *fdt;
-> > > > > >>>      int rc;
-> > > > > >>> =20
-> > > > > >>> +    kvmppc_svm_off();
-> > > > > >>
-> > > > > >> If you're going to have this return an error value, you should=
- really
-> > > > > >> check it here.
-> > > > > >=20
-> > > > > > I could, by spapr_machine_reset() and the callers don't propaga=
-te the
-> > > > > > errors up. So may be I could print a warning instead when ioctl=
- fails?
-> > > > >=20
-> > > > > An error here means you cannot restart the machine and should pro=
-bably
-> > > > > suspend, or try until it is not EBUSY (=3D=3Dall threads have sto=
-pped?).
-> > > >=20
-> > > > Right, if this fails, something has gone badly wrong.  You should
-> > > > absolutely print a message, and in fact it might be appropriate to
-> > > > quit outright.  IIUC the way PEF resets work, a failure here means =
-you
-> > > > won't be able to boot after the reset, since the guest memory will
-> > > > still be inaccessible to the host.
-> > >=20
-> > > Correct. I will send next version with a message and abort() added in
-> > > the ioctl failure path.
-> >=20
-> > abort() or assert() isn't right either - that's reserved for things
-> > that are definitely caused by a qemu code bug.  This should be an
-> > exit(EXIT_FAILURE).
->=20
-> Ok, but I see a problem with checking the return value of this
-> ioctl from userspace. If this ioctl is run on older kernels that don't
-> support this ioctl, we get -ENOTTY as return value. We shouldn't be
-> exiting in that case.
+yes, it does.
+I will try this way in next version.
 
-Ah, right.  We'll need to check for -ENOTTY specifically and ignore
-it, then.  We don't want this spewing warnings on every non-secure
-guest.
-
-> It looks like we may need a new KVM capability to advertise the presence
-> of KVM_PPC_SVM_OFF ioctl (or more generally, to advertise host kernel's
-> capability to support secure guests).
-
-Actually, that's probably a better idea still.
-
-> Paul - Do you think we should add such a KVM capability? Here is the
-> summary of the problem:
->=20
-> 1. QEMU invokes KVM_PPC_SVM_OFF ioctl from machine reset path and current=
-ly
->    we don't check for its return value.
-> 2. On host kernels that support secure guests,
->    2a. this ioctl returns 0 for regular guests and has no effect.
->    2b. the ioctl can fail for secure guests and here we could check the
->        return value and exit the guest right away.
-> 3. On host kernels that don't support secure guests, ioctl returns -ENOTTY
->    but we ignore the return value and continue the reset as this is
->    for a non-secure guest.
->=20
-> If we have such a KVM capability, we could invoke the ioctl only if it
-> is supported and handle the return value appropriately.
->=20
-> Regards,
-> Bharata.
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---oN4OvwWIcd1E23D1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3wfksACgkQbDjKyiDZ
-s5InPg//X++2EOUrUUbgGEYH6ETzBdQet9Getbty/w+O5XWGusx16xuk+IweJy6O
-qLXoVp3L332IxM0G641hwSmALMwu/ake9qG9dRSeKRUjK3cXfm+mozH8foXyjATi
-cibqTxXfTzZhVC1D92zn3hoNT3Zzb64tWmhrZSXIc75LyErtKytx2pl/HL2nAvog
-bCkwvzlo01KeeL23L93KU+1KSHuMGNkXrSV74NMfGM7WQ/PA+mM4wFsder+ArX3S
-aIfsbTfm0EBLNT+7pZh1gA4uAG/WAjc+rn8CivUP+b3dX2x5B3eRtcrjmKNCJ8t2
-eSUKv5WDrwCu/5MvIR+UuJAwoundVrVLl+oh/zhDSWO6dyhwgZ6z8N+NXt/bNKDt
-mHA3S1khxsyUfQf+GqVaKA3qG2BhgIAEZZkc23cH/HSbt17phhP6xs+oD6jCP3+d
-Zu5EdUjdTeIEaHtJtBhEyBZlCczc168iO1pWHtKyqz+1eVpNum2goTpu6PCUqOD1
-wi05KG4Y8XNa5bEnlsRyaH6ClUuWVkMRxtoewJPF1IRKBo+wcfHRAHZqNT7scUdP
-I6ablqZxbWg78rNclVQRa1VMn8++o3XgVeKd33RIhAem65mqU2tikU00h5ZTIVSp
-WDCQWyqEKJ7KFcd1I0XEI3Rhu8xS1da7KED2vJxPIPTn95Ey0OY=
-=hl4g
------END PGP SIGNATURE-----
-
---oN4OvwWIcd1E23D1--
+> > > > (2) performance optimization. There's an example in GVT (mdev case): 
+> > > >     PCI BARs are passed through on vGPU initialization and are mmaped to a host
+> > > >     dummy buffer. Then after initialization done, start trap of PCI BARs of
+> > > >     vGPUs and start normal host mediation. The initial pass-through can save
+> > > >     1000000 times of mmio trap.  
+> > > 
+> > > Much of this discussion has me worried that many assumptions are being
+> > > made about the user and device interaction.  Backwards compatible
+> > > behavior is required.  If a mdev device presents an initial sparse mmap
+> > > capability for this acceleration, how do you support an existing
+> > > userspace that doesn't understand the new dynamic mmap semantics and
+> > > continues to try to operate with the initial sparse mmap?  Doesn't this
+> > > introduce another example of the raciness of the device trying to
+> > > switch mmaps?  Seems that if QEMU doesn't handle the eventfd with
+> > > sufficient timeliness the switch back to trap behavior could miss an
+> > > important transaction.  This also seems like an optimization targeted
+> > > at VMs running for only a short time, where it's not obvious to me that
+> > > GVT-g overlaps those sorts of use cases.  How much initialization time
+> > > is actually being saved with such a hack?  Thanks,
+> > >  
+> > It can save about 4s initialization time with such a hack. But you are
+> > right, the backward compatibility is a problem and we are not going to
+> > upstream that. Just an example to show the usage.
+> > It's fine if we drop the way of asynchronous kernel notification.
+> 
+> I think to handle such a situation we'd need a mechanism to revoke the
+> user's mmap.  We can make use of an asynchronous mechanism to improve
+> performance of a device, but we need a synchronous mechanism to
+> maintain correctness.  For this example, the sparse mmap capability
+> could advertise the section of the BAR as mmap'able and revoke that
+> user mapping after the device finishes the initialization phase.
+> Potentially the user re-evaluating region_info after the initialization
+> phase would see a different sparse mmap capability excluding these
+> sections, but then we might need to think whether we want to suggest
+> that the user always re-read the region_info after device reset.  AFAIK,
+> we currently have no mechanism to revoke user mmaps. Thanks,
+> 
+Actually I think the "disable-able" flag is good except for its backward
+compatibility :)
+ 
+Thanks
+Yan
 
