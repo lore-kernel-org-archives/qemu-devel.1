@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBBB5C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:48:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E052C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:48:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2DE620836
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:48:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2786B20836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:48:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zzivh7m1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2DE620836
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cS36tjCg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2786B20836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if2Lk-0002at-26
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 08:48:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55003)
+	id 1if2Ly-0002q3-CJ
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 08:48:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56142)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1if2JX-0000nz-9B
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:46:04 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1if2Jh-0000zP-Ua
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:46:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1if2JV-0003Fn-IN
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:46:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56440
+ (envelope-from <marcandre.lureau@redhat.com>) id 1if2Jg-0003UQ-Ji
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:46:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48968
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1if2JV-0003Eq-DD
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:46:01 -0500
+ id 1if2Jf-0003RG-K8
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:46:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576071960;
+ s=mimecast20190719; t=1576071969;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VGKFTfEzQQpo+Nbwn8B8Yl3fLulEvP2Fv+bGOez1szg=;
- b=Zzivh7m1vz2i9/RP/o9LwUJ3MDuxww4qEZ4M/FS7wvBIKzVuNqJ4ZImROhGOZey3ZQPRAd
- 7JtxAWqG6lS0BYqrcEHC0rB5qTQGgJAaOV/m9XAA47x4r0jEEdtDBXPbYXbRiQcvxaMWth
- TWlSSf6bTqrpoRZviPiUN+deJwTjP6E=
+ bh=FHQuM2hLi9OLkFKNOc+ISLpaunJaxvVelpCdD47DOFg=;
+ b=cS36tjCgu+3G7yHDj84mJMoc1W/Ag7CJYlO+xn5CLxK3jE5tcJSalSEzqtYE0512HhkgW5
+ BJQ+ndpZz7qAp7wazPCM7UFpVR+tz1XMGXBVwcQ2keUq++nyXK9izhmPohu92Pt4ogBCEq
+ QoVpDmEmfbxt/7HMr6UK6bJ5+tP0yx8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-105-KY3Q_4LrOTmVOZA0sibrUQ-1; Wed, 11 Dec 2019 08:45:57 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-50-4KcbfaO8O2-MT8g51Xp2Wg-1; Wed, 11 Dec 2019 08:46:08 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CC8118557CD
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 13:45:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B085BDB63
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 13:46:07 +0000 (UTC)
 Received: from localhost (ovpn-112-63.ams2.redhat.com [10.36.112.63])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2BED160BF1;
- Wed, 11 Dec 2019 13:45:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 87C7662965;
+ Wed, 11 Dec 2019 13:46:02 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 3/8] docs: start a document to describe D-Bus usage
-Date: Wed, 11 Dec 2019 17:45:01 +0400
-Message-Id: <20191211134506.1803403-4-marcandre.lureau@redhat.com>
+Subject: [PATCH v6 4/8] util: add dbus helper unit
+Date: Wed, 11 Dec 2019 17:45:02 +0400
+Message-Id: <20191211134506.1803403-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20191211134506.1803403-1-marcandre.lureau@redhat.com>
 References: <20191211134506.1803403-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: KY3Q_4LrOTmVOZA0sibrUQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 4KcbfaO8O2-MT8g51Xp2Wg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,145 +95,126 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- MAINTAINERS            |  5 +++
- docs/interop/dbus.rst  | 99 ++++++++++++++++++++++++++++++++++++++++++
- docs/interop/index.rst |  1 +
- 3 files changed, 105 insertions(+)
- create mode 100644 docs/interop/dbus.rst
+ MAINTAINERS         |  2 ++
+ include/qemu/dbus.h | 18 +++++++++++++++
+ util/Makefile.objs  |  3 +++
+ util/dbus.c         | 55 +++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 78 insertions(+)
+ create mode 100644 include/qemu/dbus.h
+ create mode 100644 util/dbus.c
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 525b4740e8..19faa0e868 100644
+index 19faa0e868..f08fb4f24e 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -2199,6 +2199,11 @@ F: tests/migration-test.c
- F: docs/devel/migration.rst
- F: qapi/migration.json
+@@ -2202,6 +2202,8 @@ F: qapi/migration.json
+ D-Bus
+ M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+ S: Maintained
++F: util/dbus.c
++F: include/qemu/dbus.h
+ F: docs/interop/dbus.rst
 =20
-+D-Bus
-+M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+S: Maintained
-+F: docs/interop/dbus.rst
-+
  Seccomp
- M: Eduardo Otubo <otubo@redhat.com>
- S: Supported
-diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
+diff --git a/include/qemu/dbus.h b/include/qemu/dbus.h
 new file mode 100644
-index 0000000000..3d760e4882
+index 0000000000..efd74bef96
 --- /dev/null
-+++ b/docs/interop/dbus.rst
-@@ -0,0 +1,99 @@
-+=3D=3D=3D=3D=3D
-+D-Bus
-+=3D=3D=3D=3D=3D
++++ b/include/qemu/dbus.h
+@@ -0,0 +1,18 @@
++/*
++ * Helpers for using D-Bus
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
 +
-+Introduction
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++#ifndef DBUS_H
++#define DBUS_H
 +
-+QEMU may be running with various helper processes involved:
-+ - vhost-user* processes (gpu, virtfs, input, etc...)
-+ - TPM emulation (or other devices)
-+ - user networking (slirp)
-+ - network services (DHCP/DNS, samba/ftp etc)
-+ - background tasks (compression, streaming etc)
-+ - client UI
-+ - admin & cli
++#include <gio/gio.h>
 +
-+Having several processes allows stricter security rules, as well as
-+greater modularity.
++GStrv qemu_dbus_get_queued_owners(GDBusConnection *connection,
++                                  const char *name);
 +
-+While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
-+display), D-Bus is the de facto IPC of choice on Unix systems. The
-+wire format is machine friendly, good bindings exist for various
-+languages, and there are various tools available.
-+
-+Using a bus, helper processes can discover and communicate with each
-+other easily, without going through QEMU. The bus topology is also
-+easier to apprehend and debug than a mesh. However, it is wise to
-+consider the security aspects of it.
-+
-+Security
-+=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+A QEMU D-Bus bus should be private to a single VM. Thus, only
-+cooperative tasks are running on the same bus to serve the VM.
-+
-+D-Bus, the protocol and standard, doesn't have mechanisms to enforce
-+security between peers once the connection is established. Peers may
-+have additional mechanisms to enforce security rules, based for
-+example on UNIX credentials. However, because the daemon has
-+controlled who can send/recv messages to who, doesn't magically make
-+this secure. The semantics of the actual methods implemented using
-+D-Bus are just as critical. Peers need to carefully validate any
-+information they received from a peer with a different trust level.
-+
-+dbus-daemon policy
-+------------------
-+
-+dbus-daemon can enforce various policies based on the UID/GID of the
-+processes that are connected to it. It is thus a good idea to run
-+helpers as different UID from QEMU and set appropriate policies.
-+
-+Depending on the use case, you may choose different scenarios:
-+
-+ - Everything the same UID
-+
-+   - Convenient for developers
-+   - Improved reliability - crash of one part doens't take
-+     out entire VM
-+   - No security benefit over traditional QEMU
-+
-+ - Two UIDs, one for QEMU, one for dbus & helpers
-+
-+   - Moderately improved security isolation
-+
-+ - Many UIDs, one for QEMU one for dbus and one for each helpers
-+
-+   - Best security isolation
-+   - Complex to manager distinct UIDs needed for each VM
-+
-+For example, to allow only ``qemu`` user to talk to ``qemu-helper``
-+``org.qemu.Helper1`` service, a dbus-daemon policy may contain:
-+
-+.. code:: xml
-+
-+  <policy user=3D"qemu">
-+     <allow send_destination=3D"org.qemu.Helper1"/>
-+     <allow receive_sender=3D"org.qemu.Helper1"/>
-+  </policy>
-+
-+  <policy user=3D"qemu-helper">
-+     <allow own=3D"org.qemu.Helper1"/>
-+  </policy>
-+
-+
-+dbus-daemon can also perfom SELinux checks based on the security
-+context of the source and the target. For example, ``virtiofs_t``
-+could be allowed to send a message to ``svirt_t``, but ``virtiofs_t``
-+wouldn't be allowed to send a message to ``virtiofs_t``.
-+
-+See dbus-daemon man page for details.
-+
-+Guidelines
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+When implementing new D-Bus interfaces, it is recommended to follow
-+the "D-Bus API Design Guidelines":
-+https://dbus.freedesktop.org/doc/dbus-api-design.html
-+
-+The "org.qemu.*" prefix is reserved for the QEMU project.
-diff --git a/docs/interop/index.rst b/docs/interop/index.rst
-index 3e33fb5933..ded134ea75 100644
---- a/docs/interop/index.rst
-+++ b/docs/interop/index.rst
-@@ -13,6 +13,7 @@ Contents:
-    :maxdepth: 2
++#endif /* DBUS_H */
+diff --git a/util/Makefile.objs b/util/Makefile.objs
+index df124af1c5..80b76352cd 100644
+--- a/util/Makefile.objs
++++ b/util/Makefile.objs
+@@ -55,5 +55,8 @@ util-obj-$(CONFIG_INOTIFY1) +=3D filemonitor-inotify.o
+ util-obj-$(CONFIG_LINUX) +=3D vfio-helpers.o
+ util-obj-$(CONFIG_POSIX) +=3D drm.o
+ util-obj-y +=3D guest-random.o
++util-obj-$(CONFIG_GIO) +=3D dbus.o
++dbus.o-cflags =3D $(GIO_CFLAGS)
++dbus.o-libs =3D $(GIO_LIBS)
 =20
-    bitmaps
-+   dbus
-    live-block-operations
-    pr-helper
-    qemu-ga
+ stub-obj-y +=3D filemonitor-stub.o
+diff --git a/util/dbus.c b/util/dbus.c
+new file mode 100644
+index 0000000000..bb51870e54
+--- /dev/null
++++ b/util/dbus.c
+@@ -0,0 +1,55 @@
++/*
++ * Helpers for using D-Bus
++ *
++ * Copyright (C) 2019 Red Hat, Inc.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2.  See
++ * the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/dbus.h"
++#include "qemu/error-report.h"
++
++/*
++ * qemu_dbus_get_queued_owners() - return the list of queued unique names
++ * @connection: A GDBusConnection
++ * @name: a service name
++ *
++ * Return: a GStrv of unique names, or NULL on failure.
++ */
++GStrv
++qemu_dbus_get_queued_owners(GDBusConnection *connection, const char *name)
++{
++    g_autoptr(GDBusProxy) proxy =3D NULL;
++    g_autoptr(GVariant) result =3D NULL;
++    g_autoptr(GVariant) child =3D NULL;
++    g_autoptr(GError) err =3D NULL;
++
++    proxy =3D g_dbus_proxy_new_sync(connection, G_DBUS_PROXY_FLAGS_NONE, N=
+ULL,
++                                  "org.freedesktop.DBus",
++                                  "/org/freedesktop/DBus",
++                                  "org.freedesktop.DBus",
++                                  NULL, &err);
++    if (!proxy) {
++        error_report("Failed to create DBus proxy: %s", err->message);
++        return NULL;
++    }
++
++    result =3D g_dbus_proxy_call_sync(proxy, "ListQueuedOwners",
++                                    g_variant_new("(s)", name),
++                                    G_DBUS_CALL_FLAGS_NO_AUTO_START,
++                                    -1, NULL, &err);
++    if (!result) {
++        if (g_error_matches(err,
++                            G_DBUS_ERROR,
++                            G_DBUS_ERROR_NAME_HAS_NO_OWNER)) {
++            return g_new0(char *, 1);
++        }
++        error_report("Failed to call ListQueuedOwners: %s", err->message);
++        return NULL;
++    }
++
++    child =3D g_variant_get_child_value(result, 0);
++    return g_variant_dup_strv(child, NULL);
++}
 --=20
 2.24.0.308.g228f53135a
 
