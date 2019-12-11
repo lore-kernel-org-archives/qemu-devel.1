@@ -2,93 +2,85 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6275C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74462C2D0C6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:08:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84555208C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:06:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 438DA20836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:08:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WPteukQT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84555208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="ACwC6clb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 438DA20836
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if4Ve-0004IT-LV
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:06:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43488)
+	id 1if4Xg-0005VR-9l
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:08:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42535)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1if4UY-0003AN-42
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:35 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1if4UQ-0002wq-Nm
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1if4UW-00048r-FL
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:33 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40150
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1if4UP-0003wx-CA
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:26 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:49348)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1if4UW-00047y-9y
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576080331;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1if4UP-0003uV-1u
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:05:25 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 08FC196EF2;
+ Wed, 11 Dec 2019 16:05:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1576080323;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UV6nopb1zc62kP2n1lxTmW0LC7jeDzFSNycoALyvH0w=;
- b=WPteukQTsnonPXU5lpSq0yXKBPZKzKPLLFkAYB7kQX4pZ/0YO8kRBOi9q3PiQxVARxylCP
- /wqBqdNW8zXSJRS06EQjgBRYUBYXcVcfP2HKbuim81JpgM/FTCkjyBj0f6j/LqtQn4cUPf
- Yx74JTDe+TmH92e+I6j0uAGhNfarQEg=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-yiNwXglGPOiM197wW9lpRw-1; Wed, 11 Dec 2019 11:05:22 -0500
-Received: by mail-qt1-f199.google.com with SMTP id e37so4681346qtk.7
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 08:05:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=fsSJ+LS6x0r1qCD4dGVRbbZsMZSPf90DyUEncvctSbo=;
- b=N9P93UuHiAz0NFbX+7KXRz6jWxUB+mc2yR8QTPstZhswt3jOqcRV220UKoxPG6kzhY
- SZPZwuJs012dHQkqjRrb7jwC2yxh1CDP1IrqSqehDoHxXaO9mx1trGilDwvaDrIgAQBp
- 83s6UNEnnDhMyVOdMaZMzGs+3QzBxv3Wb4iFUetczOu/jtZ7bylfn6xQioWSD1gRy4bE
- 3/r2+sRgpkayzoLeXhLXdM4E2XmxOM7kmV8oaaBTRBPWVT+yTliEKpIAMRfpC8yAjjDC
- K2mL88vwnzqGDz1pav9LiHp9BQngadVHlQdxtDrYs5UHBTUyUsWt4xTpUUIDl/R4TxcF
- WnQA==
-X-Gm-Message-State: APjAAAWq7Pu1PDUpUEmqvwsPqXHvMaql+RtanXNSeZzIBB7mEdlOwf8D
- cga/JH0xPEUg2QS2Zm6tzYTbUMgOjhzpflxOSGhc6EgzGseChlnQZM8bgTmxVG61CMLegaS7Bm6
- b9y7JbzBVWbZQ1Ig=
-X-Received: by 2002:a37:8b85:: with SMTP id n127mr3702110qkd.353.1576080322470; 
- Wed, 11 Dec 2019 08:05:22 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwQltV6PHLtPIrxgLqnMmQeew1hakDwLMvsr8lSdsjO7Eez8OfUohXLpj4Gn8fUkiy2gER8gw==
-X-Received: by 2002:a37:8b85:: with SMTP id n127mr3702086qkd.353.1576080322250; 
- Wed, 11 Dec 2019 08:05:22 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id h28sm793145qkk.48.2019.12.11.08.05.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Dec 2019 08:05:21 -0800 (PST)
-Date: Wed, 11 Dec 2019 11:05:17 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH] virtio-fs: fix MSI-X nvectors calculation
-Message-ID: <20191211110504-mutt-send-email-mst@kernel.org>
-References: <20191209110759.35227-1-stefanha@redhat.com>
+ bh=+9uqqC7MBXJw6x4IMhmhvrJzByBygJmHS8WnEfIWnkU=;
+ b=ACwC6clbcuEOwrEfPBzMD69UTGdGLofoUDJBLdIHtqZju3UkkhAiORNbXsZjE7AS+QTZ05
+ PDWcen6SW/I/UsisZ0d8MaMlm4soEtqewoHko953/55MLymC8wmmLL9vK2Ireq5grBQrdW
+ 8KD3LlCNAPvDcVVgEfZfkJ7kjfOfwp8=
+From: Damien Hedde <damien.hedde@greensocs.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/2] gdbstub: change GDBState.last_packet to GByteArray
+Date: Wed, 11 Dec 2019 17:05:13 +0100
+Message-Id: <20191211160514.58373-2-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.24.0
+In-Reply-To: <20191211160514.58373-1-damien.hedde@greensocs.com>
+References: <20191211160514.58373-1-damien.hedde@greensocs.com>
 MIME-Version: 1.0
-In-Reply-To: <20191209110759.35227-1-stefanha@redhat.com>
-X-MC-Unique: yiNwXglGPOiM197wW9lpRw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=UTF-8
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1576080323;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+9uqqC7MBXJw6x4IMhmhvrJzByBygJmHS8WnEfIWnkU=;
+ b=aodmYFp5OTDeUF/hTmi362bA6KisxaxaMKl0zfgqBT4yH/d+v4+H3TlmB7xwcmGaNrthIf
+ XCou0Ah6tSkkugerdNzIUkS5CkarlVtcK8zrdoE8MyJUXH+AlEDRuZnPAANJ0ihAebsgYx
+ sJj2AQyJm+/fnIP6GpXVHjX8wBOiA+U=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1576080323; a=rsa-sha256; cv=none;
+ b=Woo/Ifp7V3ks/DeOsZnXSvVoElNOvV3Z/gBFUfeSbS8dX1mLsVEtEGG0YnZpz94COCsjdc
+ v2TeLKtIdtv4794K/StIERDZENxDARAS8wcW+SsELDG1JxxBrx3x7ZQcU3Sfd5q6DLqvLp
+ nxkEKkA1GMV1ft+rkdB4ZxCISO+4Hn4=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,52 +92,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Vivek Goyal <vgoyal@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, philmd@redhat.com,
+ alex.bennee@linaro.org, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Dec 09, 2019 at 11:07:59AM +0000, Stefan Hajnoczi wrote:
-> The following MSI-X vectors are required:
->  * VIRTIO Configuration Change
->  * hiprio virtqueue
->  * requests virtqueues
->=20
-> Fix the calculation to reserve enough MSI-X vectors.  Otherwise guest
-> drivers fall back to a sub-optional configuration where all virtqueues
-> share a single vector.
->=20
-> This change does not break live migration compatibility since
-> vhost-user-fs-pci devices are not migratable yet.
->=20
-> Reported-by: Vivek Goyal <vgoyal@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Remove the packet size upper limit by using a GByteArray
+instead of a statically allocated array for last_packet.
+Thus we can now send big packets.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Also remove the last_packet_len field and use last_packet->len
+instead.
 
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ gdbstub.c | 39 +++++++++++++++++++++------------------
+ 1 file changed, 21 insertions(+), 18 deletions(-)
 
-> ---
->  hw/virtio/vhost-user-fs-pci.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/virtio/vhost-user-fs-pci.c b/hw/virtio/vhost-user-fs-pci.=
-c
-> index 933a3f265b..e3a649d4a6 100644
-> --- a/hw/virtio/vhost-user-fs-pci.c
-> +++ b/hw/virtio/vhost-user-fs-pci.c
-> @@ -40,7 +40,8 @@ static void vhost_user_fs_pci_realize(VirtIOPCIProxy *v=
-pci_dev, Error **errp)
->      DeviceState *vdev =3D DEVICE(&dev->vdev);
-> =20
->      if (vpci_dev->nvectors =3D=3D DEV_NVECTORS_UNSPECIFIED) {
-> -        vpci_dev->nvectors =3D dev->vdev.conf.num_request_queues + 1;
-> +        /* Also reserve config change and hiprio queue vectors */
-> +        vpci_dev->nvectors =3D dev->vdev.conf.num_request_queues + 2;
->      }
-> =20
->      qdev_set_parent_bus(vdev, BUS(&vpci_dev->bus));
-> --=20
-> 2.23.0
+diff --git a/gdbstub.c b/gdbstub.c
+index 7b695bdebe..93b26f1b86 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -351,8 +351,7 @@ typedef struct GDBState {
+     int line_buf_index;
+     int line_sum; /* running checksum */
+     int line_csum; /* checksum at the end of the packet */
+-    uint8_t last_packet[MAX_PACKET_LENGTH + 4];
+-    int last_packet_len;
++    GByteArray *last_packet;
+     int signal;
+ #ifdef CONFIG_USER_ONLY
+     int fd;
+@@ -384,6 +383,7 @@ static void init_gdbserver_state(void)
+     gdbserver_state.init =3D true;
+     gdbserver_state.str_buf =3D g_string_new(NULL);
+     gdbserver_state.mem_buf =3D g_byte_array_sized_new(MAX_PACKET_LENGTH=
+);
++    gdbserver_state.last_packet =3D g_byte_array_sized_new(MAX_PACKET_LE=
+NGTH + 4);
+ }
+=20
+ #ifndef CONFIG_USER_ONLY
+@@ -626,28 +626,29 @@ static void hexdump(const char *buf, int len,
+ static int put_packet_binary(const char *buf, int len, bool dump)
+ {
+     int csum, i;
+-    uint8_t *p;
+-    uint8_t *ps =3D &gdbserver_state.last_packet[0];
++    uint8_t footer[3];
+=20
+     if (dump && trace_event_get_state_backends(TRACE_GDBSTUB_IO_BINARYRE=
+PLY)) {
+         hexdump(buf, len, trace_gdbstub_io_binaryreply);
+     }
+=20
+     for(;;) {
+-        p =3D ps;
+-        *(p++) =3D '$';
+-        memcpy(p, buf, len);
+-        p +=3D len;
++        g_byte_array_set_size(gdbserver_state.last_packet, 0);
++        g_byte_array_append(gdbserver_state.last_packet,
++                            (const uint8_t *) "$", 1);
++        g_byte_array_append(gdbserver_state.last_packet,
++                            (const uint8_t *) buf, len);
+         csum =3D 0;
+         for(i =3D 0; i < len; i++) {
+             csum +=3D buf[i];
+         }
+-        *(p++) =3D '#';
+-        *(p++) =3D tohex((csum >> 4) & 0xf);
+-        *(p++) =3D tohex((csum) & 0xf);
++        footer[0] =3D '#';
++        footer[1] =3D tohex((csum >> 4) & 0xf);
++        footer[2] =3D tohex((csum) & 0xf);
++        g_byte_array_append(gdbserver_state.last_packet, footer, 3);
+=20
+-        gdbserver_state.last_packet_len =3D p - ps;
+-        put_buffer(ps, gdbserver_state.last_packet_len);
++        put_buffer(gdbserver_state.last_packet->data,
++                   gdbserver_state.last_packet->len);
+=20
+ #ifdef CONFIG_USER_ONLY
+         i =3D get_char();
+@@ -2812,20 +2813,22 @@ static void gdb_read_byte(GDBState *s, uint8_t ch=
+)
+     uint8_t reply;
+=20
+ #ifndef CONFIG_USER_ONLY
+-    if (gdbserver_state.last_packet_len) {
++    if (gdbserver_state.last_packet->len) {
+         /* Waiting for a response to the last packet.  If we see the sta=
+rt
+            of a new command then abandon the previous response.  */
+         if (ch =3D=3D '-') {
+             trace_gdbstub_err_got_nack();
+-            put_buffer((uint8_t *)gdbserver_state.last_packet, gdbserver=
+_state.last_packet_len);
++            put_buffer(gdbserver_state.last_packet->data,
++                       gdbserver_state.last_packet->len);
+         } else if (ch =3D=3D '+') {
+             trace_gdbstub_io_got_ack();
+         } else {
+             trace_gdbstub_io_got_unexpected(ch);
+         }
+=20
+-        if (ch =3D=3D '+' || ch =3D=3D '$')
+-            gdbserver_state.last_packet_len =3D 0;
++        if (ch =3D=3D '+' || ch =3D=3D '$') {
++            g_byte_array_set_size(gdbserver_state.last_packet, 0);
++        }
+         if (ch !=3D '$')
+             return;
+     }
+@@ -3209,7 +3212,7 @@ static int gdb_monitor_write(Chardev *chr, const ui=
+nt8_t *buf, int len)
+     const char *p =3D (const char *)buf;
+     int max_sz;
+=20
+-    max_sz =3D (sizeof(gdbserver_state.last_packet) - 2) / 2;
++    max_sz =3D (MAX_PACKET_LENGTH / 2) + 1;
+     for (;;) {
+         if (len <=3D max_sz) {
+             gdb_monitor_output(&gdbserver_state, p, len);
+--=20
+2.24.0
 
 
