@@ -2,78 +2,92 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641E6C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8F2CC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:34:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E01520836
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:34:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oKiMEdf0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E01520836
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AC66F20836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:34:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC66F20836
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if34E-0006sp-MO
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:34:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33878)
+	id 1if34N-00074S-IE
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:34:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2tw-0005QN-RL
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:43 -0500
+ (envelope-from <groug@kaod.org>) id 1if32O-0005qx-Q0
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:32:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2tv-0003FU-Km
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:40 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52735)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1if2tv-0003DM-61; Wed, 11 Dec 2019 09:23:39 -0500
-Received: by mail-wm1-x341.google.com with SMTP id p9so7297080wmc.2;
- Wed, 11 Dec 2019 06:23:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id;
- bh=DDlSLM0gJZ7KaXQqepJKvC61+c7na5da89NPclbedsE=;
- b=oKiMEdf0K3rS4kJfQSAf5sHlJWePOIoEwbuFS5wrtEaA8F8+KLXiZ4Gt5ZCXOGazac
- 3SaReoLWacgYVCFaEr3qm+oTMUdFE/l+NbIFk7qKx8XTnJOhEXtpIq3D1llLBKmzV99K
- IRepDLHbUH62dMk2RhzA29hDFl2bTXsQCO1ccSNdc/dLHXB03PsCmvQvUapEpFBjEYX9
- veruvGuTnHSoq/5oel4Tu05+maYkPM09mvVQHqPm6DXOEk/vE/SpQ1s+l1LCe11YvK7d
- jM+ru+ChEiyUKrN0bcn5A4ocRq2fJ3ySQQBtLPfNhVUXKMSMUMe5Omom3hnOgKEAGuIS
- nJhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
- bh=DDlSLM0gJZ7KaXQqepJKvC61+c7na5da89NPclbedsE=;
- b=uS8zBjKvJVoBxsUoJ4fuggrx7PWj27+WxspVy0QJb2mPSCygBGFZXInjyFeKuglRKv
- LU3ZYA1r9mUQ2NGmSClypHXpelRxoMBXWkqWwHfnEakW3U6TSWwv/USI3rdYnmjD/vzR
- cRsB4XF64UrK3BZlALJoW5YdDe1HjMe6r4P+HBM0EPu0UsF2UjGWXvTForfnixDWjlYh
- kMOpuQ27iWljkMOgWByNE2Qx5mcnsOd6MaV6XvbFWdkMQ8RGy4YCbkhLXGMyg/dLbCQw
- hYLGI306wHiDLVP2SwB25w7tisMV3uBpDfV290ElJYJybESDaE7UkgeG24Cjeszyqw5l
- izJQ==
-X-Gm-Message-State: APjAAAXJTV4ceR1ChxCsML/uZ0SK1na8RylsvfYLBLoI1t1YZvf/55o0
- nRqOKsfQj2GYdoDP7QNauL4ouvBf
-X-Google-Smtp-Source: APXvYqzd1YLGsmpelVZJQnbeosTTRhrZNd8xFPZ6Z9W5lBZtYWciJR57Gt/KLX4u2UIrlmkub5FjgA==
-X-Received: by 2002:a1c:9cce:: with SMTP id f197mr9239wme.133.1576074217391;
- Wed, 11 Dec 2019 06:23:37 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g23sm2503783wmk.14.2019.12.11.06.23.36
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Dec 2019 06:23:36 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] tests: use g_test_rand_int
-Date: Wed, 11 Dec 2019 15:23:27 +0100
-Message-Id: <1576074210-52834-6-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+ (envelope-from <groug@kaod.org>) id 1if32N-0006Bl-Ee
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:32:24 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57146)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1if32N-0006A2-5m
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:32:23 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBBERFI3052449
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 09:32:21 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wsrdq7axe-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 09:32:21 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Wed, 11 Dec 2019 14:32:19 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 11 Dec 2019 14:32:16 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBBEWF9952953292
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 11 Dec 2019 14:32:15 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1D0824C040;
+ Wed, 11 Dec 2019 14:32:15 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E0AC04C046;
+ Wed, 11 Dec 2019 14:32:14 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.152.115])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 11 Dec 2019 14:32:14 +0000 (GMT)
+Subject: [PATCH] ppc/pnv: Make PnvXScomInterface an incomplete type
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Wed, 11 Dec 2019 15:32:14 +0100
+User-Agent: StGit/unknown-version
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19121114-0028-0000-0000-000003C7912B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121114-0029-0000-0000-0000248AC6AD
+Message-Id: <157607473444.179018.14127987124523137347.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-11_03:2019-12-11,2019-12-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 phishscore=0
+ impostorscore=0 mlxlogscore=707 priorityscore=1501 adultscore=0
+ bulkscore=0 mlxscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ clxscore=1034 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912110124
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,115 +99,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-g_test_rand_int provides a reproducible random integer number, using a
-different number seed every time but allowing reproduction using the
---seed command line option.  It is thus better suited to tests than
-g_random_int or random.
+PnvXScomInterface is an interface instance. It should never be
+dereferenced. Drop the dummy type definition for extra safety,
+which is the common practice with QOM interfaces.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- block/vhdx.c         | 2 +-
- block/vmdk.c         | 4 ++--
- tests/ivshmem-test.c | 2 +-
- tests/test-bitmap.c  | 8 ++++----
- tests/test-qga.c     | 4 ++--
- 5 files changed, 10 insertions(+), 10 deletions(-)
+ include/hw/ppc/pnv_xscom.h |    4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/vhdx.c b/block/vhdx.c
-index f02d261..36465d5 100644
---- a/block/vhdx.c
-+++ b/block/vhdx.c
-@@ -1504,7 +1504,7 @@ static int vhdx_create_new_headers(BlockBackend *blk, uint64_t image_size,
-     hdr = g_new0(VHDXHeader, 1);
+diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+index 1c1d76bf9be5..b738011ab205 100644
+--- a/include/hw/ppc/pnv_xscom.h
++++ b/include/hw/ppc/pnv_xscom.h
+@@ -22,9 +22,7 @@
  
-     hdr->signature       = VHDX_HEADER_SIGNATURE;
--    hdr->sequence_number = g_random_int();
-+    hdr->sequence_number = g_test_rand_int();
-     hdr->log_version     = 0;
-     hdr->version         = 1;
-     hdr->log_length      = log_size;
-diff --git a/block/vmdk.c b/block/vmdk.c
-index 20e909d..eba96bf 100644
---- a/block/vmdk.c
-+++ b/block/vmdk.c
-@@ -2037,7 +2037,7 @@ static int vmdk_pwritev(BlockDriverState *bs, uint64_t offset,
-         /* update CID on the first write every time the virtual disk is
-          * opened */
-         if (!s->cid_updated) {
--            ret = vmdk_write_cid(bs, g_random_int());
-+            ret = vmdk_write_cid(bs, g_test_rand_int());
-             if (ret < 0) {
-                 return ret;
-             }
-@@ -2499,7 +2499,7 @@ static int coroutine_fn vmdk_co_do_create(int64_t size,
+ #include "qom/object.h"
  
-     /* generate descriptor file */
-     desc = g_strdup_printf(desc_template,
--                           g_random_int(),
-+                           g_test_rand_int(),
-                            parent_cid,
-                            BlockdevVmdkSubformat_str(subformat),
-                            parent_desc_line,
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index be9aa92..ecda256 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -443,7 +443,7 @@ static gchar *mktempshm(int size, int *fd)
-     while (true) {
-         gchar *name;
+-typedef struct PnvXScomInterface {
+-    Object parent;
+-} PnvXScomInterface;
++typedef struct PnvXScomInterface PnvXScomInterface;
  
--        name = g_strdup_printf("/qtest-%u-%u", getpid(), g_random_int());
-+        name = g_strdup_printf("/qtest-%u-%u", getpid(), g_test_rand_int());
-         *fd = shm_open(name, O_CREAT|O_RDWR|O_EXCL,
-                        S_IRWXU|S_IRWXG|S_IRWXO);
-         if (*fd > 0) {
-diff --git a/tests/test-bitmap.c b/tests/test-bitmap.c
-index 087e02a..2f5b714 100644
---- a/tests/test-bitmap.c
-+++ b/tests/test-bitmap.c
-@@ -22,10 +22,10 @@ static void check_bitmap_copy_with_offset(void)
-     bmap2 = bitmap_new(BMAP_SIZE);
-     bmap3 = bitmap_new(BMAP_SIZE);
- 
--    bmap1[0] = random();
--    bmap1[1] = random();
--    bmap1[2] = random();
--    bmap1[3] = random();
-+    bmap1[0] = g_test_rand_int();
-+    bmap1[1] = g_test_rand_int();
-+    bmap1[2] = g_test_rand_int();
-+    bmap1[3] = g_test_rand_int();
-     total = BITS_PER_LONG * 4;
- 
-     /* Shift 115 bits into bmap2 */
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index 1ca49bb..d2b2435 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -143,7 +143,7 @@ static void qmp_assertion_message_error(const char     *domain,
- static void test_qga_sync_delimited(gconstpointer fix)
- {
-     const TestFixture *fixture = fix;
--    guint32 v, r = g_random_int();
-+    guint32 v, r = g_test_rand_int();
-     unsigned char c;
-     QDict *ret;
- 
-@@ -186,7 +186,7 @@ static void test_qga_sync_delimited(gconstpointer fix)
- static void test_qga_sync(gconstpointer fix)
- {
-     const TestFixture *fixture = fix;
--    guint32 v, r = g_random_int();
-+    guint32 v, r = g_test_rand_int();
-     QDict *ret;
- 
-     /*
--- 
-1.8.3.1
+ #define TYPE_PNV_XSCOM_INTERFACE "pnv-xscom-interface"
+ #define PNV_XSCOM_INTERFACE(obj) \
 
 
