@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB93C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADC6C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:28:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4696421556
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:28:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A3B320836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 14:28:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oN8qPj0j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4696421556
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WEfaMqGC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A3B320836
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if2yk-0002Hc-Cn
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:28:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33371)
+	id 1if2yo-0002Ml-Cf
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 09:28:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33693)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2ts-0005PV-Gx
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:38 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1if2tv-0005Pl-CW
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1if2tq-000391-NG
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:35 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33214)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1if2tt-0003Ce-FZ
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 09:23:39 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52735)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1if2tq-00037k-HE; Wed, 11 Dec 2019 09:23:34 -0500
-Received: by mail-wr1-x444.google.com with SMTP id b6so24267647wrq.0;
- Wed, 11 Dec 2019 06:23:34 -0800 (PST)
+ id 1if2ts-0003AT-OP; Wed, 11 Dec 2019 09:23:37 -0500
+Received: by mail-wm1-x342.google.com with SMTP id p9so7296955wmc.2;
+ Wed, 11 Dec 2019 06:23:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=KTbcScOLjXllpK9umoeqVc/PDjmIqMW5fTameWTBrIo=;
- b=oN8qPj0jT+uo3AMAXS8VqupwT9RelTzEQBqYUNqK0iIKnznELXzRwmquB1uunWzg5g
- IsMBvDiPFXpLxyaqhRE/aMbHjLrIvb+14saNSGOeuuga3uNtM0tfYjPm452SA0+JASfS
- mP5ExkHo2pPLqmS2V156WMbX9Zf+VjTY/j+trOBrx17JkthX5sz8b5LpzoOpDSuT7U4k
- UP5QtJ1Z6XRLvJrAFJdO0HzMQ+dKAMB6Z9/qobqOsgK5XkBGx8h1niM31c99ZT8RrtNS
- nrtUQ9a3FN8JkUiGFI/6j3bUqk0fqcAly8Nk6i41oNO0/P0BSrvCdcS/N5XmKjl/OnIi
- D+vA==
+ bh=WjRgIZ5qePVVbis5wVrr7iekZjJDuuFlCCqKYtN7ZTM=;
+ b=WEfaMqGCuUlAbbxFYkO+RkiTtHeG8X+1D2/TZe01d5Pv6HxDHUMHO7tONfyG/qNnsr
+ bUQr07YzwT2kbYLCEfwMGfwKeWlhZFtXeaUSgjTs3evCS2EfQPhkL5vrEeu7om4ojIDU
+ +qnuMwqTi/wWRnHXpTBDjo7bDePQgZ7m3btSrwNuwaRARrS3XqwG8cfItcX5uhal7R4f
+ vZrTd8KSmnwJuj857261waDF07emNMPDHrmFVflNUwZdyFdC0avK7IGH3pB8JXSO5Zy7
+ puChf/BUoNmptO/iKvzWeFiAJwy8UHGsUuW6MU1PjvHuCFALw9PLrPagpp7RBgoAE54L
+ AF0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :mime-version:content-transfer-encoding;
- bh=KTbcScOLjXllpK9umoeqVc/PDjmIqMW5fTameWTBrIo=;
- b=Ucu+ICvnl9pZnhOQ6H808sCBnoLjS+vGfZ8uvUW72KqSbfdOEFi4Sk+r6bja4l3SvI
- apy+e7W0W5X5g73R7t1DTgDn5pDA2I3N5HwXm7qIYWyjzfaz3U9khop2CqxXmVeqnnlr
- 0oIFf+NdemB3wbnPGGGrFv6FJbTcbEBQl7fWUn56nkg1Y0SEXwAfi/etRwyPZNQ3ceZA
- vsp9M9onLY7Z69wRKQ5OGsikT/Y4CP3MEKdTSru4t2X45xh3q2xp4qVXJHQ+chOvElA9
- XitHlCc3vKnoxjY5RUR/ZfCuflc9h09IXFeFTrSFGyK1P2/WDm3W2/QMvPa6Wu4msl1B
- 2Exg==
-X-Gm-Message-State: APjAAAXSNtnAy6qbddzJdsAeZU9O93khNy2ko+HliNGjp+SDUdDh/50z
- q7GPXTFeCqPZ7Ng8Roq89T46mY5c
-X-Google-Smtp-Source: APXvYqyJReA0qZLK4zO4VcBN0cU/v+F2bAwpe1awnganCfX8fr2Zi2UeuPOcHS90qWNi7if78+sPxg==
-X-Received: by 2002:adf:fd87:: with SMTP id d7mr70174wrr.226.1576074213202;
- Wed, 11 Dec 2019 06:23:33 -0800 (PST)
+ bh=WjRgIZ5qePVVbis5wVrr7iekZjJDuuFlCCqKYtN7ZTM=;
+ b=ZFxIeI5CkfdmrpxRjUdujnRPCizSvPyRFiNwPUI31eaXLUrT092Zww9iILjYQWFWtc
+ Mv8IvP7PscWJDcO3kK2l63S0SUshBc2Io6XxbgsHo7TJ2wBkPE9IgVMVqYVwqhIsAVo0
+ 5msAiMM3EVyMig9oNuEfXP8wtNaILpYMzoyZdPdNRbz93Dovs+nWkkiIyoWQl7usAIJg
+ FOO9G5CJocQA2ARWmbiuVzlQNtIQ+DYomJGgayTfenkNKNEb2+XfmQyfd3U6p8olCwXA
+ V+0+q9lqytJaMi31hO0BIrhXy94fEf4drxk/jsrwWToR9+lknS2uNOQbEHO8wgiD8ICl
+ Cw5w==
+X-Gm-Message-State: APjAAAX475TJDVySAIGNzmKS7lADGLZqTswznXJ1wETVMke8QoIt+ht1
+ prQybbRMNsrzPIXKZfAup/CearLS
+X-Google-Smtp-Source: APXvYqySPGzmde3Kor2ZWDovZXS+gGeYpLbPi2/kwDQHXfKGMj44DpLt7N6V05b9T5++KqtYRUznZQ==
+X-Received: by 2002:a1c:1f51:: with SMTP id f78mr83046wmf.60.1576074215437;
+ Wed, 11 Dec 2019 06:23:35 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id g23sm2503783wmk.14.2019.12.11.06.23.32
+ by smtp.gmail.com with ESMTPSA id g23sm2503783wmk.14.2019.12.11.06.23.34
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 11 Dec 2019 06:23:32 -0800 (PST)
+ Wed, 11 Dec 2019 06:23:34 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] build-sys: do not include Windows SLIRP dependencies in $LIBS
-Date: Wed, 11 Dec 2019 15:23:23 +0100
-Message-Id: <1576074210-52834-2-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH] migration: fix maybe-uninitialized warning
+Date: Wed, 11 Dec 2019 15:23:25 +0100
+Message-Id: <1576074210-52834-4-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,45 +90,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When including the internal SLIRP library, we should add all the libraries that
-it needs for the build.  Right now they are all included by QEMU, but -liphlpapi
-is not needed without slirp.  Move it from LIBS to slirp_libs.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Based on a patch by Marc-André Lureau.
+../migration/ram.c: In function ‘multifd_recv_thread’:
+/home/elmarco/src/qq/include/qapi/error.h:165:5: error: ‘block’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+  165 |     error_setg_internal((errp), __FILE__, __LINE__, __func__,   \
+      |     ^~~~~~~~~~~~~~~~~~~
+../migration/ram.c:818:15: note: ‘block’ was declared here
+  818 |     RAMBlock *block;
+      |               ^~~~~
 
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ migration/ram.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/configure b/configure
-index 6099be1..d16dad2 100755
---- a/configure
-+++ b/configure
-@@ -926,7 +926,7 @@ if test "$mingw32" = "yes" ; then
-   DSOSUF=".dll"
-   # MinGW needs -mthreads for TLS and macro _MT.
-   QEMU_CFLAGS="-mthreads $QEMU_CFLAGS"
--  LIBS="-lwinmm -lws2_32 -liphlpapi $LIBS"
-+  LIBS="-lwinmm -lws2_32 $LIBS"
-   write_c_skeleton;
-   if compile_prog "" "-liberty" ; then
-     LIBS="-liberty $LIBS"
-@@ -6069,6 +6069,9 @@ case "$slirp" in
-     mkdir -p slirp
-     slirp_cflags="-I\$(SRC_PATH)/slirp/src -I\$(BUILD_DIR)/slirp/src"
-     slirp_libs="-L\$(BUILD_DIR)/slirp -lslirp"
-+    if test "$mingw32" = "yes" ; then
-+      slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
-+    fi
-     ;;
+diff --git a/migration/ram.c b/migration/ram.c
+index 5078f94..7dd7f81 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -864,15 +864,17 @@ static int multifd_recv_unfill_packet(MultiFDRecvParams *p, Error **errp)
+     p->next_packet_size = be32_to_cpu(packet->next_packet_size);
+     p->packet_num = be64_to_cpu(packet->packet_num);
  
-   system)
+-    if (p->pages->used) {
+-        /* make sure that ramblock is 0 terminated */
+-        packet->ramblock[255] = 0;
+-        block = qemu_ram_block_by_name(packet->ramblock);
+-        if (!block) {
+-            error_setg(errp, "multifd: unknown ram block %s",
+-                       packet->ramblock);
+-            return -1;
+-        }
++    if (p->pages->used == 0) {
++        return 0;
++    }
++
++    /* make sure that ramblock is 0 terminated */
++    packet->ramblock[255] = 0;
++    block = qemu_ram_block_by_name(packet->ramblock);
++    if (!block) {
++        error_setg(errp, "multifd: unknown ram block %s",
++                   packet->ramblock);
++        return -1;
+     }
+ 
+     for (i = 0; i < p->pages->used; i++) {
 -- 
 1.8.3.1
 
