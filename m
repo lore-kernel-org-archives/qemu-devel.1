@@ -2,86 +2,83 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E8AEC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DE7C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:07:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A4712077B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:04:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF8E120836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:07:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJCEqegG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A4712077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eFuLAcZ6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF8E120836
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if1fM-0001dy-U1
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 08:04:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53717)
+	id 1if1iG-0004o9-OX
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 08:07:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55146)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1if1d2-0007D8-GA
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:02:09 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1if1gy-0003hF-5h
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1if1cy-0005a5-Vw
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:02:06 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58839
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1if1cy-0005Yx-SE
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:02:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576069324;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=evDjmeB2b7ecqtE6V9yHP0f4z+5bHE6QzpjDDaG6RYE=;
- b=ZJCEqegGjGVuNa2BC++TEDf89/x3Vz+Y6rwMzFRF+Rfby7+tsby5PfttCSjNcuiKxWCUrQ
- 08yBnDcCqBcZ+g6Dc4TlrbvmBW8g8mSp4MR2Hk1arco6cUvVorVgsesRlJpN5eb+rcn0d7
- q+8BtzM9ebVNwxTkwqvvCUFPKl/TYC4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-135-rEBksM78MFSUgVGdFm2UoQ-1; Wed, 11 Dec 2019 07:55:54 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F052764A91;
- Wed, 11 Dec 2019 12:55:52 +0000 (UTC)
-Received: from angien.pipo.sk (unknown [10.43.2.48])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B8344100EBA4;
- Wed, 11 Dec 2019 12:55:51 +0000 (UTC)
-Date: Wed, 11 Dec 2019 13:55:48 +0100
-From: Peter Krempa <pkrempa@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: Insufficiently documented deprecated command arguments
-Message-ID: <20191211125548.GE2441258@angien.pipo.sk>
-References: <87tv67wa9y.fsf@dusky.pond.sub.org>
- <20191211093317.GB2441258@angien.pipo.sk>
- <20191211101439.GA6505@linux.fritz.box>
- <20191211105147.GC2441258@angien.pipo.sk>
- <20191211122417.GB6505@linux.fritz.box>
- <20191211123210.GH955178@redhat.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1if1gw-00035O-Ve
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:06:12 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34273)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1if1gv-00030x-Lw
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:06:09 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t2so23986753wrr.1
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 05:06:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=j6HHlT6J093i0KH+E444P6RkaJOr2gNObY68xIKCC6E=;
+ b=eFuLAcZ64Z2gNuuG0jca2vRZnFaZjwtmbpwpLeKbmkPPPQ8epGgTa7D2ONI5KCLFpl
+ fkCNsPK+oRsD5eOH+ItmES4+4fgxcHmRNrI03RPBBBX7eGamnVcUxSznWCMbHZUxRBJF
+ llzhXGZfmq4eUOEhVBNGIeEvdR9NEH3k4Ky0qYevyb35lEIQfonNcYPBgd+cFjEXykeY
+ ZzSZNbyxJ3nTyxr8Q9wHEast4FfcKzPuRbExuARzdI0k5kQR/iiodWbJLux15hGk3gNG
+ VJYqWndeo7sabBwh2nZH0+/qCWpK4Ff/bnXn7U5B984a2xaw+PwSDrXOggiVexvCN7vJ
+ O0wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=j6HHlT6J093i0KH+E444P6RkaJOr2gNObY68xIKCC6E=;
+ b=NKNa6SGG2X7fyZ4/rGucQP+CbUofEDDtu9YvpbVP1ZhO/mcMNdpWhoh+FTd72Wnhfa
+ lhUd73BvF4bdDuADV7QduIiHikFWW/doejmIR0LlWAp6U8Qy0kHjyoDQ23y3174V8W79
+ Por8H7pN5uEJWRonNcpQTuYSI1eMRUR2WUFci8fdtUbLzIc9lrUVtZJ8vMeCnGJUJcgO
+ vxEG1W5NrHeNTyvlDCUbpc7lrn/1X/ftyHhOCTcV2w8K1JwU0+CyED4I96QVXk+vtC/a
+ /SDM5E8peCYsgXDZm9iuN1s5dg6n1Q6TXZkK2H+9VeglllJ2+ynwQVkWIqEppottsfeI
+ 6Fsg==
+X-Gm-Message-State: APjAAAV/qt+Xz9y3dXRJI4kOV9DAeNIzL5UOvEkTmCV0nINWBLj2qmCj
+ R5fibIoaEIqO0Bgbrja2Zk/dWrFdOvfh3bG5H+5wRmGm
+X-Google-Smtp-Source: APXvYqwwUAs4ktg6UlK6hVu6sriWd0q7Y655nYb4oO5aVFE/x9FE8fSzqQ1ADv+D5I2hyorOuDnG+ojwQYBpokLaPYQ=
+X-Received: by 2002:adf:f10a:: with SMTP id r10mr3430373wro.202.1576065697198; 
+ Wed, 11 Dec 2019 04:01:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191211123210.GH955178@redhat.com>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: rEBksM78MFSUgVGdFm2UoQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
+ <CAJ+F1CLV_JRhXX=tB7ZXYxa1En4LzYgJr+7egKzVRNBOLY2nSA@mail.gmail.com>
+In-Reply-To: <CAJ+F1CLV_JRhXX=tB7ZXYxa1En4LzYgJr+7egKzVRNBOLY2nSA@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 11 Dec 2019 16:01:25 +0400
+Message-ID: <CAJ+F1CLS4HV-SckggfYNRKXxPa0R2BxSQrpPv8CRVkfvRB3E4w@mail.gmail.com>
+Subject: Re: [PATCH v4 00/37] Clean-ups: qom-ify serial and remove
+ QDEV_PROP_PTR
+To: QEMU <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,38 +90,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Dec 11, 2019 at 12:32:10 +0000, Daniel Berrange wrote:
-> On Wed, Dec 11, 2019 at 01:24:17PM +0100, Kevin Wolf wrote:
-> > Am 11.12.2019 um 11:51 hat Peter Krempa geschrieben:
-> > > On Wed, Dec 11, 2019 at 11:14:39 +0100, Kevin Wolf wrote:
+Hi
 
-[...]
+On Sun, Dec 1, 2019 at 2:19 PM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+>
+>
+> - "chardev: generate an internal id when none given"
+>
+> As explained, this is necessary for qdev_prop_set_chr()
 
-> > > Well, in some specific cases we could detect the node names
-> > > auto-assigned by qemu and use them instead of paths, but in my opinio=
-n
-> > > it's not worth the effort and extra code.
-> >=20
-> > Well, the question is what to do on the QEMU side then. Deprecation
-> > should mean that we have a plan for removing the feature. If we're
-> > planning to keep the feature indefinitely because libvirt needs it, we
-> > might want to consider removing the deprecation notice.
->=20
-> Ideally libvirt would stop using -drive entirely, as I hate the idea of
-> having to keep this around indefinitely in libvirt too. This needs QEMU
-> to close the last gaps wrt SD cards
+ping
 
-Yes and also give us guidance how to convert it. Looking at the code
-didn't help. There's a plethora of controllers and options to configure
-without clear indication what is default behaviour expected.
+>
+> - "serial: register vmsd with DeviceClass"
+>
+> This is standard qdev-ification, however it breaks backward migration,
+> but that's just how qdev_set_legacy_instance_id() works.
 
-Trying to convert it blindly would end up worse than just ditching
-support for sdcards altogehter.
+See thread, someone could review or nack (if backward migration is a proble=
+m).
 
+>
+> - "sm501: make SerialMM a child, export chardev property"
+>
+> review?
+
+ping
+
+>
+> - "qdev/qom: remove some TODO limitations now that PROP_PTR is gone"
+>
+> This should be straightforward.
+
+ping
+
+thanks
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
