@@ -2,79 +2,83 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43736C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 17:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2823C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 17:43:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D99B20637
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 17:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E7F72077B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 17:43:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZ35iD8I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D99B20637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OyJf7J4+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E7F72077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if5wV-0000KV-7Z
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 12:38:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53046)
+	id 1if614-0002mE-EA
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 12:43:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49404)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1if5vt-0008EO-4g
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 12:37:54 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1if606-0001Xr-9r
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 12:42:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1if5vr-0001yi-Jw
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 12:37:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31298
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1if5vr-0001xz-GT
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 12:37:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576085871;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=pWIYYDIqxFQrMnbHb7i+JJOBoSDL2kGf0VMHwE0d70U=;
- b=iZ35iD8I+wp6bFNqQzRuUu84MYNYom+ynydT8mf1SUwesyjEx9yt80opIwqzaxS4J6xtuy
- +/h8W+rJEqm8q32UfWMqh7qE0qXD78aQMfvgvcQy3yKIBJ8Qre9uEPCUe8oRcMJ8z532oo
- zBZFTyjOz3LLCXADAUyJ1TPUL3xeaPE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-neRtTF0dNvqE2kLLMKEbOw-1; Wed, 11 Dec 2019 12:37:47 -0500
-X-MC-Unique: neRtTF0dNvqE2kLLMKEbOw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89BDB107B79B;
- Wed, 11 Dec 2019 17:37:46 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 269145E244;
- Wed, 11 Dec 2019 17:37:40 +0000 (UTC)
-Date: Wed, 11 Dec 2019 17:37:39 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] virtio: don't enable notifications during polling
-Message-ID: <20191211173739.GA947773@stefanha-x1.localdomain>
-References: <20191209210957.65087-1-stefanha@redhat.com>
- <20191211105755-mutt-send-email-mst@kernel.org>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1if605-0006kN-7i
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 12:42:14 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42995)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1if605-0006iT-1D
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 12:42:13 -0500
+Received: by mail-wr1-x442.google.com with SMTP id q6so3508647wro.9
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 09:42:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=7w2qYRD1PyIQCryf1XrpwNFROnS6qXPOLPmjqika46w=;
+ b=OyJf7J4+sSpG4JhvpglwjZ40BXPMX96S5mNktFw+FI1FIIozN3F33CTucsirfEthlh
+ 8zgK1E/Zvnc2BC8gAenRKcEBKMbGqN5Flzn2GQkTGksEfH7PaHp+UM6sa+JTY7j7jee9
+ WqJCzHxPzYRJsLoioiHqulSUcDqZH2Io/dLBkU30KdsDA5GSc33rbZbmAVeTHOYiY7N3
+ PfKotTWxbBpLsZwmbzJSsNjteN+/88rIhClNbYhl6Lq3kfqK5Pc84iCX5cr4s6L+H2E0
+ IOahHGY0NJ/EUO4iJEGUCeDSDudQysHODeAGYDll2DB/8skTWnNGtDnYpYA63PkKMRo0
+ lrMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=7w2qYRD1PyIQCryf1XrpwNFROnS6qXPOLPmjqika46w=;
+ b=Y2VJevWsqUdRG5e81h/CCI2V9/fFmHHoeA4hvxZyCKktL5Bm/LXIe6H9QXC29QSMjq
+ pOGnwP6ZU6LbKv+EX1mcM3SOFSq9wQS4/VRr/cq0nXldvUv5RS+SG9Qy1VX+Q1oTZwjv
+ MEr6j5p7+Aup5TlanbLsO61kVDdch19Dl3dpcqIoLxXVL6HWbAX1QCDQA0NEZeTzHwZN
+ CDhM0sWYMH5zrra+pD++5yZujYzZRux5jxHTrjt3K3/v6GIn+G7IXeI332bqOvwfA4d1
+ pq4kv3x0SdMQJSwqsa127Gma0kNitz4dGmFV9C6RhsW9GsJr5HJx4N6U2pomsLRpNxuD
+ hCKg==
+X-Gm-Message-State: APjAAAWQ1qTk0/fRrbiUAQocVyuRH/MLM6AZIz62lF2i4LgAgoaaN4VL
+ ORaU0qhMjFJnqIP6Un/KCCbHUFiIL97MQQ3jM7CxTk1J
+X-Google-Smtp-Source: APXvYqzWDcGlHx3aFm2diLCMEPyjAR0AZTJojl2XGSybnrnoMDkg9VdDKEEYUkLJym8neev7AecYuy4xRhfrwFhowiI=
+X-Received: by 2002:adf:f10a:: with SMTP id r10mr1075035wro.202.1576086131257; 
+ Wed, 11 Dec 2019 09:42:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191211105755-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="WIyZ46R2i8wDzkSu"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191201111531.1136947-1-marcandre.lureau@redhat.com>
+ <20191201111531.1136947-26-marcandre.lureau@redhat.com>
+ <fdf74ec2-5916-b885-c251-c768e9810584@redhat.com>
+In-Reply-To: <fdf74ec2-5916-b885-c251-c768e9810584@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 11 Dec 2019 21:41:56 +0400
+Message-ID: <CAJ+F1CK9x0Q13M3f8PRjzVMxmgBfj6_bk80MmmykYpHkOvsB1Q@mail.gmail.com>
+Subject: Re: [PATCH 25/26] qapi/qmp: add ObjectPropertyInfo.default-value
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,62 +90,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---WIyZ46R2i8wDzkSu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On Wed, Dec 11, 2019 at 10:58:43AM -0500, Michael S. Tsirkin wrote:
-> On Mon, Dec 09, 2019 at 09:09:57PM +0000, Stefan Hajnoczi wrote:
-> > Virtqueue notifications are not necessary during polling, so we disable
-> > them.  This allows the guest driver to avoid MMIO vmexits.
-> > Unfortunately the virtio-blk and virtio-scsi handler functions re-enabl=
-e
-> > notifications, defeating this optimization.
-> >=20
-> > Fix virtio-blk and virtio-scsi emulation so they leave notifications
-> > disabled.  The key thing to remember for correctness is that polling
-> > always checks one last time after ending its loop, therefore it's safe
-> > to lose the race when re-enabling notifications at the end of polling.
-> >=20
-> > There is a measurable performance improvement of 5-10% with the null-co
-> > block driver.  Real-life storage configurations will see a smaller
-> > improvement because the MMIO vmexit overhead contributes less to
-> > latency.
-> >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->=20
->=20
-> Thanks! I'll queue it for merge after the release. If possible please pin=
-g me
-> after the release to help make sure it didn't get dropped.
+On Wed, Dec 11, 2019 at 8:12 PM Eric Blake <eblake@redhat.com> wrote:
+>
+> On 12/1/19 5:15 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > Report the default value associated with a property.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >   qapi/qom.json      | 7 ++++++-
+> >   qom/qom-qmp-cmds.c | 4 ++++
+> >   2 files changed, 10 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/qapi/qom.json b/qapi/qom.json
+> > index 32db96ffc4..471e4b484b 100644
+> > --- a/qapi/qom.json
+> > +++ b/qapi/qom.json
+> > @@ -26,10 +26,15 @@
+> >   #
+> >   # @description: if specified, the description of the property.
+> >   #
+> > +# @default-value: the default value, if any (since 5.0)
+> > +#
+> >   # Since: 1.2
+> >   ##
+> >   { 'struct': 'ObjectPropertyInfo',
+> > -  'data': { 'name': 'str', 'type': 'str', '*description': 'str' } }
+> > +  'data': { 'name': 'str',
+> > +            'type': 'str',
+> > +            '*description': 'str',
+> > +            '*default-value': 'str' } }
+>
+> Do we always want to output the stringized value, or would it be wise to
+> make this 'any' and output integers where that makes sense?
 
-Great, thanks!
+Good point, it should work with 'any', I'll give it a try.
 
-Stefan
+thanks
 
---WIyZ46R2i8wDzkSu
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3xKWMACgkQnKSrs4Gr
-c8jgTgf/YX9xz9hKasZbmEcl/CS0YSLJuhHP0Yd/c78/Q7NdZerefh2j31vP9dzc
-EHEFFnPwk7E1lp97JALYahV9ETiZ98hN0/EJEA13f+hGrFs1Ps7eTW8C0d3yb/XH
-9aYf/buuaLAflelT8EUc7CFzFzYn88R1+iER3OqLvh+On+rGa8RK1kJAeJyaNSw2
-EL1YxgPrsDKbHPzEPart3xo9dTBSSDqnc8q2XzJ/e9A8TWB0aA3ZoD1g34zfC9WW
-dp7RiNdbSUkuZw56qlgLSRXCNVUE7OJeEYPzorI8o80KQf8+gz8HYAvzagey7nPb
-XJp+XriIcQjhb+OKLkKFqI04h9+cCw==
-=DMNr
------END PGP SIGNATURE-----
-
---WIyZ46R2i8wDzkSu--
-
+--=20
+Marc-Andr=C3=A9 Lureau
 
