@@ -6,76 +6,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7733C43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9620BC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:27:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 797732073D
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:26:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 797732073D
+	by mail.kernel.org (Postfix) with ESMTPS id 6AD6020663
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 16:27:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AD6020663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if4oJ-00026E-Fa
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:25:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43310)
+	id 1if4q6-0003g2-IV
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 11:27:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43304)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1if4kK-0006FI-T5
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1if4kK-0006FF-Ti
  for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:21:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1if4kJ-0000i7-KJ
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1if4kJ-0000hz-JB
  for qemu-devel@nongnu.org; Wed, 11 Dec 2019 11:21:52 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57496)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40274)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1if4kJ-0000fo-9G; Wed, 11 Dec 2019 11:21:51 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ id 1if4kJ-0000fp-7N; Wed, 11 Dec 2019 11:21:51 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBBGCZoi043542; Wed, 11 Dec 2019 11:21:39 -0500
+ xBBGCbQS044894; Wed, 11 Dec 2019 11:21:38 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wtf8j5g99-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wt2kupxqk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 11 Dec 2019 11:21:39 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBBGCgwV044109;
- Wed, 11 Dec 2019 11:21:39 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wtf8j5g8m-1
+ Wed, 11 Dec 2019 11:21:37 -0500
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBBGCk4Z046016;
+ Wed, 11 Dec 2019 11:21:37 -0500
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wt2kupxpy-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 11 Dec 2019 11:21:39 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBBGLS7N020598;
- Wed, 11 Dec 2019 16:21:37 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma03wdc.us.ibm.com with ESMTP id 2wr3q6p7fw-1
+ Wed, 11 Dec 2019 11:21:37 -0500
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBBGKYX0025555;
+ Wed, 11 Dec 2019 16:21:36 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma05wdc.us.ibm.com with ESMTP id 2wtdq79bc4-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 11 Dec 2019 16:21:37 +0000
+ Wed, 11 Dec 2019 16:21:36 +0000
 Received: from b03ledav001.gho.boulder.ibm.com
  (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBBGLa2m57999684
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBBGLZo359113828
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 11 Dec 2019 16:21:36 GMT
+ Wed, 11 Dec 2019 16:21:35 GMT
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C2DDF6E054;
- Wed, 11 Dec 2019 16:21:36 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 298DE6E056;
+ Wed, 11 Dec 2019 16:21:35 +0000 (GMT)
 Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 344966E04E;
- Wed, 11 Dec 2019 16:21:36 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id A116A6E054;
+ Wed, 11 Dec 2019 16:21:34 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 11 Dec 2019 16:21:36 +0000 (GMT)
+ Wed, 11 Dec 2019 16:21:34 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-ppc@nongnu.org
-Subject: [PACTH v3 5/5] docs: tpm: Add example command line for ppc64 and
- tpm-spapr
-Date: Wed, 11 Dec 2019 11:20:50 -0500
-Message-Id: <20191211162050.970199-6-stefanb@linux.vnet.ibm.com>
+Subject: [PACTH v3 3/5] tpm_spapr: Support suspend and resume
+Date: Wed, 11 Dec 2019 11:20:48 -0500
+Message-Id: <20191211162050.970199-4-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191211162050.970199-1-stefanb@linux.vnet.ibm.com>
 References: <20191211162050.970199-1-stefanb@linux.vnet.ibm.com>
@@ -85,11 +84,11 @@ X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-11_04:2019-12-11,2019-12-11 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=1 bulkscore=0
- clxscore=1015 priorityscore=1501 malwarescore=0 phishscore=0
- mlxlogscore=999 impostorscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912110137
+ suspectscore=1 spamscore=0
+ mlxscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0
+ lowpriorityscore=0 clxscore=1015 phishscore=0 bulkscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1912110137
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,66 +102,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.ibm.com>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>,
+ qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add an example to the TPM docs for how to add a TPM SPAPR
-device model to a QEMU VM emulating a pSeries machine.
+Extend the tpm_spapr frontend with VM suspend and resume support.
 
-Signed-off-by: Stefan Berger <stefanb@linux.ibm.com>
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- docs/specs/tpm.txt | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ hw/tpm/tpm_spapr.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
 
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 9c8cca042d..9c3e67d8a7 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -34,6 +34,12 @@ The CRB interface makes a memory mapped IO region in the area 0xfed40000 -
- QEMU files related to TPM CRB interface:
-  - hw/tpm/tpm_crb.c
+diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
+index c4a67e2403..d9153bd95c 100644
+--- a/hw/tpm/tpm_spapr.c
++++ b/hw/tpm/tpm_spapr.c
+@@ -87,6 +87,8 @@ typedef struct {
+     TPMVersion be_tpm_version;
  
+     size_t be_buffer_size;
 +
-+pSeries (ppc64) machines offer a tpm-spapr device model.
++    bool deliver_response; /* whether to deliver response after VM resume */
+ } SPAPRvTPMState;
+ 
+ static void tpm_spapr_show_buffer(const unsigned char *buffer,
+@@ -339,9 +341,47 @@ static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
+     return tpm_backend_get_tpm_version(s->be_driver);
+ }
+ 
++/* persistent state handling */
 +
-+QEMU files related to the SPAPR interface:
-+ - hw/tpm/tpm_spapr.c
++static int tpm_spapr_pre_save(void *opaque)
++{
++    SPAPRvTPMState *s = opaque;
 +
- = fw_cfg interface =
- 
- The bios/firmware may read the "etc/tpm/config" fw_cfg entry for
-@@ -281,7 +287,7 @@ swtpm socket --tpmstate dir=/tmp/mytpm1 \
-   --log level=20
- 
- Command line to start QEMU with the TPM emulator device communicating with
--the swtpm:
-+the swtpm (x86):
- 
- qemu-system-x86_64 -display sdl -accel kvm \
-   -m 1024 -boot d -bios bios-256k.bin -boot menu=on \
-@@ -289,6 +295,18 @@ qemu-system-x86_64 -display sdl -accel kvm \
-   -tpmdev emulator,id=tpm0,chardev=chrtpm \
-   -device tpm-tis,tpmdev=tpm0 test.img
- 
-+In case a pSeries machine is emulated, use the following command line:
++    s->deliver_response = tpm_backend_finish_sync(s->be_driver);
++    /*
++     * we cannot deliver the results to the VM since DMA would touch VM memory
++     */
 +
-+qemu-system-ppc64 -display sdl -machine pseries,accel=kvm \
-+  -m 1024 -bios slof.bin -boot menu=on \
-+  -nodefaults -device VGA -device pci-ohci -device usb-kbd \
-+  -chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \
-+  -tpmdev emulator,id=tpm0,chardev=chrtpm \
-+  -device tpm-spapr,tpmdev=tpm0 \
-+  -device spapr-vscsi,id=scsi0,reg=0x00002000 \
-+  -device virtio-blk-pci,scsi=off,bus=pci.0,addr=0x3,drive=drive-virtio-disk0,id=virtio-disk0 \
-+  -drive file=test.img,format=raw,if=none,id=drive-virtio-disk0
++    return 0;
++}
 +
++static int tpm_spapr_post_load(void *opaque, int version_id)
++{
++    SPAPRvTPMState *s = opaque;
++
++    if (s->deliver_response) {
++        /* deliver the results to the VM via DMA */
++        tpm_spapr_request_completed(TPM_IF(s), 0);
++    }
++
++    return 0;
++}
++
+ static const VMStateDescription vmstate_spapr_vtpm = {
+     .name = "tpm-spapr",
+-    .unmigratable = 1,
++    .version_id = 1,
++    .minimum_version_id = 0,
++    .minimum_version_id_old = 0,
++    .pre_save = tpm_spapr_pre_save,
++    .post_load = tpm_spapr_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_SPAPR_VIO(vdev, SPAPRvTPMState),
++
++        VMSTATE_UINT8(state, SPAPRvTPMState),
++        VMSTATE_BUFFER(buffer, SPAPRvTPMState),
++        VMSTATE_BOOL(deliver_response, SPAPRvTPMState),
++        VMSTATE_END_OF_LIST(),
++    }
+ };
  
- In case SeaBIOS is used as firmware, it should show the TPM menu item
- after entering the menu with 'ESC'.
+ static Property tpm_spapr_properties[] = {
 -- 
 2.21.0
 
