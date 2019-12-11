@@ -2,107 +2,94 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3FFC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30873C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:12:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7141214D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:09:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F15EC20836
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:12:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUratQ2D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7141214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="bT6yRxUW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F15EC20836
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if1ju-00071p-Kx
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 08:09:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36485)
+	id 1if1nG-0000qm-RE
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 08:12:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34848)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1if1is-0005pi-Ue
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:08:12 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1if1iW-0005Uu-GY
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:07:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1if1iq-000520-CB
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:08:09 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43540
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1if1iU-0004fq-KC
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:07:48 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:43192)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1if1iq-00050I-5w
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:08:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576069687;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1if1iT-0004cF-VR
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:07:46 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 0B83696EF0;
+ Wed, 11 Dec 2019 12:52:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1576068754;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=hcl1f7ZbKkam6tBSuK8vPbxhuluVrC3L2Pt2vjxkECw=;
- b=JUratQ2DpkhB95zGjt9ZT2AuHudXiwXsGEUV6llQg97RlGW/gecxzS72kIKj7NBuTG025c
- ET6fr6H+Q0sf8e4AMEqsX3TOMXLnrR7Zm87f2vuS3ZRyCFW76iiNRi7hj1ZoFh0nv+BtVq
- dyHMtUS61rfURDxtjQCqZOKYxGNsv5w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-aHNj6VCHOqKhHmc5D4UicQ-1; Wed, 11 Dec 2019 07:52:51 -0500
-X-MC-Unique: aHNj6VCHOqKhHmc5D4UicQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07D6ADB60;
- Wed, 11 Dec 2019 12:52:50 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-167.ams2.redhat.com
- [10.36.116.167])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 98E1D5C1B5;
- Wed, 11 Dec 2019 12:52:48 +0000 (UTC)
-Subject: Re: [PATCH v6 28/42] stream: Deal with filters
-From: Max Reitz <mreitz@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20190809161407.11920-1-mreitz@redhat.com>
- <20190809161407.11920-29-mreitz@redhat.com>
- <20190913141653.GH8312@dhcp-200-226.str.redhat.com>
- <0da03f2f-e7ca-1aad-f156-bbd8a0e9dbc7@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1b849809-ac7e-091b-4987-b3ee9383cb15@redhat.com>
-Date: Wed, 11 Dec 2019 13:52:46 +0100
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7c1ky3rbjTV7aYyPV6ptikkDopxg9ofpvW5Pnoq/7fY=;
+ b=bT6yRxUWB/7JW1m6/pPB2zXUyvVYFkb7i8+JAPHSd1oPNaUQvPJw+VSF7egmxkzsKzmUOA
+ c0IdulQ+6XCLLPXbuiK2OsvKZJ8oKdh7V0yNaQvW2J0X0ZWwr+kJfpiofaLWnVrhoGi5BU
+ qFNSpG+rWBzUkG9cLdb25Z2/VRjK/Y4=
+Subject: Re: qom device lifecycle interaction with hotplug/hotunplug ?
+To: Jens Freimann <jfreimann@redhat.com>
+References: <20191128182705.0635d1d4@redhat.com>
+ <CAFEAcA-qA6n49KdHsGLqt422L_b_9xPfSaJB3tATQvRdfKt-xw@mail.gmail.com>
+ <20191129132641.4c7da6c5@redhat.com>
+ <CAFEAcA_gcxqu+N5iV0L5WLyWmm5yxTFNMtmqQryBgVd4CCCT8A@mail.gmail.com>
+ <20191129200545.GG14595@habkost.net>
+ <CAFEAcA-BkETOSpOwBegDcbO3bqxDO_a9xoTB7Fc8Ajw_+CDcFA@mail.gmail.com>
+ <20191203214004.GS14595@habkost.net>
+ <20191204091824.cwufcnlfj5vm4vqu@jenstp.localdomain>
+ <20191204143537.GA498046@habkost.net>
+ <20191204162125.udpzdse3zchpfinw@jenstp.localdomain>
+ <20191204185106.GC498046@habkost.net>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <54dc79b4-d033-7990-2f8d-e3787a2803d8@greensocs.com>
+Date: Wed, 11 Dec 2019 13:52:33 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <0da03f2f-e7ca-1aad-f156-bbd8a0e9dbc7@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9OTqtuTDjRKDzFW2d6NuhyqCznjmfd9fP"
+In-Reply-To: <20191204185106.GC498046@habkost.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1576068754;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7c1ky3rbjTV7aYyPV6ptikkDopxg9ofpvW5Pnoq/7fY=;
+ b=Gu4Gqcx8Y7cs3hHy7lMol/BIfdXYZoA7294PpGYc59+dXOoEsct4HsTu8dgLKGvMchwERP
+ NtPttewjdELGafpBbktuznMxGBAQHpgb+UcpEGMzedUePfwcj7J7EeF2Q9CPcCu7C1xZ/K
+ oXMoKcR/3yIhPt+k+Jnn9QJDfiYnFJo=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1576068754; a=rsa-sha256; cv=none;
+ b=hsQWsxnGm51RYTZJ+0nvddqeFw0FMFXVMjuTIrCKhaOY3RquPArBdLW13l2H7od3JwltJG
+ sC68mW2SuEEfHQUiRawkfU7eZ4aIYVwFmnEf9urKZnptokB9dRCUYBVLp2hak16L0gnmBQ
+ xC8tzu9NMyeOfxUZ6uGXeA23N4WN3/8=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,127 +101,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9OTqtuTDjRKDzFW2d6NuhyqCznjmfd9fP
-Content-Type: multipart/mixed; boundary="k9E2PD3MvLINLOU3ZAjOZBDpzVHbWX27T"
 
---k9E2PD3MvLINLOU3ZAjOZBDpzVHbWX27T
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
 
-On 16.09.19 11:52, Max Reitz wrote:
-> On 13.09.19 16:16, Kevin Wolf wrote:
->> Am 09.08.2019 um 18:13 hat Max Reitz geschrieben:
->>> Because of the recent changes that make the stream job independent of
->>> the base node and instead track the node above it, we have to split tha=
-t
->>> "bottom" node into two cases: The bottom COW node, and the node directl=
-y
->>> above the base node (which may be an R/W filter or the bottom COW node)=
-.
+On 12/4/19 7:51 PM, Eduardo Habkost wrote:
+> On Wed, Dec 04, 2019 at 05:21:25PM +0100, Jens Freimann wrote:
+>> On Wed, Dec 04, 2019 at 11:35:37AM -0300, Eduardo Habkost wrote:
+>>> On Wed, Dec 04, 2019 at 10:18:24AM +0100, Jens Freimann wrote:
+>>>> On Tue, Dec 03, 2019 at 06:40:04PM -0300, Eduardo Habkost wrote:
+>>>>> +jfreimann, +mst
+>>>>>
+>>>>> On Sat, Nov 30, 2019 at 11:10:19AM +0000, Peter Maydell wrote:
+>>>>>> On Fri, 29 Nov 2019 at 20:05, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>>>>>>> So, to summarize the current issues:
+>>>>>>>
+>>>>>>> 1) realize triggers a plug operation implicitly.
+>>>>>>> 2) unplug triggers unrealize implicitly.
+>>>>>>>
+>>>>>>> Do you expect to see use cases that will require us to implement
+>>>>>>> realize-without-plug?
+>>>>>>
+>>>>>> I don't think so, but only because of the oddity that
+>>>>>> we put lots of devices on the 'sysbus' and claim that
+>>>>>> that's plugging them into the bus. The common case of
+>>>>>> 'realize' is where one device (say an SoC) has a bunch of child
+>>>>>> devices (like UARTs); the SoC's realize method realizes its child
+>>>>>> devices. Those devices all end up plugged into the 'sysbus'
+>>>>>> but there's no actual bus there, it's fictional and about
+>>>>>> the only thing it matters for is reset propagation (which
+>>>>>> we don't model right either). A few devices don't live on
+>>>>>> buses at all.
+>>>>>
+>>>>> That's my impression as well.
+>>>>>
+>>>>>>
+>>>>>>> Similarly, do you expect use cases that will require us to
+>>>>>>> implement unplug-without-unrealize?
+>>>>>>
+>>>>>> I don't know enough about hotplug to answer this one:
+>>>>>> it's essentially what I'm hoping you'd be able to answer.
+>>>>>> I vaguely had in mind that eg the user might be able to
+>>>>>> create a 'disk' object, plug it into a SCSI bus, then
+>>>>>> unplug it from the bus without the disk and all its data
+>>>>>> evaporating, and maybe plug it back into the SCSI
+>>>>>> bus (or some other SCSI bus) later ? But I don't know
+>>>>>> anything about how we expose that kind of thing to the
+>>>>>> user via QMP/HMP.
+>>>>>
+>>>>> This ability isn't exposed to the user at all.  Our existing
+>>>>> interfaces are -device, device_add and device_del.
+>>>>>
+>>>>> We do have something new that sounds suspiciously similar to
+>>>>> "unplugged but not unrealized", though: the new hidden device
+>>>>> API, added by commit f3a850565693 ("qdev/qbus: add hidden device
+>>>>> support").
+>>>>>
+>>>>> Jens, Michael, what exactly is the difference between a "hidden"
+>>>>> device and a "unplugged" device?
+>>>>
+>>>> "hidden" the way we use it for virtio-net failover is actually unplugged. But it
+>>>> doesn't have to be that way. You can register a function that decides
+>>>> if the device should be hidden, i.e. plugged now, or do something else
+>>>> with it (in the virtio-net failover case we just save everything we
+>>>> need to plug the device later).
+>>>>
+>>>> We did introduce a "unplugged but not unrealized" function too as part
+>>>> of the failover feature. See "a99c4da9fc pci: mark devices partially
+>>>> unplugged"
+>>>>
+>>>> This was needed so we would be able to re-plug the device in case a
+>>>> migration failed and we need to hotplug the primary device back to the
+>>>> guest. To avoid the risk of not getting the resources the device needs
+>>>> we don't unrealize but just trigger the unplug from the guest OS.
 >>>
->>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>> ---
->>>  qapi/block-core.json |  4 ++++
->>>  block/stream.c       | 52 ++++++++++++++++++++++++++++----------------
->>>  blockdev.c           |  2 +-
->>>  3 files changed, 38 insertions(+), 20 deletions(-)
-
-
-[...]
-
->>> +    if (bdrv_freeze_chain(bs, above_base, errp) < 0) {
->>>          return;
->>>      }
+>>> Thanks for the explanation.  Let me confirm if I understand the
+>>> purpose of the new mechanisms: should_be_hidden is a mechanism
+>>> for implementing realize-without-plug.  partially_hotplugged is a
+>>> mechanism for implementing unplug-without-unrealize.  Is that
+>>> correct?
 >>
->> Hm... This feels odd. There are two places where stopping to freeze the
->> chain would make obvious sense: At base, like we originally did; or at
->> base_overlay, like we (intend to) do since commit c624b015, because we
->> say that we don't actually mind if the user replaces the base image. I
->> don't see how stopping at the first filter above base makes sense.
 >>
->> So should this use bottom_cow_node/base_overlay instead of above_base?
->=20
-> I suppose I thought =E2=80=9CBetter be safe than sorry=E2=80=9D.
->=20
->> You couldn't use StreamBlockJob.above_base any more then because it
->> could change, but you also don't really need it anywhere. It's only used
->> for unfreezing (which would change) and for finding the base (you can
->> still find bdrv_backing_chain_next(s->base_overlay)). I guess this would
->> even be a code simplification.
->=20
-> Great, I=E2=80=99ll see to it.
+>> partially_hotplugged is a mechanism for implementing
+>> unplug-without-unrealize: yes.
 
-On second thought (yes, I know, it=E2=80=99s been a couple of months...) I=
-=E2=80=99m not
-so sure.
+I'm currently trying to understand if my multi-phase reset series has
+some interference with this new mechanism and I have some question.
 
-If @base is a filter, then bdrv_backing_chain_next(s->base_overlay) will
-not return it.  So then the filter will be dropped, but that probably
-isn=E2=80=99t what the user intended.
+IIUC when migration starts. the vfio-pci device is partially unplugged
+using failover_unplug_primary():
+> static bool failover_unplug_primary(VirtIONet *n)
+> {
+>     [...]
+>         pci_dev->partially_hotplugged = true;
+>         hotplug_handler_unplug_request(hotplug_ctrl, n->primary_dev,
+>     [...]
+> }
 
-(In fact, the block-stream doc says =E2=80=9CWhen streaming completes the i=
-mage
-file will have the base file as its backing file.=E2=80=9D)
+And if migration fails this same device is plugged back using
+failover_replug_primary():
+> static bool failover_replug_primary(VirtIONet *n, Error **errp)
+> {
+>     [...]
+>     qdev_set_parent_bus(n->primary_dev, n->primary_bus);
+>     [...]
+>     hotplug_ctrl = qdev_get_hotplug_handler(n->primary_dev);
+>     if (hotplug_ctrl) {
+>         hotplug_handler_pre_plug(hotplug_ctrl, n->primary_dev, &err);
+>         if (err) {
+>             goto out;
+>         }
+>         hotplug_handler_plug(hotplug_ctrl, n->primary_dev, errp);
+>     }
+>     [...]
+> }
 
-So now this gets hairy.  We do want exactly @base as the backing file
-unless the user changed the graph.  But how can we detect that and if it
-hasn=E2=80=99t changed find @base again?
+My concern is about the qdev_set_parent_bus() call above (because I
+touch this function in my series) and don't want to have side effects there.
 
-What this patch did in this version worked because the graph was frozen
-until @above_base.
+I looked at the code and thought the partial unplug has the effect of
+cutting off the unplug procedure just before doing the qdev real unplug.
+In pcie_unplug_device() we return before doing the object_unparent():
+> static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, ...
+>  {
+>      [...]
+>      if (dev->partially_hotplugged) {
+>          dev->qdev.pending_deleted_event = false;
+>          return;
+>      }
+>      hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
+>      object_unparent(OBJECT(dev));
+>  }
 
-Alternatively, we could store a pointer to @base directly (or its node
-nmae) and then see whether there is some node between s->base_overlay
-and bdrv_backing_chain_next(s->base_overlay) that matches that at the
-end of streaming.
+From my understanding, object_unparent() is the only way to really
+unplug a device from a bus regarding qdev (and it also unrealizes the
+device). So I have the feeling that qdev_set_parent_bus() here is a
+no-op (because primary_dev is already on primary_bus).
 
-Well, actually, a pointer won=E2=80=99t work because of course maybe that n=
-ode
-was deleted and the area is now used for an unrelated node that the user
-doesn=E2=80=99t want as the new backing file.
+Am I wrong ? Is there any other cases I missed where the primary_dev is
+not already on the primary_bus when failover_replug_primary() is called ?
 
-The node name could actually work, though.  I mean, if there is some
-node in the immediate backing filter chain of base_overlay with that
-node name after streaming, it does make sense to assume that the user
-wants this to be the backing file; regardless of whether that=E2=80=99s exa=
-ctly
-the same node as it was at the start of streaming.
-
-But we now also have to think about what to do when there is no node
-with such a node name.  Should we keep all filters below base_overlay?
-Or should we drop all of them?  I actually think keeping them is the
-safer choice...
-
-Max
-
-
---k9E2PD3MvLINLOU3ZAjOZBDpzVHbWX27T--
-
---9OTqtuTDjRKDzFW2d6NuhyqCznjmfd9fP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3w5p4ACgkQ9AfbAGHV
-z0ByDgf/eyFsEiHG8ALOsbHOEd74vOPo1bCUxxAneU8TUzdw41CJPaynepIJICwc
-fF3BuA1mdiw+FgcTjMfoNkmSfDdyhfhaKVSNaN1SHvuZLR89JmM0GaL+Zjfw7A29
-46b0jjSlB/Lr1wYlSy8q1YKBn+6GE+eaI8/5XJ9J79unPq0IFWlBBmlTurD680Ui
-n5hA2vnLZy1xCBYUpj70TxIaLc0/0ca7rIHN1UrgoR6he2SIuFBn66gPftBhDT+k
-+btu3PB61esB6Y5bD0rHY5zYMqIgdWQFT4KzYYbfmhCtfTDmVlUGMl1oinMisKwr
-xgkUmPBD7ylOn8y70Mp9dqUoAqI43g==
-=Zg7l
------END PGP SIGNATURE-----
-
---9OTqtuTDjRKDzFW2d6NuhyqCznjmfd9fP--
-
+Thanks,
+--
+Damien
 
