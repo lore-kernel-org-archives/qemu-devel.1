@@ -2,83 +2,102 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6D5C00454
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 15:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF3BC2D0C6
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 15:20:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A3E22467F
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 15:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8B3922527
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 15:20:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="GdHRVN08"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A3E22467F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JetfetHk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8B3922527
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1if3gb-0000I3-Pn
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 10:13:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59039)
+	id 1if3nE-0003DT-Qs
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 10:20:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37580)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=241120df0=sveith@amazon.com>)
- id 1if3b8-0002on-MF
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:08:19 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1if3mV-0002gU-6h
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:20:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=241120df0=sveith@amazon.com>)
- id 1if3b7-00048I-Jz
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:08:18 -0500
-Received: from smtp-fw-6002.amazon.com ([52.95.49.90]:24873)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <prvs=241120df0=sveith@amazon.com>)
- id 1if3b5-00045H-Be; Wed, 11 Dec 2019 10:08:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
- t=1576076895; x=1607612895;
- h=from:to:cc:subject:date:message-id:in-reply-to: references;
- bh=Z0g33k0fJJlh3np7I7IZdcyVyzV2EJT6J7A5HaBP1Jc=;
- b=GdHRVN08qKk7sweLlV/KaT4C5BvIdBKBQYeORpNQ4hdyp8xIr/0cYvN5
- oKNVE8JVB3qHzMoFIztrVHRjjD1Rx+3c6JNtTYLDSH/tLNpHHaiiDufeN
- X2YN6D6wWZNAg+5QAaIdTlEYOzU1Hng+7grYHuRIiL01jKxAky3dD6zfB I=;
-IronPort-SDR: R/ypnAI5Yu/GywgLzK+GEv4XppaOVffQUDD1PP1XQyiQwFAWoJsxZkQXlC5weWe7zYDBizOnOq
- aDoz2tDNHIFQ==
-X-IronPort-AV: E=Sophos;i="5.69,301,1571702400"; 
-   d="scan'208";a="7181932"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO
- email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com) ([10.124.125.6])
- by smtp-border-fw-out-6002.iad6.amazon.com with ESMTP;
- 11 Dec 2019 15:08:14 +0000
-Received: from sveith-desktop.aka.corp.amazon.com
- (pdx2-ws-svc-lb17-vlan3.amazon.com [10.247.140.70])
- by email-inbound-relay-2b-a7fdc47a.us-west-2.amazon.com (Postfix) with ESMTPS
- id C7E40C5D3E; Wed, 11 Dec 2019 15:08:13 +0000 (UTC)
-Received: from sveith-desktop.aka.corp.amazon.com (localhost [127.0.0.1])
- by sveith-desktop.aka.corp.amazon.com (8.15.2/8.15.2/Debian-3) with ESMTP id
- xBBF8A04025082; Wed, 11 Dec 2019 16:08:11 +0100
-Received: (from sveith@localhost)
- by sveith-desktop.aka.corp.amazon.com (8.15.2/8.15.2/Submit) id xBBF8AFM025081;
- Wed, 11 Dec 2019 16:08:10 +0100
-From: Simon Veith <sveith@amazon.de>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: Simon Veith <sveith@amazon.de>, Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v2 6/6] hw/arm/smmuv3: Report F_STE_FETCH fault address in
- correct word position
-Date: Wed, 11 Dec 2019 16:07:40 +0100
-Message-Id: <1576076860-24820-4-git-send-email-sveith@amazon.de>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1576076860-24820-1-git-send-email-sveith@amazon.de>
-References: <1576076260-18659-1-git-send-email-sveith@amazon.de>
- <1576076860-24820-1-git-send-email-sveith@amazon.de>
-Precedence: Bulk
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 52.95.49.90
+ (envelope-from <pbonzini@redhat.com>) id 1if3mR-0006ml-SW
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:20:00 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57235
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1if3mR-0006lP-Dq
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 10:19:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576077598;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WqwLral0ePoKsgMP0FMvkTCbQxadumdMNu32wH3waJA=;
+ b=JetfetHkhaP1G0Fek2bYnLGz1fuZorII37JHvYgEaJ2DxwpPG99xT5ijaXFHxv3N55aBZ8
+ gBEFZY36kNoDSPKhHbe42lJBVgmUZ7BhH4EzDShnI0FTNINIZwwJ9shW/WUGWEUo7kSuqA
+ zlxH6fZ8uYePjlcuzIKwPNor5ktkBrI=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-iQkn7nzaMSmEQLsA2xCbYA-1; Wed, 11 Dec 2019 10:19:56 -0500
+Received: by mail-wr1-f70.google.com with SMTP id f10so1083505wro.14
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 07:19:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=FzNuMIkolt2BzGbBb95RpT2dmhPPNIOV3sl1gtgzVLQ=;
+ b=TiA+/gH3NX1oIoA+APQBV9onFXQUf3L+gd+YXjKeAMJDacZSJRaJAyDBPEM0hYBzNH
+ wxDFKrbTNJoNxtVSUN0Db+SQO1a8yoOe0oHWCdFNmfPZYbW61h90zyPVw7/AHXwcI3o9
+ UvsC/HFu7q063dbtIo2yrOlJaZhD0TCiOVQX37Bv4FSjqCDDabS4l350gJIZiRQl3oQa
+ /X3dSobgzOLVmyfgE4XhdusKQ9mc3TjjcvtmIhiT5T2MwK+KsXdkFmne4Xq/TQAe0FPU
+ UC3lsNq59079veMpbGXeqsBQyWg11Bz0Ml8f9MTFSntW0GoJQjtHRUtL29jQGMMnQkNd
+ 1yzw==
+X-Gm-Message-State: APjAAAXRBGYwnEpKa2n0XgoTJx8RuRzvHw6qCIol6KeYiI/Wq7phxJ99
+ WO2TDCstiNlg+5nX6pTNMG20q1Wv25o/zCf59u34Cb149laic2OKuGTMTkyOguGZqTv5caI27u8
+ 7bXwpFk+uThNNNHw=
+X-Received: by 2002:a1c:f303:: with SMTP id q3mr349182wmq.98.1576077595436;
+ Wed, 11 Dec 2019 07:19:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyL41x51BHYpE68k01X6XWc4LTwO4jXE7YY5n+d2CN08ZwvE03Z/YzjXGno15EHVCDGbIHaBw==
+X-Received: by 2002:a1c:f303:: with SMTP id q3mr349164wmq.98.1576077595193;
+ Wed, 11 Dec 2019 07:19:55 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9?
+ ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+ by smtp.gmail.com with ESMTPSA id i16sm2777635wmb.36.2019.12.11.07.19.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 11 Dec 2019 07:19:54 -0800 (PST)
+Subject: Re: [PATCH] ff Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <1576075593-50346-1-git-send-email-pbonzini@redhat.com>
+ <20191211150228.GL955178@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <f206baa1-9d25-6c41-cefb-06ce35782d34@redhat.com>
+Date: Wed, 11 Dec 2019 16:19:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191211150228.GL955178@redhat.com>
+Content-Language: en-US
+X-MC-Unique: iQkn7nzaMSmEQLsA2xCbYA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,45 +106,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The smmuv3_record_event() function that generates the F_STE_FETCH error
-uses the EVT_SET_ADDR macro to record the fetch address, placing it in
-32-bit words 4 and 5.
+On 11/12/19 16:02, Daniel P. Berrang=C3=A9 wrote:
+> Missing commit message subject line :-)
 
-The correct position for this address is in words 6 and 7, per the
-SMMUv3 Architecture Specification.
+I'm not fast enough at Ctrl-C, it seems!
 
-Update the function to use the EVT_SET_ADDR2 macro instead, which is the
-macro intended for writing to these words.
+Paolo
 
-ref. ARM IHI 0070C, section 7.3.4.
-
-Signed-off-by: Simon Veith <sveith@amazon.de>
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
-Acked-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/smmuv3.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-index 31ac3ca..8b5f157 100644
---- a/hw/arm/smmuv3.c
-+++ b/hw/arm/smmuv3.c
-@@ -172,7 +172,7 @@ void smmuv3_record_event(SMMUv3State *s, SMMUEventInfo *info)
-     case SMMU_EVT_F_STE_FETCH:
-         EVT_SET_SSID(&evt, info->u.f_ste_fetch.ssid);
-         EVT_SET_SSV(&evt,  info->u.f_ste_fetch.ssv);
--        EVT_SET_ADDR(&evt, info->u.f_ste_fetch.addr);
-+        EVT_SET_ADDR2(&evt, info->u.f_ste_fetch.addr);
-         break;
-     case SMMU_EVT_C_BAD_STE:
-         EVT_SET_SSID(&evt, info->u.c_bad_ste.ssid);
--- 
-2.7.4
+> On Wed, Dec 11, 2019 at 03:46:33PM +0100, Paolo Bonzini wrote:
+>> ---
+>>  hw/ppc/e500.c      | 1 -
+>>  hw/ppc/spapr_irq.c | 8 --------
+>>  2 files changed, 9 deletions(-)
+>>
+>> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+>> index 928efaa..12b6a5b 100644
+>> --- a/hw/ppc/e500.c
+>> +++ b/hw/ppc/e500.c
+>> @@ -793,7 +793,6 @@ static DeviceState *ppce500_init_mpic(PPCE500Machine=
+State *pms,
+>>                                        MemoryRegion *ccsr,
+>>                                        IrqLines *irqs)
+>>  {
+>> -    MachineState *machine =3D MACHINE(pms);
+>>      const PPCE500MachineClass *pmc =3D PPCE500_MACHINE_GET_CLASS(pms);
+>>      DeviceState *dev =3D NULL;
+>>      SysBusDevice *s;
+>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+>> index c3f8870..15c3dd4 100644
+>> --- a/hw/ppc/spapr_irq.c
+>> +++ b/hw/ppc/spapr_irq.c
+>> @@ -74,7 +74,6 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptControl=
+ler *, Error **),
+>>                         SpaprInterruptController *intc,
+>>                         Error **errp)
+>>  {
+>> -    MachineState *machine =3D MACHINE(qdev_get_machine());
+>>      Error *local_err =3D NULL;
+>> =20
+>>      if (kvm_enabled() && kvm_kernel_irqchip_allowed()) {
+>> @@ -287,7 +286,6 @@ uint32_t spapr_irq_nr_msis(SpaprMachineState *spapr)
+>> =20
+>>  void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
+>>  {
+>> -    MachineState *machine =3D MACHINE(spapr);
+>>      SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>> =20
+>>      if (kvm_enabled() && kvm_kernel_irqchip_split()) {
+>> @@ -295,12 +293,6 @@ void spapr_irq_init(SpaprMachineState *spapr, Error=
+ **errp)
+>>          return;
+>>      }
+>> =20
+>> -    if (!kvm_enabled() && kvm_kernel_irqchip_required()) {
+>> -        error_setg(errp,
+>> -                   "kernel_irqchip requested but only available with KV=
+M");
+>> -        return;
+>> -    }
+>> -
+>>      if (spapr_irq_check(spapr, errp) < 0) {
+>>          return;
+>>      }
+>> --=20
+>> 1.8.3.1
+>>
+>>
+>=20
+> Regards,
+> Daniel
+>=20
 
 
