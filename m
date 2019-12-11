@@ -2,83 +2,84 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0973BC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 10:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 094B5C43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:04:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B94EE2073B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 10:25:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C52A92077B
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 13:04:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gjgjS+6O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B94EE2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dhvtLA7v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C52A92077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iezBp-0000RM-Qv
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 05:25:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43160)
+	id 1if1f2-0001Lj-Ox
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 08:04:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33420)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <estebanbosse@gmail.com>) id 1iezBB-0008Ky-Lg
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 05:25:15 -0500
+ (envelope-from <berrange@redhat.com>) id 1if1dx-0000Bx-Fh
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:03:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <estebanbosse@gmail.com>) id 1iezB8-00055Y-KY
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 05:25:13 -0500
-Received: from mail-ed1-x535.google.com ([2a00:1450:4864:20::535]:36875)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <estebanbosse@gmail.com>)
- id 1iezB8-00051S-7P
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 05:25:10 -0500
-Received: by mail-ed1-x535.google.com with SMTP id cy15so18957144edb.4
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 02:25:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=rXhwFMG0BL17nGwkzk9W9CSbQJZYitzRX1dD1vccva8=;
- b=gjgjS+6OpeEo2LgclRLcH8qUXWj6mRIqdgebvqPEErQWDykbaLpL18R/NKAnz5M2AM
- FwkYZulewN1Wq3dD13EYWQo62TD1OhJEsZ3eipLtgDMqW0LY5CY1mpa8NPbP6N8cqlGP
- vRRdEB882uTHh67eF6WwAEr43DQg8gJMgMQTFPDOHrlngBu7MSWijT5/dX2kBeHgaxVz
- r0mWlZScSo1C3XXQGTga+aOguBQgFpzWS+Ik3hQcA8sZvwQGKU15iAZpUmWRuYjNsF6K
- GoXhCP/V4qnRHkGg4m827yJqyHgqRfjGlwJ+IeZyQG9yKmi59C4Ss8qMIZQFkfwzyfIJ
- S2LQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=rXhwFMG0BL17nGwkzk9W9CSbQJZYitzRX1dD1vccva8=;
- b=KtzHrR22qwkmJazD3Bj4uunhMEDGR7ORZvO1vmRIDJA/Nv66uLyoQuzlIAQkUmKTxz
- j2N2y2hhtc8mh2Z0M9E4eFQZI+ZqltUj1Wj6qvGm1sAZI45o/Yu3gl8eixwCCmpY/17b
- 8YzkrY0az+QZC/TYLjgdZyw3nXkfsWuKBgRIsSIyQzEoKI83IvmaVILu4KOMRfsaEm2s
- TOfE2Gxg8dwtR1VtHw1AfEmZ/ae0CssYS81dhVdNyx2OcuIbJwyjJ7cDE6F4uXvD6rSH
- Pmi/ZVn2K3pRvrG9wX/bSP1NFO4GTBoCkueOSmwK80gIIicIa5C/w/szm+pxBUJZnmWf
- eWZw==
-X-Gm-Message-State: APjAAAWx8Qyxr6vP3x1EfYkchdpsoVzRrQOB7tL5dxLLZKqlblMkDnCy
- t2XuPiBfjSUv/NEuFvDby2DSVc+LOAuI9MExn2M=
-X-Google-Smtp-Source: APXvYqyLnYzegmmERscotwEokNTnTKcTl+ccwWsBJbfZ4UU80dZQ0szbRZJRyiwm2CU0BBjM/gDNX5p3TqhpNi0EHp0=
-X-Received: by 2002:a17:906:5246:: with SMTP id
- y6mr2387461ejm.330.1576059908214; 
- Wed, 11 Dec 2019 02:25:08 -0800 (PST)
+ (envelope-from <berrange@redhat.com>) id 1if1dv-0006wV-Vt
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:03:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28447
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1if1dv-0006tg-S3
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 08:03:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576069381;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pWPS/scdnjH3bZiyRlJV53iE6asMpkv3AjunRxlsBpY=;
+ b=dhvtLA7v0zPgLbCs+7e/PBvKuhMqKGJuinEgibZVU5WRHGA6ZL1LjWfdVu0W9gc4B9Kygk
+ xL4la2p1dnY8b1cyOhOv3+bAn55KUnXI8eMTBgG6TJxaQarSCNhHgBTgznjZydPr/K21HZ
+ laAMuJC6GGD9GRn4scrZ1Mb0qGYrJ88=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-47-Em5WSsJONDi5upzBJTWisQ-1; Wed, 11 Dec 2019 07:32:16 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 377801010FC2;
+ Wed, 11 Dec 2019 12:32:15 +0000 (UTC)
+Received: from redhat.com (ovpn-112-62.ams2.redhat.com [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 886AB1001B07;
+ Wed, 11 Dec 2019 12:32:13 +0000 (UTC)
+Date: Wed, 11 Dec 2019 12:32:10 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: Insufficiently documented deprecated command arguments
+Message-ID: <20191211123210.GH955178@redhat.com>
+References: <87tv67wa9y.fsf@dusky.pond.sub.org>
+ <20191211093317.GB2441258@angien.pipo.sk>
+ <20191211101439.GA6505@linux.fritz.box>
+ <20191211105147.GC2441258@angien.pipo.sk>
+ <20191211122417.GB6505@linux.fritz.box>
 MIME-Version: 1.0
-References: <CAGbAg_CAh-U-xRh+d6wNLQVWoHXEA0xcW6021Qd4WsMJBGfgOg@mail.gmail.com>
- <CAGbAg_A5G2trFWEuAL2da169v=XFrS44g64F6yZo5phLC+T=PQ@mail.gmail.com>
- <a579e1c4-fe3f-d8d0-3064-96473eb24e3a@redhat.com>
- <CAPan3Wq=ru496SOb93YA6ytTJJbSFtTuXC_B-MPETC5_ipdE6A@mail.gmail.com>
-In-Reply-To: <CAPan3Wq=ru496SOb93YA6ytTJJbSFtTuXC_B-MPETC5_ipdE6A@mail.gmail.com>
-From: Esteban Bosse <estebanbosse@gmail.com>
-Date: Wed, 11 Dec 2019 11:24:57 +0100
-Message-ID: <CAGbAg_CX62Ds3yYZUx2Q2_53FEFO26+WZ8okPBxzfTWBbAbyQA@mail.gmail.com>
-Subject: Re: BeagleBone support, omap1, omap2, omap3, etc.
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000f953d105996b0ae5"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::535
+In-Reply-To: <20191211122417.GB6505@linux.fritz.box>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: Em5WSsJONDi5upzBJTWisQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,354 +91,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Joaquin de Andres <me@xcancerberox.com.ar>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Krempa <pkrempa@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f953d105996b0ae5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, Dec 11, 2019 at 01:24:17PM +0100, Kevin Wolf wrote:
+> Am 11.12.2019 um 11:51 hat Peter Krempa geschrieben:
+> > On Wed, Dec 11, 2019 at 11:14:39 +0100, Kevin Wolf wrote:
+> > > Am 11.12.2019 um 10:33 hat Peter Krempa geschrieben:
+> > > > On Wed, Dec 11, 2019 at 09:12:41 +0100, Markus Armbruster wrote:
+> > > > >     Commit 7a9877a026 "block: Accept device model name for
+> > > > >     block_set_io_throttle" (v2.8.0) deprecated block_set_io_throt=
+tle
+> > > > >     argument @device.
+> > > >=20
+> > > > This one is more complex. The command is used both in 'blockdev' an=
+d in
+> > > > 'drive' mode:
+> > > >=20
+> > > > In 'drive' mode we pass the alias of the 'drive' as the @device
+> > > > argument.
+> > > >=20
+> > > > In 'blockdev' mode we pass the qom name as @id
+> > >=20
+> > > Any reason you couldn't use the QOM name even in 'drive' mode for any
+> > > QEMU version that has the @id option?
+> >=20
+> > Honestly, I didn't want to change the existing implementation at all.
+> >=20
+> > If it will help I can change that as it will be pretty easy to do.
+>=20
+> You can keep it for until after the blockdev dust has settled. It would
+> "just" be to address the deprecation since QEMU 2.8, not because of any
+> functional change.
+>=20
+> > >=20
+> > > > >     Commit c42e8742f5 "block: Use JSON null instead of "" to disa=
+ble
+> > > > >     backing file" (v2.10.0) deprecated blockdev-add empty string
+> > > > >     argument @backing.
+> > > >=20
+> > > > This is used in 'blockdev' mode only and we always pass the JSON nu=
+ll or
+> > > > a node name string.
+> > >=20
+> > > Here the thing to consider might be that JSON null isn't easy to use =
+on
+> > > the command line for manual users.
+> > >=20
+> > > > >     These were missed in commit eb22aeca65 "docs: document deprec=
+ation
+> > > > >     policy & deprecated features in appendix" (v2.10.0).
+> > > > >=20
+> > > > >     Commit 3c605f4074 "commit: Add top-node/base-node options" (v=
+3.1.0)
+> > > > >     deprecated block-commit arguments @base and @top.
+> > > >=20
+> > > > This command also has two modes:
+> > > >=20
+> > > > In 'drive' mode we pass in path strings as @base and @ top.
+> > > >=20
+> > > > In 'blockdev' mode we pass in nodenames as @base-node and @top-node=
+.
+> > > >=20
+> > > > Starting from qemu-4.2 libvirt uses 'blockdev' mode for VMs unless =
+an SD
+> > > > card is configured as we didn't convert to the '-device' approach f=
+or
+> > > > those as AFAIK not everything is possible to be converted.
+> > >=20
+> > > Hm... I guess in 'drive' mode, you stil don't assign node names, so y=
+ou
+> > > actually have to rely on paths?
+> >=20
+> > Well, in some specific cases we could detect the node names
+> > auto-assigned by qemu and use them instead of paths, but in my opinion
+> > it's not worth the effort and extra code.
+>=20
+> Well, the question is what to do on the QEMU side then. Deprecation
+> should mean that we have a plan for removing the feature. If we're
+> planning to keep the feature indefinitely because libvirt needs it, we
+> might want to consider removing the deprecation notice.
 
-Hello Niek and Philippe,
+Ideally libvirt would stop using -drive entirely, as I hate the idea of
+having to keep this around indefinitely in libvirt too. This needs QEMU
+to close the last gaps wrt SD cards
 
-Thank you very much for your support and all the information provided,
-I will create a new "roadmap" with all this excellent information and try
-again.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
-Thank you again and best regards,
-Esteban Bosse
-
-El mar., 10 dic. 2019 a las 20:51, Niek Linnenbank (<
-nieklinnenbank@gmail.com>) escribi=C3=B3:
-
-> Hello Philippe and Esteban,
->
-> On Tue, Dec 10, 2019 at 10:55 AM Philippe Mathieu-Daud=C3=A9 <philmd@redh=
-at.com>
-> wrote:
->
->> Hi Esteban,
->>
->> On 12/3/19 4:24 PM, Esteban Bosse wrote:
->> > Ping
->> >
->> > El mi=C3=A9., 6 nov. 2019 16:04, Esteban Bosse <estebanbosse@gmail.com
->> > <mailto:estebanbosse@gmail.com>> escribi=C3=B3:
->> >
->> >     Hello!
->> >
->> >     Some months ago I started to work trying to port the Beaglebone
->> >     support from the old qemu-linaro fork to the new QEMU mainstream.
->> >
->> >     During my work I found that the Beaglebone have an OMAP3 mpu this
->> >     mpu has very strong relation with the OMAP2 and OMAP1 in qemu, the=
-y
->> >     implement a lot of functions in common.
->> >
->> >     Then I understood that the omap1 and omap2 don't implement things
->> >     like QOM and needs a lot of work to upgrade it, at the same time
->> >     they are some boards like: omap1_sx, palm, nseries that implement
->> >     this mpus.
->> >
->> >     Looking the datasheet of the omap1 I realized that it's an very ol=
-d
->> >     device and some questions like "make sense work with this old
->> >     device?" comes to my mind.
->>
->> The OMAP3 reuse various components of the OMAP1/2.
->> Although in old shape, the OMAP1/2 are in the codebase and work.
->> It make sense to me to start upgrading the OMAP1/2 to new QOM standard,
->> then add the OMAP3 missing parts.
->>
->> The previous recommendations from Peter are still valid:
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg636936.html
->>
->> Or you can use the schema followed by Niek when adding the Allwinner H3:
->> https://www.mail-archive.com/qemu-devel@nongnu.org/msg662591.html
->>
->> That is:
->>
->> - Add tests using old code (booting Linux, network access in guest)
->> - Add an empty board
->> - Plug an empty OMAP SoC into the board, add the PoP LPDRAM
->> - Add a ARM926 core into the SoC
->> - Add most of the devices as UnimplementedDevice
->> - Add the interrupt controller in the SoC
->> - Add the UART in the SoC
->> - Add the Timers in the SoC
->> - Try to boot a Linux kernel (UART, TMR, then IRQ tested)
->> - Add the SD controller in the SoC
->> - Plug a drive to the SD in the board
->> - Try to boot u-boot
->> - You can now start the OMAP2 using a ARM1136 core
->> - Add the missing UNIMP devices (loop to previous steps)
->> - Add network controller
->> - Run tests (booting Linux, network access in guest)
->> - Remove old code
->>
->> >     When I went to the KVM Forum the last week I talked with some of
->> >     you, and you help my with different ideas and proposal to make thi=
-s
->> >     task, but I can't see the right way to make this work because it i=
-s
->> >     a lot of work.
->> >
->> >     My motivation is learn more about embedded devices, architecture,
->> >     kernel, etc. and of course contribute to the community.
->> >
->> >     I would love to hear your opinions about this 3 related devices wi=
-th
->> >     they respected boards.
->> >
->> >     Maybe someone is interested to work with me.
->> >     I dream to make this work beautiful (like the musca board with the
->> >     armsse and armv7m modules) with a good variety of tests. And in th=
-e
->> >     same time I would like to write some documentation about the proce=
-ss
->> >     with the final idea to "make an easier way for new contributors".
->>
->> Very good idea.
->>
->> Niek, since you recently did the same, do you mind sharing your
->> experience, tell us what was not clear or hard to understand, so we can
->> have a better idea what part of the documentation/process we should
->> improve first, to help and welcome new contributors?
->>
->
-> Sure! Based on my own experience with the Allwinner H3, I can fully
-> recommend the steps
-> described above by Philippe to get the work done. Those are mostly the
-> things I did as well.
->
-> I think the best advice I can give you to get started is, start with the
-> bare minimum: kernel output.
-> What I mean by that is, get the linux source and compile it for your
-> target machine. Next, take the QEMU source and choose
-> any existing machine that come closest to the machine or SoC that you wan=
-t
-> to implement.
-> Then, just try to get the kernel output working via the serial console by
-> loading it with -kernel, -append and -dtb arguments.
->
-> If you are lucky, serial output already works since the machine is simila=
-r
-> to the one you want to implement. If not,
-> you may need to check for things like the load address and DRAM addresses
-> first and try to get output
-> by reading the kernel dmesg via GDB [1]. If you start QEMU with -s -S
-> arguments, connect with gdb
-> and give the 'lx-dmesg' command you'll read the kernel output before it
-> goes to the serial device.
-> If you at least selected the right processor and things like the load
-> address are OK, chances are good
-> that you at least get some logging.  And then, you have a starting point
-> to start the real work using the
-> steps described above by Philippe.
->
-> Regards,
-> Niek
->
-> [1]
-> https://www.kernel.org/doc/html/v4.10/dev-tools/gdb-kernel-debugging.html
->
->
->
->>
->> >
->> >     If someone want to work with me in this task, should know that I
->> >     don't have to much experience and I'm doing this job in my free ti=
-me
->> >     (this means that I work only in my free time).
->> >
->> >     I appreciate any kind of comment or advice.
->> >
->> >     Thanks for your time ;)
->> >     EstebanB
->> >
->>
->>
->
-> --
-> Niek Linnenbank
->
->
-
---000000000000f953d105996b0ae5
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hello Niek and Philippe,<br><br>Thank you very much for yo=
-ur support and all the information provided,=C2=A0<br>I will create a new &=
-quot;roadmap&quot; with all this excellent=C2=A0information and try again.<=
-br><br>Thank you again and best=C2=A0regards,<div>Esteban Bosse</div></div>=
-<br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">El mar=
-., 10 dic. 2019 a las 20:51, Niek Linnenbank (&lt;<a href=3D"mailto:nieklin=
-nenbank@gmail.com">nieklinnenbank@gmail.com</a>&gt;) escribi=C3=B3:<br></di=
-v><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;borde=
-r-left:1px solid rgb(204,204,204);padding-left:1ex"><div dir=3D"ltr"><div d=
-ir=3D"ltr"><div>Hello Philippe and Esteban,</div><div><br></div></div><div =
-class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Dec 10,=
- 2019 at 10:55 AM Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@=
-redhat.com" target=3D"_blank">philmd@redhat.com</a>&gt; wrote:<br></div><bl=
-ockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-lef=
-t:1px solid rgb(204,204,204);padding-left:1ex">Hi Esteban,<br>
-<br>
-On 12/3/19 4:24 PM, Esteban Bosse wrote:<br>
-&gt; Ping<br>
-&gt; <br>
-&gt; El mi=C3=A9., 6 nov. 2019 16:04, Esteban Bosse &lt;<a href=3D"mailto:e=
-stebanbosse@gmail.com" target=3D"_blank">estebanbosse@gmail.com</a> <br>
-&gt; &lt;mailto:<a href=3D"mailto:estebanbosse@gmail.com" target=3D"_blank"=
->estebanbosse@gmail.com</a>&gt;&gt; escribi=C3=B3:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Hello!<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Some months ago I started to work trying to port th=
-e Beaglebone<br>
-&gt;=C2=A0 =C2=A0 =C2=A0support from the old qemu-linaro fork to the new QE=
-MU mainstream.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0During my work I found that the Beaglebone have an =
-OMAP3 mpu this<br>
-&gt;=C2=A0 =C2=A0 =C2=A0mpu has very strong relation with the OMAP2 and OMA=
-P1 in qemu, they<br>
-&gt;=C2=A0 =C2=A0 =C2=A0implement a lot of functions in common.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Then I understood that the omap1 and omap2 don&#39;=
-t implement things<br>
-&gt;=C2=A0 =C2=A0 =C2=A0like QOM and needs a lot of work to upgrade it, at =
-the same time<br>
-&gt;=C2=A0 =C2=A0 =C2=A0they are some boards like: omap1_sx, palm, nseries =
-that implement<br>
-&gt;=C2=A0 =C2=A0 =C2=A0this mpus.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Looking the datasheet of the omap1 I realized that =
-it&#39;s an very old<br>
-&gt;=C2=A0 =C2=A0 =C2=A0device and some questions like &quot;make sense wor=
-k with this old<br>
-&gt;=C2=A0 =C2=A0 =C2=A0device?&quot; comes to my mind.<br>
-<br>
-The OMAP3 reuse various components of the OMAP1/2.<br>
-Although in old shape, the OMAP1/2 are in the codebase and work.<br>
-It make sense to me to start upgrading the OMAP1/2 to new QOM standard, <br=
->
-then add the OMAP3 missing parts.<br>
-<br>
-The previous recommendations from Peter are still valid:<br>
-<a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg636936.htm=
-l" rel=3D"noreferrer" target=3D"_blank">https://www.mail-archive.com/qemu-d=
-evel@nongnu.org/msg636936.html</a><br>
-<br>
-Or you can use the schema followed by Niek when adding the Allwinner H3:<br=
->
-<a href=3D"https://www.mail-archive.com/qemu-devel@nongnu.org/msg662591.htm=
-l" rel=3D"noreferrer" target=3D"_blank">https://www.mail-archive.com/qemu-d=
-evel@nongnu.org/msg662591.html</a><br>
-<br>
-That is:<br>
-<br>
-- Add tests using old code (booting Linux, network access in guest)<br>
-- Add an empty board<br>
-- Plug an empty OMAP SoC into the board, add the PoP LPDRAM<br>
-- Add a ARM926 core into the SoC<br>
-- Add most of the devices as UnimplementedDevice<br>
-- Add the interrupt controller in the SoC<br>
-- Add the UART in the SoC<br>
-- Add the Timers in the SoC<br>
-- Try to boot a Linux kernel (UART, TMR, then IRQ tested)<br>
-- Add the SD controller in the SoC<br>
-- Plug a drive to the SD in the board<br>
-- Try to boot u-boot<br>
-- You can now start the OMAP2 using a ARM1136 core<br>
-- Add the missing UNIMP devices (loop to previous steps)<br>
-- Add network controller<br>
-- Run tests (booting Linux, network access in guest)<br>
-- Remove old code<br>
-<br>
-&gt;=C2=A0 =C2=A0 =C2=A0When I went to the KVM Forum the last week I talked=
- with some of<br>
-&gt;=C2=A0 =C2=A0 =C2=A0you, and you help my with different ideas and propo=
-sal to make this<br>
-&gt;=C2=A0 =C2=A0 =C2=A0task, but I can&#39;t see the right way to make thi=
-s work because it is<br>
-&gt;=C2=A0 =C2=A0 =C2=A0a lot of work.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0My motivation is learn more about embedded devices,=
- architecture,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0kernel, etc. and of course contribute to the commun=
-ity.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0I would love to hear your opinions about this 3 rel=
-ated devices with<br>
-&gt;=C2=A0 =C2=A0 =C2=A0they respected boards.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Maybe someone is interested to work with me.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0I=C2=A0dream to make this work beautiful (like the =
-musca board with the<br>
-&gt;=C2=A0 =C2=A0 =C2=A0armsse and armv7m modules) with a good variety of t=
-ests. And in the<br>
-&gt;=C2=A0 =C2=A0 =C2=A0same time I would like to write some documentation =
-about the process<br>
-&gt;=C2=A0 =C2=A0 =C2=A0with the final idea to &quot;make an easier way for=
- new contributors&quot;.<br>
-<br>
-Very good idea.<br>
-<br>
-Niek, since you recently did the same, do you mind sharing your <br>
-experience, tell us what was not clear or hard to understand, so we can <br=
->
-have a better idea what part of the documentation/process we should <br>
-improve first, to help and welcome new contributors?<br></blockquote><div><=
-br></div><div>Sure! Based on my own experience with the Allwinner H3, I can=
- fully recommend the steps</div><div>described above by Philippe to get the=
- work done. Those are mostly the things I did as well.</div><div><br></div>=
-<div>I think the best advice I can give you to get started is, start with t=
-he bare minimum: kernel output.</div><div>What I mean by that is, get the l=
-inux source and compile it for your target machine. Next, take the QEMU sou=
-rce and choose</div><div>any existing machine that come closest to the mach=
-ine or SoC that you want to implement.</div><div>Then, just try to get the =
-kernel output working via the serial console by loading it with -kernel, -a=
-ppend and -dtb arguments.</div><div><br></div><div>If you are lucky, serial=
- output already works since the machine is similar to the one you want to i=
-mplement. If not,</div><div>you may need to check for things like the load =
-address and DRAM addresses first and try to get output</div><div>by reading=
- the kernel dmesg via GDB [1]. If you start QEMU with -s -S arguments, conn=
-ect with gdb</div><div>and give the &#39;lx-dmesg&#39; command you&#39;ll r=
-ead the kernel output before it goes to the serial device.</div><div>If you=
- at least selected the right processor and things like the load address are=
- OK, chances are good</div><div>that you at least get some logging.=C2=A0 A=
-nd then, you have a starting point to start the real work using the</div><d=
-iv>steps described above by Philippe.<br></div><div><br></div><div>Regards,=
-</div><div>Niek<br></div><div><br></div><div>[1] <a href=3D"https://www.ker=
-nel.org/doc/html/v4.10/dev-tools/gdb-kernel-debugging.html" target=3D"_blan=
-k">https://www.kernel.org/doc/html/v4.10/dev-tools/gdb-kernel-debugging.htm=
-l</a></div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quote=
-" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
-padding-left:1ex">
-<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0If someone want to work with me in this task, shoul=
-d know that I<br>
-&gt;=C2=A0 =C2=A0 =C2=A0don&#39;t have to much experience and I&#39;m doing=
- this job in my free time<br>
-&gt;=C2=A0 =C2=A0 =C2=A0(this means that I work only in my free time).<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0I appreciate any kind of comment or advice.<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Thanks for your time ;)<br>
-&gt;=C2=A0 =C2=A0 =C2=A0EstebanB<br>
-&gt; <br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr"><div dir=
-=3D"ltr"><div>Niek Linnenbank<br><br></div></div></div></div>
-</blockquote></div>
-
---000000000000f953d105996b0ae5--
 
