@@ -2,83 +2,61 @@ Return-Path: <SRS0=Q6KP=2B=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3265AC43603
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 07:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B0FC43603
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 08:04:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF9512077B
-	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 07:58:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J+Kdknet"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9512077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 080A72173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 11 Dec 2019 08:04:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 080A72173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iewtU-0001ta-6f
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 02:58:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58963)
+	id 1iewyZ-0003PJ-6U
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 03:04:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33818)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iewsP-00010P-Lt
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 02:57:43 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1iewxo-0002r1-Fc
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 03:03:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iewsO-0000Dx-9z
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 02:57:41 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49579
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <guoheyi@huawei.com>) id 1iewxn-0001u2-31
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 03:03:16 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2222 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iewsO-0000Bo-4u
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 02:57:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576051059;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JDT20aKapIGgJpnIA22MqTVehQMyQBhxq1PMqwGtE3M=;
- b=J+KdknetLJEKZ/SdPEmNRRxISbSmL/3RQqWuocx9aw1hra1m1fYCnlK5vMO2gSK54alW++
- f5KoM3RlhAIEfoJ4KFuosrcNC/7lmtRWSDbVAMUJbKOAAyEyorKfNdH2ip98X7Q0Bm2p2i
- CqZlZifsfH3Ibg4YgXxPE5O9dbWR9cE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-HMXTjCAgMHOkVVSiRx10uQ-1; Wed, 11 Dec 2019 02:57:36 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75A7F18543A0;
- Wed, 11 Dec 2019 07:57:34 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B1DAC60BAB;
- Wed, 11 Dec 2019 07:57:29 +0000 (UTC)
-Date: Wed, 11 Dec 2019 08:57:27 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH 0/5] ARM virt: Add NVDIMM support
-Message-ID: <20191211085727.1ab9564e@redhat.com>
-In-Reply-To: <c2bb0be09e244ee59d27c7aaab1783a9@huawei.com>
-References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
- <a133d4c4-3f60-2bb1-a7d7-35cdb06af265@redhat.com>
- <441c818f24084b4191315cf2a6267cef@huawei.com>
- <20191125164541.3f0a593f@redhat.com>
- <444efcb441fe42e5aff58b3af3ab14b4@huawei.com>
- <20191126095655.27227f59@redhat.com>
- <c2bb0be09e244ee59d27c7aaab1783a9@huawei.com>
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1iewxh-0001ND-OE; Wed, 11 Dec 2019 03:03:10 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 5F1A8C7F098378EFBC40;
+ Wed, 11 Dec 2019 16:02:56 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Wed, 11 Dec 2019
+ 16:02:53 +0800
+Subject: Re: [PATCH v1 0/5] target/arm/kvm: Provide an option to adjust
+ virtual time
+To: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>
+References: <20191016143410.5023-1-drjones@redhat.com>
+ <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <5679d43f-3f29-6ee1-0894-19ef2f3e08a2@huawei.com>
+Date: Wed, 11 Dec 2019 16:02:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: HMXTjCAgMHOkVVSiRx10uQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAFEAcA8j8M_J8Ocdpms8a2XufigVQ6oB4JBy2BcYAkXfJX5y5A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,125 +68,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "drjones@redhat.com" <drjones@redhat.com>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- Auger Eric <eric.auger@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, qemu-arm <qemu-arm@nongnu.org>, Richard
+ Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, bijan.mottahedeh@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 9 Dec 2019 17:39:15 +0000
-Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com> wrote:
 
-> Hi Igor/ xiaoguangrong,
-> 
-> > -----Original Message-----
-> > From: Shameerali Kolothum Thodi
-> > Sent: 28 November 2019 12:36
-> > To: 'Igor Mammedov' <imammedo@redhat.com>;
-> > xiaoguangrong.eric@gmail.com
-> > Cc: peter.maydell@linaro.org; drjones@redhat.com;
-> > shannon.zhaosl@gmail.com; qemu-devel@nongnu.org; Linuxarm
-> > <linuxarm@huawei.com>; Auger Eric <eric.auger@redhat.com>;
-> > qemu-arm@nongnu.org; xuwei (O) <xuwei5@huawei.com>;
-> > lersek@redhat.com
-> > Subject: RE: [PATCH 0/5] ARM virt: Add NVDIMM support
-> > 
-> > 
-> >   
-> > > -----Original Message-----
-> > > From: Qemu-devel
-> > >  
-> > [mailto:qemu-devel-bounces+shameerali.kolothum.thodi=huawei.com@nongn  
-> > > u.org] On Behalf Of Igor Mammedov
-> > > Sent: 26 November 2019 08:57
-> > > To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> > > Cc: peter.maydell@linaro.org; drjones@redhat.com;
-> > > xiaoguangrong.eric@gmail.com; shannon.zhaosl@gmail.com;
-> > > qemu-devel@nongnu.org; Linuxarm <linuxarm@huawei.com>; Auger Eric
-> > > <eric.auger@redhat.com>; qemu-arm@nongnu.org; xuwei (O)
-> > > <xuwei5@huawei.com>; lersek@redhat.com
-> > > Subject: Re: [PATCH 0/5] ARM virt: Add NVDIMM support  
-> > 
-> > [..]
-> >   
-> > > > > 0xb8 Dirty No.  -->Another read is attempted  
-> > > > > > [Qemu]NVDIMM:nvdimm_dsm_func_read_fit: read_fit_out buf size 0x8  
-> > > > > func_ret_status 3  --> Error status returned
-> > > > >
-> > > > > status 3 means that QEMU didn't like content of NRAM, and there is only
-> > > > > 1 place like this in nvdimm_dsm_func_read_fit()
-> > > > >     if (read_fit->offset > fit->len) {
-> > > > >         func_ret_status = NVDIMM_DSM_RET_STATUS_INVALID;
-> > > > >         goto exit;
-> > > > >     }
-> > > > >
-> > > > > so I'd start looking from here and check that QEMU gets expected data
-> > > > > in nvdimm_dsm_write(). In other words I'd try to trace/compare
-> > > > > content of DSM buffer (from qemu side).  
-> > > >
-> > > > I had printed the DSM buffer previously and it looked same, I will double  
-> > check  
-> > > > that.  
-> > 
-> > Tried printing the buffer in both Qemu/AML code.
-> > 
-> > On Amr64,  
-> 
-> [...]
->  
-> > Attached the SSDT.dsl used for debugging. I am still not clear why on ARM64,
-> > 2nd iteration case, the created buffer size in NCAL and RFIT methods have
-> > additional 4 bytes!.
-> > 
-> >     CreateField (ODAT, Zero, Local1, OBUF)
-> >     Concatenate (Buffer (Zero){}, OBUF, Local7)
-> > 
-> > Please let me know if you have any clue.
-> >   
-> 
-> I couldn't figure out yet, why this extra 4 bytes are added by aml code on ARM64
-> when the nvdimm_dsm_func_read_fit() returns NvdimmFuncReadFITOut without
-> any FIT data. ie, when the FIT buffer len (read_len) is zero.
-> 
-> But the below will fix this issue,
-> 
-> diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> index f91eea3802..cddf95f4c1 100644
-> --- a/hw/acpi/nvdimm.c
-> +++ b/hw/acpi/nvdimm.c
-> @@ -588,7 +588,7 @@ static void nvdimm_dsm_func_read_fit(NVDIMMState *state, NvdimmDsmIn *in,
->      nvdimm_debug("Read FIT: offset %#x FIT size %#x Dirty %s.\n",
->                   read_fit->offset, fit->len, fit_buf->dirty ? "Yes" : "No");
-> 
-> -    if (read_fit->offset > fit->len) {
-> +    if (read_fit->offset >= fit->len) {
->          func_ret_status = NVDIMM_DSM_RET_STATUS_INVALID;
->          goto exit;
->      }
-> 
-> 
-> This will return error code to aml in the second iteration when there is no further
-> FIT data to report. But, I am not sure why this check was omitted in the first place.
-> 
-> Please let me know if this is acceptable and then probably I can look into a v2 of this
-> series.
-Sorry, I don't have capacity to debug this right now,
-but I'd prefer if 'why' question was answered first.
+=E5=9C=A8 2019/12/6 23:22, Peter Maydell =E5=86=99=E9=81=93:
+> On Wed, 16 Oct 2019 at 15:34, Andrew Jones <drjones@redhat.com> wrote:
+>> v2:
+>>   - move from RFC status to v1
+>>   - put kvm_arm_vm_state_change() in kvm.c to share among kvm32.c and =
+kvm64.c
+>>   - add r-b's from Richard
+>>
+>>
+>> This series is inspired by a series[1] posted by Bijan Mottahedeh abou=
+t
+>> a year ago.  The problem described in the cover letter of [1] is easil=
+y
+>> reproducible and some users would like to have the option to avoid it.
+>> However the solution, which is to adjust the virtual counter offset ea=
+ch
+>> time the VM transitions to the running state, introduces a different
+>> problem, which is that the virtual and physical counters diverge.  As
+>> described in the cover letter of [1] this divergence is easily observe=
+d
+>> when comparing the output of `date` and `hwclock` after suspending the
+>> guest, waiting a while, and then resuming it.  Because this different
+>> problem may actually be worse for some users, unlike [1], the series
+>> posted here makes the virtual counter offset adjustment optional and n=
+ot
+>> even enabled by default.  Besides the adjustment being optional, this
+>> series approaches the needed changes differently to apply them in more
+>> appropriate locations.  Finally, unlike [1], this series doesn't attem=
+pt
+>> to measure "pause time" itself.  Simply using QEMU_CLOCK_VIRTUAL, whic=
+h
+>> only ticks when the VM is not stopped, is sufficient.
+> So I guess my overall question is "what is the x86 solution to
+> this problem, and why is this all arm-specific?" It would also
+> be helpful to know how it fits into all the other proposals regarding
+> time in VMs.
 
-Anyways, if something is unclear in how concrete AML code is build/works,
-feel free to ask and I'll try to explain and guide you.
+I also sent a RFC in March and ARM KVM experts were also invoved in the=20
+discussion:
 
-> Thanks,
-> Shameer
-> 
-> 
-> 
+https://lists.cs.columbia.edu/pipermail/kvmarm/2019-March/035026.html
+
+According to the discussion, qemu on x86 is using KVM_KVMCLOCK_CTRL to=20
+request KVM to set a flag "PVCLOCK_GUEST_STOPPED" in pvclock, informing=20
+VM kernel about external force stop.
+
+Thanks,
+
+Heyi
+
+
+>
+> thanks
+> -- PMM
+>
+>
 
 
