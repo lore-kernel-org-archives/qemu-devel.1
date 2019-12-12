@@ -2,91 +2,82 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36585C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9037C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:32:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 014A221655
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:28:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5A4A20663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:32:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IEytGpef"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 014A221655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f5tTkX/o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5A4A20663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifPRf-0004rz-7G
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:27:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58314)
+	id 1ifPWG-0007Pw-2F
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:32:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ifPQw-0004PV-Qa
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:27:15 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifPU9-0005iq-4M
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:30:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ifPQv-0002Xg-Fd
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:27:14 -0500
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:36297)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifPU8-0008H1-2T
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:30:33 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33098)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ifPQv-0002Vt-6o
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:27:13 -0500
-Received: by mail-pf1-x444.google.com with SMTP id x184so847491pfb.3
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 06:27:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=nvxk4w/BhuCMNQHLTJjLJrN27ClmCoaoni3Fxdh9B8g=;
- b=IEytGpefHhV7GfQWn5lRMYgWtqGfwJHOp1DRypElmQa4qVURq/x1AJ9JAlCFwmYFau
- i8kKnBsg97tSznRYyxwhj+QWwEQmQgp+UxvG//6YfTqkk8e12QvFZ8fznv8T2Bjw1bnc
- 8XiT8zYAEUaGG7YcGtkHo1kIoTsjcJ3FDBtOiiKcuSX/rMgSqusqnyrn6JevT9nwdFls
- yLZ3fXz1pGmt70sLjaqpdDnvsWRwCMonKqHtjSUqF6sFwdnzMD2aVSjpcireKHCHISjl
- XGbuKgg/O7dBUc+q7ZPcDHKsGOZldIRUi796EC4izbQBDoiONMu2SR/1GL1aPB2gqgx5
- PsJA==
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1ifPU3-0008A5-CO
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:30:27 -0500
+Received: by mail-wr1-x443.google.com with SMTP id b6so3006660wrq.0
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 06:30:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=d+fGHQicJfMCQVgermELgoy5/7QyWO3sNl/PPGYy11M=;
+ b=f5tTkX/oBJRJtlTblwCIZzYIT++yb58irrw25E2QFk4JLqbF49FH5IXpGevUhLchGb
+ rlxzpdz8fdBmE454YXG3MwjlWgmgEL9txWYqMD+bjIvTDIsZhyG8/qLUWVVAyHnm+Bzo
+ RJ8ZQXXUQoLX7D0lbakZlbRVQiiJU9DooYjUnme1sv6IBDoq3EcthBx5c8CyMVaEyoPQ
+ MfoQTqhZ8WNZlwviKwIjFUt1vafKCrFdhO7Aqy5E1eWQlahvLznTirFAgHPM8pJ7tEhy
+ ejbV3xp5s7pkf6K4D885T2GLmCQHIIVt5cDQhYkMzI/w3u4lwR31a55jcce9UT5Ns855
+ XIFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=nvxk4w/BhuCMNQHLTJjLJrN27ClmCoaoni3Fxdh9B8g=;
- b=tbDq+itu+a4i1LoDY6lUq+dZaCzf47X8j+cMaulELMBIIyXHog0StoEmY4Z8QJFJvB
- XbeA9Hm2K2Qfm74a2FNAmMhBt5gq0XQZPFDlOaFJmDq8yUcWdFBHJDBa4Zh7PegA5Hr3
- 23UxgpAuYiM9z/b/GS1nQEb0/3D7Lw9unCmJpdqaIm2a/rcVY7dwCvB+IJ8owi+pH8WA
- gdsIivQf5outb4MZhyAzla4xvqdoLXnFS5JoKNdeLignzWsMSGD+5grA3QYzsxSNgQrF
- 1uLGX6WfeN9A0vUTlik0MlhYJ3Tz9zT/p+sXDccmPXLWnQoCyOly55HQV2syC2F0w/G4
- C2LQ==
-X-Gm-Message-State: APjAAAU1fDDXtY8kc/YC8f1T/D6aWGaaS3F1tbUC0GAbtGeiGX0GTsJX
- ZwFzkSuBgOJdC9CAcIGwOa2BU0WkOpQ=
-X-Google-Smtp-Source: APXvYqxiLc3KzrCoLgdeKaxFfYibSFVXLyNVaL6fQZy2g05t6YuCIIvcADMHFOYd3SuJTIaOhrLpLg==
-X-Received: by 2002:a63:5657:: with SMTP id g23mr10508251pgm.452.1576160831152; 
- Thu, 12 Dec 2019 06:27:11 -0800 (PST)
-Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id r1sm7019892pgp.15.2019.12.12.06.27.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 12 Dec 2019 06:27:10 -0800 (PST)
-Subject: Re: [PATCH 23/28] target/m68k: Use cpu_*_mmuidx_ra instead of
- MMU_MODE{0, 1}_SUFFIX
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20191212040039.26546-1-richard.henderson@linaro.org>
- <20191212040039.26546-24-richard.henderson@linaro.org>
- <6162d8ab-b608-15e4-8e33-8a656afb304a@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b1beeef1-cb13-3452-f8be-e07b860143b5@linaro.org>
-Date: Thu, 12 Dec 2019 06:27:08 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
-MIME-Version: 1.0
-In-Reply-To: <6162d8ab-b608-15e4-8e33-8a656afb304a@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=d+fGHQicJfMCQVgermELgoy5/7QyWO3sNl/PPGYy11M=;
+ b=TSwxu/bUvMHQw++Z+xrg//QCUpaXEUtfQdNachSdWSLSFmbt4DI1k1Aa3hhIMtsTBh
+ bb1HhrQItxKzAAbHjKLcyZcTb0/NraGMiRPcuP/ZtFrET1uTEZeOi9tV1U6jvKZo8AYD
+ I/rf0ffeOpMocsW4KxpyyTKuJbiJyRf5TvTCzCm6I1uiGKTlDAwjrvx+w6bCCyBsA56+
+ U5T7yh6tHAIvfY56n3VaVYd8EM7d1QT49yhtG2teBYvxL72w6jo1W9AUed3Vx4XuBE9N
+ zAcT/eWeiImNoXM8nGfMrE7Klcz/L1fRPANOjd40lPt/9IES7H4O3lMmti56YNx3hAta
+ wY6g==
+X-Gm-Message-State: APjAAAVtJ94d7QL8CK9NRXtth3EEOTgvI5f2dqWqlnxH4Eh0vWopohyh
+ ZQPh12Xx4Bf9Ie3+4212tuYg7Bn0
+X-Google-Smtp-Source: APXvYqwHhdPgXiqODZlFJx1LRu/DKz4P1XH0oZGppQNuBKCsyhKA1THPVZ8W5VXF3gLRju9jbBBegg==
+X-Received: by 2002:adf:fe0e:: with SMTP id n14mr6682043wrr.116.1576161025181; 
+ Thu, 12 Dec 2019 06:30:25 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id c9sm6140505wmc.47.2019.12.12.06.30.24
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 12 Dec 2019 06:30:24 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/5] fw_cfg: allow building without other devices
+Date: Thu, 12 Dec 2019 15:30:18 +0100
+Message-Id: <1576161021-5359-3-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1576161021-5359-1-git-send-email-pbonzini@redhat.com>
+References: <1576161021-5359-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,23 +89,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: philmd@redhat.com, slp@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/12/19 1:44 AM, Laurent Vivier wrote:
->> +#define cpu_lduw_kernel(e, p)    cpu_lduw_mmuidx_ra(e, p, MMU_KERNEL_IDX, 0)
->> +#define cpu_ldl_kernel(e, p)     cpu_ldl_mmuidx_ra(e, p, MMU_KERNEL_IDX, 0)
->> +#define cpu_stw_kernel(e, p, v)  cpu_stw_mmuidx_ra(e, p, v, MMU_KERNEL_IDX, 0)
->> +#define cpu_stl_kernel(e, p, v)  cpu_stl_mmuidx_ra(e, p, v, MMU_KERNEL_IDX, 0)
-> 
-> Do you think it would be a reasonable cleanup to replace the _kernel
-> functions by the _mmuidx_ra functions directly in the code in a future
-> patch?
+The microvm machine type uses fw_cfg but lacks SMBIOS and ACPI.  Do not include
+the files if the symbol is not present in QEMU and remove dependencies on
+machine-specific files.
 
-I can do this in v2, as David asked for the same thing for s390x.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/i386/fw_cfg.c | 7 +++++++
+ hw/i386/pc.c     | 2 --
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
+diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+index 39b6bc6..326e33e 100644
+--- a/hw/i386/fw_cfg.c
++++ b/hw/i386/fw_cfg.c
+@@ -22,6 +22,9 @@
+ #include "hw/nvram/fw_cfg.h"
+ #include "e820_memory_layout.h"
+ #include "kvm_i386.h"
++#include "config-devices.h"
++
++struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+ 
+ const char *fw_cfg_arch_key_name(uint16_t key)
+ {
+@@ -46,6 +49,7 @@ const char *fw_cfg_arch_key_name(uint16_t key)
+ 
+ void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
+ {
++#ifdef CONFIG_SMBIOS
+     uint8_t *smbios_tables, *smbios_anchor;
+     size_t smbios_tables_len, smbios_anchor_len;
+     struct smbios_phys_mem_area *mem_array;
+@@ -83,6 +87,7 @@ void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
+         fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-anchor",
+                         smbios_anchor, smbios_anchor_len);
+     }
++#endif
+ }
+ 
+ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+@@ -114,8 +119,10 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+      */
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, apic_id_limit);
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
++#ifdef CONFIG_ACPI
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_ACPI_TABLES,
+                      acpi_tables, acpi_tables_len);
++#endif
+     fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, kvm_allows_irq0_override());
+ 
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index b9f3b38..3d2c5d8 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -101,8 +101,6 @@
+ #define DPRINTF(fmt, ...)
+ #endif
+ 
+-struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+-
+ GlobalProperty pc_compat_4_1[] = {};
+ const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
+ 
+-- 
+1.8.3.1
 
-r~
 
 
