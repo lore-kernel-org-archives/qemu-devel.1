@@ -2,118 +2,101 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91AB8C2D0C8
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 08:55:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A29EC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 08:56:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 63F21214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 08:55:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63F21214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 5BDD7214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 08:56:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BDD7214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifKFs-0000mi-Er
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 03:55:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60214)
+	id 1ifKH9-0002I2-Eq
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 03:56:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ifKEP-0007fn-LI
+ (envelope-from <bharata@linux.ibm.com>) id 1ifKEP-0007fp-KA
  for qemu-devel@nongnu.org; Thu, 12 Dec 2019 03:53:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ifKEN-0005A0-Oq
+ (envelope-from <bharata@linux.ibm.com>) id 1ifKEO-0005B8-1P
  for qemu-devel@nongnu.org; Thu, 12 Dec 2019 03:53:57 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:57151)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ifKEM-000562-RX
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50894)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bharata@linux.ibm.com>)
+ id 1ifKEN-00058z-PC
  for qemu-devel@nongnu.org; Thu, 12 Dec 2019 03:53:55 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N0o3X-1hljX01xWn-00wlFA; Thu, 12 Dec 2019 09:53:51 +0100
-Subject: Re: [PATCH 23/28] target/m68k: Use cpu_*_mmuidx_ra instead of
- MMU_MODE{0,1}_SUFFIX
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20191212040039.26546-1-richard.henderson@linaro.org>
- <20191212040039.26546-24-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <ff7e0037-08b4-a989-3f52-d70fdf97f739@vivier.eu>
-Date: Thu, 12 Dec 2019 09:53:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBC8lm1o062492
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 03:53:54 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wuhsc97nb-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 03:53:54 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bharata@linux.ibm.com>;
+ Thu, 12 Dec 2019 08:53:52 -0000
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 12 Dec 2019 08:53:48 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBC8rlAv19988578
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 12 Dec 2019 08:53:47 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 327CAAE056;
+ Thu, 12 Dec 2019 08:53:47 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DFF7FAE055;
+ Thu, 12 Dec 2019 08:53:45 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.124.35.198])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Thu, 12 Dec 2019 08:53:45 +0000 (GMT)
+Date: Thu, 12 Dec 2019 14:23:43 +0530
+From: Bharata B Rao <bharata@linux.ibm.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
+ pseries guest
+References: <20191212055059.9399-1-bharata@linux.ibm.com>
+ <20191212055059.9399-3-bharata@linux.ibm.com>
+ <aeadba2d-1699-a750-2dc2-cf9921e57680@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20191212040039.26546-24-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:40GpAu44usl7gEeJhaVXdBmiBdCqyI1WESvyMNtm2WjHvU4I7xn
- yULRTwEAjL1dZX9JfKoQ/o/ZNDJlFjXbPincdNYSQztqQD1RgMXIAl/9bkdrMEhcdE7Xlp1
- MXgHTnj5i0uJaTbTE7gIi9Lztun0vWTVfo2m9jREAE7oY895wkJ4PjXAkaGrxlarJ9OZei0
- 6GLEKlnpSIbuZn25MBKcA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:d75ctQPRePA=:Lv3qHLZgG6gCrIG497xYqf
- BAcqK9EjH+4e2Ouitzkr6X4oiH6956Ui4+4/6dwJNQO2NvZx3h2rGW9B0uw4HgAzGjCYKPtje
- Ul/DtobWVRZAXFENHc6iCdnRS6wqhcvYw9cjFvTbXWvxqOTymP16m5u1+H7+D815JKSZm5lZn
- DnrfvndlFAsjw7mxRDJEghowGh1etJ/uXbwqh/k/vokfT+8LkI+d0T+lUeEw2zIddseHKO50b
- LGDxFSYF2zLh5wVQLOJjOmIfE3rZRyXXieAC4b80eG4nkgWL0rnCRYohzc6nwYHqjtnEGjzNA
- 5u7ntwd4rqpfmHItmuDTSj6BBkLj5IEsBouyQf7J7Ab8eJbEEnn5vmUxVyiyMLzs7YQmwqeZI
- HjXRziQyAtdIroSs9x7xwN4B8v+sviS1G9uWg4J1IqEVfztG1yUl4+mfomyO98mRGP5Rwu6Av
- 5tvBjkNtlp1l63bqCZyeDlAkPutBye4HEcL6MqCW27/6cNIzEG4SnkMvUDW0qVDDHaH32yJIC
- LMvBCekIljtGXSLEOwKjDNlyoTbHD8ZBN9Ut2tNbZCo+pP6/JtX5DF0ELh2NP/qNA7oY80Bzm
- JdYrP4tLJBmFoT61CUwfUmCEbQ3n0IiLNTDAD1Wfx+0u6Vh3gBCjyWd++vKZRAhh2bWFbF65M
- q7rnxHQVf4Zdwl8VYHe6zO47JoENTkdUps3V2ovIDIe6yCRJeV1N8dfITPdCi8CxMEZe+cwlF
- sTSbtodSiM4O4xgA3HHTyGxsex4QfK7aHD9jg1esiui44ZJp4wj6/3uNYFv3PE6eown0fY/dq
- 9gBLEQkUl13yPtTtLAB/RjjPIdLGTrRLlyncXsHRR2PQsVYXf2uonI2aIyWviN/aHi3I/2Lj5
- xBMFTKAggIsVL8BQ3IaehRpFI2sRVS9Qh5xTJ8khg=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.17.13
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <aeadba2d-1699-a750-2dc2-cf9921e57680@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-TM-AS-GCONF: 00
+x-cbid: 19121208-0020-0000-0000-0000039760F5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121208-0021-0000-0000-000021EE684E
+Message-Id: <20191212085343.GB28362@in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-12_01:2019-12-12,2019-12-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 impostorscore=0
+ mlxscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
+ bulkscore=0 adultscore=0 clxscore=1015 phishscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912120062
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id xBC8lm1o062492
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,52 +108,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: bharata@linux.ibm.com
+Cc: linuxram@us.ibm.com, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
+ paulus@ozlabs.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/12/2019 à 05:00, Richard Henderson a écrit :
-> The generated *_user functions are unused.  The *_kernel functions
-> have a couple of users in op_helper.c; use *_mmuidx_ra instead,
-> with MMU_KERNEL_IDX.
-> 
-> Cc: Laurent Vivier <laurent@vivier.eu>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/m68k/cpu.h       | 2 --
->  target/m68k/op_helper.c | 5 +++++
->  2 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-> index 20de3c379a..89af14e899 100644
-> --- a/target/m68k/cpu.h
-> +++ b/target/m68k/cpu.h
-> @@ -516,8 +516,6 @@ enum {
->  #define cpu_list m68k_cpu_list
->  
->  /* MMU modes definitions */
-> -#define MMU_MODE0_SUFFIX _kernel
-> -#define MMU_MODE1_SUFFIX _user
->  #define MMU_KERNEL_IDX 0
->  #define MMU_USER_IDX 1
->  static inline int cpu_mmu_index (CPUM68KState *env, bool ifetch)
-> diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-> index bc4f845e3f..96a4951c21 100644
-> --- a/target/m68k/op_helper.c
-> +++ b/target/m68k/op_helper.c
-> @@ -36,6 +36,11 @@ static inline void do_interrupt_m68k_hardirq(CPUM68KState *env)
->  
->  #else
->  
-> +#define cpu_lduw_kernel(e, p)    cpu_lduw_mmuidx_ra(e, p, MMU_KERNEL_IDX, 0)
-> +#define cpu_ldl_kernel(e, p)     cpu_ldl_mmuidx_ra(e, p, MMU_KERNEL_IDX, 0)
-> +#define cpu_stw_kernel(e, p, v)  cpu_stw_mmuidx_ra(e, p, v, MMU_KERNEL_IDX, 0)
-> +#define cpu_stl_kernel(e, p, v)  cpu_stl_mmuidx_ra(e, p, v, MMU_KERNEL_IDX, 0)
-> +
->  static void cf_rte(CPUM68KState *env)
->  {
->      uint32_t sp;
-> 
+On Thu, Dec 12, 2019 at 08:34:57AM +0100, C=E9dric Le Goater wrote:
+> Hello Bharata,
+>=20
+>=20
+> On 12/12/2019 06:50, Bharata B Rao wrote:
+> > A pseries guest can be run as a secure guest on Ultravisor-enabled
+> > POWER platforms. When such a secure guest is reset, we need to
+> > release/reset a few resources both on ultravisor and hypervisor side.
+> > This is achieved by invoking this new ioctl KVM_PPC_SVM_OFF from the
+> > machine reset path.
+> >=20
+> > As part of this ioctl, the secure guest is essentially transitioned
+> > back to normal mode so that it can reboot like a regular guest and
+> > become secure again.
+> >=20
+> > This ioctl has no effect when invoked for a normal guest. If this ioc=
+tl
+> > fails for a secure guest, the guest is terminated.
+>=20
+> This looks OK.=20
+>=20
+> > Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+> > ---
+> >  hw/ppc/spapr.c       | 15 +++++++++++++++
+> >  target/ppc/kvm.c     |  7 +++++++
+> >  target/ppc/kvm_ppc.h |  6 ++++++
+> >  3 files changed, 28 insertions(+)
+> >=20
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index f11422fc41..25e1a3446e 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -1597,6 +1597,21 @@ static void spapr_machine_reset(MachineState *=
+machine)
+> >      void *fdt;
+> >      int rc;
+> > =20
+> > +    /*
+> > +     * KVM_PPC_SVM_OFF ioctl can fail for secure guests, check and
+> > +     * exit in that case. However check for -ENOTTY explicitly
+> > +     * to ensure that we don't terminate normal guests that are
+> > +     * running on kernels which don't support this ioctl.
+> > +     *
+> > +     * Also, this ioctl returns 0 for normal guests on kernels where
+> > +     * this ioctl is supported.
+> > +     */
+> > +    rc =3D kvmppc_svm_off();
+> > +    if (rc && rc !=3D -ENOTTY) {
+>=20
+> I would put these low level tests under kvmppc_svm_off().
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Makes sense.
+
+>=20
+> > +        error_report("Reset of secure guest failed, exiting...");
+> > +        exit(EXIT_FAILURE);
+>=20
+> The exit() could probably go under kvmppc_svm_off() also.
+
+May be not. Then error_report would have also have to go in.
+Doesn't make sense to print this error from there.
+
+Regards,
+Bharata.
+
 
