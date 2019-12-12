@@ -2,85 +2,63 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CE8C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90483C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:28:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6482120663
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:27:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ccGurdDW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6482120663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6403620663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:28:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6403620663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifNZ8-0008In-Hg
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 07:27:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54944)
+	id 1ifNaF-0000xa-H8
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 07:28:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35591)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stevensd@chromium.org>) id 1ifNYL-0007sr-LB
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:26:46 -0500
+ (envelope-from <groug@kaod.org>) id 1ifNZO-0000HH-3j
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:27:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stevensd@chromium.org>) id 1ifNYK-0004ry-9i
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:26:45 -0500
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:36034)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stevensd@chromium.org>)
- id 1ifNYK-0004rG-1n
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:26:44 -0500
-Received: by mail-qt1-x844.google.com with SMTP id k11so2124131qtm.3
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:26:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=zzuaDacu5BFhoisZaoQtnflxPHTSJ1BMzYrW5oVhp6A=;
- b=ccGurdDWOjVoQeL3FLvqQ+fVjvam+gDriu9+NtKrTWLFwG7hAdq/96uznle/g7ot87
- zkuNY4KDorEuL4NVOkq6tFOB8S4Zcs0tcbdhvvOUhJlQ6YDUyfl6Dvg5yzOwHNUeokxE
- VKkje5Uql4RRBOtKUD6+7/lHTHFe6sm2xdo2U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=zzuaDacu5BFhoisZaoQtnflxPHTSJ1BMzYrW5oVhp6A=;
- b=NoIsWcrHvuPwZ+BwIdFFbO8cDlD457a2d5sxczB31p3O9IBPa6n4aIRoyjXbB+ry5v
- 0MEfbCm5jLYX0NkGtdQUXipDuR2GD52dfA9klILUg6YScNPeoIdyHVmzpwP9aFsg4ia9
- 9iK2cJ9MfvOitPswPMrQWLkRqPiRDnPS3Va+NrGtGo4mXudYRL7cTcSHvBVvXhIcxkwi
- fViELAVJcTU+ssZEHW9kHt0dtIDQRgTLMBIJhNVrW7BlwLahWvj45oaaUPnos8NSIp+w
- ZGCb1G6JvTVNUbGzQim7yz4rLbbb+LjtZFwn3MuZrrJM63psDUTCrDGJgYCM/X0gmzkg
- Ixvw==
-X-Gm-Message-State: APjAAAU3Jclid3yKSweFzpsvkoEMxCBAuZf8hJ7TV7sl8VAiOBUaIzFD
- CMBhL4PL2Hm/HGI3wpysIar/D5VHPVX8/j+PGNiUhQ==
-X-Google-Smtp-Source: APXvYqyyW9xksRz10OUFM4sUWiAeVJQVc8sXvXBShkOf1bK8grmGt1MOoQHtahVrRAWGVxDTH6FRr9lamDi8qA2+Pt8=
-X-Received: by 2002:aed:2344:: with SMTP id i4mr7392923qtc.136.1576153603247; 
- Thu, 12 Dec 2019 04:26:43 -0800 (PST)
+ (envelope-from <groug@kaod.org>) id 1ifNZM-0006DW-GA
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:27:49 -0500
+Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:49897)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ifNZM-00061T-7u
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:27:48 -0500
+Received: from player750.ha.ovh.net (unknown [10.108.57.178])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 0F1A412950A
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 13:27:38 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player750.ha.ovh.net (Postfix) with ESMTPSA id 8A8BAD2EFBF3;
+ Thu, 12 Dec 2019 12:27:26 +0000 (UTC)
+Date: Thu, 12 Dec 2019 13:27:23 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Bharata B Rao <bharata@linux.ibm.com>
+Subject: Re: [PATCH v2 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
+ pseries guest
+Message-ID: <20191212132723.5fdfee47@bahia.tlslab.ibm.com>
+In-Reply-To: <20191212055059.9399-3-bharata@linux.ibm.com>
+References: <20191212055059.9399-1-bharata@linux.ibm.com>
+ <20191212055059.9399-3-bharata@linux.ibm.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <CAD=HUj7EsxrkSubmY6HE4aYJOykVKtmGXjMjeGqnoJw1KZUc5Q@mail.gmail.com>
- <20191106124101.fsfxibdkypo4rswv@sirius.home.kraxel.org>
- <72712fe048af1489368f7416faa92c45@hostfission.com>
- <CAAFQd5Cpb=3HRL3NbgxP+S259nkNEuA=u75ew1JQTzvVUU5NeQ@mail.gmail.com>
- <d65bec5074eda5f389668e28922c1609@hostfission.com>
- <CAAFQd5AWqYaNWfYQ2hepjg7OD8y8ehHn0guusAR8JYefc+BNaw@mail.gmail.com>
- <CAEUnVG77y2DrV5kLTHDy1xio+yzMGv9j=M0c4388vH_LUaiXLg@mail.gmail.com>
- <CAD=HUj40Jb2cy8EP=24coO-CPUvq6ib+01bvXHn1G9GD8KuenA@mail.gmail.com>
- <20191211092625.jzqx2ukphhggwavo@sirius.home.kraxel.org>
- <CAD=HUj7d3SWqCH=57ymy-BVd6xdJWc=WSqHAFyQXt-3MjchEAA@mail.gmail.com>
- <20191212094121.by7w7fywlzdfoktn@sirius.home.kraxel.org>
-In-Reply-To: <20191212094121.by7w7fywlzdfoktn@sirius.home.kraxel.org>
-From: David Stevens <stevensd@chromium.org>
-Date: Thu, 12 Dec 2019 21:26:32 +0900
-Message-ID: <CAD=HUj6YYupjdxxz2mgMmE2DcKhXP-qdhRORvUNTmzcORRrLzg@mail.gmail.com>
-Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::844
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 3619205253579119094
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeljedggedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehtddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.40.148
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,84 +70,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Geoffrey McRae <geoff@hostfission.com>, Hans Verkuil <hverkuil@xs4all.nl>,
- Zach Reizner <zachr@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
- virtio-dev@lists.oasis-open.org, qemu-devel <qemu-devel@nongnu.org>,
- Alex Lau <alexlau@chromium.org>, Tomasz Figa <tfiga@chromium.org>,
- Keiichi Watanabe <keiichiw@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
- =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, linuxram@us.ibm.com,
+ qemu-devel@nongnu.org, paulus@ozlabs.org, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > > Second I think it is a bad idea
-> > > from the security point of view.  When explicitly exporting buffers it
-> > > is easy to restrict access to the actual exports.
-> >
-> > Restricting access to actual exports could perhaps help catch bugs.
-> > However, I don't think it provides any security guarantees, since the
-> > guest can always just export every buffer before using it.
->
-> Probably not on the guest/host boundary.
->
-> It's important for security inside the guest though.  You don't want
-> process A being able to access process B private resources via buffer
-> sharing support, by guessing implicit buffer identifiers.
+On Thu, 12 Dec 2019 11:20:59 +0530
+Bharata B Rao <bharata@linux.ibm.com> wrote:
 
-At least for the linux guest implementation, I wouldn't think the
-uuids would be exposed from the kernel. To me, it seems like something
-that should be handled internally by the virtio drivers. Especially
-since the 'export' process would be very much a virtio-specific
-action, so it's likely that it wouldn't fit nicely into existing
-userspace software. If you use some other guest with untrusted
-userspace drivers, or if you're pulling the uuids out of the kernel to
-give to some non-virtio transport, then I can see it being a concern.
+> A pseries guest can be run as a secure guest on Ultravisor-enabled
+> POWER platforms. When such a secure guest is reset, we need to
+> release/reset a few resources both on ultravisor and hypervisor side.
+> This is achieved by invoking this new ioctl KVM_PPC_SVM_OFF from the
+> machine reset path.
+> 
+> As part of this ioctl, the secure guest is essentially transitioned
+> back to normal mode so that it can reboot like a regular guest and
+> become secure again.
+> 
+> This ioctl has no effect when invoked for a normal guest. If this ioctl
+> fails for a secure guest, the guest is terminated.
+> 
+> Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
+> ---
+>  hw/ppc/spapr.c       | 15 +++++++++++++++
+>  target/ppc/kvm.c     |  7 +++++++
+>  target/ppc/kvm_ppc.h |  6 ++++++
+>  3 files changed, 28 insertions(+)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f11422fc41..25e1a3446e 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1597,6 +1597,21 @@ static void spapr_machine_reset(MachineState *machine)
+>      void *fdt;
+>      int rc;
+>  
+> +    /*
+> +     * KVM_PPC_SVM_OFF ioctl can fail for secure guests, check and
+> +     * exit in that case. However check for -ENOTTY explicitly
+> +     * to ensure that we don't terminate normal guests that are
+> +     * running on kernels which don't support this ioctl.
+> +     *
+> +     * Also, this ioctl returns 0 for normal guests on kernels where
+> +     * this ioctl is supported.
+> +     */
+> +    rc = kvmppc_svm_off();
+> +    if (rc && rc != -ENOTTY) {
 
-> > > Instead of using a dedicated buffer sharing device we can also use
-> > > virtio-gpu (or any other driver which supports dma-buf exports) to
-> > > manage buffers.
+This ioctl can also return -EINVAL if the ultravisor actually failed to move
+the guest back to non-secure mode or -EBUSY if a vCPU is still running. I
+agree that the former deserve the VM to be terminated. What about the latter ?
+Can this happen and if yes, why ? Should we try again as suggested by Alexey ?
+Could this reveal a bug in QEMU, in which case we should maybe abort ?
 
-Ah, okay. I misunderstood the original statement. I read the sentence
-as 'we can use virtio-gpu in place of the dedicated buffer sharing
-device', rather than 'every device can manage its own buffers'. I can
-agree with the second meaning.
+> +        error_report("Reset of secure guest failed, exiting...");
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+>      spapr_caps_apply(spapr);
+>  
+>      first_ppc_cpu = POWERPC_CPU(first_cpu);
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 7406d18945..1a86fa4f0c 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2900,3 +2900,10 @@ void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, int64_t tb_offset)
+>          kvm_set_one_reg(cs, KVM_REG_PPC_TB_OFFSET, &tb_offset);
+>      }
+>  }
+> +
+> +int kvmppc_svm_off(void)
+> +{
+> +    KVMState *s = KVM_STATE(current_machine->accelerator);
+> +
+> +    return kvm_vm_ioctl(s, KVM_PPC_SVM_OFF);
+> +}
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 47b08a4030..5cc812e486 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -37,6 +37,7 @@ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
+>  target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+>                                       bool radix, bool gtse,
+>                                       uint64_t proc_tbl);
+> +int kvmppc_svm_off(void);
+>  #ifndef CONFIG_USER_ONLY
+>  bool kvmppc_spapr_use_multitce(void);
+>  int kvmppc_spapr_enable_inkernel_multitce(void);
+> @@ -201,6 +202,11 @@ static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+>      return 0;
+>  }
+>  
+> +static inline int kvmppc_svm_off(void)
+> +{
+> +    return 0;
+> +}
+> +
+>  static inline void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu,
+>                                               unsigned int online)
+>  {
 
-> Without buffer sharing support the driver importing a virtio-gpu dma-buf
-> can send the buffer scatter list to the host.  So both virtio-gpu and
-> the other device would actually access the same guest pages, but they
-> are not aware that the buffer is shared between devices.
-
-With the uuid approach, how should this case be handled? Should it be
-equivalent to exporting and importing the buffer which was created
-first? Should the spec say it's undefined behavior that might work as
-expected but might not, depending on the device implementation? Does
-the spec even need to say anything about it?
-
-> With buffer sharing virtio-gpu would attach a uuid to the dma-buf, and
-> the importing driver can send the uuid (instead of the scatter list) to
-> the host.  So the device can simply lookup the buffer on the host side
-> and use it directly.  Another advantage is that this enables some more
-> use cases like sharing buffers between devices which are not backed by
-> guest ram.
-
-Not just buffers not backed by guest ram, but things like fences. I
-would suggest the uuids represent 'exported resources' rather than
-'exported buffers'.
-
-> Well, security-wise you want have buffer identifiers which can't be
-> easily guessed.  And guessing uuid is pretty much impossible due to
-> the namespace being huge.
-
-I guess this depends on what you're passing around within the guest.
-If you're passing around the raw uuids, sure. But I would argue it's
-better to pass around unforgeable identifiers (e.g. fds), and to
-restrict the uuids to when talking directly to the virtio transport.
-But I guess there are likely situations where that's not possible.
-
--David
 
