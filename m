@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A40BFC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE59C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:18:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 700772173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:18:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9766621655
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:18:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EZldoJaX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 700772173E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f/gEKCk/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9766621655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOMW-0007jh-VO
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:18:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59138)
+	id 1ifOMi-000858-Bc
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:18:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59827)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNy8-00035s-8Z
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:25 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyA-0003Bb-UN
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNy5-0006DF-QY
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:23 -0500
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:43663)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNy9-0006Kq-Jw
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:26 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:40421)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNy5-0006BZ-IW
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:21 -0500
-Received: by mail-wr1-x431.google.com with SMTP id d16so2588057wre.10
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:21 -0800 (PST)
+ id 1ifNy9-0006J9-B9
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:25 -0500
+Received: by mail-wm1-x334.google.com with SMTP id t14so2370700wmi.5
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bcmVb7Mje1ZL+Y95A04ro5C6kr06ir0SgoJ9qeN6MxI=;
- b=EZldoJaXud6IzCjmvTJcIAuLde7cPdO/I8szhhoxJ/KrQElHPOHPY8b14oPo8mv5Ug
- LLdqy1/9RuS6lYzGKz/lFO5JFUP0MP/F8yvfoxi0mqNMNzltkR3Zz0EQKXGhusODgK3t
- kIdI1O35ZvGiYm8pZP5Tmz4CB3ZlfXYK66jhTVyw9mFmuaZFbn65z4SEuhm73raBxDIQ
- rWdYNF3JZKfcgLIXRr7Yse7LZdaOo46M71y9+BQOhegU3lm1gvWsltsQ8Pp32oUedFzr
- mdyNDj/i1sGpYLiF2iB8uHhkhymHPUO/5L+uHEjJ9R3MmR6CbPZETdLITTiTYTaJkPsv
- aYFQ==
+ bh=xSwt9wbl5F36WhAyO5q9Z+UABxMxg8aLFFIonQFV0ZI=;
+ b=f/gEKCk/XUaOSVmfmoV0SzT0dGhPIm6K4QJWBLAQJqvirUvI/6zb/eVfSsdiGcuZE8
+ RxeUNnE5FND13W9sZqL7YJZQVn9x9xzqcp7cLr+BZfbPGqHx4x8mQPMK3BEHFt/F8BML
+ fJwbV6nVuVJSKybPTAFI10TaiqBBv1YSzzF8UxoUYViD3kFUiLI5RAflnI1I0kSXv9f2
+ mOcIfCHpvn/3ZEvikwB0ixqlJZ1//OY4MpmEOcBsNi2PPgmR5f+TdaDE13ajVWAVmI+O
+ C+ukl54otyAMjpUGhf2hz7i9VZpO2zbxc5YlYWkjVGlYW4Cne13eZ3dmzIxIEobUUvob
+ ZHDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=bcmVb7Mje1ZL+Y95A04ro5C6kr06ir0SgoJ9qeN6MxI=;
- b=A/DBST8iZ3MnEAVZlZrctQ4c1W/tlwKMGM31IREARFl6K+2wBlAaFWF57NgaWfh27I
- z2LktrbnetN450Vq/mu6iva4p4hNOksVmyc9ttFCag5Txv3r9O9kyan4A7UgsSVCIxrx
- KycRfE6mpmN3VetlM1FT5bbgNg5+OxKiLRV5MO5IqfVk1wKOWf07ZWygiyyQ6A9ndw1m
- 8B0Fi3PsqMQKwpMW9P15NqcpS6gqmMU1rtU9+uDW+79XHTJwjPTvxHH2IoFqNORHqEs8
- 4RXbJ7MaIvQ2eGowyS1Nz/PmTvSnFk4Y124libt43g0HtGVpdQvlFXK9BeEjtbDkJPUM
- U6jQ==
-X-Gm-Message-State: APjAAAXtjoP0yFqrzZZv80dcToC6qFlQ1v/sAQvx8WhLfLEPing/YuuV
- F1ch7v2Hpm3uaUXwYZLLAkowT4R9
-X-Google-Smtp-Source: APXvYqzuXxo73lub0/SJYS+1megy59pIpXLg3j5KsbJp8+N4Ojx0IaUnBkivAmwlcsjPikagUgRQnQ==
-X-Received: by 2002:adf:a141:: with SMTP id r1mr6256141wrr.285.1576155200323; 
- Thu, 12 Dec 2019 04:53:20 -0800 (PST)
+ bh=xSwt9wbl5F36WhAyO5q9Z+UABxMxg8aLFFIonQFV0ZI=;
+ b=t0Bbci1FUMM9qin8A3DwMDSrBEyznIDOcPlbaCqnL2YI2NRXKzPRdlrUe9g2aJoREK
+ PIK2nZyN82OFbEAetbBWkVXzOYU5JfKW06zwjZW3bxAfqhFZTBysBSazSf6HLwbFIB1M
+ kp5GBeWUtlGxHnH6Q/v+c5GTkEtwBhdWGFaeChpa+8hLNcI7DYyPjiqtXhi7lrM5ODAS
+ CoCx/kmp6hBxgyJB7/gxrdFDji7xcqiFAmnnGQFTiGDOZsx7y11kduas6UjXhIfQfvXT
+ LUC9w2+7MuPcJNnfLs4rJ8yqX6k4xH8Jaui9GPrxxdFsRK29nsTyBmT8qJ+VGvB+WmOR
+ TH+Q==
+X-Gm-Message-State: APjAAAW97CpIRbp6o/d0RDxtuJRDsXIGayquPNuc/vPCoPJTaz9reviC
+ Pfdih17JR+a0rZRwkrBzOQUB4YOl
+X-Google-Smtp-Source: APXvYqwq1rWduoMDzxs2tDeA/WdQtc6xWxSpF3ILrUq2A2zDZVjLoOlbjoX8RbDNFLZzLPxcHzllZA==
+X-Received: by 2002:a1c:48c1:: with SMTP id v184mr6703342wma.5.1576155204141; 
+ Thu, 12 Dec 2019 04:53:24 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.19
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.23
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:53:19 -0800 (PST)
+ Thu, 12 Dec 2019 04:53:23 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 022/132] meson: add msi generation
-Date: Thu, 12 Dec 2019 13:51:06 +0100
-Message-Id: <1576155176-2464-23-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 026/132] meson: add virtfs-proxy-helper
+Date: Thu, 12 Dec 2019 13:51:10 +0100
+Message-Id: <1576155176-2464-27-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::431
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,95 +103,99 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                  | 18 ------------------
- qga/meson.build           | 25 +++++++++++++++++++++++++
- qga/vss-win32/meson.build |  2 +-
- 3 files changed, 26 insertions(+), 19 deletions(-)
+ Makefile          | 3 ---
+ configure         | 6 ++++--
+ fsdev/meson.build | 4 ++++
+ meson.build       | 6 ++++++
+ 4 files changed, 14 insertions(+), 5 deletions(-)
+ create mode 100644 fsdev/meson.build
 
 diff --git a/Makefile b/Makefile
-index 4f20bf7..328b3c3 100644
+index 6a888b0..9110115 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -394,23 +394,6 @@ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
- qemu-keymap$(EXESUF): LIBS += $(XKBCOMMON_LIBS)
- qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
+@@ -372,9 +372,6 @@ qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io
+ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
  
--ifdef QEMU_GA_MSI_ENABLED
--QEMU_GA_MSI=qemu-ga-$(ARCH).msi
+-fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal.o fsdev/9p-iov-marshal.o $(COMMON_LDADDS)
+-fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
 -
--msi: $(QEMU_GA_MSI)
--
--$(QEMU_GA_MSI): qga/qemu-ga.exe $(QGA_VSS_PROVIDER)
--
--$(QEMU_GA_MSI): config-host.mak
--
--$(QEMU_GA_MSI):  $(SRC_PATH)/qga/installer/qemu-ga.wxs
--	$(call quiet-command,QEMU_GA_VERSION="$(QEMU_GA_VERSION)" QEMU_GA_MANUFACTURER="$(QEMU_GA_MANUFACTURER)" QEMU_GA_DISTRO="$(QEMU_GA_DISTRO)" BUILD_DIR="$(BUILD_DIR)" \
--	wixl -o $@ $(QEMU_GA_MSI_ARCH) $(QEMU_GA_MSI_WITH_VSS) $(QEMU_GA_MSI_MINGW_DLL_PATH) $<,"WIXL","$@")
--else
--msi:
--	@echo "MSI build not configured or dependency resolution failed (reconfigure with --enable-guest-agent-msi option)"
--endif
--
- ifneq ($(EXESUF),)
- .PHONY: qga/qemu-ga
- qga/qemu-ga: qga/qemu-ga$(EXESUF) $(QGA_VSS_PROVIDER) $(QEMU_GA_MSI)
-@@ -425,7 +408,6 @@ clean: recurse-clean
- # avoid old build problems by removing potentially incorrect old files
- 	rm -f config.mak op-i386.h opc-i386.h gen-op-i386.h op-arm.h opc-arm.h gen-op-arm.h
- 	rm -f qemu-options.def
--	rm -f *.msi
- 	find . \( -name '*.so' -o -name '*.dll' -o -name '*.mo' -o -name '*.[oda]' \) -type f \
- 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
- 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
-diff --git a/qga/meson.build b/qga/meson.build
-index f0ec8cf..e0e5344 100644
---- a/qga/meson.build
-+++ b/qga/meson.build
-@@ -45,5 +45,30 @@ qga = executable('qemu-ga', qga_ss.sources(),
- if host_machine.system() == 'windows'
-   if 'CONFIG_QGA_VSS' in config_host
-     subdir('vss-win32')
-+  else
-+    gen_tlb = []
-+  endif
-+
-+  wixl = find_program('wixl', required: false)
-+  if wixl.found()
-+    deps = [gen_tlb, qga]
-+    if 'QEMU_GA_MSI_WITH_VSS' in config_host
-+      deps += qga_vss
-+    endif
-+    qga_msi = custom_target('QGA MSI',
-+                            input: files('installer/qemu-ga.wxs'),
-+                            output: 'qemu-ga-@0@.msi'.format(config_host['ARCH']),
-+                            depends: deps,
-+                            command: [
-+                              'QEMU_GA_VERSION=' + config_host['QEMU_GA_VERSION'],
-+                              'QEMU_GA_MANUFACTURER=' + config_host['QEMU_GA_MANUFACTURER'],
-+                              'QEMU_GA_DISTRO=' + config_host['QEMU_GA_DISTRO'],
-+                              'BUILD_DIR=' + meson.build_root(),
-+                              wixl, '-o', '@OUTPUT0@', '@INPUT0@',
-+                              config_host['QEMU_GA_MSI_ARCH'].split(),
-+                              config_host['QEMU_GA_MSI_WITH_VSS'].split(),
-+                              config_host['QEMU_GA_MSI_MINGW_DLL_PATH'].split(),
-+                            ])
-+    alias_target('msi', qga_msi)
-   endif
+ scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ ifdef CONFIG_MPATH
+ scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
+diff --git a/configure b/configure
+index 0b294bb..ca91a76 100755
+--- a/configure
++++ b/configure
+@@ -3969,6 +3969,7 @@ fi
+ ##########################################
+ # attr probe
+ 
++libattr_libs=
+ if test "$attr" != "no" ; then
+   cat > $TMPC <<EOF
+ #include <stdio.h>
+@@ -3985,7 +3986,8 @@ EOF
+   # Older distros have <attr/xattr.h>, and need -lattr:
+   elif compile_prog "-DCONFIG_LIBATTR" "-lattr" ; then
+     attr=yes
+-    LIBS="-lattr $LIBS"
++    libattr_libs="-lattr"
++    LIBS="$libattr_libs $LIBS"
+     libattr=yes
+   else
+     if test "$attr" = "yes" ; then
+@@ -6050,7 +6052,6 @@ if test "$softmmu" = yes ; then
+   if test "$linux" = yes; then
+     if test "$virtfs" != no && test "$cap_ng" = yes && test "$attr" = yes ; then
+       virtfs=yes
+-      tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
+     else
+       if test "$virtfs" = yes; then
+         error_exit "VirtFS requires libcap devel and libattr devel"
+@@ -6833,6 +6834,7 @@ if test "$linux_aio" = "yes" ; then
+ fi
+ if test "$attr" = "yes" ; then
+   echo "CONFIG_ATTR=y" >> $config_host_mak
++  echo "LIBATTR_LIBS=$libattr_libs" >> $config_host_mak
+ fi
+ if test "$libattr" = "yes" ; then
+   echo "CONFIG_LIBATTR=y" >> $config_host_mak
+diff --git a/fsdev/meson.build b/fsdev/meson.build
+new file mode 100644
+index 0000000..eee8507
+--- /dev/null
++++ b/fsdev/meson.build
+@@ -0,0 +1,4 @@
++if have_tools and libattr.found() and libcap_ng.found() and 'CONFIG_VIRTFS' in config_host
++  executable('virtfs-proxy-helper', files('virtfs-proxy-helper.c', '9p-marshal.c', '9p-iov-marshal.c'),
++             dependencies: [qemuutil, libattr, libcap_ng])
++endif
+diff --git a/meson.build b/meson.build
+index e5b0e31..b53c2dc 100644
+--- a/meson.build
++++ b/meson.build
+@@ -56,6 +56,10 @@ if 'CONFIG_GNUTLS' in config_host
  endif
-diff --git a/qga/vss-win32/meson.build b/qga/vss-win32/meson.build
-index a7c865f..147a680 100644
---- a/qga/vss-win32/meson.build
-+++ b/qga/vss-win32/meson.build
-@@ -2,7 +2,7 @@ if add_languages('cpp', required: false)
-   glib_static = dependency('glib-2.0', static: true)
-   link_args = cc.get_supported_link_arguments(['-fstack-protector-all', '-fstack-protector-strong', '-Wl,--add-stdcall-alias', '-Wl,--enable-stdcall-fixup'])
+ pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
+                             link_args: config_host['PIXMAN_LIBS'].split())
++libattr = declare_dependency()
++if 'CONFIG_ATTR' in config_host
++  libattr = declare_dependency(link_args: config_host['LIBATTR_LIBS'].split())
++endif
+ libcap_ng = declare_dependency()
+ if 'CONFIG_LIBCAP_NG' in config_host
+   libcap_ng = declare_dependency(link_args: config_host['LIBCAP_NG_LIBS'].split())
+@@ -220,6 +224,8 @@ libqemuutil = static_library('qemuutil',
+ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: version_res)
  
--  shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
-+  qga_vss = shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
-                 name_prefix: '',
-                 cpp_args: ['-Wno-unknown-pragmas', '-Wno-delete-non-virtual-dtor', '-Wno-non-virtual-dtor'],
-                 link_args: link_args,
++subdir('fsdev')
++
+ # Other build targets
+ if 'CONFIG_GUEST_AGENT' in config_host
+   subdir('qga')
 -- 
 1.8.3.1
 
