@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C90C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0934C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:39:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E44342077B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:39:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E9AD2077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:39:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bha/P4oH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E44342077B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DqKNEYE+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E9AD2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOgN-0002JE-Ia
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:39:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36619)
+	id 1ifOgj-0002hE-AK
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:39:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38440)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyb-0003tG-Kt
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:54 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyl-00047s-51
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNya-0007FF-5R
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:53 -0500
-Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:55228)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyj-0007Y4-UW
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:02 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39313)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNyZ-0007DO-Tx
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:52 -0500
-Received: by mail-wm1-x32a.google.com with SMTP id b11so2236948wmj.4
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:51 -0800 (PST)
+ id 1ifNyj-0007WI-Nh
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:01 -0500
+Received: by mail-wr1-x442.google.com with SMTP id y11so2614572wrt.6
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:54:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Atnpcgx8oxW2ZL46UP1c38Ecu167rif8vvUIatLdPCk=;
- b=bha/P4oHOphE9TTm71AWhMgERPcecb1WRO7UkLXAXAlHecA3CsOfWevmYho23B6Jkb
- cj+MvLT0CrGS1Fz5havNVecunO79JIx+PifuGvr0FfSzw9lIjoPusNXzGQNZnr6eiJ3l
- Ad/bdHRYYDCwiJqDdJagO133ZmHZcZOLyVQqIQho1FQfyg/xjMuzmCBMFnNfz7SWKLi/
- 6dm94fffQVpGytSJntbfR9/3RUXnte+zLkvUkRjr9Y14uKWOFQEvhF9Yn0TMOQAfnh3e
- 5cZjJigBH4WCS1KHYQ6F7Zzkz1UJV72jRwEm3sb1jwNJhimsc26P9jVZXTmIMJAxIXJW
- qtew==
+ bh=syJqPmkvJMmzIU8/98Xe13xx4bSEe0J6m0yTSrxfhOA=;
+ b=DqKNEYE+2yxjHvOZAU+E8QKL5yav38LW2Q1/rO7yONRFFHdui5Gi2ER9E8kDy8ambK
+ DSmKPSdzYl/iXUya2Zo5ydqDqg8yDyyHJS6E+mi/RUrcq97cfOcssP6vwoCvdPDIN59A
+ g9x9HR/yap8+l4nodDFWc3uA4OxHeLxJ9ovW3f+yYBDIZH/lVOEjT5gGjk6DshIUoTAL
+ 0W1s4oTDfDFoVHppHnvosaLQ+UmZe2dXmozER1tPI2A/Cc2hLuWazqKK4p/Dcm8o+jLn
+ 8EIaacLJzotT/LSumpIXcmUBm/Rl8icDqYJLDqMOog/rYyfzMbL5AcGnUXmMOMZw0NAZ
+ HpWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Atnpcgx8oxW2ZL46UP1c38Ecu167rif8vvUIatLdPCk=;
- b=TSoaeqF8vpGWr/Yx/Onl4g/XGClkhQIZ3+1R4hfk/dBtTudP9gPKqKAbA8AuYVzJa1
- O0sV2cItQCs4n9i5k+hzS/Q3hNyRyjgPEc3udS/dfC/em++A6Xr9EICTEKUEIYBAFda3
- gziscTn4gza9akHajZ7nmZMieuqw0G4ArsDRqN0OIy4mgWG/G3kuqk8/VztCJ+KFZC/s
- 9Cf5c+brGJewlC8/LLTwNH6xKgI/wFd9/7JvrVtyV1wC55pz8Lp92UXR2b9mnTkdDNlj
- ROf9Jc1fP3gRAj4+LrdPDRYHRlDX6Zxz8qTicQeoDpTYgahTzg+RxhJbnrRSgehNwI30
- RP1g==
-X-Gm-Message-State: APjAAAXSy0oxuiY2rXK3/wl17Yty3OYhTgRsz1Army5fGdL1AKwTCLD8
- b9wWtkg+BykAUsjHkJR5FYrZrmc7
-X-Google-Smtp-Source: APXvYqy9gc3UpLA5JB+Nc22BUEn+VMijDhB/wWQpJm15swGaEMN9y0xnMpoAqIiBuHjpPxV7HWNkMg==
-X-Received: by 2002:a1c:286:: with SMTP id 128mr6206268wmc.176.1576155230652; 
- Thu, 12 Dec 2019 04:53:50 -0800 (PST)
+ bh=syJqPmkvJMmzIU8/98Xe13xx4bSEe0J6m0yTSrxfhOA=;
+ b=iQuDXgmcww7kRu6EMuzHxR7SjimyY6U0rLfysO3xoD5uKKwXtsXDkyNUjAoJP6s19s
+ 04yHv4t9JIaA0hKB6Ogy7Bu7XoCz1RdYcOzRPL5wFOQd/hSW2yxuHh4gslm4QRIGPRby
+ HAou/H9DEx/6qta1kprWlMClJDtIJDk3qAx4RCXPEWh9qcYehU9BMfWw+kyjvG90fxgj
+ VMmx5wbu3AaPyfhSYTgHiVIiyIPthsqjERBqLZFg1euC8MiMhTLFrRsqHOeNYd2TVdNQ
+ iNH3UIGJ/pYuwmRQAGVQUqjQYyiJOAHmA9eLDQmwQJx6CQCixdeWA4/xt0TmQbkg5CD+
+ H+fw==
+X-Gm-Message-State: APjAAAXf4kpeGXC+roKeeiRCn4Nn8Rmtv3PnRIPDWiV+YHfrWLM8Lu9V
+ 8CXiBF2Iiulcio5yN2kXTP5OvjZ7
+X-Google-Smtp-Source: APXvYqzaRwkMRKT2//tDyuphSKlcbksWqEXrm5cWTb6rk4WYCs01cW6KSB48ZT+X0rysGthlMx9wmA==
+X-Received: by 2002:adf:90e1:: with SMTP id i88mr5873056wri.95.1576155240488; 
+ Thu, 12 Dec 2019 04:54:00 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.49
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.59
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:53:49 -0800 (PST)
+ Thu, 12 Dec 2019 04:53:59 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 053/132] meson: convert dump/
-Date: Thu, 12 Dec 2019 13:51:37 +0100
-Message-Id: <1576155176-2464-54-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 062/132] meson: convert qapi-specific to meson
+Date: Thu, 12 Dec 2019 13:51:46 +0100
+Message-Id: <1576155176-2464-63-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32a
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,121 +102,80 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- Makefile.objs      | 3 +--
- Makefile.target    | 1 -
- configure          | 4 ++++
- dump/Makefile.objs | 3 ---
- dump/meson.build   | 4 ++++
- meson.build        | 9 +++++++++
- 6 files changed, 18 insertions(+), 6 deletions(-)
- delete mode 100644 dump/Makefile.objs
- create mode 100644 dump/meson.build
+ Makefile.target    |  1 -
+ qapi/Makefile.objs | 11 -----------
+ qapi/meson.build   | 21 +++++++++++++++++++--
+ 3 files changed, 19 insertions(+), 14 deletions(-)
+ delete mode 100644 qapi/Makefile.objs
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 4c7ae48..1b1eff5 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -35,8 +35,7 @@ qom-obj-y = qom/libqom.fa
- # single QEMU executable should support all CPUs and machines.
- 
- ifeq ($(CONFIG_SOFTMMU),y)
--common-obj-y = dump/
--common-obj-y += monitor/
-+common-obj-y = monitor/
- common-obj-y += net/
- common-obj-$(CONFIG_LINUX) += fsdev/
- common-obj-y += migration/
 diff --git a/Makefile.target b/Makefile.target
-index bad50ce..569f2d9 100644
+index e025246..c2fcb22 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -153,7 +153,6 @@ endif #CONFIG_BSD_USER
- ifdef CONFIG_SOFTMMU
+@@ -154,7 +154,6 @@ ifdef CONFIG_SOFTMMU
  obj-y += arch_init.o cpus.o gdbstub.o balloon.o ioport.o
  obj-y += qtest.o
--obj-y += dump/
  obj-y += hw/
- obj-y += monitor/
- obj-y += qapi/
-diff --git a/configure b/configure
-index c4b50a7..8e55f3a 100755
---- a/configure
-+++ b/configure
-@@ -2351,6 +2351,7 @@ int main(void) { lzo_version(); return 0; }
- EOF
-     if compile_prog "" "-llzo2" ; then
-         libs_softmmu="$libs_softmmu -llzo2"
-+        lzo_libs="-llzo2"
-         lzo="yes"
-     else
-         if test "$lzo" = "yes"; then
-@@ -2370,6 +2371,7 @@ int main(void) { snappy_max_compressed_length(4096); return 0; }
- EOF
-     if compile_prog "" "-lsnappy" ; then
-         libs_softmmu="$libs_softmmu -lsnappy"
-+        snappy_libs='-lsnappy'
-         snappy="yes"
-     else
-         if test "$snappy" = "yes"; then
-@@ -6976,10 +6978,12 @@ fi
- 
- if test "$lzo" = "yes" ; then
-   echo "CONFIG_LZO=y" >> $config_host_mak
-+  echo "LZO_LIBS=$lzo_libs" >> $config_host_mak
- fi
- 
- if test "$snappy" = "yes" ; then
-   echo "CONFIG_SNAPPY=y" >> $config_host_mak
-+  echo "SNAPPY_LIBS=$snappy_libs" >> $config_host_mak
- fi
- 
- if test "$bzip2" = "yes" ; then
-diff --git a/dump/Makefile.objs b/dump/Makefile.objs
+-obj-y += qapi/
+ obj-y += memory.o
+ obj-y += memory_mapping.o
+ LIBS := $(libs_softmmu) $(LIBS)
+diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
 deleted file mode 100644
-index d2a5db3..0000000
---- a/dump/Makefile.objs
+index 10ca4f6..0000000
+--- a/qapi/Makefile.objs
 +++ /dev/null
-@@ -1,3 +0,0 @@
--obj-y += dump.o
--common-obj-y += dump-hmp-cmds.o
--obj-$(TARGET_X86_64) += win_dump.o
-diff --git a/dump/meson.build b/dump/meson.build
-new file mode 100644
-index 0000000..2eff29c
---- /dev/null
-+++ b/dump/meson.build
-@@ -0,0 +1,4 @@
-+softmmu_ss.add(files('dump-hmp-cmds.c'))
+@@ -1,11 +0,0 @@
+-QAPI_TARGET_MODULES = machine-target misc-target
+-
+-obj-y = qapi-introspect.o
+-obj-y += $(QAPI_TARGET_MODULES:%=qapi-types-%.o)
+-obj-y += qapi-types.o
+-obj-y += $(QAPI_TARGET_MODULES:%=qapi-visit-%.o)
+-obj-y += qapi-visit.o
+-obj-y += $(QAPI_TARGET_MODULES:%=qapi-events-%.o)
+-obj-y += qapi-events.o
+-obj-y += $(QAPI_TARGET_MODULES:%=qapi-commands-%.o)
+-obj-y += qapi-commands.o
+diff --git a/qapi/meson.build b/qapi/meson.build
+index 8431f26..4a335d9 100644
+--- a/qapi/meson.build
++++ b/qapi/meson.build
+@@ -67,11 +67,17 @@ foreach module : qapi_common_modules + qapi_target_modules
+   endif
+ endforeach
+ 
+-qapi_all_outputs += [
++qapi_specific_outputs = [
+   'qapi-introspect.c', 'qapi-introspect.h',
+-  'qapi-doc.texi'
++  'qapi-types.c', 'qapi-types.h',
++  'qapi-visit.c', 'qapi-visit.h',
++  'qapi-events.c', 'qapi-events.h',
++  'qapi-commands.c', 'qapi-commands.h',
+ ]
+ 
++qapi_all_outputs += qapi_specific_outputs
++qapi_all_outputs += 'qapi-doc.texi'
 +
-+specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files('dump.c'), snappy, lzo])
-+specific_ss.add(when: ['CONFIG_SOFTMMU', 'TARGET_X86_64'], if_true: files('win_dump.c'))
-diff --git a/meson.build b/meson.build
-index cb60aac..804a9bc 100644
---- a/meson.build
-+++ b/meson.build
-@@ -265,6 +265,14 @@ if 'CONFIG_FDT' in config_host
-   fdt = declare_dependency(compile_args: config_host['FDT_CFLAGS'].split(),
-                            link_args: config_host['FDT_LIBS'].split())
- endif
-+snappy = declare_dependency()
-+if 'CONFIG_SNAPPY' in config_host
-+  snappy = declare_dependency(link_args: config_host['SNAPPY_LIBS'].split())
-+endif
-+lzo = declare_dependency()
-+if 'CONFIG_LZO' in config_host
-+  lzo = declare_dependency(link_args: config_host['LZO_LIBS'].split())
-+endif
- 
- create_config = find_program('scripts/create_config')
- minikconf = find_program('scripts/minikconf.py')
-@@ -546,6 +554,7 @@ subdir('audio')
- subdir('io')
- subdir('chardev')
- subdir('fsdev')
-+subdir('dump')
- 
- block_ss.add(files(
-   'block.c',
+ qapi_files = custom_target('QAPI files',
+   output: qapi_all_outputs,
+   input: [ files('qapi-schema.json') ],
+@@ -87,3 +93,14 @@ foreach output : qapi_util_outputs
+   endif
+   i = i + 1
+ endforeach
++
++i = 0
++foreach output : qapi_all_outputs
++  if output in qapi_specific_outputs
++    specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: qapi_files[i])
++  endif
++  if output.endswith('-target.c')
++    specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: qapi_files[i])
++  endif
++  i = i + 1
++endforeach
 -- 
 1.8.3.1
 
