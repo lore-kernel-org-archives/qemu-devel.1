@@ -7,62 +7,61 @@ X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC544C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 10:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB9BC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 10:37:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7084214D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 10:36:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B80C720663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 10:37:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F+NsCeLb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7084214D8
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e5A6xYQg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B80C720663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifLpd-0004Si-Kp
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 05:36:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59954)
+	id 1ifLq8-0005E6-UV
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 05:37:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1ifLoc-0003xk-RE
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 05:35:28 -0500
+ (envelope-from <david@redhat.com>) id 1ifLpN-0004N0-WF
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 05:36:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1ifLoa-0006kf-EK
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 05:35:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32005
+ (envelope-from <david@redhat.com>) id 1ifLpM-000079-14
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 05:36:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36844
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1ifLoa-0006jv-9p
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 05:35:24 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1ifLpL-0008WB-RF
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 05:36:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576146923;
+ s=mimecast20190719; t=1576146971;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=4TdKNesfJudrtT6c6aoM46for0/fSf2FOHMNzPnN50Y=;
- b=F+NsCeLbUFVytafoJN57QffDHGBvCvwQ4t9e2rHcNcV5/AjlaTP3Wou5WtCoqPRjbybhDf
- zP0DoS+nmKJUZEJ3J+zglg2wJp67L/LZjACz4N7LSYXTlSAaUVCBLo+ny9IRfya4LXN5Qv
- V4ef+Vw6UXeF9u8eFY76eY16ZKSgyOw=
+ bh=QDVcUGSfFSQ+Ejtfpj0tIBHoFkj2Cmo/Beilqm/X4Jw=;
+ b=e5A6xYQg6NEmDN7rOMMiC2zly6AtcO5EAWJe63tqlD0kNhmNW6Bs2Lpi38En/rRN6VaSHP
+ XYH5zB8WMWZlpX1q/ZlClAGG7gSfwZHB2e8F63vDWz/LKwjch3CndM+u4TrfIZsoxjIo9k
+ QEK5tHCL7eVUVV0u2uYrZv7UC0VlJsM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-ErX1LqpeNR6uPZqZ1uoS7g-1; Thu, 12 Dec 2019 05:35:20 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-70-ulBHgaEROba-giyY70TnCQ-1; Thu, 12 Dec 2019 05:36:07 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E3148017DF;
- Thu, 12 Dec 2019 10:35:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8057B800C75;
+ Thu, 12 Dec 2019 10:36:06 +0000 (UTC)
 Received: from [10.36.116.183] (ovpn-116-183.ams2.redhat.com [10.36.116.183])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E4646013D;
- Thu, 12 Dec 2019 10:35:18 +0000 (UTC)
-Subject: Re: [PATCH 2/2] target/s390x: Implement LOAD/STORE TO REAL ADDRESS
- inline
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C1BBB60BF1;
+ Thu, 12 Dec 2019 10:36:05 +0000 (UTC)
+Subject: Re: [PATCH 09/28] target/s390x: Include tcg.h in mem_helper.c
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20191211203614.15611-1-richard.henderson@linaro.org>
- <20191211203614.15611-3-richard.henderson@linaro.org>
+References: <20191212040039.26546-1-richard.henderson@linaro.org>
+ <20191212040039.26546-10-richard.henderson@linaro.org>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -108,21 +107,21 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <032873c2-9f04-2c9d-e74d-2625d5e1948d@redhat.com>
-Date: Thu, 12 Dec 2019 11:35:17 +0100
+Message-ID: <2cc80899-f315-24b1-a040-35e78ba35a18@redhat.com>
+Date: Thu, 12 Dec 2019 11:36:05 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191211203614.15611-3-richard.henderson@linaro.org>
+In-Reply-To: <20191212040039.26546-10-richard.henderson@linaro.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: ErX1LqpeNR6uPZqZ1uoS7g-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: ulBHgaEROba-giyY70TnCQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,144 +133,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11.12.19 21:36, Richard Henderson wrote:
-> These are trivially done by performing a memory operation
-> with the correct mmu_idx.  The only tricky part is using
-> get_address directly in order to get the address wrapped;
-> we cannot use la2 because of the format.
+On 12.12.19 05:00, Richard Henderson wrote:
+> Code movement in an upcoming patch will show that this file
+> was implicitly depending on tcg.h being included indirectly.
 > 
+> Cc: David Hildenbrand <david@redhat.com>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/s390x/helper.h      |  4 ----
->  target/s390x/mem_helper.c  | 22 ----------------------
->  target/s390x/translate.c   | 21 ++++-----------------
->  target/s390x/insn-data.def |  8 ++++----
->  4 files changed, 8 insertions(+), 47 deletions(-)
+>  target/s390x/mem_helper.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/target/s390x/helper.h b/target/s390x/helper.h
-> index f5b4bb6a31..b5813c2ac2 100644
-> --- a/target/s390x/helper.h
-> +++ b/target/s390x/helper.h
-> @@ -324,10 +324,6 @@ DEF_HELPER_FLAGS_4(ipte, TCG_CALL_NO_RWG, void, env, i64, i64, i32)
->  DEF_HELPER_FLAGS_1(ptlb, TCG_CALL_NO_RWG, void, env)
->  DEF_HELPER_FLAGS_1(purge, TCG_CALL_NO_RWG, void, env)
->  DEF_HELPER_2(lra, i64, env, i64)
-> -DEF_HELPER_FLAGS_2(lura, TCG_CALL_NO_WG, i64, env, i64)
-> -DEF_HELPER_FLAGS_2(lurag, TCG_CALL_NO_WG, i64, env, i64)
-> -DEF_HELPER_FLAGS_3(stura, TCG_CALL_NO_WG, void, env, i64, i64)
-> -DEF_HELPER_FLAGS_3(sturg, TCG_CALL_NO_WG, void, env, i64, i64)
->  DEF_HELPER_1(per_check_exception, void, env)
->  DEF_HELPER_FLAGS_3(per_branch, TCG_CALL_NO_RWG, void, env, i64, i64)
->  DEF_HELPER_FLAGS_2(per_ifetch, TCG_CALL_NO_RWG, void, env, i64)
 > diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-> index b1b3f406c9..2921419c27 100644
+> index 2325767f17..57ce17c252 100644
 > --- a/target/s390x/mem_helper.c
 > +++ b/target/s390x/mem_helper.c
-> @@ -2329,28 +2329,6 @@ void HELPER(purge)(CPUS390XState *env)
->      tlb_flush_all_cpus_synced(env_cpu(env));
->  }
+> @@ -27,6 +27,7 @@
+>  #include "exec/cpu_ldst.h"
+>  #include "qemu/int128.h"
+>  #include "qemu/atomic128.h"
+> +#include "tcg.h"
 >  
-> -/* load using real address */
-> -uint64_t HELPER(lura)(CPUS390XState *env, uint64_t addr)
-> -{
-> -    return cpu_ldl_real_ra(env, wrap_address(env, addr), GETPC());
-> -}
-> -
-> -uint64_t HELPER(lurag)(CPUS390XState *env, uint64_t addr)
-> -{
-> -    return cpu_ldq_real_ra(env, wrap_address(env, addr), GETPC());
-> -}
-> -
-> -/* store using real address */
-> -void HELPER(stura)(CPUS390XState *env, uint64_t addr, uint64_t v1)
-> -{
-> -    cpu_stl_real_ra(env, wrap_address(env, addr), (uint32_t)v1, GETPC());
-> -}
-> -
-> -void HELPER(sturg)(CPUS390XState *env, uint64_t addr, uint64_t v1)
-> -{
-> -    cpu_stq_real_ra(env, wrap_address(env, addr), v1, GETPC());
-> -}
-> -
->  /* load real address */
->  uint64_t HELPER(lra)(CPUS390XState *env, uint64_t addr)
->  {
-> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-> index ef751fefa4..4292bb0dd0 100644
-> --- a/target/s390x/translate.c
-> +++ b/target/s390x/translate.c
-> @@ -3272,13 +3272,8 @@ static DisasJumpType op_lpq(DisasContext *s, DisasOps *o)
->  #ifndef CONFIG_USER_ONLY
->  static DisasJumpType op_lura(DisasContext *s, DisasOps *o)
->  {
-> -    gen_helper_lura(o->out, cpu_env, o->in2);
-> -    return DISAS_NEXT;
-> -}
-> -
-> -static DisasJumpType op_lurag(DisasContext *s, DisasOps *o)
-> -{
-> -    gen_helper_lurag(o->out, cpu_env, o->in2);
-> +    o->addr1 = get_address(s, 0, get_field(s->fields, r2), 0);
-> +    tcg_gen_qemu_ld_tl(o->out, o->addr1, MMU_REAL_IDX, s->insn->data);
->      return DISAS_NEXT;
->  }
->  #endif
-> @@ -4506,17 +4501,9 @@ static DisasJumpType op_stnosm(DisasContext *s, DisasOps *o)
->  
->  static DisasJumpType op_stura(DisasContext *s, DisasOps *o)
->  {
-> -    gen_helper_stura(cpu_env, o->in2, o->in1);
-> -    if (s->base.tb->flags & FLAG_MASK_PER) {
-> -        update_psw_addr(s);
-> -        gen_helper_per_store_real(cpu_env);
-> -    }
-> -    return DISAS_NEXT;
-> -}
-> +    o->addr1 = get_address(s, 0, get_field(s->fields, r2), 0);
-> +    tcg_gen_qemu_st_tl(o->in1, o->addr1, MMU_REAL_IDX, s->insn->data);
->  
-> -static DisasJumpType op_sturg(DisasContext *s, DisasOps *o)
-> -{
-> -    gen_helper_sturg(cpu_env, o->in2, o->in1);
->      if (s->base.tb->flags & FLAG_MASK_PER) {
->          update_psw_addr(s);
->          gen_helper_per_store_real(cpu_env);
-> diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-> index 449eee1662..2bc77f0871 100644
-> --- a/target/s390x/insn-data.def
-> +++ b/target/s390x/insn-data.def
-> @@ -1275,8 +1275,8 @@
->      F(0xe313, LRAY,    RXY_a, LD,  0, a2, r1, 0, lra, 0, IF_PRIV)
->      F(0xe303, LRAG,    RXY_a, Z,   0, a2, r1, 0, lra, 0, IF_PRIV)
->  /* LOAD USING REAL ADDRESS */
-> -    F(0xb24b, LURA,    RRE,   Z,   0, r2, new, r1_32, lura, 0, IF_PRIV)
-> -    F(0xb905, LURAG,   RRE,   Z,   0, r2, r1, 0, lurag, 0, IF_PRIV)
-> +    E(0xb24b, LURA,    RRE,   Z,   0, 0, new, r1_32, lura, 0, MO_TEUL, IF_PRIV)
-> +    E(0xb905, LURAG,   RRE,   Z,   0, 0, r1, 0, lura, 0, MO_TEQ, IF_PRIV)
->  /* MOVE TO PRIMARY */
->      F(0xda00, MVCP,    SS_d,  Z,   la1, a2, 0, 0, mvcp, 0, IF_PRIV)
->  /* MOVE TO SECONDARY */
-> @@ -1329,8 +1329,8 @@
->  /* STORE THEN OR SYSTEM MASK */
->      F(0xad00, STOSM,   SI,    Z,   la1, 0, 0, 0, stnosm, 0, IF_PRIV)
->  /* STORE USING REAL ADDRESS */
-> -    F(0xb246, STURA,   RRE,   Z,   r1_o, r2_o, 0, 0, stura, 0, IF_PRIV)
-> -    F(0xb925, STURG,   RRE,   Z,   r1_o, r2_o, 0, 0, sturg, 0, IF_PRIV)
-> +    E(0xb246, STURA,   RRE,   Z,   r1_o, 0, 0, 0, stura, 0, MO_TEUL, IF_PRIV)
-> +    E(0xb925, STURG,   RRE,   Z,   r1_o, 0, 0, 0, stura, 0, MO_TEQ, IF_PRIV)
->  /* TEST BLOCK */
->      F(0xb22c, TB,      RRE,   Z,   0, r2_o, 0, 0, testblock, 0, IF_PRIV)
->  /* TEST PROTECTION */
+>  #if !defined(CONFIG_USER_ONLY)
+>  #include "hw/s390x/storage-keys.h"
 > 
-
-So the MMU_REAL indeed does pay off in various ways ;)
-
-Thanks!
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
 
