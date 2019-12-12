@@ -2,81 +2,82 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A03A2C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:06:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D654AC2D0C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:07:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73F6221556
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:06:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACE38214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:07:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GX7/Q8q7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73F6221556
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="idO6K8oE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE38214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifSrI-0004RO-EU
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 13:06:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36100)
+	id 1ifSrh-00056Q-3C
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 13:07:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ifRWx-0007g8-BH
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:41:36 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifSHB-0005GP-Ov
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 12:29:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ifRWv-0004ez-UB
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:41:35 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38409
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRWv-0004dV-Nj
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:41:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576168893;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QkQNskb1O+iFuDtfgWzUtEposL/3Dhc5iN8z7TMbZRo=;
- b=GX7/Q8q7Jh77qZKvWREV52X3IhzDhlFZCU62vqg/jC2eQ9qD4obFxxMdtzDiweJyYyRqO5
- Bux8ST2gwMegYdrV2UMiGlh9B/BlBUtPjRg71ZDQsF/Y2Wa2nB+gGhZRtUrQ7aRvJNHp+P
- Z759XuD4c75/T+V2MCB86gYZ+AHHZ3Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-EBYV0yZDP8yDFtSCDGBg0g-1; Thu, 12 Dec 2019 11:41:32 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D7EE1183E17
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:41:31 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-116-226.ams2.redhat.com
- [10.36.116.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6459660BE1;
- Thu, 12 Dec 2019 16:41:30 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org,
-	stefanha@redhat.com,
-	vgoyal@redhat.com
-Subject: [PATCH 091/104] libvhost-user: Fix some memtable remap cases
-Date: Thu, 12 Dec 2019 16:38:51 +0000
-Message-Id: <20191212163904.159893-92-dgilbert@redhat.com>
-In-Reply-To: <20191212163904.159893-1-dgilbert@redhat.com>
-References: <20191212163904.159893-1-dgilbert@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: EBYV0yZDP8yDFtSCDGBg0g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifSHA-0003zQ-L8
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 12:29:21 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34355)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1ifSHA-0003y5-EC
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 12:29:20 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t2so3661225wrr.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 09:29:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=HsUH1afV9fTj6bRLKgdy/ZlBd4ecIN0MQZ09ZAA7vd4=;
+ b=idO6K8oEq0v5KusymRCXOxJUpNKHvhxHyB8Wo/Dj/XNm7RxnV34dDqu/Ox8NiqpLbP
+ 7ocyutPEiJzZDZXua2vGHh2sZKKZPD1z8qYYoddzWTTAFxYRwcdid+Og06CPC+9eBWWT
+ jGElRk/Hz1mSfCFcsxjD7D+V1XILnewZM5XkZtYKE7JBBk1JW20Hub3SW18XOTKhj+BY
+ Y4HZFciQNYJIKGC+nRR/Fc5O+JKrn1M+lxHZy9g01gvExImQ0oAJRO8dgYiHWZbUkGbG
+ nJNSseqaUZVUTkGiVfao7BhAEH8jqAwi4jxpnq64q/QmSaKuGWWRPxAsg3BK7pAva2Dp
+ NDqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=HsUH1afV9fTj6bRLKgdy/ZlBd4ecIN0MQZ09ZAA7vd4=;
+ b=Sj0jOrG4Cnu/j/RPUwc+IQFOWgYnCayQyfZ+hNYlqpyHoEFi6O51EMgFjTG0hvMFMl
+ dcrVB0D1jH7WODr0SRhLEu5VVCRf4KgROYKPF9IG6xGNKh3L6ptbBbPDi5uM4IQ/ba6J
+ ILIXP1VjXWnaNFdETtNGyaR+8PctHDcJEeYa75jG0IGU7FjZW3d28E0AN3enyuCI9B6U
+ jNo0GyNtRnODPYxli4hN2fLInbV3xOlI1WxgqPAOmlh9zZBwsG8U42SAJyjHqBWg1Bpk
+ CAJbBoUtlxAOL4MgQ/zAxKRCLWxhN1QycNpLc5Q9q4xL7HAISzsIWnw7kiDPKAQy8NIc
+ qCAg==
+X-Gm-Message-State: APjAAAWmDcz7frmkbTowJQLtITnAQ8hz5t4+wDhD7Lpy5oF0cjJMqLgk
+ 6s5Q1geAIpQqNvDRYJWd7w7ygwXS
+X-Google-Smtp-Source: APXvYqz5rT5jTJZ6KnBGysaCC+7ysy1uq/6+3SW5zeg0y6e+Wy3yzwZaZ8C68T9CZRGb3oqfB42tdA==
+X-Received: by 2002:adf:f103:: with SMTP id r3mr7342824wro.295.1576171759139; 
+ Thu, 12 Dec 2019 09:29:19 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id 2sm6810130wrq.31.2019.12.12.09.29.18
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 12 Dec 2019 09:29:18 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 2/8] fw_cfg: allow building without other devices
+Date: Thu, 12 Dec 2019 18:29:08 +0100
+Message-Id: <1576171754-45138-3-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1576171754-45138-1-git-send-email-pbonzini@redhat.com>
+References: <1576171754-45138-1-git-send-email-pbonzini@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,111 +89,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: philmd@redhat.com, slp@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+The microvm machine type uses fw_cfg but lacks SMBIOS and ACPI.  Do not
+include the files if the symbol is not present in QEMU and remove
+dependencies on machine-specific files.
 
-If a new setmemtable command comes in once the vhost threads are
-running, it will remap the guests address space and the threads
-will now be looking in the wrong place.
-
-Fortunately we're running this command under lock, so we can
-update the queue mappings so that threads will look in the new-right
-place.
-
-Note: This doesn't fix things that the threads might be doing
-without a lock (e.g. a readv/writev!)  That's for another time.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 33 ++++++++++++++++++++-------
- contrib/libvhost-user/libvhost-user.h |  3 +++
- 2 files changed, 28 insertions(+), 8 deletions(-)
+ hw/i386/fw_cfg.c | 7 +++++++
+ hw/i386/pc.c     | 2 --
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/=
-libvhost-user.c
-index 63e41062a4..b89bf18501 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -564,6 +564,21 @@ vu_reset_device_exec(VuDev *dev, VhostUserMsg *vmsg)
-     return false;
- }
-=20
-+static bool
-+map_ring(VuDev *dev, VuVirtq *vq)
-+{
-+    vq->vring.desc =3D qva_to_va(dev, vq->vra.desc_user_addr);
-+    vq->vring.used =3D qva_to_va(dev, vq->vra.used_user_addr);
-+    vq->vring.avail =3D qva_to_va(dev, vq->vra.avail_user_addr);
+diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+index 39b6bc6..326e33e 100644
+--- a/hw/i386/fw_cfg.c
++++ b/hw/i386/fw_cfg.c
+@@ -22,6 +22,9 @@
+ #include "hw/nvram/fw_cfg.h"
+ #include "e820_memory_layout.h"
+ #include "kvm_i386.h"
++#include "config-devices.h"
 +
-+    DPRINT("Setting virtq addresses:\n");
-+    DPRINT("    vring_desc  at %p\n", vq->vring.desc);
-+    DPRINT("    vring_used  at %p\n", vq->vring.used);
-+    DPRINT("    vring_avail at %p\n", vq->vring.avail);
-+
-+    return !(vq->vring.desc && vq->vring.used && vq->vring.avail);
-+}
-+
- static bool
- vu_set_mem_table_exec_postcopy(VuDev *dev, VhostUserMsg *vmsg)
++struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+ 
+ const char *fw_cfg_arch_key_name(uint16_t key)
  {
-@@ -767,6 +782,14 @@ vu_set_mem_table_exec(VuDev *dev, VhostUserMsg *vmsg)
-         close(vmsg->fds[i]);
+@@ -46,6 +49,7 @@ const char *fw_cfg_arch_key_name(uint16_t key)
+ 
+ void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
+ {
++#ifdef CONFIG_SMBIOS
+     uint8_t *smbios_tables, *smbios_anchor;
+     size_t smbios_tables_len, smbios_anchor_len;
+     struct smbios_phys_mem_area *mem_array;
+@@ -83,6 +87,7 @@ void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
+         fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-anchor",
+                         smbios_anchor, smbios_anchor_len);
      }
-=20
-+    for (i =3D 0; i < dev->max_queues; i++) {
-+        if (dev->vq[i].vring.desc) {
-+            if (map_ring(dev, &dev->vq[i])) {
-+                vu_panic(dev, "remaping queue %d during setmemtable", i);
-+            }
-+        }
-+    }
-+
-     return false;
++#endif
  }
-=20
-@@ -853,18 +876,12 @@ vu_set_vring_addr_exec(VuDev *dev, VhostUserMsg *vmsg=
-)
-     DPRINT("    avail_user_addr:  0x%016" PRIx64 "\n", vra->avail_user_add=
-r);
-     DPRINT("    log_guest_addr:   0x%016" PRIx64 "\n", vra->log_guest_addr=
-);
-=20
-+    vq->vra =3D *vra;
-     vq->vring.flags =3D vra->flags;
--    vq->vring.desc =3D qva_to_va(dev, vra->desc_user_addr);
--    vq->vring.used =3D qva_to_va(dev, vra->used_user_addr);
--    vq->vring.avail =3D qva_to_va(dev, vra->avail_user_addr);
-     vq->vring.log_guest_addr =3D vra->log_guest_addr;
-=20
--    DPRINT("Setting virtq addresses:\n");
--    DPRINT("    vring_desc  at %p\n", vq->vring.desc);
--    DPRINT("    vring_used  at %p\n", vq->vring.used);
--    DPRINT("    vring_avail at %p\n", vq->vring.avail);
-=20
--    if (!(vq->vring.desc && vq->vring.used && vq->vring.avail)) {
-+    if (map_ring(dev, vq)) {
-         vu_panic(dev, "Invalid vring_addr message");
-         return false;
-     }
-diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/=
-libvhost-user.h
-index 1844b6f8d4..5cb7708559 100644
---- a/contrib/libvhost-user/libvhost-user.h
-+++ b/contrib/libvhost-user/libvhost-user.h
-@@ -327,6 +327,9 @@ typedef struct VuVirtq {
-     int err_fd;
-     unsigned int enable;
-     bool started;
-+
-+    /* Guest addresses of our ring */
-+    struct vhost_vring_addr vra;
- } VuVirtq;
-=20
- enum VuWatchCondtion {
---=20
-2.23.0
+ 
+ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+@@ -114,8 +119,10 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+      */
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, apic_id_limit);
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
++#ifdef CONFIG_ACPI
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_ACPI_TABLES,
+                      acpi_tables, acpi_tables_len);
++#endif
+     fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, kvm_allows_irq0_override());
+ 
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index b9f3b38..3d2c5d8 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -101,8 +101,6 @@
+ #define DPRINTF(fmt, ...)
+ #endif
+ 
+-struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
+-
+ GlobalProperty pc_compat_4_1[] = {};
+ const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
+ 
+-- 
+1.8.3.1
+
 
 
