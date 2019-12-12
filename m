@@ -2,97 +2,82 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0E50C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 11:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 394A2C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 11:37:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85562227BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 11:26:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 05A7420663
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 11:37:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K3Cl5h3v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85562227BF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X373bO2+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05A7420663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifMbu-0004wb-AN
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 06:26:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50020)
+	id 1ifMms-0000KE-3o
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 06:37:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41944)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1ifMam-0004Gv-LU
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 06:25:15 -0500
+ (envelope-from <berrange@redhat.com>) id 1ifMm3-0008IQ-Nz
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 06:36:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1ifMah-0006wL-GE
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 06:25:09 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59302
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <berrange@redhat.com>) id 1ifMlz-0001H8-Ez
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 06:36:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37269
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1ifMah-0006th-85
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 06:25:07 -0500
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1ifMly-0001C2-U4
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 06:36:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576149906;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1576150604;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=B+QDvCekcH//Ke0qvYXdEGTbLEmQodWY2I1WlxQqzvI=;
- b=K3Cl5h3vcFBPsXmhz/0bCKtZYgZBKqMfD1BvqUtJ+DbtOmGOXlIZfHL2LmCFaYh1aUTg0L
- 9oiwQql1xFJYeEk8VHVSlXktC9t4Q2VoayazJk9YtynmXfhbVZetdHngnXDv8EyF0+g6Nq
- o2COL2Vqoh1ENqmwjscLLLI0ry45J6o=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-wk2vLMsGN2upp3HWaNec2Q-1; Thu, 12 Dec 2019 06:25:01 -0500
-Received: by mail-qk1-f199.google.com with SMTP id a6so1173291qkl.7
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 03:25:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=iizwp79AS31udxvOQzqaEq5gPMX1CTMtd/jTalJLAhU=;
- b=ocdbWa30D1da4TbEZC6ceLYRn9rpOhS/nUVQbQ+uYewgRzjCBWamN356vrfUOuxM4u
- Y/TQQ7V6vT6QYd+c54A3fQ0muDSRZNwtuBbEZC2+Owr4N/+BMLGN7cvwi/UvJbuUVxpV
- pKCorqSj9WCuDH5RAtBt9jZJxHwJUzzB7+XMzV9rCv2KBrDrssaivEuSaLIQcaJGEoun
- WBasztiwSv21lcbiClrK7O2YspgciAblOYRHSyiEWFt4SIaaKHuB05YZTIW7vc3rSHRF
- h/noI0jRAx63UnoFDUKL18ATIGcbQrq3WCE3SIjEEFUnMdkSQTCmSxFuoeOgwcoRJGhp
- cpSA==
-X-Gm-Message-State: APjAAAX9RJ1EK8/bxdp6vW9mpeQzWnTmakk55uylMwk5uOSmd3i0NVKx
- +yF5ZReqE0Uu4R+LtpqScaQYAPsKDJiHy/4w7JsGXO7IicJJ4WFrFgBCV6iztCRC9dJq92P9mpB
- UwWkOPGpVa+757wE=
-X-Received: by 2002:a37:a00b:: with SMTP id j11mr7605829qke.268.1576149901257; 
- Thu, 12 Dec 2019 03:25:01 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxIjoIXrDvOlByXVAKdXyMXtPT8Fh4dab5ZTdv0NRa2M4kL8mL6rDgGYackIVUiTNroCpvELg==
-X-Received: by 2002:a37:a00b:: with SMTP id j11mr7605803qke.268.1576149900952; 
- Thu, 12 Dec 2019 03:25:00 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id a24sm1958847qtj.61.2019.12.12.03.24.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Dec 2019 03:24:59 -0800 (PST)
-Date: Thu, 12 Dec 2019 06:24:55 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2] vhost-vsock: report QMP event when
- setrunning
-Message-ID: <20191212062328-mutt-send-email-mst@kernel.org>
-References: <20190809134134.GA8594@stefanha-x1.localdomain>
- <201911281926474453744@zte.com.cn>
- <20191212110525.GA1141992@stefanha-x1.localdomain>
+ bh=cFEbeVYpeJCN3JLg7uhgTDyRZUrpPVp2zyHRrIpuuig=;
+ b=X373bO2+kRYTF9pm+CXYjv5IR1DfYcYWo8siVgh6BdagaX29Mo1A/IVLH4uSfH4JaBRUud
+ VCoyzZVb7lWzK+GBwD77JExG7l3nnlvLp482IVKF8WGnL3uX13A2YqwKg/scG5H9r6dtsq
+ zU9ylzjYeCzWdmOfWdgRZP6ZHi3nRzc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-66-QB389X19Pmu5jQfwi9T3PA-1; Thu, 12 Dec 2019 06:36:37 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C20CD107ACE6
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 11:36:36 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 93E4F5C241;
+ Thu, 12 Dec 2019 11:36:33 +0000 (UTC)
+Date: Thu, 12 Dec 2019 11:36:31 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Subject: Re: [PATCH v6 3/8] docs: start a document to describe D-Bus usage
+Message-ID: <20191212113631.GG1829331@redhat.com>
+References: <20191211134506.1803403-1-marcandre.lureau@redhat.com>
+ <20191211134506.1803403-4-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191212110525.GA1141992@stefanha-x1.localdomain>
-X-MC-Unique: wk2vLMsGN2upp3HWaNec2Q-1
+In-Reply-To: <20191211134506.1803403-4-marcandre.lureau@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: QB389X19Pmu5jQfwi9T3PA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,155 +89,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ning.bo9@zte.com.cn, qemu-devel@nongnu.org, armbru@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: mprivozn@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 11:05:25AM +0000, Stefan Hajnoczi wrote:
-> On Thu, Nov 28, 2019 at 07:26:47PM +0800, ning.bo9@zte.com.cn wrote:
-> > Let me describe the issue with an example via `nc-vsock`:
-> >=20
-> > Let's assume the Guest cid is 3.
-> > execute 'rmmod vmw_vsock_virtio_transport' in Guest,
-> > then execute 'while true; do nc-vsock 3 1234' in Host.
-> >=20
-> > Host                             Guest
-> >                                  # rmmod vmw_vsock_virtio_transport
-> >=20
-> > # while true; do ./nc-vsock 3 1234; done
-> > (after 2 second)
-> > connect: Connection timed out
-> > (after 2 second)
-> > connect: Connection timed out
-> > ...
-> >=20
-> >                                  # modprobe vmw_vsock_virtio_transport
-> >=20
-> > connect: Connection reset by peer
-> > connect: Connection reset by peer
-> > connect: Connection reset by peer
-> > ...
-> >=20
-> >                                  # nc-vsock -l 1234
-> >                                  Connetion from cid 2 port ***...
-> > (stop printing)
-> >=20
-> >=20
-> > The above process simulates the communication process between
-> > the `kata-runtime` and `kata-agent` after starting the Guest.
-> > In order to connect to `kata-agent` as soon as possible,=20
-> > `kata-runtime` will continuously try to connect to `kata-agent` in a lo=
-op.
-> > see https://github.com/kata-containers/runtime/blob/d054556f60f092335a2=
-2a288011fa29539ad4ccc/vendor/github.com/kata-containers/agent/protocols/cli=
-ent/client.go#L327
-> > But when the vsock device in the Guest is not ready, the connection
-> > will block for 2 seconds. This situation actually slows down
-> > the entire startup time of `kata-runtime`.
+On Wed, Dec 11, 2019 at 05:45:01PM +0400, Marc-Andr=C3=A9 Lureau wrote:
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  MAINTAINERS            |  5 +++
+>  docs/interop/dbus.rst  | 99 ++++++++++++++++++++++++++++++++++++++++++
+>  docs/interop/index.rst |  1 +
+>  3 files changed, 105 insertions(+)
+>  create mode 100644 docs/interop/dbus.rst
 >=20
-> This can be done efficiently as follows:
-> 1. kata-runtime listens on a vsock port
-> 2. kata-agent-port=3DPORT is added to the kernel command-line options
-> 3. kata-agent parses the port number and connects to the host
->=20
-> This eliminates the reconnection attempts.
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 525b4740e8..19faa0e868 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -2199,6 +2199,11 @@ F: tests/migration-test.c
+>  F: docs/devel/migration.rst
+>  F: qapi/migration.json
+> =20
+> +D-Bus
+> +M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> +S: Maintained
+> +F: docs/interop/dbus.rst
+> +
+>  Seccomp
+>  M: Eduardo Otubo <otubo@redhat.com>
+>  S: Supported
+> diff --git a/docs/interop/dbus.rst b/docs/interop/dbus.rst
+> new file mode 100644
+> index 0000000000..3d760e4882
+> --- /dev/null
+> +++ b/docs/interop/dbus.rst
+> @@ -0,0 +1,99 @@
+> +=3D=3D=3D=3D=3D
+> +D-Bus
+> +=3D=3D=3D=3D=3D
+> +
+> +Introduction
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +QEMU may be running with various helper processes involved:
+> + - vhost-user* processes (gpu, virtfs, input, etc...)
+> + - TPM emulation (or other devices)
+> + - user networking (slirp)
+> + - network services (DHCP/DNS, samba/ftp etc)
+> + - background tasks (compression, streaming etc)
+> + - client UI
+> + - admin & cli
+> +
+> +Having several processes allows stricter security rules, as well as
+> +greater modularity.
+> +
+> +While QEMU itself uses QMP as primary IPC (and Spice/VNC for remote
+> +display), D-Bus is the de facto IPC of choice on Unix systems. The
+> +wire format is machine friendly, good bindings exist for various
+> +languages, and there are various tools available.
+> +
+> +Using a bus, helper processes can discover and communicate with each
+> +other easily, without going through QEMU. The bus topology is also
+> +easier to apprehend and debug than a mesh. However, it is wise to
+> +consider the security aspects of it.
+> +
+> +Security
+> +=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +A QEMU D-Bus bus should be private to a single VM. Thus, only
+> +cooperative tasks are running on the same bus to serve the VM.
+> +
+> +D-Bus, the protocol and standard, doesn't have mechanisms to enforce
+> +security between peers once the connection is established. Peers may
+> +have additional mechanisms to enforce security rules, based for
+> +example on UNIX credentials.
 
-Then we'll get the same problem in reverse, won't we?
-Agent must now be running before guest can boot ...
-Or did I miss anything?
 
-> > > I think that adding a QMP event is working around the issue rather th=
-an
-> > > fixing the root cause.  This is probably a vhost_vsock.ko problem and
-> > > should be fixed there.
-> >=20
-> > After looking at the source code of vhost_vsock.ko,=20
-> > I think it is possible to optimize the logic here too.
-> > The simple patch is as follows. Do you think the modification is approp=
-riate?
-> >=20
-> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > index 9f57736f..8fad67be 100644
-> > --- a/drivers/vhost/vsock.c
-> > +++ b/drivers/vhost/vsock.c
-> > @@ -51,6 +51,7 @@ struct vhost_vsock {
-> >  =09atomic_t queued_replies;
-> >=20
-> >  =09u32 guest_cid;
-> > +=09u32 state;
-> >  };
-> >=20
-> >  static u32 vhost_transport_get_local_cid(void)
-> > @@ -497,6 +541,7 @@ static int vhost_vsock_start(struct vhost_vsock *vs=
-ock)
-> >=20
-> >  =09=09mutex_unlock(&vq->mutex);
-> >  =09}
-> > +=09vsock->state =3D 1;
-> >=20
-> >  =09mutex_unlock(&vsock->dev.mutex);
-> >  =09return 0;
-> > @@ -535,6 +580,7 @@ static int vhost_vsock_stop(struct vhost_vsock *vso=
-ck)
-> >  =09=09vq->private_data =3D NULL;
-> >  =09=09mutex_unlock(&vq->mutex);
-> >  =09}
-> > +=09vsock->state =3D 0;
-> >=20
-> >  err:
-> >  =09mutex_unlock(&vsock->dev.mutex);
-> > @@ -786,6 +832,27 @@ static struct miscdevice vhost_vsock_misc =3D {
-> >  =09.fops =3D &vhost_vsock_fops,
-> >  };
-> >=20
-> > +int vhost_transport_connect(struct vsock_sock *vsk) {
-> > +=09struct vhost_vsock *vsock;
-> > +
-> > +=09rcu_read_lock();
-> > +
-> > +=09/* Find the vhost_vsock according to guest context id  */
-> > +=09vsock =3D vhost_vsock_get(vsk->remote_addr.svm_cid);
-> > +=09if (!vsock) {
-> > +=09=09rcu_read_unlock();
-> > +=09=09return -ENODEV;
-> > +=09}
-> > +
-> > +=09rcu_read_unlock();
-> > +
-> > +=09if (vsock->state =3D=3D 1) {
-> > +=09=09return virtio_transport_connect(vsk);
-> > +=09} else {
-> > +=09=09return -ECONNRESET;
-> > +=09}
-> > +}
-> > +
-> >  static struct virtio_transport vhost_transport =3D {
-> >  =09.transport =3D {
-> >  =09=09.get_local_cid            =3D vhost_transport_get_local_cid,
-> > @@ -793,7 +860,7 @@ static struct virtio_transport vhost_transport =3D =
-{
-> >  =09=09.init                     =3D virtio_transport_do_socket_init,
-> >  =09=09.destruct                 =3D virtio_transport_destruct,
-> >  =09=09.release                  =3D virtio_transport_release,
-> > -=09=09.connect                  =3D virtio_transport_connect,
-> > +=09=09.connect                  =3D vhost_transport_connect,
-> >  =09=09.shutdown                 =3D virtio_transport_shutdown,
-> >  =09=09.cancel_pkt               =3D vhost_transport_cancel_pkt,
->=20
-> I'm not keen on adding a special case for vhost_vsock.ko connect.
->=20
-> Userspace APIs to avoid the 2 second wait already exist:
->=20
-> 1. The SO_VM_SOCKETS_CONNECT_TIMEOUT socket option controls the connect
->    timeout for this socket.
->=20
-> 2. Non-blocking connect allows the userspace process to do other things
->    while a connection attempt is being made.
->=20
-> But the best solution is the one I mentioned above.
->=20
-> Stefan
+                                 However, because the daemon has
+> +controlled who can send/recv messages to who, doesn't magically make
+> +this secure.=20
 
+This reads a little awkwardly, instead:
+
+ The daemon can control which peers can send/recv messages using various
+ metadata attributes, however, this is alone is not generally sufficient
+ to make the deployment secure.
+
+>                The semantics of the actual methods implemented using
+> +D-Bus are just as critical. Peers need to carefully validate any
+> +information they received from a peer with a different trust level.
+> +
+> +dbus-daemon policy
+> +------------------
+> +
+> +dbus-daemon can enforce various policies based on the UID/GID of the
+> +processes that are connected to it. It is thus a good idea to run
+> +helpers as different UID from QEMU and set appropriate policies.
+> +
+> +Depending on the use case, you may choose different scenarios:
+> +
+> + - Everything the same UID
+> +
+> +   - Convenient for developers
+> +   - Improved reliability - crash of one part doens't take
+> +     out entire VM
+> +   - No security benefit over traditional QEMU
+
+In the last point add
+
+    ', unless additional unless additional controls
+     such as SELinux or AppArmor are applied'.
+
+> +
+> + - Two UIDs, one for QEMU, one for dbus & helpers
+> +
+> +   - Moderately improved security isolation
+
+s/improved/improved user based/
+
+> +
+> + - Many UIDs, one for QEMU one for dbus and one for each helpers
+> +
+> +   - Best security isolation
+
+s/Best/Best user based/
+
+> +   - Complex to manager distinct UIDs needed for each VM
+> +
+> +For example, to allow only ``qemu`` user to talk to ``qemu-helper``
+> +``org.qemu.Helper1`` service, a dbus-daemon policy may contain:
+> +
+> +.. code:: xml
+> +
+> +  <policy user=3D"qemu">
+> +     <allow send_destination=3D"org.qemu.Helper1"/>
+> +     <allow receive_sender=3D"org.qemu.Helper1"/>
+> +  </policy>
+> +
+> +  <policy user=3D"qemu-helper">
+> +     <allow own=3D"org.qemu.Helper1"/>
+> +  </policy>
+> +
+> +
+> +dbus-daemon can also perfom SELinux checks based on the security
+> +context of the source and the target. For example, ``virtiofs_t``
+> +could be allowed to send a message to ``svirt_t``, but ``virtiofs_t``
+> +wouldn't be allowed to send a message to ``virtiofs_t``.
+> +
+> +See dbus-daemon man page for details.
+> +
+> +Guidelines
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +When implementing new D-Bus interfaces, it is recommended to follow
+> +the "D-Bus API Design Guidelines":
+> +https://dbus.freedesktop.org/doc/dbus-api-design.html
+> +
+> +The "org.qemu.*" prefix is reserved for the QEMU project.
+
+Perhaps change the last few words to
+
+  'for services implemented & distributed by the QEMU project'
+
+> diff --git a/docs/interop/index.rst b/docs/interop/index.rst
+> index 3e33fb5933..ded134ea75 100644
+> --- a/docs/interop/index.rst
+> +++ b/docs/interop/index.rst
+> @@ -13,6 +13,7 @@ Contents:
+>     :maxdepth: 2
+> =20
+>     bitmaps
+> +   dbus
+>     live-block-operations
+>     pr-helper
+>     qemu-ga
+
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
