@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42C12C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1175C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:14:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DD912173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6922C21655
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:14:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RYq9PWa+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DD912173E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+xCY67z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6922C21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOHQ-0000yn-Nv
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:13:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58989)
+	id 1ifOIS-0002Bv-Tl
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:14:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNy6-00034f-Ek
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:23 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyK-0003SX-Aq
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNy4-0006BR-Rd
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:22 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:39014)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyI-0006fl-Ui
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:36 -0500
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:46471)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNy4-00069g-J1
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:20 -0500
-Received: by mail-wm1-x332.google.com with SMTP id d5so2374588wmb.4
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:20 -0800 (PST)
+ id 1ifNyI-0006dx-ML
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:34 -0500
+Received: by mail-wr1-x430.google.com with SMTP id z7so2568152wrl.13
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Ckq3xlyA0Y/TEyi6tdKF2WSmdCjFLbYMhdQ4Hgb8BiA=;
- b=RYq9PWa+gNxE9Dbr6CdIGcAKkCwawFY5ISYwq76pvTfjR636083CiKnp9/YeepIIlr
- 6P0lyHx2OOKCIzv0xsNKgFaOH5/VWSgbT+xJFwBttK+QNxEfPcu7VpbgLSll1V4Nf01i
- qTSzQbS0yBS0QC12uwZy5xri9e3KSZvWln0uucpXmQRcnBVZwOd2kzfkTymFOGrv7loR
- k3ER0R44hO2mttDjrVEmrzSbTo6Kdo6hpWB2JDfykiUfOFur+xqEybNoCLO1ei7M6pnL
- MPQeMYMh3MF9qlw7q8dORgjmuOZ7XbUl5+DmWWtoTmRSMoLZ408XPvkdDfRI4Zj4kTUZ
- ID1A==
+ bh=A5otGqkyi8y7l7sbXLP+BCvpARxLg62OQnpw8ufGbb0=;
+ b=W+xCY67zPwj7iA723++cTKN84pUSMVt1UXR76AyghXlQya3c6Om7B5JnldmNFjRh+7
+ QIM2UVoeYkOHSJhWmbY5wwkj9Jy+ByufbnTkEkNvjM35N7PTyQQQczv57tfZScJT1nLu
+ BACoHAAcZ/DsiuZnNRV6mBnxZ3SG4IMPzGUemKaUacK1qcsalftBYXfxiCKE9TPJqtdi
+ fEuG2BB5bfo0PIhrA5dq07ClaKdiYpxIicsfveUCUiZFDjYiSTJOUT9qwcKb5P+kkNRX
+ mpkbdUmfWlMbO9WG5Lq2DZz1I9pE2YAztHMNBe7teIgpP42wwWtTDllUeP/Z+VMwwIxa
+ AzMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Ckq3xlyA0Y/TEyi6tdKF2WSmdCjFLbYMhdQ4Hgb8BiA=;
- b=QAHnqYj09/ouQRxS1/tITIdfiMccqyipBPfPzCg6cw3qycoaB8TBRpj+msdedABZE5
- TJj++ngKYvnL9Y80aX9apLmqfwUeDnAnsFvJsiepAgS6jkAyENXV2rJLCnLAFlSZMcwp
- rz9cjv2r51una+IlJGdJl45pp21aejr5j/Q8cuhQAMOwSFsNHqj5ZGeVeF6cfWqqDKAI
- e9FgYAdOOOmsWhrW/WQMaPMVvDKbNbXmIUtYlHqJ7efHnxLC0a8rP56W1SKKzO1EBk6Y
- JjT8bBgnmT0pI9QAMI9yVqWO/uvcCz3dLViryDYruz3kkx7rzVbgT7wg4LKsSM4YOK4m
- rGjA==
-X-Gm-Message-State: APjAAAUZgoe/PlAAw6RXbFPAG962pkPhT+h9rmIayHsrTqLLi2pNrVz5
- 8B02ivRhefuFSmmxHLkNfJcUEP0P
-X-Google-Smtp-Source: APXvYqyNYBwi6vqcgBn3R7wcyB4OmeaK3tkCOFcIAoAjt83uSIIQIiaSV7QijADW9dI4gvCZlKJt1Q==
-X-Received: by 2002:a05:600c:a:: with SMTP id g10mr6349562wmc.69.1576155199234; 
- Thu, 12 Dec 2019 04:53:19 -0800 (PST)
+ bh=A5otGqkyi8y7l7sbXLP+BCvpARxLg62OQnpw8ufGbb0=;
+ b=XgtRCuO8mAeISKc94ijADa0pCjhb67CAGVsDDSa9omagFNoaFWj3kbpCbQuHDOfGKf
+ GPapH86XsbdVEdJ5wvTIcLfG+0uaC8muJ082XDL84JUDj5ktjORudiS9JhmconRThlRm
+ 6M213LbfCFqJXVR/chCNHTFnh6IlVHqGo5QYFtvQRVIqWdJV13rpdLh/Ln6xpkOp1gOi
+ FojjT4tW9+VFDz87KFRiGpecNHLykBAbEoLhHPpj96CYCtGk+8Es7mfFikoRlxfhcxHu
+ 0Tl7dl1/d9qU84hAXBu4R1fnjItvlK71CXhMX6rSd+UZJREF//DWhLMkm1K/xixN2yPn
+ zuxg==
+X-Gm-Message-State: APjAAAUrWHnu8rf0CmQaENPIqW1pgdKQRlvoekNA5hFd/jhCM8JHG/Mw
+ zHS72qWf7hfx28mp52e0qPU9BhIr
+X-Google-Smtp-Source: APXvYqw6PA5Vsv6HA7wIjLR3QgIqDq1KSM9+nPX3/ghJ3j0JrNsys1wGyJATimKqpekhRZQ8OXZCvg==
+X-Received: by 2002:a5d:494f:: with SMTP id r15mr6441261wrs.143.1576155213411; 
+ Thu, 12 Dec 2019 04:53:33 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.18
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.32
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:53:18 -0800 (PST)
+ Thu, 12 Dec 2019 04:53:32 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 021/132] meson: convert vss-win32
-Date: Thu, 12 Dec 2019 13:51:05 +0100
-Message-Id: <1576155176-2464-22-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 036/132] meson: convert crypto directory to Meson
+Date: Thu, 12 Dec 2019 13:51:20 +0100
+Message-Id: <1576155176-2464-37-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
+X-Received-From: 2a00:1450:4864:20::430
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,150 +103,206 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile                    |  1 -
- Makefile.objs               |  8 --------
- meson.build                 |  4 +++-
- qga/Makefile.objs           |  1 -
- qga/meson.build             |  6 ++++++
- qga/vss-win32/Makefile.objs | 23 -----------------------
- qga/vss-win32/meson.build   | 28 ++++++++++++++++++++++++++++
- 7 files changed, 37 insertions(+), 34 deletions(-)
- delete mode 100644 qga/Makefile.objs
- delete mode 100644 qga/vss-win32/Makefile.objs
- create mode 100644 qga/vss-win32/meson.build
+ Makefile             |  1 -
+ Makefile.objs        |  7 ++-----
+ Makefile.target      |  2 +-
+ crypto/Makefile.objs | 34 ----------------------------------
+ crypto/meson.build   | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ meson.build          |  4 ++--
+ qom/meson.build      |  2 +-
+ 7 files changed, 55 insertions(+), 44 deletions(-)
+ delete mode 100644 crypto/Makefile.objs
 
 diff --git a/Makefile b/Makefile
-index a78d5e0..4f20bf7 100644
+index 4da605e..d070335 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -261,7 +261,6 @@ endif
- dummy := $(call unnest-vars,, \
-                 authz-obj-y \
+@@ -200,7 +200,6 @@ dummy := $(call unnest-vars,, \
                  chardev-obj-y \
--                qga-vss-dll-obj-y \
                  block-obj-y \
                  block-obj-m \
-                 crypto-obj-y \
+-                crypto-obj-y \
+                 io-obj-y \
+                 common-obj-y \
+                 common-obj-m)
 diff --git a/Makefile.objs b/Makefile.objs
-index 736bdaa..38e3604 100644
+index 9201eca..a5dd228 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -94,11 +94,3 @@ version-obj-$(CONFIG_WIN32) += $(BUILD_DIR)/version.o
- ######################################################################
- # tracing
- util-obj-y +=  trace/
+@@ -14,16 +14,13 @@ block-obj-$(CONFIG_REPLICATION) += replication.o
+ block-obj-m = block/
+ 
+ #######################################################################
+-# crypto-obj-y is code used by both qemu system emulation and qemu-img
 -
--######################################################################
--# guest agent
+-crypto-obj-y = crypto/
 -
--# FIXME: a few definitions from qapi/qapi-types.o and
--# qapi/qapi-visit.o are needed by libqemuutil.a.  These should be
--# extracted into a QAPI schema module, or perhaps a separate schema.
--qga-vss-dll-obj-y = qga/
+-#######################################################################
+ # libraries built entirely from meson
+ 
+ authz-obj-y = authz/libauthz.fa
+ authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
+ 
++crypto-obj-y = crypto/libcrypto.fa
++
+ qom-obj-y = qom/libqom.fa
+ 
+ #######################################################################
+diff --git a/Makefile.target b/Makefile.target
+index d243e52..d8a6491 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -178,12 +178,12 @@ all-obj-y := $(obj-y)
+ include $(SRC_PATH)/Makefile.objs
+ dummy := $(call fix-paths,../,, \
+               authz-obj-y \
++              crypto-obj-y \
+               qom-obj-y)
+ dummy := $(call unnest-vars,.., \
+                block-obj-y \
+                block-obj-m \
+                chardev-obj-y \
+-               crypto-obj-y \
+                io-obj-y \
+                common-obj-y \
+                common-obj-m)
+diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
+deleted file mode 100644
+index 3587f41..0000000
+--- a/crypto/Makefile.objs
++++ /dev/null
+@@ -1,34 +0,0 @@
+-crypto-obj-y = init.o
+-crypto-obj-y += hash.o
+-crypto-obj-$(CONFIG_NETTLE) += hash-nettle.o
+-crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += hash-gcrypt.o
+-crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT),n,y)) += hash-glib.o
+-crypto-obj-y += hmac.o
+-crypto-obj-$(CONFIG_NETTLE) += hmac-nettle.o
+-crypto-obj-$(CONFIG_GCRYPT_HMAC) += hmac-gcrypt.o
+-crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT_HMAC),n,y)) += hmac-glib.o
+-crypto-obj-y += aes.o
+-crypto-obj-y += desrfb.o
+-crypto-obj-y += cipher.o
+-crypto-obj-$(CONFIG_AF_ALG) += afalg.o
+-crypto-obj-$(CONFIG_AF_ALG) += cipher-afalg.o
+-crypto-obj-$(CONFIG_AF_ALG) += hash-afalg.o
+-crypto-obj-y += tlscreds.o
+-crypto-obj-y += tlscredsanon.o
+-crypto-obj-y += tlscredspsk.o
+-crypto-obj-y += tlscredsx509.o
+-crypto-obj-y += tlssession.o
+-crypto-obj-y += secret.o
+-crypto-obj-y += pbkdf.o
+-crypto-obj-$(CONFIG_NETTLE) += pbkdf-nettle.o
+-crypto-obj-$(if $(CONFIG_NETTLE),n,$(CONFIG_GCRYPT)) += pbkdf-gcrypt.o
+-crypto-obj-$(if $(CONFIG_NETTLE),n,$(if $(CONFIG_GCRYPT),n,y)) += pbkdf-stub.o
+-crypto-obj-y += ivgen.o
+-crypto-obj-y += ivgen-essiv.o
+-crypto-obj-y += ivgen-plain.o
+-crypto-obj-y += ivgen-plain64.o
+-crypto-obj-y += afsplit.o
+-crypto-obj-y += xts.o
+-crypto-obj-y += block.o
+-crypto-obj-y += block-qcow.o
+-crypto-obj-y += block-luks.o
+diff --git a/crypto/meson.build b/crypto/meson.build
+index 7250ffc..1310195 100644
+--- a/crypto/meson.build
++++ b/crypto/meson.build
+@@ -1,3 +1,52 @@
++crypto_ss = ss.source_set()
++crypto_ss.add(genh)
++crypto_ss.add(files(
++  'afsplit.c',
++  'block-luks.c',
++  'block-qcow.c',
++  'block.c',
++  'cipher.c',
++  'desrfb.c',
++  'hash.c',
++  'hmac.c',
++  'ivgen-essiv.c',
++  'ivgen-plain.c',
++  'ivgen-plain64.c',
++  'ivgen.c',
++  'pbkdf.c',
++  'secret.c',
++  'tlscreds.c',
++  'tlscredsanon.c',
++  'tlscredspsk.c',
++  'tlscredsx509.c',
++  'tlssession.c',
++  'xts.c',
++))
++crypto_ss.add(authz)
++
++if 'CONFIG_GCRYPT' in config_host
++  wo_nettle = files('hash-gcrypt.c', 'pbkdf-gcrypt.c')
++else
++  wo_nettle = files('hash-glib.c', 'pbkdf-stub.c')
++endif
++if 'CONFIG_GCRYPT_HMAC' not in config_host
++  wo_nettle += files('hmac-glib.c')
++endif
++crypto_ss.add(when: [nettle, 'CONFIG_NETTLE'],
++             if_true: files('hash-nettle.c', 'hmac-nettle.c', 'pbkdf-nettle.c'),
++             if_false: wo_nettle)
++
++crypto_ss.add(when: 'CONFIG_GCRYPT_HMAC', if_true: files('hmac-gcrypt.c'))
++crypto_ss.add(when: 'CONFIG_AF_ALG', if_true: files('afalg.c', 'cipher-afalg.c', 'hash-afalg.c'))
++
++crypto_ss = crypto_ss.apply(config_host, strict: false)
++libcrypto = static_library('crypto', crypto_ss.sources(),
++                           dependencies: [crypto_ss.dependencies()],
++                           name_suffix: 'fa',
++                           build_by_default: false)
++
++crypto = declare_dependency(link_whole: libcrypto)
++
+ util_ss.add(files('aes.c'))
+ util_ss.add(files('init.c'))
+ if 'CONFIG_GCRYPT' in config_host
 diff --git a/meson.build b/meson.build
-index f65ad9d..7e772c1 100644
+index 9ae2699..e8bd526 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -9,12 +9,14 @@ add_project_arguments(config_host['CFLAGS'].split(),
-                       language: ['c', 'objc'])
- add_project_arguments(config_host['QEMU_CFLAGS'].split(),
-                       language: 'c')
-+add_project_arguments(config_host['QEMU_CXXFLAGS'].split(),
-+                      language: 'cpp')
- add_project_link_arguments(config_host['LDFLAGS'].split(),
-                            language: ['c', 'cpp', 'objc'])
- add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
-                            language: ['c', 'cpp', 'objc'])
- add_project_arguments(config_host['QEMU_INCLUDES'].split(),
--                      language: 'c')
-+                      language: ['c', 'cpp'])
+@@ -260,6 +260,8 @@ subdir('qobject')
+ subdir('stubs')
+ subdir('trace')
+ subdir('util')
++subdir('qom')
++subdir('authz')
+ subdir('crypto')
+ subdir('ui')
  
- configure_file(input: files('scripts/ninjatool.py'),
-                output: 'ninjatool',
-diff --git a/qga/Makefile.objs b/qga/Makefile.objs
-deleted file mode 100644
-index 9ecf249..0000000
---- a/qga/Makefile.objs
-+++ /dev/null
-@@ -1 +0,0 @@
--qga-vss-dll-obj-$(CONFIG_QGA_VSS) += vss-win32/
-diff --git a/qga/meson.build b/qga/meson.build
-index 116102b..f0ec8cf 100644
---- a/qga/meson.build
-+++ b/qga/meson.build
-@@ -41,3 +41,9 @@ qga_ss = qga_ss.apply(config_host, strict: false)
- qga = executable('qemu-ga', qga_ss.sources(),
-                  link_args: config_host['LIBS_QGA'].split(),
-                  dependencies: [qemuutil, libudev])
-+
-+if host_machine.system() == 'windows'
-+  if 'CONFIG_QGA_VSS' in config_host
-+    subdir('vss-win32')
-+  endif
-+endif
-diff --git a/qga/vss-win32/Makefile.objs b/qga/vss-win32/Makefile.objs
-deleted file mode 100644
-index fd3ba18..0000000
---- a/qga/vss-win32/Makefile.objs
-+++ /dev/null
-@@ -1,23 +0,0 @@
--# rules to build qga-vss.dll
--
--qga-vss-dll-obj-y += requester.o provider.o install.o
--
--obj-qga-vss-dll-obj-y = $(addprefix $(obj)/, $(qga-vss-dll-obj-y))
--$(obj-qga-vss-dll-obj-y): QEMU_CXXFLAGS := $(filter-out -fstack-protector-all -fstack-protector-strong, $(QEMU_CXXFLAGS)) -Wno-unknown-pragmas -Wno-delete-non-virtual-dtor
--
--$(obj)/qga-vss.dll: LDFLAGS = -shared -Wl,--add-stdcall-alias,--enable-stdcall-fixup -lglib-2.0 -lole32 -loleaut32 -lshlwapi -luuid -lintl -lws2_32 -static
--$(obj)/qga-vss.dll: $(obj-qga-vss-dll-obj-y) $(SRC_PATH)/$(obj)/qga-vss.def
--	$(call quiet-command,$(CXX) -o $@ $(qga-vss-dll-obj-y) $(SRC_PATH)/qga/vss-win32/qga-vss.def $(CXXFLAGS) $(LDFLAGS),"LINK","$(TARGET_DIR)$@")
--
--
--# rules to build qga-provider.tlb
--# Currently, only native build is supported because building .tlb
--# (TypeLibrary) from .idl requires WindowsSDK and MIDL (and cl.exe in VC++).
--MIDL=$(WIN_SDK)/Bin/midl
--
--$(obj)/qga-vss.tlb: $(SRC_PATH)/$(obj)/qga-vss.idl
--ifeq ($(WIN_SDK),"")
--	$(call quiet-command,cp $(dir $<)qga-vss.tlb $@,"COPY","$(TARGET_DIR)$@")
--else
--	$(call quiet-command,$(MIDL) -tlb $@ -I $(WIN_SDK)/Include $<,"MIDL","$(TARGET_DIR)$@")
--endif
-diff --git a/qga/vss-win32/meson.build b/qga/vss-win32/meson.build
-new file mode 100644
-index 0000000..a7c865f
---- /dev/null
-+++ b/qga/vss-win32/meson.build
-@@ -0,0 +1,28 @@
-+if add_languages('cpp', required: false)
-+  glib_static = dependency('glib-2.0', static: true)
-+  link_args = cc.get_supported_link_arguments(['-fstack-protector-all', '-fstack-protector-strong', '-Wl,--add-stdcall-alias', '-Wl,--enable-stdcall-fixup'])
-+
-+  shared_module('qga-vss', ['requester.cpp', 'provider.cpp', 'install.cpp'],
-+                name_prefix: '',
-+                cpp_args: ['-Wno-unknown-pragmas', '-Wno-delete-non-virtual-dtor', '-Wno-non-virtual-dtor'],
-+                link_args: link_args,
-+                vs_module_defs: 'qga-vss.def',
-+                dependencies: glib_static)
-+endif
-+
-+# rules to build qga-vss.tlb
-+# Currently, only native build is supported because building .tlb
-+# (TypeLibrary) from .idl requires WindowsSDK and MIDL (and cl.exe in VC++).
-+midl = find_program('midl', required: false)
-+if midl.found()
-+  gen_tlb = custom_target('gen-tlb',
-+                          input: 'qga-vss.idl',
-+                          output: 'qga-vss.tlb',
-+                          command: [midl, '-tlb', '-I' + config_host['WIN_SDK'],
-+                                     '@INPUT@', '@OUTPUT@'])
-+else
-+  gen_tlb = custom_target('gen-tlb',
-+                          input: 'qga-vss.tlb',
-+                          output: 'qga-vss.tlb',
-+                          command: ['cp', '@INPUT@', '@OUTPUT@'])
-+endif
+@@ -275,8 +277,6 @@ libqemuutil = static_library('qemuutil',
+ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: version_res)
+ 
+-subdir('qom')
+-subdir('authz')
+ subdir('fsdev')
+ 
+ # Other build targets
+diff --git a/qom/meson.build b/qom/meson.build
+index 3c41ed3..4af044d 100644
+--- a/qom/meson.build
++++ b/qom/meson.build
+@@ -1,4 +1,5 @@
+ qom_ss = ss.source_set()
++qom_ss.add(genh)
+ qom_ss.add(files(
+   'container.c',
+   'object.c',
+@@ -9,7 +10,6 @@ qom_ss.add(files(
+ qom_ss = qom_ss.apply(config_host, strict: false)
+ libqom = static_library('qom', qom_ss.sources(),
+                         dependencies: [qom_ss.dependencies()],
+-                        link_with: [libqemuutil],
+                         name_suffix: 'fa')
+ 
+ qom = declare_dependency(link_whole: libqom)
 -- 
 1.8.3.1
 
