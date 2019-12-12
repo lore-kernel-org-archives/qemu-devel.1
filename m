@@ -2,104 +2,79 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B03B5C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA5EC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:15:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83728214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:15:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83728214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 12FC4214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:15:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FNnhfUTo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12FC4214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifPF7-0003E5-12
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:15:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45265)
+	id 1ifPFM-0003Tw-KQ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:15:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48269)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1ifOQZ-00068s-ET
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 08:22:48 -0500
+ (envelope-from <crosa@redhat.com>) id 1ifPE4-0001vG-4Y
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:13:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1ifOQY-000082-2V
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 08:22:47 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20974
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1ifOQX-00006r-TZ; Thu, 12 Dec 2019 08:22:46 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBCDCCcV089627; Thu, 12 Dec 2019 08:22:34 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wujxr7egq-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 12 Dec 2019 08:22:34 -0500
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBCDCf6v092981;
- Thu, 12 Dec 2019 08:22:33 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wujxr7efy-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 12 Dec 2019 08:22:33 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBCDKc2Q014076;
- Thu, 12 Dec 2019 13:22:33 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma03dal.us.ibm.com with ESMTP id 2wr3q81dcp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 12 Dec 2019 13:22:33 +0000
-Received: from b03ledav002.gho.boulder.ibm.com
- (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBCDMVhd50528696
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Dec 2019 13:22:31 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9BFA813605D;
- Thu, 12 Dec 2019 13:22:31 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2EB3F136059;
- Thu, 12 Dec 2019 13:22:31 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu, 12 Dec 2019 13:22:30 +0000 (GMT)
-Subject: Re: [PACTH v3 3/5] tpm_spapr: Support suspend and resume
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>
-References: <20191211162050.970199-1-stefanb@linux.vnet.ibm.com>
- <20191211162050.970199-4-stefanb@linux.vnet.ibm.com>
- <CAJ+F1CL6R5wwn6pnFTRaoTWqXUr7eTDAzMzT27M8zSkG2K7uEw@mail.gmail.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <08e2a506-2a0e-f8d2-40ea-97429ff2c46c@linux.ibm.com>
-Date: Thu, 12 Dec 2019 08:22:25 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <crosa@redhat.com>) id 1ifPE1-0005rH-5u
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:13:54 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55716
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ifPE1-0005oR-11
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:13:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576160031;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=KZs2c3ua3XI4JlaybMO4mKpScj/gnCYK5aGNCIu41Rw=;
+ b=FNnhfUTobi3iwy/shOppXFqOu5er1CUVKKokBKM+szIYbvhd0RKx3+97HiXpUGo+2sxNDB
+ Esq1Kk5tp7CbfL3xPNbdiMukTTFTwJ4Qf3K1pcXiM1QHvZVV/o3KW2AhcOk+n2sYo5rT4C
+ gaKs/FPFMixdG+FdxlfzNQi8nL9gt7U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-110-bH4IrWj3MP2h9n_06DLgyQ-1; Thu, 12 Dec 2019 09:13:50 -0500
+X-MC-Unique: bH4IrWj3MP2h9n_06DLgyQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30B0C107ACC4
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 14:13:49 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-124-90.rdu2.redhat.com
+ [10.10.124.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 538F310013A1;
+ Thu, 12 Dec 2019 14:13:43 +0000 (UTC)
+Date: Thu, 12 Dec 2019 09:13:42 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Subject: Re: [PATCH v2 1/2] python/qemu: Add set_qmp_monitor() to QEMUMachine
+Message-ID: <20191212141342.GA26584@localhost.localdomain>
+References: <20191211185536.16962-1-wainersm@redhat.com>
+ <20191211185536.16962-2-wainersm@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CL6R5wwn6pnFTRaoTWqXUr7eTDAzMzT27M8zSkG2K7uEw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-12_03:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 lowpriorityscore=0
- malwarescore=0 mlxlogscore=999 impostorscore=0 priorityscore=1501
- clxscore=1015 suspectscore=0 bulkscore=0 spamscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912120100
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0a-001b2d01.pphosted.com id xBCDCCcV089627
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+In-Reply-To: <20191211185536.16962-2-wainersm@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="ZGiS0Q5IWpPtfppv"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,79 +86,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:sPAPR pseries" <qemu-ppc@nongnu.org>,
- QEMU <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: philmd@redhat.com, qemu-devel@nongnu.org, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/12/19 6:00 AM, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->
-> On Wed, Dec 11, 2019 at 8:27 PM Stefan Berger
-> <stefanb@linux.vnet.ibm.com> wrote:
->> Extend the tpm_spapr frontend with VM suspend and resume support.
->>
->> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->> ---
->>   hw/tpm/tpm_spapr.c | 42 +++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 41 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
->> index c4a67e2403..d9153bd95c 100644
->> --- a/hw/tpm/tpm_spapr.c
->> +++ b/hw/tpm/tpm_spapr.c
->> @@ -87,6 +87,8 @@ typedef struct {
->>       TPMVersion be_tpm_version;
->>
->>       size_t be_buffer_size;
->> +
->> +    bool deliver_response; /* whether to deliver response after VM re=
-sume */
->>   } SPAPRvTPMState;
->>
->>   static void tpm_spapr_show_buffer(const unsigned char *buffer,
->> @@ -339,9 +341,47 @@ static enum TPMVersion tpm_spapr_get_version(TPMI=
-f *ti)
->>       return tpm_backend_get_tpm_version(s->be_driver);
->>   }
->>
->> +/* persistent state handling */
->> +
->> +static int tpm_spapr_pre_save(void *opaque)
->> +{
->> +    SPAPRvTPMState *s =3D opaque;
->> +
->> +    s->deliver_response =3D tpm_backend_finish_sync(s->be_driver);
->> +    /*
->> +     * we cannot deliver the results to the VM since DMA would touch =
-VM memory
->> +     */
->> +
->> +    return 0;
->> +}
->> +
->> +static int tpm_spapr_post_load(void *opaque, int version_id)
->> +{
->> +    SPAPRvTPMState *s =3D opaque;
->> +
->> +    if (s->deliver_response) {
->> +        /* deliver the results to the VM via DMA */
->> +        tpm_spapr_request_completed(TPM_IF(s), 0);
-> Why isn't it enough to rely on tpm_spapr_request_completed callback
-> being called during pre-save when tpm_backend_finish_sync() is called?
-> (like tis & crb)
+--ZGiS0Q5IWpPtfppv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Dec 11, 2019 at 01:55:35PM -0500, Wainer dos Santos Moschetta wrote=
+:
+> The QEMUMachine VM has a monitor setup on which an QMP
+> connection is always attempted on _post_launch() (executed
+> by launch()). In case the QEMU process immediatly exits
+> then the qmp.accept() (used to establish the connection) stalls
+> until it reaches timeout and consequently an exception raises.
+>=20
+> That behavior is undesirable when, for instance, it needs to
+> gather information from the QEMU binary ($ qemu -cpu list) or a
+> test which launches the VM expecting its failure.
+>=20
+> This patch adds the set_qmp_monitor() method to QEMUMachine that
+> allows turn off the creation of the monitor machinery on VM launch.
+>=20
+> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  python/qemu/machine.py | 66 +++++++++++++++++++++++++++---------------
+>  1 file changed, 43 insertions(+), 23 deletions(-)
+>=20
+> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+> index a4631d6934..7d4d621a42 100644
+> --- a/python/qemu/machine.py
+> +++ b/python/qemu/machine.py
+> @@ -104,6 +104,7 @@ class QEMUMachine(object):
+>          self._events =3D []
+>          self._iolog =3D None
+>          self._socket_scm_helper =3D socket_scm_helper
+> +        self._qmp_set =3D True   # Enable QMP monitor by default.
+>          self._qmp =3D None
+>          self._qemu_full_args =3D None
+>          self._test_dir =3D test_dir
+> @@ -228,15 +229,16 @@ class QEMUMachine(object):
+>                  self._iolog =3D iolog.read()
+> =20
+>      def _base_args(self):
+> -        if isinstance(self._monitor_address, tuple):
+> -            moncdev =3D "socket,id=3Dmon,host=3D%s,port=3D%s" % (
+> +        args =3D ['-display', 'none', '-vga', 'none']
+> +        if self._qmp_set:
+> +            if isinstance(self._monitor_address, tuple):
+> +                moncdev =3D "socket,id=3Dmon,host=3D%s,port=3D%s" % (
+>                  self._monitor_address[0],
+>                  self._monitor_address[1])
 
-When .pre_save is called the VM memory has been fully replicated and=20
-only the devices need to save their state, right? So TIS and CRB save=20
-the response in memory of the device for the OS driver to pick up after=20
-resume. The SPAPR device model is expected to write the response into VM=20
-memory using DMA but memory won't be marked dirty anymore and replicated=20
-(afaik). So we may have the mechanism of having=20
-tpm_spapr_request_completed() invoked but in addition we need to=20
-re-deliver a response after resume so that the OS driver reads the=20
-proper response then. I'll investigate, though...
+One thing I missed in my review on v1 was this now became badly
+indented.  No worries, it's a minor issue that I can fix on my side
+when queueing this patch.
 
+- Cleber.
+
+--ZGiS0Q5IWpPtfppv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl3ySxQACgkQZX6NM6Xy
+CfNiLw//afjGUN6UEY4gJDqjnjdi/Y4RG14AuaN211ZDa63R8lWPElsPueK+brNc
+75+a0Nm3IevT9WG+hziVjwVVVB83N3hq2WSe6gV1Lc/FGVRscTzigP1AbCUytX+v
+HD4bMvRwtFpUGYDF4CYuBUmkkjclZASb2/GkBf2H11y6O0zMOU/wB1SUFF18T0oJ
+mVEuudr9y/tD/eqdkxTrhoSx3wFmHI9DcyCA/JPf4mnG3Yi49UFRhIyNHIseRfD/
+2MQ36cGa58f5HXJc/oNlZY7mdiMWYBYdVo2tUmFzMjLQyniAAx2tjKx3K1INLYlg
+LGjUOnsts3frO3/BgMvrX+VXRDPUbNBByU9je2zibotnhbZIZ+wJ4zFbhEVnSciy
+eImIC5WYMopNWwcrxyTQ6fZ8s95qN6mpniQVWv3VmZ75hqCEVkP5bF/rKHlLniF5
+EA589D7zWa4LCCP0K5NwRmnjp0QxvlsTyg/Pr7qK6ZSFA69wfVKko+Zy94kXTyex
+J7KmrTvZSS6tAUPh0OmMX0IVa2ZtNvqBMrLS0CZ8hmPQyAfw6Khn7drfSLAKw06p
+F/Coa2DCAwXRl82R+qdU4RDD1/ce9Z3s3Ke5o+rnUk3ShkNpK5aPvhrBIMfxO9y2
+rkSFpKsqM0oPU87t9iNEPi0Dda1nnfjJutC1Uq/4o51dc/epjfo=
+=Cn/s
+-----END PGP SIGNATURE-----
+
+--ZGiS0Q5IWpPtfppv--
 
 
