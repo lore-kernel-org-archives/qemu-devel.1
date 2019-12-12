@@ -7,62 +7,61 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3213AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1113FC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:53:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2115206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:52:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE79C206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:53:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cx2Av/c3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2115206C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K0s/xa3b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE79C206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifPpZ-0001tn-2W
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:52:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35172)
+	id 1ifPq0-0002Mg-KW
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:53:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39624)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1ifPoa-0001Fi-GV
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:51:42 -0500
+ (envelope-from <david@redhat.com>) id 1ifPow-0001Pf-8X
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:52:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1ifPoX-0003ub-4B
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:51:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20638
+ (envelope-from <david@redhat.com>) id 1ifPou-0004fl-Vn
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:52:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31231
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1ifPoW-0003s0-Rn
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:51:37 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1ifPou-0004en-Qt
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:52:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576162295;
+ s=mimecast20190719; t=1576162320;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ztvbiMoN0QSJSh0ev1nG0Eowx2PlcMytfYiJHpKNir4=;
- b=cx2Av/c3mtERN8V1Za6nVHJiNZ/payjr+TLCq091TyxBs/3WILxNNRB6hx9ezruhQeAI5W
- mGtryCSrW0OmZDdcmFyGveYjCFwQC++PvDr9/8s9vszvcvxKdKRQpwOc9jIemwb00lSHvw
- wv3hDyjXvUgmy5gUWynm00vr7fXgHPs=
+ bh=pKn32YKXtKwGdi7rjkmfbbRwkQa8uVHntSwdAyKXtqU=;
+ b=K0s/xa3b4yHyDtGRX0HOXzy6L5GFBCPeYZQxsc/wCtXW/JCPXZcBOtvb09ATAt4nf3u6xt
+ SNCqrfXsXhTLWLsXDpQ1a2j8sr/fXwPXBDBy4+uxZBSn0hWYPSJ64P+uvr9dyoyGXKlC0/
+ 81PGRChC54zS9bSZl/iQbJRc57R8UQ8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-41-wh67BMgPNlaN1FLfrbLkwQ-1; Thu, 12 Dec 2019 09:51:32 -0500
+ us-mta-125-KxA4jd-KPNe45W_gROi88A-1; Thu, 12 Dec 2019 09:51:57 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06E2F800D41;
- Thu, 12 Dec 2019 14:51:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCFEB107ACC5;
+ Thu, 12 Dec 2019 14:51:55 +0000 (UTC)
 Received: from [10.36.117.65] (ovpn-117-65.ams2.redhat.com [10.36.117.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E9EC319C4F;
- Thu, 12 Dec 2019 14:51:25 +0000 (UTC)
-Subject: Re: [PATCH v3 2/3] virtio-balloon: fix memory leak while attach
- virtio-balloon device
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 78D7E19C4F;
+ Thu, 12 Dec 2019 14:51:51 +0000 (UTC)
+Subject: Re: [PATCH v3 1/3] virtio: add ability to delete vq through a pointer
 To: pannengyuan@huawei.com, mst@redhat.com
 References: <1575856810-9388-1-git-send-email-pannengyuan@huawei.com>
- <1575856810-9388-3-git-send-email-pannengyuan@huawei.com>
+ <1575856810-9388-2-git-send-email-pannengyuan@huawei.com>
 From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -108,15 +107,15 @@ Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
  njnuI31KBiLUks+paRkHQlFcgS2N3gkRBzH7xSZ+t7Re3jvXdXEzKBbQ+dC3lpJB0wPnyMcX
  FOTT3aZT7IgePkt5iC/BKBk3hqKteTnJFeVIT7EC+a6YUFg=
 Organization: Red Hat GmbH
-Message-ID: <286a92f9-a419-f924-6460-0ec36e1ddf07@redhat.com>
-Date: Thu, 12 Dec 2019 15:51:25 +0100
+Message-ID: <e0744163-713f-7cee-8be4-866c61617ec2@redhat.com>
+Date: Thu, 12 Dec 2019 15:51:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1575856810-9388-3-git-send-email-pannengyuan@huawei.com>
+In-Reply-To: <1575856810-9388-2-git-send-email-pannengyuan@huawei.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: wh67BMgPNlaN1FLfrbLkwQ-1
+X-MC-Unique: KxA4jd-KPNe45W_gROi88A-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
@@ -141,54 +140,74 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 09.12.19 03:00, pannengyuan@huawei.com wrote:
-> From: Pan Nengyuan <pannengyuan@huawei.com>
+> From: Michael S. Tsirkin <mst@redhat.com> 
 > 
-> ivq/dvq/svq/free_page_vq forgot to cleanup in
-> virtio_balloon_device_unrealize, the memory leak stack is as follow:
+> Devices tend to maintain vq pointers, allow deleting them through a vq
+> pointer.
 > 
-> Direct leak of 14336 byte(s) in 2 object(s) allocated from:
->     #0 0x7f99fd9d8560 in calloc (/usr/lib64/libasan.so.3+0xc7560)
->     #1 0x7f99fcb20015 in g_malloc0 (/usr/lib64/libglib-2.0.so.0+0x50015)
->     #2 0x557d90638437 in virtio_add_queue hw/virtio/virtio.c:2327
->     #3 0x557d9064401d in virtio_balloon_device_realize hw/virtio/virtio-balloon.c:793
->     #4 0x557d906356f7 in virtio_device_realize hw/virtio/virtio.c:3504
->     #5 0x557d9073f081 in device_set_realized hw/core/qdev.c:876
->     #6 0x557d908b1f4d in property_set_bool qom/object.c:2080
->     #7 0x557d908b655e in object_property_set_qobject qom/qom-qobject.c:26
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+> [PMM: change function name to virtio_queue_cleanup; set used_elems to NULL after free]
 > Cc: Amit Shah <amit@kernel.org>
+> Reviewed-by: Pankaj Gupta <pagupta@redhat.com>
 > Reviewed-by: Laurent Vivier <lvivier@redhat.com>
 > ---
 > Changes v2 to v1:
-> - use virtio_delete_queue to cleanup vq through a vq pointer (suggested by
->   Michael S. Tsirkin)
+> - use virtio_delete_queue to cleanup vq through a vq pointer
 > ---
 > Changes v3 to v2:
-> - change virtio_delete_queue to virtio_queue_cleanup
+> - change function name from virtio_delete_queue to virtio_queue_cleanup
 > ---
->  hw/virtio/virtio-balloon.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  hw/virtio/virtio.c         | 16 +++++++++++-----
+>  include/hw/virtio/virtio.h |  2 ++
+>  2 files changed, 13 insertions(+), 5 deletions(-)
 > 
-> diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-> index 40b04f5..681a2b2 100644
-> --- a/hw/virtio/virtio-balloon.c
-> +++ b/hw/virtio/virtio-balloon.c
-> @@ -831,6 +831,13 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
->      }
->      balloon_stats_destroy_timer(s);
->      qemu_remove_balloon_handler(s);
-> +
-> +    virtio_queue_cleanup(s->ivq);
-> +    virtio_queue_cleanup(s->dvq);
-> +    virtio_queue_cleanup(s->svq);
-> +    if (s->free_page_vq) {
-> +        virtio_queue_cleanup(s->free_page_vq);
-> +    }
->      virtio_cleanup(vdev);
+> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> index 04716b5..2743258 100644
+> --- a/hw/virtio/virtio.c
+> +++ b/hw/virtio/virtio.c
+> @@ -2330,17 +2330,23 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, int queue_size,
+>      return &vdev->vq[i];
 >  }
 >  
+> +void virtio_queue_cleanup(VirtQueue *vq)
+> +{
+> +    vq->vring.num = 0;
+> +    vq->vring.num_default = 0;
+> +    vq->handle_output = NULL;
+> +    vq->handle_aio_output = NULL;
+> +    g_free(vq->used_elems);
+> +    vq->used_elems = NULL;
+> +}
+> +
+>  void virtio_del_queue(VirtIODevice *vdev, int n)
+>  {
+>      if (n < 0 || n >= VIRTIO_QUEUE_MAX) {
+>          abort();
+>      }
+>  
+> -    vdev->vq[n].vring.num = 0;
+> -    vdev->vq[n].vring.num_default = 0;
+> -    vdev->vq[n].handle_output = NULL;
+> -    vdev->vq[n].handle_aio_output = NULL;
+> -    g_free(vdev->vq[n].used_elems);
+> +    virtio_queue_cleanup(&vdev->vq[n]);
+>  }
+>  
+>  static void virtio_set_isr(VirtIODevice *vdev, int value)
+> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+> index c32a815..cc0b3f0 100644
+> --- a/include/hw/virtio/virtio.h
+> +++ b/include/hw/virtio/virtio.h
+> @@ -183,6 +183,8 @@ VirtQueue *virtio_add_queue(VirtIODevice *vdev, int queue_size,
+>  
+>  void virtio_del_queue(VirtIODevice *vdev, int n);
+>  
+> +void virtio_queue_cleanup(VirtQueue *vq);
+> +
+>  void virtqueue_push(VirtQueue *vq, const VirtQueueElement *elem,
+>                      unsigned int len);
+>  void virtqueue_flush(VirtQueue *vq, unsigned int count);
 > 
 
 Reviewed-by: David Hildenbrand <david@redhat.com>
