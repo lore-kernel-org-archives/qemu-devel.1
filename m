@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E89A6C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0812C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:13:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1561222C4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:13:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B56E222C4
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:13:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U4d5yTE1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1561222C4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yU7qj1XN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B56E222C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifFqe-0008Li-Bb
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:13:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49299)
+	id 1ifFqo-000072-6r
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:13:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49097)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ifFez-0000vl-Gf
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:07 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ifFex-0004EI-FM
+ (envelope-from <richard.henderson@linaro.org>) id 1ifFex-0000uI-KH
  for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:05 -0500
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38060)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <richard.henderson@linaro.org>) id 1ifFew-0004CO-Hw
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:03 -0500
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41897)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ifFex-0004Aw-3E
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:03 -0500
-Received: by mail-pl1-x642.google.com with SMTP id a17so4534pls.5
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:01:02 -0800 (PST)
+ id 1ifFet-00043l-P9
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:01 -0500
+Received: by mail-pl1-x644.google.com with SMTP id bd4so444084plb.8
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:00:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=cdzUkCGd4j9cyI7GBjpMOiOf+nGUeT9o9Hdz62SsCpo=;
- b=U4d5yTE18ArAv/25Nxrz4jz1YA0MzeWCk/NTL7hd1tfPPcJinFivSlHDbc4u25L+8C
- saVhdaTIOyLpGZtkMCAs6vMvYxXubjPJVBQOdQJcP/+2N7BEYRCSv5YOBBli+H/BsnCl
- nn6Oc+Cze/C5FBflxbX1MWc2RbnUuDoyUcGw8f+LRlZk/kgyC+y7F32e8comyVOwxi3d
- n7UG6qPcHkZ6hfiQSn52eQEZBN53pDK+JXZxH0HikxfBNfwAYVDkW0fC/898499+T1xU
- /vBxa4hzelM0UmF9KgHQMsRY6BQDxfNUL631r8c/QR29gaw6P91w/pDENPnTpOdJT8yB
- djMw==
+ bh=eyI58KOw8f6KjHd513cv2CHH4iBrq42PUmdQAMssFYg=;
+ b=yU7qj1XNPXvU2aK0pxXWNBjDcqxCt8gSjhGqkbLmUYjZzt14lFVB5uyDIN+MmYDjlJ
+ S/sdqZw3de50hJbaptVKpOUIYvO0mam0o8VZTbshL+sE1UA5tsZfvOETvvWiiJB9E9hN
+ 3Hd+ydtwdahyHdhdYEUyD8UEnpAYF2Q73twN5f+DxGX9Ynn9+zjK3o8rzatKxX8gupUD
+ XgOmiL1JpaN5nwgaSa3ym70/7l5tlEHEzoL2fKzzSEyITMY8cQ4MYSdcdo08kmYtwV/f
+ lizTHrd7oYxzlfbwYV8qvTjr8CrUAI5XN3GDxg0rMfT16GdQwA5xxKqMyyhF6R0h9RJ0
+ 70TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cdzUkCGd4j9cyI7GBjpMOiOf+nGUeT9o9Hdz62SsCpo=;
- b=Os+Kn6nk2ZWO8p1K0AaGUK6QOV4vlfUAaFcgutwa4MNROiZujTQT+uAWpsPJFp9Y8z
- 9OZazuPxEM+kom9LsKEkXyNc6o1bqmEBJt4AjXLfnZxiovjuU4RyoipcXfDbTyJZwa4L
- yMuWMRM+cpPJo2cJyF3ViR9fGwyMEXTsPHDl7KJBfX6IsyaWWvb+M20a0gRmX3qv6Uvj
- HGzT8SpYson91Ie5QuqnYWtRibY6PWlD6mh2gcCTFwL+utD+5TtxbXYKSlE2CRwxf2Qv
- 7v2TQhNVqzOHm3j0TQ70a5m2O3Bb7sos1eoRxdHnZSodb+dY9mdd0hHKQzZS1Bu4j0lh
- NEHQ==
-X-Gm-Message-State: APjAAAUrGmOUuVgF3jdi4pacd4OObzrktge3ndQ7+F/ouSsUcEiuHWx6
- hIZK712lpOPPuei+t7AiB1kh5MKeACI=
-X-Google-Smtp-Source: APXvYqwvnQMx/5beYozyVtjRQ4yGSbLGqA5XPtQ7MV6mg63knysAmIbkLEQMIYkxF3bfrZn8cSrrLA==
-X-Received: by 2002:a17:902:12c:: with SMTP id
- 41mr7147011plb.160.1576123260944; 
- Wed, 11 Dec 2019 20:01:00 -0800 (PST)
+ bh=eyI58KOw8f6KjHd513cv2CHH4iBrq42PUmdQAMssFYg=;
+ b=m2gR4A/Uu9Z244jyuq5ZYF+LNJPopa+oxHDdQjB7KzcMVmQvbJn63tfAtV9z/+GThT
+ aA0hppjj6djX3pv0MEZkfy+0en5FJCWOuDNsQ8Dj/VfzPuEp900dJphejWvOH5mqOXAe
+ /1aKsRltb70ypvoEwZKtxkLTdaM0adGQdzQ8i4blXnzvFgsmpatf80ASUbHpRRROfFj4
+ LYbG/KGSkO2vGFrD5Qlfh7NYBHO0DMru7HvTQzTR5KWgL5tsZyOBv2KnaEIumLXfMKGe
+ WNC27EQzkXndeIsgflme431UUuKXduH5n6AKvPNj8qBJz0fKOEUY60WkWtnF//Y16IoW
+ O4hQ==
+X-Gm-Message-State: APjAAAUtSZvZV2LoFf7YpP8SOSklcTnfFfuwBJ1bJsI/jIe94DQ1nqt/
+ uJBOOwz+jMmycDxYl7yMxTWAARfxruA=
+X-Google-Smtp-Source: APXvYqwjlALn333oE2jlKifjQIXUM5rWtYcGOWHuLWntj/gC6WUKGfGPIn4jmCg4F42apuDu8C4s7A==
+X-Received: by 2002:a17:902:9a04:: with SMTP id
+ v4mr7382327plp.192.1576123256006; 
+ Wed, 11 Dec 2019 20:00:56 -0800 (PST)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id z130sm4666391pgz.6.2019.12.11.20.00.59
+ by smtp.gmail.com with ESMTPSA id z130sm4666391pgz.6.2019.12.11.20.00.54
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Dec 2019 20:01:00 -0800 (PST)
+ Wed, 11 Dec 2019 20:00:55 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 16/28] target/alpha: Remove MMU_MODE{0,1}_SUFFIX
-Date: Wed, 11 Dec 2019 20:00:27 -0800
-Message-Id: <20191212040039.26546-17-richard.henderson@linaro.org>
+Subject: [PATCH 12/28] linux-user: Include tcg.h in syscall.c
+Date: Wed, 11 Dec 2019 20:00:23 -0800
+Message-Id: <20191212040039.26546-13-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191212040039.26546-1-richard.henderson@linaro.org>
 References: <20191212040039.26546-1-richard.henderson@linaro.org>
@@ -83,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::642
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,26 +99,26 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The functions generated by these macros are unused.
+Code movement in an upcoming patch will show that this file
+was implicitly depending on tcg.h being included indirectly.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/alpha/cpu.h | 2 --
- 1 file changed, 2 deletions(-)
+ linux-user/syscall.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index a530249a5b..3f782c0efe 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -193,8 +193,6 @@ enum {
-    PALcode cheats and usees the KSEG mapping for its code+data rather than
-    physical addresses.  */
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index 171c0caef3..34825f15bf 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -115,6 +115,7 @@
+ #include "user/syscall-trace.h"
+ #include "qapi/error.h"
+ #include "fd-trans.h"
++#include "tcg.h"
  
--#define MMU_MODE0_SUFFIX _kernel
--#define MMU_MODE1_SUFFIX _user
- #define MMU_KERNEL_IDX   0
- #define MMU_USER_IDX     1
- #define MMU_PHYS_IDX     2
+ #ifndef CLONE_IO
+ #define CLONE_IO                0x80000000      /* Clone io context */
 -- 
 2.20.1
 
