@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C65C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA91C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:55:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A274F21655
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:54:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B41A21655
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:55:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nodDSSyA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A274F21655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/M4N4Dd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B41A21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOv6-0002WX-B0
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:54:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41321)
+	id 1ifOvo-0003cB-Vr
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:55:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42698)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNz2-0004YN-CC
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:21 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNzB-0004nW-L6
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNz1-00082s-4z
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:20 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:32989)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNzA-0008Hy-Ae
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:29 -0500
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:34220)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNz0-00081X-Ud
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:19 -0500
-Received: by mail-wr1-x441.google.com with SMTP id b6so2661985wrq.0
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:54:18 -0800 (PST)
+ id 1ifNzA-0008GN-49
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:28 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id t2so2647279wrr.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:54:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7II7HXD2dCRyEaFrPk3gzA1HlPJFN/y0B2bCD8zF+hQ=;
- b=nodDSSyAAf9Gf/5/eQmt6w8OXZq77kqROWaOVOQa8n0/nbO1csHPcW5m27DoxAacqj
- DLtwTQXsPYlOrQp8HXgMbeluGz3WxjODbeIiNMX9vY4LcI+lq/jE+Q58PedaS9nJz0KU
- I6LRU9k3TbSncBSVieLbNxnSrSXJ4EE2TttddCHFpG1x55PrNpsaLZX906xvK5D1/82Z
- PofI1KpDarHcs1mzuSdjfcZg2eNXMC5KyYmLZAxnOS57R0QS1RZf6hm6wPK2q+y6qicB
- m7yq2MrBsXEHZV74M5jvc+OUThKg90mKyxFdsVayKkw+B4mY1yHrZg+NgH+0GWfoMpJR
- mI4w==
+ bh=T8nlJuKHUFV6YDTgA0pf50k84pJ1aEuOI0caCAxP+sI=;
+ b=U/M4N4DdnO7Xn28tAIEtwkjRZgcJjReHyw00UgJQoITPzs1AeeOvTAqaiRP2DXvpAb
+ PC5Sc45wt+2qmzeMVPnldMVQdGD/vhrjHakT04YV2pa3yZLemjmcTRS49kOB8gpElWzh
+ nQpNoJBGOnMy/JDuEq2y4D29mDi47e6Fi2Ls8fZrJn1bcFImXLGo9BERE+OIbo/FwRYQ
+ v8iRqgFtrsTB7ObsWLBghSZu6c+j1iJWA6srKMjsFMa4dhmgWqAedxx3tydsoRRlC11O
+ nFPhFhS0UVihJc7vJgYf1AhJP/h1esn/K4J/+hz6bkt57Ep2l+dmCCWKIiQGEuC6RFGj
+ pyUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=7II7HXD2dCRyEaFrPk3gzA1HlPJFN/y0B2bCD8zF+hQ=;
- b=T7QLx7GHzmUHHPZ6HFEDUFbVRtNNmnDMoDJTO8jKnykDhA8naBYtL0CRsp7+VBEPJb
- CbVqcrUkN+UwzehwdJJiXEelQSH1H1ykxhQ3F9NRR4ddVPWvtjz9f3XKBfA735qFCmH0
- QrdTkom+lpx5pVJXIu2fBpNHTFgqyd3+qIX1gGigW77vczlP3ajw/X7SnPeu42Ow8xGK
- nQBL/612Z1QRYdLNmJGt9hOgKoIreQSqzIkTnlQ6pWBk6EoddIq3Lq2w/3ao/abjRIEr
- yWrdzMEmUCnXwDjAQ3sQ90F5wyT+wa8WBH7DNG/7uhCruaueMnl3LxyOgFrVUpnOYiJM
- E73A==
-X-Gm-Message-State: APjAAAXVF9Yw72HqY6ipaa0fQvMVoagzegBTRHZEvw06FBy0AKrZZZa/
- A04NibtSkiysuByGQRcKaMmTgk/Z
-X-Google-Smtp-Source: APXvYqwwjd0rMZqpzjIS1x4vvjQGINspR4hli4t9X/d/605b7nPkt0cvtc4AcY7ExpOUjcTlRtSSOA==
-X-Received: by 2002:a5d:5704:: with SMTP id a4mr6171543wrv.198.1576155257766; 
- Thu, 12 Dec 2019 04:54:17 -0800 (PST)
+ bh=T8nlJuKHUFV6YDTgA0pf50k84pJ1aEuOI0caCAxP+sI=;
+ b=KG7tW5nsUeiQ7ulkXI4VaR81zndydZ5GnAKMkBymuEjPXjt+vCT1KCMTmELsy3RNcV
+ YLa2gdk752JkByqyyPCGp7NRO275O8FKAMX+T4vMJzlxARBOPyWGKdbTbsgTqvMGd+pR
+ GICRDT769DUzGlK6utMfQ5/4aE7daqeqmJPuKGoP8V5rWOmxEKcLAJFnrhxgiSmogvZ7
+ JQjYajLqlXqCWZqw/UvIICuOEMAmLwrXszfipjRsvfd1y+GfrhBgb7rxWjuL57StRZdk
+ lXyFG3k6QpkyOyt+QTB1wPkx9RCzv1E9i4yrqabHDLVy7x0LiFXXQQnz/BYhuLBp6BaE
+ LO2Q==
+X-Gm-Message-State: APjAAAURT74yZrFR9BKA8+5rRZoQYalAkjIOB57z/VNs0E6kDowvl7sc
+ 3m9MESJSGItQxcV9xWLaNasXQjQf
+X-Google-Smtp-Source: APXvYqzSdB9RsmIKQPuWTiPl8hUOUm6kgfOWyJEEsbqL+FmUvijdrf7zJW2XiDwQKwojHjIYegWEBA==
+X-Received: by 2002:adf:fe43:: with SMTP id m3mr6373042wrs.213.1576155266825; 
+ Thu, 12 Dec 2019 04:54:26 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.54.16
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.54.25
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:54:17 -0800 (PST)
+ Thu, 12 Dec 2019 04:54:25 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 080/132] meson: convert hw/pci
-Date: Thu, 12 Dec 2019 13:52:04 +0100
-Message-Id: <1576155176-2464-81-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 089/132] meson: convert hw/input
+Date: Thu, 12 Dec 2019 13:52:13 +0100
+Message-Id: <1576155176-2464-90-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::42a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,82 +102,82 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs     |  1 -
- hw/meson.build       |  1 +
- hw/pci/Makefile.objs | 14 --------------
- hw/pci/meson.build   | 19 +++++++++++++++++++
- 4 files changed, 20 insertions(+), 15 deletions(-)
- delete mode 100644 hw/pci/Makefile.objs
- create mode 100644 hw/pci/meson.build
+ hw/Makefile.objs       |  1 -
+ hw/input/Makefile.objs | 17 -----------------
+ hw/input/meson.build   | 17 +++++++++++++++++
+ hw/meson.build         |  1 +
+ 4 files changed, 18 insertions(+), 18 deletions(-)
+ delete mode 100644 hw/input/Makefile.objs
+ create mode 100644 hw/input/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 8a56abf..512d10d 100644
+index c89ca8d..c99f7e3 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -22,7 +22,6 @@ devices-dirs-y += misc/
- devices-dirs-y += net/
- devices-dirs-y += rdma/
- devices-dirs-y += nvram/
--devices-dirs-y += pci/
+@@ -13,7 +13,6 @@ devices-dirs-y += gpio/
+ devices-dirs-$(CONFIG_HYPERV) += hyperv/
+ devices-dirs-$(CONFIG_I2C) += i2c/
+ devices-dirs-y += ide/
+-devices-dirs-y += input/
  endif
  
  common-obj-y += $(devices-dirs-y)
+diff --git a/hw/input/Makefile.objs b/hw/input/Makefile.objs
+deleted file mode 100644
+index a1bc502..0000000
+--- a/hw/input/Makefile.objs
++++ /dev/null
+@@ -1,17 +0,0 @@
+-common-obj-$(CONFIG_ADB) += adb.o adb-mouse.o adb-kbd.o
+-common-obj-y += hid.o
+-common-obj-$(CONFIG_LM832X) += lm832x.o
+-common-obj-$(CONFIG_PCKBD) += pckbd.o
+-common-obj-$(CONFIG_PL050) += pl050.o
+-common-obj-$(CONFIG_PS2) += ps2.o
+-common-obj-$(CONFIG_STELLARIS_INPUT) += stellaris_input.o
+-common-obj-$(CONFIG_TSC2005) += tsc2005.o
+-
+-common-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input.o
+-common-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-hid.o
+-common-obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host.o
+-common-obj-$(CONFIG_VHOST_USER_INPUT) += vhost-user-input.o
+-
+-obj-$(CONFIG_MILKYMIST) += milkymist-softusb.o
+-obj-$(CONFIG_PXA2XX) += pxa2xx_keypad.o
+-obj-$(CONFIG_TSC210X) += tsc210x.o
+diff --git a/hw/input/meson.build b/hw/input/meson.build
+new file mode 100644
+index 0000000..6cc59e6
+--- /dev/null
++++ b/hw/input/meson.build
+@@ -0,0 +1,17 @@
++softmmu_ss.add(files('hid.c'))
++softmmu_ss.add(when: 'CONFIG_ADB', if_true: files('adb.c', 'adb-mouse.c', 'adb-kbd.c'))
++softmmu_ss.add(when: 'CONFIG_LM832X', if_true: files('lm832x.c'))
++softmmu_ss.add(when: 'CONFIG_PCKBD', if_true: files('pckbd.c'))
++softmmu_ss.add(when: 'CONFIG_PL050', if_true: files('pl050.c'))
++softmmu_ss.add(when: 'CONFIG_PS2', if_true: files('ps2.c'))
++softmmu_ss.add(when: 'CONFIG_STELLARIS_INPUT', if_true: files('stellaris_input.c'))
++softmmu_ss.add(when: 'CONFIG_TSC2005', if_true: files('tsc2005.c'))
++
++softmmu_ss.add(when: 'CONFIG_VIRTIO_INPUT', if_true: files('virtio-input.c'))
++softmmu_ss.add(when: 'CONFIG_VIRTIO_INPUT', if_true: files('virtio-input-hid.c'))
++softmmu_ss.add(when: 'CONFIG_VIRTIO_INPUT_HOST', if_true: files('virtio-input-host.c'))
++softmmu_ss.add(when: 'CONFIG_VHOST_USER_INPUT', if_true: files('vhost-user-input.c'))
++
++specific_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-softusb.c'))
++specific_ss.add(when: 'CONFIG_PXA2XX', if_true: files('pxa2xx_keypad.c'))
++specific_ss.add(when: 'CONFIG_TSC210X', if_true: files('tsc210x.c'))
 diff --git a/hw/meson.build b/hw/meson.build
-index 4d88cfa..1fd9eb5 100644
+index a5032d3..a85ec93 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1,5 +1,6 @@
+@@ -1,4 +1,5 @@
  subdir('core')
- subdir('mem')
-+subdir('pci')
- subdir('pci-bridge')
- subdir('pci-host')
- subdir('pcmcia')
-diff --git a/hw/pci/Makefile.objs b/hw/pci/Makefile.objs
-deleted file mode 100644
-index c78f2fb..0000000
---- a/hw/pci/Makefile.objs
-+++ /dev/null
-@@ -1,14 +0,0 @@
--common-obj-$(CONFIG_PCI) += pci.o pci_bridge.o
--common-obj-$(CONFIG_PCI) += msix.o msi.o
--common-obj-$(CONFIG_PCI) += shpc.o
--common-obj-$(CONFIG_PCI) += slotid_cap.o
--common-obj-$(CONFIG_PCI) += pci_host.o
--
--# The functions in these modules can be used by devices too.  Since we
--# allow plugging PCIe devices into PCI buses, include them even if
--# CONFIG_PCI_EXPRESS=n.
--common-obj-$(CONFIG_PCI) += pcie.o pcie_aer.o
--common-obj-$(CONFIG_PCI_EXPRESS) += pcie_port.o pcie_host.o
--
--common-obj-$(call lnot,$(CONFIG_PCI)) += pci-stub.o
--common-obj-$(CONFIG_ALL) += pci-stub.o
-diff --git a/hw/pci/meson.build b/hw/pci/meson.build
-new file mode 100644
-index 0000000..5c4bbac
---- /dev/null
-+++ b/hw/pci/meson.build
-@@ -0,0 +1,19 @@
-+pci_ss = ss.source_set()
-+pci_ss.add(files(
-+  'msi.c',
-+  'msix.c',
-+  'pci.c',
-+  'pci_bridge.c',
-+  'pci_host.c',
-+  'shpc.c',
-+  'slotid_cap.c'
-+))
-+# The functions in these modules can be used by devices too.  Since we
-+# allow plugging PCIe devices into PCI buses, include them even if
-+# CONFIG_PCI_EXPRESS=n.
-+pci_ss.add(files('pcie.c', 'pcie_aer.c'))
-+softmmu_ss.add(when: 'CONFIG_PCI_EXPRESS', if_true: files('pcie_port.c', 'pcie_host.c'))
-+softmmu_ss.add_all(when: 'CONFIG_PCI', if_true: pci_ss)
-+
-+softmmu_ss.add(when: 'CONFIG_PCI', if_false: files('pci-stub.c'))
-+softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('pci-stub.c'))
++subdir('input')
+ subdir('intc')
+ subdir('ipack')
+ subdir('ipmi')
 -- 
 1.8.3.1
 
