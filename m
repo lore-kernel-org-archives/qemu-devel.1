@@ -7,81 +7,76 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C35A5C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 09:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1581EC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 09:33:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E767214D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 09:13:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5B9121655
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 09:33:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MVJqv1pH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E767214D8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYwk8Li+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5B9121655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifKX5-0005eK-Ld
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 04:13:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33986)
+	id 1ifKr0-0001eQ-OX
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 04:33:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35179)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ifKWQ-0005Fi-8S
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 04:12:36 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ifKqL-0001AH-K0
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 04:33:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1ifKWN-0007rv-R8
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 04:12:34 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45143)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ifKqI-0002eD-Uf
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 04:33:09 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43440)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1ifKWN-0007oh-KD
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 04:12:31 -0500
-Received: by mail-ot1-x343.google.com with SMTP id 59so1058233otp.12
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 01:12:31 -0800 (PST)
+ id 1ifKqI-0002cU-Ob
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 04:33:06 -0500
+Received: by mail-ot1-x342.google.com with SMTP id p8so1150516oth.10
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 01:33:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=IQrrKyBBYF7FQ7E7MReP9ehht403oLrVGzxKrFNoyOs=;
- b=MVJqv1pHukBhenQ4MnAvV69B1wT39dRvQ62889b9rA9SCw+Uy667XCh3BN99msnZAR
- n0bZHCcG0+G4+lwSt4YrbeWOinR6S0Hev34GVqC4+weq496s0Gm8opS85lGuer5VUzOQ
- /U468qGXBsItllvbAKIfmp+9GPmQkeAC+ulE9/dx76mJfXHrxEjcfIRoLJpR4kjbqXmK
- +tWUfr84orn3WVGP/SAzfXzPgLjMKfyMG36U4bjukMzxLaXr3mi3Eyyw62hyopRdZ/wz
- OLbbdB5ibT+6UkbQr/JomkUy8ysnhHcCwTcNbl/rTEiv9lG8ng3eTODU4oc0JjxvB8LK
- piPw==
+ :cc; bh=dvL35+kdbwH9Vov4fGIckykUEz1oBeNPDpK9537sA0Y=;
+ b=lYwk8Li+haVxVtjRZf+Deo4WleMPG6NtT/suAoABTFC7+2u4enTTxPoA0RcuDnUhjC
+ t7HORxrgMANNlqk91TkOBhbB4XNFKhoye5QBylCjtErrl1eP0gpGL+TfAU+7Qn6o/J3q
+ sk9A1XUDpzUH/CrZnZ30K+/hE/pXVGhMsVkcL4Dx9/4CCD8x7fzT1zQzIEw0CsHFJAo3
+ 3pPq3mXr6bkeZmY+oY/M8hpBOf6clxMSXLn2vmUEAT/I65hNPn9nk+iaVZGsQiAQA1w7
+ VceM7YmqyUAIeR5N5i9J0QwToOZeqkToJLQLkTOk5fRJzXUoDMPsXiJaWiKBfLy4Rw27
+ kk5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=IQrrKyBBYF7FQ7E7MReP9ehht403oLrVGzxKrFNoyOs=;
- b=IADI3AkJUkHUZH23NwMqXpM020qLqi1kLgD9W7pcemlfl/VzRmiLdsSWI6b4Vutajo
- 0Pt76n3UiWn6FGxrf5/L/aIGpRfVINUO730XA3m7TMN1g7gCuUn9QIof/wFKwaUI1h8b
- qpPXbkDow45sG3ZJWzYq2J3/6udm62CzjdtG7BTeASxlVpCfMACRDTfeFeRCio27rKnL
- Ezd6wpXZCQ+7Ixj7xneGIXzylVmcoDzdxOyMuNkg9soO1Jd6RpWtBoHGYIcfgKmPX9Mb
- NsLvyBGPEwFUn9wqAelE7opFRnW7OPsY7cR+cYMpuKIZxmJi1FszPTkqgs6W/1Vjivgy
- 8Bkg==
-X-Gm-Message-State: APjAAAXn7CwA6N8l4tTiaLNPq9zyrkJjpCkWJTa0+b8qDeBMb1kP3D14
- Vl7DDiWKJuOnz1pa1FGNRo7CMGIFKH3eP4mPf2Y=
-X-Google-Smtp-Source: APXvYqyP9CB73fALpqXoXX2bMsVkpbSVOnCkIfJF43yIYS4TAzycTLrcE3XzwrF5mFj+YtwbOX1x1B1rVbTPAiv2mCQ=
-X-Received: by 2002:a9d:58c9:: with SMTP id s9mr6636965oth.121.1576141950296; 
- Thu, 12 Dec 2019 01:12:30 -0800 (PST)
+ :message-id:subject:to:cc;
+ bh=dvL35+kdbwH9Vov4fGIckykUEz1oBeNPDpK9537sA0Y=;
+ b=N3A9yBRcOTsH4/sNqEOmB8JVnvK4DrKRWJNUKJbGGQaM2M44fPF3wGkd7ZILq6eHQU
+ +C9D6p5h+aepxYmE1mLDE+x0jkQEtZG62G6fx1zoSnjDKlvgm5LSe/LHNqfLKfsSzwwb
+ TvZo1dQIpjfCRanRSwjO9bDIoSQkVmf5t4WsA/Bcbli2+a3KWZuFafeuOpytbAKSAfGS
+ zbGjMFym1l/DLnq7bMCSQNIDpZb5u9uOYV91xbYwpSBDmcU7KGtWQLK1omGYSx8uKxdN
+ MAI47qdALA8EicRFcpEQeucBlx6JEcvkleGbfS3dMnkNQ2SEasUKbZYzDVAEtAGauwaR
+ 7QHA==
+X-Gm-Message-State: APjAAAUfIW1mmpLaHptjwnUR8JfBXruiMh4sTYrHftV6DtA9avRT3cdA
+ Q629JmblceLS6ANPIO0+N/pK3zx4sq6gqcQCMEM=
+X-Google-Smtp-Source: APXvYqyMW+wX/IrLfaMsp4efGyw45AW9M5hKgmd14xrzfiQe4sp7IRV7JrlHWx2mgKcZsFioTPlFEssWjk2RyiuJs1I=
+X-Received: by 2002:a9d:7c8f:: with SMTP id q15mr7420256otn.341.1576143185970; 
+ Thu, 12 Dec 2019 01:33:05 -0800 (PST)
 MIME-Version: 1.0
-References: <20191208183922.13757-1-mrolnik@gmail.com>
- <20191208183922.13757-12-mrolnik@gmail.com>
- <CAL1e-=iPsFgtEmvT2xt-Fm8AiQBxq48_veVDcnnyMEqghF16hw@mail.gmail.com>
- <CAK4993ipego3-ELy82A85Rcd=PDiqCF0M5-COpHPUTL6UjVQZQ@mail.gmail.com>
- <CAL1e-=gkGa0GCjSMm1QK+KrsnSts_1ZgvcjjP6acCVt7xP3ZpQ@mail.gmail.com>
- <CAK4993jAANG-P_FeWhzu0ncZdiDEn=moWQ=qPKjNS_7SxzPFUQ@mail.gmail.com>
-In-Reply-To: <CAK4993jAANG-P_FeWhzu0ncZdiDEn=moWQ=qPKjNS_7SxzPFUQ@mail.gmail.com>
+References: <20191212040039.26546-1-richard.henderson@linaro.org>
+ <20191212040039.26546-25-richard.henderson@linaro.org>
+In-Reply-To: <20191212040039.26546-25-richard.henderson@linaro.org>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 12 Dec 2019 10:12:19 +0100
-Message-ID: <CAL1e-=i-PViLdw1bT2JXnMf_MdKdswAGBFvYsWSbCRrgcmd_tQ@mail.gmail.com>
-Subject: Re: [PATCH v38 11/22] target/avr: Add instruction disassembly function
-To: Michael Rolnik <mrolnik@gmail.com>
+Date: Thu, 12 Dec 2019 10:32:55 +0100
+Message-ID: <CAL1e-=jDG7ytDfdcu+cgSFyb+E5rJemUvY3zcF6iHNSRD_zVwg@mail.gmail.com>
+Subject: Re: [PATCH 24/28] target/mips: Use cpu_*_mmuidx_ra instead of
+ MMU_MODE*_SUFFIX
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,421 +88,384 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- "me@xcancerberox.com.ar" <me@xcancerberox.com.ar>,
- Richard Henderson <richard.henderson@linaro.org>,
+Cc: Aurelien Jarno <aurelien@aurel32.net>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
  QEMU Developers <qemu-devel@nongnu.org>,
- "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Dec 10, 2019 at 8:18 AM Michael Rolnik <mrolnik@gmail.com> wrote:
+On Thu, Dec 12, 2019 at 5:21 AM Richard Henderson
+<richard.henderson@linaro.org> wrote:
 >
-> You are right. See at the bottom of the file. There is a comment about it
+> The separate suffixed functions were used to construct
+> some do_##insn function switched on mmu_idx.  The interface
+> is exactly identical to the *_mmuidx_ra functions.  Replace
+> them directly and remove the constructions.
+>
+> Cc: Aurelien Jarno <aurelien@aurel32.net>
+> Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
+> Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  target/mips/cpu.h       |   4 -
+>  target/mips/op_helper.c | 182 +++++++++++++---------------------------
+>  2 files changed, 60 insertions(+), 126 deletions(-)
 >
 
-Sorry, what file?
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-I also see that you disassemble instructions regardless of what AVR
-CPU the current executable is built for, don't you? OK, not a very big
-deal, but can be confusing for end user if disassembly text of an
-instruction that is not supported by a particular CPU is displayed as
-if it is supported.
-
-> Sent from my cell phone, please ignore typos
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index ca00f41daf..c218ccc4a8 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -1147,10 +1147,6 @@ extern uint32_t cpu_rddsp(uint32_t mask_num, CPUMIPSState *env);
+>   * MMU modes definitions. We carefully match the indices with our
+>   * hflags layout.
+>   */
+> -#define MMU_MODE0_SUFFIX _kernel
+> -#define MMU_MODE1_SUFFIX _super
+> -#define MMU_MODE2_SUFFIX _user
+> -#define MMU_MODE3_SUFFIX _error
+>  #define MMU_USER_IDX 2
 >
-> On Tue, Dec 10, 2019, 6:21 AM Aleksandar Markovic <aleksandar.m.mail@gmai=
-l.com> wrote:
->>
->>
->>
->> On Monday, December 9, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
->>>
->>> Hi Aleksandar.
->>>
->>> 1. all instructions are 16 bit long except CALL & JMP they are 32 bit l=
-ong
->>
->>
->> Accordingto the doc, LDS and STS also have 32-bit coding.
->>
->>
->>>
->>> 2. next_word_used is set to true by next_word when called by append_16 =
-when CALL & JMP are parsed
->>>
->>> Regards,
->>> Michael Rolnik
->>>
->>> On Mon, Dec 9, 2019 at 8:10 PM Aleksandar Markovic <aleksandar.m.mail@g=
-mail.com> wrote:
->>>>
->>>>
->>>>
->>>> On Sunday, December 8, 2019, Michael Rolnik <mrolnik@gmail.com> wrote:
->>>>>
->>>>> Provide function disassembles executed instruction when `-d in_asm` i=
-s
->>>>> provided
->>>>>
->>>>> Example:
->>>>> `./avr-softmmu/qemu-system-avr -bios free-rtos/Demo/AVR_ATMega2560_GC=
-C/demo.elf -d in_asm` will produce something like the following
->>>>>
->>>>> ```
->>>>>     ...
->>>>>     IN:
->>>>>     0x0000014a:  CALL      0x3808
->>>>>
->>>>>     IN: main
->>>>>     0x00003808:  CALL      0x4b4
->>>>>
->>>>>     IN: vParTestInitialise
->>>>>     0x000004b4:  LDI       r24, 255
->>>>>     0x000004b6:  STS       r24, 0
->>>>>     0x000004b8:  MULS      r16, r20
->>>>>     0x000004ba:  OUT       $1, r24
->>>>>     0x000004bc:  LDS       r24, 0
->>>>>     0x000004be:  MULS      r16, r20
->>>>>     0x000004c0:  OUT       $2, r24
->>>>>     0x000004c2:  RET
->>>>>     ...
->>>>> ```
->>>>>
->>>>> Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
->>>>> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
->>>>> Suggested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>>> Suggested-by: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
->>>>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>>> Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>>> ---
->>>>>  target/avr/cpu.h       |   1 +
->>>>>  target/avr/cpu.c       |   2 +-
->>>>>  target/avr/disas.c     | 226 +++++++++++++++++++++++++++++++++++++++=
-++
->>>>>  target/avr/translate.c |  11 ++
->>>>>  4 files changed, 239 insertions(+), 1 deletion(-)
->>>>>  create mode 100644 target/avr/disas.c
->>>>>
->>>>> diff --git a/target/avr/cpu.h b/target/avr/cpu.h
->>>>> index c217eefeb4..a8a3e7ade6 100644
->>>>> --- a/target/avr/cpu.h
->>>>> +++ b/target/avr/cpu.h
->>>>> @@ -178,6 +178,7 @@ bool avr_cpu_exec_interrupt(CPUState *cpu, int in=
-t_req);
->>>>>  hwaddr avr_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
->>>>>  int avr_cpu_gdb_read_register(CPUState *cpu, uint8_t *buf, int reg);
->>>>>  int avr_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg)=
-;
->>>>> +int avr_print_insn(bfd_vma addr, disassemble_info *info);
->>>>>
->>>>>  static inline int avr_feature(CPUAVRState *env, int feature)
->>>>>  {
->>>>> diff --git a/target/avr/cpu.c b/target/avr/cpu.c
->>>>> index c5cafcae3c..be4b921e4d 100644
->>>>> --- a/target/avr/cpu.c
->>>>> +++ b/target/avr/cpu.c
->>>>> @@ -83,7 +83,7 @@ static void avr_cpu_reset(CPUState *cs)
->>>>>  static void avr_cpu_disas_set_info(CPUState *cpu, disassemble_info *=
-info)
->>>>>  {
->>>>>      info->mach =3D bfd_arch_avr;
->>>>> -    info->print_insn =3D NULL;
->>>>> +    info->print_insn =3D avr_print_insn;
->>>>>  }
->>>>>
->>>>>  static void avr_cpu_realizefn(DeviceState *dev, Error **errp)
->>>>> diff --git a/target/avr/disas.c b/target/avr/disas.c
->>>>> new file mode 100644
->>>>> index 0000000000..22863d2eb1
->>>>> --- /dev/null
->>>>> +++ b/target/avr/disas.c
->>>>> @@ -0,0 +1,226 @@
->>>>> +/*
->>>>> + * AVR disassembler
->>>>> + *
->>>>> + * Copyright (c) 2019 Richard Henderson <rth@twiddle.net>
->>>>> + * Copyright (c) 2019 Michael Rolnik <mrolnik@gmail.com>
->>>>> + *
->>>>> + * This program is free software: you can redistribute it and/or mod=
-ify
->>>>> + * it under the terms of the GNU General Public License as published=
- by
->>>>> + * the Free Software Foundation, either version 2 of the License, or
->>>>> + * (at your option) any later version.
->>>>> + *
->>>>> + * This program is distributed in the hope that it will be useful,
->>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->>>>> + * GNU General Public License for more details.
->>>>> + *
->>>>> + * You should have received a copy of the GNU General Public License
->>>>> + * along with this program.  If not, see <http://www.gnu.org/license=
-s/>.
->>>>> + */
->>>>> +
->>>>> +#include "qemu/osdep.h"
->>>>> +#include "cpu.h"
->>>>> +
->>>>> +typedef struct {
->>>>> +    disassemble_info *info;
->>>>> +    uint16_t next_word;
->>>>> +    bool next_word_used;
->>>>> +} DisasContext;
->>>>> +
->>>>> +static int to_regs_16_31_by_one(DisasContext *ctx, int indx)
->>>>> +{
->>>>> +    return 16 + (indx % 16);
->>>>> +}
->>>>> +
->>>>> +static int to_regs_16_23_by_one(DisasContext *ctx, int indx)
->>>>> +{
->>>>> +    return 16 + (indx % 8);
->>>>> +}
->>>>> +static int to_regs_24_30_by_two(DisasContext *ctx, int indx)
->>>>> +{
->>>>> +    return 24 + (indx % 4) * 2;
->>>>> +}
->>>>> +static int to_regs_00_30_by_two(DisasContext *ctx, int indx)
->>>>> +{
->>>>> +    return (indx % 16) * 2;
->>>>> +}
->>>>> +
->>>>> +static uint16_t next_word(DisasContext *ctx)
->>>>> +{
->>>>> +    ctx->next_word_used =3D true;
->>>>> +    return ctx->next_word;
->>>>> +}
->>>>> +
->>>>> +static int append_16(DisasContext *ctx, int x)
->>>>> +{
->>>>> +    return x << 16 | next_word(ctx);
->>>>> +}
->>>>> +
->>>>> +
->>>>> +/* Include the auto-generated decoder.  */
->>>>> +static bool decode_insn(DisasContext *ctx, uint16_t insn);
->>>>> +#include "decode_insn.inc.c"
->>>>> +
->>>>> +#define output(mnemonic, format, ...) \
->>>>> +    (pctx->info->fprintf_func(pctx->info->stream, "%-9s " format, \
->>>>> +                        mnemonic, ##__VA_ARGS__))
->>>>> +
->>>>> +int avr_print_insn(bfd_vma addr, disassemble_info *info)
->>>>> +{
->>>>> +    DisasContext ctx;
->>>>> +    DisasContext *pctx =3D &ctx;
->>>>> +    bfd_byte buffer[4];
->>>>> +    uint16_t insn;
->>>>> +    int status;
->>>>> +
->>>>> +    ctx.info =3D info;
->>>>> +
->>>>> +    status =3D info->read_memory_func(addr, buffer, 4, info);
->>>>> +    if (status !=3D 0) {
->>>>> +        info->memory_error_func(status, addr, info);
->>>>> +        return -1;
->>>>> +    }
->>>>> +    insn =3D bfd_getl16(buffer);
->>>>> +    ctx.next_word =3D bfd_getl16(buffer + 2);
->>>>> +    ctx.next_word_used =3D false;
->>>>> +
->>>>> +    if (!decode_insn(&ctx, insn)) {
->>>>> +        output(".db", "0x%02x, 0x%02x", buffer[0], buffer[1]);
->>>>> +    }
->>>>> +
->>>>> +    return ctx.next_word_used ? 4 : 2;
->>>>> +}
->>>>
->>>>
->>>> Hi, Michael,
->>>>
->>>> What is the role of ctx.next_word_used, if it looks it is always "fals=
-e"?
->>>>
->>>> Related to this, how do you disassemble 32-bit-coded instructions? Fro=
-m this patch, it looks you treat all AVR instructions as 16-bit-coded?
->>>>
->>>> Thanks,
->>>> Aleksandar
->>>>
->>>>>
->>>>> +
->>>>> +
->>>>> +#define INSN(opcode, format, ...)                                   =
-    \
->>>>> +static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)    =
-    \
->>>>> +{                                                                   =
-    \
->>>>> +    output(#opcode, format, ##__VA_ARGS__);                         =
-    \
->>>>> +    return true;                                                    =
-    \
->>>>> +}
->>>>> +
->>>>> +#define INSN_MNEMONIC(opcode, mnemonic, format, ...)                =
-    \
->>>>> +static bool trans_##opcode(DisasContext *pctx, arg_##opcode * a)    =
-    \
->>>>> +{                                                                   =
-    \
->>>>> +    output(mnemonic, format, ##__VA_ARGS__);                        =
-    \
->>>>> +    return true;                                                    =
-    \
->>>>> +}
->>>>> +
->>>>> +/*
->>>>> + *   C       Z       N       V       S       H       T       I
->>>>> + *   0       1       2       3       4       5       6       7
->>>>> + */
->>>>> +static const char *brbc[] =3D {
->>>>> +    "BRCC", "BRNE", "BRPL", "BRVC", "BRGE", "BRHC", "BRTC", "BRID"
->>>>> +};
->>>>> +
->>>>> +static const char *brbs[] =3D {
->>>>> +    "BRCS", "BREQ", "BRMI", "BRVS", "BRLT", "BRHS", "BRTS", "BRIE"
->>>>> +};
->>>>> +
->>>>> +static const char *bset[] =3D {
->>>>> +    "SEC",  "SEZ",  "SEN",  "SEZ",  "SES",  "SEH",  "SET",  "SEI"
->>>>> +};
->>>>> +
->>>>> +static const char *bclr[] =3D {
->>>>> +    "CLC",  "CLZ",  "CLN",  "CLZ",  "CLS",  "CLH",  "CLT",  "CLI"
->>>>> +};
->>>>> +
->>>>> +INSN(ADC,    "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(ADD,    "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(ADIW,   "r%d:r%d, %d", a->rd + 1, a->rd, a->imm)
->>>>> +INSN(AND,    "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(ANDI,   "r%d, %d", a->rd, a->imm)
->>>>> +INSN(ASR,    "r%d", a->rd)
->>>>> +INSN_MNEMONIC(BCLR,  bclr[a->bit], "")
->>>>> +INSN(BLD,    "r%d, %d", a->rd, a->bit)
->>>>> +INSN_MNEMONIC(BRBC,  brbc[a->bit], ".%+d", a->imm * 2)
->>>>> +INSN_MNEMONIC(BRBS,  brbs[a->bit], ".%+d", a->imm * 2)
->>>>> +INSN(BREAK,  "")
->>>>> +INSN_MNEMONIC(BSET,  bset[a->bit], "")
->>>>> +INSN(BST,    "r%d, %d", a->rd, a->bit)
->>>>> +INSN(CALL,   "0x%x", a->imm * 2)
->>>>> +INSN(CBI,    "%d, %d", a->reg, a->bit)
->>>>> +INSN(COM,    "r%d", a->rd)
->>>>> +INSN(CP,     "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(CPC,    "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(CPI,    "r%d, %d", a->rd, a->imm)
->>>>> +INSN(CPSE,   "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(DEC,    "r%d", a->rd)
->>>>> +INSN(DES,    "%d", a->imm)
->>>>> +INSN(EICALL, "")
->>>>> +INSN(EIJMP,  "")
->>>>> +INSN(ELPM1,  "")
->>>>> +INSN(ELPM2,  "r%d, Z", a->rd)
->>>>> +INSN(ELPMX,  "r%d, Z+", a->rd)
->>>>> +INSN(EOR,    "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(FMUL,   "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(FMULS,  "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(FMULSU, "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(ICALL,  "")
->>>>> +INSN(IJMP,   "")
->>>>> +INSN(IN,     "r%d, $%d", a->rd, a->imm)
->>>>> +INSN(INC,    "r%d", a->rd)
->>>>> +INSN(JMP,    "0x%x", a->imm * 2)
->>>>> +INSN(LAC,    "Z, r%d", a->rd)
->>>>> +INSN(LAS,    "Z, r%d", a->rd)
->>>>> +INSN(LAT,    "Z, r%d", a->rd)
->>>>> +INSN(LDDY,   "r%d, Y+%d", a->rd, a->imm)
->>>>> +INSN(LDDZ,   "r%d, Z+%d", a->rd, a->imm)
->>>>> +INSN(LDI,    "r%d, %d", a->rd, a->imm)
->>>>> +INSN(LDS,    "r%d, %d", a->rd, a->imm)
->>>>> +INSN(LDX1,   "r%d, X", a->rd)
->>>>> +INSN(LDX2,   "r%d, X+", a->rd)
->>>>> +INSN(LDX3,   "r%d, -X", a->rd)
->>>>> +INSN(LDY2,   "r%d, Y+", a->rd)
->>>>> +INSN(LDY3,   "r%d, -Y", a->rd)
->>>>> +INSN(LDZ2,   "r%d, Z+", a->rd)
->>>>> +INSN(LDZ3,   "r%d, -Z", a->rd)
->>>>> +INSN(LPM1,   "")
->>>>> +INSN(LPM2,   "r%d, Z", a->rd)
->>>>> +INSN(LPMX,   "r%d, Z+", a->rd)
->>>>> +INSN(LSR,    "r%d", a->rd)
->>>>> +INSN(MOV,    "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(MOVW,   "r%d:r%d, r%d,r:r%d", a->rd + 1, a->rd, a->rr + 1, a->r=
-r)
->>>>> +INSN(MUL,    "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(MULS,   "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(MULSU,  "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(NEG,    "r%d", a->rd)
->>>>> +INSN(NOP,    "")
->>>>> +INSN(OR,     "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(ORI,    "r%d, %d", a->rd, a->imm)
->>>>> +INSN(OUT,    "$%d, r%d", a->imm, a->rd)
->>>>> +INSN(POP,    "r%d", a->rd)
->>>>> +INSN(PUSH,   "r%d", a->rd)
->>>>> +INSN(RCALL,  ".%+d", a->imm * 2)
->>>>> +INSN(RET,    "")
->>>>> +INSN(RETI,   "")
->>>>> +INSN(RJMP,   ".%+d", a->imm * 2)
->>>>> +INSN(ROR,    "r%d", a->rd)
->>>>> +INSN(SBC,    "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(SBCI,   "r%d, %d", a->rd, a->imm)
->>>>> +INSN(SBI,    "$%d, %d", a->reg, a->bit)
->>>>> +INSN(SBIC,   "$%d, %d", a->reg, a->bit)
->>>>> +INSN(SBIS,   "$%d, %d", a->reg, a->bit)
->>>>> +INSN(SBIW,   "r%d:r%d, %d", a->rd + 1, a->rd, a->imm)
->>>>> +INSN(SBRC,   "r%d, %d", a->rr, a->bit)
->>>>> +INSN(SBRS,   "r%d, %d", a->rr, a->bit)
->>>>> +INSN(SLEEP,  "")
->>>>> +INSN(SPM,    "")
->>>>> +INSN(SPMX,   "Z+")
->>>>> +INSN(STDY,   "r%d, Y+%d", a->rd, a->imm)
->>>>> +INSN(STDZ,   "r%d, Z+%d", a->rd, a->imm)
->>>>> +INSN(STS,    "r%d, %d", a->rd, a->imm)
->>>>> +INSN(STX1,   "r%d, X", a->rr)
->>>>> +INSN(STX2,   "r%d, X+", a->rr)
->>>>> +INSN(STX3,   "r%d, -X", a->rr)
->>>>> +INSN(STY2,   "r%d, Y+", a->rd)
->>>>> +INSN(STY3,   "r%d, -Y", a->rd)
->>>>> +INSN(STZ2,   "r%d, Z+", a->rd)
->>>>> +INSN(STZ3,   "r%d, -Z", a->rd)
->>>>> +INSN(SUB,    "r%d, r%d", a->rd, a->rr)
->>>>> +INSN(SUBI,   "r%d, %d", a->rd, a->imm)
->>>>> +INSN(SWAP,   "r%d", a->rd)
->>>>> +INSN(WDR,    "")
->>>>> +INSN(XCH,    "Z, r%d", a->rd)
->>>>> +
->>>>> diff --git a/target/avr/translate.c b/target/avr/translate.c
->>>>> index c8c6f798bf..a621195817 100644
->>>>> --- a/target/avr/translate.c
->>>>> +++ b/target/avr/translate.c
->>>>> @@ -2917,6 +2917,17 @@ done_generating:
->>>>>
->>>>>      tb->size =3D (ctx.npc - pc_start) * 2;
->>>>>      tb->icount =3D num_insns;
->>>>> +
->>>>> +#ifdef DEBUG_DISAS
->>>>> +    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
->>>>> +        && qemu_log_in_addr_range(tb->pc)) {
->>>>> +        qemu_log_lock();
->>>>> +        qemu_log("IN: %s\n", lookup_symbol(tb->pc));
->>>>> +        log_target_disas(cs, tb->pc, tb->size);
->>>>> +        qemu_log("\n");
->>>>> +        qemu_log_unlock();
->>>>> +    }
->>>>> +#endif
->>>>>  }
->>>>>
->>>>>  void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
->>>>> --
->>>>> 2.17.2 (Apple Git-113)
->>>>>
->>>
->>>
->>> --
->>> Best Regards,
->>> Michael Rolnik
+>  static inline int hflags_mmu_index(uint32_t hflags)
+> diff --git a/target/mips/op_helper.c b/target/mips/op_helper.c
+> index 18fcee4a78..79d44da6fa 100644
+> --- a/target/mips/op_helper.c
+> +++ b/target/mips/op_helper.c
+> @@ -52,69 +52,6 @@ static void raise_exception(CPUMIPSState *env, uint32_t exception)
+>      do_raise_exception(env, exception, 0);
+>  }
+>
+> -#if defined(CONFIG_USER_ONLY)
+> -#define HELPER_LD(name, insn, type)                                     \
+> -static inline type do_##name(CPUMIPSState *env, target_ulong addr,      \
+> -                             int mem_idx, uintptr_t retaddr)            \
+> -{                                                                       \
+> -    return (type) cpu_##insn##_data_ra(env, addr, retaddr);             \
+> -}
+> -#else
+> -#define HELPER_LD(name, insn, type)                                     \
+> -static inline type do_##name(CPUMIPSState *env, target_ulong addr,      \
+> -                             int mem_idx, uintptr_t retaddr)            \
+> -{                                                                       \
+> -    switch (mem_idx) {                                                  \
+> -    case 0: return (type) cpu_##insn##_kernel_ra(env, addr, retaddr);   \
+> -    case 1: return (type) cpu_##insn##_super_ra(env, addr, retaddr);    \
+> -    default:                                                            \
+> -    case 2: return (type) cpu_##insn##_user_ra(env, addr, retaddr);     \
+> -    case 3: return (type) cpu_##insn##_error_ra(env, addr, retaddr);    \
+> -    }                                                                   \
+> -}
+> -#endif
+> -HELPER_LD(lw, ldl, int32_t)
+> -#if defined(TARGET_MIPS64)
+> -HELPER_LD(ld, ldq, int64_t)
+> -#endif
+> -#undef HELPER_LD
+> -
+> -#if defined(CONFIG_USER_ONLY)
+> -#define HELPER_ST(name, insn, type)                                     \
+> -static inline void do_##name(CPUMIPSState *env, target_ulong addr,      \
+> -                             type val, int mem_idx, uintptr_t retaddr)  \
+> -{                                                                       \
+> -    cpu_##insn##_data_ra(env, addr, val, retaddr);                      \
+> -}
+> -#else
+> -#define HELPER_ST(name, insn, type)                                     \
+> -static inline void do_##name(CPUMIPSState *env, target_ulong addr,      \
+> -                             type val, int mem_idx, uintptr_t retaddr)  \
+> -{                                                                       \
+> -    switch (mem_idx) {                                                  \
+> -    case 0:                                                             \
+> -        cpu_##insn##_kernel_ra(env, addr, val, retaddr);                \
+> -        break;                                                          \
+> -    case 1:                                                             \
+> -        cpu_##insn##_super_ra(env, addr, val, retaddr);                 \
+> -        break;                                                          \
+> -    default:                                                            \
+> -    case 2:                                                             \
+> -        cpu_##insn##_user_ra(env, addr, val, retaddr);                  \
+> -        break;                                                          \
+> -    case 3:                                                             \
+> -        cpu_##insn##_error_ra(env, addr, val, retaddr);                 \
+> -        break;                                                          \
+> -    }                                                                   \
+> -}
+> -#endif
+> -HELPER_ST(sb, stb, uint8_t)
+> -HELPER_ST(sw, stl, uint32_t)
+> -#if defined(TARGET_MIPS64)
+> -HELPER_ST(sd, stq, uint64_t)
+> -#endif
+> -#undef HELPER_ST
+> -
+>  /* 64 bits arithmetic for 32 bits hosts */
+>  static inline uint64_t get_HILO(CPUMIPSState *env)
+>  {
+> @@ -379,12 +316,12 @@ target_ulong helper_##name(CPUMIPSState *env, target_ulong arg, int mem_idx)  \
+>      }                                                                         \
+>      env->CP0_LLAddr = do_translate_address(env, arg, 0, GETPC());             \
+>      env->lladdr = arg;                                                        \
+> -    env->llval = do_##insn(env, arg, mem_idx, GETPC());                       \
+> +    env->llval = cpu_##insn##_mmuidx_ra(env, arg, mem_idx, GETPC());          \
+>      return env->llval;                                                        \
+>  }
+> -HELPER_LD_ATOMIC(ll, lw, 0x3)
+> +HELPER_LD_ATOMIC(ll, ldl, 0x3)
+>  #ifdef TARGET_MIPS64
+> -HELPER_LD_ATOMIC(lld, ld, 0x7)
+> +HELPER_LD_ATOMIC(lld, ldq, 0x7)
+>  #endif
+>  #undef HELPER_LD_ATOMIC
+>  #endif
+> @@ -400,42 +337,42 @@ HELPER_LD_ATOMIC(lld, ld, 0x7)
+>  void helper_swl(CPUMIPSState *env, target_ulong arg1, target_ulong arg2,
+>                  int mem_idx)
+>  {
+> -    do_sb(env, arg2, (uint8_t)(arg1 >> 24), mem_idx, GETPC());
+> +    cpu_stb_mmuidx_ra(env, arg2, (uint8_t)(arg1 >> 24), mem_idx, GETPC());
+>
+>      if (GET_LMASK(arg2) <= 2) {
+> -        do_sb(env, GET_OFFSET(arg2, 1), (uint8_t)(arg1 >> 16), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 1), (uint8_t)(arg1 >> 16),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK(arg2) <= 1) {
+> -        do_sb(env, GET_OFFSET(arg2, 2), (uint8_t)(arg1 >> 8), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 2), (uint8_t)(arg1 >> 8),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK(arg2) == 0) {
+> -        do_sb(env, GET_OFFSET(arg2, 3), (uint8_t)arg1, mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 3), (uint8_t)arg1,
+> +                          mem_idx, GETPC());
+>      }
+>  }
+>
+>  void helper_swr(CPUMIPSState *env, target_ulong arg1, target_ulong arg2,
+>                  int mem_idx)
+>  {
+> -    do_sb(env, arg2, (uint8_t)arg1, mem_idx, GETPC());
+> +    cpu_stb_mmuidx_ra(env, arg2, (uint8_t)arg1, mem_idx, GETPC());
+>
+>      if (GET_LMASK(arg2) >= 1) {
+> -        do_sb(env, GET_OFFSET(arg2, -1), (uint8_t)(arg1 >> 8), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -1), (uint8_t)(arg1 >> 8),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK(arg2) >= 2) {
+> -        do_sb(env, GET_OFFSET(arg2, -2), (uint8_t)(arg1 >> 16), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -2), (uint8_t)(arg1 >> 16),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK(arg2) == 3) {
+> -        do_sb(env, GET_OFFSET(arg2, -3), (uint8_t)(arg1 >> 24), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -3), (uint8_t)(arg1 >> 24),
+> +                          mem_idx, GETPC());
+>      }
+>  }
+>
+> @@ -453,82 +390,82 @@ void helper_swr(CPUMIPSState *env, target_ulong arg1, target_ulong arg2,
+>  void helper_sdl(CPUMIPSState *env, target_ulong arg1, target_ulong arg2,
+>                  int mem_idx)
+>  {
+> -    do_sb(env, arg2, (uint8_t)(arg1 >> 56), mem_idx, GETPC());
+> +    cpu_stb_mmuidx_ra(env, arg2, (uint8_t)(arg1 >> 56), mem_idx, GETPC());
+>
+>      if (GET_LMASK64(arg2) <= 6) {
+> -        do_sb(env, GET_OFFSET(arg2, 1), (uint8_t)(arg1 >> 48), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 1), (uint8_t)(arg1 >> 48),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) <= 5) {
+> -        do_sb(env, GET_OFFSET(arg2, 2), (uint8_t)(arg1 >> 40), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 2), (uint8_t)(arg1 >> 40),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) <= 4) {
+> -        do_sb(env, GET_OFFSET(arg2, 3), (uint8_t)(arg1 >> 32), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 3), (uint8_t)(arg1 >> 32),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) <= 3) {
+> -        do_sb(env, GET_OFFSET(arg2, 4), (uint8_t)(arg1 >> 24), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 4), (uint8_t)(arg1 >> 24),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) <= 2) {
+> -        do_sb(env, GET_OFFSET(arg2, 5), (uint8_t)(arg1 >> 16), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 5), (uint8_t)(arg1 >> 16),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) <= 1) {
+> -        do_sb(env, GET_OFFSET(arg2, 6), (uint8_t)(arg1 >> 8), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 6), (uint8_t)(arg1 >> 8),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) <= 0) {
+> -        do_sb(env, GET_OFFSET(arg2, 7), (uint8_t)arg1, mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, 7), (uint8_t)arg1,
+> +                          mem_idx, GETPC());
+>      }
+>  }
+>
+>  void helper_sdr(CPUMIPSState *env, target_ulong arg1, target_ulong arg2,
+>                  int mem_idx)
+>  {
+> -    do_sb(env, arg2, (uint8_t)arg1, mem_idx, GETPC());
+> +    cpu_stb_mmuidx_ra(env, arg2, (uint8_t)arg1, mem_idx, GETPC());
+>
+>      if (GET_LMASK64(arg2) >= 1) {
+> -        do_sb(env, GET_OFFSET(arg2, -1), (uint8_t)(arg1 >> 8), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -1), (uint8_t)(arg1 >> 8),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) >= 2) {
+> -        do_sb(env, GET_OFFSET(arg2, -2), (uint8_t)(arg1 >> 16), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -2), (uint8_t)(arg1 >> 16),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) >= 3) {
+> -        do_sb(env, GET_OFFSET(arg2, -3), (uint8_t)(arg1 >> 24), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -3), (uint8_t)(arg1 >> 24),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) >= 4) {
+> -        do_sb(env, GET_OFFSET(arg2, -4), (uint8_t)(arg1 >> 32), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -4), (uint8_t)(arg1 >> 32),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) >= 5) {
+> -        do_sb(env, GET_OFFSET(arg2, -5), (uint8_t)(arg1 >> 40), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -5), (uint8_t)(arg1 >> 40),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) >= 6) {
+> -        do_sb(env, GET_OFFSET(arg2, -6), (uint8_t)(arg1 >> 48), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -6), (uint8_t)(arg1 >> 48),
+> +                          mem_idx, GETPC());
+>      }
+>
+>      if (GET_LMASK64(arg2) == 7) {
+> -        do_sb(env, GET_OFFSET(arg2, -7), (uint8_t)(arg1 >> 56), mem_idx,
+> -              GETPC());
+> +        cpu_stb_mmuidx_ra(env, GET_OFFSET(arg2, -7), (uint8_t)(arg1 >> 56),
+> +                          mem_idx, GETPC());
+>      }
+>  }
+>  #endif /* TARGET_MIPS64 */
+> @@ -546,14 +483,14 @@ void helper_lwm(CPUMIPSState *env, target_ulong addr, target_ulong reglist,
+>
+>          for (i = 0; i < base_reglist; i++) {
+>              env->active_tc.gpr[multiple_regs[i]] =
+> -                (target_long)do_lw(env, addr, mem_idx, GETPC());
+> +                (target_long)cpu_ldl_mmuidx_ra(env, addr, mem_idx, GETPC());
+>              addr += 4;
+>          }
+>      }
+>
+>      if (do_r31) {
+> -        env->active_tc.gpr[31] = (target_long)do_lw(env, addr, mem_idx,
+> -                                                    GETPC());
+> +        env->active_tc.gpr[31] =
+> +            (target_long)cpu_ldl_mmuidx_ra(env, addr, mem_idx, GETPC());
+>      }
+>  }
+>
+> @@ -567,14 +504,14 @@ void helper_swm(CPUMIPSState *env, target_ulong addr, target_ulong reglist,
+>          target_ulong i;
+>
+>          for (i = 0; i < base_reglist; i++) {
+> -            do_sw(env, addr, env->active_tc.gpr[multiple_regs[i]], mem_idx,
+> -                  GETPC());
+> +            cpu_stw_mmuidx_ra(env, addr, env->active_tc.gpr[multiple_regs[i]],
+> +                              mem_idx, GETPC());
+>              addr += 4;
+>          }
+>      }
+>
+>      if (do_r31) {
+> -        do_sw(env, addr, env->active_tc.gpr[31], mem_idx, GETPC());
+> +        cpu_stw_mmuidx_ra(env, addr, env->active_tc.gpr[31], mem_idx, GETPC());
+>      }
+>  }
+>
+> @@ -589,14 +526,15 @@ void helper_ldm(CPUMIPSState *env, target_ulong addr, target_ulong reglist,
+>          target_ulong i;
+>
+>          for (i = 0; i < base_reglist; i++) {
+> -            env->active_tc.gpr[multiple_regs[i]] = do_ld(env, addr, mem_idx,
+> -                                                         GETPC());
+> +            env->active_tc.gpr[multiple_regs[i]] =
+> +                cpu_ldq_mmuidx_ra(env, addr, mem_idx, GETPC());
+>              addr += 8;
+>          }
+>      }
+>
+>      if (do_r31) {
+> -        env->active_tc.gpr[31] = do_ld(env, addr, mem_idx, GETPC());
+> +        env->active_tc.gpr[31] =
+> +            cpu_ldq_mmuidx_ra(env, addr, mem_idx, GETPC());
+>      }
+>  }
+>
+> @@ -610,14 +548,14 @@ void helper_sdm(CPUMIPSState *env, target_ulong addr, target_ulong reglist,
+>          target_ulong i;
+>
+>          for (i = 0; i < base_reglist; i++) {
+> -            do_sd(env, addr, env->active_tc.gpr[multiple_regs[i]], mem_idx,
+> -                  GETPC());
+> +            cpu_stq_mmuidx_ra(env, addr, env->active_tc.gpr[multiple_regs[i]],
+> +                              mem_idx, GETPC());
+>              addr += 8;
+>          }
+>      }
+>
+>      if (do_r31) {
+> -        do_sd(env, addr, env->active_tc.gpr[31], mem_idx, GETPC());
+> +        cpu_stq_mmuidx_ra(env, addr, env->active_tc.gpr[31], mem_idx, GETPC());
+>      }
+>  }
+>  #endif
+> --
+> 2.20.1
+>
+>
 
