@@ -2,82 +2,79 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8645FC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BA09C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5405D2067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:35:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 466E4214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:36:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JJEXAuh2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5405D2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jwMxC2Kj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 466E4214AF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifPYa-000241-9y
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:35:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58965)
+	id 1ifPZj-0003Uf-GY
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:36:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42310)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifPU9-0005jO-U9
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:30:39 -0500
+ (envelope-from <linus.walleij@linaro.org>) id 1ifPXx-0001ci-HY
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:34:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifPU8-0008HS-5s
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:30:33 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34299)
+ (envelope-from <linus.walleij@linaro.org>) id 1ifPXr-00075p-PX
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:34:29 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:40954)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifPU3-0008BY-Jv
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:30:32 -0500
-Received: by mail-wm1-x341.google.com with SMTP id f4so3748511wmj.1
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 06:30:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=9EDJH/BxPkKlhLjKsWHknM6vk0Y8bYaWTnGtJKPkwqA=;
- b=JJEXAuh2pZssLNJEJY0y+N1djE2rGkTr5dDpfrFrlt/b1iIM/99Ytr69xV6yXfuT8S
- FDcp707k5l/70HeDFUJvRYjxMr5gD/03uPVIGH0bJfyH0s638OjUw2II/lRoYQHeEEjK
- GQoByIUJgH0/ZQRoQVDq7pBER3+F6TZ04SvxrfTytJRX/YLM3O+6a4R8oz0JIrogVgXF
- aezy6Iv6Oc0rIQ3e1ZSaRXslruiXDtk/0G1/QA0Kbz0LLzmaMMyZ8TzxLojSH4yezALI
- R0Tqn2aB8L4H1gWcqBapvLR7EeHbuNjRaOB92FHkK6sFXeJEfamex0+3+pDoRDarfDeE
- iW/A==
+ (Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
+ id 1ifPXr-000721-9t
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 09:34:23 -0500
+Received: by mail-lj1-x242.google.com with SMTP id s22so2526438ljs.7
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 06:34:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=M01hRpD11CkkOeauBIVCjuItQ11kCezb4GIbMatT12c=;
+ b=jwMxC2KjvVPAJJabNt2EixKGKNXDmT6INs3XC3sgyHNqZBtPmTN4Tm+tz0Ys8mMnlI
+ 6iXQrpWyX159Jei4YMB2xTsoD/xSMAZVmG2upOB4pQq9PG0NPT5ZVkVMoeHIMv0ALiLq
+ ZqRfteFEjzauejojoUL4jnojtYaFCLrtZMLNlqiFNufQeb9yeU6XifAljnjLUYBpIRZ3
+ hCe6KvmaOnpA8ZxohByGH/M3WUG0NmNop6Ept8tGjmI9oYU7NethV3yAqH8g+ORjoocp
+ eKj+9MPSdmcu1QAjGxi/pYJmZ5pU1BKMgd/Xx5nJs25JpNgA5IejqQ41Bj0K/IkFut/G
+ XvtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=9EDJH/BxPkKlhLjKsWHknM6vk0Y8bYaWTnGtJKPkwqA=;
- b=LyXaPX/lGxjaU3KqbFSmDN4XyD/uk85FORAQL0gZyhGqil/uJ2hzGOdQ45y+VL6W0F
- W8ZTnHYv/4bxwyFKDfIfMR7W0EFmTTY8sYCekCuA8wWeanml08dxWXVuevQUh56t/f5x
- OwYvfoKpE9U0N/vEPHUgE8Xt+8evOPDG7Fr11F3qYFIgdFaSQNJQ4c60/Ho1Lxcch7Z/
- PMX5LA0xV4CMCXAe6ReEGySEAv6+Ii98X1SYCtfV/eFtUX9NoPfjJMnLxf2h0lYFE/bT
- 82lXT3se5/W3FHiWKe2U/WNPC5YR1DmlxHYgMFqV8GDsSgWZJrfVyAWhnPh5WMiHZId9
- kR6w==
-X-Gm-Message-State: APjAAAVlRlJWX4zGFuFujB6S6IxJir0Tqys8vgRGVdJ33928+ztXjFzG
- B3tQrzrz8CmkmivuA4lzR1Ct9P9G
-X-Google-Smtp-Source: APXvYqxK9ivQbr6rzDsczuHIBj602drLKASadsEvrPkAi6usJNZki99iULJweMKzdaH5R+zmXzyV2w==
-X-Received: by 2002:a1c:1d8c:: with SMTP id d134mr7303447wmd.16.1576161026205; 
- Thu, 12 Dec 2019 06:30:26 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id c9sm6140505wmc.47.2019.12.12.06.30.25
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 06:30:25 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 3/5] x86: move more functions to X86MachineState and x86.c
-Date: Thu, 12 Dec 2019 15:30:19 +0100
-Message-Id: <1576161021-5359-4-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1576161021-5359-1-git-send-email-pbonzini@redhat.com>
-References: <1576161021-5359-1-git-send-email-pbonzini@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=M01hRpD11CkkOeauBIVCjuItQ11kCezb4GIbMatT12c=;
+ b=WyPdq6YQ+4GU6huNQ22NyQjANH30lD4AwsErAoTwpz24usPtrenRqA2AOmvTzMF+2g
+ /tTrO46lnwbEeYj9koOD25mQ9kIs7U1PT6C3lDO1wUKr/QERfNl0atVb2u2/4fCSW0bo
+ lQXxxVZMfmZ3MKysEpNaMFAZdy+ErCvnO8WxJPIdZrnM3HSUddlRwTHRDQmXoAY0kWiz
+ oV08ECUarB7M+2ZqYwij0W3TKZRk4Q/hpu9Zsd8uQSOHZ3G3DUsNZo7OXerRdnC27D4z
+ TxI7NsMRtUB58PcNg7be142eZhd3iyc7ImnVB37MzFMPOKB4V95JEx0NOTPglR2Q1xi8
+ fD9g==
+X-Gm-Message-State: APjAAAX0VjYszv9Np9+0E6mB8n0t9eDutNypLW+32g6KfQWpKLKdHZWQ
+ yovQEOdmUm9OnXd9NJvLQX8Sz0wtN2G+sKV5etoBsA==
+X-Google-Smtp-Source: APXvYqwxi4IxwAztLPEIoaBKmWi+PA6mLW1szFcIPlhkAwR494Ll690WDLTixRbkmknZWP+z6eu4/b3mbO4S/MBcekg=
+X-Received: by 2002:a2e:9ec4:: with SMTP id h4mr6202874ljk.77.1576161261524;
+ Thu, 12 Dec 2019 06:34:21 -0800 (PST)
+MIME-Version: 1.0
+References: <20191127084253.16356-1-geert+renesas@glider.be>
+ <20191127084253.16356-6-geert+renesas@glider.be>
+In-Reply-To: <20191127084253.16356-6-geert+renesas@glider.be>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 12 Dec 2019 15:34:09 +0100
+Message-ID: <CACRpkdaW7nmpE99FAvBDBTmkTZOTQ5WdM=JbMzBTLk7cbLRXPw@mail.gmail.com>
+Subject: Re: [PATCH v3 5/7] gpio: Add GPIO Aggregator/Repeater driver
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,354 +86,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, slp@redhat.com
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
+ Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These are needed by microvm too, so move them outside of PC-specific files.
+Hi Geert!
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/i386/pc.c          |  99 -------------------------------------------------
- hw/i386/x86.c         | 101 ++++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/i386/pc.h  |  12 ------
- include/hw/i386/x86.h |  13 +++++++
- 4 files changed, 114 insertions(+), 111 deletions(-)
+Thanks for this interesting patch!
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 3d2c5d8..308248d 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -342,17 +342,6 @@ GlobalProperty pc_compat_1_4[] = {
- };
- const size_t pc_compat_1_4_len = G_N_ELEMENTS(pc_compat_1_4);
- 
--void gsi_handler(void *opaque, int n, int level)
--{
--    GSIState *s = opaque;
--
--    DPRINTF("pc: %s GSI %d\n", level ? "raising" : "lowering", n);
--    if (n < ISA_NUM_IRQS) {
--        qemu_set_irq(s->i8259_irq[n], level);
--    }
--    qemu_set_irq(s->ioapic_irq[n], level);
--}
--
- GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled)
- {
-     GSIState *s;
-@@ -392,55 +381,6 @@ static uint64_t ioportF0_read(void *opaque, hwaddr addr, unsigned size)
-     return 0xffffffffffffffffULL;
- }
- 
--/* TSC handling */
--uint64_t cpu_get_tsc(CPUX86State *env)
--{
--    return cpu_get_ticks();
--}
--
--/* IRQ handling */
--int cpu_get_pic_interrupt(CPUX86State *env)
--{
--    X86CPU *cpu = env_archcpu(env);
--    int intno;
--
--    if (!kvm_irqchip_in_kernel()) {
--        intno = apic_get_interrupt(cpu->apic_state);
--        if (intno >= 0) {
--            return intno;
--        }
--        /* read the irq from the PIC */
--        if (!apic_accept_pic_intr(cpu->apic_state)) {
--            return -1;
--        }
--    }
--
--    intno = pic_read_irq(isa_pic);
--    return intno;
--}
--
--static void pic_irq_request(void *opaque, int irq, int level)
--{
--    CPUState *cs = first_cpu;
--    X86CPU *cpu = X86_CPU(cs);
--
--    DPRINTF("pic_irqs: %s irq %d\n", level? "raise" : "lower", irq);
--    if (cpu->apic_state && !kvm_irqchip_in_kernel()) {
--        CPU_FOREACH(cs) {
--            cpu = X86_CPU(cs);
--            if (apic_accept_pic_intr(cpu->apic_state)) {
--                apic_deliver_pic_intr(cpu->apic_state, level);
--            }
--        }
--    } else {
--        if (level) {
--            cpu_interrupt(cs, CPU_INTERRUPT_HARD);
--        } else {
--            cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
--        }
--    }
--}
--
- /* PC cmos mappings */
- 
- #define REG_EQUIPMENT_BYTE          0x14
-@@ -884,16 +824,6 @@ void pc_init_ne2k_isa(ISABus *bus, NICInfo *nd)
-     nb_ne2k++;
- }
- 
--DeviceState *cpu_get_current_apic(void)
--{
--    if (current_cpu) {
--        X86CPU *cpu = X86_CPU(current_cpu);
--        return cpu->apic_state;
--    } else {
--        return NULL;
--    }
--}
--
- void pc_acpi_smi_interrupt(void *opaque, int irq, int level)
- {
-     X86CPU *cpu = opaque;
-@@ -1289,11 +1219,6 @@ uint64_t pc_pci_hole64_start(void)
-     return ROUND_UP(hole64_start, 1 * GiB);
- }
- 
--qemu_irq pc_allocate_cpu_irq(void)
--{
--    return qemu_allocate_irq(pic_irq_request, NULL, 0);
--}
--
- DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus)
- {
-     DeviceState *dev = NULL;
-@@ -1480,30 +1405,6 @@ void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs)
-     g_free(i8259);
- }
- 
--void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
--{
--    DeviceState *dev;
--    SysBusDevice *d;
--    unsigned int i;
--
--    if (kvm_ioapic_in_kernel()) {
--        dev = qdev_create(NULL, TYPE_KVM_IOAPIC);
--    } else {
--        dev = qdev_create(NULL, TYPE_IOAPIC);
--    }
--    if (parent_name) {
--        object_property_add_child(object_resolve_path(parent_name, NULL),
--                                  "ioapic", OBJECT(dev), NULL);
--    }
--    qdev_init_nofail(dev);
--    d = SYS_BUS_DEVICE(dev);
--    sysbus_mmio_map(d, 0, IO_APIC_DEFAULT_ADDRESS);
--
--    for (i = 0; i < IOAPIC_NUM_PINS; i++) {
--        gsi_state->ioapic_irq[i] = qdev_get_gpio_in(dev, i);
--    }
--}
--
- static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                                Error **errp)
- {
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 394edc2..028bbf4 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -41,11 +41,15 @@
- #include "hw/i386/fw_cfg.h"
- 
- #include "hw/acpi/cpu_hotplug.h"
-+#include "hw/i386/pc.h"
-+#include "hw/irq.h"
- #include "hw/nmi.h"
- #include "hw/loader.h"
- #include "multiboot.h"
- #include "elf.h"
- #include "standard-headers/asm-x86/bootparam.h"
-+#include "config-devices.h"
-+#include "kvm_i386.h"
- 
- #define BIOS_FILENAME "bios.bin"
- 
-@@ -220,6 +224,103 @@ static long get_file_size(FILE *f)
-     return size;
- }
- 
-+/* TSC handling */
-+uint64_t cpu_get_tsc(CPUX86State *env)
-+{
-+    return cpu_get_ticks();
-+}
-+
-+/* IRQ handling */
-+static void pic_irq_request(void *opaque, int irq, int level)
-+{
-+    CPUState *cs = first_cpu;
-+    X86CPU *cpu = X86_CPU(cs);
-+
-+    if (cpu->apic_state && !kvm_irqchip_in_kernel()) {
-+        CPU_FOREACH(cs) {
-+            cpu = X86_CPU(cs);
-+            if (apic_accept_pic_intr(cpu->apic_state)) {
-+                apic_deliver_pic_intr(cpu->apic_state, level);
-+            }
-+        }
-+    } else {
-+        if (level) {
-+            cpu_interrupt(cs, CPU_INTERRUPT_HARD);
-+        } else {
-+            cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
-+        }
-+    }
-+}
-+
-+qemu_irq pc_allocate_cpu_irq(void)
-+{
-+    return qemu_allocate_irq(pic_irq_request, NULL, 0);
-+}
-+
-+int cpu_get_pic_interrupt(CPUX86State *env)
-+{
-+    X86CPU *cpu = env_archcpu(env);
-+    int intno;
-+
-+    if (!kvm_irqchip_in_kernel()) {
-+        intno = apic_get_interrupt(cpu->apic_state);
-+        if (intno >= 0) {
-+            return intno;
-+        }
-+        /* read the irq from the PIC */
-+        if (!apic_accept_pic_intr(cpu->apic_state)) {
-+            return -1;
-+        }
-+    }
-+
-+    intno = pic_read_irq(isa_pic);
-+    return intno;
-+}
-+
-+DeviceState *cpu_get_current_apic(void)
-+{
-+    if (current_cpu) {
-+        X86CPU *cpu = X86_CPU(current_cpu);
-+        return cpu->apic_state;
-+    } else {
-+        return NULL;
-+    }
-+}
-+
-+void gsi_handler(void *opaque, int n, int level)
-+{
-+    GSIState *s = opaque;
-+
-+    if (n < ISA_NUM_IRQS) {
-+        qemu_set_irq(s->i8259_irq[n], level);
-+    }
-+    qemu_set_irq(s->ioapic_irq[n], level);
-+}
-+
-+void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
-+{
-+    DeviceState *dev;
-+    SysBusDevice *d;
-+    unsigned int i;
-+
-+    if (kvm_ioapic_in_kernel()) {
-+        dev = qdev_create(NULL, TYPE_KVM_IOAPIC);
-+    } else {
-+        dev = qdev_create(NULL, TYPE_IOAPIC);
-+    }
-+    if (parent_name) {
-+        object_property_add_child(object_resolve_path(parent_name, NULL),
-+                                  "ioapic", OBJECT(dev), NULL);
-+    }
-+    qdev_init_nofail(dev);
-+    d = SYS_BUS_DEVICE(dev);
-+    sysbus_mmio_map(d, 0, IO_APIC_DEFAULT_ADDRESS);
-+
-+    for (i = 0; i < IOAPIC_NUM_PINS; i++) {
-+        gsi_state->ioapic_irq[i] = qdev_get_gpio_in(dev, i);
-+    }
-+}
-+
- struct setup_data {
-     uint64_t next;
-     uint32_t type;
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 1f86eba..0ab4a2a 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -3,11 +3,9 @@
- 
- #include "exec/memory.h"
- #include "hw/boards.h"
--#include "hw/isa/isa.h"
- #include "hw/block/fdc.h"
- #include "hw/block/flash.h"
- #include "net/net.h"
--#include "hw/i386/ioapic.h"
- #include "hw/i386/x86.h"
- 
- #include "qemu/range.h"
-@@ -144,15 +142,6 @@ int pic_get_output(DeviceState *d);
- 
- /* ioapic.c */
- 
--/* Global System Interrupts */
--
--#define GSI_NUM_PINS IOAPIC_NUM_PINS
--
--typedef struct GSIState {
--    qemu_irq i8259_irq[ISA_NUM_IRQS];
--    qemu_irq ioapic_irq[IOAPIC_NUM_PINS];
--} GSIState;
--
- void gsi_handler(void *opaque, int n, int level);
- 
- GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled);
-@@ -217,7 +206,6 @@ void pc_pci_device_init(PCIBus *pci_bus);
- typedef void (*cpu_set_smm_t)(int smm, void *arg);
- 
- void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs);
--void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name);
- 
- ISADevice *pc_find_fdc0(void);
- int cmos_get_fd_drive_type(FloppyDriveType fd0);
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index 4b84917..a6c23ef 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -23,6 +23,8 @@
- 
- #include "hw/boards.h"
- #include "hw/nmi.h"
-+#include "hw/isa/isa.h"
-+#include "hw/i386/ioapic.h"
- 
- typedef struct {
-     /*< private >*/
-@@ -95,4 +97,15 @@ void x86_load_linux(X86MachineState *x86ms,
-                     bool pvh_enabled,
-                     bool linuxboot_dma_enabled);
- 
-+/* Global System Interrupts */
-+
-+#define GSI_NUM_PINS IOAPIC_NUM_PINS
-+
-+typedef struct GSIState {
-+    qemu_irq i8259_irq[ISA_NUM_IRQS];
-+    qemu_irq ioapic_irq[IOAPIC_NUM_PINS];
-+} GSIState;
-+
-+void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name);
-+
- #endif
--- 
-1.8.3.1
+On Wed, Nov 27, 2019 at 9:43 AM Geert Uytterhoeven
+<geert+renesas@glider.be> wrote:
 
+> GPIO controllers are exported to userspace using /dev/gpiochip*
+> character devices.  Access control to these devices is provided by
+> standard UNIX file system permissions, on an all-or-nothing basis:
+> either a GPIO controller is accessible for a user, or it is not.
+> Currently no mechanism exists to control access to individual GPIOs.
+>
+> Hence add a GPIO driver to aggregate existing GPIOs, and expose them as
+> a new gpiochip.
+>
+> This supports the following use cases:
+>   1. Aggregating GPIOs using Sysfs
+>      This is useful for implementing access control, and assigning a set
+>      of GPIOs to a specific user or virtual machine.
+>
+>   2. GPIO Repeater in Device Tree
+>      This supports modelling e.g. GPIO inverters in DT.
+>
+>   3. Generic GPIO Driver
+>      This provides userspace access to a simple GPIO-operated device
+>      described in DT, cfr. e.g. spidev for SPI-operated devices.
+>
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
+Overall I like how this is developing!
+
+> +config GPIO_AGGREGATOR
+> +       tristate "GPIO Aggregator/Repeater"
+> +       help
+> +         Say yes here to enable the GPIO Aggregator and repeater, which
+> +         provides a way to aggregate and/or repeat existing GPIOs into a new
+> +         GPIO device.
+
+Should it say a "new virtual GPIO chip"?
+
+> +         This can serve the following purposes:
+> +           1. Assign a collection of GPIOs to a user, or export them to a
+> +              virtual machine,
+
+This is ambiguous. What is a "user"? A process calling from
+userspace? A device tree node?
+
+I would write "assign a collection of GPIO lines from any lines on
+existing physical GPIO chips to form a new virtual GPIO chip"
+
+That should be to the point, right?
+
+> +           2. Support GPIOs that are connected to a physical inverter,
+
+s/to/through/g
+
+> +           3. Provide a generic driver for a GPIO-operated device, to be
+> +               controlled from userspace using the GPIO chardev interface.
+
+I don't understand this, it needs to be elaborated. What is meant
+by a "GPIO-operated device" in this context? Example?
+
+I consistently use the term "GPIO line" as opposed to "GPIO"
+or "GPIO number" etc that are abigous, so please rephrase using
+"GPIO lines" rather than just "GPIOs" above.
+
+> +#include "gpiolib.h"
+
+Whenever this is included in a driver I want it to come with a comment
+explicitly stating exactly why and which internal symbols the driver
+needs to access. Ideally all drivers should just need <linux/gpio/driver.h>...
+
+> +static int aggr_add_gpio(struct gpio_aggregator *aggr, const char *label,
+> +                        int hwnum, unsigned int *n)
+
+u16 hwnum for the hardware number but if it is always -1/U16_MAX
+then why pass the parameter at all.
+
+Is "label" the right name of this parameter if that is going to actually
+be line_name then use that.
+
+> +{
+> +       struct gpiod_lookup_table *lookups;
+> +
+> +       lookups = krealloc(aggr->lookups, struct_size(lookups, table, *n + 2),
+> +                          GFP_KERNEL);
+> +       if (!lookups)
+> +               return -ENOMEM;
+> +
+> +       lookups->table[*n].chip_label = label;
+
+This is pending the discussion on whether to just use "key" for this
+name.
+
+> +       lookups->table[*n].chip_hwnum = hwnum;
+
+If this is always going to be U16_MAX (-1 in the current code)
+then it can just be assigned as that here instead of passed as
+parameter.
+
+> +static int aggr_parse(struct gpio_aggregator *aggr)
+> +{
+> +       char *name, *offsets, *first, *last, *next;
+> +       unsigned int a, b, i, n = 0;
+> +       char *args = aggr->args;
+> +       int error;
+> +
+> +       for (name = get_arg(&args), offsets = get_arg(&args); name;
+> +            offsets = get_arg(&args)) {
+> +               if (IS_ERR(name)) {
+> +                       pr_err("Cannot get GPIO specifier: %ld\n",
+> +                              PTR_ERR(name));
+> +                       return PTR_ERR(name);
+> +               }
+> +
+> +               if (!isrange(offsets)) {
+> +                       /* Named GPIO line */
+> +                       error = aggr_add_gpio(aggr, name, -1, &n);
+
+So the third argument woule be U16_MAX here. Or not pass
+a parameter at all.
+
+But honestly, when I look at this I don't understand why you
+have to avoid so hard to use offsets for the GPIO lines on
+your aggregator?
+
+Just put a u16 ngpios in your
+struct gpio_aggregator and count it up every time you
+add some new offsets here and you have
+offset numbers for all your GPIO lines on the aggregator
+and you can just drop the patch for lookup up lines by line
+names.
+
+Is there something wrong with my reasoning here?
+
+At the pointe later when the lines are counted from the
+allocated lookups using gpiod_count() that will just figure
+out this number anyways, so it is not like we don't know
+it at the end of the day.
+
+So it seems the patch to gpiolib is just to use machine
+descriptor tables as a substitute for a simple counter
+variable in this local struct to me.
+
+> +static void __exit gpio_aggregator_remove_all(void)
+> +{
+> +       mutex_lock(&gpio_aggregator_lock);
+> +       idr_for_each(&gpio_aggregator_idr, gpio_aggregator_idr_remove, NULL);
+> +       idr_destroy(&gpio_aggregator_idr);
+> +       mutex_unlock(&gpio_aggregator_lock);
+> +}
+> +
+> +
+> +       /*
+> +        *  Common GPIO Forwarder
+> +        */
+> +
+
+Nitpick: lots and weird spacing here.
+
+> +struct gpiochip_fwd {
+> +       struct gpio_chip chip;
+> +       struct gpio_desc **descs;
+> +       union {
+> +               struct mutex mlock;     /* protects tmp[] if can_sleep */
+> +               spinlock_t slock;       /* protects tmp[] if !can_sleep */
+> +       };
+
+That was a very elegant use of union!
+
+> +static int gpio_fwd_get_multiple(struct gpio_chip *chip, unsigned long *mask,
+> +                                unsigned long *bits)
+> +static void gpio_fwd_set_multiple(struct gpio_chip *chip, unsigned long *mask,
+> +                                 unsigned long *bits)
+
+I guess these can both be optimized to use get/set_multiple on
+the target chip if the offsets are consecutive?
+
+However that is going to be tricky so I'm not saying you should
+implement that. So for now, let's say just add a TODO: comment
+about it.
+
+> +static int gpio_fwd_init_valid_mask(struct gpio_chip *chip,
+> +                                   unsigned long *valid_mask,
+> +                                   unsigned int ngpios)
+> +{
+> +       struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
+> +       unsigned int i;
+> +
+> +       for (i = 0; i < ngpios; i++) {
+> +               if (!gpiochip_line_is_valid(fwd->descs[i]->gdev->chip,
+> +                                           gpio_chip_hwgpio(fwd->descs[i])))
+> +                       clear_bit(i, valid_mask);
+> +       }
+
+This is what uses "gpiolib.h" is it not?
+
+devm_gpiod_get_index() will not succeed if the line
+is not valid so I think this can be just dropped, since
+what you do before this is exactly devm_gpiod_get_index()
+on each line, then you call gpiochip_fwd_create()
+with the result.
+
+So I think you can just drop this entire function.
+This will not happen.
+
+If it does happen, add a comment above this loop
+explaining which circumstances would make lines on
+the forwarder invalid.
+
+> +       for (i = 0; i < ngpios; i++) {
+> +               dev_dbg(dev, "gpio %u => gpio-%d (%s)\n", i,
+> +                       desc_to_gpio(descs[i]), descs[i]->label ? : "?");
+> +
+> +               if (gpiod_cansleep(descs[i]))
+> +                       chip->can_sleep = true;
+> +               if (descs[i]->gdev->chip->set_config)
+> +                       chip->set_config = gpio_fwd_set_config;
+> +               if (descs[i]->gdev->chip->init_valid_mask)
+> +                       chip->init_valid_mask = gpio_fwd_init_valid_mask;
+> +       }
+
+I do not think you should need to inspect the init_valid_mask()
+as explained above.
+
+Add a comment above the loop that if any of the GPIO lines
+are sleeping then the entire forwarder will be sleeping
+and if any of the chips support .set_config() we will support
+setting configs.
+
+However the way that the .gpio_fwd_set_config() is coded
+it looks like you can just unconditionally assign it and
+only check the cansleep condition in this loop.
+
+> +}
+> +
+> +
+> +       /*
+> +        *  Common GPIO Aggregator/Repeater platform device
+> +        */
+> +
+
+Nitpick: weird and excess spacing again.
+
+> +       for (i = 0; i < n; i++) {
+> +               descs[i] = devm_gpiod_get_index(dev, NULL, i, GPIOD_ASIS);
+> +               if (IS_ERR(descs[i]))
+> +                       return PTR_ERR(descs[i]);
+> +       }
+
+If this succeeds none of the obtained gpio_desc:s can be
+invalid.
+
+Yours,
+Linus Walleij
 
