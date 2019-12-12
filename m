@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A88C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 16:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B47C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 16:58:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40D6F214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 16:56:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5870214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 16:57:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kr71Hf1B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40D6F214AF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XcjeQG+o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5870214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifRlX-0006fn-Rh
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 11:56:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44562)
+	id 1ifRmo-00006N-Dg
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 11:57:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46442)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ifRV7-0005C9-4f
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:43 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ifRVJ-0005ND-Uf
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ifRV5-0001J0-PA
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59908
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1ifRVI-0001c2-Mw
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:53 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30385
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRV5-0001HC-Kt
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:39 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRVI-0001ag-If
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576168778;
+ s=mimecast20190719; t=1576168791;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ApPmWPRK4I1lG2CXxc3V5NYXJ4zQBISIKKv39MLqhpc=;
- b=Kr71Hf1BwXSWdNSQ9cUH0PMCwZ/lmhj5gcblS1sUgIwSSlg2YBDyr1F6IJi/9zzARoCZK5
- 9cm2XY+34JJqGsC8OjcwrDahrfs18ZgjHk/Zf5k7BLsDam+FYnOr6Z7pNPpmyAqbUNgGGn
- qoPH6AmjXJZV3oGkmU/6ycaZUgaVGOk=
+ bh=YRLLWR3oSmOC1GQ4wgCvG70PVNqMhkYy6wEguAA/JYY=;
+ b=XcjeQG+oFPWwdqHl2GzLi0bCfK1jEfO8eMhCizjcpp2nl4d1woKr9PthBm859jmGdVtA93
+ voaVBihRX7vRsuqIymLz55KN4muAAqqyz6ALGzPD2/TINS4P54NSZBUybLEO7utGrurX2T
+ Lh+5d781ED/917Lj6MnNhyh7fQOeObY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-PPetnx_kNkGd1PRof1zxxA-1; Thu, 12 Dec 2019 11:39:36 -0500
+ us-mta-384-UorVez84OYmnn83aMol55Q-1; Thu, 12 Dec 2019 11:39:50 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 922921800D42
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:39:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D96E64A7E
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:39:49 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-226.ams2.redhat.com
  [10.36.116.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B6EE560BE1;
- Thu, 12 Dec 2019 16:39:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C4B5C60BE1;
+ Thu, 12 Dec 2019 16:39:48 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com,
 	vgoyal@redhat.com
-Subject: [PATCH 014/104] virtiofsd: Add options for virtio
-Date: Thu, 12 Dec 2019 16:37:34 +0000
-Message-Id: <20191212163904.159893-15-dgilbert@redhat.com>
+Subject: [PATCH 024/104] virtiofsd: Keep track of replies
+Date: Thu, 12 Dec 2019 16:37:44 +0000
+Message-Id: <20191212163904.159893-25-dgilbert@redhat.com>
 In-Reply-To: <20191212163904.159893-1-dgilbert@redhat.com>
 References: <20191212163904.159893-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: PPetnx_kNkGd1PRof1zxxA-1
+X-MC-Unique: UorVez84OYmnn83aMol55Q-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,109 +94,100 @@ Sender: "Qemu-devel"
 
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Add options to specify parameters for virtio-fs paths, i.e.
-
-   ./virtiofsd -o vhost_user_socket=3D/tmp/vhostqemu
+Keep track of whether we sent a reply to a request; this is a bit
+paranoid but it means:
+  a) We should always recycle an element even if there was an error
+     in the request
+  b) Never try and send two replies on one queue element
 
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/fuse_i.h        |  1 +
- tools/virtiofsd/fuse_lowlevel.c | 17 ++++++++++++-----
- tools/virtiofsd/helper.c        | 22 +++++++++++-----------
- 3 files changed, 24 insertions(+), 16 deletions(-)
+ tools/virtiofsd/fuse_virtio.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/tools/virtiofsd/fuse_i.h b/tools/virtiofsd/fuse_i.h
-index 0b5acc8765..f58be71e4b 100644
---- a/tools/virtiofsd/fuse_i.h
-+++ b/tools/virtiofsd/fuse_i.h
-@@ -63,6 +63,7 @@ struct fuse_session {
-     struct fuse_notify_req notify_list;
-     size_t bufsize;
-     int error;
-+    char *vu_socket_path;
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index c38268a1d5..c33e0f7e8c 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -44,6 +44,7 @@ struct fv_QueueInfo {
+=20
+     /* The element for the command currently being processed */
+     VuVirtqElement *qe;
++    bool reply_sent;
  };
 =20
- struct fuse_chan {
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
-l.c
-index 167701b453..da708161e1 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -2118,8 +2118,12 @@ reply_err:
+ /*
+@@ -178,6 +179,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
+e_chan *ch,
+ {
+     VuVirtqElement *elem;
+     VuVirtq *q;
++    int ret =3D 0;
+=20
+     assert(count >=3D 1);
+     assert(iov[0].iov_len >=3D sizeof(struct fuse_out_header));
+@@ -191,6 +193,7 @@ int virtio_send_msg(struct fuse_session *se, struct fus=
+e_chan *ch,
+     assert(out->unique);
+     /* For virtio we always have ch */
+     assert(ch);
++    assert(!ch->qi->reply_sent);
+     elem =3D ch->qi->qe;
+     q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
+=20
+@@ -208,19 +211,23 @@ int virtio_send_msg(struct fuse_session *se, struct f=
+use_chan *ch,
+     if (in_len < sizeof(struct fuse_out_header)) {
+         fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for out_header\n",
+                  __func__, elem->index);
+-        return -E2BIG;
++        ret =3D -E2BIG;
++        goto err;
+     }
+     if (in_len < tosend_len) {
+         fuse_log(FUSE_LOG_ERR, "%s: elem %d too small for data len %zd\n",
+                  __func__, elem->index, tosend_len);
+-        return -E2BIG;
++        ret =3D -E2BIG;
++        goto err;
      }
 =20
- static const struct fuse_opt fuse_ll_opts[] =3D {
--    LL_OPTION("debug", debug, 1), LL_OPTION("-d", debug, 1),
--    LL_OPTION("--debug", debug, 1), LL_OPTION("allow_root", deny_others, 1=
-),
-+    LL_OPTION("debug", debug, 1),
-+    LL_OPTION("-d", debug, 1),
-+    LL_OPTION("--debug", debug, 1),
-+    LL_OPTION("allow_root", deny_others, 1),
-+    LL_OPTION("--socket-path=3D%s", vu_socket_path, 0),
-+    LL_OPTION("vhost_user_socket=3D%s", vu_socket_path, 0),
-     FUSE_OPT_END
- };
+     copy_iov(iov, count, in_sg, in_num, tosend_len);
+     vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
+     vu_queue_notify(&se->virtio_dev->dev, q);
++    ch->qi->reply_sent =3D true;
 =20
-@@ -2135,9 +2139,12 @@ void fuse_lowlevel_help(void)
-      * These are not all options, but the ones that are
-      * potentially of interest to an end-user
-      */
--    printf("    -o allow_other         allow access by all users\n"
--           "    -o allow_root          allow access by root\n"
--           "    -o auto_unmount        auto unmount on process termination=
-\n");
-+    printf(
-+        "    -o allow_other             allow access by all users\n"
-+        "    -o allow_root              allow access by root\n"
-+        "    --socket-path=3DPATH         path for the vhost-user socket\n=
-"
-+        "    -o vhost_user_socket=3DPATH  path for the vhost-user socket\n=
-"
-+        "    -o auto_unmount            auto unmount on process terminatio=
-n\n");
+-    return 0;
++err:
++    return ret;
  }
 =20
- void fuse_session_destroy(struct fuse_session *se)
-diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
-index 8afccfc15e..48e38a7963 100644
---- a/tools/virtiofsd/helper.c
-+++ b/tools/virtiofsd/helper.c
-@@ -128,17 +128,17 @@ static const struct fuse_opt conn_info_opt_spec[] =3D=
- {
+ /* Thread function for individual queues, created when a queue is 'started=
+' */
+@@ -297,6 +304,9 @@ static void *fv_queue_thread(void *opaque)
+                 break;
+             }
 =20
- void fuse_cmdline_help(void)
- {
--    printf(
--        "    -h   --help            print help\n"
--        "    -V   --version         print version\n"
--        "    -d   -o debug          enable debug output (implies -f)\n"
--        "    -f                     foreground operation\n"
--        "    -s                     disable multi-threaded operation\n"
--        "    -o clone_fd            use separate fuse device fd for each "
--        "thread\n"
--        "                           (may improve performance)\n"
--        "    -o max_idle_threads    the maximum number of idle worker thre=
-ads\n"
--        "                           allowed (default: 10)\n");
-+    printf("    -h   --help                print help\n"
-+           "    -V   --version             print version\n"
-+           "    -d   -o debug              enable debug output (implies -f=
-)\n"
-+           "    -f                         foreground operation\n"
-+           "    -s                         disable multi-threaded operatio=
-n\n"
-+           "    -o clone_fd                use separate fuse device fd for=
- "
-+           "each thread\n"
-+           "                               (may improve performance)\n"
-+           "    -o max_idle_threads        the maximum number of idle work=
-er "
-+           "threads\n"
-+           "                               allowed (default: 10)\n");
- }
++            qi->qe =3D elem;
++            qi->reply_sent =3D false;
++
+             if (!fbuf.mem) {
+                 fbuf.mem =3D malloc(se->bufsize);
+                 assert(fbuf.mem);
+@@ -332,6 +342,13 @@ static void *fv_queue_thread(void *opaque)
+             /* TODO: Add checks for fuse_session_exited */
+             fuse_session_process_buf_int(se, &fbuf, &ch);
 =20
- static int fuse_helper_opt_proc(void *data, const char *arg, int key,
++            if (!qi->reply_sent) {
++                fuse_log(FUSE_LOG_DEBUG, "%s: elem %d no reply sent\n",
++                         __func__, elem->index);
++                /* I think we've still got to recycle the element */
++                vu_queue_push(dev, q, elem, 0);
++                vu_queue_notify(dev, q);
++            }
+             qi->qe =3D NULL;
+             free(elem);
+             elem =3D NULL;
 --=20
 2.23.0
 
