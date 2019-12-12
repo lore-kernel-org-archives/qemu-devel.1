@@ -7,75 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 951D6C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F870C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:10:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F72F222C4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:10:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 475A124653
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:10:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ytK+wWRO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F72F222C4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FhjIvlSP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 475A124653
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifFoD-0004rL-12
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:10:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49304)
+	id 1ifFoH-00052H-UG
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:10:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ifFez-0000vw-KG
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:06 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ifFew-0000u2-Ve
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ifFew-0004DB-Vg
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:05 -0500
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:46507)
+ (envelope-from <richard.henderson@linaro.org>) id 1ifFev-0004AL-Nq
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:02 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:44618)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ifFew-00046A-9S
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:02 -0500
-Received: by mail-pj1-x1044.google.com with SMTP id z21so429790pjq.13
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:00:58 -0800 (PST)
+ id 1ifFes-00041J-7h
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:00:59 -0500
+Received: by mail-pg1-x544.google.com with SMTP id x7so420892pgl.11
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:00:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=r5qvsiX5IA+LOMSB6fEkOOIthLDhI8Op7OL9OEMu7no=;
- b=ytK+wWROUGVs+Qv86KTs5TbB7kJY3WTm7emXiy/vlvsSaxx6zeJRhCrRLvnmzJrpFc
- D/hG3+hdr4GnuHLDgTHbjt0RrQhYmgXJLj9BMIBxSMrX/wuE3eVVpIkwYhtwLlsCDbAW
- fFvM+6/bD9wKgDkOT0dMlmPLShgw08Th8rnUKywFD1rXUTNQ9pQRUABvwHs+DjFneqL0
- aquuU1X+mBBpjoBdqayERow2YFk92J8goM1FBhFGbdiYm4Gt2WEKHwi4L5K1C8RrPyaX
- ry+stkL79HGZ7/mP3R7mPR4VS7S8T6wOOUiDEGXlxpOeHKZjT+MedZuKqCwN1oczN8wM
- OOVA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=BDlFqXreFAX+2qKs+QbdbUJAsxEgY9F0CR36Id8YiRk=;
+ b=FhjIvlSPbHhaz2/P6BtwCZPI/B+kn1i+MH5t/o1szbLbROqCwcKv6K5EXkIqiEPOH3
+ E0XY0UmeEnu4QuiaGch+YXQnHN6jJNh++fi78S6rQiMK8tiVp8Td6m+q2oUOon0OZ9Bj
+ vtvZKLwXAwWGOiXAcKRyO3chWcumquuuNNXpyk4OIOmpSPJtoTMa4vLZAzZxzIMqzdrx
+ Ea5JkiJ/9Z6uZE4V/J1nq1v8tGIsBBegtEdEVycWYH7sUpdD6s+vl1BBsIdk8i5VFzFw
+ JMOa3o8oiR/s/QtPolsLIs+VRwYEOTaYqjzxfwD/2ONqvEBwRbKHLV+7CBTV+HcckHeF
+ zTwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=r5qvsiX5IA+LOMSB6fEkOOIthLDhI8Op7OL9OEMu7no=;
- b=Q/7HRsff+Vp8l93RQecpk/BaVRG3eSqfiC93UOioqqUVf86GG5uV4v5rBFlQmQ9/86
- QedZ4U8PYKXg+72luTELTLw9dqHdk+cYpSqWRaVauMB7ky8q8UyNVDrhAHbTzueaR7Am
- SPQFhZhAaLcM5mK8STPI52jdijfD8VIbhSZTf/zZuuYmSeAF1+fQNZany7cosJuW22A2
- CFtEqyHzL+NMzZUrl+jgwg8679h+6DVG1/kh0BRCkNj37q8CI6UD7suAA9uQofxT/f6f
- 2Fe9QJm4e7MONPkh2S0HDB+gnenPaK/jyfT+QL9sYvwPq6BW4R2YgiTv2AtDeKc0Ae67
- 0UXA==
-X-Gm-Message-State: APjAAAUGdkIrfmiUYUVnCRfE4bx3HUq9oilB2xb/XVm4pz8cDjSzcieG
- IR6VmiQNkuQ28r/2cVBL2UM3eVziLoo=
-X-Google-Smtp-Source: APXvYqzrFP/EB6HKoI0bH6DR+PWum7MrOEZD5PM1xcm+mwmZg1TGCb8Z5WkztnqGl7Qr/6EIVCEjPg==
-X-Received: by 2002:a17:902:8216:: with SMTP id
- x22mr7261485pln.334.1576123257273; 
- Wed, 11 Dec 2019 20:00:57 -0800 (PST)
+ bh=BDlFqXreFAX+2qKs+QbdbUJAsxEgY9F0CR36Id8YiRk=;
+ b=l+zsLkTKuyK5nk8AjNb+xZ3rncW4WetWGwRMCh5/1An/rOGu+SE+Vm6RThI7HgOBp3
+ uOWIXNuJW3Tm5XwbD+DpMMC8qT8ab7XuQMIgM1n/1dOwFKbIrpfZdxlOdkE7/jg14XGn
+ fEbmZsf4dbjvET28p9Qero+uXDOYvqTnIxBY3QgBNUPoJOCx2pw+Hjd32NYUreyaGVRN
+ RuHkB1a6J2rchjzHjyBF+HEExzdiNSR/ILIzJX2R13z3eBeyWQJqaGwHBZLlej1KwXen
+ EtPc8wrye+ux4tR8qbU5T5NJjZ8Q5f4cQhRRJzRJUJbzvl1YAp/6OT/Df8OXSl6d/zwW
+ x9Sg==
+X-Gm-Message-State: APjAAAXaK0UtDZFkNR+q7dNZwQSJ1+KkaHw8ZAwDQRoX9SdzlDaXTKEh
+ KVvnrgZnFLNNYJnHcKY3cpf1SiPNjDY=
+X-Google-Smtp-Source: APXvYqzrZ6k6i2MUaKrBDmyCkzJuA+yJnCZS5sEDcN7MSdgMtFVLzLd2ErheKt0IYmPFzirssU1YrQ==
+X-Received: by 2002:aa7:8438:: with SMTP id q24mr7383682pfn.170.1576123252507; 
+ Wed, 11 Dec 2019 20:00:52 -0800 (PST)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id z130sm4666391pgz.6.2019.12.11.20.00.56
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id z130sm4666391pgz.6.2019.12.11.20.00.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Dec 2019 20:00:56 -0800 (PST)
+ Wed, 11 Dec 2019 20:00:51 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 13/28] linux-user: Include trace-root.h in syscall-trace.h
-Date: Wed, 11 Dec 2019 20:00:24 -0800
-Message-Id: <20191212040039.26546-14-richard.henderson@linaro.org>
+Subject: [PATCH 09/28] target/s390x: Include tcg.h in mem_helper.c
+Date: Wed, 11 Dec 2019 20:00:20 -0800
+Message-Id: <20191212040039.26546-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191212040039.26546-1-richard.henderson@linaro.org>
 References: <20191212040039.26546-1-richard.henderson@linaro.org>
@@ -83,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1044
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,31 +93,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Code movement in an upcoming patch will show that this file
-was implicitly depending on trace-root.h being included beforehand.
+was implicitly depending on tcg.h being included indirectly.
 
+Cc: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/user/syscall-trace.h | 2 ++
- 1 file changed, 2 insertions(+)
+ target/s390x/mem_helper.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/user/syscall-trace.h b/include/user/syscall-trace.h
-index 9e60473643..79fd3e5aa9 100644
---- a/include/user/syscall-trace.h
-+++ b/include/user/syscall-trace.h
-@@ -10,6 +10,8 @@
- #ifndef _SYSCALL_TRACE_H_
- #define _SYSCALL_TRACE_H_
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 2325767f17..57ce17c252 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -27,6 +27,7 @@
+ #include "exec/cpu_ldst.h"
+ #include "qemu/int128.h"
+ #include "qemu/atomic128.h"
++#include "tcg.h"
  
-+#include "trace-root.h"
-+
- /*
-  * These helpers just provide a common place for the various
-  * subsystems that want to track syscalls to put their hooks in. We
+ #if !defined(CONFIG_USER_ONLY)
+ #include "hw/s390x/storage-keys.h"
 -- 
 2.20.1
 
