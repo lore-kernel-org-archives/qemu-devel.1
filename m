@@ -7,82 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6301C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:54:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD80BC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:56:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1D8722527
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:54:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7464C22527
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:56:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KkMIC2af"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1D8722527
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MyFyFQoe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7464C22527
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifNzZ-0004hq-Oh
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 07:54:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55896)
+	id 1ifO0m-0006ML-U5
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 07:56:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNxp-0002ed-SB
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:06 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNxx-0002po-2O
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNxo-0005gA-QV
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:05 -0500
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:37683)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNxv-0005tq-JJ
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:12 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39303)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNxo-0005dv-K2
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:04 -0500
-Received: by mail-wr1-x431.google.com with SMTP id w15so2623900wru.4
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:04 -0800 (PST)
+ id 1ifNxv-0005sH-Bu
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:11 -0500
+Received: by mail-wr1-x441.google.com with SMTP id y11so2611783wrt.6
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=PH7UeOYv3AaEAyoiruUKVOCR4GfXDd27Kf2Yko972zU=;
- b=KkMIC2afPP7er6EMMZVmh7Mm86Qtdyw8GEd/41txIwD7nn9x/dB1QUeGqWGbHp+MLN
- s7gp7Jatu7QKuQNt2ZffEYzL7F/Wr8Pi71AtVx7T+juYAhsADEvF3V5npmyglKEc4Xuh
- cL9XSclfrpql+S9GJhjKFLcagHReZlMa8A9E7YPtM630FBkSeiZ6R4RXcK/+XdL9pCVy
- yqzq0ketLYYWjaEu00Hd0X5FSeklMjUcMFsDvNiJZBdUuQlKAW4EOXnGGx4Ivm47GC3o
- +yqmBudMf8uf65XUjUcxShzHM5qzlpCPir0KefHrVtabxTrLevk6G3SG/Xl3igHD1qR2
- GxzQ==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=rBx/jhpeemEhVPmqdIJ1QkUAPiG8kXc9Er3XvzBvw64=;
+ b=MyFyFQoeNLQAflpSFNNljxQWJKLf+3N9PodvOu1G5c79X5Isst/TAUaqF2xERpsERo
+ EytZteKBUAEQC8Ghwoox0pEgWZHbYmwLH6ftSI/C7jw1Fz/AgnvGaDlsCVjMdiTUFF1O
+ aJAnmkp+3FK427HEUGkjWPARpMeQaHiYMS1cmmZaAg0etVjXAtx1WgNQ4vBKduGn3GmH
+ h+qVyQ5anwpaSJH/H4+ltFtW0w6Rkb8qIqoSoSUOTotc7gm7VcqmB2s2h/SvpO+V+/dq
+ jo7UwJKsuypt7GFK0nWW5rJDHRxqYtL3dUXOSJnezk7dsvHKNBPYbKTzgZz01+XGNd4H
+ Q5uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=PH7UeOYv3AaEAyoiruUKVOCR4GfXDd27Kf2Yko972zU=;
- b=TpAV7HRQOeotKG7dFf9NyCt+yssM+pvJDRgGQPNCj80/msiqFpSis0/xGSju8Oc/X4
- LmYehGgT97SxGSqtXZbmHaOrdj7trTfpPtBan+jbONSvg1/QboHY5PsyYUT8IbbVg0QO
- Y1ip2kHjhBcRMR9dkkjTthJg+10MYhNyBoWfNVdRF1o7gxiyVSCxK646gbvw+pzovNVf
- wxa5D1dWn8jrAQymH9brPOMf7umzBPadmC/YMcG55czY+PSrBIqr8Rj/S9nBZnPBA/xR
- U3afetDonVinOJtR27qqCQR4oj1OBYtwkPnzwjidf1s02Q60xnfO9nTciQOYPwg/wbKk
- JW2w==
-X-Gm-Message-State: APjAAAXd6fyEB4OLXKTjylpWzJqbCyFtfh+fE0854oL6R79rVLTZfOBK
- aXH5NBEqVPlb3+hK/Ng7nG7yAqps
-X-Google-Smtp-Source: APXvYqzQu8+Il+Ac4szdLi8B0eAEAuG3hk8OVneswrjBIe5KT8NhmTsfpdJJRvVrAvC7t/ZYfqVdiA==
-X-Received: by 2002:adf:e591:: with SMTP id l17mr5699975wrm.139.1576155183211; 
- Thu, 12 Dec 2019 04:53:03 -0800 (PST)
+ :in-reply-to:references;
+ bh=rBx/jhpeemEhVPmqdIJ1QkUAPiG8kXc9Er3XvzBvw64=;
+ b=sQn3uOlsIptu0jRiK4FLyaZ8IyMElNaui6FD2N3frckLuE9QVSGo3TRrX37t+ZuC/u
+ jjwkbQsBVTgrP1HPY7a0f8RwAOwWyg27c3I40CdOqtNTKo1DpHKWakrATuSm4G3OjGni
+ sk1dj+TISuN7sX5STLZY3u6jZBwWpGvtrCS6s0mZEmdbXQL+t55+CMrAeLcF5Jzl1B18
+ zuOCD8Y/KZdpW4Kds9539Sl+IysW5Lzly3DuBTXW1vb+8MFv2VyOXvvBvJNWdDRai3sy
+ xtJKUk0vDOthFKTk4xyogprASqUuceq0jpAO3vd/40cX4iqs6uIQA3BBU8GDYcVXE5bX
+ E0nQ==
+X-Gm-Message-State: APjAAAXXBDaBAaIrZt/PhaG/nYPZAVDEgk1WX7guZUl9IKPSkgoOF1ku
+ iKcZ2yT9gPIES3i79tCYaSQVWaai
+X-Google-Smtp-Source: APXvYqxGqjRrdNy+8RPukoOb8AIp8XsrBKufHHqRfDggHuXygpzxDvpY6Ay0fHB0xNSy3KumidkCsg==
+X-Received: by 2002:adf:f288:: with SMTP id k8mr6535645wro.301.1576155190018; 
+ Thu, 12 Dec 2019 04:53:10 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.02
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.09
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:53:02 -0800 (PST)
+ Thu, 12 Dec 2019 04:53:09 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 005/132] configure: generate Meson cross file
-Date: Thu, 12 Dec 2019 13:50:49 +0100
-Message-Id: <1576155176-2464-6-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 012/132] contrib/libvhost-user: convert to Meson
+Date: Thu, 12 Dec 2019 13:50:56 +0100
+Message-Id: <1576155176-2464-13-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::431
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,73 +94,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Since libqemuutil.a has been converted to Meson, the conversion is
+straightforward.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ Makefile                            | 14 ++++----------
+ Makefile.objs                       |  1 -
+ contrib/libvhost-user/Makefile.objs |  1 -
+ contrib/libvhost-user/meson.build   |  2 ++
+ meson.build                         |  8 ++++++++
+ 5 files changed, 14 insertions(+), 12 deletions(-)
+ delete mode 100644 contrib/libvhost-user/Makefile.objs
+ create mode 100644 contrib/libvhost-user/meson.build
 
-diff --git a/configure b/configure
-index 3e3eb3d..2f3e231 100755
---- a/configure
-+++ b/configure
-@@ -7852,6 +7852,46 @@ echo "# Automatically generated by configure - do not modify" > "$iotests_common
- echo >> "$iotests_common_env"
- echo "export PYTHON='$python'" >> "$iotests_common_env"
+diff --git a/Makefile b/Makefile
+index 97f9ffd..27e9ea3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -267,7 +267,6 @@ dummy := $(call unnest-vars,, \
+                 ivshmem-client-obj-y \
+                 ivshmem-server-obj-y \
+                 rdmacm-mux-obj-y \
+-                libvhost-user-obj-y \
+                 vhost-user-scsi-obj-y \
+                 vhost-user-blk-obj-y \
+                 vhost-user-input-obj-y \
+@@ -377,11 +376,6 @@ $(BUILD_DIR)/version.o: $(SRC_PATH)/version.rc config-host.h
+ Makefile: $(version-obj-y)
  
-+cross="config-meson.cross"
-+cross_arg=
-+
-+if test -n "$cross_prefix"; then
-+    echo "# Automatically generated by configure - do not modify" > $cross
-+    echo "[binaries]" >> $cross
-+    echo "c = '$cc'" >> $cross
-+    echo "cpp = '$cxx'" >> $cross
-+    echo "ar = '$ar'" >> $cross
-+    echo "nm = '$nm'" >> $cross
-+    echo "pkgconfig = '$pkg_config_exe'" >> $cross
-+    echo "ranlib = '$ranlib'" >> $cross
-+    echo "strip = '$strip'" >> $cross
-+    echo "windres = '$windres'" >> $cross
-+
-+    echo "[properties]" >> $cross
-+    echo "root = '$prefix'" >> $cross
-+
-+    echo "[host_machine]" >> $cross
-+if test "$mingw32" = "yes" ; then
-+    echo "system = 'windows'" >> $cross
-+fi
-+case "$ARCH" in
-+    i386|x86_64)
-+        echo "cpu_family = 'x86'" >> $cross
-+        ;;
-+    *)
-+        echo "cpu_family = '$ARCH'" >> $cross
-+        ;;
-+esac
-+    echo "cpu = '$cpu'" >> $cross
-+if test "$bigendian" = "yes" ; then
-+    echo "endian = 'big'" >> $cross
-+else
-+    echo "endian = 'little'" >> $cross
-+fi
-+
-+    cross_arg="--cross-file=$cross"
-+fi
-+
- rm -rf meson-private meson-info meson-logs
- NINJA=$PWD/ninjatool $python $meson setup \
- 	--prefix "$prefix" \
-@@ -7865,6 +7905,7 @@ NINJA=$PWD/ninjatool $python $meson setup \
- 	--localstatedir "$local_statedir" \
- 	$(test "$strip_opt" = yes && echo --strip) \
- 	--buildtype $(if test "$debug" = yes; then echo debug; else echo debugoptimized; fi) \
-+        $cross_arg \
- 	"$PWD" "$source_path"
+ ######################################################################
+-# Build libraries
+-
+-libvhost-user.a: $(libvhost-user-obj-y)
+-
+-######################################################################
  
- if test "$?" -ne 0 ; then
+ COMMON_LDADDS = libqemuutil.a
+ 
+@@ -471,21 +465,21 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
+ ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ endif
+-vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a $(COMMON_LDADDS)
++vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+-vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) libvhost-user.a $(COMMON_LDADDS)
++vhost-user-blk$(EXESUF): $(vhost-user-blk-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ 
+ rdmacm-mux$(EXESUF): LIBS += "-libumad"
+ rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ 
+-vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-y) $(COMMON_LDADDS)
++vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ 
+ ifdef CONFIG_VHOST_USER_INPUT
+ ifdef CONFIG_LINUX
+-vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) libvhost-user.a $(COMMON_LDADDS)
++vhost-user-input$(EXESUF): $(vhost-user-input-obj-y) contrib/libvhost-user/libvhost-user.a $(COMMON_LDADDS)
+ 	$(call LINK, $^)
+ 
+ # build by default, do not install
+diff --git a/Makefile.objs b/Makefile.objs
+index f820829..3142dbb 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -109,7 +109,6 @@ qga-vss-dll-obj-y = qga/
+ elf2dmp-obj-y = contrib/elf2dmp/
+ ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
+ ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
+-libvhost-user-obj-y = contrib/libvhost-user/
+ vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
+ vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
+ vhost-user-scsi-obj-y = contrib/vhost-user-scsi/
+diff --git a/contrib/libvhost-user/Makefile.objs b/contrib/libvhost-user/Makefile.objs
+deleted file mode 100644
+index ef3778e..0000000
+--- a/contrib/libvhost-user/Makefile.objs
++++ /dev/null
+@@ -1 +0,0 @@
+-libvhost-user-obj-y += libvhost-user.o libvhost-user-glib.o
+diff --git a/contrib/libvhost-user/meson.build b/contrib/libvhost-user/meson.build
+new file mode 100644
+index 0000000..03ba2af
+--- /dev/null
++++ b/contrib/libvhost-user/meson.build
+@@ -0,0 +1,2 @@
++libvhost_user = static_library('vhost-user',
++                               [files('libvhost-user.c', 'libvhost-user-glib.c')])
+diff --git a/meson.build b/meson.build
+index ba4d891..6b9636d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -185,3 +185,11 @@ libqemuutil = static_library('qemuutil',
+                              dependencies: [util_ss.dependencies(), m, glib, socket])
+ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: version_res)
++
++# Other build targets
++
++if have_tools
++  if 'CONFIG_VHOST_USER' in config_host
++    subdir('contrib/libvhost-user')
++  endif
++endif
 -- 
 1.8.3.1
 
