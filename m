@@ -2,80 +2,70 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAD6C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:12:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 283E2C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:14:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ECED214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:12:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SSsBUJhx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ECED214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id EFA65214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:14:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFA65214AF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifPCx-0000nZ-4N
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:12:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53829)
+	id 1ifPES-00028C-RU
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:14:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49267)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <linus.walleij@linaro.org>) id 1ifOOp-0003Kc-UF
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 08:21:01 -0500
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1ifOb4-0003eW-92
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 08:33:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <linus.walleij@linaro.org>) id 1ifOOo-0005Lf-GP
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 08:20:59 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:37830)
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1ifOb2-0002f9-Os
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 08:33:38 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:41332)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <linus.walleij@linaro.org>)
- id 1ifOOo-0005Iu-7K
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 08:20:58 -0500
-Received: by mail-lj1-x242.google.com with SMTP id u17so2271527lja.4
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 05:20:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Hg7Wl/6CET3pvbTGNm/tGvdeGMQk6gSudBEEyfBygCo=;
- b=SSsBUJhxA1aRWawSyAxOR8XEmSe8IeDhUogI22JjnRdTk3guoUUCNE18wU5spaIBSN
- Tge40xKNTf2c46f/Ct3PtBV62vLDyTgN2F3kU/LEPoq1BJ2nnzBXF8JYtD2eEX1mqIJz
- rW7wDkFNi5MxHljIDydZyIjHe6qK9dZp/ZzKZFTU8OzgxhvVNWUmlr/+DUAbJCPCYqdT
- SZmfh20Q3fi5Bhn0MuHL9ePyN6uLVtDrP1daGTkTkZZvu5ew56B9/mLwobAy+2/ftSrB
- 0Q9aN+TRxhkjgCuoZ7lNHssuUGfAJkwH65uRfr9oM3Du3HhN0ra9yv9gV/v3pVzTcRo0
- 0k3g==
+ (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1ifOb2-0002dV-ID
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 08:33:36 -0500
+Received: by mail-oi1-f195.google.com with SMTP id i1so409193oie.8
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 05:33:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=Hg7Wl/6CET3pvbTGNm/tGvdeGMQk6gSudBEEyfBygCo=;
- b=lAvZLoBzIzxLNCVVUfVYczuZFUzRPff70Q4Rm9eYmHwxJj+23/HYvFzTwVzviHJH/R
- fFME/grfjGDmYLl5TjQXnlXjHHuQYVlu4o75meIq2OsarFD7fEQd5bRsdtlGRmESQ91t
- /393kzYwj03jb0FEjwQWXNnrJvTsSI2m7UlkPYSH7ZP/4tDnOqw25Z3hSodiJh70cP9G
- MKIawyn+VFY+qW7sAOmlhBuUlSrJzHoR8Tm+Acn8fzvtAQwwVY/+bgiALXpwDVAdaGjE
- 1KGSPzlE29CwTSJRQ4+/hM8t+H3qvNyep6mA494vCfk1V3fkM0kk6JZDoBfudtHszYeo
- WSkg==
-X-Gm-Message-State: APjAAAV9wpFmYcC1N4upwHWqMQYvUe0+hYfS6cNkzjtsFy78VO/ktkWw
- wWKYpJvAYOAkQNycOW6a14sI4CgB9WdDp15beAia3Q==
-X-Google-Smtp-Source: APXvYqw5fhzsAgc+HL+XC84iHcSjemi0g8V+vxBZMQOSmUPecN5cY5o5jyiYAB8ZURwvkZwuG5+myIg9qUaLJdi8vHI=
-X-Received: by 2002:a2e:844e:: with SMTP id u14mr5871004ljh.183.1576156856527; 
- Thu, 12 Dec 2019 05:20:56 -0800 (PST)
+ bh=B1c5GbpC2qZV4XZL32ReXMmOl4Gf9Xdye7e43MFMR8g=;
+ b=ubcrILAsj0IiGasCgkyC49mc/Gmrg0xueyh88hZjFcZ5PUazTVkzBOVcWYi7ejGI8t
+ P+MSGfJzGWxyBw1+3TQQXuSPECEXCHoeVp8+y7MeaULOa7r1+3wBxvpq1WBBzSRl6Lqx
+ UDtn4nVxRgdrDMZVWcgpMkdfOiNEU6rzx3rUkCbLjm+9qD9K55zAAP4DdcZ0yQHeAutF
+ LjMB0d+esnZ5IagBZUrgUnwzGD5wLFro3qllbbLZYig/2ZDchk4Q5tRm5RQXxv/v+m2W
+ 2H7vMIv30lAUgU+WW7F5UPNx9XgLcJnhwpoPnoePt0Npu81bHi1sMy8pIXq+gqT7IFPS
+ /LYQ==
+X-Gm-Message-State: APjAAAVHXRzsXHAXRy+U9BqulFC+ltx4pKFcnPyuPx85Oa0Snd1jv6Qo
+ tIRLX3KrEfEBAT4Vw8gKLPJI6/8thJBgAsP/TYQ=
+X-Google-Smtp-Source: APXvYqyZrB81syD0Ce6WwALcSofZswA84PMJGyV785ydrh5qmd3i1ZIC8I8AuxCcmSbHRH3rYOaGved6PnxX/cMztls=
+X-Received: by 2002:aca:4e87:: with SMTP id c129mr4645921oib.153.1576157615510; 
+ Thu, 12 Dec 2019 05:33:35 -0800 (PST)
 MIME-Version: 1.0
 References: <20191127084253.16356-1-geert+renesas@glider.be>
  <20191127084253.16356-3-geert+renesas@glider.be>
-In-Reply-To: <20191127084253.16356-3-geert+renesas@glider.be>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 12 Dec 2019 14:20:45 +0100
-Message-ID: <CACRpkdYyY0eGipdK6ixZxLtdJ5px=U2mOa79VZb00NEEAEL=6g@mail.gmail.com>
+ <CACRpkdYyY0eGipdK6ixZxLtdJ5px=U2mOa79VZb00NEEAEL=6g@mail.gmail.com>
+In-Reply-To: <CACRpkdYyY0eGipdK6ixZxLtdJ5px=U2mOa79VZb00NEEAEL=6g@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 12 Dec 2019 14:33:24 +0100
+Message-ID: <CAMuHMdVL2w=DzOHTh-Tq6NZLTNUKxUneMi3wX71Z83mdsy3LTA@mail.gmail.com>
 Subject: Re: [PATCH v3 2/7] gpiolib: Add support for gpiochipN-based table
  lookup
-To: Geert Uytterhoeven <geert+renesas@glider.be>
+To: Linus Walleij <linus.walleij@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.167.195
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,7 +80,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Mark Rutland <mark.rutland@arm.com>,
  Peter Maydell <peter.maydell@linaro.org>,
  QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
- Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <marc.zyngier@arm.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>,
  "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
  Linux Doc Mailing List <linux-doc@vger.kernel.org>,
  Magnus Damm <magnus.damm@gmail.com>,
@@ -107,69 +98,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Geert!
+Hi Linus,
 
-On Wed, Nov 27, 2019 at 9:43 AM Geert Uytterhoeven
-<geert+renesas@glider.be> wrote:
-
-> Currently GPIO controllers can only be referred to by label in GPIO
-> lookup tables.
+On Thu, Dec 12, 2019 at 2:20 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+> On Wed, Nov 27, 2019 at 9:43 AM Geert Uytterhoeven
+> <geert+renesas@glider.be> wrote:
+> > Currently GPIO controllers can only be referred to by label in GPIO
+> > lookup tables.
+> >
+> > Add support for looking them up by "gpiochipN" name, with "N" either the
+> > corresponding GPIO device's ID number, or the GPIO controller's first
+> > GPIO number.
+> >
+> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 >
-> Add support for looking them up by "gpiochipN" name, with "N" either the
-> corresponding GPIO device's ID number, or the GPIO controller's first
-> GPIO number.
+> What the commit message is missing is a rationale, why is this needed?
+
+Right. To be added: so they can be looked up in the GPIO lookup table
+using either the chip's label, or the "gpiochipN" name.
+
+> > If this is rejected, the GPIO Aggregator documentation must be updated.
+> >
+> > The second variant is currently used by the legacy sysfs interface only,
+> > so perhaps the chip->base check should be dropped?
 >
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Anything improving the sysfs is actively discouraged by me.
+> If it is just about staying compatible it is another thing.
 
-What the commit message is missing is a rationale, why is this needed?
+OK, so N must be the corresponding GPIO device's ID number.
 
-> If this is rejected, the GPIO Aggregator documentation must be updated.
+> > +static int gpiochip_match_id(struct gpio_chip *chip, void *data)
+> > +{
+> > +       int id = (uintptr_t)data;
+> > +
+> > +       return id == chip->base || id == chip->gpiodev->id;
+> > +}
+> >  static struct gpio_chip *find_chip_by_name(const char *name)
+> >  {
+> > -       return gpiochip_find((void *)name, gpiochip_match_name);
+> > +       struct gpio_chip *chip;
+> > +       int id;
+> > +
+> > +       chip = gpiochip_find((void *)name, gpiochip_match_name);
+> > +       if (chip)
+> > +               return chip;
+> > +
+> > +       if (!str_has_prefix(name, GPIOCHIP_NAME))
+> > +               return NULL;
+> > +
+> > +       if (kstrtoint(name + strlen(GPIOCHIP_NAME), 10, &id))
+> > +               return NULL;
+> > +
+> > +       return gpiochip_find((void *)(uintptr_t)id, gpiochip_match_id);
 >
-> The second variant is currently used by the legacy sysfs interface only,
-> so perhaps the chip->base check should be dropped?
+> Isn't it easier to just  augment the existing match function to
+> check like this:
+>
+> static int gpiochip_match_name(struct gpio_chip *chip, void *data)
+> {
+>         const char *name = data;
+>
+>         if (!strcmp(chip->label, name))
+>                return 0;
 
-Anything improving the sysfs is actively discouraged by me.
-If it is just about staying compatible it is another thing.
+return true;
 
-> +static int gpiochip_match_id(struct gpio_chip *chip, void *data)
-> +{
-> +       int id = (uintptr_t)data;
-> +
-> +       return id == chip->base || id == chip->gpiodev->id;
-> +}
->  static struct gpio_chip *find_chip_by_name(const char *name)
->  {
-> -       return gpiochip_find((void *)name, gpiochip_match_name);
-> +       struct gpio_chip *chip;
-> +       int id;
-> +
-> +       chip = gpiochip_find((void *)name, gpiochip_match_name);
-> +       if (chip)
-> +               return chip;
-> +
-> +       if (!str_has_prefix(name, GPIOCHIP_NAME))
-> +               return NULL;
-> +
-> +       if (kstrtoint(name + strlen(GPIOCHIP_NAME), 10, &id))
-> +               return NULL;
-> +
-> +       return gpiochip_find((void *)(uintptr_t)id, gpiochip_match_id);
+>         return !strcmp(dev_name(&chip->gpiodev->dev), name);
+> }
 
-Isn't it easier to just  augment the existing match function to
-check like this:
+Oh, didn't think of using dev_name() on the gpiodev.
+Yes, with the chip->base check removed, the code can be simplified.
 
-static int gpiochip_match_name(struct gpio_chip *chip, void *data)
-{
-        const char *name = data;
+Or just
 
-        if (!strcmp(chip->label, name))
-               return 0;
-        return !strcmp(dev_name(&chip->gpiodev->dev), name);
-}
+        return !strcmp(chip->label, name) ||
+               !strcmp(dev_name(&chip->gpiodev->dev), name);
 
-We should I guess also add some kerneldoc to say we first
-match on the label and second on dev_name().
+> We should I guess also add some kerneldoc to say we first
+> match on the label and second on dev_name().
 
-Yours,
-Linus Walleij
+OK.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
