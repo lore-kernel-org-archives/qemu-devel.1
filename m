@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D031AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:14:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0AB0C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:16:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C88521655
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:14:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCDC12173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:16:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uAIVzBZL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C88521655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XVHMAmhd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCDC12173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOIr-0002r3-5N
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:14:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32836)
+	id 1ifOK8-0004K6-8l
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:16:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59367)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyH-0003Nx-Eb
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:34 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNy8-00037m-GB
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyG-0006Zu-3B
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:33 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:39580)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNy7-0006Fu-1m
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:24 -0500
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:33619)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNyF-0006X7-Qw
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:32 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id y11so2612920wrt.6
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:31 -0800 (PST)
+ id 1ifNy6-0006E3-Pf
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:22 -0500
+Received: by mail-wr1-x435.google.com with SMTP id b6so2659121wrq.0
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Bxsd7cj1t1IS27BdAUrkJJ/4ZajGVGqHzwhI7jGnNf0=;
- b=uAIVzBZLzlF70bo9em0ieC8sc5toqa+mD/sXh/cKdxoieVhINn1uovhUC30H8NHG9+
- vepKIhlhI2hHGfa8Bok1edNlKChTVGZ7iw6lySuSIK7DhMU5Gji0SZei3qTYKgPxrMql
- oQb140psvjHwohlGGfiPLrt877JKQklUsJFZoK1w/MKKDVI6eatd9YWTDdyBdz2WTHPn
- mYJwu16zTKoAZDDjjFHWW94FRcvwYLDsAwoEUyV7/2Sj4wT1l9dHPi62Qe9Jqtksidgp
- HcXrRT+pt+N4sPKFueCDSgoxoJQ048BucRGFp6iOXo2/RUXmVPjpzlmCQt0XqWmi4kz8
- 1OFQ==
+ bh=HXR0svkyY3DtengHr9Una6kU9oDOnxpx+/sr/xfZFfM=;
+ b=XVHMAmhdkBkblMMFlb157dveyCNuYEr9KhrnLNszlVx/7OzqlKqwm144LVYIIPoUXu
+ bHPuPYeXdFAoFYwk0RwBb15Zt6XNBqvIXnAdFOqVat1LBjFmX8GQ5mvWGPx7NhBVea8b
+ iZWqmQZdze/7SYL8glnxNBu7TVtjhu6HVTRqUznTXDbGgntKz3Iz9lFGZPJDx1cnZOiY
+ a/ejM0NQR6hARkhh2NP7SgJuTiyhkZTMM62b050JLDEfIgmvYYgBegAuf1+uMSaxrKAZ
+ NoBzXmN0BaRScr2lAhZe2Ty0hWoAQUitp9qbvVEXZ2AWM9Li/2udTvKFFdjeSvjmHjzX
+ HtMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=Bxsd7cj1t1IS27BdAUrkJJ/4ZajGVGqHzwhI7jGnNf0=;
- b=ccicDJk8le6bBXY1r4xr0nZGS1kw+jV+FwYWXzbEgTjdMm2vjAe9b7vJGJm0CfMS1w
- G6HVr7HB1QFbeDqdEduyexTRjkFBSgZBwDTD+YVtNXBiVGfQym4qSM+csGshg4h0QpLX
- qxyxxmv7Agsyo0FoMWZX7nQa1L92R8pYRf0Sy1s/bRRzlPk+JmLN3xcI+ouscSf9ndaf
- ViZJ3L9Gq/6KHEzBcrLvkP6UBOtbwy9Ut2Jado71e8UTpkI8nf67Dca+IZDxRLeJvhF8
- B82eirwllMbRL3QPkXlY9xG4vyRjnmUL7zsVDYTZnjsY64ce+cRKo0jnnHXqlq3L2UKg
- d/rA==
-X-Gm-Message-State: APjAAAWTDRlXCcgPDesUSNkdCIYKIfTm2Rw1qWGYccgcEntYEgT00+TU
- z0F8axLQlGj//jBtGKp/JY7KULpp
-X-Google-Smtp-Source: APXvYqzvPJCqG/Gxinm+XDjZpeEBehFj+5csNVj/Td1sjPtT22lzkJSNc0rqnbJ8BVO5J6M4MTxxxA==
-X-Received: by 2002:adf:f885:: with SMTP id u5mr6283471wrp.359.1576155210602; 
- Thu, 12 Dec 2019 04:53:30 -0800 (PST)
+ bh=HXR0svkyY3DtengHr9Una6kU9oDOnxpx+/sr/xfZFfM=;
+ b=fqaL+uRAb1oX+YvCCeY3yaPNzO5TKIcJkNaYY/g8TRUd4bq6h9HtqfGV9Lw6Sk/RS5
+ ENpdV93d+OeiCq6yu4bPur8bHf/Cm5bukqrbMqVG/jw0/8Sujs8KLvhSOPN+sNQ9P+Nv
+ Epo//hQ9czwkOQUK657MRRpoArj7U7sO4u6KuZJxexf0JsaR9YITitOJu4v6Lh7N4MIc
+ xZG0IU7Jf/O0kQXmD73eANr1wcGNVmzTmkHYfb8pT2mEMjBZZAFk53jSQll1oiZ/iv1C
+ bm31gjh1agRXMOS6jb8uBT4Qh7LCaAfEAA4FZLjO9FksdyBpsgTGE7EoYp24Kq5qm9tm
+ /SzQ==
+X-Gm-Message-State: APjAAAXOV8mWuImFBuqCsksyVSbhKluW9jJ4qqWNgp3aN+CrJF3xWvOa
+ Iuz8SgsRPmXCeBr7w5tFMK9ogxnO
+X-Google-Smtp-Source: APXvYqwj+CIKZDwlp/uEKyMSItUN2MO8kdJtusCOimeoXlHiBdqk+AKBnZ1soo9nMQ1GgiOu70HCtQ==
+X-Received: by 2002:a5d:4b8f:: with SMTP id b15mr6560367wrt.100.1576155201288; 
+ Thu, 12 Dec 2019 04:53:21 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.29
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.20
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:53:30 -0800 (PST)
+ Thu, 12 Dec 2019 04:53:20 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 033/132] build-sys hack: link with whole .fa archives
-Date: Thu, 12 Dec 2019 13:51:17 +0100
-Message-Id: <1576155176-2464-34-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 023/132] meson: add qemu-bridge-helper
+Date: Thu, 12 Dec 2019 13:51:07 +0100
+Message-Id: <1576155176-2464-24-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42b
+X-Received-From: 2a00:1450:4864:20::435
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,69 +100,85 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-In order to link the *-obj-y files into tests, we will make static
-libraries of them in Meson, and then link them as whole archives
-into the tests.  To separate regular static libraries from link-whole
-libraries, give them a different file extension.
-
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- rules.mak | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ Makefile    |  4 ----
+ configure   |  1 +
+ meson.build | 12 +++++++++++-
+ 3 files changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/rules.mak b/rules.mak
-index 5289184..a10a972 100644
---- a/rules.mak
-+++ b/rules.mak
-@@ -39,6 +39,13 @@ find-symbols = $(if $1, $(sort $(shell $(NM) -P -g $1 | $2)))
- defined-symbols = $(call find-symbols,$1,awk '$$2!="U"{print $$1}')
- undefined-symbols = $(call find-symbols,$1,awk '$$2=="U"{print $$1}')
+diff --git a/Makefile b/Makefile
+index 328b3c3..d153186 100644
+--- a/Makefile
++++ b/Makefile
+@@ -173,8 +173,6 @@ LIBS+=-lz $(LIBS_TOOLS)
+ vhost-user-json-y =
+ HELPERS-y =
  
-+WL := -Wl,
-+ifdef CONFIG_DARWIN
-+whole-archive = $(WL)-force_load,$1
-+else
-+whole-archive = $(WL)--whole-archive $1 $(WL)--no-whole-archive
+-HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) = qemu-bridge-helper$(EXESUF)
+-
+ ifeq ($(CONFIG_LINUX)$(CONFIG_VIRGL)$(CONFIG_GBM)$(CONFIG_TOOLS),yyyy)
+ vhost-user-json-y += contrib/vhost-user-gpu/50-qemu-gpu.json
+ endif
+@@ -374,8 +372,6 @@ qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io
+ qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+ 
+-qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+-
+ qemu-keymap$(EXESUF): qemu-keymap.o ui/input-keymap.o $(COMMON_LDADDS)
+ 
+ qemu-edid$(EXESUF): qemu-edid.o hw/display/edid-generate.o $(COMMON_LDADDS)
+diff --git a/configure b/configure
+index 4ed65db..9615d63 100755
+--- a/configure
++++ b/configure
+@@ -6603,6 +6603,7 @@ if test "$l2tpv3" = "yes" ; then
+ fi
+ if test "$cap_ng" = "yes" ; then
+   echo "CONFIG_LIBCAP_NG=y" >> $config_host_mak
++  echo "LIBCAP_NG_LIBS=$cap_libs" >> $config_host_mak
+ fi
+ echo "CONFIG_AUDIO_DRIVERS=$audio_drv_list" >> $config_host_mak
+ for drv in $audio_drv_list; do
+diff --git a/meson.build b/meson.build
+index 7e772c1..854b1cb 100644
+--- a/meson.build
++++ b/meson.build
+@@ -56,6 +56,10 @@ if 'CONFIG_GNUTLS' in config_host
+ endif
+ pixman = declare_dependency(compile_args: config_host['PIXMAN_CFLAGS'].split(),
+                             link_args: config_host['PIXMAN_LIBS'].split())
++libcap_ng = declare_dependency()
++if 'CONFIG_LIBCAP_NG' in config_host
++  libcap_ng = declare_dependency(link_args: config_host['LIBCAP_NG_LIBS'].split())
 +endif
+ rt = cc.find_library('rt', required: false)
+ libiscsi = declare_dependency()
+ if 'CONFIG_LIBISCSI' in config_host
+@@ -216,7 +220,6 @@ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: version_res)
+ 
+ # Other build targets
+-
+ if 'CONFIG_GUEST_AGENT' in config_host
+   subdir('qga')
+ endif
+@@ -235,6 +238,13 @@ if have_tools
+     subdir('contrib/vhost-user-scsi')
+   endif
+ 
++  if host_machine.system() == 'linux'
++    executable('qemu-bridge-helper', files('qemu-bridge-helper.c'),
++               dependencies: [qemuutil, libcap_ng],
++               install: true,
++               install_dir: get_option('libexecdir'))
++  endif
 +
- # All the .mo objects in -m variables are also added into corresponding -y
- # variable in unnest-vars, but filtered out here, when LINK is called.
- #
-@@ -54,11 +61,12 @@ undefined-symbols = $(call find-symbols,$1,awk '$$2=="U"{print $$1}')
- # This is necessary because the exectuable itself may not use the function, in
- # which case the function would not be linked in. Then the DSO loading will
- # fail because of the missing symbol.
--process-archive-undefs = $(filter-out %.a %.mo,$1) \
-+process-archive-undefs = $(filter-out %.a %.fa %.mo,$1) \
-                 $(addprefix $(WL_U), \
--                     $(filter $(call defined-symbols,$(filter %.a, $1)), \
-+                     $(filter $(call defined-symbols,$(filter %.a %.fa, $1)), \
-                               $(call undefined-symbols,$(filter %.mo,$1)))) \
--                $(filter %.a,$1)
-+		$(foreach l,$(filter %.fa,$1),$(call whole-archive,$l)) \
-+		$(filter %.a,$1)
- 
- extract-libs = $(strip $(foreach o,$(filter-out %.mo,$1),$($o-libs)))
- expand-objs = $(strip $(sort $(filter %.o,$1)) \
-@@ -122,7 +130,7 @@ LD_REL := $(CC) -nostdlib $(LD_REL_FLAGS)
- modules:
- 
- %$(EXESUF): %.o
--	$(call LINK,$(filter %.o %.a %.mo, $^))
-+	$(call LINK,$(filter %.o %.a %.mo %.fa, $^))
- 
- %.a:
- 	$(call quiet-command,rm -f $@ && $(AR) rcs $@ $^,"AR","$(TARGET_DIR)$@")
-@@ -378,7 +386,7 @@ define unnest-vars
-                 $(error $o added in $v but $o-objs is not set)))
-         $(shell mkdir -p ./ $(sort $(dir $($v))))
-         # Include all the .d files
--        $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$($v))))
-+        $(eval -include $(patsubst %.o,%.d,$(patsubst %.mo,%.d,$(filter %.o,$($v)))))
-         $(eval $v := $(filter-out %/,$($v))))
- endef
- 
+   if 'CONFIG_IVSHMEM' in config_host
+     subdir('contrib/ivshmem-client')
+     subdir('contrib/ivshmem-server')
 -- 
 1.8.3.1
 
