@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C66FC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F777C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:30:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B36E2173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9F1A21655
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:30:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQcHw9TG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B36E2173E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X5v6ztYK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9F1A21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifSGZ-000480-Up
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 12:28:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52703)
+	id 1ifSHu-0005ke-55
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 12:30:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52505)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ifRVw-0006Cx-KR
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:34 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ifRVu-0002cK-Lm
+ (envelope-from <dgilbert@redhat.com>) id 1ifRVv-00068E-5D
  for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:32 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39254
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <dgilbert@redhat.com>) id 1ifRVt-0002aO-Hi
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:31 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29730
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRVu-0002bf-HR
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:30 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRVt-0002Zc-Cp
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576168830;
+ s=mimecast20190719; t=1576168829;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0PgdZCyw8sY7AIHCYCuBhgOjNpGmvh6jgIw8FLDcjig=;
- b=WQcHw9TG2Ho+WvOLNdmvRJ7QXmCNL7ArlhRRRBPrpXxFhR5WGZh8JNR/YCJroJz/OtNnTf
- 5fqxkrKWulnMyn3fWMc9IEtiz6+1anz/RM6hRwOr7HiIqF8QuFj/504zEYb3EiAxUzqJw7
- JBIQJ5i4ADC4l/fce3lIp8qqK+/QZts=
+ bh=gcHRGaMQySuscGEZQmOdWv9vhYbjHTW0hTRIDvEx2xA=;
+ b=X5v6ztYKejFU1jdtkhXYlwshNeDMSXVmGSbB6n1JaOOlCLuk5MhU8rizsfps52Ysx9xrq3
+ e5A0dq9sWAR1mlGoL0uTXv+CQ51HyLyb9h7sgzmwPLXvAe5FxFnCyu5HXbCeji0pVK5XZL
+ iBdBSi10P1DxInIQEyAl5R1N1uBkmDM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-KJx-_6ZPOFCD6Ssrh1euww-1; Thu, 12 Dec 2019 11:40:28 -0500
+ us-mta-265-8Mk_Z5igPCWYyTCmEP8dzA-1; Thu, 12 Dec 2019 11:40:27 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A743800EB5
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:40:28 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAE631800D45
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:40:26 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-226.ams2.redhat.com
  [10.36.116.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3C2AD60BF3;
- Thu, 12 Dec 2019 16:40:27 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E429160BF3;
+ Thu, 12 Dec 2019 16:40:25 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com,
 	vgoyal@redhat.com
-Subject: [PATCH 050/104] virtiofsd: add seccomp whitelist
-Date: Thu, 12 Dec 2019 16:38:10 +0000
-Message-Id: <20191212163904.159893-51-dgilbert@redhat.com>
+Subject: [PATCH 049/104] virtiofsd: move to a new pid namespace
+Date: Thu, 12 Dec 2019 16:38:09 +0000
+Message-Id: <20191212163904.159893-50-dgilbert@redhat.com>
 In-Reply-To: <20191212163904.159893-1-dgilbert@redhat.com>
 References: <20191212163904.159893-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: KJx-_6ZPOFCD6Ssrh1euww-1
+X-MC-Unique: 8Mk_Z5igPCWYyTCmEP8dzA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,251 +94,215 @@ Sender: "Qemu-devel"
 
 From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Only allow system calls that are needed by virtiofsd.  All other system
-calls cause SIGSYS to be directed at the thread and the process will
-coredump.
+virtiofsd needs access to /proc/self/fd.  Let's move to a new pid
+namespace so that a compromised process cannot see another other
+processes running on the system.
 
-Restricting system calls reduces the kernel attack surface and limits
-what the process can do when compromised.
+One wrinkle in this approach: unshare(CLONE_NEWPID) affects *child*
+processes and not the current process.  Therefore we need to fork the
+pid 1 process that will actually run virtiofsd and leave a parent in
+waitpid(2).  This is not the same thing as daemonization and parent
+processes should not notice a difference.
 
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-with additional entries by:
-Signed-off-by: Ganesh Maharaj Mahalingam <ganesh.mahalingam@intel.com>
-Signed-off-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Signed-off-by: piaojun <piaojun@huawei.com>
-Signed-off-by: Vivek Goyal <vgoyal@redhat.com>
-Signed-off-by: Eric Ren <renzhen@linux.alibaba.com>
 ---
- Makefile                         |   2 +
- tools/virtiofsd/Makefile.objs    |   5 +-
- tools/virtiofsd/passthrough_ll.c |   2 +
- tools/virtiofsd/seccomp.c        | 141 +++++++++++++++++++++++++++++++
- tools/virtiofsd/seccomp.h        |  14 +++
- 5 files changed, 163 insertions(+), 1 deletion(-)
- create mode 100644 tools/virtiofsd/seccomp.c
- create mode 100644 tools/virtiofsd/seccomp.h
+ tools/virtiofsd/passthrough_ll.c | 134 ++++++++++++++++++++-----------
+ 1 file changed, 86 insertions(+), 48 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 8a5746d8a0..3f5d04e1f7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -322,8 +322,10 @@ HELPERS-y =3D
- HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D qemu-bridge-hel=
-per$(EXESUF)
-=20
- ifdef CONFIG_LINUX
-+ifdef CONFIG_SECCOMP
- HELPERS-y +=3D virtiofsd$(EXESUF)
- vhost-user-json-y +=3D tools/virtiofsd/50-qemu-virtiofsd.json
-+endif
-=20
- ifdef CONFIG_VIRGL
- ifdef CONFIG_GBM
-diff --git a/tools/virtiofsd/Makefile.objs b/tools/virtiofsd/Makefile.objs
-index 67be16332c..941b19f18e 100644
---- a/tools/virtiofsd/Makefile.objs
-+++ b/tools/virtiofsd/Makefile.objs
-@@ -6,5 +6,8 @@ virtiofsd-obj-y =3D buffer.o \
-                   fuse_signals.o \
-                   fuse_virtio.o \
-                   helper.o \
--                  passthrough_ll.o
-+                  passthrough_ll.o \
-+                  seccomp.o
-=20
-+seccomp.o-cflags :=3D $(SECCOMP_CFLAGS)
-+seccomp.o-libs :=3D $(SECCOMP_LIBS)
 diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
 _ll.c
-index 754ef2618b..701608c6df 100644
+index 135a99f2fd..754ef2618b 100644
 --- a/tools/virtiofsd/passthrough_ll.c
 +++ b/tools/virtiofsd/passthrough_ll.c
-@@ -58,6 +58,7 @@
+@@ -50,7 +50,10 @@
+ #include <string.h>
+ #include <sys/file.h>
+ #include <sys/mount.h>
++#include <sys/prctl.h>
+ #include <sys/syscall.h>
++#include <sys/types.h>
++#include <sys/wait.h>
+ #include <sys/xattr.h>
  #include <unistd.h>
 =20
- #include "passthrough_helpers.h"
-+#include "seccomp.h"
+@@ -1927,24 +1930,95 @@ static void print_capabilities(void)
+ }
 =20
- #define HAVE_POSIX_FALLOCATE 1
- struct lo_map_elem {
-@@ -2073,6 +2074,7 @@ static void setup_sandbox(struct lo_data *lo, struct =
-fuse_session *se)
+ /*
+- * Called after our UNIX domain sockets have been created, now we can move=
+ to
+- * an empty network namespace to prevent TCP/IP and other network activity=
+ in
+- * case this process is compromised.
++ * Move to a new mount, net, and pid namespaces to isolate this process.
+  */
+-static void setup_net_namespace(void)
++static void setup_namespaces(struct lo_data *lo, struct fuse_session *se)
  {
-     setup_namespaces(lo, se);
-     setup_mounts(lo->source);
-+    setup_seccomp();
+-    if (unshare(CLONE_NEWNET) !=3D 0) {
+-        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWNET): %m\n");
++    pid_t child;
++
++    /*
++     * Create a new pid namespace for *child* processes.  We'll have to
++     * fork in order to enter the new pid namespace.  A new mount namespac=
+e
++     * is also needed so that we can remount /proc for the new pid
++     * namespace.
++     *
++     * Our UNIX domain sockets have been created.  Now we can move to
++     * an empty network namespace to prevent TCP/IP and other network
++     * activity in case this process is compromised.
++     */
++    if (unshare(CLONE_NEWPID | CLONE_NEWNS | CLONE_NEWNET) !=3D 0) {
++        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWPID | CLONE_NEWNS): %m\n"=
+);
++        exit(1);
++    }
++
++    child =3D fork();
++    if (child < 0) {
++        fuse_log(FUSE_LOG_ERR, "fork() failed: %m\n");
++        exit(1);
++    }
++    if (child > 0) {
++        pid_t waited;
++        int wstatus;
++
++        /* The parent waits for the child */
++        do {
++            waited =3D waitpid(child, &wstatus, 0);
++        } while (waited < 0 && errno =3D=3D EINTR && !se->exited);
++
++        /* We were terminated by a signal, see fuse_signals.c */
++        if (se->exited) {
++            exit(0);
++        }
++
++        if (WIFEXITED(wstatus)) {
++            exit(WEXITSTATUS(wstatus));
++        }
++
++        exit(1);
++    }
++
++    /* Send us SIGTERM when the parent thread terminates, see prctl(2) */
++    prctl(PR_SET_PDEATHSIG, SIGTERM);
++
++    /*
++     * If the mounts have shared propagation then we want to opt out so ou=
+r
++     * mount changes don't affect the parent mount namespace.
++     */
++    if (mount(NULL, "/", NULL, MS_REC | MS_SLAVE, NULL) < 0) {
++        fuse_log(FUSE_LOG_ERR, "mount(/, MS_REC|MS_SLAVE): %m\n");
++        exit(1);
++    }
++
++    /* The child must remount /proc to use the new pid namespace */
++    if (mount("proc", "/proc", "proc",
++              MS_NODEV | MS_NOEXEC | MS_NOSUID | MS_RELATIME, NULL) < 0) {
++        fuse_log(FUSE_LOG_ERR, "mount(/proc): %m\n");
++        exit(1);
++    }
++
++    /* Now we can get our /proc/self/fd directory file descriptor */
++    lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
++    if (lo->proc_self_fd =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
+         exit(1);
+     }
+ }
+=20
+-/* This magic is based on lxc's lxc_pivot_root() */
+-static void setup_pivot_root(const char *source)
++/*
++ * Make the source directory our root so symlinks cannot escape and no oth=
+er
++ * files are accessible.  Assumes unshare(CLONE_NEWNS) was already called.
++ */
++static void setup_mounts(const char *source)
+ {
+     int oldroot;
+     int newroot;
+=20
++    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
++        fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source, sou=
+rce);
++        exit(1);
++    }
++
++    /* This magic is based on lxc's lxc_pivot_root() */
+     oldroot =3D open("/", O_DIRECTORY | O_RDONLY | O_CLOEXEC);
+     if (oldroot < 0) {
+         fuse_log(FUSE_LOG_ERR, "open(/): %m\n");
+@@ -1991,47 +2065,14 @@ static void setup_pivot_root(const char *source)
+     close(oldroot);
+ }
+=20
+-static void setup_proc_self_fd(struct lo_data *lo)
+-{
+-    lo->proc_self_fd =3D open("/proc/self/fd", O_PATH);
+-    if (lo->proc_self_fd =3D=3D -1) {
+-        fuse_log(FUSE_LOG_ERR, "open(/proc/self/fd, O_PATH): %m\n");
+-        exit(1);
+-    }
+-}
+-
+-/*
+- * Make the source directory our root so symlinks cannot escape and no oth=
+er
+- * files are accessible.
+- */
+-static void setup_mount_namespace(const char *source)
+-{
+-    if (unshare(CLONE_NEWNS) !=3D 0) {
+-        fuse_log(FUSE_LOG_ERR, "unshare(CLONE_NEWNS): %m\n");
+-        exit(1);
+-    }
+-
+-    if (mount(NULL, "/", NULL, MS_REC | MS_SLAVE, NULL) < 0) {
+-        fuse_log(FUSE_LOG_ERR, "mount(/, MS_REC|MS_PRIVATE): %m\n");
+-        exit(1);
+-    }
+-
+-    if (mount(source, source, NULL, MS_BIND, NULL) < 0) {
+-        fuse_log(FUSE_LOG_ERR, "mount(%s, %s, MS_BIND): %m\n", source, sou=
+rce);
+-        exit(1);
+-    }
+-
+-    setup_pivot_root(source);
+-}
+-
+ /*
+  * Lock down this process to prevent access to other processes or files ou=
+tside
+  * source directory.  This reduces the impact of arbitrary code execution =
+bugs.
+  */
+-static void setup_sandbox(struct lo_data *lo)
++static void setup_sandbox(struct lo_data *lo, struct fuse_session *se)
+ {
+-    setup_net_namespace();
+-    setup_mount_namespace(lo->source);
++    setup_namespaces(lo, se);
++    setup_mounts(lo->source);
  }
 =20
  int main(int argc, char *argv[])
-diff --git a/tools/virtiofsd/seccomp.c b/tools/virtiofsd/seccomp.c
-new file mode 100644
-index 0000000000..6359bb55bb
---- /dev/null
-+++ b/tools/virtiofsd/seccomp.c
-@@ -0,0 +1,141 @@
-+/*
-+ * Seccomp sandboxing for virtiofsd
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#include "seccomp.h"
-+#include "fuse_i.h"
-+#include "fuse_log.h"
-+#include <errno.h>
-+#include <glib.h>
-+#include <seccomp.h>
-+#include <stdlib.h>
-+
-+/* Bodge for libseccomp 2.4.2 which broke ppoll */
-+#if !defined(__SNR_ppoll) && defined(__SNR_brk)
-+#ifdef __NR_ppoll
-+#define __SNR_ppoll __NR_ppoll
-+#else
-+#define __SNR_ppoll __PNR_ppoll
-+#endif
-+#endif
-+
-+static const int syscall_whitelist[] =3D {
-+    /* TODO ireg sem*() syscalls */
-+    SCMP_SYS(brk),
-+    SCMP_SYS(capget), /* For CAP_FSETID */
-+    SCMP_SYS(capset),
-+    SCMP_SYS(clock_gettime),
-+    SCMP_SYS(clone),
-+    SCMP_SYS(close),
-+    SCMP_SYS(copy_file_range),
-+    SCMP_SYS(dup),
-+    SCMP_SYS(eventfd2),
-+    SCMP_SYS(exit),
-+    SCMP_SYS(exit_group),
-+    SCMP_SYS(fallocate),
-+    SCMP_SYS(fchmodat),
-+    SCMP_SYS(fchownat),
-+    SCMP_SYS(fcntl),
-+    SCMP_SYS(fdatasync),
-+    SCMP_SYS(fgetxattr),
-+    SCMP_SYS(flistxattr),
-+    SCMP_SYS(flock),
-+    SCMP_SYS(fremovexattr),
-+    SCMP_SYS(fsetxattr),
-+    SCMP_SYS(fstat),
-+    SCMP_SYS(fstatfs),
-+    SCMP_SYS(fsync),
-+    SCMP_SYS(ftruncate),
-+    SCMP_SYS(futex),
-+    SCMP_SYS(getdents),
-+    SCMP_SYS(getdents64),
-+    SCMP_SYS(getegid),
-+    SCMP_SYS(geteuid),
-+    SCMP_SYS(getpid),
-+    SCMP_SYS(gettid),
-+    SCMP_SYS(gettimeofday),
-+    SCMP_SYS(linkat),
-+    SCMP_SYS(lseek),
-+    SCMP_SYS(madvise),
-+    SCMP_SYS(mkdirat),
-+    SCMP_SYS(mknodat),
-+    SCMP_SYS(mmap),
-+    SCMP_SYS(mprotect),
-+    SCMP_SYS(mremap),
-+    SCMP_SYS(munmap),
-+    SCMP_SYS(newfstatat),
-+    SCMP_SYS(open),
-+    SCMP_SYS(openat),
-+    SCMP_SYS(ppoll),
-+    SCMP_SYS(prctl), /* TODO restrict to just PR_SET_NAME? */
-+    SCMP_SYS(preadv),
-+    SCMP_SYS(pread64),
-+    SCMP_SYS(pwritev),
-+    SCMP_SYS(pwrite64),
-+    SCMP_SYS(read),
-+    SCMP_SYS(readlinkat),
-+    SCMP_SYS(recvmsg),
-+    SCMP_SYS(renameat),
-+    SCMP_SYS(renameat2),
-+    SCMP_SYS(rt_sigaction),
-+    SCMP_SYS(rt_sigprocmask),
-+    SCMP_SYS(rt_sigreturn),
-+    SCMP_SYS(sendmsg),
-+    SCMP_SYS(setresgid),
-+    SCMP_SYS(setresuid),
-+    SCMP_SYS(set_robust_list),
-+    SCMP_SYS(symlinkat),
-+    SCMP_SYS(time), /* Rarely needed, except on static builds */
-+    SCMP_SYS(tgkill),
-+    SCMP_SYS(unlinkat),
-+    SCMP_SYS(utimensat),
-+    SCMP_SYS(write),
-+    SCMP_SYS(writev),
-+};
-+
-+void setup_seccomp(void)
-+{
-+    scmp_filter_ctx ctx;
-+    size_t i;
-+
-+#ifdef SCMP_ACT_KILL_PROCESS
-+    ctx =3D seccomp_init(SCMP_ACT_KILL_PROCESS);
-+    /* Handle a newer libseccomp but an older kernel */
-+    if (!ctx && errno =3D=3D EOPNOTSUPP) {
-+        ctx =3D seccomp_init(SCMP_ACT_TRAP);
-+    }
-+#else
-+    ctx =3D seccomp_init(SCMP_ACT_TRAP);
-+#endif
-+    if (!ctx) {
-+        fuse_log(FUSE_LOG_ERR, "seccomp_init() failed\n");
-+        exit(1);
-+    }
-+
-+    for (i =3D 0; i < G_N_ELEMENTS(syscall_whitelist); i++) {
-+        if (seccomp_rule_add(ctx, SCMP_ACT_ALLOW,
-+                             syscall_whitelist[i], 0) !=3D 0) {
-+            fuse_log(FUSE_LOG_ERR, "seccomp_rule_add syscall %d",
-+                     syscall_whitelist[i]);
-+            exit(1);
-+        }
-+    }
-+
-+    /* libvhost-user calls this for post-copy migration, we don't need it =
-*/
-+    if (seccomp_rule_add(ctx, SCMP_ACT_ERRNO(ENOSYS),
-+                         SCMP_SYS(userfaultfd), 0) !=3D 0) {
-+        fuse_log(FUSE_LOG_ERR, "seccomp_rule_add userfaultfd failed\n");
-+        exit(1);
-+    }
-+
-+    if (seccomp_load(ctx) < 0) {
-+        fuse_log(FUSE_LOG_ERR, "seccomp_load() failed\n");
-+        exit(1);
-+    }
-+
-+    seccomp_release(ctx);
-+}
-diff --git a/tools/virtiofsd/seccomp.h b/tools/virtiofsd/seccomp.h
-new file mode 100644
-index 0000000000..86bce72652
---- /dev/null
-+++ b/tools/virtiofsd/seccomp.h
-@@ -0,0 +1,14 @@
-+/*
-+ * Seccomp sandboxing for virtiofsd
-+ *
-+ * Copyright (C) 2019 Red Hat, Inc.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#ifndef VIRTIOFSD_SECCOMP_H
-+#define VIRTIOFSD_SECCOMP_H
-+
-+void setup_seccomp(void);
-+
-+#endif /* VIRTIOFSD_SECCOMP_H */
+@@ -2155,10 +2196,7 @@ int main(int argc, char *argv[])
+=20
+     fuse_daemonize(opts.foreground);
+=20
+-    /* Must be after daemonize to get the right /proc/self/fd */
+-    setup_proc_self_fd(&lo);
+-
+-    setup_sandbox(&lo);
++    setup_sandbox(&lo, se);
+=20
+     /* Block until ctrl+c or fusermount -u */
+     ret =3D virtio_loop(se);
 --=20
 2.23.0
 
