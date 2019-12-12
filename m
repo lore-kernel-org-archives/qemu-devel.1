@@ -2,84 +2,70 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD3EC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 15:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D27C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 15:25:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07AE22067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 15:14:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g2+Q7E4u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07AE22067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 161FA206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 15:25:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 161FA206A5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifQAS-0002Sx-2z
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 10:14:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48588)
+	id 1ifQL3-0006Mr-4i
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 10:25:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ifQ9b-0001sU-Pb
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 10:13:25 -0500
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1ifQKP-0005y7-T2
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 10:24:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ifQ9Z-0001zM-Ic
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 10:13:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40955
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ifQ9Z-0001x3-Bk
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 10:13:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576163600;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=N4fGbcXqbsKwRu/bOJBiDOmHdAb7I+sxr97ThhtjbYs=;
- b=g2+Q7E4u3YOcWXx6wmkvSSrXmGz6VJyofQkGO2wJvEi773ci/YUnw116aZ7oXBjX8gs5RG
- UIsnwvlkYnIpUHE73+6r7gRUtD3A6iIwo4FuTlgVk8sZac6t8PKofJ2o49cSiXHrt4qBHE
- VT4UxJdYeIis2TEpp+h7OPlNsGGtcW0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-DU9iWiCGMEatQzC071nuYg-1; Thu, 12 Dec 2019 10:13:19 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73249800D41;
- Thu, 12 Dec 2019 15:13:17 +0000 (UTC)
-Received: from [10.36.116.117] (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5847A67E46;
- Thu, 12 Dec 2019 15:13:08 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v11 12/20] qapi: Introduce DEFINE_PROP_INTERVAL
-To: Markus Armbruster <armbru@redhat.com>
-References: <20191122182943.4656-1-eric.auger@redhat.com>
- <20191122182943.4656-13-eric.auger@redhat.com>
- <87wob17n6j.fsf@dusky.pond.sub.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <66ae0999-bdd8-6b54-f550-f036dafc982b@redhat.com>
-Date: Thu, 12 Dec 2019 16:13:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <geert.uytterhoeven@gmail.com>) id 1ifQKN-0007em-SU
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 10:24:33 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:42917)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <geert.uytterhoeven@gmail.com>)
+ id 1ifQKN-0007ci-M3
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 10:24:31 -0500
+Received: by mail-ot1-f68.google.com with SMTP id 66so2339809otd.9
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 07:24:31 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5eiYdgaPsuaNjKat9eSh0SH2mSzf4JO+utEpUCnyTPo=;
+ b=b9HEbT1T/lZVTsiRrbHEdP8ysHpgjMzTEzjagYltw92UOstyCW59PZF+NGHw6DDgpT
+ 0yn2AjAG03dyNwhIOEpvrzGWiyrUffMdxhmgeQFWTKa1QwqGlRxpSp1yWMZnQ5QxJirQ
+ NdXihzBNFSS5kBizbUrz7J4jOABnFoZUth7WknFwPZNhwkriwSJo67WKUk25lJt7MBFn
+ ZoC1HmU5Tq7cge1TkBuimZFqge7XB1TijS7THPr5XyH9miWhWucd6ql+POu4JSWplpFN
+ FPPYiIq7+B6px0zNZVxHZv5w+7FT5oMhqgu4Cea1T1YXEeNn5xuhfdoHCAEvTebW/pw/
+ cCtQ==
+X-Gm-Message-State: APjAAAWQRvu7dawZhBPnV5SVp85hTrzTpDjkKZRSYW96jcrj22WpLXN+
+ 6TLyUqV3zreRRG2YmCWpcoVA/IVVD6gbiiYDYo0=
+X-Google-Smtp-Source: APXvYqx6G6JtyfrS3/BoIs3YPBAZEJjC6Ig0g5RdBo+a7S4dxiDcydAEHMgy/uFa2xd0GFBBLcu73j0JFKA2CIyvPnk=
+X-Received: by 2002:a05:6830:91:: with SMTP id
+ a17mr8257869oto.107.1576164270611; 
+ Thu, 12 Dec 2019 07:24:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87wob17n6j.fsf@dusky.pond.sub.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: DU9iWiCGMEatQzC071nuYg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+References: <20191127084253.16356-1-geert+renesas@glider.be>
+ <20191127084253.16356-6-geert+renesas@glider.be>
+ <CACRpkdaW7nmpE99FAvBDBTmkTZOTQ5WdM=JbMzBTLk7cbLRXPw@mail.gmail.com>
+In-Reply-To: <CACRpkdaW7nmpE99FAvBDBTmkTZOTQ5WdM=JbMzBTLk7cbLRXPw@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 12 Dec 2019 16:24:19 +0100
+Message-ID: <CAMuHMdVbk5S__8OK-zNXmiW66=WVA8Jzyc=hUvf_hJSU=u9TFg@mail.gmail.com>
+Subject: Re: [PATCH v3 5/7] gpio: Add GPIO Aggregator/Repeater driver
+To: Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 209.85.210.68
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,312 +77,351 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
- tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
- quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
- dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
- eric.auger.pro@gmail.com
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Phil Reid <preid@electromag.com.au>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, Jonathan Corbet <corbet@lwn.net>,
+ Marc Zyngier <marc.zyngier@arm.com>,
+ "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
+ Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Christoffer Dall <christoffer.dall@arm.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+ Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+ "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS"
+ <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Harish Jenny K N <harish_kandiga@mentor.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <graf@amazon.com>,
+ Eugeniu Rosca <erosca@de.adit-jv.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Markus,
+Hi Linus,
 
-On 12/12/19 1:17 PM, Markus Armbruster wrote:
-> Eric Auger <eric.auger@redhat.com> writes:
-> 
->> Introduce a new property defining a labelled interval:
->> <low address>,<high address>,label.
->>
->> This will be used to encode reserved IOVA regions. The label
->> is left undefined to ease reuse accross use cases.
-> 
-> What does the last sentence mean?
-The dilemma was shall I specialize this property such as ReservedRegion
-or shall I leave it generic enough to serve somebody else use case. I
-first chose the latter but now I think I should rather call it something
-like ReservedRegion as in any case it has addresses and an integer label.
-> 
->> For instance, in virtio-iommu use case, reserved IOVA regions
->> will be passed by the machine code to the virtio-iommu-pci
->> device (an array of those). The label will match the
->> virtio_iommu_probe_resv_mem subtype value:
->> - VIRTIO_IOMMU_RESV_MEM_T_RESERVED (0)
->> - VIRTIO_IOMMU_RESV_MEM_T_MSI (1)
->>
->> This is used to inform the virtio-iommu-pci device it should
->> bypass the MSI region: 0xfee00000, 0xfeefffff, 1.
-> 
-> So the "label" part of "<low address>,<high address>,label" is a number?
-yes it is.
-> 
-> Is a number appropriate for your use case, or would an enum be better?
-I think a number is OK. There might be other types of reserved regions
-in the future. Also if we want to allow somebody else to reuse that
-property in another context, I would rather leave it open?
-> 
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com> ---
->> hw/core/qdev-properties.c | 90 ++++++++++++++++++++++++++++++++++++
->> include/exec/memory.h | 6 +++ include/hw/qdev-properties.h | 3 ++
->> include/qemu/typedefs.h | 1 + 4 files changed, 100 insertions(+)
-> 
-> Subject has 'qapi:', but it's actually about qdev.  Please adjust the subject.
-OK
-> 
->> diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
->> index ac28890e5a..8d70f34e37 100644
->> --- a/hw/core/qdev-properties.c
->> +++ b/hw/core/qdev-properties.c
->> @@ -13,6 +13,7 @@
->>  #include "qapi/visitor.h"
->>  #include "chardev/char.h"
->>  #include "qemu/uuid.h"
->> +#include "qemu/cutils.h"
->>  
->>  void qdev_prop_set_after_realize(DeviceState *dev, const char *name,
->>                                    Error **errp)
->> @@ -585,6 +586,95 @@ const PropertyInfo qdev_prop_macaddr = {
->>      .set   = set_mac,
->>  };
->>  
->> +/* --- Labelled Interval --- */
->> +
->> +/*
->> + * accepted syntax versions:
-> 
-> "versions"?
-s/versions/version
-> 
->> + *   <low address>,<high address>,<type>
->> + *   where low/high addresses are uint64_t in hexa (feat. 0x prefix)
-> 
-> "hexa" is not a word.
-OK
-> 
-> I'm afraid I don't get the parenthesis.
-I wanted to mention the 0x prefix was needed but as you mentionned below
-it is not needed actually.
-> 
->> + *   and type is an unsigned integer
->> + */
->> +static void get_interval(Object *obj, Visitor *v, const char *name,
->> +                         void *opaque, Error **errp)
->> +{
->> +    DeviceState *dev = DEVICE(obj);
->> +    Property *prop = opaque;
->> +    Interval *interval = qdev_get_prop_ptr(dev, prop);
->> +    char buffer[64];
->> +    char *p = buffer;
->> +
->> +    Snprintf(buffer, sizeof(buffer), "0x%"PRIx64",0x%"PRIx64",%d",
->> +             interval->low, interval->high, interval->type);
-> 
-> interval->type is unsigned.  Use %u, not %d.
-OK
-> 
->> +
->> +    visit_type_str(v, name, &p, errp);
->> +}
->> +
->> +static void set_interval(Object *obj, Visitor *v, const char *name,
->> +                         void *opaque, Error **errp)
->> +{
->> +    DeviceState *dev = DEVICE(obj);
->> +    Property *prop = opaque;
->> +    Interval *interval = qdev_get_prop_ptr(dev, prop);
->> +    Error *local_err = NULL;
->> +    unsigned int type;
->> +    gchar **fields;
->> +    uint64_t addr;
->> +    char *str;
->> +    int ret;
->> +
->> +    if (dev->realized) {
->> +        qdev_prop_set_after_realize(dev, name, errp);
->> +        return;
->> +    }
->> +
->> +    visit_type_str(v, name, &str, &local_err);
->> +    if (local_err) {
->> +        error_propagate(errp, local_err);
->> +        return;
->> +    }
->> +
->> +    fields = g_strsplit(str, ",", 3);
->> +
->> +    ret = qemu_strtou64(fields[0], NULL, 16, &addr);
-> 
-> Aha, the 0x prefix is actually optional.
-> 
->> +    if (!ret) {
->> +        interval->low = addr;
->> +    } else {
->> +        error_setg(errp, "Failed to decode interval low addr");
->> +        error_append_hint(errp,
->> +                          "should be an address in hexa with 0x prefix\n");
-> 
-> "hexa" is not a word, and the 0x prefix is actually optional.
-OK
-> 
->> +        goto out;
->> +    }
-> 
-> I prefer
-> 
->        if (error) {
->            handle error
->            bail out
->        }
->        handle success
-> 
-> over
-> 
->        if (success) {
->            handle success
->        if (error) {
->            handle error
->            bail out
->        }
-> 
-> In this case:
-> 
->        if (ret) {
->            error_setg(errp, "Failed to decode interval low addr");
->            error_append_hint(errp,
->                              "should be an address in hexa with 0x prefix\n");
->            goto out;
->        }
->        interval->low = addr;
-OK
-> 
-> 
->> +
->> +    ret = qemu_strtou64(fields[1], NULL, 16, &addr);
-> 
-> Crash if @str doesn't contain ',', because the g_strsplit(str, ",", 3)
-> yields { [0] = str, NULL }.
-> 
->> +    if (!ret) {
->> +        interval->high = addr;
->> +    } else {
->> +        error_setg(errp, "Failed to decode interval high addr");
->> +        error_append_hint(errp,
->> +                          "should be an address in hexa with 0x prefix\n");
->> +        goto out;
->> +    }
->> +
->> +    ret = qemu_strtoui(fields[2], NULL, 10, &type);
-> 
-> Likewise, crash if @str contains only one ','.
-> 
-> I wouldn't use g_strsplit() here.  After
-> 
->     ret = qemu_strtoui(str, &endptr, 16, &interval->low);
-> 
-> @endptr points behind the address.  So:
-> 
->     if (ret || *endptr != ',') {
->         handle error ...
->         goto out
->     }
-> 
->     ret = qemu_strtoui(endptr + 1, &endptr, 16, &interval->high);
-> 
-> and so forth.
-> 
-> Note that the if (ret || *endptr != ',') checks for two distinct errors.
-> Distinct error messages might be more helpful.
-OK I will revisit that.
-> 
->> +    if (!ret) {
->> +        interval->type = type;
->> +    } else {
->> +        error_setg(errp, "Failed to decode interval type");
->> +        error_append_hint(errp, "should be an unsigned int in decimal\n");
->> +    }
->> +out:
->> +    g_free(str);
->> +    g_strfreev(fields);
->> +    return;
->> +}
->> +
->> +const PropertyInfo qdev_prop_interval = {
->> +    .name  = "labelled_interval",
->> +    .description = "Labelled interval, example: 0xFEE00000,0xFEEFFFFF,0",
->> +    .get   = get_interval,
->> +    .set   = set_interval,
->> +};
->> +
->>  /* --- on/off/auto --- */
->>  
->>  const PropertyInfo qdev_prop_on_off_auto = {
->> diff --git a/include/exec/memory.h b/include/exec/memory.h
->> index e499dc215b..e238d1c352 100644
->> --- a/include/exec/memory.h
->> +++ b/include/exec/memory.h
->> @@ -57,6 +57,12 @@ struct MemoryRegionMmio {
->>      CPUWriteMemoryFunc *write[3];
->>  };
->>  
->> +struct Interval {
->> +    hwaddr low;
->> +    hwaddr high;
->> +    unsigned int type;
->> +};
-> 
-> This isn't an interval.  An interval consists of two values, not three.
-> 
-> The third one is called "type" here, and "label" elsewhere.  Pick one
-> and stick to it.
-> 
-> Then pick a name for the triple.  Elsewhere, you call it "labelled
-> interval".
-I would tend to use ReservedRegion now if nobody objects.
+On Thu, Dec 12, 2019 at 3:34 PM Linus Walleij <linus.walleij@linaro.org> wrote:
+> On Wed, Nov 27, 2019 at 9:43 AM Geert Uytterhoeven
+> <geert+renesas@glider.be> wrote:
+> > GPIO controllers are exported to userspace using /dev/gpiochip*
+> > character devices.  Access control to these devices is provided by
+> > standard UNIX file system permissions, on an all-or-nothing basis:
+> > either a GPIO controller is accessible for a user, or it is not.
+> > Currently no mechanism exists to control access to individual GPIOs.
+> >
+> > Hence add a GPIO driver to aggregate existing GPIOs, and expose them as
+> > a new gpiochip.
+> >
+> > This supports the following use cases:
+> >   1. Aggregating GPIOs using Sysfs
+> >      This is useful for implementing access control, and assigning a set
+> >      of GPIOs to a specific user or virtual machine.
+> >
+> >   2. GPIO Repeater in Device Tree
+> >      This supports modelling e.g. GPIO inverters in DT.
+> >
+> >   3. Generic GPIO Driver
+> >      This provides userspace access to a simple GPIO-operated device
+> >      described in DT, cfr. e.g. spidev for SPI-operated devices.
+> >
+> > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+>
+> Overall I like how this is developing!
+>
+> > +config GPIO_AGGREGATOR
+> > +       tristate "GPIO Aggregator/Repeater"
+> > +       help
+> > +         Say yes here to enable the GPIO Aggregator and repeater, which
+> > +         provides a way to aggregate and/or repeat existing GPIOs into a new
+> > +         GPIO device.
+>
+> Should it say a "new virtual GPIO chip"?
 
-Thank you for the review!
+OK.
 
+> > +         This can serve the following purposes:
+> > +           1. Assign a collection of GPIOs to a user, or export them to a
+> > +              virtual machine,
+>
+> This is ambiguous. What is a "user"? A process calling from
+> userspace? A device tree node?
 
-Eric
-> 
->> +
->>  typedef struct IOMMUTLBEntry IOMMUTLBEntry;
->>  
->>  /* See address_space_translate: bit 0 is read, bit 1 is write.  */
->> diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
->> index c6a8cb5516..2ba7c8711b 100644
->> --- a/include/hw/qdev-properties.h
->> +++ b/include/hw/qdev-properties.h
->> @@ -20,6 +20,7 @@ extern const PropertyInfo qdev_prop_chr;
->>  extern const PropertyInfo qdev_prop_tpm;
->>  extern const PropertyInfo qdev_prop_ptr;
->>  extern const PropertyInfo qdev_prop_macaddr;
->> +extern const PropertyInfo qdev_prop_interval;
->>  extern const PropertyInfo qdev_prop_on_off_auto;
->>  extern const PropertyInfo qdev_prop_losttickpolicy;
->>  extern const PropertyInfo qdev_prop_blockdev_on_error;
->> @@ -202,6 +203,8 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
->>      DEFINE_PROP(_n, _s, _f, qdev_prop_drive_iothread, BlockBackend *)
->>  #define DEFINE_PROP_MACADDR(_n, _s, _f)         \
->>      DEFINE_PROP(_n, _s, _f, qdev_prop_macaddr, MACAddr)
->> +#define DEFINE_PROP_INTERVAL(_n, _s, _f)         \
->> +    DEFINE_PROP(_n, _s, _f, qdev_prop_interval, Interval)
->>  #define DEFINE_PROP_ON_OFF_AUTO(_n, _s, _f, _d) \
->>      DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_on_off_auto, OnOffAuto)
->>  #define DEFINE_PROP_LOSTTICKPOLICY(_n, _s, _f, _d) \
->> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
->> index 375770a80f..a827c9a3fe 100644
->> --- a/include/qemu/typedefs.h
->> +++ b/include/qemu/typedefs.h
->> @@ -58,6 +58,7 @@ typedef struct ISABus ISABus;
->>  typedef struct ISADevice ISADevice;
->>  typedef struct IsaDma IsaDma;
->>  typedef struct MACAddr MACAddr;
->> +typedef struct Interval Interval;
->>  typedef struct MachineClass MachineClass;
->>  typedef struct MachineState MachineState;
->>  typedef struct MemoryListener MemoryListener;
-> 
-> 
+A user is an entity with a UID, typically listed in /etc/passwd.
+This is similar to letting some, not all, people on the machine access
+the CD-ROM drive.
 
+> I would write "assign a collection of GPIO lines from any lines on
+> existing physical GPIO chips to form a new virtual GPIO chip"
+>
+> That should be to the point, right?
+
+Yes, that's WHAT it does. The WHY is the granular access control.
+
+> > +           2. Support GPIOs that are connected to a physical inverter,
+>
+> s/to/through/g
+
+OK.
+
+> > +           3. Provide a generic driver for a GPIO-operated device, to be
+> > +               controlled from userspace using the GPIO chardev interface.
+>
+> I don't understand this, it needs to be elaborated. What is meant
+> by a "GPIO-operated device" in this context? Example?
+
+E.g. a motor. Or a door opener.
+
+        door-opener {
+                compatible = "mydoor,opener";
+
+                gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+        };
+
+You don't need a full-featured kernel driver for that, so just bind the
+gpio-aggregator to the door-opener, and control it through libgpiod.
+
+> I consistently use the term "GPIO line" as opposed to "GPIO"
+> or "GPIO number" etc that are abigous, so please rephrase using
+> "GPIO lines" rather than just "GPIOs" above.
+
+OK.
+
+> > +#include "gpiolib.h"
+>
+> Whenever this is included in a driver I want it to come with a comment
+> explicitly stating exactly why and which internal symbols the driver
+> needs to access. Ideally all drivers should just need <linux/gpio/driver.h>...
+
+"gpiolib.h" is needed to access gpio_desc.gdev->chip in
+gpio_fwd_set_config().  And for gpio_chip_hwgpio() (see below).
+
+But indeed, I should add #include <linux/gpio/consumer.h>, for e.g. the
+various gpiod_[gs]et_*() functions.
+
+> > +static int aggr_add_gpio(struct gpio_aggregator *aggr, const char *label,
+> > +                        int hwnum, unsigned int *n)
+>
+> u16 hwnum for the hardware number but if it is always -1/U16_MAX
+> then why pass the parameter at all.
+>
+> Is "label" the right name of this parameter if that is going to actually
+> be line_name then use that.
+
+It's not always -1.
+This function can be called either with a gpiochip label/name and an
+offset, or a line-name and -1.
+
+> > +{
+> > +       struct gpiod_lookup_table *lookups;
+> > +
+> > +       lookups = krealloc(aggr->lookups, struct_size(lookups, table, *n + 2),
+> > +                          GFP_KERNEL);
+> > +       if (!lookups)
+> > +               return -ENOMEM;
+> > +
+> > +       lookups->table[*n].chip_label = label;
+>
+> This is pending the discussion on whether to just use "key" for this
+> name.
+
+Which would require touching all users (board files and mfd drivers).
+
+> > +       lookups->table[*n].chip_hwnum = hwnum;
+>
+> If this is always going to be U16_MAX (-1 in the current code)
+> then it can just be assigned as that here instead of passed as
+> parameter.
+
+So it's not, see above.
+
+> > +static int aggr_parse(struct gpio_aggregator *aggr)
+> > +{
+> > +       char *name, *offsets, *first, *last, *next;
+> > +       unsigned int a, b, i, n = 0;
+> > +       char *args = aggr->args;
+> > +       int error;
+> > +
+> > +       for (name = get_arg(&args), offsets = get_arg(&args); name;
+> > +            offsets = get_arg(&args)) {
+> > +               if (IS_ERR(name)) {
+> > +                       pr_err("Cannot get GPIO specifier: %ld\n",
+> > +                              PTR_ERR(name));
+> > +                       return PTR_ERR(name);
+> > +               }
+> > +
+> > +               if (!isrange(offsets)) {
+> > +                       /* Named GPIO line */
+> > +                       error = aggr_add_gpio(aggr, name, -1, &n);
+>
+> So the third argument woule be U16_MAX here. Or not pass
+> a parameter at all.
+>
+> But honestly, when I look at this I don't understand why you
+> have to avoid so hard to use offsets for the GPIO lines on
+> your aggregator?
+>
+> Just put a u16 ngpios in your
+> struct gpio_aggregator and count it up every time you
+> add some new offsets here and you have
+> offset numbers for all your GPIO lines on the aggregator
+> and you can just drop the patch for lookup up lines by line
+> names.
+>
+> Is there something wrong with my reasoning here?
+
+Yes, I think there is.
+The offsets are not offsets on the aggregated gpiochip, but on the
+original target gpiochip.
+
+> At the pointe later when the lines are counted from the
+> allocated lookups using gpiod_count() that will just figure
+> out this number anyways, so it is not like we don't know
+> it at the end of the day.
+>
+> So it seems the patch to gpiolib is just to use machine
+> descriptor tables as a substitute for a simple counter
+> variable in this local struct to me.
+
+Nope, it's used for looking up the target GPIO lines.
+
+> > +static void __exit gpio_aggregator_remove_all(void)
+> > +{
+> > +       mutex_lock(&gpio_aggregator_lock);
+> > +       idr_for_each(&gpio_aggregator_idr, gpio_aggregator_idr_remove, NULL);
+> > +       idr_destroy(&gpio_aggregator_idr);
+> > +       mutex_unlock(&gpio_aggregator_lock);
+> > +}
+> > +
+> > +
+> > +       /*
+> > +        *  Common GPIO Forwarder
+> > +        */
+> > +
+>
+> Nitpick: lots and weird spacing here.
+
+OK.
+
+> > +struct gpiochip_fwd {
+> > +       struct gpio_chip chip;
+> > +       struct gpio_desc **descs;
+> > +       union {
+> > +               struct mutex mlock;     /* protects tmp[] if can_sleep */
+> > +               spinlock_t slock;       /* protects tmp[] if !can_sleep */
+> > +       };
+>
+> That was a very elegant use of union!
+>
+> > +static int gpio_fwd_get_multiple(struct gpio_chip *chip, unsigned long *mask,
+> > +                                unsigned long *bits)
+> > +static void gpio_fwd_set_multiple(struct gpio_chip *chip, unsigned long *mask,
+> > +                                 unsigned long *bits)
+>
+> I guess these can both be optimized to use get/set_multiple on
+> the target chip if the offsets are consecutive?
+>
+> However that is going to be tricky so I'm not saying you should
+> implement that. So for now, let's say just add a TODO: comment
+> about it.
+
+Doesn't gpiod_[gs]et_array_value() already call .[gs]et_multiple()?
+
+> > +static int gpio_fwd_init_valid_mask(struct gpio_chip *chip,
+> > +                                   unsigned long *valid_mask,
+> > +                                   unsigned int ngpios)
+> > +{
+> > +       struct gpiochip_fwd *fwd = gpiochip_get_data(chip);
+> > +       unsigned int i;
+> > +
+> > +       for (i = 0; i < ngpios; i++) {
+> > +               if (!gpiochip_line_is_valid(fwd->descs[i]->gdev->chip,
+> > +                                           gpio_chip_hwgpio(fwd->descs[i])))
+> > +                       clear_bit(i, valid_mask);
+> > +       }
+>
+> This is what uses "gpiolib.h" is it not?
+>
+> devm_gpiod_get_index() will not succeed if the line
+> is not valid so I think this can be just dropped, since
+> what you do before this is exactly devm_gpiod_get_index()
+> on each line, then you call gpiochip_fwd_create()
+> with the result.
+>
+> So I think you can just drop this entire function.
+> This will not happen.
+
+OK, if all lines are valid, the mask handling is indeed not needed.
+
+> If it does happen, add a comment above this loop
+> explaining which circumstances would make lines on
+> the forwarder invalid.
+
+OK, so cannot happen.
+
+> > +       for (i = 0; i < ngpios; i++) {
+> > +               dev_dbg(dev, "gpio %u => gpio-%d (%s)\n", i,
+> > +                       desc_to_gpio(descs[i]), descs[i]->label ? : "?");
+> > +
+> > +               if (gpiod_cansleep(descs[i]))
+> > +                       chip->can_sleep = true;
+> > +               if (descs[i]->gdev->chip->set_config)
+> > +                       chip->set_config = gpio_fwd_set_config;
+> > +               if (descs[i]->gdev->chip->init_valid_mask)
+> > +                       chip->init_valid_mask = gpio_fwd_init_valid_mask;
+> > +       }
+>
+> I do not think you should need to inspect the init_valid_mask()
+> as explained above.
+
+OK.
+
+> Add a comment above the loop that if any of the GPIO lines
+> are sleeping then the entire forwarder will be sleeping
+> and if any of the chips support .set_config() we will support
+> setting configs.
+
+OK.
+
+> However the way that the .gpio_fwd_set_config() is coded
+> it looks like you can just unconditionally assign it and
+> only check the cansleep condition in this loop.
+
+I wanted to avoid the overhead of calling into gpio_fwd_set_config() if
+none of the targets gpiochips support .set_config(), see
+gpiod_set_transitory().
+
+> > +}
+> > +
+> > +
+> > +       /*
+> > +        *  Common GPIO Aggregator/Repeater platform device
+> > +        */
+> > +
+>
+> Nitpick: weird and excess spacing again.
+
+Yeah, this dates back from when the aggregator, repeater, and
+forwarder were all separate files and modules.
+
+> > +       for (i = 0; i < n; i++) {
+> > +               descs[i] = devm_gpiod_get_index(dev, NULL, i, GPIOD_ASIS);
+> > +               if (IS_ERR(descs[i]))
+> > +                       return PTR_ERR(descs[i]);
+> > +       }
+>
+> If this succeeds none of the obtained gpio_desc:s can be
+> invalid.
+
+OK.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
