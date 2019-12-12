@@ -2,99 +2,68 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E81C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 19:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 046C4C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 19:56:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E9322077B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 19:50:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+9gG8WI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E9322077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CC4802073B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 19:56:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC4802073B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifUTt-0001eG-6v
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 14:50:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46021)
+	id 1ifUZe-0004DZ-0o
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 14:56:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45567)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ifUT3-0001BB-Q1
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:49:46 -0500
+ (envelope-from <laurent@vivier.eu>) id 1ifUNg-0007VR-9k
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:44:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ifUT1-0008T9-CE
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:49:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57426
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ifUT0-0008QP-Tt
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:49:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576180181;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=J+igDZpZo3oGb7s51gniocQDN0+eNVW1CTVHPpvjbXc=;
- b=H+9gG8WIuhUfbEmZP6GfogXUJGD9X8snhE+I+vhJbFpnTx3LOeyHRBF+x14+QfmCYFObqs
- vUZyyEMPe1J2ksdaKUf8tODRX3aimZBqfBCYnSrTsETOnq6ijlQI/G5NR+HLOa6wCseprG
- FNPhtzzz7jn2klFcsyGku3tDULIEaT0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-Zrkzy6S1MRqnBmUiCSUphQ-1; Thu, 12 Dec 2019 14:49:39 -0500
-Received: by mail-wr1-f71.google.com with SMTP id k18so1433649wrw.9
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 11:49:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=llnroTvFFDmz8+5y4uMgGGIvzVLQ41Ivm9eqif6Dn4M=;
- b=TlyGcH7dD/RLbWjtfwvGWxfQqVyHtRBOqueV7DOTBTj+WUinw6D0SGqC6hm5/aMSMj
- zl552clKb1DvaeiNdqUzNQKJVUx0HfBTMWZlHQFt8tS686KCmkhCAMi23CH1mtCbSy4H
- 5YKsgbLdLZVDZt12QwPJpm/As/Ffc7L/wXUarrY5lrDLSE6+pAj9ons4BGp6XJDeH1o1
- GukKqnNVMJd5JISxZk4U6aQo4/BXkSmPDSRw13nQwH6iOTWImugpR6LLEe49lXkJM34v
- Ox26xoriVOCraIBaiORiBJR4WFTux2Kt+UeAuhu2SqsMGCMtWOiIH4f1IAnKP5oIKRcf
- 92NQ==
-X-Gm-Message-State: APjAAAU9cfWKIx1yqoatZGMmoYHCrNibysAAWD0NQfH35yMt36aBaDoG
- mNLJwDoqO0+KzvF+7yG7aE5M/o5KIT9AlQgpj8anfIocmXT2Ve9jts+f30EwdABUtyzsnfOyFvr
- Ya/ptlnqdxs6zpoE=
-X-Received: by 2002:a1c:1941:: with SMTP id 62mr5076575wmz.111.1576180178777; 
- Thu, 12 Dec 2019 11:49:38 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzZFm4LvoTWnm8ubXhPO6WF1iWPbXI2w5celQiEED5a30/T1puPzOPAx6ogNzf/xCbzAb4IOA==
-X-Received: by 2002:a1c:1941:: with SMTP id 62mr5076559wmz.111.1576180178576; 
- Thu, 12 Dec 2019 11:49:38 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id l15sm6962327wrv.39.2019.12.12.11.49.37
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 12 Dec 2019 11:49:37 -0800 (PST)
-Subject: Re: [PATCH v2 4/8] pci-stub: add more MSI functions
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1576171754-45138-1-git-send-email-pbonzini@redhat.com>
- <1576171754-45138-5-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <24791146-c86c-ad98-94ba-30bfb6141c74@redhat.com>
-Date: Thu, 12 Dec 2019 20:49:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <laurent@vivier.eu>) id 1ifUNf-0006oQ-4b
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:44:12 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:58415)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1ifUNb-0006cT-P2; Thu, 12 Dec 2019 14:44:08 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MUY9w-1iFC6L3TX6-00QSTU; Thu, 12 Dec 2019 20:44:02 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] mos6522: remove anh register
+Date: Thu, 12 Dec 2019 20:43:59 +0100
+Message-Id: <20191212194359.13508-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <1576171754-45138-5-git-send-email-pbonzini@redhat.com>
-Content-Language: en-US
-X-MC-Unique: Zrkzy6S1MRqnBmUiCSUphQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:TkbCZicbBO8E00QHGiYTY59pahKYt1llB7ucbZMACFczBXbjEqS
+ 1kWKgZIRl544qCYqof2RrM9G4ZZ7xcos/kTfCm3MjIZGvZM7EEgxNfbV5dhigF5nw8U/td5
+ DV+6sfdRHQ0GunBV7jqOjQE1MYHEgwuNB40o2MYrumgOFXmecLKpnauAQHlNjHoLRI8iRQ9
+ LkbyRVH3GGNqXsDu3tuaw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:V8W02lgdepM=:oVl7cbaGVrOa9161g3Oz0I
+ LrkBQYL5+K9MHgK7OxK8xK/scyr28aad36oq5x/EGRNYu5ft7IYwakD7B3HRPpkvu2XPDGJ+f
+ YGeQWmQMu4n5cZTnPKN5kxFY01DN5hAYEGAKKNM03zWLmdSMF+Rxz7GcBivX+bw7QJFR9uBAr
+ XpUCoGvJYJszS3ebTCJOQIuA1CXVO+PwVQJkmXRMJQTO+Fa1rB7pmDgwIHdi3jUdExUPDnAAf
+ 7XG5szWC54NXNhr2u4AyS6ezvUWAo24V/SB66I7shQq71vIbhH2APGkw6B3w0xltnVD48H3mp
+ kzQFT1FcD1LdFvWGoA8dhJhox27gPZW7gPy0+GRxkLbmKW44xAC/vv2/KK9c1Luj0lM8iAY51
+ geyiMsYBoB87QPum1sLtuqYG7rdNXXlKFd1nHyH8070zkMBl6JcHvMoEJucuETXUYx7bhCJNx
+ e8afkFyro/ohJS+03R4qH+z30uQqfz7x9aM/9/+EndaN5TmtcSCcnLKQq4cP3heATwpS4WSyY
+ OXW7LL2HAL1kgU6Fb3eesRsh4B9Upb1VsbhGaBXfDLpY6ptB/7YSTXC7416Fz5nnA+p0q1JCo
+ y9wHZH4vCfiB5DEsdDJc4WQq7n/V6RzWtSOG6vQQu/Kc4qZVLmVteDPNaFiS+0PoKKH9f18aQ
+ qgTMrMO/t4jMptT8yZFgRfssIBvKNKWJ4EpGbeK4Hr2B7Tqs7kxJGVa5YARBf4GBhVOx818d+
+ 73N3zQc/rekOirtTpL30tvWC4lWhdYTSsEaqBfsDzT9d8Ay9KXnqiW/FP3JcYzxrLvzHWZZY0
+ GjtWZtG9RO6dZmuo+zhtMLrxMfphi78UFABuasss9TS5hIDgD/GhIUvRsvmq5HYWgdnaUMbWn
+ uZasYjU2AYrjv/keu3Iw==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,67 +75,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: slp@redhat.com
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/12/19 6:29 PM, Paolo Bonzini wrote:
-> On x86, KVM needs some function from the PCI subsystem in order to set
-> up interrupt routes.  Provide some stubs to support x86 machines that
-> lack PCI.
->=20
-> Reviewed-by: Sergio Lopez <slp@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Register addr 1 is defined as buffer A with handshake (vBufAH),
+register addr 15 is also defined as buffer A without handshake (vBufA).
 
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Linux kernel has a big "DON'T USE!" next to the register 1 addr
+definition (vBufAH), and only uses register 15 (vBufA).
 
-> ---
->   hw/pci/pci-stub.c | 27 +++++++++++++++++++++++++++
->   1 file changed, 27 insertions(+)
->=20
-> diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
-> index c04a5df..cc2a2e1 100644
-> --- a/hw/pci/pci-stub.c
-> +++ b/hw/pci/pci-stub.c
-> @@ -26,6 +26,7 @@
->   #include "qapi/qmp/qerror.h"
->   #include "hw/pci/pci.h"
->   #include "hw/pci/msi.h"
-> +#include "hw/pci/msix.h"
->  =20
->   bool msi_nonbroken;
->   bool pci_available;
-> @@ -64,3 +65,29 @@ void msi_notify(PCIDevice *dev, unsigned int vector)
->   {
->       g_assert_not_reached();
->   }
-> +
-> +/* Required by target/i386/kvm.c */
-> +bool msi_is_masked(const PCIDevice *dev, unsigned vector)
-> +{
-> +    g_assert_not_reached();
-> +}
-> +
-> +MSIMessage msi_get_message(PCIDevice *dev, unsigned int vector)
-> +{
-> +    g_assert_not_reached();
-> +}
-> +
-> +int msix_enabled(PCIDevice *dev)
-> +{
-> +    return false;
-> +}
-> +
-> +bool msix_is_masked(PCIDevice *dev, unsigned vector)
-> +{
-> +    g_assert_not_reached();
-> +}
-> +
-> +MSIMessage msix_get_message(PCIDevice *dev, unsigned int vector)
-> +{
-> +    g_assert_not_reached();
-> +}
->=20
+So remove the definition of 'anh' and use only 'a' (with VIA_REG_ANH and
+VIA_REG_A).
+
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ hw/misc/mos6522.c         | 12 ++++--------
+ include/hw/misc/mos6522.h |  1 -
+ 2 files changed, 4 insertions(+), 9 deletions(-)
+
+diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
+index cecf0be59e..86ede4005c 100644
+--- a/hw/misc/mos6522.c
++++ b/hw/misc/mos6522.c
+@@ -244,6 +244,7 @@ uint64_t mos6522_read(void *opaque, hwaddr addr, unsigned size)
+         val = s->b;
+         break;
+     case VIA_REG_A:
++    case VIA_REG_ANH:
+         val = s->a;
+         break;
+     case VIA_REG_DIRB:
+@@ -297,9 +298,7 @@ uint64_t mos6522_read(void *opaque, hwaddr addr, unsigned size)
+         val = s->ier | 0x80;
+         break;
+     default:
+-    case VIA_REG_ANH:
+-        val = s->anh;
+-        break;
++        g_assert_not_reached();
+     }
+ 
+     if (addr != VIA_REG_IFR || val != 0) {
+@@ -322,6 +321,7 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+         mdc->portB_write(s);
+         break;
+     case VIA_REG_A:
++    case VIA_REG_ANH:
+         s->a = (s->a & ~s->dira) | (val & s->dira);
+         mdc->portA_write(s);
+         break;
+@@ -395,9 +395,7 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+                               qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+         break;
+     default:
+-    case VIA_REG_ANH:
+-        s->anh = val;
+-        break;
++        g_assert_not_reached();
+     }
+ }
+ 
+@@ -439,7 +437,6 @@ const VMStateDescription vmstate_mos6522 = {
+         VMSTATE_UINT8(pcr, MOS6522State),
+         VMSTATE_UINT8(ifr, MOS6522State),
+         VMSTATE_UINT8(ier, MOS6522State),
+-        VMSTATE_UINT8(anh, MOS6522State),
+         VMSTATE_STRUCT_ARRAY(timers, MOS6522State, 2, 0,
+                              vmstate_mos6522_timer, MOS6522Timer),
+         VMSTATE_END_OF_LIST()
+@@ -460,7 +457,6 @@ static void mos6522_reset(DeviceState *dev)
+     s->ifr = 0;
+     s->ier = 0;
+     /* s->ier = T1_INT | SR_INT; */
+-    s->anh = 0;
+ 
+     s->timers[0].frequency = s->frequency;
+     s->timers[0].latch = 0xffff;
+diff --git a/include/hw/misc/mos6522.h b/include/hw/misc/mos6522.h
+index 493c907537..97384c6e02 100644
+--- a/include/hw/misc/mos6522.h
++++ b/include/hw/misc/mos6522.h
+@@ -115,7 +115,6 @@ typedef struct MOS6522State {
+     uint8_t pcr;
+     uint8_t ifr;
+     uint8_t ier;
+-    uint8_t anh;
+ 
+     MOS6522Timer timers[2];
+     uint64_t frequency;
+-- 
+2.23.0
 
 
