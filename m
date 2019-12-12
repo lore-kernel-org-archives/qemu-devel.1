@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B29C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1153DC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:28:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F7ED21655
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:27:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D10E821655
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:27:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DONXNLEa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F7ED21655
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LZFLQ7YJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D10E821655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifSFD-0002Q0-PT
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 12:27:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57946)
+	id 1ifSFq-0003Oy-IC
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 12:27:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55553)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ifRWN-0006uS-Rz
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:41:00 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ifRWB-0006cL-Sx
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ifRWM-0003aE-KZ
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47952
+ (envelope-from <dgilbert@redhat.com>) id 1ifRWA-0003Bd-Qs
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:47 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59385
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRWM-0003ZD-G1
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:58 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRWA-0003Ak-HM
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576168858;
+ s=mimecast20190719; t=1576168846;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7BsrckIFQW8QN2BqI6w7lFA0iLmZpO0tgnx4feiIVvE=;
- b=DONXNLEazK4jM90g0FPSXJ4JHdNZn/gDHZD0khUQPJjfGdzhuz3Fba/K5gObC55gX64pEa
- Ug5jqr/K6e4UtxKsV71xqWu65mG7r5pgYNyW2AniCAFL8eYQ6gV0xVEQccAbA/oMDnkPCv
- Pu3Gk3QT7N/GxcTrBEaFUC8x9+NSiJ0=
+ bh=vm85j66IltQCXExFgd1+RioUfVQTx62vadIJZy4Eo6I=;
+ b=LZFLQ7YJN1nsnBL3fa6B0sHKMimj1NJ947BUhPAoz82LojQddk5RxQWBvZZdI0Wau462n5
+ sNy8KZQhfFUPQmxqN3ganns9q33QRW2Pmifurx4NYepPPDy7egO678gXgOu7ooBKk5lkPB
+ HAhoKvXRGKc5Lea2OdvA/BvfHdqDt10=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-37-HKNKaFOoOAKgiAevhu-MHw-1; Thu, 12 Dec 2019 11:40:56 -0500
+ us-mta-220-WNBeU_9aOea8ykyopDn8fg-1; Thu, 12 Dec 2019 11:40:45 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE6361005512
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:40:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 478FE800D54
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:40:44 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-226.ams2.redhat.com
  [10.36.116.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 135CD60BF3;
- Thu, 12 Dec 2019 16:40:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6EED660BE1;
+ Thu, 12 Dec 2019 16:40:43 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com,
 	vgoyal@redhat.com
-Subject: [PATCH 072/104] virtiofsd: passthrough_ll: fix refcounting on
- remove/rename
-Date: Thu, 12 Dec 2019 16:38:32 +0000
-Message-Id: <20191212163904.159893-73-dgilbert@redhat.com>
+Subject: [PATCH 062/104] virtiofsd: Handle hard reboot
+Date: Thu, 12 Dec 2019 16:38:22 +0000
+Message-Id: <20191212163904.159893-63-dgilbert@redhat.com>
 In-Reply-To: <20191212163904.159893-1-dgilbert@redhat.com>
 References: <20191212163904.159893-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: HKNKaFOoOAKgiAevhu-MHw-1
+X-MC-Unique: WNBeU_9aOea8ykyopDn8fg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,130 +92,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Miklos Szeredi <mszeredi@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+Handle a
+  mount
+  hard reboot (without unmount)
+  mount
+
+we get another 'init' which FUSE doesn't normally expect.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 50 +++++++++++++++++++++++++++++++-
- 1 file changed, 49 insertions(+), 1 deletion(-)
+ tools/virtiofsd/fuse_lowlevel.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 0f33c3c5e9..1b84d4f313 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -1077,17 +1077,42 @@ out_err:
-     fuse_reply_err(req, saverr);
- }
-=20
-+static struct lo_inode *lookup_name(fuse_req_t req, fuse_ino_t parent,
-+                                    const char *name)
-+{
-+    int res;
-+    struct stat attr;
-+
-+    res =3D fstatat(lo_fd(req, parent), name, &attr,
-+                  AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW);
-+    if (res =3D=3D -1) {
-+        return NULL;
-+    }
-+
-+    return lo_find(lo_data(req), &attr);
-+}
-+
- static void lo_rmdir(fuse_req_t req, fuse_ino_t parent, const char *name)
- {
-     int res;
-+    struct lo_inode *inode;
-+    struct lo_data *lo =3D lo_data(req);
-+
-     if (!is_safe_path_component(name)) {
-         fuse_reply_err(req, EINVAL);
-         return;
-     }
-=20
-+    inode =3D lookup_name(req, parent, name);
-+    if (!inode) {
-+        fuse_reply_err(req, EIO);
-+        return;
-+    }
-+
-     res =3D unlinkat(lo_fd(req, parent), name, AT_REMOVEDIR);
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-+    unref_inode_lolocked(lo, inode, 1);
- }
-=20
- static void lo_rename(fuse_req_t req, fuse_ino_t parent, const char *name,
-@@ -1095,12 +1120,23 @@ static void lo_rename(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name,
-                       unsigned int flags)
- {
-     int res;
-+    struct lo_inode *oldinode;
-+    struct lo_inode *newinode;
-+    struct lo_data *lo =3D lo_data(req);
-=20
-     if (!is_safe_path_component(name) || !is_safe_path_component(newname))=
- {
-         fuse_reply_err(req, EINVAL);
-         return;
-     }
-=20
-+    oldinode =3D lookup_name(req, parent, name);
-+    newinode =3D lookup_name(req, newparent, newname);
-+
-+    if (!oldinode) {
-+        fuse_reply_err(req, EIO);
-+        goto out;
-+    }
-+
-     if (flags) {
- #ifndef SYS_renameat2
-         fuse_reply_err(req, EINVAL);
-@@ -1113,26 +1149,38 @@ static void lo_rename(fuse_req_t req, fuse_ino_t pa=
-rent, const char *name,
-             fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 2d1d1a2e59..45125ef66a 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -2436,7 +2436,21 @@ void fuse_session_process_buf_int(struct fuse_sessio=
+n *se,
+             goto reply_err;
          }
- #endif
--        return;
-+        goto out;
-     }
-=20
-     res =3D renameat(lo_fd(req, parent), name, lo_fd(req, newparent), newn=
-ame);
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-+out:
-+    unref_inode_lolocked(lo, oldinode, 1);
-+    unref_inode_lolocked(lo, newinode, 1);
- }
-=20
- static void lo_unlink(fuse_req_t req, fuse_ino_t parent, const char *name)
+     } else if (in->opcode =3D=3D FUSE_INIT || in->opcode =3D=3D CUSE_INIT)=
  {
-     int res;
-+    struct lo_inode *inode;
-+    struct lo_data *lo =3D lo_data(req);
-=20
-     if (!is_safe_path_component(name)) {
-         fuse_reply_err(req, EINVAL);
-         return;
+-        goto reply_err;
++        if (fuse_lowlevel_is_virtio(se)) {
++            /*
++             * TODO: This is after a hard reboot typically, we need to do
++             * a destroy, but we can't reply to this request yet so
++             * we can't use do_destroy
++             */
++            fuse_log(FUSE_LOG_DEBUG, "%s: reinit\n", __func__);
++            se->got_destroy =3D 1;
++            se->got_init =3D 0;
++            if (se->op.destroy) {
++                se->op.destroy(se->userdata);
++            }
++        } else {
++            goto reply_err;
++        }
      }
 =20
-+    inode =3D lookup_name(req, parent, name);
-+    if (!inode) {
-+        fuse_reply_err(req, EIO);
-+        return;
-+    }
-+
-     res =3D unlinkat(lo_fd(req, parent), name, 0);
-=20
-     fuse_reply_err(req, res =3D=3D -1 ? errno : 0);
-+    unref_inode_lolocked(lo, inode, 1);
- }
-=20
- static void unref_inode_lolocked(struct lo_data *lo, struct lo_inode *inod=
-e,
+     err =3D EACCES;
 --=20
 2.23.0
 
