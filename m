@@ -7,85 +7,87 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF65DC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:42:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 474E1C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:48:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9653A20652
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:42:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B89F21655
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:48:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rIC3UGOv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9653A20652
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YQzJ/qUY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B89F21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifGJ5-0007B1-L5
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:42:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48962)
+	id 1ifGOP-0008Rd-6V
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:48:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51494)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ifGIT-0006mP-IM
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:41:54 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ifGNk-00080Y-Gv
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:47:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ifGIS-0003ac-Jf
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:41:53 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34611)
+ (envelope-from <richard.henderson@linaro.org>) id 1ifGNj-0004XV-J2
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:47:20 -0500
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:44321)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ifGIS-0003YQ-CI
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:41:52 -0500
-Received: by mail-pg1-x544.google.com with SMTP id r11so491551pgf.1
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:41:52 -0800 (PST)
+ id 1ifGNj-0004VK-BQ
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:47:19 -0500
+Received: by mail-pj1-x1042.google.com with SMTP id w5so476862pjh.11
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:47:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=TMZ0jDyFGMuzuCun35FlQjcRk8vnwVUTT98KZNlN13M=;
- b=rIC3UGOvk9L2dFuquPAhkVi0JGGUefnwwMeATGvEcJT9T9T0Ao/kbJWcrGIS3HG64H
- z6FPG4zIdt8ULJz/sD5A5B6ifRVIY2XburA/bFv9i3stuC3NtBD3qJm9lEgN5JYJqMZU
- XDSbUbHPhs+VTkW3zlTPBTera4He3/UqM7dOE6Ck0HL+wRZ7U0/hf1Cioz4kXANyTPqh
- JA11thxmywFY96WnRpL18925n1P6u/QduKAJ9nnjm1aSNIc7RbLg6SDrLK8+wDJOhTpx
- rj+/by9AKOGeibcBFqPzA94dPftUfTETF3AeReKNooSF+fdxo+hNOVIBqkWaWHsKgCu0
- VOUg==
+ bh=bmarqO1plC3fKJtO3kqi2xmiPTvovvFC18tmAR5wJGg=;
+ b=YQzJ/qUYAz2NAQFQjEpgGAoxHORIZfJQt585ZKFzW1eQr2vGAWPLpYv3IzWmox/2Ca
+ /vyrFbp5FJsfWTIriPQPmhkBpE9QMUCwfxcCWquM/qBVmCifPzWHalUIW067TWXh4f5T
+ JtDiFvqsTfkxGjGmkpKicvazFAGrbVYs5UDQoyZUGdTMJ5O7Gj2FC8AjtMnVBvdse46X
+ eaqiGtsXq5cgX26yCEjRiox01DG0Q9bO8Ggp6BSDC4nGjDZU5FIpH00bvPtQU4R6OLX/
+ dyDwCKmq4xFn19Kqur3SxJ4Q7A9I7Ay9t5RHftSceKWiKs7rqNIA4n9M8uOoLk+Qo/xW
+ lOOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=TMZ0jDyFGMuzuCun35FlQjcRk8vnwVUTT98KZNlN13M=;
- b=JDokP0SI2NA29Mdrqrw3Y5hJt8tIOvtPjvN+ylJPy9QrNmJJZY548bzQMqKtw4ydWG
- WqhD8Nw5K/PdiW8O/21JjUcyfVtHrzPDNHzGCShU9WvK9WKuSrydF8ULAXbznrtdNmao
- xoVreaTlaLr6YcsFGxG4dHraGB273FMBdQygoOQa4wCs8uZBfZhwoXx9ZI1rUQNRHRE0
- IjsYN8EVNsTN3hUe0zva+4hDFX/tEamBpTyEYM3Vtklp3S2fLbsvt8rLV30usGes98Ve
- O0D2GoLfUYxNfS76QEQnS8a+NXeJqsOo0zFSqCbDNzwyV+G29wMYXxY575+hTpY5YlGH
- BT4w==
-X-Gm-Message-State: APjAAAWlk2+L2/3Xx1hs4gBB9BrDOJVGOuhlRNJbeU5AeVrrfck+mH/o
- ch++uQGy1DpuRA5caBVR7PjMkQ==
-X-Google-Smtp-Source: APXvYqwK6/C7GUruSSPXAiesSBseeFs/8Mu2J3mL+fJ8sDvqVh+HY5vX+pLmTsjNeg4OhLLvK3mpQQ==
-X-Received: by 2002:aa7:870c:: with SMTP id b12mr7866804pfo.82.1576125711350; 
- Wed, 11 Dec 2019 20:41:51 -0800 (PST)
+ bh=bmarqO1plC3fKJtO3kqi2xmiPTvovvFC18tmAR5wJGg=;
+ b=f1OgQJeAkECp5RixNZbIjUdBXjc+P8lxQSn+0KTN6NTut4StSD6dmtaPAm0fO6Cc15
+ B1FzDW9gBcCFpUpB1aUEqCn5EHO4pDyPdyuEicCSqnOV4V/dbRnc2+RHdA+er582WAwu
+ ygwVvIRdMNTcjJH6g9sh9MxNV+HkhZOYYESgbM6wobp18ybPNI6SIsFSOoOtNZurgi3m
+ gvgwsauFSG7qg6dJVRtXzldmUgLRZdsVuVwywqpreivxCOBg+8Jh7KkkBfItDYTpxT1G
+ NyfVUYpCFCzQsVEUwVXVZ4sXoMTenb9wapgbB7MsGsjgjl+BQx9eaXZ66q83Upp19eFu
+ lpMg==
+X-Gm-Message-State: APjAAAWqLiy2nxFnr7fb5Rk4XFPCFKru6HW2JmmVswpNzbn7Q4GsT7U2
+ 5mgEjoEyKxNr3yYgUJ0xWb3PFA==
+X-Google-Smtp-Source: APXvYqxBPPPbGnPVbwCIphaqkiXEjLQz3xgRcSz+m8cifrjaGOXfTUNupM03llR6sXp4yXd745SZxw==
+X-Received: by 2002:a17:90a:8685:: with SMTP id
+ p5mr7837360pjn.92.1576126038282; 
+ Wed, 11 Dec 2019 20:47:18 -0800 (PST)
 Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id e6sm4945379pfh.32.2019.12.11.20.41.50
+ by smtp.gmail.com with ESMTPSA id a10sm4844919pgm.81.2019.12.11.20.47.17
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 11 Dec 2019 20:41:50 -0800 (PST)
-Subject: Re: [PATCH v2 02/18] vl: move icount configuration earlier
+ Wed, 11 Dec 2019 20:47:17 -0800 (PST)
+Subject: Re: [PATCH v2 03/18] tcg: move qemu_tcg_configure to
+ accel/tcg/tcg-all.c
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 References: <1575903705-12925-1-git-send-email-pbonzini@redhat.com>
- <1575903705-12925-3-git-send-email-pbonzini@redhat.com>
+ <1575903705-12925-4-git-send-email-pbonzini@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9b07e930-97cc-544c-d72e-22c5503bce0c@linaro.org>
-Date: Wed, 11 Dec 2019 20:41:48 -0800
+Message-ID: <71e3c89a-e62a-2ba4-8a63-b4868d7f3356@linaro.org>
+Date: Wed, 11 Dec 2019 20:47:15 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <1575903705-12925-3-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1575903705-12925-4-git-send-email-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+X-Received-From: 2607:f8b0:4864:20::1042
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,19 +105,18 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 12/9/19 7:01 AM, Paolo Bonzini wrote:
-> Once qemu_tcg_configure is turned into a QOM property setter, it will not
-> be able to set a default value for mttcg_enabled.  Setting the default will
-> move to the TCG instance_init function, which currently runs before "-icount"
-> is processed.
+> Move everything related to mttcg_enabled in accel/tcg/tcg-all.c,
+> which will make even more sense when "thread" becomes a QOM property.
 > 
-> However, it is harmless to do configure_icount for all accelerators; we will
-> just fail later if a non-TCG accelerator is selected.  So do that.
+> For now, initializing mttcg_enabled in the instance_init function
+> prepares for the next patch, which will only invoke qemu_tcg_configure
+> when the command line includes a -accel option.
 > 
-> Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  vl.c | 18 +++++++++++-------
->  1 file changed, 11 insertions(+), 7 deletions(-)
+>  accel/tcg/tcg-all.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  cpus.c              | 72 ---------------------------------------------
+>  2 files changed, 85 insertions(+), 72 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
