@@ -2,87 +2,75 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D430AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78EFCC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:05:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C31821655
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F80C21655
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 14:05:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="geY7uFeI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C31821655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XaYZBVIg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F80C21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifP5R-0007lB-Bf
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:05:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42955)
+	id 1ifP5d-0007yP-S7
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 09:05:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNzD-0004r6-ED
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:32 -0500
+ (envelope-from <wainersm@redhat.com>) id 1ifO3I-0001ce-HY
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:58:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNzC-0008LT-6N
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:31 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:45876)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNzB-0008KP-Vl
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:30 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id j42so2575921wrj.12
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:54:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=B1cIguF+o7g6L/Tvyh0nFkUMyH+9grlYA2KZIF+cBA4=;
- b=geY7uFeIqPwdnWVJB4L9Dv4jZTkjjclNvjhd69o7QsMqYgQSf7ENTefo708s3/vq2W
- XCDN5t6kJKETK+Rism0kpDW5/686u1t6KtFORxztskvs2qsZ6mtWV8nV6HNT82KZAiyX
- mO8rMY9CsH+j+ig73CpkgW5AGZgjPwcR0iazGUKNkgVmzkYJEa9c2aEMDpR9oFBWDYsQ
- bwfAFp69D/GF0+nucrw/XOPjd3nl1R62PLeF4M3xURfZkAiynTiSV5n5boIwhSZ9U6ss
- JLpeHoGGQ4FUdroFTfZ2fiusszDb2xv5KnxjtOx+6/AYDWRDxfKgKeOZmwU6TTKJSMCW
- dodg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=B1cIguF+o7g6L/Tvyh0nFkUMyH+9grlYA2KZIF+cBA4=;
- b=Qk//csYL3hxzB0dc+4EgcbOFo4BGyDVSJyKWHWNRKh+WjiP/2sTQFpiG7qZ7bBraNK
- 6jFDVO4MsjyeXdB3+09NpLS4V2YMKf3Uq3AuFYs4fAXmHB6lWj11uSJd0vVbajsbypZI
- uHokQwaAwn1aeDC93z42vKuQJG5zzhr3xhArGHTOmLlMLztnVoDkfz2h545Gc7faAJJF
- MMyYGUwZN0vLKStwwbEukDFLWDAQ1Ie8JDctozMkdGuo94nOtZ2YwlSnyn5BwWLNK66P
- uojE5obOaCYNmqLO1kB44HQXh/EKsg5aBQf3heaTem9wedglv8/L81y2feoS930f40+k
- 84cw==
-X-Gm-Message-State: APjAAAWTgDqwbcqOtqm4yEq7rR8b7Pxx4gp5b/6NSYXXwdhknLS0lZIg
- XMCLefHYCFScowNh3dsm30/WD2Ms
-X-Google-Smtp-Source: APXvYqxfAP5NZHismulfhdGxUh2PJqm6OJch9DL64yNbwVND6yiZFiEY7jswLG2qOiHRPuUyDAkZ/A==
-X-Received: by 2002:a5d:494b:: with SMTP id r11mr6275554wrs.184.1576155268658; 
- Thu, 12 Dec 2019 04:54:28 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.54.27
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:54:28 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (envelope-from <wainersm@redhat.com>) id 1ifO3H-0005I4-46
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:58:44 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43693
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1ifO3G-0005HA-Vi
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:58:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576155522;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=oSO7A+dXdJZ8ryN9WaQGS8dKl0GZ1r6/F/p0+CEDDsw=;
+ b=XaYZBVIgXFaX3Kr4LYXZFHRVWzRiMqLRrmaAYLS6Kzk1GgbLDf52kG9FJ00+hJsUX+Mlib
+ uCwrwOvi+421S6RY9tF0rLpJFFCqwmZ6jFblehAEGxapJFqiw1iOt7jGPpbt0bK3h+5erU
+ Cf7LIsJFiBwvy6IKIG9LsXAUzm9aAYc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-383-QqoJDWgpMMi5nIAyg6BUlg-1; Thu, 12 Dec 2019 07:58:39 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D057F801E66;
+ Thu, 12 Dec 2019 12:58:37 +0000 (UTC)
+Received: from virtlab501.virt.lab.eng.bos.redhat.com
+ (virtlab501.virt.lab.eng.bos.redhat.com [10.19.152.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 31E4610013A1;
+ Thu, 12 Dec 2019 12:58:32 +0000 (UTC)
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 091/132] meson: convert hw/i2c
-Date: Thu, 12 Dec 2019 13:52:15 +0100
-Message-Id: <1576155176-2464-92-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
-References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH v3 0/5] python/qemu: New accel module and improvements
+Date: Thu, 12 Dec 2019 07:58:26 -0500
+Message-Id: <20191212125831.2654-1-wainersm@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: QqoJDWgpMMi5nIAyg6BUlg-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42b
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,89 +82,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: fam@euphon.net, ehabkost@redhat.com, jsnow@redhat.com,
+ alex.bennee@linaro.org, crosa@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+On commit abf0bf998dcb John Snow moved some code out of __init__.py
+to machine.py. kvm_available() remained in though. So on patch 01
+I continue his work by creating a home for that method (the new
+'accel' module). Honestly I was unsure about whether move the code
+to any existing module or make a new, but since I am adding more
+methods related with accelerators then I thought they would deserve a modul=
+e.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
----
- hw/Makefile.objs     |  1 -
- hw/i2c/Makefile.objs | 13 -------------
- hw/i2c/meson.build   | 18 ++++++++++++++++++
- hw/meson.build       |  1 +
- 4 files changed, 19 insertions(+), 14 deletions(-)
- delete mode 100644 hw/i2c/Makefile.objs
- create mode 100644 hw/i2c/meson.build
+The patches 02-04 introduce new helpers and make improvements. Later
+I intend to use those methods on the acceptance tests such as
+to automatically set the accelerator in QEMUMachine VM via Avocado
+tags, and skip the test if the accelerator is not available.
 
-diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index b75e027..0213b1b 100644
---- a/hw/Makefile.objs
-+++ b/hw/Makefile.objs
-@@ -11,7 +11,6 @@ devices-dirs-y += display/
- devices-dirs-y += dma/
- devices-dirs-y += gpio/
- devices-dirs-$(CONFIG_HYPERV) += hyperv/
--devices-dirs-$(CONFIG_I2C) += i2c/
- endif
- 
- common-obj-y += $(devices-dirs-y)
-diff --git a/hw/i2c/Makefile.objs b/hw/i2c/Makefile.objs
-deleted file mode 100644
-index d7073a4..0000000
---- a/hw/i2c/Makefile.objs
-+++ /dev/null
-@@ -1,13 +0,0 @@
--common-obj-$(CONFIG_I2C) += core.o smbus_slave.o smbus_master.o
--common-obj-$(CONFIG_SMBUS_EEPROM) += smbus_eeprom.o
--common-obj-$(CONFIG_VERSATILE_I2C) += versatile_i2c.o
--common-obj-$(CONFIG_ACPI_X86_ICH) += smbus_ich9.o
--common-obj-$(CONFIG_ACPI_SMBUS) += pm_smbus.o
--common-obj-$(CONFIG_BITBANG_I2C) += bitbang_i2c.o
--common-obj-$(CONFIG_EXYNOS4) += exynos4210_i2c.o
--common-obj-$(CONFIG_IMX_I2C) += imx_i2c.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_i2c.o
--common-obj-$(CONFIG_NRF51_SOC) += microbit_i2c.o
--common-obj-$(CONFIG_MPC_I2C) += mpc_i2c.o
--obj-$(CONFIG_OMAP) += omap_i2c.o
--obj-$(CONFIG_PPC4XX) += ppc4xx_i2c.o
-diff --git a/hw/i2c/meson.build b/hw/i2c/meson.build
-new file mode 100644
-index 0000000..43901e6
---- /dev/null
-+++ b/hw/i2c/meson.build
-@@ -0,0 +1,18 @@
-+i2c_ss = ss.source_set()
-+i2c_ss.add(when: 'CONFIG_ACPI_SMBUS', if_true: files('pm_smbus.c'))
-+i2c_ss.add(when: 'CONFIG_ACPI_X86_ICH', if_true: files('smbus_ich9.c'))
-+i2c_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_BITBANG_I2C', if_true: files('bitbang_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_I2C', if_true: files('core.c', 'smbus_slave.c', 'smbus_master.c'))
-+i2c_ss.add(when: 'CONFIG_IMX_I2C', if_true: files('imx_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_MPC_I2C', if_true: files('mpc_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('microbit_i2c.c'))
-+i2c_ss.add(when: 'CONFIG_SMBUS_EEPROM', if_true: files('smbus_eeprom.c'))
-+i2c_ss.add(when: 'CONFIG_VERSATILE_I2C', if_true: files('versatile_i2c.c'))
-+softmmu_ss.add_all(when: 'CONFIG_I2C', if_true: i2c_ss)
-+
-+specific_i2c_ss = ss.source_set()
-+specific_i2c_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_i2c.c'))
-+specific_i2c_ss.add(when: 'CONFIG_PPC4XX', if_true: files('ppc4xx_i2c.c'))
-+specific_ss.add_all(when: 'CONFIG_I2C', if_true: specific_i2c_ss)
-diff --git a/hw/meson.build b/hw/meson.build
-index 848736d..e59ed44 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -1,4 +1,5 @@
- subdir('core')
-+subdir('i2c')
- subdir('ide')
- subdir('input')
- subdir('intc')
--- 
-1.8.3.1
+Patch 05 just remove unneeded imports in __init__.py
 
+Changes v2 -> v3:
+- Refactor subprocess.check_output() call (patch 02) [crosa]
+  Not using shell=3DTrue
+  Pass universal_newlines=3DTrue so don't need to decode() the output
+  Do not check if returned accelerator's name is empty string
+- New patch 05 [crosa]
+  On patch 01 Cleber suggested to remove unneeded imports in
+  python/qemu/__init__.py
+
+Changes v1 -> v2:
+- Removed 'Based on qmp.py' from python/qemu/accel.py
+(patch 01) [alex.bennee]
+- logging added only when used on python/qemu/accel.py
+(patch 02) [alex.bennee]
+
+Git:
+- Tree: https://github.com/wainersm/qemu
+- Branch: python_accel_v3
+
+CI:
+- Travis (FAIL): https://travis-ci.org/wainersm/qemu/builds/623800273
+  Failure is not related with this change
+
+Wainer dos Santos Moschetta (5):
+  python/qemu: Move kvm_available() to its own module
+  python/qemu: accel: Add list_accel() method
+  python/qemu: accel: Strengthen kvm_available() checks
+  python/qemu: accel: Add tcg_available() method
+  python/qemu: Remove unneeded imports in __init__
+
+ python/qemu/__init__.py | 24 -------------
+ python/qemu/accel.py    | 77 +++++++++++++++++++++++++++++++++++++++++
+ tests/vm/basevm.py      |  2 +-
+ 3 files changed, 78 insertions(+), 25 deletions(-)
+ create mode 100644 python/qemu/accel.py
+
+--=20
+2.21.0
 
 
