@@ -6,90 +6,89 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A51CC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 05:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E467FC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 05:52:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F35F920652
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 05:52:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F35F920652
+	by mail.kernel.org (Postfix) with ESMTPS id A46272073D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 05:52:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A46272073D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifHOr-0001H7-Lz
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 00:52:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35361)
+	id 1ifHOy-0001OB-KI
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 00:52:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35017)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bharata@linux.ibm.com>) id 1ifHNg-0008Ni-C2
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:51:21 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bharata@linux.ibm.com>) id 1ifHNe-00063E-Rk
+ (envelope-from <bharata@linux.ibm.com>) id 1ifHNe-0008L6-LQ
  for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:51:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20526
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <bharata@linux.ibm.com>) id 1ifHNc-0005zK-PO
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:51:18 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:5284
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <bharata@linux.ibm.com>)
- id 1ifHNe-00062Y-MN
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:51:18 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ id 1ifHNc-0005yG-JX
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:51:16 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBC5grro176629
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 00:51:18 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wtbt2xkfv-1
+ xBC5gqBj031916
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 00:51:16 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wu4t6t0x1-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 00:51:18 -0500
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 00:51:15 -0500
 Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <bharata@linux.ibm.com>;
- Thu, 12 Dec 2019 05:51:16 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Thu, 12 Dec 2019 05:51:14 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 12 Dec 2019 05:51:13 -0000
+ Thu, 12 Dec 2019 05:51:12 -0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
  [9.149.105.58])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBC5pCEa54591630
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBC5pBvj31129716
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Dec 2019 05:51:12 GMT
+ Thu, 12 Dec 2019 05:51:11 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CFF1E4C04A;
- Thu, 12 Dec 2019 05:51:12 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9DDB34C044;
+ by IMSVA (Postfix) with ESMTP id 583204C040;
  Thu, 12 Dec 2019 05:51:11 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 280FA4C04A;
+ Thu, 12 Dec 2019 05:51:10 +0000 (GMT)
 Received: from bharata.in.ibm.com (unknown [9.124.35.198])
  by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 12 Dec 2019 05:51:11 +0000 (GMT)
+ Thu, 12 Dec 2019 05:51:09 +0000 (GMT)
 From: Bharata B Rao <bharata@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
- pseries guest
-Date: Thu, 12 Dec 2019 11:20:59 +0530
+Subject: [PATCH v2 ppc-for-5.0 1/2] linux-headers: Update
+Date: Thu, 12 Dec 2019 11:20:58 +0530
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191212055059.9399-1-bharata@linux.ibm.com>
 References: <20191212055059.9399-1-bharata@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19121205-4275-0000-0000-0000038E2341
+x-cbid: 19121205-0028-0000-0000-000003C7BB19
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121205-4276-0000-0000-000038A1DADA
-Message-Id: <20191212055059.9399-3-bharata@linux.ibm.com>
+x-cbparentid: 19121205-0029-0000-0000-0000248AF269
+Message-Id: <20191212055059.9399-2-bharata@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-12_01:2019-12-12,2019-12-11 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  lowpriorityscore=0
- spamscore=0 suspectscore=1 phishscore=0 malwarescore=0 bulkscore=0
- mlxlogscore=999 impostorscore=0 clxscore=1015 adultscore=0
- priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-1912120036
+ bulkscore=0 impostorscore=0 spamscore=0 clxscore=1015 suspectscore=1
+ mlxscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912120036
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,91 +109,274 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-A pseries guest can be run as a secure guest on Ultravisor-enabled
-POWER platforms. When such a secure guest is reset, we need to
-release/reset a few resources both on ultravisor and hypervisor side.
-This is achieved by invoking this new ioctl KVM_PPC_SVM_OFF from the
-machine reset path.
-
-As part of this ioctl, the secure guest is essentially transitioned
-back to normal mode so that it can reboot like a regular guest and
-become secure again.
-
-This ioctl has no effect when invoked for a normal guest. If this ioctl
-fails for a secure guest, the guest is terminated.
+Update to mainline commit: e42617b825f8 ("Linux 5.5-rc1")
 
 Signed-off-by: Bharata B Rao <bharata@linux.ibm.com>
 ---
- hw/ppc/spapr.c       | 15 +++++++++++++++
- target/ppc/kvm.c     |  7 +++++++
- target/ppc/kvm_ppc.h |  6 ++++++
- 3 files changed, 28 insertions(+)
+ include/standard-headers/asm-x86/bootparam.h  |  7 +-
+ .../infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h | 15 +++-
+ include/standard-headers/drm/drm_fourcc.h     | 28 ++++++-
+ .../linux/input-event-codes.h                 | 77 +++++++++++++++++++
+ include/standard-headers/linux/pci_regs.h     |  3 +
+ .../standard-headers/rdma/vmw_pvrdma-abi.h    |  5 ++
+ linux-headers/linux/kvm.h                     |  1 +
+ 7 files changed, 132 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f11422fc41..25e1a3446e 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1597,6 +1597,21 @@ static void spapr_machine_reset(MachineState *machine)
-     void *fdt;
-     int rc;
+diff --git a/include/standard-headers/asm-x86/bootparam.h b/include/standard-headers/asm-x86/bootparam.h
+index a6f7cf535e..072e2ed546 100644
+--- a/include/standard-headers/asm-x86/bootparam.h
++++ b/include/standard-headers/asm-x86/bootparam.h
+@@ -2,7 +2,7 @@
+ #ifndef _ASM_X86_BOOTPARAM_H
+ #define _ASM_X86_BOOTPARAM_H
  
-+    /*
-+     * KVM_PPC_SVM_OFF ioctl can fail for secure guests, check and
-+     * exit in that case. However check for -ENOTTY explicitly
-+     * to ensure that we don't terminate normal guests that are
-+     * running on kernels which don't support this ioctl.
-+     *
-+     * Also, this ioctl returns 0 for normal guests on kernels where
-+     * this ioctl is supported.
-+     */
-+    rc = kvmppc_svm_off();
-+    if (rc && rc != -ENOTTY) {
-+        error_report("Reset of secure guest failed, exiting...");
-+        exit(EXIT_FAILURE);
-+    }
-+
-     spapr_caps_apply(spapr);
+-/* setup_data types */
++/* setup_data/setup_indirect types */
+ #define SETUP_NONE			0
+ #define SETUP_E820_EXT			1
+ #define SETUP_DTB			2
+@@ -11,6 +11,11 @@
+ #define SETUP_APPLE_PROPERTIES		5
+ #define SETUP_JAILHOUSE			6
  
-     first_ppc_cpu = POWERPC_CPU(first_cpu);
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 7406d18945..1a86fa4f0c 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2900,3 +2900,10 @@ void kvmppc_set_reg_tb_offset(PowerPCCPU *cpu, int64_t tb_offset)
-         kvm_set_one_reg(cs, KVM_REG_PPC_TB_OFFSET, &tb_offset);
-     }
- }
++#define SETUP_INDIRECT			(1<<31)
 +
-+int kvmppc_svm_off(void)
-+{
-+    KVMState *s = KVM_STATE(current_machine->accelerator);
++/* SETUP_INDIRECT | max(SETUP_*) */
++#define SETUP_TYPE_MAX			(SETUP_INDIRECT | SETUP_JAILHOUSE)
 +
-+    return kvm_vm_ioctl(s, KVM_PPC_SVM_OFF);
-+}
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 47b08a4030..5cc812e486 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -37,6 +37,7 @@ int kvmppc_booke_watchdog_enable(PowerPCCPU *cpu);
- target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
-                                      bool radix, bool gtse,
-                                      uint64_t proc_tbl);
-+int kvmppc_svm_off(void);
- #ifndef CONFIG_USER_ONLY
- bool kvmppc_spapr_use_multitce(void);
- int kvmppc_spapr_enable_inkernel_multitce(void);
-@@ -201,6 +202,11 @@ static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
-     return 0;
- }
+ /* ram_size flags */
+ #define RAMDISK_IMAGE_START_MASK	0x07FF
+ #define RAMDISK_PROMPT_FLAG		0x8000
+diff --git a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h
+index d019872608..a5a1c8234e 100644
+--- a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h
++++ b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_dev_api.h
+@@ -58,7 +58,8 @@
+ #define PVRDMA_ROCEV1_VERSION		17
+ #define PVRDMA_ROCEV2_VERSION		18
+ #define PVRDMA_PPN64_VERSION		19
+-#define PVRDMA_VERSION			PVRDMA_PPN64_VERSION
++#define PVRDMA_QPHANDLE_VERSION		20
++#define PVRDMA_VERSION			PVRDMA_QPHANDLE_VERSION
  
-+static inline int kvmppc_svm_off(void)
-+{
-+    return 0;
-+}
+ #define PVRDMA_BOARD_ID			1
+ #define PVRDMA_REV_ID			1
+@@ -581,6 +582,17 @@ struct pvrdma_cmd_create_qp_resp {
+ 	uint32_t max_inline_data;
+ };
+ 
++struct pvrdma_cmd_create_qp_resp_v2 {
++	struct pvrdma_cmd_resp_hdr hdr;
++	uint32_t qpn;
++	uint32_t qp_handle;
++	uint32_t max_send_wr;
++	uint32_t max_recv_wr;
++	uint32_t max_send_sge;
++	uint32_t max_recv_sge;
++	uint32_t max_inline_data;
++};
 +
- static inline void kvmppc_set_reg_ppc_online(PowerPCCPU *cpu,
-                                              unsigned int online)
- {
+ struct pvrdma_cmd_modify_qp {
+ 	struct pvrdma_cmd_hdr hdr;
+ 	uint32_t qp_handle;
+@@ -663,6 +675,7 @@ union pvrdma_cmd_resp {
+ 	struct pvrdma_cmd_create_cq_resp create_cq_resp;
+ 	struct pvrdma_cmd_resize_cq_resp resize_cq_resp;
+ 	struct pvrdma_cmd_create_qp_resp create_qp_resp;
++	struct pvrdma_cmd_create_qp_resp_v2 create_qp_resp_v2;
+ 	struct pvrdma_cmd_query_qp_resp query_qp_resp;
+ 	struct pvrdma_cmd_destroy_qp_resp destroy_qp_resp;
+ 	struct pvrdma_cmd_create_srq_resp create_srq_resp;
+diff --git a/include/standard-headers/drm/drm_fourcc.h b/include/standard-headers/drm/drm_fourcc.h
+index a308c91b4f..46d279f515 100644
+--- a/include/standard-headers/drm/drm_fourcc.h
++++ b/include/standard-headers/drm/drm_fourcc.h
+@@ -68,7 +68,7 @@ extern "C" {
+ #define fourcc_code(a, b, c, d) ((uint32_t)(a) | ((uint32_t)(b) << 8) | \
+ 				 ((uint32_t)(c) << 16) | ((uint32_t)(d) << 24))
+ 
+-#define DRM_FORMAT_BIG_ENDIAN (1<<31) /* format is big endian instead of little endian */
++#define DRM_FORMAT_BIG_ENDIAN (1U<<31) /* format is big endian instead of little endian */
+ 
+ /* Reserve 0 for the invalid format specifier */
+ #define DRM_FORMAT_INVALID	0
+@@ -647,7 +647,21 @@ extern "C" {
+  * Further information on the use of AFBC modifiers can be found in
+  * Documentation/gpu/afbc.rst
+  */
+-#define DRM_FORMAT_MOD_ARM_AFBC(__afbc_mode)	fourcc_mod_code(ARM, __afbc_mode)
++
++/*
++ * The top 4 bits (out of the 56 bits alloted for specifying vendor specific
++ * modifiers) denote the category for modifiers. Currently we have only two
++ * categories of modifiers ie AFBC and MISC. We can have a maximum of sixteen
++ * different categories.
++ */
++#define DRM_FORMAT_MOD_ARM_CODE(__type, __val) \
++	fourcc_mod_code(ARM, ((uint64_t)(__type) << 52) | ((__val) & 0x000fffffffffffffULL))
++
++#define DRM_FORMAT_MOD_ARM_TYPE_AFBC 0x00
++#define DRM_FORMAT_MOD_ARM_TYPE_MISC 0x01
++
++#define DRM_FORMAT_MOD_ARM_AFBC(__afbc_mode) \
++	DRM_FORMAT_MOD_ARM_CODE(DRM_FORMAT_MOD_ARM_TYPE_AFBC, __afbc_mode)
+ 
+ /*
+  * AFBC superblock size
+@@ -741,6 +755,16 @@ extern "C" {
+  */
+ #define AFBC_FORMAT_MOD_BCH     (1ULL << 11)
+ 
++/*
++ * Arm 16x16 Block U-Interleaved modifier
++ *
++ * This is used by Arm Mali Utgard and Midgard GPUs. It divides the image
++ * into 16x16 pixel blocks. Blocks are stored linearly in order, but pixels
++ * in the block are reordered.
++ */
++#define DRM_FORMAT_MOD_ARM_16X16_BLOCK_U_INTERLEAVED \
++	DRM_FORMAT_MOD_ARM_CODE(DRM_FORMAT_MOD_ARM_TYPE_MISC, 1ULL)
++
+ /*
+  * Allwinner tiled modifier
+  *
+diff --git a/include/standard-headers/linux/input-event-codes.h b/include/standard-headers/linux/input-event-codes.h
+index eb08cb8598..b484c25289 100644
+--- a/include/standard-headers/linux/input-event-codes.h
++++ b/include/standard-headers/linux/input-event-codes.h
+@@ -649,6 +649,83 @@
+  */
+ #define KEY_DATA			0x277
+ #define KEY_ONSCREEN_KEYBOARD		0x278
++/* Electronic privacy screen control */
++#define KEY_PRIVACY_SCREEN_TOGGLE	0x279
++
++/*
++ * Some keyboards have keys which do not have a defined meaning, these keys
++ * are intended to be programmed / bound to macros by the user. For most
++ * keyboards with these macro-keys the key-sequence to inject, or action to
++ * take, is all handled by software on the host side. So from the kernel's
++ * point of view these are just normal keys.
++ *
++ * The KEY_MACRO# codes below are intended for such keys, which may be labeled
++ * e.g. G1-G18, or S1 - S30. The KEY_MACRO# codes MUST NOT be used for keys
++ * where the marking on the key does indicate a defined meaning / purpose.
++ *
++ * The KEY_MACRO# codes MUST also NOT be used as fallback for when no existing
++ * KEY_FOO define matches the marking / purpose. In this case a new KEY_FOO
++ * define MUST be added.
++ */
++#define KEY_MACRO1			0x290
++#define KEY_MACRO2			0x291
++#define KEY_MACRO3			0x292
++#define KEY_MACRO4			0x293
++#define KEY_MACRO5			0x294
++#define KEY_MACRO6			0x295
++#define KEY_MACRO7			0x296
++#define KEY_MACRO8			0x297
++#define KEY_MACRO9			0x298
++#define KEY_MACRO10			0x299
++#define KEY_MACRO11			0x29a
++#define KEY_MACRO12			0x29b
++#define KEY_MACRO13			0x29c
++#define KEY_MACRO14			0x29d
++#define KEY_MACRO15			0x29e
++#define KEY_MACRO16			0x29f
++#define KEY_MACRO17			0x2a0
++#define KEY_MACRO18			0x2a1
++#define KEY_MACRO19			0x2a2
++#define KEY_MACRO20			0x2a3
++#define KEY_MACRO21			0x2a4
++#define KEY_MACRO22			0x2a5
++#define KEY_MACRO23			0x2a6
++#define KEY_MACRO24			0x2a7
++#define KEY_MACRO25			0x2a8
++#define KEY_MACRO26			0x2a9
++#define KEY_MACRO27			0x2aa
++#define KEY_MACRO28			0x2ab
++#define KEY_MACRO29			0x2ac
++#define KEY_MACRO30			0x2ad
++
++/*
++ * Some keyboards with the macro-keys described above have some extra keys
++ * for controlling the host-side software responsible for the macro handling:
++ * -A macro recording start/stop key. Note that not all keyboards which emit
++ *  KEY_MACRO_RECORD_START will also emit KEY_MACRO_RECORD_STOP if
++ *  KEY_MACRO_RECORD_STOP is not advertised, then KEY_MACRO_RECORD_START
++ *  should be interpreted as a recording start/stop toggle;
++ * -Keys for switching between different macro (pre)sets, either a key for
++ *  cycling through the configured presets or keys to directly select a preset.
++ */
++#define KEY_MACRO_RECORD_START		0x2b0
++#define KEY_MACRO_RECORD_STOP		0x2b1
++#define KEY_MACRO_PRESET_CYCLE		0x2b2
++#define KEY_MACRO_PRESET1		0x2b3
++#define KEY_MACRO_PRESET2		0x2b4
++#define KEY_MACRO_PRESET3		0x2b5
++
++/*
++ * Some keyboards have a buildin LCD panel where the contents are controlled
++ * by the host. Often these have a number of keys directly below the LCD
++ * intended for controlling a menu shown on the LCD. These keys often don't
++ * have any labeling so we just name them KEY_KBD_LCD_MENU#
++ */
++#define KEY_KBD_LCD_MENU1		0x2b8
++#define KEY_KBD_LCD_MENU2		0x2b9
++#define KEY_KBD_LCD_MENU3		0x2ba
++#define KEY_KBD_LCD_MENU4		0x2bb
++#define KEY_KBD_LCD_MENU5		0x2bc
+ 
+ #define BTN_TRIGGER_HAPPY		0x2c0
+ #define BTN_TRIGGER_HAPPY1		0x2c0
+diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
+index 29d6e93fd1..acb7d2bdb4 100644
+--- a/include/standard-headers/linux/pci_regs.h
++++ b/include/standard-headers/linux/pci_regs.h
+@@ -34,6 +34,7 @@
+  * of which the first 64 bytes are standardized as follows:
+  */
+ #define PCI_STD_HEADER_SIZEOF	64
++#define PCI_STD_NUM_BARS	6	/* Number of standard BARs */
+ #define PCI_VENDOR_ID		0x00	/* 16 bits */
+ #define PCI_DEVICE_ID		0x02	/* 16 bits */
+ #define PCI_COMMAND		0x04	/* 16 bits */
+@@ -673,6 +674,8 @@
+ #define  PCI_EXP_LNKCTL2_TLS_8_0GT	0x0003 /* Supported Speed 8GT/s */
+ #define  PCI_EXP_LNKCTL2_TLS_16_0GT	0x0004 /* Supported Speed 16GT/s */
+ #define  PCI_EXP_LNKCTL2_TLS_32_0GT	0x0005 /* Supported Speed 32GT/s */
++#define  PCI_EXP_LNKCTL2_ENTER_COMP	0x0010 /* Enter Compliance */
++#define  PCI_EXP_LNKCTL2_TX_MARGIN	0x0380 /* Transmit Margin */
+ #define PCI_EXP_LNKSTA2		50	/* Link Status 2 */
+ #define PCI_CAP_EXP_ENDPOINT_SIZEOF_V2	52	/* v2 endpoints with link end here */
+ #define PCI_EXP_SLTCAP2		52	/* Slot Capabilities 2 */
+diff --git a/include/standard-headers/rdma/vmw_pvrdma-abi.h b/include/standard-headers/rdma/vmw_pvrdma-abi.h
+index 336a8d596f..0989426a3f 100644
+--- a/include/standard-headers/rdma/vmw_pvrdma-abi.h
++++ b/include/standard-headers/rdma/vmw_pvrdma-abi.h
+@@ -179,6 +179,11 @@ struct pvrdma_create_qp {
+ 	uint64_t __attribute__((aligned(8))) qp_addr;
+ };
+ 
++struct pvrdma_create_qp_resp {
++	uint32_t qpn;
++	uint32_t qp_handle;
++};
++
+ /* PVRDMA masked atomic compare and swap */
+ struct pvrdma_ex_cmp_swap {
+ 	uint64_t __attribute__((aligned(8))) swap_val;
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 3b27a1ae85..9d647fad76 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -1348,6 +1348,7 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_PPC_GET_CPU_CHAR	  _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
+ /* Available with KVM_CAP_PMU_EVENT_FILTER */
+ #define KVM_SET_PMU_EVENT_FILTER  _IOW(KVMIO,  0xb2, struct kvm_pmu_event_filter)
++#define KVM_PPC_SVM_OFF		  _IO(KVMIO,  0xb3)
+ 
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
 -- 
 2.21.0
 
