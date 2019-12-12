@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF357C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B77C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:27:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75AA0206A5
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:27:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CBB6206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:27:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PYwLDjgb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75AA0206A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m2ZXIv0T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CBB6206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOUe-0003Yh-5G
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:27:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34731)
+	id 1ifOVA-0004G6-5i
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:27:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyR-0003eC-P8
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:44 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyh-00042U-Gy
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyQ-0006uD-Ja
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:43 -0500
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:34216)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyg-0007Q1-39
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:59 -0500
+Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:38632)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNyQ-0006sK-At
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:42 -0500
-Received: by mail-wr1-x42c.google.com with SMTP id t2so2645062wrr.1
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:42 -0800 (PST)
+ id 1ifNyf-0007OT-Rp
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:58 -0500
+Received: by mail-wm1-x333.google.com with SMTP id p17so2377038wmi.3
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=AtwMOLvxXn85AOzw7ez1xNn8Y3y0JTmxG03ZrTDH7vU=;
- b=PYwLDjgbUYegUpgA0HKTrVR7svYP7IQS/u0m9yYSEBx9wRURIxfyBz+JtdiT1GYVw7
- kaOMIGhRszTcHJlYD+rtAryf/Srk6TYeh4kXh8FgPv+gRXJMbvzvTXqCpyFcwJ497C67
- cIA/KQ+5O5aaxXCCh6hsdzcqjXkWXjceSVPWbjVTVjOcmTIY6eay35izeptQraMJdsqo
- e2ka6ZgfZbzCcrkZ67ttrwPPJtS0DVJ2I0GSR+jL/bDg6GQfFIjTeFQFZpJMpLq2Q8Wi
- T3lPzVqUQXjVyORbSgv6Bla1beJPG5UIh1IWqFqt6xCZfdf8FRKlDkyCx5sVyAQl7GUK
- eCyQ==
+ bh=WW4k8JNn6CBU2Fa9v+82C5oHQxkIO9+9vFjrxZX46U4=;
+ b=m2ZXIv0TakOvPXiRh3KJ/E/le/wyI9sftjlXvwNWN6YnEB7q8B9UOPl5h81p17rg1G
+ g5NmTuSNsDINMNWtPbDiFL/a6Ro4VQYfJSI+TJIQS0TqLfOF2C5voL4X6sNtYEbTId5A
+ zCR/aR/rBN8SsYykDw/G0tx4Q+vRZHlnUWoJ9H2veMNa2LpMPEqh9dx89Lp1w/3T7t9S
+ aRsJu9GGSpA5TRrHrq40ZudfUTMVPEUeDQcEZH3W77Kfn/Jvb3nR/mflhK7gV4KR6uKK
+ N64z1n1xzpDuYWm/zH7hu2zBcpYLqzNNmCGekMLY551gA23MIH1cdgI+3Nb6EZm6o8Ot
+ NUww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=AtwMOLvxXn85AOzw7ez1xNn8Y3y0JTmxG03ZrTDH7vU=;
- b=uFj45oEd4i4SGat/r3SxCfauuz2IdBYqO4EcfR6+fwjCazUD4GxbHRN6ga5O5wESEd
- jvbkfX5U34FzfOd8gTT7b0g/mHDBES/iaGqUrHuhqVIz53t6lwH5vEmJbpe6uGvkP/Du
- u6HowWeUim4+g2cMcC62/B6pE0QqZuLAhOs9j1UIgp/Ku8+4iu9MBqLkgg3y60iA8KiS
- 02ET/Q4GZNar/+FqwMDm+jtDYKRXcVPWQS73clfOFOMkmJ2lGRmoUHHLgsGEhjkraLWe
- QoLcxswnYZPqebVZYssreqPu31qttvW/fbB9nBZAvo+Uf5ZcWnTxpqWfxC/BjSKEdNbh
- Ii3A==
-X-Gm-Message-State: APjAAAUYV/cjkrJ6ZnNj33E4YI3Qk2EPsWi94p+Rh7iVWTNMMdL+Iyw5
- S89qNfBlfGKDTdjUCYw3z8LsU/h5
-X-Google-Smtp-Source: APXvYqyveVTDWjdy4dKQPwTt+nfHPni3TPBbxFgJj8MLqO2SnHo0ESDaQxJXnYr/EaK2GfwF/LuvWA==
-X-Received: by 2002:a5d:4d0e:: with SMTP id z14mr5995838wrt.208.1576155221034; 
- Thu, 12 Dec 2019 04:53:41 -0800 (PST)
+ bh=WW4k8JNn6CBU2Fa9v+82C5oHQxkIO9+9vFjrxZX46U4=;
+ b=sd8qd7VD7G+M6Y5WEryS5nZVkgKNVZfGUg5TcVAhFZnnqE7/XBmJa00jvQvZleq79a
+ 2eiACCWr5szk7IbjgvJoJkVrBPemFDXj8My57qiJoXETYQJ1HYN81LVxrxF9d9ZnpH86
+ Yu7/QEs+Oxs3uPxNsUg4AlGNGVblhugK5EW3f0bqNxEU2i3RvCeBwfDfMPX5k6CnjjGT
+ ZicWP0kpdAouaO5l4s9XUzlp6EAAFVsaXxmK7cyY/eOgdvuPiPshHJTHS0he7Q93lXHy
+ jWQyPDkK5/eHOWaUyeTJewyLX7ng4pTSQDkgE0HIMmUITKGVJt/1Wi1lWC6IuV1B6xo/
+ T8Gg==
+X-Gm-Message-State: APjAAAXf86SR0Nv+YaT3bcG/WjmPa1IKeBeepUqgQSSpBvloPo/EiFkZ
+ ouTASQVXjLNlbymJc8wyssbSkHrC
+X-Google-Smtp-Source: APXvYqyInI8iIQX9Wd0peKH5ML2sJlnPvRR+OHWAomflmQdhTZCLLdwvYUadLUT1lmqsbrOAtykgQg==
+X-Received: by 2002:a05:600c:2290:: with SMTP id
+ 16mr6819118wmf.93.1576155236592; 
+ Thu, 12 Dec 2019 04:53:56 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.39
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.55
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:53:40 -0800 (PST)
+ Thu, 12 Dec 2019 04:53:55 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 043/132] meson: qemu-{img,io,nbd}
-Date: Thu, 12 Dec 2019 13:51:27 +0100
-Message-Id: <1576155176-2464-44-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 058/132] meson: convert net directory to Meson
+Date: Thu, 12 Dec 2019 13:51:42 +0100
+Message-Id: <1576155176-2464-59-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42c
+X-Received-From: 2a00:1450:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,71 +104,175 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile    | 6 ------
- configure   | 6 ------
- meson.build | 8 +++++++-
- 3 files changed, 7 insertions(+), 13 deletions(-)
+ Makefile.objs         |  3 +--
+ Makefile.target       |  1 +
+ meson.build           | 10 ++++++++++
+ net/Makefile.objs     | 32 --------------------------------
+ net/can/Makefile.objs |  2 --
+ net/can/meson.build   |  5 +++++
+ net/meson.build       | 39 +++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 56 insertions(+), 36 deletions(-)
+ delete mode 100644 net/Makefile.objs
+ delete mode 100644 net/can/Makefile.objs
+ create mode 100644 net/can/meson.build
+ create mode 100644 net/meson.build
 
-diff --git a/Makefile b/Makefile
-index cdd9d14..764981d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -231,12 +231,6 @@ Makefile: $(version-obj-y)
+diff --git a/Makefile.objs b/Makefile.objs
+index 5f2a644..e316e96 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -35,8 +35,7 @@ qom-obj-y = qom/libqom.fa
+ # single QEMU executable should support all CPUs and machines.
  
- COMMON_LDADDS = libqemuutil.a
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = net/
+-common-obj-$(CONFIG_LINUX) += fsdev/
++common-obj-$(CONFIG_LINUX) = fsdev/
  
--qemu-img.o: qemu-img-cmds.h
--
--qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
--
- scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(authz-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
- ifdef CONFIG_MPATH
- scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
-diff --git a/configure b/configure
-index 7be08f3..964897c 100755
---- a/configure
-+++ b/configure
-@@ -6043,12 +6043,6 @@ if [ "$eventfd" = "yes" ]; then
- fi
+ common-obj-$(CONFIG_AUDIO_ALSA) += audio-alsa$(DSOSUF)
+ common-obj-$(CONFIG_AUDIO_OSS) += audio-oss$(DSOSUF)
+diff --git a/Makefile.target b/Makefile.target
+index cc0c038..e025246 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -167,6 +167,7 @@ LIBS := $(LIBS) $(GTK_LIBS) $(VTE_LIBS) $(X11_LIBS) $(CURSES_LIBS) $(ICONV_LIBS)
+ endif
+ LIBS := $(LIBS) $(BRLAPI_LIBS) $(SDL_LIBS) $(SPICE_LIBS) $(OPENGL_LIBS) $(SECCOMP_LIBS)
+ LIBS := $(LIBS) $(COREAUDIO_LIBS) $(DSOUND_LIBS)
++LIBS := $(LIBS) $(VDE_LIBS) $(SLIRP_LIBS)
  
- tools=""
--if test "$want_tools" = "yes" ; then
--  tools="qemu-img\$(EXESUF) qemu-io\$(EXESUF) $tools"
--  if [ "$linux" = "yes" -o "$bsd" = "yes" -o "$solaris" = "yes" ] ; then
--    tools="qemu-nbd\$(EXESUF) $tools"
--  fi
--fi
- if test "$softmmu" = yes ; then
-   if test "$linux" = yes; then
-     if test "$virtfs" != no && test "$cap_ng" = yes && test "$attr" = yes ; then
+ # Hardware support
+ ifeq ($(TARGET_NAME), sparc64)
 diff --git a/meson.build b/meson.build
-index a46b671..2b4b36d 100644
+index 2961c44..2333a87 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -280,7 +280,7 @@ if have_system
-   ]
+@@ -109,6 +109,15 @@ if 'CONFIG_LIBCAP_NG' in config_host
+   libcap_ng = declare_dependency(link_args: config_host['LIBCAP_NG_LIBS'].split())
  endif
- foreach d : hx_headers
--  custom_target(d[1],
-+  hxdep += custom_target(d[1],
-                 input: files(d[0]),
-                 output: d[1],
-                 capture: true,
-@@ -591,6 +591,12 @@ if 'CONFIG_GUEST_AGENT' in config_host
- endif
+ xkbcommon = dependency('xkbcommon', required: false)
++slirp = declare_dependency()
++if config_host.has_key('CONFIG_SLIRP')
++  slirp = declare_dependency(compile_args: config_host['SLIRP_CFLAGS'].split(),
++                             link_args: config_host['SLIRP_LIBS'].split())
++endif
++vde = declare_dependency()
++if config_host.has_key('CONFIG_VDE')
++  vde = declare_dependency(link_args: config_host['VDE_LIBS'].split())
++endif
+ pulse = declare_dependency()
+ if 'CONFIG_LIBPULSE' in config_host
+   pulse = declare_dependency(compile_args: config_host['PULSE_CFLAGS'].split(),
+@@ -601,6 +610,7 @@ common_ss.add(files('cpus-common.c'))
  
- if have_tools
-+  executable('qemu-img', [files('qemu-img.c'), hxdep], dependencies: [block, qemuutil], install: true)
-+  if host_machine.system() == 'linux' or host_machine.system() == 'sunos' or host_machine.system().endswith('bsd')
-+    executable('qemu-nbd', files('qemu-nbd.c'), dependencies: [block, qemuutil], install: true)
-+  endif
-+  executable('qemu-io', files('qemu-io.c'), dependencies: [block, qemuutil], install: true)
+ subdir('migration')
+ subdir('monitor')
++subdir('net')
+ subdir('replay')
+ 
+ mods = []
+diff --git a/net/Makefile.objs b/net/Makefile.objs
+deleted file mode 100644
+index c5d076d..0000000
+--- a/net/Makefile.objs
++++ /dev/null
+@@ -1,32 +0,0 @@
+-common-obj-y = net.o queue.o checksum.o util.o hub.o
+-common-obj-y += socket.o
+-common-obj-y += dump.o
+-common-obj-y += eth.o
+-common-obj-y += announce.o
+-common-obj-$(CONFIG_L2TPV3) += l2tpv3.o
+-common-obj-$(call land,$(CONFIG_VIRTIO_NET),$(CONFIG_VHOST_NET_USER)) += vhost-user.o
+-common-obj-$(call land,$(call lnot,$(CONFIG_VIRTIO_NET)),$(CONFIG_VHOST_NET_USER)) += vhost-user-stub.o
+-common-obj-$(CONFIG_ALL) += vhost-user-stub.o
+-common-obj-$(CONFIG_SLIRP) += slirp.o
+-slirp.o-cflags := $(SLIRP_CFLAGS)
+-slirp.o-libs := $(SLIRP_LIBS)
+-common-obj-$(CONFIG_VDE) += vde.o
+-common-obj-$(CONFIG_NETMAP) += netmap.o
+-common-obj-y += filter.o
+-common-obj-y += filter-buffer.o
+-common-obj-y += filter-mirror.o
+-common-obj-y += colo-compare.o
+-common-obj-y += colo.o
+-common-obj-y += filter-rewriter.o
+-common-obj-y += filter-replay.o
+-
+-tap-obj-$(CONFIG_LINUX) = tap-linux.o
+-tap-obj-$(CONFIG_BSD) = tap-bsd.o
+-tap-obj-$(CONFIG_SOLARIS) = tap-solaris.o
+-tap-obj-y ?= tap-stub.o
+-common-obj-$(CONFIG_POSIX) += tap.o $(tap-obj-y)
+-common-obj-$(CONFIG_WIN32) += tap-win32.o
+-
+-vde.o-libs = $(VDE_LIBS)
+-
+-common-obj-$(CONFIG_CAN_BUS) += can/
+diff --git a/net/can/Makefile.objs b/net/can/Makefile.objs
+deleted file mode 100644
+index 9f35dc5..0000000
+--- a/net/can/Makefile.objs
++++ /dev/null
+@@ -1,2 +0,0 @@
+-common-obj-y += can_core.o can_host.o
+-common-obj-$(CONFIG_LINUX) += can_socketcan.o
+diff --git a/net/can/meson.build b/net/can/meson.build
+new file mode 100644
+index 0000000..f53d9ec
+--- /dev/null
++++ b/net/can/meson.build
+@@ -0,0 +1,5 @@
++can_ss = ss.source_set()
++can_ss.add(files('can_core.c', 'can_host.c'))
++can_ss.add(when: 'CONFIG_LINUX', if_true: files('can_socketcan.c'))
 +
-   subdir('contrib/rdmacm-mux')
-   subdir('contrib/elf2dmp')
- 
++softmmu_ss.add_all(when: 'CONFIG_CAN_BUS', if_true: can_ss)
+diff --git a/net/meson.build b/net/meson.build
+new file mode 100644
+index 0000000..a67f5af
+--- /dev/null
++++ b/net/meson.build
+@@ -0,0 +1,39 @@
++softmmu_ss.add(files(
++  'announce.c',
++  'checksum.c',
++  'colo-compare.c',
++  'colo.c',
++  'dump.c',
++  'eth.c',
++  'filter-buffer.c',
++  'filter-mirror.c',
++  'filter-replay.c',
++  'filter-rewriter.c',
++  'filter.c',
++  'hub.c',
++  'net.c',
++  'queue.c',
++  'socket.c',
++  'util.c',
++))
++
++softmmu_ss.add(when: 'CONFIG_L2TPV3', if_true: files('l2tpv3.c'))
++softmmu_ss.add(when: ['CONFIG_SLIRP', slirp], if_true: files('slirp.c'))
++softmmu_ss.add(when: ['CONFIG_VDE', vde], if_true: files('vde.c'))
++softmmu_ss.add(when: 'CONFIG_NETMAP', if_true: files('netmap.c'))
++vhost_user_ss = ss.source_set()
++vhost_user_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('vhost-user.c'), if_false: files('vhost-user-stub.c'))
++softmmu_ss.add_all(when: 'CONFIG_VHOST_NET_USER', if_true: vhost_user_ss)
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('vhost-user-stub.c'))
++
++softmmu_ss.add(when: 'CONFIG_LINUX', if_true: files('tap-linux.c'))
++softmmu_ss.add(when: 'CONFIG_BSD', if_true: files('tap-bsd.c'))
++softmmu_ss.add(when: 'CONFIG_SOLARIS', if_true: files('tap-solaris.c'))
++tap_posix = ['tap.c']
++if not config_host.has_key('CONFIG_LINUX') and not config_host.has_key('CONFIG_BSD') and not config_host.has_key('CONFIG_SOLARIS')
++  tap_posix += 'tap-stub.c'
++endif
++softmmu_ss.add(when: 'CONFIG_POSIX', if_true: files(tap_posix))
++softmmu_ss.add(when: 'CONFIG_WIN32', if_true: files('tap-win32.c'))
++
++subdir('can')
 -- 
 1.8.3.1
 
