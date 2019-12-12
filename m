@@ -2,82 +2,82 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D654AC2D0C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92766C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:07:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACE38214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 675BC2253D
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="idO6K8oE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACE38214AF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LPYfclk8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 675BC2253D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifSrh-00056Q-3C
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 13:07:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57720)
+	id 1ifSs7-0005kG-0b
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 13:07:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37024)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifSHB-0005GP-Ov
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 12:29:22 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ifRX1-0007nL-KZ
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:41:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifSHA-0003zQ-L8
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 12:29:21 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34355)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifSHA-0003y5-EC
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 12:29:20 -0500
-Received: by mail-wr1-x444.google.com with SMTP id t2so3661225wrr.1
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 09:29:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=HsUH1afV9fTj6bRLKgdy/ZlBd4ecIN0MQZ09ZAA7vd4=;
- b=idO6K8oEq0v5KusymRCXOxJUpNKHvhxHyB8Wo/Dj/XNm7RxnV34dDqu/Ox8NiqpLbP
- 7ocyutPEiJzZDZXua2vGHh2sZKKZPD1z8qYYoddzWTTAFxYRwcdid+Og06CPC+9eBWWT
- jGElRk/Hz1mSfCFcsxjD7D+V1XILnewZM5XkZtYKE7JBBk1JW20Hub3SW18XOTKhj+BY
- Y4HZFciQNYJIKGC+nRR/Fc5O+JKrn1M+lxHZy9g01gvExImQ0oAJRO8dgYiHWZbUkGbG
- nJNSseqaUZVUTkGiVfao7BhAEH8jqAwi4jxpnq64q/QmSaKuGWWRPxAsg3BK7pAva2Dp
- NDqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=HsUH1afV9fTj6bRLKgdy/ZlBd4ecIN0MQZ09ZAA7vd4=;
- b=Sj0jOrG4Cnu/j/RPUwc+IQFOWgYnCayQyfZ+hNYlqpyHoEFi6O51EMgFjTG0hvMFMl
- dcrVB0D1jH7WODr0SRhLEu5VVCRf4KgROYKPF9IG6xGNKh3L6ptbBbPDi5uM4IQ/ba6J
- ILIXP1VjXWnaNFdETtNGyaR+8PctHDcJEeYa75jG0IGU7FjZW3d28E0AN3enyuCI9B6U
- jNo0GyNtRnODPYxli4hN2fLInbV3xOlI1WxgqPAOmlh9zZBwsG8U42SAJyjHqBWg1Bpk
- CAJbBoUtlxAOL4MgQ/zAxKRCLWxhN1QycNpLc5Q9q4xL7HAISzsIWnw7kiDPKAQy8NIc
- qCAg==
-X-Gm-Message-State: APjAAAWmDcz7frmkbTowJQLtITnAQ8hz5t4+wDhD7Lpy5oF0cjJMqLgk
- 6s5Q1geAIpQqNvDRYJWd7w7ygwXS
-X-Google-Smtp-Source: APXvYqz5rT5jTJZ6KnBGysaCC+7ysy1uq/6+3SW5zeg0y6e+Wy3yzwZaZ8C68T9CZRGb3oqfB42tdA==
-X-Received: by 2002:adf:f103:: with SMTP id r3mr7342824wro.295.1576171759139; 
- Thu, 12 Dec 2019 09:29:19 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id 2sm6810130wrq.31.2019.12.12.09.29.18
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 09:29:18 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/8] fw_cfg: allow building without other devices
-Date: Thu, 12 Dec 2019 18:29:08 +0100
-Message-Id: <1576171754-45138-3-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1576171754-45138-1-git-send-email-pbonzini@redhat.com>
-References: <1576171754-45138-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+ (envelope-from <dgilbert@redhat.com>) id 1ifRX0-0004pc-Ek
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:41:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58129
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRX0-0004oC-AM
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:41:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576168897;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cfSe41TLUp+GhrlKGSyL7HvQZ5ppxCVRsLJMopRQC34=;
+ b=LPYfclk88Bfk0nVf3ojsjPFRJ3M8fjEMA0eW1KsIGMRop4sZZ1uBj52yhqCQhwIKy35Qhp
+ M0jqBFZSp1LSrvsPNBnJSpZjmxxfA9aDp6k6hcmqijbNO+0CjFaMp9YhPiuQLUCsX7tIEh
+ vGFLa5dSzuabqvwt5RccW8hxsLI2XfM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-390-qMAXncyqNyeU3NCPdaJ7vA-1; Thu, 12 Dec 2019 11:41:36 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D22BC1572974
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:41:35 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-116-226.ams2.redhat.com
+ [10.36.116.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F33FB60BE1;
+ Thu, 12 Dec 2019 16:41:34 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org,
+	stefanha@redhat.com,
+	vgoyal@redhat.com
+Subject: [PATCH 095/104] virtiofsd: convert more fprintf and perror to use
+ fuse log infra
+Date: Thu, 12 Dec 2019 16:38:55 +0000
+Message-Id: <20191212163904.159893-96-dgilbert@redhat.com>
+In-Reply-To: <20191212163904.159893-1-dgilbert@redhat.com>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: qMAXncyqNyeU3NCPdaJ7vA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,78 +89,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, slp@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The microvm machine type uses fw_cfg but lacks SMBIOS and ACPI.  Do not
-include the files if the symbol is not present in QEMU and remove
-dependencies on machine-specific files.
+From: Eryu Guan <eguan@linux.alibaba.com>
 
-Reviewed-by: Sergio Lopez <slp@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Eryu Guan <eguan@linux.alibaba.com>
 ---
- hw/i386/fw_cfg.c | 7 +++++++
- hw/i386/pc.c     | 2 --
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ tools/virtiofsd/fuse_signals.c | 6 +++++-
+ tools/virtiofsd/helper.c       | 9 ++++++---
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-index 39b6bc6..326e33e 100644
---- a/hw/i386/fw_cfg.c
-+++ b/hw/i386/fw_cfg.c
-@@ -22,6 +22,9 @@
- #include "hw/nvram/fw_cfg.h"
- #include "e820_memory_layout.h"
- #include "kvm_i386.h"
-+#include "config-devices.h"
-+
-+struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
- 
- const char *fw_cfg_arch_key_name(uint16_t key)
- {
-@@ -46,6 +49,7 @@ const char *fw_cfg_arch_key_name(uint16_t key)
- 
- void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
- {
-+#ifdef CONFIG_SMBIOS
-     uint8_t *smbios_tables, *smbios_anchor;
-     size_t smbios_tables_len, smbios_anchor_len;
-     struct smbios_phys_mem_area *mem_array;
-@@ -83,6 +87,7 @@ void fw_cfg_build_smbios(MachineState *ms, FWCfgState *fw_cfg)
-         fw_cfg_add_file(fw_cfg, "etc/smbios/smbios-anchor",
-                         smbios_anchor, smbios_anchor_len);
+diff --git a/tools/virtiofsd/fuse_signals.c b/tools/virtiofsd/fuse_signals.=
+c
+index 10a6f88088..edabf24e0d 100644
+--- a/tools/virtiofsd/fuse_signals.c
++++ b/tools/virtiofsd/fuse_signals.c
+@@ -11,6 +11,7 @@
+ #include "fuse_i.h"
+ #include "fuse_lowlevel.h"
+=20
++#include <errno.h>
+ #include <signal.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -46,12 +47,15 @@ static int set_one_signal_handler(int sig, void (*handl=
+er)(int), int remove)
+     sa.sa_flags =3D 0;
+=20
+     if (sigaction(sig, NULL, &old_sa) =3D=3D -1) {
+-        perror("fuse: cannot get old signal handler");
++        fuse_log(FUSE_LOG_ERR, "fuse: cannot get old signal handler: %s\n"=
+,
++                 strerror(errno));
+         return -1;
      }
-+#endif
- }
- 
- FWCfgState *fw_cfg_arch_create(MachineState *ms,
-@@ -114,8 +119,10 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
-      */
-     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, apic_id_limit);
-     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)ram_size);
-+#ifdef CONFIG_ACPI
-     fw_cfg_add_bytes(fw_cfg, FW_CFG_ACPI_TABLES,
-                      acpi_tables, acpi_tables_len);
-+#endif
-     fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, kvm_allows_irq0_override());
- 
-     fw_cfg_add_bytes(fw_cfg, FW_CFG_E820_TABLE,
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index b9f3b38..3d2c5d8 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -101,8 +101,6 @@
- #define DPRINTF(fmt, ...)
- #endif
- 
--struct hpet_fw_config hpet_cfg = {.count = UINT8_MAX};
--
- GlobalProperty pc_compat_4_1[] = {};
- const size_t pc_compat_4_1_len = G_N_ELEMENTS(pc_compat_4_1);
- 
--- 
-1.8.3.1
-
+=20
+     if (old_sa.sa_handler =3D=3D (remove ? handler : SIG_DFL) &&
+         sigaction(sig, &sa, NULL) =3D=3D -1) {
++        fuse_log(FUSE_LOG_ERR, "fuse: cannot set signal handler: %s\n",
++                 strerror(errno));
+         perror("fuse: cannot set signal handler");
+         return -1;
+     }
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index 7b28507a38..bcb8c05063 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -200,7 +200,8 @@ int fuse_daemonize(int foreground)
+         char completed;
+=20
+         if (pipe(waiter)) {
+-            perror("fuse_daemonize: pipe");
++            fuse_log(FUSE_LOG_ERR, "fuse_daemonize: pipe: %s\n",
++                     strerror(errno));
+             return -1;
+         }
+=20
+@@ -210,7 +211,8 @@ int fuse_daemonize(int foreground)
+          */
+         switch (fork()) {
+         case -1:
+-            perror("fuse_daemonize: fork");
++            fuse_log(FUSE_LOG_ERR, "fuse_daemonize: fork: %s\n",
++                     strerror(errno));
+             return -1;
+         case 0:
+             break;
+@@ -220,7 +222,8 @@ int fuse_daemonize(int foreground)
+         }
+=20
+         if (setsid() =3D=3D -1) {
+-            perror("fuse_daemonize: setsid");
++            fuse_log(FUSE_LOG_ERR, "fuse_daemonize: setsid: %s\n",
++                     strerror(errno));
+             return -1;
+         }
+=20
+--=20
+2.23.0
 
 
