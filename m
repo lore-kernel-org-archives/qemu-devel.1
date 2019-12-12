@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5103C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:22:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4718CC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:22:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A32B20663
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:22:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 135BB206A5
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:22:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D1lVWJW1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A32B20663
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="btDYmDDO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 135BB206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOQE-0004vt-0u
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:22:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33596)
+	id 1ifOQe-0005ky-Op
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:22:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyL-0003U0-By
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:38 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyc-0003uP-7c
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyJ-0006hj-T5
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:37 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:34214)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNya-0007Gw-VT
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:54 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:35172)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNyJ-0006g3-L3
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:35 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id t2so2644748wrr.1
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:35 -0800 (PST)
+ id 1ifNya-0007FM-OB
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:52 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id p17so2392346wmb.0
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=jNzhakuXNcL2ED9Y1t+KNZMGJfF6taioPx2OOiXLQc8=;
- b=D1lVWJW1SGxPX70tQ0TQa87CK++QYLMw3WNPF2c3U8aM8NFOD/VZyoqE3Ymy2zkgig
- BQ6NgOoEsfJ+YDWSN6JA9K6oK9wZ5nwT4pn7+akFf4RKYL1ENtcJROPnCmoOOoM6NwDw
- /BE6VlvPCXrNz1X+c2BC3xAuBKZsGciqErAT1+f24IQKErzDipdwt4bw0uJxoKP9+7B9
- qacRzPrPY8OxNB2BWmCFCAL/RCayG8YV9ugSqRgvQJ5iF85hby29pIGmB52hxd0Pynr7
- 06b0n/t4lWRGCNFpH4E0NMp159Tl/Z/Mq4ybnuEl+UgefqnaMbMtV+58/soTKvKsSBh2
- Lt9Q==
+ bh=BhjIZSbzDXjcTJIBhziqsn15p3DsoLde/mMNVXxEiZ4=;
+ b=btDYmDDOk46C3BY24FAccxqqZxOt4YNYLUMQ661E17dEPA9you8jM5n7SlMTfZxczY
+ jXkSYOLrG+Bbjdq7v6t0H3sHvkcD5jfW7LaeQVD9rwjUjvdOSTOSXCEyhc0oAYX6G7tW
+ 7vUX9snuEKOBDKovYGZUMI/RPO8aBQS0KBhN636nL+Cd5ior5h6QWgVuiYfpc9Q3QnyI
+ lS5necW50Dq4urWX1ohSKjLerC1/lSMKxH6coP1P6CM3oVbT2UMMI/hmHfLrDVzkIwl8
+ yDJyGbp8jslY9/v7lyPpkUQkKT9mbPgaZPfHh8+p4LQerolYTxLiOaBPXJ7O2fULKoEC
+ kvUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=jNzhakuXNcL2ED9Y1t+KNZMGJfF6taioPx2OOiXLQc8=;
- b=BFIJZMV1qbSiUYMMGCGB2EEh2CK7Ax2upYs0JVaJisAUo4ukXWjMPRTb/MDFwB0wjC
- xtkmbV+bT4v1S1LabEAyO/o602O3xVUBTGu06JXcusujTXOUPCYJ5rPe6NSObfnku7L+
- If8i1fdG4P2FxA9p6i0RqUVd7sJH0lDFwx+mnCYz7pArDa+v/VzfuaeJGwlP3Qyv3Cz9
- 1AEAKIteIqJJGhU1lC4rZ3Fk2ubwfCmHszoynrXGn36ttqdSfyhVhHVggb4ISz20zZJt
- 2icoUKnUHtNamQlUyviNmg/9fFeHdgscgHbUFzNksrfxIOD6Gi3ZONit4R/+6zktuohu
- jT5Q==
-X-Gm-Message-State: APjAAAWiK16TZ5w8e+B9EUVbzvpCtaivod3C4Hi/2Hck5vXk2MBqq3/W
- Ctus5dNfrL9fU8Nuucg8nbGU+PUK
-X-Google-Smtp-Source: APXvYqxa/czJrp+Ssu02hNnEJToTz76wK1OlZo+YpGb4xQtFBQ6FQxCT0qcbid/+89vSxxgFeLXYLg==
-X-Received: by 2002:adf:ea0f:: with SMTP id q15mr6018155wrm.324.1576155214463; 
- Thu, 12 Dec 2019 04:53:34 -0800 (PST)
+ bh=BhjIZSbzDXjcTJIBhziqsn15p3DsoLde/mMNVXxEiZ4=;
+ b=IWt6g0e5cZF7rsz5uCwKcIRkbVkL28MB37F1oyddXZstF11VQVDnLdsAfXSYkOKF9j
+ eMDGO55XfiRAv98nCwbRVYSX62eftBxHFL3KX9deUbLQrNIiPt+scj132KwtY3OA6czQ
+ hAoUATAac9eeGu354WqQVwB3DmDAxxDDitcMxrL0vOo7b2odV4UQ6sBKcEjZQoNh49y1
+ BWDHWHZ8yH71hb59r5lvdArd6oxVfmleUwyQA1nQQv8uJXOft/q4nMZTH1vsnYZRfCmF
+ wOs6FFXQIWZ+kItFXGUa29kqX1xTzqRcB68yVF94vCzpW9R/8c9HQ+OTsFLqjr+u8Gml
+ G9EQ==
+X-Gm-Message-State: APjAAAW3L2M1gKEBGm9JN9Ik5OVyeWLgjzMCeSoFwymObNs0RR4TIUHP
+ 40CZBIkEAJ/v/USDGYEuvfpPDMhI
+X-Google-Smtp-Source: APXvYqwjjEv1BDRXhrYBEdftOfSVdQnj3K0ircHYWXYEObwbYYLazohzGuk4ljp5l2qNIweW5RiQew==
+X-Received: by 2002:a7b:c0d8:: with SMTP id s24mr6830421wmh.30.1576155231503; 
+ Thu, 12 Dec 2019 04:53:51 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.33
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.50
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:53:33 -0800 (PST)
+ Thu, 12 Dec 2019 04:53:50 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 037/132] meson: convert io directory to Meson
-Date: Thu, 12 Dec 2019 13:51:21 +0100
-Message-Id: <1576155176-2464-38-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 054/132] meson: convert monitor directory to Meson
+Date: Thu, 12 Dec 2019 13:51:38 +0100
+Message-Id: <1576155176-2464-55-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42b
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,126 +103,78 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile         |  1 -
- Makefile.objs    |  7 ++-----
- Makefile.target  |  2 +-
- io/Makefile.objs | 12 ------------
- io/meson.build   | 25 +++++++++++++++++++++++++
- meson.build      |  1 +
- 6 files changed, 29 insertions(+), 19 deletions(-)
- delete mode 100644 io/Makefile.objs
- create mode 100644 io/meson.build
+ Makefile.objs         | 3 +--
+ Makefile.target       | 1 -
+ meson.build           | 2 ++
+ monitor/Makefile.objs | 3 ---
+ monitor/meson.build   | 9 +++++++++
+ 5 files changed, 12 insertions(+), 6 deletions(-)
+ delete mode 100644 monitor/Makefile.objs
+ create mode 100644 monitor/meson.build
 
-diff --git a/Makefile b/Makefile
-index d070335..77ac1ea 100644
---- a/Makefile
-+++ b/Makefile
-@@ -200,7 +200,6 @@ dummy := $(call unnest-vars,, \
-                 chardev-obj-y \
-                 block-obj-y \
-                 block-obj-m \
--                io-obj-y \
-                 common-obj-y \
-                 common-obj-m)
- 
 diff --git a/Makefile.objs b/Makefile.objs
-index a5dd228..75d4355c 100644
+index 1b1eff5..98c16c5 100644
 --- a/Makefile.objs
 +++ b/Makefile.objs
-@@ -21,12 +21,9 @@ authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
+@@ -35,8 +35,7 @@ qom-obj-y = qom/libqom.fa
+ # single QEMU executable should support all CPUs and machines.
  
- crypto-obj-y = crypto/libcrypto.fa
+ ifeq ($(CONFIG_SOFTMMU),y)
+-common-obj-y = monitor/
+-common-obj-y += net/
++common-obj-y = net/
+ common-obj-$(CONFIG_LINUX) += fsdev/
+ common-obj-y += migration/
  
--qom-obj-y = qom/libqom.fa
--
--#######################################################################
--# io-obj-y is code used by both qemu system emulation and qemu-img
-+io-obj-y = io/libio.fa
- 
--io-obj-y = io/
-+qom-obj-y = qom/libqom.fa
- 
- ######################################################################
- # Target independent part of system emulation. The long term path is to
 diff --git a/Makefile.target b/Makefile.target
-index d8a6491..f912ba0 100644
+index 569f2d9..8628e25 100644
 --- a/Makefile.target
 +++ b/Makefile.target
-@@ -179,12 +179,12 @@ include $(SRC_PATH)/Makefile.objs
- dummy := $(call fix-paths,../,, \
-               authz-obj-y \
-               crypto-obj-y \
-+              io-obj-y \
-               qom-obj-y)
- dummy := $(call unnest-vars,.., \
-                block-obj-y \
-                block-obj-m \
-                chardev-obj-y \
--               io-obj-y \
-                common-obj-y \
-                common-obj-m)
- all-obj-y += $(common-obj-y)
-diff --git a/io/Makefile.objs b/io/Makefile.objs
-deleted file mode 100644
-index 9a20fce..0000000
---- a/io/Makefile.objs
-+++ /dev/null
-@@ -1,12 +0,0 @@
--io-obj-y = channel.o
--io-obj-y += channel-buffer.o
--io-obj-y += channel-command.o
--io-obj-y += channel-file.o
--io-obj-y += channel-socket.o
--io-obj-y += channel-tls.o
--io-obj-y += channel-watch.o
--io-obj-y += channel-websock.o
--io-obj-y += channel-util.o
--io-obj-y += dns-resolver.o
--io-obj-y += net-listener.o
--io-obj-y += task.o
-diff --git a/io/meson.build b/io/meson.build
-new file mode 100644
-index 0000000..5737709
---- /dev/null
-+++ b/io/meson.build
-@@ -0,0 +1,25 @@
-+io_ss = ss.source_set()
-+io_ss.add(genh)
-+io_ss.add(files(
-+  'channel-buffer.c',
-+  'channel-command.c',
-+  'channel-file.c',
-+  'channel-socket.c',
-+  'channel-tls.c',
-+  'channel-util.c',
-+  'channel-watch.c',
-+  'channel-websock.c',
-+  'channel.c',
-+  'dns-resolver.c',
-+  'net-listener.c',
-+  'task.c',
-+))
-+
-+io_ss = io_ss.apply(config_host, strict: false)
-+libio = static_library('io', io_ss.sources(),
-+                       dependencies: [crypto, qom, io_ss.dependencies()],
-+                       link_with: libqemuutil,
-+                       name_suffix: 'fa',
-+                       build_by_default: false)
-+
-+io = declare_dependency(link_whole: libio)
+@@ -154,7 +154,6 @@ ifdef CONFIG_SOFTMMU
+ obj-y += arch_init.o cpus.o gdbstub.o balloon.o ioport.o
+ obj-y += qtest.o
+ obj-y += hw/
+-obj-y += monitor/
+ obj-y += qapi/
+ obj-y += memory.o
+ obj-y += memory_mapping.o
 diff --git a/meson.build b/meson.build
-index e8bd526..bdc2f3e 100644
+index 804a9bc..2355a99 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -277,6 +277,7 @@ libqemuutil = static_library('qemuutil',
- qemuutil = declare_dependency(link_with: libqemuutil,
-                               sources: version_res)
+@@ -590,6 +590,8 @@ softmmu_ss.add(when: ['CONFIG_FDT', fdt],  if_true: [files('device_tree.c')])
  
-+subdir('io')
- subdir('fsdev')
+ common_ss.add(files('cpus-common.c'))
  
- # Other build targets
++subdir('monitor')
++
+ mods = []
+ block_mods = []
+ softmmu_mods = []
+diff --git a/monitor/Makefile.objs b/monitor/Makefile.objs
+deleted file mode 100644
+index e91a858..0000000
+--- a/monitor/Makefile.objs
++++ /dev/null
+@@ -1,3 +0,0 @@
+-obj-y += misc.o
+-common-obj-y += monitor.o qmp.o hmp.o
+-common-obj-y += qmp-cmds.o hmp-cmds.o
+diff --git a/monitor/meson.build b/monitor/meson.build
+new file mode 100644
+index 0000000..1eabfd5
+--- /dev/null
++++ b/monitor/meson.build
+@@ -0,0 +1,9 @@
++softmmu_ss.add(files(
++  'hmp-cmds.c',
++  'hmp.c',
++  'monitor.c',
++  'qmp-cmds.c',
++  'qmp.c',
++))
++
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files('misc.c'))
 -- 
 1.8.3.1
 
