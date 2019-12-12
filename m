@@ -2,95 +2,78 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B52C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:23:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CBB8C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:24:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C27D722527
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:23:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C27D722527
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4172F22527
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 18:24:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wtcl+Le6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4172F22527
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifT7d-0001CR-Q9
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 13:23:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34144)
+	id 1ifT8J-00022u-Vq
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 13:24:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45562)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ifStI-00085t-UB
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 13:08:45 -0500
+ (envelope-from <drjones@redhat.com>) id 1ifSLS-0002LH-8T
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 12:33:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ifStH-0006Oo-SI
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 13:08:44 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24856
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1ifStH-0006Nk-Mu; Thu, 12 Dec 2019 13:08:43 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBCHrJHk052000; Thu, 12 Dec 2019 13:08:29 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wusnb1thr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 12 Dec 2019 13:08:28 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBCHxZ3k103276;
- Thu, 12 Dec 2019 13:08:28 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
- [169.63.121.186])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wusnb1thg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 12 Dec 2019 13:08:28 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
- by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBCI5qXk032027;
- Thu, 12 Dec 2019 18:08:27 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma03wdc.us.ibm.com with ESMTP id 2wr3q702j3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 12 Dec 2019 18:08:27 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
- [9.57.199.108])
- by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBCI8RmV34275664
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 12 Dec 2019 18:08:27 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 03E22B2066;
- Thu, 12 Dec 2019 18:08:27 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E1282B2065;
- Thu, 12 Dec 2019 18:08:26 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu, 12 Dec 2019 18:08:26 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-To: qemu-ppc@nongnu.org
-Subject: [PATCH v4 5/8] tpm: Return bool from tpm_backend_finish_sync
-Date: Thu, 12 Dec 2019 13:07:41 -0500
-Message-Id: <20191212180744.1070446-6-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191212180744.1070446-1-stefanb@linux.vnet.ibm.com>
-References: <20191212180744.1070446-1-stefanb@linux.vnet.ibm.com>
+ (envelope-from <drjones@redhat.com>) id 1ifSLO-0002wH-Se
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 12:33:45 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20302
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ifSLO-0002rv-Ly
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 12:33:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576172020;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=r69RStoSm0rMO8wwtIxPtrqT52+0T861lC3busDYwak=;
+ b=Wtcl+Le6v0hhSRxyATrCtT8df+xLyJB0vS+Bnkx+nkxUKxSLjofZbTKR86yl3VMEX9Avb7
+ A0/7IYgTVr+aBNESmy6y0qk7vWmC2hUixEpbkuQ09TRocAPgBsB7qf3/ZBwwknaGR4Z2uH
+ f7RtG+4MMslpRUfRi/O89xEw+nPnp/s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-352-ByIa6DMzPIaUClIcA_SxXw-1; Thu, 12 Dec 2019 12:33:37 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 954F218543A1;
+ Thu, 12 Dec 2019 17:33:35 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.43.2.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C6A2419C4F;
+ Thu, 12 Dec 2019 17:33:33 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org
+Subject: [RFC PATCH v2 2/5] target/arm/kvm64: kvm64 cpus have timer registers
+Date: Thu, 12 Dec 2019 18:33:17 +0100
+Message-Id: <20191212173320.11610-3-drjones@redhat.com>
+In-Reply-To: <20191212173320.11610-1-drjones@redhat.com>
+References: <20191212173320.11610-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-12_05:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 bulkscore=0
- suspectscore=1 impostorscore=0 phishscore=0 mlxscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912120140
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: ByIa6DMzPIaUClIcA_SxXw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,55 +85,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: peter.maydell@linaro.org, bijan.mottahedeh@oracle.com, maz@kernel.org,
+ richard.henderson@linaro.org, guoheyi@huawei.com, msys.mizuma@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Return true in case we had to wait for an outstanding response
-to come back, false otherwise.
+Add the missing GENERIC_TIMER feature to kvm64 cpus.
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+We don't currently use these registers when KVM is enabled, but it's
+probably best we add the feature flag for consistency and potential
+future use. There's also precedent, as we add the PMU feature flag to
+KVM enabled guests, even though we don't use those registers either.
 
-diff --git a/backends/tpm.c b/backends/tpm.c
-index 424c9fd485..ae4d8c526b 100644
---- a/backends/tpm.c
-+++ b/backends/tpm.c
-@@ -49,11 +49,15 @@ static int tpm_backend_worker_thread(gpointer data)
-     return 0;
- }
- 
--void tpm_backend_finish_sync(TPMBackend *s)
-+bool tpm_backend_finish_sync(TPMBackend *s)
- {
-+    bool ret = s->cmd != NULL;
-+
-     while (s->cmd) {
-         aio_poll(qemu_get_aio_context(), true);
-     }
-+
-+    return ret;
- }
- 
- enum TpmType tpm_backend_get_type(TPMBackend *s)
-diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
-index f5d8051b45..3ab9f51ba4 100644
---- a/include/sysemu/tpm_backend.h
-+++ b/include/sysemu/tpm_backend.h
-@@ -202,8 +202,10 @@ size_t tpm_backend_get_buffer_size(TPMBackend *s);
-  *
-  * Finish the pending command synchronously (this will call aio_poll()
-  * on qemu main AIOContext until it ends)
-+ *
-+ * Returns true in case there was a pending command, false otherwise.
-  */
--void tpm_backend_finish_sync(TPMBackend *s);
-+bool tpm_backend_finish_sync(TPMBackend *s);
- 
- /**
-  * tpm_backend_query_tpm:
--- 
+This change was originally posted as a hunk of a different, never
+merged patch from Bijan Mottahedeh.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/kvm64.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 876184b8fe4d..5cafcb7d36dd 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -605,6 +605,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *=
+ahcf)
+     set_feature(&features, ARM_FEATURE_NEON);
+     set_feature(&features, ARM_FEATURE_AARCH64);
+     set_feature(&features, ARM_FEATURE_PMU);
++    set_feature(&features, ARM_FEATURE_GENERIC_TIMER);
+=20
+     ahcf->features =3D features;
+=20
+--=20
 2.21.0
 
 
