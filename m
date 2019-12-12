@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C4AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0EBC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:36:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C5DA214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:35:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61443214AF
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:36:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgYiAkSW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C5DA214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7BHyjNI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61443214AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOcw-0005h2-7w
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:35:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36998)
+	id 1ifOdL-0006TQ-UB
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:35:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyd-0003wG-G7
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:56 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyp-0004DP-0P
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyc-0007JK-8b
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:55 -0500
-Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:41631)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyn-0007ex-Nn
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:06 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:36365)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNyc-0007Hs-26
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:54 -0500
-Received: by mail-wr1-x430.google.com with SMTP id c9so2603640wrw.8
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:54 -0800 (PST)
+ id 1ifNyn-0007dg-Fc
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:05 -0500
+Received: by mail-wm1-x335.google.com with SMTP id p17so2391054wma.1
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:54:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=1UQ2kTNLPaicL/8LAE1GmhnSZYlZaS/Vm313Ic4mUkw=;
- b=XgYiAkSWQlt2SoFD0M62ObTvO2zVpIA8T7okLa0LVugQU/YkMN+0doPnRz+9+ZifRN
- CL8m5OAtADHNgTz8YhJ8iwPSKZjYKhL/kFU1Vd3X+niH/IuqAcnqCn9IrkdqeaeUVvO3
- 6lx+E5skrFyeRz2bmIKySVziYesO8BfCPC5zoW4eWwAtxf/BVcvCeP+7SBYEaN5hfs5u
- X4cxPuGdmy1KcZR1tRUw0YE2Rq2NP0ZZVubAjl2BbEcFBotnPvbaQ+7mkNNWmdXhVdQ6
- 0SaTYwN1ZRaNqa7bEdg7hBZW9uW3ZEGV4QV6sk9nfGuOjXOBBB1pfU25gPX6lHppaOv9
- DdtA==
+ bh=5sLKEsC2AjqCYXP02DMsL82Clyu5WweyfT29QYZ6O8w=;
+ b=W7BHyjNICO3HQoVmcTNvWa+W1/N0jTgubmwDbqtBDfwikx6x2U8pkX+swYe+PIJHHF
+ WJaGcgkIUjp4G/c3Qon05VN/QIn7fIvwDDLcQ8Sc9gKAjlLANd2rNuxBhuenR3rcPlxQ
+ rUEbVyKfnDLss2D98Pz2fn6iMd2ipfGCIXDRw8VZlckvHNMHq9FlbFSc2T60iab+Db3e
+ 9SuiVH1kfK7Uojwko+cZ6huU6WjW1Ttir/i7eiNnY2DZ8JyOCtGx7JIc/UDPuwFv0nYA
+ BqrT/E7syOPM2hP/N1gmZJh8qdzkAX06aPYpOu4EQe+HbksfXAnNtWcbsMxbwj29TQ3m
+ 7BXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=1UQ2kTNLPaicL/8LAE1GmhnSZYlZaS/Vm313Ic4mUkw=;
- b=g7RGOjEJMy+Ovne5/TD3DzSrscP7ehNAHFgMBzaLr0lRkg1+XBdURXiivs9AWnoHvA
- zQt456GFlrpUKVF6Mv5M6r6o3Vx28JcND0NaxaQPHfOW72BUJl0kwmz20K5JHG2+HWZL
- B2EkePYS0OP0Pqif5Mk+qgLN9yJoQ784WRQ3Y3Y9pZhMcDuallWF35lMBg0jXiaQ38ip
- kAhjptSW1+7nhNdvORd+u/QAEWo+YXCLY6rK/GdFVTRmFaecNCWOw7FE9x/8ELgghRWy
- G7BhcafEBJZsrAZo13mQ2VVV4Pnqx/VK1vlaCLLz3Gr9YWKS4KRnVEC9RD6zl23hu8JM
- pnFQ==
-X-Gm-Message-State: APjAAAXvw/TGJHV86+mQFK9StyAyL7BfiYG0TgUlYAS73dX07UpIbCXL
- xVqv0XqhsNtue4xcn5tP90O01fhy
-X-Google-Smtp-Source: APXvYqy2E9AxbVe9yQ698mq0hZ50w6kgQg4zunOK5GKhuGq9I4AZTKvPbmWJhd+EZoQ5JNBKobkG2w==
-X-Received: by 2002:a5d:494b:: with SMTP id r11mr6272794wrs.184.1576155232693; 
- Thu, 12 Dec 2019 04:53:52 -0800 (PST)
+ bh=5sLKEsC2AjqCYXP02DMsL82Clyu5WweyfT29QYZ6O8w=;
+ b=jSSYN6t4wvqs3YIllGrF08r+1U87BCLOU/B03t4LWPhhAg7gxrlzhS6T+Rm9hrEkyE
+ tVbmpTUJi3VrKjwfgLFg7JhCBCCVIMmrHv9+Qz9oKy72dZGtSfblkZBG6oT357s5kxmD
+ pZPNZwPWrceW2jW9NQSfcrobZ1BvNGqCN/VKzbr6AcrqwTY2L19/kPvvyQifBDNhuUwb
+ 8XV7Lyihg40IXBZ627p/umMXBOuBStOXcuPtu6qyeUHE9Y2yOqBbS7d2lTdh0WXmde2H
+ +TsQy0//w1VZkZlHJxWUIwoZQwrw1VB/XEjaGHeJ+yzp7eS0lORBuR0CgIQfH4QkYIG8
+ /MBA==
+X-Gm-Message-State: APjAAAWbBx/oO76TKYEWaGAhxluYXzomMEamRRPEViLXrgFnt4UAI9Ts
+ TZKgLUaPKPrCUL3Clj5RRqYMZU3G
+X-Google-Smtp-Source: APXvYqze+HnRgSQH2c7rAST6/EYRYw8RKVylv+k7ggbvh806W6kkxNaO4n0i6AEtlRgZA7tjIPU8Qg==
+X-Received: by 2002:a7b:c0d8:: with SMTP id s24mr6831350wmh.30.1576155244308; 
+ Thu, 12 Dec 2019 04:54:04 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.53.51
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.54.03
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:53:51 -0800 (PST)
+ Thu, 12 Dec 2019 04:54:03 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 055/132] meson: convert replay directory to Meson
-Date: Thu, 12 Dec 2019 13:51:39 +0100
-Message-Id: <1576155176-2464-56-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 066/132] meson: convert hw/smbios
+Date: Thu, 12 Dec 2019 13:51:50 +0100
+Message-Id: <1576155176-2464-67-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::430
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,72 +101,70 @@ Sender: "Qemu-devel"
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs        |  1 -
- meson.build          |  1 +
- replay/Makefile.objs |  9 ---------
- replay/meson.build   | 11 +++++++++++
- 4 files changed, 12 insertions(+), 10 deletions(-)
- delete mode 100644 replay/Makefile.objs
- create mode 100644 replay/meson.build
+ hw/Makefile.objs        |  1 -
+ hw/meson.build          |  1 +
+ hw/smbios/Makefile.objs | 10 ----------
+ hw/smbios/meson.build   | 13 +++++++++++++
+ 4 files changed, 14 insertions(+), 11 deletions(-)
+ delete mode 100644 hw/smbios/Makefile.objs
+ create mode 100644 hw/smbios/meson.build
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 98c16c5..542d8e8 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -60,7 +60,6 @@ common-obj-$(if $(CONFIG_LZFSE),m) += block-dmg-lzfse$(DSOSUF)
- common-obj-$(if $(and $(CONFIG_BZIP2),$(CONFIG_DMG)),m) += block-dmg-bz2$(DSOSUF)
- 
- common-obj-y += hw/
--common-obj-y += replay/
- common-obj-y += backends/
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 1e23cb9..f5c2ab4 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -35,7 +35,6 @@ devices-dirs-$(CONFIG_VFIO) += vfio/
+ devices-dirs-y += virtio/
+ devices-dirs-y += watchdog/
+ devices-dirs-$(CONFIG_MEM_DEVICE) += mem/
+-devices-dirs-y += smbios/
  endif
  
-diff --git a/meson.build b/meson.build
-index 2355a99..29c68cd 100644
---- a/meson.build
-+++ b/meson.build
-@@ -591,6 +591,7 @@ softmmu_ss.add(when: ['CONFIG_FDT', fdt],  if_true: [files('device_tree.c')])
- common_ss.add(files('cpus-common.c'))
- 
- subdir('monitor')
-+subdir('replay')
- 
- mods = []
- block_mods = []
-diff --git a/replay/Makefile.objs b/replay/Makefile.objs
+ common-obj-y += $(devices-dirs-y)
+diff --git a/hw/meson.build b/hw/meson.build
+index 66a2f6c..80da62d 100644
+--- a/hw/meson.build
++++ b/hw/meson.build
+@@ -1,3 +1,4 @@
+ subdir('core')
+ subdir('semihosting')
++subdir('smbios')
+ subdir('xen')
+diff --git a/hw/smbios/Makefile.objs b/hw/smbios/Makefile.objs
 deleted file mode 100644
-index cee6539..0000000
---- a/replay/Makefile.objs
+index 23bb2ba..0000000
+--- a/hw/smbios/Makefile.objs
 +++ /dev/null
-@@ -1,9 +0,0 @@
--common-obj-y += replay.o
--common-obj-y += replay-internal.o
--common-obj-y += replay-events.o
--common-obj-y += replay-time.o
--common-obj-y += replay-input.o
--common-obj-y += replay-char.o
--common-obj-y += replay-snapshot.o
--common-obj-y += replay-net.o
--common-obj-y += replay-audio.o
-\ No newline at end of file
-diff --git a/replay/meson.build b/replay/meson.build
+@@ -1,10 +0,0 @@
+-ifeq ($(CONFIG_SMBIOS),y)
+-common-obj-y += smbios.o
+-common-obj-$(CONFIG_IPMI) += smbios_type_38.o
+-common-obj-$(call lnot,$(CONFIG_IPMI)) += smbios_type_38-stub.o
+-else
+-common-obj-y += smbios-stub.o
+-endif
+-
+-common-obj-$(CONFIG_ALL) += smbios-stub.o
+-common-obj-$(CONFIG_ALL) += smbios_type_38-stub.o
+diff --git a/hw/smbios/meson.build b/hw/smbios/meson.build
 new file mode 100644
-index 0000000..b532189
+index 0000000..9e762c7
 --- /dev/null
-+++ b/replay/meson.build
-@@ -0,0 +1,11 @@
-+softmmu_ss.add(files(
-+  'replay.c',
-+  'replay-internal.c',
-+  'replay-events.c',
-+  'replay-time.c',
-+  'replay-input.c',
-+  'replay-char.c',
-+  'replay-snapshot.c',
-+  'replay-net.c',
-+  'replay-audio.c',
++++ b/hw/smbios/meson.build
+@@ -0,0 +1,13 @@
++smbios_ss = ss.source_set()
++smbios_ss.add(files('smbios.c'))
++smbios_ss.add(when: 'CONFIG_IPMI',
++              if_true: files('smbios_type_38.c'),
++              if_false: files('smbios_type_38-stub.c'))
++
++softmmu_ss.add_all(when: 'CONFIG_SMBIOS', if_true: smbios_ss)
++softmmu_ss.add(when: 'CONFIG_SMBIOS', if_false: files('smbios-stub.c'))
++
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files(
++  'smbios-stub.c',
++  'smbios_type_38-stub.c',
 +))
 -- 
 1.8.3.1
