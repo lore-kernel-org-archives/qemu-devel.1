@@ -2,75 +2,76 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B273CC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0EB8C00454
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:06:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 808B9214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCAF721655
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:06:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M14yr7JG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 808B9214AF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P//gKzGF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCAF721655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifRty-0008VK-Am
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 12:05:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45598)
+	id 1ifRv6-0001sV-P9
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 12:06:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48198)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ifRVE-0005Jl-6Y
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:51 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ifRVU-0005d7-4T
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ifRVC-0001Tn-RM
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36758
+ (envelope-from <dgilbert@redhat.com>) id 1ifRVS-0001u7-RB
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:03 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22351
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRVC-0001Sz-Mq
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:46 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRVS-0001tE-N3
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576168786;
+ s=mimecast20190719; t=1576168802;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mo97Bji0Z5eOsYgXy/X0hGU7EsBvErIS+Lr8joNglx8=;
- b=M14yr7JGO3KKpBpU4NvYT3lh8a8nmoG5P8twMJH5RXxpkml3UC6usE/zvBx+TwXYWFnFql
- 41ANKgEcdpi93Fl0JeHf6Gode9oiyTN5rC40rZ/ebs5ECq1s4UdDUMtSlgXH+8gG/X6THn
- p10HzV4NVp3n0ZY8hYIk75Hy1qgthT4=
+ bh=LUc9A04WxAwderv2hi4N2/3RQtBzmJtTPcK/JP0dPA0=;
+ b=P//gKzGFVUASE/z26wb5W8bn4dzr9sRZsZKZe4gwfI10ZNHMqEA7dlWG0hPEPd466B+Scl
+ kD7DJlsTTPIknPkG/KTaoO7241Z+HlcurL8aIbfqjVE4XKDWjIZ+z+OnszDVy2Wa+HFDfX
+ Ja3dEd/HbIlgviNmipdeg82hKRGOTlM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-kjfGa86oNeC9geUGqWixhA-1; Thu, 12 Dec 2019 11:39:44 -0500
+ us-mta-373-s87SvoJIPIWj6dMU2eoutw-1; Thu, 12 Dec 2019 11:40:01 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DFEB8189CD02
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:39:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 21A1B64A7F
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:40:00 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-226.ams2.redhat.com
  [10.36.116.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BB49F60BE1;
- Thu, 12 Dec 2019 16:39:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 477DA60BE1;
+ Thu, 12 Dec 2019 16:39:59 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com,
 	vgoyal@redhat.com
-Subject: [PATCH 021/104] virtiofsd: Poll kick_fd for queue
-Date: Thu, 12 Dec 2019 16:37:41 +0000
-Message-Id: <20191212163904.159893-22-dgilbert@redhat.com>
+Subject: [PATCH 033/104] virtiofsd: passthrough_ll: add lo_map for ino/fh
+ indirection
+Date: Thu, 12 Dec 2019 16:37:53 +0000
+Message-Id: <20191212163904.159893-34-dgilbert@redhat.com>
 In-Reply-To: <20191212163904.159893-1-dgilbert@redhat.com>
 References: <20191212163904.159893-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: kjfGa86oNeC9geUGqWixhA-1
+X-MC-Unique: s87SvoJIPIWj6dMU2eoutw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -92,85 +93,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-In the queue thread poll the kick_fd we're passed.
+A layer of indirection is needed because passthrough_ll cannot expose
+pointers or file descriptor numbers to untrusted clients.  Malicious
+clients could send invalid pointers or file descriptors in order to
+crash or exploit the file system daemon.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+lo_map provides an integer key->value mapping.  This will be used for
+ino and fh fields in the patches that follow.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tools/virtiofsd/fuse_virtio.c | 40 ++++++++++++++++++++++++++++++++++-
- 1 file changed, 39 insertions(+), 1 deletion(-)
+ tools/virtiofsd/passthrough_ll.c | 124 +++++++++++++++++++++++++++++++
+ 1 file changed, 124 insertions(+)
 
-diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
-index 94f9db76df..7118def1eb 100644
---- a/tools/virtiofsd/fuse_virtio.c
-+++ b/tools/virtiofsd/fuse_virtio.c
-@@ -24,6 +24,7 @@
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <sys/eventfd.h>
- #include <sys/socket.h>
- #include <sys/types.h>
- #include <sys/un.h>
-@@ -100,13 +101,50 @@ static void fv_panic(VuDev *dev, const char *err)
-     exit(EXIT_FAILURE);
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
+_ll.c
+index 0188cd9ad6..0a94c3e1f2 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -74,6 +74,21 @@ struct _uintptr_to_must_hold_fuse_ino_t_dummy_struct {
+ };
+ #endif
+=20
++struct lo_map_elem {
++    union {
++        /* Element values will go here... */
++        ssize_t freelist;
++    };
++    bool in_use;
++};
++
++/* Maps FUSE fh or ino values to internal objects */
++struct lo_map {
++    struct lo_map_elem *elems;
++    size_t nelems;
++    ssize_t freelist;
++};
++
+ struct lo_inode {
+     struct lo_inode *next; /* protected by lo->mutex */
+     struct lo_inode *prev; /* protected by lo->mutex */
+@@ -130,6 +145,115 @@ static struct lo_data *lo_data(fuse_req_t req)
+     return (struct lo_data *)fuse_req_userdata(req);
  }
 =20
-+/* Thread function for individual queues, created when a queue is 'started=
-' */
- static void *fv_queue_thread(void *opaque)
++__attribute__((unused)) static void lo_map_init(struct lo_map *map)
++{
++    map->elems =3D NULL;
++    map->nelems =3D 0;
++    map->freelist =3D -1;
++}
++
++__attribute__((unused)) static void lo_map_destroy(struct lo_map *map)
++{
++    free(map->elems);
++}
++
++static int lo_map_grow(struct lo_map *map, size_t new_nelems)
++{
++    struct lo_map_elem *new_elems;
++    size_t i;
++
++    if (new_nelems <=3D map->nelems) {
++        return 1;
++    }
++
++    new_elems =3D realloc(map->elems, sizeof(map->elems[0]) * new_nelems);
++    if (!new_elems) {
++        return 0;
++    }
++
++    for (i =3D map->nelems; i < new_nelems; i++) {
++        new_elems[i].freelist =3D i + 1;
++        new_elems[i].in_use =3D false;
++    }
++    new_elems[new_nelems - 1].freelist =3D -1;
++
++    map->elems =3D new_elems;
++    map->freelist =3D map->nelems;
++    map->nelems =3D new_nelems;
++    return 1;
++}
++
++__attribute__((unused)) static struct lo_map_elem *
++lo_map_alloc_elem(struct lo_map *map)
++{
++    struct lo_map_elem *elem;
++
++    if (map->freelist =3D=3D -1 && !lo_map_grow(map, map->nelems + 256)) {
++        return NULL;
++    }
++
++    elem =3D &map->elems[map->freelist];
++    map->freelist =3D elem->freelist;
++
++    elem->in_use =3D true;
++
++    return elem;
++}
++
++__attribute__((unused)) static struct lo_map_elem *
++lo_map_reserve(struct lo_map *map, size_t key)
++{
++    ssize_t *prev;
++
++    if (!lo_map_grow(map, key + 1)) {
++        return NULL;
++    }
++
++    for (prev =3D &map->freelist; *prev !=3D -1;
++         prev =3D &map->elems[*prev].freelist) {
++        if (*prev =3D=3D key) {
++            struct lo_map_elem *elem =3D &map->elems[key];
++
++            *prev =3D elem->freelist;
++            elem->in_use =3D true;
++            return elem;
++        }
++    }
++    return NULL;
++}
++
++__attribute__((unused)) static struct lo_map_elem *
++lo_map_get(struct lo_map *map, size_t key)
++{
++    if (key >=3D map->nelems) {
++        return NULL;
++    }
++    if (!map->elems[key].in_use) {
++        return NULL;
++    }
++    return &map->elems[key];
++}
++
++__attribute__((unused)) static void lo_map_remove(struct lo_map *map,
++                                                  size_t key)
++{
++    struct lo_map_elem *elem;
++
++    if (key >=3D map->nelems) {
++        return;
++    }
++
++    elem =3D &map->elems[key];
++    if (!elem->in_use) {
++        return;
++    }
++
++    elem->in_use =3D false;
++
++    elem->freelist =3D map->freelist;
++    map->freelist =3D key;
++}
++
+ static struct lo_inode *lo_inode(fuse_req_t req, fuse_ino_t ino)
  {
-     struct fv_QueueInfo *qi =3D opaque;
-     fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __func_=
-_,
-              qi->qidx, qi->kick_fd);
-     while (1) {
--        /* TODO */
-+        struct pollfd pf[1];
-+        pf[0].fd =3D qi->kick_fd;
-+        pf[0].events =3D POLLIN;
-+        pf[0].revents =3D 0;
-+
-+        fuse_log(FUSE_LOG_DEBUG, "%s: Waiting for Queue %d event\n", __fun=
-c__,
-+                 qi->qidx);
-+        int poll_res =3D ppoll(pf, 1, NULL, NULL);
-+
-+        if (poll_res =3D=3D -1) {
-+            if (errno =3D=3D EINTR) {
-+                fuse_log(FUSE_LOG_INFO, "%s: ppoll interrupted, going arou=
-nd\n",
-+                         __func__);
-+                continue;
-+            }
-+            fuse_log(FUSE_LOG_ERR, "fv_queue_thread ppoll: %m\n");
-+            break;
-+        }
-+        assert(poll_res =3D=3D 1);
-+        if (pf[0].revents & (POLLERR | POLLHUP | POLLNVAL)) {
-+            fuse_log(FUSE_LOG_ERR, "%s: Unexpected poll revents %x Queue %=
-d\n",
-+                     __func__, pf[0].revents, qi->qidx);
-+            break;
-+        }
-+        assert(pf[0].revents & POLLIN);
-+        fuse_log(FUSE_LOG_DEBUG, "%s: Got queue event on Queue %d\n", __fu=
-nc__,
-+                 qi->qidx);
-+
-+        eventfd_t evalue;
-+        if (eventfd_read(qi->kick_fd, &evalue)) {
-+            fuse_log(FUSE_LOG_ERR, "Eventfd_read for queue: %m\n");
-+            break;
-+        }
-+        if (qi->virtio_dev->se->debug) {
-+            fprintf(stderr, "%s: Queue %d gave evalue: %zx\n", __func__,
-+                    qi->qidx, (size_t)evalue);
-+        }
-     }
-=20
-     return NULL;
+     if (ino =3D=3D FUSE_ROOT_ID) {
 --=20
 2.23.0
 
