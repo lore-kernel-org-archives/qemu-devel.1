@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5085EC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1261C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16E912173E
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:49:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E52A2077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:49:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SNE2+tez"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16E912173E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gdeyUl7Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E52A2077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOpz-0003lu-3s
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:49:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40462)
+	id 1ifOqn-0004oY-Bt
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:49:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41504)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyw-0004Pv-TK
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:15 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNz3-0004a6-GB
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyv-0007tg-J0
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:14 -0500
-Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:34228)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNz2-00084X-9D
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:21 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:37687)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNyv-0007s3-9e
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:13 -0500
-Received: by mail-wr1-x435.google.com with SMTP id t2so2646587wrr.1
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:54:13 -0800 (PST)
+ id 1ifNz2-00083V-2F
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:20 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id w15so2627654wru.4
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:54:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=tSMwvOVlmljJ/d7pUHQjqPiE5EBDb5gSPZ7yrnNNJfk=;
- b=SNE2+tezie7kPxeQwQ1zKJ31REZIRUiH5F49tNoYAyrmeVoDq3nbxUaaz06z0nFi+z
- qr81l8U288WjjM9wnhoYADBu+9zY4WMMPtgIiGEerfoqzfWfej6Nj8TXnVhEEj+esGDc
- Hv4giCv5EKwFr7QsinMQv2/4A1tFmAo17DVXcimmnsPIzJgMOKZaHoyzO0vW4uvNREmv
- 3++QaqBtH5aWHUH2FVCy9ovDsP5xdo2ryQjxJSyZR7cQjzWHwEEXcgHQ4B9rDDmIKOtY
- I1gKqkXxNRbznj3E2/UUnlk5b43jURzrlA+N+IzwqSGNGsw5yyuZds4TsqG7O3Y0PC0Q
- Pj5g==
+ bh=f04wqxzvz6vmNitqs9qCctC0F90gACS660EYcjH2fbc=;
+ b=gdeyUl7YImDpzWo98PSMUMyXIpGxpXGjRLEwx2k9VAYwQ+g0TRoAMjYUVWi9w+K9kU
+ hcxKEdDJEY38r4QliP+bIah0YWI/Rt/Xt5pf6i8v7oVF91gnCIoRZwF3SRMNyb76HKK0
+ hu2y+vhg85F9JqEDyjPoarNIzFRQ7XH4rmRCTCTMIVzIAu/E2bQIuo9j0Glq98xzLzLA
+ ZKuHRqUcj8LaLq5jtDcxp7SS2XJP+J1/LavfsBpOpbxd0FhgK5KMQZyfHWGZE6kEZNoz
+ QlfDcjZrrZy/uDRkRe/knL/4/4WRWwEnD9/B+UjxwT/sBFQrn+K8dxb+5S+jY5nQaNqc
+ iB3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=tSMwvOVlmljJ/d7pUHQjqPiE5EBDb5gSPZ7yrnNNJfk=;
- b=c8tyXWOutf2Uq0zt9fROB+T93LqDsUIM4TvonkKcXoQI1MxXLoH/ZZN6b8ZJv+AOie
- Bbit/aRm91+XPpWq52mXiIHyb2diF5k4xlLFgZzc4b1t1tsAnPLnNYaJGAlRw3SY1uP5
- +bBboMYFl0QFZ+nVNZhHqb3dBEzqV3mUHj7/6f4V1SF+6bSbCNeg3Lflep8rEPVqV/Eg
- tpCPGN1ajCEb8wkXF83x/b9MIUiQK7N5SyHZJk8uBf0OAUJtP/TOD54HFVEDjxnse7Zs
- ZqWZ7bH/GB+GzrL46XRFf9J45J1MRR8SVIb7OWTy6VJxyUAG3/uFXgvQ/a7J299U6khV
- dQ2Q==
-X-Gm-Message-State: APjAAAUjJH9Bcw/IquIYFvHXDBvuO+Y51Fniz08dJ7NWmYPDCUiJSKc8
- wZOeWM5orEA38pFfTyUOtaTnhBSI
-X-Google-Smtp-Source: APXvYqy5pey0D27+QQgofM/UsmmeEhimhJqgLZRBha717I8MkKwGaPoseAHiJ+a3u8OuhuivZjIMrQ==
-X-Received: by 2002:adf:ffc7:: with SMTP id x7mr6133054wrs.159.1576155252105; 
- Thu, 12 Dec 2019 04:54:12 -0800 (PST)
+ bh=f04wqxzvz6vmNitqs9qCctC0F90gACS660EYcjH2fbc=;
+ b=nkRQqOants11kkv6NMc8yi3kcGBN0fOjBC56r4lT8ix4ukoh5wkEiYI5wbAtwI7vEe
+ 0bZkWx6P2/IOmznlg3QsX/Piqslcy+DfpLrEtaoO/HiCFuN5QpB0+BwGlJ73+2ETWAm3
+ DtWTm3r55hprQwwnvb+Avf5rQB/SROY8GtrGud+bRxFT41OH4RUDKWZa36HyrCuChkBL
+ m6A1PdpqGHGFoGqcsSE4XY2nvi15QIwEnjU7G0H1qREV3uIbZI4oaMU3GEEpJ+ss7GYV
+ VQxp0CFIwVd+2IamDcDdOffi1rIeLC7a1tsphmxv9obE+zQ4P0RT+w8IFEWKo372e3fk
+ L2yQ==
+X-Gm-Message-State: APjAAAW7+7Ikjj2lQsIUrD4Yo8pzWa41M+1tFdjLLkRcxHZiFFTbMv5+
+ G8d2T/x8EyB0Wq9DXhEFcneST4lT
+X-Google-Smtp-Source: APXvYqyU1gG4AULMpjCycLbtI+LYlPgT0Ysencj90hR2OFBJv0MK1HbCVdtoxwaIBbhkc2+n1zTnww==
+X-Received: by 2002:a05:6000:cf:: with SMTP id
+ q15mr6067114wrx.393.1576155258893; 
+ Thu, 12 Dec 2019 04:54:18 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.54.11
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.54.17
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:54:11 -0800 (PST)
+ Thu, 12 Dec 2019 04:54:18 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 074/132] meson: convert hw/ssi
-Date: Thu, 12 Dec 2019 13:51:58 +0100
-Message-Id: <1576155176-2464-75-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 081/132] meson: convert hw/nvram
+Date: Thu, 12 Dec 2019 13:52:05 +0100
+Message-Id: <1576155176-2464-82-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +83,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::435
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,70 +103,68 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs     |  1 -
- hw/meson.build       |  1 +
- hw/ssi/Makefile.objs | 10 ----------
- hw/ssi/meson.build   | 10 ++++++++++
- 4 files changed, 11 insertions(+), 11 deletions(-)
- delete mode 100644 hw/ssi/Makefile.objs
- create mode 100644 hw/ssi/meson.build
+ hw/Makefile.objs       |  1 -
+ hw/meson.build         |  1 +
+ hw/nvram/Makefile.objs |  8 --------
+ hw/nvram/meson.build   | 11 +++++++++++
+ 4 files changed, 12 insertions(+), 9 deletions(-)
+ delete mode 100644 hw/nvram/Makefile.objs
+ create mode 100644 hw/nvram/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 1d47113..201d614 100644
+index 512d10d..6ce70d5 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -27,7 +27,6 @@ devices-dirs-$(CONFIG_PCI) += pci-bridge/ pci-host/
- devices-dirs-y += pcmcia/
- devices-dirs-$(CONFIG_SCSI) += scsi/
- devices-dirs-y += sd/
--devices-dirs-y += ssi/
+@@ -21,7 +21,6 @@ devices-dirs-y += isa/
+ devices-dirs-y += misc/
+ devices-dirs-y += net/
+ devices-dirs-y += rdma/
+-devices-dirs-y += nvram/
  endif
  
  common-obj-y += $(devices-dirs-y)
 diff --git a/hw/meson.build b/hw/meson.build
-index 960fd14..a867f82 100644
+index 1fd9eb5..0c528e5 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -2,6 +2,7 @@ subdir('core')
+@@ -1,5 +1,6 @@
+ subdir('core')
  subdir('mem')
- subdir('semihosting')
- subdir('smbios')
-+subdir('ssi')
- subdir('timer')
- subdir('tpm')
- subdir('usb')
-diff --git a/hw/ssi/Makefile.objs b/hw/ssi/Makefile.objs
++subdir('nvram')
+ subdir('pci')
+ subdir('pci-bridge')
+ subdir('pci-host')
+diff --git a/hw/nvram/Makefile.objs b/hw/nvram/Makefile.objs
 deleted file mode 100644
-index f5bcc65..0000000
---- a/hw/ssi/Makefile.objs
+index 26f7b4c..0000000
+--- a/hw/nvram/Makefile.objs
 +++ /dev/null
-@@ -1,10 +0,0 @@
--common-obj-$(CONFIG_PL022) += pl022.o
--common-obj-$(CONFIG_SSI) += ssi.o
--common-obj-$(CONFIG_XILINX_SPI) += xilinx_spi.o
--common-obj-$(CONFIG_XILINX_SPIPS) += xilinx_spips.o
--common-obj-$(CONFIG_ASPEED_SOC) += aspeed_smc.o
--common-obj-$(CONFIG_STM32F2XX_SPI) += stm32f2xx_spi.o
--common-obj-$(CONFIG_MSF2) += mss-spi.o
--
--obj-$(CONFIG_OMAP) += omap_spi.o
--obj-$(CONFIG_IMX) += imx_spi.o
-diff --git a/hw/ssi/meson.build b/hw/ssi/meson.build
+@@ -1,8 +0,0 @@
+-common-obj-$(CONFIG_DS1225Y) += ds1225y.o
+-common-obj-y += eeprom93xx.o
+-common-obj-$(CONFIG_AT24C) += eeprom_at24c.o
+-common-obj-y += fw_cfg.o
+-common-obj-y += chrp_nvram.o
+-common-obj-$(CONFIG_MAC_NVRAM) += mac_nvram.o
+-obj-$(CONFIG_PSERIES) += spapr_nvram.o
+-obj-$(CONFIG_NRF51_SOC) += nrf51_nvm.o
+diff --git a/hw/nvram/meson.build b/hw/nvram/meson.build
 new file mode 100644
-index 0000000..612c109
+index 0000000..75fca7b
 --- /dev/null
-+++ b/hw/ssi/meson.build
-@@ -0,0 +1,10 @@
-+softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true: files('aspeed_smc.c'))
-+softmmu_ss.add(when: 'CONFIG_MSF2', if_true: files('mss-spi.c'))
-+softmmu_ss.add(when: 'CONFIG_PL022', if_true: files('pl022.c'))
-+softmmu_ss.add(when: 'CONFIG_SSI', if_true: files('ssi.c'))
-+softmmu_ss.add(when: 'CONFIG_STM32F2XX_SPI', if_true: files('stm32f2xx_spi.c'))
-+softmmu_ss.add(when: 'CONFIG_XILINX_SPI', if_true: files('xilinx_spi.c'))
-+softmmu_ss.add(when: 'CONFIG_XILINX_SPIPS', if_true: files('xilinx_spips.c'))
++++ b/hw/nvram/meson.build
+@@ -0,0 +1,11 @@
++softmmu_ss.add(files(
++  'chrp_nvram.c',
++  'eeprom93xx.c',
++  'fw_cfg.c',
++))
++softmmu_ss.add(when: 'CONFIG_AT24C', if_true: files('eeprom_at24c.c'))
++softmmu_ss.add(when: 'CONFIG_DS1225Y', if_true: files('ds1225y.c'))
++softmmu_ss.add(when: 'CONFIG_MAC_NVRAM', if_true: files('mac_nvram.c'))
 +
-+specific_ss.add(when: 'CONFIG_IMX', if_true: files('imx_spi.c'))
-+specific_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_spi.c'))
++specific_ss.add(when: 'CONFIG_PSERIES', if_true: files('spapr_nvram.c'))
++specific_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_nvm.c'))
 -- 
 1.8.3.1
 
