@@ -7,73 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17025C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0133EC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3ED7206C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:19:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDF04206C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:20:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CI2cLMYv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3ED7206C3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eiblINp2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDF04206C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifFxB-0008Dx-2H
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:19:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50157)
+	id 1ifFyE-0000kJ-VA
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:20:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ifFf7-00011r-Ea
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:14 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ifFf9-00015B-SX
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ifFf6-0004Or-5r
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:13 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45764)
+ (envelope-from <richard.henderson@linaro.org>) id 1ifFf8-0004UN-IN
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:15 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:34018)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ifFf5-0004Mv-S9
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:12 -0500
-Received: by mail-pg1-x543.google.com with SMTP id b9so418073pgk.12
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:01:08 -0800 (PST)
+ id 1ifFf8-0004SH-BV
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:14 -0500
+Received: by mail-pl1-x641.google.com with SMTP id x17so11569pln.1
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:01:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=b1FV8qQCpJxFWsy94CcM4K8EE5MW0MHS/kAxt/18Mds=;
- b=CI2cLMYvXSjEb4joBAT2W6nowNYTooCSvH6uGbWtxJ/KQw141IGP7Aj/MZY+721nBY
- ywvgicjIQuBzLFC6YDnLYdCLvy7yDmaSb69w1BADykENtV64QKwl5+1av5x+etmeNVB6
- u/IMjpGOgLaGr6aZtHBdeW0e5GCkiexozN2VKF3GkNJ4LWYp8ZKiPJTx+nokRVklpx7x
- vUR3zpQKH6prB5h8Wl7fXg+wGEVJOYzhGEZltFxMREY+94aYBDBIjz2DCpBemBRRzEHj
- EmckYepIyH5hSyv3gjgXaUscyBOxDrZU60+pfT1ejXQ8fFcSWLAas8MwKjJn56rxY+9L
- kszA==
+ bh=LUeojZYde3/VPw2CxoZItM1wJDRbu9EUvabmt44460c=;
+ b=eiblINp2VMI3MQxaYSnI2FBOhKZFOnvn+VkzoxYpz/Nl4SlibWU3HBih2G6tNva4Vf
+ wRC2BkJXqBCPOKMRgWC1AU+MevuT9+cgTDHdzYHR5bM4YhwUnwlCxLeLD+JH4Rvj6BSd
+ cCJV2NbVOBkdpCFQt+TvPNdTb02JmP2d4XhToaBfjsJeiaBiMChwFQ18dx/etimCPs1B
+ dwnDuGrnthmSAn61PpUuV9xb4rqUOn0BG/MqXezipE1GkBic7+7gzVcWX/LI+1cf2/9I
+ qykamI4WQmVbMdMMRXsGjOPdX0gYyfpkurhtelbL0x3I5Gna23Peusrur1+6xG3i4DXY
+ pZ5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=b1FV8qQCpJxFWsy94CcM4K8EE5MW0MHS/kAxt/18Mds=;
- b=ainJnwnIOuWwUbp6rRU1J+b8w+nREAJ1Kx7p0tiuITR08m9DZnrERar2eZRbeA5xlg
- ZuX+lLGnEd7ALptjj8fZNVKC0dHaaCF2MW3OshM2q5VvAi8M8fvd/u7bCbb3sYfRMN4x
- 8sg2jh9zL+XwK69t0OjFlxkn8CRSoZl814ZQUV34O/bn9jaICiqq6RIE/us7TwNCPmad
- dQZ3+1GhLpOtbCMonsmgmup7mQQW6pzQqtC2UvD3cof91HznvyPV/y3EvX5cg9Uh1X1x
- 7SGJUMcKsdPLRoCG8gfgjtgTqwU59ddSCDIy9hIIFz9ZVl7T6lvhPmz3FVIYXSdDJmlz
- le7w==
-X-Gm-Message-State: APjAAAX7S8nRnba6EoGZYgNcizasn9+1JgR0tJioahqKKIKpEfDSJoS5
- 8EtCbJ+JfQfapJTLY3kkQWMo02mlb+0=
-X-Google-Smtp-Source: APXvYqyVSJqZnZdPu8PCFmFamFypvuqp9Xh1Rt+M9Q4VdQMNPN8It7Ao7qq0Frbdb15jW7XokfHcEA==
-X-Received: by 2002:a65:5ccc:: with SMTP id b12mr8091321pgt.124.1576123267458; 
- Wed, 11 Dec 2019 20:01:07 -0800 (PST)
+ bh=LUeojZYde3/VPw2CxoZItM1wJDRbu9EUvabmt44460c=;
+ b=CUWXKQXV75DBpg0eTSgBddlZ4adagNfuIUtftoPcwu44RuBcWMiFtHl8fHwX/kUh4J
+ STafwuJQ8praJWJ9XkEW4B7ZOe7gTFhzKCOj5ygp1LdcNfQAnAZd4m0FdsX4t9x1ak58
+ uhPvt1G5EOZedc7bGPQmUiurgLIAac3JvQZ3s5e+KgPTqU8oCRsQlfHJgUUAeCme/cWq
+ 8OWjpPPGO6JP6rmyoay0dj2RRNMkjWvTac0lu/ELklSklvsZcrbGvBQHyMMbb85AHney
+ AKZ5pQwn54JnPbjH8O4HWz+TwRxu1AtUtyaMVEJBa4ULQnDAdE+anqsbc12w4HfweDwV
+ +yFg==
+X-Gm-Message-State: APjAAAUHizsT2TzPITBx8UdsIEiGU185/mAQzW+YfFJ7PedMyUuHMflT
+ k0zKRKS2gvvL82ckR7HF/BfZVG0kayg=
+X-Google-Smtp-Source: APXvYqyCITezLurnr52VrmWBIDqt6GRIzS1WHSZ0sA87c0nqV1ATXrsMOjg2zFTLYacOnWqPt7oDpw==
+X-Received: by 2002:a17:902:8608:: with SMTP id
+ f8mr7383736plo.106.1576123273028; 
+ Wed, 11 Dec 2019 20:01:13 -0800 (PST)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id z130sm4666391pgz.6.2019.12.11.20.01.06
+ by smtp.gmail.com with ESMTPSA id z130sm4666391pgz.6.2019.12.11.20.01.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Dec 2019 20:01:06 -0800 (PST)
+ Wed, 11 Dec 2019 20:01:12 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 21/28] target/unicore32: Remove MMU_MODE{0,1}_SUFFIX
-Date: Wed, 11 Dec 2019 20:00:32 -0800
-Message-Id: <20191212040039.26546-22-richard.henderson@linaro.org>
+Subject: [PATCH 25/28] target/s390x: Use cpu_*_mmuidx_ra instead of
+ MMU_MODE*_SUFFIX
+Date: Wed, 11 Dec 2019 20:00:36 -0800
+Message-Id: <20191212040039.26546-26-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191212040039.26546-1-richard.henderson@linaro.org>
 References: <20191212040039.26546-1-richard.henderson@linaro.org>
@@ -81,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,32 +95,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
+Cc: David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The functions generated by these macros are unused.
+The generated functions aside from *_real are unused.
+The *_real functions have a couple of users in mem_helper.c;
+use *_mmuidx_ra instead, with MMU_REAL_IDX.
 
-Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
+Cc: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/unicore32/cpu.h | 2 --
- 1 file changed, 2 deletions(-)
+ target/s390x/cpu.h        | 5 -----
+ target/s390x/mem_helper.c | 5 +++++
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/unicore32/cpu.h b/target/unicore32/cpu.h
-index 50ed9dd99c..7a32e086ed 100644
---- a/target/unicore32/cpu.h
-+++ b/target/unicore32/cpu.h
-@@ -133,8 +133,6 @@ void cpu_asr_write(CPUUniCore32State *env1, target_ulong val, target_ulong mask)
- int uc32_cpu_signal_handler(int host_signum, void *pinfo, void *puc);
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 17460ed7b3..2670728e8a 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -36,11 +36,6 @@
  
- /* MMU modes definitions */
--#define MMU_MODE0_SUFFIX _kernel
--#define MMU_MODE1_SUFFIX _user
- #define MMU_USER_IDX 1
- static inline int cpu_mmu_index(CPUUniCore32State *env, bool ifetch)
+ #define TARGET_INSN_START_EXTRA_WORDS 2
+ 
+-#define MMU_MODE0_SUFFIX _primary
+-#define MMU_MODE1_SUFFIX _secondary
+-#define MMU_MODE2_SUFFIX _home
+-#define MMU_MODE3_SUFFIX _real
+-
+ #define MMU_USER_IDX 0
+ 
+ #define S390_MAX_CPUS 248
+diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
+index 57ce17c252..d379be8418 100644
+--- a/target/s390x/mem_helper.c
++++ b/target/s390x/mem_helper.c
+@@ -43,6 +43,11 @@
+ #define HELPER_LOG(x...)
+ #endif
+ 
++#define cpu_ldl_real_ra(e, p, r)    cpu_ldl_mmuidx_ra(e, p, MMU_REAL_IDX, r)
++#define cpu_ldq_real_ra(e, p, r)    cpu_ldq_mmuidx_ra(e, p, MMU_REAL_IDX, r)
++#define cpu_stl_real_ra(e, p, v, r) cpu_stl_mmuidx_ra(e, p, v, MMU_REAL_IDX, r)
++#define cpu_stq_real_ra(e, p, v, r) cpu_stq_mmuidx_ra(e, p, v, MMU_REAL_IDX, r)
++
+ static inline bool psw_key_valid(CPUS390XState *env, uint8_t psw_key)
  {
+     uint16_t pkm = env->cregs[3] >> 16;
 -- 
 2.20.1
 
