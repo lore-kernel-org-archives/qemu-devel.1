@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0812C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE9EC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:15:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B56E222C4
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:13:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9076D22B48
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 04:15:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yU7qj1XN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B56E222C4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lKAF37rD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9076D22B48
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifFqo-000072-6r
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:13:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49097)
+	id 1ifFsY-0002Zg-Uc
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 23:15:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1ifFex-0000uI-KH
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:05 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ifFfB-00016n-Ad
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1ifFew-0004CO-Hw
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:03 -0500
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:41897)
+ (envelope-from <richard.henderson@linaro.org>) id 1ifFfA-0004XO-04
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:17 -0500
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42167)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1ifFet-00043l-P9
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:01 -0500
-Received: by mail-pl1-x644.google.com with SMTP id bd4so444084plb.8
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:00:57 -0800 (PST)
+ id 1ifFf9-0004Vw-QA
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 23:01:15 -0500
+Received: by mail-pl1-x642.google.com with SMTP id x13so443510plr.9
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 20:01:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=eyI58KOw8f6KjHd513cv2CHH4iBrq42PUmdQAMssFYg=;
- b=yU7qj1XNPXvU2aK0pxXWNBjDcqxCt8gSjhGqkbLmUYjZzt14lFVB5uyDIN+MmYDjlJ
- S/sdqZw3de50hJbaptVKpOUIYvO0mam0o8VZTbshL+sE1UA5tsZfvOETvvWiiJB9E9hN
- 3Hd+ydtwdahyHdhdYEUyD8UEnpAYF2Q73twN5f+DxGX9Ynn9+zjK3o8rzatKxX8gupUD
- XgOmiL1JpaN5nwgaSa3ym70/7l5tlEHEzoL2fKzzSEyITMY8cQ4MYSdcdo08kmYtwV/f
- lizTHrd7oYxzlfbwYV8qvTjr8CrUAI5XN3GDxg0rMfT16GdQwA5xxKqMyyhF6R0h9RJ0
- 70TA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=JWpl4dTJywBw8dk4WBNibniYDIKR8WNVBGRxmrDjrqI=;
+ b=lKAF37rDeJwPJJzCVjRsrmVOwoq2hL4644wwI/qCwCYqryAMD88LiuofJSjSc2wbx1
+ L+ali8Cl+rvvOXZDCOdY2yqCQwz01B6uLU6X3f2//gZhf/ndHjU4zyBjcCkiPiNkrz4C
+ i6SgCednOhD+cK05Y/08UsbAHvzN7FqQGmwnI64I23E7UxI7Px7nBzW5CeaqKa6LN0+K
+ mLIRH31VOO4pc+BYw5g9MK0XRljkZ/O/cj2IEFwtsA+DLZe7whzvtL6Bcz5XQDifTcM9
+ PPiGZyV6to7o1o0M6x1wOgJLrlX9CTq+sbkGn2uidWNJUzHHBs/vjMTfaWgPwMOrlbxv
+ tJHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=eyI58KOw8f6KjHd513cv2CHH4iBrq42PUmdQAMssFYg=;
- b=m2gR4A/Uu9Z244jyuq5ZYF+LNJPopa+oxHDdQjB7KzcMVmQvbJn63tfAtV9z/+GThT
- aA0hppjj6djX3pv0MEZkfy+0en5FJCWOuDNsQ8Dj/VfzPuEp900dJphejWvOH5mqOXAe
- /1aKsRltb70ypvoEwZKtxkLTdaM0adGQdzQ8i4blXnzvFgsmpatf80ASUbHpRRROfFj4
- LYbG/KGSkO2vGFrD5Qlfh7NYBHO0DMru7HvTQzTR5KWgL5tsZyOBv2KnaEIumLXfMKGe
- WNC27EQzkXndeIsgflme431UUuKXduH5n6AKvPNj8qBJz0fKOEUY60WkWtnF//Y16IoW
- O4hQ==
-X-Gm-Message-State: APjAAAUtSZvZV2LoFf7YpP8SOSklcTnfFfuwBJ1bJsI/jIe94DQ1nqt/
- uJBOOwz+jMmycDxYl7yMxTWAARfxruA=
-X-Google-Smtp-Source: APXvYqwjlALn333oE2jlKifjQIXUM5rWtYcGOWHuLWntj/gC6WUKGfGPIn4jmCg4F42apuDu8C4s7A==
-X-Received: by 2002:a17:902:9a04:: with SMTP id
- v4mr7382327plp.192.1576123256006; 
- Wed, 11 Dec 2019 20:00:56 -0800 (PST)
+ bh=JWpl4dTJywBw8dk4WBNibniYDIKR8WNVBGRxmrDjrqI=;
+ b=SRxpjtnjuW7+HliNEKHPNL83zFLEQ1a8DHJeW+hgAr0MoDOWiQnhUx+p/lQvg7AiR0
+ m1geQY7WpZM6xtxyyO3exiTwqiX6+7NcBb7nn/qJtphDWwDKQrfS1xCAPTcdg0ctbnjj
+ 6wVZLrzn4JawNeQ4zA6A4Vg/UlIQz1cRg9djGmFwjuppPKtVgTgnYzIT35K7KOPvrFLA
+ oNgIkCzZMeaKSvMmkNNf5srrer6wir3bu1hqhzFXO+pCIy4nQnrv5bxuqbUX66t60RBV
+ traPPSh7KCaBI3uZ11CtXqmcRp4DYX4qz8EANUgSobEbfcrgIRHdZhIZbuOeD7N8iXCy
+ dkfw==
+X-Gm-Message-State: APjAAAVm6hLQzw/h6FOcna6+zkQtn6IFt1OPSGcU4WdNhv9E9nh5bQCJ
+ JYKMk8FnABwmYQFADAevzHEVH5ZQzc8=
+X-Google-Smtp-Source: APXvYqx80jEZM4tYvc2SvKg0t14l04dBqVCLsJrpRibL1qYFzamtq4K8QgFGXU2NbpOf5BCUnEkyWA==
+X-Received: by 2002:a17:90b:8cf:: with SMTP id
+ ds15mr7663891pjb.134.1576123274493; 
+ Wed, 11 Dec 2019 20:01:14 -0800 (PST)
 Received: from localhost.localdomain (97-113-7-119.tukw.qwest.net.
  [97.113.7.119])
- by smtp.gmail.com with ESMTPSA id z130sm4666391pgz.6.2019.12.11.20.00.54
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id z130sm4666391pgz.6.2019.12.11.20.01.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 11 Dec 2019 20:00:55 -0800 (PST)
+ Wed, 11 Dec 2019 20:01:13 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 12/28] linux-user: Include tcg.h in syscall.c
-Date: Wed, 11 Dec 2019 20:00:23 -0800
-Message-Id: <20191212040039.26546-13-richard.henderson@linaro.org>
+Subject: [PATCH 26/28] target/ppc: Use cpu_*_mmuidx_ra instead of
+ MMU_MODE*_SUFFIX
+Date: Wed, 11 Dec 2019 20:00:37 -0800
+Message-Id: <20191212040039.26546-27-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191212040039.26546-1-richard.henderson@linaro.org>
 References: <20191212040039.26546-1-richard.henderson@linaro.org>
@@ -83,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2607:f8b0:4864:20::642
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,30 +95,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Code movement in an upcoming patch will show that this file
-was implicitly depending on tcg.h being included indirectly.
+There are only two uses.  Within dcbz_common, the local variable
+mmu_idx already contains the epid computation, and we can avoid
+repeating it for the store.  Within helper_icbiep, the usage is
+trivially expanded using PPC_TLB_EPID_LOAD.
 
+Cc: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- linux-user/syscall.c | 1 +
- 1 file changed, 1 insertion(+)
+ target/ppc/cpu.h        |  2 --
+ target/ppc/mem_helper.c | 11 ++---------
+ 2 files changed, 2 insertions(+), 11 deletions(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 171c0caef3..34825f15bf 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -115,6 +115,7 @@
- #include "user/syscall-trace.h"
- #include "qapi/error.h"
- #include "fd-trans.h"
-+#include "tcg.h"
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index e3e82327b7..3bd983adaa 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -951,8 +951,6 @@ struct ppc_radix_page_info {
+  * + real/paged mode combinations. The other two modes are for
+  * external PID load/store.
+  */
+-#define MMU_MODE8_SUFFIX _epl
+-#define MMU_MODE9_SUFFIX _eps
+ #define PPC_TLB_EPID_LOAD 8
+ #define PPC_TLB_EPID_STORE 9
  
- #ifndef CLONE_IO
- #define CLONE_IO                0x80000000      /* Clone io context */
+diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
+index 1351b53f28..56855f2381 100644
+--- a/target/ppc/mem_helper.c
++++ b/target/ppc/mem_helper.c
+@@ -177,14 +177,7 @@ static void dcbz_common(CPUPPCState *env, target_ulong addr,
+     } else {
+         /* Slow path */
+         for (i = 0; i < dcbz_size; i += 8) {
+-            if (epid) {
+-#if !defined(CONFIG_USER_ONLY)
+-                /* Does not make sense on USER_ONLY config */
+-                cpu_stq_eps_ra(env, addr + i, 0, retaddr);
+-#endif
+-            } else {
+-                cpu_stq_data_ra(env, addr + i, 0, retaddr);
+-            }
++            cpu_stq_mmuidx_ra(env, addr + i, 0, mmu_idx, retaddr);
+         }
+     }
+ }
+@@ -216,7 +209,7 @@ void helper_icbiep(CPUPPCState *env, target_ulong addr)
+ #if !defined(CONFIG_USER_ONLY)
+     /* See comments above */
+     addr &= ~(env->dcache_line_size - 1);
+-    cpu_ldl_epl_ra(env, addr, GETPC());
++    cpu_ldl_mmuidx_ra(env, addr, PPC_TLB_EPID_LOAD, GETPC());
+ #endif
+ }
+ 
 -- 
 2.20.1
 
