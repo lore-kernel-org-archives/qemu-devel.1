@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C17C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:41:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B40BFC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:41:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D48082077B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:41:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 841C52077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 13:41:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RIMiuXiJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D48082077B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BKzKwUW+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 841C52077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifOiF-0004QM-7R
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:41:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38880)
+	id 1ifOil-00050e-9X
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 08:41:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39670)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyn-0004BD-Ic
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:06 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyr-0004I1-Vz
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyl-0007bj-RK
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:05 -0500
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:43663)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNyq-0007k6-JL
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:09 -0500
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:41629)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1ifNyl-0007Zz-JS
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:03 -0500
-Received: by mail-wr1-x42c.google.com with SMTP id d16so2590157wre.10
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:54:03 -0800 (PST)
+ id 1ifNyq-0007il-B4
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:54:08 -0500
+Received: by mail-wr1-x42b.google.com with SMTP id c9so2604405wrw.8
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:54:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=TESjvbFFHZQtGhm+TKmt7RVZlTLVhBorgrOtIeNvXYE=;
- b=RIMiuXiJ3sD9iLEgnhXrRiHGKfAkf2cguKBQ7yjaPqqSwx+lg+Q+LFzuBF9spDAjpZ
- AHcgsnoFpEkK41WUBhE8LePRKERJUnFkvnH4LRnwcDF9mel+VBeorXLijXqPh3ZzkebU
- UUKQPoKZQ7OZtT02rfWwWc3LtxmmHeW3Oo8dkNDEGZ8E9EJTiTtFiR+pBSASKGjAZmJ0
- ALVJfC8Mpu1vZ8Km21MfjvcruW8Z/ZzJL0ATMLU6tYAxnfJ5+35GE5Tz+PsREj8VB7DC
- Vi0ANSG/F0OTdtYIsrtYiuZ61Bzatix41p9t5Ls+tsKaN8w2Xqz1S0Y8i8rtXa/rkjOH
- MjpQ==
+ bh=j12SgvFUEMlLTMG0dlw8JQNUMvzFA/y97s9nwnCqE4I=;
+ b=BKzKwUW+igYVlfNZTSixnxrNjnDnnkVF9/0E/sd9cSUKKSnPFuaT94QBEerIzJlUme
+ MKaGDeZOQrm1vSHBWwCeIBF9OYnFAuig50SsZWJ9k6EhOspRr6RhxvdcSL2+3rupOYkh
+ GqNivcF+fbpOuYDe752wEkpd4289wr5IWtDFnoujG3VLoCFuyJDYHrCsiwB8Uo6dMa3i
+ /NZiGCiM189V6tb01QtBpMWpocvPlApG0IDZPnaNJwBTjwcRg+eJp0ZDzm3cbKmRwyU7
+ 8xEF+xMQdXnixib5fXygQzvNMxrfjnoFtPeqUlxf7Z+fTVYrSGKNByjOB6PGFZRF273y
+ ontA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=TESjvbFFHZQtGhm+TKmt7RVZlTLVhBorgrOtIeNvXYE=;
- b=pYBJAYyF/2yo2GnKZzMdgSengmLdY/DbAn0CEZmXE+i2+6dus3bbNAchZjUmpfKb4Z
- rAnn7h1sZqoNXSxkHAwoHTfm0EJlflM13AQ7HQDF9cRj6bHzFN3nBom+DWWQaakiJQFd
- YDt8HoJeZ4ngtIK6Znc0y0m6CPIxgIbexZmAiUdYM69AEItbT7F1/bQrw7qWGFvGY2Gp
- 0QRjyqoRf4E94zGwaZMTNKhfhmcncPaxFXRRDl2+WpH7AnF4bPspu8JJa3fiM2B2kwC3
- JZzfZZ40NZjt8Pfvu8/1+Fc3OYW5+Nvm4QOrQN3LMT4J+VdP1cr2EgR6eWiayBmmwR4l
- DLDQ==
-X-Gm-Message-State: APjAAAXP/b81poj3PQvF0+aEqeexXouTGuHMrmGFhOoGf1JWTLSk7WTn
- cWvGaudppIUkDBn4C+rKzMo8aRdw
-X-Google-Smtp-Source: APXvYqzfDEHha/vqe5JrB+opbsxZL4V3QVKCbH3z71XNg3oHkyU47i0TY6X/3+mULc1KDLIm+D+gZQ==
-X-Received: by 2002:a5d:6ca1:: with SMTP id a1mr6002872wra.36.1576155242414;
- Thu, 12 Dec 2019 04:54:02 -0800 (PST)
+ bh=j12SgvFUEMlLTMG0dlw8JQNUMvzFA/y97s9nwnCqE4I=;
+ b=dyZoBEDVLf8o/u+duTsR1jc0WgTlwO+leuZmSJmsAg2vRCkXhA/9E7c9G55qna94W5
+ bZb7qOmcnTjPVc7ZxHRs5LaoPAmh29drZu9Ei2PhpaMxyVTIMsq4I37g5/dVhRrAoALV
+ 0lnFRI5b9P/O4R4u4WVAou38aN6mR3+A0u9B3cVZsRupL6bXsRAQlQU8uKvZFLWK9CLx
+ wHCXTKI0uShTzmKroWgU+T8KTKvcI7xUOcmgzK1aESpCNJ+6DkdFcogzC8VfaGaVJhqX
+ icbdaHgI2adXVc3WEr4SeCORqkUqr/IF9nCXk/LL21qkfQKOUkVFpxRnxVoF/qs5P40L
+ FY4g==
+X-Gm-Message-State: APjAAAVpBK/J8htMlsUBIROXgG+B/Lj35POBaUPYX88ZWMJ0pFUI7IO4
+ v8PxrVp3u8mA5MsMm4drmD9760kM
+X-Google-Smtp-Source: APXvYqyAnips2NxZhNeO61iScFJfWPcMLo0eNTGZdCmbd0DavSOoBbKPEYavcdI6uCyNBZyh4gl+4Q==
+X-Received: by 2002:adf:dfd2:: with SMTP id q18mr6168159wrn.152.1576155247095; 
+ Thu, 12 Dec 2019 04:54:07 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.54.01
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.54.06
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 12 Dec 2019 04:54:01 -0800 (PST)
+ Thu, 12 Dec 2019 04:54:06 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 064/132] meson: convert hw/core
-Date: Thu, 12 Dec 2019 13:51:48 +0100
-Message-Id: <1576155176-2464-65-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 069/132] meson: convert hw/virtio
+Date: Thu, 12 Dec 2019 13:51:53 +0100
+Message-Id: <1576155176-2464-70-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
 References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42c
+X-Received-From: 2a00:1450:4864:20::42b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,111 +102,130 @@ From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- hw/Makefile.objs      |  1 -
- hw/core/Makefile.objs | 30 ------------------------------
- hw/core/meson.build   | 39 +++++++++++++++++++++++++++++++++++++++
- hw/meson.build        |  1 +
- 4 files changed, 40 insertions(+), 31 deletions(-)
- delete mode 100644 hw/core/Makefile.objs
- create mode 100644 hw/core/meson.build
+ hw/Makefile.objs        |  1 -
+ hw/meson.build          |  1 +
+ hw/virtio/Makefile.objs | 39 ---------------------------------------
+ hw/virtio/meson.build   | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 43 insertions(+), 40 deletions(-)
+ delete mode 100644 hw/virtio/Makefile.objs
+ create mode 100644 hw/virtio/meson.build
 
 diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-index 793d55b..2ef93e7 100644
+index a1d3f07..3f528b5 100644
 --- a/hw/Makefile.objs
 +++ b/hw/Makefile.objs
-@@ -1,4 +1,3 @@
--devices-dirs-y = core/
- ifeq ($(CONFIG_SOFTMMU), y)
- devices-dirs-$(call lor,$(CONFIG_VIRTIO_9P),$(call land,$(CONFIG_VIRTFS),$(CONFIG_XEN))) += 9pfs/
- devices-dirs-y += acpi/
-diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
-deleted file mode 100644
-index fd0550d..0000000
---- a/hw/core/Makefile.objs
-+++ /dev/null
-@@ -1,30 +0,0 @@
--# core qdev-related obj files, also used by *-user:
--common-obj-y += qdev.o qdev-properties.o
--common-obj-y += bus.o reset.o
--common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
--common-obj-$(CONFIG_SOFTMMU) += fw-path-provider.o
--# irq.o needed for qdev GPIO handling:
--common-obj-y += irq.o
--common-obj-y += hotplug.o
--common-obj-$(CONFIG_SOFTMMU) += nmi.o
--common-obj-$(CONFIG_SOFTMMU) += vm-change-state-handler.o
--common-obj-y += cpu.o
--
--common-obj-$(CONFIG_EMPTY_SLOT) += empty_slot.o
--common-obj-$(CONFIG_XILINX_AXI) += stream.o
--common-obj-$(CONFIG_PTIMER) += ptimer.o
--common-obj-$(CONFIG_SOFTMMU) += sysbus.o
--common-obj-$(CONFIG_SOFTMMU) += machine.o
--common-obj-$(CONFIG_SOFTMMU) += loader.o
--common-obj-$(CONFIG_FITLOADER) += loader-fit.o
--common-obj-$(CONFIG_SOFTMMU) += qdev-properties-system.o
--common-obj-$(CONFIG_REGISTER) += register.o
--common-obj-$(CONFIG_OR_IRQ) += or-irq.o
--common-obj-$(CONFIG_SPLIT_IRQ) += split-irq.o
--common-obj-$(CONFIG_PLATFORM_BUS) += platform-bus.o
--common-obj-$(CONFIG_GENERIC_LOADER) += generic-loader.o
--common-obj-$(CONFIG_SOFTMMU) += null-machine.o
--
--obj-$(CONFIG_SOFTMMU) += machine-qmp-cmds.o
--obj-$(CONFIG_SOFTMMU) += numa.o
--common-obj-$(CONFIG_SOFTMMU) += machine-hmp-cmds.o
-diff --git a/hw/core/meson.build b/hw/core/meson.build
-new file mode 100644
-index 0000000..70bdff6
---- /dev/null
-+++ b/hw/core/meson.build
-@@ -0,0 +1,39 @@
-+common_ss.add(files(
-+  # core qdev-related obj files, also used by *-user:
-+  'bus.c',
-+  'cpu.c',
-+  'hotplug.c',
-+  'qdev-properties.c',
-+  'qdev.c',
-+  'reset.c',
-+  # irq.c needed for qdev GPIO handling:
-+  'irq.c',
-+))
-+
-+common_ss.add(when: 'CONFIG_EMPTY_SLOT', if_true: files('empty_slot.c'))
-+common_ss.add(when: 'CONFIG_FITLOADER', if_true: files('loader-fit.c'))
-+common_ss.add(when: 'CONFIG_GENERIC_LOADER', if_true: files('generic-loader.c'))
-+common_ss.add(when: 'CONFIG_OR_IRQ', if_true: files('or-irq.c'))
-+common_ss.add(when: 'CONFIG_PLATFORM_BUS', if_true: files('platform-bus.c'))
-+common_ss.add(when: 'CONFIG_PTIMER', if_true: files('ptimer.c'))
-+common_ss.add(when: 'CONFIG_REGISTER', if_true: files('register.c'))
-+common_ss.add(when: 'CONFIG_SPLIT_IRQ', if_true: files('split-irq.c'))
-+common_ss.add(when: 'CONFIG_XILINX_AXI', if_true: files('stream.c'))
-+
-+softmmu_ss.add(files(
-+  'fw-path-provider.c',
-+  'loader.c',
-+  'machine-hmp-cmds.c',
-+  'machine.c',
-+  'nmi.c',
-+  'null-machine.c',
-+  'qdev-fw.c',
-+  'qdev-properties-system.c',
-+  'sysbus.c',
-+  'vm-change-state-handler.c',
-+))
-+
-+specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
-+  'machine-qmp-cmds.c',
-+  'numa.c',
-+))
+@@ -32,7 +32,6 @@ devices-dirs-y += timer/
+ devices-dirs-$(CONFIG_TPM) += tpm/
+ devices-dirs-y += usb/
+ devices-dirs-$(CONFIG_VFIO) += vfio/
+-devices-dirs-y += virtio/
+ endif
+ 
+ common-obj-y += $(devices-dirs-y)
 diff --git a/hw/meson.build b/hw/meson.build
-index 08112a5..fe7c466 100644
+index 376dbef..a8e9acd 100644
 --- a/hw/meson.build
 +++ b/hw/meson.build
-@@ -1 +1,2 @@
-+subdir('core')
+@@ -2,5 +2,6 @@ subdir('core')
+ subdir('mem')
+ subdir('semihosting')
+ subdir('smbios')
++subdir('virtio')
+ subdir('watchdog')
  subdir('xen')
+diff --git a/hw/virtio/Makefile.objs b/hw/virtio/Makefile.objs
+deleted file mode 100644
+index e0d7cd3..0000000
+--- a/hw/virtio/Makefile.objs
++++ /dev/null
+@@ -1,39 +0,0 @@
+-ifeq ($(CONFIG_VIRTIO),y)
+-common-obj-y += virtio-bus.o
+-obj-y += virtio.o
+-
+-obj-$(CONFIG_VHOST) += vhost.o vhost-backend.o
+-common-obj-$(call lnot,$(CONFIG_VHOST)) += vhost-stub.o
+-obj-$(CONFIG_VHOST_USER) += vhost-user.o
+-
+-common-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng.o
+-common-obj-$(CONFIG_VIRTIO_PCI) += virtio-pci.o
+-common-obj-$(CONFIG_VIRTIO_MMIO) += virtio-mmio.o
+-obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon.o
+-obj-$(CONFIG_VIRTIO_CRYPTO) += virtio-crypto.o
+-obj-$(call land,$(CONFIG_VIRTIO_CRYPTO),$(CONFIG_VIRTIO_PCI)) += virtio-crypto-pci.o
+-obj-$(CONFIG_VIRTIO_PMEM) += virtio-pmem.o
+-common-obj-$(call land,$(CONFIG_VIRTIO_PMEM),$(CONFIG_VIRTIO_PCI)) += virtio-pmem-pci.o
+-obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock.o
+-
+-ifeq ($(CONFIG_VIRTIO_PCI),y)
+-obj-$(CONFIG_VHOST_VSOCK) += vhost-vsock-pci.o
+-obj-$(CONFIG_VHOST_USER_BLK) += vhost-user-blk-pci.o
+-obj-$(CONFIG_VHOST_USER_INPUT) += vhost-user-input-pci.o
+-obj-$(CONFIG_VHOST_USER_SCSI) += vhost-user-scsi-pci.o
+-obj-$(CONFIG_VHOST_SCSI) += vhost-scsi-pci.o
+-obj-$(CONFIG_VIRTIO_INPUT_HOST) += virtio-input-host-pci.o
+-obj-$(CONFIG_VIRTIO_INPUT) += virtio-input-pci.o
+-obj-$(CONFIG_VIRTIO_RNG) += virtio-rng-pci.o
+-obj-$(CONFIG_VIRTIO_BALLOON) += virtio-balloon-pci.o
+-obj-$(CONFIG_VIRTIO_9P) += virtio-9p-pci.o
+-obj-$(CONFIG_VIRTIO_SCSI) += virtio-scsi-pci.o
+-obj-$(CONFIG_VIRTIO_BLK) += virtio-blk-pci.o
+-obj-$(CONFIG_VIRTIO_NET) += virtio-net-pci.o
+-obj-$(CONFIG_VIRTIO_SERIAL) += virtio-serial-pci.o
+-endif
+-else
+-common-obj-y += vhost-stub.o
+-endif
+-
+-common-obj-$(CONFIG_ALL) += vhost-stub.o
+diff --git a/hw/virtio/meson.build b/hw/virtio/meson.build
+new file mode 100644
+index 0000000..1a75a87
+--- /dev/null
++++ b/hw/virtio/meson.build
+@@ -0,0 +1,42 @@
++softmmu_virtio_ss = ss.source_set()
++softmmu_virtio_ss.add(files('virtio-bus.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_RNG', if_true: files('virtio-rng.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_PCI', if_true: files('virtio-pci.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VIRTIO_MMIO', if_true: files('virtio-mmio.c'))
++softmmu_virtio_ss.add(when: 'CONFIG_VHOST', if_false: files('vhost-stub.c'))
++softmmu_virtio_ss.add(when: ['CONFIG_VIRTIO_PMEM', 'CONFIG_VIRTIO_PCI'], if_true: files('virtio-pmem-pci.c'))
++
++softmmu_ss.add_all(when: 'CONFIG_VIRTIO', if_true: softmmu_virtio_ss)
++softmmu_ss.add(when: 'CONFIG_VIRTIO', if_false: files('vhost-stub.c'))
++
++softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('vhost-stub.c'))
++
++virtio_ss = ss.source_set()
++virtio_ss.add(files('virtio.c'))
++virtio_ss.add(when: 'CONFIG_VHOST', if_true: files('vhost.c', 'vhost-backend.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_USER', if_true: files('vhost-user.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_BALLOON', if_true: files('virtio-balloon.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_CRYPTO', if_true: files('virtio-crypto.c'))
++virtio_ss.add(when: ['CONFIG_VIRTIO_CRYPTO', 'CONFIG_VIRTIO_PCI'], if_true: files('virtio-crypto-pci.c'))
++virtio_ss.add(when: 'CONFIG_VIRTIO_PMEM', if_true: files('virtio-pmem.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_VSOCK', if_true: files('vhost-vsock.c'))
++
++virtio_pci_ss = ss.source_set()
++virtio_pci_ss.add(when: 'CONFIG_VHOST_VSOCK', if_true: files('vhost-vsock-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_BLK', if_true: files('vhost-user-blk-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_INPUT', if_true: files('vhost-user-input-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_USER_SCSI', if_true: files('vhost-user-scsi-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VHOST_SCSI', if_true: files('vhost-scsi-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_INPUT_HOST', if_true: files('virtio-input-host-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_INPUT', if_true: files('virtio-input-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_RNG', if_true: files('virtio-rng-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_BALLOON', if_true: files('virtio-balloon-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_9P', if_true: files('virtio-9p-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio-scsi-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_BLK', if_true: files('virtio-blk-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio-net-pci.c'))
++virtio_pci_ss.add(when: 'CONFIG_VIRTIO_SERIAL', if_true: files('virtio-serial-pci.c'))
++
++virtio_ss.add_all(when: 'CONFIG_VIRTIO_PCI', if_true: virtio_pci_ss)
++
++specific_ss.add_all(when: 'CONFIG_VIRTIO', if_true: virtio_ss)
 -- 
 1.8.3.1
 
