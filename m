@@ -2,77 +2,87 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9134CC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 812B2C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:54:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59B6E2077B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:51:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3AF2622527
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 12:54:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TgxAmmwC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59B6E2077B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bl6pHj62"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AF2622527
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifNwH-0000xF-G9
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 07:51:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37821)
+	id 1ifNzM-0004Ov-Qh
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 07:54:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1ifNtm-0006Au-Pu
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:48:55 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNxl-0002Yz-Sh
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1ifNtl-0005ry-OW
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:48:54 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53669
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ifNtl-0005qx-Jq
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:48:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576154933;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=e3eBk9H3wmrRYV94a1hWXPBU9DHclXPvjVNKrXohu3g=;
- b=TgxAmmwCe5jLHP6xzcWAPoYlQ5GChduaRnfHaJzWOCViXOiKIrd+eh7ednU6kHGAO5KDic
- EW1VagCdfztZGOpFTnWsv7/13wmFC+yWgqBUF7TNNKUkYE0l1hJSZQGC4pg/+aSJeD7um4
- qEwtvvKrXK4bFhP88uBgKp9+yk2BHQs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-Xs1KILyFN56-Kb0m_Vc_dQ-1; Thu, 12 Dec 2019 07:48:49 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BA7F107ACC4;
- Thu, 12 Dec 2019 12:48:48 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
- (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4E91710013A1;
- Thu, 12 Dec 2019 12:48:46 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1ifNxk-0005Xh-Tb
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:01 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:42362)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1ifNxk-0005W5-MU
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 07:53:00 -0500
+Received: by mail-wr1-x432.google.com with SMTP id q6so2580858wro.9
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 04:53:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=UJRw/6pTHwg669MDPUQSE4YZuxiWLe8OTKSvZ9cB834=;
+ b=Bl6pHj62C154FAn8yUHrU+tf6VBj9MsVCs9UDgm7DNU72lHYXrPCfp+u2GX9ss57VL
+ PdShZdG13EdszCG0aAssaOcOBMqnMf/BJTZQT/RGuDvSKXjUqlU3j8UZb+S83HRe81aX
+ F7+UpjDxtfef4uEcGdFHuE0fE8/dnsG0Qkcy4JvpUUZwDNF70rh3300dxdUjty6sL314
+ P93oUzBSwMohrsP7digMCu+JxuyQ4+XZhKye0KlisQZIcP5ykYGUIEAPL3zMPyppc2xN
+ xFUkruB4Dpyi93MLJr37nlhY+/ntz6HH7rZ5BGK+rRxkhaq8fxzkYwP9dVY9zuuJSuAP
+ hXeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=UJRw/6pTHwg669MDPUQSE4YZuxiWLe8OTKSvZ9cB834=;
+ b=BUsvD1uZMRfybtcC7d8TqYjdeWNNqOSQ0Ncb5Lx12hIOxeAaxq2aWFKMBZxs4ft9ID
+ yd+MNpVvEEwkmBgxmQkPkCW1Pe46BahOPZiKxKjk65IdPNN3u3oLmQSlgHkflMN4/YAK
+ FFtbfpln9DSFDaL5D7QneSbYII0kEY1x5QB1FBv4V/27z7TLOVz9yMYgM7HuwN8rfUHH
+ SxLfgTL+BMc+fnBKCSXPMCXdhxNqUnMexJS8BBH3+c5citaElOjawmS2EoyMeQjKFzqC
+ rKuj8UnIofbLAbBMnlLUQR80w7WAr7Ep6I2E7RBsWQvaEnDupVGOW9UESt6CPMPAJQLn
+ wBCQ==
+X-Gm-Message-State: APjAAAU9a1ObQE/T4cUa3kd0aupWpfOh/Mjh3RA0UacfC3FkC5ZfQNEu
+ K6nut+uCpZL8ENAkYvC+UCYvqQAZ
+X-Google-Smtp-Source: APXvYqwejByHMZ9YhntEjizwraJccYaaiLfwwIlsZkvB6TmnNbLCZzJd9VI/OjKop6cnLyoalMKBLw==
+X-Received: by 2002:adf:dfd2:: with SMTP id q18mr6163190wrn.152.1576155179330; 
+ Thu, 12 Dec 2019 04:52:59 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id n189sm5193825wme.33.2019.12.12.04.52.58
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Thu, 12 Dec 2019 04:52:58 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] numa: properly check if numa is supported
-Date: Thu, 12 Dec 2019 13:48:56 +0100
-Message-Id: <1576154936-178362-3-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1576154936-178362-1-git-send-email-imammedo@redhat.com>
-References: <1576154936-178362-1-git-send-email-imammedo@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: Xs1KILyFN56-Kb0m_Vc_dQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Subject: [PATCH 001/132] build-sys hack: ensure target directory is there
+Date: Thu, 12 Dec 2019 13:50:45 +0100
+Message-Id: <1576155176-2464-2-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
+References: <1576155176-2464-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,82 +94,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Tao Xu <tao3.xu@intel.com>,
- qemu-stable@nongnu.org, Leif Lindholm <leif.lindholm@linaro.org>,
- qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit aa57020774b, by mistake used MachineClass::numa_mem_supported
-to check if NUMA is supported by machine and also as unrelated change
-set it to true for sbsa-ref board.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Luckily change didn't break machines that support NUMA, as the field
-is set to true for them.
+By removing some unnest-vars calls, we miss some directory creation
+that may be required by some/dir/object.d.
 
-But the field is not intended for checking if NUMA is supported and
-will be flipped to false within this release for new machine types.
+This will go away once everything is converted to Meson.
 
-Fix it:
- - by using previously used condition
-      !mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id
-   the first time and then use MachineState::numa_state down the road
-   to check if NUMA is supported
- - dropping stray sbsa-ref chunk
-
-Fixes: aa57020774b690a22be72453b8e91c9b5a68c516
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
-CC: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
-CC: Peter Maydell <peter.maydell@linaro.org>
-CC: Leif Lindholm <leif.lindholm@linaro.org>
-CC: qemu-arm@nongnu.org
-CC: qemu-stable@nongnu.org
+ rules.mak | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/rules.mak b/rules.mak
+index 967295d..e19ad19 100644
+--- a/rules.mak
++++ b/rules.mak
+@@ -66,6 +66,7 @@ expand-objs = $(strip $(sort $(filter %.o,$1)) \
+                   $(filter-out %.o %.mo,$1))
+ 
+ %.o: %.c
++	@mkdir -p $(dir $@)
+ 	$(call quiet-command,$(CC) $(QEMU_LOCAL_INCLUDES) $(QEMU_INCLUDES) \
+ 	       $(QEMU_CFLAGS) $(QEMU_DGFLAGS) $(CFLAGS) $($@-cflags) \
+ 	       -c -o $@ $<,"CC","$(TARGET_DIR)$@")
+-- 
+1.8.3.1
 
- hw/arm/sbsa-ref.c | 1 -
- hw/core/machine.c | 4 ++--
- 2 files changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-index 27046cc..c6261d4 100644
---- a/hw/arm/sbsa-ref.c
-+++ b/hw/arm/sbsa-ref.c
-@@ -791,7 +791,6 @@ static void sbsa_ref_class_init(ObjectClass *oc, void *=
-data)
-     mc->possible_cpu_arch_ids =3D sbsa_ref_possible_cpu_arch_ids;
-     mc->cpu_index_to_instance_props =3D sbsa_ref_cpu_index_to_props;
-     mc->get_default_cpu_node_id =3D sbsa_ref_get_default_cpu_node_id;
--    mc->numa_mem_supported =3D true;
- }
-=20
- static const TypeInfo sbsa_ref_info =3D {
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 1689ad3..aa63231 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -958,7 +958,7 @@ static void machine_initfn(Object *obj)
-                                         NULL);
-     }
-=20
--    if (mc->numa_mem_supported) {
-+    if (mc->cpu_index_to_instance_props && mc->get_default_cpu_node_id) {
-         ms->numa_state =3D g_new0(NumaState, 1);
-     }
-=20
-@@ -1102,7 +1102,7 @@ void machine_run_board_init(MachineState *machine)
- {
-     MachineClass *machine_class =3D MACHINE_GET_CLASS(machine);
-=20
--    if (machine_class->numa_mem_supported) {
-+    if (machine->numa_state) {
-         numa_complete_configuration(machine);
-         if (machine->numa_state->num_nodes) {
-             machine_numa_finish_cpu_init(machine);
---=20
-2.7.4
 
 
