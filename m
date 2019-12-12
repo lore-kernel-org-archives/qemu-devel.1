@@ -2,68 +2,99 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D75DC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 19:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E81C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 19:50:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 687A52077B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 19:42:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 687A52077B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 4E9322077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 19:50:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+9gG8WI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E9322077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifULg-0006Si-JP
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 14:42:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42508)
+	id 1ifUTt-0001eG-6v
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 14:50:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46021)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ifUKX-0005WE-VG
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:40:59 -0500
+ (envelope-from <philmd@redhat.com>) id 1ifUT3-0001BB-Q1
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:49:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ifUKW-00019h-Lr
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:40:57 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:60751)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ifUKS-000101-CB
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:40:56 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M1INQ-1ih91W05nO-002siR; Thu, 12 Dec 2019 20:40:48 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] target/m68k: only change valid bits in CACR
-Date: Thu, 12 Dec 2019 20:40:45 +0100
-Message-Id: <20191212194045.12882-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.23.0
+ (envelope-from <philmd@redhat.com>) id 1ifUT1-0008T9-CE
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:49:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57426
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ifUT0-0008QP-Tt
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 14:49:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576180181;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=J+igDZpZo3oGb7s51gniocQDN0+eNVW1CTVHPpvjbXc=;
+ b=H+9gG8WIuhUfbEmZP6GfogXUJGD9X8snhE+I+vhJbFpnTx3LOeyHRBF+x14+QfmCYFObqs
+ vUZyyEMPe1J2ksdaKUf8tODRX3aimZBqfBCYnSrTsETOnq6ijlQI/G5NR+HLOa6wCseprG
+ FNPhtzzz7jn2klFcsyGku3tDULIEaT0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-Zrkzy6S1MRqnBmUiCSUphQ-1; Thu, 12 Dec 2019 14:49:39 -0500
+Received: by mail-wr1-f71.google.com with SMTP id k18so1433649wrw.9
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 11:49:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=llnroTvFFDmz8+5y4uMgGGIvzVLQ41Ivm9eqif6Dn4M=;
+ b=TlyGcH7dD/RLbWjtfwvGWxfQqVyHtRBOqueV7DOTBTj+WUinw6D0SGqC6hm5/aMSMj
+ zl552clKb1DvaeiNdqUzNQKJVUx0HfBTMWZlHQFt8tS686KCmkhCAMi23CH1mtCbSy4H
+ 5YKsgbLdLZVDZt12QwPJpm/As/Ffc7L/wXUarrY5lrDLSE6+pAj9ons4BGp6XJDeH1o1
+ GukKqnNVMJd5JISxZk4U6aQo4/BXkSmPDSRw13nQwH6iOTWImugpR6LLEe49lXkJM34v
+ Ox26xoriVOCraIBaiORiBJR4WFTux2Kt+UeAuhu2SqsMGCMtWOiIH4f1IAnKP5oIKRcf
+ 92NQ==
+X-Gm-Message-State: APjAAAU9cfWKIx1yqoatZGMmoYHCrNibysAAWD0NQfH35yMt36aBaDoG
+ mNLJwDoqO0+KzvF+7yG7aE5M/o5KIT9AlQgpj8anfIocmXT2Ve9jts+f30EwdABUtyzsnfOyFvr
+ Ya/ptlnqdxs6zpoE=
+X-Received: by 2002:a1c:1941:: with SMTP id 62mr5076575wmz.111.1576180178777; 
+ Thu, 12 Dec 2019 11:49:38 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzZFm4LvoTWnm8ubXhPO6WF1iWPbXI2w5celQiEED5a30/T1puPzOPAx6ogNzf/xCbzAb4IOA==
+X-Received: by 2002:a1c:1941:: with SMTP id 62mr5076559wmz.111.1576180178576; 
+ Thu, 12 Dec 2019 11:49:38 -0800 (PST)
+Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
+ [83.42.66.34])
+ by smtp.gmail.com with ESMTPSA id l15sm6962327wrv.39.2019.12.12.11.49.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 12 Dec 2019 11:49:37 -0800 (PST)
+Subject: Re: [PATCH v2 4/8] pci-stub: add more MSI functions
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1576171754-45138-1-git-send-email-pbonzini@redhat.com>
+ <1576171754-45138-5-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <24791146-c86c-ad98-94ba-30bfb6141c74@redhat.com>
+Date: Thu, 12 Dec 2019 20:49:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:yozRRqaLw1zXvx3bLY+piiPVA8r1Z5yVhMB0a/Cn0SOI85RS/1x
- iWIfEm5dLsyFT8MqXZG0XZFSLNrF+iozBOSRKEFNPZIJEm13TV/kBWEAgpF2wka1Tpw7uPD
- PrBlOdcTlsmgoDwwTNz0dS5n1bFDpByqm/NEpUZWQ6DYWHbt1cNFJIWtzyLM/rzNC6QstGp
- 59NgIMppt6ehKRZm+1Vqg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:xtZ0CctKWak=:yhaW4BbiU8ipJ5oTQ2qd12
- z1W2V+q/YjyUGwYID/CHZB32Tdz0S5DUt5bRw7a0nwOuwPw6ecQZLufYwxu5hGLB9isa28qRE
- QeNrzk26vG9PQ5WiVvkaB3BJVyN76HEzvm3FQn59SPSwC2Y6oQbW1Id0Hqs5iIGrNwF7zx5X9
- HTmAWR8lzKQYRt28maN3SyGXeqdzyIYZZzbTZyN4LMy1OaAo/ForYbJs6uCmNFua+jfGI9m6c
- NOFJFC6rB45D8EXdUWmxhUxq7EiU638JQ0PN7ppg4r5DEzYBo/KMz7NddnwImr4p2JM2vucNd
- +trqYMqYDEqzxCCEveAY6/B30IFcwvP27pg/LquAg7+BbbmU+YLY5CG0uHbImb2cY7cAGv86O
- s7pJ+L3A6Dx27koZwchaV/A8seWoVRnasTKjK2nIbQ5JS65zbvTFcEDuvKzkvqiGpfTJGQjgt
- NoUUA1uF600fuc+Tf8J2HvRtTl26UVeOrYjSD2HSnehG8lJX8E7BvvLE9ZiYqyZvoS+g6P9oE
- 4FEIOLYt6xcRXiVp3Yub+UZzKji2yOEOa++JRuWaPFLNxjkzqRYy3QHYrz5CeOn+XTXkEu8T0
- fXMu+QbEL7g9KQC6nt1J4+STw9ZHeVDvs1togmsMuIjVcYkXFS2Qo9xfplsTD+8duVQJBZTwi
- gj9+sdsqZGLWxbdwaO+T5zcxWpGQDFwr5zcawmEsodtSeaEFk+XpZu6cvWE7iglneQLWLoadc
- T2b0DQcrJLFL249KnmA6PeBal4cUJuyoVLJLJuysloGYa8pv/mzuTvESo5m99H21l++KYVlq6
- /sdj6kzh7+Ao+LmWR9hI8QlYgHttmn+hjQroHvJxsMZMaGJUl7gJmRLIDFEKf19yX98Fmnu6a
- /tByyNQRtE11SfrDaXCg==
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Received-From: 212.227.17.10
+In-Reply-To: <1576171754-45138-5-git-send-email-pbonzini@redhat.com>
+Content-Language: en-US
+X-MC-Unique: Zrkzy6S1MRqnBmUiCSUphQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,130 +106,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <huth@tuxfamily.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: slp@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is used by netBSD (and MacOS ROM) to detect the MMU type
+On 12/12/19 6:29 PM, Paolo Bonzini wrote:
+> On x86, KVM needs some function from the PCI subsystem in order to set
+> up interrupt routes.  Provide some stubs to support x86 machines that
+> lack PCI.
+>=20
+> Reviewed-by: Sergio Lopez <slp@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- target/m68k/cpu.c    | 28 ++++++++++++++++++++++------
- target/m68k/cpu.h    |  4 ++++
- target/m68k/helper.c | 16 ++++++++++++++--
- 3 files changed, 40 insertions(+), 8 deletions(-)
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index e6596de29c..1d202cec49 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -114,11 +114,8 @@ static void m68000_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_MOVEP);
- }
- 
--static void m68020_cpu_initfn(Object *obj)
-+static void m680x0_cpu_common(CPUM68KState *env)
- {
--    M68kCPU *cpu = M68K_CPU(obj);
--    CPUM68KState *env = &cpu->env;
--
-     m68k_set_feature(env, M68K_FEATURE_M68000);
-     m68k_set_feature(env, M68K_FEATURE_USP);
-     m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
-@@ -136,14 +133,32 @@ static void m68020_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_CHK2);
-     m68k_set_feature(env, M68K_FEATURE_MOVEP);
- }
--#define m68030_cpu_initfn m68020_cpu_initfn
-+
-+static void m68020_cpu_initfn(Object *obj)
-+{
-+    M68kCPU *cpu = M68K_CPU(obj);
-+    CPUM68KState *env = &cpu->env;
-+
-+    m680x0_cpu_common(env);
-+    m68k_set_feature(env, M68K_FEATURE_MMU68851);
-+}
-+
-+static void m68030_cpu_initfn(Object *obj)
-+{
-+    M68kCPU *cpu = M68K_CPU(obj);
-+    CPUM68KState *env = &cpu->env;
-+
-+    m680x0_cpu_common(env);
-+    m68k_set_feature(env, M68K_FEATURE_MMU68030);
-+}
- 
- static void m68040_cpu_initfn(Object *obj)
- {
-     M68kCPU *cpu = M68K_CPU(obj);
-     CPUM68KState *env = &cpu->env;
- 
--    m68020_cpu_initfn(obj);
-+    m680x0_cpu_common(env);
-+    m68k_set_feature(env, M68K_FEATURE_MMU68040);
-     m68k_set_feature(env, M68K_FEATURE_M68040);
- }
- 
-@@ -166,6 +181,7 @@ static void m68060_cpu_initfn(Object *obj)
-     m68k_set_feature(env, M68K_FEATURE_BKPT);
-     m68k_set_feature(env, M68K_FEATURE_RTD);
-     m68k_set_feature(env, M68K_FEATURE_CHK2);
-+    m68k_set_feature(env, M68K_FEATURE_MMU68060);
- }
- 
- static void m5208_cpu_initfn(Object *obj)
-diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-index 20de3c379a..36e4353b44 100644
---- a/target/m68k/cpu.h
-+++ b/target/m68k/cpu.h
-@@ -483,6 +483,10 @@ enum m68k_features {
-     M68K_FEATURE_CHK2,
-     M68K_FEATURE_M68040, /* instructions specific to MC68040 */
-     M68K_FEATURE_MOVEP,
-+    M68K_FEATURE_MMU68851,
-+    M68K_FEATURE_MMU68030,
-+    M68K_FEATURE_MMU68040,
-+    M68K_FEATURE_MMU68060,
- };
- 
- static inline int m68k_feature(CPUM68KState *env, int feature)
-diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-index ae766a6cb0..b5758bbd7d 100644
---- a/target/m68k/helper.c
-+++ b/target/m68k/helper.c
-@@ -205,7 +205,13 @@ void HELPER(m68k_movec_to)(CPUM68KState *env, uint32_t reg, uint32_t val)
-         return;
-     /* MC680[234]0 */
-     case M68K_CR_CACR:
--        env->cacr = val;
-+        if (m68k_feature(env, M68K_FEATURE_MMU68040)) {
-+            env->cacr = val & 0x80008000;
-+        } else if (m68k_feature(env, M68K_FEATURE_MMU68030)) {
-+            env->cacr = val & 0x00003fff;
-+        } else if (m68k_feature(env, M68K_FEATURE_MMU68851)) {
-+            env->cacr = val & 0x0000000f;
-+        }
-         m68k_switch_sp(env);
-         return;
-     /* MC680[34]0 */
-@@ -261,7 +267,13 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState *env, uint32_t reg)
-         return env->vbr;
-     /* MC680[234]0 */
-     case M68K_CR_CACR:
--        return env->cacr;
-+        if (m68k_feature(env, M68K_FEATURE_MMU68040)) {
-+            return env->cacr & 0x80008000;
-+        } else if (m68k_feature(env, M68K_FEATURE_MMU68030)) {
-+            return env->cacr & 0x00003fff;
-+        } else if (m68k_feature(env, M68K_FEATURE_MMU68851)) {
-+            return env->cacr & 0x0000000f;
-+        }
-     /* MC680[34]0 */
-     case M68K_CR_TC:
-         return env->mmu.tcr;
--- 
-2.23.0
+> ---
+>   hw/pci/pci-stub.c | 27 +++++++++++++++++++++++++++
+>   1 file changed, 27 insertions(+)
+>=20
+> diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+> index c04a5df..cc2a2e1 100644
+> --- a/hw/pci/pci-stub.c
+> +++ b/hw/pci/pci-stub.c
+> @@ -26,6 +26,7 @@
+>   #include "qapi/qmp/qerror.h"
+>   #include "hw/pci/pci.h"
+>   #include "hw/pci/msi.h"
+> +#include "hw/pci/msix.h"
+>  =20
+>   bool msi_nonbroken;
+>   bool pci_available;
+> @@ -64,3 +65,29 @@ void msi_notify(PCIDevice *dev, unsigned int vector)
+>   {
+>       g_assert_not_reached();
+>   }
+> +
+> +/* Required by target/i386/kvm.c */
+> +bool msi_is_masked(const PCIDevice *dev, unsigned vector)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +
+> +MSIMessage msi_get_message(PCIDevice *dev, unsigned int vector)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +
+> +int msix_enabled(PCIDevice *dev)
+> +{
+> +    return false;
+> +}
+> +
+> +bool msix_is_masked(PCIDevice *dev, unsigned vector)
+> +{
+> +    g_assert_not_reached();
+> +}
+> +
+> +MSIMessage msix_get_message(PCIDevice *dev, unsigned int vector)
+> +{
+> +    g_assert_not_reached();
+> +}
+>=20
 
 
