@@ -2,101 +2,90 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D63C2C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 00:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D45C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 00:37:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2259214AF
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 00:34:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DED5214D8
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 00:37:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQjxMyKk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2259214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rom8Njni"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DED5214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifCQf-00057Y-QC
-	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 19:34:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60611)
+	id 1ifCTn-0006Za-6y
+	for qemu-devel@archiver.kernel.org; Wed, 11 Dec 2019 19:37:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52020)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ifCOB-0002nG-W9
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 19:31:32 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ifCSz-00062I-Bm
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 19:36:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ifCO4-000849-HH
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 19:31:27 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24016
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ifCO3-000823-AB
- for qemu-devel@nongnu.org; Wed, 11 Dec 2019 19:31:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576110682;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UJGOP2uBpm5En8S36aOhtvQxYnoYYWbOTtm9lAZdCHs=;
- b=QQjxMyKkqLe+0TPITzH+FcBBaIl8Y8ueWC+TQF5bARO+Od32T2uO/9h9nta4pdBtURS3eA
- 1kXcuHrEggoGpQfLbzPT1pOMoOYHmQ1fp7HDmjzuiq6u+P6u2a7flh1HbHQGeCHqQDOLtX
- P9MtSmPwbvMJj/qEMJtTfpPdBJ5tfKE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-291-TykT7G5XMxiSs8NWJWXUWQ-1; Wed, 11 Dec 2019 19:31:07 -0500
-Received: by mail-wr1-f72.google.com with SMTP id 90so311766wrq.6
- for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 16:31:07 -0800 (PST)
+ (envelope-from <richard.henderson@linaro.org>) id 1ifCSy-0008Bc-Eh
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 19:36:29 -0500
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:40185)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ifCSy-00089i-8O
+ for qemu-devel@nongnu.org; Wed, 11 Dec 2019 19:36:28 -0500
+Received: by mail-pg1-x541.google.com with SMTP id k25so198983pgt.7
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 16:36:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=EBXWGM+EyE3h+YSrNPASzXIjTgAbTF+CJziNTgPQOdo=;
+ b=Rom8Njnibqlg71eElLdJ/4Tum17IzXEg9p0+k72itPKxD9n3qpUiPVNbHgdrwfG4kv
+ 9jBr/dEJ9ayyrpTaeTO0YqF3ZX8sC/9Q2jjy3onxueYM5j23eTCOjfT5gKDoMzVPeUU6
+ xInVMsynMypPVSEYqZmS8J5vzHExhBnTScCnoWxE2h6Z9S5AEOAlfBzgh+YUOprfk9DY
+ W3+cR6PVQNJTSPYL+MfOczw4YxWquCHxIMDXyRVQ/NekD/Jq+cM3mhGnm6UGDkJMnvmc
+ VPP9X/j2IZlWiaGMAxYgfJFZ5frXTnDdqqS/HICUmNUBD4f2RUyNJy93HLnP6przGlLR
+ Jtlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=UJGOP2uBpm5En8S36aOhtvQxYnoYYWbOTtm9lAZdCHs=;
- b=VOLpbk650fuWCzCLnNmD5TUxnQwNnIs8TkL9kun9k/vhjBUFiD7NFMxbnkWd2YXmOK
- ZwgbT9ESM7m4ncGAgJouhZCH2HrOpL8mo/qvzQQC1B4b3oizNxC7tfJZVqWtL2HvhaI0
- J6zGjU8ZC87zIbeQbjPCtt48YfspXZkpCkMdHUV6DvROwVVJQlglop08ih7/61v4L7I+
- C3V2QANsq6svkvQbtXmso1zjzOoeEJSvzOSoFGgybKd+mdrgIICJYh5+zVBWPtH1jRrn
- Z1JZt/rg4Koo/76QF0MAB+THl3zVy2VXGE61V/IZ15umeTSKxJ3b2E54t0avfwrprKhl
- 0NqA==
-X-Gm-Message-State: APjAAAUgarlvAZ6ThGTCaDjjcTh2i2SHAsoML6S2yett+DT62A3P+eE4
- IWGu6xPZ8mzARPQdix4+GQ7IvkQcYyfK2/4mpCteixFCqO5svYAPxiOFJJB7rAOwd6cGqsL7km6
- PKuc1re5DQCw84L0=
-X-Received: by 2002:adf:fa12:: with SMTP id m18mr2711295wrr.309.1576110666141; 
- Wed, 11 Dec 2019 16:31:06 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzcqfZatkvH4PnwiUjxdpl7g13EVDB2oLVNPnTsYZZ1kdm4muEW6fxgbOom+YOWS/ntbE1v+Q==
-X-Received: by 2002:adf:fa12:: with SMTP id m18mr2711276wrr.309.1576110665845; 
- Wed, 11 Dec 2019 16:31:05 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9?
- ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
- by smtp.gmail.com with ESMTPSA id f1sm4231998wml.11.2019.12.11.16.31.05
+ bh=EBXWGM+EyE3h+YSrNPASzXIjTgAbTF+CJziNTgPQOdo=;
+ b=KwKjgOhdptfL+kmFqxgk3z4abuHotZOsTjSseaIhOZrgyiVVWH5Qe0ZuKms9SwCEBf
+ N2UpkoAhSd7JOuify0qrWjn5LGdXud8l26P8sq3Avnw385W64IihqkgiCNRi7CJAW8is
+ w25EOiRohrqF9s7DwQKwCUIMWW8LtWnKYY1psEnHM6O52KieQg4rUqsRqseFDTFi4iuj
+ rF9e8nJoIvs8NbqplfiMA5z2GofKUAyY3akb6Gs2c0yh02MZgu077+oMqmGRkaNRyQK5
+ /3JNoSv0oL7bHJqYAf9ITZlQwI4Z/+apap9x9dkmWrKsPjy6+3tKr0m3vYZ5P0IqdT73
+ WUlA==
+X-Gm-Message-State: APjAAAUi7V7j4LVGui/fEsx5Xa+nZb5I88GUcu8OUJpQx3HYIS6WmpeG
+ cDU5oNrve88HUm9kc4T5lJp3NQ==
+X-Google-Smtp-Source: APXvYqwPrYv5D14beVLe9QF1KTYggoi6brCUqnoLQX7mZLrMqhFCB1W9EUwdv4iCCoHOj5Zi6fRsiA==
+X-Received: by 2002:a62:aa13:: with SMTP id e19mr6853409pff.36.1576110986855; 
+ Wed, 11 Dec 2019 16:36:26 -0800 (PST)
+Received: from [192.168.1.11] (97-113-7-119.tukw.qwest.net. [97.113.7.119])
+ by smtp.gmail.com with ESMTPSA id q6sm4683307pfq.27.2019.12.11.16.36.25
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 11 Dec 2019 16:31:05 -0800 (PST)
-Subject: Re: [PATCH 1/1] tests/Makefile: Fix check-report.* targets shown in
- check-help
-To: Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org, 
- "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
-References: <20191211204427.4681-1-wainersm@redhat.com>
- <20191211204427.4681-2-wainersm@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <daf920c0-7b3e-5b2e-c865-ccaf39ba1740@redhat.com>
-Date: Thu, 12 Dec 2019 01:31:05 +0100
+ Wed, 11 Dec 2019 16:36:26 -0800 (PST)
+Subject: Re: [PATCH] target/arm: Display helpful message when hflags mismatch
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20191209134552.27733-1-philmd@redhat.com>
+ <87d0cx32vv.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <1d51109a-ae9f-7bfe-66d4-0e1e1266df64@linaro.org>
+Date: Wed, 11 Dec 2019 16:36:24 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <20191211204427.4681-2-wainersm@redhat.com>
-Content-Language: en-US
-X-MC-Unique: TykT7G5XMxiSs8NWJWXUWQ-1
-X-Mimecast-Spam-Score: 0
+In-Reply-To: <87d0cx32vv.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::541
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,41 +97,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/12/19 21:44, Wainer dos Santos Moschetta wrote:
-> The check-report.html and check-report.xml targets were replaced
-> with check-report.tap in commit 9df43317b82 but the check-help
-> text was not updated so it still lists check-report.html.
+On 12/9/19 8:00 AM, Alex Bennée wrote:
+>> -#ifdef CONFIG_DEBUG_TCG
+>> -    assert(flags == rebuild_hflags_internal(env));
+>> -#endif
+>> +    assert_hflags_rebuild_correctly(env);
 > 
-> Fixes: 9df43317b82
-> Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-> ---
->  tests/Makefile.include | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+> I'm trying to recall why we don't just use:
 > 
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 8566f5f119..680bd8a669 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -16,12 +16,10 @@ check-help:
->  	@echo " $(MAKE) check-softfloat      Run FPU emulation tests"
->  	@echo " $(MAKE) check-acceptance     Run all acceptance (functional) tests"
->  	@echo
-> -	@echo " $(MAKE) check-report.html    Generates an HTML test report"
-> +	@echo " $(MAKE) check-report.tap     Generates an aggregated TAP test report"
->  	@echo " $(MAKE) check-venv           Creates a Python venv for tests"
->  	@echo " $(MAKE) check-clean          Clean the tests and related data"
->  	@echo
-> -	@echo "Please note that HTML reports do not regenerate if the unit tests"
-> -	@echo "have not changed."
->  	@echo
->  	@echo "The variable SPEED can be set to control the gtester speed setting."
->  	@echo "Default options are -k and (for $(MAKE) V=1) --verbose; they can be"
+>   g_assert_cmphex(flags, =, rebuild_hflags_internal(env))
 > 
+> I think it came up in one of the reviews.
 
-Cc: qemu-trivial@nongnu.org
+checkpatch.pl.
 
+Because, I believe, there is an environment variable that causes this to *not*
+abort on mismatch.
+
+
+r~
 
