@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4D5C00454
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76B69C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:14:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F8992253D
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:13:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39792205C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 17:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nt9GFHwU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F8992253D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AGIoZUjF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39792205C9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34507 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifS1q-0000op-OL
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 12:13:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50142)
+	id 1ifS30-00027L-0E
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 12:14:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46735)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ifRVg-0005pv-GJ
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:18 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ifRVL-0005Q1-Lj
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ifRVe-0002CJ-L2
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57737
+ (envelope-from <dgilbert@redhat.com>) id 1ifRVK-0001eV-6A
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47710
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRVc-00029B-Hg
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:40:13 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifRVK-0001dl-2K
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 11:39:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576168811;
+ s=mimecast20190719; t=1576168793;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KjTJlOeSDvTMFG+Z7IYeIYkmtBqqT9LFbg4f4QaR7T4=;
- b=Nt9GFHwU+T7akoL4M4Pg9eqfp0jaCn+DI/LQjN7a5DmM1ehjHHZnOdRRCyCMRtZIeUV9Md
- XZgg6EwMB/0eV9CtB1ovCeJZS7Z6YspJdL+QlBZCXbCEK+eEWUT7FlDfXAJgxObtPDgW+L
- 0OhQQDtmbzvtOA/AZcr0C5hd4pyeM1M=
+ bh=5oWNA0oGQioHCkmreQwFOTLRRcxDsb9hm+i3cW+LpQc=;
+ b=AGIoZUjF1AsVQNAe3s7wG+I/5GE7a5TEbsPfh5+nCX25SXwqTFtUS1plN9wGUrywaxJKrp
+ vkbfiQgUxrq3lLJi2CIYPMIP4nu5kyktelknm8srUIqARyFiX9xhGymAZ+qEPKBNVKKIQD
+ 6VK8fDgmN46ypYiK75QhzXHiV34CILc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-kHbCYqpqNO63Ntm8fJAO4Q-1; Thu, 12 Dec 2019 11:40:10 -0500
+ us-mta-125-pjp5xW6aOB-45cUY2xSFSg-1; Thu, 12 Dec 2019 11:39:49 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D51FE477
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:40:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 778B41800D42
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:39:48 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-116-226.ams2.redhat.com
  [10.36.116.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0107860BF3;
- Thu, 12 Dec 2019 16:40:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6D23A60BE1;
+ Thu, 12 Dec 2019 16:39:45 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org,
 	stefanha@redhat.com,
 	vgoyal@redhat.com
-Subject: [PATCH 037/104] virtiofsd: passthrough_ll: add fallback for racy ops
-Date: Thu, 12 Dec 2019 16:37:57 +0000
-Message-Id: <20191212163904.159893-38-dgilbert@redhat.com>
+Subject: [PATCH 023/104] virtiofsd: Send replies to messages
+Date: Thu, 12 Dec 2019 16:37:43 +0000
+Message-Id: <20191212163904.159893-24-dgilbert@redhat.com>
 In-Reply-To: <20191212163904.159893-1-dgilbert@redhat.com>
 References: <20191212163904.159893-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: kHbCYqpqNO63Ntm8fJAO4Q-1
+X-MC-Unique: pjp5xW6aOB-45cUY2xSFSg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -92,294 +92,187 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Miklos Szeredi <mszeredi@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-We have two operations that cannot be done race-free on a symlink in
-certain cases: utimes and link.
+Route fuse out messages back through the same queue elements
+that had the command that triggered the request.
 
-Add racy fallback for these if the race-free method doesn't work.  We do
-our best to avoid races even in this case:
-
-  - get absolute path by reading /proc/self/fd/NN symlink
-
-  - lookup parent directory: after this we are safe against renames in
-    ancestors
-
-  - lookup name in parent directory, and verify that we got to the original
-    inode,  if not retry the whole thing
-
-Both utimes(2) and link(2) hold i_lock on the inode across the operation,
-so a racing rename/delete by this fuse instance is not possible, only from
-other entities changing the filesystem.
-
-If the "norace" option is given, then disable the racy fallbacks.
-
-Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/passthrough_ll.c | 159 +++++++++++++++++++++++++++----
- 1 file changed, 142 insertions(+), 17 deletions(-)
+ tools/virtiofsd/fuse_lowlevel.c |   4 ++
+ tools/virtiofsd/fuse_virtio.c   | 107 ++++++++++++++++++++++++++++++--
+ tools/virtiofsd/fuse_virtio.h   |   4 ++
+ 3 files changed, 111 insertions(+), 4 deletions(-)
 
-diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough=
-_ll.c
-index 93e74cce21..1faae2753f 100644
---- a/tools/virtiofsd/passthrough_ll.c
-+++ b/tools/virtiofsd/passthrough_ll.c
-@@ -98,6 +98,7 @@ enum {
- struct lo_data {
-     pthread_mutex_t mutex;
-     int debug;
-+    int norace;
-     int writeback;
-     int flock;
-     int xattr;
-@@ -124,10 +125,15 @@ static const struct fuse_opt lo_opts[] =3D {
-     { "cache=3Dnever", offsetof(struct lo_data, cache), CACHE_NEVER },
-     { "cache=3Dauto", offsetof(struct lo_data, cache), CACHE_NORMAL },
-     { "cache=3Dalways", offsetof(struct lo_data, cache), CACHE_ALWAYS },
--
-+    { "norace", offsetof(struct lo_data, norace), 1 },
-     FUSE_OPT_END
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowleve=
+l.c
+index 2bdd1d9d80..c2b114cf5b 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -171,6 +171,10 @@ static int fuse_send_msg(struct fuse_session *se, stru=
+ct fuse_chan *ch,
+         }
+     }
+=20
++    if (fuse_lowlevel_is_virtio(se)) {
++        return virtio_send_msg(se, ch, iov, count);
++    }
++
+     abort(); /* virtio should have taken it before here */
+     return 0;
+ }
+diff --git a/tools/virtiofsd/fuse_virtio.c b/tools/virtiofsd/fuse_virtio.c
+index 99cced6888..c38268a1d5 100644
+--- a/tools/virtiofsd/fuse_virtio.c
++++ b/tools/virtiofsd/fuse_virtio.c
+@@ -41,6 +41,9 @@ struct fv_QueueInfo {
+     /* Our queue index, corresponds to array position */
+     int qidx;
+     int kick_fd;
++
++    /* The element for the command currently being processed */
++    VuVirtqElement *qe;
  };
 =20
-+static void unref_inode(struct lo_data *lo, struct lo_inode *inode, uint64=
-_t n);
-+
-+static struct lo_inode *lo_find(struct lo_data *lo, struct stat *st);
-+
-+
- static struct lo_data *lo_data(fuse_req_t req)
- {
-     return (struct lo_data *)fuse_req_userdata(req);
-@@ -347,23 +353,127 @@ static void lo_getattr(fuse_req_t req, fuse_ino_t in=
-o,
-     fuse_reply_attr(req, &buf, lo->timeout);
+ /*
+@@ -121,6 +124,105 @@ static void copy_from_iov(struct fuse_buf *buf, size_=
+t out_num,
+     }
  }
 =20
--static int utimensat_empty_nofollow(struct lo_inode *inode,
--                                    const struct timespec *tv)
-+static int lo_parent_and_name(struct lo_data *lo, struct lo_inode *inode,
-+                              char path[PATH_MAX], struct lo_inode **paren=
-t)
- {
--    int res;
-     char procname[64];
-+    char *last;
-+    struct stat stat;
-+    struct lo_inode *p;
-+    int retries =3D 2;
-+    int res;
++/*
++ * Copy from one iov to another, the given number of bytes
++ * The caller must have checked sizes.
++ */
++static void copy_iov(struct iovec *src_iov, int src_count,
++                     struct iovec *dst_iov, int dst_count, size_t to_copy)
++{
++    size_t dst_offset =3D 0;
++    /* Outer loop copies 'src' elements */
++    while (to_copy) {
++        assert(src_count);
++        size_t src_len =3D src_iov[0].iov_len;
++        size_t src_offset =3D 0;
 +
-+retry:
-+    sprintf(procname, "/proc/self/fd/%i", inode->fd);
-+
-+    res =3D readlink(procname, path, PATH_MAX);
-+    if (res < 0) {
-+        fuse_log(FUSE_LOG_WARNING, "lo_parent_and_name: readlink failed: %=
-m\n");
-+        goto fail_noretry;
-+    }
-+
-+    if (res >=3D PATH_MAX) {
-+        fuse_log(FUSE_LOG_WARNING, "lo_parent_and_name: readlink overflowe=
-d\n");
-+        goto fail_noretry;
-+    }
-+    path[res] =3D '\0';
-+
-+    last =3D strrchr(path, '/');
-+    if (last =3D=3D NULL) {
-+        /* Shouldn't happen */
-+        fuse_log(
-+            FUSE_LOG_WARNING,
-+            "lo_parent_and_name: INTERNAL ERROR: bad path read from proc\n=
-");
-+        goto fail_noretry;
-+    }
-+    if (last =3D=3D path) {
-+        p =3D &lo->root;
-+        pthread_mutex_lock(&lo->mutex);
-+        p->refcount++;
-+        pthread_mutex_unlock(&lo->mutex);
-+    } else {
-+        *last =3D '\0';
-+        res =3D fstatat(AT_FDCWD, last =3D=3D path ? "/" : path, &stat, 0)=
-;
-+        if (res =3D=3D -1) {
-+            if (!retries) {
-+                fuse_log(FUSE_LOG_WARNING,
-+                         "lo_parent_and_name: failed to stat parent: %m\n"=
-);
++        if (src_len > to_copy) {
++            src_len =3D to_copy;
++        }
++        /* Inner loop copies contents of one 'src' to maybe multiple dst. =
+*/
++        while (src_len) {
++            assert(dst_count);
++            size_t dst_len =3D dst_iov[0].iov_len - dst_offset;
++            if (dst_len > src_len) {
++                dst_len =3D src_len;
 +            }
-+            goto fail;
-+        }
-+        p =3D lo_find(lo, &stat);
-+        if (p =3D=3D NULL) {
-+            if (!retries) {
-+                fuse_log(FUSE_LOG_WARNING,
-+                         "lo_parent_and_name: failed to find parent\n");
++
++            memcpy(dst_iov[0].iov_base + dst_offset,
++                   src_iov[0].iov_base + src_offset, dst_len);
++            src_len -=3D dst_len;
++            to_copy -=3D dst_len;
++            src_offset +=3D dst_len;
++            dst_offset +=3D dst_len;
++
++            assert(dst_offset <=3D dst_iov[0].iov_len);
++            if (dst_offset =3D=3D dst_iov[0].iov_len) {
++                dst_offset =3D 0;
++                dst_iov++;
++                dst_count--;
 +            }
-+            goto fail;
 +        }
++        src_iov++;
++        src_count--;
 +    }
-+    last++;
-+    res =3D fstatat(p->fd, last, &stat, AT_SYMLINK_NOFOLLOW);
-+    if (res =3D=3D -1) {
-+        if (!retries) {
-+            fuse_log(FUSE_LOG_WARNING,
-+                     "lo_parent_and_name: failed to stat last\n");
-+        }
-+        goto fail_unref;
-+    }
-+    if (stat.st_dev !=3D inode->dev || stat.st_ino !=3D inode->ino) {
-+        if (!retries) {
-+            fuse_log(FUSE_LOG_WARNING,
-+                     "lo_parent_and_name: failed to match last\n");
-+        }
-+        goto fail_unref;
-+    }
-+    *parent =3D p;
-+    memmove(path, last, strlen(last) + 1);
-+
-+    return 0;
-+
-+fail_unref:
-+    unref_inode(lo, p, 1);
-+fail:
-+    if (retries) {
-+        retries--;
-+        goto retry;
-+    }
-+fail_noretry:
-+    errno =3D EIO;
-+    return -1;
 +}
 +
-+static int utimensat_empty(struct lo_data *lo, struct lo_inode *inode,
-+                           const struct timespec *tv)
++/*
++ * Called back by ll whenever it wants to send a reply/message back
++ * The 1st element of the iov starts with the fuse_out_header
++ * 'unique'=3D=3D0 means it's a notify message.
++ */
++int virtio_send_msg(struct fuse_session *se, struct fuse_chan *ch,
++                    struct iovec *iov, int count)
 +{
-+    int res;
-+    struct lo_inode *parent;
-+    char path[PATH_MAX];
-=20
-     if (inode->is_symlink) {
--        res =3D utimensat(inode->fd, "", tv, AT_EMPTY_PATH | AT_SYMLINK_NO=
-FOLLOW);
-+        res =3D utimensat(inode->fd, "", tv, AT_EMPTY_PATH);
-         if (res =3D=3D -1 && errno =3D=3D EINVAL) {
-             /* Sorry, no race free way to set times on symlink. */
--            errno =3D EPERM;
-+            if (lo->norace) {
-+                errno =3D EPERM;
-+            } else {
-+                goto fallback;
-+            }
-         }
-         return res;
-     }
--    sprintf(procname, "/proc/self/fd/%i", inode->fd);
-+    sprintf(path, "/proc/self/fd/%i", inode->fd);
++    VuVirtqElement *elem;
++    VuVirtq *q;
 +
-+    return utimensat(AT_FDCWD, path, tv, 0);
-=20
--    return utimensat(AT_FDCWD, procname, tv, 0);
-+fallback:
-+    res =3D lo_parent_and_name(lo, inode, path, &parent);
-+    if (res !=3D -1) {
-+        res =3D utimensat(parent->fd, path, tv, AT_SYMLINK_NOFOLLOW);
-+        unref_inode(lo, parent, 1);
++    assert(count >=3D 1);
++    assert(iov[0].iov_len >=3D sizeof(struct fuse_out_header));
++
++    struct fuse_out_header *out =3D iov[0].iov_base;
++    /* TODO: Endianness! */
++
++    size_t tosend_len =3D iov_size(iov, count);
++
++    /* unique =3D=3D 0 is notification, which we don't support */
++    assert(out->unique);
++    /* For virtio we always have ch */
++    assert(ch);
++    elem =3D ch->qi->qe;
++    q =3D &ch->qi->virtio_dev->dev.vq[ch->qi->qidx];
++
++    /* The 'in' part of the elem is to qemu */
++    unsigned int in_num =3D elem->in_num;
++    struct iovec *in_sg =3D elem->in_sg;
++    size_t in_len =3D iov_size(in_sg, in_num);
++    fuse_log(FUSE_LOG_DEBUG, "%s: elem %d: with %d in desc of length %zd\n=
+",
++             __func__, elem->index, in_num, in_len);
++
++    /*
++     * The elem should have room for a 'fuse_out_header' (out from fuse)
++     * plus the data based on the len in the header.
++     */
++    if (in_len < sizeof(struct fuse_out_header)) {
++        fuse_log(FUSE_LOG_ERR, "%s: elem %d too short for out_header\n",
++                 __func__, elem->index);
++        return -E2BIG;
++    }
++    if (in_len < tosend_len) {
++        fuse_log(FUSE_LOG_ERR, "%s: elem %d too small for data len %zd\n",
++                 __func__, elem->index, tosend_len);
++        return -E2BIG;
 +    }
 +
-+    return res;
- }
-=20
- static int lo_fi_fd(fuse_req_t req, struct fuse_file_info *fi)
-@@ -387,6 +497,7 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino, =
-struct stat *attr,
- {
-     int saverr;
-     char procname[64];
-+    struct lo_data *lo =3D lo_data(req);
-     struct lo_inode *inode;
-     int ifd;
-     int res;
-@@ -459,7 +570,7 @@ static void lo_setattr(fuse_req_t req, fuse_ino_t ino, =
-struct stat *attr,
-         if (fi) {
-             res =3D futimens(fd, tv);
-         } else {
--            res =3D utimensat_empty_nofollow(inode, tv);
-+            res =3D utimensat_empty(lo, inode, tv);
-         }
-         if (res =3D=3D -1) {
-             goto out_err;
-@@ -692,24 +803,38 @@ static void lo_symlink(fuse_req_t req, const char *li=
-nk, fuse_ino_t parent,
-     lo_mknod_symlink(req, parent, name, S_IFLNK, 0, link);
- }
-=20
--static int linkat_empty_nofollow(struct lo_inode *inode, int dfd,
--                                 const char *name)
-+static int linkat_empty_nofollow(struct lo_data *lo, struct lo_inode *inod=
-e,
-+                                 int dfd, const char *name)
- {
-     int res;
--    char procname[64];
-+    struct lo_inode *parent;
-+    char path[PATH_MAX];
-=20
-     if (inode->is_symlink) {
-         res =3D linkat(inode->fd, "", dfd, name, AT_EMPTY_PATH);
-         if (res =3D=3D -1 && (errno =3D=3D ENOENT || errno =3D=3D EINVAL))=
- {
-             /* Sorry, no race free way to hard-link a symlink. */
--            errno =3D EPERM;
-+            if (lo->norace) {
-+                errno =3D EPERM;
-+            } else {
-+                goto fallback;
-+            }
-         }
-         return res;
-     }
-=20
--    sprintf(procname, "/proc/self/fd/%i", inode->fd);
-+    sprintf(path, "/proc/self/fd/%i", inode->fd);
++    copy_iov(iov, count, in_sg, in_num, tosend_len);
++    vu_queue_push(&se->virtio_dev->dev, q, elem, tosend_len);
++    vu_queue_notify(&se->virtio_dev->dev, q);
 +
-+    return linkat(AT_FDCWD, path, dfd, name, AT_SYMLINK_FOLLOW);
++    return 0;
++}
 +
-+fallback:
-+    res =3D lo_parent_and_name(lo, inode, path, &parent);
-+    if (res !=3D -1) {
-+        res =3D linkat(parent->fd, path, dfd, name, 0);
-+        unref_inode(lo, parent, 1);
-+    }
+ /* Thread function for individual queues, created when a queue is 'started=
+' */
+ static void *fv_queue_thread(void *opaque)
+ {
+@@ -227,13 +329,10 @@ static void *fv_queue_thread(void *opaque)
 =20
--    return linkat(AT_FDCWD, procname, dfd, name, AT_SYMLINK_FOLLOW);
-+    return res;
- }
+             /* TODO! Endianness of header */
 =20
- static void lo_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t parent,
-@@ -731,7 +856,7 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, fus=
-e_ino_t parent,
-     e.attr_timeout =3D lo->timeout;
-     e.entry_timeout =3D lo->timeout;
+-            /* TODO: Fixup fuse_send_msg */
+             /* TODO: Add checks for fuse_session_exited */
+             fuse_session_process_buf_int(se, &fbuf, &ch);
 =20
--    res =3D linkat_empty_nofollow(inode, lo_fd(req, parent), name);
-+    res =3D linkat_empty_nofollow(lo, inode, lo_fd(req, parent), name);
-     if (res =3D=3D -1) {
-         goto out_err;
-     }
-@@ -1544,7 +1669,7 @@ static void lo_setxattr(fuse_req_t req, fuse_ino_t in=
-o, const char *name,
-     }
+-            /* TODO: vu_queue_push(dev, q, elem, qi->write_count); */
+-            vu_queue_notify(dev, q);
+-
++            qi->qe =3D NULL;
+             free(elem);
+             elem =3D NULL;
+         }
+diff --git a/tools/virtiofsd/fuse_virtio.h b/tools/virtiofsd/fuse_virtio.h
+index 23026d6e4c..135a14875a 100644
+--- a/tools/virtiofsd/fuse_virtio.h
++++ b/tools/virtiofsd/fuse_virtio.h
+@@ -22,4 +22,8 @@ int virtio_session_mount(struct fuse_session *se);
 =20
-     if (inode->is_symlink) {
--        /* Sorry, no race free way to setxattr on symlink. */
-+        /* Sorry, no race free way to removexattr on symlink. */
-         saverr =3D EPERM;
-         goto out;
-     }
+ int virtio_loop(struct fuse_session *se);
+=20
++
++int virtio_send_msg(struct fuse_session *se, struct fuse_chan *ch,
++                    struct iovec *iov, int count);
++
+ #endif
 --=20
 2.23.0
 
