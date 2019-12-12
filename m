@@ -2,79 +2,96 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD2AC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 07:16:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6AF0C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 07:18:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 350DD22B48
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 07:16:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 734412173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 07:18:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XNI5qHzV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 350DD22B48
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XCQIlmKk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 734412173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55427 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifIiA-0004dE-WB
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 02:16:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33872)
+	id 1ifIk9-0005iL-KQ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 02:18:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56129)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ifIge-0003uq-Na
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 02:15:05 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ifIjP-0005FY-FJ
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 02:17:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ifIgd-0004pX-IW
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 02:15:00 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25507
+ (envelope-from <pbonzini@redhat.com>) id 1ifIjO-0000Yc-3f
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 02:17:51 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23673
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ifIgd-0004oc-D0
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 02:14:59 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ifIjN-0000Wz-Sv
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 02:17:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576134898;
+ s=mimecast20190719; t=1576135069;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=HrOr8ThciaL1w99d1O++m/DVMpp8xswZ6Fzo9yj+2XQ=;
- b=XNI5qHzVI464OdUw66S2BbuAKY0QbAB5m4UUTil561f6eAAkzNx1Mqrm3zDVSMCOK8SKlv
- 6fpveU3a2CAbbnR1KeeSvVZ9XqngSTodw8MFzSPX4RQxztSnXiS4GQMInUewUrS1mMaeQY
- 4zx99NwL1fLKbuB8TdxOfHhP+0x8t8k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-T5y-wLeCOLyd53Txhd5VTA-1; Thu, 12 Dec 2019 02:14:57 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4D78107ACC9
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 07:14:56 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-168.ams2.redhat.com [10.36.116.168])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 63A1C5D6C8;
- Thu, 12 Dec 2019 07:14:56 +0000 (UTC)
-Subject: Re: [PATCH v2] tests: use g_test_rand_int
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1576113478-42926-1-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <984565ca-2188-5b44-b43b-3691deb65a6b@redhat.com>
-Date: Thu, 12 Dec 2019 08:14:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ in-reply-to:in-reply-to:references:references;
+ bh=wtYJ85nXYbiYIFPrscbftjICbAnI7ye5q/5npJoT3iQ=;
+ b=XCQIlmKklYS+ioL1u8Mla9/tBXqF2aNFYgGgUPOREMJd/mwtRlLmURw+e1U2vSI4DwlxwL
+ yfZmpTwaJ2B4Um83jbsUbU0Tfc//QtypG5bFzt+KQ5cvHjCbnFpq9ScZxlBRWHUPBq57+u
+ TV7Vv3kfdIGxyovZ8o8DVNxGLqOV0hY=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-156-NAn2Aed9OruByr7H5Cv3Jg-1; Thu, 12 Dec 2019 02:17:45 -0500
+Received: by mail-wm1-f70.google.com with SMTP id l13so496106wmj.8
+ for <qemu-devel@nongnu.org>; Wed, 11 Dec 2019 23:17:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Mcpjq99AUbutGHbXzMEKyeZrNJEihaodjTPgkQNcUBg=;
+ b=ktgZ74J+afrSMsz5M8J2Kou4or7sV8R6p2ePTpeYoa5vd2ELPz6umuV+1+/8pNuUSi
+ M0ftGZDCBQ3ayf54yMlkct4bEiXxCMFVwYZIKQrDvqhrtTtiFwPm3xj4R3pT2lwULHGy
+ QF/sdyO7yrf41XxhH1W5ZgBw0rFzv4M7dAb/EVYSCiow7wCUwMguPDxbzycO8VbWF+Gm
+ 36FwTCLA2zftNQTS7kmJQYQyWn/4NQPcAB5zp9TuCYMEQ9UDbZjS1FLnCWOv3fGeKo0i
+ Bl5Sp4GAxYa3KOCaeIGjHKvJETcKoxpaFHdNfzq1rX08fkdlLbBnTfAHoSu6T05PuaU0
+ Ao6w==
+X-Gm-Message-State: APjAAAW/zYS/dQBggUVkdn/Vc/qohGc35fr3qKaofRLJOLgNj5RIrJ2M
+ GcDMRxvb/qYKczugkvKFW+NqXIoPr9Ha/K2zXokp7SPs+qP0DiePSd9GN8LfTrHZzpjy9GRYvZT
+ hEbz9/tuMuvp2/5w=
+X-Received: by 2002:a5d:428c:: with SMTP id k12mr4424889wrq.57.1576135064357; 
+ Wed, 11 Dec 2019 23:17:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqykpFmbplYjpT/U0IMslxnazxs7bSNhNF4s7XhTOYUc/RhNDqSrJ0+w7VEfCreK1Wfs2YAoPQ==
+X-Received: by 2002:a5d:428c:: with SMTP id k12mr4424859wrq.57.1576135064043; 
+ Wed, 11 Dec 2019 23:17:44 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9?
+ ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
+ by smtp.gmail.com with ESMTPSA id u10sm5033119wmd.1.2019.12.11.23.17.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 11 Dec 2019 23:17:43 -0800 (PST)
+Subject: Re: QEMU VM crashes when enabling KVM
+To: Wayne Li <waynli329@gmail.com>
+References: <CAM2K0nrhkOhiJDxnANGmAu2140-TP0a9pY58i_PN1k9xAWGz9A@mail.gmail.com>
+ <76b207cd-09ce-b3df-e288-a515df40677e@redhat.com>
+ <CAM2K0nph2GZQkAv3tCgoP+ciPMWSzVJp0rHDXJJ2Gtqeq2Bgug@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c4e14191-efe5-7713-1eac-55a6bafb027a@redhat.com>
+Date: Thu, 12 Dec 2019 08:17:41 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <1576113478-42926-1-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <CAM2K0nph2GZQkAv3tCgoP+ciPMWSzVJp0rHDXJJ2Gtqeq2Bgug@mail.gmail.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: T5y-wLeCOLyd53Txhd5VTA-1
+X-MC-Unique: NAn2Aed9OruByr7H5Cv3Jg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -89,79 +106,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: David Gibson <dgibson@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/12/2019 02.17, Paolo Bonzini wrote:
-> g_test_rand_int provides a reproducible random integer number, using a
-> different number seed every time but allowing reproduction using the
-> --seed command line option.  It is thus better suited to tests than
-> g_random_int or random.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/ivshmem-test.c | 2 +-
->  tests/test-bitmap.c  | 8 ++++----
->  tests/test-qga.c     | 4 ++--
->  3 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-> index be9aa92..ecda256 100644
-> --- a/tests/ivshmem-test.c
-> +++ b/tests/ivshmem-test.c
-> @@ -443,7 +443,7 @@ static gchar *mktempshm(int size, int *fd)
->      while (true) {
->          gchar *name;
->  
-> -        name = g_strdup_printf("/qtest-%u-%u", getpid(), g_random_int());
-> +        name = g_strdup_printf("/qtest-%u-%u", getpid(), g_test_rand_int());
->          *fd = shm_open(name, O_CREAT|O_RDWR|O_EXCL,
->                         S_IRWXU|S_IRWXG|S_IRWXO);
->          if (*fd > 0) {
-> diff --git a/tests/test-bitmap.c b/tests/test-bitmap.c
-> index 087e02a..2f5b714 100644
-> --- a/tests/test-bitmap.c
-> +++ b/tests/test-bitmap.c
-> @@ -22,10 +22,10 @@ static void check_bitmap_copy_with_offset(void)
->      bmap2 = bitmap_new(BMAP_SIZE);
->      bmap3 = bitmap_new(BMAP_SIZE);
->  
-> -    bmap1[0] = random();
-> -    bmap1[1] = random();
-> -    bmap1[2] = random();
-> -    bmap1[3] = random();
-> +    bmap1[0] = g_test_rand_int();
-> +    bmap1[1] = g_test_rand_int();
-> +    bmap1[2] = g_test_rand_int();
-> +    bmap1[3] = g_test_rand_int();
->      total = BITS_PER_LONG * 4;
->  
->      /* Shift 115 bits into bmap2 */
-> diff --git a/tests/test-qga.c b/tests/test-qga.c
-> index 1ca49bb..d2b2435 100644
-> --- a/tests/test-qga.c
-> +++ b/tests/test-qga.c
-> @@ -143,7 +143,7 @@ static void qmp_assertion_message_error(const char     *domain,
->  static void test_qga_sync_delimited(gconstpointer fix)
->  {
->      const TestFixture *fixture = fix;
-> -    guint32 v, r = g_random_int();
-> +    guint32 v, r = g_test_rand_int();
->      unsigned char c;
->      QDict *ret;
->  
-> @@ -186,7 +186,7 @@ static void test_qga_sync_delimited(gconstpointer fix)
->  static void test_qga_sync(gconstpointer fix)
->  {
->      const TestFixture *fixture = fix;
-> -    guint32 v, r = g_random_int();
-> +    guint32 v, r = g_test_rand_int();
->      QDict *ret;
->  
->      /*
-> 
+On 12/12/19 02:59, Wayne Li wrote:
+> We wrote a project that is created on top of the QEMU source code; it
+> calls functions from the QEMU code.=C2=A0 I run the executable created by
+> compiling that project/QEMU code.=C2=A0 Anyway, looking at the following
+> documentation:
+>=20
+> https://www.kernel.org/doc/Documentation/powerpc/cpu_families.txt
+>=20
+> It looks like the PowerPC 7457 is Book3S and the PowerPC e6500 is
+> BookE.=C2=A0 Is that why you think I require a Book3S KVM?=C2=A0 Exactly =
+why do
+> you feel this way?=C2=A0 Also would that mean my team would need to go an=
+d
+> buy a board with a Book3S processor?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+CCing the PPC maintainer.  There are aspects of BookE and Book3S that
+are different and not really interchangeable in the privileged interface.
+
+Paolo
+
+> -Thanks!, Wayne Li
+>=20
+> From my understanding
+>=20
+> On Wed, Dec 11, 2019 at 7:16 PM Paolo Bonzini <pbonzini@redhat.com
+> <mailto:pbonzini@redhat.com>> wrote:
+>=20
+>     On 11/12/19 22:23, Wayne Li wrote:
+>     >
+>     > Now I am fairly sure KVM is actually enabled on the system.=C2=A0 F=
+inding
+>     > that out was another story that spanned a couple of months.=C2=A0 B=
+ut long
+>     > story short, lsmod doesn't show that the KVM kernel module is
+>     running.=C2=A0
+>     > But that's because KVM is built-in and it can't actually be built a=
+s a
+>     > loadable kernel module in this particular system.
+>     >
+>     > So I'm not really sure what could be the problem.=C2=A0 Though I wa=
+s
+>     thinking
+>     > if I understood the error better that might help?=C2=A0 Following t=
+he
+>     code I
+>     > see that the "Missing PVR setting capability." is called when a
+>     variable
+>     > called "cap_segstate" is 0:
+>     >
+>     > if (!cap_segstate) {
+>     > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 fprintf(stderr, "kvm erro=
+r: missing PVR setting
+>     capability\n");
+>     > =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return -ENOSYS;
+>     > }
+>     >
+>     > And the cap_segstate variable is set by the following function:
+>     >
+>     > cap_segstate =3D kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
+>=20
+>     You are not saying how you are running QEMU.=C2=A0 I think you are us=
+ing a
+>     CPU model that requires a Book3S KVM.
+>=20
+>     Paolo
+>=20
 
 
