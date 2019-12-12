@@ -2,117 +2,81 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 662D5C43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 09:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE270C43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 10:02:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 356DA214D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 09:45:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 356DA214D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 87C302173E
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 10:02:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UJ/XnQ2x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87C302173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifL2H-0006PY-5I
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 04:45:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34710)
+	id 1ifLIM-0001tR-EJ
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 05:02:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38678)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ifL1Q-0005hk-CA
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 04:44:37 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ifLHB-0001L9-T5
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 05:00:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ifL1P-0006SV-0W
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 04:44:36 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:52567)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ifL1O-0006Py-Mm
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 04:44:34 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MbBUc-1i8TBA18xc-00bcVm; Thu, 12 Dec 2019 10:44:32 +0100
-Subject: Re: [PATCH 23/28] target/m68k: Use cpu_*_mmuidx_ra instead of
- MMU_MODE{0, 1}_SUFFIX
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20191212040039.26546-1-richard.henderson@linaro.org>
- <20191212040039.26546-24-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <6162d8ab-b608-15e4-8e33-8a656afb304a@vivier.eu>
-Date: Thu, 12 Dec 2019 10:44:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1ifLH9-0004Uw-Nq
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 05:00:53 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44145)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1ifLH7-0004RX-El
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 05:00:49 -0500
+Received: by mail-ot1-x342.google.com with SMTP id x3so1249402oto.11
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 02:00:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=O/ut1nssvnQ8mOCW94IsGOLPUuoNGCzVVBKXA2a9weQ=;
+ b=UJ/XnQ2xaGSimApfx+zPkDCZhVh1YUGPvENmCyZmFYFvT5CxpGyk05cFz+Y5QbIhqJ
+ Ynf19gW/WmsAnzhP+qvgNI+nWyiAWX3LG2SRfFWEPDi4nz1EjU2GNllKOyjFNUS9imc2
+ OOmSLFWgfElvP2tUQFqMAbJWGvL3qI4Epwe3eUqY251v9LS6KCv2DDF70U4oRtGavyxT
+ v2YN5w7bYNFRLgJdNdNHD/+aPC+1+RIwdHJKlB5xkQmHSPPho58HbsHJ7IqGr1jXtGLz
+ x+Uw+qQbN7W6UvUrpAYiDHk+qCKheG3JPKa26ctMmRdJ8jkrLxJpgCPUbOgqy8s2eEIq
+ R/TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=O/ut1nssvnQ8mOCW94IsGOLPUuoNGCzVVBKXA2a9weQ=;
+ b=Nn6p1aw8WXkIh87YQIubAwh4jQ5pPY4BJBy12YgxHPh9iB6yfSPC5XxTZ6rjBeY1Yf
+ dYL5UEr7ThoRkyLXOCrYqEDzUPxYP7La6pClO5NSTD5tAmLqI8wi7jktkBM7Pf5O1Sn0
+ M6cC6JekHuT4ii1tlvkehSOYAb9iYmoWbkP+ZodOlOuDJKI6tdaSmM5ATkRVBsvKF2vU
+ jU51XRf0s8lCjpZ7NFXUEU/sCqAcKuQy8T3uYGUTOCFPnIeft4EgbxPaeslVDtrG2O/J
+ ko4064MvhLXyo9BpaHPjuiDdN187MRXquQPlmc8ya4FeGAeckovc0mOePRk/EwHX9NSj
+ ZnJA==
+X-Gm-Message-State: APjAAAU1MW7dtutim5jdq2Z9o4Pk2s3Uj8UHgA6fYaEW0nyTqV6dH2E6
+ 4TkpFm5A8SPFHuntLN76rw+ogzZsblsMP0IHfeg=
+X-Google-Smtp-Source: APXvYqxQUV66i3vq+CkfFCMuzbiQwWjXQ/KseUqkthE94zQoTswCJqKCgSZVJmdFe91CTOzXIRQG/6pu3t7F53DeTfw=
+X-Received: by 2002:a05:6830:1042:: with SMTP id
+ b2mr7187849otp.306.1576144847722; 
+ Thu, 12 Dec 2019 02:00:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191212040039.26546-24-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:+ctxzit/VivpYT9XXvvcuQmjHSo6SgTV0n5Ab7MV7jwVyzbupV3
- AII27YfYZ5PolLhQaJzhk7m2FsLW+/bMHe+TDqBHbAvke6f4R3bWW1hFumZGjndWzyBKHAP
- +zAEV44nm0u9fAZ/4SjBNuYa5VDLnrHmzKL+5B5cNmMjuAKg4AZGcMR6rXkdvrhROP1lJp5
- Cz4zkNXB18oITJn60tOyw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8gXAZszHdEg=:27tZBYa76X7gK1Mlh9XxJn
- zrSUYXt8oXh4BzNH3ck8LpC9NmTVOI4VHAB4PsY1GXK1el5M3kBNP8U1XaxP4HbIgml3QcR4w
- YFVMascPpxpieF4mmnJg0Lyt4Xwy8S7Sf8GAoxVgVqr0JGMJzGs+mnlTWYW9EGoEfHnOXU//C
- M0Hh06AJZqpIDjHF7v6agvQYJrO8ms57DVdacJQrKWuyqjuZN15elyJrXW3AbP6kt1TbN3xE+
- iT4dsaNWjvbZmrO0sdOvOqg622WjDGmurv/XYlY3sXPCnOU117/p9/AfpkdCcovtP4buuBah9
- geYDVDUxQ4+C8c7KHKPDg0CX9lGJoh1iBs4eOQhKao+26VIpaFW7rWB9oimN0ogc1tr/gJAWZ
- tZP0D3Sar8b/dYustWvA8Q4+G3zXCANAbXZKNTp1eKtZhAa2kboKGVSc4vV2qT+NiJ/fbQndZ
- jfOITT5IoAt44dbKWlXOD1s9RsLZbVbApQKCUcO0GElFKUpDmdE8acwiUpBQH6Juioiqsx15n
- vz2nYo6KtrJYJFph5mZCc5c9AgYhVZT1tCBrRS5h+mXD3MUqvBtBHtGQetjRQhOFYnS+YYAUW
- mdX6ZL4StRmCr9tABzNci7B3Hfyfl5zTHtOV9Czh19W4YnEs8TuG1JW44chHRK9MGO7jZo3H/
- uU47KLOM61YWr+l/EZYOPJHrn39UZ2B2OWWF0Rwl5rdNPhwnOWjAah0S4IN+tvnde/JrzIFCZ
- tZUViZ6Eu3i37tD+F3+3Ow+1iBXjEqEq8KOp7T3MikQSL1qFeXyDHcP4AiiHjfyEmDVlAp9iV
- w/TBXjVoMPqzhskby1NEe22ictmPlj+hX5dnhqYThw2iof2TsOK4miX4j6eiqKipKsKvPaUwf
- CEpGSJegNei67/fg8VaW0oF9T0+ydgXZYFJHdubz4=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.17.10
+References: <20191212040039.26546-1-richard.henderson@linaro.org>
+ <20191212040039.26546-29-richard.henderson@linaro.org>
+In-Reply-To: <20191212040039.26546-29-richard.henderson@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 12 Dec 2019 11:00:36 +0100
+Message-ID: <CAL1e-=h1FGOHoRAFdtbPrYsd9K0rmCH61MbMHaA3R2NbwXHe4g@mail.gmail.com>
+Subject: Re: [PATCH 28/28] cputlb: Expand cpu_ldst_template.h in cputlb.c
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,54 +88,388 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/12/2019 à 05:00, Richard Henderson a écrit :
-> The generated *_user functions are unused.  The *_kernel functions
-> have a couple of users in op_helper.c; use *_mmuidx_ra instead,
-> with MMU_KERNEL_IDX.
-> 
-> Cc: Laurent Vivier <laurent@vivier.eu>
+On Thu, Dec 12, 2019 at 5:22 AM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> Reduce the amount of preprocessor obfuscation by expanding
+> the text of each of the functions generated.  The result is
+> only slightly smaller than the original.
+>
+
+I am not sure what you meant by "The result is only slightly smaller
+than the original." If you measured resulting source code size, the
+size of source code is usually larger while doing this kind of
+refactoring, but it is a conscious choice, the goal was not to reduce
+the size of source code. Did you perhaps mean "The result is *even*
+only slightly smaller than the original." (or
+"nevertheless"/"nonetheless")?
+
+In any case:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/m68k/cpu.h       | 2 --
->  target/m68k/op_helper.c | 5 +++++
->  2 files changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-> index 20de3c379a..89af14e899 100644
-> --- a/target/m68k/cpu.h
-> +++ b/target/m68k/cpu.h
-> @@ -516,8 +516,6 @@ enum {
->  #define cpu_list m68k_cpu_list
->  
->  /* MMU modes definitions */
-> -#define MMU_MODE0_SUFFIX _kernel
-> -#define MMU_MODE1_SUFFIX _user
->  #define MMU_KERNEL_IDX 0
->  #define MMU_USER_IDX 1
->  static inline int cpu_mmu_index (CPUM68KState *env, bool ifetch)
-> diff --git a/target/m68k/op_helper.c b/target/m68k/op_helper.c
-> index bc4f845e3f..96a4951c21 100644
-> --- a/target/m68k/op_helper.c
-> +++ b/target/m68k/op_helper.c
-> @@ -36,6 +36,11 @@ static inline void do_interrupt_m68k_hardirq(CPUM68KState *env)
->  
->  #else
->  
-> +#define cpu_lduw_kernel(e, p)    cpu_lduw_mmuidx_ra(e, p, MMU_KERNEL_IDX, 0)
-> +#define cpu_ldl_kernel(e, p)     cpu_ldl_mmuidx_ra(e, p, MMU_KERNEL_IDX, 0)
-> +#define cpu_stw_kernel(e, p, v)  cpu_stw_mmuidx_ra(e, p, v, MMU_KERNEL_IDX, 0)
-> +#define cpu_stl_kernel(e, p, v)  cpu_stl_mmuidx_ra(e, p, v, MMU_KERNEL_IDX, 0)
-
-Do you think it would be a reasonable cleanup to replace the _kernel
-functions by the _mmuidx_ra functions directly in the code in a future
-patch?
-
-Thanks,
-Laurent
-
-
+>  include/exec/cpu_ldst.h          |  67 +++++++-----------
+>  include/exec/cpu_ldst_template.h | 117 -------------------------------
+>  accel/tcg/cputlb.c               | 107 +++++++++++++++++++++++++++-
+>  3 files changed, 130 insertions(+), 161 deletions(-)
+>  delete mode 100644 include/exec/cpu_ldst_template.h
+>
+> diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
+> index eb2756e214..d7a20145ce 100644
+> --- a/include/exec/cpu_ldst.h
+> +++ b/include/exec/cpu_ldst.h
+> @@ -98,32 +98,6 @@ typedef target_ulong abi_ptr;
+>  #define TARGET_ABI_FMT_ptr TARGET_ABI_FMT_lx
+>  #endif
+>
+> -#if defined(CONFIG_USER_ONLY)
+> -
+> -extern __thread uintptr_t helper_retaddr;
+> -
+> -static inline void set_helper_retaddr(uintptr_t ra)
+> -{
+> -    helper_retaddr = ra;
+> -    /*
+> -     * Ensure that this write is visible to the SIGSEGV handler that
+> -     * may be invoked due to a subsequent invalid memory operation.
+> -     */
+> -    signal_barrier();
+> -}
+> -
+> -static inline void clear_helper_retaddr(void)
+> -{
+> -    /*
+> -     * Ensure that previous memory operations have succeeded before
+> -     * removing the data visible to the signal handler.
+> -     */
+> -    signal_barrier();
+> -    helper_retaddr = 0;
+> -}
+> -
+> -/* In user-only mode we provide only the _code and _data accessors. */
+> -
+>  uint32_t cpu_ldub_data(CPUArchState *env, abi_ptr ptr);
+>  uint32_t cpu_lduw_data(CPUArchState *env, abi_ptr ptr);
+>  uint32_t cpu_ldl_data(CPUArchState *env, abi_ptr ptr);
+> @@ -152,6 +126,30 @@ void cpu_stl_data_ra(CPUArchState *env, abi_ptr ptr,
+>  void cpu_stq_data_ra(CPUArchState *env, abi_ptr ptr,
+>                       uint64_t val, uintptr_t retaddr);
+>
+> +#if defined(CONFIG_USER_ONLY)
+> +
+> +extern __thread uintptr_t helper_retaddr;
+> +
+> +static inline void set_helper_retaddr(uintptr_t ra)
+> +{
+> +    helper_retaddr = ra;
+> +    /*
+> +     * Ensure that this write is visible to the SIGSEGV handler that
+> +     * may be invoked due to a subsequent invalid memory operation.
+> +     */
+> +    signal_barrier();
+> +}
+> +
+> +static inline void clear_helper_retaddr(void)
+> +{
+> +    /*
+> +     * Ensure that previous memory operations have succeeded before
+> +     * removing the data visible to the signal handler.
+> +     */
+> +    signal_barrier();
+> +    helper_retaddr = 0;
+> +}
+> +
+>  /*
+>   * Provide the same *_mmuidx_ra interface as for softmmu.
+>   * The mmu_idx argument is ignored.
+> @@ -275,23 +273,6 @@ void cpu_stl_mmuidx_ra(CPUArchState *env, abi_ptr addr, uint32_t val,
+>  void cpu_stq_mmuidx_ra(CPUArchState *env, abi_ptr addr, uint64_t val,
+>                         int mmu_idx, uintptr_t retaddr);
+>
+> -/* these access are slower, they must be as rare as possible */
+> -#define CPU_MMU_INDEX (cpu_mmu_index(env, false))
+> -#define MEMSUFFIX _data
+> -#define DATA_SIZE 1
+> -#include "exec/cpu_ldst_template.h"
+> -
+> -#define DATA_SIZE 2
+> -#include "exec/cpu_ldst_template.h"
+> -
+> -#define DATA_SIZE 4
+> -#include "exec/cpu_ldst_template.h"
+> -
+> -#define DATA_SIZE 8
+> -#include "exec/cpu_ldst_template.h"
+> -#undef CPU_MMU_INDEX
+> -#undef MEMSUFFIX
+> -
+>  #endif /* defined(CONFIG_USER_ONLY) */
+>
+>  uint32_t cpu_ldub_code(CPUArchState *env, abi_ptr addr);
+> diff --git a/include/exec/cpu_ldst_template.h b/include/exec/cpu_ldst_template.h
+> deleted file mode 100644
+> index e400979f23..0000000000
+> --- a/include/exec/cpu_ldst_template.h
+> +++ /dev/null
+> @@ -1,117 +0,0 @@
+> -/*
+> - *  Software MMU support
+> - *
+> - * Generate inline load/store functions for one MMU mode and data
+> - * size.
+> - *
+> - * Generate a store function as well as signed and unsigned loads.
+> - *
+> - * Not used directly but included from cpu_ldst.h.
+> - *
+> - *  Copyright (c) 2003 Fabrice Bellard
+> - *
+> - * This library is free software; you can redistribute it and/or
+> - * modify it under the terms of the GNU Lesser General Public
+> - * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> - *
+> - * This library is distributed in the hope that it will be useful,
+> - * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> - * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> - * Lesser General Public License for more details.
+> - *
+> - * You should have received a copy of the GNU Lesser General Public
+> - * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+> - */
+> -
+> -#if DATA_SIZE == 8
+> -#define SUFFIX q
+> -#define USUFFIX q
+> -#define DATA_TYPE uint64_t
+> -#define SHIFT 3
+> -#elif DATA_SIZE == 4
+> -#define SUFFIX l
+> -#define USUFFIX l
+> -#define DATA_TYPE uint32_t
+> -#define SHIFT 2
+> -#elif DATA_SIZE == 2
+> -#define SUFFIX w
+> -#define USUFFIX uw
+> -#define DATA_TYPE uint16_t
+> -#define DATA_STYPE int16_t
+> -#define SHIFT 1
+> -#elif DATA_SIZE == 1
+> -#define SUFFIX b
+> -#define USUFFIX ub
+> -#define DATA_TYPE uint8_t
+> -#define DATA_STYPE int8_t
+> -#define SHIFT 0
+> -#else
+> -#error unsupported data size
+> -#endif
+> -
+> -#if DATA_SIZE == 8
+> -#define RES_TYPE uint64_t
+> -#else
+> -#define RES_TYPE uint32_t
+> -#endif
+> -
+> -/* generic load/store macros */
+> -
+> -static inline RES_TYPE
+> -glue(glue(glue(cpu_ld, USUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+> -                                                  target_ulong ptr,
+> -                                                  uintptr_t retaddr)
+> -{
+> -    return glue(glue(cpu_ld, USUFFIX), _mmuidx_ra)(env, ptr, CPU_MMU_INDEX,
+> -                                                   retaddr);
+> -}
+> -
+> -static inline RES_TYPE
+> -glue(glue(cpu_ld, USUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr)
+> -{
+> -    return glue(glue(cpu_ld, USUFFIX), _mmuidx_ra)(env, ptr, CPU_MMU_INDEX, 0);
+> -}
+> -
+> -#if DATA_SIZE <= 2
+> -static inline int
+> -glue(glue(glue(cpu_lds, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+> -                                                  target_ulong ptr,
+> -                                                  uintptr_t retaddr)
+> -{
+> -    return glue(glue(cpu_lds, SUFFIX), _mmuidx_ra)(env, ptr, CPU_MMU_INDEX,
+> -                                                   retaddr);
+> -}
+> -
+> -static inline int
+> -glue(glue(cpu_lds, SUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr)
+> -{
+> -    return glue(glue(cpu_lds, SUFFIX), _mmuidx_ra)(env, ptr, CPU_MMU_INDEX, 0);
+> -}
+> -#endif
+> -
+> -/* generic store macro */
+> -
+> -static inline void
+> -glue(glue(glue(cpu_st, SUFFIX), MEMSUFFIX), _ra)(CPUArchState *env,
+> -                                                 target_ulong ptr,
+> -                                                 RES_TYPE v, uintptr_t retaddr)
+> -{
+> -    glue(glue(cpu_st, SUFFIX), _mmuidx_ra)(env, ptr, v, CPU_MMU_INDEX,
+> -                                           retaddr);
+> -}
+> -
+> -static inline void
+> -glue(glue(cpu_st, SUFFIX), MEMSUFFIX)(CPUArchState *env, target_ulong ptr,
+> -                                      RES_TYPE v)
+> -{
+> -    glue(glue(cpu_st, SUFFIX), _mmuidx_ra)(env, ptr, v, CPU_MMU_INDEX, 0);
+> -}
+> -
+> -#undef RES_TYPE
+> -#undef DATA_TYPE
+> -#undef DATA_STYPE
+> -#undef SUFFIX
+> -#undef USUFFIX
+> -#undef DATA_SIZE
+> -#undef SHIFT
+> diff --git a/accel/tcg/cputlb.c b/accel/tcg/cputlb.c
+> index 7d519738bb..34560dd3e1 100644
+> --- a/accel/tcg/cputlb.c
+> +++ b/accel/tcg/cputlb.c
+> @@ -35,7 +35,6 @@
+>  #include "qemu/atomic128.h"
+>  #include "translate-all.h"
+>  #include "trace-root.h"
+> -#include "qemu/plugin.h"
+>  #include "trace/mem.h"
+>  #ifdef CONFIG_PLUGIN
+>  #include "qemu/plugin-memory.h"
+> @@ -1697,6 +1696,68 @@ uint64_t cpu_ldq_mmuidx_ra(CPUArchState *env, abi_ptr addr,
+>                             ? helper_le_ldq_mmu : helper_be_ldq_mmu);
+>  }
+>
+> +uint32_t cpu_ldub_data_ra(CPUArchState *env, target_ulong ptr,
+> +                          uintptr_t retaddr)
+> +{
+> +    return cpu_ldub_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +int cpu_ldsb_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t retaddr)
+> +{
+> +    return cpu_ldsb_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +uint32_t cpu_lduw_data_ra(CPUArchState *env, target_ulong ptr,
+> +                          uintptr_t retaddr)
+> +{
+> +    return cpu_lduw_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +int cpu_ldsw_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t retaddr)
+> +{
+> +    return cpu_ldsw_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +uint32_t cpu_ldl_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t retaddr)
+> +{
+> +    return cpu_ldl_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +uint64_t cpu_ldq_data_ra(CPUArchState *env, target_ulong ptr, uintptr_t retaddr)
+> +{
+> +    return cpu_ldq_mmuidx_ra(env, ptr, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +uint32_t cpu_ldub_data(CPUArchState *env, target_ulong ptr)
+> +{
+> +    return cpu_ldub_data_ra(env, ptr, 0);
+> +}
+> +
+> +int cpu_ldsb_data(CPUArchState *env, target_ulong ptr)
+> +{
+> +    return cpu_ldsb_data_ra(env, ptr, 0);
+> +}
+> +
+> +uint32_t cpu_lduw_data(CPUArchState *env, target_ulong ptr)
+> +{
+> +    return cpu_lduw_data_ra(env, ptr, 0);
+> +}
+> +
+> +int cpu_ldsw_data(CPUArchState *env, target_ulong ptr)
+> +{
+> +    return cpu_ldsw_data_ra(env, ptr, 0);
+> +}
+> +
+> +uint32_t cpu_ldl_data(CPUArchState *env, target_ulong ptr)
+> +{
+> +    return cpu_ldl_data_ra(env, ptr, 0);
+> +}
+> +
+> +uint64_t cpu_ldq_data(CPUArchState *env, target_ulong ptr)
+> +{
+> +    return cpu_ldq_data_ra(env, ptr, 0);
+> +}
+> +
+>  /*
+>   * Store Helpers
+>   */
+> @@ -1970,6 +2031,50 @@ void cpu_stq_mmuidx_ra(CPUArchState *env, target_ulong addr, uint64_t val,
+>      cpu_store_helper(env, addr, val, mmu_idx, retaddr, MO_TEQ);
+>  }
+>
+> +void cpu_stb_data_ra(CPUArchState *env, target_ulong ptr,
+> +                     uint32_t val, uintptr_t retaddr)
+> +{
+> +    cpu_stb_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +void cpu_stw_data_ra(CPUArchState *env, target_ulong ptr,
+> +                     uint32_t val, uintptr_t retaddr)
+> +{
+> +    cpu_stw_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +void cpu_stl_data_ra(CPUArchState *env, target_ulong ptr,
+> +                     uint32_t val, uintptr_t retaddr)
+> +{
+> +    cpu_stl_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +void cpu_stq_data_ra(CPUArchState *env, target_ulong ptr,
+> +                     uint64_t val, uintptr_t retaddr)
+> +{
+> +    cpu_stq_mmuidx_ra(env, ptr, val, cpu_mmu_index(env, false), retaddr);
+> +}
+> +
+> +void cpu_stb_data(CPUArchState *env, target_ulong ptr, uint32_t val)
+> +{
+> +    cpu_stb_data_ra(env, ptr, val, 0);
+> +}
+> +
+> +void cpu_stw_data(CPUArchState *env, target_ulong ptr, uint32_t val)
+> +{
+> +    cpu_stw_data_ra(env, ptr, val, 0);
+> +}
+> +
+> +void cpu_stl_data(CPUArchState *env, target_ulong ptr, uint32_t val)
+> +{
+> +    cpu_stl_data_ra(env, ptr, val, 0);
+> +}
+> +
+> +void cpu_stq_data(CPUArchState *env, target_ulong ptr, uint64_t val)
+> +{
+> +    cpu_stq_data_ra(env, ptr, val, 0);
+> +}
+> +
+>  /* First set of helpers allows passing in of OI and RETADDR.  This makes
+>     them callable from other helpers.  */
+>
+> --
+> 2.20.1
+>
+>
 
