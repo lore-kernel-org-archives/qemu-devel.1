@@ -2,81 +2,79 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C53BDC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 20:26:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CA0C2D0C9
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 20:26:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 976D12077B
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 20:26:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 976D12077B
+	by mail.kernel.org (Postfix) with ESMTPS id 3BA062077B
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 20:26:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BA062077B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifV2Y-0001EB-M4
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 15:26:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42647)
+	id 1ifV2Z-0001F6-65
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 15:26:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42654)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ifV1T-0008J4-EI
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ifV1T-0008J5-Cx
  for qemu-devel@nongnu.org; Thu, 12 Dec 2019 15:25:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ifV1R-0001qz-V1
+ (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ifV1R-0001r5-VM
  for qemu-devel@nongnu.org; Thu, 12 Dec 2019 15:25:19 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32112)
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55874)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1ifV1R-0001oy-LX; Thu, 12 Dec 2019 15:25:17 -0500
+ id 1ifV1R-0001ow-MJ; Thu, 12 Dec 2019 15:25:17 -0500
 Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBCKOQk2126704; Thu, 12 Dec 2019 15:25:14 -0500
+ xBCKOPBU126671; Thu, 12 Dec 2019 15:25:13 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wuq3wkws6-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wuq3wkws3-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Thu, 12 Dec 2019 15:25:13 -0500
 Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBCKPAB9129206;
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBCKOXe0127393;
  Thu, 12 Dec 2019 15:25:13 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wuq3wkwrr-1
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wuq3wkwrm-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Thu, 12 Dec 2019 15:25:13 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBCKOebg028631;
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBCKOeek012391;
  Thu, 12 Dec 2019 20:25:12 GMT
 Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma02dal.us.ibm.com with ESMTP id 2wr3q7d5yn-1
+ [9.57.198.27]) by ppma03wdc.us.ibm.com with ESMTP id 2wr3q70ydc-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
  Thu, 12 Dec 2019 20:25:12 +0000
 Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
  [9.57.199.111])
  by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBCKPBsL25690498
+ xBCKPBK846858748
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
  Thu, 12 Dec 2019 20:25:11 GMT
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B1F3DAC064;
+ by IMSVA (Postfix) with ESMTP id 657C6AC05F;
  Thu, 12 Dec 2019 20:25:11 +0000 (GMT)
 Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A488DAC062;
+ by IMSVA (Postfix) with ESMTP id 4E930AC05B;
  Thu, 12 Dec 2019 20:25:11 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
  Thu, 12 Dec 2019 20:25:11 +0000 (GMT)
 From: Stefan Berger <stefanb@linux.vnet.ibm.com>
 To: qemu-ppc@nongnu.org
-Subject: [PATCH v5 3/5] tpm_spapr: Support suspend and resume
-Date: Thu, 12 Dec 2019 15:24:28 -0500
-Message-Id: <20191212202430.1079725-4-stefanb@linux.vnet.ibm.com>
+Subject: [PATCH v5 0/5] Add vTPM emulator support for ppc64 platform
+Date: Thu, 12 Dec 2019 15:24:25 -0500
+Message-Id: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
-References: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
@@ -84,7 +82,7 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-12_06:2019-12-12,2019-12-12 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  mlxscore=0 clxscore=1015
- mlxlogscore=999 impostorscore=0 suspectscore=1 bulkscore=0 adultscore=0
+ mlxlogscore=999 impostorscore=0 suspectscore=0 bulkscore=0 adultscore=0
  lowpriorityscore=0 spamscore=0 priorityscore=1501 malwarescore=0
  phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-1912120157
@@ -107,109 +105,79 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Extend the tpm_spapr frontend with VM suspend and resume support.
+The following series of patches adds vTPM emulator support for the
+ppc64 platform (pSeries). 
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+It can be tested as follows with swtpm/libtpms:
 
-diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-index c4a67e2403..8f5a142bd4 100644
---- a/hw/tpm/tpm_spapr.c
-+++ b/hw/tpm/tpm_spapr.c
-@@ -87,6 +87,8 @@ typedef struct {
-     TPMVersion be_tpm_version;
- 
-     size_t be_buffer_size;
-+
-+    bool deliver_response; /* whether to deliver response after VM resume */
- } SPAPRvTPMState;
- 
- static void tpm_spapr_show_buffer(const unsigned char *buffer,
-@@ -256,6 +258,12 @@ static void tpm_spapr_request_completed(TPMIf *ti, int ret)
-     uint32_t len;
-     int rc;
- 
-+    if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
-+        /* defer delivery of response until .post_load */
-+        s->deliver_response |= true;
-+        return;
-+    }
-+
-     s->state = SPAPR_VTPM_STATE_COMPLETION;
- 
-     /* a max. of be_buffer_size bytes can be transported */
-@@ -316,6 +324,7 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
-     SPAPRvTPMState *s = VIO_SPAPR_VTPM(dev);
- 
-     s->state = SPAPR_VTPM_STATE_NONE;
-+    s->deliver_response = false;
- 
-     s->be_tpm_version = tpm_backend_get_tpm_version(s->be_driver);
-     tpm_spapr_update_deviceclass(dev);
-@@ -339,9 +348,53 @@ static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
-     return tpm_backend_get_tpm_version(s->be_driver);
- }
- 
-+/* persistent state handling */
-+
-+static int tpm_spapr_pre_save(void *opaque)
-+{
-+    SPAPRvTPMState *s = opaque;
-+
-+    s->deliver_response |= tpm_backend_finish_sync(s->be_driver);
-+
-+    trace_tpm_spapr_pre_save(s->deliver_response);
-+    /*
-+     * we cannot deliver the results to the VM since DMA would touch VM memory
-+     */
-+
-+    return 0;
-+}
-+
-+static int tpm_spapr_post_load(void *opaque, int version_id)
-+{
-+    SPAPRvTPMState *s = opaque;
-+
-+    if (s->deliver_response) {
-+        trace_tpm_spapr_post_load();
-+        /* deliver the results to the VM via DMA */
-+        tpm_spapr_request_completed(TPM_IF(s), 0);
-+        s->deliver_response = false;
-+    }
-+
-+    return 0;
-+}
-+
- static const VMStateDescription vmstate_spapr_vtpm = {
-     .name = "tpm-spapr",
--    .unmigratable = 1,
-+    .version_id = 1,
-+    .minimum_version_id = 0,
-+    .minimum_version_id_old = 0,
-+    .pre_save = tpm_spapr_pre_save,
-+    .post_load = tpm_spapr_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_SPAPR_VIO(vdev, SPAPRvTPMState),
-+
-+        VMSTATE_UINT8(state, SPAPRvTPMState),
-+        VMSTATE_BUFFER(buffer, SPAPRvTPMState),
-+        /* remember DMA address */
-+        VMSTATE_UINT32(crq.s.data, SPAPRvTPMState),
-+        VMSTATE_BOOL(deliver_response, SPAPRvTPMState),
-+        VMSTATE_END_OF_LIST(),
-+    }
- };
- 
- static Property tpm_spapr_properties[] = {
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 6278a39618..d109661b96 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -67,3 +67,5 @@ tpm_spapr_do_crq_get_version(uint32_t version) "response: version %u"
- tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to suspend"
- tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type 0x%02x"
- tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ 0x%02x 0x%02x ..."
-+tpm_spapr_pre_save(bool v) "TPM response to deliver after resume: %d"
-+tpm_spapr_post_load(void) "Delivering TPM response after resume"
+mkdir /tmp/mytpm1
+swtpm socket --tpmstate dir=/tmp/mytpm1 \
+  --ctrl type=unixio,path=/tmp/mytpm1/swtpm-sock \
+  --log level=20
+
+If TPM 2 is desired, add --tpm2 as parameter to the above.
+
+In another terminal start QEMU:
+
+sudo ./ppc64-softmmu/qemu-system-ppc64 -display sdl \
+	-machine pseries,accel=kvm \
+	-m 1024 -bios slof.bin -boot menu=on \
+	-nodefaults -device VGA -device pci-ohci -device usb-kbd \
+	-chardev socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock \
+	-tpmdev emulator,id=tpm0,chardev=chrtpm \
+	-device tpm-spapr,tpmdev=tpm0 \
+	-device spapr-vscsi,id=scsi0,reg=0x00002000 \
+	-device virtio-blk-pci,scsi=off,bus=pci.0,addr=0x3,drive=drive-virtio-disk0,id=virtio-disk0 \
+	-drive file=test.img,format=raw,if=none,id=drive-virtio-disk0
+
+Links:
+ - libtpms: https://github.com/stefanberger/libtpms/wiki
+ - swtpm: https://github.com/stefanberger/swtpm/wiki
+
+Changes:
+ v4->v5:
+  - use runstate_check(RUN_STATE_FINISH_MIGRATE) to check whether devices
+    are suspending; ditch 3 patches in this series that tried to do similar
+
+ v3->v4:
+  - addressed comments to v3
+  - reworked suspend/resume support that requires extensions to backends
+
+ v2->v3:
+  - patch 1: a TPM 2 is identified by IBM,vtpm20 in the compatible node
+  - patch 1: convert to tracing to display Tx and Rx buffers
+  - added documentation patch
+  - added patch to enable TPM device as part of pSeries
+
+ v1->v2:
+  - followed Cedric Le Goater's suggestions to patch 1
+  - send appropriate CRQ error responses if DMA read or write fails
+  - renamed tpm_spapr_got_payload to tpm_spapr_process_cmd and
+    pass endianess-adjusted data pointer from CRQ to it
+
+Regards,
+    Stefan
+
+Stefan Berger (5):
+  tpm_spapr: Support TPM for ppc64 using CRQ based interface
+  tpm: Return bool from tpm_backend_finish_sync
+  tpm_spapr: Support suspend and resume
+  hw/ppc/Kconfig: Enable TPM_SPAPR as part of PSERIES config
+  docs: tpm: Add example command line for ppc64 and tpm-spapr
+
+ backends/tpm.c               |   6 +-
+ docs/specs/tpm.txt           |  20 +-
+ hw/ppc/Kconfig               |   1 +
+ hw/tpm/Kconfig               |   6 +
+ hw/tpm/Makefile.objs         |   1 +
+ hw/tpm/tpm_spapr.c           | 458 +++++++++++++++++++++++++++++++++++
+ hw/tpm/trace-events          |  14 ++
+ include/sysemu/tpm.h         |   3 +
+ include/sysemu/tpm_backend.h |   4 +-
+ qapi/tpm.json                |   6 +-
+ 10 files changed, 513 insertions(+), 6 deletions(-)
+ create mode 100644 hw/tpm/tpm_spapr.c
+
 -- 
 2.21.0
 
