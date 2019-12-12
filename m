@@ -2,65 +2,106 @@ Return-Path: <SRS0=2YLf=2C=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F28CC43603
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 05:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E2AC43603
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 05:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC9DF214D8
-	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 05:15:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="l/Wag2uh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC9DF214D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 057B622527
+	for <qemu-devel@archiver.kernel.org>; Thu, 12 Dec 2019 05:50:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 057B622527
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifGp3-0007j2-6g
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 00:15:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54538)
+	id 1ifHN4-0007km-2z
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 00:50:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ifGnN-0006Ab-A1
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:13:51 -0500
+ (envelope-from <bharata@linux.ibm.com>) id 1ifHM7-00079D-3k
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:49:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ifGnL-000348-Kp
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:13:49 -0500
-Received: from ozlabs.org ([203.11.71.1]:39879)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ifGnL-000300-7H
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:13:47 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47YMQd0LSmz9sNH; Thu, 12 Dec 2019 16:13:44 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576127625;
- bh=LYAgn+pS7iHQ2kixpgIr66xWOo4Jx6V1A4PVwitqc8U=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=l/Wag2uhPIVtUwMuDe4F7qzTnuYnD8Q8FlEVXixAFmW49P7LgmSXKTSxz5yzSD1Ur
- gyXYzBYV/M0l+j5XBCOR5JkS7oukG6EqmBwuIsyU2crPzDy5t+WZ2lcirn1iMIbSba
- TdtwI55lWHRS3S7W8FswhyA7rQFBitQRAhmSbUYw=
-Date: Thu, 12 Dec 2019 16:13:39 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 26/28] target/ppc: Use cpu_*_mmuidx_ra instead of
- MMU_MODE*_SUFFIX
-Message-ID: <20191212051339.GX207300@umbus.fritz.box>
-References: <20191212040039.26546-1-richard.henderson@linaro.org>
- <20191212040039.26546-27-richard.henderson@linaro.org>
+ (envelope-from <bharata@linux.ibm.com>) id 1ifHM1-0003I6-CJ
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:49:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52892
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bharata@linux.ibm.com>)
+ id 1ifHM1-0003EJ-7c
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 00:49:37 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBC5jDr0038177
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 00:49:34 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wtf84jh63-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 00:49:34 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bharata@linux.ibm.com>;
+ Thu, 12 Dec 2019 05:49:32 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 12 Dec 2019 05:49:29 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBC5nSjZ50069700
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 12 Dec 2019 05:49:28 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BB8C7A4054;
+ Thu, 12 Dec 2019 05:49:28 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 94C0AA405C;
+ Thu, 12 Dec 2019 05:49:27 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.124.35.198])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Thu, 12 Dec 2019 05:49:27 +0000 (GMT)
+Date: Thu, 12 Dec 2019 11:19:25 +0530
+From: Bharata B Rao <bharata@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH v1 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
+ pseries guest
+References: <20191209070012.14766-1-bharata@linux.ibm.com>
+ <20191209070012.14766-3-bharata@linux.ibm.com>
+ <20191210032851.GC207300@umbus.fritz.box>
+ <20191210035038.GB17552@in.ibm.com>
+ <dd94f089-7df8-1a13-f4a6-631e765f6339@ozlabs.ru>
+ <20191210050536.GH207300@umbus.fritz.box>
+ <20191210065007.GD17552@in.ibm.com>
+ <20191210234132.GL207300@umbus.fritz.box>
+ <20191211050824.GE17552@in.ibm.com>
+ <20191211052742.GQ207300@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="uWCTLymdFNG0vGYZ"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191212040039.26546-27-richard.henderson@linaro.org>
+In-Reply-To: <20191211052742.GQ207300@umbus.fritz.box>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-TM-AS-GCONF: 00
+x-cbid: 19121205-0020-0000-0000-0000039755CF
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121205-0021-0000-0000-000021EE5C98
+Message-Id: <20191212054925.GA28362@in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-12_01:2019-12-12,2019-12-11 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 impostorscore=0
+ spamscore=0 priorityscore=1501 suspectscore=18 mlxscore=0 adultscore=0
+ clxscore=1015 lowpriorityscore=0 malwarescore=0 mlxlogscore=832
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912120036
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,103 +113,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Reply-To: bharata@linux.ibm.com
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-ppc@nongnu.org,
+ linuxram@us.ibm.com, qemu-devel@nongnu.org, paulus@ozlabs.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Dec 11, 2019 at 04:27:42PM +1100, David Gibson wrote:
+> Ah, right.  We'll need to check for -ENOTTY specifically and ignore
+> it, then.  We don't want this spewing warnings on every non-secure
+> guest.
 
---uWCTLymdFNG0vGYZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I am posting v2 with explicit check for -ENOTTY.
 
-On Wed, Dec 11, 2019 at 08:00:37PM -0800, Richard Henderson wrote:
-> There are only two uses.  Within dcbz_common, the local variable
-> mmu_idx already contains the epid computation, and we can avoid
-> repeating it for the store.  Within helper_icbiep, the usage is
-> trivially expanded using PPC_TLB_EPID_LOAD.
->=20
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> 
+> > It looks like we may need a new KVM capability to advertise the presence
+> > of KVM_PPC_SVM_OFF ioctl (or more generally, to advertise host kernel's
+> > capability to support secure guests).
+> 
+> Actually, that's probably a better idea still.
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+If and when we decide to have this KVM capability and that goes upstream,
+we can update the QEMU accordingly?
 
-> ---
->  target/ppc/cpu.h        |  2 --
->  target/ppc/mem_helper.c | 11 ++---------
->  2 files changed, 2 insertions(+), 11 deletions(-)
->=20
-> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-> index e3e82327b7..3bd983adaa 100644
-> --- a/target/ppc/cpu.h
-> +++ b/target/ppc/cpu.h
-> @@ -951,8 +951,6 @@ struct ppc_radix_page_info {
->   * + real/paged mode combinations. The other two modes are for
->   * external PID load/store.
->   */
-> -#define MMU_MODE8_SUFFIX _epl
-> -#define MMU_MODE9_SUFFIX _eps
->  #define PPC_TLB_EPID_LOAD 8
->  #define PPC_TLB_EPID_STORE 9
-> =20
-> diff --git a/target/ppc/mem_helper.c b/target/ppc/mem_helper.c
-> index 1351b53f28..56855f2381 100644
-> --- a/target/ppc/mem_helper.c
-> +++ b/target/ppc/mem_helper.c
-> @@ -177,14 +177,7 @@ static void dcbz_common(CPUPPCState *env, target_ulo=
-ng addr,
->      } else {
->          /* Slow path */
->          for (i =3D 0; i < dcbz_size; i +=3D 8) {
-> -            if (epid) {
-> -#if !defined(CONFIG_USER_ONLY)
-> -                /* Does not make sense on USER_ONLY config */
-> -                cpu_stq_eps_ra(env, addr + i, 0, retaddr);
-> -#endif
-> -            } else {
-> -                cpu_stq_data_ra(env, addr + i, 0, retaddr);
-> -            }
-> +            cpu_stq_mmuidx_ra(env, addr + i, 0, mmu_idx, retaddr);
->          }
->      }
->  }
-> @@ -216,7 +209,7 @@ void helper_icbiep(CPUPPCState *env, target_ulong add=
-r)
->  #if !defined(CONFIG_USER_ONLY)
->      /* See comments above */
->      addr &=3D ~(env->dcache_line_size - 1);
-> -    cpu_ldl_epl_ra(env, addr, GETPC());
-> +    cpu_ldl_mmuidx_ra(env, addr, PPC_TLB_EPID_LOAD, GETPC());
->  #endif
->  }
-> =20
+Regards,
+Bharata.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---uWCTLymdFNG0vGYZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3xzIMACgkQbDjKyiDZ
-s5JGKRAAvVjhDCp0hbvtgRirtGmP0MJDzkU7zBPwwxnbksjfDJ79km77brCkem97
-3U4ZUhXFrkjwZZZL9aMJihNOn+fWofcOukpQqrm86xcJ1AtDJwaer4vXMZh8Nr2W
-xenFVL3CKHDOvWjHsui0um1nPGjGJRQ3z64yIZ9gUKzI6gf/vzcm0sxRdc6kvtQf
-GHZ2hnQPmI5SDR+nu3jZfrSX9QRk/DAcdL5HK7nSuQ6i3WcNWUFTEd54ijK0XxlF
-+FYH6HdHycIHa70rlADhf9BaEX6M/NXnV+90uZQWJfo+4p/BODELYpZbiKEj0v0r
-/X5MpTjQqtd3u2DLSD9/kWUlxBOSVdlFZy6guVzayzJ1SWy0K6PpJgnoMach95/F
-XDnmzFT1BQXGAM2nXbZgyqkMTsBIuCnW1/MKozwzU/2gfHGHxe5nextE0sOzKVty
-80tJiUrCfb866Brqb0ELmXGGS5JKTlBVdHkCJ9sOCXlm/fVl7RHhsg7MZ1eMp8KP
-wQ3Y+OsV2wmCAjqUQtKet5/9YuQX0CTbtzxCXht/qCItvURWjpei8x55Z+Q/eQHw
-BdSZ5Vpu9OGXIy8J4qvnRuYZJEPkz2OoyWVh0xMOSKUjSb7v355Ix3I5DchC405/
-HBVQ4zjk6kRmyyEl57nC5OW5LVpBTS1ZS/arLSwlRKHZ8Be7bg8=
-=HtS8
------END PGP SIGNATURE-----
-
---uWCTLymdFNG0vGYZ--
 
