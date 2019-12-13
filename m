@@ -4,69 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EDD6C00454
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41478C2D0C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D87FD24125
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEAF224125
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cUZUvd4J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D87FD24125
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAcJlCY4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEAF224125
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifisG-0002OO-IN
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 06:12:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59206)
+	id 1ifqMG-0005Ts-86
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 14:12:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41618)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ifirX-0001wn-BH
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:12:00 -0500
+ (envelope-from <drjones@redhat.com>) id 1ifqLP-00051P-1H
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 14:11:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ifirW-0000Yz-Bf
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:11:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22790
+ (envelope-from <drjones@redhat.com>) id 1ifqLL-0006OA-Ps
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 14:11:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46295
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ifirW-0000Y5-7v
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:11:58 -0500
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1ifqLL-0006LS-Ag
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 14:11:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576235517;
+ s=mimecast20190719; t=1576264274;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=9m3dEZtdHZV4704oi8uUh8EJBV6qZdzh2uIOy9D2PN0=;
- b=cUZUvd4JQJ7yBiToLNGdTXrI9QpAmJTgCm+IXsGx9diLUvT6rjDwP3VVhstYqMqdnVT7HJ
- sb9cJEWpbA3bh+/gwj80ApxFbHxD9pmTyya48xF0sxD0RtNz6qkXBzVwRRS5lSHRbJOPaw
- yRseOFptLsYRq6ZXHu809IDUA7/aCPc=
+ in-reply-to:in-reply-to:references:references;
+ bh=eq3tHp7jLyViJfHrNkpUprKdOUFUFzEmN21wHzSWZQo=;
+ b=KAcJlCY4kjtU+0GOp6/Pz1iV0j3JgGewkkZVlVgs7xhgVkz4jjHf9EmULOrLhmfwM5zKsO
+ jkISZOsX2dAzaUNysx6yd9HlT6NCkRzB9iqIBnj73zcGdkEwHXal+PB0HiWV+coq0spH9/
+ BecmTBgWHTfycX54AwjAmRo8awzLYJM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-309-km6ISO6JOp2eqirXKCoUXw-1; Fri, 13 Dec 2019 06:11:56 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-397-AiqzPycOPumUKHGDf8sbOA-1; Fri, 13 Dec 2019 14:11:10 -0500
+X-MC-Unique: AiqzPycOPumUKHGDf8sbOA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DDB6800D41;
- Fri, 13 Dec 2019 11:11:55 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-204-134.brq.redhat.com [10.40.204.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 54EC75C3FD;
- Fri, 13 Dec 2019 11:11:47 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/i386/pc: Simplify ioapic_init_gsi()
-Date: Fri, 13 Dec 2019 12:11:45 +0100
-Message-Id: <20191213111145.11288-1-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5DE8100550E;
+ Fri, 13 Dec 2019 19:11:08 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-204-115.brq.redhat.com
+ [10.40.204.115])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C8725D9C9;
+ Fri, 13 Dec 2019 19:10:48 +0000 (UTC)
+Date: Fri, 13 Dec 2019 20:10:43 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Eric Auger <eric.auger@redhat.com>
+Subject: Re: [kvm-unit-tests RFC 04/10] pmu: Check Required Event Support
+Message-ID: <20191213191043.azvoxkcsahhycmhl@kamzik.brq.redhat.com>
+References: <20191206172724.947-1-eric.auger@redhat.com>
+ <20191206172724.947-5-eric.auger@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: km6ISO6JOp2eqirXKCoUXw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191206172724.947-5-eric.auger@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -81,50 +84,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, kvm@vger.kernel.org, maz@kernel.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, andre.przywara@arm.com,
+ andrew.murray@arm.com, kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All callers of ioapic_init_gsi() provide a parent. We want new
-uses to follow the same good practice and provide the parent
-name, so do not make this optional: assert the parent name is
-provided, and simplify the code.
+On Fri, Dec 06, 2019 at 06:27:18PM +0100, Eric Auger wrote:
+> If event counters are implemented check the common events
+> required by the PMUv3 are implemented.
+> 
+> Some are unconditionally required (SW_INCR, CPU_CYCLES,
+> either INST_RETIRED or INST_SPEC). Some others only are
+> required if the implementation implements some other features.
+> 
+> Check those wich are unconditionally required.
+> 
+> This test currently fails on TCG as neither INST_RETIRED
+> or INST_SPEC are supported.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> ---
+>  arm/pmu.c         | 70 +++++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg |  6 ++++
+>  2 files changed, 76 insertions(+)
+> 
+> diff --git a/arm/pmu.c b/arm/pmu.c
+> index 8e95251..f78c43f 100644
+> --- a/arm/pmu.c
+> +++ b/arm/pmu.c
+> @@ -102,6 +102,10 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  	: [pmcr] "r" (pmcr), [z] "r" (0)
+>  	: "cc");
+>  }
+> +
+> +/* event counter tests only implemented for aarch64 */
+> +static void test_event_introspection(void) {}
+> +
+>  #elif defined(__aarch64__)
+>  #define ID_AA64DFR0_PERFMON_SHIFT 8
+>  #define ID_AA64DFR0_PERFMON_MASK  0xf
+> @@ -140,6 +144,69 @@ static inline void precise_instrs_loop(int loop, uint32_t pmcr)
+>  	: [pmcr] "r" (pmcr)
+>  	: "cc");
+>  }
+> +
+> +#define PMCEID1_EL0 sys_reg(11, 3, 9, 12, 7)
+> +
+> +static bool is_event_supported(uint32_t n, bool warn)
+> +{
+> +	uint64_t pmceid0 = read_sysreg(pmceid0_el0);
+> +	uint64_t pmceid1 = read_sysreg_s(PMCEID1_EL0);
+> +	bool supported;
+> +	uint32_t reg;
+> +
+> +	if (n >= 0x0  && n <= 0x1F) {
+> +		reg = pmceid0 & 0xFFFFFFFF;
+> +	} else if  (n >= 0x4000 && n <= 0x401F) {
+> +		reg = pmceid0 >> 32;
+> +	} else if (n >= 0x20  && n <= 0x3F) {
+> +		reg = pmceid1 & 0xFFFFFFFF;
+> +	} else if (n >= 0x4020 && n <= 0x403F) {
+> +		reg = pmceid1 >> 32;
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/i386/pc.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index ac08e63604..234945d328 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1488,15 +1488,14 @@ void ioapic_init_gsi(GSIState *gsi_state, const cha=
-r *parent_name)
-     SysBusDevice *d;
-     unsigned int i;
-=20
-+    assert(parent_name);
-     if (kvm_ioapic_in_kernel()) {
-         dev =3D qdev_create(NULL, TYPE_KVM_IOAPIC);
-     } else {
-         dev =3D qdev_create(NULL, TYPE_IOAPIC);
-     }
--    if (parent_name) {
--        object_property_add_child(object_resolve_path(parent_name, NULL),
--                                  "ioapic", OBJECT(dev), NULL);
--    }
-+    object_property_add_child(object_resolve_path(parent_name, NULL),
-+                              "ioapic", OBJECT(dev), NULL);
-     qdev_init_nofail(dev);
-     d =3D SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(d, 0, IO_APIC_DEFAULT_ADDRESS);
---=20
-2.21.0
+Lot's of stray spaces in there. Also the 0x4000 should probably get a
+define, and maybe another for the size 0x20.
+
+> +	} else {
+> +		abort();
+> +	}
+> +	supported =  reg & (1 << n);
+> +	if (!supported && warn)
+> +		report_info("event %d is not supported", n);
+> +	return supported;
+> +}
+> +
+> +static void test_event_introspection(void)
+> +{
+> +	bool required_events;
+> +
+> +	if (!pmu.nb_implemented_counters) {
+> +		report_skip("No event counter, skip ...");
+> +		return;
+> +	}
+> +	if (pmu.nb_implemented_counters < 2)
+> +		report_info("%d event counters are implemented. "
+> +                            "ARM recommends to implement at least 2",
+> +                            pmu.nb_implemented_counters);
+
+nit: I'd use {} on these multi-line if's (even if they're just one line)
+
+> +
+> +	/* PMUv3 requires an implementation includes some common events */
+> +	required_events = is_event_supported(0x0, true) /* SW_INCR */ &&
+> +			  is_event_supported(0x11, true) /* CPU_CYCLES */ &&
+> +			  (is_event_supported(0x8, true) /* INST_RETIRED */ ||
+> +			   is_event_supported(0x1B, true) /* INST_PREC */);
+> +	if (!is_event_supported(0x8, false))
+> +		report_info("ARM strongly recomments INST_RETIRED (0x8) event "
+                                          ^ recommends
+> +			    "to be implemented");
+
+Do we need to report Arm's recommendation?
+
+> +
+> +	if (pmu.version == 0x4) {
+> +		/* ARMv8.1 PMU: STALL_FRONTEND and STALL_BACKEND are required */
+> +		required_events = required_events ||
+> +				  is_event_supported(0x23, true) ||
+> +				  is_event_supported(0x24, true);
+> +	}
+> +
+> +	/* L1D_CACHE_REFILL(0x3) and L1D_CACHE(0x4) are only required if
+> +	   L1 data / unified cache. BR_MIS_PRED(0x10), BR_PRED(0x12) are only
+> +	   required if program-flow prediction is implemented. */
+> +
+> +	report("Check required events are implemented", required_events);
+> +}
+> +
+>  #endif
+>  
+>  /*
+> @@ -324,6 +391,9 @@ int main(int argc, char *argv[])
+>  		report("Monotonically increasing cycle count", check_cycles_increase());
+>  		report("Cycle/instruction ratio", check_cpi(cpi));
+>  		pmccntr64_test();
+> +	} else if (strcmp(argv[1], "event-introspection") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_event_introspection();
+>  	} else {
+>  		report_abort("Unknown subtest '%s'", argv[1]);
+>  	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index 79f0d7a..4433ef3 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -66,6 +66,12 @@ file = pmu.flat
+>  groups = pmu
+>  extra_params = -append 'cycle-counter 0'
+>  
+> +[pmu-event-introspection]
+> +file = pmu.flat
+> +groups = pmu
+> +arch = arm64
+> +extra_params = -append 'event-introspection'
+> +
+>  # Test PMU support (TCG) with -icount IPC=1
+>  #[pmu-tcg-icount-1]
+>  #file = pmu.flat
+> -- 
+> 2.20.1
+>
+
+Thanks,
+drew 
 
 
