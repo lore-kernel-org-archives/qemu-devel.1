@@ -2,64 +2,95 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C225AC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6792DC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F8AE21655
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8AE21655
+	by mail.kernel.org (Postfix) with ESMTPS id EBB1121655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBB1121655
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifkg6-00011G-RV
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 08:08:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50120)
+	id 1ifjl8-0000Um-NH
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:09:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59309)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ifkeW-0007nJ-Qo
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:06:42 -0500
+ (envelope-from <groug@kaod.org>) id 1ifjbv-0007CD-1Z
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:59:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ifkeV-0007lH-8x
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:06:40 -0500
-Received: from 17.mo7.mail-out.ovh.net ([188.165.35.227]:56843)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ifkeV-0007ia-0j
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:06:39 -0500
-Received: from player696.ha.ovh.net (unknown [10.109.143.249])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 7F4C5140421
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 14:06:36 +0100 (CET)
-Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
- [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player696.ha.ovh.net (Postfix) with ESMTPSA id A5481D51B97D;
- Fri, 13 Dec 2019 13:06:31 +0000 (UTC)
-Subject: Re: [PATCH 12/13] ppc/pnv: Introduce PnvChipClass::xscom_pcba() method
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+ (envelope-from <groug@kaod.org>) id 1ifjbs-0003sr-Uq
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:59:54 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20512
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ifjbs-0003rU-JT
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:59:52 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBDBv7ET061092
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 06:59:50 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wujxsc3ew-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 06:59:49 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Fri, 13 Dec 2019 11:59:48 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 13 Dec 2019 11:59:46 -0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBDBxjqQ57606320
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Dec 2019 11:59:45 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D0FC6A4057;
+ Fri, 13 Dec 2019 11:59:45 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A2E0DA4040;
+ Fri, 13 Dec 2019 11:59:45 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.185.241])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 13 Dec 2019 11:59:45 +0000 (GMT)
+Subject: [PATCH 03/13] ppc/pnv: Drop PnvPsiClass::chip_type
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 13 Dec 2019 12:59:45 +0100
+In-Reply-To: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
 References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
- <157623843543.360005.13996472463887521794.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <07d68959-4f71-56cd-75e7-2035d770535b@kaod.org>
-Date: Fri, 13 Dec 2019 14:06:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <157623843543.360005.13996472463887521794.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 10149987662132841299
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelledggeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 188.165.35.227
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19121311-0028-0000-0000-000003C82A47
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121311-0029-0000-0000-0000248B6788
+Message-Id: <157623838530.360005.15470128760871845396.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-13_03:2019-12-13,2019-12-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 lowpriorityscore=0
+ malwarescore=0 mlxlogscore=665 impostorscore=0 priorityscore=1501
+ clxscore=1034 suspectscore=0 bulkscore=0 spamscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912130097
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,176 +102,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/12/2019 13:00, Greg Kurz wrote:
-> The XSCOM bus is implemented with a QOM interface, which is mostly
-> generic from a CPU type standpoint, except for the computation of
-> addresses on the Pervasize Connect Bus (PCB) network. This is handled
+It isn't used anymore.
 
-Pervasive
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/pnv_psi.c         |    3 ---
+ include/hw/ppc/pnv_psi.h |    1 -
+ 2 files changed, 4 deletions(-)
 
-> by the pnv_xscom_pcba() function with a switch statement based on
-> the chip_type class level attribute of the CPU chip.
->=20
-> This can be achieved using QOM. Also the address argument is masked wit=
-h
-> PNV_XSCOM_SIZE - 1, which is for POWER8 only. Addresses may have differ=
-ent
-> sizes with other CPU types. Have each CPU chip type handle the appropri=
-ate
-> computation with a QOM xscom_pcba() method.
-
-PnvXscom model ? :)
-
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-> ---
->  hw/ppc/pnv.c         |   23 +++++++++++++++++++++++
->  hw/ppc/pnv_xscom.c   |   14 +-------------
->  include/hw/ppc/pnv.h |    1 +
->  3 files changed, 25 insertions(+), 13 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index 0447b534b8c5..cc40b90e9cd2 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -1121,6 +1121,12 @@ static void pnv_chip_power8_realize(DeviceState =
-*dev, Error **errp)
->                                  &chip8->homer.regs);
->  }
-> =20
-> +static uint32_t pnv_chip_power8_xscom_pcba(PnvChip *chip, uint64_t add=
-r)
-> +{
-> +    addr &=3D (PNV_XSCOM_SIZE - 1);
-> +    return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
-> +}
-> +
->  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data=
-)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -1138,6 +1144,7 @@ static void pnv_chip_power8e_class_init(ObjectCla=
-ss *klass, void *data)
->      k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
->      k->xscom_core_base =3D pnv_chip_power8_xscom_core_base;
-> +    k->xscom_pcba =3D pnv_chip_power8_xscom_pcba;
->      dc->desc =3D "PowerNV Chip POWER8E";
-> =20
->      device_class_set_parent_realize(dc, pnv_chip_power8_realize,
-> @@ -1161,6 +1168,7 @@ static void pnv_chip_power8_class_init(ObjectClas=
-s *klass, void *data)
->      k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
->      k->xscom_core_base =3D pnv_chip_power8_xscom_core_base;
-> +    k->xscom_pcba =3D pnv_chip_power8_xscom_pcba;
->      dc->desc =3D "PowerNV Chip POWER8";
-> =20
->      device_class_set_parent_realize(dc, pnv_chip_power8_realize,
-> @@ -1184,6 +1192,7 @@ static void pnv_chip_power8nvl_class_init(ObjectC=
-lass *klass, void *data)
->      k->dt_populate =3D pnv_chip_power8_dt_populate;
->      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
->      k->xscom_core_base =3D pnv_chip_power8_xscom_core_base;
-> +    k->xscom_pcba =3D pnv_chip_power8_xscom_pcba;
->      dc->desc =3D "PowerNV Chip POWER8NVL";
-> =20
->      device_class_set_parent_realize(dc, pnv_chip_power8_realize,
-> @@ -1340,6 +1349,12 @@ static void pnv_chip_power9_realize(DeviceState =
-*dev, Error **errp)
->                                  &chip9->homer.regs);
->  }
-> =20
-> +static uint32_t pnv_chip_power9_xscom_pcba(PnvChip *chip, uint64_t add=
-r)
-> +{
-> +    addr &=3D (PNV9_XSCOM_SIZE - 1);
-> +    return addr >> 3;
-> +}
-> +
->  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -1357,6 +1372,7 @@ static void pnv_chip_power9_class_init(ObjectClas=
-s *klass, void *data)
->      k->dt_populate =3D pnv_chip_power9_dt_populate;
->      k->pic_print_info =3D pnv_chip_power9_pic_print_info;
->      k->xscom_core_base =3D pnv_chip_power9_xscom_core_base;
-> +    k->xscom_pcba =3D pnv_chip_power9_xscom_pcba;
->      dc->desc =3D "PowerNV Chip POWER9";
-> =20
->      device_class_set_parent_realize(dc, pnv_chip_power9_realize,
-> @@ -1422,6 +1438,12 @@ static void pnv_chip_power10_realize(DeviceState=
- *dev, Error **errp)
->                                              (uint64_t) PNV10_LPCM_BASE=
-(chip));
->  }
-> =20
-> +static uint32_t pnv_chip_power10_xscom_pcba(PnvChip *chip, uint64_t ad=
-dr)
-> +{
-> +    addr &=3D (PNV10_XSCOM_SIZE - 1);
-> +    return addr >> 3;
-> +}
-> +
->  static void pnv_chip_power10_class_init(ObjectClass *klass, void *data=
-)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -1439,6 +1461,7 @@ static void pnv_chip_power10_class_init(ObjectCla=
-ss *klass, void *data)
->      k->dt_populate =3D pnv_chip_power10_dt_populate;
->      k->pic_print_info =3D pnv_chip_power10_pic_print_info;
->      k->xscom_core_base =3D pnv_chip_power10_xscom_core_base;
-> +    k->xscom_pcba =3D pnv_chip_power10_xscom_pcba;
->      dc->desc =3D "PowerNV Chip POWER10";
-> =20
->      device_class_set_parent_realize(dc, pnv_chip_power10_realize,
-> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-> index 5ae9dfbb88ad..b681c72575b2 100644
-> --- a/hw/ppc/pnv_xscom.c
-> +++ b/hw/ppc/pnv_xscom.c
-> @@ -57,19 +57,7 @@ static void xscom_complete(CPUState *cs, uint64_t hm=
-er_bits)
-> =20
->  static uint32_t pnv_xscom_pcba(PnvChip *chip, uint64_t addr)
->  {
-> -    addr &=3D (PNV_XSCOM_SIZE - 1);
-> -
-> -    switch (PNV_CHIP_GET_CLASS(chip)->chip_type) {
-> -    case PNV_CHIP_POWER8E:
-> -    case PNV_CHIP_POWER8:
-> -    case PNV_CHIP_POWER8NVL:
-> -        return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
-> -    case PNV_CHIP_POWER9:
-> -    case PNV_CHIP_POWER10:
-> -        return addr >> 3;
-> -    default:
-> -        g_assert_not_reached();
-> -    }
-> +    return PNV_CHIP_GET_CLASS(chip)->xscom_pcba(chip, addr);
->  }
-> =20
->  static uint64_t xscom_read_default(PnvChip *chip, uint32_t pcba)
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 7a134a15d3b5..4972e93c2619 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -138,6 +138,7 @@ typedef struct PnvChipClass {
->      void (*dt_populate)(PnvChip *chip, void *fdt);
->      void (*pic_print_info)(PnvChip *chip, Monitor *mon);
->      uint64_t (*xscom_core_base)(PnvChip *chip, uint32_t core_id);
-> +    uint32_t (*xscom_pcba)(PnvChip *chip, uint64_t addr);
->  } PnvChipClass;
-> =20
->  #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
->=20
+diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+index 98a82b25e01f..75e20d9da08b 100644
+--- a/hw/ppc/pnv_psi.c
++++ b/hw/ppc/pnv_psi.c
+@@ -574,7 +574,6 @@ static void pnv_psi_power8_class_init(ObjectClass *klass, void *data)
+     dc->desc    = "PowerNV PSI Controller POWER8";
+     dc->realize = pnv_psi_power8_realize;
+ 
+-    ppc->chip_type =  PNV_CHIP_POWER8;
+     ppc->xscom_pcba = PNV_XSCOM_PSIHB_BASE;
+     ppc->xscom_size = PNV_XSCOM_PSIHB_SIZE;
+     ppc->bar_mask   = PSIHB_BAR_MASK;
+@@ -884,7 +883,6 @@ static void pnv_psi_power9_class_init(ObjectClass *klass, void *data)
+     dc->desc    = "PowerNV PSI Controller POWER9";
+     dc->realize = pnv_psi_power9_realize;
+ 
+-    ppc->chip_type  = PNV_CHIP_POWER9;
+     ppc->xscom_pcba = PNV9_XSCOM_PSIHB_BASE;
+     ppc->xscom_size = PNV9_XSCOM_PSIHB_SIZE;
+     ppc->bar_mask   = PSIHB9_BAR_MASK;
+@@ -915,7 +913,6 @@ static void pnv_psi_power10_class_init(ObjectClass *klass, void *data)
+ 
+     dc->desc    = "PowerNV PSI Controller POWER10";
+ 
+-    ppc->chip_type  = PNV_CHIP_POWER10;
+     ppc->xscom_pcba = PNV10_XSCOM_PSIHB_BASE;
+     ppc->xscom_size = PNV10_XSCOM_PSIHB_SIZE;
+     ppc->compat     = compat;
+diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
+index fc068c95e543..f0f5b5519767 100644
+--- a/include/hw/ppc/pnv_psi.h
++++ b/include/hw/ppc/pnv_psi.h
+@@ -79,7 +79,6 @@ typedef struct Pnv9Psi {
+ typedef struct PnvPsiClass {
+     SysBusDeviceClass parent_class;
+ 
+-    int chip_type;
+     uint32_t xscom_pcba;
+     uint32_t xscom_size;
+     uint64_t bar_mask;
 
 
