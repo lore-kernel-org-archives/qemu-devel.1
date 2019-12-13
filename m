@@ -2,64 +2,120 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46677C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B79DEC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C4A222527
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:32:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C4A222527
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6F20324656
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:34:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="aS3LvG5M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F20324656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iffRU-0005aA-A6
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 02:32:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38643)
+	id 1iffT2-0006uK-Fj
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 02:34:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42220)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iffP0-0003pC-Re
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:30:20 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iffPS-0004FM-Hp
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:30:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iffOz-0005UE-A5
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:30:18 -0500
-Received: from 9.mo68.mail-out.ovh.net ([46.105.78.111]:56137)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iffOz-0005RY-3D
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:30:17 -0500
-Received: from player760.ha.ovh.net (unknown [10.108.1.219])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 564BE153A77
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 08:30:15 +0100 (CET)
-Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
- [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player760.ha.ovh.net (Postfix) with ESMTPSA id 60571D41D73B;
- Fri, 13 Dec 2019 07:30:10 +0000 (UTC)
-Subject: Re: [PATCH v2 2/2] hw/arm: ast2600: Wire up the eMMC controller
-To: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org
-References: <cover.fc3e5e495d85ebd919c1f06a1a2c7c7730518f9c.1576211124.git-series.andrew@aj.id.au>
- <23bbbd829459a9a2508c9e76f0720e428852d92d.1576211124.git-series.andrew@aj.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <94b599da-2211-e77e-267a-5826203c522e@kaod.org>
-Date: Fri, 13 Dec 2019 08:30:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <23bbbd829459a9a2508c9e76f0720e428852d92d.1576211124.git-series.andrew@aj.id.au>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iffPQ-00065a-8M
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:30:46 -0500
+Received: from mail-ve1eur01on072e.outbound.protection.outlook.com
+ ([2a01:111:f400:fe1f::72e]:21191
+ helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1iffPP-00061X-1N; Fri, 13 Dec 2019 02:30:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nTstqspdTLUUJXCg97QgZ/0bpcP2yqrOie81VBXQcc7oOOEgvh4VjPVL2GbG5K7utq7pxdIdBFLbBKEe4sA9ZuuoXzYupaZwTdyTpnGzSfPnZqsBgSUwXEg0JvFPWhn0FWOy82pC4cstuYxOYHIev63Vsn6S11CWfohRblBVIbB8Z4aSKLqa+GQNmJzph/tfIFEdU5xcHWxWEGUtb0EjGwlUrsy6xC0VE31A0RKWBEGsSge9tg8OnZhABOZtXH0bgkUfsGKNHO9gDbBH77cIELOoGoqUMyDXkk+iM2NkKngQfHLbbXr+dUkKzAKxSxacq0//erxPUzPm9efPUcnHvQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w0ORpQXEUzkgJEs3bxIRznCCAtJX16lz7KJo3JDM6Hc=;
+ b=IysAdZ/r0D2HaMnIEj8RP3/LWGhBF+3D5A2SH6JtFyZkkg3+jwnu/C6WMxrjAwychqYbpyM5bUPNrfwo9aa3IkG+irWLUmVuCvQn33WmdFL512Bj8GbSmTorr4+YzLIi0rVv1qgBj+JN9YlmD8EdDWaX2YNCHQxH5s4D8LjeaKUK83DvKqdwENL7KzwWq2NnTeH6tDit8i7YoJ4MS9vcLQ7ElY8/KWucnU6XW0j/or+dA0C0KTyTdroc3rbZdDWyERfALffYluype4rZjumhYBTCKrbApliyKzvkrFn2B1402Opxnhhy4iwRC9GBq+ro9CRC2z85CB9pEVEPsuXwGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w0ORpQXEUzkgJEs3bxIRznCCAtJX16lz7KJo3JDM6Hc=;
+ b=aS3LvG5M4wUtRevFMz5xwDXDTxnsFoK787nx3UTQuOFskSN1h3hcqq2RxZ5EaxYANfjGjz8zct/dwzewfRMSkmgLN8W+0nS+8Rw3Pjza+K6YLncGCriX6CLq9qyijBzs7LTXDwxu0pAv4Dtevvi9lNfLf554u+71wAHkwXysQDU=
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
+ AM0PR08MB4259.eurprd08.prod.outlook.com (20.179.35.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2538.15; Fri, 13 Dec 2019 07:30:39 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::893d:bf37:4b98:12]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::893d:bf37:4b98:12%4]) with mapi id 15.20.2538.017; Fri, 13 Dec 2019
+ 07:30:38 +0000
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: [PING]Re: [PATCH v0 2/2] block: allow to set 'drive' property on a
+ realized block device
+Thread-Topic: [PING]Re: [PATCH v0 2/2] block: allow to set 'drive' property on
+ a realized block device
+Thread-Index: AQHVl/muMyF4ca4YdU2Ub7M+IU0rR6eE9tyAgAvVKACAJxJzgA==
+Date: Fri, 13 Dec 2019 07:30:38 +0000
+Message-ID: <d51d1a43-1069-8e55-fbe7-8eeaab5c1364@virtuozzo.com>
+References: <20191110190310.19799-1-dplotnikov@virtuozzo.com>
+ <20191110190310.19799-3-dplotnikov@virtuozzo.com>
+ <c19343f9-73b2-89a4-2b7d-b101a0b20016@virtuozzo.com>
+ <c38c1301-a28f-baf1-d441-ae8c7205feb1@virtuozzo.com>
+In-Reply-To: <c38c1301-a28f-baf1-d441-ae8c7205feb1@virtuozzo.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Ovh-Tracer-Id: 4469259683614264128
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelkedguddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeitddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.78.111
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0371.eurprd05.prod.outlook.com
+ (2603:10a6:7:94::30) To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [46.63.153.184]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0a00b19c-d57f-43bc-ed15-08d77f9e59c0
+x-ms-traffictypediagnostic: AM0PR08MB4259:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR08MB4259F14A9C80FDA8D14B20C2CF540@AM0PR08MB4259.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2000;
+x-forefront-prvs: 0250B840C1
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(396003)(376002)(39840400004)(136003)(366004)(199004)(189003)(6916009)(31686004)(2616005)(36756003)(478600001)(6486002)(316002)(52116002)(66446008)(107886003)(71200400001)(6512007)(31696002)(53546011)(6506007)(66556008)(8936002)(66946007)(4326008)(186003)(5660300002)(2906002)(81166006)(81156014)(26005)(66476007)(64756008)(8676002)(86362001)(54906003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4259;
+ H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Wxuif7JO28NoYrcgjINI08LRj+3RShIZ35Js8LHmPnp7RJu0iorkjJDtwTMJzQOsEHEvqMTjTROnN9+Q0EM/W/dneFsVMtO3FKnjY0gan/DIBo/rTjulhzp8el5lb1lLEg417dgH0oCMrefH8pRqJO2HrB1uAyVnj1lPAFUixsMsPR1lSHia6jcoMm9SkPF4P4rVP35nnLdBN1SZ6TtCnmMy0x8ASL5tqiFy2U1HMdBiFABqLAzlpPk6M0pv9ndlPO34q74dhqPgE0aog5uGSDemcDccgEefEIeSpAWUfwPu1EWy9+JdyG6bQtoHCnFN+0qML1imkNA35uLp+/rhAqjP/7CEWCkCeFuky5j0Qj4R5DCn+1BNBIXW87ZdUXerZJPpfLBzf2cXmWCr4Jk6PLFRLnFK/i+FkArW9ltqqZ5bsLhWp2sVnn7H3SZRnzA2
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DB05A866E4AD8E44804AD66845BA4450@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a00b19c-d57f-43bc-ed15-08d77f9e59c0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Dec 2019 07:30:38.7838 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: yIrvaDDNfaWOgUgr8tZ/fSENhsibdq46eAj4JuPej3dgkz+0BFig+JkxrgxZNmRAO3lTpxwLsUHrz0I3MTaVPThASGSml9JKqhPpScRg9Qo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4259
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 2a01:111:f400:fe1f::72e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,171 +127,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, joel@jms.id.au, qemu-devel@nongnu.org
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/12/2019 05:28, Andrew Jeffery wrote:
-> Initialise another SDHCI model instance for the AST2600's eMMC
-> controller and use the SDHCI's num_slots value introduced previously to
-> determine whether we should create an SD card instance for the new slot=
-.
->=20
-> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-> ---
->=20
-> v2:
-> * Extract instantiation of SD cards to helper function
->=20
->  hw/arm/aspeed.c             | 25 ++++++++++++++++---------
->  hw/arm/aspeed_ast2600.c     | 21 +++++++++++++++++++++
->  include/hw/arm/aspeed_soc.h |  2 ++
->  3 files changed, 39 insertions(+), 9 deletions(-)
->=20
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index 862549b1f3a9..87baac0ea46c 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -167,6 +167,18 @@ static void aspeed_board_init_flashes(AspeedSMCSta=
-te *s, const char *flashtype,
->      }
->  }
-> =20
-> +static void sdhci_attach_drive(SDHCIState *sdhci, DriveInfo *dinfo)
-> +{
-> +        BlockBackend *blk;
-> +        DeviceState *card;
-> +
-> +        blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
-> +        card =3D qdev_create(qdev_get_child_bus(DEVICE(sdhci), "sd-bus=
-"),
-> +                           TYPE_SD_CARD);
-> +        qdev_prop_set_drive(card, "drive", blk, &error_fatal);
-> +        object_property_set_bool(OBJECT(card), true, "realized", &erro=
-r_fatal);
-> +}
-> +
->  static void aspeed_board_init(MachineState *machine,
->                                const AspeedBoardConfig *cfg)
->  {
-> @@ -260,16 +272,11 @@ static void aspeed_board_init(MachineState *machi=
-ne,
->      }
-> =20
->      for (i =3D 0; i < bmc->soc.sdhci.num_slots; i++) {
-> -        SDHCIState *sdhci =3D &bmc->soc.sdhci.slots[i];
-> -        DriveInfo *dinfo =3D drive_get_next(IF_SD);
-> -        BlockBackend *blk;
-> -        DeviceState *card;
-> +        sdhci_attach_drive(&bmc->soc.sdhci.slots[i], drive_get_next(IF=
-_SD));
-> +    }
-> =20
-> -        blk =3D dinfo ? blk_by_legacy_dinfo(dinfo) : NULL;
-> -        card =3D qdev_create(qdev_get_child_bus(DEVICE(sdhci), "sd-bus=
-"),
-> -                           TYPE_SD_CARD);
-> -        qdev_prop_set_drive(card, "drive", blk, &error_fatal);
-> -        object_property_set_bool(OBJECT(card), true, "realized", &erro=
-r_fatal);
-> +    if (bmc->soc.emmc.num_slots) {
-> +        sdhci_attach_drive(&bmc->soc.emmc.slots[0], drive_get_next(IF_=
-SD));
->      }
-> =20
->      arm_load_kernel(ARM_CPU(first_cpu), machine, &aspeed_board_binfo);
-> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-> index 931ee5aae183..723c8196c8a5 100644
-> --- a/hw/arm/aspeed_ast2600.c
-> +++ b/hw/arm/aspeed_ast2600.c
-> @@ -46,6 +46,7 @@ static const hwaddr aspeed_soc_ast2600_memmap[] =3D {
->      [ASPEED_ADC]       =3D 0x1E6E9000,
->      [ASPEED_VIDEO]     =3D 0x1E700000,
->      [ASPEED_SDHCI]     =3D 0x1E740000,
-> +    [ASPEED_EMMC]      =3D 0x1E750000,
->      [ASPEED_GPIO]      =3D 0x1E780000,
->      [ASPEED_GPIO_1_8V] =3D 0x1E780800,
->      [ASPEED_RTC]       =3D 0x1E781000,
-> @@ -64,6 +65,7 @@ static const hwaddr aspeed_soc_ast2600_memmap[] =3D {
-> =20
->  #define ASPEED_SOC_AST2600_MAX_IRQ 128
-> =20
-> +/* Shared Peripheral Interrupt values below are offset by -32 from dat=
-asheet */
->  static const int aspeed_soc_ast2600_irqmap[] =3D {
->      [ASPEED_UART1]     =3D 47,
->      [ASPEED_UART2]     =3D 48,
-> @@ -77,6 +79,7 @@ static const int aspeed_soc_ast2600_irqmap[] =3D {
->      [ASPEED_ADC]       =3D 78,
->      [ASPEED_XDMA]      =3D 6,
->      [ASPEED_SDHCI]     =3D 43,
-> +    [ASPEED_EMMC]      =3D 15,
->      [ASPEED_GPIO]      =3D 40,
->      [ASPEED_GPIO_1_8V] =3D 11,
->      [ASPEED_RTC]       =3D 13,
-> @@ -215,6 +218,14 @@ static void aspeed_soc_ast2600_init(Object *obj)
->          sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[=
-i]),
->                                sizeof(s->sdhci.slots[i]), TYPE_SYSBUS_S=
-DHCI);
->      }
-> +
-> +    sysbus_init_child_obj(obj, "emmc", OBJECT(&s->emmc), sizeof(s->emm=
-c),
-> +                          TYPE_ASPEED_SDHCI);
-> +
-> +    object_property_set_int(OBJECT(&s->emmc), 1, "num-slots", &error_a=
-bort);
-> +
-> +    sysbus_init_child_obj(obj, "emmc[*]", OBJECT(&s->emmc.slots[0]),
-> +            sizeof(s->emmc.slots[0]), TYPE_SYSBUS_SDHCI);
->  }
-> =20
->  /*
-> @@ -487,6 +498,16 @@ static void aspeed_soc_ast2600_realize(DeviceState=
- *dev, Error **errp)
->                      sc->memmap[ASPEED_SDHCI]);
->      sysbus_connect_irq(SYS_BUS_DEVICE(&s->sdhci), 0,
->                         aspeed_soc_get_irq(s, ASPEED_SDHCI));
-> +
-> +    /* eMMC */
-> +    object_property_set_bool(OBJECT(&s->emmc), true, "realized", &err)=
-;
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->emmc), 0, sc->memmap[ASPEED_EMM=
-C]);
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->emmc), 0,
-> +                       aspeed_soc_get_irq(s, ASPEED_EMMC));
->  }
-> =20
->  static void aspeed_soc_ast2600_class_init(ObjectClass *oc, void *data)
-> diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-> index 495c08be1b84..911443f4c071 100644
-> --- a/include/hw/arm/aspeed_soc.h
-> +++ b/include/hw/arm/aspeed_soc.h
-> @@ -56,6 +56,7 @@ typedef struct AspeedSoCState {
->      AspeedGPIOState gpio;
->      AspeedGPIOState gpio_1_8v;
->      AspeedSDHCIState sdhci;
-> +    AspeedSDHCIState emmc;
->  } AspeedSoCState;
-> =20
->  #define TYPE_ASPEED_SOC "aspeed-soc"
-> @@ -125,6 +126,7 @@ enum {
->      ASPEED_MII4,
->      ASPEED_SDRAM,
->      ASPEED_XDMA,
-> +    ASPEED_EMMC,
->  };
-> =20
->  #endif /* ASPEED_SOC_H */
->=20
-
+DQoNCk9uIDE4LjExLjIwMTkgMTM6NTAsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4NCj4NCj4g
+T24gMTAuMTEuMjAxOSAyMjowOCwgRGVuaXMgUGxvdG5pa292IHdyb3RlOg0KPj4NCj4+IE9uIDEw
+LjExLjIwMTkgMjI6MDMsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4+PiBUaGlzIGFsbG93cyB0
+byBjaGFuZ2UgKHJlcGxhY2UpIHRoZSBmaWxlIG9uIGEgYmxvY2sgZGV2aWNlIGFuZCBpcyANCj4+
+PiB1c2VmdWwNCj4+PiB0byB3b3JrYXJvdW5kIGV4Y2x1c2l2ZSBmaWxlIGFjY2VzcyByZXN0cmlj
+dGlvbnMsIGUuZy4gdG8gaW1wbGVtZW50IFZNDQo+Pj4gbWlncmF0aW9uIHdpdGggYSBzaGFyZWQg
+ZGlzayBzdG9yZWQgb24gc29tZSBzdG9yYWdlIHdpdGggdGhlIGV4Y2x1c2l2ZQ0KPj4+IGZpbGUg
+b3BlbmluZyBtb2RlbDogYSBkZXN0aW5hdGlvbiBWTSBpcyBzdGFydGVkIHdhaXRpbmcgZm9yIGlu
+Y29tbWluZw0KPj4+IG1pZ3JhdGlvbiB3aXRoIGEgZmFrZSBpbWFnZSBkcml2ZSwgYW5kIGxhdGVy
+LCBvbiB0aGUgbGFzdCBtaWdyYXRpb24NCj4+PiBwaGFzZSwgdGhlIGZha2UgaW1hZ2UgZmlsZSBp
+cyByZXBsYWNlZCB3aXRoIHRoZSByZWFsIG9uZS4NCj4+Pg0KPj4+IFNpZ25lZC1vZmYtYnk6IERl
+bmlzIFBsb3RuaWtvdiA8ZHBsb3RuaWtvdkB2aXJ0dW96em8uY29tPg0KPj4+IC0tLQ0KPj4+IMKg
+IGh3L2NvcmUvcWRldi1wcm9wZXJ0aWVzLXN5c3RlbS5jIHwgODkgDQo+Pj4gKysrKysrKysrKysr
+KysrKysrKysrKysrKysrLS0tLS0NCj4+PiDCoCAxIGZpbGUgY2hhbmdlZCwgNzcgaW5zZXJ0aW9u
+cygrKSwgMTIgZGVsZXRpb25zKC0pDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEvaHcvY29yZS9xZGV2
+LXByb3BlcnRpZXMtc3lzdGVtLmMgDQo+Pj4gYi9ody9jb3JlL3FkZXYtcHJvcGVydGllcy1zeXN0
+ZW0uYw0KPj4+IGluZGV4IGM1MzQ1OTBkY2QuLmFhYWIxMzcwYTQgMTAwNjQ0DQo+Pj4gLS0tIGEv
+aHcvY29yZS9xZGV2LXByb3BlcnRpZXMtc3lzdGVtLmMNCj4+PiArKysgYi9ody9jb3JlL3FkZXYt
+cHJvcGVydGllcy1zeXN0ZW0uYw0KPj4+IEBAIC03OSw4ICs3OSw1NSBAQCBzdGF0aWMgdm9pZCBz
+ZXRfcG9pbnRlcihPYmplY3QgKm9iaiwgVmlzaXRvciAqdiwgDQo+Pj4gUHJvcGVydHkgKnByb3As
+DQo+Pj4gwqAgwqAgLyogLS0tIGRyaXZlIC0tLSAqLw0KPj4+IMKgIC1zdGF0aWMgdm9pZCBkb19w
+YXJzZV9kcml2ZShEZXZpY2VTdGF0ZSAqZGV2LCBjb25zdCBjaGFyICpzdHIsIA0KPj4+IHZvaWQg
+KipwdHIsDQo+Pj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgY29uc3QgY2hhciAqcHJvcG5hbWUsIGJvb2wgaW90aHJlYWQsIA0KPj4+IEVycm9y
+ICoqZXJycCkNCj4+PiArc3RhdGljIHZvaWQgZG9fcGFyc2VfZHJpdmVfcmVhbGl6ZWQoRGV2aWNl
+U3RhdGUgKmRldiwgY29uc3QgY2hhciAqc3RyLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZvaWQgKipw
+dHIsIGNvbnN0IGNoYXIgKnByb3BuYW1lLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJvb2wgaW90aHJl
+YWQsIEVycm9yICoqZXJycCkNCj4+PiArew0KPj4+ICvCoMKgwqAgQmxvY2tCYWNrZW5kICpibGsg
+PSAqcHRyOw0KPj4+ICvCoMKgwqAgQmxvY2tEcml2ZXJTdGF0ZSAqYnMgPSBiZHJ2X2xvb2t1cF9i
+cyhOVUxMLCBzdHIsIE5VTEwpOw0KPj4+ICvCoMKgwqAgaW50IHJldDsNCj4+PiArwqDCoMKgIGJv
+b2wgYmxrX2NyZWF0ZWQgPSBmYWxzZTsNCj4+PiArDQo+Pj4gK8KgwqDCoCBpZiAoIWJzKSB7DQo+
+Pj4gK8KgwqDCoMKgwqDCoMKgIGVycm9yX3NldGcoZXJycCwgIkNhbid0IGZpbmQgYmxvY2tkZXYg
+JyVzJyIsIHN0cik7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIHJldHVybjsNCj4+PiArwqDCoMKgIH0N
+Cj4+PiArDQo+Pj4gK8KgwqDCoCBpZiAoIWJsaykgew0KPj4+ICvCoMKgwqDCoMKgwqDCoCBBaW9D
+b250ZXh0ICpjdHggPSBpb3RocmVhZCA/IGJkcnZfZ2V0X2Fpb19jb250ZXh0KGJzKSA6DQo+Pj4g
+K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBxZW11X2dldF9haW9fY29udGV4dCgpOw0KPj4+ICvCoMKgwqDCoMKg
+wqDCoCBibGsgPSBibGtfbmV3KGN0eCwgQkxLX1BFUk1fQUxMLCBCTEtfUEVSTV9BTEwpOw0KPj4+
+ICvCoMKgwqDCoMKgwqDCoCBibGtfY3JlYXRlZCA9IHRydWU7DQo+Pg0KPj4gQWN0dWFsbHksIEkg
+aGF2ZSBjb25jZXJucyBhYm91dCBzaXR1YXRpb24gd2hlcmUgYmxrPW51bGwuDQo+Pg0KPj4gSXMg
+dGhlcmUgYW55IGNhc2Ugd2hlbiBzY3NpLWhkIChvciBvdGhlcnMpIGRvZXNuJ3QgaGF2ZSBhIGJs
+ayANCj4+IGFzc2lnbmVkIGFuZCBpdCdzIGxlZ2FsPw0KPj4NCj4+PiArwqDCoMKgIH0gZWxzZSB7
+DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIGlmIChibGtfYnMoYmxrKSkgew0KPj4+ICvCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIGJsa19yZW1vdmVfYnMoYmxrKTsNCj4+PiArwqDCoMKgwqDCoMKgwqAgfQ0K
+Pj4+ICvCoMKgwqAgfQ0KPj4+ICsNCj4+PiArwqDCoMKgIHJldCA9IGJsa19pbnNlcnRfYnMoYmxr
+LCBicywgZXJycCk7DQo+Pj4gKw0KPj4+ICvCoMKgwqAgaWYgKCFyZXQgJiYgYmxrX2NyZWF0ZWQp
+IHsNCj4+PiArwqDCoMKgwqDCoMKgwqAgaWYgKGJsa19hdHRhY2hfZGV2KGJsaywgZGV2KSA8IDAp
+IHsNCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAvKg0KPj4+ICvCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgKiBTaG91bGRuJ3QgYmUgYW55IGVycm9ycyBoZXJlIHNpbmNlIHdlIGp1c3QgY3Jl
+YXRlZA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiB0aGUgbmV3IGJsayBiZWNhdXNl
+IHRoZSBkZXZpY2UgZG9lc24ndCBoYXZlIGFueS4NCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgICogTGVhdmUgdGhlIG1lc3NhZ2UgaGVyZSBpbiBjYXNlIGJsa19hdHRhY2hfZGV2IGlzIA0K
+Pj4+IGNoYW5nZWQNCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICovDQo+Pj4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJvcl9zZXRnKGVycnAsICJDYW4ndCBhdHRhY2ggZHJpdmUg
+JyVzJyB0byBkZXZpY2UgDQo+Pj4gJyVzJyIsDQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3RyLCBvYmplY3RfZ2V0X3R5cGVuYW1lKE9CSkVDVChk
+ZXYpKSk7DQo+Pj4gK8KgwqDCoMKgwqDCoMKgIH0gZWxzZSB7DQo+Pj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgKnB0ciA9IGJsazsNCj4+PiArwqDCoMKgwqDCoMKgwqAgfQ0KPj4+ICvCoMKgwqAg
+fQ0KPiBBbm90aGVyIHByb2JsZW0gaGVyZSwgaXMgdGhhdCB0aGUgInNpemUiIG9mIHRoZSBkZXZp
+Y2UgZGV2IG1heSBub3QgDQo+IG1hdGNoIGFmdGVyIHNldHRpbmcgYSBkcml2ZS4NCj4gU28sIHdl
+IHNob3VsZCB1cGRhdGUgaXQgYWZ0ZXIgdGhlIGRyaXZlIHNldHRpbmcuDQo+IEl0IHdhcyBmb3Vu
+ZCwgdGhhdCBpdCBjb3VsZCBiZSBkb25lIGJ5IGNhbGxpbmcgDQo+IEJsb2NrRGV2T3BzLmJkcnZf
+cGFyZW50X2NiX3Jlc2l6ZS4NCj4NCj4gQnV0IEkgaGF2ZSBzb21lIGNvbmNlcm5zIGFib3V0IGRv
+aW5nIGl0IHNvLiBJbiB0aGUgY2FzZSBvZiB2aXJ0aW8gc2NzaSANCj4gZGlzayB3ZSBoYXZlIHRo
+ZSBmb2xsb3dpbmcgY2FsbHN0YWNrDQo+DQo+IMKgwqDCoCBiZHJ2X3BhcmVudF9jYl9yZXNpemUg
+Y2FsbHMoKSAtPg0KPiDCoCDCoMKgwqDCoMKgIHNjc2lfZGV2aWNlX3JlcG9ydF9jaGFuZ2UoZGV2
+LCBTRU5TRV9DT0RFKENBUEFDSVRZX0NIQU5HRUQpKSAtPg0KPiDCoCDCoCDCoCDCoCDCoCDCoCB2
+aXJ0aW9fc2NzaV9jaGFuZ2UgLT4NCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZp
+cnRpb19zY3NpX3B1c2hfZXZlbnQocywgZGV2LCANCj4gVklSVElPX1NDU0lfVF9QQVJBTV9DSEFO
+R0UsDQo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoCDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzZW5zZS5hc2MgfCANCj4g
+KHNlbnNlLmFzY3EgPDwgOCkpOw0KPg0KPg0KPiB2aXJ0aW9fc2NzaV9jaGFuZ2XCoCBwdXNoZXMg
+dGhlIGV2ZW50IHRvIHRoZSBndWVzdCB0byBtYWtlIHRoZSBndWVzdCANCj4gYXNrIGZvciBzaXpl
+IHJlZnJlc2hpbmcuDQo+IElmIEknbSBub3QgbWlzdGFrZW4sIGhlcmUgd2UgY2FuIGdldCBhIHJh
+Y2UgY29uZGl0aW9uIHdoZW4gc29tZSANCj4gYW5vdGhlciByZXF1ZXN0IGlzIHByb2Nlc3NlZCB3
+aXRoIGFuIHVuY2hhbmdlZA0KPiBzaXplIGFuZCB0aGVuIHRoZSBzaXplIGNoYW5naW5nIHJlcXVl
+c3QgaXMgcHJvY2Vzc2VkLg0KPg0KPiBJIGRpZG4ndCBmaW5kIGEgYmV0dGVyIHdheSB0byB1cGRh
+dGUgZGV2aWNlIHNpemUgc28gYW55IGNvbW1lbnRzIGFyZSANCj4gd2VsY29tZS4NCj4NCj4gVGhh
+bmtzIQ0KPg0KPiBEZW5pcw0KPj4+ICsNCj4+PiArwqDCoMKgIGlmIChibGtfY3JlYXRlZCkgew0K
+Pj4+ICvCoMKgwqDCoMKgwqDCoCBibGtfdW5yZWYoYmxrKTsNCj4+PiArwqDCoMKgIH0NCj4+PiAr
+fQ0KPj4+ICsNCj4+PiArc3RhdGljIHZvaWQgZG9fcGFyc2VfZHJpdmVfdW5yZWFsaXplZChEZXZp
+Y2VTdGF0ZSAqZGV2LCBjb25zdCBjaGFyIA0KPj4+ICpzdHIsDQo+Pj4gK8KgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHZvaWQgKipwdHIsIGNvbnN0IGNoYXIgDQo+Pj4gKnByb3BuYW1lLA0KPj4+ICvCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCBib29sIGlvdGhyZWFkLCBFcnJvciAqKmVycnApDQo+Pj4gwqAgew0KPj4+IMKg
+wqDCoMKgwqAgQmxvY2tCYWNrZW5kICpibGs7DQo+Pj4gwqDCoMKgwqDCoCBib29sIGJsa19jcmVh
+dGVkID0gZmFsc2U7DQo+Pj4gQEAgLTEzNywxOCArMTg0LDM0IEBAIGZhaWw6DQo+Pj4gwqDCoMKg
+wqDCoCB9DQo+Pj4gwqAgfQ0KPj4+IMKgIC1zdGF0aWMgdm9pZCBwYXJzZV9kcml2ZShEZXZpY2VT
+dGF0ZSAqZGV2LCBjb25zdCBjaGFyICpzdHIsIHZvaWQgDQo+Pj4gKipwdHIsDQo+Pj4gLcKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29uc3QgY2hhciAqcHJv
+cG5hbWUsIEVycm9yICoqZXJycCkNCj4+PiAtew0KPj4+IC3CoMKgwqAgZG9fcGFyc2VfZHJpdmUo
+ZGV2LCBzdHIsIHB0ciwgcHJvcG5hbWUsIGZhbHNlLCBlcnJwKTsNCj4+PiAtfQ0KPj4+IC0NCj4+
+PiAtc3RhdGljIHZvaWQgcGFyc2VfZHJpdmVfaW90aHJlYWQoRGV2aWNlU3RhdGUgKmRldiwgY29u
+c3QgY2hhciAqc3RyLCANCj4+PiB2b2lkICoqcHRyLA0KPj4+ICtzdGF0aWMgdm9pZCBwYXJzZV9k
+cml2ZV9yZWFsaXplZChEZXZpY2VTdGF0ZSAqZGV2LCBjb25zdCBjaGFyICpzdHIsIA0KPj4+IHZv
+aWQgKipwdHIsDQo+Pj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29uc3QgY2hhciAqcHJvcG5hbWUsIEVycm9yICoq
+ZXJycCkNCj4+PiDCoCB7DQo+Pj4gLcKgwqDCoCBkb19wYXJzZV9kcml2ZShkZXYsIHN0ciwgcHRy
+LCBwcm9wbmFtZSwgdHJ1ZSwgZXJycCk7DQo+Pj4gK8KgwqDCoCBkb19wYXJzZV9kcml2ZV9yZWFs
+aXplZChkZXYsIHN0ciwgcHRyLCBwcm9wbmFtZSwgZmFsc2UsIGVycnApOw0KPj4+IMKgIH0NCj4+
+PiDCoCArc3RhdGljIHZvaWQgcGFyc2VfZHJpdmVfcmVhbGl6ZWRfaW90aHJlYWQoRGV2aWNlU3Rh
+dGUgKmRldiwgY29uc3QgDQo+Pj4gY2hhciAqc3RyLA0KPj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIHZvaWQgKipwdHIsIGNvbnN0IGNoYXIgDQo+Pj4gKnByb3BuYW1lLA0KPj4+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIEVycm9yICoqZXJycCkNCj4+PiArew0KPj4+ICvCoMKgwqAg
+ZG9fcGFyc2VfZHJpdmVfcmVhbGl6ZWQoZGV2LCBzdHIsIHB0ciwgcHJvcG5hbWUsIHRydWUsIGVy
+cnApOw0KPj4+ICt9DQo+Pj4gKw0KPj4+ICtzdGF0aWMgdm9pZCBwYXJzZV9kcml2ZV91bnJlYWxp
+emVkKERldmljZVN0YXRlICpkZXYsIGNvbnN0IGNoYXIgKnN0ciwNCj4+PiArwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+dm9pZCAqKnB0ciwgY29uc3QgY2hhciAqcHJvcG5hbWUsDQo+Pj4gK8KgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEVycm9y
+ICoqZXJycCkNCj4+PiArew0KPj4+ICvCoMKgwqAgZG9fcGFyc2VfZHJpdmVfdW5yZWFsaXplZChk
+ZXYsIHN0ciwgcHRyLCBwcm9wbmFtZSwgZmFsc2UsIGVycnApOw0KPj4+ICt9DQo+Pj4gKw0KPj4+
+ICtzdGF0aWMgdm9pZCBwYXJzZV9kcml2ZV91bnJlYWxpemVkX2lvdGhyZWFkKERldmljZVN0YXRl
+ICpkZXYsIGNvbnN0IA0KPj4+IGNoYXIgKnN0ciwNCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgdm9pZCAqKnB0ciwgY29uc3QgY2hhciANCj4+PiAqcHJvcG5hbWUsDQo+Pj4gK8Kg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEVycm9yICoqZXJycCkNCj4+PiArew0KPj4+ICvC
+oMKgwqAgZG9fcGFyc2VfZHJpdmVfdW5yZWFsaXplZChkZXYsIHN0ciwgcHRyLCBwcm9wbmFtZSwg
+dHJ1ZSwgZXJycCk7DQo+Pj4gK30NCj4+PiArDQo+Pj4gKw0KPj4+IMKgIHN0YXRpYyB2b2lkIHJl
+bGVhc2VfZHJpdmUoT2JqZWN0ICpvYmosIGNvbnN0IGNoYXIgKm5hbWUsIHZvaWQgDQo+Pj4gKm9w
+YXF1ZSkNCj4+PiDCoCB7DQo+Pj4gwqDCoMKgwqDCoCBEZXZpY2VTdGF0ZSAqZGV2ID0gREVWSUNF
+KG9iaik7DQo+Pj4gQEAgLTE4OCwxMyArMjUxLDE1IEBAIHN0YXRpYyB2b2lkIGdldF9kcml2ZShP
+YmplY3QgKm9iaiwgVmlzaXRvciAqdiwgDQo+Pj4gY29uc3QgY2hhciAqbmFtZSwgdm9pZCAqb3Bh
+cXVlLA0KPj4+IMKgIHN0YXRpYyB2b2lkIHNldF9kcml2ZShPYmplY3QgKm9iaiwgVmlzaXRvciAq
+diwgY29uc3QgY2hhciAqbmFtZSwgDQo+Pj4gdm9pZCAqb3BhcXVlLA0KPj4+IMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgRXJyb3IgKiplcnJwKQ0KPj4+IMKg
+IHsNCj4+PiAtwqDCoMKgIHNldF9wb2ludGVyKG9iaiwgdiwgb3BhcXVlLCBOVUxMLCBwYXJzZV9k
+cml2ZSwgbmFtZSwgZXJycCk7DQo+Pj4gK8KgwqDCoCBzZXRfcG9pbnRlcihvYmosIHYsIG9wYXF1
+ZSwgcGFyc2VfZHJpdmVfcmVhbGl6ZWQsIA0KPj4+IHBhcnNlX2RyaXZlX3VucmVhbGl6ZWQsDQo+
+Pj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBuYW1lLCBlcnJwKTsNCj4+PiDCoCB9
+DQo+Pj4gwqAgwqAgc3RhdGljIHZvaWQgc2V0X2RyaXZlX2lvdGhyZWFkKE9iamVjdCAqb2JqLCBW
+aXNpdG9yICp2LCBjb25zdCANCj4+PiBjaGFyICpuYW1lLA0KPj4+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdm9pZCAqb3Bh
+cXVlLCBFcnJvciAqKmVycnApDQo+Pj4gwqAgew0KPj4+IC3CoMKgwqAgc2V0X3BvaW50ZXIob2Jq
+LCB2LCBvcGFxdWUsIE5VTEwsIHBhcnNlX2RyaXZlX2lvdGhyZWFkLCBuYW1lLCANCj4+PiBlcnJw
+KTsNCj4+PiArwqDCoMKgIHNldF9wb2ludGVyKG9iaiwgdiwgb3BhcXVlLCBwYXJzZV9kcml2ZV9y
+ZWFsaXplZF9pb3RocmVhZCwNCj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHBh
+cnNlX2RyaXZlX3VucmVhbGl6ZWRfaW90aHJlYWQsIG5hbWUsIGVycnApOw0KPj4+IMKgIH0NCj4+
+PiDCoCDCoCBjb25zdCBQcm9wZXJ0eUluZm8gcWRldl9wcm9wX2RyaXZlID0gew0KPg0KDQo=
 
