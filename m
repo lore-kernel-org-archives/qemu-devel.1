@@ -2,88 +2,85 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C81B6C00454
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 920D3C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5099E21655
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BA4D21655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="5JIV9Oc+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5099E21655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gtv7zyy1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA4D21655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifjvY-0003yR-Ul
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:20:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44657)
+	id 1ifs3Y-0006Uo-Nm
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 16:01:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38001)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1ifjpO-0006w7-7D
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:13:51 -0500
+ (envelope-from <eblake@redhat.com>) id 1ifs2L-0005pg-70
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 15:59:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1ifjpL-0000cG-Uk
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:13:48 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:39226)
+ (envelope-from <eblake@redhat.com>) id 1ifs2H-0007O7-OE
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 15:59:43 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40197
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1ifjpL-0000Y1-8p
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:13:47 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 2F72496EF0;
- Fri, 13 Dec 2019 12:13:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1576239224;
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ifs2H-0007KT-HS
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 15:59:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576270780;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+4h+Tpe1bgg9RxVaI1c0u10O2LKCLBITWj2yz7gPrUw=;
- b=5JIV9Oc+d2wPq3z0uBiMP1+l9C7Hx1W/A6OZq9o+S8VTnSgphr5prtloSmm2qS6TtxyyAu
- 40wvIq06qN7RvRoOKJtxduMnP6snZGvT2VgtVGI1SBf/DVXhVgEbsgJhedoicF5skIi4+j
- g9gWbh2dONuBSvQuBnM081nQsTSjEq0=
-From: Damien Hedde <damien.hedde@greensocs.com>
-Subject: Re: [PATCH v2 2/2] gdbstub: do not split gdb_monitor_write payload
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20191211160514.58373-1-damien.hedde@greensocs.com>
- <20191211160514.58373-3-damien.hedde@greensocs.com>
- <871rta3czj.fsf@linaro.org>
- <c0457ff2-0141-34b5-980f-4f7ae8a65b09@greensocs.com>
- <87v9ql24u2.fsf@linaro.org>
-Message-ID: <e6f663bd-fca8-6aa8-4bdc-f6279e0cbf3b@greensocs.com>
-Date: Fri, 13 Dec 2019 13:13:43 +0100
+ bh=t/gLqqtGE8AR2CYAo6pWp3+fioKxkjQmNsG9cuqgydI=;
+ b=Gtv7zyy1Izvmb6xOf93/j6WCzjg6ip6uOnXlIzG+jx/Mp42nHHU+eBPkVD+wZs17Ia1Qf9
+ 5oi9fueCBPy7cVsWdbU0hk57FXiwD6IvL43EjND/TnCs5erTfYY8dqpBFGqYfHZUH3PPzF
+ QRRhEjlD9yE15scNYYhYGOFBjjILauY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-WTZt4EzcMCC1juWTa7nAqw-1; Fri, 13 Dec 2019 15:59:38 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1FE898C4ECD;
+ Fri, 13 Dec 2019 20:59:37 +0000 (UTC)
+Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 458B360BF3;
+ Fri, 13 Dec 2019 20:59:34 +0000 (UTC)
+Subject: Re: [PATCH v5 4/4] blockdev: honor bdrv_try_set_aio_context() context
+ requirements
+To: Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>
+References: <20191128104129.250206-1-slp@redhat.com>
+ <20191128104129.250206-5-slp@redhat.com>
+ <20191209160601.GB6715@linux.fritz.box>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <7ea304ab-0a4b-8c0a-ae9f-2f6501198840@redhat.com>
+Date: Fri, 13 Dec 2019 14:59:33 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <87v9ql24u2.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1576239224;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+4h+Tpe1bgg9RxVaI1c0u10O2LKCLBITWj2yz7gPrUw=;
- b=nan6MTTmLxETnKPMnZSdVXrHcUkRDg76F4k87Pampxk55urh3QHx9m0UttGcfmnRKzUL1L
- Syn4E86bfuULQvbBFUchBAjOA+VNsLKFOlF14oapW3b14t7kmPWcTYxxHvlUEwbIeNzIOB
- 0Bjnl0RXEz/nIFYYYI9jhXlSZhP6CWE=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1576239224; a=rsa-sha256; cv=none;
- b=OAEUQMjnPEFLN3H3OmUzwbmT/I3qWJcn9DQz1bwAz8GRIcYR6qBZAaOmM3MtoTOkr41Plw
- io5ZKJ93pnfKxVttatmeV4Uk0bT+WknMZs76PEwzJikNr6PwQqn9/g415CTEKJJApD/qQT
- gOYzDPRjGCwWB2yIgzWO9a+OY9UgwGc=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191209160601.GB6715@linux.fritz.box>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: WTZt4EzcMCC1juWTa7nAqw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,52 +92,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, qemu-devel@nongnu.org, luc.michel@greensocs.com
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 12/12/19 11:52 AM, Alex Benn=C3=A9e wrote:
->=20
-> Damien Hedde <damien.hedde@greensocs.com> writes:
->=20
->> On 12/11/19 7:59 PM, Alex Benn=C3=A9e wrote:
->>>
->>> Damien Hedde <damien.hedde@greensocs.com> writes:
->>>
->>>> Since we can now send packets of arbitrary length:
->>>> simplify gdb_monitor_write() and send the whole payload
->>>> in one packet.
->>>
->>> Do we know gdb won't barf on us. Does the negotiated max packet size
->>> only apply to data sent to the gdbserver?
+On 12/9/19 10:06 AM, Kevin Wolf wrote:
+> Am 28.11.2019 um 11:41 hat Sergio Lopez geschrieben:
+>> bdrv_try_set_aio_context() requires that the old context is held, and
+>> the new context is not held. Fix all the occurrences where it's not
+>> done this way.
 >>
->> Yes the negociated packet size is only about packet we can receive.
->> Qutoting the gdb doc:
->> | =E2=80=98PacketSize=3Dbytes=E2=80=99
->> |
->> |    The remote stub can accept packets up to at least bytes in length=
-.
->> | GDB will send packets up to this size for bulk transfers, and will
->> | never send larger packets.
->>
->> The qSupported doc also says that "Any GDB which sends a =E2=80=98qSup=
-ported=E2=80=99
->> packet supports receiving packets of unlimited length".
->> I did some digging and qSupported appeared in gdb 6.6 (december 2006).
->> And gdb supported arbitrary sized packet even before that (6.4.9 2006
->> too).
->=20
-> I think that is worth a comment for the function gdb_monitor_write
-> quoting the spec and the versions. With that comment:
->=20
-> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->=20
+>> Suggested-by: Max Reitz <mreitz@redhat.com>
+>> Signed-off-by: Sergio Lopez <slp@redhat.com>
+>> ---
 
-Good idea ! Is that ok if I add these comments in the 1st patch along
-with the gdbstate.last_packet field ? it seems a more central place.
-I can still add a short note for gdb_monitor_write().
+> Or in fact, I think you need to hold the AioContext of a bs to
+> bdrv_unref() it, so maybe 'goto out' is right, but you need to unref
+> target_bs while you still hold old_context.
 
-Damien
+I suspect https://bugzilla.redhat.com/show_bug.cgi?id=1779036 is also a 
+symptom of this.  The v5 patch did not fix this simple test case:
+
+
+$ qemu-img create -f qcow2 f1 100m
+$ qemu-img create -f qcow2 f2 100m
+$ ./qemu-kvm -nodefaults -nographic -qmp stdio -object iothread,id=io0 \
+  -drive driver=qcow2,id=drive1,file=f1,if=none -device 
+virtio-scsi-pci,id=scsi0,iothread=io0 -device 
+scsi-hd,id=image1,drive=drive1 \
+  -drive driver=qcow2,id=drive2,file=f2,if=none -device 
+virtio-blk-pci,id=image2,drive=drive2,iothread=io0
+
+{'execute':'qmp_capabilities'}
+
+{'execute':'transaction','arguments':{'actions':[ 
+{'type':'blockdev-snapshot-sync','data':{'device':'drive1', 
+'snapshot-file':'sn1','mode':'absolute-paths','format':'qcow2'}}, 
+{'type':'blockdev-snapshot-sync','data':{'device':'drive2', 
+'snapshot-file':'/aa/sn1','mode':'absolute-paths','format':'qcow2'}}]}}
+
+which is an aio context bug somewhere on the error path of 
+blockdev-snapshot-sync (the first one has to be rolled back because the 
+second part of the transaction fails early on a nonexistent directory)
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
