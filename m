@@ -2,67 +2,98 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38E4DC2D0BF
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 03:51:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0BBC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:05:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 079AF206D8
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 03:51:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ogy0Oi75"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 079AF206D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id D0AEB2077B
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:05:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0AEB2077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifbyq-00048c-1b
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 22:51:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50574)
+	id 1ifcCy-0007xP-2N
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 23:05:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41282)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ifbxu-00037R-VC
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 22:50:09 -0500
+ (envelope-from <bharata@linux.ibm.com>) id 1ifcCA-0007Qf-MV
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:04:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ifbxt-0004R5-Ep
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 22:50:06 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38767 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1ifbxr-00048A-6t
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 22:50:05 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47YxWK3pZGz9sP6; Fri, 13 Dec 2019 14:49:49 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576208989;
- bh=jTQ07n6bhhDkHqXYlFmMU8HcoexHQHqh/zM9QtI82nI=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ogy0Oi75qVQKtAH3b1a6ppAETFhEC7qZFpYvUeL0beJ88hV9cV+tD07LjiMGsmOwZ
- +vUfp/yhUnlxgSAx1VBQApfdG348Ys+GrYBb4/aZMOS+Jwfy/fKxe40kcQ4TO2B+Dm
- aRyIekYALnia3oouK8+RIspkyl3U5uoRAFC7R2r0=
-Date: Fri, 13 Dec 2019 14:49:37 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Wayne Li <waynli329@gmail.com>
-Subject: Re: QEMU VM crashes when enabling KVM
-Message-ID: <20191213034937.GB207300@umbus.fritz.box>
-References: <CAM2K0nrhkOhiJDxnANGmAu2140-TP0a9pY58i_PN1k9xAWGz9A@mail.gmail.com>
- <76b207cd-09ce-b3df-e288-a515df40677e@redhat.com>
- <CAM2K0nph2GZQkAv3tCgoP+ciPMWSzVJp0rHDXJJ2Gtqeq2Bgug@mail.gmail.com>
- <c4e14191-efe5-7713-1eac-55a6bafb027a@redhat.com>
- <CAM2K0no9-M9WRm-QKFBMRofUaNkfmMtDvop3KxrOQrU80YWSTA@mail.gmail.com>
+ (envelope-from <bharata@linux.ibm.com>) id 1ifcC9-0004pk-MZ
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:04:50 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5516)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bharata@linux.ibm.com>)
+ id 1ifcC9-0004oD-Ef
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:04:49 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBD42BM7023040
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 23:04:48 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wuswnengj-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 23:04:47 -0500
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bharata@linux.ibm.com>;
+ Fri, 13 Dec 2019 04:04:45 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 13 Dec 2019 04:04:42 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBD44fpa42532986
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Dec 2019 04:04:41 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B796E4C04A;
+ Fri, 13 Dec 2019 04:04:41 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 65D9C4C040;
+ Fri, 13 Dec 2019 04:04:40 +0000 (GMT)
+Received: from in.ibm.com (unknown [9.85.92.59])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Fri, 13 Dec 2019 04:04:40 +0000 (GMT)
+Date: Fri, 13 Dec 2019 09:34:38 +0530
+From: Bharata B Rao <bharata@linux.ibm.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH v2 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
+ pseries guest
+References: <20191212055059.9399-1-bharata@linux.ibm.com>
+ <20191212055059.9399-3-bharata@linux.ibm.com>
+ <20191212132723.5fdfee47@bahia.tlslab.ibm.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="hgh6eN/EXvS46552"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAM2K0no9-M9WRm-QKFBMRofUaNkfmMtDvop3KxrOQrU80YWSTA@mail.gmail.com>
+In-Reply-To: <20191212132723.5fdfee47@bahia.tlslab.ibm.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-TM-AS-GCONF: 00
+x-cbid: 19121304-0012-0000-0000-000003745172
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121304-0013-0000-0000-000021B02F9F
+Message-Id: <20191213040438.GC28362@in.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-12_08:2019-12-12,2019-12-12 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0
+ priorityscore=1501 malwarescore=0 spamscore=0 mlxscore=0 adultscore=0
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912130032
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,172 +105,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
- David Gibson <dgibson@redhat.com>
+Reply-To: bharata@linux.ibm.com
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, linuxram@us.ibm.com,
+ qemu-devel@nongnu.org, paulus@ozlabs.org, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Dec 12, 2019 at 01:27:23PM +0100, Greg Kurz wrote:
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index f11422fc41..25e1a3446e 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -1597,6 +1597,21 @@ static void spapr_machine_reset(MachineState *machine)
+> >      void *fdt;
+> >      int rc;
+> >  
+> > +    /*
+> > +     * KVM_PPC_SVM_OFF ioctl can fail for secure guests, check and
+> > +     * exit in that case. However check for -ENOTTY explicitly
+> > +     * to ensure that we don't terminate normal guests that are
+> > +     * running on kernels which don't support this ioctl.
+> > +     *
+> > +     * Also, this ioctl returns 0 for normal guests on kernels where
+> > +     * this ioctl is supported.
+> > +     */
+> > +    rc = kvmppc_svm_off();
+> > +    if (rc && rc != -ENOTTY) {
+> 
+> This ioctl can also return -EINVAL if the ultravisor actually failed to move
+> the guest back to non-secure mode or -EBUSY if a vCPU is still running. I
+> agree that the former deserve the VM to be terminated. What about the latter ?
+> Can this happen and if yes, why ? Should we try again as suggested by Alexey ?
+> Could this reveal a bug in QEMU, in which case we should maybe abort ?
 
---hgh6eN/EXvS46552
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+We are in machine reset path, so all vcpus are already paused. So we don't
+expect any vcpus to be running to handle -EBUSY here. Neither do I see any
+sane recovery path from here.
 
-On Thu, Dec 12, 2019 at 10:40:44AM -0600, Wayne Li wrote:
-> Dear David Gibson,
->=20
-> I know you are under no obligation to respond, but if it's possible for y=
-ou
-> to find the time to respond to my question, I would be extremely grateful.
-> My team at Boeing has been stuck trying to get KVM working for our project
-> for the last few months.  A good explanation of why this isn't possible
-> would be absolutely critical.
+As Alexey mentioned earlier, may be we can just stop the VM?
+Do vm_stop() with RUN_STATE_PAUSED or some such reason?
 
-As you can see from that diagram, the history ppc CPUs is quite a bit
-more diverse than x86.  Although they're all very similar from the
-point of view of userspace code, they're quite different for
-privileged kernel code: they have different MMUs, different privileged
-registers amongst other things.
+Regards,
+Bharata.
 
-Because of this there are several different KVM implementations.
-
-1) KVM HV
-
-This one uses the virtualization facilities of BookS CPUs (present
-since POWER4 / 970, but only well supported from POWER7 onwards).
-Those don't allow much to virtualize the guest cpu model, so it
-assumes the guest cpu is the same as the host.
-
-So, both your guest and host CPUs rule this one out.
-
-2) Book3E KVM
-
-Uses the virtualization features of recent enough Freescale Book E
-CPUs.  I don't know a lot about this or its limitations.  The e6500
-might well have these features, but I'm pretty sure it can only
-emulate BookE cpus for the guest.
-
-So, your guest rules this one out.
-
-3) KVM PR
-
-This one operates by running the entire guest in user mode, and
-emulating all privileged instructions.  It's slow (relative to
-hardware assisted KVM models), but it's flexible.
-
-In theory, this one can do what you want, but there are a bunch of
-caveats:
-
-  * Emulating all the privileged instructions for a whole bunch of cpu
-  variants is a huge task, and KVM PR is now barely maintained.  There
-  are lots of gaps in coverage.
-
-  * I'm not sure if it was ever really implemented for BookE hosts.
-
-  * Although there aren't many, there are a few differences between
-  userland instructions between cpu variants, mostly because of new
-  additions.  I think 7457 is an old enough design that this probably
-  won't cause you troube, but I'm not certain.
-
-
-
->=20
-> -Thanks, Wayne Li
->=20
-> On Thu, Dec 12, 2019 at 1:17 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> > On 12/12/19 02:59, Wayne Li wrote:
-> > > We wrote a project that is created on top of the QEMU source code; it
-> > > calls functions from the QEMU code.  I run the executable created by
-> > > compiling that project/QEMU code.  Anyway, looking at the following
-0> > > documentation:
-> > >
-> > > https://www.kernel.org/doc/Documentation/powerpc/cpu_families.txt
-> > >
-> > > It looks like the PowerPC 7457 is Book3S and the PowerPC e6500 is
-> > > BookE.  Is that why you think I require a Book3S KVM?  Exactly why do
-> > > you feel this way?  Also would that mean my team would need to go and
-> > > buy a board with a Book3S processor?
-> >
-> > CCing the PPC maintainer.  There are aspects of BookE and Book3S that
-> > are different and not really interchangeable in the privileged interfac=
-e.
-> >
-> > Paolo
-> >
-> > > -Thanks!, Wayne Li
-> > >
-> > > From my understanding
-> > >
-> > > On Wed, Dec 11, 2019 at 7:16 PM Paolo Bonzini <pbonzini@redhat.com
-> > > <mailto:pbonzini@redhat.com>> wrote:
-> > >
-> > >     On 11/12/19 22:23, Wayne Li wrote:
-> > >     >
-> > >     > Now I am fairly sure KVM is actually enabled on the system.
-> > Finding
-> > >     > that out was another story that spanned a couple of months.  But
-> > long
-> > >     > story short, lsmod doesn't show that the KVM kernel module is
-> > >     running.
-> > >     > But that's because KVM is built-in and it can't actually be bui=
-lt
-> > as a
-> > >     > loadable kernel module in this particular system.
-> > >     >
-> > >     > So I'm not really sure what could be the problem.  Though I was
-> > >     thinking
-> > >     > if I understood the error better that might help?  Following the
-> > >     code I
-> > >     > see that the "Missing PVR setting capability." is called when a
-> > >     variable
-> > >     > called "cap_segstate" is 0:
-> > >     >
-> > >     > if (!cap_segstate) {
-> > >     >             fprintf(stderr, "kvm error: missing PVR setting
-> > >     capability\n");
-> > >     >             return -ENOSYS;
-> > >     > }
-> > >     >
-> > >     > And the cap_segstate variable is set by the following function:
-> > >     >
-> > >     > cap_segstate =3D kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
-> > >
-> > >     You are not saying how you are running QEMU.  I think you are usi=
-ng a
-> > >     CPU model that requires a Book3S KVM.
-> > >
-> > >     Paolo
-> > >
-> >
-> >
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---hgh6eN/EXvS46552
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3zCk4ACgkQbDjKyiDZ
-s5Kz3BAA0lgareU2jmbZ1EErMg5g+wodHNhJxSDnPKlf+6t2wfym1AlZyF6zEnws
-+IKaDetPu0uUgLepUdtLlJGvLIoqemQq1NLIepYF90tuTGZ6DoUIk7OWOFSn4v8u
-wTe8Kb7zTSPzegJE3rL9Kk2tjR3g59bN9Tcq9zBX5QDqg+C/XcrXQcL5B1ZMhEhX
-BRdRtUccNmPfoEE4atz6yREHTPgFfaOGXlAXgMHlMy9Eq2DYAZ630e3Q6nPXPA5Z
-oRReCg2LVoH/VmJ/de4qMGr5wYAHgmWqYZw27tOOzKAtW6YLeSoaL0xRPwGEZvNr
-vwjfMdzwYJB8UHR5hqyHqIqbfKDA8TQzvc97PlQVi2tEmqOt+fo5sA5scvdCY1S+
-nvqFzGh7/OFiSaTy5yVZk0iSbTLCU0kaX1edt7FgK35Sb7tBfqk1tZdMkomLLY83
-nTkgPQC+ygCuga2XMOo6mErqXz7MIqjoWLt4YjYUf8Op1X20ebQ/yiPQGYGk3dXB
-Hn6aehq/Te33hWlC2VqI1ialSF8j+qNLnwNdLskenF0wvzco9HgQF7p8sRWDNPEA
-NZJsvc6ZeuOq4eS/Nm+pajj6kHgR6hWXBY7Ln8ctbL4gHKEsi1S+TAR/UB5gJGT5
-UgmHWVm7d3FLPoSsUe6rQ4ujHaLK+ilFmYanFUVO/W2/Uj0h/xM=
-=oAwn
------END PGP SIGNATURE-----
-
---hgh6eN/EXvS46552--
 
