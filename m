@@ -2,80 +2,65 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6974C00454
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 285C2C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7078624125
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V1JTwMHl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7078624125
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AD8E524125
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD8E524125
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifnRL-0003yv-DG
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:05:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50043)
+	id 1ifkdK-00063t-3i
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 08:05:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49443)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ifnPs-000356-FI
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:03:46 -0500
+ (envelope-from <clg@kaod.org>) id 1ifkbN-0004ax-35
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:03:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ifnPp-0007tV-3B
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:03:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31640
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1ifkbL-0002fI-Tx
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:03:24 -0500
+Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:52059)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ifnPo-0007qn-FU
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:03:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576253019;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Y67nNUw3kEABmusngWQxuPaBGm/fVHALxf3bTj2Zees=;
- b=V1JTwMHlIwVBQmZWZh1RSRKQLmwyJh0H6H9gXM6IfeK0hojg8YF8PapFaAWIrbaKu8F49U
- jqjbrX7F9+fC1sPgVbsK8s3AEzisfv1R0cBPmJ65xjru7SHs32VRPL4Tuy11BDcinJuZHc
- WpFa4Rt3XDbvBt8V3IWiFd9WgFTjymA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-418-eJeG1hRzMzawDPN9RfCJKA-1; Fri, 13 Dec 2019 11:03:38 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 667D6100A155
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 16:03:37 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-153.ams2.redhat.com
- [10.36.117.153])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E010810013D9;
- Fri, 13 Dec 2019 16:03:31 +0000 (UTC)
-Date: Fri, 13 Dec 2019 17:03:30 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Subject: Re: [PATCH v6 00/25] monitor: add asynchronous command type
-Message-ID: <20191213160330.GD3428@localhost.localdomain>
-References: <20191108150123.12213-1-marcandre.lureau@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ifkbL-0002bZ-Nm
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:03:23 -0500
+Received: from player789.ha.ovh.net (unknown [10.109.146.131])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 2C25B145AEB
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 14:03:21 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player789.ha.ovh.net (Postfix) with ESMTPSA id 47D9FD36F13B;
+ Fri, 13 Dec 2019 13:03:15 +0000 (UTC)
+Subject: Re: [PATCH 09/13] ppc/pnv: Pass XSCOM base address and address size
+ to pnv_dt_xscom()
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
+ <157623841868.360005.17577624823547136435.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <b93304e0-8b51-cc69-e224-8c2c446e231c@kaod.org>
+Date: Fri, 13 Dec 2019 14:03:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191108150123.12213-1-marcandre.lureau@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: eJeG1hRzMzawDPN9RfCJKA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <157623841868.360005.17577624823547136435.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 10094818565461936979
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelledggeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedu
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.58.60
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,69 +72,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kraxel@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 08.11.2019 um 16:00 hat Marc-Andr=E9 Lureau geschrieben:
-> The following series implements an internal async command solution
-> instead. By introducing a session context and a command return
-> handler, QMP handlers can:
-> - defer the return, allowing the mainloop to reenter
-> - return only to the caller (instead of the broadcast event reply)
-> - optionnally allow cancellation when the client is gone
-> - track on-going qapi command(s) per session
+On 13/12/2019 13:00, Greg Kurz wrote:
+> Since pnv_dt_xscom() is called from chip specific dt_populate() hooks,
+> it shouldn't have to guess the chip type in order to populate the "reg"
+> property. Just pass the base address and address size as arguments.
 
-This requires major changes to existing QMP command handlers. Did you
-consider at least optionally providing a way where instead of using the
-new async_fn, QMP already creates a coroutine in which the handler is
-executed?
+Much better,
+=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-At least for some of the block layer commands, we could simply enable
-this without changing any of the code and would automatically get rid of
-blocking the guest while the command is doing I/O. If we need to
-implement .async_fn, in contrast, it would be quite a bit of boiler
-plate code for each single handler to create a coroutine for the real
-handler and to wrap all parameters in a struct.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-I started playing a bit with this and it didn't look too bad, but we
-can't move every command handler to a coroutine without auditing it, so
-I would have had to add a new option to the QAPI schema - and at that
-point I thought that I might end up duplicating a lot of your code if I
-continued. So I'm now trying to get your opinion or advice before I
-continue with anything in that direction.
-
-> This does not introduce new QMP APIs or client visible changes, the
-> command are handled in order, and the reply still come in order (even
-> when handlers finish out of order).
+> ---
+>  hw/ppc/pnv.c               |   12 +++++++++---
+>  hw/ppc/pnv_xscom.c         |   16 +++-------------
+>  include/hw/ppc/pnv_xscom.h |    3 ++-
+>  3 files changed, 14 insertions(+), 17 deletions(-)
 >=20
-> Existing qemu commands can be gradually replaced by async:true
-> variants when needed, while carefully reviewing the concurrency
-> aspects. The async:true commands marshaller helpers are splitted in
-> half, the calling and return functions. The command is called with a
-> QmpReturn context, that can return immediately or later, using the
-> generated return helper.
-
-This part would certainly become simpler with coroutines (the marshaller
-could stay unchanged).
-
-> The screendump command is converted to an async:true version to solve
-> rhbz#1230527. The command shows basic cancellation (this could be
-> extended if needed). It could be further improved to do asynchronous
-> IO writes as well.
-
-After converting it to QIOChannel like you already do, I/O would
-automatically become asynchronous when run in a coroutine.
-
-If you don't want this yet, but only fix the BZ, I guess you could delay
-that patch until later and just have a single yield and reenter of the
-command handler coroutine like this:
-
-    co =3D qemu_coroutine_self();
-    aio_co_schedule(qemu_coroutine_get_aio_context(co), co);
-    qemu_coroutine_yield();
-
-Kevin
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 88efa755e611..c532e98e752a 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -282,7 +282,9 @@ static void pnv_chip_power8_dt_populate(PnvChip *ch=
+ip, void *fdt)
+>  {
+>      int i;
+> =20
+> -    pnv_dt_xscom(chip, fdt, 0);
+> +    pnv_dt_xscom(chip, fdt, 0,
+> +                 cpu_to_be64(PNV_XSCOM_BASE(chip)),
+> +                 cpu_to_be64(PNV_XSCOM_SIZE));
+> =20
+>      for (i =3D 0; i < chip->nr_cores; i++) {
+>          PnvCore *pnv_core =3D chip->cores[i];
+> @@ -302,7 +304,9 @@ static void pnv_chip_power9_dt_populate(PnvChip *ch=
+ip, void *fdt)
+>  {
+>      int i;
+> =20
+> -    pnv_dt_xscom(chip, fdt, 0);
+> +    pnv_dt_xscom(chip, fdt, 0,
+> +                 cpu_to_be64(PNV9_XSCOM_BASE(chip)),
+> +                 cpu_to_be64(PNV9_XSCOM_SIZE));
+> =20
+>      for (i =3D 0; i < chip->nr_cores; i++) {
+>          PnvCore *pnv_core =3D chip->cores[i];
+> @@ -321,7 +325,9 @@ static void pnv_chip_power10_dt_populate(PnvChip *c=
+hip, void *fdt)
+>  {
+>      int i;
+> =20
+> -    pnv_dt_xscom(chip, fdt, 0);
+> +    pnv_dt_xscom(chip, fdt, 0,
+> +                 cpu_to_be64(PNV10_XSCOM_BASE(chip)),
+> +                 cpu_to_be64(PNV10_XSCOM_SIZE));
+> =20
+>      for (i =3D 0; i < chip->nr_cores; i++) {
+>          PnvCore *pnv_core =3D chip->cores[i];
+> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> index df926003f2ba..8189767eb0bb 100644
+> --- a/hw/ppc/pnv_xscom.c
+> +++ b/hw/ppc/pnv_xscom.c
+> @@ -286,24 +286,14 @@ static const char compat_p8[] =3D "ibm,power8-xsc=
+om\0ibm,xscom";
+>  static const char compat_p9[] =3D "ibm,power9-xscom\0ibm,xscom";
+>  static const char compat_p10[] =3D "ibm,power10-xscom\0ibm,xscom";
+> =20
+> -int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset)
+> +int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset,
+> +                 uint64_t xscom_base, uint64_t xscom_size)
+>  {
+> -    uint64_t reg[2];
+> +    uint64_t reg[] =3D { xscom_base, xscom_size };
+>      int xscom_offset;
+>      ForeachPopulateArgs args;
+>      char *name;
+> =20
+> -    if (pnv_chip_is_power10(chip)) {
+> -        reg[0] =3D cpu_to_be64(PNV10_XSCOM_BASE(chip));
+> -        reg[1] =3D cpu_to_be64(PNV10_XSCOM_SIZE);
+> -    } else if (pnv_chip_is_power9(chip)) {
+> -        reg[0] =3D cpu_to_be64(PNV9_XSCOM_BASE(chip));
+> -        reg[1] =3D cpu_to_be64(PNV9_XSCOM_SIZE);
+> -    } else {
+> -        reg[0] =3D cpu_to_be64(PNV_XSCOM_BASE(chip));
+> -        reg[1] =3D cpu_to_be64(PNV_XSCOM_SIZE);
+> -    }
+> -
+>      name =3D g_strdup_printf("xscom@%" PRIx64, be64_to_cpu(reg[0]));
+>      xscom_offset =3D fdt_add_subnode(fdt, root_offset, name);
+>      _FDT(xscom_offset);
+> diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+> index 2bdb7ae84fd3..ad53f788b44c 100644
+> --- a/include/hw/ppc/pnv_xscom.h
+> +++ b/include/hw/ppc/pnv_xscom.h
+> @@ -114,7 +114,8 @@ typedef struct PnvXScomInterfaceClass {
+>  #define PNV10_XSCOM_PSIHB_SIZE     0x100
+> =20
+>  void pnv_xscom_realize(PnvChip *chip, uint64_t size, Error **errp);
+> -int pnv_dt_xscom(PnvChip *chip, void *fdt, int offset);
+> +int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset,
+> +                 uint64_t xscom_base, uint64_t xscom_size);
+> =20
+>  void pnv_xscom_add_subregion(PnvChip *chip, hwaddr offset,
+>                               MemoryRegion *mr);
+>=20
 
 
