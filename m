@@ -2,99 +2,64 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB5DC2D0C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C225AC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 722B224125
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U10MTE07"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 722B224125
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4F8AE21655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8AE21655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifjY6-0004g9-B9
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 06:55:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38139)
+	id 1ifkg6-00011G-RV
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 08:08:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ifjXN-00043f-Qw
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:55:14 -0500
+ (envelope-from <clg@kaod.org>) id 1ifkeW-0007nJ-Qo
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:06:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ifjXI-0004UC-AC
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:55:13 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54586
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1ifkeV-0007lH-8x
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:06:40 -0500
+Received: from 17.mo7.mail-out.ovh.net ([188.165.35.227]:56843)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ifjXI-0004TJ-6I
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:55:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576238107;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ARv6mcy281jUa1nbgAjuLfWfQQSOGGA4O9KDT/2tagM=;
- b=U10MTE07/2ymqJaPIfCcIkg8vU7h7S2L78KPEiM5lBqBPyISE4nvAc9Hu7cx4RFKbNORlu
- ETUbK+/xbqaccRHTLLA44DaUVnSW8mDvEVY2wn1zlp/GOE/c8A/P7kzvWqpNAhujUNvlD2
- bC6sbkI3ugCLT8kBnMIAONtADfI6Q64=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-o7R-LI4qNUmRrpC5cZodZA-1; Fri, 13 Dec 2019 06:55:04 -0500
-Received: by mail-wr1-f69.google.com with SMTP id i9so2496524wru.1
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 03:55:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Z1TphYBfZEVPZphlaqakJCWwiVWqp8Gd3XbmpXjBi4I=;
- b=PffXhGIqvUMbgK2a/IpdIkQ/Q1Gvv08LOguZN8j8iErNuBfIBCaIla9wA1LB6DBVef
- bYzSTwpBRCPAdrhDb8oFwTf7kOxkqrWhQ9QS/WuLaKHs7W3+XLPCetTavWKxPsVrW+wn
- lWmIaFQydYdcWHVx8vGP2Tgt8sUxtwCQmirW7imHixNonM8V0dQcx7zgm8fMvhzJeX5P
- /KYzLFFi0EDWljKqToT0pQtjsRsVftI/OAqprkN5FmXae5qELKYRzmpsO+D1i1/3pXyS
- MSXq67N0Jigeyk0xUjLnnITHRk/bfGf9d6j5LUmPsomxDvxKpvvKChkZktgB6WVf3w1R
- lyIg==
-X-Gm-Message-State: APjAAAVtD3LjLhtMny/pz+QIiRsEtFroBa8HPfeJNDOsrWVHo1hU7IoF
- 72apW9vOLYPeTOLWUNsqhINnS4GL9Ed7UY8P5UsWtWGW/EQh61SYHfoCMFd+umx5cMcVVuJu5tm
- C/iizs60sPszPiTw=
-X-Received: by 2002:adf:c54e:: with SMTP id s14mr13010791wrf.385.1576238102948; 
- Fri, 13 Dec 2019 03:55:02 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxp97+/F1/T9RSvc65pPuib8yjdamuaVfF7HAVYD1x+PRiPlaxWvZC+lr5Tc/0mj0ARxgfZCQ==
-X-Received: by 2002:adf:c54e:: with SMTP id s14mr13010772wrf.385.1576238102737; 
- Fri, 13 Dec 2019 03:55:02 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9?
- ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
- by smtp.gmail.com with ESMTPSA id g2sm9668770wrw.76.2019.12.13.03.55.01
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Dec 2019 03:55:02 -0800 (PST)
-Subject: Re: [PATCH] hw/i386/pc: Simplify ioapic_init_gsi()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191213111145.11288-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <573a8391-ff5d-601c-e651-75025a1ea026@redhat.com>
-Date: Fri, 13 Dec 2019 12:55:01 +0100
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ifkeV-0007ia-0j
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:06:39 -0500
+Received: from player696.ha.ovh.net (unknown [10.109.143.249])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id 7F4C5140421
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 14:06:36 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player696.ha.ovh.net (Postfix) with ESMTPSA id A5481D51B97D;
+ Fri, 13 Dec 2019 13:06:31 +0000 (UTC)
+Subject: Re: [PATCH 12/13] ppc/pnv: Introduce PnvChipClass::xscom_pcba() method
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
+ <157623843543.360005.13996472463887521794.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <07d68959-4f71-56cd-75e7-2035d770535b@kaod.org>
+Date: Fri, 13 Dec 2019 14:06:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191213111145.11288-1-philmd@redhat.com>
-Content-Language: en-US
-X-MC-Unique: o7R-LI4qNUmRrpC5cZodZA-1
-X-Mimecast-Spam-Score: 0
+In-Reply-To: <157623843543.360005.13996472463887521794.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 10149987662132841299
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelledggeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 188.165.35.227
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,52 +71,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Richard Henderson <rth@twiddle.net>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/12/19 12:11, Philippe Mathieu-Daud=C3=A9 wrote:
-> All callers of ioapic_init_gsi() provide a parent. We want new
-> uses to follow the same good practice and provide the parent
-> name, so do not make this optional: assert the parent name is
-> provided, and simplify the code.
+On 13/12/2019 13:00, Greg Kurz wrote:
+> The XSCOM bus is implemented with a QOM interface, which is mostly
+> generic from a CPU type standpoint, except for the computation of
+> addresses on the Pervasize Connect Bus (PCB) network. This is handled
+
+Pervasive
+
+> by the pnv_xscom_pcba() function with a switch statement based on
+> the chip_type class level attribute of the CPU chip.
 >=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> This can be achieved using QOM. Also the address argument is masked wit=
+h
+> PNV_XSCOM_SIZE - 1, which is for POWER8 only. Addresses may have differ=
+ent
+> sizes with other CPU types. Have each CPU chip type handle the appropri=
+ate
+> computation with a QOM xscom_pcba() method.
+
+PnvXscom model ? :)
+
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
 > ---
->  hw/i386/pc.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+>  hw/ppc/pnv.c         |   23 +++++++++++++++++++++++
+>  hw/ppc/pnv_xscom.c   |   14 +-------------
+>  include/hw/ppc/pnv.h |    1 +
+>  3 files changed, 25 insertions(+), 13 deletions(-)
 >=20
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index ac08e63604..234945d328 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1488,15 +1488,14 @@ void ioapic_init_gsi(GSIState *gsi_state, const c=
-har *parent_name)
->      SysBusDevice *d;
->      unsigned int i;
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 0447b534b8c5..cc40b90e9cd2 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -1121,6 +1121,12 @@ static void pnv_chip_power8_realize(DeviceState =
+*dev, Error **errp)
+>                                  &chip8->homer.regs);
+>  }
 > =20
-> +    assert(parent_name);
->      if (kvm_ioapic_in_kernel()) {
->          dev =3D qdev_create(NULL, TYPE_KVM_IOAPIC);
->      } else {
->          dev =3D qdev_create(NULL, TYPE_IOAPIC);
->      }
-> -    if (parent_name) {
-> -        object_property_add_child(object_resolve_path(parent_name, NULL)=
-,
-> -                                  "ioapic", OBJECT(dev), NULL);
+> +static uint32_t pnv_chip_power8_xscom_pcba(PnvChip *chip, uint64_t add=
+r)
+> +{
+> +    addr &=3D (PNV_XSCOM_SIZE - 1);
+> +    return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
+> +}
+> +
+>  static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data=
+)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> @@ -1138,6 +1144,7 @@ static void pnv_chip_power8e_class_init(ObjectCla=
+ss *klass, void *data)
+>      k->dt_populate =3D pnv_chip_power8_dt_populate;
+>      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
+>      k->xscom_core_base =3D pnv_chip_power8_xscom_core_base;
+> +    k->xscom_pcba =3D pnv_chip_power8_xscom_pcba;
+>      dc->desc =3D "PowerNV Chip POWER8E";
+> =20
+>      device_class_set_parent_realize(dc, pnv_chip_power8_realize,
+> @@ -1161,6 +1168,7 @@ static void pnv_chip_power8_class_init(ObjectClas=
+s *klass, void *data)
+>      k->dt_populate =3D pnv_chip_power8_dt_populate;
+>      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
+>      k->xscom_core_base =3D pnv_chip_power8_xscom_core_base;
+> +    k->xscom_pcba =3D pnv_chip_power8_xscom_pcba;
+>      dc->desc =3D "PowerNV Chip POWER8";
+> =20
+>      device_class_set_parent_realize(dc, pnv_chip_power8_realize,
+> @@ -1184,6 +1192,7 @@ static void pnv_chip_power8nvl_class_init(ObjectC=
+lass *klass, void *data)
+>      k->dt_populate =3D pnv_chip_power8_dt_populate;
+>      k->pic_print_info =3D pnv_chip_power8_pic_print_info;
+>      k->xscom_core_base =3D pnv_chip_power8_xscom_core_base;
+> +    k->xscom_pcba =3D pnv_chip_power8_xscom_pcba;
+>      dc->desc =3D "PowerNV Chip POWER8NVL";
+> =20
+>      device_class_set_parent_realize(dc, pnv_chip_power8_realize,
+> @@ -1340,6 +1349,12 @@ static void pnv_chip_power9_realize(DeviceState =
+*dev, Error **errp)
+>                                  &chip9->homer.regs);
+>  }
+> =20
+> +static uint32_t pnv_chip_power9_xscom_pcba(PnvChip *chip, uint64_t add=
+r)
+> +{
+> +    addr &=3D (PNV9_XSCOM_SIZE - 1);
+> +    return addr >> 3;
+> +}
+> +
+>  static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> @@ -1357,6 +1372,7 @@ static void pnv_chip_power9_class_init(ObjectClas=
+s *klass, void *data)
+>      k->dt_populate =3D pnv_chip_power9_dt_populate;
+>      k->pic_print_info =3D pnv_chip_power9_pic_print_info;
+>      k->xscom_core_base =3D pnv_chip_power9_xscom_core_base;
+> +    k->xscom_pcba =3D pnv_chip_power9_xscom_pcba;
+>      dc->desc =3D "PowerNV Chip POWER9";
+> =20
+>      device_class_set_parent_realize(dc, pnv_chip_power9_realize,
+> @@ -1422,6 +1438,12 @@ static void pnv_chip_power10_realize(DeviceState=
+ *dev, Error **errp)
+>                                              (uint64_t) PNV10_LPCM_BASE=
+(chip));
+>  }
+> =20
+> +static uint32_t pnv_chip_power10_xscom_pcba(PnvChip *chip, uint64_t ad=
+dr)
+> +{
+> +    addr &=3D (PNV10_XSCOM_SIZE - 1);
+> +    return addr >> 3;
+> +}
+> +
+>  static void pnv_chip_power10_class_init(ObjectClass *klass, void *data=
+)
+>  {
+>      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> @@ -1439,6 +1461,7 @@ static void pnv_chip_power10_class_init(ObjectCla=
+ss *klass, void *data)
+>      k->dt_populate =3D pnv_chip_power10_dt_populate;
+>      k->pic_print_info =3D pnv_chip_power10_pic_print_info;
+>      k->xscom_core_base =3D pnv_chip_power10_xscom_core_base;
+> +    k->xscom_pcba =3D pnv_chip_power10_xscom_pcba;
+>      dc->desc =3D "PowerNV Chip POWER10";
+> =20
+>      device_class_set_parent_realize(dc, pnv_chip_power10_realize,
+> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> index 5ae9dfbb88ad..b681c72575b2 100644
+> --- a/hw/ppc/pnv_xscom.c
+> +++ b/hw/ppc/pnv_xscom.c
+> @@ -57,19 +57,7 @@ static void xscom_complete(CPUState *cs, uint64_t hm=
+er_bits)
+> =20
+>  static uint32_t pnv_xscom_pcba(PnvChip *chip, uint64_t addr)
+>  {
+> -    addr &=3D (PNV_XSCOM_SIZE - 1);
+> -
+> -    switch (PNV_CHIP_GET_CLASS(chip)->chip_type) {
+> -    case PNV_CHIP_POWER8E:
+> -    case PNV_CHIP_POWER8:
+> -    case PNV_CHIP_POWER8NVL:
+> -        return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
+> -    case PNV_CHIP_POWER9:
+> -    case PNV_CHIP_POWER10:
+> -        return addr >> 3;
+> -    default:
+> -        g_assert_not_reached();
 > -    }
-> +    object_property_add_child(object_resolve_path(parent_name, NULL),
-> +                              "ioapic", OBJECT(dev), NULL);
->      qdev_init_nofail(dev);
->      d =3D SYS_BUS_DEVICE(dev);
->      sysbus_mmio_map(d, 0, IO_APIC_DEFAULT_ADDRESS);
+> +    return PNV_CHIP_GET_CLASS(chip)->xscom_pcba(chip, addr);
+>  }
+> =20
+>  static uint64_t xscom_read_default(PnvChip *chip, uint32_t pcba)
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index 7a134a15d3b5..4972e93c2619 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -138,6 +138,7 @@ typedef struct PnvChipClass {
+>      void (*dt_populate)(PnvChip *chip, void *fdt);
+>      void (*pic_print_info)(PnvChip *chip, Monitor *mon);
+>      uint64_t (*xscom_core_base)(PnvChip *chip, uint32_t core_id);
+> +    uint32_t (*xscom_pcba)(PnvChip *chip, uint64_t addr);
+>  } PnvChipClass;
+> =20
+>  #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
 >=20
-
-Queued, thanks.
-
-Paolo
 
 
