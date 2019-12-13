@@ -2,101 +2,60 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE186C00454
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 00:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F7BC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 01:21:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A98D02073B
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 00:10:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bslzZ8WJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A98D02073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 978A121655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 01:21:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 978A121655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifYXN-0003Wx-RC
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 19:10:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51577)
+	id 1ifZeB-0007qe-SH
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 20:21:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48329)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ifYWg-00030w-E4
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 19:09:48 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1ifZcP-00069Y-Hm
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 20:19:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ifYWe-0007Fk-4p
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 19:09:45 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:51104
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <tao3.xu@intel.com>) id 1ifZcN-0006y6-AY
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 20:19:44 -0500
+Received: from mga11.intel.com ([192.55.52.93]:9641)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ifYWd-0007DB-Uz
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 19:09:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576195782;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PcjcNVS9ZiBh6x4p+XIweK4+ijawmCzEkyUTPVZLO1A=;
- b=bslzZ8WJ7dz6YYPgSnVzJjGX24b3zCqD41Aj71hpgm0a0Uo2S31LKTEukIOEMpZmAbI+6L
- w2GAF1J7hkgbI1lOYaOLu1BFZO6tYDi2444WUJ4XHt9qSEiy5QsOgHpAz57x/9m/eIfxmq
- QB72esqHLtGCGrjuAFiw7rnuZ5l8Ucs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-H1GB269sNEynsXggkAmkSQ-1; Thu, 12 Dec 2019 19:09:41 -0500
-Received: by mail-wm1-f71.google.com with SMTP id q21so1436643wmc.7
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 16:09:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=PcjcNVS9ZiBh6x4p+XIweK4+ijawmCzEkyUTPVZLO1A=;
- b=bAK3fQCZJFj5Y8YuXEOHuQDyStNq8r7Qr3Ar1ZGkZejSXhSqff/vG4K3ariQoZIMDN
- GYi68TrzPLiXKhH9fFAkqG2Oo8LlXVGGUiL7T3xtXfVhoNIM7zjTqGS1WGQkMPnTSh+n
- WJCTL91S8f+2AcifjA/Zu16q2hck2zZdl34t7siATxgVdb+fP6JhMaedPoRYoRuPFbJx
- ZaPRArvT64HfJPzb78BopZBEgaaqq45eezo61ffy1WTnWrGyg3rIVpLwkNo1gJf9cL0X
- M8flu9qodgbEMAE6s0rj52URKg0wmKclQCmqKftiYbkEPakNeJt/WP8wzLKbfJhCHyzK
- WGZg==
-X-Gm-Message-State: APjAAAXtjoM0fL14m5vE71kT1+Kl1vnPmPRK7s0pnLT9PPJPJ9SbSrgA
- ztNPM2ZD9nrkwJSe80OHzKCkPdjco9sx5mNhhs42qcrDgvbfI6Vp/ufoZOxeZgkK4hasV64dA+p
- Uf+1y4YGHPeSVWvQ=
-X-Received: by 2002:a05:600c:24b:: with SMTP id
- 11mr9621018wmj.19.1576195779960; 
- Thu, 12 Dec 2019 16:09:39 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz3bwsbp9ICSHCWan+IaghqeKC+bUxfNnO3oddaF6sMqZbKRMoHgAKFGe92ZJ1Byeu4AoXNXA==
-X-Received: by 2002:a05:600c:24b:: with SMTP id
- 11mr9620994wmj.19.1576195779650; 
- Thu, 12 Dec 2019 16:09:39 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id n16sm7941308wro.88.2019.12.12.16.09.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 12 Dec 2019 16:09:39 -0800 (PST)
-Subject: Re: [PATCH 05/10] arm: allwinner-h3: add System Control module
-To: Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-devel@nongnu.org
-References: <20191202210947.3603-1-nieklinnenbank@gmail.com>
- <20191202210947.3603-6-nieklinnenbank@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <949aec5f-fd92-9fb2-25f4-803cd1bbf601@redhat.com>
-Date: Fri, 13 Dec 2019 01:09:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1ifZcN-0006im-1K
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 20:19:43 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 12 Dec 2019 17:19:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,307,1571727600"; d="scan'208";a="216480498"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
+ by orsmga003.jf.intel.com with ESMTP; 12 Dec 2019 17:19:30 -0800
+From: Tao Xu <tao3.xu@intel.com>
+To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
+ ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
+ sw@weilnetz.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com,
+ lvivier@redhat.com
+Subject: [PATCH RESEND v20 0/8] Build ACPI Heterogeneous Memory Attribute
+ Table (HMAT)
+Date: Fri, 13 Dec 2019 09:19:21 +0800
+Message-Id: <20191213011929.2520-1-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20191202210947.3603-6-nieklinnenbank@gmail.com>
-Content-Language: en-US
-X-MC-Unique: H1GB269sNEynsXggkAmkSQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,297 +67,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: b.galvani@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/2/19 10:09 PM, Niek Linnenbank wrote:
-> The Allwinner H3 System on Chip has an System Control
-> module that provides system wide generic controls and
-> device information. This commit adds support for the
-> Allwinner H3 System Control module.
-> 
-> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-> ---
->   hw/arm/allwinner-h3.c                 |  11 ++
->   hw/misc/Makefile.objs                 |   1 +
->   hw/misc/allwinner-h3-syscon.c         | 139 ++++++++++++++++++++++++++
->   include/hw/arm/allwinner-h3.h         |   2 +
->   include/hw/misc/allwinner-h3-syscon.h |  43 ++++++++
->   5 files changed, 196 insertions(+)
->   create mode 100644 hw/misc/allwinner-h3-syscon.c
->   create mode 100644 include/hw/misc/allwinner-h3-syscon.h
-> 
-> diff --git a/hw/arm/allwinner-h3.c b/hw/arm/allwinner-h3.c
-> index afeb49c0ac..ebd8fde412 100644
-> --- a/hw/arm/allwinner-h3.c
-> +++ b/hw/arm/allwinner-h3.c
-> @@ -41,6 +41,9 @@ static void aw_h3_init(Object *obj)
->   
->       sysbus_init_child_obj(obj, "ccu", &s->ccu, sizeof(s->ccu),
->                             TYPE_AW_H3_CLK);
-> +
-> +    sysbus_init_child_obj(obj, "syscon", &s->syscon, sizeof(s->syscon),
-> +                          TYPE_AW_H3_SYSCON);
->   }
->   
->   static void aw_h3_realize(DeviceState *dev, Error **errp)
-> @@ -184,6 +187,14 @@ static void aw_h3_realize(DeviceState *dev, Error **errp)
->       }
->       sysbus_mmio_map(SYS_BUS_DEVICE(&s->ccu), 0, AW_H3_CCU_BASE);
->   
-> +    /* System Control */
-> +    object_property_set_bool(OBJECT(&s->syscon), true, "realized", &err);
-> +    if (err) {
-> +        error_propagate(errp, err);
-> +        return;
-> +    }
-> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->syscon), 0, AW_H3_SYSCON_BASE);
-> +
->       /* Universal Serial Bus */
->       sysbus_create_simple(TYPE_AW_H3_EHCI, AW_H3_EHCI0_BASE,
->                            s->irq[AW_H3_GIC_SPI_EHCI0]);
-> diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-> index 200ed44ce1..b234aefba5 100644
-> --- a/hw/misc/Makefile.objs
-> +++ b/hw/misc/Makefile.objs
-> @@ -29,6 +29,7 @@ common-obj-$(CONFIG_MACIO) += macio/
->   common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
->   
->   common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-clk.o
-> +common-obj-$(CONFIG_ALLWINNER_H3) += allwinner-h3-syscon.o
->   common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
->   common-obj-$(CONFIG_NSERIES) += cbus.o
->   common-obj-$(CONFIG_ECCMEMCTL) += eccmemctl.o
-> diff --git a/hw/misc/allwinner-h3-syscon.c b/hw/misc/allwinner-h3-syscon.c
-> new file mode 100644
-> index 0000000000..66bd518a05
-> --- /dev/null
-> +++ b/hw/misc/allwinner-h3-syscon.c
-> @@ -0,0 +1,139 @@
-> +/*
-> + * Allwinner H3 System Control emulation
-> + *
-> + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-> + *
-> + * This program is free software: you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation, either version 2 of the License, or
-> + * (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/sysbus.h"
-> +#include "migration/vmstate.h"
-> +#include "qemu/log.h"
-> +#include "qemu/module.h"
-> +#include "hw/misc/allwinner-h3-syscon.h"
-> +
-> +/* SYSCON register offsets */
-> +#define REG_VER                 (0x24)  /* Version */
-> +#define REG_EMAC_PHY_CLK        (0x30)  /* EMAC PHY Clock */
-> +#define REG_INDEX(offset)       (offset / sizeof(uint32_t))
-> +
-> +/* SYSCON register reset values */
-> +#define REG_VER_RST             (0x0)
-> +#define REG_EMAC_PHY_CLK_RST    (0x58000)
-> +
-> +static uint64_t allwinner_h3_syscon_read(void *opaque, hwaddr offset,
-> +                                         unsigned size)
-> +{
-> +    const AwH3SysconState *s = (AwH3SysconState *)opaque;
-> +    const uint32_t idx = REG_INDEX(offset);
-> +
-> +    if (idx >= AW_H3_SYSCON_REGS_NUM) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad read offset 0x%04x\n",
-> +                      __func__, (uint32_t)offset);
-> +        return 0;
-> +    }
-> +
-> +    return s->regs[idx];
-> +}
-> +
-> +static void allwinner_h3_syscon_write(void *opaque, hwaddr offset,
-> +                                      uint64_t val, unsigned size)
-> +{
-> +    AwH3SysconState *s = (AwH3SysconState *)opaque;
-> +    const uint32_t idx = REG_INDEX(offset);
-> +
-> +    if (idx >= AW_H3_SYSCON_REGS_NUM) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write offset 0x%04x\n",
-> +                      __func__, (uint32_t)offset);
-> +        return;
-> +    }
-> +
-> +    switch (offset) {
-> +    case REG_VER:       /* Version */
-> +        break;
-> +    default:
-> +        s->regs[idx] = (uint32_t) val;
-> +        break;
-> +    }
-> +}
-> +
-> +static const MemoryRegionOps allwinner_h3_syscon_ops = {
-> +    .read = allwinner_h3_syscon_read,
-> +    .write = allwinner_h3_syscon_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
+This series of patches will build Heterogeneous Memory Attribute Table (HMAT)
+according to the command line. The ACPI HMAT describes the memory attributes,
+such as memory side cache attributes and bandwidth and latency details,
+related to the Memory Proximity Domain.
+The software is expected to use HMAT information as hint for optimization.
 
-Can you point me to the datasheet page that says this region is 
-restricted to 32-bit accesses? Maybe you want .valid -> .impl instead?
+In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
+the platform's HMAT tables.
 
-> +        .unaligned = false
-> +    }
-> +};
-> +
-> +static void allwinner_h3_syscon_reset(DeviceState *dev)
-> +{
-> +    AwH3SysconState *s = AW_H3_SYSCON(dev);
-> +
-> +    /* Set default values for registers */
-> +    s->regs[REG_INDEX(REG_VER)] = REG_VER_RST;
-> +    s->regs[REG_INDEX(REG_EMAC_PHY_CLK)] = REG_EMAC_PHY_CLK_RST;
-> +}
-> +
-> +static void allwinner_h3_syscon_realize(DeviceState *dev, Error **errp)
-> +{
-> +}
-> +
-> +static void allwinner_h3_syscon_init(Object *obj)
-> +{
-> +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-> +    AwH3SysconState *s = AW_H3_SYSCON(obj);
-> +
-> +    /* Memory mapping */
-> +    memory_region_init_io(&s->iomem, OBJECT(s), &allwinner_h3_syscon_ops, s,
-> +                          TYPE_AW_H3_SYSCON, AW_H3_SYSCON_REGS_MEM_SIZE);
+The V19 patches link:
+https://patchwork.kernel.org/cover/11265525/
 
-This definition isn't very helpful IMO, I'd use the value in place: '4 * 
-KiB'.
+Changelog:
+v20:
+    - Resend to fix the wrong target in pc_hmat_erange_cfg()
+    - Use g_assert_true and g_assert_false to replace g_assert
+      (Thomas and Markus)
+    - Rename assoc as associativity, update the QAPI description (Markus)
+    - Disable cache level 0 in hmat-cache option (Igor)
+    - Keep base and bitmap unchanged when latency or bandwidth
+      out of range
+    - Fix the broken CI case when user input latency or bandwidth
+      less than required.
+v19:
+    - Add description about the machine property 'hmat' in commit
+      message (Markus)
+    - Update the QAPI comments
+    - Add a check for no memory side cache
+    - Add some fail cases for hmat-cache when level=0
+v18:
+    - Defer patches 01/14~06/14 of V17, use qapi type uint64 and
+      only nanosecond for latency (Markus)
+    - Rewrite the lines over 80 characters(Igor)
+v17:
+    - Add check when user input latency or bandwidth 0, the
+      lb_info_provided should also be 0. Because in ACPI 6.3 5.2.27.4,
+      0 means the corresponding latency or bandwidth information is
+      not provided.
+    - Fix the infinite loop when node->latency is 0.
+    - Use NumaHmatCacheOptions to replace HMAT_Cache_Info (Igor)
+    - Add check for unordered cache level input (Igor)
+    - Add some fail test cases (Igor)
+v16:
+    - Add and use qemu_strtold_finite to parse size, support full
+      64bit precision, modify related test cases (Eduardo and Markus)
+    - Simplify struct HMAT_LB_Info and related code, unify latency
+      and bandwidth (Igor)
+    - Add cross check with hmat_lb data (Igor)
+    - Fields in Cache Attributes are promoted to uint32_t before
+      shifting (Igor)
+    - Add case for QMP build HMAT (Igor)
+v15:
+    - Add a new patch to refactor do_strtosz() (Eduardo)
+    - Make tests without breaking CI (Michael)
+v14:
+    - Reuse the codes of do_strtosz to build qemu_strtotime_ns
+      (Eduardo)
+    - Squash patch v13 01/12 and 02/12 together (Daniel and Eduardo)
+    - Drop time unit picosecond (Eric)
+    - Use qemu ctz64 and clz64 instead of builtin function
+v13:
+    - Modify some text description
+    - Drop "initiator_valid" field in struct NodeInfo
+    - Reuse Garray to store the raw bandwidth and bandwidth data
+    - Calculate common base unit using range bitmap
+    - Add a patch to alculate hmat latency and bandwidth entry list
+    - Drop the total_levels option and use readable cache size
+    - Remove the unnecessary head file
+    - Use decimal notation with appropriate suffix for cache size
 
-> +    sysbus_init_mmio(sbd, &s->iomem);
-> +}
-> +
-> +static const VMStateDescription allwinner_h3_syscon_vmstate = {
-> +    .name = TYPE_AW_H3_SYSCON,
+Liu Jingqi (5):
+  numa: Extend CLI to provide memory latency and bandwidth information
+  numa: Extend CLI to provide memory side cache information
+  hmat acpi: Build Memory Proximity Domain Attributes Structure(s)
+  hmat acpi: Build System Locality Latency and Bandwidth Information
+    Structure(s)
+  hmat acpi: Build Memory Side Cache Information Structure(s)
 
-Plain name.
+Tao Xu (3):
+  numa: Extend CLI to provide initiator information for numa nodes
+  tests/numa: Add case for QMP build HMAT
+  tests/bios-tables-test: add test cases for ACPI HMAT
 
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINT32_ARRAY(regs, AwH3SysconState, AW_H3_SYSCON_REGS_NUM),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void allwinner_h3_syscon_class_init(ObjectClass *klass, void *data)
-> +{
-> +    DeviceClass *dc = DEVICE_CLASS(klass);
-> +
-> +    dc->reset = allwinner_h3_syscon_reset;
-> +    dc->realize = allwinner_h3_syscon_realize;
-> +    dc->vmsd = &allwinner_h3_syscon_vmstate;
-> +}
-> +
-> +static const TypeInfo allwinner_h3_syscon_info = {
-> +    .name          = TYPE_AW_H3_SYSCON,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_init = allwinner_h3_syscon_init,
-> +    .instance_size = sizeof(AwH3SysconState),
-> +    .class_init    = allwinner_h3_syscon_class_init,
-> +};
-> +
-> +static void allwinner_h3_syscon_register(void)
-> +{
-> +    type_register_static(&allwinner_h3_syscon_info);
-> +}
-> +
-> +type_init(allwinner_h3_syscon_register)
-> diff --git a/include/hw/arm/allwinner-h3.h b/include/hw/arm/allwinner-h3.h
-> index e596516c5c..2bc526b77b 100644
-> --- a/include/hw/arm/allwinner-h3.h
-> +++ b/include/hw/arm/allwinner-h3.h
-> @@ -27,6 +27,7 @@
->   #include "hw/timer/allwinner-a10-pit.h"
->   #include "hw/intc/arm_gic.h"
->   #include "hw/misc/allwinner-h3-clk.h"
-> +#include "hw/misc/allwinner-h3-syscon.h"
->   #include "target/arm/cpu.h"
->   
->   #define AW_H3_SRAM_A1_BASE     (0x00000000)
-> @@ -111,6 +112,7 @@ typedef struct AwH3State {
->       qemu_irq irq[AW_H3_GIC_NUM_SPI];
->       AwA10PITState timer;
->       AwH3ClockState ccu;
-> +    AwH3SysconState syscon;
->       GICState gic;
->       MemoryRegion sram_a1;
->       MemoryRegion sram_a2;
-> diff --git a/include/hw/misc/allwinner-h3-syscon.h b/include/hw/misc/allwinner-h3-syscon.h
-> new file mode 100644
-> index 0000000000..22a2f2a11b
-> --- /dev/null
-> +++ b/include/hw/misc/allwinner-h3-syscon.h
-> @@ -0,0 +1,43 @@
-> +/*
-> + * Allwinner H3 System Control emulation
-> + *
-> + * Copyright (C) 2019 Niek Linnenbank <nieklinnenbank@gmail.com>
-> + *
-> + * This program is free software: you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation, either version 2 of the License, or
-> + * (at your option) any later version.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef HW_MISC_ALLWINNER_H3_SYSCON_H
-> +#define HW_MISC_ALLWINNER_H3_SYSCON_H
-> +
-> +#include "hw/sysbus.h"
-> +
-> +#define AW_H3_SYSCON_REGS_MAX_ADDR  (0x30)
-> +#define AW_H3_SYSCON_REGS_NUM       ((AW_H3_SYSCON_REGS_MAX_ADDR / \
-> +                                      sizeof(uint32_t)) + 1)
-> +#define AW_H3_SYSCON_REGS_MEM_SIZE  (1024)
+ hw/acpi/Kconfig                       |   7 +-
+ hw/acpi/Makefile.objs                 |   1 +
+ hw/acpi/hmat.c                        | 268 +++++++++++++++++++++++
+ hw/acpi/hmat.h                        |  42 ++++
+ hw/core/machine.c                     |  64 ++++++
+ hw/core/numa.c                        | 297 ++++++++++++++++++++++++++
+ hw/i386/acpi-build.c                  |   5 +
+ include/sysemu/numa.h                 |  63 ++++++
+ qapi/machine.json                     | 180 +++++++++++++++-
+ qemu-options.hx                       |  95 +++++++-
+ tests/bios-tables-test-allowed-diff.h |   8 +
+ tests/bios-tables-test.c              |  44 ++++
+ tests/data/acpi/pc/APIC.acpihmat      |   0
+ tests/data/acpi/pc/DSDT.acpihmat      |   0
+ tests/data/acpi/pc/HMAT.acpihmat      |   0
+ tests/data/acpi/pc/SRAT.acpihmat      |   0
+ tests/data/acpi/q35/APIC.acpihmat     |   0
+ tests/data/acpi/q35/DSDT.acpihmat     |   0
+ tests/data/acpi/q35/HMAT.acpihmat     |   0
+ tests/data/acpi/q35/SRAT.acpihmat     |   0
+ tests/numa-test.c                     | 213 ++++++++++++++++++
+ 21 files changed, 1276 insertions(+), 11 deletions(-)
+ create mode 100644 hw/acpi/hmat.c
+ create mode 100644 hw/acpi/hmat.h
+ create mode 100644 tests/data/acpi/pc/APIC.acpihmat
+ create mode 100644 tests/data/acpi/pc/DSDT.acpihmat
+ create mode 100644 tests/data/acpi/pc/HMAT.acpihmat
+ create mode 100644 tests/data/acpi/pc/SRAT.acpihmat
+ create mode 100644 tests/data/acpi/q35/APIC.acpihmat
+ create mode 100644 tests/data/acpi/q35/DSDT.acpihmat
+ create mode 100644 tests/data/acpi/q35/HMAT.acpihmat
+ create mode 100644 tests/data/acpi/q35/SRAT.acpihmat
 
-"4.1. Memory Mapping" the System Control is 4KiB, isn't it?
-
-> +
-> +#define TYPE_AW_H3_SYSCON    "allwinner-h3-syscon"
-> +#define AW_H3_SYSCON(obj)    OBJECT_CHECK(AwH3SysconState, (obj), \
-> +                                          TYPE_AW_H3_SYSCON)
-> +
-> +typedef struct AwH3SysconState {
-> +    /*< private >*/
-> +    SysBusDevice parent_obj;
-> +    /*< public >*/
-> +
-> +    MemoryRegion iomem;
-> +    uint32_t regs[AW_H3_SYSCON_REGS_NUM];
-> +} AwH3SysconState;
-> +
-> +#endif
-> 
+-- 
+2.20.1
 
 
