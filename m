@@ -2,116 +2,80 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E87C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 09:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1E3C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 09:13:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86244206C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 09:02:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86244206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 0A27D2077B
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 09:13:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CMWSYjzy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A27D2077B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifgpr-00025z-LC
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 04:02:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47405)
+	id 1ifh0k-00053n-4F
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 04:13:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1ifgob-0001XV-Iz
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 04:00:50 -0500
+ (envelope-from <imammedo@redhat.com>) id 1ifgzv-0004P4-Ru
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 04:12:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1ifgoa-0006xD-19
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 04:00:49 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:43755)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1ifgoZ-0006u9-FU
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 04:00:47 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N4yyQ-1hhIkd3iHk-010tBM; Fri, 13 Dec 2019 10:00:32 +0100
-To: Xinyu Li <precinct@mail.ustc.edu.cn>, qemu-devel@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>
-References: <20191213022919.5934-1-precinct@mail.ustc.edu.cn>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH] linux-user:Fix align mistake when mmap guest space
-Message-ID: <965e1a25-cbdd-a758-371d-dab7a7c2eb4d@vivier.eu>
-Date: Fri, 13 Dec 2019 10:00:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <imammedo@redhat.com>) id 1ifgzt-0000sm-2R
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 04:12:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49042
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ifgzs-0000pS-KE
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 04:12:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576228347;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=g8Vid2Cs8r6/Rmya9pqc2DE1uJoY/si0o8UbX/u+0vQ=;
+ b=CMWSYjzynILl/YyszkPaEDN+fGwegAl3cNM+1KWDhDtgJ5qeDO2ti2p6tYqNRy2dPzU9Hr
+ JncdY6sTpzdHbUfP3NyEKuEH5F+ejNf0a31Ne8G526zvuOiougcBilexyHDEZeNkQ4mYOH
+ /tNditLNizZpDgElIoRevdj1Iwkm2OE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-a5GX5yCGPyOkF52cnlAqFw-1; Fri, 13 Dec 2019 04:12:24 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5C351010FC4;
+ Fri, 13 Dec 2019 09:12:22 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C6546601A2;
+ Fri, 13 Dec 2019 09:12:20 +0000 (UTC)
+Date: Fri, 13 Dec 2019 10:12:19 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Subject: Re: [PATCH 2/2] numa: properly check if numa is supported
+Message-ID: <20191213101219.0aa249dc@redhat.com>
+In-Reply-To: <bf9dc1f6-514a-67ac-d09b-0b515545bf22@intel.com>
+References: <1576154936-178362-1-git-send-email-imammedo@redhat.com>
+ <1576154936-178362-3-git-send-email-imammedo@redhat.com>
+ <bf9dc1f6-514a-67ac-d09b-0b515545bf22@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191213022919.5934-1-precinct@mail.ustc.edu.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:axNnd7N8HEhvTJ1aMBSrvQHiOsq4JTbBY7RrUjinMVeNwfNItUr
- 25NxG5wmzshP2a70pKLjacBg2uRapeQLPTrfY+Qi+0D3OmVQT126YgLVdPnQKx8zwZz8zea
- 35YL1KSE51T+oYRTQDyMZcFPhEbffdW4IlcFgFuoNnGEzIlYzSCc/IVp9cpRSgpkuWf9bLZ
- BLSQoNT2IwOvsSxUFhOEw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:MKqD4MMBkA8=:vFUGjBuy4Lstb5EvB8an1Y
- xiNm/yu2fl3f0agEAcJrr+Byjql2t5BN+CTtWUAzzBAwJtn+OU4MOmBYhRypMDVmb1nhVh/kx
- TDlW9sTHeotHAZNsdZjV3SEgOLuufdC2LHHAZPhn+RU2rkBDTRNbM56NUEmAlHMQLr6C08V1m
- 4c0Ejjvex4/uEaHet8etHp1yFyKo/WpGGkph+dHk4a7EDtOiQ7RYR7VrdveW3URawRD1oVsuN
- uN+8tQqPzWJLSg7heraRHeq4YT3EmBLh6yciR5e+SY7STJ6MED2ytDPFHV84FHVWt7YBpFc7X
- Y7iJpN8M5PxCuu5RbU6abGfRrUjqfOoiFp+FUWORzfnEsbjRdHakEQ4TyCOemwf5hfwqZ2FU7
- wyW26ctPO9EK3Rh9bEWWD5RMaYjjVPDSUVf5zv6wFou2Eubg/gM3vTImXKtMooJiVgCaxhX3V
- 8NMlAoc3/ik2QnG8e/urgeEDzYlhCe4+CC8nAypg5ldHG1Sp0aqF5E7dfrMzMTJ0pGCAVzsqT
- cR8PAtfhiNvbJwdZN/OzDEi5PSJPijfbeHrtfT5Jgk6gJNGEi+m5T9lYpUditATZ/lrRM9ygf
- /TUl7VhWupmSztxL/C3uv3FoSeiC+uiswEgWQ1C1lvPS5OuF7lqo+mC4siRM1kuMgSMJhqqMs
- AWupBy5nYrduTuCelNqzI8n5ZLArFngx5KWSH9yRK+QObHs6l7AmSkpavM2D4CyhRYyGKmTP1
- MFQkJkzyBXzSNsqYrpr4L7cuiLNp+Wi0Jx/A7LS6apDoT7wXMB3UMysMkRY3Uz2dSPCIsLQJ6
- BJ4foqGnGp2qZcsC1b3mgKMXqhNSq18DdayJn3Dphlna6sllJy+Zpl7cKdvIAgs5y6zITg/VG
- 1aNNxv+7kUnC0rNtqIMA==
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: a5GX5yCGPyOkF52cnlAqFw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.10
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,50 +87,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Leif Lindholm <leif.lindholm@linaro.org>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/12/2019 à 03:29, Xinyu Li a écrit :
-> In init_guest_space, we need to mmap guest space. If the return address
-> of first mmap is not aligned with align, which was set to MAX(SHMLBA,
-> qemu_host_page_size), we need unmap and a new mmap(space is larger than
-> first size). The new size is named real_size, which is aligned_size +
-> qemu_host_page_size. alugned_size is the guest space size. And add a
-> qemu_host_page_size to avoid memory error when we align real_start
-> manually (ROUND_UP(real_start, align)). But when SHMLBA >
-> qemu_host_page_size, the added size will smaller than the size to align,
-> which can make a mistake(in a mips machine, it appears). So change
-> real_size from aligned_size +qemu_host_page_size
-> to aligned_size + align will solve it.
-> 
-> Signed-off-by: Xinyu Li <precinct@mail.ustc.edu.cn>
-> ---
->  linux-user/elfload.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-> index f6693e5760..312ded0779 100644
-> --- a/linux-user/elfload.c
-> +++ b/linux-user/elfload.c
-> @@ -2189,7 +2189,7 @@ unsigned long init_guest_space(unsigned long host_start,
->               * to where we need to put the commpage.
->               */
->              munmap((void *)real_start, host_size);
-> -            real_size = aligned_size + qemu_host_page_size;
-> +            real_size = aligned_size + align;
->              real_start = (unsigned long)
->                  mmap((void *)real_start, real_size, PROT_NONE, flags, -1, 0);
->              if (real_start == (unsigned long)-1) {
-> 
+On Fri, 13 Dec 2019 09:33:10 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
-Your change seems correct to me.
+> On 12/12/2019 8:48 PM, Igor Mammedov wrote:
+> > Commit aa57020774b, by mistake used MachineClass::numa_mem_supported
+> > to check if NUMA is supported by machine and also as unrelated change
+> > set it to true for sbsa-ref board.
+> > 
+> > Luckily change didn't break machines that support NUMA, as the field
+> > is set to true for them.
+> > 
+> > But the field is not intended for checking if NUMA is supported and
+> > will be flipped to false within this release for new machine types.
+> > 
+> > Fix it:
+> >   - by using previously used condition
+> >        !mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id
+> >     the first time and then use MachineState::numa_state down the road
+> >     to check if NUMA is supported
+> >   - dropping stray sbsa-ref chunk
+> > 
+> > Fixes: aa57020774b690a22be72453b8e91c9b5a68c516
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> > CC: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
+> > CC: Peter Maydell <peter.maydell@linaro.org>
+> > CC: Leif Lindholm <leif.lindholm@linaro.org>
+> > CC: qemu-arm@nongnu.org
+> > CC: qemu-stable@nongnu.org
+> > 
+> > 
+> >   hw/arm/sbsa-ref.c | 1 -
+> >   hw/core/machine.c | 4 ++--
+> >   2 files changed, 2 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+> > index 27046cc..c6261d4 100644
+> > --- a/hw/arm/sbsa-ref.c
+> > +++ b/hw/arm/sbsa-ref.c
+> > @@ -791,7 +791,6 @@ static void sbsa_ref_class_init(ObjectClass *oc, void *data)
+> >       mc->possible_cpu_arch_ids = sbsa_ref_possible_cpu_arch_ids;
+> >       mc->cpu_index_to_instance_props = sbsa_ref_cpu_index_to_props;
+> >       mc->get_default_cpu_node_id = sbsa_ref_get_default_cpu_node_id;
+> > -    mc->numa_mem_supported = true;
+> >   }
+> >   
+> >   static const TypeInfo sbsa_ref_info = {
+> > diff --git a/hw/core/machine.c b/hw/core/machine.c
+> > index 1689ad3..aa63231 100644
+> > --- a/hw/core/machine.c
+> > +++ b/hw/core/machine.c
+> > @@ -958,7 +958,7 @@ static void machine_initfn(Object *obj)
+> >                                           NULL);
+> >       }
+> >   
+> > -    if (mc->numa_mem_supported) {
+> > +    if (mc->cpu_index_to_instance_props && mc->get_default_cpu_node_id) {
+> >           ms->numa_state = g_new0(NumaState, 1);
+> >       }  
+> 
+> I am wondering if @numa_mem_supported is unused here, it is unused for 
+> QEMU, because the only usage of @numa_mem_supported is to initialize 
+> @numa_state. Or there is other usage? So should it be removed from 
+> struct MachineClass?
+You are wrong, it's not intended for numa_state initialization,
+read doc comment for it in include/hw/boards.h
+(for full story look at commit cd5ff8333a3)
 
-Richard did you miss this in your patch
-30ab9ef2967d ("linux-user: Fix shmat emulation by honoring host SHMLBA")
-or was it voluntary to keep it?
-
-Thanks,
-Laurent
 
