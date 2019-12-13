@@ -2,64 +2,85 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B25C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 01:34:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFAB5C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 03:21:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79CD6206B7
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 01:34:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79CD6206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id BA8952173E
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 03:21:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NbXVTwns"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA8952173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifZqT-0007tg-Kz
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 20:34:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55197)
+	id 1ifbWe-0007KS-TU
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 22:21:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33988)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1ifZpY-0007Kl-GZ
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 20:33:21 -0500
+ (envelope-from <stevensd@chromium.org>) id 1ifbW2-0006t1-N0
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 22:21:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1ifZpX-0002iL-En
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 20:33:20 -0500
-Received: from mga03.intel.com ([134.134.136.65]:14945)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>)
- id 1ifZpS-0002WF-93; Thu, 12 Dec 2019 20:33:14 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 12 Dec 2019 17:33:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,307,1571727600"; d="scan'208";a="239148017"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.238])
- ([10.239.196.238])
- by fmsmga004.fm.intel.com with ESMTP; 12 Dec 2019 17:33:10 -0800
-Subject: Re: [PATCH 2/2] numa: properly check if numa is supported
-To: Igor Mammedov <imammedo@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1576154936-178362-1-git-send-email-imammedo@redhat.com>
- <1576154936-178362-3-git-send-email-imammedo@redhat.com>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <bf9dc1f6-514a-67ac-d09b-0b515545bf22@intel.com>
-Date: Fri, 13 Dec 2019 09:33:10 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+ (envelope-from <stevensd@chromium.org>) id 1ifbW1-00038a-Gg
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 22:21:18 -0500
+Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:45329)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stevensd@chromium.org>)
+ id 1ifbW0-00036C-4U
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 22:21:17 -0500
+Received: by mail-qt1-x843.google.com with SMTP id l12so112553qtq.12
+ for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 19:21:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Hu2APQv+IVI+5iybEWjt//7XPT9MTquVNsXr5eKGijw=;
+ b=NbXVTwnsEakgsLDn5trxVEpIqvFPkyT91OGxu6GSmlghAmcQnQGqJZi3cOnahPfSrD
+ 2IJNLrAntLb2Vg5yzKRR4QuDDeoYyiy6na2abkFIXUui3mifNSzOyNyMo0Ep0GzowQ8k
+ 73kBaxv12ceugNuZDtRCisBAErHfxIMqH+xDk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Hu2APQv+IVI+5iybEWjt//7XPT9MTquVNsXr5eKGijw=;
+ b=SBnsqCe+cy3LWpGjheog8EGtezKs0bHuBcr38Ovfm0FTKLsvQ5PTq74qd8wCuYFmC+
+ uSKRqv0M72VQ8ZILpqfIVo1cFxAoB1nVeDi2L7+T15TbLRrbOH9lXma28xexuLttYAhN
+ kGwOgAGajhzhVkYEGYL+9tmBLZJjhcrSU+DgiHw0CWi5YKlms42dBDz1TjB3WG6CzlNd
+ 41QVzfLQh9Z+1vNVQuuQE1JN1o68peuBPHXb38/weN9HXlJWLSu4WZhFFvht4RVmubDS
+ lOblm2V2wLvAcJ0jb01xE2ew33cbW8Qfd6McK4tTjZ1sENKqA736Y0VIemi0X08MO/z9
+ 7IJQ==
+X-Gm-Message-State: APjAAAUVJv526vwPI95R1hxJ5POFo803K1+RYVDkEgc4O0mPLzW4wSZ3
+ pZ9Js2wh84xD/snLTSylAUMT6qGn9NW8zhgJvzQFYA==
+X-Google-Smtp-Source: APXvYqxkanE7QbTS//jm2AxQAVONJGlepSsWXOV9cZX2KUxILe5+aXQHWvDwDfO80Q8vQlRxi2+uGt+89jAjHljpaI4=
+X-Received: by 2002:ac8:27a3:: with SMTP id w32mr10895350qtw.234.1576207275087; 
+ Thu, 12 Dec 2019 19:21:15 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1576154936-178362-3-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <72712fe048af1489368f7416faa92c45@hostfission.com>
+ <CAAFQd5Cpb=3HRL3NbgxP+S259nkNEuA=u75ew1JQTzvVUU5NeQ@mail.gmail.com>
+ <d65bec5074eda5f389668e28922c1609@hostfission.com>
+ <CAAFQd5AWqYaNWfYQ2hepjg7OD8y8ehHn0guusAR8JYefc+BNaw@mail.gmail.com>
+ <CAEUnVG77y2DrV5kLTHDy1xio+yzMGv9j=M0c4388vH_LUaiXLg@mail.gmail.com>
+ <CAD=HUj40Jb2cy8EP=24coO-CPUvq6ib+01bvXHn1G9GD8KuenA@mail.gmail.com>
+ <20191211092625.jzqx2ukphhggwavo@sirius.home.kraxel.org>
+ <CAD=HUj7d3SWqCH=57ymy-BVd6xdJWc=WSqHAFyQXt-3MjchEAA@mail.gmail.com>
+ <20191212094121.by7w7fywlzdfoktn@sirius.home.kraxel.org>
+ <CAD=HUj6YYupjdxxz2mgMmE2DcKhXP-qdhRORvUNTmzcORRrLzg@mail.gmail.com>
+ <20191212133048.4nbmuwhbq5z2ai6o@sirius.home.kraxel.org>
+In-Reply-To: <20191212133048.4nbmuwhbq5z2ai6o@sirius.home.kraxel.org>
+From: David Stevens <stevensd@chromium.org>
+Date: Fri, 13 Dec 2019 12:21:03 +0900
+Message-ID: <CAD=HUj623MyeZ7VmrYTfig9oiyNhipidpvhuuurs3VgGBgjZpQ@mail.gmail.com>
+Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.65
+X-Received-From: 2607:f8b0:4864:20::843
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,77 +92,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Radoslaw Biernacki <radoslaw.biernacki@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- Leif Lindholm <leif.lindholm@linaro.org>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
+Cc: Geoffrey McRae <geoff@hostfission.com>, Hans Verkuil <hverkuil@xs4all.nl>,
+ Zach Reizner <zachr@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
+ virtio-dev@lists.oasis-open.org, qemu-devel <qemu-devel@nongnu.org>,
+ Alex Lau <alexlau@chromium.org>, Tomasz Figa <tfiga@chromium.org>,
+ Keiichi Watanabe <keiichiw@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
+ =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/12/2019 8:48 PM, Igor Mammedov wrote:
-> Commit aa57020774b, by mistake used MachineClass::numa_mem_supported
-> to check if NUMA is supported by machine and also as unrelated change
-> set it to true for sbsa-ref board.
-> 
-> Luckily change didn't break machines that support NUMA, as the field
-> is set to true for them.
-> 
-> But the field is not intended for checking if NUMA is supported and
-> will be flipped to false within this release for new machine types.
-> 
-> Fix it:
->   - by using previously used condition
->        !mc->cpu_index_to_instance_props || !mc->get_default_cpu_node_id
->     the first time and then use MachineState::numa_state down the road
->     to check if NUMA is supported
->   - dropping stray sbsa-ref chunk
-> 
-> Fixes: aa57020774b690a22be72453b8e91c9b5a68c516
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> CC: Radoslaw Biernacki <radoslaw.biernacki@linaro.org>
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> CC: Leif Lindholm <leif.lindholm@linaro.org>
-> CC: qemu-arm@nongnu.org
-> CC: qemu-stable@nongnu.org
-> 
-> 
->   hw/arm/sbsa-ref.c | 1 -
->   hw/core/machine.c | 4 ++--
->   2 files changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-> index 27046cc..c6261d4 100644
-> --- a/hw/arm/sbsa-ref.c
-> +++ b/hw/arm/sbsa-ref.c
-> @@ -791,7 +791,6 @@ static void sbsa_ref_class_init(ObjectClass *oc, void *data)
->       mc->possible_cpu_arch_ids = sbsa_ref_possible_cpu_arch_ids;
->       mc->cpu_index_to_instance_props = sbsa_ref_cpu_index_to_props;
->       mc->get_default_cpu_node_id = sbsa_ref_get_default_cpu_node_id;
-> -    mc->numa_mem_supported = true;
->   }
->   
->   static const TypeInfo sbsa_ref_info = {
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 1689ad3..aa63231 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -958,7 +958,7 @@ static void machine_initfn(Object *obj)
->                                           NULL);
->       }
->   
-> -    if (mc->numa_mem_supported) {
-> +    if (mc->cpu_index_to_instance_props && mc->get_default_cpu_node_id) {
->           ms->numa_state = g_new0(NumaState, 1);
->       }
+> > > Without buffer sharing support the driver importing a virtio-gpu dma-buf
+> > > can send the buffer scatter list to the host.  So both virtio-gpu and
+> > > the other device would actually access the same guest pages, but they
+> > > are not aware that the buffer is shared between devices.
+> >
+> > With the uuid approach, how should this case be handled? Should it be
+> > equivalent to exporting and importing the buffer which was created
+> > first? Should the spec say it's undefined behavior that might work as
+> > expected but might not, depending on the device implementation? Does
+> > the spec even need to say anything about it?
+>
+> Using the uuid is an optional optimization.  I'd expect the workflow be
+> roughly this:
+>
+>   (1) exporting driver exports a dma-buf as usual, additionally attaches
+>       a uuid to it and notifies the host (using device-specific commands).
+>   (2) importing driver will ask the host to use the buffer referenced by
+>       the given uuid.
+>   (3) if (2) fails for some reason use the dma-buf scatter list instead.
+>
+> Of course only virtio drivers would try step (2), other drivers (when
+> sharing buffers between intel gvt device and virtio-gpu for example)
+> would go straight to (3).
 
-I am wondering if @numa_mem_supported is unused here, it is unused for 
-QEMU, because the only usage of @numa_mem_supported is to initialize 
-@numa_state. Or there is other usage? So should it be removed from 
-struct MachineClass?
+For virtio-gpu as it is today, it's not clear to me that they're
+equivalent. As I read it, the virtio-gpu spec makes a distinction
+between the guest memory and the host resource. If virtio-gpu is
+communicating with non-virtio devices, then obviously you'd just be
+working with guest memory. But if it's communicating with another
+virtio device, then there are potentially distinct guest and host
+buffers that could be used. The spec shouldn't leave any room for
+ambiguity as to how this distinction is handled.
 
+> > Not just buffers not backed by guest ram, but things like fences. I
+> > would suggest the uuids represent 'exported resources' rather than
+> > 'exported buffers'.
+>
+> Hmm, I can't see how this is useful.  Care to outline how you envision
+> this to work in a typical use case?
 
+Looking at the spec again, it seems like there's some more work that
+would need to be done before this would be possible. But the use case
+I was thinking of would be to export a fence from virtio-gpu and share
+it with a virtio decoder, to set up a decode pipeline that doesn't
+need to go back into the guest for synchronization. I'm fine dropping
+this point for now, though, and revisiting it as a separate proposal.
+
+-David
 
