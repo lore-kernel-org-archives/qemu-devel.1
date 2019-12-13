@@ -2,92 +2,80 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDE1C3F68F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D27C00454
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:23:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 443B12465A
+	by mail.kernel.org (Postfix) with ESMTPS id 340A521655
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:23:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 443B12465A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AuDyePU+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 340A521655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iflyz-0002zm-Nq
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 09:31:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57203)
+	id 1ifnjP-0005Nz-7R
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:23:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35658)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ifly2-0002XL-UV
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:30:56 -0500
+ (envelope-from <cohuck@redhat.com>) id 1ifnev-0008Sc-0v
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ifly1-0003fv-8w
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:30:54 -0500
-Received: from indium.canonical.com ([91.189.90.7]:45300)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ifly1-0003bg-3E
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:30:53 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iflxw-0002LJ-Dr
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 14:30:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id F38EB2E80DC
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 14:30:47 +0000 (UTC)
+ (envelope-from <cohuck@redhat.com>) id 1ifnet-00013N-LH
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27125
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ifnet-00012I-H3
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576253955;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=XjihPKr7LPtpeVUyD1Ywx5iZuUUmd9Xf4ZGxJ7BU3l4=;
+ b=AuDyePU+g5tXDyfr60qFHlzMVB3UINIj0LxBkRzl5PxT15YJ4cmsQ461iIFbh4s2KSBBZK
+ LPTW0eH62jLqsGJb/QF7GdjKy4T3FpF4JJPNXJjjuRQgefWwgCGT7u3wwDOM5lHD4R3TgE
+ FfnbTcu4BBLzYkF0JtYatEBXCNCWn3I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-EYLts699MfyuIx5gU5koYA-1; Fri, 13 Dec 2019 11:19:13 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6598E800EB4;
+ Fri, 13 Dec 2019 16:19:12 +0000 (UTC)
+Received: from localhost (ovpn-116-226.ams2.redhat.com [10.36.116.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 06F465C553;
+ Fri, 13 Dec 2019 16:19:11 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 04/16] s390x: Move reset normal to shared reset handler
+Date: Fri, 13 Dec 2019 17:18:39 +0100
+Message-Id: <20191213161851.24687-5-cohuck@redhat.com>
+In-Reply-To: <20191213161851.24687-1-cohuck@redhat.com>
+References: <20191213161851.24687-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: EYLts699MfyuIx5gU5koYA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Dec 2019 14:24:54 -0000
-From: dann frazier <dann.frazier@canonical.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=kunpeng920; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Confirmed; importance=Medium; assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=bionic; sourcepackage=qemu; 
- component=main; status=Confirmed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=disco; sourcepackage=qemu; 
- component=main; status=Confirmed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=In Progress; importance=Medium;
- assignee=rafaeldtinoco@kernelpath.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Confirmed; importance=Medium;
- assignee=None; 
-X-Launchpad-Bug-Tags: qemu-img
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dannf jan-glauber-i jnsnow lizhengui rafaeldtinoco
-X-Launchpad-Bug-Reporter: dann frazier (dannf)
-X-Launchpad-Bug-Modifier: dann frazier (dannf)
-References: <154327283728.15443.11625169757714443608.malonedeb@soybean.canonical.com>
-Message-Id: <157624709546.6430.15706163417270184638.launchpad@soybean.canonical.com>
-Subject: [Bug 1805256] Re: qemu-img hangs on rcu_call_ready_event logic in
- Aarch64 when converting images
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a6eeae460e41c686003b56bcc76379b5da267c59
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,170 +84,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1805256 <1805256@bugs.launchpad.net>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: kunpeng920
-       Status: New =3D> Confirmed
+From: Janosch Frank <frankja@linux.ibm.com>
 
-** Changed in: qemu (Ubuntu Bionic)
-       Status: New =3D> Confirmed
+Let's start moving the cpu reset functions into a single function with
+a switch/case, so we can later use fallthroughs and share more code
+between resets.
 
-** Changed in: qemu (Ubuntu Disco)
-       Status: New =3D> Confirmed
+This patch introduces the reset function by renaming cpu_reset().
 
-** Changed in: qemu (Ubuntu Focal)
-       Status: New =3D> Confirmed
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20191127175046.4911-3-frankja@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/cpu-qom.h |  6 +++++-
+ target/s390x/cpu.c     | 19 +++++++++++++------
+ target/s390x/cpu.h     |  2 +-
+ target/s390x/sigp.c    |  2 +-
+ 4 files changed, 20 insertions(+), 9 deletions(-)
 
--- =
+diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
+index b809ec8418e0..f3b71bac67c9 100644
+--- a/target/s390x/cpu-qom.h
++++ b/target/s390x/cpu-qom.h
+@@ -34,6 +34,10 @@
+ typedef struct S390CPUModel S390CPUModel;
+ typedef struct S390CPUDef S390CPUDef;
+=20
++typedef enum cpu_reset_type {
++    S390_CPU_RESET_NORMAL,
++} cpu_reset_type;
++
+ /**
+  * S390CPUClass:
+  * @parent_realize: The parent class' realize handler.
+@@ -57,7 +61,7 @@ typedef struct S390CPUClass {
+     DeviceRealize parent_realize;
+     void (*parent_reset)(CPUState *cpu);
+     void (*load_normal)(CPUState *cpu);
+-    void (*cpu_reset)(CPUState *cpu);
++    void (*reset)(CPUState *cpu, cpu_reset_type type);
+     void (*initial_cpu_reset)(CPUState *cpu);
+ } S390CPUClass;
+=20
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 3abe7e80fd0a..67d6fbfa4401 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -82,18 +82,25 @@ static void s390_cpu_load_normal(CPUState *s)
+ }
+ #endif
+=20
+-/* S390CPUClass::cpu_reset() */
+-static void s390_cpu_reset(CPUState *s)
++/* S390CPUClass::reset() */
++static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
+ {
+     S390CPU *cpu =3D S390_CPU(s);
+     S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
+     CPUS390XState *env =3D &cpu->env;
+=20
+-    env->pfault_token =3D -1UL;
+-    env->bpbc =3D false;
+     scc->parent_reset(s);
+     cpu->env.sigp_order =3D 0;
+     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
++
++    switch (type) {
++    case S390_CPU_RESET_NORMAL:
++        env->pfault_token =3D -1UL;
++        env->bpbc =3D false;
++        break;
++    default:
++        g_assert_not_reached();
++    }
+ }
+=20
+ /* S390CPUClass::initial_reset() */
+@@ -102,7 +109,7 @@ static void s390_cpu_initial_reset(CPUState *s)
+     S390CPU *cpu =3D S390_CPU(s);
+     CPUS390XState *env =3D &cpu->env;
+=20
+-    s390_cpu_reset(s);
++    s390_cpu_reset(s, S390_CPU_RESET_NORMAL);
+     /* initial reset does not clear everything! */
+     memset(&env->start_initial_reset_fields, 0,
+         offsetof(CPUS390XState, end_reset_fields) -
+@@ -473,7 +480,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *=
+data)
+ #if !defined(CONFIG_USER_ONLY)
+     scc->load_normal =3D s390_cpu_load_normal;
+ #endif
+-    scc->cpu_reset =3D s390_cpu_reset;
++    scc->reset =3D s390_cpu_reset;
+     scc->initial_cpu_reset =3D s390_cpu_initial_reset;
+     cc->reset =3D s390_cpu_full_reset;
+     cc->class_by_name =3D s390_cpu_class_by_name,
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 17460ed7b381..18123dfd5bd1 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -741,7 +741,7 @@ static inline void s390_do_cpu_reset(CPUState *cs, run_=
+on_cpu_data arg)
+ {
+     S390CPUClass *scc =3D S390_CPU_GET_CLASS(cs);
+=20
+-    scc->cpu_reset(cs);
++    scc->reset(cs, S390_CPU_RESET_NORMAL);
+ }
+=20
+ static inline void s390_do_cpu_initial_reset(CPUState *cs, run_on_cpu_data=
+ arg)
+diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+index 2ce22d4dc18b..850139b9cd54 100644
+--- a/target/s390x/sigp.c
++++ b/target/s390x/sigp.c
+@@ -266,7 +266,7 @@ static void sigp_cpu_reset(CPUState *cs, run_on_cpu_dat=
+a arg)
+     SigpInfo *si =3D arg.host_ptr;
+=20
+     cpu_synchronize_state(cs);
+-    scc->cpu_reset(cs);
++    scc->reset(cs, S390_CPU_RESET_NORMAL);
+     cpu_synchronize_post_reset(cs);
+     si->cc =3D SIGP_CC_ORDER_CODE_ACCEPTED;
+ }
+--=20
+2.21.0
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1805256
-
-Title:
-  qemu-img hangs on rcu_call_ready_event logic in Aarch64 when
-  converting images
-
-Status in kunpeng920:
-  Confirmed
-Status in QEMU:
-  In Progress
-Status in qemu package in Ubuntu:
-  Confirmed
-Status in qemu source package in Bionic:
-  Confirmed
-Status in qemu source package in Disco:
-  Confirmed
-Status in qemu source package in Eoan:
-  In Progress
-Status in qemu source package in Focal:
-  Confirmed
-
-Bug description:
-  Command:
-
-  qemu-img convert -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Hangs indefinitely approximately 30% of the runs.
-
-  ----
-
-  Workaround:
-
-  qemu-img convert -m 1 -f qcow2 -O qcow2 ./disk01.qcow2 ./output.qcow2
-
-  Run "qemu-img convert" with "a single coroutine" to avoid this issue.
-
-  ----
-
-  (gdb) thread 1
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf1ad81c in __GI_ppoll
-  #1 0x0000aaaaaabcf73c in ppoll
-  #2 qemu_poll_ns
-  #3 0x0000aaaaaabd0764 in os_host_main_loop_wait
-  #4 main_loop_wait
-  ...
-
-  (gdb) thread 2
-  ...
-  (gdb) bt
-  #0 syscall ()
-  #1 0x0000aaaaaabd41cc in qemu_futex_wait
-  #2 qemu_event_wait (ev=3Dev@entry=3D0xaaaaaac86ce8 <rcu_call_ready_event>)
-  #3 0x0000aaaaaabed05c in call_rcu_thread
-  #4 0x0000aaaaaabd34c8 in qemu_thread_start
-  #5 0x0000ffffbf25c880 in start_thread
-  #6 0x0000ffffbf1b6b9c in thread_start ()
-
-  (gdb) thread 3
-  ...
-  (gdb) bt
-  #0 0x0000ffffbf11aa20 in __GI___sigtimedwait
-  #1 0x0000ffffbf2671b4 in __sigwait
-  #2 0x0000aaaaaabd1ddc in sigwait_compat
-  #3 0x0000aaaaaabd34c8 in qemu_thread_start
-  #4 0x0000ffffbf25c880 in start_thread
-  #5 0x0000ffffbf1b6b9c in thread_start
-
-  ----
-
-  (gdb) run
-  Starting program: /usr/bin/qemu-img convert -f qcow2 -O qcow2
-  ./disk01.ext4.qcow2 ./output.qcow2
-
-  [New Thread 0xffffbec5ad90 (LWP 72839)]
-  [New Thread 0xffffbe459d90 (LWP 72840)]
-  [New Thread 0xffffbdb57d90 (LWP 72841)]
-  [New Thread 0xffffacac9d90 (LWP 72859)]
-  [New Thread 0xffffa7ffed90 (LWP 72860)]
-  [New Thread 0xffffa77fdd90 (LWP 72861)]
-  [New Thread 0xffffa6ffcd90 (LWP 72862)]
-  [New Thread 0xffffa67fbd90 (LWP 72863)]
-  [New Thread 0xffffa5ffad90 (LWP 72864)]
-
-  [Thread 0xffffa5ffad90 (LWP 72864) exited]
-  [Thread 0xffffa6ffcd90 (LWP 72862) exited]
-  [Thread 0xffffa77fdd90 (LWP 72861) exited]
-  [Thread 0xffffbdb57d90 (LWP 72841) exited]
-  [Thread 0xffffa67fbd90 (LWP 72863) exited]
-  [Thread 0xffffacac9d90 (LWP 72859) exited]
-  [Thread 0xffffa7ffed90 (LWP 72860) exited]
-
-  <HUNG w/ 3 threads in the stack trace showed before>
-  """
-
-  All the tasks left are blocked in a system call, so no task left to call
-  qemu_futex_wake() to unblock thread #2 (in futex()), which would unblock
-  thread #1 (doing poll() in a pipe with thread #2).
-
-  Those 7 threads exit before disk conversion is complete (sometimes in
-  the beginning, sometimes at the end).
-
-  ----
-
-  [ Original Description ]
-
-  On the HiSilicon D06 system - a 96 core NUMA arm64 box - qemu-img
-  frequently hangs (~50% of the time) with this command:
-
-  qemu-img convert -f qcow2 -O qcow2 /tmp/cloudimg /tmp/cloudimg2
-
-  Where "cloudimg" is a standard qcow2 Ubuntu cloud image. This
-  qcow2->qcow2 conversion happens to be something uvtool does every time
-  it fetches images.
-
-  Once hung, attaching gdb gives the following backtrace:
-
-  (gdb) bt
-  #0  0x0000ffffae4f8154 in __GI_ppoll (fds=3D0xaaaae8a67dc0, nfds=3D187650=
-274213760,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3D<optimized out>, timeout@entry=3D0x0, s=
-igmask=3D0xffffc123b950)
-  =C2=A0=C2=A0=C2=A0=C2=A0at ../sysdeps/unix/sysv/linux/ppoll.c:39
-  #1  0x0000aaaabbefaf00 in ppoll (__ss=3D0x0, __timeout=3D0x0, __nfds=3D<o=
-ptimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0__fds=3D<optimized out>) at /usr/include/aarch64-=
-linux-gnu/bits/poll2.h:77
-  #2  qemu_poll_ns (fds=3D<optimized out>, nfds=3D<optimized out>,
-  =C2=A0=C2=A0=C2=A0=C2=A0timeout=3Dtimeout@entry=3D-1) at util/qemu-timer.=
-c:322
-  #3  0x0000aaaabbefbf80 in os_host_main_loop_wait (timeout=3D-1)
-  =C2=A0=C2=A0=C2=A0=C2=A0at util/main-loop.c:233
-  #4  main_loop_wait (nonblocking=3D<optimized out>) at util/main-loop.c:497
-  #5  0x0000aaaabbe2aa30 in convert_do_copy (s=3D0xffffc123bb58) at qemu-im=
-g.c:1980
-  #6  img_convert (argc=3D<optimized out>, argv=3D<optimized out>) at qemu-=
-img.c:2456
-  #7  0x0000aaaabbe2333c in main (argc=3D7, argv=3D<optimized out>) at qemu=
--img.c:4975
-
-  Reproduced w/ latest QEMU git (@ 53744e0a182)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/kunpeng920/+bug/1805256/+subscriptions
 
