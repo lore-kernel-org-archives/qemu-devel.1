@@ -2,98 +2,83 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90024C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BCBC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D32424671
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D32424671
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 809A221655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lx2m4Cmi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 809A221655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifpCI-0004Ak-JC
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 12:57:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41043)
+	id 1ifpop-0001N5-T1
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 13:37:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57232)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ifp85-0007dQ-4f
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 12:53:31 -0500
+ (envelope-from <waynli329@gmail.com>) id 1ifpno-0000qw-27
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 13:36:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.vnet.ibm.com>) id 1ifp82-0005oO-U0
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 12:53:29 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53786
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
- id 1ifp82-0005na-OK; Fri, 13 Dec 2019 12:53:26 -0500
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBDHr6LF145301; Fri, 13 Dec 2019 12:53:09 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wusmm1cra-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Dec 2019 12:53:09 -0500
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBDHr86J145547;
- Fri, 13 Dec 2019 12:53:08 -0500
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.26])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wusmm1cmu-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Dec 2019 12:53:08 -0500
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
- by ppma04wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBDHmok4027567;
- Fri, 13 Dec 2019 17:52:58 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma04wdc.us.ibm.com with ESMTP id 2wuqrbt89x-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Dec 2019 17:52:58 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBDHqvrJ53543418
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Dec 2019 17:52:57 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id AD510C6055;
- Fri, 13 Dec 2019 17:52:57 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 279F5C605B;
- Fri, 13 Dec 2019 17:52:57 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 13 Dec 2019 17:52:56 +0000 (GMT)
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-To: qemu-ppc@nongnu.org
-Subject: [PATCH v6 1/4] tpm_spapr: Support TPM for ppc64 using CRQ based
- interface
-Date: Fri, 13 Dec 2019 12:52:12 -0500
-Message-Id: <20191213175215.1234660-2-stefanb@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191213175215.1234660-1-stefanb@linux.vnet.ibm.com>
-References: <20191213175215.1234660-1-stefanb@linux.vnet.ibm.com>
+ (envelope-from <waynli329@gmail.com>) id 1ifpnk-0008FX-Pm
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 13:36:35 -0500
+Received: from mail-il1-x132.google.com ([2607:f8b0:4864:20::132]:41647)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <waynli329@gmail.com>) id 1ifpnk-0008AE-E3
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 13:36:32 -0500
+Received: by mail-il1-x132.google.com with SMTP id f10so226682ils.8
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 10:36:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=jfQMfbcxt/GN7F55THyaQZwB2FdUzJvz8k7hQ1CU7+M=;
+ b=lx2m4CmiqXA3an6TXzafYZcgzuCIpOKF3b2+4x7//NyyP62PF8YrR14bH/D3YkKjE+
+ 8ZMiIZ58wlyEbJUAMvx7vhp3kRZGnfUJ/JMkMZfbW9yKPDIewUVQNH7KWrc/bNu8lixT
+ 7DFmb+far/0r/pqY9JENOwsrJiwRYdRy6LIKYg8yrqiLJkGVmP2Veov4+UO94jzlJqPC
+ BZ/gyVibhcYoaAtYUOxJO6ujfRoP49n5tQX2WN/gjo9WCzdUKYsfe/G9yz63PvJkTUxy
+ n0yUY4YnE7PGzy5bL4x6h2EPTIXBxjsCP21qsaq9ij0brXWRiezwbcFouT050MnGg/1p
+ KmRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=jfQMfbcxt/GN7F55THyaQZwB2FdUzJvz8k7hQ1CU7+M=;
+ b=p1LBFL+fIybVnFCM/IKawvCnQmOnYlGY85xN2mp6jYXNUsxc4x4CTYZJTjj2jGy067
+ Sb2Nnm/fH1xF6SVtxt3OZ2Nr3Px4xzHN4qIvSaGsXT1RUomWTb4k0c0XrJFsMSmDhUkV
+ XL4ipop8NjKmw8unDMMSYjP0zNk5hrKss2a7sDnexJ8Ng98vUdb7TAMt4o+2KVZezwFZ
+ LfqH4MY53DcdAntBpfihrdoIHZ/oIW3RMxNl6M21jBAPEjaSsF4hGqQVb6zqhICVlbOo
+ zih+H/0Ehn0ry02Ufb8BHjEW+k98llXJHcMAMHpeOj92pyXaIuCRN4gb2HoEd9gxZDbK
+ ycxA==
+X-Gm-Message-State: APjAAAXwwIFHvV45TMh50B9j2qBHiCx6mu8XFUD1vHBZaYdzW/yMclvA
+ tL/oQ3EsK2pZiw7WBHOi1/Z3BcPLiy7ghDOXAjg=
+X-Google-Smtp-Source: APXvYqyBEeAHKEVyGMulbmYfNPAHuuqedFCkCmvQmN+qeSE320MC17XkeJn6BM5TKoqNv8vEXhd/d9/QKx1PANfDm1U=
+X-Received: by 2002:a92:465c:: with SMTP id t89mr686411ila.263.1576262189848; 
+ Fri, 13 Dec 2019 10:36:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-13_05:2019-12-13,2019-12-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 suspectscore=4
- spamscore=0 adultscore=0 mlxscore=0 mlxlogscore=999 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 impostorscore=0 malwarescore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912130142
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+References: <CAM2K0nrhkOhiJDxnANGmAu2140-TP0a9pY58i_PN1k9xAWGz9A@mail.gmail.com>
+ <76b207cd-09ce-b3df-e288-a515df40677e@redhat.com>
+ <CAM2K0nph2GZQkAv3tCgoP+ciPMWSzVJp0rHDXJJ2Gtqeq2Bgug@mail.gmail.com>
+ <c4e14191-efe5-7713-1eac-55a6bafb027a@redhat.com>
+ <CAM2K0no9-M9WRm-QKFBMRofUaNkfmMtDvop3KxrOQrU80YWSTA@mail.gmail.com>
+ <20191213034937.GB207300@umbus.fritz.box>
+In-Reply-To: <20191213034937.GB207300@umbus.fritz.box>
+From: Wayne Li <waynli329@gmail.com>
+Date: Fri, 13 Dec 2019 12:36:18 -0600
+Message-ID: <CAM2K0noRK2LqV9JfWd8jezm-bZM=Qqk1rY6a+cDoHAqSafiZcQ@mail.gmail.com>
+Subject: Re: QEMU VM crashes when enabling KVM
+To: David Gibson <david@gibson.dropbear.id.au>
+Content-Type: multipart/alternative; boundary="000000000000e61e8905999a2311"
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Received-From: 2607:f8b0:4864:20::132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,533 +90,351 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ David Gibson <dgibson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement support for TPM on ppc64 by implementing the vTPM CRQ interface
-as a frontend. It can use the tpm_emulator driver backend with the external
-swtpm.
+--000000000000e61e8905999a2311
+Content-Type: text/plain; charset="UTF-8"
 
-The Linux vTPM driver for ppc64 works with this emulation.
+Thanks David and Zalton for the awesome explanations.  They're very helpful
+to us!
 
-This TPM emulator also handles the TPM 2 case.
+-Thanks, Wayne Li
 
-Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/tpm/Kconfig       |   6 +
- hw/tpm/Makefile.objs |   1 +
- hw/tpm/tpm_spapr.c   | 405 +++++++++++++++++++++++++++++++++++++++++++
- hw/tpm/trace-events  |  12 ++
- include/sysemu/tpm.h |   3 +
- qapi/tpm.json        |   6 +-
- 6 files changed, 430 insertions(+), 3 deletions(-)
- create mode 100644 hw/tpm/tpm_spapr.c
+On Thu, Dec 12, 2019 at 9:49 PM David Gibson <david@gibson.dropbear.id.au>
+wrote:
 
-diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
-index 4c8ee87d67..66a570aac1 100644
---- a/hw/tpm/Kconfig
-+++ b/hw/tpm/Kconfig
-@@ -22,3 +22,9 @@ config TPM_EMULATOR
-     bool
-     default y
-     depends on TPMDEV
-+
-+config TPM_SPAPR
-+    bool
-+    default n
-+    select TPMDEV
-+    depends on PSERIES
-diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
-index de0b85d02a..85eb99ae05 100644
---- a/hw/tpm/Makefile.objs
-+++ b/hw/tpm/Makefile.objs
-@@ -4,3 +4,4 @@ common-obj-$(CONFIG_TPM_TIS) += tpm_tis.o
- common-obj-$(CONFIG_TPM_CRB) += tpm_crb.o
- common-obj-$(CONFIG_TPM_PASSTHROUGH) += tpm_passthrough.o
- common-obj-$(CONFIG_TPM_EMULATOR) += tpm_emulator.o
-+obj-$(CONFIG_TPM_SPAPR) += tpm_spapr.o
-diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-new file mode 100644
-index 0000000000..a5f19b9ca3
---- /dev/null
-+++ b/hw/tpm/tpm_spapr.c
-@@ -0,0 +1,405 @@
-+/*
-+ * QEMU PowerPC pSeries Logical Partition (aka sPAPR) hardware System Emulator
-+ *
-+ * PAPR Virtual TPM
-+ *
-+ * Copyright (c) 2015, 2017, 2019 IBM Corporation.
-+ *
-+ * Authors:
-+ *    Stefan Berger <stefanb@linux.vnet.ibm.com>
-+ *
-+ * This code is licensed under the GPL version 2 or later. See the
-+ * COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "hw/qdev-properties.h"
-+#include "migration/vmstate.h"
-+
-+#include "sysemu/tpm_backend.h"
-+#include "tpm_int.h"
-+#include "tpm_util.h"
-+
-+#include "hw/ppc/spapr.h"
-+#include "hw/ppc/spapr_vio.h"
-+#include "trace.h"
-+
-+#define DEBUG_SPAPR 0
-+
-+#define VIO_SPAPR_VTPM(obj) \
-+     OBJECT_CHECK(SpaprTpmState, (obj), TYPE_TPM_SPAPR)
-+
-+typedef struct TpmCrq {
-+    uint8_t valid;  /* 0x80: cmd; 0xc0: init crq */
-+                    /* 0x81-0x83: CRQ message response */
-+    uint8_t msg;    /* see below */
-+    uint16_t len;   /* len of TPM request; len of TPM response */
-+    uint32_t data;  /* rtce_dma_handle when sending TPM request */
-+    uint64_t reserved;
-+} TpmCrq;
-+
-+#define SPAPR_VTPM_VALID_INIT_CRQ_COMMAND  0xC0
-+#define SPAPR_VTPM_VALID_COMMAND           0x80
-+#define SPAPR_VTPM_MSG_RESULT              0x80
-+
-+/* msg types for valid = SPAPR_VTPM_VALID_INIT_CRQ */
-+#define SPAPR_VTPM_INIT_CRQ_RESULT           0x1
-+#define SPAPR_VTPM_INIT_CRQ_COMPLETE_RESULT  0x2
-+
-+/* msg types for valid = SPAPR_VTPM_VALID_CMD */
-+#define SPAPR_VTPM_GET_VERSION               0x1
-+#define SPAPR_VTPM_TPM_COMMAND               0x2
-+#define SPAPR_VTPM_GET_RTCE_BUFFER_SIZE      0x3
-+#define SPAPR_VTPM_PREPARE_TO_SUSPEND        0x4
-+
-+/* response error messages */
-+#define SPAPR_VTPM_VTPM_ERROR                0xff
-+
-+/* error codes */
-+#define SPAPR_VTPM_ERR_COPY_IN_FAILED        0x3
-+#define SPAPR_VTPM_ERR_COPY_OUT_FAILED       0x4
-+
-+#define TPM_SPAPR_BUFFER_MAX		4096
-+
-+typedef struct {
-+    SpaprVioDevice vdev;
-+
-+    TpmCrq crq; /* track single TPM command */
-+
-+    uint8_t state;
-+#define SPAPR_VTPM_STATE_NONE         0
-+#define SPAPR_VTPM_STATE_EXECUTION    1
-+#define SPAPR_VTPM_STATE_COMPLETION   2
-+
-+    unsigned char buffer[TPM_SPAPR_BUFFER_MAX];
-+
-+    TPMBackendCmd cmd;
-+
-+    TPMBackend *be_driver;
-+    TPMVersion be_tpm_version;
-+
-+    size_t be_buffer_size;
-+} SpaprTpmState;
-+
-+static void tpm_spapr_show_buffer(const unsigned char *buffer,
-+                                  size_t buffer_size, const char *string)
-+{
-+    size_t len, i;
-+    char *line_buffer, *p;
-+
-+    len = MIN(tpm_cmd_get_size(buffer), buffer_size);
-+
-+    /*
-+     * allocate enough room for 3 chars per buffer entry plus a
-+     * newline after every 16 chars and a final null terminator.
-+     */
-+    line_buffer = g_malloc(len * 3 + (len / 16) + 1);
-+
-+    for (i = 0, p = line_buffer; i < len; i++) {
-+        if (i && !(i % 16)) {
-+            p += sprintf(p, "\n");
-+        }
-+        p += sprintf(p, "%.2X ", buffer[i]);
-+    }
-+    trace_tpm_spapr_show_buffer(string, len, line_buffer);
-+
-+    g_free(line_buffer);
-+}
-+
-+/*
-+ * Send a request to the TPM.
-+ */
-+static void tpm_spapr_tpm_send(SpaprTpmState *s)
-+{
-+    if (trace_event_get_state_backends(TRACE_TPM_SPAPR_SHOW_BUFFER)) {
-+        tpm_spapr_show_buffer(s->buffer, s->be_buffer_size, "To TPM");
-+    }
-+
-+    s->state = SPAPR_VTPM_STATE_EXECUTION;
-+    s->cmd = (TPMBackendCmd) {
-+        .locty = 0,
-+        .in = s->buffer,
-+        .in_len = MIN(tpm_cmd_get_size(s->buffer), s->be_buffer_size),
-+        .out = s->buffer,
-+        .out_len = s->be_buffer_size,
-+    };
-+
-+    tpm_backend_deliver_request(s->be_driver, &s->cmd);
-+}
-+
-+static int tpm_spapr_process_cmd(SpaprTpmState *s, uint64_t dataptr)
-+{
-+    long rc;
-+
-+    /* a max. of be_buffer_size bytes can be transported */
-+    rc = spapr_vio_dma_read(&s->vdev, dataptr,
-+                            s->buffer, s->be_buffer_size);
-+    if (rc) {
-+        error_report("tpm_spapr_got_payload: DMA read failure");
-+    }
-+    /* let vTPM handle any malformed request */
-+    tpm_spapr_tpm_send(s);
-+
-+    return rc;
-+}
-+
-+static inline int spapr_tpm_send_crq(struct SpaprVioDevice *dev, TpmCrq *crq)
-+{
-+    return spapr_vio_send_crq(dev, (uint8_t *)crq);
-+}
-+
-+static int tpm_spapr_do_crq(struct SpaprVioDevice *dev, uint8_t *crq_data)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-+    TpmCrq local_crq;
-+    TpmCrq *crq = &s->crq; /* requests only */
-+    int rc;
-+
-+    trace_tpm_spapr_do_crq(crq_data[0], crq_data[1]);
-+
-+    switch (crq_data[0] /* valid */) {
-+    case SPAPR_VTPM_VALID_INIT_CRQ_COMMAND: /* Init command/response */
-+
-+        /* Respond to initialization request */
-+        switch (crq_data[1] /* msg */) {
-+        case SPAPR_VTPM_INIT_CRQ_RESULT:
-+            trace_tpm_spapr_do_crq_crq_result();
-+            memset(&local_crq, 0, sizeof(local_crq));
-+            local_crq.valid = SPAPR_VTPM_VALID_INIT_CRQ_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_INIT_CRQ_RESULT;
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+
-+        case SPAPR_VTPM_INIT_CRQ_COMPLETE_RESULT:
-+            trace_tpm_spapr_do_crq_crq_complete_result();
-+            memset(&local_crq, 0, sizeof(local_crq));
-+            local_crq.valid = SPAPR_VTPM_VALID_INIT_CRQ_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_INIT_CRQ_COMPLETE_RESULT;
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+        }
-+
-+        break;
-+    case SPAPR_VTPM_VALID_COMMAND: /* Payloads */
-+        switch (crq_data[1] /* msg */) {
-+        case SPAPR_VTPM_TPM_COMMAND:
-+            trace_tpm_spapr_do_crq_tpm_command();
-+            if (s->state == SPAPR_VTPM_STATE_EXECUTION) {
-+                return H_BUSY;
-+            }
-+            memcpy(crq, crq_data, sizeof(*crq));
-+
-+            rc = tpm_spapr_process_cmd(s, be32_to_cpu(crq->data));
-+
-+            if (rc == H_SUCCESS) {
-+                crq->valid = be16_to_cpu(0);
-+            } else {
-+                local_crq.valid = SPAPR_VTPM_MSG_RESULT;
-+                local_crq.msg = SPAPR_VTPM_VTPM_ERROR;
-+                local_crq.len = cpu_to_be16(0);
-+                local_crq.data = cpu_to_be32(SPAPR_VTPM_ERR_COPY_IN_FAILED);
-+                spapr_tpm_send_crq(dev, &local_crq);
-+            }
-+            break;
-+
-+        case SPAPR_VTPM_GET_RTCE_BUFFER_SIZE:
-+            trace_tpm_spapr_do_crq_tpm_get_rtce_buffer_size(s->be_buffer_size);
-+            local_crq.valid = SPAPR_VTPM_VALID_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_GET_RTCE_BUFFER_SIZE |
-+                            SPAPR_VTPM_MSG_RESULT;
-+            local_crq.len = cpu_to_be16(s->be_buffer_size);
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+
-+        case SPAPR_VTPM_GET_VERSION:
-+            local_crq.valid = SPAPR_VTPM_VALID_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_GET_VERSION | SPAPR_VTPM_MSG_RESULT;
-+            local_crq.len = cpu_to_be16(0);
-+            switch (s->be_tpm_version) {
-+            case TPM_VERSION_1_2:
-+                local_crq.data = cpu_to_be32(1);
-+                break;
-+            case TPM_VERSION_2_0:
-+                local_crq.data = cpu_to_be32(2);
-+                break;
-+            default:
-+                g_assert_not_reached();
-+                break;
-+            }
-+            trace_tpm_spapr_do_crq_get_version(be32_to_cpu(local_crq.data));
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+
-+        case SPAPR_VTPM_PREPARE_TO_SUSPEND:
-+            trace_tpm_spapr_do_crq_prepare_to_suspend();
-+            local_crq.valid = SPAPR_VTPM_VALID_COMMAND;
-+            local_crq.msg = SPAPR_VTPM_PREPARE_TO_SUSPEND |
-+                            SPAPR_VTPM_MSG_RESULT;
-+            spapr_tpm_send_crq(dev, &local_crq);
-+            break;
-+
-+        default:
-+            trace_tpm_spapr_do_crq_unknown_msg_type(crq->msg);
-+        }
-+        break;
-+    default:
-+        trace_tpm_spapr_do_crq_unknown_crq(crq_data[0], crq_data[1]);
-+    };
-+
-+    return H_SUCCESS;
-+}
-+
-+static void tpm_spapr_request_completed(TPMIf *ti, int ret)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(ti);
-+    TpmCrq *crq = &s->crq;
-+    uint32_t len;
-+    int rc;
-+
-+    s->state = SPAPR_VTPM_STATE_COMPLETION;
-+
-+    /* a max. of be_buffer_size bytes can be transported */
-+    len = MIN(tpm_cmd_get_size(s->buffer), s->be_buffer_size);
-+    rc = spapr_vio_dma_write(&s->vdev, be32_to_cpu(crq->data),
-+                             s->buffer, len);
-+
-+    if (trace_event_get_state_backends(TRACE_TPM_SPAPR_SHOW_BUFFER)) {
-+        tpm_spapr_show_buffer(s->buffer, len, "From TPM");
-+    }
-+
-+    crq->valid = SPAPR_VTPM_MSG_RESULT;
-+    if (rc == H_SUCCESS) {
-+        crq->msg = SPAPR_VTPM_TPM_COMMAND | SPAPR_VTPM_MSG_RESULT;
-+        crq->len = cpu_to_be16(len);
-+    } else {
-+        error_report("%s: DMA write failure", __func__);
-+        crq->msg = SPAPR_VTPM_VTPM_ERROR;
-+        crq->len = cpu_to_be16(0);
-+        crq->data = cpu_to_be32(SPAPR_VTPM_ERR_COPY_OUT_FAILED);
-+    }
-+
-+    rc = spapr_tpm_send_crq(&s->vdev, crq);
-+    if (rc) {
-+        error_report("%s: Error sending response", __func__);
-+    }
-+}
-+
-+static int tpm_spapr_do_startup_tpm(SpaprTpmState *s, size_t buffersize)
-+{
-+    return tpm_backend_startup_tpm(s->be_driver, buffersize);
-+}
-+
-+static void tpm_spapr_update_deviceclass(SpaprVioDevice *dev)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-+    SpaprVioDeviceClass *k = VIO_SPAPR_DEVICE_GET_CLASS(dev);
-+
-+    switch (s->be_tpm_version) {
-+    case TPM_VERSION_1_2:
-+        k->dt_compatible = "IBM,vtpm";
-+        break;
-+    case TPM_VERSION_2_0:
-+        k->dt_compatible = "IBM,vtpm20";
-+        break;
-+    default:
-+        g_assert_not_reached();
-+        break;
-+    }
-+}
-+
-+static void tpm_spapr_reset(SpaprVioDevice *dev)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-+
-+    s->state = SPAPR_VTPM_STATE_NONE;
-+
-+    s->be_tpm_version = tpm_backend_get_tpm_version(s->be_driver);
-+    tpm_spapr_update_deviceclass(dev);
-+
-+    s->be_buffer_size = MIN(tpm_backend_get_buffer_size(s->be_driver),
-+                            TPM_SPAPR_BUFFER_MAX);
-+
-+    tpm_backend_reset(s->be_driver);
-+    tpm_spapr_do_startup_tpm(s, s->be_buffer_size);
-+}
-+
-+static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(ti);
-+
-+    if (tpm_backend_had_startup_error(s->be_driver)) {
-+        return TPM_VERSION_UNSPEC;
-+    }
-+
-+    return tpm_backend_get_tpm_version(s->be_driver);
-+}
-+
-+static const VMStateDescription vmstate_spapr_vtpm = {
-+    .name = "tpm-spapr",
-+    .unmigratable = 1,
-+};
-+
-+static Property tpm_spapr_properties[] = {
-+    DEFINE_SPAPR_PROPERTIES(SpaprTpmState, vdev),
-+    DEFINE_PROP_TPMBE("tpmdev", SpaprTpmState, be_driver),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void tpm_spapr_realizefn(SpaprVioDevice *dev, Error **errp)
-+{
-+    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-+
-+    if (!tpm_find()) {
-+        error_setg(errp, "at most one TPM device is permitted");
-+        return;
-+    }
-+
-+    dev->crq.SendFunc = tpm_spapr_do_crq;
-+
-+    if (!s->be_driver) {
-+        error_setg(errp, "'tpmdev' property is required");
-+        return;
-+    }
-+}
-+
-+static void tpm_spapr_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    SpaprVioDeviceClass *k = VIO_SPAPR_DEVICE_CLASS(klass);
-+    TPMIfClass *tc = TPM_IF_CLASS(klass);
-+
-+    k->realize = tpm_spapr_realizefn;
-+    k->reset = tpm_spapr_reset;
-+    k->dt_name = "vtpm";
-+    k->dt_type = "IBM,vtpm";
-+    k->signal_mask = 0x00000001;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->props = tpm_spapr_properties;
-+    k->rtce_window_size = 0x10000000;
-+    dc->vmsd = &vmstate_spapr_vtpm;
-+
-+    tc->model = TPM_MODEL_TPM_SPAPR;
-+    tc->get_version = tpm_spapr_get_version;
-+    tc->request_completed = tpm_spapr_request_completed;
-+}
-+
-+static const TypeInfo tpm_spapr_info = {
-+    .name          = TYPE_TPM_SPAPR,
-+    .parent        = TYPE_VIO_SPAPR_DEVICE,
-+    .instance_size = sizeof(SpaprTpmState),
-+    .class_init    = tpm_spapr_class_init,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_TPM_IF },
-+        { }
-+    }
-+};
-+
-+static void tpm_spapr_register_types(void)
-+{
-+    type_register_static(&tpm_spapr_info);
-+}
-+
-+type_init(tpm_spapr_register_types)
-diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-index 89804bcd64..6278a39618 100644
---- a/hw/tpm/trace-events
-+++ b/hw/tpm/trace-events
-@@ -55,3 +55,15 @@ tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset) "locty: %d, rw_offset = %u"
- 
- # tpm_ppi.c
- tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
-+
-+# hw/tpm/tpm_spapr.c
-+tpm_spapr_show_buffer(const char *direction, size_t len, const char *buf) "direction: %s len: %zu\n%s"
-+tpm_spapr_do_crq(uint8_t raw1, uint8_t raw2) "1st 2 bytes in CRQ: 0x%02x 0x%02x"
-+tpm_spapr_do_crq_crq_result(void) "SPAPR_VTPM_INIT_CRQ_RESULT"
-+tpm_spapr_do_crq_crq_complete_result(void) "SPAPR_VTPM_INIT_CRQ_COMP_RESULT"
-+tpm_spapr_do_crq_tpm_command(void) "got TPM command payload"
-+tpm_spapr_do_crq_tpm_get_rtce_buffer_size(size_t buffersize) "response: buffer size is %zu"
-+tpm_spapr_do_crq_get_version(uint32_t version) "response: version %u"
-+tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to suspend"
-+tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type 0x%02x"
-+tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ 0x%02x 0x%02x ..."
-diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
-index 5b541a71c8..15979a3647 100644
---- a/include/sysemu/tpm.h
-+++ b/include/sysemu/tpm.h
-@@ -45,11 +45,14 @@ typedef struct TPMIfClass {
- 
- #define TYPE_TPM_TIS                "tpm-tis"
- #define TYPE_TPM_CRB                "tpm-crb"
-+#define TYPE_TPM_SPAPR              "tpm-spapr"
- 
- #define TPM_IS_TIS(chr)                             \
-     object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS)
- #define TPM_IS_CRB(chr)                             \
-     object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
-+#define TPM_IS_SPAPR(chr)                           \
-+    object_dynamic_cast(OBJECT(chr), TYPE_TPM_SPAPR)
- 
- /* returns NULL unless there is exactly one TPM device */
- static inline TPMIf *tpm_find(void)
-diff --git a/qapi/tpm.json b/qapi/tpm.json
-index b30323bb6b..63878aa0f4 100644
---- a/qapi/tpm.json
-+++ b/qapi/tpm.json
-@@ -12,11 +12,11 @@
- #
- # @tpm-tis: TPM TIS model
- # @tpm-crb: TPM CRB model (since 2.12)
-+# @tpm-spapr: TPM SPAPR model (since 5.0)
- #
- # Since: 1.5
- ##
--{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
--
-+{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb', 'tpm-spapr' ] }
- ##
- # @query-tpm-models:
- #
-@@ -29,7 +29,7 @@
- # Example:
- #
- # -> { "execute": "query-tpm-models" }
--# <- { "return": [ "tpm-tis", "tpm-crb" ] }
-+# <- { "return": [ "tpm-tis", "tpm-crb", "tpm-spapr" ] }
- #
- ##
- { 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
--- 
-2.21.0
+> On Thu, Dec 12, 2019 at 10:40:44AM -0600, Wayne Li wrote:
+> > Dear David Gibson,
+> >
+> > I know you are under no obligation to respond, but if it's possible for
+> you
+> > to find the time to respond to my question, I would be extremely
+> grateful.
+> > My team at Boeing has been stuck trying to get KVM working for our
+> project
+> > for the last few months.  A good explanation of why this isn't possible
+> > would be absolutely critical.
+>
+> As you can see from that diagram, the history ppc CPUs is quite a bit
+> more diverse than x86.  Although they're all very similar from the
+> point of view of userspace code, they're quite different for
+> privileged kernel code: they have different MMUs, different privileged
+> registers amongst other things.
+>
+> Because of this there are several different KVM implementations.
+>
+> 1) KVM HV
+>
+> This one uses the virtualization facilities of BookS CPUs (present
+> since POWER4 / 970, but only well supported from POWER7 onwards).
+> Those don't allow much to virtualize the guest cpu model, so it
+> assumes the guest cpu is the same as the host.
+>
+> So, both your guest and host CPUs rule this one out.
+>
+> 2) Book3E KVM
+>
+> Uses the virtualization features of recent enough Freescale Book E
+> CPUs.  I don't know a lot about this or its limitations.  The e6500
+> might well have these features, but I'm pretty sure it can only
+> emulate BookE cpus for the guest.
+>
+> So, your guest rules this one out.
+>
+> 3) KVM PR
+>
+> This one operates by running the entire guest in user mode, and
+> emulating all privileged instructions.  It's slow (relative to
+> hardware assisted KVM models), but it's flexible.
+>
+> In theory, this one can do what you want, but there are a bunch of
+> caveats:
+>
+>   * Emulating all the privileged instructions for a whole bunch of cpu
+>   variants is a huge task, and KVM PR is now barely maintained.  There
+>   are lots of gaps in coverage.
+>
+>   * I'm not sure if it was ever really implemented for BookE hosts.
+>
+>   * Although there aren't many, there are a few differences between
+>   userland instructions between cpu variants, mostly because of new
+>   additions.  I think 7457 is an old enough design that this probably
+>   won't cause you troube, but I'm not certain.
+>
+>
+>
+> >
+> > -Thanks, Wayne Li
+> >
+> > On Thu, Dec 12, 2019 at 1:17 AM Paolo Bonzini <pbonzini@redhat.com>
+> wrote:
+> >
+> > > On 12/12/19 02:59, Wayne Li wrote:
+> > > > We wrote a project that is created on top of the QEMU source code; it
+> > > > calls functions from the QEMU code.  I run the executable created by
+> > > > compiling that project/QEMU code.  Anyway, looking at the following
+> 0> > > documentation:
+> > > >
+> > > > https://www.kernel.org/doc/Documentation/powerpc/cpu_families.txt
+> > > >
+> > > > It looks like the PowerPC 7457 is Book3S and the PowerPC e6500 is
+> > > > BookE.  Is that why you think I require a Book3S KVM?  Exactly why do
+> > > > you feel this way?  Also would that mean my team would need to go and
+> > > > buy a board with a Book3S processor?
+> > >
+> > > CCing the PPC maintainer.  There are aspects of BookE and Book3S that
+> > > are different and not really interchangeable in the privileged
+> interface.
+> > >
+> > > Paolo
+> > >
+> > > > -Thanks!, Wayne Li
+> > > >
+> > > > From my understanding
+> > > >
+> > > > On Wed, Dec 11, 2019 at 7:16 PM Paolo Bonzini <pbonzini@redhat.com
+> > > > <mailto:pbonzini@redhat.com>> wrote:
+> > > >
+> > > >     On 11/12/19 22:23, Wayne Li wrote:
+> > > >     >
+> > > >     > Now I am fairly sure KVM is actually enabled on the system.
+> > > Finding
+> > > >     > that out was another story that spanned a couple of months.
+> But
+> > > long
+> > > >     > story short, lsmod doesn't show that the KVM kernel module is
+> > > >     running.
+> > > >     > But that's because KVM is built-in and it can't actually be
+> built
+> > > as a
+> > > >     > loadable kernel module in this particular system.
+> > > >     >
+> > > >     > So I'm not really sure what could be the problem.  Though I was
+> > > >     thinking
+> > > >     > if I understood the error better that might help?  Following
+> the
+> > > >     code I
+> > > >     > see that the "Missing PVR setting capability." is called when a
+> > > >     variable
+> > > >     > called "cap_segstate" is 0:
+> > > >     >
+> > > >     > if (!cap_segstate) {
+> > > >     >             fprintf(stderr, "kvm error: missing PVR setting
+> > > >     capability\n");
+> > > >     >             return -ENOSYS;
+> > > >     > }
+> > > >     >
+> > > >     > And the cap_segstate variable is set by the following function:
+> > > >     >
+> > > >     > cap_segstate = kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
+> > > >
+> > > >     You are not saying how you are running QEMU.  I think you are
+> using a
+> > > >     CPU model that requires a Book3S KVM.
+> > > >
+> > > >     Paolo
+> > > >
+> > >
+> > >
+>
+> --
+> David Gibson                    | I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au  | minimalist, thank you.  NOT _the_
+> _other_
+>                                 | _way_ _around_!
+> http://www.ozlabs.org/~dgibson
+>
 
+--000000000000e61e8905999a2311
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Thanks David and Zalton for the awesome explanations.=
+=C2=A0 They&#39;re very helpful to us!</div><div><br></div><div>-Thanks, Wa=
+yne Li<br></div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=
+=3D"gmail_attr">On Thu, Dec 12, 2019 at 9:49 PM David Gibson &lt;<a href=3D=
+"mailto:david@gibson.dropbear.id.au">david@gibson.dropbear.id.au</a>&gt; wr=
+ote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px=
+ 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On Thu, Dec=
+ 12, 2019 at 10:40:44AM -0600, Wayne Li wrote:<br>
+&gt; Dear David Gibson,<br>
+&gt; <br>
+&gt; I know you are under no obligation to respond, but if it&#39;s possibl=
+e for you<br>
+&gt; to find the time to respond to my question, I would be extremely grate=
+ful.<br>
+&gt; My team at Boeing has been stuck trying to get KVM working for our pro=
+ject<br>
+&gt; for the last few months.=C2=A0 A good explanation of why this isn&#39;=
+t possible<br>
+&gt; would be absolutely critical.<br>
+<br>
+As you can see from that diagram, the history ppc CPUs is quite a bit<br>
+more diverse than x86.=C2=A0 Although they&#39;re all very similar from the=
+<br>
+point of view of userspace code, they&#39;re quite different for<br>
+privileged kernel code: they have different MMUs, different privileged<br>
+registers amongst other things.<br>
+<br>
+Because of this there are several different KVM implementations.<br>
+<br>
+1) KVM HV<br>
+<br>
+This one uses the virtualization facilities of BookS CPUs (present<br>
+since POWER4 / 970, but only well supported from POWER7 onwards).<br>
+Those don&#39;t allow much to virtualize the guest cpu model, so it<br>
+assumes the guest cpu is the same as the host.<br>
+<br>
+So, both your guest and host CPUs rule this one out.<br>
+<br>
+2) Book3E KVM<br>
+<br>
+Uses the virtualization features of recent enough Freescale Book E<br>
+CPUs.=C2=A0 I don&#39;t know a lot about this or its limitations.=C2=A0 The=
+ e6500<br>
+might well have these features, but I&#39;m pretty sure it can only<br>
+emulate BookE cpus for the guest.<br>
+<br>
+So, your guest rules this one out.<br>
+<br>
+3) KVM PR<br>
+<br>
+This one operates by running the entire guest in user mode, and<br>
+emulating all privileged instructions.=C2=A0 It&#39;s slow (relative to<br>
+hardware assisted KVM models), but it&#39;s flexible.<br>
+<br>
+In theory, this one can do what you want, but there are a bunch of<br>
+caveats:<br>
+<br>
+=C2=A0 * Emulating all the privileged instructions for a whole bunch of cpu=
+<br>
+=C2=A0 variants is a huge task, and KVM PR is now barely maintained.=C2=A0 =
+There<br>
+=C2=A0 are lots of gaps in coverage.<br>
+<br>
+=C2=A0 * I&#39;m not sure if it was ever really implemented for BookE hosts=
+.<br>
+<br>
+=C2=A0 * Although there aren&#39;t many, there are a few differences betwee=
+n<br>
+=C2=A0 userland instructions between cpu variants, mostly because of new<br=
+>
+=C2=A0 additions.=C2=A0 I think 7457 is an old enough design that this prob=
+ably<br>
+=C2=A0 won&#39;t cause you troube, but I&#39;m not certain.<br>
+<br>
+<br>
+<br>
+&gt; <br>
+&gt; -Thanks, Wayne Li<br>
+&gt; <br>
+&gt; On Thu, Dec 12, 2019 at 1:17 AM Paolo Bonzini &lt;<a href=3D"mailto:pb=
+onzini@redhat.com" target=3D"_blank">pbonzini@redhat.com</a>&gt; wrote:<br>
+&gt; <br>
+&gt; &gt; On 12/12/19 02:59, Wayne Li wrote:<br>
+&gt; &gt; &gt; We wrote a project that is created on top of the QEMU source=
+ code; it<br>
+&gt; &gt; &gt; calls functions from the QEMU code.=C2=A0 I run the executab=
+le created by<br>
+&gt; &gt; &gt; compiling that project/QEMU code.=C2=A0 Anyway, looking at t=
+he following<br>
+0&gt; &gt; &gt; documentation:<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; <a href=3D"https://www.kernel.org/doc/Documentation/powerpc/=
+cpu_families.txt" rel=3D"noreferrer" target=3D"_blank">https://www.kernel.o=
+rg/doc/Documentation/powerpc/cpu_families.txt</a><br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; It looks like the PowerPC 7457 is Book3S and the PowerPC e65=
+00 is<br>
+&gt; &gt; &gt; BookE.=C2=A0 Is that why you think I require a Book3S KVM?=
+=C2=A0 Exactly why do<br>
+&gt; &gt; &gt; you feel this way?=C2=A0 Also would that mean my team would =
+need to go and<br>
+&gt; &gt; &gt; buy a board with a Book3S processor?<br>
+&gt; &gt;<br>
+&gt; &gt; CCing the PPC maintainer.=C2=A0 There are aspects of BookE and Bo=
+ok3S that<br>
+&gt; &gt; are different and not really interchangeable in the privileged in=
+terface.<br>
+&gt; &gt;<br>
+&gt; &gt; Paolo<br>
+&gt; &gt;<br>
+&gt; &gt; &gt; -Thanks!, Wayne Li<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; From my understanding<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt; On Wed, Dec 11, 2019 at 7:16 PM Paolo Bonzini &lt;<a href=3D=
+"mailto:pbonzini@redhat.com" target=3D"_blank">pbonzini@redhat.com</a><br>
+&gt; &gt; &gt; &lt;mailto:<a href=3D"mailto:pbonzini@redhat.com" target=3D"=
+_blank">pbonzini@redhat.com</a>&gt;&gt; wrote:<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0On 11/12/19 22:23, Wayne Li wrote:<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; Now I am fairly sure KVM is actually=
+ enabled on the system.<br>
+&gt; &gt; Finding<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; that out was another story that span=
+ned a couple of months.=C2=A0 But<br>
+&gt; &gt; long<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; story short, lsmod doesn&#39;t show =
+that the KVM kernel module is<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0running.<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; But that&#39;s because KVM is built-=
+in and it can&#39;t actually be built<br>
+&gt; &gt; as a<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; loadable kernel module in this parti=
+cular system.<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; So I&#39;m not really sure what coul=
+d be the problem.=C2=A0 Though I was<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0thinking<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; if I understood the error better tha=
+t might help?=C2=A0 Following the<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0code I<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; see that the &quot;Missing PVR setti=
+ng capability.&quot; is called when a<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0variable<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; called &quot;cap_segstate&quot; is 0=
+:<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; if (!cap_segstate) {<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0fprintf(stderr, &quot;kvm error: missing PVR setting<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0capability\n&quot;);<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0return -ENOSYS;<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; }<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; And the cap_segstate variable is set=
+ by the following function:<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0&gt; cap_segstate =3D kvm_check_extension=
+(s, KVM_CAP_PPC_SEGSTATE);<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0You are not saying how you are running QE=
+MU.=C2=A0 I think you are using a<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0CPU model that requires a Book3S KVM.<br>
+&gt; &gt; &gt;<br>
+&gt; &gt; &gt;=C2=A0 =C2=A0 =C2=A0Paolo<br>
+&gt; &gt; &gt;<br>
+&gt; &gt;<br>
+&gt; &gt;<br>
+<br>
+-- <br>
+David Gibson=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 | I&#39;ll have my music baroque, and my code<br>
+david AT <a href=3D"http://gibson.dropbear.id.au" rel=3D"noreferrer" target=
+=3D"_blank">gibson.dropbear.id.au</a>=C2=A0 | minimalist, thank you.=C2=A0 =
+NOT _the_ _other_<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | _way_ _around_!<br>
+<a href=3D"http://www.ozlabs.org/~dgibson" rel=3D"noreferrer" target=3D"_bl=
+ank">http://www.ozlabs.org/~dgibson</a><br>
+</blockquote></div>
+
+--000000000000e61e8905999a2311--
 
