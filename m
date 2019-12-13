@@ -2,98 +2,67 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0BBC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1B6C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:21:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0AEB2077B
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:05:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0AEB2077B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 697C4227BF
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:21:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 697C4227BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mail.ustc.edu.cn
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40614 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifcCy-0007xP-2N
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 23:05:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41282)
+	id 1ifcS1-0001pO-Po
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 23:21:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50294)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bharata@linux.ibm.com>) id 1ifcCA-0007Qf-MV
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:04:51 -0500
+ (envelope-from <precinct@mail.ustc.edu.cn>) id 1ifaiC-0008Ej-TQ
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 21:29:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bharata@linux.ibm.com>) id 1ifcC9-0004pk-MZ
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:04:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5516)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <bharata@linux.ibm.com>)
- id 1ifcC9-0004oD-Ef
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:04:49 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBD42BM7023040
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 23:04:48 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wuswnengj-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 23:04:47 -0500
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <bharata@linux.ibm.com>;
- Fri, 13 Dec 2019 04:04:45 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 13 Dec 2019 04:04:42 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBD44fpa42532986
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Dec 2019 04:04:41 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B796E4C04A;
- Fri, 13 Dec 2019 04:04:41 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 65D9C4C040;
- Fri, 13 Dec 2019 04:04:40 +0000 (GMT)
-Received: from in.ibm.com (unknown [9.85.92.59])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
- Fri, 13 Dec 2019 04:04:40 +0000 (GMT)
-Date: Fri, 13 Dec 2019 09:34:38 +0530
-From: Bharata B Rao <bharata@linux.ibm.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v2 ppc-for-5.0 2/2] ppc/spapr: Support reboot of secure
- pseries guest
-References: <20191212055059.9399-1-bharata@linux.ibm.com>
- <20191212055059.9399-3-bharata@linux.ibm.com>
- <20191212132723.5fdfee47@bahia.tlslab.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191212132723.5fdfee47@bahia.tlslab.ibm.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-TM-AS-GCONF: 00
-x-cbid: 19121304-0012-0000-0000-000003745172
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121304-0013-0000-0000-000021B02F9F
-Message-Id: <20191213040438.GC28362@in.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-12_08:2019-12-12,2019-12-12 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0
- priorityscore=1501 malwarescore=0 spamscore=0 mlxscore=0 adultscore=0
- lowpriorityscore=0 suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912130032
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <precinct@mail.ustc.edu.cn>) id 1ifaiA-0004OJ-Og
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 21:29:47 -0500
+Received: from email6.ustc.edu.cn ([2001:da8:d800::8]:33264 helo=ustc.edu.cn)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <precinct@mail.ustc.edu.cn>) id 1ifai9-0003pQ-U5
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 21:29:46 -0500
+Received: from lxy.loongson.cn (unknown [114.242.206.180])
+ by newmailweb.ustc.edu.cn (Coremail) with SMTP id
+ LkAmygBnbc2F9_Jd4kJhAQ--.3943S2; 
+ Fri, 13 Dec 2019 10:29:27 +0800 (CST)
+From: Xinyu Li <precinct@mail.ustc.edu.cn>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] linux-user:Fix align mistake when mmap guest space
+Date: Fri, 13 Dec 2019 10:29:19 +0800
+Message-Id: <20191213022919.5934-1-precinct@mail.ustc.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: LkAmygBnbc2F9_Jd4kJhAQ--.3943S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFWrWFykXF4xJw1rXrWrXwb_yoW8Gw15pF
+ ZxCrn7WrWjqFy5Xw17t3sakw4jqas0kFWYkry3A348ArsxXF1a9rnFga4UWrWDCF4vgw4q
+ 9FZ5twn7Ww1UZF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDU0xBIdaVrnRJUUUyG14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+ rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+ 1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+ 6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+ Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+ I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+ 4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
+ rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
+ vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IY
+ x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
+ xKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
+ xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbWCJPUUUUU==
+X-CM-SenderInfo: 5suhuxxqfwqzxdloh3xvwfhvlgxou0/
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:da8:d800::8
+X-Mailman-Approved-At: Thu, 12 Dec 2019 23:10:17 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,49 +74,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: bharata@linux.ibm.com
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, linuxram@us.ibm.com,
- qemu-devel@nongnu.org, paulus@ozlabs.org, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: riku.voipio@iki.fi, laurent@vivier.eu, Xinyu Li <precinct@mail.ustc.edu.cn>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Dec 12, 2019 at 01:27:23PM +0100, Greg Kurz wrote:
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index f11422fc41..25e1a3446e 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -1597,6 +1597,21 @@ static void spapr_machine_reset(MachineState *machine)
-> >      void *fdt;
-> >      int rc;
-> >  
-> > +    /*
-> > +     * KVM_PPC_SVM_OFF ioctl can fail for secure guests, check and
-> > +     * exit in that case. However check for -ENOTTY explicitly
-> > +     * to ensure that we don't terminate normal guests that are
-> > +     * running on kernels which don't support this ioctl.
-> > +     *
-> > +     * Also, this ioctl returns 0 for normal guests on kernels where
-> > +     * this ioctl is supported.
-> > +     */
-> > +    rc = kvmppc_svm_off();
-> > +    if (rc && rc != -ENOTTY) {
-> 
-> This ioctl can also return -EINVAL if the ultravisor actually failed to move
-> the guest back to non-secure mode or -EBUSY if a vCPU is still running. I
-> agree that the former deserve the VM to be terminated. What about the latter ?
-> Can this happen and if yes, why ? Should we try again as suggested by Alexey ?
-> Could this reveal a bug in QEMU, in which case we should maybe abort ?
+In init_guest_space, we need to mmap guest space. If the return address
+of first mmap is not aligned with align, which was set to MAX(SHMLBA,
+qemu_host_page_size), we need unmap and a new mmap(space is larger than
+first size). The new size is named real_size, which is aligned_size +
+qemu_host_page_size. alugned_size is the guest space size. And add a
+qemu_host_page_size to avoid memory error when we align real_start
+manually (ROUND_UP(real_start, align)). But when SHMLBA >
+qemu_host_page_size, the added size will smaller than the size to align,
+which can make a mistake(in a mips machine, it appears). So change
+real_size from aligned_size +qemu_host_page_size
+to aligned_size + align will solve it.
 
-We are in machine reset path, so all vcpus are already paused. So we don't
-expect any vcpus to be running to handle -EBUSY here. Neither do I see any
-sane recovery path from here.
+Signed-off-by: Xinyu Li <precinct@mail.ustc.edu.cn>
+---
+ linux-user/elfload.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-As Alexey mentioned earlier, may be we can just stop the VM?
-Do vm_stop() with RUN_STATE_PAUSED or some such reason?
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index f6693e5760..312ded0779 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2189,7 +2189,7 @@ unsigned long init_guest_space(unsigned long host_start,
+              * to where we need to put the commpage.
+              */
+             munmap((void *)real_start, host_size);
+-            real_size = aligned_size + qemu_host_page_size;
++            real_size = aligned_size + align;
+             real_start = (unsigned long)
+                 mmap((void *)real_start, real_size, PROT_NONE, flags, -1, 0);
+             if (real_start == (unsigned long)-1) {
+-- 
+2.17.1
 
-Regards,
-Bharata.
 
 
