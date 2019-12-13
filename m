@@ -2,72 +2,79 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A8EC2D0C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B06C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC80F2465A
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB3ED24671
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZD+8YF65"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC80F2465A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I2iH/ONg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3ED24671
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifjby-0006nq-6c
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 06:59:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46631)
+	id 1ifmny-0005h6-4C
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 10:24:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39446)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ifjae-0005rN-58
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:58:37 -0500
+ (envelope-from <eblake@redhat.com>) id 1ifmnA-00053G-Pp
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 10:23:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ifjad-0001vY-5g
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:58:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47772
+ (envelope-from <eblake@redhat.com>) id 1ifmn6-00072n-Vv
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 10:23:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57099
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifjad-0001tl-1Q
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:58:35 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1ifmn6-00071H-SA
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 10:23:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576238314;
+ s=mimecast20190719; t=1576250620;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=7asAq2FFGpqRVjmV3tPPYhEAVmNdYMYAjM4bntVSLVE=;
- b=ZD+8YF65zn/3/hsheNL+6aUcs3cY7UE2tHaRrjwv2lpeRCqAeQPT1bwv+pvXUGC5LYYrqS
- CnAIcbtmN+aukP4QdekLnyX6RopO9l23qVkkm8Bp8hvO4QGtlR5khTbShXV9EDOiLU1MmD
- YP6pYKgEi23CxlSl06qV2cTZmWMORGM=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=MeK51fxNFq5+BdirxnvGrOlWweZR5gMFavqnBcWMREA=;
+ b=I2iH/ONgNC+H8G3KTgbIMdo+/S38Hwugs3d562aBL51Yh2Mz78FLdSHLzKMD+2QAngTa1Z
+ hoUbUy9mF4XgL51sKtclMbSQk0L+yQHpU/9pWf6X98iyerh4H2d+PYgoy2MsMCCc+GBdFb
+ jJo1MRLQU/msOzb1ZbymoDwQmIewiAc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-136-PqkOhAY9Mey3LL9qHSJJPA-1; Fri, 13 Dec 2019 06:58:32 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-158-6hpohohwOXOslwRvMcvq3A-1; Fri, 13 Dec 2019 10:23:37 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E5D45800D41
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 11:58:31 +0000 (UTC)
-Received: from dgilbert-t580.localhost (unknown [10.36.117.255])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 31D2619C4F;
- Fri, 13 Dec 2019 11:58:24 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 0/2] virtiofs queue
-Date: Fri, 13 Dec 2019 11:58:20 +0000
-Message-Id: <20191213115822.77260-1-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A20B800D48;
+ Fri, 13 Dec 2019 15:23:36 +0000 (UTC)
+Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BDB2960BF3;
+ Fri, 13 Dec 2019 15:23:35 +0000 (UTC)
+Subject: Re: [PATCH RFC] qapi: Allow getting flat output from
+ 'query-named-block-nodes'
+To: Peter Krempa <pkrempa@redhat.com>, qemu-devel@nongnu.org
+References: <42dae98e1f6a9f444f48a20192f45195337824f0.1576246045.git.pkrempa@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <836c1a18-b67d-0426-2137-8f464e4e5c9b@redhat.com>
+Date: Fri, 13 Dec 2019 09:23:35 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: PqkOhAY9Mey3LL9qHSJJPA-1
+In-Reply-To: <42dae98e1f6a9f444f48a20192f45195337824f0.1576246045.git.pkrempa@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 6hpohohwOXOslwRvMcvq3A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -82,41 +89,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, stefanha@redhat.com, mst@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 12/13/19 8:11 AM, Peter Krempa wrote:
+> When a management application manages node names there's no reason to
+> recurse into backing images in the output of query-named-block-nodes.
+> 
+> Add a parameter to the command which will return just the top level
+> structs.
 
-The following changes since commit b0ca999a43a22b38158a222233d3f5881648bb4f=
-:
+At one point, Kevin was working on a saner command that tried to cut out 
+on more than just the redundant nesting.  But this is certainly a 
+quick-and-easy fix to ease libvirt's use of the existing command, while 
+we decide whether to add a saner new command.
 
-  Update version for v4.2.0 release (2019-12-12 16:45:57 +0000)
+> 
+> Signed-off-by: Peter Krempa <pkrempa@redhat.com>
+> ---
+>   block.c               |  5 +++--
+>   block/qapi.c          | 10 ++++++++--
+>   blockdev.c            | 12 ++++++++++--
+>   include/block/block.h |  2 +-
+>   include/block/qapi.h  |  4 +++-
+>   monitor/hmp-cmds.c    |  2 +-
+>   qapi/block-core.json  |  6 +++++-
+>   7 files changed, 31 insertions(+), 10 deletions(-)
+> 
 
-are available in the Git repository at:
+> +++ b/blockdev.c
+> @@ -3707,9 +3707,17 @@ void qmp_drive_backup(DriveBackup *arg, Error **errp)
+>       }
+>   }
+> 
+> -BlockDeviceInfoList *qmp_query_named_block_nodes(Error **errp)
+> +BlockDeviceInfoList *qmp_query_named_block_nodes(bool has_flat,
+> +                                                 bool flat,
+> +                                                 Error **errp)
+>   {
+> -    return bdrv_named_nodes_list(errp);
+> +    bool return_flat = false;
+> +
+> +    if (has_flat) {
+> +        return_flat = flat;
+> +    }
 
-  git://github.com/dagrh/qemu.git tags/pull-virtiofs-20191213a
+This could be shortened as 'bool return_flat = has_flat && flat;', but 
+that's not essential.
 
-for you to fetch changes up to 366844f3d1329c6423dd752891a28ccb3ee8fddd:
+> +
+> +    return bdrv_named_nodes_list(return_flat, errp);
+>   }
+> 
 
-  virtio-fs: fix MSI-X nvectors calculation (2019-12-13 10:53:57 +0000)
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-----------------------------------------------------------------
-virtiofs pull 2019-12-13: Minor fixes and cleanups
-
-Cleanup from Marc-Andr=C3=A9 and MSI-X fix from Stefan.
-
-----------------------------------------------------------------
-Marc-Andr=C3=A9 Lureau (1):
-      vhost-user-fs: remove "vhostfd" property
-
-Stefan Hajnoczi (1):
-      virtio-fs: fix MSI-X nvectors calculation
-
- hw/virtio/vhost-user-fs-pci.c     | 3 ++-
- hw/virtio/vhost-user-fs.c         | 1 -
- include/hw/virtio/vhost-user-fs.h | 1 -
- 3 files changed, 2 insertions(+), 3 deletions(-)
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
