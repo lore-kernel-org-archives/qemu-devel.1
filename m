@@ -2,81 +2,65 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D157C43603
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1BFDC00454
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 894B22465A
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AcNMFPU/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 894B22465A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 847EC21655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 847EC21655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifmUp-00070Z-PG
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 10:04:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40019)
+	id 1ifkYI-0001km-IK
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 08:00:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39068)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ifmTz-0006Vi-6K
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 10:03:56 -0500
+ (envelope-from <clg@kaod.org>) id 1ifkXQ-0001DQ-SC
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:59:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ifmTt-0007jv-1M
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 10:03:53 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40802
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1ifkXP-0004IK-PR
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:59:20 -0500
+Received: from 14.mo1.mail-out.ovh.net ([178.32.97.215]:41737)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifmTs-0007hX-T7
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 10:03:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576249428;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iGY7qKX7AQigBv8N2a3MrzcqR+4xPBU4YHCK/lbRjSY=;
- b=AcNMFPU/TDOQK68sU2DGAi6aRr1+ZoD7dteIg8FMSJwK37GRzfdZpJLPsUyA/MF6A7eW4e
- oX9KmTDUYRyogcVeRcJhsHVo7Xb4pwFOkMT9zFKhNHoazJ/R28BqDK/4XmcnVJSj3rPdoK
- 7dkC/Peixsxa26JRqEzL+kt3/K1sWZc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-27-nn90rs3NMku3cY7Zu5vxGw-1; Fri, 13 Dec 2019 10:03:46 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33F2C593A1;
- Fri, 13 Dec 2019 15:03:45 +0000 (UTC)
-Received: from work-vm (unknown [10.36.117.255])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 15C3410013D9;
- Fri, 13 Dec 2019 15:03:43 +0000 (UTC)
-Date: Fri, 13 Dec 2019 15:03:41 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, quintela@redhat.com,
- chen.zhang@intel.com
-Subject: Re: [PATCH] colo: fix return without releasing RCU
-Message-ID: <20191213150341.GG3713@work-vm>
-References: <1576246112-23406-2-git-send-email-pbonzini@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ifkXP-0004FS-Hx
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:59:19 -0500
+Received: from player688.ha.ovh.net (unknown [10.108.54.237])
+ by mo1.mail-out.ovh.net (Postfix) with ESMTP id 5756619F65D
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 13:59:17 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player688.ha.ovh.net (Postfix) with ESMTPSA id 3406FD2E2D5A;
+ Fri, 13 Dec 2019 12:59:13 +0000 (UTC)
+Subject: Re: [PATCH 06/13] ppc/pnv: Drop pnv_is_power9() and pnv_is_power10()
+ helpers
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
+ <157623840200.360005.1300941274565357363.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <8ddb12e7-a49f-b7be-ac62-6e0859ab3850@kaod.org>
+Date: Fri, 13 Dec 2019 13:59:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <1576246112-23406-2-git-send-email-pbonzini@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: nn90rs3NMku3cY7Zu5vxGw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <157623840200.360005.1300941274565357363.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 10026138672240233299
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelledggeejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheikeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 178.32.97.215
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,84 +72,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Paolo Bonzini (pbonzini@redhat.com) wrote:
-> Use WITH_RCU_READ_LOCK_GUARD to avoid exiting colo_init_ram_cache
-> without releasing RCU.
->=20
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 13/12/2019 13:00, Greg Kurz wrote:
+> They aren't used anymore.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Good !=20
+
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
 
 > ---
->  migration/ram.c | 33 +++++++++++++++++----------------
->  1 file changed, 17 insertions(+), 16 deletions(-)
+>  include/hw/ppc/pnv.h |   10 ----------
+>  1 file changed, 10 deletions(-)
 >=20
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 7dd7f81..8d7c015 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -3891,26 +3891,27 @@ int colo_init_ram_cache(void)
->  {
->      RAMBlock *block;
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index 8a42c199b65c..c213bdd5ecd3 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -227,11 +227,6 @@ static inline bool pnv_chip_is_power9(const PnvChi=
+p *chip)
+>      return PNV_CHIP_GET_CLASS(chip)->chip_type =3D=3D PNV_CHIP_POWER9;
+>  }
 > =20
-> -    rcu_read_lock();
-> -    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-> -        block->colo_cache =3D qemu_anon_ram_alloc(block->used_length,
-> -                                                NULL,
-> -                                                false);
-> -        if (!block->colo_cache) {
-> -            error_report("%s: Can't alloc memory for COLO cache of block=
- %s,"
-> -                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
-> -                         block->used_length);
-> -            RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-> -                if (block->colo_cache) {
-> -                    qemu_anon_ram_free(block->colo_cache, block->used_le=
-ngth);
-> -                    block->colo_cache =3D NULL;
-> +    WITH_RCU_READ_LOCK_GUARD() {
-> +        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-> +            block->colo_cache =3D qemu_anon_ram_alloc(block->used_length=
-,
-> +                                                    NULL,
-> +                                                    false);
-> +            if (!block->colo_cache) {
-> +                error_report("%s: Can't alloc memory for COLO cache of b=
-lock %s,"
-> +                             "size 0x" RAM_ADDR_FMT, __func__, block->id=
-str,
-> +                             block->used_length);
-> +                RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-> +                    if (block->colo_cache) {
-> +                        qemu_anon_ram_free(block->colo_cache, block->use=
-d_length);
-> +                        block->colo_cache =3D NULL;
-> +                    }
->                  }
-> +                return -errno;
->              }
-> -            return -errno;
-> +            memcpy(block->colo_cache, block->host, block->used_length);
->          }
-> -        memcpy(block->colo_cache, block->host, block->used_length);
->      }
-> -    rcu_read_unlock();
-> +
->      /*
->      * Record the dirty pages that sent by PVM, we use this dirty bitmap =
-together
->      * with to decide which page in cache should be flushed into SVM's RA=
-M. Here
-> --=20
-> 1.8.3.1
+> -static inline bool pnv_is_power9(PnvMachineState *pnv)
+> -{
+> -    return pnv_chip_is_power9(pnv->chips[0]);
+> -}
+> -
+>  PnvChip *pnv_get_chip(uint32_t chip_id);
+> =20
+>  #define PNV_FDT_ADDR          0x01000000
+> @@ -242,11 +237,6 @@ static inline bool pnv_chip_is_power10(const PnvCh=
+ip *chip)
+>      return PNV_CHIP_GET_CLASS(chip)->chip_type =3D=3D PNV_CHIP_POWER10=
+;
+>  }
+> =20
+> -static inline bool pnv_is_power10(PnvMachineState *pnv)
+> -{
+> -    return pnv_chip_is_power10(pnv->chips[0]);
+> -}
+> -
+>  /*
+>   * BMC helpers
+>   */
 >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
