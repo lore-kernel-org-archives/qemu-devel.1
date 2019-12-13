@@ -2,65 +2,80 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8729FC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3D2C2D0C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 111BA21655
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 111BA21655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E245421655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GGyAgWXD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E245421655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifkga-0001t0-Ur
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 08:08:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42058)
+	id 1ifjKA-0007KL-GI
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 06:41:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35346)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ifkdW-0006pJ-Jo
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:05:39 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ifjIl-00062E-Pv
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:40:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ifkdV-0006Ij-Em
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:05:38 -0500
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:51270)
+ (envelope-from <stefanha@redhat.com>) id 1ifjIk-0006Lk-6j
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:40:07 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24573
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ifkdV-0006EN-7M
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:05:37 -0500
-Received: from player788.ha.ovh.net (unknown [10.109.143.24])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 04E481BC5AD
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 14:05:34 +0100 (CET)
-Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
- [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player788.ha.ovh.net (Postfix) with ESMTPSA id 18A3BD3973B0;
- Fri, 13 Dec 2019 13:05:30 +0000 (UTC)
-Subject: Re: [PATCH 11/13] ppc/pnv: Drop pnv_chip_is_power9() and
- pnv_chip_is_power10() helpers
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
- <157623842986.360005.1787401623906380181.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <69656c61-c5c6-c9f3-f42c-2c8a489f44ea@kaod.org>
-Date: Fri, 13 Dec 2019 14:05:28 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ifjIk-0006KR-1E
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:40:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576237205;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=9/SQS0kR7Vm0JJ0sZMxfjNjCZ2IFPpb6kbnnhl0+dHg=;
+ b=GGyAgWXDol4vGMuXgAWmNgQYLvg2pRVNC7J8dQZSwn+J0+kE/K56cMUWWlKGtLk1X1/FNu
+ VwXnxQhaIIJ3ZB/L9kpW0rcKb49A0hqKzzI36cc8Yq7Y0lNBvhj7ImYgcqjmYFWxcZ7l+V
+ 2nV+Y6lfYdM+DDwJ1lqB7Wn4er2npQE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-216-ZuTOqXwrMHiCoideIMnQnw-1; Fri, 13 Dec 2019 06:40:02 -0500
+X-MC-Unique: ZuTOqXwrMHiCoideIMnQnw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2387ADB2E;
+ Fri, 13 Dec 2019 11:40:01 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 433FA100EBCC;
+ Fri, 13 Dec 2019 11:39:58 +0000 (UTC)
+Date: Fri, 13 Dec 2019 11:39:57 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: gongsu@us.ibm.com
+Subject: Re: [PATCH 0/2] RFC: add -mem-shared option
+Message-ID: <20191213113957.GB1186952@stefanha-x1.localdomain>
+References: <20191128141518.628245-1-marcandre.lureau@redhat.com>
+ <20191128165933.GB3295@work-vm>
+ <20191129102325.55ee16ea@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <157623842986.360005.1787401623906380181.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 10132536214670117715
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelledggeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191129102325.55ee16ea@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="i0/AhcQY5QxfSsSZ"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.58.226
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,51 +87,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/12/2019 13:00, Greg Kurz wrote:
-> They aren't used anymore.
+--i0/AhcQY5QxfSsSZ
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Good !
-
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-> ---
->  include/hw/ppc/pnv.h |   10 ----------
->  1 file changed, 10 deletions(-)
+On Fri, Nov 29, 2019 at 10:23:25AM +0100, Igor Mammedov wrote:
+> On Thu, 28 Nov 2019 16:59:33 +0000
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 >=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 17ca9a14ac8f..7a134a15d3b5 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -224,21 +224,11 @@ struct PnvMachineState {
->      PnvPnor      *pnor;
->  };
-> =20
-> -static inline bool pnv_chip_is_power9(const PnvChip *chip)
-> -{
-> -    return PNV_CHIP_GET_CLASS(chip)->chip_type =3D=3D PNV_CHIP_POWER9;
-> -}
-> -
->  PnvChip *pnv_get_chip(uint32_t chip_id);
-> =20
->  #define PNV_FDT_ADDR          0x01000000
->  #define PNV_TIMEBASE_FREQ     512000000ULL
-> =20
-> -static inline bool pnv_chip_is_power10(const PnvChip *chip)
-> -{
-> -    return PNV_CHIP_GET_CLASS(chip)->chip_type =3D=3D PNV_CHIP_POWER10=
-;
-> -}
-> -
->  /*
->   * BMC helpers
->   */
->=20
+> > * Marc-Andr=E9 Lureau (marcandre.lureau@redhat.com) wrote:
+> > > Hi,
+> > >=20
+> > > Setting up shared memory for vhost-user is a bit complicated from
+> > > command line, as it requires NUMA setup such as: m 4G -object
+> > > memory-backend-file,id=3Dmem,size=3D4G,mem-path=3D/dev/shm,share=3Don=
+ -numa
+> > > node,memdev=3Dmem.
+> > >=20
+> > > Instead, I suggest to add a -mem-shared option for non-numa setups,
+> > > that will make the -mem-path or anonymouse memory shareable.
+> > >=20
+> > > Comments welcome, =20
+> >=20
+> > It's worth checking with Igor (cc'd) - he said he was going to work on
+> > something similar.
+> >=20
+> > One other thing this fixes is that it lets you potentially do vhost-use=
+r
+> > on s390, since it currently has no NUMA.
+> Switching to memdev will let vhost-user on s390 work as well.
+> This is convenience option and workarounds inability to set main RAM
+> properties in current impl.=20
+
+Gong Su asked about virtio-fs (vhost-user) on s390.  This patch series
+might be the first step to enabling it.
+
+Stefan
+
+--i0/AhcQY5QxfSsSZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3zeI0ACgkQnKSrs4Gr
+c8heCQf/Tpua65a7VQ+IxGSYTVOd6Q/96lNPKA/slXSeePextNU3gucNpzB/uZ2B
+B2QLf/tLHHaci28RdMwoeW9WhTQA4rN0ppQVYuBuTfIQNgATywY0/c+Au/sZqZcB
+kNcD+p1b4WjZOkdXkPtsGukzKye9Ek6JOueHPqC2LhC08EixN6Zq5vT3z74srMkL
+ItqHKmjUlE0LFH5E4/QNAorFbK7zJHafuenlSUmWPT+gPpFwi87ERsnqke2j2dVX
+JJgpeyxShjBYUD3UJX1y0YNuA77ToEBhQlnhDJGMiUWrxoH8qPUvODeVmJIJcfD9
+VsUMyMbgyMSVPyeIPpAPJWo/LTvJog==
+=x6gH
+-----END PGP SIGNATURE-----
+
+--i0/AhcQY5QxfSsSZ--
 
 
