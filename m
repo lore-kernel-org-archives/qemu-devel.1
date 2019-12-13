@@ -2,79 +2,95 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 554F3C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCD5C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C79AD21655
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:23:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OF2KDv31"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C79AD21655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA14E2465A
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA14E2465A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifj0q-0006uW-MB
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 06:21:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38370)
+	id 1ifjks-00008I-Lq
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:09:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38612)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ifj07-0006PJ-NJ
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:20:53 -0500
+ (envelope-from <groug@kaod.org>) id 1ifjci-00085Q-W1
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:00:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ifj05-0007vF-FD
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:20:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44274
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ifj04-0007tg-VD
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:20:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576236048;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=85BsN3hcho5aOm2jFT958KOgCaKK0VGtvcO3s0ZtxsY=;
- b=OF2KDv31nMIIlskHOr4HutnTdko1ZViY65lu02CYkIJ81pIg+c2tz2Slb6LSMf2nBZMbAz
- W8ubMRK/RMeeXpDiGpDJVHaYduE3nivt9cow0xCzGZQ/Zzvt/319jKl49CJ+8oOJQ4OPHo
- Qac79/47C+/HxzDv6tydRehDOXq/qHQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-239-O-pKwGUgNxuZAv0o8x55nw-1; Fri, 13 Dec 2019 06:20:44 -0500
-X-MC-Unique: O-pKwGUgNxuZAv0o8x55nw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2C00DB63;
- Fri, 13 Dec 2019 11:20:43 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C5E0C6013D;
- Fri, 13 Dec 2019 11:20:40 +0000 (UTC)
-Date: Fri, 13 Dec 2019 11:20:39 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH] virtio: don't enable notifications during polling
-Message-ID: <20191213112039.GH1180977@stefanha-x1.localdomain>
-References: <20191209210957.65087-1-stefanha@redhat.com>
+ (envelope-from <groug@kaod.org>) id 1ifjch-0005Fj-B8
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:00:44 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26324
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ifjch-0005FJ-4c
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:00:43 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBDBv6an061012
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 07:00:42 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wujxsc4uv-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 07:00:42 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Fri, 13 Dec 2019 12:00:40 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 13 Dec 2019 12:00:37 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xBDBxrJL50462988
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Dec 2019 11:59:54 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 0742111C05E;
+ Fri, 13 Dec 2019 12:00:36 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C9AA911C06F;
+ Fri, 13 Dec 2019 12:00:35 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.185.241])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 13 Dec 2019 12:00:35 +0000 (GMT)
+Subject: [PATCH 12/13] ppc/pnv: Introduce PnvChipClass::xscom_pcba() method
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 13 Dec 2019 13:00:35 +0100
+In-Reply-To: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
+References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <20191209210957.65087-1-stefanha@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="D6IIOQQv2Iwyp54J"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19121312-0028-0000-0000-000003C82A54
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121312-0029-0000-0000-0000248B6796
+Message-Id: <157623843543.360005.13996472463887521794.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-13_03:2019-12-13,2019-12-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 lowpriorityscore=0
+ malwarescore=0 mlxlogscore=884 impostorscore=0 priorityscore=1501
+ clxscore=1034 suspectscore=0 bulkscore=0 spamscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912130097
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,182 +102,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---D6IIOQQv2Iwyp54J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The XSCOM bus is implemented with a QOM interface, which is mostly
+generic from a CPU type standpoint, except for the computation of
+addresses on the Pervasize Connect Bus (PCB) network. This is handled
+by the pnv_xscom_pcba() function with a switch statement based on
+the chip_type class level attribute of the CPU chip.
 
-On Mon, Dec 09, 2019 at 09:09:57PM +0000, Stefan Hajnoczi wrote:
-> Virtqueue notifications are not necessary during polling, so we disable
-> them.  This allows the guest driver to avoid MMIO vmexits.
-> Unfortunately the virtio-blk and virtio-scsi handler functions re-enable
-> notifications, defeating this optimization.
->=20
-> Fix virtio-blk and virtio-scsi emulation so they leave notifications
-> disabled.  The key thing to remember for correctness is that polling
-> always checks one last time after ending its loop, therefore it's safe
-> to lose the race when re-enabling notifications at the end of polling.
->=20
-> There is a measurable performance improvement of 5-10% with the null-co
-> block driver.  Real-life storage configurations will see a smaller
-> improvement because the MMIO vmexit overhead contributes less to
-> latency.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  hw/block/virtio-blk.c      |  9 +++++++--
->  hw/scsi/virtio-scsi.c      |  9 +++++++--
->  hw/virtio/virtio.c         | 12 ++++++------
->  include/hw/virtio/virtio.h |  1 +
->  4 files changed, 21 insertions(+), 10 deletions(-)
+This can be achieved using QOM. Also the address argument is masked with
+PNV_XSCOM_SIZE - 1, which is for POWER8 only. Addresses may have different
+sizes with other CPU types. Have each CPU chip type handle the appropriate
+computation with a QOM xscom_pcba() method.
 
-Post-release ping :)
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/pnv.c         |   23 +++++++++++++++++++++++
+ hw/ppc/pnv_xscom.c   |   14 +-------------
+ include/hw/ppc/pnv.h |    1 +
+ 3 files changed, 25 insertions(+), 13 deletions(-)
 
-> diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-> index 4c357d2928..c4e55fb3de 100644
-> --- a/hw/block/virtio-blk.c
-> +++ b/hw/block/virtio-blk.c
-> @@ -764,13 +764,16 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue=
- *vq)
->  {
->      VirtIOBlockReq *req;
->      MultiReqBuffer mrb =3D {};
-> +    bool suppress_notifications =3D virtio_queue_get_notification(vq);
->      bool progress =3D false;
-> =20
->      aio_context_acquire(blk_get_aio_context(s->blk));
->      blk_io_plug(s->blk);
-> =20
->      do {
-> -        virtio_queue_set_notification(vq, 0);
-> +        if (suppress_notifications) {
-> +            virtio_queue_set_notification(vq, 0);
-> +        }
-> =20
->          while ((req =3D virtio_blk_get_request(s, vq))) {
->              progress =3D true;
-> @@ -781,7 +784,9 @@ bool virtio_blk_handle_vq(VirtIOBlock *s, VirtQueue *=
-vq)
->              }
->          }
-> =20
-> -        virtio_queue_set_notification(vq, 1);
-> +        if (suppress_notifications) {
-> +            virtio_queue_set_notification(vq, 1);
-> +        }
->      } while (!virtio_queue_empty(vq));
-> =20
->      if (mrb.num_reqs) {
-> diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-> index e8b2b64d09..f080545f48 100644
-> --- a/hw/scsi/virtio-scsi.c
-> +++ b/hw/scsi/virtio-scsi.c
-> @@ -597,12 +597,15 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQ=
-ueue *vq)
->  {
->      VirtIOSCSIReq *req, *next;
->      int ret =3D 0;
-> +    bool suppress_notifications =3D virtio_queue_get_notification(vq);
->      bool progress =3D false;
-> =20
->      QTAILQ_HEAD(, VirtIOSCSIReq) reqs =3D QTAILQ_HEAD_INITIALIZER(reqs);
-> =20
->      do {
-> -        virtio_queue_set_notification(vq, 0);
-> +        if (suppress_notifications) {
-> +            virtio_queue_set_notification(vq, 0);
-> +        }
-> =20
->          while ((req =3D virtio_scsi_pop_req(s, vq))) {
->              progress =3D true;
-> @@ -622,7 +625,9 @@ bool virtio_scsi_handle_cmd_vq(VirtIOSCSI *s, VirtQue=
-ue *vq)
->              }
->          }
-> =20
-> -        virtio_queue_set_notification(vq, 1);
-> +        if (suppress_notifications) {
-> +            virtio_queue_set_notification(vq, 1);
-> +        }
->      } while (ret !=3D -EINVAL && !virtio_queue_empty(vq));
-> =20
->      QTAILQ_FOREACH_SAFE(req, &reqs, next, next) {
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 762df12f4c..78e5852296 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -431,6 +431,11 @@ static void virtio_queue_packed_set_notification(Vir=
-tQueue *vq, int enable)
->      }
->  }
-> =20
-> +bool virtio_queue_get_notification(VirtQueue *vq)
-> +{
-> +    return vq->notification;
-> +}
-> +
->  void virtio_queue_set_notification(VirtQueue *vq, int enable)
->  {
->      vq->notification =3D enable;
-> @@ -3382,17 +3387,12 @@ static bool virtio_queue_host_notifier_aio_poll(v=
-oid *opaque)
->  {
->      EventNotifier *n =3D opaque;
->      VirtQueue *vq =3D container_of(n, VirtQueue, host_notifier);
-> -    bool progress;
-> =20
->      if (!vq->vring.desc || virtio_queue_empty(vq)) {
->          return false;
->      }
-> =20
-> -    progress =3D virtio_queue_notify_aio_vq(vq);
-> -
-> -    /* In case the handler function re-enabled notifications */
-> -    virtio_queue_set_notification(vq, 0);
-> -    return progress;
-> +    return virtio_queue_notify_aio_vq(vq);
->  }
-> =20
->  static void virtio_queue_host_notifier_aio_poll_end(EventNotifier *n)
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 3448d67d2a..8ee93873a4 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -224,6 +224,7 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int =
-version_id);
-> =20
->  void virtio_notify_config(VirtIODevice *vdev);
-> =20
-> +bool virtio_queue_get_notification(VirtQueue *vq);
->  void virtio_queue_set_notification(VirtQueue *vq, int enable);
-> =20
->  int virtio_queue_ready(VirtQueue *vq);
-> --=20
-> 2.23.0
->=20
-
---D6IIOQQv2Iwyp54J
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3zdAcACgkQnKSrs4Gr
-c8g9IAf+PHGuNGH3XQxUFrFazr4Fqtr+2S+NbYPxstmWksn5OPsFCrgkI1VMAXdz
-Z11Q/GZP+FecZ5lQgdyq+yPmZgKPdS2sHcgv2boZWTvnzkzqorlu7ccQaxLFIUX/
-YfoVdDxhY44Cq4dEFs0BhrXmpLTRtmZBAz9zYA3Eo5EzAhKtQwPvhAHCQsGYsL2q
-t0niBFF4C6Rm9pCGE/X/eHRAkBtEiyzQb6unfhOlNhShUDRgGOZmLHkEswwBRnBY
-j6ww77XEiAReE+R7WQ1J+n2EUa7Rpctd0oa4qv5EBx3T9E2YkDWXM8q8/ZSrRF4R
-qYNBT8ipunF6xS6b9olqOqfBsyWm3Q==
-=PGMw
------END PGP SIGNATURE-----
-
---D6IIOQQv2Iwyp54J--
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 0447b534b8c5..cc40b90e9cd2 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -1121,6 +1121,12 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
+                                 &chip8->homer.regs);
+ }
+ 
++static uint32_t pnv_chip_power8_xscom_pcba(PnvChip *chip, uint64_t addr)
++{
++    addr &= (PNV_XSCOM_SIZE - 1);
++    return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
++}
++
+ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -1138,6 +1144,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
+     k->dt_populate = pnv_chip_power8_dt_populate;
+     k->pic_print_info = pnv_chip_power8_pic_print_info;
+     k->xscom_core_base = pnv_chip_power8_xscom_core_base;
++    k->xscom_pcba = pnv_chip_power8_xscom_pcba;
+     dc->desc = "PowerNV Chip POWER8E";
+ 
+     device_class_set_parent_realize(dc, pnv_chip_power8_realize,
+@@ -1161,6 +1168,7 @@ static void pnv_chip_power8_class_init(ObjectClass *klass, void *data)
+     k->dt_populate = pnv_chip_power8_dt_populate;
+     k->pic_print_info = pnv_chip_power8_pic_print_info;
+     k->xscom_core_base = pnv_chip_power8_xscom_core_base;
++    k->xscom_pcba = pnv_chip_power8_xscom_pcba;
+     dc->desc = "PowerNV Chip POWER8";
+ 
+     device_class_set_parent_realize(dc, pnv_chip_power8_realize,
+@@ -1184,6 +1192,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass *klass, void *data)
+     k->dt_populate = pnv_chip_power8_dt_populate;
+     k->pic_print_info = pnv_chip_power8_pic_print_info;
+     k->xscom_core_base = pnv_chip_power8_xscom_core_base;
++    k->xscom_pcba = pnv_chip_power8_xscom_pcba;
+     dc->desc = "PowerNV Chip POWER8NVL";
+ 
+     device_class_set_parent_realize(dc, pnv_chip_power8_realize,
+@@ -1340,6 +1349,12 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
+                                 &chip9->homer.regs);
+ }
+ 
++static uint32_t pnv_chip_power9_xscom_pcba(PnvChip *chip, uint64_t addr)
++{
++    addr &= (PNV9_XSCOM_SIZE - 1);
++    return addr >> 3;
++}
++
+ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -1357,6 +1372,7 @@ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
+     k->dt_populate = pnv_chip_power9_dt_populate;
+     k->pic_print_info = pnv_chip_power9_pic_print_info;
+     k->xscom_core_base = pnv_chip_power9_xscom_core_base;
++    k->xscom_pcba = pnv_chip_power9_xscom_pcba;
+     dc->desc = "PowerNV Chip POWER9";
+ 
+     device_class_set_parent_realize(dc, pnv_chip_power9_realize,
+@@ -1422,6 +1438,12 @@ static void pnv_chip_power10_realize(DeviceState *dev, Error **errp)
+                                             (uint64_t) PNV10_LPCM_BASE(chip));
+ }
+ 
++static uint32_t pnv_chip_power10_xscom_pcba(PnvChip *chip, uint64_t addr)
++{
++    addr &= (PNV10_XSCOM_SIZE - 1);
++    return addr >> 3;
++}
++
+ static void pnv_chip_power10_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+@@ -1439,6 +1461,7 @@ static void pnv_chip_power10_class_init(ObjectClass *klass, void *data)
+     k->dt_populate = pnv_chip_power10_dt_populate;
+     k->pic_print_info = pnv_chip_power10_pic_print_info;
+     k->xscom_core_base = pnv_chip_power10_xscom_core_base;
++    k->xscom_pcba = pnv_chip_power10_xscom_pcba;
+     dc->desc = "PowerNV Chip POWER10";
+ 
+     device_class_set_parent_realize(dc, pnv_chip_power10_realize,
+diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+index 5ae9dfbb88ad..b681c72575b2 100644
+--- a/hw/ppc/pnv_xscom.c
++++ b/hw/ppc/pnv_xscom.c
+@@ -57,19 +57,7 @@ static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
+ 
+ static uint32_t pnv_xscom_pcba(PnvChip *chip, uint64_t addr)
+ {
+-    addr &= (PNV_XSCOM_SIZE - 1);
+-
+-    switch (PNV_CHIP_GET_CLASS(chip)->chip_type) {
+-    case PNV_CHIP_POWER8E:
+-    case PNV_CHIP_POWER8:
+-    case PNV_CHIP_POWER8NVL:
+-        return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
+-    case PNV_CHIP_POWER9:
+-    case PNV_CHIP_POWER10:
+-        return addr >> 3;
+-    default:
+-        g_assert_not_reached();
+-    }
++    return PNV_CHIP_GET_CLASS(chip)->xscom_pcba(chip, addr);
+ }
+ 
+ static uint64_t xscom_read_default(PnvChip *chip, uint32_t pcba)
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 7a134a15d3b5..4972e93c2619 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -138,6 +138,7 @@ typedef struct PnvChipClass {
+     void (*dt_populate)(PnvChip *chip, void *fdt);
+     void (*pic_print_info)(PnvChip *chip, Monitor *mon);
+     uint64_t (*xscom_core_base)(PnvChip *chip, uint32_t core_id);
++    uint32_t (*xscom_pcba)(PnvChip *chip, uint64_t addr);
+ } PnvChipClass;
+ 
+ #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
 
 
