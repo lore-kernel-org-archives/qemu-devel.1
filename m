@@ -2,78 +2,64 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F10FEC2D0CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EAC4C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E3372465A
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLsm9z6q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E3372465A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 19A0924125
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19A0924125
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifm1c-0005TT-CX
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 09:34:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55486)
+	id 1ifkL1-0002QQ-K6
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:46:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43163)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1ifm0b-0004Wm-HX
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:33:34 -0500
+ (envelope-from <clg@kaod.org>) id 1ifkJY-0001EA-CS
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:45:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1ifm0a-0008GL-BP
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:33:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36666
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1ifkJX-0004vB-5c
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:45:00 -0500
+Received: from 7.mo69.mail-out.ovh.net ([46.105.50.32]:54620)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ifm0a-0008FW-7A
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:33:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576247611;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8dyZzK+/rwkkyZTZ71KCvOWKB6vb2M8+p22eBPZs6Gc=;
- b=fLsm9z6qa4+vUgE69QCI/xk2vHI+Eo6FHhCLkxkaDHAxOoGZmp3M3KdjA/pq3oNREB4wO5
- 50DXgryFxvgEPp1IbukrVzdS2rvsbFYCDe8N296+1Pxltuyb3m7GyQGTc9+EwOdjkItNZH
- ezkyHcze++tH4tdj/zEj4WQdtFGC8yQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-CQOv34Q0Otq2o2EY2aSESw-1; Fri, 13 Dec 2019 09:33:26 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AF168D9F81;
- Fri, 13 Dec 2019 14:33:25 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.64])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DCBED601A2;
- Fri, 13 Dec 2019 14:33:23 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/2] iothread: document -object iothread on man page
-Date: Fri, 13 Dec 2019 14:33:14 +0000
-Message-Id: <20191213143314.1198821-3-stefanha@redhat.com>
-In-Reply-To: <20191213143314.1198821-1-stefanha@redhat.com>
-References: <20191213143314.1198821-1-stefanha@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ifkJW-0004sS-VK
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:44:59 -0500
+Received: from player699.ha.ovh.net (unknown [10.109.143.3])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 3B4A078FC2
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 13:44:57 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player699.ha.ovh.net (Postfix) with ESMTPSA id 9E6FFD3F658F;
+ Fri, 13 Dec 2019 12:44:51 +0000 (UTC)
+Subject: Re: [PATCH 05/13] ppc/pnv: Introduce PnvMachineClass::dt_power_mgt()
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
+ <157623839642.360005.9243510140436689941.stgit@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <861cd13c-9237-59be-dad6-5f3d4031a1e1@kaod.org>
+Date: Fri, 13 Dec 2019 13:44:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: CQOv34Q0Otq2o2EY2aSESw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <157623839642.360005.9243510140436689941.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 9784070194249501523
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelledggeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.50.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,89 +71,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, Zhenyu Ye <yezhenyu2@huawei.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add -object iothread documentation to the man page, including references
-to the query-iothread QMP command and qom-set syntax for adjusting
-adaptive polling parameters at run-time.
+On 13/12/2019 12:59, Greg Kurz wrote:
+> We add an extra node to advertise power management on some machines,
+> namely powernv9 and powernv10. This is achieved by using the
+> pnv_is_power9() and pnv_is_power10() helpers.
+>=20
+> This can be achieved with QOM. Add a method to the base class for
+> powernv machines and have it implemented by machine types that
+> support power management instead.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Reported-by: Zhenyu Ye <yezhenyu2@huawei.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20191025122236.29815-1-stefanha@redhat.com
-Message-Id: <20191025122236.29815-1-stefanha@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- qemu-options.hx | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 65c9473b73..68d1592ccc 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4926,6 +4926,44 @@ access
- CN=3Dlaptop.example.com,O=3DExample Home,L=3DLondon,ST=3DLondon,C=3DGB
- @end example
-=20
-+@item -object iothread,id=3D@var{id},poll-max-ns=3D@var{poll-max-ns},poll-=
-grow=3D@var{poll-grow},poll-shrink=3D@var{poll-shrink}
-+
-+Creates a dedicated event loop thread that devices can be assigned to.  Th=
-is is
-+known as an IOThread.  By default device emulation happens in vCPU threads=
- or
-+the main event loop thread.  This can become a scalability bottleneck.
-+IOThreads allow device emulation and I/O to run on other host CPUs.
-+
-+The @option{id} parameter is a unique ID that will be used to reference th=
-is
-+IOThread from @option{-device ...,iothread=3D@var{id}}.  Multiple devices =
-can be
-+assigned to an IOThread.  Note that not all devices support an
-+@option{iothread} parameter.
-+
-+The @code{query-iothreads} QMP command lists IOThreads and reports their t=
-hread
-+IDs so that the user can configure host CPU pinning/affinity.
-+
-+IOThreads use an adaptive polling algorithm to reduce event loop latency.
-+Instead of entering a blocking system call to monitor file descriptors and=
- then
-+pay the cost of being woken up when an event occurs, the polling algorithm
-+spins waiting for events for a short time.  The algorithm's default parame=
-ters
-+are suitable for many cases but can be adjusted based on knowledge of the
-+workload and/or host device latency.
-+
-+The @option{poll-max-ns} parameter is the maximum number of nanoseconds to=
- busy
-+wait for events.  Polling can be disabled by setting this value to 0.
-+
-+The @option{poll-grow} parameter is the multiplier used to increase the po=
-lling
-+time when the algorithm detects it is missing events due to not polling lo=
-ng
-+enough.
-+
-+The @option{poll-shrink} parameter is the divisor used to decrease the pol=
-ling
-+time when the algorithm detects it is spending too long polling without
-+encountering events.
-+
-+The polling parameters can be modified at run-time using the @code{qom-set=
-} command (where @code{iothread1} is the IOThread's @code{id}):
-+
-+@example
-+(qemu) qom-set /objects/iothread1 poll-max-ns 100000
-+@end example
-=20
- @end table
-=20
---=20
-2.23.0
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+> ---
+>  hw/ppc/pnv.c         |   10 ++++++----
+>  include/hw/ppc/pnv.h |    8 ++++++--
+>  2 files changed, 12 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 5ac149b149d8..efc00f4cb67a 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -472,7 +472,7 @@ static void pnv_dt_isa(PnvMachineState *pnv, void *=
+fdt)
+>                         &args);
+>  }
+> =20
+> -static void pnv_dt_power_mgt(void *fdt)
+> +static void pnv_dt_power_mgt(PnvMachineState *pnv, void *fdt)
+>  {
+>      int off;
+> =20
+> @@ -540,9 +540,9 @@ static void *pnv_dt_create(MachineState *machine)
+>          pnv_dt_bmc_sensors(pnv->bmc, fdt);
+>      }
+> =20
+> -    /* Create an extra node for power management on Power9 and Power10=
+ */
+> -    if (pnv_is_power9(pnv) || pnv_is_power10(pnv)) {
+> -        pnv_dt_power_mgt(fdt);
+> +    /* Create an extra node for power management on machines that supp=
+ort it */
+> +    if (pmc->dt_power_mgt) {
+> +        pmc->dt_power_mgt(pnv, fdt);
+>      }
+> =20
+>      return fdt;
+> @@ -1710,6 +1710,7 @@ static void pnv_machine_power9_class_init(ObjectC=
+lass *oc, void *data)
+> =20
+>      pmc->compat =3D compat;
+>      pmc->compat_size =3D sizeof(compat);
+> +    pmc->dt_power_mgt =3D pnv_dt_power_mgt;
+>  }
+> =20
+>  static void pnv_machine_power10_class_init(ObjectClass *oc, void *data=
+)
+> @@ -1723,6 +1724,7 @@ static void pnv_machine_power10_class_init(Object=
+Class *oc, void *data)
+> =20
+>      pmc->compat =3D compat;
+>      pmc->compat_size =3D sizeof(compat);
+> +    pmc->dt_power_mgt =3D pnv_dt_power_mgt;
+>  }
+> =20
+>  static void pnv_machine_class_init(ObjectClass *oc, void *data)
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index d534746bd493..8a42c199b65c 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -190,6 +190,8 @@ PowerPCCPU *pnv_chip_find_cpu(PnvChip *chip, uint32=
+_t pir);
+>  #define PNV_MACHINE_CLASS(klass) \
+>      OBJECT_CLASS_CHECK(PnvMachineClass, klass, TYPE_PNV_MACHINE)
+> =20
+> +typedef struct PnvMachineState PnvMachineState;
+> +
+>  typedef struct PnvMachineClass {
+>      /*< private >*/
+>      MachineClass parent_class;
+> @@ -197,9 +199,11 @@ typedef struct PnvMachineClass {
+>      /*< public >*/
+>      const char *compat;
+>      int compat_size;
+> +
+> +    void (*dt_power_mgt)(PnvMachineState *pnv, void *fdt);
+>  } PnvMachineClass;
+> =20
+> -typedef struct PnvMachineState {
+> +struct PnvMachineState {
+>      /*< private >*/
+>      MachineState parent_obj;
+> =20
+> @@ -216,7 +220,7 @@ typedef struct PnvMachineState {
+>      Notifier     powerdown_notifier;
+> =20
+>      PnvPnor      *pnor;
+> -} PnvMachineState;
+> +};
+> =20
+>  static inline bool pnv_chip_is_power9(const PnvChip *chip)
+>  {
+>=20
 
 
