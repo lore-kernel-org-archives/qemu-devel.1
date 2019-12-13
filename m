@@ -2,77 +2,101 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF51C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71AE4C2D0C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EF2C24671
+	by mail.kernel.org (Postfix) with ESMTPS id EEF1821655
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUAAx3Wp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EF2C24671
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEF1821655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifnmS-0000sA-V2
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:27:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36961)
+	id 1ifkMo-0004di-LO
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:48:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60887)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1ifnf1-0000By-TO
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:25 -0500
+ (envelope-from <stefanb@linux.ibm.com>) id 1ifkLX-0003Po-PK
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:47:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1ifnf0-0001GK-A6
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39574
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ifnf0-0001FO-3y
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576253961;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9RyiNGZBK+I1IuNyF19r9i05wMa4bRY1ZaqLueSYmug=;
- b=aUAAx3Wp3kDXNn6i29vNAAovvvnJ8yqDuVcmm/FTPyXhgDeP/9vxAFNokLHNNGzU9P2mei
- yD2VmqZzqa168M3GahAzKtw+8oeNDtvCAMKcx9ltiJZabWeURZUvS+0tg23Aho7/eKwHIg
- V3HXQtCRlZ7NSKUPIIkrn20FWv/Ndb4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-310-UaX0mvpWMkmmNoGhZOZUZw-1; Fri, 13 Dec 2019 11:19:18 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1690A801E77;
- Fri, 13 Dec 2019 16:19:17 +0000 (UTC)
-Received: from localhost (ovpn-116-226.ams2.redhat.com [10.36.116.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1AA3319C70;
- Fri, 13 Dec 2019 16:19:13 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 05/16] s390x: Move initial reset
-Date: Fri, 13 Dec 2019 17:18:40 +0100
-Message-Id: <20191213161851.24687-6-cohuck@redhat.com>
-In-Reply-To: <20191213161851.24687-1-cohuck@redhat.com>
-References: <20191213161851.24687-1-cohuck@redhat.com>
+ (envelope-from <stefanb@linux.ibm.com>) id 1ifkLW-00086x-Bs
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:47:03 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:16966)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
+ id 1ifkLW-000852-0r; Fri, 13 Dec 2019 07:47:02 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBDChVT8111256; Fri, 13 Dec 2019 07:46:53 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wugd3hwh6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 13 Dec 2019 07:46:53 -0500
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBDCheiG112482;
+ Fri, 13 Dec 2019 07:46:52 -0500
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wugd3hwgs-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 13 Dec 2019 07:46:52 -0500
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBDCjwi2015739;
+ Fri, 13 Dec 2019 12:46:51 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma01dal.us.ibm.com with ESMTP id 2wr3q7vf7y-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 13 Dec 2019 12:46:51 +0000
+Received: from b03ledav002.gho.boulder.ibm.com
+ (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBDCkouC61932012
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Dec 2019 12:46:50 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E5383136051;
+ Fri, 13 Dec 2019 12:46:49 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8410713604F;
+ Fri, 13 Dec 2019 12:46:49 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Fri, 13 Dec 2019 12:46:49 +0000 (GMT)
+Subject: Re: [PATCH v5 3/5] tpm_spapr: Support suspend and resume
+To: David Gibson <david@gibson.dropbear.id.au>,
+ Stefan Berger <stefanb@linux.vnet.ibm.com>
+References: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
+ <20191212202430.1079725-4-stefanb@linux.vnet.ibm.com>
+ <20191213053933.GE207300@umbus.fritz.box>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <3ee5443f-6156-62de-d70d-13b4b224c2f3@linux.ibm.com>
+Date: Fri, 13 Dec 2019 07:46:44 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: UaX0mvpWMkmmNoGhZOZUZw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+In-Reply-To: <20191213053933.GE207300@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-13_03:2019-12-13,2019-12-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 suspectscore=0
+ mlxlogscore=999 clxscore=1015 adultscore=0 malwarescore=0
+ priorityscore=1501 spamscore=0 bulkscore=0 phishscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912130102
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,158 +108,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org
+Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Janosch Frank <frankja@linux.ibm.com>
+On 12/13/19 12:39 AM, David Gibson wrote:
+> On Thu, Dec 12, 2019 at 03:24:28PM -0500, Stefan Berger wrote:
+>> Extend the tpm_spapr frontend with VM suspend and resume support.
+>>
+>> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>>
+>> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
+>> index c4a67e2403..8f5a142bd4 100644
+>> --- a/hw/tpm/tpm_spapr.c
+>> +++ b/hw/tpm/tpm_spapr.c
+>> @@ -87,6 +87,8 @@ typedef struct {
+>>       TPMVersion be_tpm_version;
+>>   
+>>       size_t be_buffer_size;
+>> +
+>> +    bool deliver_response; /* whether to deliver response after VM resume */
+>>   } SPAPRvTPMState;
+>>   
+>>   static void tpm_spapr_show_buffer(const unsigned char *buffer,
+>> @@ -256,6 +258,12 @@ static void tpm_spapr_request_completed(TPMIf *ti, int ret)
+>>       uint32_t len;
+>>       int rc;
+>>   
+>> +    if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
+> I'm trying to figure out the circumstances in which
+> request_completed() would get called before post_load on the
+> destination.
 
-Let's move the intial reset into the reset handler and cleanup
-afterwards.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20191128083723.11937-1-frankja@linux.ibm.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- target/s390x/cpu-qom.h |  2 +-
- target/s390x/cpu.c     | 46 +++++++++++++++++-------------------------
- target/s390x/cpu.h     |  2 +-
- target/s390x/sigp.c    |  2 +-
- 4 files changed, 21 insertions(+), 31 deletions(-)
+This is on the source side where we must not deliver the response in 
+case the devices are now suspending but defer the delivery to after the 
+resume.
 
-diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-index f3b71bac67c9..6f0a12042ed4 100644
---- a/target/s390x/cpu-qom.h
-+++ b/target/s390x/cpu-qom.h
-@@ -36,6 +36,7 @@ typedef struct S390CPUDef S390CPUDef;
-=20
- typedef enum cpu_reset_type {
-     S390_CPU_RESET_NORMAL,
-+    S390_CPU_RESET_INITIAL,
- } cpu_reset_type;
-=20
- /**
-@@ -62,7 +63,6 @@ typedef struct S390CPUClass {
-     void (*parent_reset)(CPUState *cpu);
-     void (*load_normal)(CPUState *cpu);
-     void (*reset)(CPUState *cpu, cpu_reset_type type);
--    void (*initial_cpu_reset)(CPUState *cpu);
- } S390CPUClass;
-=20
- typedef struct S390CPU S390CPU;
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 67d6fbfa4401..ca62fe768569 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -94,6 +94,23 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type t=
-ype)
-     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
-=20
-     switch (type) {
-+    case S390_CPU_RESET_INITIAL:
-+        /* initial reset does not clear everything! */
-+        memset(&env->start_initial_reset_fields, 0,
-+               offsetof(CPUS390XState, end_reset_fields) -
-+               offsetof(CPUS390XState, start_initial_reset_fields));
-+
-+        /* architectured initial value for Breaking-Event-Address register=
- */
-+        env->gbea =3D 1;
-+
-+        /* architectured initial values for CR 0 and 14 */
-+        env->cregs[0] =3D CR0_RESET;
-+        env->cregs[14] =3D CR14_RESET;
-+
-+        /* tininess for underflow is detected before rounding */
-+        set_float_detect_tininess(float_tininess_before_rounding,
-+                                  &env->fpu_status);
-+       /* fall through */
-     case S390_CPU_RESET_NORMAL:
-         env->pfault_token =3D -1UL;
-         env->bpbc =3D false;
-@@ -101,35 +118,9 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type=
- type)
-     default:
-         g_assert_not_reached();
-     }
--}
--
--/* S390CPUClass::initial_reset() */
--static void s390_cpu_initial_reset(CPUState *s)
--{
--    S390CPU *cpu =3D S390_CPU(s);
--    CPUS390XState *env =3D &cpu->env;
--
--    s390_cpu_reset(s, S390_CPU_RESET_NORMAL);
--    /* initial reset does not clear everything! */
--    memset(&env->start_initial_reset_fields, 0,
--        offsetof(CPUS390XState, end_reset_fields) -
--        offsetof(CPUS390XState, start_initial_reset_fields));
--
--    /* architectured initial values for CR 0 and 14 */
--    env->cregs[0] =3D CR0_RESET;
--    env->cregs[14] =3D CR14_RESET;
--
--    /* architectured initial value for Breaking-Event-Address register */
--    env->gbea =3D 1;
--
--    env->pfault_token =3D -1UL;
--
--    /* tininess for underflow is detected before rounding */
--    set_float_detect_tininess(float_tininess_before_rounding,
--                              &env->fpu_status);
-=20
-     /* Reset state inside the kernel that we cannot access yet from QEMU. =
-*/
--    if (kvm_enabled()) {
-+    if (kvm_enabled() && type !=3D S390_CPU_RESET_NORMAL) {
-         kvm_s390_reset_vcpu(cpu);
-     }
- }
-@@ -481,7 +472,6 @@ static void s390_cpu_class_init(ObjectClass *oc, void *=
-data)
-     scc->load_normal =3D s390_cpu_load_normal;
- #endif
-     scc->reset =3D s390_cpu_reset;
--    scc->initial_cpu_reset =3D s390_cpu_initial_reset;
-     cc->reset =3D s390_cpu_full_reset;
-     cc->class_by_name =3D s390_cpu_class_by_name,
-     cc->has_work =3D s390_cpu_has_work;
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 18123dfd5bd1..d2af13b345cc 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -748,7 +748,7 @@ static inline void s390_do_cpu_initial_reset(CPUState *=
-cs, run_on_cpu_data arg)
- {
-     S390CPUClass *scc =3D S390_CPU_GET_CLASS(cs);
-=20
--    scc->initial_cpu_reset(cs);
-+    scc->reset(cs, S390_CPU_RESET_INITIAL);
- }
-=20
- static inline void s390_do_cpu_load_normal(CPUState *cs, run_on_cpu_data a=
-rg)
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index 850139b9cd54..727875bb4ab9 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -254,7 +254,7 @@ static void sigp_initial_cpu_reset(CPUState *cs, run_on=
-_cpu_data arg)
-     SigpInfo *si =3D arg.host_ptr;
-=20
-     cpu_synchronize_state(cs);
--    scc->initial_cpu_reset(cs);
-+    scc->reset(cs, S390_CPU_RESET_INITIAL);
-     cpu_synchronize_post_reset(cs);
-     si->cc =3D SIGP_CC_ORDER_CODE_ACCEPTED;
- }
---=20
-2.21.0
+
+>
+>> +        /* defer delivery of response until .post_load */
+>> +        s->deliver_response |= true;
+> |= is a bitwise OR which is not what you want, although it will
+> *probably* work in practice.  Better to just use
+> 	s->deliver_response = true;
+>
+>> +        return;
+>> +    }
+>> +
+>>       s->state = SPAPR_VTPM_STATE_COMPLETION;
+>>   
+>>       /* a max. of be_buffer_size bytes can be transported */
+>> @@ -316,6 +324,7 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
+>>       SPAPRvTPMState *s = VIO_SPAPR_VTPM(dev);
+>>   
+>>       s->state = SPAPR_VTPM_STATE_NONE;
+>> +    s->deliver_response = false;
+>>   
+>>       s->be_tpm_version = tpm_backend_get_tpm_version(s->be_driver);
+>>       tpm_spapr_update_deviceclass(dev);
+>> @@ -339,9 +348,53 @@ static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
+>>       return tpm_backend_get_tpm_version(s->be_driver);
+>>   }
+>>   
+>> +/* persistent state handling */
+>> +
+>> +static int tpm_spapr_pre_save(void *opaque)
+>> +{
+>> +    SPAPRvTPMState *s = opaque;
+>> +
+>> +    s->deliver_response |= tpm_backend_finish_sync(s->be_driver);
+> Same problem here.
+>
+>> +    trace_tpm_spapr_pre_save(s->deliver_response);
+>> +    /*
+>> +     * we cannot deliver the results to the VM since DMA would touch VM memory
+>> +     */
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static int tpm_spapr_post_load(void *opaque, int version_id)
+>> +{
+>> +    SPAPRvTPMState *s = opaque;
+>> +
+>> +    if (s->deliver_response) {
+>> +        trace_tpm_spapr_post_load();
+>> +        /* deliver the results to the VM via DMA */
+>> +        tpm_spapr_request_completed(TPM_IF(s), 0);
+>> +        s->deliver_response = false;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>   static const VMStateDescription vmstate_spapr_vtpm = {
+>>       .name = "tpm-spapr",
+>> -    .unmigratable = 1,
+>> +    .version_id = 1,
+>> +    .minimum_version_id = 0,
+>> +    .minimum_version_id_old = 0,
+>> +    .pre_save = tpm_spapr_pre_save,
+>> +    .post_load = tpm_spapr_post_load,
+>> +    .fields = (VMStateField[]) {
+>> +        VMSTATE_SPAPR_VIO(vdev, SPAPRvTPMState),
+>> +
+>> +        VMSTATE_UINT8(state, SPAPRvTPMState),
+>> +        VMSTATE_BUFFER(buffer, SPAPRvTPMState),
+> Transferring the whole 4kiB buffer unconditionally when it mostly
+> won't have anything useful in it doesn't seem like a great idea.
+
+
+It's really only needed in case of a 'delayed response'. So, yeah, we 
+could transfer data in only that case then.
+
+
+>
+>> +        /* remember DMA address */
+>> +        VMSTATE_UINT32(crq.s.data, SPAPRvTPMState),
+>> +        VMSTATE_BOOL(deliver_response, SPAPRvTPMState),
+>> +        VMSTATE_END_OF_LIST(),
+>> +    }
+>>   };
+>>   
+>>   static Property tpm_spapr_properties[] = {
+>> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+>> index 6278a39618..d109661b96 100644
+>> --- a/hw/tpm/trace-events
+>> +++ b/hw/tpm/trace-events
+>> @@ -67,3 +67,5 @@ tpm_spapr_do_crq_get_version(uint32_t version) "response: version %u"
+>>   tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to suspend"
+>>   tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type 0x%02x"
+>>   tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ 0x%02x 0x%02x ..."
+>> +tpm_spapr_pre_save(bool v) "TPM response to deliver after resume: %d"
+>> +tpm_spapr_post_load(void) "Delivering TPM response after resume"
+
 
 
