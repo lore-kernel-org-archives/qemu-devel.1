@@ -2,64 +2,78 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C25C3F68F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F10FEC2D0CA
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ED0424671
+	by mail.kernel.org (Postfix) with ESMTPS id 6E3372465A
 	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED0424671
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fLsm9z6q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E3372465A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49890 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifkID-00084m-O5
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:43:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55032)
+	id 1ifm1c-0005TT-CX
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 09:34:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55486)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ifkHQ-0007Hq-4t
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:42:49 -0500
+ (envelope-from <stefanha@redhat.com>) id 1ifm0b-0004Wm-HX
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:33:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ifkHL-00022k-64
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:42:47 -0500
-Received: from 8.mo7.mail-out.ovh.net ([46.105.77.114]:55519)
+ (envelope-from <stefanha@redhat.com>) id 1ifm0a-0008GL-BP
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:33:33 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36666
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ifkHK-0001yV-Un
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:42:43 -0500
-Received: from player696.ha.ovh.net (unknown [10.108.1.202])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id 57D8A147295
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 13:42:40 +0100 (CET)
-Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
- [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player696.ha.ovh.net (Postfix) with ESMTPSA id A8F61D516898;
- Fri, 13 Dec 2019 12:42:32 +0000 (UTC)
-Subject: Re: [PATCH 02/13] ppc/pnv: Introduce PnvPsiClass::compat
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
- <157623837974.360005.14706607446188964477.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a4240408-f53f-36b5-786a-f7f915027a58@kaod.org>
-Date: Fri, 13 Dec 2019 13:42:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ifm0a-0008FW-7A
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:33:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576247611;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8dyZzK+/rwkkyZTZ71KCvOWKB6vb2M8+p22eBPZs6Gc=;
+ b=fLsm9z6qa4+vUgE69QCI/xk2vHI+Eo6FHhCLkxkaDHAxOoGZmp3M3KdjA/pq3oNREB4wO5
+ 50DXgryFxvgEPp1IbukrVzdS2rvsbFYCDe8N296+1Pxltuyb3m7GyQGTc9+EwOdjkItNZH
+ ezkyHcze++tH4tdj/zEj4WQdtFGC8yQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-CQOv34Q0Otq2o2EY2aSESw-1; Fri, 13 Dec 2019 09:33:26 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AF168D9F81;
+ Fri, 13 Dec 2019 14:33:25 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.64])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DCBED601A2;
+ Fri, 13 Dec 2019 14:33:23 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 2/2] iothread: document -object iothread on man page
+Date: Fri, 13 Dec 2019 14:33:14 +0000
+Message-Id: <20191213143314.1198821-3-stefanha@redhat.com>
+In-Reply-To: <20191213143314.1198821-1-stefanha@redhat.com>
+References: <20191213143314.1198821-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <157623837974.360005.14706607446188964477.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 9745508121677171539
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelledggeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: CQOv34Q0Otq2o2EY2aSESw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.77.114
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,136 +85,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, Zhenyu Ye <yezhenyu2@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/12/2019 12:59, Greg Kurz wrote:
-> The Processor Service Interface (PSI) model has a chip_type class level
-> attribute, which is used to generate the content of the "compatible" DT
-> property according to the CPU type.
->=20
-> Since the PSI model already has specialized classes for each supported
-> CPU type, it seems cleaner to achieve this with QOM. Provide the conten=
-t
-> of the "compatible" property with a new class level attribute.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Add -object iothread documentation to the man page, including references
+to the query-iothread QMP command and qom-set syntax for adjusting
+adaptive polling parameters at run-time.
 
+Reported-by: Zhenyu Ye <yezhenyu2@huawei.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20191025122236.29815-1-stefanha@redhat.com
+Message-Id: <20191025122236.29815-1-stefanha@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ qemu-options.hx | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-> ---
->  hw/ppc/pnv_psi.c         |   25 +++++++++++--------------
->  include/hw/ppc/pnv_psi.h |    2 ++
->  2 files changed, 13 insertions(+), 14 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-> index 572924388b3c..98a82b25e01f 100644
-> --- a/hw/ppc/pnv_psi.c
-> +++ b/hw/ppc/pnv_psi.c
-> @@ -536,10 +536,6 @@ static void pnv_psi_power8_realize(DeviceState *de=
-v, Error **errp)
->      qemu_register_reset(pnv_psi_reset, dev);
->  }
-> =20
-> -static const char compat_p8[] =3D "ibm,power8-psihb-x\0ibm,psihb-x";
-> -static const char compat_p9[] =3D "ibm,power9-psihb-x\0ibm,psihb-x";
-> -static const char compat_p10[] =3D "ibm,power10-psihb-x\0ibm,psihb-x";
-> -
->  static int pnv_psi_dt_xscom(PnvXScomInterface *dev, void *fdt, int xsc=
-om_offset)
->  {
->      PnvPsiClass *ppc =3D PNV_PSI_GET_CLASS(dev);
-> @@ -558,16 +554,8 @@ static int pnv_psi_dt_xscom(PnvXScomInterface *dev=
-, void *fdt, int xscom_offset)
->      _FDT(fdt_setprop(fdt, offset, "reg", reg, sizeof(reg)));
->      _FDT(fdt_setprop_cell(fdt, offset, "#address-cells", 2));
->      _FDT(fdt_setprop_cell(fdt, offset, "#size-cells", 1));
-> -    if (ppc->chip_type =3D=3D PNV_CHIP_POWER10) {
-> -        _FDT(fdt_setprop(fdt, offset, "compatible", compat_p10,
-> -                         sizeof(compat_p10)));
-> -    } else if (ppc->chip_type =3D=3D PNV_CHIP_POWER9) {
-> -        _FDT(fdt_setprop(fdt, offset, "compatible", compat_p9,
-> -                         sizeof(compat_p9)));
-> -    } else {
-> -        _FDT(fdt_setprop(fdt, offset, "compatible", compat_p8,
-> -                         sizeof(compat_p8)));
-> -    }
-> +    _FDT(fdt_setprop(fdt, offset, "compatible", ppc->compat,
-> +                     ppc->compat_size));
->      return 0;
->  }
-> =20
-> @@ -581,6 +569,7 @@ static void pnv_psi_power8_class_init(ObjectClass *=
-klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->      PnvPsiClass *ppc =3D PNV_PSI_CLASS(klass);
-> +    static const char compat[] =3D "ibm,power8-psihb-x\0ibm,psihb-x";
-> =20
->      dc->desc    =3D "PowerNV PSI Controller POWER8";
->      dc->realize =3D pnv_psi_power8_realize;
-> @@ -590,6 +579,8 @@ static void pnv_psi_power8_class_init(ObjectClass *=
-klass, void *data)
->      ppc->xscom_size =3D PNV_XSCOM_PSIHB_SIZE;
->      ppc->bar_mask   =3D PSIHB_BAR_MASK;
->      ppc->irq_set    =3D pnv_psi_power8_irq_set;
-> +    ppc->compat     =3D compat;
-> +    ppc->compat_size =3D sizeof(compat);
->  }
-> =20
->  static const TypeInfo pnv_psi_power8_info =3D {
-> @@ -888,6 +879,7 @@ static void pnv_psi_power9_class_init(ObjectClass *=
-klass, void *data)
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->      PnvPsiClass *ppc =3D PNV_PSI_CLASS(klass);
->      XiveNotifierClass *xfc =3D XIVE_NOTIFIER_CLASS(klass);
-> +    static const char compat[] =3D "ibm,power9-psihb-x\0ibm,psihb-x";
-> =20
->      dc->desc    =3D "PowerNV PSI Controller POWER9";
->      dc->realize =3D pnv_psi_power9_realize;
-> @@ -897,6 +889,8 @@ static void pnv_psi_power9_class_init(ObjectClass *=
-klass, void *data)
->      ppc->xscom_size =3D PNV9_XSCOM_PSIHB_SIZE;
->      ppc->bar_mask   =3D PSIHB9_BAR_MASK;
->      ppc->irq_set    =3D pnv_psi_power9_irq_set;
-> +    ppc->compat     =3D compat;
-> +    ppc->compat_size =3D sizeof(compat);
-> =20
->      xfc->notify      =3D pnv_psi_notify;
->  }
-> @@ -917,12 +911,15 @@ static void pnv_psi_power10_class_init(ObjectClas=
-s *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
->      PnvPsiClass *ppc =3D PNV_PSI_CLASS(klass);
-> +    static const char compat[] =3D "ibm,power10-psihb-x\0ibm,psihb-x";
-> =20
->      dc->desc    =3D "PowerNV PSI Controller POWER10";
-> =20
->      ppc->chip_type  =3D PNV_CHIP_POWER10;
->      ppc->xscom_pcba =3D PNV10_XSCOM_PSIHB_BASE;
->      ppc->xscom_size =3D PNV10_XSCOM_PSIHB_SIZE;
-> +    ppc->compat     =3D compat;
-> +    ppc->compat_size =3D sizeof(compat);
->  }
-> =20
->  static const TypeInfo pnv_psi_power10_info =3D {
-> diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
-> index a044aab304ae..fc068c95e543 100644
-> --- a/include/hw/ppc/pnv_psi.h
-> +++ b/include/hw/ppc/pnv_psi.h
-> @@ -83,6 +83,8 @@ typedef struct PnvPsiClass {
->      uint32_t xscom_pcba;
->      uint32_t xscom_size;
->      uint64_t bar_mask;
-> +    const char *compat;
-> +    int compat_size;
-> =20
->      void (*irq_set)(PnvPsi *psi, int, bool state);
->  } PnvPsiClass;
->=20
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 65c9473b73..68d1592ccc 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4926,6 +4926,44 @@ access
+ CN=3Dlaptop.example.com,O=3DExample Home,L=3DLondon,ST=3DLondon,C=3DGB
+ @end example
+=20
++@item -object iothread,id=3D@var{id},poll-max-ns=3D@var{poll-max-ns},poll-=
+grow=3D@var{poll-grow},poll-shrink=3D@var{poll-shrink}
++
++Creates a dedicated event loop thread that devices can be assigned to.  Th=
+is is
++known as an IOThread.  By default device emulation happens in vCPU threads=
+ or
++the main event loop thread.  This can become a scalability bottleneck.
++IOThreads allow device emulation and I/O to run on other host CPUs.
++
++The @option{id} parameter is a unique ID that will be used to reference th=
+is
++IOThread from @option{-device ...,iothread=3D@var{id}}.  Multiple devices =
+can be
++assigned to an IOThread.  Note that not all devices support an
++@option{iothread} parameter.
++
++The @code{query-iothreads} QMP command lists IOThreads and reports their t=
+hread
++IDs so that the user can configure host CPU pinning/affinity.
++
++IOThreads use an adaptive polling algorithm to reduce event loop latency.
++Instead of entering a blocking system call to monitor file descriptors and=
+ then
++pay the cost of being woken up when an event occurs, the polling algorithm
++spins waiting for events for a short time.  The algorithm's default parame=
+ters
++are suitable for many cases but can be adjusted based on knowledge of the
++workload and/or host device latency.
++
++The @option{poll-max-ns} parameter is the maximum number of nanoseconds to=
+ busy
++wait for events.  Polling can be disabled by setting this value to 0.
++
++The @option{poll-grow} parameter is the multiplier used to increase the po=
+lling
++time when the algorithm detects it is missing events due to not polling lo=
+ng
++enough.
++
++The @option{poll-shrink} parameter is the divisor used to decrease the pol=
+ling
++time when the algorithm detects it is spending too long polling without
++encountering events.
++
++The polling parameters can be modified at run-time using the @code{qom-set=
+} command (where @code{iothread1} is the IOThread's @code{id}):
++
++@example
++(qemu) qom-set /objects/iothread1 poll-max-ns 100000
++@end example
+=20
+ @end table
+=20
+--=20
+2.23.0
 
 
