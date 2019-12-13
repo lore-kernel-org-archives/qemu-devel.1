@@ -2,98 +2,88 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C16C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0515BC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8994D21655
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8994D21655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 61D6721655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="vHCy8fd5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61D6721655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifs7V-0001Ux-Lw
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 16:05:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52258)
+	id 1ifk9d-0001VI-Ji
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:34:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45678)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <farosas@linux.ibm.com>) id 1ifs6T-0000VN-PN
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 16:04:02 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1ifk6d-0000rp-5Q
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:31:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <farosas@linux.ibm.com>) id 1ifs6S-0000mK-Ms
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 16:04:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59260
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <farosas@linux.ibm.com>)
- id 1ifs6S-0000hq-Gk; Fri, 13 Dec 2019 16:04:00 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBDKxBXl126052; Fri, 13 Dec 2019 16:03:44 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wu4t8nct2-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Dec 2019 16:03:43 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBDKxX78126896;
- Fri, 13 Dec 2019 16:03:43 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wu4t8ncsn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Dec 2019 16:03:43 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBDL1Hkk008067;
- Fri, 13 Dec 2019 21:03:42 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com
- (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
- by ppma03dal.us.ibm.com with ESMTP id 2wr3q8geyr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Dec 2019 21:03:42 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBDL3fZj59507108
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Dec 2019 21:03:41 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 364C6BE051;
- Fri, 13 Dec 2019 21:03:41 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id EE28EBE04F;
- Fri, 13 Dec 2019 21:03:40 +0000 (GMT)
-Received: from localhost (unknown [9.86.27.221])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Fri, 13 Dec 2019 21:03:40 +0000 (GMT)
-From: Fabiano Rosas <farosas@linux.ibm.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v5 1/3] linux-headers: Update kvm.h for ppc single step
- capability
-In-Reply-To: <20191212034431.GT207300@umbus.fritz.box>
-References: <20191211191013.454125-1-farosas@linux.ibm.com>
- <20191211191013.454125-2-farosas@linux.ibm.com>
- <20191212034431.GT207300@umbus.fritz.box>
-Date: Fri, 13 Dec 2019 18:03:29 -0300
-Message-ID: <871rt8aqfy.fsf@linux.ibm.com>
+ (envelope-from <damien.hedde@greensocs.com>) id 1ifk6a-0002gV-4f
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:31:38 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:39822)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1ifk6Z-0002cz-Ho
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:31:36 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 8D46796EF0;
+ Fri, 13 Dec 2019 12:31:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1576240292;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bhc1GIhf3JQETAKPfdzZX+BNcXiUjsCrkpoLJYIxJXU=;
+ b=vHCy8fd5hPGS5/oetRrzHcSbJT9z54tYuAU7FCTByX4Ydi5zNkEQ0J2a85GDXRlVgN/13e
+ vU/bQtAEgY0rUMdozFU6ZlD6ECn9S+pHkCAbnuwBbc/eqgvoWwkCK/zMzHaNM2nErFamzU
+ mD65002OCW3zCHRwfFyiepzAGAQrQNU=
+Subject: Re: [PATCH v3 04/20] gdbstub: move mem_buf to GDBState and use
+ GByteArray
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20191211170520.7747-1-alex.bennee@linaro.org>
+ <20191211170520.7747-5-alex.bennee@linaro.org>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <b5cfb77b-b969-f7e8-fb7f-a2eddd394578@greensocs.com>
+Date: Fri, 13 Dec 2019 13:31:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-13_07:2019-12-13,2019-12-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- bulkscore=0 impostorscore=0 spamscore=0 clxscore=1015 suspectscore=1
- mlxscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912130154
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+In-Reply-To: <20191211170520.7747-5-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1576240293;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bhc1GIhf3JQETAKPfdzZX+BNcXiUjsCrkpoLJYIxJXU=;
+ b=ouYJZR90ApEgG/mT3wUtRMwy1zEtCj//6OVdt/W+L5oVoC2wKBI64z3qxQu45QFI+ykh4a
+ 2Hy2HM2tqkoKbPqbrhS4bpquzfeCzsIVfST1w/wn3TcgcdF9LlNgSaT+vPsDt3E9hFaPFC
+ X3KZAxMFoEyKbcAsjkubP+13eZQghVM=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1576240293; a=rsa-sha256; cv=none;
+ b=GcjBirSbZWx9VVWhRChoFogQeVxXR8lQ/z8ixgJyGaBpSk6op8xdQx0aWW5GfTCOrswRpE
+ Y8ok7n7a1tOXqUJtP4TrGczKbJrYxAjHBTeUBKNrAUjnYbc5Ce3xxU07FueETukoNHv6JL
+ xppj5jKgffK4RdCRSXeCQW5OLXPNHxw=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,44 +95,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: luis.machado@linaro.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, alan.hayward@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David Gibson <david@gibson.dropbear.id.au> writes:
 
-> On Wed, Dec 11, 2019 at 04:10:11PM -0300, Fabiano Rosas wrote:
->> Signed-off-by: Fabiano Rosas <farosas@linux.ibm.com>
->
-> Generally, imported linux header updates are done as a block, pulling
-> qemu up to a specified kernel commit id, rather than just grabbing
-> pieces for a particular feature.
->
 
-I know, I thought it would make the review easier. =)
+On 12/11/19 6:05 PM, Alex Benn=C3=A9e wrote:
+> This is in preparation for further re-factoring of the register API
+> with the rest of the code. Theoretically the read register function
+> could overwrite the MAX_PACKET_LENGTH buffer although currently all
+> registers are well within the size range.
+>=20
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
+> Tested-by: Damien Hedde <damien.hedde@greensocs.com>
+>=20
+> ---
+> v3
+>   - fixed up email on Damien's tags
+> ---
+>  gdbstub.c | 56 ++++++++++++++++++++++++++++++++++---------------------
+>  1 file changed, 35 insertions(+), 21 deletions(-)
+>=20
 
-> There's actually already a header update to be2eca94d144 in my
-> ppc-for-5.0 tree.  Is that recent enough for what you need here?
->
+> @@ -2092,11 +2105,12 @@ static void handle_query_rcmd(GdbCmdContext *gd=
+b_ctx, void *user_ctx)
+>      }
+> =20
+>      len =3D len / 2;
+> -    hextomem(gdb_ctx->mem_buf, gdb_ctx->params[0].data, len);
+> -    gdb_ctx->mem_buf[len++] =3D 0;
+> -    qemu_chr_be_write(gdbserver_state.mon_chr, gdb_ctx->mem_buf, len);
+> +    g_byte_array_set_size(gdbserver_state.mem_buf, len);
 
-It is. I need 1a9167a214f5.
+Hi Alex,
 
->> ---
->>  linux-headers/linux/kvm.h | 1 +
->>  1 file changed, 1 insertion(+)
->> 
->> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
->> index 3d9b18f7f8..488f3baf01 100644
->> --- a/linux-headers/linux/kvm.h
->> +++ b/linux-headers/linux/kvm.h
->> @@ -1000,6 +1000,7 @@ struct kvm_ppc_resize_hpt {
->>  #define KVM_CAP_PMU_EVENT_FILTER 173
->>  #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
->>  #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
->> +#define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 176
->>  
->>  #ifdef KVM_CAP_IRQ_ROUTING
->>  
+Just found out that the g_byte_array_set_size() above should be removed.
+hextomem() will append data starting at offset [len] instead of [0] and
+we end up with an uninitialized prefix in the array.
+
+> +    hextomem(gdbserver_state.mem_buf, gdb_ctx->params[0].data, len);
+> +    g_byte_array_append(gdbserver_state.mem_buf, &zero, 1);
+> +    qemu_chr_be_write(gdbserver_state.mon_chr, gdbserver_state.mem_buf=
+->data,
+> +                      gdbserver_state.mem_buf->len);
+>      put_packet("OK");
+> -
+>  }
+>  #endif
+> =20
+>=20
+
+I did double-checked the rest of the patch and it is it the only resize
+that passed through v2 review.
+
+Regards,
+Damien
 
