@@ -2,84 +2,86 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B09BC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 09:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84C10C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 10:04:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E94042073D
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 09:59:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D4E92073D
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 10:04:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rwv+J8Dk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E94042073D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QoRRu6bb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D4E92073D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifhjK-0005D8-1A
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 04:59:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53685)
+	id 1ifho1-0006jA-1O
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 05:04:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jean-philippe@linaro.org>) id 1ifhia-0004oX-LI
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 04:58:41 -0500
+ (envelope-from <armbru@redhat.com>) id 1ifhn5-00068R-7V
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 05:03:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jean-philippe@linaro.org>) id 1ifhiZ-0004hp-9F
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 04:58:40 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44307)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jean-philippe@linaro.org>)
- id 1ifhiZ-0004eA-1n
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 04:58:39 -0500
-Received: by mail-wr1-x441.google.com with SMTP id q10so5921432wrm.11
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 01:58:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=rc863mpgWMbIDtGydzeePchhIO4jO4tkazPeQWspVtQ=;
- b=rwv+J8Dk8zicF6PQMqfISUo+MB/gNW3NHpuoa/UD3F1fQiJOjK+6uA9DdlDo5Jtsii
- 3TWkOvp/UYelHlU4F7VuT41lAxxaJdP01GemAF/LE6mQDt6zlmjygiG5AnzuNoWadlmS
- SlyTyu4p5+VzklyRC5IZCkc1R643iNmFLnEZgma3oLlVrH0jXYe6GNnKgzlnPxqXmxCr
- 8ggyYR8JS+PEJrXkPsTozc9BEsBTB43O1T5n2KqyOmHj+VzImrQW0w9c4cYfRkoZGnET
- 1Idoo6nxAelW03GjMskxMyTrzmf0wHva4O+3+ed3RMk3MANdw5OwbzY8jfMEBZ/Rb81Z
- O0Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=rc863mpgWMbIDtGydzeePchhIO4jO4tkazPeQWspVtQ=;
- b=LajIqBdk9+QkU+OvpvdvtvIExMT0BB6btxc9gNqAYXegI1seU0P/ETiqAGc3AhBI91
- OnkHeUgkC1RkcvyDNxRzk12Ir876IX5TrkMCn+UEIQ3q4souPnrQHwfAo5favPZc/jBX
- vH2bhO/wL3m6ZVJt2NyO+tW5KrHMfByfDkZK+GTCXEyayvZ8G35pyJPPsTBTskTaEwKx
- nSIBWDbjdBg0Ff6MFnW01/KWF+yfOFv2K9U3ziTp5LOPMPw6traRhIt66T2BfISRitAM
- pnYsprKeooA1yHOW2oa7wML2D8KqVLhM0jRpvMo6fFGKiJ29YX817cMRJTi+w5kGm04h
- e8tw==
-X-Gm-Message-State: APjAAAWgdCR3mEACZLmCQ2L8GIi7J5pgteVgt/KrTIpzmk6MJRYTvUlT
- cFBiZGeakxudtF/xff7n32kcX+ocrUw=
-X-Google-Smtp-Source: APXvYqwsPR4Z1FXx6N7sXsXVOVe5BRZ5Qo2q9rpbB1CMI+R47BJQlsnt7oxaHvhPQzqPVAXoRRLhdg==
-X-Received: by 2002:a5d:5381:: with SMTP id d1mr10691117wrv.259.1576231116841; 
- Fri, 13 Dec 2019 01:58:36 -0800 (PST)
-Received: from localhost.localdomain (adsl-84-227-176-239.adslplus.ch.
- [84.227.176.239])
- by smtp.gmail.com with ESMTPSA id b17sm9417051wrp.49.2019.12.13.01.58.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 13 Dec 2019 01:58:36 -0800 (PST)
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] virtio-mmio: Clear v2 transport state on soft reset
-Date: Fri, 13 Dec 2019 10:54:10 +0100
-Message-Id: <20191213095410.1516119-1-jean-philippe@linaro.org>
-X-Mailer: git-send-email 2.24.0
+ (envelope-from <armbru@redhat.com>) id 1ifhn2-0003wK-39
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 05:03:17 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42830
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ifhn1-0003uM-Le
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 05:03:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576231394;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=azycGipua+/jyOaHF/EYGm8hN/wv19QybKjhz4VJCro=;
+ b=QoRRu6bbjD2DQ9d1HuuLsvFSVonaKpP5nedc7KdadF2t/RYungd0WEgnhY03VmGfe5Vik8
+ kcNqkY/YdsY1WGshymw0ZA//x+s7KqMRcPsjZAq2SyibnTWkyJolAyWJ6lmPX4hKx7Qa0e
+ uXl3FhKRHStvQCigJbR7ovhZnEOr1uM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-153-AUUT5R3MNaenh2LbWNgr2w-1; Fri, 13 Dec 2019 05:03:13 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1126800D4E;
+ Fri, 13 Dec 2019 10:03:11 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-181.ams2.redhat.com
+ [10.36.116.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7CE185C1D4;
+ Fri, 13 Dec 2019 10:03:04 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D6F5F11386A7; Fri, 13 Dec 2019 11:03:02 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Auger Eric <eric.auger@redhat.com>
+Subject: Re: [PATCH for-5.0 v11 12/20] qapi: Introduce DEFINE_PROP_INTERVAL
+References: <20191122182943.4656-1-eric.auger@redhat.com>
+ <20191122182943.4656-13-eric.auger@redhat.com>
+ <87wob17n6j.fsf@dusky.pond.sub.org>
+ <66ae0999-bdd8-6b54-f550-f036dafc982b@redhat.com>
+Date: Fri, 13 Dec 2019 11:03:02 +0100
+In-Reply-To: <66ae0999-bdd8-6b54-f550-f036dafc982b@redhat.com> (Auger Eric's
+ message of "Thu, 12 Dec 2019 16:13:06 +0100")
+Message-ID: <87y2vg4k6h.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: AUUT5R3MNaenh2LbWNgr2w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,69 +93,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: slp@redhat.com, mst@redhat.com
+Cc: yang.zhong@intel.com, peter.maydell@linaro.org, kevin.tian@intel.com,
+ tnowicki@marvell.com, mst@redhat.com, jean-philippe.brucker@arm.com,
+ quintela@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com,
+ dgilbert@redhat.com, bharatb.linux@gmail.com, qemu-arm@nongnu.org,
+ eric.auger.pro@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-At the moment when the guest writes a status of 0, we only reset the
-virtio core state but not the virtio-mmio state. The virtio-mmio
-specification says (v1.1 cs01, 4.2.2.1 Device Requirements:
-MMIO Device Register Layout):
+Auger Eric <eric.auger@redhat.com> writes:
 
-    Upon reset, the device MUST clear all bits in InterruptStatus and
-    ready bits in the QueueReady register for all queues in the device.
+> Hi Markus,
+>
+> On 12/12/19 1:17 PM, Markus Armbruster wrote:
+>> Eric Auger <eric.auger@redhat.com> writes:
+>>=20
+>>> Introduce a new property defining a labelled interval:
+>>> <low address>,<high address>,label.
+>>>
+>>> This will be used to encode reserved IOVA regions. The label
+>>> is left undefined to ease reuse accross use cases.
+>>=20
+>> What does the last sentence mean?
+> The dilemma was shall I specialize this property such as ReservedRegion
+> or shall I leave it generic enough to serve somebody else use case. I
+> first chose the latter but now I think I should rather call it something
+> like ReservedRegion as in any case it has addresses and an integer label.
+>>=20
+>>> For instance, in virtio-iommu use case, reserved IOVA regions
+>>> will be passed by the machine code to the virtio-iommu-pci
+>>> device (an array of those). The label will match the
+>>> virtio_iommu_probe_resv_mem subtype value:
+>>> - VIRTIO_IOMMU_RESV_MEM_T_RESERVED (0)
+>>> - VIRTIO_IOMMU_RESV_MEM_T_MSI (1)
+>>>
+>>> This is used to inform the virtio-iommu-pci device it should
+>>> bypass the MSI region: 0xfee00000, 0xfeefffff, 1.
+>>=20
+>> So the "label" part of "<low address>,<high address>,label" is a number?
+> yes it is.
+>>=20
+>> Is a number appropriate for your use case, or would an enum be better?
+> I think a number is OK. There might be other types of reserved regions
+> in the future. Also if we want to allow somebody else to reuse that
+> property in another context, I would rather leave it open?
 
-The core already takes care of InterruptStatus by clearing isr, but we
-still need to clear QueueReady.
+I'd prioritize the user interface over possible reuse (which might never
+happen).  Mind, I'm not telling you using numbers is a bad user
+interface.  In general, enums are nicer, but I don't know enough about
+this particular case.
 
-It would be tempting to clean all registers, but since the specification
-doesn't say anything more, guests could rely on the registers keeping
-their state across reset. Linux for example, relies on this for
-GuestPageSize in the legacy MMIO tranport.
+>>=20
+>>>
+>>> Signed-off-by: Eric Auger <eric.auger@redhat.com> ---
+[...]
+>>> diff --git a/include/exec/memory.h b/include/exec/memory.h
+>>> index e499dc215b..e238d1c352 100644
+>>> --- a/include/exec/memory.h
+>>> +++ b/include/exec/memory.h
+>>> @@ -57,6 +57,12 @@ struct MemoryRegionMmio {
+>>>      CPUWriteMemoryFunc *write[3];
+>>>  };
+>>> =20
+>>> +struct Interval {
+>>> +    hwaddr low;
+>>> +    hwaddr high;
+>>> +    unsigned int type;
+>>> +};
+>>=20
+>> This isn't an interval.  An interval consists of two values, not three.
+>>=20
+>> The third one is called "type" here, and "label" elsewhere.  Pick one
+>> and stick to it.
+>>=20
+>> Then pick a name for the triple.  Elsewhere, you call it "labelled
+>> interval".
+> I would tend to use ReservedRegion now if nobody objects.
 
-Fixes: 44e687a4d9ab ("virtio-mmio: implement modern (v2) personality (virtio-1)")
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
----
-This fixes kexec of a Linux guest that uses the modern virtio-mmio
-transport.
----
- hw/virtio/virtio-mmio.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Sounds good to me.
 
-diff --git a/hw/virtio/virtio-mmio.c b/hw/virtio/virtio-mmio.c
-index 94d934c44b..ef40b7a9b2 100644
---- a/hw/virtio/virtio-mmio.c
-+++ b/hw/virtio/virtio-mmio.c
-@@ -65,6 +65,19 @@ static void virtio_mmio_stop_ioeventfd(VirtIOMMIOProxy *proxy)
-     virtio_bus_stop_ioeventfd(&proxy->bus);
- }
- 
-+static void virtio_mmio_soft_reset(VirtIOMMIOProxy *proxy)
-+{
-+    int i;
-+
-+    if (proxy->legacy) {
-+        return;
-+    }
-+
-+    for (i = 0; i < VIRTIO_QUEUE_MAX; i++) {
-+        proxy->vqs[i].enabled = 0;
-+    }
-+}
-+
- static uint64_t virtio_mmio_read(void *opaque, hwaddr offset, unsigned size)
- {
-     VirtIOMMIOProxy *proxy = (VirtIOMMIOProxy *)opaque;
-@@ -378,6 +391,7 @@ static void virtio_mmio_write(void *opaque, hwaddr offset, uint64_t value,
- 
-         if (vdev->status == 0) {
-             virtio_reset(vdev);
-+            virtio_mmio_soft_reset(proxy);
-         }
-         break;
-     case VIRTIO_MMIO_QUEUE_DESC_LOW:
--- 
-2.24.0
+> Thank you for the review!
+
+You're welcome!
 
 
