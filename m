@@ -2,64 +2,74 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A30C2D0CC
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D6CC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0243024125
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0243024125
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8798B24125
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7FtgtZy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8798B24125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifkJ2-0000jg-4B
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:44:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32908)
+	id 1ifng2-00013v-0m
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:20:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55549)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ifkIB-0008EC-LI
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:43:36 -0500
+ (envelope-from <philmd@redhat.com>) id 1ifne2-0007nD-9n
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:18:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ifkIA-00038F-Ic
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:43:35 -0500
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:54620)
+ (envelope-from <philmd@redhat.com>) id 1ifndz-00083x-Ff
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:18:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27929
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ifkIA-00035v-B8
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:43:34 -0500
-Received: from player735.ha.ovh.net (unknown [10.109.146.50])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id 7F7D81B5F09
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 13:43:32 +0100 (CET)
-Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
- [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player735.ha.ovh.net (Postfix) with ESMTPSA id 51723D2F24B8;
- Fri, 13 Dec 2019 12:43:26 +0000 (UTC)
-Subject: Re: [PATCH 03/13] ppc/pnv: Drop PnvPsiClass::chip_type
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
- <157623838530.360005.15470128760871845396.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <7fde18e9-153b-bea7-ffc9-eb161fa8ea81@kaod.org>
-Date: Fri, 13 Dec 2019 13:43:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ifndz-00082N-BH
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:18:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576253898;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=eictPqqvfDWdLCnWulB6nvsiJMgILd7otDTiwQaZME4=;
+ b=W7FtgtZy02cgeowTjxtRgkyZ4xFT2qSVGM77Q+xQmb5rJO9AOgBIT2ez5KWeNhvYZQ0aZq
+ we01nH6WoRkLxRGiSg3khpteMc7lhCzlZolJJkWc1gcfDC76VlR8wDehbqlrGVloctr7pt
+ KAUKgVhiPknzDQ6XqFhbXdrD55H72cs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-termAq3FMgGFGnyF0OlLXA-1; Fri, 13 Dec 2019 11:18:14 -0500
+X-MC-Unique: termAq3FMgGFGnyF0OlLXA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E942800D41;
+ Fri, 13 Dec 2019 16:18:12 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F91219C4F;
+ Fri, 13 Dec 2019 16:17:57 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 00/12] hw/i386/pc: Move PC-machine specific declarations to
+ 'pc_internal.h'
+Date: Fri, 13 Dec 2019 17:17:41 +0100
+Message-Id: <20191213161753.8051-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <157623838530.360005.15470128760871845396.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 9760426295776349011
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelledggeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.181.248
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,67 +81,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Sergio Lopez <slp@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Paul Durrant <paul@xen.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>,
+ Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/12/2019 12:59, Greg Kurz wrote:
-> It isn't used anymore.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+Hi Paolo,
 
+Since you posted your "x86: allow building without PC machine
+types" series [1], I looked at my past work on this topic
+(restrict "hw/i386/pc.h" to the X86 architecture).
+I'm glad to see in [2] you remove most (all) of the last uses.
+Since I haven't looked at this for some time, my WiP branch was
+quite diverged from QEMU master. I guess I could salvage most of
+the easy patches. The rest is QOMification of GSI/IOAPIC which
+require various changes with the i8259, so I'll keep that for
+later.
 
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664760.html
+[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664765.html
 
-> ---
->  hw/ppc/pnv_psi.c         |    3 ---
->  include/hw/ppc/pnv_psi.h |    1 -
->  2 files changed, 4 deletions(-)
->=20
-> diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
-> index 98a82b25e01f..75e20d9da08b 100644
-> --- a/hw/ppc/pnv_psi.c
-> +++ b/hw/ppc/pnv_psi.c
-> @@ -574,7 +574,6 @@ static void pnv_psi_power8_class_init(ObjectClass *=
-klass, void *data)
->      dc->desc    =3D "PowerNV PSI Controller POWER8";
->      dc->realize =3D pnv_psi_power8_realize;
-> =20
-> -    ppc->chip_type =3D  PNV_CHIP_POWER8;
->      ppc->xscom_pcba =3D PNV_XSCOM_PSIHB_BASE;
->      ppc->xscom_size =3D PNV_XSCOM_PSIHB_SIZE;
->      ppc->bar_mask   =3D PSIHB_BAR_MASK;
-> @@ -884,7 +883,6 @@ static void pnv_psi_power9_class_init(ObjectClass *=
-klass, void *data)
->      dc->desc    =3D "PowerNV PSI Controller POWER9";
->      dc->realize =3D pnv_psi_power9_realize;
-> =20
-> -    ppc->chip_type  =3D PNV_CHIP_POWER9;
->      ppc->xscom_pcba =3D PNV9_XSCOM_PSIHB_BASE;
->      ppc->xscom_size =3D PNV9_XSCOM_PSIHB_SIZE;
->      ppc->bar_mask   =3D PSIHB9_BAR_MASK;
-> @@ -915,7 +913,6 @@ static void pnv_psi_power10_class_init(ObjectClass =
-*klass, void *data)
-> =20
->      dc->desc    =3D "PowerNV PSI Controller POWER10";
-> =20
-> -    ppc->chip_type  =3D PNV_CHIP_POWER10;
->      ppc->xscom_pcba =3D PNV10_XSCOM_PSIHB_BASE;
->      ppc->xscom_size =3D PNV10_XSCOM_PSIHB_SIZE;
->      ppc->compat     =3D compat;
-> diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
-> index fc068c95e543..f0f5b5519767 100644
-> --- a/include/hw/ppc/pnv_psi.h
-> +++ b/include/hw/ppc/pnv_psi.h
-> @@ -79,7 +79,6 @@ typedef struct Pnv9Psi {
->  typedef struct PnvPsiClass {
->      SysBusDeviceClass parent_class;
-> =20
-> -    int chip_type;
->      uint32_t xscom_pcba;
->      uint32_t xscom_size;
->      uint64_t bar_mask;
->=20
+Philippe Mathieu-Daud=C3=A9 (12):
+  hw/i386/pc: Convert DPRINTF() to trace events
+  hw/i386/pc: Move kvm_i8259_init() declaration to sysemu/kvm.h
+  hw/i386/pc: Remove obsolete pc_pci_device_init() declaration
+  hw/i386/pc: Remove obsolete cpu_set_smm_t typedef
+  hw/i386/ich9: Remove unused include
+  hw/i386/ich9: Move unnecessary "pci_bridge.h" include
+  hw/ide/piix: Remove superfluous DEVICE() cast
+  hw/ide/piix: Use ARRAY_SIZE() instead of magic numbers
+  hw/intc/ioapic: Make ioapic_print_redtbl() static
+  hw/i386/pc: Rename allocate_cpu_irq from 'pc' to 'x86_machine'
+  hw/i386/pc: Move x86_machine_allocate_cpu_irq() to 'hw/i386/x86.c'
+  hw/i386/pc: Move PC-machine specific declarations to 'pc_internal.h'
+
+ hw/i386/pc_internal.h             | 144 ++++++++++++++++++++++++++++++
+ include/hw/i386/ich9.h            |   2 -
+ include/hw/i386/ioapic_internal.h |   1 -
+ include/hw/i386/pc.h              | 133 ---------------------------
+ include/hw/i386/x86.h             |   2 +
+ include/sysemu/kvm.h              |   1 +
+ hw/i386/acpi-build.c              |   2 +
+ hw/i386/microvm.c                 |   2 +-
+ hw/i386/pc.c                      |  47 ++--------
+ hw/i386/pc_piix.c                 |   1 +
+ hw/i386/pc_q35.c                  |   1 +
+ hw/i386/pc_sysfw.c                |   1 +
+ hw/i386/x86.c                     |  30 +++++++
+ hw/i386/xen/xen-hvm.c             |   1 +
+ hw/ide/piix.c                     |  29 +++---
+ hw/intc/ioapic_common.c           |   2 +-
+ hw/pci-bridge/i82801b11.c         |   1 +
+ hw/i386/trace-events              |   6 ++
+ 18 files changed, 211 insertions(+), 195 deletions(-)
+ create mode 100644 hw/i386/pc_internal.h
+
+--=20
+2.21.0
 
 
