@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E74C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFE0C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B16F21655
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C71EF24671
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MmZQ1LiH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B16F21655
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bhlYHGbn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C71EF24671
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifo1g-0004Ho-SG
+	id 1ifo1g-0004IG-Be
 	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:42:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47242)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ifnft-0001Q3-L3
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:20:18 -0500
+ (envelope-from <cohuck@redhat.com>) id 1ifnfN-0000lG-LC
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ifnfs-00034R-B8
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:20:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49710
+ (envelope-from <cohuck@redhat.com>) id 1ifnfM-00022g-HP
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:45 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52630
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ifnfs-00033X-5Y
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:20:16 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ifnfM-00021k-DJ
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576254015;
+ s=mimecast20190719; t=1576253984;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KN6AckxlKUpsLzxakKRr0um+iuOesJrJu7GlUIEw6bQ=;
- b=MmZQ1LiHb7yd5M4X7q+qCp2C3t93mtfXDF/x8cB6eIBT8rCHDnU0/DVfK0fcYvpRW182ag
- v1quLewpJc9Ssm5HWeXXxkoa9wFe+ywXBZMj5MH2UbEHAPF7YXeWgeIlxsL4TXXTMbRa8P
- I7VEcUTf2nHYAYxMUePHNie0Ke0Gc1s=
+ bh=uw8RzRlPrWToSzICCddlif8igLPYf+K8CwNrzt2Ukug=;
+ b=bhlYHGbnDoEiQCcsMxDv+Znp57j05m7RNku3ufgZjjQf/QxTS/iDfrYpc+tZDYyDP9na3x
+ AFaOT22oj21sh/IGb92f7pG9krx+X8L8PNMs9PDb5pCTdi57woi/MH3G/mZ2WWIt2zj2FQ
+ enGRhGyjkqAy4Q2+5ElwkECyEdpPDSg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-394-rlsJfBc9OvaPIStuNENCNA-1; Fri, 13 Dec 2019 11:20:14 -0500
-X-MC-Unique: rlsJfBc9OvaPIStuNENCNA-1
+ us-mta-31-2lovRvkRMeGBz613K5DIVA-1; Fri, 13 Dec 2019 11:19:40 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A050800EC0;
- Fri, 13 Dec 2019 16:20:12 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B180319C4F;
- Fri, 13 Dec 2019 16:20:04 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 10/12] hw/i386/pc: Rename allocate_cpu_irq from 'pc' to
- 'x86_machine'
-Date: Fri, 13 Dec 2019 17:17:51 +0100
-Message-Id: <20191213161753.8051-11-philmd@redhat.com>
-In-Reply-To: <20191213161753.8051-1-philmd@redhat.com>
-References: <20191213161753.8051-1-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 436B3102C8C2;
+ Fri, 13 Dec 2019 16:19:39 +0000 (UTC)
+Received: from localhost (ovpn-116-226.ams2.redhat.com [10.36.116.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7E0D319C70;
+ Fri, 13 Dec 2019 16:19:36 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 11/16] s390x/cpumodel: Fix feature property error API violations
+Date: Fri, 13 Dec 2019 17:18:46 +0100
+Message-Id: <20191213161851.24687-12-cohuck@redhat.com>
+In-Reply-To: <20191213161851.24687-1-cohuck@redhat.com>
+References: <20191213161851.24687-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 2lovRvkRMeGBz613K5DIVA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,79 +84,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Sergio Lopez <slp@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Paul Durrant <paul@xen.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>,
- Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All the X86 machines use an interrupt controller.
-Rename the function to something more generic.
+From: Markus Armbruster <armbru@redhat.com>
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+s390x-cpu property setters set_feature() and set_feature_group()
+dereference @errp when the visitor fails.  That's wrong; see the big
+comment in error.h.  Introduced in commit 0754f60429 "s390x/cpumodel:
+expose features and feature groups as properties".
+
+No caller actually passes null.
+
+Fix anyway: splice in a local Error *err, and error_propagate().
+
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20191204093625.14836-13-armbru@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- include/hw/i386/pc.h | 2 +-
- hw/i386/microvm.c    | 2 +-
- hw/i386/pc.c         | 4 ++--
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ target/s390x/cpu_models.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 743141e107..244dbf2ec0 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -198,7 +198,7 @@ void pc_memory_init(PCMachineState *pcms,
-                     MemoryRegion *rom_memory,
-                     MemoryRegion **ram_memory);
- uint64_t pc_pci_hole64_start(void);
--qemu_irq pc_allocate_cpu_irq(void);
-+qemu_irq x86_machine_allocate_cpu_irq(void);
- DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus);
- void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-                           ISADevice **rtc_state,
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index def37e60f7..7ac008460a 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -132,7 +132,7 @@ static void microvm_devices_init(MicrovmMachineState =
-*mms)
-     if (mms->pic =3D=3D ON_OFF_AUTO_ON || mms->pic =3D=3D ON_OFF_AUTO_AU=
-TO) {
-         qemu_irq *i8259;
-=20
--        i8259 =3D i8259_init(isa_bus, pc_allocate_cpu_irq());
-+        i8259 =3D i8259_init(isa_bus, x86_machine_allocate_cpu_irq());
-         for (i =3D 0; i < ISA_NUM_IRQS; i++) {
-             gsi_state->i8259_irq[i] =3D i8259[i];
-         }
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 5f8e39c025..4defee274f 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1282,7 +1282,7 @@ uint64_t pc_pci_hole64_start(void)
-     return ROUND_UP(hole64_start, 1 * GiB);
- }
-=20
--qemu_irq pc_allocate_cpu_irq(void)
-+qemu_irq x86_machine_allocate_cpu_irq(void)
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index 7e92fb2e156d..6a29fd3ab113 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -987,6 +987,7 @@ static void get_feature(Object *obj, Visitor *v, const =
+char *name,
+ static void set_feature(Object *obj, Visitor *v, const char *name,
+                         void *opaque, Error **errp)
  {
-     return qemu_allocate_irq(pic_irq_request, NULL, 0);
- }
-@@ -1463,7 +1463,7 @@ void pc_i8259_create(ISABus *isa_bus, qemu_irq *i82=
-59_irqs)
-     } else if (xen_enabled()) {
-         i8259 =3D xen_interrupt_controller_init();
-     } else {
--        i8259 =3D i8259_init(isa_bus, pc_allocate_cpu_irq());
-+        i8259 =3D i8259_init(isa_bus, x86_machine_allocate_cpu_irq());
++    Error *err =3D NULL;
+     S390Feat feat =3D (S390Feat) opaque;
+     DeviceState *dev =3D DEVICE(obj);
+     S390CPU *cpu =3D S390_CPU(obj);
+@@ -1002,8 +1003,9 @@ static void set_feature(Object *obj, Visitor *v, cons=
+t char *name,
+         return;
      }
 =20
-     for (size_t i =3D 0; i < ISA_NUM_IRQS; i++) {
+-    visit_type_bool(v, name, &value, errp);
+-    if (*errp) {
++    visit_type_bool(v, name, &value, &err);
++    if (err) {
++        error_propagate(errp, err);
+         return;
+     }
+     if (value) {
+@@ -1043,6 +1045,7 @@ static void get_feature_group(Object *obj, Visitor *v=
+, const char *name,
+ static void set_feature_group(Object *obj, Visitor *v, const char *name,
+                               void *opaque, Error **errp)
+ {
++    Error *err =3D NULL;
+     S390FeatGroup group =3D (S390FeatGroup) opaque;
+     const S390FeatGroupDef *def =3D s390_feat_group_def(group);
+     DeviceState *dev =3D DEVICE(obj);
+@@ -1059,8 +1062,9 @@ static void set_feature_group(Object *obj, Visitor *v=
+, const char *name,
+         return;
+     }
+=20
+-    visit_type_bool(v, name, &value, errp);
+-    if (*errp) {
++    visit_type_bool(v, name, &value, &err);
++    if (err) {
++        error_propagate(errp, err);
+         return;
+     }
+     if (value) {
 --=20
 2.21.0
 
