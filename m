@@ -2,72 +2,82 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BABC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A48FC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C079B20663
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C079B20663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A04F921655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A04F921655
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifoOv-0008BY-E3
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 12:06:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38658)
+	id 1ifkRX-0006rq-VI
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:53:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59370)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ifoNp-0007JS-HW
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 12:05:42 -0500
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ifkQm-0006JE-0R
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:52:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ifoNo-0001so-2Q
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 12:05:41 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55318)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ifoNn-0001rh-Rk
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 12:05:40 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ifoNm-0001mX-LU
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 17:05:38 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 8CF342E80C8
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 17:05:38 +0000 (UTC)
+ (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ifkQk-0000zj-Hb
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:52:27 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2057 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
+ id 1ifkQh-0000hV-4s; Fri, 13 Dec 2019 07:52:23 -0500
+Received: from LHREML711-CAH.china.huawei.com (unknown [172.18.7.107])
+ by Forcepoint Email with ESMTP id 6351F7A21D9689193AD4;
+ Fri, 13 Dec 2019 12:52:16 +0000 (GMT)
+Received: from lhreml701-chm.china.huawei.com (10.201.108.50) by
+ LHREML711-CAH.china.huawei.com (10.201.108.34) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Fri, 13 Dec 2019 12:52:15 +0000
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml701-chm.china.huawei.com (10.201.108.50) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Fri, 13 Dec 2019 12:52:15 +0000
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.1713.004; Fri, 13 Dec 2019 12:52:15 +0000
+From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: RE: [PATCH 0/5] ARM virt: Add NVDIMM support
+Thread-Topic: [PATCH 0/5] ARM virt: Add NVDIMM support
+Thread-Index: AQHVeswdQv2zL2ZjnU2+5S1CywnCCKdgnucAgAYn2ECANV3CUIAANK6AgAADjLCAARyUgIADW0wAgBGftACAAodbgIADcKzg
+Date: Fri, 13 Dec 2019 12:52:15 +0000
+Message-ID: <effeee8f654c4bd985e24dafaf99e5b8@huawei.com>
+References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
+ <a133d4c4-3f60-2bb1-a7d7-35cdb06af265@redhat.com>
+ <441c818f24084b4191315cf2a6267cef@huawei.com>
+ <20191125164541.3f0a593f@redhat.com>
+ <444efcb441fe42e5aff58b3af3ab14b4@huawei.com>
+ <20191126095655.27227f59@redhat.com>
+ <c2bb0be09e244ee59d27c7aaab1783a9@huawei.com>
+ <20191211085727.1ab9564e@redhat.com>
+In-Reply-To: <20191211085727.1ab9564e@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.237]
+Content-Type: multipart/mixed;
+ boundary="_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_"
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Dec 2019 16:56:02 -0000
-From: Damir <1856335@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: djdatte
-X-Launchpad-Bug-Reporter: Damir (djdatte)
-X-Launchpad-Bug-Modifier: Damir (djdatte)
-Message-Id: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
-Subject: [Bug 1856335] [NEW] Cache Layout wrong on many Zen Arch CPUs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 501b2a790ede7d387f473732526516a9d239071f
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 185.176.76.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,118 +86,452 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "drjones@redhat.com" <drjones@redhat.com>,
+ "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
+ Auger Eric <eric.auger@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Linuxarm <linuxarm@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
+ "lersek@redhat.com" <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+--_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems to
-always map Cache ass if it was an 4-Core per CCX CPU, which is
-incorrect, and costs upwards 30% performance (more realistically 10%) in
-L3 Cache Layout aware applications.
+Hi Igor,
 
-Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
+> -----Original Message-----
+> From: Igor Mammedov [mailto:imammedo@redhat.com]
+> Sent: 11 December 2019 07:57
+> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+> Cc: xiaoguangrong.eric@gmail.com; peter.maydell@linaro.org;
+> drjones@redhat.com; shannon.zhaosl@gmail.com; qemu-devel@nongnu.org;
+> Linuxarm <linuxarm@huawei.com>; Auger Eric <eric.auger@redhat.com>;
+> qemu-arm@nongnu.org; xuwei (O) <xuwei5@huawei.com>;
+> lersek@redhat.com
+> Subject: Re: [PATCH 0/5] ARM virt: Add NVDIMM support
 
-  <cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-    <model fallback=3D'forbid'>EPYC-IBPB</model>
-    <vendor>AMD</vendor>
-    <topology sockets=3D'1' cores=3D'8' threads=3D'1'/>
+[...]
 
-In windows, coreinfo reports correctly:
+> > I couldn't figure out yet, why this extra 4 bytes are added by aml code=
+ on
+> ARM64
+> > when the nvdimm_dsm_func_read_fit() returns NvdimmFuncReadFITOut
+> without
+> > any FIT data. ie, when the FIT buffer len (read_len) is zero.
+> >
+> > But the below will fix this issue,
+> >
+> > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
+> > index f91eea3802..cddf95f4c1 100644
+> > --- a/hw/acpi/nvdimm.c
+> > +++ b/hw/acpi/nvdimm.c
+> > @@ -588,7 +588,7 @@ static void
+> nvdimm_dsm_func_read_fit(NVDIMMState *state, NvdimmDsmIn *in,
+> >      nvdimm_debug("Read FIT: offset %#x FIT size %#x Dirty %s.\n",
+> >                   read_fit->offset, fit->len, fit_buf->dirty ? "Yes" : =
+"No");
+> >
+> > -    if (read_fit->offset > fit->len) {
+> > +    if (read_fit->offset >=3D fit->len) {
+> >          func_ret_status =3D NVDIMM_DSM_RET_STATUS_INVALID;
+> >          goto exit;
+> >      }
+> >
+> >
+> > This will return error code to aml in the second iteration when there i=
+s no
+> further
+> > FIT data to report. But, I am not sure why this check was omitted in th=
+e first
+> place.
+> >
+> > Please let me know if this is acceptable and then probably I can look i=
+nto a v2
+> of this
+> > series.
+> Sorry, I don't have capacity to debug this right now,
 
-****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
-----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
+No problem.
 
-On a 3-CCX CPU (3960X /w 6 cores and no SMT):
+> but I'd prefer if 'why' question was answered first.
 
- <cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-    <model fallback=3D'forbid'>EPYC-IBPB</model>
-    <vendor>AMD</vendor>
-    <topology sockets=3D'1' cores=3D'6' threads=3D'1'/>
+Right.
 
-in windows, coreinfo reports incorrectly:
+> Anyways, if something is unclear in how concrete AML code is build/works,
+> feel free to ask and I'll try to explain and guide you.
 
-****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
-----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
+Thanks for your help. I did spend some more time debugging this further.
+I tried to introduce a totally new Buffer field object with different
+sizes and printing the size after creation.
 
+--- SSDT.dsl	2019-12-12 15:28:21.976986949 +0000
++++ SSDT-arm64-dbg.dsl	2019-12-13 12:17:11.026806186 +0000
+@@ -18,7 +18,7 @@
+  *     Compiler ID      "BXPC"
+  *     Compiler Version 0x00000001 (1)
+  */
+-DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000001)
++DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000002)
+ {
+     Scope (\_SB)
+     {
+@@ -48,6 +48,11 @@
+                     RLEN,   32,=20
+                     ODAT,   32736
+                 }
++               =20
++                Field (NRAM, DWordAcc, NoLock, Preserve)
++                {
++                    NBUF,   32768=20
++                }
+=20
+                 If ((Arg4 =3D=3D Zero))
+                 {
+@@ -87,6 +92,12 @@
+                     Local3 =3D DerefOf (Local2)
+                     FARG =3D Local3
+                 }
++              =20
++                Local2 =3D 0x2=20
++                printf("AML:NVDIMM Creating TBUF with bytes %o", Local2)
++                CreateField (NBUF, Zero, (Local2 << 3), TBUF)
++                Concatenate (Buffer (Zero){}, TBUF, Local3)
++                printf("AML:NVDIMM Size of TBUF(Local3) %o", SizeOf(Local3=
+))
+=20
+                 NTFI =3D Local6
+                 Local1 =3D (RLEN - 0x04)
 
-Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm. =
+And run it by changing Local2 with different values, It looks on ARM64,=20
 
+For cases where, Local2 <8, the created buffer size is always 8 bytes
 
-With newer Qemu there is a fix (that does behave correctly) in using the di=
-es parameter: =
+"AML:NVDIMM Creating TBUF with bytes 0000000000000002"
+"AML:NVDIMM Size of TBUF(Local3) 0000000000000008"
 
- <qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
+...
+"AML:NVDIMM Creating TBUF with bytes 0000000000000005"
+"AML:NVDIMM Size of TBUF(Local3) 0000000000000008"
 
-The problem is that the dies are exposed differently than how AMD does
-it natively, they are exposed to Windows as sockets, which means, you
-can't ever have a machine with more than two CCX (6 cores) as Windows
-only supports two sockets. (Should this be reported as a separate bug?)
+And once Local2 >=3D8, it gets the correct size,
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856335
-
-Title:
-  Cache Layout wrong on many Zen Arch CPUs
-
-Status in QEMU:
-  New
-
-Bug description:
-  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
-  to always map Cache ass if it was an 4-Core per CCX CPU, which is
-  incorrect, and costs upwards 30% performance (more realistically 10%)
-  in L3 Cache Layout aware applications.
-
-  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
-
-    <cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-      <model fallback=3D'forbid'>EPYC-IBPB</model>
-      <vendor>AMD</vendor>
-      <topology sockets=3D'1' cores=3D'8' threads=3D'1'/>
-
-  In windows, coreinfo reports correctly:
-
-  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
-
-   <cpu mode=3D'custom' match=3D'exact' check=3D'full'>
-      <model fallback=3D'forbid'>EPYC-IBPB</model>
-      <vendor>AMD</vendor>
-      <topology sockets=3D'1' cores=3D'6' threads=3D'1'/>
-
-  in windows, coreinfo reports incorrectly:
-
-  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
-  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
-
-  =
-
-  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm. =
+"AML:NVDIMM Creating TBUF with bytes 0000000000000009"
+"AML:NVDIMM Size of TBUF(Local3) 0000000000000009"
 
 
-  With newer Qemu there is a fix (that does behave correctly) in using the =
-dies parameter: =
+But on x86, the behavior is like,=20
 
-   <qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
+For cases where, Local2 <4, the created buffer size is always 4 bytes
 
-  The problem is that the dies are exposed differently than how AMD does
-  it natively, they are exposed to Windows as sockets, which means, you
-  can't ever have a machine with more than two CCX (6 cores) as Windows
-  only supports two sockets. (Should this be reported as a separate
-  bug?)
+"AML:NVDIMM Creating TBUF with bytes 00000002"
+"AML:NVDIMM Size of TBUF(Local3) 00000004"
+....
+"AML:NVDIMM Creating TBUF with bytes 00000003"
+"AML:NVDIMM Size of TBUF(Local3) 00000004"
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
+And once Local2 >=3D 4, it is ok
+
+"AML:NVDIMM Creating TBUF with bytes 00000005"
+"AML:NVDIMM Size of TBUF(Local3) 00000005"
+...
+"AML:NVDIMM Creating TBUF with bytes 00000009"
+"AML:NVDIMM Size of TBUF(Local3) 00000009"
+
+This is the reason why it works on x86 and not on ARM64. Because, if you
+remember on second iteration of the FIT buffer, the requested buffer size i=
+s 4 .
+
+I tried changing the AccessType of the below NBUF field from DWordAcc to
+ByteAcc/BufferAcc, but no luck.
+
++                Field (NRAM, DWordAcc, NoLock, Preserve)
++                {
++                    NBUF,   32768=20
++                }
+
+Not sure what we need to change for ARM64 to create buffer object of size 4
+here. Please let me know if you have any pointers to debug this further.
+
+(I am attaching both x86 and ARM64 SSDT dsl used for reference)
+
+Thanks,
+Shameer
+
+
+> > Thanks,
+> > Shameer
+> >
+> >
+> >
+
+
+--_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_
+Content-Type: application/octet-stream; name="SSDT-arm64-dbg.dsl"
+Content-Description: SSDT-arm64-dbg.dsl
+Content-Disposition: attachment; filename="SSDT-arm64-dbg.dsl"; size=6942;
+	creation-date="Fri, 13 Dec 2019 12:27:25 GMT";
+	modification-date="Fri, 13 Dec 2019 12:28:16 GMT"
+Content-Transfer-Encoding: base64
+
+LyoKICogSW50ZWwgQUNQSSBDb21wb25lbnQgQXJjaGl0ZWN0dXJlCiAqIEFNTC9BU0wrIERpc2Fz
+c2VtYmxlciB2ZXJzaW9uIDIwMTgwMTA1ICg2NC1iaXQgdmVyc2lvbikKICogQ29weXJpZ2h0IChj
+KSAyMDAwIC0gMjAxOCBJbnRlbCBDb3Jwb3JhdGlvbgogKiAKICogRGlzYXNzZW1ibGluZyB0byBz
+eW1ib2xpYyBBU0wrIG9wZXJhdG9ycwogKgogKiBEaXNhc3NlbWJseSBvZiBTU0RULCBUaHUgRGVj
+IDEyIDE1OjI4OjIxIDIwMTkKICoKICogT3JpZ2luYWwgVGFibGUgSGVhZGVyOgogKiAgICAgU2ln
+bmF0dXJlICAgICAgICAiU1NEVCIKICogICAgIExlbmd0aCAgICAgICAgICAgMHgwMDAwMDJFRiAo
+NzUxKQogKiAgICAgUmV2aXNpb24gICAgICAgICAweDAxCiAqICAgICBDaGVja3N1bSAgICAgICAg
+IDB4QTQKICogICAgIE9FTSBJRCAgICAgICAgICAgIkJPQ0hTICIKICogICAgIE9FTSBUYWJsZSBJ
+RCAgICAgIk5WRElNTSIKICogICAgIE9FTSBSZXZpc2lvbiAgICAgMHgwMDAwMDAwMSAoMSkKICog
+ICAgIENvbXBpbGVyIElEICAgICAgIkJYUEMiCiAqICAgICBDb21waWxlciBWZXJzaW9uIDB4MDAw
+MDAwMDEgKDEpCiAqLwpEZWZpbml0aW9uQmxvY2sgKCIiLCAiU1NEVCIsIDEsICJCT0NIUyAiLCAi
+TlZESU1NIiwgMHgwMDAwMDAwMikKewogICAgU2NvcGUgKFxfU0IpCiAgICB7CiAgICAgICAgRGV2
+aWNlIChOVkRSKQogICAgICAgIHsKICAgICAgICAgICAgTmFtZSAoX0hJRCwgIkFDUEkwMDEyIiAv
+KiBOVkRJTU0gUm9vdCBEZXZpY2UgKi8pICAvLyBfSElEOiBIYXJkd2FyZSBJRAogICAgICAgICAg
+ICBNZXRob2QgKE5DQUwsIDUsIFNlcmlhbGl6ZWQpCiAgICAgICAgICAgIHsKICAgICAgICAgICAg
+ICAgIExvY2FsNiA9IE1FTUEgLyogXE1FTUEgKi8KICAgICAgICAgICAgICAgIE9wZXJhdGlvblJl
+Z2lvbiAoTlBJTywgU3lzdGVtTWVtb3J5LCAweDA5MDkwMDAwLCAweDA0KQogICAgICAgICAgICAg
+ICAgT3BlcmF0aW9uUmVnaW9uIChOUkFNLCBTeXN0ZW1NZW1vcnksIExvY2FsNiwgMHgxMDAwKQog
+ICAgICAgICAgICAgICAgRmllbGQgKE5QSU8sIERXb3JkQWNjLCBOb0xvY2ssIFByZXNlcnZlKQog
+ICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIE5URkksICAgMzIKICAgICAgICAg
+ICAgICAgIH0KCiAgICAgICAgICAgICAgICBGaWVsZCAoTlJBTSwgRFdvcmRBY2MsIE5vTG9jaywg
+UHJlc2VydmUpCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgSERMRSwgICAz
+MiwgCiAgICAgICAgICAgICAgICAgICAgUkVWUywgICAzMiwgCiAgICAgICAgICAgICAgICAgICAg
+RlVOQywgICAzMiwgCiAgICAgICAgICAgICAgICAgICAgRkFSRywgICAzMjY3MgogICAgICAgICAg
+ICAgICAgfQoKICAgICAgICAgICAgICAgIEZpZWxkIChOUkFNLCBEV29yZEFjYywgTm9Mb2NrLCBQ
+cmVzZXJ2ZSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBSTEVOLCAgIDMy
+LCAKICAgICAgICAgICAgICAgICAgICBPREFULCAgIDMyNzM2CiAgICAgICAgICAgICAgICB9CiAg
+ICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIEZpZWxkIChOUkFNLCBEV29yZEFjYywgTm9M
+b2NrLCBQcmVzZXJ2ZSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBOQlVG
+LCAgIDMyNzY4IAogICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgIElmICgoQXJnNCA9
+PSBaZXJvKSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBMb2NhbDAgPSBU
+b1VVSUQgKCIyZjEwZTdhNC05ZTkxLTExZTQtODlkMy0xMjNiOTNmNzVjYmEiKQogICAgICAgICAg
+ICAgICAgfQogICAgICAgICAgICAgICAgRWxzZUlmICgoQXJnNCA9PSAweDAwMDEwMDAwKSkKICAg
+ICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBMb2NhbDAgPSBUb1VVSUQgKCI2NDhi
+OWNmMi1jZGExLTQzMTItOGFkOS00OWM0YWYzMmJkNjIiKQogICAgICAgICAgICAgICAgfQogICAg
+ICAgICAgICAgICAgRWxzZQogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIExv
+Y2FsMCA9IFRvVVVJRCAoIjQzMDlhYzMwLTBkMTEtMTFlNC05MTkxLTA4MDAyMDBjOWE2NiIpCiAg
+ICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgSWYgKCgoTG9jYWw2ID09IFplcm8pIHwg
+KEFyZzAgIT0gTG9jYWwwKSkpCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAg
+SWYgKChBcmcyID09IFplcm8pKQogICAgICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAg
+ICAgICAgICAgUmV0dXJuIChCdWZmZXIgKE9uZSkKICAgICAgICAgICAgICAgICAgICAgICAgewog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIDB4MDAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAvLyAuCiAgICAgICAgICAgICAgICAgICAgICAgIH0pCiAgICAg
+ICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgICAgICBSZXR1cm4gKEJ1ZmZlciAoT25l
+KQogICAgICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAgICAgIDB4MDEgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAvLyAuCiAgICAgICAgICAg
+ICAgICAgICAgfSkKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBIRExFID0gQXJn
+NAogICAgICAgICAgICAgICAgUkVWUyA9IEFyZzEKICAgICAgICAgICAgICAgIEZVTkMgPSBBcmcy
+CiAgICAgICAgICAgICAgICBJZiAoKChPYmplY3RUeXBlIChBcmczKSA9PSAweDA0KSAmIChTaXpl
+T2YgKEFyZzMpID09IE9uZSkpKQogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAg
+IExvY2FsMiA9IEFyZzMgW1plcm9dCiAgICAgICAgICAgICAgICAgICAgTG9jYWwzID0gRGVyZWZP
+ZiAoTG9jYWwyKQogICAgICAgICAgICAgICAgICAgIEZBUkcgPSBMb2NhbDMKICAgICAgICAgICAg
+ICAgIH0KICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICBMb2NhbDIgPSAweEQgCiAgICAg
+ICAgICAgICAgICBwcmludGYoIkFNTDpOVkRJTU0gQ3JlYXRpbmcgVEJVRiB3aXRoIGJ5dGVzICVv
+IiwgTG9jYWwyKQogICAgICAgICAgICAgICAgQ3JlYXRlRmllbGQgKE5CVUYsIFplcm8sIChMb2Nh
+bDIgPDwgMyksIFRCVUYpCiAgICAgICAgICAgICAgICBDb25jYXRlbmF0ZSAoQnVmZmVyIChaZXJv
+KXt9LCBUQlVGLCBMb2NhbDMpCiAgICAgICAgICAgICAgICBwcmludGYoIkFNTDpOVkRJTU0gU2l6
+ZSBvZiBUQlVGKExvY2FsMykgJW8iLCBTaXplT2YoTG9jYWwzKSkKCiAgICAgICAgICAgICAgICBO
+VEZJID0gTG9jYWw2CiAgICAgICAgICAgICAgICBMb2NhbDEgPSAoUkxFTiAtIDB4MDQpCiAgICAg
+ICAgICAgICAgICBMb2NhbDEgPSAoTG9jYWwxIDw8IDB4MDMpCiAgICAgICAgICAgICAgICBDcmVh
+dGVGaWVsZCAoT0RBVCwgWmVybywgTG9jYWwxLCBPQlVGKQogICAgICAgICAgICAgICAgQ29uY2F0
+ZW5hdGUgKEJ1ZmZlciAoWmVybyl7fSwgT0JVRiwgTG9jYWw3KQogICAgICAgICAgICAgICAgUmV0
+dXJuIChMb2NhbDcpCiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwg
+Tm90U2VyaWFsaXplZCkgIC8vIF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAg
+ICAgewogICAgICAgICAgICAgICAgUmV0dXJuIChOQ0FMIChBcmcwLCBBcmcxLCBBcmcyLCBBcmcz
+LCBaZXJvKSkKICAgICAgICAgICAgfQoKICAgICAgICAgICAgTmFtZSAoUlNUQSwgWmVybykKICAg
+ICAgICAgICAgTWV0aG9kIChSRklULCAxLCBTZXJpYWxpemVkKQogICAgICAgICAgICB7CiAgICAg
+ICAgICAgICAgICBOYW1lIChPRlNULCBaZXJvKQogICAgICAgICAgICAgICAgT0ZTVCA9IEFyZzAK
+ICAgICAgICAgICAgICAgIExvY2FsMCA9IE5DQUwgKFRvVVVJRCAoIjY0OGI5Y2YyLWNkYTEtNDMx
+Mi04YWQ5LTQ5YzRhZjMyYmQ2MiIpLCBPbmUsIE9uZSwgUGFja2FnZSAoMHgwMSkKICAgICAgICAg
+ICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgT0ZTVAogICAgICAg
+ICAgICAgICAgICAgICAgICB9LCAweDAwMDEwMDAwKQogICAgICAgICAgICAgICAgQ3JlYXRlRFdv
+cmRGaWVsZCAoTG9jYWwwLCBaZXJvLCBTVEFVKQogICAgICAgICAgICAgICAgUlNUQSA9IFNUQVUg
+LyogXF9TQl8uTlZEUi5SRklULlNUQVUgKi8KICAgICAgICAgICAgICAgIElmICgoWmVybyAhPSBT
+VEFVKSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBSZXR1cm4gKEJ1ZmZl
+ciAoWmVybyl7fSkKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBMb2NhbDEgPSBT
+aXplT2YgKExvY2FsMCkKICAgICAgICAgICAgICAgIExvY2FsMSAtPSAweDA0CiAgICAgICAgICAg
+ICAgICBJZiAoKExvY2FsMSA9PSBaZXJvKSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAg
+ICAgICAgICBSZXR1cm4gKEJ1ZmZlciAoWmVybyl7fSkKICAgICAgICAgICAgICAgIH0KCiAgICAg
+ICAgICAgICAgICBDcmVhdGVGaWVsZCAoTG9jYWwwLCAweDIwLCAoTG9jYWwxIDw8IDB4MDMpLCBC
+VUZGKQogICAgICAgICAgICAgICAgUmV0dXJuIChCVUZGKSAvKiBcX1NCXy5OVkRSLlJGSVQuQlVG
+RiAqLwogICAgICAgICAgICB9CgogICAgICAgICAgICBNZXRob2QgKF9GSVQsIDAsIFNlcmlhbGl6
+ZWQpICAvLyBfRklUOiBGaXJtd2FyZSBJbnRlcmZhY2UgVGFibGUKICAgICAgICAgICAgewogICAg
+ICAgICAgICAgICAgTG9jYWwyID0gQnVmZmVyIChaZXJvKXt9CiAgICAgICAgICAgICAgICBMb2Nh
+bDMgPSBaZXJvCiAgICAgICAgICAgICAgICBXaGlsZSAoT25lKQogICAgICAgICAgICAgICAgewog
+ICAgICAgICAgICAgICAgICAgIExvY2FsMCA9IFJGSVQgKExvY2FsMykKICAgICAgICAgICAgICAg
+ICAgICBMb2NhbDEgPSBTaXplT2YgKExvY2FsMCkKICAgICAgICAgICAgICAgICAgICBJZiAoKFJT
+VEEgPT0gMHgwMTAwKSkKICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAg
+ICAgIExvY2FsMiA9IEJ1ZmZlciAoWmVybyl7fQogICAgICAgICAgICAgICAgICAgICAgICBMb2Nh
+bDMgPSBaZXJvCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIEVsc2UK
+ICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAgIElmICgoTG9jYWwx
+ID09IFplcm8pKQogICAgICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBSZXR1cm4gKExvY2FsMikKICAgICAgICAgICAgICAgICAgICAgICAgfQoKICAgICAg
+ICAgICAgICAgICAgICAgICAgTG9jYWwzICs9IExvY2FsMQogICAgICAgICAgICAgICAgICAgICAg
+ICBDb25jYXRlbmF0ZSAoTG9jYWwyLCBMb2NhbDAsIExvY2FsMikKICAgICAgICAgICAgICAgICAg
+ICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIERldmljZSAo
+TlYwMCkKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgTmFtZSAoX0FEUiwgT25lKSAgLy8g
+X0FEUjogQWRkcmVzcwogICAgICAgICAgICAgICAgTWV0aG9kIChfRFNNLCA0LCBOb3RTZXJpYWxp
+emVkKSAgLy8gX0RTTTogRGV2aWNlLVNwZWNpZmljIE1ldGhvZAogICAgICAgICAgICAgICAgewog
+ICAgICAgICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJnMSwgQXJnMiwgQXJnMywg
+T25lKSkKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAgICAgICAgRGV2aWNl
+IChOVjAxKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBOYW1lIChfQURSLCAweDAyKSAg
+Ly8gX0FEUjogQWRkcmVzcwogICAgICAgICAgICAgICAgTWV0aG9kIChfRFNNLCA0LCBOb3RTZXJp
+YWxpemVkKSAgLy8gX0RTTTogRGV2aWNlLVNwZWNpZmljIE1ldGhvZAogICAgICAgICAgICAgICAg
+ewogICAgICAgICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJnMSwgQXJnMiwgQXJn
+MywgMHgwMikpCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIERl
+dmljZSAoTlYwMikKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgTmFtZSAoX0FEUiwgMHgw
+MykgIC8vIF9BRFI6IEFkZHJlc3MKICAgICAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwgTm90
+U2VyaWFsaXplZCkgIC8vIF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAgICAg
+ICAgIHsKICAgICAgICAgICAgICAgICAgICBSZXR1cm4gKE5DQUwgKEFyZzAsIEFyZzEsIEFyZzIs
+IEFyZzMsIDB4MDMpKQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CgogICAgICAgICAg
+ICBEZXZpY2UgKE5WMDMpCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgIE5hbWUgKF9BRFIs
+IDB4MDQpICAvLyBfQURSOiBBZGRyZXNzCiAgICAgICAgICAgICAgICBNZXRob2QgKF9EU00sIDQs
+IE5vdFNlcmlhbGl6ZWQpICAvLyBfRFNNOiBEZXZpY2UtU3BlY2lmaWMgTWV0aG9kCiAgICAgICAg
+ICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgUmV0dXJuIChOQ0FMIChBcmcwLCBBcmcxLCBB
+cmcyLCBBcmczLCAweDA0KSkKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAg
+ICAgICAgRGV2aWNlIChOVjA0KQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBOYW1lIChf
+QURSLCAweDA1KSAgLy8gX0FEUjogQWRkcmVzcwogICAgICAgICAgICAgICAgTWV0aG9kIChfRFNN
+LCA0LCBOb3RTZXJpYWxpemVkKSAgLy8gX0RTTTogRGV2aWNlLVNwZWNpZmljIE1ldGhvZAogICAg
+ICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJn
+MSwgQXJnMiwgQXJnMywgMHgwNSkpCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAg
+ICAgICB9CiAgICB9CgogICAgTmFtZSAoTUVNQSwgMHhGRkZGMDAwMCkKfQoK
+
+--_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_
+Content-Type: application/octet-stream; name="SSDT-x86-dbg.dsl"
+Content-Description: SSDT-x86-dbg.dsl
+Content-Disposition: attachment; filename="SSDT-x86-dbg.dsl"; size=6934;
+	creation-date="Fri, 13 Dec 2019 12:27:25 GMT";
+	modification-date="Fri, 13 Dec 2019 12:28:25 GMT"
+Content-Transfer-Encoding: base64
+
+LyoKICogSW50ZWwgQUNQSSBDb21wb25lbnQgQXJjaGl0ZWN0dXJlCiAqIEFNTC9BU0wrIERpc2Fz
+c2VtYmxlciB2ZXJzaW9uIDIwMTgwMTA1ICg2NC1iaXQgdmVyc2lvbikKICogQ29weXJpZ2h0IChj
+KSAyMDAwIC0gMjAxOCBJbnRlbCBDb3Jwb3JhdGlvbgogKiAKICogRGlzYXNzZW1ibGluZyB0byBz
+eW1ib2xpYyBBU0wrIG9wZXJhdG9ycwogKgogKiBEaXNhc3NlbWJseSBvZiBTU0RULCBNb24gTm92
+IDE4IDE1OjUzOjE0IDIwMTkKICoKICogT3JpZ2luYWwgVGFibGUgSGVhZGVyOgogKiAgICAgU2ln
+bmF0dXJlICAgICAgICAiU1NEVCIKICogICAgIExlbmd0aCAgICAgICAgICAgMHgwMDAwMDJFRCAo
+NzQ5KQogKiAgICAgUmV2aXNpb24gICAgICAgICAweDAxCiAqICAgICBDaGVja3N1bSAgICAgICAg
+IDB4M0QKICogICAgIE9FTSBJRCAgICAgICAgICAgIkJPQ0hTICIKICogICAgIE9FTSBUYWJsZSBJ
+RCAgICAgIk5WRElNTSIKICogICAgIE9FTSBSZXZpc2lvbiAgICAgMHgwMDAwMDAwMSAoMSkKICog
+ICAgIENvbXBpbGVyIElEICAgICAgIkJYUEMiCiAqICAgICBDb21waWxlciBWZXJzaW9uIDB4MDAw
+MDAwMDEgKDEpCiAqLwpEZWZpbml0aW9uQmxvY2sgKCIiLCAiU1NEVCIsIDEsICJCT0NIUyAiLCAi
+TlZESU1NIiwgMHgwMDAwMDAwMikKewogICAgU2NvcGUgKFxfU0IpCiAgICB7CiAgICAgICAgRGV2
+aWNlIChOVkRSKQogICAgICAgIHsKICAgICAgICAgICAgTmFtZSAoX0hJRCwgIkFDUEkwMDEyIiAv
+KiBOVkRJTU0gUm9vdCBEZXZpY2UgKi8pICAvLyBfSElEOiBIYXJkd2FyZSBJRAogICAgICAgICAg
+ICBNZXRob2QgKE5DQUwsIDUsIFNlcmlhbGl6ZWQpCiAgICAgICAgICAgIHsKICAgICAgICAgICAg
+ICAgIExvY2FsNiA9IE1FTUEgLyogXE1FTUEgKi8KICAgICAgICAgICAgICAgIE9wZXJhdGlvblJl
+Z2lvbiAoTlBJTywgU3lzdGVtSU8sIDB4MEExOCwgMHgwNCkKICAgICAgICAgICAgICAgIE9wZXJh
+dGlvblJlZ2lvbiAoTlJBTSwgU3lzdGVtTWVtb3J5LCBMb2NhbDYsIDB4MTAwMCkKICAgICAgICAg
+ICAgICAgIEZpZWxkIChOUElPLCBEV29yZEFjYywgTm9Mb2NrLCBQcmVzZXJ2ZSkKICAgICAgICAg
+ICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBOVEZJLCAgIDMyCiAgICAgICAgICAgICAgICB9
+CgogICAgICAgICAgICAgICAgRmllbGQgKE5SQU0sIERXb3JkQWNjLCBOb0xvY2ssIFByZXNlcnZl
+KQogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIEhETEUsICAgMzIsIAogICAg
+ICAgICAgICAgICAgICAgIFJFVlMsICAgMzIsIAogICAgICAgICAgICAgICAgICAgIEZVTkMsICAg
+MzIsIAogICAgICAgICAgICAgICAgICAgIEZBUkcsICAgMzI2NzIKICAgICAgICAgICAgICAgIH0K
+CiAgICAgICAgICAgICAgICBGaWVsZCAoTlJBTSwgRFdvcmRBY2MsIE5vTG9jaywgUHJlc2VydmUp
+CiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgUkxFTiwgICAzMiwgCiAgICAg
+ICAgICAgICAgICAgICAgT0RBVCwgICAzMjczNgogICAgICAgICAgICAgICAgfQogICAgICAgICAg
+ICAgICAgCiAgICAgICAgICAgICAgICBGaWVsZCAoTlJBTSwgRFdvcmRBY2MsIE5vTG9jaywgUHJl
+c2VydmUpCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgTkJVRiwgICAzMjc2
+OCAKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBJZiAoKEFyZzQgPT0gWmVybykp
+CiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgTG9jYWwwID0gVG9VVUlEICgi
+MmYxMGU3YTQtOWU5MS0xMWU0LTg5ZDMtMTIzYjkzZjc1Y2JhIikKICAgICAgICAgICAgICAgIH0K
+ICAgICAgICAgICAgICAgIEVsc2VJZiAoKEFyZzQgPT0gMHgwMDAxMDAwMCkpCiAgICAgICAgICAg
+ICAgICB7CiAgICAgICAgICAgICAgICAgICAgTG9jYWwwID0gVG9VVUlEICgiNjQ4YjljZjItY2Rh
+MS00MzEyLThhZDktNDljNGFmMzJiZDYyIikKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAg
+ICAgIEVsc2UKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBMb2NhbDAgPSBU
+b1VVSUQgKCI0MzA5YWMzMC0wZDExLTExZTQtOTE5MS0wODAwMjAwYzlhNjYiKQogICAgICAgICAg
+ICAgICAgfQoKICAgICAgICAgICAgICAgIElmICgoKExvY2FsNiA9PSBaZXJvKSB8IChBcmcwICE9
+IExvY2FsMCkpKQogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIElmICgoQXJn
+MiA9PSBaZXJvKSkKICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAg
+IFJldHVybiAoQnVmZmVyIChPbmUpCiAgICAgICAgICAgICAgICAgICAgICAgIHsKICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAweDAwICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgLy8gLgogICAgICAgICAgICAgICAgICAgICAgICB9KQogICAgICAgICAgICAg
+ICAgICAgIH0KCiAgICAgICAgICAgICAgICAgICAgUmV0dXJuIChCdWZmZXIgKE9uZSkKICAgICAg
+ICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAgICAweDAxICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLy8gLgogICAgICAgICAgICAgICAgICAg
+IH0pCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgSERMRSA9IEFyZzQKICAgICAg
+ICAgICAgICAgIFJFVlMgPSBBcmcxCiAgICAgICAgICAgICAgICBGVU5DID0gQXJnMgogICAgICAg
+ICAgICAgICAgSWYgKCgoT2JqZWN0VHlwZSAoQXJnMykgPT0gMHgwNCkgJiAoU2l6ZU9mIChBcmcz
+KSA9PSBPbmUpKSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBMb2NhbDIg
+PSBBcmczIFtaZXJvXQogICAgICAgICAgICAgICAgICAgIExvY2FsMyA9IERlcmVmT2YgKExvY2Fs
+MikKICAgICAgICAgICAgICAgICAgICBGQVJHID0gTG9jYWwzCiAgICAgICAgICAgICAgICB9CiAg
+ICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgTG9jYWwyID0gMHg5IAogICAgICAgICAgICAg
+ICAgcHJpbnRmKCJBTUw6TlZESU1NIENyZWF0aW5nIFRCVUYgd2l0aCBieXRlcyAlbyIsIExvY2Fs
+MikKICAgICAgICAgICAgICAgIENyZWF0ZUZpZWxkIChOQlVGLCBaZXJvLCAoTG9jYWwyIDw8IDMp
+LCBUQlVGKQogICAgICAgICAgICAgICAgQ29uY2F0ZW5hdGUgKEJ1ZmZlciAoWmVybyl7fSwgVEJV
+RiwgTG9jYWwzKQogICAgICAgICAgICAgICAgcHJpbnRmKCJBTUw6TlZESU1NIFNpemUgb2YgVEJV
+RihMb2NhbDMpICVvIiwgU2l6ZU9mKExvY2FsMykpCgogICAgICAgICAgICAgICAgTlRGSSA9IExv
+Y2FsNgogICAgICAgICAgICAgICAgTG9jYWwxID0gKFJMRU4gLSAweDA0KQogICAgICAgICAgICAg
+ICAgTG9jYWwxID0gKExvY2FsMSA8PCAweDAzKQogICAgICAgICAgICAgICAgQ3JlYXRlRmllbGQg
+KE9EQVQsIFplcm8sIExvY2FsMSwgT0JVRikKICAgICAgICAgICAgICAgIENvbmNhdGVuYXRlIChC
+dWZmZXIgKFplcm8pe30sIE9CVUYsIExvY2FsNykKICAgICAgICAgICAgICAgIFJldHVybiAoTG9j
+YWw3KQogICAgICAgICAgICB9CgogICAgICAgICAgICBNZXRob2QgKF9EU00sIDQsIE5vdFNlcmlh
+bGl6ZWQpICAvLyBfRFNNOiBEZXZpY2UtU3BlY2lmaWMgTWV0aG9kCiAgICAgICAgICAgIHsKICAg
+ICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJnMSwgQXJnMiwgQXJnMywgWmVybykp
+CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIE5hbWUgKFJTVEEsIFplcm8pCiAgICAgICAgICAg
+IE1ldGhvZCAoUkZJVCwgMSwgU2VyaWFsaXplZCkKICAgICAgICAgICAgewogICAgICAgICAgICAg
+ICAgTmFtZSAoT0ZTVCwgWmVybykKICAgICAgICAgICAgICAgIE9GU1QgPSBBcmcwCiAgICAgICAg
+ICAgICAgICBMb2NhbDAgPSBOQ0FMIChUb1VVSUQgKCI2NDhiOWNmMi1jZGExLTQzMTItOGFkOS00
+OWM0YWYzMmJkNjIiKSwgT25lLCBPbmUsIFBhY2thZ2UgKDB4MDEpCiAgICAgICAgICAgICAgICAg
+ICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIE9GU1QKICAgICAgICAgICAgICAg
+ICAgICAgICAgfSwgMHgwMDAxMDAwMCkKICAgICAgICAgICAgICAgIENyZWF0ZURXb3JkRmllbGQg
+KExvY2FsMCwgWmVybywgU1RBVSkKICAgICAgICAgICAgICAgIFJTVEEgPSBTVEFVIC8qIFxfU0Jf
+Lk5WRFIuUkZJVC5TVEFVICovCiAgICAgICAgICAgICAgICBJZiAoKFplcm8gIT0gU1RBVSkpCiAg
+ICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgUmV0dXJuIChCdWZmZXIgKFplcm8p
+e30pCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgTG9jYWwxID0gU2l6ZU9mIChM
+b2NhbDApCiAgICAgICAgICAgICAgICBMb2NhbDEgLT0gMHgwNAogICAgICAgICAgICAgICAgSWYg
+KChMb2NhbDEgPT0gWmVybykpCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAg
+UmV0dXJuIChCdWZmZXIgKFplcm8pe30pCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAg
+ICAgQ3JlYXRlRmllbGQgKExvY2FsMCwgMHgyMCwgKExvY2FsMSA8PCAweDAzKSwgQlVGRikKICAg
+ICAgICAgICAgICAgIFJldHVybiAoQlVGRikgLyogXF9TQl8uTlZEUi5SRklULkJVRkYgKi8KICAg
+ICAgICAgICAgfQoKICAgICAgICAgICAgTWV0aG9kIChfRklULCAwLCBTZXJpYWxpemVkKSAgLy8g
+X0ZJVDogRmlybXdhcmUgSW50ZXJmYWNlIFRhYmxlCiAgICAgICAgICAgIHsKICAgICAgICAgICAg
+ICAgIExvY2FsMiA9IEJ1ZmZlciAoWmVybyl7fQogICAgICAgICAgICAgICAgTG9jYWwzID0gWmVy
+bwogICAgICAgICAgICAgICAgV2hpbGUgKE9uZSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAg
+ICAgICAgICAgICBMb2NhbDAgPSBSRklUIChMb2NhbDMpCiAgICAgICAgICAgICAgICAgICAgTG9j
+YWwxID0gU2l6ZU9mIChMb2NhbDApCiAgICAgICAgICAgICAgICAgICAgSWYgKChSU1RBID09IDB4
+MDEwMCkpCiAgICAgICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICAgICBMb2Nh
+bDIgPSBCdWZmZXIgKFplcm8pe30KICAgICAgICAgICAgICAgICAgICAgICAgTG9jYWwzID0gWmVy
+bwogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBFbHNlCiAgICAgICAg
+ICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICAgICBJZiAoKExvY2FsMSA9PSBaZXJv
+KSkKICAgICAgICAgICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+UmV0dXJuIChMb2NhbDIpCiAgICAgICAgICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAg
+ICAgICAgICAgIExvY2FsMyArPSBMb2NhbDEKICAgICAgICAgICAgICAgICAgICAgICAgQ29uY2F0
+ZW5hdGUgKExvY2FsMiwgTG9jYWwwLCBMb2NhbDIpCiAgICAgICAgICAgICAgICAgICAgfQogICAg
+ICAgICAgICAgICAgfQogICAgICAgICAgICB9CgogICAgICAgICAgICBEZXZpY2UgKE5WMDApCiAg
+ICAgICAgICAgIHsKICAgICAgICAgICAgICAgIE5hbWUgKF9BRFIsIE9uZSkgIC8vIF9BRFI6IEFk
+ZHJlc3MKICAgICAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwgTm90U2VyaWFsaXplZCkgIC8v
+IF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAgICAgICAgIHsKICAgICAgICAg
+ICAgICAgICAgICBSZXR1cm4gKE5DQUwgKEFyZzAsIEFyZzEsIEFyZzIsIEFyZzMsIE9uZSkpCiAg
+ICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIERldmljZSAoTlYwMSkK
+ICAgICAgICAgICAgewogICAgICAgICAgICAgICAgTmFtZSAoX0FEUiwgMHgwMikgIC8vIF9BRFI6
+IEFkZHJlc3MKICAgICAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwgTm90U2VyaWFsaXplZCkg
+IC8vIF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAgICAgICAgIHsKICAgICAg
+ICAgICAgICAgICAgICBSZXR1cm4gKE5DQUwgKEFyZzAsIEFyZzEsIEFyZzIsIEFyZzMsIDB4MDIp
+KQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CgogICAgICAgICAgICBEZXZpY2UgKE5W
+MDIpCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgIE5hbWUgKF9BRFIsIDB4MDMpICAvLyBf
+QURSOiBBZGRyZXNzCiAgICAgICAgICAgICAgICBNZXRob2QgKF9EU00sIDQsIE5vdFNlcmlhbGl6
+ZWQpICAvLyBfRFNNOiBEZXZpY2UtU3BlY2lmaWMgTWV0aG9kCiAgICAgICAgICAgICAgICB7CiAg
+ICAgICAgICAgICAgICAgICAgUmV0dXJuIChOQ0FMIChBcmcwLCBBcmcxLCBBcmcyLCBBcmczLCAw
+eDAzKSkKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAgICAgICAgRGV2aWNl
+IChOVjAzKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBOYW1lIChfQURSLCAweDA0KSAg
+Ly8gX0FEUjogQWRkcmVzcwogICAgICAgICAgICAgICAgTWV0aG9kIChfRFNNLCA0LCBOb3RTZXJp
+YWxpemVkKSAgLy8gX0RTTTogRGV2aWNlLVNwZWNpZmljIE1ldGhvZAogICAgICAgICAgICAgICAg
+ewogICAgICAgICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJnMSwgQXJnMiwgQXJn
+MywgMHgwNCkpCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIERl
+dmljZSAoTlYwNCkKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgTmFtZSAoX0FEUiwgMHgw
+NSkgIC8vIF9BRFI6IEFkZHJlc3MKICAgICAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwgTm90
+U2VyaWFsaXplZCkgIC8vIF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAgICAg
+ICAgIHsKICAgICAgICAgICAgICAgICAgICBSZXR1cm4gKE5DQUwgKEFyZzAsIEFyZzEsIEFyZzIs
+IEFyZzMsIDB4MDUpKQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQog
+ICAgfQoKICAgIE5hbWUgKE1FTUEsIDB4QkZCRkQwMDApCn0KCg==
+
+--_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_--
 
