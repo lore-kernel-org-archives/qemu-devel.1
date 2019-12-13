@@ -2,94 +2,65 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CE0C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:26:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0E6DC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:31:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2479422527
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:26:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TuOEG/se"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2479422527
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 86BDA24656
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:31:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86BDA24656
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iffKy-0001xd-8U
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 02:26:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54851)
+	id 1iffQK-0004bc-Nw
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 02:31:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36871)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iffK0-0001Qe-1I
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:25:09 -0500
+ (envelope-from <clg@kaod.org>) id 1iffOp-0003aG-0M
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:30:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iffJy-0006jx-Bk
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:25:07 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35920
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iffOn-000587-Dl
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:30:06 -0500
+Received: from 10.mo69.mail-out.ovh.net ([46.105.73.241]:45134)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iffJu-0006gT-L8
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:25:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576221901;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Na3N2WXXqvUnmunnAoOZJLOkQIIflLK7Tc2r4I2RqgU=;
- b=TuOEG/se98jhKLtPW/DlJDWvRe56uEJE2UB3j5gnPmPumMEMlD7AjmiztcSBVJfpbSvqrN
- 9u4rEsdhDbAtAPd017tRf8lxTkq+MrFZCv/lCurfYdt4orjw80Xa4/4lVWBmIH/twQD9kw
- SV8A9kTSZJj0l/q3YuRHRrQb2Rsa4N8=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-229-cZUSpixPOfGs6ENkbQHnxw-1; Fri, 13 Dec 2019 02:25:00 -0500
-Received: by mail-qt1-f198.google.com with SMTP id e37so1248927qtk.7
- for <qemu-devel@nongnu.org>; Thu, 12 Dec 2019 23:25:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=rX886d0pBx2+lV5vTKvUPai/BzNutvZN6o5uaESUZ3M=;
- b=oyB2pZttyhFqluZZXpjG/mpZTrcCZWDmWB/afmaaHxk5vA5oocsBlaLb86JxE1n1MW
- jRrXR8mStEO3HaGjJSNqFBkZoYmVvgTb+ygY3xIcclC9xgFEasyU8ywq/3I35QCEyHcl
- zSgY8uSZBIGtPsiaZanjjHf3x+vTv7N8a3tzKtBaJrdJsPqbuQ/8aWK04bWLDQMrb2Kx
- zt0wibq/kkKmEjZXV25L0uSANcrBIBxXITAEd/MJYFBmiC/iJpNMYbaz7gL1OhSo44MF
- GYTG0HAdBO93sU9fqOQtOVFloPCcM76CDw3s/qZWDDZq78X8sVg1JV5SaNABEOzgH8j9
- LpZA==
-X-Gm-Message-State: APjAAAUnGFrbwF3lKT8RPsyZs/jKXg78faGsBK1HJLel7L8mxEU0jzuY
- gUUN2VCpFgNOO4seWF+JFPVCxhAHUgwR7K30QMi8VAKSoTyQdN6OBwqY8oGniBCnuBlxaac9AQ+
- OBHAqGrPvOpxOvrI=
-X-Received: by 2002:ac8:41c3:: with SMTP id o3mr11257196qtm.88.1576221899300; 
- Thu, 12 Dec 2019 23:24:59 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzJ2Jh+2/F1d2/LHgt04MCKI7ksbBJhi8QCKBlbn/MCCEDi4c7DsmTKCFmr8wtEXgNE2mutUw==
-X-Received: by 2002:ac8:41c3:: with SMTP id o3mr11257190qtm.88.1576221899088; 
- Thu, 12 Dec 2019 23:24:59 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id n7sm2573471qke.121.2019.12.12.23.24.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 12 Dec 2019 23:24:58 -0800 (PST)
-Date: Fri, 13 Dec 2019 02:24:54 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Subject: Re: virtio capabilities
-Message-ID: <20191213021820-mutt-send-email-mst@kernel.org>
-References: <823b58f1-f17e-6645-11be-406ad1494e06@ozlabs.ru>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iffOn-0004ru-7S
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:30:05 -0500
+Received: from player726.ha.ovh.net (unknown [10.108.54.209])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id B1DD17436C
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 08:29:51 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player726.ha.ovh.net (Postfix) with ESMTPSA id 4D5CBD2C0463;
+ Fri, 13 Dec 2019 07:29:44 +0000 (UTC)
+Subject: Re: [PATCH v2 1/2] hw/sd: Configure number of slots exposed by the
+ ASPEED SDHCI model
+To: Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org
+References: <cover.fc3e5e495d85ebd919c1f06a1a2c7c7730518f9c.1576211124.git-series.andrew@aj.id.au>
+ <6281ebb475f652838d10dc48ec70fa5113b1f029.1576211124.git-series.andrew@aj.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <863368db-1056-81eb-d52f-d033002b4650@kaod.org>
+Date: Fri, 13 Dec 2019 08:29:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <823b58f1-f17e-6645-11be-406ad1494e06@ozlabs.ru>
-X-MC-Unique: cZUSpixPOfGs6ENkbQHnxw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6281ebb475f652838d10dc48ec70fa5113b1f029.1576211124.git-series.andrew@aj.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 4462785757740501795
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudelkedguddtjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedviedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.73.241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,89 +72,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>, joel@jms.id.au,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 13, 2019 at 05:05:05PM +1100, Alexey Kardashevskiy wrote:
-> Hi!
+On 13/12/2019 05:28, Andrew Jeffery wrote:
+> The AST2600 includes a second cut-down version of the SD/MMC controller
+> found in the AST2500, named the eMMC controller. It's cut down in the
+> sense that it only supports one slot rather than two, but it brings the
+> total number of slots supported by the AST2600 to three.
 >=20
-> I am having an issue with capabilities (hopefully the chunk formatting
-> won't break).
+> The existing code assumed that the SD controller always provided two
+> slots. Rework the SDHCI object to expose the number of slots as a
+> property to be set by the SoC configuration.
 >=20
-> The problem is that when virtio_pci_find_capability() reads
-> pci_find_capability(dev, PCI_CAP_ID_VNDR), 0 is returned; if repeated,
-> it returns a valid number (0x84). Timing seems to matter. pci_cfg_read
-> trace shows that that first time read does not reach QEMU but others do
-> reach QEMU and return what is expected.
->=20
-> How to debug this, any quick ideas?
-> The config space is not a MMIO BAR
-> or KVM memory slot or anything like this, right? :) Thanks,
+> Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Depends on the platform.
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-E.g. on x86, when using cf8/cfc pair, if guest doesn't
-have a lock around programming the pair of registers,
-then one access can conflict with another one.
-
-When using express it's MMIO so shouldn't be a problem.
-
+> ---
+>  hw/arm/aspeed.c              |  2 +-
+>  hw/arm/aspeed_ast2600.c      |  2 ++
+>  hw/arm/aspeed_soc.c          |  2 ++
+>  hw/sd/aspeed_sdhci.c         | 11 +++++++++--
+>  include/hw/sd/aspeed_sdhci.h |  1 +
+>  5 files changed, 15 insertions(+), 3 deletions(-)
 >=20
-> [    3.489492] ___K___ (0) virtio_pci_modern_probe 642
-> [    3.489697] ___K___ (0) virtio_pci_find_capability 492: FIND a cap
-> [    3.490070] ___K___ (0) virtio_pci_find_capability 494: cap is at 0
-> [    3.490335] ___K___ (0) virtio_pci_find_capability 492: FIND a cap
-> 10909@1576216763.643271:pci_cfg_read virtio-net-pci 00:0 @0x6 -> 0x10
-> 10909@1576216763.643431:pci_cfg_read virtio-net-pci 00:0 @0x34 -> 0x98
-> 10909@1576216763.643591:pci_cfg_read virtio-net-pci 00:0 @0x98 -> 0x8411
-> 10909@1576216763.643747:pci_cfg_read virtio-net-pci 00:0 @0x84 -> 0x7009
-> [    3.491264] ___K___ (0) virtio_pci_find_capability 494: cap is at 132
-> 10909@1576216763.644140:pci_cfg_read virtio-net-pci 00:0 @0x87 -> 0x5
-> 10909@1576216763.644287:pci_cfg_read virtio-net-pci 00:0 @0x88 -> 0x0
-> [    3.491803] ___K___ (0) virtio_pci_find_capability 506: 5 0
-> 10909@1576216763.644632:pci_cfg_read virtio-net-pci 00:0 @0x85 -> 0x70
-> 10909@1576216763.644786:pci_cfg_read virtio-net-pci 00:0 @0x70 -> 0x6009
-> 10909@1576216763.644942:pci_cfg_read virtio-net-pci 00:0 @0x73 -> 0x2
-> 10909@1576216763.645092:pci_cfg_read virtio-net-pci 00:0 @0x74 -> 0x4
-> [    3.492607] ___K___ (0) virtio_pci_find_capability 506: 2 4
->=20
->=20
->=20
->=20
->=20
-> diff --git a/drivers/virtio/virtio_pci_modern.c
-> b/drivers/virtio/virtio_pci_modern.c
-> index 7abcc50838b8..85b2a7ce96e9 100644
-> --- a/drivers/virtio/virtio_pci_modern.c
-> +++ b/drivers/virtio/virtio_pci_modern.c
-> @@ -486,9 +486,14 @@ static const struct virtio_config_ops
-> virtio_pci_config_ops =3D {
->  static inline int virtio_pci_find_capability(struct pci_dev *dev, u8
-> cfg_type,
->                                              u32 ioresource_types, int
-> *bars)
+> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+> index 028191ff36fc..862549b1f3a9 100644
+> --- a/hw/arm/aspeed.c
+> +++ b/hw/arm/aspeed.c
+> @@ -259,7 +259,7 @@ static void aspeed_board_init(MachineState *machine=
+,
+>          cfg->i2c_init(bmc);
+>      }
+> =20
+> -    for (i =3D 0; i < ARRAY_SIZE(bmc->soc.sdhci.slots); i++) {
+> +    for (i =3D 0; i < bmc->soc.sdhci.num_slots; i++) {
+>          SDHCIState *sdhci =3D &bmc->soc.sdhci.slots[i];
+>          DriveInfo *dinfo =3D drive_get_next(IF_SD);
+>          BlockBackend *blk;
+> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+> index 931887ac681f..931ee5aae183 100644
+> --- a/hw/arm/aspeed_ast2600.c
+> +++ b/hw/arm/aspeed_ast2600.c
+> @@ -208,6 +208,8 @@ static void aspeed_soc_ast2600_init(Object *obj)
+>      sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdh=
+ci),
+>                            TYPE_ASPEED_SDHCI);
+> =20
+> +    object_property_set_int(OBJECT(&s->sdhci), 2, "num-slots", &error_=
+abort);
+> +
+>      /* Init sd card slot class here so that they're under the correct =
+parent */
+>      for (i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
+>          sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[=
+i]),
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index f4fe243458fd..c39a42f914d4 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -215,6 +215,8 @@ static void aspeed_soc_init(Object *obj)
+>      sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdh=
+ci),
+>                            TYPE_ASPEED_SDHCI);
+> =20
+> +    object_property_set_int(OBJECT(&s->sdhci), 2, "num-slots", &error_=
+abort);
+> +
+>      /* Init sd card slot class here so that they're under the correct =
+parent */
+>      for (i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
+>          sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[=
+i]),
+> diff --git a/hw/sd/aspeed_sdhci.c b/hw/sd/aspeed_sdhci.c
+> index cff3eb7dd21e..939d1510dedb 100644
+> --- a/hw/sd/aspeed_sdhci.c
+> +++ b/hw/sd/aspeed_sdhci.c
+> @@ -13,6 +13,7 @@
+>  #include "qapi/error.h"
+>  #include "hw/irq.h"
+>  #include "migration/vmstate.h"
+> +#include "hw/qdev-properties.h"
+> =20
+>  #define ASPEED_SDHCI_INFO            0x00
+>  #define  ASPEED_SDHCI_INFO_RESET     0x00030000
+> @@ -120,14 +121,14 @@ static void aspeed_sdhci_realize(DeviceState *dev=
+, Error **errp)
+> =20
+>      /* Create input irqs for the slots */
+>      qdev_init_gpio_in_named_with_opaque(DEVICE(sbd), aspeed_sdhci_set_=
+irq,
+> -                                        sdhci, NULL, ASPEED_SDHCI_NUM_=
+SLOTS);
+> +                                        sdhci, NULL, sdhci->num_slots)=
+;
+> =20
+>      sysbus_init_irq(sbd, &sdhci->irq);
+>      memory_region_init_io(&sdhci->iomem, OBJECT(sdhci), &aspeed_sdhci_=
+ops,
+>                            sdhci, TYPE_ASPEED_SDHCI, 0x1000);
+>      sysbus_init_mmio(sbd, &sdhci->iomem);
+> =20
+> -    for (int i =3D 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
+> +    for (int i =3D 0; i < sdhci->num_slots; ++i) {
+>          Object *sdhci_slot =3D OBJECT(&sdhci->slots[i]);
+>          SysBusDevice *sbd_slot =3D SYS_BUS_DEVICE(&sdhci->slots[i]);
+> =20
+> @@ -174,6 +175,11 @@ static const VMStateDescription vmstate_aspeed_sdh=
+ci =3D {
+>      },
+>  };
+> =20
+> +static Property aspeed_sdhci_properties[] =3D {
+> +    DEFINE_PROP_UINT8("num-slots", AspeedSDHCIState, num_slots, 0),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>  static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
 >  {
-> -       int pos;
-> +       int pos =3D 0;// =3D pci_find_capability(dev, PCI_CAP_ID_VNDR);
+>      DeviceClass *dc =3D DEVICE_CLASS(classp);
+> @@ -181,6 +187,7 @@ static void aspeed_sdhci_class_init(ObjectClass *cl=
+assp, void *data)
+>      dc->realize =3D aspeed_sdhci_realize;
+>      dc->reset =3D aspeed_sdhci_reset;
+>      dc->vmsd =3D &vmstate_aspeed_sdhci;
+> +    dc->props =3D aspeed_sdhci_properties;
+>  }
+> =20
+>  static TypeInfo aspeed_sdhci_info =3D {
+> diff --git a/include/hw/sd/aspeed_sdhci.h b/include/hw/sd/aspeed_sdhci.=
+h
+> index dfdab4379021..dffbb46946b9 100644
+> --- a/include/hw/sd/aspeed_sdhci.h
+> +++ b/include/hw/sd/aspeed_sdhci.h
+> @@ -24,6 +24,7 @@ typedef struct AspeedSDHCIState {
+>      SysBusDevice parent;
+> =20
+>      SDHCIState slots[ASPEED_SDHCI_NUM_SLOTS];
+> +    uint8_t num_slots;
+> =20
+>      MemoryRegion iomem;
+>      qemu_irq irq;
 >=20
-> -       for (pos =3D pci_find_capability(dev, PCI_CAP_ID_VNDR);
-> +       while (!pos) {
-> +               pr_err("___K___ (%u) %s %u: FIND a cap\n",
-> smp_processor_id(), __func__, __LINE__);
-> +               pos =3D pci_find_capability(dev, PCI_CAP_ID_VNDR);
-> +               pr_err("___K___ (%u) %s %u: cap is at %d\n",
-> smp_processor_id(), __func__, __LINE__, pos);
-> +       }
-> +       for (;
->              pos > 0;
->              pos =3D pci_find_next_capability(dev, pos, PCI_CAP_ID_VNDR))=
- {
->                 u8 type, bar;
->=20
->=20
-> --=20
-> Alexey
 
 
