@@ -2,96 +2,64 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 975E1C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CC5C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 05:41:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60051206E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:29:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C43FC2253D
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 05:41:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="WodJyDHB";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XnKiNzXd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60051206E2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="R4gOIp9d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C43FC2253D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifcZY-0005QI-8t
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 23:29:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55323)
+	id 1ifdhM-0000FC-MK
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 00:41:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50425)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrew@aj.id.au>) id 1ifcY1-0003Tb-0n
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:27:26 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ifdgC-0007d6-KU
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 00:39:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrew@aj.id.au>) id 1ifcXw-0003JK-L9
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:27:24 -0500
-Received: from wout3-smtp.messagingengine.com ([64.147.123.19]:54267)
+ (envelope-from <dgibson@ozlabs.org>) id 1ifdg9-0004PC-VS
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 00:39:56 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:51953 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrew@aj.id.au>)
- id 1ifcXt-0003Ai-Lv; Thu, 12 Dec 2019 23:27:17 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.west.internal (Postfix) with ESMTP id 7267A87D;
- Thu, 12 Dec 2019 23:27:16 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute4.internal (MEProxy); Thu, 12 Dec 2019 23:27:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=from
- :to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-type:content-transfer-encoding; s=fm1; bh=
- 0lW1mMLBYhMF9Wt+yQXH47/Bfxh3BxEXaqeyk1Njp9k=; b=WodJyDHBTZL3ni+d
- 53jU7Qzqp16ZJwPCeyHiyvvK9VetkUfbOqlL+9dI3R/E7N4O8yH8ykytGTlO+Gsu
- MaOp9w43POdA60NhLLHxV4fl5I4+cE0cnJPf/sgyTMpDELfyjh0PeIxhbMaLLbUx
- wapi55dgTjPS/wkouwYQTLhJFoVA9OvdBvVpURqIlO3PCQ3FO+R/KAAy3hmzmZco
- PfI4rPya8AyUGwIU/egeSgul/zFuErtiRirBETTaEGv7ce8zhAZ6C+YS25JFIDXp
- OqZDg9Vf14OpYuRAHaBYAvJjhOanDhR8/mbS9zkC/j3Rn0foQ8BkmxZnoCpvgilR
- 4BMHBA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:content-type
- :date:from:in-reply-to:message-id:mime-version:references
- :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
- :x-sasl-enc; s=fm1; bh=0lW1mMLBYhMF9Wt+yQXH47/Bfxh3BxEXaqeyk1Njp
- 9k=; b=XnKiNzXdpUss4L6qJkeBUIJXU3PanyxhmqJ6+vMk4ZAG38htP23jU+bbB
- 3VAvgNaNgh5A2mcMwPQnxnw+HqnYjvj776l95zqA1eh2wD59dPeeriLTQZOmNUR6
- l8S65WQSnbVRFG5tFptTY1dk2IlDKiWhNF1cqOE5fsvxTlsFqkNM3FMG7P+IrfyI
- xNomE+nl7I9zEPiKPFUaljeV2SHsneOJH5PkAxEuKa8pPbq9wBa3URy3VpY7ZaFr
- ixlXNGlwtUE9VwAM1uUVQb1uzOKOxK41gi/yCt/vq7Om69iGjJPEoCQsEBwN+fQg
- BUonlA7J7Dq1nS52VCUsVWCor6DQw==
-X-ME-Sender: <xms:IxPzXYDKFnzgCmTEFFy7NX2TcifkXCP7vE3jgAUlAmzdwPdZOdFm_g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrudelkedgjedtucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomheptehnughr
- vgifucflvghffhgvrhihuceorghnughrvgifsegrjhdrihgurdgruheqnecukfhppedvtd
- dvrdekuddrudekrdeftdenucfrrghrrghmpehmrghilhhfrhhomheprghnughrvgifsegr
- jhdrihgurdgruhenucevlhhushhtvghrufhiiigvpedt
-X-ME-Proxy: <xmx:IxPzXaF3wZtP8fclQpNOYBzB9omYtmZ8hfpoFRYDlGnQ0eajZQ8_fw>
- <xmx:IxPzXf4owusVqP5hHefPk_mwoqKjC8T11BjEe4vYtvGZJ42_gDziBw>
- <xmx:IxPzXRQoiCFYCYjZ5I794TIOiEQwf9Mp5rwu4VoyWLuPBqHsDb8W4w>
- <xmx:JBPzXQvkYCh8m3JxfD7veREistXs4K-tycwkI0LcAHyuQAy6-DVXdg>
-Received: from mistburn.au.ibm.com (bh02i525f01.au.ibm.com [202.81.18.30])
- by mail.messagingengine.com (Postfix) with ESMTPA id 4D73B80066;
- Thu, 12 Dec 2019 23:27:13 -0500 (EST)
-From: Andrew Jeffery <andrew@aj.id.au>
-To: qemu-arm@nongnu.org
-Subject: [PATCH v2 1/2] hw/sd: Configure number of slots exposed by the ASPEED
- SDHCI model
-Date: Fri, 13 Dec 2019 14:58:41 +1030
-Message-Id: <6281ebb475f652838d10dc48ec70fa5113b1f029.1576211124.git-series.andrew@aj.id.au>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.fc3e5e495d85ebd919c1f06a1a2c7c7730518f9c.1576211124.git-series.andrew@aj.id.au>
-References: <cover.fc3e5e495d85ebd919c1f06a1a2c7c7730518f9c.1576211124.git-series.andrew@aj.id.au>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ifdg8-0004He-Pv; Fri, 13 Dec 2019 00:39:53 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47YzyD1Y1pz9sPT; Fri, 13 Dec 2019 16:39:48 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1576215588;
+ bh=K8I7BySlXe5w70jX25JhHMATjVMwd7LT9XDyP6NzhxY=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=R4gOIp9dC2iGmCiVVrn92yqN5+vXvWRJEB1hptLieKldWsMz8jCmf7fayxM3Sv3Op
+ JYMPzag2Vm3L9nHpwun44jntpfif0ewVJfSmsh4WATeVZ+heXE/ozhP3LKyLM05D2G
+ 0jmkqPFWxBODljfDNs1ub2avWEP8LkvpThGVS03Q=
+Date: Fri, 13 Dec 2019 16:39:33 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Subject: Re: [PATCH v5 3/5] tpm_spapr: Support suspend and resume
+Message-ID: <20191213053933.GE207300@umbus.fritz.box>
+References: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
+ <20191212202430.1079725-4-stefanb@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="qicme7IxPpkH/pPU"
+Content-Disposition: inline
+In-Reply-To: <20191212202430.1079725-4-stefanb@linux.vnet.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 64.147.123.19
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,132 +71,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, clg@kaod.org,
- joel@jms.id.au
+Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The AST2600 includes a second cut-down version of the SD/MMC controller
-found in the AST2500, named the eMMC controller. It's cut down in the
-sense that it only supports one slot rather than two, but it brings the
-total number of slots supported by the AST2600 to three.
 
-The existing code assumed that the SD controller always provided two
-slots. Rework the SDHCI object to expose the number of slots as a
-property to be set by the SoC configuration.
+--qicme7IxPpkH/pPU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Andrew Jeffery <andrew@aj.id.au>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/arm/aspeed.c              |  2 +-
- hw/arm/aspeed_ast2600.c      |  2 ++
- hw/arm/aspeed_soc.c          |  2 ++
- hw/sd/aspeed_sdhci.c         | 11 +++++++++--
- include/hw/sd/aspeed_sdhci.h |  1 +
- 5 files changed, 15 insertions(+), 3 deletions(-)
+On Thu, Dec 12, 2019 at 03:24:28PM -0500, Stefan Berger wrote:
+> Extend the tpm_spapr frontend with VM suspend and resume support.
+>=20
+> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+>=20
+> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
+> index c4a67e2403..8f5a142bd4 100644
+> --- a/hw/tpm/tpm_spapr.c
+> +++ b/hw/tpm/tpm_spapr.c
+> @@ -87,6 +87,8 @@ typedef struct {
+>      TPMVersion be_tpm_version;
+> =20
+>      size_t be_buffer_size;
+> +
+> +    bool deliver_response; /* whether to deliver response after VM resum=
+e */
+>  } SPAPRvTPMState;
+> =20
+>  static void tpm_spapr_show_buffer(const unsigned char *buffer,
+> @@ -256,6 +258,12 @@ static void tpm_spapr_request_completed(TPMIf *ti, i=
+nt ret)
+>      uint32_t len;
+>      int rc;
+> =20
+> +    if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
 
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 028191ff36fc..862549b1f3a9 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -259,7 +259,7 @@ static void aspeed_board_init(MachineState *machine,
-         cfg->i2c_init(bmc);
-     }
- 
--    for (i = 0; i < ARRAY_SIZE(bmc->soc.sdhci.slots); i++) {
-+    for (i = 0; i < bmc->soc.sdhci.num_slots; i++) {
-         SDHCIState *sdhci = &bmc->soc.sdhci.slots[i];
-         DriveInfo *dinfo = drive_get_next(IF_SD);
-         BlockBackend *blk;
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index 931887ac681f..931ee5aae183 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -208,6 +208,8 @@ static void aspeed_soc_ast2600_init(Object *obj)
-     sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdhci),
-                           TYPE_ASPEED_SDHCI);
- 
-+    object_property_set_int(OBJECT(&s->sdhci), 2, "num-slots", &error_abort);
-+
-     /* Init sd card slot class here so that they're under the correct parent */
-     for (i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
-         sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[i]),
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index f4fe243458fd..c39a42f914d4 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -215,6 +215,8 @@ static void aspeed_soc_init(Object *obj)
-     sysbus_init_child_obj(obj, "sdc", OBJECT(&s->sdhci), sizeof(s->sdhci),
-                           TYPE_ASPEED_SDHCI);
- 
-+    object_property_set_int(OBJECT(&s->sdhci), 2, "num-slots", &error_abort);
-+
-     /* Init sd card slot class here so that they're under the correct parent */
-     for (i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
-         sysbus_init_child_obj(obj, "sdhci[*]", OBJECT(&s->sdhci.slots[i]),
-diff --git a/hw/sd/aspeed_sdhci.c b/hw/sd/aspeed_sdhci.c
-index cff3eb7dd21e..939d1510dedb 100644
---- a/hw/sd/aspeed_sdhci.c
-+++ b/hw/sd/aspeed_sdhci.c
-@@ -13,6 +13,7 @@
- #include "qapi/error.h"
- #include "hw/irq.h"
- #include "migration/vmstate.h"
-+#include "hw/qdev-properties.h"
- 
- #define ASPEED_SDHCI_INFO            0x00
- #define  ASPEED_SDHCI_INFO_RESET     0x00030000
-@@ -120,14 +121,14 @@ static void aspeed_sdhci_realize(DeviceState *dev, Error **errp)
- 
-     /* Create input irqs for the slots */
-     qdev_init_gpio_in_named_with_opaque(DEVICE(sbd), aspeed_sdhci_set_irq,
--                                        sdhci, NULL, ASPEED_SDHCI_NUM_SLOTS);
-+                                        sdhci, NULL, sdhci->num_slots);
- 
-     sysbus_init_irq(sbd, &sdhci->irq);
-     memory_region_init_io(&sdhci->iomem, OBJECT(sdhci), &aspeed_sdhci_ops,
-                           sdhci, TYPE_ASPEED_SDHCI, 0x1000);
-     sysbus_init_mmio(sbd, &sdhci->iomem);
- 
--    for (int i = 0; i < ASPEED_SDHCI_NUM_SLOTS; ++i) {
-+    for (int i = 0; i < sdhci->num_slots; ++i) {
-         Object *sdhci_slot = OBJECT(&sdhci->slots[i]);
-         SysBusDevice *sbd_slot = SYS_BUS_DEVICE(&sdhci->slots[i]);
- 
-@@ -174,6 +175,11 @@ static const VMStateDescription vmstate_aspeed_sdhci = {
-     },
- };
- 
-+static Property aspeed_sdhci_properties[] = {
-+    DEFINE_PROP_UINT8("num-slots", AspeedSDHCIState, num_slots, 0),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(classp);
-@@ -181,6 +187,7 @@ static void aspeed_sdhci_class_init(ObjectClass *classp, void *data)
-     dc->realize = aspeed_sdhci_realize;
-     dc->reset = aspeed_sdhci_reset;
-     dc->vmsd = &vmstate_aspeed_sdhci;
-+    dc->props = aspeed_sdhci_properties;
- }
- 
- static TypeInfo aspeed_sdhci_info = {
-diff --git a/include/hw/sd/aspeed_sdhci.h b/include/hw/sd/aspeed_sdhci.h
-index dfdab4379021..dffbb46946b9 100644
---- a/include/hw/sd/aspeed_sdhci.h
-+++ b/include/hw/sd/aspeed_sdhci.h
-@@ -24,6 +24,7 @@ typedef struct AspeedSDHCIState {
-     SysBusDevice parent;
- 
-     SDHCIState slots[ASPEED_SDHCI_NUM_SLOTS];
-+    uint8_t num_slots;
- 
-     MemoryRegion iomem;
-     qemu_irq irq;
--- 
-git-series 0.9.1
+I'm trying to figure out the circumstances in which
+request_completed() would get called before post_load on the
+destination.
+
+> +        /* defer delivery of response until .post_load */
+> +        s->deliver_response |=3D true;
+
+|=3D is a bitwise OR which is not what you want, although it will
+*probably* work in practice.  Better to just use
+	s->deliver_response =3D true;
+
+> +        return;
+> +    }
+> +
+>      s->state =3D SPAPR_VTPM_STATE_COMPLETION;
+> =20
+>      /* a max. of be_buffer_size bytes can be transported */
+> @@ -316,6 +324,7 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
+>      SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(dev);
+> =20
+>      s->state =3D SPAPR_VTPM_STATE_NONE;
+> +    s->deliver_response =3D false;
+> =20
+>      s->be_tpm_version =3D tpm_backend_get_tpm_version(s->be_driver);
+>      tpm_spapr_update_deviceclass(dev);
+> @@ -339,9 +348,53 @@ static enum TPMVersion tpm_spapr_get_version(TPMIf *=
+ti)
+>      return tpm_backend_get_tpm_version(s->be_driver);
+>  }
+> =20
+> +/* persistent state handling */
+> +
+> +static int tpm_spapr_pre_save(void *opaque)
+> +{
+> +    SPAPRvTPMState *s =3D opaque;
+> +
+> +    s->deliver_response |=3D tpm_backend_finish_sync(s->be_driver);
+
+Same problem here.
+
+> +    trace_tpm_spapr_pre_save(s->deliver_response);
+> +    /*
+> +     * we cannot deliver the results to the VM since DMA would touch VM =
+memory
+> +     */
+> +
+> +    return 0;
+> +}
+> +
+> +static int tpm_spapr_post_load(void *opaque, int version_id)
+> +{
+> +    SPAPRvTPMState *s =3D opaque;
+> +
+> +    if (s->deliver_response) {
+> +        trace_tpm_spapr_post_load();
+> +        /* deliver the results to the VM via DMA */
+> +        tpm_spapr_request_completed(TPM_IF(s), 0);
+> +        s->deliver_response =3D false;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+>  static const VMStateDescription vmstate_spapr_vtpm =3D {
+>      .name =3D "tpm-spapr",
+> -    .unmigratable =3D 1,
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 0,
+> +    .minimum_version_id_old =3D 0,
+> +    .pre_save =3D tpm_spapr_pre_save,
+> +    .post_load =3D tpm_spapr_post_load,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_SPAPR_VIO(vdev, SPAPRvTPMState),
+> +
+> +        VMSTATE_UINT8(state, SPAPRvTPMState),
+> +        VMSTATE_BUFFER(buffer, SPAPRvTPMState),
+
+Transferring the whole 4kiB buffer unconditionally when it mostly
+won't have anything useful in it doesn't seem like a great idea.
+
+> +        /* remember DMA address */
+> +        VMSTATE_UINT32(crq.s.data, SPAPRvTPMState),
+> +        VMSTATE_BOOL(deliver_response, SPAPRvTPMState),
+> +        VMSTATE_END_OF_LIST(),
+> +    }
+>  };
+> =20
+>  static Property tpm_spapr_properties[] =3D {
+> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
+> index 6278a39618..d109661b96 100644
+> --- a/hw/tpm/trace-events
+> +++ b/hw/tpm/trace-events
+> @@ -67,3 +67,5 @@ tpm_spapr_do_crq_get_version(uint32_t version) "respons=
+e: version %u"
+>  tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to suspen=
+d"
+>  tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type 0x=
+%02x"
+>  tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ 0x=
+%02x 0x%02x ..."
+> +tpm_spapr_pre_save(bool v) "TPM response to deliver after resume: %d"
+> +tpm_spapr_post_load(void) "Delivering TPM response after resume"
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--qicme7IxPpkH/pPU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3zJBUACgkQbDjKyiDZ
+s5LIjw/+JBlIgi+CV3NicSHeunB98iIMN9C4LDuoF/oEaPVq0OqM3VpocDH13dKt
+Cz3UZZpiIRlBF9EIO8KyxTgkxpGuu24ntkkof172meOY0INHJMADWuCMraO1oaOA
+haOIg64RderRz1U9majVWAeR/uY7cDs2qlNJCGmhhtkklYOjOVIwS/TxO0EvU6/R
+xQ0qV0JVwfsBNwwPogpIkjgxpCoMi/v93V5cYzDsrKnscLPpN2Y85mgCRUoXpAus
+NBZex9DM85uja2WEvkuBhJBGyT8moH/PP1RpSwBdJr6SKYFPej2+YYP3qs66ehrq
+vC0QUn6GC29BtPttQYLQlYX/AXV9TZBdVQu/Up+mJWsMXu2ZuOeO/0aMBhao/+iN
+gCccbAtTDZ1rR/14zwS1mZWzW8DpHSat1JvPYGLuhmMmiK87nzngxY4gspU2ckJ2
+9y2JaC4RcNrARqnao5y8NgJUp1qBjpKWQJA9FU3pJnoXsifLluP8H2Yy2bYtiO4L
+FgHoGvA/Ezkg7G4YoWvylKjNz4Mu8aonHkGugVMDVo0H8Z2UlfRGpecReAD9zNt6
+ykTVdFnX/5qSsWhDT4CAHViXTpE4noo1+RaXOIdq5Dpvx/8eL+cmqEmDYOwcrY3S
+dtXe9x+WJbehRGsax5//hRVBfF366nIrMAJaXhr81pJENlV579M=
+=OQsi
+-----END PGP SIGNATURE-----
+
+--qicme7IxPpkH/pPU--
 
