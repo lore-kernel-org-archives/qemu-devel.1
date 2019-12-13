@@ -2,105 +2,120 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0AC6C3F68F
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B76EC2D0CB
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 653FC2465A
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 653FC2465A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id AABE72467F
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vrY0kGuQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AABE72467F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifke5-0006mC-Fz
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 08:06:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54747)
+	id 1ifjBQ-0004dz-7j
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 06:32:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59840)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanb@linux.ibm.com>) id 1ifkbz-000545-Km
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:04:06 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ifjAi-0004E2-53
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:31:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanb@linux.ibm.com>) id 1ifkbw-0003Yc-P8
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:04:03 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:27732
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1ifjAg-0000WW-Qw
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:31:47 -0500
+Received: from mail-eopbgr150129.outbound.protection.outlook.com
+ ([40.107.15.129]:46502 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanb@linux.ibm.com>)
- id 1ifkbv-0003VI-VN; Fri, 13 Dec 2019 08:04:00 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBDCqafU178282; Fri, 13 Dec 2019 08:03:46 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wusv0wwp0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Dec 2019 08:03:45 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBDCrET7180501;
- Fri, 13 Dec 2019 08:03:45 -0500
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2wusv0wwnk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Dec 2019 08:03:45 -0500
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBDD0FOj018079;
- Fri, 13 Dec 2019 13:03:50 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma01wdc.us.ibm.com with ESMTP id 2wr3q772nq-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 13 Dec 2019 13:03:50 +0000
-Received: from b03ledav002.gho.boulder.ibm.com
- (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBDD3hqA53674300
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Dec 2019 13:03:43 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A61C613605E;
- Fri, 13 Dec 2019 13:03:43 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D6E4813604F;
- Fri, 13 Dec 2019 13:03:42 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 13 Dec 2019 13:03:42 +0000 (GMT)
-Subject: Re: [PATCH v5 1/5] tpm_spapr: Support TPM for ppc64 using CRQ based
- interface
-To: David Gibson <david@gibson.dropbear.id.au>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>
-References: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
- <20191212202430.1079725-2-stefanb@linux.vnet.ibm.com>
- <20191213053453.GD207300@umbus.fritz.box>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <75fd3e95-d72f-069b-22ce-f354e1c34660@linux.ibm.com>
-Date: Fri, 13 Dec 2019 08:03:36 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <20191213053453.GD207300@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1ifjAg-0000SK-CI; Fri, 13 Dec 2019 06:31:46 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iZDQdTm/+0H+o2jUxxz4YLC4Z5zELHBvvQf3ADLm0tDVIM7thQfGkOk/DIBmuTJQhqFUCk9oSr/QqkhuTrN+NFjyEBM5gMw76vuLjkm8+rLPrNGVQMUCMNJSlusISCl4Q8Uk2szu2CPQPGE8CeGkoCThjbGZY533lj/Y5ilt7X0kHzb75+KGegFeNLpdiz0o61Km3wbek/XAeQVaVcJfPFUQEyC9cotLUGhkhaEoOQQrHIXYh2Uud75LR/qHNQ8m7BRmMPPBBfj/joJAsnZoh7SY8kKlFEuAZGM92m+4EEiM3x6PmBsqDCBZFIsOSnsI66Gb0gq3bCAxlZUDnG+QJQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iE3e+hyaSn7GWamRYnOoq7Gg/pm+kv7xxp5UfV/58i0=;
+ b=Y2xTd1FIo3WzHH15kLCWsMGhmIo6bkARuqc2gbJjABK+saPYOMjjVRpAHh4w/z64Ib8qXqhv8fZYY686q2USCsttFN2LpdmdbnkutHHp7e88pgmmX438qnHUKc/JpLi9um7TRMzCqVIp++E53HWjd0mzzTEz0vzDQXt6iocQebXd4GuLHQGdmhEcRd8vtRQdVyLEG3omb2lAkZf7ywhkgBG/vA+DKiX9UHwxerIfbcbR4lK1ryhIGAfOaBJgly7fr70sFaQQD0Lvy6hoqN6pQpTu10bFLJlV6E7W5zwAoMLjFi5oJI2P1EA/2wjp/F8wEIVbNCYTN0C7bYU1PNKaWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iE3e+hyaSn7GWamRYnOoq7Gg/pm+kv7xxp5UfV/58i0=;
+ b=vrY0kGuQsW3CWqNPVR+qXLGAGHlVkXL7fGDt/WQDnQUXNBABRLlwsJ9RAYgmMArgPiZRoAd78BE+K+WOpybFUOTgG+WmEYevlV57MLz6BWyD4i1gFCF0ydcZYMhDVgKUL2O6m8wMqKMPKF+1adWAzob2HTJkAuAE29p+wscaLOw=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3079.eurprd08.prod.outlook.com (52.135.163.152) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2538.15; Fri, 13 Dec 2019 11:31:43 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2516.020; Fri, 13 Dec 2019
+ 11:31:43 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH for-5.0 v2 19/23] iotests: Resolve TODOs in 041
+Thread-Topic: [PATCH for-5.0 v2 19/23] iotests: Resolve TODOs in 041
+Thread-Index: AQHVmKmNmeJL6G4US0WS+6Oh5cK+GqeovUSA///N8YCACYqFAIAGCrkA
+Date: Fri, 13 Dec 2019 11:31:43 +0000
+Message-ID: <8b72b979-92c5-d0ce-a34c-052425a2e53f@virtuozzo.com>
+References: <20191111160216.197086-1-mreitz@redhat.com>
+ <20191111160216.197086-20-mreitz@redhat.com>
+ <2416e1d8-c1c3-4c88-6e7b-52670eb23c0e@virtuozzo.com>
+ <3be97c8b-fbee-a183-0cd8-dc2e5824efbc@virtuozzo.com>
+ <e21bfadf-670f-9c17-71b8-c14a1ed3727c@redhat.com>
+In-Reply-To: <e21bfadf-670f-9c17-71b8-c14a1ed3727c@redhat.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-13_03:2019-12-13,2019-12-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999 bulkscore=0
- adultscore=0 clxscore=1015 spamscore=0 malwarescore=0 phishscore=0
- impostorscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=2
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912130104
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0208.eurprd05.prod.outlook.com
+ (2603:10a6:3:f9::32) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191213143140814
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 454ba24a-77d0-48dd-e2d7-08d77fc00751
+x-ms-traffictypediagnostic: AM6PR08MB3079:
+x-microsoft-antispam-prvs: <AM6PR08MB30792A07F5435B7B73937AE4C1540@AM6PR08MB3079.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-forefront-prvs: 0250B840C1
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(346002)(396003)(39840400004)(376002)(366004)(199004)(189003)(53546011)(6506007)(6486002)(31696002)(4744005)(54906003)(5660300002)(2906002)(52116002)(110136005)(66556008)(66946007)(66476007)(66446008)(64756008)(4326008)(86362001)(478600001)(31686004)(6512007)(71200400001)(186003)(8936002)(2616005)(8676002)(36756003)(316002)(81156014)(26005)(81166006);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3079;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: QgayushFMCfTe51SFFKDl9cRPjzxoIsVkos6HoplwpzJNZcRBKVrGOIpbZ7rvOBnBlmYNgckCV77Z+zmpgIPb8xc09+Jm3UUfz284VTScdmSJ5THYgjE2vRUQnxGcODyn3Hg3ZKOmUl3zFiR7Iwd9cR5XWUISibupS+z24X86T6Xx3NniDNh9sMeyBtpA+6nqzMLw8mzWGzWdCkzvVBMpyBbSw9NePQN53uTH5T28E1LldBUcKfpN9q9vId1gFVvP7HvFtVRFrZKoh24HOqh4TMsVEc8EhiZ9pRxQOjBHJbC9iDshtbXS/GIBX+ykJxLkdwhDEUIx+XQTMB04+nwPmtxW1c+9EqFLhM9a3td+dzcm2A2cJd8FYkOf4JTLuSrEsnL3KgwN+wqFWC3mLMnJ5CFLVmZwzcKP5+BQHp3Czg2Nx+CffHU7P8PPQGk4gvt
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <69015D065E94E546ACC00AFB2575F6D3@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by
- mx0b-001b2d01.pphosted.com id xBDCqafU178282
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 454ba24a-77d0-48dd-e2d7-08d77fc00751
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Dec 2019 11:31:43.1228 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Ij576y4gVz78Avf4f+LRC3NXzhEMKA8pOyzB9m/GSc/SO8urox47Rq7f5HHjCC434AJ1QuPab1DkikXSjM+XS0n5Me8TXFHpcIL6G4VhNeo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3079
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.15.129
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,653 +127,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/13/19 12:34 AM, David Gibson wrote:
-> On Thu, Dec 12, 2019 at 03:24:26PM -0500, Stefan Berger wrote:
->> Implement support for TPM on ppc64 by implementing the vTPM CRQ interf=
-ace
->> as a frontend. It can use the tpm_emulator driver backend with the ext=
-ernal
->> swtpm.
+09.12.2019 18:15, Max Reitz wrote:
+> On 03.12.19 14:33, Vladimir Sementsov-Ogievskiy wrote:
+>> 03.12.2019 16:32, Vladimir Sementsov-Ogievskiy wrote:
+>>> 11.11.2019 19:02, Max Reitz wrote:
+>>>> Signed-off-by: Max Reitz<mreitz@redhat.com>
+>>>
+>>>
+>>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>>
 >>
->> The Linux vTPM driver for ppc64 works with this emulation.
 >>
->> This TPM emulator also handles the TPM 2 case.
->>
->> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
->> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->>
->> diff --git a/hw/tpm/Kconfig b/hw/tpm/Kconfig
->> index 4c8ee87d67..66a570aac1 100644
->> --- a/hw/tpm/Kconfig
->> +++ b/hw/tpm/Kconfig
->> @@ -22,3 +22,9 @@ config TPM_EMULATOR
->>       bool
->>       default y
->>       depends on TPMDEV
->> +
->> +config TPM_SPAPR
->> +    bool
->> +    default n
->> +    select TPMDEV
->> +    depends on PSERIES
->> diff --git a/hw/tpm/Makefile.objs b/hw/tpm/Makefile.objs
->> index de0b85d02a..85eb99ae05 100644
->> --- a/hw/tpm/Makefile.objs
->> +++ b/hw/tpm/Makefile.objs
->> @@ -4,3 +4,4 @@ common-obj-$(CONFIG_TPM_TIS) +=3D tpm_tis.o
->>   common-obj-$(CONFIG_TPM_CRB) +=3D tpm_crb.o
->>   common-obj-$(CONFIG_TPM_PASSTHROUGH) +=3D tpm_passthrough.o
->>   common-obj-$(CONFIG_TPM_EMULATOR) +=3D tpm_emulator.o
->> +obj-$(CONFIG_TPM_SPAPR) +=3D tpm_spapr.o
->> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
->> new file mode 100644
->> index 0000000000..c4a67e2403
->> --- /dev/null
->> +++ b/hw/tpm/tpm_spapr.c
->> @@ -0,0 +1,405 @@
->> +/*
->> + * QEMU PowerPC pSeries Logical Partition (aka sPAPR) hardware System=
- Emulator
->> + *
->> + * PAPR Virtual TPM
->> + *
->> + * Copyright (c) 2015, 2017 IBM Corporation.
->> + *
->> + * Authors:
->> + *    Stefan Berger <stefanb@linux.vnet.ibm.com>
->> + *
->> + * This code is licensed under the GPL version 2 or later. See the
->> + * COPYING file in the top-level directory.
->> + *
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qemu/error-report.h"
->> +#include "qapi/error.h"
->> +#include "hw/qdev-properties.h"
->> +#include "migration/vmstate.h"
->> +
->> +#include "sysemu/tpm_backend.h"
->> +#include "tpm_int.h"
->> +#include "tpm_util.h"
->> +
->> +#include "hw/ppc/spapr.h"
->> +#include "hw/ppc/spapr_vio.h"
->> +#include "trace.h"
->> +
->> +#define DEBUG_SPAPR 0
->> +
->> +#define VIO_SPAPR_VTPM(obj) \
->> +     OBJECT_CHECK(SPAPRvTPMState, (obj), TYPE_TPM_SPAPR)
->> +
->> +typedef struct VioCRQ {
-> How does this structure relate to the existing SpaprVioCrq?
+>> Oops, stop. Why do you remove line "self.vm.shutdown()" ?
+>=20
+> Because we don=92t need it.  tearDown() does it anyway.  I suppose I
+> should mention it in the commit message.
+>=20
 
-The existing one looks like this:
+Yes...
 
-typedef struct SpaprVioCrq {
- =A0=A0=A0 uint64_t qladdr;
- =A0=A0=A0 uint32_t qsize;
- =A0=A0=A0 uint32_t qnext;
- =A0=A0=A0 int(*SendFunc)(struct SpaprVioDevice *vdev, uint8_t *crq);
-} SpaprVioCrq;
+But actually, better to remove extra shutdown from all test cases, not from
+one, and than it would be separate patch.
 
-I don't seem to find the fields there that we need for vTPM support.
-
->
-> Also we're now avoiding exceptions to StudlyCaps, because it causes
-> more confusion even if it is to match other capitalization
-> conventions.  So, I'd suggest 'VioCrq', 'TpmSpaprCrq' etc.
+Extra shutdown is left in (considering only class TestRepairQuorum):
+test_pause
+test_cancel_after_ready
+test_cancel
+test_complete
 
 
-Will adjust.
-
-
->
->> +    uint8_t valid;  /* 0x80: cmd; 0xc0: init crq */
->> +                    /* 0x81-0x83: CRQ message response */
->> +    uint8_t msg;    /* see below */
->> +    uint16_t len;   /* len of TPM request; len of TPM response */
->> +    uint32_t data;  /* rtce_dma_handle when sending TPM request */
->> +    uint64_t reserved;
->> +} VioCRQ;
->> +
->> +typedef union TPMSpaprCRQ {
->> +    VioCRQ s;
->> +    uint8_t raw[sizeof(VioCRQ)];
->> +} TPMSpaprCRQ;
-> A union just to get raw bytes seems a really weird thing to do (as
-> opposed to just casting to (char *))
-
-
-Ok, I will change it.
-
-
-
->
->> +
->> +#define SPAPR_VTPM_VALID_INIT_CRQ_COMMAND  0xC0
->> +#define SPAPR_VTPM_VALID_COMMAND           0x80
->> +#define SPAPR_VTPM_MSG_RESULT              0x80
->> +
->> +/* msg types for valid =3D SPAPR_VTPM_VALID_INIT_CRQ */
->> +#define SPAPR_VTPM_INIT_CRQ_RESULT           0x1
->> +#define SPAPR_VTPM_INIT_CRQ_COMPLETE_RESULT  0x2
->> +
->> +/* msg types for valid =3D SPAPR_VTPM_VALID_CMD */
->> +#define SPAPR_VTPM_GET_VERSION               0x1
->> +#define SPAPR_VTPM_TPM_COMMAND               0x2
->> +#define SPAPR_VTPM_GET_RTCE_BUFFER_SIZE      0x3
->> +#define SPAPR_VTPM_PREPARE_TO_SUSPEND        0x4
->> +
->> +/* response error messages */
->> +#define SPAPR_VTPM_VTPM_ERROR                0xff
->> +
->> +/* error codes */
->> +#define SPAPR_VTPM_ERR_COPY_IN_FAILED        0x3
->> +#define SPAPR_VTPM_ERR_COPY_OUT_FAILED       0x4
->> +
->> +#define MAX_BUFFER_SIZE TARGET_PAGE_SIZE
->> +
->> +typedef struct {
->> +    SpaprVioDevice vdev;
->> +
->> +    TPMSpaprCRQ crq; /* track single TPM command */
->> +
->> +    uint8_t state;
->> +#define SPAPR_VTPM_STATE_NONE         0
->> +#define SPAPR_VTPM_STATE_EXECUTION    1
->> +#define SPAPR_VTPM_STATE_COMPLETION   2
-> I see this field written, but never read.  What's up with that?
-
-
- =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (s->state =3D=3D SPAPR_VTPM_STATE_E=
-XECUTION) {
- =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 return H_BUSY;
- =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
-
-Is this what you mean?
-
-
->
->> +
->> +    unsigned char buffer[MAX_BUFFER_SIZE];
->> +
->> +    TPMBackendCmd cmd;
->> +
->> +    TPMBackend *be_driver;
->> +    TPMVersion be_tpm_version;
->> +
->> +    size_t be_buffer_size;
->> +} SPAPRvTPMState;
-> SpaprVtpmState
->
-> Or just SpaprTpmState, since we use just "tpm spapr" rather than
-> "vtpm" in plenty of other places.
-
-
-Will adjust.
-
-
->
->> +
->> +static void tpm_spapr_show_buffer(const unsigned char *buffer,
->> +                                  size_t buffer_size, const char *str=
-ing)
->> +{
->> +    size_t len, i;
->> +    char *line_buffer, *p;
->> +
->> +    len =3D MIN(tpm_cmd_get_size(buffer), buffer_size);
->> +
->> +    /*
->> +     * allocate enough room for 3 chars per buffer entry plus a
->> +     * newline after every 16 chars and a final null terminator.
->> +     */
->> +    line_buffer =3D g_malloc(len * 3 + (len / 16) + 1);
-> You can use g_strdup_printf() / g_string_append_printf() to avoid
-> fiddly messing around with allocations like this.
-
-This is a 1:1 copy from the existing TIS driver.
-
-
->
->> +
->> +    for (i =3D 0, p =3D line_buffer; i < len; i++) {
->> +        if (i && !(i % 16)) {
->> +            p +=3D sprintf(p, "\n");
->> +        }
->> +        p +=3D sprintf(p, "%.2X ", buffer[i]);
->> +    }
->> +    trace_tpm_spapr_show_buffer(string, len, line_buffer);
->> +
->> +    g_free(line_buffer);
->> +}
->> +
->> +/*
->> + * Send a request to the TPM.
->> + */
->> +static void tpm_spapr_tpm_send(SPAPRvTPMState *s)
->> +{
->> +    if (trace_event_get_state_backends(TRACE_TPM_SPAPR_SHOW_BUFFER)) =
-{
->> +        tpm_spapr_show_buffer(s->buffer, sizeof(s->buffer), "To TPM")=
-;
->> +    }
->> +
->> +    s->state =3D SPAPR_VTPM_STATE_EXECUTION;
->> +    s->cmd =3D (TPMBackendCmd) {
->> +        .locty =3D 0,
->> +        .in =3D s->buffer,
->> +        .in_len =3D MIN(tpm_cmd_get_size(s->buffer), sizeof(s->buffer=
-)),
->> +        .out =3D s->buffer,
->> +        .out_len =3D sizeof(s->buffer),
->> +    };
->> +
->> +    tpm_backend_deliver_request(s->be_driver, &s->cmd);
->> +}
->> +
->> +static int tpm_spapr_process_cmd(SPAPRvTPMState *s, uint64_t dataptr)
->> +{
->> +    long rc;
->> +
->> +    /* a max. of be_buffer_size bytes can be transported */
->> +    rc =3D spapr_vio_dma_read(&s->vdev, dataptr,
->> +                            s->buffer, s->be_buffer_size);
->> +    if (rc) {
->> +        error_report("tpm_spapr_got_payload: DMA read failure");
->> +    }
->> +    /* let vTPM handle any malformed request */
->> +    tpm_spapr_tpm_send(s);
->> +
->> +    return rc;
->> +}
->> +
->> +static int tpm_spapr_do_crq(struct SpaprVioDevice *dev, uint8_t *crq_=
-data)
->> +{
->> +    SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(dev);
->> +    TPMSpaprCRQ local_crq;
->> +    TPMSpaprCRQ *crq =3D &s->crq; /* requests only */
->> +    int rc;
->> +
->> +    memcpy(&local_crq.raw, crq_data, sizeof(local_crq.raw));
-> Again, no real need for a union here, you can just memcpy onto a
-> structure variable.
->
->> +    trace_tpm_spapr_do_crq(local_crq.raw[0], local_crq.raw[1]);
->> +
->> +    switch (local_crq.s.valid) {
->> +    case SPAPR_VTPM_VALID_INIT_CRQ_COMMAND: /* Init command/response =
-*/
->> +
->> +        /* Respond to initialization request */
->> +        switch (local_crq.s.msg) {
->> +        case SPAPR_VTPM_INIT_CRQ_RESULT:
->> +            trace_tpm_spapr_do_crq_crq_result();
->> +            memset(local_crq.raw, 0, sizeof(local_crq.raw));
->> +            local_crq.s.valid =3D SPAPR_VTPM_VALID_INIT_CRQ_COMMAND;
->> +            local_crq.s.msg =3D SPAPR_VTPM_INIT_CRQ_RESULT;
->> +            spapr_vio_send_crq(dev, local_crq.raw);
->> +            break;
->> +
->> +        case SPAPR_VTPM_INIT_CRQ_COMPLETE_RESULT:
->> +            trace_tpm_spapr_do_crq_crq_complete_result();
->> +            memset(local_crq.raw, 0, sizeof(local_crq.raw));
->> +            local_crq.s.valid =3D SPAPR_VTPM_VALID_INIT_CRQ_COMMAND;
->> +            local_crq.s.msg =3D SPAPR_VTPM_INIT_CRQ_COMPLETE_RESULT;
->> +            spapr_vio_send_crq(dev, local_crq.raw);
->> +            break;
->> +        }
->> +
->> +        break;
->> +    case SPAPR_VTPM_VALID_COMMAND: /* Payloads */
->> +        switch (local_crq.s.msg) {
->> +        case SPAPR_VTPM_TPM_COMMAND:
->> +            trace_tpm_spapr_do_crq_tpm_command();
->> +            if (s->state =3D=3D SPAPR_VTPM_STATE_EXECUTION) {
->> +                return H_BUSY;
->> +            }
->> +            /* this crq is tracked */
->> +            memcpy(crq->raw, crq_data, sizeof(crq->raw));
->> +
->> +            rc =3D tpm_spapr_process_cmd(s, be32_to_cpu(crq->s.data))=
-;
->> +
->> +            if (rc =3D=3D H_SUCCESS) {
->> +                crq->s.valid =3D be16_to_cpu(0);
->> +            } else {
->> +                local_crq.s.valid =3D SPAPR_VTPM_MSG_RESULT;
->> +                local_crq.s.msg =3D SPAPR_VTPM_VTPM_ERROR;
->> +                local_crq.s.data =3D cpu_to_be32(SPAPR_VTPM_ERR_COPY_=
-IN_FAILED);
->> +                spapr_vio_send_crq(dev, local_crq.raw);
->> +            }
->> +            break;
->> +
->> +        case SPAPR_VTPM_GET_RTCE_BUFFER_SIZE:
->> +            trace_tpm_spapr_do_crq_tpm_get_rtce_buffer_size(s->be_buf=
-fer_size);
->> +            local_crq.s.msg |=3D SPAPR_VTPM_MSG_RESULT;
->> +            local_crq.s.len =3D cpu_to_be16(s->be_buffer_size);
->> +            spapr_vio_send_crq(dev, local_crq.raw);
->> +            break;
->> +
->> +        case SPAPR_VTPM_GET_VERSION:
->> +            local_crq.s.msg |=3D SPAPR_VTPM_MSG_RESULT;
->> +            local_crq.s.len =3D cpu_to_be16(0);
->> +            switch (s->be_tpm_version) {
->> +            case TPM_VERSION_UNSPEC:
->> +                local_crq.s.data =3D cpu_to_be32(0);
->> +                break;
->> +            case TPM_VERSION_1_2:
->> +                local_crq.s.data =3D cpu_to_be32(1);
->> +                break;
->> +            case TPM_VERSION_2_0:
->> +                local_crq.s.data =3D cpu_to_be32(2);
->> +                break;
-> To make the breakage obvious when/if the backend adds a new version we
-> should probably have a default: case with g_assert_not_reached() or
-> the like.
-I will add this.
->
->> +            }
->> +            trace_tpm_spapr_do_crq_get_version(be32_to_cpu(local_crq.=
-s.data));
->> +            spapr_vio_send_crq(dev, local_crq.raw);
->> +            break;
->> +
->> +        case SPAPR_VTPM_PREPARE_TO_SUSPEND:
->> +            trace_tpm_spapr_do_crq_prepare_to_suspend();
->> +            local_crq.s.msg |=3D SPAPR_VTPM_MSG_RESULT;
->> +            spapr_vio_send_crq(dev, local_crq.raw);
->> +            break;
->> +
->> +        default:
->> +            trace_tpm_spapr_do_crq_unknown_msg_type(crq->s.msg);
->> +        }
->> +        break;
->> +    default:
->> +        trace_tpm_spapr_do_crq_unknown_crq(local_crq.raw[0], local_cr=
-q.raw[1]);
->> +    };
->> +
->> +    return H_SUCCESS;
->> +}
->> +
->> +static void tpm_spapr_request_completed(TPMIf *ti, int ret)
->> +{
->> +    SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(ti);
->> +    TPMSpaprCRQ *crq =3D &s->crq;
->> +    uint32_t len;
->> +    int rc;
->> +
->> +    s->state =3D SPAPR_VTPM_STATE_COMPLETION;
->> +
->> +    /* a max. of be_buffer_size bytes can be transported */
->> +    len =3D MIN(tpm_cmd_get_size(s->buffer), s->be_buffer_size);
->> +    rc =3D spapr_vio_dma_write(&s->vdev, be32_to_cpu(crq->s.data),
->> +                             s->buffer, len);
->> +
->> +    if (trace_event_get_state_backends(TRACE_TPM_SPAPR_SHOW_BUFFER)) =
-{
->> +        tpm_spapr_show_buffer(s->buffer, len, "From TPM");
->> +    }
->> +
->> +    crq->s.valid =3D SPAPR_VTPM_MSG_RESULT;
->> +    if (rc =3D=3D H_SUCCESS) {
->> +        crq->s.msg =3D SPAPR_VTPM_TPM_COMMAND | SPAPR_VTPM_MSG_RESULT=
-;
->> +        crq->s.len =3D cpu_to_be16(len);
->> +    } else {
->> +        error_report("%s: DMA write failure", __func__);
->> +        crq->s.msg =3D SPAPR_VTPM_VTPM_ERROR;
->> +        crq->s.len =3D cpu_to_be16(0);
->> +        crq->s.data =3D cpu_to_be32(SPAPR_VTPM_ERR_COPY_OUT_FAILED);
->> +    }
->> +
->> +    rc =3D spapr_vio_send_crq(&s->vdev, crq->raw);
->> +    if (rc) {
->> +        error_report("%s: Error sending response", __func__);
->> +    }
->> +}
->> +
->> +static int tpm_spapr_do_startup_tpm(SPAPRvTPMState *s, size_t buffers=
-ize)
->> +{
->> +    return tpm_backend_startup_tpm(s->be_driver, buffersize);
->> +}
->> +
->> +static void tpm_spapr_update_deviceclass(SpaprVioDevice *dev)
->> +{
->> +    SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(dev);
->> +    SpaprVioDeviceClass *k =3D VIO_SPAPR_DEVICE_GET_CLASS(dev);
->> +
->> +    switch (s->be_tpm_version) {
->> +    case TPM_VERSION_UNSPEC:
->> +        assert(false);
->> +        break;
->> +    case TPM_VERSION_1_2:
->> +        k->dt_name =3D "vtpm";
->> +        k->dt_type =3D "IBM,vtpm";
->> +        k->dt_compatible =3D "IBM,vtpm";
->> +        break;
->> +    case TPM_VERSION_2_0:
->> +        k->dt_name =3D "vtpm";
->> +        k->dt_type =3D "IBM,vtpm";
->> +        k->dt_compatible =3D "IBM,vtpm20";
->> +        break;
-> Erk.  Updating DeviceClass structures on the fly is hideously ugly.
-> We might need to take a different approach for this.
-
-Make a suggestion... Obviously, we can hard-initialize dt_name and=20
-dt_type but dt_compatible can only be set after we have determined the=20
-version of TPM.
-
-
->
->> +    }
->> +}
->> +
->> +static void tpm_spapr_reset(SpaprVioDevice *dev)
->> +{
->> +    SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(dev);
->> +
->> +    s->state =3D SPAPR_VTPM_STATE_NONE;
->> +
->> +    s->be_tpm_version =3D tpm_backend_get_tpm_version(s->be_driver);
->> +    tpm_spapr_update_deviceclass(dev);
->> +
->> +    s->be_buffer_size =3D MAX(ROUND_UP(tpm_backend_get_buffer_size(s-=
->be_driver),
->> +                                     TARGET_PAGE_SIZE),
->> +                            sizeof(s->buffer));
-> I'm very confused as to what be_buffer_size is supposed to represent.
-> it's not the backend size, because you're rounding that up and taking
-> MAX with another thing.  But it's not the max safe size for this
-> locally, because it can be bigger than s->buffer.
-
-
-Will adjust.
-
->
->> +    tpm_backend_reset(s->be_driver);
->> +    tpm_spapr_do_startup_tpm(s, s->be_buffer_size);
->> +}
->> +
->> +static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
->> +{
->> +    SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(ti);
->> +
->> +    if (tpm_backend_had_startup_error(s->be_driver)) {
->> +        return TPM_VERSION_UNSPEC;
->> +    }
->> +
->> +    return tpm_backend_get_tpm_version(s->be_driver);
->> +}
->> +
->> +static const VMStateDescription vmstate_spapr_vtpm =3D {
->> +    .name =3D "tpm-spapr",
->> +    .unmigratable =3D 1,
->> +};
->> +
->> +static Property tpm_spapr_properties[] =3D {
->> +    DEFINE_SPAPR_PROPERTIES(SPAPRvTPMState, vdev),
->> +    DEFINE_PROP_TPMBE("tpmdev", SPAPRvTPMState, be_driver),
->> +    DEFINE_PROP_END_OF_LIST(),
->> +};
->> +
->> +static void tpm_spapr_realizefn(SpaprVioDevice *dev, Error **errp)
->> +{
->> +    SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(dev);
->> +
->> +    if (!tpm_find()) {
-> This seems wrong, even though I also see it in existing TPM code.
-> AFAICT tpm_find() returns a TPMIf pointer for the existing TPM if it
-> exists, meaning !tpm_find() will be true if there is *not* an existing
-> TPM.
-/* returns NULL unless there is exactly one TPM device */
-static inline TPMIf *tpm_find(void)
-{
- =A0=A0=A0 Object *obj =3D object_resolve_path_type("", TYPE_TPM_IF, NULL=
-);
-
- =A0=A0=A0 return TPM_IF(obj);
-}
-
-
-I would rather leave it like this.
-
-
->
->> +        error_setg(errp, "at most one TPM device is permitted");
->> +        return;
->> +    }
->> +
->> +    dev->crq.SendFunc =3D tpm_spapr_do_crq;
->> +
->> +    if (!s->be_driver) {
->> +        error_setg(errp, "'tpmdev' property is required");
->> +        return;
->> +    }
->> +}
->> +
->> +static void tpm_spapr_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->> +    SpaprVioDeviceClass *k =3D VIO_SPAPR_DEVICE_CLASS(klass);
->> +    TPMIfClass *tc =3D TPM_IF_CLASS(klass);
->> +
->> +    k->realize =3D tpm_spapr_realizefn;
->> +    k->reset =3D tpm_spapr_reset;
->> +    k->signal_mask =3D 0x00000001;
->> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->> +    dc->props =3D tpm_spapr_properties;
->> +    k->rtce_window_size =3D 0x10000000;
->> +    dc->vmsd =3D &vmstate_spapr_vtpm;
->> +
->> +    tc->model =3D TPM_MODEL_TPM_SPAPR;
->> +    tc->get_version =3D tpm_spapr_get_version;
->> +    tc->request_completed =3D tpm_spapr_request_completed;
->> +}
->> +
->> +static const TypeInfo tpm_spapr_info =3D {
->> +    .name          =3D TYPE_TPM_SPAPR,
->> +    .parent        =3D TYPE_VIO_SPAPR_DEVICE,
->> +    .instance_size =3D sizeof(SPAPRvTPMState),
->> +    .class_init    =3D tpm_spapr_class_init,
->> +    .interfaces =3D (InterfaceInfo[]) {
->> +        { TYPE_TPM_IF },
->> +        { }
->> +    }
->> +};
->> +
->> +static void tpm_spapr_register_types(void)
->> +{
->> +    type_register_static(&tpm_spapr_info);
->> +}
->> +
->> +type_init(tpm_spapr_register_types)
->> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
->> index 89804bcd64..6278a39618 100644
->> --- a/hw/tpm/trace-events
->> +++ b/hw/tpm/trace-events
->> @@ -55,3 +55,15 @@ tpm_tis_pre_save(uint8_t locty, uint32_t rw_offset)=
- "locty: %d, rw_offset =3D %u"
->>  =20
->>   # tpm_ppi.c
->>   tpm_ppi_memset(uint8_t *ptr, size_t size) "memset: %p %zu"
->> +
->> +# hw/tpm/tpm_spapr.c
->> +tpm_spapr_show_buffer(const char *direction, size_t len, const char *=
-buf) "direction: %s len: %zu\n%s"
->> +tpm_spapr_do_crq(uint8_t raw1, uint8_t raw2) "1st 2 bytes in CRQ: 0x%=
-02x 0x%02x"
->> +tpm_spapr_do_crq_crq_result(void) "SPAPR_VTPM_INIT_CRQ_RESULT"
->> +tpm_spapr_do_crq_crq_complete_result(void) "SPAPR_VTPM_INIT_CRQ_COMP_=
-RESULT"
->> +tpm_spapr_do_crq_tpm_command(void) "got TPM command payload"
->> +tpm_spapr_do_crq_tpm_get_rtce_buffer_size(size_t buffersize) "respons=
-e: buffer size is %zu"
->> +tpm_spapr_do_crq_get_version(uint32_t version) "response: version %u"
->> +tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to sus=
-pend"
->> +tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type=
- 0x%02x"
->> +tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ=
- 0x%02x 0x%02x ..."
->> diff --git a/include/sysemu/tpm.h b/include/sysemu/tpm.h
->> index 5b541a71c8..15979a3647 100644
->> --- a/include/sysemu/tpm.h
->> +++ b/include/sysemu/tpm.h
->> @@ -45,11 +45,14 @@ typedef struct TPMIfClass {
->>  =20
->>   #define TYPE_TPM_TIS                "tpm-tis"
->>   #define TYPE_TPM_CRB                "tpm-crb"
->> +#define TYPE_TPM_SPAPR              "tpm-spapr"
->>  =20
->>   #define TPM_IS_TIS(chr)                             \
->>       object_dynamic_cast(OBJECT(chr), TYPE_TPM_TIS)
->>   #define TPM_IS_CRB(chr)                             \
->>       object_dynamic_cast(OBJECT(chr), TYPE_TPM_CRB)
->> +#define TPM_IS_SPAPR(chr)                           \
->> +    object_dynamic_cast(OBJECT(chr), TYPE_TPM_SPAPR)
->>  =20
->>   /* returns NULL unless there is exactly one TPM device */
->>   static inline TPMIf *tpm_find(void)
->> diff --git a/qapi/tpm.json b/qapi/tpm.json
->> index b30323bb6b..63878aa0f4 100644
->> --- a/qapi/tpm.json
->> +++ b/qapi/tpm.json
->> @@ -12,11 +12,11 @@
->>   #
->>   # @tpm-tis: TPM TIS model
->>   # @tpm-crb: TPM CRB model (since 2.12)
->> +# @tpm-spapr: TPM SPAPR model (since 5.0)
->>   #
->>   # Since: 1.5
->>   ##
->> -{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb' ] }
->> -
->> +{ 'enum': 'TpmModel', 'data': [ 'tpm-tis', 'tpm-crb', 'tpm-spapr' ] }
->>   ##
->>   # @query-tpm-models:
->>   #
->> @@ -29,7 +29,7 @@
->>   # Example:
->>   #
->>   # -> { "execute": "query-tpm-models" }
->> -# <- { "return": [ "tpm-tis", "tpm-crb" ] }
->> +# <- { "return": [ "tpm-tis", "tpm-crb", "tpm-spapr" ] }
->>   #
->>   ##
->>   { 'command': 'query-tpm-models', 'returns': ['TpmModel'] }
-
-
+--=20
+Best regards,
+Vladimir
 
