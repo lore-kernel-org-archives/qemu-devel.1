@@ -2,79 +2,94 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A48FC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75539C2D0C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A04F921655
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A04F921655
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id EAF6020663
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:22:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAF6020663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifkRX-0006rq-VI
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:53:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59370)
+	id 1ifjnX-00045U-I5
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:11:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1ifkQm-0006JE-0R
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:52:29 -0500
+ (envelope-from <groug@kaod.org>) id 1ifjdJ-0000HI-Lk
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:01:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1ifkQk-0000zj-Hb
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:52:27 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2057 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <shameerali.kolothum.thodi@huawei.com>)
- id 1ifkQh-0000hV-4s; Fri, 13 Dec 2019 07:52:23 -0500
-Received: from LHREML711-CAH.china.huawei.com (unknown [172.18.7.107])
- by Forcepoint Email with ESMTP id 6351F7A21D9689193AD4;
- Fri, 13 Dec 2019 12:52:16 +0000 (GMT)
-Received: from lhreml701-chm.china.huawei.com (10.201.108.50) by
- LHREML711-CAH.china.huawei.com (10.201.108.34) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Fri, 13 Dec 2019 12:52:15 +0000
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml701-chm.china.huawei.com (10.201.108.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1713.5; Fri, 13 Dec 2019 12:52:15 +0000
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.1713.004; Fri, 13 Dec 2019 12:52:15 +0000
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: RE: [PATCH 0/5] ARM virt: Add NVDIMM support
-Thread-Topic: [PATCH 0/5] ARM virt: Add NVDIMM support
-Thread-Index: AQHVeswdQv2zL2ZjnU2+5S1CywnCCKdgnucAgAYn2ECANV3CUIAANK6AgAADjLCAARyUgIADW0wAgBGftACAAodbgIADcKzg
-Date: Fri, 13 Dec 2019 12:52:15 +0000
-Message-ID: <effeee8f654c4bd985e24dafaf99e5b8@huawei.com>
-References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
- <a133d4c4-3f60-2bb1-a7d7-35cdb06af265@redhat.com>
- <441c818f24084b4191315cf2a6267cef@huawei.com>
- <20191125164541.3f0a593f@redhat.com>
- <444efcb441fe42e5aff58b3af3ab14b4@huawei.com>
- <20191126095655.27227f59@redhat.com>
- <c2bb0be09e244ee59d27c7aaab1783a9@huawei.com>
- <20191211085727.1ab9564e@redhat.com>
-In-Reply-To: <20191211085727.1ab9564e@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.237]
-Content-Type: multipart/mixed;
- boundary="_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_"
+ (envelope-from <groug@kaod.org>) id 1ifjdI-0006HQ-G2
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:01:21 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17226)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ifjdI-0006Fb-80
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:01:20 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBDBuuLF049732
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 07:01:19 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wr8m23m43-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 07:01:13 -0500
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Fri, 13 Dec 2019 12:00:35 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 13 Dec 2019 12:00:32 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xBDC0V2a34472352
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Dec 2019 12:00:31 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5EEA242042;
+ Fri, 13 Dec 2019 12:00:30 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 38DA94204C;
+ Fri, 13 Dec 2019 12:00:30 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.185.241])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 13 Dec 2019 12:00:30 +0000 (GMT)
+Subject: [PATCH 11/13] ppc/pnv: Drop pnv_chip_is_power9() and
+ pnv_chip_is_power10() helpers
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 13 Dec 2019 13:00:29 +0100
+In-Reply-To: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
+References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 185.176.76.210
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19121312-0008-0000-0000-00000340728E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121312-0009-0000-0000-00004A607875
+Message-Id: <157623842986.360005.1787401623906380181.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-13_03:2019-12-13,2019-12-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 mlxlogscore=916
+ lowpriorityscore=0 priorityscore=1501 impostorscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 clxscore=1034 adultscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912130097
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,452 +101,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "drjones@redhat.com" <drjones@redhat.com>,
- "xiaoguangrong.eric@gmail.com" <xiaoguangrong.eric@gmail.com>,
- Auger Eric <eric.auger@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, "xuwei \(O\)" <xuwei5@huawei.com>,
- "lersek@redhat.com" <lersek@redhat.com>
+Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+They aren't used anymore.
 
-Hi Igor,
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ include/hw/ppc/pnv.h |   10 ----------
+ 1 file changed, 10 deletions(-)
 
-> -----Original Message-----
-> From: Igor Mammedov [mailto:imammedo@redhat.com]
-> Sent: 11 December 2019 07:57
-> To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-> Cc: xiaoguangrong.eric@gmail.com; peter.maydell@linaro.org;
-> drjones@redhat.com; shannon.zhaosl@gmail.com; qemu-devel@nongnu.org;
-> Linuxarm <linuxarm@huawei.com>; Auger Eric <eric.auger@redhat.com>;
-> qemu-arm@nongnu.org; xuwei (O) <xuwei5@huawei.com>;
-> lersek@redhat.com
-> Subject: Re: [PATCH 0/5] ARM virt: Add NVDIMM support
-
-[...]
-
-> > I couldn't figure out yet, why this extra 4 bytes are added by aml code=
- on
-> ARM64
-> > when the nvdimm_dsm_func_read_fit() returns NvdimmFuncReadFITOut
-> without
-> > any FIT data. ie, when the FIT buffer len (read_len) is zero.
-> >
-> > But the below will fix this issue,
-> >
-> > diff --git a/hw/acpi/nvdimm.c b/hw/acpi/nvdimm.c
-> > index f91eea3802..cddf95f4c1 100644
-> > --- a/hw/acpi/nvdimm.c
-> > +++ b/hw/acpi/nvdimm.c
-> > @@ -588,7 +588,7 @@ static void
-> nvdimm_dsm_func_read_fit(NVDIMMState *state, NvdimmDsmIn *in,
-> >      nvdimm_debug("Read FIT: offset %#x FIT size %#x Dirty %s.\n",
-> >                   read_fit->offset, fit->len, fit_buf->dirty ? "Yes" : =
-"No");
-> >
-> > -    if (read_fit->offset > fit->len) {
-> > +    if (read_fit->offset >=3D fit->len) {
-> >          func_ret_status =3D NVDIMM_DSM_RET_STATUS_INVALID;
-> >          goto exit;
-> >      }
-> >
-> >
-> > This will return error code to aml in the second iteration when there i=
-s no
-> further
-> > FIT data to report. But, I am not sure why this check was omitted in th=
-e first
-> place.
-> >
-> > Please let me know if this is acceptable and then probably I can look i=
-nto a v2
-> of this
-> > series.
-> Sorry, I don't have capacity to debug this right now,
-
-No problem.
-
-> but I'd prefer if 'why' question was answered first.
-
-Right.
-
-> Anyways, if something is unclear in how concrete AML code is build/works,
-> feel free to ask and I'll try to explain and guide you.
-
-Thanks for your help. I did spend some more time debugging this further.
-I tried to introduce a totally new Buffer field object with different
-sizes and printing the size after creation.
-
---- SSDT.dsl	2019-12-12 15:28:21.976986949 +0000
-+++ SSDT-arm64-dbg.dsl	2019-12-13 12:17:11.026806186 +0000
-@@ -18,7 +18,7 @@
-  *     Compiler ID      "BXPC"
-  *     Compiler Version 0x00000001 (1)
+diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+index 17ca9a14ac8f..7a134a15d3b5 100644
+--- a/include/hw/ppc/pnv.h
++++ b/include/hw/ppc/pnv.h
+@@ -224,21 +224,11 @@ struct PnvMachineState {
+     PnvPnor      *pnor;
+ };
+ 
+-static inline bool pnv_chip_is_power9(const PnvChip *chip)
+-{
+-    return PNV_CHIP_GET_CLASS(chip)->chip_type == PNV_CHIP_POWER9;
+-}
+-
+ PnvChip *pnv_get_chip(uint32_t chip_id);
+ 
+ #define PNV_FDT_ADDR          0x01000000
+ #define PNV_TIMEBASE_FREQ     512000000ULL
+ 
+-static inline bool pnv_chip_is_power10(const PnvChip *chip)
+-{
+-    return PNV_CHIP_GET_CLASS(chip)->chip_type == PNV_CHIP_POWER10;
+-}
+-
+ /*
+  * BMC helpers
   */
--DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000001)
-+DefinitionBlock ("", "SSDT", 1, "BOCHS ", "NVDIMM", 0x00000002)
- {
-     Scope (\_SB)
-     {
-@@ -48,6 +48,11 @@
-                     RLEN,   32,=20
-                     ODAT,   32736
-                 }
-+               =20
-+                Field (NRAM, DWordAcc, NoLock, Preserve)
-+                {
-+                    NBUF,   32768=20
-+                }
-=20
-                 If ((Arg4 =3D=3D Zero))
-                 {
-@@ -87,6 +92,12 @@
-                     Local3 =3D DerefOf (Local2)
-                     FARG =3D Local3
-                 }
-+              =20
-+                Local2 =3D 0x2=20
-+                printf("AML:NVDIMM Creating TBUF with bytes %o", Local2)
-+                CreateField (NBUF, Zero, (Local2 << 3), TBUF)
-+                Concatenate (Buffer (Zero){}, TBUF, Local3)
-+                printf("AML:NVDIMM Size of TBUF(Local3) %o", SizeOf(Local3=
-))
-=20
-                 NTFI =3D Local6
-                 Local1 =3D (RLEN - 0x04)
 
-And run it by changing Local2 with different values, It looks on ARM64,=20
-
-For cases where, Local2 <8, the created buffer size is always 8 bytes
-
-"AML:NVDIMM Creating TBUF with bytes 0000000000000002"
-"AML:NVDIMM Size of TBUF(Local3) 0000000000000008"
-
-...
-"AML:NVDIMM Creating TBUF with bytes 0000000000000005"
-"AML:NVDIMM Size of TBUF(Local3) 0000000000000008"
-
-And once Local2 >=3D8, it gets the correct size,
-
-"AML:NVDIMM Creating TBUF with bytes 0000000000000009"
-"AML:NVDIMM Size of TBUF(Local3) 0000000000000009"
-
-
-But on x86, the behavior is like,=20
-
-For cases where, Local2 <4, the created buffer size is always 4 bytes
-
-"AML:NVDIMM Creating TBUF with bytes 00000002"
-"AML:NVDIMM Size of TBUF(Local3) 00000004"
-....
-"AML:NVDIMM Creating TBUF with bytes 00000003"
-"AML:NVDIMM Size of TBUF(Local3) 00000004"
-
-And once Local2 >=3D 4, it is ok
-
-"AML:NVDIMM Creating TBUF with bytes 00000005"
-"AML:NVDIMM Size of TBUF(Local3) 00000005"
-...
-"AML:NVDIMM Creating TBUF with bytes 00000009"
-"AML:NVDIMM Size of TBUF(Local3) 00000009"
-
-This is the reason why it works on x86 and not on ARM64. Because, if you
-remember on second iteration of the FIT buffer, the requested buffer size i=
-s 4 .
-
-I tried changing the AccessType of the below NBUF field from DWordAcc to
-ByteAcc/BufferAcc, but no luck.
-
-+                Field (NRAM, DWordAcc, NoLock, Preserve)
-+                {
-+                    NBUF,   32768=20
-+                }
-
-Not sure what we need to change for ARM64 to create buffer object of size 4
-here. Please let me know if you have any pointers to debug this further.
-
-(I am attaching both x86 and ARM64 SSDT dsl used for reference)
-
-Thanks,
-Shameer
-
-
-> > Thanks,
-> > Shameer
-> >
-> >
-> >
-
-
---_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_
-Content-Type: application/octet-stream; name="SSDT-arm64-dbg.dsl"
-Content-Description: SSDT-arm64-dbg.dsl
-Content-Disposition: attachment; filename="SSDT-arm64-dbg.dsl"; size=6942;
-	creation-date="Fri, 13 Dec 2019 12:27:25 GMT";
-	modification-date="Fri, 13 Dec 2019 12:28:16 GMT"
-Content-Transfer-Encoding: base64
-
-LyoKICogSW50ZWwgQUNQSSBDb21wb25lbnQgQXJjaGl0ZWN0dXJlCiAqIEFNTC9BU0wrIERpc2Fz
-c2VtYmxlciB2ZXJzaW9uIDIwMTgwMTA1ICg2NC1iaXQgdmVyc2lvbikKICogQ29weXJpZ2h0IChj
-KSAyMDAwIC0gMjAxOCBJbnRlbCBDb3Jwb3JhdGlvbgogKiAKICogRGlzYXNzZW1ibGluZyB0byBz
-eW1ib2xpYyBBU0wrIG9wZXJhdG9ycwogKgogKiBEaXNhc3NlbWJseSBvZiBTU0RULCBUaHUgRGVj
-IDEyIDE1OjI4OjIxIDIwMTkKICoKICogT3JpZ2luYWwgVGFibGUgSGVhZGVyOgogKiAgICAgU2ln
-bmF0dXJlICAgICAgICAiU1NEVCIKICogICAgIExlbmd0aCAgICAgICAgICAgMHgwMDAwMDJFRiAo
-NzUxKQogKiAgICAgUmV2aXNpb24gICAgICAgICAweDAxCiAqICAgICBDaGVja3N1bSAgICAgICAg
-IDB4QTQKICogICAgIE9FTSBJRCAgICAgICAgICAgIkJPQ0hTICIKICogICAgIE9FTSBUYWJsZSBJ
-RCAgICAgIk5WRElNTSIKICogICAgIE9FTSBSZXZpc2lvbiAgICAgMHgwMDAwMDAwMSAoMSkKICog
-ICAgIENvbXBpbGVyIElEICAgICAgIkJYUEMiCiAqICAgICBDb21waWxlciBWZXJzaW9uIDB4MDAw
-MDAwMDEgKDEpCiAqLwpEZWZpbml0aW9uQmxvY2sgKCIiLCAiU1NEVCIsIDEsICJCT0NIUyAiLCAi
-TlZESU1NIiwgMHgwMDAwMDAwMikKewogICAgU2NvcGUgKFxfU0IpCiAgICB7CiAgICAgICAgRGV2
-aWNlIChOVkRSKQogICAgICAgIHsKICAgICAgICAgICAgTmFtZSAoX0hJRCwgIkFDUEkwMDEyIiAv
-KiBOVkRJTU0gUm9vdCBEZXZpY2UgKi8pICAvLyBfSElEOiBIYXJkd2FyZSBJRAogICAgICAgICAg
-ICBNZXRob2QgKE5DQUwsIDUsIFNlcmlhbGl6ZWQpCiAgICAgICAgICAgIHsKICAgICAgICAgICAg
-ICAgIExvY2FsNiA9IE1FTUEgLyogXE1FTUEgKi8KICAgICAgICAgICAgICAgIE9wZXJhdGlvblJl
-Z2lvbiAoTlBJTywgU3lzdGVtTWVtb3J5LCAweDA5MDkwMDAwLCAweDA0KQogICAgICAgICAgICAg
-ICAgT3BlcmF0aW9uUmVnaW9uIChOUkFNLCBTeXN0ZW1NZW1vcnksIExvY2FsNiwgMHgxMDAwKQog
-ICAgICAgICAgICAgICAgRmllbGQgKE5QSU8sIERXb3JkQWNjLCBOb0xvY2ssIFByZXNlcnZlKQog
-ICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIE5URkksICAgMzIKICAgICAgICAg
-ICAgICAgIH0KCiAgICAgICAgICAgICAgICBGaWVsZCAoTlJBTSwgRFdvcmRBY2MsIE5vTG9jaywg
-UHJlc2VydmUpCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgSERMRSwgICAz
-MiwgCiAgICAgICAgICAgICAgICAgICAgUkVWUywgICAzMiwgCiAgICAgICAgICAgICAgICAgICAg
-RlVOQywgICAzMiwgCiAgICAgICAgICAgICAgICAgICAgRkFSRywgICAzMjY3MgogICAgICAgICAg
-ICAgICAgfQoKICAgICAgICAgICAgICAgIEZpZWxkIChOUkFNLCBEV29yZEFjYywgTm9Mb2NrLCBQ
-cmVzZXJ2ZSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBSTEVOLCAgIDMy
-LCAKICAgICAgICAgICAgICAgICAgICBPREFULCAgIDMyNzM2CiAgICAgICAgICAgICAgICB9CiAg
-ICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgIEZpZWxkIChOUkFNLCBEV29yZEFjYywgTm9M
-b2NrLCBQcmVzZXJ2ZSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBOQlVG
-LCAgIDMyNzY4IAogICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgIElmICgoQXJnNCA9
-PSBaZXJvKSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBMb2NhbDAgPSBU
-b1VVSUQgKCIyZjEwZTdhNC05ZTkxLTExZTQtODlkMy0xMjNiOTNmNzVjYmEiKQogICAgICAgICAg
-ICAgICAgfQogICAgICAgICAgICAgICAgRWxzZUlmICgoQXJnNCA9PSAweDAwMDEwMDAwKSkKICAg
-ICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBMb2NhbDAgPSBUb1VVSUQgKCI2NDhi
-OWNmMi1jZGExLTQzMTItOGFkOS00OWM0YWYzMmJkNjIiKQogICAgICAgICAgICAgICAgfQogICAg
-ICAgICAgICAgICAgRWxzZQogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIExv
-Y2FsMCA9IFRvVVVJRCAoIjQzMDlhYzMwLTBkMTEtMTFlNC05MTkxLTA4MDAyMDBjOWE2NiIpCiAg
-ICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgSWYgKCgoTG9jYWw2ID09IFplcm8pIHwg
-KEFyZzAgIT0gTG9jYWwwKSkpCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAg
-SWYgKChBcmcyID09IFplcm8pKQogICAgICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAg
-ICAgICAgICAgUmV0dXJuIChCdWZmZXIgKE9uZSkKICAgICAgICAgICAgICAgICAgICAgICAgewog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgIDB4MDAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAvLyAuCiAgICAgICAgICAgICAgICAgICAgICAgIH0pCiAgICAg
-ICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgICAgICBSZXR1cm4gKEJ1ZmZlciAoT25l
-KQogICAgICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAgICAgIDB4MDEgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAvLyAuCiAgICAgICAgICAg
-ICAgICAgICAgfSkKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBIRExFID0gQXJn
-NAogICAgICAgICAgICAgICAgUkVWUyA9IEFyZzEKICAgICAgICAgICAgICAgIEZVTkMgPSBBcmcy
-CiAgICAgICAgICAgICAgICBJZiAoKChPYmplY3RUeXBlIChBcmczKSA9PSAweDA0KSAmIChTaXpl
-T2YgKEFyZzMpID09IE9uZSkpKQogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAg
-IExvY2FsMiA9IEFyZzMgW1plcm9dCiAgICAgICAgICAgICAgICAgICAgTG9jYWwzID0gRGVyZWZP
-ZiAoTG9jYWwyKQogICAgICAgICAgICAgICAgICAgIEZBUkcgPSBMb2NhbDMKICAgICAgICAgICAg
-ICAgIH0KICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICBMb2NhbDIgPSAweEQgCiAgICAg
-ICAgICAgICAgICBwcmludGYoIkFNTDpOVkRJTU0gQ3JlYXRpbmcgVEJVRiB3aXRoIGJ5dGVzICVv
-IiwgTG9jYWwyKQogICAgICAgICAgICAgICAgQ3JlYXRlRmllbGQgKE5CVUYsIFplcm8sIChMb2Nh
-bDIgPDwgMyksIFRCVUYpCiAgICAgICAgICAgICAgICBDb25jYXRlbmF0ZSAoQnVmZmVyIChaZXJv
-KXt9LCBUQlVGLCBMb2NhbDMpCiAgICAgICAgICAgICAgICBwcmludGYoIkFNTDpOVkRJTU0gU2l6
-ZSBvZiBUQlVGKExvY2FsMykgJW8iLCBTaXplT2YoTG9jYWwzKSkKCiAgICAgICAgICAgICAgICBO
-VEZJID0gTG9jYWw2CiAgICAgICAgICAgICAgICBMb2NhbDEgPSAoUkxFTiAtIDB4MDQpCiAgICAg
-ICAgICAgICAgICBMb2NhbDEgPSAoTG9jYWwxIDw8IDB4MDMpCiAgICAgICAgICAgICAgICBDcmVh
-dGVGaWVsZCAoT0RBVCwgWmVybywgTG9jYWwxLCBPQlVGKQogICAgICAgICAgICAgICAgQ29uY2F0
-ZW5hdGUgKEJ1ZmZlciAoWmVybyl7fSwgT0JVRiwgTG9jYWw3KQogICAgICAgICAgICAgICAgUmV0
-dXJuIChMb2NhbDcpCiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwg
-Tm90U2VyaWFsaXplZCkgIC8vIF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAg
-ICAgewogICAgICAgICAgICAgICAgUmV0dXJuIChOQ0FMIChBcmcwLCBBcmcxLCBBcmcyLCBBcmcz
-LCBaZXJvKSkKICAgICAgICAgICAgfQoKICAgICAgICAgICAgTmFtZSAoUlNUQSwgWmVybykKICAg
-ICAgICAgICAgTWV0aG9kIChSRklULCAxLCBTZXJpYWxpemVkKQogICAgICAgICAgICB7CiAgICAg
-ICAgICAgICAgICBOYW1lIChPRlNULCBaZXJvKQogICAgICAgICAgICAgICAgT0ZTVCA9IEFyZzAK
-ICAgICAgICAgICAgICAgIExvY2FsMCA9IE5DQUwgKFRvVVVJRCAoIjY0OGI5Y2YyLWNkYTEtNDMx
-Mi04YWQ5LTQ5YzRhZjMyYmQ2MiIpLCBPbmUsIE9uZSwgUGFja2FnZSAoMHgwMSkKICAgICAgICAg
-ICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgT0ZTVAogICAgICAg
-ICAgICAgICAgICAgICAgICB9LCAweDAwMDEwMDAwKQogICAgICAgICAgICAgICAgQ3JlYXRlRFdv
-cmRGaWVsZCAoTG9jYWwwLCBaZXJvLCBTVEFVKQogICAgICAgICAgICAgICAgUlNUQSA9IFNUQVUg
-LyogXF9TQl8uTlZEUi5SRklULlNUQVUgKi8KICAgICAgICAgICAgICAgIElmICgoWmVybyAhPSBT
-VEFVKSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBSZXR1cm4gKEJ1ZmZl
-ciAoWmVybyl7fSkKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBMb2NhbDEgPSBT
-aXplT2YgKExvY2FsMCkKICAgICAgICAgICAgICAgIExvY2FsMSAtPSAweDA0CiAgICAgICAgICAg
-ICAgICBJZiAoKExvY2FsMSA9PSBaZXJvKSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAg
-ICAgICAgICBSZXR1cm4gKEJ1ZmZlciAoWmVybyl7fSkKICAgICAgICAgICAgICAgIH0KCiAgICAg
-ICAgICAgICAgICBDcmVhdGVGaWVsZCAoTG9jYWwwLCAweDIwLCAoTG9jYWwxIDw8IDB4MDMpLCBC
-VUZGKQogICAgICAgICAgICAgICAgUmV0dXJuIChCVUZGKSAvKiBcX1NCXy5OVkRSLlJGSVQuQlVG
-RiAqLwogICAgICAgICAgICB9CgogICAgICAgICAgICBNZXRob2QgKF9GSVQsIDAsIFNlcmlhbGl6
-ZWQpICAvLyBfRklUOiBGaXJtd2FyZSBJbnRlcmZhY2UgVGFibGUKICAgICAgICAgICAgewogICAg
-ICAgICAgICAgICAgTG9jYWwyID0gQnVmZmVyIChaZXJvKXt9CiAgICAgICAgICAgICAgICBMb2Nh
-bDMgPSBaZXJvCiAgICAgICAgICAgICAgICBXaGlsZSAoT25lKQogICAgICAgICAgICAgICAgewog
-ICAgICAgICAgICAgICAgICAgIExvY2FsMCA9IFJGSVQgKExvY2FsMykKICAgICAgICAgICAgICAg
-ICAgICBMb2NhbDEgPSBTaXplT2YgKExvY2FsMCkKICAgICAgICAgICAgICAgICAgICBJZiAoKFJT
-VEEgPT0gMHgwMTAwKSkKICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAg
-ICAgIExvY2FsMiA9IEJ1ZmZlciAoWmVybyl7fQogICAgICAgICAgICAgICAgICAgICAgICBMb2Nh
-bDMgPSBaZXJvCiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIEVsc2UK
-ICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAgIElmICgoTG9jYWwx
-ID09IFplcm8pKQogICAgICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICBSZXR1cm4gKExvY2FsMikKICAgICAgICAgICAgICAgICAgICAgICAgfQoKICAgICAg
-ICAgICAgICAgICAgICAgICAgTG9jYWwzICs9IExvY2FsMQogICAgICAgICAgICAgICAgICAgICAg
-ICBDb25jYXRlbmF0ZSAoTG9jYWwyLCBMb2NhbDAsIExvY2FsMikKICAgICAgICAgICAgICAgICAg
-ICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIERldmljZSAo
-TlYwMCkKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgTmFtZSAoX0FEUiwgT25lKSAgLy8g
-X0FEUjogQWRkcmVzcwogICAgICAgICAgICAgICAgTWV0aG9kIChfRFNNLCA0LCBOb3RTZXJpYWxp
-emVkKSAgLy8gX0RTTTogRGV2aWNlLVNwZWNpZmljIE1ldGhvZAogICAgICAgICAgICAgICAgewog
-ICAgICAgICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJnMSwgQXJnMiwgQXJnMywg
-T25lKSkKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAgICAgICAgRGV2aWNl
-IChOVjAxKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBOYW1lIChfQURSLCAweDAyKSAg
-Ly8gX0FEUjogQWRkcmVzcwogICAgICAgICAgICAgICAgTWV0aG9kIChfRFNNLCA0LCBOb3RTZXJp
-YWxpemVkKSAgLy8gX0RTTTogRGV2aWNlLVNwZWNpZmljIE1ldGhvZAogICAgICAgICAgICAgICAg
-ewogICAgICAgICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJnMSwgQXJnMiwgQXJn
-MywgMHgwMikpCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIERl
-dmljZSAoTlYwMikKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgTmFtZSAoX0FEUiwgMHgw
-MykgIC8vIF9BRFI6IEFkZHJlc3MKICAgICAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwgTm90
-U2VyaWFsaXplZCkgIC8vIF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAgICAg
-ICAgIHsKICAgICAgICAgICAgICAgICAgICBSZXR1cm4gKE5DQUwgKEFyZzAsIEFyZzEsIEFyZzIs
-IEFyZzMsIDB4MDMpKQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CgogICAgICAgICAg
-ICBEZXZpY2UgKE5WMDMpCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgIE5hbWUgKF9BRFIs
-IDB4MDQpICAvLyBfQURSOiBBZGRyZXNzCiAgICAgICAgICAgICAgICBNZXRob2QgKF9EU00sIDQs
-IE5vdFNlcmlhbGl6ZWQpICAvLyBfRFNNOiBEZXZpY2UtU3BlY2lmaWMgTWV0aG9kCiAgICAgICAg
-ICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgUmV0dXJuIChOQ0FMIChBcmcwLCBBcmcxLCBB
-cmcyLCBBcmczLCAweDA0KSkKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAg
-ICAgICAgRGV2aWNlIChOVjA0KQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBOYW1lIChf
-QURSLCAweDA1KSAgLy8gX0FEUjogQWRkcmVzcwogICAgICAgICAgICAgICAgTWV0aG9kIChfRFNN
-LCA0LCBOb3RTZXJpYWxpemVkKSAgLy8gX0RTTTogRGV2aWNlLVNwZWNpZmljIE1ldGhvZAogICAg
-ICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJn
-MSwgQXJnMiwgQXJnMywgMHgwNSkpCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAg
-ICAgICB9CiAgICB9CgogICAgTmFtZSAoTUVNQSwgMHhGRkZGMDAwMCkKfQoK
-
---_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_
-Content-Type: application/octet-stream; name="SSDT-x86-dbg.dsl"
-Content-Description: SSDT-x86-dbg.dsl
-Content-Disposition: attachment; filename="SSDT-x86-dbg.dsl"; size=6934;
-	creation-date="Fri, 13 Dec 2019 12:27:25 GMT";
-	modification-date="Fri, 13 Dec 2019 12:28:25 GMT"
-Content-Transfer-Encoding: base64
-
-LyoKICogSW50ZWwgQUNQSSBDb21wb25lbnQgQXJjaGl0ZWN0dXJlCiAqIEFNTC9BU0wrIERpc2Fz
-c2VtYmxlciB2ZXJzaW9uIDIwMTgwMTA1ICg2NC1iaXQgdmVyc2lvbikKICogQ29weXJpZ2h0IChj
-KSAyMDAwIC0gMjAxOCBJbnRlbCBDb3Jwb3JhdGlvbgogKiAKICogRGlzYXNzZW1ibGluZyB0byBz
-eW1ib2xpYyBBU0wrIG9wZXJhdG9ycwogKgogKiBEaXNhc3NlbWJseSBvZiBTU0RULCBNb24gTm92
-IDE4IDE1OjUzOjE0IDIwMTkKICoKICogT3JpZ2luYWwgVGFibGUgSGVhZGVyOgogKiAgICAgU2ln
-bmF0dXJlICAgICAgICAiU1NEVCIKICogICAgIExlbmd0aCAgICAgICAgICAgMHgwMDAwMDJFRCAo
-NzQ5KQogKiAgICAgUmV2aXNpb24gICAgICAgICAweDAxCiAqICAgICBDaGVja3N1bSAgICAgICAg
-IDB4M0QKICogICAgIE9FTSBJRCAgICAgICAgICAgIkJPQ0hTICIKICogICAgIE9FTSBUYWJsZSBJ
-RCAgICAgIk5WRElNTSIKICogICAgIE9FTSBSZXZpc2lvbiAgICAgMHgwMDAwMDAwMSAoMSkKICog
-ICAgIENvbXBpbGVyIElEICAgICAgIkJYUEMiCiAqICAgICBDb21waWxlciBWZXJzaW9uIDB4MDAw
-MDAwMDEgKDEpCiAqLwpEZWZpbml0aW9uQmxvY2sgKCIiLCAiU1NEVCIsIDEsICJCT0NIUyAiLCAi
-TlZESU1NIiwgMHgwMDAwMDAwMikKewogICAgU2NvcGUgKFxfU0IpCiAgICB7CiAgICAgICAgRGV2
-aWNlIChOVkRSKQogICAgICAgIHsKICAgICAgICAgICAgTmFtZSAoX0hJRCwgIkFDUEkwMDEyIiAv
-KiBOVkRJTU0gUm9vdCBEZXZpY2UgKi8pICAvLyBfSElEOiBIYXJkd2FyZSBJRAogICAgICAgICAg
-ICBNZXRob2QgKE5DQUwsIDUsIFNlcmlhbGl6ZWQpCiAgICAgICAgICAgIHsKICAgICAgICAgICAg
-ICAgIExvY2FsNiA9IE1FTUEgLyogXE1FTUEgKi8KICAgICAgICAgICAgICAgIE9wZXJhdGlvblJl
-Z2lvbiAoTlBJTywgU3lzdGVtSU8sIDB4MEExOCwgMHgwNCkKICAgICAgICAgICAgICAgIE9wZXJh
-dGlvblJlZ2lvbiAoTlJBTSwgU3lzdGVtTWVtb3J5LCBMb2NhbDYsIDB4MTAwMCkKICAgICAgICAg
-ICAgICAgIEZpZWxkIChOUElPLCBEV29yZEFjYywgTm9Mb2NrLCBQcmVzZXJ2ZSkKICAgICAgICAg
-ICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBOVEZJLCAgIDMyCiAgICAgICAgICAgICAgICB9
-CgogICAgICAgICAgICAgICAgRmllbGQgKE5SQU0sIERXb3JkQWNjLCBOb0xvY2ssIFByZXNlcnZl
-KQogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIEhETEUsICAgMzIsIAogICAg
-ICAgICAgICAgICAgICAgIFJFVlMsICAgMzIsIAogICAgICAgICAgICAgICAgICAgIEZVTkMsICAg
-MzIsIAogICAgICAgICAgICAgICAgICAgIEZBUkcsICAgMzI2NzIKICAgICAgICAgICAgICAgIH0K
-CiAgICAgICAgICAgICAgICBGaWVsZCAoTlJBTSwgRFdvcmRBY2MsIE5vTG9jaywgUHJlc2VydmUp
-CiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgUkxFTiwgICAzMiwgCiAgICAg
-ICAgICAgICAgICAgICAgT0RBVCwgICAzMjczNgogICAgICAgICAgICAgICAgfQogICAgICAgICAg
-ICAgICAgCiAgICAgICAgICAgICAgICBGaWVsZCAoTlJBTSwgRFdvcmRBY2MsIE5vTG9jaywgUHJl
-c2VydmUpCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgTkJVRiwgICAzMjc2
-OCAKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBJZiAoKEFyZzQgPT0gWmVybykp
-CiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgTG9jYWwwID0gVG9VVUlEICgi
-MmYxMGU3YTQtOWU5MS0xMWU0LTg5ZDMtMTIzYjkzZjc1Y2JhIikKICAgICAgICAgICAgICAgIH0K
-ICAgICAgICAgICAgICAgIEVsc2VJZiAoKEFyZzQgPT0gMHgwMDAxMDAwMCkpCiAgICAgICAgICAg
-ICAgICB7CiAgICAgICAgICAgICAgICAgICAgTG9jYWwwID0gVG9VVUlEICgiNjQ4YjljZjItY2Rh
-MS00MzEyLThhZDktNDljNGFmMzJiZDYyIikKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAg
-ICAgIEVsc2UKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBMb2NhbDAgPSBU
-b1VVSUQgKCI0MzA5YWMzMC0wZDExLTExZTQtOTE5MS0wODAwMjAwYzlhNjYiKQogICAgICAgICAg
-ICAgICAgfQoKICAgICAgICAgICAgICAgIElmICgoKExvY2FsNiA9PSBaZXJvKSB8IChBcmcwICE9
-IExvY2FsMCkpKQogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIElmICgoQXJn
-MiA9PSBaZXJvKSkKICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAg
-IFJldHVybiAoQnVmZmVyIChPbmUpCiAgICAgICAgICAgICAgICAgICAgICAgIHsKICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAweDAwICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgLy8gLgogICAgICAgICAgICAgICAgICAgICAgICB9KQogICAgICAgICAgICAg
-ICAgICAgIH0KCiAgICAgICAgICAgICAgICAgICAgUmV0dXJuIChCdWZmZXIgKE9uZSkKICAgICAg
-ICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAgICAweDAxICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLy8gLgogICAgICAgICAgICAgICAgICAg
-IH0pCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgSERMRSA9IEFyZzQKICAgICAg
-ICAgICAgICAgIFJFVlMgPSBBcmcxCiAgICAgICAgICAgICAgICBGVU5DID0gQXJnMgogICAgICAg
-ICAgICAgICAgSWYgKCgoT2JqZWN0VHlwZSAoQXJnMykgPT0gMHgwNCkgJiAoU2l6ZU9mIChBcmcz
-KSA9PSBPbmUpKSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgICAgICBMb2NhbDIg
-PSBBcmczIFtaZXJvXQogICAgICAgICAgICAgICAgICAgIExvY2FsMyA9IERlcmVmT2YgKExvY2Fs
-MikKICAgICAgICAgICAgICAgICAgICBGQVJHID0gTG9jYWwzCiAgICAgICAgICAgICAgICB9CiAg
-ICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgTG9jYWwyID0gMHg5IAogICAgICAgICAgICAg
-ICAgcHJpbnRmKCJBTUw6TlZESU1NIENyZWF0aW5nIFRCVUYgd2l0aCBieXRlcyAlbyIsIExvY2Fs
-MikKICAgICAgICAgICAgICAgIENyZWF0ZUZpZWxkIChOQlVGLCBaZXJvLCAoTG9jYWwyIDw8IDMp
-LCBUQlVGKQogICAgICAgICAgICAgICAgQ29uY2F0ZW5hdGUgKEJ1ZmZlciAoWmVybyl7fSwgVEJV
-RiwgTG9jYWwzKQogICAgICAgICAgICAgICAgcHJpbnRmKCJBTUw6TlZESU1NIFNpemUgb2YgVEJV
-RihMb2NhbDMpICVvIiwgU2l6ZU9mKExvY2FsMykpCgogICAgICAgICAgICAgICAgTlRGSSA9IExv
-Y2FsNgogICAgICAgICAgICAgICAgTG9jYWwxID0gKFJMRU4gLSAweDA0KQogICAgICAgICAgICAg
-ICAgTG9jYWwxID0gKExvY2FsMSA8PCAweDAzKQogICAgICAgICAgICAgICAgQ3JlYXRlRmllbGQg
-KE9EQVQsIFplcm8sIExvY2FsMSwgT0JVRikKICAgICAgICAgICAgICAgIENvbmNhdGVuYXRlIChC
-dWZmZXIgKFplcm8pe30sIE9CVUYsIExvY2FsNykKICAgICAgICAgICAgICAgIFJldHVybiAoTG9j
-YWw3KQogICAgICAgICAgICB9CgogICAgICAgICAgICBNZXRob2QgKF9EU00sIDQsIE5vdFNlcmlh
-bGl6ZWQpICAvLyBfRFNNOiBEZXZpY2UtU3BlY2lmaWMgTWV0aG9kCiAgICAgICAgICAgIHsKICAg
-ICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJnMSwgQXJnMiwgQXJnMywgWmVybykp
-CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIE5hbWUgKFJTVEEsIFplcm8pCiAgICAgICAgICAg
-IE1ldGhvZCAoUkZJVCwgMSwgU2VyaWFsaXplZCkKICAgICAgICAgICAgewogICAgICAgICAgICAg
-ICAgTmFtZSAoT0ZTVCwgWmVybykKICAgICAgICAgICAgICAgIE9GU1QgPSBBcmcwCiAgICAgICAg
-ICAgICAgICBMb2NhbDAgPSBOQ0FMIChUb1VVSUQgKCI2NDhiOWNmMi1jZGExLTQzMTItOGFkOS00
-OWM0YWYzMmJkNjIiKSwgT25lLCBPbmUsIFBhY2thZ2UgKDB4MDEpCiAgICAgICAgICAgICAgICAg
-ICAgICAgIHsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIE9GU1QKICAgICAgICAgICAgICAg
-ICAgICAgICAgfSwgMHgwMDAxMDAwMCkKICAgICAgICAgICAgICAgIENyZWF0ZURXb3JkRmllbGQg
-KExvY2FsMCwgWmVybywgU1RBVSkKICAgICAgICAgICAgICAgIFJTVEEgPSBTVEFVIC8qIFxfU0Jf
-Lk5WRFIuUkZJVC5TVEFVICovCiAgICAgICAgICAgICAgICBJZiAoKFplcm8gIT0gU1RBVSkpCiAg
-ICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgUmV0dXJuIChCdWZmZXIgKFplcm8p
-e30pCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAgICAgTG9jYWwxID0gU2l6ZU9mIChM
-b2NhbDApCiAgICAgICAgICAgICAgICBMb2NhbDEgLT0gMHgwNAogICAgICAgICAgICAgICAgSWYg
-KChMb2NhbDEgPT0gWmVybykpCiAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAg
-UmV0dXJuIChCdWZmZXIgKFplcm8pe30pCiAgICAgICAgICAgICAgICB9CgogICAgICAgICAgICAg
-ICAgQ3JlYXRlRmllbGQgKExvY2FsMCwgMHgyMCwgKExvY2FsMSA8PCAweDAzKSwgQlVGRikKICAg
-ICAgICAgICAgICAgIFJldHVybiAoQlVGRikgLyogXF9TQl8uTlZEUi5SRklULkJVRkYgKi8KICAg
-ICAgICAgICAgfQoKICAgICAgICAgICAgTWV0aG9kIChfRklULCAwLCBTZXJpYWxpemVkKSAgLy8g
-X0ZJVDogRmlybXdhcmUgSW50ZXJmYWNlIFRhYmxlCiAgICAgICAgICAgIHsKICAgICAgICAgICAg
-ICAgIExvY2FsMiA9IEJ1ZmZlciAoWmVybyl7fQogICAgICAgICAgICAgICAgTG9jYWwzID0gWmVy
-bwogICAgICAgICAgICAgICAgV2hpbGUgKE9uZSkKICAgICAgICAgICAgICAgIHsKICAgICAgICAg
-ICAgICAgICAgICBMb2NhbDAgPSBSRklUIChMb2NhbDMpCiAgICAgICAgICAgICAgICAgICAgTG9j
-YWwxID0gU2l6ZU9mIChMb2NhbDApCiAgICAgICAgICAgICAgICAgICAgSWYgKChSU1RBID09IDB4
-MDEwMCkpCiAgICAgICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICAgICBMb2Nh
-bDIgPSBCdWZmZXIgKFplcm8pe30KICAgICAgICAgICAgICAgICAgICAgICAgTG9jYWwzID0gWmVy
-bwogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBFbHNlCiAgICAgICAg
-ICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICAgICBJZiAoKExvY2FsMSA9PSBaZXJv
-KSkKICAgICAgICAgICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgICAgICAgICAg
-UmV0dXJuIChMb2NhbDIpCiAgICAgICAgICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAg
-ICAgICAgICAgIExvY2FsMyArPSBMb2NhbDEKICAgICAgICAgICAgICAgICAgICAgICAgQ29uY2F0
-ZW5hdGUgKExvY2FsMiwgTG9jYWwwLCBMb2NhbDIpCiAgICAgICAgICAgICAgICAgICAgfQogICAg
-ICAgICAgICAgICAgfQogICAgICAgICAgICB9CgogICAgICAgICAgICBEZXZpY2UgKE5WMDApCiAg
-ICAgICAgICAgIHsKICAgICAgICAgICAgICAgIE5hbWUgKF9BRFIsIE9uZSkgIC8vIF9BRFI6IEFk
-ZHJlc3MKICAgICAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwgTm90U2VyaWFsaXplZCkgIC8v
-IF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAgICAgICAgIHsKICAgICAgICAg
-ICAgICAgICAgICBSZXR1cm4gKE5DQUwgKEFyZzAsIEFyZzEsIEFyZzIsIEFyZzMsIE9uZSkpCiAg
-ICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIERldmljZSAoTlYwMSkK
-ICAgICAgICAgICAgewogICAgICAgICAgICAgICAgTmFtZSAoX0FEUiwgMHgwMikgIC8vIF9BRFI6
-IEFkZHJlc3MKICAgICAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwgTm90U2VyaWFsaXplZCkg
-IC8vIF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAgICAgICAgIHsKICAgICAg
-ICAgICAgICAgICAgICBSZXR1cm4gKE5DQUwgKEFyZzAsIEFyZzEsIEFyZzIsIEFyZzMsIDB4MDIp
-KQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CgogICAgICAgICAgICBEZXZpY2UgKE5W
-MDIpCiAgICAgICAgICAgIHsKICAgICAgICAgICAgICAgIE5hbWUgKF9BRFIsIDB4MDMpICAvLyBf
-QURSOiBBZGRyZXNzCiAgICAgICAgICAgICAgICBNZXRob2QgKF9EU00sIDQsIE5vdFNlcmlhbGl6
-ZWQpICAvLyBfRFNNOiBEZXZpY2UtU3BlY2lmaWMgTWV0aG9kCiAgICAgICAgICAgICAgICB7CiAg
-ICAgICAgICAgICAgICAgICAgUmV0dXJuIChOQ0FMIChBcmcwLCBBcmcxLCBBcmcyLCBBcmczLCAw
-eDAzKSkKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAgICAgICAgRGV2aWNl
-IChOVjAzKQogICAgICAgICAgICB7CiAgICAgICAgICAgICAgICBOYW1lIChfQURSLCAweDA0KSAg
-Ly8gX0FEUjogQWRkcmVzcwogICAgICAgICAgICAgICAgTWV0aG9kIChfRFNNLCA0LCBOb3RTZXJp
-YWxpemVkKSAgLy8gX0RTTTogRGV2aWNlLVNwZWNpZmljIE1ldGhvZAogICAgICAgICAgICAgICAg
-ewogICAgICAgICAgICAgICAgICAgIFJldHVybiAoTkNBTCAoQXJnMCwgQXJnMSwgQXJnMiwgQXJn
-MywgMHgwNCkpCiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIERl
-dmljZSAoTlYwNCkKICAgICAgICAgICAgewogICAgICAgICAgICAgICAgTmFtZSAoX0FEUiwgMHgw
-NSkgIC8vIF9BRFI6IEFkZHJlc3MKICAgICAgICAgICAgICAgIE1ldGhvZCAoX0RTTSwgNCwgTm90
-U2VyaWFsaXplZCkgIC8vIF9EU006IERldmljZS1TcGVjaWZpYyBNZXRob2QKICAgICAgICAgICAg
-ICAgIHsKICAgICAgICAgICAgICAgICAgICBSZXR1cm4gKE5DQUwgKEFyZzAsIEFyZzEsIEFyZzIs
-IEFyZzMsIDB4MDUpKQogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQog
-ICAgfQoKICAgIE5hbWUgKE1FTUEsIDB4QkZCRkQwMDApCn0KCg==
-
---_003_effeee8f654c4bd985e24dafaf99e5b8huaweicom_--
 
