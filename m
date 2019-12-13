@@ -2,102 +2,78 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82532C00454
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D83EC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09B5B24125
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D827724125
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RtS7frjs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09B5B24125
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VjDavv3e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D827724125
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48211 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifjnY-00044Q-3Y
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:11:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56850)
+	id 1ifnxY-0006cW-Ij
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:38:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42224)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1ifjeh-0001Vt-B3
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:02:51 -0500
+ (envelope-from <cohuck@redhat.com>) id 1ifnfS-0000sf-FG
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1ifjef-0008PI-FS
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:02:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56413
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1ifnfR-0002CC-7p
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:50 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34281
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ifjef-0008Ng-8u
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:02:45 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ifnfR-0002B1-2g
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576238562;
+ s=mimecast20190719; t=1576253988;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zDpMWcY8MAvgf11QbhUG+VybIy/cco4vYWuQfZdZoDo=;
- b=RtS7frjsYObr9s79UN4DXHM5kTl15vqX4WkteSuzq/fnWgHl9W+XXSYZZSG7mEFYQyS+NY
- IDrYxgimTbpYX4dnNERuyXwxiAdY2Iml9b2LmJn3MK+xkeQLK+2ZqRkQxtKreqdlYK07Ap
- j7zUrox619enkawbUFbo5SzeHEmX1d8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-407-AUOugu-eNiimCP-cBN0QTA-1; Fri, 13 Dec 2019 07:02:41 -0500
-Received: by mail-wm1-f70.google.com with SMTP id g1so2265977wmg.4
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 04:02:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=KFc9zrc0lnaWTXScDbTfhkxNxQpAVklGF7JvKKV46Yw=;
- b=X1v2KUfSphZOzaoPKKnJRrLNu0S9Qh3a4g/8HPfjkUemlllnJaam158rP2LHfvJLhg
- qhSq/Fg64bQOXtN1YxLnNMI3w1ZAIgPiub0MXSAEYOR87LjB6hcRcHPHlsFv5GmjUIGm
- sqPoHQbiSBVDHUq6KWc6OOuNJXN48I7LMOcnC67V/VDJLEkyhc+LvmpEUdpa9Vuj5pbU
- 3dVXnqX/G1SUMSidtms5BXV8KC5IMrCCOZ5jN/pZYCz4w1JXsxhasKvt5AKxUPHt0PJw
- GgmDYxPhtUNUmSkJxLd5STkB9oMOFJLf9MYfq6QY2d0mFloqLCCHozRrRhl3fhf1ZsPw
- LLjQ==
-X-Gm-Message-State: APjAAAXLUYIbdaN9NGVrZ69FzaLS+MBE0wHSo19E13dxE+ifsMkSFYOu
- IA28JdTy/wdHyNSBgk5YMoUKsUSFv2yL+ZLwCTslQKjmL3qJ+kG6MfUqXyTNxyKgoNWtR+cTZPb
- MnNwdk40fJevu8Ss=
-X-Received: by 2002:a05:600c:21da:: with SMTP id
- x26mr12626475wmj.4.1576238559917; 
- Fri, 13 Dec 2019 04:02:39 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwoCftRM04qYwi72pC5q921M1Ds05cpN5tdRSlsIAa2FJQ3rJ756T/keW2JOQHWPggqcz0ujA==
-X-Received: by 2002:a05:600c:21da:: with SMTP id
- x26mr12626438wmj.4.1576238559671; 
- Fri, 13 Dec 2019 04:02:39 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9?
- ([2001:b07:6468:f312:e9bb:92e9:fcc3:7ba9])
- by smtp.gmail.com with ESMTPSA id u8sm9915651wmm.15.2019.12.13.04.02.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Dec 2019 04:02:39 -0800 (PST)
-Subject: Re: [PATCH] hw/i386: De-duplicate gsi_handler() to remove
- kvm_pc_gsi_handler()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191213110736.10767-1-philmd@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <02225320-0c42-33d2-6e30-16935eaaa5d2@redhat.com>
-Date: Fri, 13 Dec 2019 13:02:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=0n4kzHV7ijQhtr1OsgzkClrsjQtDJq/jf3/dxh+9j8I=;
+ b=VjDavv3efQcbSS+ObFSu2rbQqz3Oimd/ZZhFd/3qDU7W1Fglr9eRkzv3DPNccZG8HaBGGK
+ 2X7XtLj+GEMgOWk2oZ0l1MJ6HF//CBDG98bu9lwaHW80SHBMRO/QnL5xOdbdEyedYKK3t1
+ fcinP0I1PQu3aAGWChYaASuEYnTAU2Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-146-Wdf2M40RPCOisdBVTM-BAQ-1; Fri, 13 Dec 2019 11:19:46 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDC38593DB;
+ Fri, 13 Dec 2019 16:19:45 +0000 (UTC)
+Received: from localhost (ovpn-116-226.ams2.redhat.com [10.36.116.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 198481CB;
+ Fri, 13 Dec 2019 16:19:42 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 13/16] s390x/cpumodel: Fix query-cpu-model-FOO error API
+ violations
+Date: Fri, 13 Dec 2019 17:18:48 +0100
+Message-Id: <20191213161851.24687-14-cohuck@redhat.com>
+In-Reply-To: <20191213161851.24687-1-cohuck@redhat.com>
+References: <20191213161851.24687-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191213110736.10767-1-philmd@redhat.com>
-Content-Language: en-US
-X-MC-Unique: AUOugu-eNiimCP-cBN0QTA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: Wdf2M40RPCOisdBVTM-BAQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,89 +85,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>, "Michael S. Tsirkin" <mst@redhat.com>,
- kvm@vger.kernel.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
+ David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/12/19 12:07, Philippe Mathieu-Daud=C3=A9 wrote:
-> Both gsi_handler() and kvm_pc_gsi_handler() have the same content,
-> except one comment. Move the comment, and de-duplicate the code.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  include/sysemu/kvm.h |  1 -
->  hw/i386/kvm/ioapic.c | 12 ------------
->  hw/i386/pc.c         |  5 ++---
->  3 files changed, 2 insertions(+), 16 deletions(-)
->=20
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index 9fe233b9bf..f5d0d0d710 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -515,7 +515,6 @@ int kvm_irqchip_add_irqfd_notifier(KVMState *s, Event=
-Notifier *n,
->  int kvm_irqchip_remove_irqfd_notifier(KVMState *s, EventNotifier *n,
->                                        qemu_irq irq);
->  void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi);
-> -void kvm_pc_gsi_handler(void *opaque, int n, int level);
->  void kvm_pc_setup_irq_routing(bool pci_enabled);
->  void kvm_init_irq_routing(KVMState *s);
-> =20
-> diff --git a/hw/i386/kvm/ioapic.c b/hw/i386/kvm/ioapic.c
-> index f94729c565..bae7413a39 100644
-> --- a/hw/i386/kvm/ioapic.c
-> +++ b/hw/i386/kvm/ioapic.c
-> @@ -48,18 +48,6 @@ void kvm_pc_setup_irq_routing(bool pci_enabled)
->      }
->  }
-> =20
-> -void kvm_pc_gsi_handler(void *opaque, int n, int level)
-> -{
-> -    GSIState *s =3D opaque;
-> -
-> -    if (n < ISA_NUM_IRQS) {
-> -        /* Kernel will forward to both PIC and IOAPIC */
-> -        qemu_set_irq(s->i8259_irq[n], level);
-> -    } else {
-> -        qemu_set_irq(s->ioapic_irq[n], level);
-> -    }
-> -}
-> -
->  typedef struct KVMIOAPICState KVMIOAPICState;
-> =20
->  struct KVMIOAPICState {
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index ac08e63604..97e9049b71 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -350,6 +350,7 @@ void gsi_handler(void *opaque, int n, int level)
-> =20
->      DPRINTF("pc: %s GSI %d\n", level ? "raising" : "lowering", n);
->      if (n < ISA_NUM_IRQS) {
-> +        /* Under KVM, Kernel will forward to both PIC and IOAPIC */
->          qemu_set_irq(s->i8259_irq[n], level);
->      }
->      qemu_set_irq(s->ioapic_irq[n], level);
-> @@ -362,10 +363,8 @@ GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_en=
-abled)
->      s =3D g_new0(GSIState, 1);
->      if (kvm_ioapic_in_kernel()) {
->          kvm_pc_setup_irq_routing(pci_enabled);
-> -        *irqs =3D qemu_allocate_irqs(kvm_pc_gsi_handler, s, GSI_NUM_PINS=
-);
-> -    } else {
-> -        *irqs =3D qemu_allocate_irqs(gsi_handler, s, GSI_NUM_PINS);
->      }
-> +    *irqs =3D qemu_allocate_irqs(gsi_handler, s, GSI_NUM_PINS);
-> =20
->      return s;
->  }
->=20
+From: Markus Armbruster <armbru@redhat.com>
 
-Queued, thanks.
+cpu_model_from_info() is a helper for qmp_query_cpu_model_expansion(),
+qmp_query_cpu_model_comparison(), qmp_query_cpu_model_baseline().  It
+dereferences @errp when the visitor or the QOM setter fails.  That's
+wrong; see the big comment in error.h.  Introduced in commit
+137974cea3 's390x/cpumodel: implement QMP interface
+"query-cpu-model-expansion"'.
 
-Paolo
+Its three callers have the same issue.  Introduced in commit
+4e82ef0502 's390x/cpumodel: implement QMP interface
+"query-cpu-model-comparison"' and commit f1a47d08ef 's390x/cpumodel:
+implement QMP interface "query-cpu-model-baseline"'.
+
+No caller actually passes null.
+
+Fix anyway: splice in a local Error *err, and error_propagate().
+
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20191204093625.14836-15-armbru@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/cpu_models.c | 43 ++++++++++++++++++++++++---------------
+ 1 file changed, 27 insertions(+), 16 deletions(-)
+
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index c702e34a26b9..3ed301b5e509 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -477,6 +477,7 @@ CpuDefinitionInfoList *qmp_query_cpu_definitions(Error =
+**errp)
+ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *i=
+nfo,
+                                 Error **errp)
+ {
++    Error *err =3D NULL;
+     const QDict *qdict =3D NULL;
+     const QDictEntry *e;
+     Visitor *visitor;
+@@ -513,24 +514,26 @@ static void cpu_model_from_info(S390CPUModel *model, =
+const CpuModelInfo *info,
+=20
+     if (qdict) {
+         visitor =3D qobject_input_visitor_new(info->props);
+-        visit_start_struct(visitor, NULL, NULL, 0, errp);
+-        if (*errp) {
++        visit_start_struct(visitor, NULL, NULL, 0, &err);
++        if (err) {
++            error_propagate(errp, err);
+             visit_free(visitor);
+             object_unref(obj);
+             return;
+         }
+         for (e =3D qdict_first(qdict); e; e =3D qdict_next(qdict, e)) {
+-            object_property_set(obj, visitor, e->key, errp);
+-            if (*errp) {
++            object_property_set(obj, visitor, e->key, &err);
++            if (err) {
+                 break;
+             }
+         }
+-        if (!*errp) {
++        if (!err) {
+             visit_check_struct(visitor, errp);
+         }
+         visit_end_struct(visitor, NULL);
+         visit_free(visitor);
+-        if (*errp) {
++        if (err) {
++            error_propagate(errp, err);
+             object_unref(obj);
+             return;
+         }
+@@ -595,13 +598,15 @@ CpuModelExpansionInfo *qmp_query_cpu_model_expansion(=
+CpuModelExpansionType type,
+                                                       CpuModelInfo *model,
+                                                       Error **errp)
+ {
++    Error *err =3D NULL;
+     CpuModelExpansionInfo *expansion_info =3D NULL;
+     S390CPUModel s390_model;
+     bool delta_changes =3D false;
+=20
+     /* convert it to our internal representation */
+-    cpu_model_from_info(&s390_model, model, errp);
+-    if (*errp) {
++    cpu_model_from_info(&s390_model, model, &err);
++    if (err) {
++        error_propagate(errp, err);
+         return NULL;
+     }
+=20
+@@ -634,18 +639,21 @@ CpuModelCompareInfo *qmp_query_cpu_model_comparison(C=
+puModelInfo *infoa,
+                                                      CpuModelInfo *infob,
+                                                      Error **errp)
+ {
++    Error *err =3D NULL;
+     CpuModelCompareResult feat_result, gen_result;
+     CpuModelCompareInfo *compare_info;
+     S390FeatBitmap missing, added;
+     S390CPUModel modela, modelb;
+=20
+     /* convert both models to our internal representation */
+-    cpu_model_from_info(&modela, infoa, errp);
+-    if (*errp) {
++    cpu_model_from_info(&modela, infoa, &err);
++    if (err) {
++        error_propagate(errp, err);
+         return NULL;
+     }
+-    cpu_model_from_info(&modelb, infob, errp);
+-    if (*errp) {
++    cpu_model_from_info(&modelb, infob, &err);
++    if (err) {
++        error_propagate(errp, err);
+         return NULL;
+     }
+     compare_info =3D g_new0(CpuModelCompareInfo, 1);
+@@ -707,6 +715,7 @@ CpuModelBaselineInfo *qmp_query_cpu_model_baseline(CpuM=
+odelInfo *infoa,
+                                                     CpuModelInfo *infob,
+                                                     Error **errp)
+ {
++    Error *err =3D NULL;
+     CpuModelBaselineInfo *baseline_info;
+     S390CPUModel modela, modelb, model;
+     uint16_t cpu_type;
+@@ -714,13 +723,15 @@ CpuModelBaselineInfo *qmp_query_cpu_model_baseline(Cp=
+uModelInfo *infoa,
+     uint8_t max_gen;
+=20
+     /* convert both models to our internal representation */
+-    cpu_model_from_info(&modela, infoa, errp);
+-    if (*errp) {
++    cpu_model_from_info(&modela, infoa, &err);
++    if (err) {
++        error_propagate(errp, err);
+         return NULL;
+     }
+=20
+-    cpu_model_from_info(&modelb, infob, errp);
+-    if (*errp) {
++    cpu_model_from_info(&modelb, infob, &err);
++    if (err) {
++        error_propagate(errp, err);
+         return NULL;
+     }
+=20
+--=20
+2.21.0
 
 
