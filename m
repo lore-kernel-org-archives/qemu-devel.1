@@ -2,95 +2,57 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C88FC43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A79B7C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:48:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 238DA2077B
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:38:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="UXrRXxlY";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="b/MXrZne"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 238DA2077B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 7AC1B24656
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 07:48:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AC1B24656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iffWs-00018K-CO
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 02:38:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53901)
+	id 1iffgD-0002su-Iv
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 02:48:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrew@aj.id.au>) id 1iffW6-0000XV-M2
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:37:39 -0500
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1ifffS-0002Qy-3B
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:47:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrew@aj.id.au>) id 1iffW5-0001FE-O0
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:37:38 -0500
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:45253)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrew@aj.id.au>)
- id 1iffW3-00018Z-1i; Fri, 13 Dec 2019 02:37:35 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.nyi.internal (Postfix) with ESMTP id 6A25622706;
- Fri, 13 Dec 2019 02:37:34 -0500 (EST)
-Received: from imap2 ([10.202.2.52])
- by compute4.internal (MEProxy); Fri, 13 Dec 2019 02:37:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
- mime-version:message-id:in-reply-to:references:date:from:to:cc
- :subject:content-type:content-transfer-encoding; s=fm1; bh=R7vvN
- QShjZstXykvSSp28e4ebWdGwPKaCuhGtz3SP9U=; b=UXrRXxlY/RqY3GbUFkhrk
- SnylI3BL2xlgfwKqdVfSu4QPuBVZ5r8HhtKMLteQ/pR9PK52hgCI0jjcrfpQiyer
- QRt1O+lnQtVI8Wp6rj539BVkDp1/5t4MtWKNHD70JuiW+lcbEzk0IQyxmDq7HGH7
- D6/AVh27FRhy6dl9HDOMGPifZuBoTisrOPTu/yq1Ag73u7d9EcfFi9Gl2EX1ETMt
- CE9JEmvZ2csQYC25yk3Lit4DWf8mI6ZN+Q5Wnm/dy4kahrT9wsTm3/kZhM4X48Rq
- WTbLFjKVYPfxOAkjOX/HhKgsarUuZRKOWzzYAd9zmTT5NxG76uYhVVfPdeDZLdB9
- w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:content-type
- :date:from:in-reply-to:message-id:mime-version:references
- :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
- :x-sasl-enc; s=fm1; bh=R7vvNQShjZstXykvSSp28e4ebWdGwPKaCuhGtz3SP
- 9U=; b=b/MXrZnenWgGj1row49Q8nWuHVIkklMIH/V09xnfKqYqvdzdPEyxuxQt8
- Tw7ggmBhoKuQu4W1vkxI52iaZwEgv5rfKkh138WrtF941mDFvrtdzAOz42aooegn
- oEHqDlc3aVjX01jaO1UUM7GY2c3gzpjIpqbAIsHG0Di4gSV5d5w1mBhuy+eDwPty
- AMazPPXxw4gT7AWPm/n4xv4TClbmXwsxYKFKX+zmwqN+9cF5GlXrdTh3HeM+cWKG
- ot85eF3OQcHmboLBvVcHgOm6AhNfX102FBn/BuLw8/120g1UMjp28zHQT2Y6A+sW
- 3zG93CGgQpDyjBPq3b2OrZV3VLQWw==
-X-ME-Sender: <xms:vT_zXcbzn5IWRBJmvNoh_KpYLuq9O43MMyG-Qva3FNxLqyzWH6RcNQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrudelkedguddutdcutefuodetggdotefrod
- ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
- necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
- enucfjughrpefofgggkfgjfhffhffvufgtgfesthhqredtreerjeenucfhrhhomhepfdet
- nhgurhgvficulfgvfhhfvghrhidfuceorghnughrvgifsegrjhdrihgurdgruheqnecurf
- grrhgrmhepmhgrihhlfhhrohhmpegrnhgurhgvfiesrghjrdhiugdrrghunecuvehluhhs
- thgvrhfuihiivgeptd
-X-ME-Proxy: <xmx:vT_zXYkCys5yL4M5eVP3bu9WGnNkJPk1UTCOANvYikT-JnqKd24bYA>
- <xmx:vT_zXXYUUZMFZoMmlKEE-IRTedz2SkEGa6kJwaIy8g_VzYteayX6uA>
- <xmx:vT_zXQA--z7XnBhP3TB4hqGAmUGuL0_LlqZsu-BzNfw1UKuHYNyagQ>
- <xmx:vj_zXSIqOv2Ax0xggKCMWf-RW-JP5Vu5nXaVGw6TdYbbMPpcPm_H8Q>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
- id 9557DE00A2; Fri, 13 Dec 2019 02:37:33 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.1.7-680-g58d4e90-fmstable-20191213v1
-Mime-Version: 1.0
-Message-Id: <1d96ac9b-5eb2-43ec-bf21-334ee3fa4420@www.fastmail.com>
-In-Reply-To: <16c90bb0-a3a9-06ec-e79a-bd98471d9e11@kaod.org>
-References: <cover.fc3e5e495d85ebd919c1f06a1a2c7c7730518f9c.1576211124.git-series.andrew@aj.id.au>
- <16c90bb0-a3a9-06ec-e79a-bd98471d9e11@kaod.org>
-Date: Fri, 13 Dec 2019 18:07:11 +1030
-From: "Andrew Jeffery" <andrew@aj.id.au>
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, qemu-arm@nongnu.org
-Subject: Re: [PATCH v2 0/2] hw/arm: ast2600: Wire up eMMC controller
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1ifffQ-0000PH-07
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:47:17 -0500
+Received: from [192.146.154.1] (port=54921 helo=mcp01.nutanix.com)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <raphael.norwitz@nutanix.com>) id 1ifffP-0000LM-NU
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 02:47:15 -0500
+Received: from raphael-norwitz.user.nutanix.com
+ (raphael-norwitz.dev.nutanix.com [10.41.25.241])
+ by mcp01.nutanix.com (Postfix) with ESMTP id EE42E1007E2A;
+ Fri, 13 Dec 2019 07:47:13 +0000 (UTC)
+Date: Thu, 12 Dec 2019 23:47:13 -0800
+From: Raphael Norwitz <raphael.norwitz@nutanix.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH 1/2] vhost-user: add VHOST_USER_RESET_DEVICE to reset
+ devices
+Message-ID: <20191213074713.GA40566@raphael-norwitz.user.nutanix.com>
+References: <1572385083-5254-1-git-send-email-raphael.norwitz@nutanix.com>
+ <1572385083-5254-2-git-send-email-raphael.norwitz@nutanix.com>
+ <20191106063525-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191106063525-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.5.20 (2009-12-10)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 66.111.4.27
+X-Received-From: 192.146.154.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,37 +64,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>,
- qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Nov 06, 2019 at 06:36:01AM -0500, Michael S. Tsirkin wrote:
+> 
+> On Tue, Oct 29, 2019 at 05:38:02PM -0400, Raphael Norwitz wrote:
+> > Add a VHOST_USER_RESET_DEVICE message which will reset the vhost user
+> > backend. Disabling all rings, and resetting all internal state, ready
+> > for the backend to be reinitialized.
+> > 
+> > A backend has to report it supports this features with the
+> > VHOST_USER_PROTOCOL_F_RESET_DEVICE protocol feature bit. If it does
+> > so, the new message is used instead of sending a RESET_OWNER which has
+> > had inconsistent implementations.
+> > 
+> > Signed-off-by: David Vrabel <david.vrabel@nutanix.com>
+> > Signed-off-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
 
+Ping on this. 
 
-On Fri, 13 Dec 2019, at 18:03, C=C3=A9dric Le Goater wrote:
-> On 13/12/2019 05:28, Andrew Jeffery wrote:
-> > Hello,
-> >=20
-> > The AST2600 has an additional SDHCI intended for use as an eMMC boot=
- source.
-> > These two patches rework the existing ASPEED SDHCI model to accommod=
-ate the
-> > single-slot nature of the eMMC controller and wire it into the AST26=
-00 SoC.
-> >=20
-> > v2 contains some minor refactorings in response to issues pointed ou=
-t by
-> > Cedric.
-> =20
->=20
-> I think these patches are based on mainline. I fixed them locally on=20=
-
-> my aspeed 5.0 branch and I plan to send them along with other aspeed=20=
-
-> changes in the 5.0 timeframe. =20
-
-Yeah, they're based on Peter's tree. I'll base future patches on yours.
-
-Andrew
+> 
+> Looks ok, pls ping me after the release to apply this.
+> > ---
+> >  docs/interop/vhost-user.rst | 15 +++++++++++++++
+> >  hw/virtio/vhost-user.c      |  8 +++++++-
+> >  2 files changed, 22 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/docs/interop/vhost-user.rst b/docs/interop/vhost-user.rst
+> > index 7827b71..d213d4a 100644
+> > --- a/docs/interop/vhost-user.rst
+> > +++ b/docs/interop/vhost-user.rst
+> > @@ -785,6 +785,7 @@ Protocol features
+> >    #define VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD  10
+> >    #define VHOST_USER_PROTOCOL_F_HOST_NOTIFIER  11
+> >    #define VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD 12
+> > +  #define VHOST_USER_PROTOCOL_F_RESET_DEVICE   13
+> >  
+> >  Master message types
+> >  --------------------
+> > @@ -1190,6 +1191,20 @@ Master message types
+> >    ancillary data. The GPU protocol is used to inform the master of
+> >    rendering state and updates. See vhost-user-gpu.rst for details.
+> >  
+> > +``VHOST_USER_RESET_DEVICE``
+> > +  :id: 34
+> > +  :equivalent ioctl: N/A
+> > +  :master payload: N/A
+> > +  :slave payload: N/A
+> > +
+> > +  Ask the vhost user backend to disable all rings and reset all
+> > +  internal device state to the initial state, ready to be
+> > +  reinitialized. The backend retains ownership of the device
+> > +  throughout the reset operation.
+> > +
+> > +  Only valid if the ``VHOST_USER_PROTOCOL_F_RESET_DEVICE`` protocol
+> > +  feature is set by the backend.
+> > +
+> >  Slave message types
+> >  -------------------
+> >  
+> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> > index 02a9b25..d27a10f 100644
+> > --- a/hw/virtio/vhost-user.c
+> > +++ b/hw/virtio/vhost-user.c
+> > @@ -58,6 +58,7 @@ enum VhostUserProtocolFeature {
+> >      VHOST_USER_PROTOCOL_F_SLAVE_SEND_FD = 10,
+> >      VHOST_USER_PROTOCOL_F_HOST_NOTIFIER = 11,
+> >      VHOST_USER_PROTOCOL_F_INFLIGHT_SHMFD = 12,
+> > +    VHOST_USER_PROTOCOL_F_RESET_DEVICE = 13,
+> >      VHOST_USER_PROTOCOL_F_MAX
+> >  };
+> >  
+> > @@ -98,6 +99,7 @@ typedef enum VhostUserRequest {
+> >      VHOST_USER_GET_INFLIGHT_FD = 31,
+> >      VHOST_USER_SET_INFLIGHT_FD = 32,
+> >      VHOST_USER_GPU_SET_SOCKET = 33,
+> > +    VHOST_USER_RESET_DEVICE = 34,
+> >      VHOST_USER_MAX
+> >  } VhostUserRequest;
+> >  
+> > @@ -890,10 +892,14 @@ static int vhost_user_set_owner(struct vhost_dev *dev)
+> >  static int vhost_user_reset_device(struct vhost_dev *dev)
+> >  {
+> >      VhostUserMsg msg = {
+> > -        .hdr.request = VHOST_USER_RESET_OWNER,
+> >          .hdr.flags = VHOST_USER_VERSION,
+> >      };
+> >  
+> > +    msg.hdr.request = virtio_has_feature(dev->protocol_features,
+> > +                                         VHOST_USER_PROTOCOL_F_RESET_DEVICE)
+> > +        ? VHOST_USER_RESET_DEVICE
+> > +        : VHOST_USER_RESET_OWNER;
+> > +
+> >      if (vhost_user_write(dev, &msg, NULL, 0) < 0) {
+> >          return -1;
+> >      }
+> > -- 
+> > 1.8.3.1
+> 
+> 
 
