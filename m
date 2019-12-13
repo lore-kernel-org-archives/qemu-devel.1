@@ -2,100 +2,93 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BE6C00454
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6302C3F68F
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC6AE21655
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PekFU5T9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC6AE21655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4716224125
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4716224125
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifkv8-0002Rn-7c
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 08:23:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40327)
+	id 1ifjg8-0001zG-Qh
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:04:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57047)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ifktZ-0001Nm-Og
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:22:15 -0500
+ (envelope-from <groug@kaod.org>) id 1ifjbg-0006yK-0x
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:59:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ifktY-0007je-4l
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:22:13 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57034
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ifktY-0007ie-0E
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 08:22:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576243331;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7jgspVajfgjE42ZvZQfn/amiK0x8QorJMMvgrfevHDE=;
- b=PekFU5T9/j6OhBJgSohsS3m+K9HmC5+aLgP2wRsylXEZs3VcqlzSmHkWVZM9362nYsm4Lf
- 3h8lDvVS9YFMAa5xSImGKOOe8VDvBZcCrvMbzhMZH8hvIzkUZpANqNngdaXUgBA1RtqZ5R
- 5pZEDGvkBA06QiPYkcw1B9SUthpolYY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-nI_HTVw2PcKznDOqT0uJeg-1; Fri, 13 Dec 2019 08:22:10 -0500
-Received: by mail-wr1-f71.google.com with SMTP id v17so2555203wrm.17
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 05:22:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=VY/4rF+g3Stxjk2j0HlkvEIE4fBT/7Xv9T82Gu/sONg=;
- b=Nu9FIVTjmzDZ82l60uaG94b8r5pnxocYY+xSI2h0B/RyRFnkGA0bCGbBfPTLLCR1SJ
- XwJ/nGAgouZJwFnpSwjNm/+D9JKyHU5epc/6RxyM36l+xTZzbnR+geBV3F09kmCCQHvp
- Is5z6Kq8qfslzNOAhI06qYxFqkQQvBatliiBdNJm24V64+yC8B8MRpP/LeHbBqCZ2Ihl
- 6M4XccXiUB1L2cvN1LEog7BL08k2Vlk62nN488nHMxVIvx5ZyXpZDKD86xUPs4cPQNxI
- i9ULiVT2Dg2Ekc8AIB06sTXCFOY6h1vGfcJunaiberO+iqdoaDQz7cdxyYJo2JAzsPnN
- uchA==
-X-Gm-Message-State: APjAAAUNdmvmTQHc0i3l9jCCmWqK3olijHgYs2W/wtgJMUCFAzDFgmND
- L7TKsCeLbHrFfO00D37T/CAHpuMQqtKoaDRihUBi/m+Qis3FmQXBdC+k0ByWo7NKn1nySMT+wMs
- WQN3hGAKPLxarvzU=
-X-Received: by 2002:a1c:6585:: with SMTP id
- z127mr13324476wmb.113.1576243329175; 
- Fri, 13 Dec 2019 05:22:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwrPpDti4gPsctX5koB9VTm1Tquxj03KYjvJPGJQKBSDmkVKjKjnaXIWDgcfvBIr4GAcm2yzA==
-X-Received: by 2002:a1c:6585:: with SMTP id
- z127mr13324458wmb.113.1576243328984; 
- Fri, 13 Dec 2019 05:22:08 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id c9sm9823992wmc.47.2019.12.13.05.22.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 13 Dec 2019 05:22:08 -0800 (PST)
-Subject: Re: [PATCH] hw/isa/isa-bus: Use ISA_NUM_IRQS instead of magic number
-To: qemu-devel@nongnu.org
-References: <20191213105921.9529-1-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0be14c5f-4d19-e633-8ed7-47bf99e632d9@redhat.com>
-Date: Fri, 13 Dec 2019 14:22:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <groug@kaod.org>) id 1ifjbe-0003XB-JY
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:59:39 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31826
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ifjbe-0003V4-C3
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:59:38 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBDBvgoe121422
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 06:59:35 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wu4t86r7w-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 06:59:34 -0500
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Fri, 13 Dec 2019 11:59:33 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 13 Dec 2019 11:59:30 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xBDBwlwB49283516
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 13 Dec 2019 11:58:47 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 34FF54C044;
+ Fri, 13 Dec 2019 11:59:29 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 040694C040;
+ Fri, 13 Dec 2019 11:59:29 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.185.241])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 13 Dec 2019 11:59:28 +0000 (GMT)
+Subject: [PATCH 00/13] ppc/pnv: Get rid of chip_type attributes
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri, 13 Dec 2019 12:59:28 +0100
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-In-Reply-To: <20191213105921.9529-1-philmd@redhat.com>
-Content-Language: en-US
-X-MC-Unique: nI_HTVw2PcKznDOqT0uJeg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19121311-0008-0000-0000-00000340727E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121311-0009-0000-0000-00004A607864
+Message-Id: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-13_03:2019-12-13,2019-12-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ bulkscore=0 impostorscore=0 spamscore=0 clxscore=1034 suspectscore=0
+ mlxscore=0 mlxlogscore=285 malwarescore=0 adultscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912130097
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,40 +100,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/13/19 11:59 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> We have a definition for the number of ISA IRQs, use it.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->   hw/isa/isa-bus.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-> index 388800603b..1d79ed133c 100644
-> --- a/hw/isa/isa-bus.c
-> +++ b/hw/isa/isa-bus.c
-> @@ -85,7 +85,7 @@ void isa_bus_irqs(ISABus *bus, qemu_irq *irqs)
->   qemu_irq isa_get_irq(ISADevice *dev, int isairq)
->   {
->       assert(!dev || ISA_BUS(qdev_get_parent_bus(DEVICE(dev))) =3D=3D isa=
-bus);
-> -    if (isairq < 0 || isairq > 15) {
-> +    if (isairq < 0 || isairq > >=3D ISA_NUM_IRQS) {
+The PnvChipClass type has a chip_type attribute which identifies various
+POWER CPU chip types that can be used in a powernv machine.
 
-Oops, Pablo was quicker than patchew to notice this buggy patch =3D)
+typedef enum PnvChipType {
+    PNV_CHIP_POWER8E,     /* AKA Murano (default) */
+    PNV_CHIP_POWER8,      /* AKA Venice */
+    PNV_CHIP_POWER8NVL,   /* AKA Naples */
+    PNV_CHIP_POWER9,      /* AKA Nimbus */
+    PNV_CHIP_POWER10,     /* AKA TBD */
+} PnvChipType;
 
-I messed when copy/pasting from a bigger series :/
+This attribute is used in many places where we want a different behaviour
+depending on the CPU type, either directly like:
 
-So no need to review further.
+    switch (PNV_CHIP_GET_CLASS(chip)->chip_type) {
+    case PNV_CHIP_POWER8E:
+    case PNV_CHIP_POWER8:
+    case PNV_CHIP_POWER8NVL:
+        return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
+    case PNV_CHIP_POWER9:
+    case PNV_CHIP_POWER10:
+        return addr >> 3;
+    default:
+        g_assert_not_reached();
+    }
 
->           hw_error("isa irq %d invalid", isairq);
->       }
->       return isabus->irqs[isairq];
->=20
+or through various helpers that rely on it:
+
+        /* Each core has an XSCOM MMIO region */
+        if (pnv_chip_is_power10(chip)) {
+            xscom_core_base = PNV10_XSCOM_EC_BASE(core_hwid);
+        } else if (pnv_chip_is_power9(chip)) {
+            xscom_core_base = PNV9_XSCOM_EC_BASE(core_hwid);
+        } else {
+            xscom_core_base = PNV_XSCOM_EX_BASE(core_hwid);
+        }
+
+The chip_type is also duplicated in the PnvPsiClass type.
+
+It looks a bit unfortunate to implement manually something that falls into
+the scope of QOM. Especially since we don't seem to need a finer grain than
+the CPU familly, ie. POWER8, POWER9, POWER10, ..., and we already have
+specialized versions of PnvChipClass and PnvPsiClass for these.
+
+This series basically QOM-ifies all the places where we check on the chip
+type, and gets rid of the chip_type attributes and the is_powerXX() helpers.
+
+Patch 1 was recently posted to the list but it isn't available in David's
+ppc-for-5.0 tree yet, so I include it in this series for convenience.
+
+--
+Greg
+
+---
+
+Greg Kurz (13):
+      ppc: Drop useless extern annotation for functions
+      ppc/pnv: Introduce PnvPsiClass::compat
+      ppc/pnv: Drop PnvPsiClass::chip_type
+      ppc/pnv: Introduce PnvMachineClass and PnvMachineClass::compat
+      ppc/pnv: Introduce PnvMachineClass::dt_power_mgt()
+      ppc/pnv: Drop pnv_is_power9() and pnv_is_power10() helpers
+      ppc/pnv: Introduce PnvChipClass::intc_print_info() method
+      ppc/pnv: Introduce PnvChipClass::xscom_core_base() method
+      ppc/pnv: Pass XSCOM base address and address size to pnv_dt_xscom()
+      ppc/pnv: Pass content of the "compatible" property to pnv_dt_xscom()
+      ppc/pnv: Drop pnv_chip_is_power9() and pnv_chip_is_power10() helpers
+      ppc/pnv: Introduce PnvChipClass::xscom_pcba() method
+      ppc/pnv: Drop PnvChipClass::type
+
+
+ hw/ppc/pnv.c               |  150 +++++++++++++++++++++++++++++++++-----------
+ hw/ppc/pnv_psi.c           |   28 +++-----
+ hw/ppc/pnv_xscom.c         |   48 ++------------
+ include/hw/ppc/pnv.h       |   53 ++++++----------
+ include/hw/ppc/pnv_psi.h   |    3 +
+ include/hw/ppc/pnv_xscom.h |   24 ++++---
+ include/hw/ppc/spapr_vio.h |    6 +-
+ 7 files changed, 169 insertions(+), 143 deletions(-)
 
 
