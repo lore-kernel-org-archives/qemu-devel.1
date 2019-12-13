@@ -2,67 +2,89 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1B6C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17979C43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:28:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 697C4227BF
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:21:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 697C4227BF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mail.ustc.edu.cn
+	by mail.kernel.org (Postfix) with ESMTPS id B581A206E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 04:28:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="TQ20b1eK";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="fjtlUuFi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B581A206E2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aj.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifcS1-0001pO-Po
-	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 23:21:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50294)
+	id 1ifcZR-0005I5-Pt
+	for qemu-devel@archiver.kernel.org; Thu, 12 Dec 2019 23:28:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54604)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <precinct@mail.ustc.edu.cn>) id 1ifaiC-0008Ej-TQ
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 21:29:49 -0500
+ (envelope-from <andrew@aj.id.au>) id 1ifcXw-0003Oe-MO
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:27:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <precinct@mail.ustc.edu.cn>) id 1ifaiA-0004OJ-Og
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 21:29:47 -0500
-Received: from email6.ustc.edu.cn ([2001:da8:d800::8]:33264 helo=ustc.edu.cn)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <precinct@mail.ustc.edu.cn>) id 1ifai9-0003pQ-U5
- for qemu-devel@nongnu.org; Thu, 12 Dec 2019 21:29:46 -0500
-Received: from lxy.loongson.cn (unknown [114.242.206.180])
- by newmailweb.ustc.edu.cn (Coremail) with SMTP id
- LkAmygBnbc2F9_Jd4kJhAQ--.3943S2; 
- Fri, 13 Dec 2019 10:29:27 +0800 (CST)
-From: Xinyu Li <precinct@mail.ustc.edu.cn>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] linux-user:Fix align mistake when mmap guest space
-Date: Fri, 13 Dec 2019 10:29:19 +0800
-Message-Id: <20191213022919.5934-1-precinct@mail.ustc.edu.cn>
-X-Mailer: git-send-email 2.17.1
-X-CM-TRANSID: LkAmygBnbc2F9_Jd4kJhAQ--.3943S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uFWrWFykXF4xJw1rXrWrXwb_yoW8Gw15pF
- ZxCrn7WrWjqFy5Xw17t3sakw4jqas0kFWYkry3A348ArsxXF1a9rnFga4UWrWDCF4vgw4q
- 9FZ5twn7Ww1UZF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
- 9KBjDU0xBIdaVrnRJUUUyG14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
- rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
- 1l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
- 6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
- Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
- I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
- 4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCF04k20xvY0x0EwIxG
- rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
- vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IY
- x2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
- xKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7Cj
- xVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUbWCJPUUUUU==
-X-CM-SenderInfo: 5suhuxxqfwqzxdloh3xvwfhvlgxou0/
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2001:da8:d800::8
-X-Mailman-Approved-At: Thu, 12 Dec 2019 23:10:17 -0500
+ (envelope-from <andrew@aj.id.au>) id 1ifcXv-0003Gt-JO
+ for qemu-devel@nongnu.org; Thu, 12 Dec 2019 23:27:20 -0500
+Received: from wout3-smtp.messagingengine.com ([64.147.123.19]:54753)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrew@aj.id.au>)
+ id 1ifcXs-00035M-EX; Thu, 12 Dec 2019 23:27:16 -0500
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailout.west.internal (Postfix) with ESMTP id F12AD877;
+ Thu, 12 Dec 2019 23:27:13 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Thu, 12 Dec 2019 23:27:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=from
+ :to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding; s=fm1; bh=PqgLhpy94OGx/TZUhKr14ouSOm
+ hNdalV2V/031LW2zc=; b=TQ20b1eKD9tveMzCEHh14gs1nOP7CDus0iJBcem7JE
+ W1N7fTq9QC0oDxCMbs6FNEE1OhD/64Ch1F6UnpKqjDF/8hY0BzxrKATiazH5I+5l
+ 7+7cPTCKOIhdo5JuqIKD7E1JG6UlfAcOdihS04W2IBcdG0gD5QSgiMmBxW0LMRd2
+ 5zrP1TPkwu51xCEShImCDtEL791aVNEPcUBX9+Dhca2PDdcyxJG6r1BIMKjo9/wf
+ 19UXE6s3vxWhnVopngjgYU0LCD73aOH9iKUyl1EbUUxr1MSWxeFYVUDGl2gsj549
+ aOcQh90rGX1AUy3cVLnOW3/Q1Cmw8u+iklmFYnaFnwNQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:date:from
+ :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+ :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=PqgLhpy94OGx/TZUh
+ Kr14ouSOmhNdalV2V/031LW2zc=; b=fjtlUuFiyE4jIDZ3KSWKN1GNKe9+zXfZm
+ fpuP9YIwMCvdP62UyS9WOJ/YmQ2PQou19V02LzHCds9lM377pStfrYuRA6C3wJ0S
+ GaY0d4NCUix9qK7H+fJj+fHrn6SL6o2ZPNxSojamgDODokHiaOLzWz56OcY/tv9x
+ C03n3B3z+Jtf3VnV4XdXxEy8tzDjcsKni/YjWp/yNz7pEeGaYGE1EdC/KQCAt/0W
+ Gfh5AsckbHI4xOAHn7NCTpGFIi5T6gtMA8Hwjdjqm4p/tVgwh1DTLP7Jn/mQcgXw
+ xMMuIDkfMxONihV7+doR+dinxwSJ6FMPeMfCdHRQhL8RTSyeGG6wA==
+X-ME-Sender: <xms:IBPzXdlMrB_MOnDJmOfb4k3215zaCAUKop6ZXCqZ9uuOZU0IZ0xsxQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrudelkedgjedtucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucenucfjughrpefhvffufffkofgggfestdekredtre
+ dttdenucfhrhhomheptehnughrvgifucflvghffhgvrhihuceorghnughrvgifsegrjhdr
+ ihgurdgruheqnecuffhomhgrihhnpehoiihlrggsshdrohhrghenucfkphepvddtvddrke
+ durddukedrfedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrnhgurhgvfiesrghjrdhi
+ ugdrrghunecuvehluhhsthgvrhfuihiivgeptd
+X-ME-Proxy: <xmx:IBPzXdGjmPDFsEAobpPH6MTrWKJcPrJ6djzR77tzJVexEs8ywzDpVA>
+ <xmx:IBPzXepygpgOXjWZ9tol5MBD-fwWJB_WkSjZZSk2Eq4R4pR7aCHJKQ>
+ <xmx:IBPzXR4zgA3paZxElv-tetBNg92gcVenbawa1JC1IedWwyGkBGx-_g>
+ <xmx:IRPzXd0yGcDmFYHjWxycXSVzfZ5W3zuaQCEK9nZAzpvOFVyM6l1DRQ>
+Received: from mistburn.au.ibm.com (bh02i525f01.au.ibm.com [202.81.18.30])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 79FA980063;
+ Thu, 12 Dec 2019 23:27:10 -0500 (EST)
+From: Andrew Jeffery <andrew@aj.id.au>
+To: qemu-arm@nongnu.org
+Subject: [PATCH v2 0/2] hw/arm: ast2600: Wire up eMMC controller
+Date: Fri, 13 Dec 2019 14:58:40 +1030
+Message-Id: <cover.fc3e5e495d85ebd919c1f06a1a2c7c7730518f9c.1576211124.git-series.andrew@aj.id.au>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 64.147.123.19
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,43 +96,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: riku.voipio@iki.fi, laurent@vivier.eu, Xinyu Li <precinct@mail.ustc.edu.cn>
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, clg@kaod.org,
+ joel@jms.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In init_guest_space, we need to mmap guest space. If the return address
-of first mmap is not aligned with align, which was set to MAX(SHMLBA,
-qemu_host_page_size), we need unmap and a new mmap(space is larger than
-first size). The new size is named real_size, which is aligned_size +
-qemu_host_page_size. alugned_size is the guest space size. And add a
-qemu_host_page_size to avoid memory error when we align real_start
-manually (ROUND_UP(real_start, align)). But when SHMLBA >
-qemu_host_page_size, the added size will smaller than the size to align,
-which can make a mistake(in a mips machine, it appears). So change
-real_size from aligned_size +qemu_host_page_size
-to aligned_size + align will solve it.
+Hello,
 
-Signed-off-by: Xinyu Li <precinct@mail.ustc.edu.cn>
----
- linux-user/elfload.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The AST2600 has an additional SDHCI intended for use as an eMMC boot source.
+These two patches rework the existing ASPEED SDHCI model to accommodate the
+single-slot nature of the eMMC controller and wire it into the AST2600 SoC.
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index f6693e5760..312ded0779 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2189,7 +2189,7 @@ unsigned long init_guest_space(unsigned long host_start,
-              * to where we need to put the commpage.
-              */
-             munmap((void *)real_start, host_size);
--            real_size = aligned_size + qemu_host_page_size;
-+            real_size = aligned_size + align;
-             real_start = (unsigned long)
-                 mmap((void *)real_start, real_size, PROT_NONE, flags, -1, 0);
-             if (real_start == (unsigned long)-1) {
+v2 contains some minor refactorings in response to issues pointed out by
+Cedric.
+
+v1 can be found here:
+
+https://patchwork.ozlabs.org/cover/1206845/
+
+Please review!
+
+Andrew
+
+Andrew Jeffery (2):
+  hw/sd: Configure number of slots exposed by the ASPEED SDHCI model
+  hw/arm: ast2600: Wire up the eMMC controller
+
+ hw/arm/aspeed.c              | 27 +++++++++++++++++----------
+ hw/arm/aspeed_ast2600.c      | 23 +++++++++++++++++++++++
+ hw/arm/aspeed_soc.c          |  2 ++
+ hw/sd/aspeed_sdhci.c         | 11 +++++++++--
+ include/hw/arm/aspeed_soc.h  |  2 ++
+ include/hw/sd/aspeed_sdhci.h |  1 +
+ 6 files changed, 54 insertions(+), 12 deletions(-)
+
+base-commit: 6a4ef4e5d1084ce41fafa7d470a644b0fd3d9317
 -- 
-2.17.1
-
-
+git-series 0.9.1
 
