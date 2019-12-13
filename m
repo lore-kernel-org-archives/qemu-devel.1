@@ -2,95 +2,77 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCD5C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE0DC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA14E2465A
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA14E2465A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BC09521655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:24:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZlQ+cX1T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC09521655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51368 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifjks-00008I-Lq
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:09:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38612)
+	id 1ifo7O-00018g-Bo
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:48:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51511)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ifjci-00085Q-W1
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:00:46 -0500
+ (envelope-from <philmd@redhat.com>) id 1ifngG-00022L-4v
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:20:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ifjch-0005Fj-B8
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:00:44 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26324
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ifjch-0005FJ-4c
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:00:43 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBDBv6an061012
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 07:00:42 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wujxsc4uv-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 07:00:42 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Fri, 13 Dec 2019 12:00:40 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 13 Dec 2019 12:00:37 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xBDBxrJL50462988
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Dec 2019 11:59:54 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0742111C05E;
- Fri, 13 Dec 2019 12:00:36 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C9AA911C06F;
- Fri, 13 Dec 2019 12:00:35 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.185.241])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 13 Dec 2019 12:00:35 +0000 (GMT)
-Subject: [PATCH 12/13] ppc/pnv: Introduce PnvChipClass::xscom_pcba() method
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 13 Dec 2019 13:00:35 +0100
-In-Reply-To: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
-References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
+ (envelope-from <philmd@redhat.com>) id 1ifngD-0003kO-U5
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:20:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47299
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ifngD-0003j2-Oo
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:20:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576254037;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4iY8APFf9mkIq+cbZyyzXVA8af+R0+1u/Mw6FuzxngQ=;
+ b=ZlQ+cX1TrrGTLyHIT4HrhfBzgyp4hzdNWw+ZCyATgCLzaTz7lh0dbQ1nKZQOOKfH0oGKtu
+ HnloFwUCAWOj16jGNLYBQiqxRKbsgWKjB/cNQIakbpouAa/J65C8qdY2BrEIhhpll1OdZj
+ qaRLhWvmaAimzv7KEXRFRIFlRpJZGRE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-7TJ690WrPveV067pFYkoLA-1; Fri, 13 Dec 2019 11:20:35 -0500
+X-MC-Unique: 7TJ690WrPveV067pFYkoLA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF7DF1856A60;
+ Fri, 13 Dec 2019 16:20:33 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20A8F19C4F;
+ Fri, 13 Dec 2019 16:20:24 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 12/12] hw/i386/pc: Move PC-machine specific declarations to
+ 'pc_internal.h'
+Date: Fri, 13 Dec 2019 17:17:53 +0100
+Message-Id: <20191213161753.8051-13-philmd@redhat.com>
+In-Reply-To: <20191213161753.8051-1-philmd@redhat.com>
+References: <20191213161753.8051-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121312-0028-0000-0000-000003C82A54
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121312-0029-0000-0000-0000248B6796
-Message-Id: <157623843543.360005.13996472463887521794.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-13_03:2019-12-13,2019-12-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 lowpriorityscore=0
- malwarescore=0 mlxlogscore=884 impostorscore=0 priorityscore=1501
- clxscore=1034 suspectscore=0 bulkscore=0 spamscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912130097
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,149 +84,454 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Sergio Lopez <slp@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ Paul Durrant <paul@xen.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ xen-devel@lists.xenproject.org, Anthony Perard <anthony.perard@citrix.com>,
+ Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org,
+ John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The XSCOM bus is implemented with a QOM interface, which is mostly
-generic from a CPU type standpoint, except for the computation of
-addresses on the Pervasize Connect Bus (PCB) network. This is handled
-by the pnv_xscom_pcba() function with a switch statement based on
-the chip_type class level attribute of the CPU chip.
+Historically, QEMU started with only one X86 machine: the PC.
+The 'hw/i386/pc.h' header was used to store all X86 and PC
+declarations. Since we have now multiple machines based on the
+X86 architecture, move the PC-specific declarations in a new
+header.
+We use 'internal' in the name to explicit this header is restricted
+to the X86 architecture. Other architecture can not access it.
 
-This can be achieved using QOM. Also the address argument is masked with
-PNV_XSCOM_SIZE - 1, which is for POWER8 only. Addresses may have different
-sizes with other CPU types. Have each CPU chip type handle the appropriate
-computation with a QOM xscom_pcba() method.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- hw/ppc/pnv.c         |   23 +++++++++++++++++++++++
- hw/ppc/pnv_xscom.c   |   14 +-------------
- include/hw/ppc/pnv.h |    1 +
- 3 files changed, 25 insertions(+), 13 deletions(-)
+Maybe name it 'pc_machine.h'?
+---
+ hw/i386/pc_internal.h | 144 ++++++++++++++++++++++++++++++++++++++++++
+ include/hw/i386/pc.h  | 128 -------------------------------------
+ hw/i386/acpi-build.c  |   1 +
+ hw/i386/pc.c          |   1 +
+ hw/i386/pc_piix.c     |   1 +
+ hw/i386/pc_q35.c      |   1 +
+ hw/i386/pc_sysfw.c    |   1 +
+ hw/i386/xen/xen-hvm.c |   1 +
+ 8 files changed, 150 insertions(+), 128 deletions(-)
+ create mode 100644 hw/i386/pc_internal.h
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 0447b534b8c5..cc40b90e9cd2 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -1121,6 +1121,12 @@ static void pnv_chip_power8_realize(DeviceState *dev, Error **errp)
-                                 &chip8->homer.regs);
- }
- 
-+static uint32_t pnv_chip_power8_xscom_pcba(PnvChip *chip, uint64_t addr)
-+{
-+    addr &= (PNV_XSCOM_SIZE - 1);
-+    return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
-+}
+diff --git a/hw/i386/pc_internal.h b/hw/i386/pc_internal.h
+new file mode 100644
+index 0000000000..c9be64e815
+--- /dev/null
++++ b/hw/i386/pc_internal.h
+@@ -0,0 +1,144 @@
++#ifndef HW_I386_PC_INTERNAL_H
++#define HW_I386_PC_INTERNAL_H
 +
- static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -1138,6 +1144,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
-     k->dt_populate = pnv_chip_power8_dt_populate;
-     k->pic_print_info = pnv_chip_power8_pic_print_info;
-     k->xscom_core_base = pnv_chip_power8_xscom_core_base;
-+    k->xscom_pcba = pnv_chip_power8_xscom_pcba;
-     dc->desc = "PowerNV Chip POWER8E";
- 
-     device_class_set_parent_realize(dc, pnv_chip_power8_realize,
-@@ -1161,6 +1168,7 @@ static void pnv_chip_power8_class_init(ObjectClass *klass, void *data)
-     k->dt_populate = pnv_chip_power8_dt_populate;
-     k->pic_print_info = pnv_chip_power8_pic_print_info;
-     k->xscom_core_base = pnv_chip_power8_xscom_core_base;
-+    k->xscom_pcba = pnv_chip_power8_xscom_pcba;
-     dc->desc = "PowerNV Chip POWER8";
- 
-     device_class_set_parent_realize(dc, pnv_chip_power8_realize,
-@@ -1184,6 +1192,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass *klass, void *data)
-     k->dt_populate = pnv_chip_power8_dt_populate;
-     k->pic_print_info = pnv_chip_power8_pic_print_info;
-     k->xscom_core_base = pnv_chip_power8_xscom_core_base;
-+    k->xscom_pcba = pnv_chip_power8_xscom_pcba;
-     dc->desc = "PowerNV Chip POWER8NVL";
- 
-     device_class_set_parent_realize(dc, pnv_chip_power8_realize,
-@@ -1340,6 +1349,12 @@ static void pnv_chip_power9_realize(DeviceState *dev, Error **errp)
-                                 &chip9->homer.regs);
- }
- 
-+static uint32_t pnv_chip_power9_xscom_pcba(PnvChip *chip, uint64_t addr)
-+{
-+    addr &= (PNV9_XSCOM_SIZE - 1);
-+    return addr >> 3;
-+}
++#include "hw/hw.h"
++#include "hw/isa/isa.h"
++#include "hw/i386/pc.h"
++#include "hw/block/fdc.h"
++#include "net/net.h"
 +
- static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -1357,6 +1372,7 @@ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-     k->dt_populate = pnv_chip_power9_dt_populate;
-     k->pic_print_info = pnv_chip_power9_pic_print_info;
-     k->xscom_core_base = pnv_chip_power9_xscom_core_base;
-+    k->xscom_pcba = pnv_chip_power9_xscom_pcba;
-     dc->desc = "PowerNV Chip POWER9";
- 
-     device_class_set_parent_realize(dc, pnv_chip_power9_realize,
-@@ -1422,6 +1438,12 @@ static void pnv_chip_power10_realize(DeviceState *dev, Error **errp)
-                                             (uint64_t) PNV10_LPCM_BASE(chip));
- }
- 
-+static uint32_t pnv_chip_power10_xscom_pcba(PnvChip *chip, uint64_t addr)
-+{
-+    addr &= (PNV10_XSCOM_SIZE - 1);
-+    return addr >> 3;
-+}
++#define PC_MACHINE_ACPI_DEVICE_PROP     "acpi-device"
++#define PC_MACHINE_DEVMEM_REGION_SIZE   "device-memory-region-size"
++#define PC_MACHINE_MAX_RAM_BELOW_4G     "max-ram-below-4g"
++#define PC_MACHINE_VMPORT               "vmport"
++#define PC_MACHINE_SMM                  "smm"
++#define PC_MACHINE_SMBUS                "smbus"
++#define PC_MACHINE_SATA                 "sata"
++#define PC_MACHINE_PIT                  "pit"
 +
- static void pnv_chip_power10_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -1439,6 +1461,7 @@ static void pnv_chip_power10_class_init(ObjectClass *klass, void *data)
-     k->dt_populate = pnv_chip_power10_dt_populate;
-     k->pic_print_info = pnv_chip_power10_pic_print_info;
-     k->xscom_core_base = pnv_chip_power10_xscom_core_base;
-+    k->xscom_pcba = pnv_chip_power10_xscom_pcba;
-     dc->desc = "PowerNV Chip POWER10";
- 
-     device_class_set_parent_realize(dc, pnv_chip_power10_realize,
-diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-index 5ae9dfbb88ad..b681c72575b2 100644
---- a/hw/ppc/pnv_xscom.c
-+++ b/hw/ppc/pnv_xscom.c
-@@ -57,19 +57,7 @@ static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
- 
- static uint32_t pnv_xscom_pcba(PnvChip *chip, uint64_t addr)
- {
--    addr &= (PNV_XSCOM_SIZE - 1);
++void pc_register_ferr_irq(qemu_irq irq);
++void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
++
++void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
++void pc_smp_parse(MachineState *ms, QemuOpts *opts);
++
++void pc_guest_info_init(PCMachineState *pcms);
++
++void xen_load_linux(PCMachineState *pcms);
++void pc_memory_init(PCMachineState *pcms,
++                    MemoryRegion *system_memory,
++                    MemoryRegion *rom_memory,
++                    MemoryRegion **ram_memory);
++
++void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
++                          ISADevice **rtc_state,
++                          bool create_fdctrl,
++                          bool no_vmport,
++                          bool has_pit,
++                          uint32_t hpet_irqs);
++void pc_init_ne2k_isa(ISABus *bus, NICInfo *nd);
++void pc_cmos_init(PCMachineState *pcms,
++                  BusState *ide0, BusState *ide1,
++                  ISADevice *s);
++void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus)=
+;
++
++ISADevice *pc_find_fdc0(void);
++int cmos_get_fd_drive_type(FloppyDriveType fd0);
++
++#define FW_CFG_IO_BASE     0x510
++
++/* pc_sysfw.c */
++void pc_system_flash_create(PCMachineState *pcms);
++void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_mem=
+ory);
++
++extern GlobalProperty pc_compat_4_1[];
++extern const size_t pc_compat_4_1_len;
++
++extern GlobalProperty pc_compat_4_0[];
++extern const size_t pc_compat_4_0_len;
++
++extern GlobalProperty pc_compat_3_1[];
++extern const size_t pc_compat_3_1_len;
++
++extern GlobalProperty pc_compat_3_0[];
++extern const size_t pc_compat_3_0_len;
++
++extern GlobalProperty pc_compat_2_12[];
++extern const size_t pc_compat_2_12_len;
++
++extern GlobalProperty pc_compat_2_11[];
++extern const size_t pc_compat_2_11_len;
++
++extern GlobalProperty pc_compat_2_10[];
++extern const size_t pc_compat_2_10_len;
++
++extern GlobalProperty pc_compat_2_9[];
++extern const size_t pc_compat_2_9_len;
++
++extern GlobalProperty pc_compat_2_8[];
++extern const size_t pc_compat_2_8_len;
++
++extern GlobalProperty pc_compat_2_7[];
++extern const size_t pc_compat_2_7_len;
++
++extern GlobalProperty pc_compat_2_6[];
++extern const size_t pc_compat_2_6_len;
++
++extern GlobalProperty pc_compat_2_5[];
++extern const size_t pc_compat_2_5_len;
++
++extern GlobalProperty pc_compat_2_4[];
++extern const size_t pc_compat_2_4_len;
++
++extern GlobalProperty pc_compat_2_3[];
++extern const size_t pc_compat_2_3_len;
++
++extern GlobalProperty pc_compat_2_2[];
++extern const size_t pc_compat_2_2_len;
++
++extern GlobalProperty pc_compat_2_1[];
++extern const size_t pc_compat_2_1_len;
++
++extern GlobalProperty pc_compat_2_0[];
++extern const size_t pc_compat_2_0_len;
++
++extern GlobalProperty pc_compat_1_7[];
++extern const size_t pc_compat_1_7_len;
++
++extern GlobalProperty pc_compat_1_6[];
++extern const size_t pc_compat_1_6_len;
++
++extern GlobalProperty pc_compat_1_5[];
++extern const size_t pc_compat_1_5_len;
++
++extern GlobalProperty pc_compat_1_4[];
++extern const size_t pc_compat_1_4_len;
++
++/*
++ * Helper for setting model-id for CPU models that changed model-id
++ * depending on QEMU versions up to QEMU 2.4.
++ */
++#define PC_CPU_MODEL_IDS(v) \
++    { "qemu32-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v,=
+ },\
++    { "qemu64-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v,=
+ },\
++    { "athlon-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v,=
+ },
++
++#define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
++    static void pc_machine_##suffix##_class_init(ObjectClass *oc, void *=
+data) \
++    { \
++        MachineClass *mc =3D MACHINE_CLASS(oc); \
++        optsfn(mc); \
++        mc->init =3D initfn; \
++    } \
++    static const TypeInfo pc_machine_type_##suffix =3D { \
++        .name       =3D namestr TYPE_MACHINE_SUFFIX, \
++        .parent     =3D TYPE_PC_MACHINE, \
++        .class_init =3D pc_machine_##suffix##_class_init, \
++    }; \
++    static void pc_machine_init_##suffix(void) \
++    { \
++        type_register(&pc_machine_type_##suffix); \
++    } \
++    type_init(pc_machine_init_##suffix)
++
++#endif
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 2ef6e2cfff..9a5633a394 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -4,9 +4,7 @@
+ #include "exec/memory.h"
+ #include "hw/boards.h"
+ #include "hw/isa/isa.h"
+-#include "hw/block/fdc.h"
+ #include "hw/block/flash.h"
+-#include "net/net.h"
+ #include "hw/i386/ioapic.h"
+ #include "hw/i386/x86.h"
+=20
+@@ -58,14 +56,6 @@ struct PCMachineState {
+     hwaddr memhp_io_base;
+ };
+=20
+-#define PC_MACHINE_ACPI_DEVICE_PROP "acpi-device"
+-#define PC_MACHINE_DEVMEM_REGION_SIZE "device-memory-region-size"
+-#define PC_MACHINE_VMPORT           "vmport"
+-#define PC_MACHINE_SMM              "smm"
+-#define PC_MACHINE_SMBUS            "smbus"
+-#define PC_MACHINE_SATA             "sata"
+-#define PC_MACHINE_PIT              "pit"
 -
--    switch (PNV_CHIP_GET_CLASS(chip)->chip_type) {
--    case PNV_CHIP_POWER8E:
--    case PNV_CHIP_POWER8:
--    case PNV_CHIP_POWER8NVL:
--        return ((addr >> 4) & ~0xfull) | ((addr >> 3) & 0xf);
--    case PNV_CHIP_POWER9:
--    case PNV_CHIP_POWER10:
--        return addr >> 3;
--    default:
--        g_assert_not_reached();
--    }
-+    return PNV_CHIP_GET_CLASS(chip)->xscom_pcba(chip, addr);
- }
- 
- static uint64_t xscom_read_default(PnvChip *chip, uint32_t pcba)
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 7a134a15d3b5..4972e93c2619 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -138,6 +138,7 @@ typedef struct PnvChipClass {
-     void (*dt_populate)(PnvChip *chip, void *fdt);
-     void (*pic_print_info)(PnvChip *chip, Monitor *mon);
-     uint64_t (*xscom_core_base)(PnvChip *chip, uint32_t core_id);
-+    uint32_t (*xscom_pcba)(PnvChip *chip, uint64_t addr);
- } PnvChipClass;
- 
- #define PNV_CHIP_TYPE_SUFFIX "-" TYPE_PNV_CHIP
+ /**
+  * PCMachineClass:
+  *
+@@ -173,12 +163,6 @@ void vmmouse_set_data(const uint32_t *data);
+ extern int fd_bootchk;
+=20
+ bool pc_machine_is_smm_enabled(PCMachineState *pcms);
+-void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
+-
+-void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
+-void pc_smp_parse(MachineState *ms, QemuOpts *opts);
+-
+-void pc_guest_info_init(PCMachineState *pcms);
+=20
+ #define PCI_HOST_PROP_PCI_HOLE_START   "pci-hole-start"
+ #define PCI_HOST_PROP_PCI_HOLE_END     "pci-hole-end"
+@@ -192,31 +176,12 @@ void pc_guest_info_init(PCMachineState *pcms);
+ void pc_pci_as_mapping_init(Object *owner, MemoryRegion *system_memory,
+                             MemoryRegion *pci_address_space);
+=20
+-void xen_load_linux(PCMachineState *pcms);
+-void pc_memory_init(PCMachineState *pcms,
+-                    MemoryRegion *system_memory,
+-                    MemoryRegion *rom_memory,
+-                    MemoryRegion **ram_memory);
+ uint64_t pc_pci_hole64_start(void);
+ DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus);
+-void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
+-                          ISADevice **rtc_state,
+-                          bool create_fdctrl,
+-                          bool no_vmport,
+-                          bool has_pit,
+-                          uint32_t hpet_irqs);
+-void pc_init_ne2k_isa(ISABus *bus, NICInfo *nd);
+-void pc_cmos_init(PCMachineState *pcms,
+-                  BusState *ide0, BusState *ide1,
+-                  ISADevice *s);
+-void pc_nic_init(PCMachineClass *pcmc, ISABus *isa_bus, PCIBus *pci_bus)=
+;
+=20
+ void pc_i8259_create(ISABus *isa_bus, qemu_irq *i8259_irqs);
+ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name);
+=20
+-ISADevice *pc_find_fdc0(void);
+-int cmos_get_fd_drive_type(FloppyDriveType fd0);
+-
+ #define FW_CFG_IO_BASE     0x510
+=20
+ #define PORT92_A20_LINE "a20"
+@@ -224,102 +189,9 @@ int cmos_get_fd_drive_type(FloppyDriveType fd0);
+ /* hpet.c */
+ extern int no_hpet;
+=20
+-/* pc_sysfw.c */
+-void pc_system_flash_create(PCMachineState *pcms);
+-void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_mem=
+ory);
+-
+ /* acpi-build.c */
+ void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+                        const CPUArchIdList *apic_ids, GArray *entry);
+=20
+-extern GlobalProperty pc_compat_4_1[];
+-extern const size_t pc_compat_4_1_len;
+-
+-extern GlobalProperty pc_compat_4_0[];
+-extern const size_t pc_compat_4_0_len;
+-
+-extern GlobalProperty pc_compat_3_1[];
+-extern const size_t pc_compat_3_1_len;
+-
+-extern GlobalProperty pc_compat_3_0[];
+-extern const size_t pc_compat_3_0_len;
+-
+-extern GlobalProperty pc_compat_2_12[];
+-extern const size_t pc_compat_2_12_len;
+-
+-extern GlobalProperty pc_compat_2_11[];
+-extern const size_t pc_compat_2_11_len;
+-
+-extern GlobalProperty pc_compat_2_10[];
+-extern const size_t pc_compat_2_10_len;
+-
+-extern GlobalProperty pc_compat_2_9[];
+-extern const size_t pc_compat_2_9_len;
+-
+-extern GlobalProperty pc_compat_2_8[];
+-extern const size_t pc_compat_2_8_len;
+-
+-extern GlobalProperty pc_compat_2_7[];
+-extern const size_t pc_compat_2_7_len;
+-
+-extern GlobalProperty pc_compat_2_6[];
+-extern const size_t pc_compat_2_6_len;
+-
+-extern GlobalProperty pc_compat_2_5[];
+-extern const size_t pc_compat_2_5_len;
+-
+-extern GlobalProperty pc_compat_2_4[];
+-extern const size_t pc_compat_2_4_len;
+-
+-extern GlobalProperty pc_compat_2_3[];
+-extern const size_t pc_compat_2_3_len;
+-
+-extern GlobalProperty pc_compat_2_2[];
+-extern const size_t pc_compat_2_2_len;
+-
+-extern GlobalProperty pc_compat_2_1[];
+-extern const size_t pc_compat_2_1_len;
+-
+-extern GlobalProperty pc_compat_2_0[];
+-extern const size_t pc_compat_2_0_len;
+-
+-extern GlobalProperty pc_compat_1_7[];
+-extern const size_t pc_compat_1_7_len;
+-
+-extern GlobalProperty pc_compat_1_6[];
+-extern const size_t pc_compat_1_6_len;
+-
+-extern GlobalProperty pc_compat_1_5[];
+-extern const size_t pc_compat_1_5_len;
+-
+-extern GlobalProperty pc_compat_1_4[];
+-extern const size_t pc_compat_1_4_len;
+-
+-/* Helper for setting model-id for CPU models that changed model-id
+- * depending on QEMU versions up to QEMU 2.4.
+- */
+-#define PC_CPU_MODEL_IDS(v) \
+-    { "qemu32-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v,=
+ },\
+-    { "qemu64-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v,=
+ },\
+-    { "athlon-" TYPE_X86_CPU, "model-id", "QEMU Virtual CPU version " v,=
+ },
+-
+-#define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
+-    static void pc_machine_##suffix##_class_init(ObjectClass *oc, void *=
+data) \
+-    { \
+-        MachineClass *mc =3D MACHINE_CLASS(oc); \
+-        optsfn(mc); \
+-        mc->init =3D initfn; \
+-    } \
+-    static const TypeInfo pc_machine_type_##suffix =3D { \
+-        .name       =3D namestr TYPE_MACHINE_SUFFIX, \
+-        .parent     =3D TYPE_PC_MACHINE, \
+-        .class_init =3D pc_machine_##suffix##_class_init, \
+-    }; \
+-    static void pc_machine_init_##suffix(void) \
+-    { \
+-        type_register(&pc_machine_type_##suffix); \
+-    } \
+-    type_init(pc_machine_init_##suffix)
+-
+ extern void igd_passthrough_isa_bridge_create(PCIBus *bus, uint16_t gpu_=
+dev_id);
+ #endif
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index 291909fa05..7267e9754f 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -64,6 +64,7 @@
+ #include "hw/acpi/pci.h"
+=20
+ #include "qom/qom-qobject.h"
++#include "hw/i386/pc_internal.h"
+ #include "hw/i386/amd_iommu.h"
+ #include "hw/i386/intel_iommu.h"
+=20
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4c018735b0..df879ff8e5 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -26,6 +26,7 @@
+ #include "qemu/units.h"
+ #include "hw/i386/x86.h"
+ #include "hw/i386/pc.h"
++#include "hw/i386/pc_internal.h"
+ #include "hw/char/serial.h"
+ #include "hw/char/parallel.h"
+ #include "hw/i386/apic.h"
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 1bd70d1abb..a7f67f39a8 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -29,6 +29,7 @@
+ #include "hw/loader.h"
+ #include "hw/i386/x86.h"
+ #include "hw/i386/pc.h"
++#include "hw/i386/pc_internal.h"
+ #include "hw/i386/apic.h"
+ #include "hw/pci-host/i440fx.h"
+ #include "hw/southbridge/piix.h"
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index 385e5cffb1..d1d251cb26 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -42,6 +42,7 @@
+ #include "exec/address-spaces.h"
+ #include "hw/i386/x86.h"
+ #include "hw/i386/pc.h"
++#include "hw/i386/pc_internal.h"
+ #include "hw/i386/ich9.h"
+ #include "hw/i386/amd_iommu.h"
+ #include "hw/i386/intel_iommu.h"
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index f5f3f466b0..6762a6b453 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -33,6 +33,7 @@
+ #include "hw/sysbus.h"
+ #include "hw/i386/x86.h"
+ #include "hw/i386/pc.h"
++#include "hw/i386/pc_internal.h"
+ #include "hw/loader.h"
+ #include "hw/qdev-properties.h"
+ #include "sysemu/sysemu.h"
+diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
+index 82ece6b9e7..26e6d013d0 100644
+--- a/hw/i386/xen/xen-hvm.c
++++ b/hw/i386/xen/xen-hvm.c
+@@ -14,6 +14,7 @@
+ #include "hw/pci/pci.h"
+ #include "hw/pci/pci_host.h"
+ #include "hw/i386/pc.h"
++#include "hw/i386/pc_internal.h"
+ #include "hw/southbridge/piix.h"
+ #include "hw/irq.h"
+ #include "hw/hw.h"
+--=20
+2.21.0
 
 
