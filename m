@@ -2,79 +2,77 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4915C2D0C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7890DC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 385C324125
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0F6024125
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:25:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r9Cn8ghf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 385C324125
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XsXn88rG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F6024125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifnLy-0007i6-So
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 10:59:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35582)
+	id 1ifnzy-0001fv-BB
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:41:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ifnL0-00079C-9C
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 10:58:44 -0500
+ (envelope-from <cohuck@redhat.com>) id 1ifnfE-0000WC-2G
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ifnKy-0000ZW-VJ
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 10:58:42 -0500
-Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:43168)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ifnKy-0000Xs-OQ
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 10:58:40 -0500
-Received: by mail-ot1-x32d.google.com with SMTP id p8so6971584oth.10
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 07:58:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=1gMq4r3ksiE1RRJUmICWKucGCYMCWCZ2HaS2ZBh9Pl0=;
- b=r9Cn8ghfmB2BicULwcfOrMkEQwG6E9IMaaeWMEHmVlQuBdQ1n6FAqdFKh/pVJ3tFWv
- 7e236gGGb17BLo7rMpahhnKTqe8F9EXQsxaczuw+JD+NCm1pLYW6RDw1U+OOqvGf8nKw
- BK0py1tG5aKxR9ylr7PewsvD/lWEDCKD5Nb1gPCsnHOjUZJwNZ6psVx0zhRquWXYlxYt
- yO3i0mB2rcwxAmEHzeQ+XefU9ZmV1VxNMwIclpHmg5fCLUI6dWBtPwbeAKL7C85pDtHB
- ZsKJRRzD6PjGGNAvkIkDKojECX4VAWoZs5AuYzuV9xzGl8wjMAKRHtAMBnV3l6Xu+1Ss
- tEWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=1gMq4r3ksiE1RRJUmICWKucGCYMCWCZ2HaS2ZBh9Pl0=;
- b=hCi11Puf43qIlA/YdU3T95rAN+NQ0Y1F2IvhtBe5qUCyP59akaWK01V5tgxdHfQJoN
- yOvPSso4nYBioXABpJr76DJ4rNUyvhI4kOccUM1G53GizBInShsTMlbLA8Ri6iPtFn3b
- YQPVfYcDsZ1OC7Xvlk0BgnJrqmYL+BIWVMuNtKIspBThHHnP4WqL9eIyuLP9Eve79B8R
- 9BJFAijwPrrGKlD1vl935GGdErF2gHLfNeM6qlkOkPQTVR4ncWhMotfT/BZYzFoVPoMq
- g4c5pVzfXzDSglirFJI4aSoSBHAkVFt0B/Q8cg/7TXx8vlcHrnT3jGGX+bZMViO8lM0P
- yGHQ==
-X-Gm-Message-State: APjAAAUQUtpKh0zeP/iE1OVM6hFFwVe+SyiApzmSQWVEUQPUoetGM9q6
- sRExFYdzLCjbyejeFZRNyIg6mawkRngOxiEwSv21zA==
-X-Google-Smtp-Source: APXvYqzei8ekSdQ8UNcjocsvKdaip5Qyfo9p3zbfb0x9xdp2nFkG9nU8IWhJx9uH+PJYCBPHIUE0c0sHe4rcp8Yz5eI=
-X-Received: by 2002:a9d:6745:: with SMTP id w5mr14623595otm.221.1576252719375; 
- Fri, 13 Dec 2019 07:58:39 -0800 (PST)
+ (envelope-from <cohuck@redhat.com>) id 1ifnfC-0001hO-T5
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:35 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26020
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ifnfC-0001gi-P5
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576253974;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8LjIPDCpWRkfw5wVp11KGA8s6SR+qMeIEMfDWf9vzM4=;
+ b=XsXn88rGbGj0Zee98sLU+/PNjoNn5sfIqmFtYa54AZJecKhV4TLManbqiDuxBVau1qX3nh
+ L4bxhNzTDIBaclIe4GSbeCmA/SdAdVRYWG67FGPnVbhUl+ssMyh6GqB7DW0LcpkDAUIdk0
+ NyZe0HJB9a7tMkqjec+THj5STnq4CA0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-187-JQysbnDTOtGb0N6BNXfyeQ-1; Fri, 13 Dec 2019 11:19:31 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 995C58024F9;
+ Fri, 13 Dec 2019 16:19:30 +0000 (UTC)
+Received: from localhost (ovpn-116-226.ams2.redhat.com [10.36.116.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D28E5100164D;
+ Fri, 13 Dec 2019 16:19:27 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 08/16] s390x: kvm: Make kvm_sclp_service_call void
+Date: Fri, 13 Dec 2019 17:18:43 +0100
+Message-Id: <20191213161851.24687-9-cohuck@redhat.com>
+In-Reply-To: <20191213161851.24687-1-cohuck@redhat.com>
+References: <20191213161851.24687-1-cohuck@redhat.com>
 MIME-Version: 1.0
-References: <20191212223601.309245-1-groug@kaod.org>
-In-Reply-To: <20191212223601.309245-1-groug@kaod.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 13 Dec 2019 15:58:28 +0000
-Message-ID: <CAFEAcA9mfqoKOtC6j9z62GauDyO2r2MZ=-vJ1dpE0W225HNnRw@mail.gmail.com>
-Subject: Re: [PULL 0/5] 9pfs patches for QEMU 5.0
-To: Greg Kurz <groug@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32d
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: JQysbnDTOtGb0N6BNXfyeQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,35 +84,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 12 Dec 2019 at 22:36, Greg Kurz <groug@kaod.org> wrote:
->
-> The following changes since commit fb2246882a2c8d7f084ebe0617e97ac78467d156:
->
->   .travis.yml: drop xcode9.4 from build matrix (2019-11-29 15:51:52 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/gkurz/qemu.git tags/9p-next-2019-12-12
->
-> for you to fetch changes up to b3e2bb9458af556cb8aa0558f59222f462b81069:
->
->   virtfs: Remove the deprecated "-virtfs_synth" option (2019-12-09 18:00:35 +0100)
->
-> ----------------------------------------------------------------
-> - conversion of virtfs-proxy-helper from libcap to libcap-ng
-> - removal of libcap-dev from docker, travis and gitlab CI
-> - removal of deprecate "-virtfs_synth" option
->
+From: Janosch Frank <frankja@linux.ibm.com>
 
-Applied, thanks.
+It defaults to returning 0 anyway and that return value is not
+necessary, as 0 is also the default rc that the caller would return.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
-for any user-visible changes.
+While doing that we can simplify the logic a bit and return early if
+we inject a PGM exception.
 
--- PMM
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20191129091713.4582-1-frankja@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+ target/s390x/kvm.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 0c9d14b4b115..ad6e38c8761b 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1159,13 +1159,13 @@ void kvm_s390_access_exception(S390CPU *cpu, uint16=
+_t code, uint64_t te_code)
+     kvm_s390_vcpu_interrupt(cpu, &irq);
+ }
+=20
+-static int kvm_sclp_service_call(S390CPU *cpu, struct kvm_run *run,
++static void kvm_sclp_service_call(S390CPU *cpu, struct kvm_run *run,
+                                  uint16_t ipbh0)
+ {
+     CPUS390XState *env =3D &cpu->env;
+     uint64_t sccb;
+     uint32_t code;
+-    int r =3D 0;
++    int r;
+=20
+     sccb =3D env->regs[ipbh0 & 0xf];
+     code =3D env->regs[(ipbh0 & 0xf0) >> 4];
+@@ -1173,11 +1173,9 @@ static int kvm_sclp_service_call(S390CPU *cpu, struc=
+t kvm_run *run,
+     r =3D sclp_service_call(env, sccb, code);
+     if (r < 0) {
+         kvm_s390_program_interrupt(cpu, -r);
+-    } else {
+-        setcc(cpu, r);
++        return;
+     }
+-
+-    return 0;
++    setcc(cpu, r);
+ }
+=20
+ static int handle_b2(S390CPU *cpu, struct kvm_run *run, uint8_t ipa1)
+@@ -1240,7 +1238,7 @@ static int handle_b2(S390CPU *cpu, struct kvm_run *ru=
+n, uint8_t ipa1)
+         setcc(cpu, 3);
+         break;
+     case PRIV_B2_SCLP_CALL:
+-        rc =3D kvm_sclp_service_call(cpu, run, ipbh0);
++        kvm_sclp_service_call(cpu, run, ipbh0);
+         break;
+     default:
+         rc =3D -1;
+--=20
+2.21.0
+
 
