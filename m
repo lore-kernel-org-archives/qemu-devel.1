@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CC5C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 05:41:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E8CC2D0C9
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 05:41:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C43FC2253D
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 05:41:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 029122253D
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 05:41:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="R4gOIp9d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C43FC2253D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="kW7q/l9r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 029122253D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifdhM-0000FC-MK
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 00:41:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50425)
+	id 1ifdhV-0000SC-3z
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 00:41:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51047)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ifdgC-0007d6-KU
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 00:39:58 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ifdgG-0007dd-G4
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 00:40:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ifdg9-0004PC-VS
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 00:39:56 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:51953 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ifdgE-0004WZ-QN
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 00:40:00 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45643 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ifdg8-0004He-Pv; Fri, 13 Dec 2019 00:39:53 -0500
+ id 1ifdg9-0004HL-6R; Fri, 13 Dec 2019 00:39:53 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47YzyD1Y1pz9sPT; Fri, 13 Dec 2019 16:39:48 +1100 (AEDT)
+ id 47YzyC6x1Yz9sPL; Fri, 13 Dec 2019 16:39:47 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576215588;
- bh=K8I7BySlXe5w70jX25JhHMATjVMwd7LT9XDyP6NzhxY=;
+ d=gibson.dropbear.id.au; s=201602; t=1576215587;
+ bh=56eM89FTG1pvXviciouBwME2vyl4LJRakyHsbFicFXw=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=R4gOIp9dC2iGmCiVVrn92yqN5+vXvWRJEB1hptLieKldWsMz8jCmf7fayxM3Sv3Op
- JYMPzag2Vm3L9nHpwun44jntpfif0ewVJfSmsh4WATeVZ+heXE/ozhP3LKyLM05D2G
- 0jmkqPFWxBODljfDNs1ub2avWEP8LkvpThGVS03Q=
-Date: Fri, 13 Dec 2019 16:39:33 +1100
+ b=kW7q/l9rA2YfyK6wdsyyds/u3Yd01xGt3h2pnHPBDYewVEAh8AKG8/hDS6jk0qzT4
+ CLphEkUbeeuJ8f0uNB8oiX/tmeHt6wMgnGEroQZBSxCjUFpt3VleLa/nY0wCB/Bwfs
+ HsVGTXY24nJi20QByygqhDomwDdl2PKDFZyQTVOg=
+Date: Fri, 13 Dec 2019 16:00:05 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Subject: Re: [PATCH v5 3/5] tpm_spapr: Support suspend and resume
-Message-ID: <20191213053933.GE207300@umbus.fritz.box>
-References: <20191212202430.1079725-1-stefanb@linux.vnet.ibm.com>
- <20191212202430.1079725-4-stefanb@linux.vnet.ibm.com>
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [RFC PATCH v2 1/5] hw: add compat machines for 5.0
+Message-ID: <20191213050005.GC207300@umbus.fritz.box>
+References: <20191212173320.11610-1-drjones@redhat.com>
+ <20191212173320.11610-2-drjones@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="qicme7IxPpkH/pPU"
+ protocol="application/pgp-signature"; boundary="RyB1I56Pcq42iZjE"
 Content-Disposition: inline
-In-Reply-To: <20191212202430.1079725-4-stefanb@linux.vnet.ibm.com>
+In-Reply-To: <20191212173320.11610-2-drjones@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,145 +71,266 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, Cornelia Huck <cohuck@redhat.com>,
+ bijan.mottahedeh@oracle.com, "Michael S. Tsirkin" <mst@redhat.com>,
+ maz@kernel.org, Richard Henderson <rth@twiddle.net>,
+ David Hildenbrand <david@redhat.com>, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ "open list:S390 TCG CPUs" <qemu-s390x@nongnu.org>, qemu-arm@nongnu.org,
+ "open list:sPAPR" <qemu-ppc@nongnu.org>, guoheyi@huawei.com,
+ Paolo Bonzini <pbonzini@redhat.com>, msys.mizuma@gmail.com,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---qicme7IxPpkH/pPU
+--RyB1I56Pcq42iZjE
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 12, 2019 at 03:24:28PM -0500, Stefan Berger wrote:
-> Extend the tpm_spapr frontend with VM suspend and resume support.
+On Thu, Dec 12, 2019 at 06:33:16PM +0100, Andrew Jones wrote:
+> Add 5.0 machine types for arm/i440fx/q35/s390x/spapr.
 >=20
-> Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+
+ppc parts
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+
 >=20
-> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-> index c4a67e2403..8f5a142bd4 100644
-> --- a/hw/tpm/tpm_spapr.c
-> +++ b/hw/tpm/tpm_spapr.c
-> @@ -87,6 +87,8 @@ typedef struct {
->      TPMVersion be_tpm_version;
+> ---
+>=20
+> Hi Eduardo,
+>=20
+> If we need to do something special for i440fx and q35, as
+> 9aec2e52ce9d ("hw: add compat machines for 4.2") implies, then
+> I'll need guidance as to what.
+> ---
+>  hw/arm/virt.c              |  9 ++++++++-
+>  hw/core/machine.c          |  3 +++
+>  hw/i386/pc.c               |  3 +++
+>  hw/i386/pc_piix.c          | 14 +++++++++++++-
+>  hw/i386/pc_q35.c           | 13 ++++++++++++-
+>  hw/ppc/spapr.c             | 15 +++++++++++++--
+>  hw/s390x/s390-virtio-ccw.c | 15 ++++++++++++++-
+>  include/hw/boards.h        |  3 +++
+>  include/hw/i386/pc.h       |  3 +++
+>  9 files changed, 72 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index d4bedc260712..cb7041e9677a 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -2147,10 +2147,17 @@ static void machvirt_machine_init(void)
+>  }
+>  type_init(machvirt_machine_init);
 > =20
->      size_t be_buffer_size;
+> +static void virt_machine_5_0_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_VIRT_MACHINE_AS_LATEST(5, 0)
 > +
-> +    bool deliver_response; /* whether to deliver response after VM resum=
-e */
->  } SPAPRvTPMState;
+>  static void virt_machine_4_2_options(MachineClass *mc)
+>  {
+> +    virt_machine_5_0_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
+>  }
+> -DEFINE_VIRT_MACHINE_AS_LATEST(4, 2)
+> +DEFINE_VIRT_MACHINE(4, 2)
 > =20
->  static void tpm_spapr_show_buffer(const unsigned char *buffer,
-> @@ -256,6 +258,12 @@ static void tpm_spapr_request_completed(TPMIf *ti, i=
-nt ret)
->      uint32_t len;
->      int rc;
+>  static void virt_machine_4_1_options(MachineClass *mc)
+>  {
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 1689ad3bf8af..21fe2d974817 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -27,6 +27,9 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/mem/nvdimm.h"
 > =20
-> +    if (runstate_check(RUN_STATE_FINISH_MIGRATE)) {
-
-I'm trying to figure out the circumstances in which
-request_completed() would get called before post_load on the
-destination.
-
-> +        /* defer delivery of response until .post_load */
-> +        s->deliver_response |=3D true;
-
-|=3D is a bitwise OR which is not what you want, although it will
-*probably* work in practice.  Better to just use
-	s->deliver_response =3D true;
-
-> +        return;
-> +    }
+> +GlobalProperty hw_compat_4_2[] =3D {};
+> +const size_t hw_compat_4_2_len =3D G_N_ELEMENTS(hw_compat_4_2);
 > +
->      s->state =3D SPAPR_VTPM_STATE_COMPLETION;
+>  GlobalProperty hw_compat_4_1[] =3D {
+>      { "virtio-pci", "x-pcie-flr-init", "off" },
+>  };
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index ac08e6360437..58867f987d88 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -103,6 +103,9 @@
 > =20
->      /* a max. of be_buffer_size bytes can be transported */
-> @@ -316,6 +324,7 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
->      SPAPRvTPMState *s =3D VIO_SPAPR_VTPM(dev);
+>  struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8_MAX};
 > =20
->      s->state =3D SPAPR_VTPM_STATE_NONE;
-> +    s->deliver_response =3D false;
+> +GlobalProperty pc_compat_4_2[] =3D {};
+> +const size_t pc_compat_4_2_len =3D G_N_ELEMENTS(pc_compat_4_2);
+> +
+>  GlobalProperty pc_compat_4_1[] =3D {};
+>  const size_t pc_compat_4_1_len =3D G_N_ELEMENTS(pc_compat_4_1);
 > =20
->      s->be_tpm_version =3D tpm_backend_get_tpm_version(s->be_driver);
->      tpm_spapr_update_deviceclass(dev);
-> @@ -339,9 +348,53 @@ static enum TPMVersion tpm_spapr_get_version(TPMIf *=
-ti)
->      return tpm_backend_get_tpm_version(s->be_driver);
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 1bd70d1abbc4..aa2c6147a7ea 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -424,7 +424,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
 >  }
 > =20
-> +/* persistent state handling */
-> +
-> +static int tpm_spapr_pre_save(void *opaque)
-> +{
-> +    SPAPRvTPMState *s =3D opaque;
-> +
-> +    s->deliver_response |=3D tpm_backend_finish_sync(s->be_driver);
-
-Same problem here.
-
-> +    trace_tpm_spapr_pre_save(s->deliver_response);
-> +    /*
-> +     * we cannot deliver the results to the VM since DMA would touch VM =
-memory
-> +     */
-> +
-> +    return 0;
-> +}
-> +
-> +static int tpm_spapr_post_load(void *opaque, int version_id)
-> +{
-> +    SPAPRvTPMState *s =3D opaque;
-> +
-> +    if (s->deliver_response) {
-> +        trace_tpm_spapr_post_load();
-> +        /* deliver the results to the VM via DMA */
-> +        tpm_spapr_request_completed(TPM_IF(s), 0);
-> +        s->deliver_response =3D false;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  static const VMStateDescription vmstate_spapr_vtpm =3D {
->      .name =3D "tpm-spapr",
-> -    .unmigratable =3D 1,
-> +    .version_id =3D 1,
-> +    .minimum_version_id =3D 0,
-> +    .minimum_version_id_old =3D 0,
-> +    .pre_save =3D tpm_spapr_pre_save,
-> +    .post_load =3D tpm_spapr_post_load,
-> +    .fields =3D (VMStateField[]) {
-> +        VMSTATE_SPAPR_VIO(vdev, SPAPRvTPMState),
-> +
-> +        VMSTATE_UINT8(state, SPAPRvTPMState),
-> +        VMSTATE_BUFFER(buffer, SPAPRvTPMState),
-
-Transferring the whole 4kiB buffer unconditionally when it mostly
-won't have anything useful in it doesn't seem like a great idea.
-
-> +        /* remember DMA address */
-> +        VMSTATE_UINT32(crq.s.data, SPAPRvTPMState),
-> +        VMSTATE_BOOL(deliver_response, SPAPRvTPMState),
-> +        VMSTATE_END_OF_LIST(),
-> +    }
->  };
+> -static void pc_i440fx_4_2_machine_options(MachineClass *m)
+> +static void pc_i440fx_5_0_machine_options(MachineClass *m)
+>  {
+>      PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+>      pc_i440fx_machine_options(m);
+> @@ -433,6 +433,18 @@ static void pc_i440fx_4_2_machine_options(MachineCla=
+ss *m)
+>      pcmc->default_cpu_version =3D 1;
+>  }
 > =20
->  static Property tpm_spapr_properties[] =3D {
-> diff --git a/hw/tpm/trace-events b/hw/tpm/trace-events
-> index 6278a39618..d109661b96 100644
-> --- a/hw/tpm/trace-events
-> +++ b/hw/tpm/trace-events
-> @@ -67,3 +67,5 @@ tpm_spapr_do_crq_get_version(uint32_t version) "respons=
-e: version %u"
->  tpm_spapr_do_crq_prepare_to_suspend(void) "response: preparing to suspen=
-d"
->  tpm_spapr_do_crq_unknown_msg_type(uint8_t type) "Unknown message type 0x=
-%02x"
->  tpm_spapr_do_crq_unknown_crq(uint8_t raw1, uint8_t raw2) "unknown CRQ 0x=
-%02x 0x%02x ..."
-> +tpm_spapr_pre_save(bool v) "TPM response to deliver after resume: %d"
-> +tpm_spapr_post_load(void) "Delivering TPM response after resume"
+> +DEFINE_I440FX_MACHINE(v5_0, "pc-i440fx-5.0", NULL,
+> +                      pc_i440fx_5_0_machine_options)
+> +
+> +static void pc_i440fx_4_2_machine_options(MachineClass *m)
+> +{
+> +    pc_i440fx_5_0_machine_options(m);
+> +    m->alias =3D NULL;
+> +    m->is_default =3D 0;
+> +    compat_props_add(m->compat_props, hw_compat_4_2, hw_compat_4_2_len);
+> +    compat_props_add(m->compat_props, pc_compat_4_2, pc_compat_4_2_len);
+> +}
+> +
+>  DEFINE_I440FX_MACHINE(v4_2, "pc-i440fx-4.2", NULL,
+>                        pc_i440fx_4_2_machine_options);
+> =20
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 385e5cffb167..ddd485d608c0 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -348,7 +348,7 @@ static void pc_q35_machine_options(MachineClass *m)
+>      m->max_cpus =3D 288;
+>  }
+> =20
+> -static void pc_q35_4_2_machine_options(MachineClass *m)
+> +static void pc_q35_5_0_machine_options(MachineClass *m)
+>  {
+>      PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+>      pc_q35_machine_options(m);
+> @@ -356,6 +356,17 @@ static void pc_q35_4_2_machine_options(MachineClass =
+*m)
+>      pcmc->default_cpu_version =3D 1;
+>  }
+> =20
+> +DEFINE_Q35_MACHINE(v5_0, "pc-q35-5.0", NULL,
+> +                   pc_q35_5_0_machine_options);
+> +
+> +static void pc_q35_4_2_machine_options(MachineClass *m)
+> +{
+> +    pc_q35_5_0_machine_options(m);
+> +    m->alias =3D NULL;
+> +    compat_props_add(m->compat_props, hw_compat_4_2, hw_compat_4_2_len);
+> +    compat_props_add(m->compat_props, pc_compat_4_2, pc_compat_4_2_len);
+> +}
+> +
+>  DEFINE_Q35_MACHINE(v4_2, "pc-q35-4.2", NULL,
+>                     pc_q35_4_2_machine_options);
+> =20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index e076f6023c73..3ae7db156303 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -4491,15 +4491,26 @@ static const TypeInfo spapr_machine_info =3D {
+>      }                                                                \
+>      type_init(spapr_machine_register_##suffix)
+> =20
+> +/*
+> + * pseries-5.0
+> + */
+> +static void spapr_machine_5_0_class_options(MachineClass *mc)
+> +{
+> +    /* Defaults for the latest behaviour inherited from the base class */
+> +}
+> +
+> +DEFINE_SPAPR_MACHINE(5_0, "5.0", true);
+> +
+>  /*
+>   * pseries-4.2
+>   */
+>  static void spapr_machine_4_2_class_options(MachineClass *mc)
+>  {
+> -    /* Defaults for the latest behaviour inherited from the base class */
+> +    spapr_machine_5_0_class_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
+>  }
+> =20
+> -DEFINE_SPAPR_MACHINE(4_2, "4.2", true);
+> +DEFINE_SPAPR_MACHINE(4_2, "4.2", false);
+> =20
+>  /*
+>   * pseries-4.1
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index d3edeef0ad92..a40f79e20733 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -639,14 +639,27 @@ bool css_migration_enabled(void)
+>      }                                                                   =
+      \
+>      type_init(ccw_machine_register_##suffix)
+> =20
+> +
+> +static void ccw_machine_5_0_instance_options(MachineState *machine)
+> +{
+> +}
+> +
+> +static void ccw_machine_5_0_class_options(MachineClass *mc)
+> +{
+> +}
+> +DEFINE_CCW_MACHINE(5_0, "5.0", true);
+> +
+>  static void ccw_machine_4_2_instance_options(MachineState *machine)
+>  {
+> +    ccw_machine_5_0_instance_options(machine);
+>  }
+> =20
+>  static void ccw_machine_4_2_class_options(MachineClass *mc)
+>  {
+> +    ccw_machine_5_0_class_options(mc);
+> +    compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
+>  }
+> -DEFINE_CCW_MACHINE(4_2, "4.2", true);
+> +DEFINE_CCW_MACHINE(4_2, "4.2", false);
+> =20
+>  static void ccw_machine_4_1_instance_options(MachineState *machine)
+>  {
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index de45087f34cb..24cbeecbaecc 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -329,6 +329,9 @@ struct MachineState {
+>      } \
+>      type_init(machine_initfn##_register_types)
+> =20
+> +extern GlobalProperty hw_compat_4_2[];
+> +extern const size_t hw_compat_4_2_len;
+> +
+>  extern GlobalProperty hw_compat_4_1[];
+>  extern const size_t hw_compat_4_1_len;
+> =20
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index 1f86eba3f998..61a998de4665 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -237,6 +237,9 @@ void pc_system_firmware_init(PCMachineState *pcms, Me=
+moryRegion *rom_memory);
+>  void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
+>                         const CPUArchIdList *apic_ids, GArray *entry);
+> =20
+> +extern GlobalProperty pc_compat_4_2[];
+> +extern const size_t pc_compat_4_2_len;
+> +
+>  extern GlobalProperty pc_compat_4_1[];
+>  extern const size_t pc_compat_4_1_len;
+> =20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -217,25 +338,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---qicme7IxPpkH/pPU
+--RyB1I56Pcq42iZjE
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3zJBUACgkQbDjKyiDZ
-s5LIjw/+JBlIgi+CV3NicSHeunB98iIMN9C4LDuoF/oEaPVq0OqM3VpocDH13dKt
-Cz3UZZpiIRlBF9EIO8KyxTgkxpGuu24ntkkof172meOY0INHJMADWuCMraO1oaOA
-haOIg64RderRz1U9majVWAeR/uY7cDs2qlNJCGmhhtkklYOjOVIwS/TxO0EvU6/R
-xQ0qV0JVwfsBNwwPogpIkjgxpCoMi/v93V5cYzDsrKnscLPpN2Y85mgCRUoXpAus
-NBZex9DM85uja2WEvkuBhJBGyT8moH/PP1RpSwBdJr6SKYFPej2+YYP3qs66ehrq
-vC0QUn6GC29BtPttQYLQlYX/AXV9TZBdVQu/Up+mJWsMXu2ZuOeO/0aMBhao/+iN
-gCccbAtTDZ1rR/14zwS1mZWzW8DpHSat1JvPYGLuhmMmiK87nzngxY4gspU2ckJ2
-9y2JaC4RcNrARqnao5y8NgJUp1qBjpKWQJA9FU3pJnoXsifLluP8H2Yy2bYtiO4L
-FgHoGvA/Ezkg7G4YoWvylKjNz4Mu8aonHkGugVMDVo0H8Z2UlfRGpecReAD9zNt6
-ykTVdFnX/5qSsWhDT4CAHViXTpE4noo1+RaXOIdq5Dpvx/8eL+cmqEmDYOwcrY3S
-dtXe9x+WJbehRGsax5//hRVBfF366nIrMAJaXhr81pJENlV579M=
-=OQsi
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3zGtIACgkQbDjKyiDZ
+s5KuqhAAxyf7RGKynjk1H4vgjIrPaU6rDarsH7A7JCFgTbHxQq0dkl3dW3Z1kY2Q
+3nDOC3Fks9MWBQTzk/Vz8kdzT5Y1C7eihSbAE1G91IU0nAu7oFXc7w/t27+QHGf8
+2Ll1DNoo1L5i/9GwOp3S+sxVpL2aba8TAuyW5eOHkSLiPXRz1ohuB+8lKomAf+/c
+JJMZBX0qa41/1zDPEAqvKAb/jSBkBtmPyqmu7v4ZSnkweTxQ+y2UjYUNKS+cAwHh
+WP6QAWMdoaOCSjiwaPBjw5l101TlcH0WX9YbkuengjvbMrIlLQEkwXxft+8mK2AW
+RrVttCBHRVf0KITA1Wi8viz2ElrHOA4BCzOq90BkT+GV30HEAWrzIRYuVs7CDZ9/
+X6CQW0pXz5W4iLPXvIT9ciER4AeuFWUQZqG6C/CiXWiXYzUEASmS8XrQG70jrZ47
+89QxdUgxkKLtRleiD80wCdk2YdzAgTRwbqmBW9gyfjg8cUmseq+CjrZaMnNoJgvr
++5Jjy937JzFiEJzrX9Rn1SJhDDJ2M+OztQMK7aYiBeusBn54B6Y70Kp5eonoi9Vd
+NMgZdzyX0hUn2oTiLWuD6KLMV6dD+vpJNqGnJGG20vtltcb3L6h2p0ZGUWwXM+Vc
+0RqP0Vbh3wUm9fhaZPPob3O5LDHvRludpw+wHdPPKmy8uBi/+88=
+=QmEN
 -----END PGP SIGNATURE-----
 
---qicme7IxPpkH/pPU--
+--RyB1I56Pcq42iZjE--
 
