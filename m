@@ -2,117 +2,83 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01B8EC2D0CA
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B4BC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8042624680
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20D2924125
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="lm6MZz0I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8042624680
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F68vm6hK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20D2924125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifj7U-0002T6-IM
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 06:28:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50203)
+	id 1ifoG5-0000pn-Jd
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:57:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ifj6k-0001t8-Hp
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:27:43 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1ifoFS-0000L3-91
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:57:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1ifj6j-0002LH-AJ
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 06:27:42 -0500
-Received: from mail-eopbgr40139.outbound.protection.outlook.com
- ([40.107.4.139]:61830 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1ifj6j-0002IB-3d; Fri, 13 Dec 2019 06:27:41 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fR+3RF5M5flsi1RynRP4VnVumJYabd0urKOMYKCuWd/CHgybQ9ZIaI1JPpjmCna4ov57RXegTYpbapX2spUtf9Z+47TTUVujrl5N9TXiM9CekNFOni3rGeW6ffdF6JsAciNhY8QD+SEa+0qjTqirYNmzzxoQtOLYeceyB1gBJYFDKicnwA8oQ9u24/GrI//TRwyxtyCgZV5AuWOPND7CZPF3TFZpT4K4sd/vhieFvH7moeGoovGuHKCNs1zPTZYQbSL2DvN7c8yZpOzAY5HFxGRaA1U6lXiGDtGI7rftNOau7hnIU6Bvuvo2W0OCrxTi5x86EyN2g/P9YsRrzpjjgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2JZ787Oqr2ic2K3v+EFoOHXRzH9OS+1bB0Z3gtMtcYc=;
- b=FzgGnA8huGbLGiqFNbCKvv5yMC0CpaRh1+QKRACYur9W28xT/Af7rT8+j8UCSoR900Br+vVdRhGMJa1hbw/du2scLPtXj7wmNOGQvhjJhlXZ/obFkXAjlhh2BIp8ZMcxoTeCZGs+t4WWVPtLAD14sU1yt04qi6Qolo2BV274uslVpAHK1TZ9w2S9o558vGLUdF3PwXl9YBQTWEe7NaB4EYi0J4Abf3eoegwnN5vsFgJVxQqF+Cy1JqKRhbeORM87Gqxv6093wTn7wAywxl7C+E8kDissfeD3Vq8FUapX7h7fDJVHRZ7NTOdhQG2QeYooI8QTJGcTRypnvBgrlUSnrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2JZ787Oqr2ic2K3v+EFoOHXRzH9OS+1bB0Z3gtMtcYc=;
- b=lm6MZz0Ich5r9Tmc/sdGtj8S4mhuntvlkmjZywfwt3vPNraEbbM/9gjJwVhkg4VfU1crQBO10GpOWN0m1b21zNOMqYfE56BD/jKsv8wACpPefFhkh9qASV+N9H7l5pkt+a5FEml9Xl52mLGnH89DdjxMShVVis2vTePqPcqLuY8=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3079.eurprd08.prod.outlook.com (52.135.163.152) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2538.15; Fri, 13 Dec 2019 11:27:37 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::11a9:a944:c946:3030%7]) with mapi id 15.20.2516.020; Fri, 13 Dec 2019
- 11:27:37 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH for-5.0 v2 18/23] iotests: Add VM.assert_block_path()
-Thread-Topic: [PATCH for-5.0 v2 18/23] iotests: Add VM.assert_block_path()
-Thread-Index: AQHVmKmLxO8pIw50PUGbvTIVfXIH5qe4H0+A
-Date: Fri, 13 Dec 2019 11:27:37 +0000
-Message-ID: <16697362-7d89-74a0-53d4-7d9d48a1386a@virtuozzo.com>
-References: <20191111160216.197086-1-mreitz@redhat.com>
- <20191111160216.197086-19-mreitz@redhat.com>
-In-Reply-To: <20191111160216.197086-19-mreitz@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P192CA0002.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::12)
- To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191213142734996
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 708d1141-78d2-4a56-1041-08d77fbf74ce
-x-ms-traffictypediagnostic: AM6PR08MB3079:
-x-microsoft-antispam-prvs: <AM6PR08MB30796D928F02FEB7CEBC80B2C1540@AM6PR08MB3079.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
-x-forefront-prvs: 0250B840C1
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(346002)(396003)(39840400004)(376002)(366004)(199004)(189003)(6506007)(6486002)(31696002)(54906003)(5660300002)(2906002)(52116002)(110136005)(66556008)(66946007)(66476007)(66446008)(64756008)(4326008)(86362001)(478600001)(31686004)(6512007)(71200400001)(186003)(8936002)(2616005)(8676002)(36756003)(316002)(81156014)(26005)(81166006);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3079;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: OAvVHc56Zh2dksWG6/vJZ5dtXspFhVn9cEawqQoJIdhqnFqQshtlfsKE2lO6BZ+frqYigj9Qh8g0dAqh5HJcwN14amGNQvLR+NJXyZtlLG6kDN8WLNL/c/7g8rfj9kf2NKl9TMs+crEAPmb8DjSIgFN3iLD+kE+sk+N6aVJlKFvkvKME0i9/GKCEXz8ohceqr99GZNvMoIX5Hs1/fFgdjhocr8I2Op7L1jgtgu1Hff4cn3K/Y17h9tU8tY3xA9GEIfa/erfzkq7ymMvD4XRjVByXssToY2BNIvfiMGPcvUbmplmnrvMGojDAjKZhQnk8QENpsUltd2RW15fWwdeHrYWcLXjTEfr38JJkb0xUAHceChmRvHDKpu/zYZNWUsHwV7jVScQuh61YXv0+HKgZV5e+vGOKa6Yspf7QG15nf9sFKVa8NfosU2W6P5ESG+7J
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <038BECF9CBECB04B89C56326884AC97A@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <dgilbert@redhat.com>) id 1ifoFP-0004uY-IP
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:57:00 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45532
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ifoFP-0004sg-Db
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:56:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576256218;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pq7lolIRfKv7T5Xf3TIhvB5H/tc/hMMwKGM+sW3QDH0=;
+ b=F68vm6hKYNa99GOXWZr0ZqM/UIFxskav5TijPnt045Ef/YgC8QXR1GGO+3Swb73aL8E5M1
+ qgWzcGJtWeok1W7tqhyY4glF3obZHg2X/kFOkvoivnpGK6ICRDNINUpxQYyCrjiJcSZnZl
+ B+Lg4UiSooRy4THLBjXUYlJYnKPCFTg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-403-VaHvOFBAM-a0pVsixn_2OQ-1; Fri, 13 Dec 2019 11:56:56 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9C52264A7E;
+ Fri, 13 Dec 2019 16:56:55 +0000 (UTC)
+Received: from work-vm (unknown [10.36.117.255])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 67F6461F37;
+ Fri, 13 Dec 2019 16:56:52 +0000 (UTC)
+Date: Fri, 13 Dec 2019 16:56:49 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Liam Merwick <liam.merwick@oracle.com>
+Subject: Re: [PATCH 025/104] virtiofsd: Add Makefile wiring for virtiofsd
+ contrib
+Message-ID: <20191213165649.GN3713@work-vm>
+References: <20191212163904.159893-1-dgilbert@redhat.com>
+ <20191212163904.159893-26-dgilbert@redhat.com>
+ <a3a3b681-b411-0c22-291a-9e0cd9116c19@oracle.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 708d1141-78d2-4a56-1041-08d77fbf74ce
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Dec 2019 11:27:37.2966 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cBH2OtKqFSl/SmgirkQ4b8tAutdwoUbRCSGQCGNTe4W9vAKrnOIePTy19+AulzQsVd24GxsiUEcZ3w+ncGbxzkTQhkcnBKBzZ0/gDMbljFY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3079
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.4.139
+In-Reply-To: <a3a3b681-b411-0c22-291a-9e0cd9116c19@oracle.com>
+User-Agent: Mutt/1.13.0 (2019-11-30)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: VaHvOFBAM-a0pVsixn_2OQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,102 +90,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-11.11.2019 19:02, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->   tests/qemu-iotests/iotests.py | 59 +++++++++++++++++++++++++++++++++++
->   1 file changed, 59 insertions(+)
+* Liam Merwick (liam.merwick@oracle.com) wrote:
+> On 12/12/2019 16:37, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >=20
+> > Wire up the building of the virtiofsd in contrib.
 >=20
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-> index d34305ce69..3e03320ce3 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -681,6 +681,65 @@ class VM(qtest.QEMUQtestMachine):
->  =20
->           return fields.items() <=3D ret.items()
->  =20
-> +    """
-> +    Check whether the node under the given path in the block graph is
-> +    @expected_node.
-> +
-> +    @root is the node name of the node where the @path is rooted.
-> +
-> +    @path is a string that consists of child names separated by
-> +    slashes.  It must begin with a slash.
-> +
-> +    Examples for @root + @path:
-> +      - root=3D"qcow2-node", path=3D"/backing/file"
-> +      - root=3D"quorum-node", path=3D"/children.2/file"
-> +
-> +    Hypothetically, @path could be empty, in which case it would point
-> +    to @root.  However, in practice this case is not useful and hence
-> +    not allowed.
-> +
-> +    @expected_node may be None.
-> +
-> +    @graph may be None or the result of an x-debug-query-block-graph
-> +    call that has already been performed.
-> +    """
-> +    def assert_block_path(self, root, path, expected_node, graph=3DNone)=
-:
-> +        if graph is None:
-> +            graph =3D self.qmp('x-debug-query-block-graph')['return']
-> +
-> +        iter_path =3D iter(path.split('/'))
-> +
-> +        # Must start with a /
-> +        assert next(iter_path) =3D=3D ''
-> +
-> +        node =3D next((node for node in graph['nodes'] if node['name'] =
-=3D=3D root),
-> +                    None)
-> +
-> +        for path_node in iter_path:
+> s/contrib/tools/
 
-I'd rename path_node to child or edge, to not interfere with block nodes he=
-re.
+Ah! My sed of s-contrib/virtiofsd-tools/virtiofsd-
+wasn't smart enough for that!
 
-> +            assert node is not None, 'Cannot follow path %s' % path
-> +
-> +            try:
-> +                node_id =3D next(edge['child'] for edge in graph['edges'=
-] \
-> +                                             if edge['parent'] =3D=3D no=
-de['id'] and
-> +                                                edge['name'] =3D=3D path=
-_node)
-> +
-> +                node =3D next(node for node in graph['nodes'] \
-> +                                 if node['id'] =3D=3D node_id)
-> +            except StopIteration:
-> +                node =3D None
-> +
-> +        assert node is not None or expected_node is None, \
-> +               'No node found under %s (but expected %s)' % \
-> +               (path, expected_node)
-> +
-> +        assert expected_node is not None or node is None, \
-> +               'Found node %s under %s (but expected none)' % \
-> +               (node['name'], path)
-> +
-> +        if node is not None and expected_node is not None:
-> +            assert node['name'] =3D=3D expected_node, \
-> +                   'Found node %s under %s (but expected %s)' % \
-> +                   (node['name'], path, expected_node)
->  =20
->   index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
->  =20
+> otherwise
 >=20
+> Reviewed-by: Liam Merwick <liam.merwick@oracle.com>
 
+Thanks.
 
---=20
-Best regards,
-Vladimir
+Dave
+
+>=20
+> >=20
+> > virtiofsd relies on Linux-specific system calls and seccomp.  Anyone
+> > wishing to port it to other host operating systems should do so
+> > carefully and without reducing security.
+> >=20
+> > Only allow building on Linux hosts.
+> >=20
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >   Makefile                      |  8 ++++++++
+> >   Makefile.objs                 |  1 +
+> >   tools/virtiofsd/Makefile.objs | 10 ++++++++++
+> >   3 files changed, 19 insertions(+)
+> >   create mode 100644 tools/virtiofsd/Makefile.objs
+> >=20
+> > diff --git a/Makefile b/Makefile
+> > index b437a346d7..b7f7019a50 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -322,6 +322,8 @@ HELPERS-y =3D
+> >   HELPERS-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_LINUX)) =3D qemu-bridg=
+e-helper$(EXESUF)
+> >   ifdef CONFIG_LINUX
+> > +HELPERS-y +=3D virtiofsd$(EXESUF)
+> > +
+> >   ifdef CONFIG_VIRGL
+> >   ifdef CONFIG_GBM
+> >   HELPERS-y +=3D vhost-user-gpu$(EXESUF)
+> > @@ -430,6 +432,7 @@ dummy :=3D $(call unnest-vars,, \
+> >                   elf2dmp-obj-y \
+> >                   ivshmem-client-obj-y \
+> >                   ivshmem-server-obj-y \
+> > +                virtiofsd-obj-y \
+> >                   rdmacm-mux-obj-y \
+> >                   libvhost-user-obj-y \
+> >                   vhost-user-scsi-obj-y \
+> > @@ -674,6 +677,11 @@ rdmacm-mux$(EXESUF): LIBS +=3D "-libumad"
+> >   rdmacm-mux$(EXESUF): $(rdmacm-mux-obj-y) $(COMMON_LDADDS)
+> >   =09$(call LINK, $^)
+> > +ifdef CONFIG_LINUX # relies on Linux-specific syscalls
+> > +virtiofsd$(EXESUF): $(virtiofsd-obj-y) libvhost-user.a $(COMMON_LDADDS=
+)
+> > +=09$(call LINK, $^)
+> > +endif
+> > +
+> >   vhost-user-gpu$(EXESUF): $(vhost-user-gpu-obj-y) $(libvhost-user-obj-=
+y) libqemuutil.a libqemustub.a
+> >   =09$(call LINK, $^)
+> > diff --git a/Makefile.objs b/Makefile.objs
+> > index 11ba1a36bd..b5f667a4ba 100644
+> > --- a/Makefile.objs
+> > +++ b/Makefile.objs
+> > @@ -125,6 +125,7 @@ vhost-user-blk-obj-y =3D contrib/vhost-user-blk/
+> >   rdmacm-mux-obj-y =3D contrib/rdmacm-mux/
+> >   vhost-user-input-obj-y =3D contrib/vhost-user-input/
+> >   vhost-user-gpu-obj-y =3D contrib/vhost-user-gpu/
+> > +virtiofsd-obj-y =3D tools/virtiofsd/
+> >   #####################################################################=
+#
+> >   trace-events-subdirs =3D
+> > diff --git a/tools/virtiofsd/Makefile.objs b/tools/virtiofsd/Makefile.o=
+bjs
+> > new file mode 100644
+> > index 0000000000..67be16332c
+> > --- /dev/null
+> > +++ b/tools/virtiofsd/Makefile.objs
+> > @@ -0,0 +1,10 @@
+> > +virtiofsd-obj-y =3D buffer.o \
+> > +                  fuse_opt.o \
+> > +                  fuse_log.o \
+> > +                  fuse_loop_mt.o \
+> > +                  fuse_lowlevel.o \
+> > +                  fuse_signals.o \
+> > +                  fuse_virtio.o \
+> > +                  helper.o \
+> > +                  passthrough_ll.o
+> > +
+> >=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
