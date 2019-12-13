@@ -2,74 +2,91 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32140C43603
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC6BC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC98021655
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 63F2B21655
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:27:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HRYq+6vX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC98021655
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5Pp56bD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63F2B21655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifnoU-0003oS-Qk
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 11:29:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37568)
+	id 1iflsF-0000c1-HE
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 09:24:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53079)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1ifnf4-0000GV-RI
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:28 -0500
+ (envelope-from <mst@redhat.com>) id 1iflrc-0000A7-DF
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:24:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1ifnf3-0001Me-Hp
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:26 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30780
+ (envelope-from <mst@redhat.com>) id 1iflra-0002Gi-3H
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:24:14 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46908
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ifnf3-0001Lg-DU
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 11:19:25 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iflrZ-0002En-N9
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:24:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576253964;
+ s=mimecast20190719; t=1576247052;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3nzSX4Eik3KjtGJOW7//s0suSjmGjAvzRFJ0ah76MqM=;
- b=HRYq+6vXIP2YoqHq5zEDzGlxExQ8rBSrV36IEuchnGyrOCQSDkBg0TYqFxU9w7kPTuNRNO
- 7tg2mUj0EdFNm+xpLsuarZAoMYD7779ttD8HtuZ0ptFq3046jxYOTJSvGmlCen5EfgYWNE
- ufC/ORWqiKMGBda5kYBRgjKNkaRTq8c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-ct8vcmzbM5W5MIWSrMcgvg-1; Fri, 13 Dec 2019 11:19:23 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6BCD1852E29;
- Fri, 13 Dec 2019 16:19:21 +0000 (UTC)
-Received: from localhost (ovpn-116-226.ams2.redhat.com [10.36.116.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C206660BF3;
- Fri, 13 Dec 2019 16:19:18 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 06/16] s390x: Move clear reset
-Date: Fri, 13 Dec 2019 17:18:41 +0100
-Message-Id: <20191213161851.24687-7-cohuck@redhat.com>
-In-Reply-To: <20191213161851.24687-1-cohuck@redhat.com>
-References: <20191213161851.24687-1-cohuck@redhat.com>
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=zj2wVrIh8KQNhFA65bESMfJP7roYgy+mFo3n5QglPhQ=;
+ b=Z5Pp56bDZjCGYD8Njs1oRlq2vyG2iH0J5q9a2NNc7gnThbIpC/3bdNMW51pKPM7/swXaTj
+ vGla6gO3igcOSHqmHnn6vWStgDJLdDU0CE2gwgw0JMiRKbI+UmzKu9EMcfHmwSkveflqJN
+ AomN6kRxdYixIrfuJFWXBojskcgMvaI=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-75-HWAvGZezMlGrQe6SSrllNQ-1; Fri, 13 Dec 2019 09:24:08 -0500
+Received: by mail-qv1-f72.google.com with SMTP id x22so1762864qvc.18
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 06:24:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+ :content-disposition;
+ bh=sanExUpcAf7TPhNumiJmyXjhA8u9u6QpSUASPDnjn/0=;
+ b=cCgaSlaFbSsZvoJObnW1VGVk8hir2KBlyM0r2SNqn33ZyHd1JmdmdH45nOT+63xC2o
+ wHoztA2QOiS4vSuXyAPqFo2UY/BhAfF5pgw7GmD1w/F+vTEfHg2OkSYD4XuigsketORJ
+ c2chEb1CRYOMDYbK86ExvViiv9iEsBgbkXuVA7HOPjnODEfAFtdu/TpeuuvmCKoVJcZA
+ WwJN0K8Z8puSKwjq9gTajJT/TyiyopSmkspJ3bvxUGYwXHdwTERm31QR4P+yETYgGa8O
+ S9oTVoBbJXYoprPkNfasl0XfI0z2UVdE59Z17NOhR0NZoaN42BIN4/7tGFIu/xpz8zD7
+ AQMQ==
+X-Gm-Message-State: APjAAAUzqVk1uWd8M3Mxa9qapub5lxwSeWis01Z9hW31NSidBtb5xDv+
+ 2YmrvRjYHmx0eeYeOCOAyIlLRVAZx4Z05YxEg6HoNPtKMl/ZISfmHNuI8j4b84EBGMpbDHfquJF
+ LdFAStM4dOusEjAI=
+X-Received: by 2002:a37:6706:: with SMTP id b6mr12959008qkc.461.1576247047437; 
+ Fri, 13 Dec 2019 06:24:07 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxLWjfw6jptdpPaRDRdzXNuPoPBB3I+XUOkYu/8THWHjzmwLt0ZWNZT+nzbG95goC5DYAGEaA==
+X-Received: by 2002:a37:6706:: with SMTP id b6mr12958993qkc.461.1576247047170; 
+ Fri, 13 Dec 2019 06:24:07 -0800 (PST)
+Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
+ by smtp.gmail.com with ESMTPSA id w1sm1785155qtk.31.2019.12.13.06.24.05
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 13 Dec 2019 06:24:06 -0800 (PST)
+Date: Fri, 13 Dec 2019 09:24:03 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtio: update queue size on guest write
+Message-ID: <20191213142358.345301-1-mst@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: ct8vcmzbM5W5MIWSrMcgvg-1
+X-Mailer: git-send-email 2.24.1.751.gd10ce2899c
+X-Mutt-Fcc: =sent
+X-MC-Unique: HWAvGZezMlGrQe6SSrllNQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -84,143 +101,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Janosch Frank <frankja@linux.ibm.com>
+Some guests read back queue size after writing it.
+Update the size immediatly upon write otherwise
+they get confused.
 
-Let's also move the clear reset function into the reset handler.
-
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Message-Id: <20191127175046.4911-5-frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- target/s390x/cpu-qom.h |  1 +
- target/s390x/cpu.c     | 58 +++++++++++++-----------------------------
- 2 files changed, 18 insertions(+), 41 deletions(-)
+ hw/virtio/virtio-pci.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-index 6f0a12042ed4..dbe5346ec901 100644
---- a/target/s390x/cpu-qom.h
-+++ b/target/s390x/cpu-qom.h
-@@ -37,6 +37,7 @@ typedef struct S390CPUDef S390CPUDef;
- typedef enum cpu_reset_type {
-     S390_CPU_RESET_NORMAL,
-     S390_CPU_RESET_INITIAL,
-+    S390_CPU_RESET_CLEAR,
- } cpu_reset_type;
-=20
- /**
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index ca62fe768569..bd39cb54b7aa 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -94,6 +94,9 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type ty=
-pe)
-     s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
-=20
-     switch (type) {
-+    case S390_CPU_RESET_CLEAR:
-+        memset(env, 0, offsetof(CPUS390XState, start_initial_reset_fields)=
-);
-+        /* fall through */
-     case S390_CPU_RESET_INITIAL:
-         /* initial reset does not clear everything! */
-         memset(&env->start_initial_reset_fields, 0,
-@@ -107,6 +110,14 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type=
- type)
-         env->cregs[0] =3D CR0_RESET;
-         env->cregs[14] =3D CR14_RESET;
-=20
-+#if defined(CONFIG_USER_ONLY)
-+        /* user mode should always be allowed to use the full FPU */
-+        env->cregs[0] |=3D CR0_AFP;
-+        if (s390_has_feat(S390_FEAT_VECTOR)) {
-+            env->cregs[0] |=3D CR0_VECTOR;
-+        }
-+#endif
-+
-         /* tininess for underflow is detected before rounding */
-         set_float_detect_tininess(float_tininess_before_rounding,
-                                   &env->fpu_status);
-@@ -125,46 +136,6 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type=
- type)
-     }
- }
-=20
--/* CPUClass:reset() */
--static void s390_cpu_full_reset(CPUState *s)
--{
--    S390CPU *cpu =3D S390_CPU(s);
--    S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
--    CPUS390XState *env =3D &cpu->env;
--
--    scc->parent_reset(s);
--    cpu->env.sigp_order =3D 0;
--    s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
--
--    memset(env, 0, offsetof(CPUS390XState, end_reset_fields));
--
--    /* architectured initial values for CR 0 and 14 */
--    env->cregs[0] =3D CR0_RESET;
--    env->cregs[14] =3D CR14_RESET;
--
--#if defined(CONFIG_USER_ONLY)
--    /* user mode should always be allowed to use the full FPU */
--    env->cregs[0] |=3D CR0_AFP;
--    if (s390_has_feat(S390_FEAT_VECTOR)) {
--        env->cregs[0] |=3D CR0_VECTOR;
--    }
--#endif
--
--    /* architectured initial value for Breaking-Event-Address register */
--    env->gbea =3D 1;
--
--    env->pfault_token =3D -1UL;
--
--    /* tininess for underflow is detected before rounding */
--    set_float_detect_tininess(float_tininess_before_rounding,
--                              &env->fpu_status);
--
--    /* Reset state inside the kernel that we cannot access yet from QEMU. =
-*/
--    if (kvm_enabled()) {
--        kvm_s390_reset_vcpu(cpu);
--    }
--}
--
- #if !defined(CONFIG_USER_ONLY)
- static void s390_cpu_machine_reset_cb(void *opaque)
- {
-@@ -456,6 +427,11 @@ static Property s390x_cpu_properties[] =3D {
-     DEFINE_PROP_END_OF_LIST()
- };
-=20
-+static void s390_cpu_reset_full(CPUState *s)
-+{
-+    return s390_cpu_reset(s, S390_CPU_RESET_CLEAR);
-+}
-+
- static void s390_cpu_class_init(ObjectClass *oc, void *data)
- {
-     S390CPUClass *scc =3D S390_CPU_CLASS(oc);
-@@ -472,7 +448,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *=
-data)
-     scc->load_normal =3D s390_cpu_load_normal;
- #endif
-     scc->reset =3D s390_cpu_reset;
--    cc->reset =3D s390_cpu_full_reset;
-+    cc->reset =3D s390_cpu_reset_full;
-     cc->class_by_name =3D s390_cpu_class_by_name,
-     cc->has_work =3D s390_cpu_has_work;
- #ifdef CONFIG_TCG
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index c6b47a9c73..e5c759e19e 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -1256,6 +1256,8 @@ static void virtio_pci_common_write(void *opaque, hwa=
+ddr addr,
+         break;
+     case VIRTIO_PCI_COMMON_Q_SIZE:
+         proxy->vqs[vdev->queue_sel].num =3D val;
++        virtio_queue_set_num(vdev, vdev->queue_sel,
++                             proxy->vqs[vdev->queue_sel].num);
+         break;
+     case VIRTIO_PCI_COMMON_Q_MSIX:
+         msix_vector_unuse(&proxy->pci_dev,
 --=20
-2.21.0
+MST
 
 
