@@ -2,95 +2,79 @@ Return-Path: <SRS0=VaDC=2D=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A0CC00454
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38DFBC43603
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3483C24125
-	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3483C24125
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id AEAC224125
+	for <qemu-devel@archiver.kernel.org>; Fri, 13 Dec 2019 21:26:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LbwispCs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEAC224125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifjr6-0008C8-FI
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 07:15:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34810)
+	id 1ifldk-00032T-Et
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 09:09:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42831)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1ifjcH-0007YS-N9
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:00:19 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iflcU-0001aU-DI
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:08:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1ifjcG-0004Xd-4o
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:00:17 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27654)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1ifjcF-0004Vk-RL
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 07:00:16 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBDBuvPT002806
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 07:00:14 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wupyt0nj1-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 07:00:14 -0500
-Received: from localhost
- by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Fri, 13 Dec 2019 12:00:12 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 13 Dec 2019 12:00:09 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com
- (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBDC083757999486
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 13 Dec 2019 12:00:08 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 133A9A4068;
- Fri, 13 Dec 2019 12:00:08 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E0F7AA4064;
- Fri, 13 Dec 2019 12:00:07 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.185.241])
- by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 13 Dec 2019 12:00:07 +0000 (GMT)
-Subject: [PATCH 07/13] ppc/pnv: Introduce PnvChipClass::intc_print_info()
- method
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 13 Dec 2019 13:00:07 +0100
-In-Reply-To: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
-References: <157623836852.360005.1112241220707384093.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121312-0016-0000-0000-000002D47154
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121312-0017-0000-0000-000033369CBB
-Message-Id: <157623840755.360005.5002022339473369934.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-13_03:2019-12-13,2019-12-13 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 clxscore=1034
- adultscore=0 mlxlogscore=810 priorityscore=1501 impostorscore=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 bulkscore=0 malwarescore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912130097
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iflcT-0002sT-9N
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:08:38 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46989)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1iflcT-0002pv-0n
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 09:08:37 -0500
+Received: by mail-wr1-x443.google.com with SMTP id z7so6736610wrl.13
+ for <qemu-devel@nongnu.org>; Fri, 13 Dec 2019 06:08:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id;
+ bh=iSvd7kR69HHZhRhQRzsPwBtBWFePaMT2xa1YRgm+R84=;
+ b=LbwispCsQp5nFasH0RNzM0G4RWFwcQCHS7fQ9DaXqsfN6D1vs99tXra/ozFXEu3TsN
+ e5JkInjRKYqfh/Ffk2tnKrlXgH/N4umbO3u7IaOLzIlmuzyyd7e6D/YpkYyaAl8+lbtr
+ 3doSM4vKimPbI7bT/3SZKJGeYWNnv7qaWwGAA2OKodhY1UHj/4Q/ULGIYXzbrfN4di3S
+ PDVmEaFlig1bvhbXaMcqwICHzqZ27/ugVIfZQJLfDqPU2WuxpO3XvyfEQrZ1bhHcKy8K
+ 7LckHpEdr2lz0slIFAgl2XhxMb1TzeIhk3dRUtFfnSyZ4iwnrm6yT5FQWNIQTgnrIQDD
+ wjBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+ bh=iSvd7kR69HHZhRhQRzsPwBtBWFePaMT2xa1YRgm+R84=;
+ b=dX1UdVVULfFQLZxigLHFtvGE7A4uRgU4pFXtjrdbyLSzhSYwlrylBTnYvXLx71wR3h
+ G2LA0xnv58FLM7X01Z/wbJAvdgduom5o3oFctibMVU9yXnqp48tdPEYfFpSYfLWHXZlM
+ 40eoVPDRaFH8jD/k3PhdReX2+/pn2dM60Z6G31QZq18EbPhfr4A78Tyfq8XUUHPi25Z2
+ cf6HKou6NemhpOJ5bYi7XDN0Eb5OK8VqqRHqdN5VS6YG4rtxiCIYNQt/+vyF9xzoY82x
+ SSZRU8YyOySMb5DdUS5AQi28NtwPG3ECXqAwFV9PV+Xxm7Lh+ZyM4asffTJou1ectP0U
+ NRhQ==
+X-Gm-Message-State: APjAAAV4t7Es7QASiSt5KsbERhyTLO7OS3NyhRtATUCRgwA3EQBPxssf
+ nISlkUkdnPtz9b7Az7Adr7umVDaq
+X-Google-Smtp-Source: APXvYqyUMB172N78c7z8TQh3qlx1OlG72JTyCbbld6hf82ZwzARG0KngjIkdKxsQNoCMJvhC6WwKyQ==
+X-Received: by 2002:a5d:4805:: with SMTP id l5mr12677481wrq.3.1576246115435;
+ Fri, 13 Dec 2019 06:08:35 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id i8sm10268193wro.47.2019.12.13.06.08.34
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 13 Dec 2019 06:08:34 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] colo: fix return without releasing RCU
+Date: Fri, 13 Dec 2019 15:08:32 +0100
+Message-Id: <1576246112-23406-2-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,134 +86,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The pnv_pic_print_info() callback checks the type of the chip in order
-to forward to the request appropriate interrupt controller. This can
-be achieved with QOM. Introduce a method for this in the base chip class
-and implement it in child classes.
+Use WITH_RCU_READ_LOCK_GUARD to avoid exiting colo_init_ram_cache
+without releasing RCU.
 
-This also prepares ground for the upcoming interrupt controller of POWER10
-chips.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/ppc/pnv.c         |   30 +++++++++++++++++++++++++-----
- include/hw/ppc/pnv.h |    1 +
- 2 files changed, 26 insertions(+), 5 deletions(-)
+ migration/ram.c | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index efc00f4cb67a..2a53e99bda2e 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -832,6 +832,12 @@ static void pnv_chip_power8_intc_destroy(PnvChip *chip, PowerPCCPU *cpu)
-     pnv_cpu->intc = NULL;
- }
- 
-+static void pnv_chip_power8_intc_print_info(PnvChip *chip, PowerPCCPU *cpu,
-+                                            Monitor *mon)
-+{
-+    icp_pic_print_info(ICP(pnv_cpu_state(cpu)->intc), mon);
-+}
-+
- /*
-  *    0:48  Reserved - Read as zeroes
-  *   49:52  Node ID
-@@ -889,6 +895,12 @@ static void pnv_chip_power9_intc_destroy(PnvChip *chip, PowerPCCPU *cpu)
-     pnv_cpu->intc = NULL;
- }
- 
-+static void pnv_chip_power9_intc_print_info(PnvChip *chip, PowerPCCPU *cpu,
-+                                            Monitor *mon)
-+{
-+    xive_tctx_pic_print_info(XIVE_TCTX(pnv_cpu_state(cpu)->intc), mon);
-+}
-+
- static void pnv_chip_power10_intc_create(PnvChip *chip, PowerPCCPU *cpu,
-                                         Error **errp)
+diff --git a/migration/ram.c b/migration/ram.c
+index 7dd7f81..8d7c015 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3891,26 +3891,27 @@ int colo_init_ram_cache(void)
  {
-@@ -910,6 +922,11 @@ static void pnv_chip_power10_intc_destroy(PnvChip *chip, PowerPCCPU *cpu)
-     pnv_cpu->intc = NULL;
- }
+     RAMBlock *block;
  
-+static void pnv_chip_power10_intc_print_info(PnvChip *chip, PowerPCCPU *cpu,
-+                                             Monitor *mon)
-+{
-+}
-+
- /*
-  * Allowed core identifiers on a POWER8 Processor Chip :
-  *
-@@ -1086,6 +1103,7 @@ static void pnv_chip_power8e_class_init(ObjectClass *klass, void *data)
-     k->intc_create = pnv_chip_power8_intc_create;
-     k->intc_reset = pnv_chip_power8_intc_reset;
-     k->intc_destroy = pnv_chip_power8_intc_destroy;
-+    k->intc_print_info = pnv_chip_power8_intc_print_info;
-     k->isa_create = pnv_chip_power8_isa_create;
-     k->dt_populate = pnv_chip_power8_dt_populate;
-     k->pic_print_info = pnv_chip_power8_pic_print_info;
-@@ -1107,6 +1125,7 @@ static void pnv_chip_power8_class_init(ObjectClass *klass, void *data)
-     k->intc_create = pnv_chip_power8_intc_create;
-     k->intc_reset = pnv_chip_power8_intc_reset;
-     k->intc_destroy = pnv_chip_power8_intc_destroy;
-+    k->intc_print_info = pnv_chip_power8_intc_print_info;
-     k->isa_create = pnv_chip_power8_isa_create;
-     k->dt_populate = pnv_chip_power8_dt_populate;
-     k->pic_print_info = pnv_chip_power8_pic_print_info;
-@@ -1128,6 +1147,7 @@ static void pnv_chip_power8nvl_class_init(ObjectClass *klass, void *data)
-     k->intc_create = pnv_chip_power8_intc_create;
-     k->intc_reset = pnv_chip_power8_intc_reset;
-     k->intc_destroy = pnv_chip_power8_intc_destroy;
-+    k->intc_print_info = pnv_chip_power8_intc_print_info;
-     k->isa_create = pnv_chip_power8nvl_isa_create;
-     k->dt_populate = pnv_chip_power8_dt_populate;
-     k->pic_print_info = pnv_chip_power8_pic_print_info;
-@@ -1299,6 +1319,7 @@ static void pnv_chip_power9_class_init(ObjectClass *klass, void *data)
-     k->intc_create = pnv_chip_power9_intc_create;
-     k->intc_reset = pnv_chip_power9_intc_reset;
-     k->intc_destroy = pnv_chip_power9_intc_destroy;
-+    k->intc_print_info = pnv_chip_power9_intc_print_info;
-     k->isa_create = pnv_chip_power9_isa_create;
-     k->dt_populate = pnv_chip_power9_dt_populate;
-     k->pic_print_info = pnv_chip_power9_pic_print_info;
-@@ -1379,6 +1400,7 @@ static void pnv_chip_power10_class_init(ObjectClass *klass, void *data)
-     k->intc_create = pnv_chip_power10_intc_create;
-     k->intc_reset = pnv_chip_power10_intc_reset;
-     k->intc_destroy = pnv_chip_power10_intc_destroy;
-+    k->intc_print_info = pnv_chip_power10_intc_print_info;
-     k->isa_create = pnv_chip_power10_isa_create;
-     k->dt_populate = pnv_chip_power10_dt_populate;
-     k->pic_print_info = pnv_chip_power10_pic_print_info;
-@@ -1575,11 +1597,9 @@ static void pnv_pic_print_info(InterruptStatsProvider *obj,
-     CPU_FOREACH(cs) {
-         PowerPCCPU *cpu = POWERPC_CPU(cs);
- 
--        if (pnv_chip_is_power9(pnv->chips[0])) {
--            xive_tctx_pic_print_info(XIVE_TCTX(pnv_cpu_state(cpu)->intc), mon);
--        } else {
--            icp_pic_print_info(ICP(pnv_cpu_state(cpu)->intc), mon);
--        }
-+        /* XXX: loop on each chip/core/thread instead of CPU_FOREACH() */
-+        PNV_CHIP_GET_CLASS(pnv->chips[0])->intc_print_info(pnv->chips[0], cpu,
-+                                                           mon);
+-    rcu_read_lock();
+-    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+-        block->colo_cache = qemu_anon_ram_alloc(block->used_length,
+-                                                NULL,
+-                                                false);
+-        if (!block->colo_cache) {
+-            error_report("%s: Can't alloc memory for COLO cache of block %s,"
+-                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
+-                         block->used_length);
+-            RAMBLOCK_FOREACH_NOT_IGNORED(block) {
+-                if (block->colo_cache) {
+-                    qemu_anon_ram_free(block->colo_cache, block->used_length);
+-                    block->colo_cache = NULL;
++    WITH_RCU_READ_LOCK_GUARD() {
++        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
++            block->colo_cache = qemu_anon_ram_alloc(block->used_length,
++                                                    NULL,
++                                                    false);
++            if (!block->colo_cache) {
++                error_report("%s: Can't alloc memory for COLO cache of block %s,"
++                             "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
++                             block->used_length);
++                RAMBLOCK_FOREACH_NOT_IGNORED(block) {
++                    if (block->colo_cache) {
++                        qemu_anon_ram_free(block->colo_cache, block->used_length);
++                        block->colo_cache = NULL;
++                    }
+                 }
++                return -errno;
+             }
+-            return -errno;
++            memcpy(block->colo_cache, block->host, block->used_length);
+         }
+-        memcpy(block->colo_cache, block->host, block->used_length);
      }
- 
-     for (i = 0; i < pnv->num_chips; i++) {
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index c213bdd5ecd3..7d2402784d4b 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -133,6 +133,7 @@ typedef struct PnvChipClass {
-     void (*intc_create)(PnvChip *chip, PowerPCCPU *cpu, Error **errp);
-     void (*intc_reset)(PnvChip *chip, PowerPCCPU *cpu);
-     void (*intc_destroy)(PnvChip *chip, PowerPCCPU *cpu);
-+    void (*intc_print_info)(PnvChip *chip, PowerPCCPU *cpu, Monitor *mon);
-     ISABus *(*isa_create)(PnvChip *chip, Error **errp);
-     void (*dt_populate)(PnvChip *chip, void *fdt);
-     void (*pic_print_info)(PnvChip *chip, Monitor *mon);
+-    rcu_read_unlock();
++
+     /*
+     * Record the dirty pages that sent by PVM, we use this dirty bitmap together
+     * with to decide which page in cache should be flushed into SVM's RAM. Here
+-- 
+1.8.3.1
 
 
