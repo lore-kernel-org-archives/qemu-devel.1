@@ -2,72 +2,80 @@ Return-Path: <SRS0=ZS6r=2E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B17C43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 09:11:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3530DC43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 09:31:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 869B4214AF
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 09:11:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 869B4214AF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxfamily.org
+	by mail.kernel.org (Postfix) with ESMTPS id F0B4524125
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 09:31:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ViDij9xU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0B4524125
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ig3Sa-0006Zf-Qu
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 04:11:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42295)
+	id 1ig3lu-00020m-Rg
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 04:31:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <th.huth@gmail.com>) id 1ig3Rv-0006Ai-Rh
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 04:10:57 -0500
+ (envelope-from <cohuck@redhat.com>) id 1ig3ks-0001UU-KT
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 04:30:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <th.huth@gmail.com>) id 1ig3Ru-00029H-57
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 04:10:55 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:36154)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <th.huth@gmail.com>) id 1ig3Rt-00024c-Qu
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 04:10:54 -0500
-Received: by mail-wr1-f66.google.com with SMTP id z3so1329453wru.3
- for <qemu-devel@nongnu.org>; Sat, 14 Dec 2019 01:10:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=v33cw69P2zoxuwSSZ6jlqZkbriymrwWqhO3QUIg5p9c=;
- b=bib2aD1z8RjmGChPvJ/Y5dWb8PJq4T/l5+J5Q2oAngzuoeZIaS6SCTz46dDj86M+O2
- Gk11bb2lxXmPSlTdPciom4+9aVZivLo9f4rtcTQBjaq26LJ4tRvFaTnd+yQs9p3AD94G
- 47WwhqDl7uAKjWYdn4R/I/MrB3FHmfAfKLC5ZO7+htdhahgnXI00Ug4mtYPjQQw5OJ1C
- RfJRdsqgv1MrHq+QyoDKmoKTKCCF3022NX3+POCaGf4zCySaLgDveu0JvdhNdlh8u6kD
- qd4uzq1LEiUlMRB75fHGrtRVWgOA1CznqwVdVkbEni2dg03sRhhyka88p+ODXetKx7R8
- 2YNg==
-X-Gm-Message-State: APjAAAVNmM59SXU/iefX11lYyUZ7JOupU6ww1fTZyifsjNyFco3pEueJ
- zRUn/6hsB5vGfFqB7/R+yEk=
-X-Google-Smtp-Source: APXvYqxGGnV7KycCASOnSV6qEbmPWACoXOKGC60c1kG/hWEqAbcNQ0XTUV31o2gF09wWfBce0S+tNw==
-X-Received: by 2002:a5d:4807:: with SMTP id l7mr18167052wrq.64.1576314652324; 
- Sat, 14 Dec 2019 01:10:52 -0800 (PST)
-Received: from thl530.multi.box (pD9575849.dip0.t-ipconnect.de. [217.87.88.73])
- by smtp.gmail.com with ESMTPSA id o185sm13154009wmb.40.2019.12.14.01.10.51
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 14 Dec 2019 01:10:51 -0800 (PST)
-Date: Sat, 14 Dec 2019 10:10:47 +0100
-From: Thomas Huth <huth@tuxfamily.org>
-To: Laurent Vivier <laurent@vivier.eu>
-Subject: Re: [PATCH] target/m68k: only change valid bits in CACR
-Message-ID: <20191214101047.217a887a@thl530.multi.box>
-In-Reply-To: <20191212194045.12882-1-laurent@vivier.eu>
-References: <20191212194045.12882-1-laurent@vivier.eu>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <cohuck@redhat.com>) id 1ig3kq-0001rm-7j
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 04:30:29 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32994
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ig3kq-0001q4-1b
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 04:30:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576315827;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=krUqtHQq2+/RjAJg5zXYP5k6eEvtTAFZGy9yHCYbMjo=;
+ b=ViDij9xU9hEgTKy8NfpeadLSbHBsXynx83c9gBp/7T3VajN/RLKDunr4vMCODZjSz0HSIy
+ 3St0KzejfsH9+dRKTCO5V9BeGP9dkvbV6U104t9YmCuL0Mu36JQhXxbefr+6PF3nsHvcNw
+ 7bBgD0C0+5s4faRmyWpl1KmbgfbqtHc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-7mDK5tegOZit7Fo8ZI7Syg-1; Sat, 14 Dec 2019 04:30:24 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14A492F61;
+ Sat, 14 Dec 2019 09:30:23 +0000 (UTC)
+Received: from gondolin (ovpn-116-90.ams2.redhat.com [10.36.116.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1FD5F5C298;
+ Sat, 14 Dec 2019 09:30:21 +0000 (UTC)
+Date: Sat, 14 Dec 2019 10:30:19 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 00/16] first s390x update for 5.0
+Message-ID: <20191214103019.74bcd9f8.cohuck@redhat.com>
+In-Reply-To: <CAFEAcA8O=ezHAQKKr9zrA0M_TE-FbnHmict5K8_+5v64BDoTxA@mail.gmail.com>
+References: <20191213161851.24687-1-cohuck@redhat.com>
+ <CAFEAcA8O=ezHAQKKr9zrA0M_TE-FbnHmict5K8_+5v64BDoTxA@mail.gmail.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 7mDK5tegOZit7Fo8ZI7Syg-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.221.66
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,146 +87,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-s390x <qemu-s390x@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am Thu, 12 Dec 2019 20:40:45 +0100
-schrieb Laurent Vivier <laurent@vivier.eu>:
+On Fri, 13 Dec 2019 21:12:18 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> This is used by netBSD (and MacOS ROM) to detect the MMU type
+> On Fri, 13 Dec 2019 at 16:19, Cornelia Huck <cohuck@redhat.com> wrote:
+> >
+> > The following changes since commit b0ca999a43a22b38158a222233d3f5881648bb4f:
+> >
+> >   Update version for v4.2.0 release (2019-12-12 16:45:57 +0000)
+> >
+> > are available in the Git repository at:
+> >
+> >   https://github.com/cohuck/qemu tags/s390x-20191213
+> >
+> > for you to fetch changes up to b147562019dd845a224cde7a37c219f9848d1b8d:
+> >
+> >   qga: fence guest-set-time if hwclock not available (2019-12-13 12:16:50 +0100)
+> >
+> > ----------------------------------------------------------------
+> > First s390x update for 5.0:
+> > - compat machines (also for other architectures)
+> > - cleanups and fixes in reset handling
+> > - fence off guest-set-time, as we have no hwclock
+> > - fix some misuses of the error API
+> > - further cleanups
+> >
+> > ----------------------------------------------------------------
+> >  
 > 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  target/m68k/cpu.c    | 28 ++++++++++++++++++++++------
->  target/m68k/cpu.h    |  4 ++++
->  target/m68k/helper.c | 16 ++++++++++++++--
->  3 files changed, 40 insertions(+), 8 deletions(-)
+> Hi -- this has conflicts. Most of them I could probably fix up,
+> but this one in particular:
 > 
-> diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-> index e6596de29c..1d202cec49 100644
-> --- a/target/m68k/cpu.c
-> +++ b/target/m68k/cpu.c
-> @@ -114,11 +114,8 @@ static void m68000_cpu_initfn(Object *obj)
->      m68k_set_feature(env, M68K_FEATURE_MOVEP);
->  }
->  
-> -static void m68020_cpu_initfn(Object *obj)
-> +static void m680x0_cpu_common(CPUM68KState *env)
->  {
-> -    M68kCPU *cpu = M68K_CPU(obj);
-> -    CPUM68KState *env = &cpu->env;
-> -
->      m68k_set_feature(env, M68K_FEATURE_M68000);
->      m68k_set_feature(env, M68K_FEATURE_USP);
->      m68k_set_feature(env, M68K_FEATURE_WORD_INDEX);
-> @@ -136,14 +133,32 @@ static void m68020_cpu_initfn(Object *obj)
->      m68k_set_feature(env, M68K_FEATURE_CHK2);
->      m68k_set_feature(env, M68K_FEATURE_MOVEP);
->  }
-> -#define m68030_cpu_initfn m68020_cpu_initfn
-> +
-> +static void m68020_cpu_initfn(Object *obj)
-> +{
-> +    M68kCPU *cpu = M68K_CPU(obj);
-> +    CPUM68KState *env = &cpu->env;
-> +
-> +    m680x0_cpu_common(env);
-> +    m68k_set_feature(env, M68K_FEATURE_MMU68851);
-> +}
-> +
-> +static void m68030_cpu_initfn(Object *obj)
-> +{
-> +    M68kCPU *cpu = M68K_CPU(obj);
-> +    CPUM68KState *env = &cpu->env;
-> +
-> +    m680x0_cpu_common(env);
-> +    m68k_set_feature(env, M68K_FEATURE_MMU68030);
-> +}
->  
->  static void m68040_cpu_initfn(Object *obj)
->  {
->      M68kCPU *cpu = M68K_CPU(obj);
->      CPUM68KState *env = &cpu->env;
->  
-> -    m68020_cpu_initfn(obj);
-> +    m680x0_cpu_common(env);
-> +    m68k_set_feature(env, M68K_FEATURE_MMU68040);
->      m68k_set_feature(env, M68K_FEATURE_M68040);
->  }
->  
-> @@ -166,6 +181,7 @@ static void m68060_cpu_initfn(Object *obj)
->      m68k_set_feature(env, M68K_FEATURE_BKPT);
->      m68k_set_feature(env, M68K_FEATURE_RTD);
->      m68k_set_feature(env, M68K_FEATURE_CHK2);
-> +    m68k_set_feature(env, M68K_FEATURE_MMU68060);
->  }
->  
->  static void m5208_cpu_initfn(Object *obj)
-> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
-> index 20de3c379a..36e4353b44 100644
-> --- a/target/m68k/cpu.h
-> +++ b/target/m68k/cpu.h
-> @@ -483,6 +483,10 @@ enum m68k_features {
->      M68K_FEATURE_CHK2,
->      M68K_FEATURE_M68040, /* instructions specific to MC68040 */
->      M68K_FEATURE_MOVEP,
-> +    M68K_FEATURE_MMU68851,
-> +    M68K_FEATURE_MMU68030,
-> +    M68K_FEATURE_MMU68040,
-> +    M68K_FEATURE_MMU68060,
->  };
->  
->  static inline int m68k_feature(CPUM68KState *env, int feature)
-> diff --git a/target/m68k/helper.c b/target/m68k/helper.c
-> index ae766a6cb0..b5758bbd7d 100644
-> --- a/target/m68k/helper.c
-> +++ b/target/m68k/helper.c
-> @@ -205,7 +205,13 @@ void HELPER(m68k_movec_to)(CPUM68KState *env,
-> uint32_t reg, uint32_t val) return;
->      /* MC680[234]0 */
->      case M68K_CR_CACR:
-> -        env->cacr = val;
-> +        if (m68k_feature(env, M68K_FEATURE_MMU68040)) {
+> diff --cc hw/s390x/s390-virtio-ccw.c
+> index cb5fe4c84d,e0e28139a2..0000000000
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@@ -645,9 -658,10 +658,13 @@@ static void ccw_machine_4_2_instance_op
+> 
+>   static void ccw_machine_4_2_class_options(MachineClass *mc)
+>   {
+> ++<<<<<<< HEAD
+> ++=======
+> +     ccw_machine_5_0_class_options(mc);
+> ++>>>>>>> remotes/cohuck/tags/s390x-20191213  
+>       compat_props_add(mc->compat_props, hw_compat_4_2, hw_compat_4_2_len);
+>   }
+> - DEFINE_CCW_MACHINE(4_2, "4.2", true);
+> + DEFINE_CCW_MACHINE(4_2, "4.2", false);
+> 
+>   static void ccw_machine_4_1_instance_options(MachineState *machine)
+>   {
+> 
+> 
+> I don't know whether we want the 'true' or 'false' version...
+> 
+> Could you rebase and resend, please?
+> 
+> thanks
+> -- PMM
+> 
 
-Why is the *Cache* control register tied to an MMU feature?
-Maybe use M68K_FEATURE_M68040 instead? Or call the new flag
-M68K_FEATURE_CACHE040 instead?
+Yes, that's because 5f2585772fff ("virtio-blk: advertise F_WCE
+(F_FLUSH) if F_CONFIG_WCE is advertised") introduced 4.2 compat options
+before introducing the 5.0 machine types :/
 
-> +            env->cacr = val & 0x80008000;
-> +        } else if (m68k_feature(env, M68K_FEATURE_MMU68030)) {
-> +            env->cacr = val & 0x00003fff;
+Will send a rebased version.
 
-That seems to be too much, according to my MC68030 UM, there are some
-bits tied to zero inbetween. The correct mask should be 0x3f1f, I think.
-
-> +        } else if (m68k_feature(env, M68K_FEATURE_MMU68851)) {
-> +            env->cacr = val & 0x0000000f;
-> +        }
-
-What about the 68060? It has yet another set of bits in the CACR...
-
->          m68k_switch_sp(env);
->          return;
->      /* MC680[34]0 */
-> @@ -261,7 +267,13 @@ uint32_t HELPER(m68k_movec_from)(CPUM68KState
-> *env, uint32_t reg) return env->vbr;
->      /* MC680[234]0 */
->      case M68K_CR_CACR:
-> -        return env->cacr;
-> +        if (m68k_feature(env, M68K_FEATURE_MMU68040)) {
-> +            return env->cacr & 0x80008000;
-> +        } else if (m68k_feature(env, M68K_FEATURE_MMU68030)) {
-> +            return env->cacr & 0x00003fff;
-> +        } else if (m68k_feature(env, M68K_FEATURE_MMU68851)) {
-> +            return env->cacr & 0x0000000f;
-> +        }
-
-Wouldn't it be enough to do the masking either only during the "from"
-or during the "to" move? If you want to do it for both, I'd suggest to
-declare a little helper function for the masking instead, so that you
-don't have to repeat the code.
-
- Thomas
 
