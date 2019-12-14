@@ -8,78 +8,78 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	MENTIONS_GIT_HOSTING,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0DC2C43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 23:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F880C43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 23:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93C99206D8
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 23:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5385420706
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 23:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iAsPxaE1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C99206D8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o+t6k81d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5385420706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igGux-0006Hg-NF
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 18:33:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33590)
+	id 1igGxg-0007mq-EE
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 18:36:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52479)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1igGti-0005IT-0z
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 18:32:31 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1igGwu-0007MY-Gm
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 18:35:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1igGtg-0008Sf-9b
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 18:32:29 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46890)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1igGwt-00089q-1E
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 18:35:48 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:40670)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1igGtg-0008ML-1M; Sat, 14 Dec 2019 18:32:28 -0500
-Received: by mail-oi1-x242.google.com with SMTP id a124so2622558oii.13;
- Sat, 14 Dec 2019 15:32:26 -0800 (PST)
+ id 1igGws-00086d-PV; Sat, 14 Dec 2019 18:35:46 -0500
+Received: by mail-oi1-x241.google.com with SMTP id 6so2652038oix.7;
+ Sat, 14 Dec 2019 15:35:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=Y4NaC/znUTa69ELyXuJE/GuLuxb3fChZEcuPQJ1GAdA=;
- b=iAsPxaE1WJG02IC/aAvIaTu7HP7Q+jouzFFYpZl6ezCPN3Pz7jDR54icHcm89uaXWv
- 1k09DyiBgMduiwxeBeVqRA8zk59GP3J1AMtNklyLdCS/EcOoKAJaPoH4K/c7oQd+JDXO
- +6TlMLnMfw1EeCDzIoiYFsRGCpsEiiA0BzHzhQNoQg4UBsPsCG6DXvDp2rDOnV5A8TBW
- iN8H/AtDFyj8RthCD1kYR9u80/OO4WxC9/sbJ9MPrYxorgTk8uaiJN3KXObuWKVCXkeK
- HPM6xbDhEmc0reXukFuMZyX1vet9RySE6uVK3qXzdvAQBt2zZcM2vZBTWyy2ZalhXU4J
- XNcQ==
+ :cc; bh=alKby2HQ8O/eZnC/VPF2517t9OEB3x15CojX2zko3u0=;
+ b=o+t6k81dEdtzZYbixoKZaKYJqKcbv29f+njeLBS1VKdnt6VOoNqYCw9vl+dOJfz0Wb
+ QDxox9uUB3Ez2uGjyD9v+ffD9j+DDNkrbwZXMHgwxHFktqfqMLrVS4m+uH/kwtXnbQir
+ BN8oZR/KnBDOCoTxtZuPkCOqBDn6oXBJxDClyAMbPBxKT0YL8b5uvZwSMBaPj/QtY5bm
+ nul5vFKQzZUJBZutv2gx5ymM6MrA5N2a/9zgZipEWgwDK5BHZRpvnPw0AZp+dPEChwHZ
+ Qso1UGjDUt3OFxdkIySzG38OOfr93aHxdSL+/x/uTFM3iRzW67UKeEAcNpOlEt9vETG5
+ wN1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=Y4NaC/znUTa69ELyXuJE/GuLuxb3fChZEcuPQJ1GAdA=;
- b=sIdA6gOEjnE57NY9tBDSkiKhKOZJyW9gqNziqi/5YBWLqD/V/D5JXviiK0SDmmUIRX
- OAXjN7lerb8ccxEVa6Fbz1RXxkTFgAQS5RDaB1apjKBVLuBtvKmRvOBm/yU44ZfqRvKg
- 0GFuBzbdv1Oe92ccJX2C1whC9dw89GkBk91WDlNWMXRGFHV3bxoAifHzYhLAksqF02l+
- EiNEuW0gF7h+Tb+n/poZDLp1c+hdUaO6AHzUDwAXuNK/2rpkYayOV/Axa2t9I2Vy5ZfY
- s+bQcw6M7moFy/nn8ruY1cux+BdurA9HhjjUhTU8z2QbB1F89IfUu/PgDgOaMwqDfY2B
- ZEAQ==
-X-Gm-Message-State: APjAAAVNMUrgLQF88HglUSQ21gKRvSE5IgfrlhMYYE819R6FL71ejiEO
- MXuqHuPxvPV6Ingb5Qh2RnV6aomp4ka6cEHoyfE=
-X-Google-Smtp-Source: APXvYqyFlHkTaEX5nCzkeYXkyUkE62eyivtzN6m0WTgzPJyue3bTH6jpqKEle250uK37n7OHk7NG1QPd0OvdN4vaz3g=
-X-Received: by 2002:a05:6808:98b:: with SMTP id
- a11mr9000740oic.62.1576366345487; 
- Sat, 14 Dec 2019 15:32:25 -0800 (PST)
+ bh=alKby2HQ8O/eZnC/VPF2517t9OEB3x15CojX2zko3u0=;
+ b=UP481JbGoeVQwrplReWDVX1z5NLA3ezCsKCMXGmkfDWWFuwHuVTXb/WF998fxm3tHo
+ Yc/CIk8J0RNR8ew2pnYt/XPM6LuaKsbBfupNxtcLaNLWuONx20QMpy+iobZ80guwxFQB
+ LL1jgI9Avk3kOhBlk9iFXnMvSM9vsKLru6iR2WkaoQMwkB4Wm9TekSaSHvLw5rdJeAqL
+ onysNcQsdfpEi15LiyEQOHNOuYFkbNLPegAMfKTFaYFOem0ckmiABN/Ob4wWxhXPhQi+
+ kRBDdtj7pnonhXFrTsuYhmCdoZV2eQtQWpiW+eWi2wecn8saSVEpmJ4EK8OaxMlj6nkv
+ vY2A==
+X-Gm-Message-State: APjAAAXBc86O/8kGzcaUY0nqpWgKAoLA31XwkPfmj5xDVWBsRUgQLEw8
+ N1TAA+1UrFwhu2UiAjcP5nJoSZocje+vn7E2sTlH+w==
+X-Google-Smtp-Source: APXvYqyCV4Di/OufRFAZCpmf6bEv5C9D/UoqGpUGZIGqHOy/UEF20mOgRIaDioqlRSHxbtO7zJ+fdN86hCSRc1ZTQ8k=
+X-Received: by 2002:aca:bbc6:: with SMTP id l189mr8938517oif.53.1576366545667; 
+ Sat, 14 Dec 2019 15:35:45 -0800 (PST)
 MIME-Version: 1.0
 Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Sat, 14 Dec 2019 15:32:25 -0800 (PST)
-In-Reply-To: <alpine.LNX.2.21.1.1912150915460.8@nippy.intranet>
+ Sat, 14 Dec 2019 15:35:45 -0800 (PST)
+In-Reply-To: <CAL1e-=hRs0EMz7ZTt+GXMfyHW8arq-h-m1Dzd3jz+vqP82+zjA@mail.gmail.com>
 References: <cover.1576286757.git.fthain@telegraphics.com.au>
  <CAL1e-=gwxSDa1NSevcCbjG1r5vg6A49Kg_FP2EL1jW+BMn7Ghw@mail.gmail.com>
  <alpine.LNX.2.21.1.1912150915460.8@nippy.intranet>
+ <CAL1e-=hRs0EMz7ZTt+GXMfyHW8arq-h-m1Dzd3jz+vqP82+zjA@mail.gmail.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sun, 15 Dec 2019 00:32:25 +0100
-Message-ID: <CAL1e-=hRs0EMz7ZTt+GXMfyHW8arq-h-m1Dzd3jz+vqP82+zjA@mail.gmail.com>
+Date: Sun, 15 Dec 2019 00:35:45 +0100
+Message-ID: <CAL1e-=iTBxqCsNCbGpONdewE4uTDG=OAV36fF_Cq9=i6KQhMaA@mail.gmail.com>
 Subject: Re: [PATCH 00/10] Fixes for DP8393X SONIC device emulation
 To: Finn Thain <fthain@telegraphics.com.au>
-Content-Type: multipart/alternative; boundary="0000000000000f0bb90599b264b3"
+Content-Type: multipart/alternative; boundary="000000000000fd8e2e0599b26fab"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,82 +101,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000000f0bb90599b264b3
+--000000000000fd8e2e0599b26fab
 Content-Type: text/plain; charset="UTF-8"
 
-On Sunday, December 15, 2019, Finn Thain <fthain@telegraphics.com.au> wrote:
+On Sunday, December 15, 2019, Aleksandar Markovic <
+aleksandar.m.mail@gmail.com> wrote:
 
-> On Sat, 14 Dec 2019, Aleksandar Markovic wrote:
->
-> > On Saturday, December 14, 2019, Finn Thain <fthain@telegraphics.com.au>
-> > wrote:
-> >
-> > > Hi All,
-> > >
-> > > There is a bug in the DP8393X emulation that can stop packet reception.
-> > >
-> > >
-> > Can you provide the details of your test scenario?
-> >
-> > Thanks,
-> > Aleksandar
-> >
->
-> I test the qemu build like this,
->
-> qemu-system-m68k -M q800 -m 512M -serial none -serial mon:stdio -g
-> 800x600x4
-> -net nic,model=dp83932,addr=00:00:00:01:02:03
-> -net bridge,helper=/opt/qemu/libexec/qemu-bridge-helper,br=br0
-> -append "fbcon=font:ProFont6x11 console=tty0 console=ttyS0 ignore_loglevel"
-> -kernel vmlinux-4.14.157-mac-backport+
-> -initrd /mnt/loop/install/cdrom/initrd.gz
->
-> You can obtain this kernel binary from the linux-mac68k project on
-> sourceforge. (I usually use a mainline Linux build but it makes no
-> difference.)
->
-> I normally use a disk image with Debian/m68k SID rootfs but in this
-> example I've used the initrd that you can find on the Debian/m68k
-> installer ISO.
->
-> Once the guest starts, switch to a different virtual console and bring up
-> the SONIC:
->
-> <ctrl>-<a> <ctrl>-<a> <2>
-> # ip addr add dev eth0 192.168.65.2/24
-> # ip link set dev eth0 up
->
-> On the host, send a ping flood (with preload) to the guest:
->
-> # ifconfig br0 192.168.65.1/24
-> # ping 192.168.65.2 -f -l 20
->
-> The packet reception ("deaf sonic") issue is reproduced immediately.
->
-> This has been observed in both qemu-m68k and mainline qemu. See also,
-> https://github.com/vivier/qemu-m68k/commit/0a45280c9fa40da8d5f30b1bb3d051
-> 3db91c3909
 >
 >
-Finn,
+> On Sunday, December 15, 2019, Finn Thain <fthain@telegraphics.com.au>
+> wrote:
+>
+>> On Sat, 14 Dec 2019, Aleksandar Markovic wrote:
+>>
+>> > On Saturday, December 14, 2019, Finn Thain <fthain@telegraphics.com.au>
+>> > wrote:
+>> >
+>> > > Hi All,
+>> > >
+>> > > There is a bug in the DP8393X emulation that can stop packet
+>> reception.
+>> > >
+>> > >
+>> > Can you provide the details of your test scenario?
+>> >
+>> > Thanks,
+>> > Aleksandar
+>> >
+>>
+>> I test the qemu build like this,
+>>
+>> qemu-system-m68k -M q800 -m 512M -serial none -serial mon:stdio -g
+>> 800x600x4
+>> -net nic,model=dp83932,addr=00:00:00:01:02:03
+>> -net bridge,helper=/opt/qemu/libexec/qemu-bridge-helper,br=br0
+>> -append "fbcon=font:ProFont6x11 console=tty0 console=ttyS0
+>> ignore_loglevel"
+>> -kernel vmlinux-4.14.157-mac-backport+
+>> -initrd /mnt/loop/install/cdrom/initrd.gz
+>>
+>> You can obtain this kernel binary from the linux-mac68k project on
+>> sourceforge. (I usually use a mainline Linux build but it makes no
+>> difference.)
+>>
+>> I normally use a disk image with Debian/m68k SID rootfs but in this
+>> example I've used the initrd that you can find on the Debian/m68k
+>> installer ISO.
+>>
+>> Once the guest starts, switch to a different virtual console and bring up
+>> the SONIC:
+>>
+>> <ctrl>-<a> <ctrl>-<a> <2>
+>> # ip addr add dev eth0 192.168.65.2/24
+>> # ip link set dev eth0 up
+>>
+>> On the host, send a ping flood (with preload) to the guest:
+>>
+>> # ifconfig br0 192.168.65.1/24
+>> # ping 192.168.65.2 -f -l 20
+>>
+>> The packet reception ("deaf sonic") issue is reproduced immediately.
+>>
+>> This has been observed in both qemu-m68k and mainline qemu. See also,
+>> https://github.com/vivier/qemu-m68k/commit/0a45280c9fa40da8d
+>> 5f30b1bb3d0513db91c3909
+>>
+>>
+> Finn,
+>
+> I appreciate your detailed response!
+>
+> Aleksandar
+>
+>
 
-I appreciate your detailed response!
 
+Herve,
+
+Is there any way for us to come up with an equivalent or at least
+approximate scenario for Jazz machines?
+
+Regards,
 Aleksandar
 
---0000000000000f0bb90599b264b3
+--000000000000fd8e2e0599b26fab
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<br><br>On Sunday, December 15, 2019, Finn Thain &lt;<a href=3D"mailto:ftha=
-in@telegraphics.com.au">fthain@telegraphics.com.au</a>&gt; wrote:<br><block=
-quote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc=
- solid;padding-left:1ex">On Sat, 14 Dec 2019, Aleksandar Markovic wrote:<br=
->
+<br><br>On Sunday, December 15, 2019, Aleksandar Markovic &lt;<a href=3D"ma=
+ilto:aleksandar.m.mail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt; wrote=
+:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-le=
+ft:1px #ccc solid;padding-left:1ex"><br><br>On Sunday, December 15, 2019, F=
+inn Thain &lt;<a href=3D"mailto:fthain@telegraphics.com.au" target=3D"_blan=
+k">fthain@telegraphics.com.au</a>&gt; wrote:<br><blockquote class=3D"gmail_=
+quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1=
+ex">On Sat, 14 Dec 2019, Aleksandar Markovic wrote:<br>
 <br>
 &gt; On Saturday, December 14, 2019, Finn Thain &lt;<a href=3D"mailto:fthai=
-n@telegraphics.com.au">fthain@telegraphics.com.au</a>&gt;<br>
+n@telegraphics.com.au" target=3D"_blank">fthain@telegraphics.com.au</a>&gt;=
+<br>
 &gt; wrote:<br>
 &gt; <br>
 &gt; &gt; Hi All,<br>
@@ -195,13 +218,12 @@ I test the qemu build like this,<br>
 <br>
 qemu-system-m68k -M q800 -m 512M -serial none -serial mon:stdio -g 800x600x=
 4<br>
--net nic,model=3Ddp83932,addr=3D00:00:<wbr>00:01:02:03<br>
--net bridge,helper=3D/opt/qemu/<wbr>libexec/qemu-bridge-helper,br=3D<wbr>br=
-0<br>
+-net nic,model=3Ddp83932,addr=3D00:00:0<wbr>0:01:02:03<br>
+-net bridge,helper=3D/opt/qemu/libexe<wbr>c/qemu-bridge-helper,br=3Dbr0<br>
 -append &quot;fbcon=3Dfont:ProFont6x11 console=3Dtty0 console=3DttyS0 ignor=
 e_loglevel&quot;<br>
 -kernel vmlinux-4.14.157-mac-backport+<br>
--initrd /mnt/loop/install/cdrom/<wbr>initrd.gz<br>
+-initrd /mnt/loop/install/cdrom/initrd<wbr>.gz<br>
 <br>
 You can obtain this kernel binary from the linux-mac68k project on <br>
 sourceforge. (I usually use a mainline Linux build but it makes no <br>
@@ -231,12 +253,15 @@ ly.<br>
 <br>
 This has been observed in both qemu-m68k and mainline qemu. See also,<br>
 <a href=3D"https://github.com/vivier/qemu-m68k/commit/0a45280c9fa40da8d5f30=
-b1bb3d0513db91c3909" target=3D"_blank">https://github.com/vivier/<wbr>qemu-=
-m68k/commit/<wbr>0a45280c9fa40da8d5f30b1bb3d051<wbr>3db91c3909</a><br>
+b1bb3d0513db91c3909" target=3D"_blank">https://github.com/vivier/qemu<wbr>-=
+m68k/commit/0a45280c9fa40da8d<wbr>5f30b1bb3d0513db91c3909</a><br>
 <br>
 </blockquote><div><br></div><div>Finn,</div><div><br></div><div>I appreciat=
 e your detailed response!</div><div><br></div><div>Aleksandar</div><div>=C2=
-=A0</div>
+=A0</div></blockquote><div><br></div><div><br></div><div>Herve,</div><div><=
+br></div><div>Is there any way for us to come up with an equivalent or at l=
+east approximate scenario for Jazz machines?</div><div><br></div><div>Regar=
+ds,</div><div>Aleksandar=C2=A0</div>
 
---0000000000000f0bb90599b264b3--
+--000000000000fd8e2e0599b26fab--
 
