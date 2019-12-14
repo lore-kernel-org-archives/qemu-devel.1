@@ -2,103 +2,99 @@ Return-Path: <SRS0=ZS6r=2E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A8AC43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1FCC43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:20:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C24F920866
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:18:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DBF120866
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:20:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JpYlYY6G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C24F920866
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SdCp3WgS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DBF120866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igEne-00039d-QU
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 16:18:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45633)
+	id 1igEqH-0006BA-Rs
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 16:20:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43120)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1igEXA-0001TG-4z
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:01:05 -0500
+ (envelope-from <philmd@redhat.com>) id 1igEoe-0004Xx-Gb
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:19:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1igEX8-0004dQ-Qv
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:01:04 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34030
+ (envelope-from <philmd@redhat.com>) id 1igEoc-0007xb-1L
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:19:07 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48435
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1igEX8-0004bo-Lg
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:01:02 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1igEob-0007v2-Hn
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:19:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576357262;
+ s=mimecast20190719; t=1576358344;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=joKcrZqse/2rI2WBzidhVM6HneRljCD0MWlkHrQCOPM=;
- b=JpYlYY6GRr4O0aBKfZh5xMh4bbcZqDw4STW6G34dRxb9pxZk+AL18Fs6ADiuyMhTvTGksy
- K/Vsyq+z6LG8DVY85o5/g4tYqvuFbK5mj0W3uF+riFG4gYL8JC5SjddIn9prLEzMBP/WV1
- qWPSghjMVN8rpWnX3zzKVMY8VZNjpCc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-4COBcRMUPGGefyLNNGFApw-1; Sat, 14 Dec 2019 08:59:54 -0500
-Received: by mail-wr1-f72.google.com with SMTP id f10so1017207wro.14
- for <qemu-devel@nongnu.org>; Sat, 14 Dec 2019 05:59:54 -0800 (PST)
+ bh=y1WKTAAdK/tLnNkgos6Lk4vIt/+CYxOhkXdm02qtRI4=;
+ b=SdCp3WgSZYhtWzJy5xIYLDSGVCHuITzfoCvP3HVlsa6Wi4CY1pI7/dj6ch3pwaaEcTDb+8
+ qoFOcbeBG8ZqgFNo0HkWi5fsjxbK13fRUGUAzAKmWGOTgS3E1Lq93L1HuMCWVsi+CROvIJ
+ B9iyokMMsjICjY6YuzcJnYXpmtYQ0hs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-IRF1AYsgPJ29uxCrvvfezw-1; Sat, 14 Dec 2019 08:15:39 -0500
+Received: by mail-wr1-f69.google.com with SMTP id z15so986965wrw.0
+ for <qemu-devel@nongnu.org>; Sat, 14 Dec 2019 05:15:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=8ablovXuvhNSxsWx83+/G5FRg33eclyz++hORIZtpqw=;
- b=ZRTmp2qKeQKwjworT9cR1nkp8rjyk85RIJwvIN3wdsitv5HPfzMyGGKmXSTMgtxABu
- m2fsY0ashKCx4L79+G2PkZMa/If7btSrYdIfus5QCv1DbTM8PIuLMcdBoZ09kKby1KvX
- Wt9R9aQcNXapV4kRNlm3iUA5675fujNThKs7aqQsnlYZt3KsuYbwgEpTSAdEsYOvmLMb
- 0CC9nFwfcFyFEkLfTkRV4BI23PEEF+zwcMDnom+nj51cAnbHLRpLe0CVSQOqKiyQdf0v
- UarnO0DgrYpxL2EXae5J5ndwW0AwOdpyLdape2CMfqgF174Z11g63xBzqbx63Bogea0F
- 81Ag==
-X-Gm-Message-State: APjAAAVAE1vpxzM88pG11KbJVJGsE3AvyTv8VoQE8m+jtmbONmPIF8c0
- Pq0uFPgp01HCKX5YlnFL7GiUX6QcwcaZK8RgfaZJCWncPINRXFr1ATRMkF/bhEQ6KwLv1NnMhM1
- pB8Ro0dWWSHm5lE4=
-X-Received: by 2002:a05:600c:54b:: with SMTP id
- k11mr19359950wmc.63.1576331993073; 
- Sat, 14 Dec 2019 05:59:53 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwrx5HZOidI8oSBXFDAPClc+5D4C097hsRHKYDeM6nDsPjp5XZzhTAKSDZLvYNqNkzmNjJtHw==
-X-Received: by 2002:a05:600c:54b:: with SMTP id
- k11mr19359939wmc.63.1576331992865; 
- Sat, 14 Dec 2019 05:59:52 -0800 (PST)
+ bh=y1WKTAAdK/tLnNkgos6Lk4vIt/+CYxOhkXdm02qtRI4=;
+ b=RilfM5GqtPiM8Ubt3EHkQ6uGH6EahAd6XLf63OBQ/nkH4/ZQ3GRJFKOK6SEENWVk/V
+ p8NPl2l4uVBtK7vKSQjgN0Ta6Gvw7UDkFujYxgQkLABhdgoMefqALfHo2+W8fv2kmRNO
+ yhRTZBMLk6yWS8Xdehc5YnLmswrglMVVkebwhJHwH0Z0VKbC1D2UJjG6JG6kRibJn6VA
+ sjrx6b2NK+AlAIS48W7p2GsNcl2Eka2Q3/EtyMxVe7VykIIsy1NNeVA/m+3tWHZTSLCJ
+ 0lgUXDDzd2ew0/Lpf9oQev6n0+ozBq/02k2JM2NEuUmKIUn+lgBmCym5IUvuXUhR+P+z
+ yIjg==
+X-Gm-Message-State: APjAAAWJn0C6+FS4yMnARA0Kk3Rhunff5d5xSmCWXB0pQXF7Jx/8kX5b
+ iiHMtKrgLaYZlaXbb1b2l8brVR55igT0l8pdZJaaevtdnMsYP6caXkpxzmXPlRzF5GdOuHm5oNj
+ X9ZmWbxgTjlSO2OM=
+X-Received: by 2002:adf:fd07:: with SMTP id e7mr18437409wrr.21.1576329338165; 
+ Sat, 14 Dec 2019 05:15:38 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzq84gfzBloTd+YaV1BT/Az2HOxGWAqJysHV99UsnXBOidd/s4ulY5JkHbF69zA8OlNFY8LpQ==
+X-Received: by 2002:adf:fd07:: with SMTP id e7mr18437335wrr.21.1576329337246; 
+ Sat, 14 Dec 2019 05:15:37 -0800 (PST)
 Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id u10sm13781029wmd.1.2019.12.14.05.59.51
+ by smtp.gmail.com with ESMTPSA id e8sm13607070wrt.7.2019.12.14.05.15.36
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 14 Dec 2019 05:59:52 -0800 (PST)
-Subject: Re: [PATCH 09/10] arm: allwinner-h3: add SD/MMC host controller
-To: Niek Linnenbank <nieklinnenbank@gmail.com>
-References: <20191202210947.3603-1-nieklinnenbank@gmail.com>
- <20191202210947.3603-10-nieklinnenbank@gmail.com>
- <CAPan3WrRKnu5vFz=JvrnD8tewUk7SdwFVYx4xVL353AnfPDgHQ@mail.gmail.com>
- <6bee15d7-7d80-0709-ac90-ef2052b39329@redhat.com>
- <CAPan3Woq_EJAE6s-N5dAApAgzexGr4M-OtFkiHuMN_Xp=8_bTQ@mail.gmail.com>
+ Sat, 14 Dec 2019 05:15:36 -0800 (PST)
+Subject: Re: [PATCH 3/3] q800: add machine id register
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20191212200142.15688-1-laurent@vivier.eu>
+ <20191212200142.15688-4-laurent@vivier.eu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <457e0620-c11e-8e5a-df1c-93f95f52eda8@redhat.com>
-Date: Sat, 14 Dec 2019 14:59:51 +0100
+Message-ID: <147a4c04-3833-b812-977f-786f36c02bd6@redhat.com>
+Date: Sat, 14 Dec 2019 14:15:35 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <CAPan3Woq_EJAE6s-N5dAApAgzexGr4M-OtFkiHuMN_Xp=8_bTQ@mail.gmail.com>
+In-Reply-To: <20191212200142.15688-4-laurent@vivier.eu>
 Content-Language: en-US
-X-MC-Unique: 4COBcRMUPGGefyLNNGFApw-1
+X-MC-Unique: IRF1AYsgPJ29uxCrvvfezw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,99 +106,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beniamino Galvani <b.galvani@gmail.com>,
- Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/13/19 10:00 PM, Niek Linnenbank wrote:
-> On Fri, Dec 13, 2019 at 12:56 AM Philippe Mathieu-Daud=C3=A9=20
-> <philmd@redhat.com <mailto:philmd@redhat.com>> wrote:
->=20
->     Hi Niek,
->=20
->     On 12/11/19 11:34 PM, Niek Linnenbank wrote:
->      > Ping!
->      >
->      > Anyone would like to comment on this driver?
->      >
->      > I finished the rework on all previous comments in this series.
->      >
->      > Currently debugging the hflags error reported by Philippe.
->      > After that, I'm ready to send out v2 of these patches.
->      >
->      > Regards,
->      > Niek
->      >
->      > On Mon, Dec 2, 2019 at 10:10 PM Niek Linnenbank
->      > <nieklinnenbank@gmail.com <mailto:nieklinnenbank@gmail.com>
->     <mailto:nieklinnenbank@gmail.com <mailto:nieklinnenbank@gmail.com>>>
->     wrote:
->      >
->      >=C2=A0 =C2=A0 =C2=A0The Allwinner H3 System on Chip contains an int=
-egrated storage
->      >=C2=A0 =C2=A0 =C2=A0controller for Secure Digital (SD) and Multi Me=
-dia Card (MMC)
->      >=C2=A0 =C2=A0 =C2=A0interfaces. This commit adds support for the Al=
-lwinner H3
->      >=C2=A0 =C2=A0 =C2=A0SD/MMC storage controller with the following em=
-ulated features:
->      >
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0* DMA transfers
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0* Direct FIFO I/O
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0* Short/Long format command responses
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0* Auto-Stop command (CMD12)
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0* Insert & remove card detection
->      >
->      >=C2=A0 =C2=A0 =C2=A0Signed-off-by: Niek Linnenbank <nieklinnenbank@=
-gmail.com
->     <mailto:nieklinnenbank@gmail.com>
->      >=C2=A0 =C2=A0 =C2=A0<mailto:nieklinnenbank@gmail.com
->     <mailto:nieklinnenbank@gmail.com>>>
->      >=C2=A0 =C2=A0 =C2=A0---
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0hw/arm/allwinner-h3.c=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 20 +
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0hw/arm/orangepi.c=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 17 +
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0hw/sd/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A01 +
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0hw/sd/allwinner-h3-sdhost.c=C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0| 791
->     ++++++++++++++++++++++++++++
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0hw/sd/trace-events=C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A07 +
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0include/hw/arm/allwinner-h3.h=C2=A0 =C2=
-=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A02 +
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0include/hw/sd/allwinner-h3-sdhost.h |=C2=
-=A0 73 +++
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A07 files changed, 911 insertions(+)
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0create mode 100644 hw/sd/allwinner-h3-sd=
-host.c
->      >=C2=A0 =C2=A0 =C2=A0 =C2=A0create mode 100644 include/hw/sd/allwinn=
-er-h3-sdhost.h
-[...]
-> Thanks again for all of your helpful comments Philippe!
-> I've started to rework the patch.
->=20
-> One question about adding tags in the commit message: should I
-> already add 'Reviewed-by: ' when I re-send v2 of this patch? Or should
-> that be added after you have seen the v2 changes?
+On 12/12/19 9:01 PM, Laurent Vivier wrote:
+> MacOS reads this address to identify the hardware.
+> 
+> This is a basic implementation returning the ID of Quadra 800.
+> 
+> Details:
+> 
+>    http://mess.redump.net/mess/driver_info/mac_technical_notes
+> 
+> "There are 3 ID schemes [...]
+>   The third and most scalable is a machine ID register at 0x5ffffffc.
+>   The top word must be 0xa55a to be valid. Then bits 15-11 are 0 for
+>   consumer Macs, 1 for portables, 2 for high-end 68k, and 3 for high-end
+>   PowerPC. Bit 10 is 1 if additional ID bits appear elsewhere (e.g. in VIA1).
+>   The rest of the bits are a per-model identifier.
+> 
+>   Model                          Lower 16 bits of ID
+> ...
+>   Quadra/Centris 610/650/800     0x2BAD"
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>   hw/m68k/q800.c | 22 ++++++++++++++++++++++
+>   1 file changed, 22 insertions(+)
+> 
+> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+> index 9ee0cb1141..c2b2aa779f 100644
+> --- a/hw/m68k/q800.c
+> +++ b/hw/m68k/q800.c
+> @@ -97,6 +97,23 @@ static void main_cpu_reset(void *opaque)
+>       cpu->env.pc = ldl_phys(cs->as, 4);
+>   }
+>   
+> +static uint64_t machine_id_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    return 0xa55a2bad; /* Quadra 800 ID */
+> +}
+> +
+> +static void machine_id_write(void *opaque, hwaddr addr, uint64_t val,
+> +                             unsigned size)
+> +{
 
-You shouldn't add the Reviewed-by tag until explicitly given by the=20
-reviewer. If the changes are trivial, it is easy to conditionally give=20
-the tag such "If ... is done: R-b", "With ... fixed: R-b".
+Maybe worth adding:
 
-Since this is your first contribution, I have been more careful. Also=20
-since your patch is already of very good quality, I'v been a bit picky=20
-regarding few details.
+        qemu_log_mask(LOG_GUEST_ERROR, ...);
 
-Since there are too many comments, so I prefer to fully review the v2 of=20
-this patch again.
+> +}
+> +
+> +static const MemoryRegionOps machine_id_ops = {
+> +    .read = machine_id_read,
+> +    .write = machine_id_write,
+> +    .valid.min_access_size = 4,
+> +    .valid.max_access_size = 4,
 
-Regards,
+I think you want s/valid/impl/, because i.e. the guest could use 16-bit 
+access right?
 
-Phil.
+> +};
+> +
+>   static void q800_init(MachineState *machine)
+>   {
+>       M68kCPU *cpu = NULL;
+> @@ -110,6 +127,7 @@ static void q800_init(MachineState *machine)
+>       MemoryRegion *rom;
+>       MemoryRegion *ram;
+>       MemoryRegion *io;
+> +    MemoryRegion *machine_id;
+>       const int io_slice_nb = (IO_SIZE / IO_SLICE) - 1;
+>       int i;
+>       ram_addr_t ram_size = machine->ram_size;
+> @@ -159,6 +177,10 @@ static void q800_init(MachineState *machine)
+>           g_free(name);
+>       }
+>   
+> +    machine_id = g_malloc(sizeof(*machine_id));
+
+We now prefer g_new(MemoryRegion, 1).
+
+> +    memory_region_init_io(machine_id, NULL, &machine_id_ops, NULL, "Machine ID", 4);
+> +    memory_region_add_subregion(get_system_memory(), 0x5ffffffc, machine_id);
+
+To keep the style consistent, can you use a MACHINEID_BASE definition 
+instead?
+
+> +
+>       /* djMEMC memory and interrupt controller */
+>   
+>       djmemc_dev = qdev_create(NULL, TYPE_DJMEMC);
+> 
 
 
