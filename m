@@ -2,88 +2,82 @@ Return-Path: <SRS0=ZS6r=2E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A690EC43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 11:00:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8FAC43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 12:23:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 744E324125
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 11:00:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 744E324125
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 76DAF20706
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 12:23:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bvxRtN0Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76DAF20706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ig5AA-0008I2-9c
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 06:00:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41951)
+	id 1ig6SL-0006XZ-JP
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 07:23:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58468)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig586-0007Z3-8D
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:58:35 -0500
+ (envelope-from <thuth@redhat.com>) id 1ig6R2-0005vB-Vx
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 07:22:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig584-0005ay-Uv
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:58:33 -0500
-Received: from mail.ilande.co.uk ([46.43.2.167]:48462
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1ig584-0005WP-DT
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:58:32 -0500
-Received: from host86-191-82-191.range86-191.btcentralplus.com
- ([86.191.82.191] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1ig58v-0003jv-H7; Sat, 14 Dec 2019 10:59:25 +0000
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20191212200142.15688-1-laurent@vivier.eu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <c90975ff-7e20-8de3-1faf-60e542ab3413@ilande.co.uk>
-Date: Sat, 14 Dec 2019 10:58:30 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ (envelope-from <thuth@redhat.com>) id 1ig6Qz-00081c-HX
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 07:22:10 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23890
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ig6Qy-0007uz-RZ
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 07:22:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576326127;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=MiYsMXgGsFHfWNGUd03kBxtaFzsYHIdfW2UUfaxifrI=;
+ b=bvxRtN0ZpV3Vk46YhHObmpIfo3d4y8VD4TzNRM1J8zh0mowwm8YqAECobu29mM0QnZ42WT
+ fKdmMyWpLXZTtwZMymgtIaTG+aFLcZ2hQdNElRFHpZD0rp/V/V0sz2RAoH3l6O0VMKBz9S
+ U8YPS3YGiZg61WsxVICeGOtYgfNB/1I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-cZztHh_DO_yeBQktVlvZug-1; Sat, 14 Dec 2019 07:22:04 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC62A477;
+ Sat, 14 Dec 2019 12:22:03 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-80.ams2.redhat.com [10.36.116.80])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 84B965D9CA;
+ Sat, 14 Dec 2019 12:21:53 +0000 (UTC)
+Subject: Re: [PATCH] virtio-blk: deprecate SCSI passthrough
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20191213144626.1208237-1-stefanha@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <0d2e25dc-ff7a-e133-433a-faac5d6a45d2@redhat.com>
+Date: Sat, 14 Dec 2019 13:21:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191212200142.15688-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191213144626.1208237-1-stefanha@redhat.com>
 Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: cZztHh_DO_yeBQktVlvZug-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 86.191.82.191
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 0/3] q800: update machine emulation
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.43.2.167
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,47 +89,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>, Christoph Hellwig <hch@lst.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/12/2019 20:01, Laurent Vivier wrote:
-
-> On the way to run a MacOS ROM we need a more accurate
-> emulation of the Quadra 800.
+On 13/12/2019 15.46, Stefan Hajnoczi wrote:
+> The Linux virtio_blk.ko guest driver is removing legacy SCSI passthrough
+> support.  Deprecate this feature in QEMU too.
 > 
-> This series fixes the ESCC base address that was wrong but
-> as the linux kernel uses the one provided by the bootloader
-> (in our case QEMU) it was not a problem. This value
-> is hardcoded in the ROM, so QEMU must use the good one.
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  qemu-deprecated.texi | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 > 
-> The two other patches update the description of the machine
-> by introducing the djMEMC memory controller and the machine id
-> register.
-> 
-> Laurent Vivier (3):
->   q800: fix ESCC base
->   q800: add djMEMC memory controller
->   q800: add machine id register
-> 
->  MAINTAINERS              |   2 +
->  hw/m68k/Kconfig          |   1 +
->  hw/m68k/q800.c           |  85 +++++++++----------
->  hw/misc/Kconfig          |   3 +
->  hw/misc/Makefile.objs    |   1 +
->  hw/misc/djmemc.c         | 176 +++++++++++++++++++++++++++++++++++++++
->  hw/misc/trace-events     |   4 +
->  include/hw/misc/djmemc.h |  34 ++++++++
->  8 files changed, 260 insertions(+), 46 deletions(-)
->  create mode 100644 hw/misc/djmemc.c
->  create mode 100644 include/hw/misc/djmemc.h
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index 4b4b7425ac..ef94d497da 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -285,6 +285,17 @@ spec you can use the ``-cpu rv64gcsu,priv_spec=v1.9.1`` command line argument.
+>  
+>  @section Device options
+>  
+> +@subsection Emulated device options
+> +
+> +@subsubsection -device virtio-blk,scsi=on|off (since 5.0.0)
+> +
+> +The virtio-blk SCSI passthrough feature is a legacy VIRTIO feature.  VIRTIO 1.0
+> +and later do not support it because the virtio-scsi device was introduced for
+> +full SCSI support.  Use virtio-scsi instead when SCSI passthrough is required.
+> +
+> +Note this also applies to ``-device virtio-blk-pci,scsi=on|off'', which is an
+> +alias.
 
-I think this is mostly there other than a few minor style and other tweaks, however
-I'm wondering that since the q800 seems to have a few esoteric devices if it is worth
-creating a separate subdirectory for them all under hw/misc/mac or similar?
+... and "-device virtio-blk-ccw,scsi=on|off". With that added:
 
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-ATB,
-
-Mark.
 
