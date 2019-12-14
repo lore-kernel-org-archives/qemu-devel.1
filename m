@@ -2,69 +2,51 @@ Return-Path: <SRS0=ZS6r=2E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A1A7C43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 22:52:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CE04C43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 23:17:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11A9D20706
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 22:52:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11A9D20706
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id CD7B720724
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 23:17:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD7B720724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igGHD-0005vQ-8q
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 17:52:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33233)
+	id 1igGey-0006pV-UR
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 18:17:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33699)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1igGGf-0005JG-8u
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 17:52:10 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1igGeC-0006Fy-FJ
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 18:16:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1igGGc-0003Yf-Gb
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 17:52:08 -0500
-Resent-Date: Sat, 14 Dec 2019 17:52:07 -0500
-Resent-Message-Id: <E1igGGc-0003Yf-Gb@eggs.gnu.org>
-Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21196)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1igGGb-0003Wj-BL
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 17:52:06 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1576363920; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=SDd7fBCTuZYmFB5ZdpXvVQCqB4wEONgRIzdGdXVrkm2vdCStyYX5RuryotnBcj5huNEBPD43aQKQicnjYHu0X/j3DBOYIsirEEUiNpniRUTgkzbPje6bX1j1fYAKMovjvUCQKxqftaNEQ4o1rpqr2TJCXSMuQ5gaBzeRUOGm2Xc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1576363920;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=aqqGk0a10/rPZl05aGrsHiHsIaZuHQfvOwH7mr0MIMQ=; 
- b=i9qkSTi1FWqZztkZEZyE7XPULTUjfGC2Ieo4Xzrqy/8iq1lDMU6HxPXdW3qR6+4lJbDmwDoWV+tMwQwG3/RFoR12jBfz7ReQtzS8dUI71156z/PMupxqP8abu80tH1vCoAmSvOg7TGtly9RWkiTFfjMXM7pwlSPij/iww8uDD6k=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1576363919350906.9678499416525;
- Sat, 14 Dec 2019 14:51:59 -0800 (PST)
-In-Reply-To: <20191214121347.17071-1-joakim.tjernlund@infinera.com>
-Subject: Re: [PATCH] ppc: remove excessive logging
-Message-ID: <157636391850.20418.3375562763974198993@37313f22b938>
+ (envelope-from <fthain@telegraphics.com.au>) id 1igGeB-0003bq-51
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 18:16:28 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:55270)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <fthain@telegraphics.com.au>)
+ id 1igGeB-0003UP-0s; Sat, 14 Dec 2019 18:16:27 -0500
+Received: from localhost (localhost.localdomain [127.0.0.1])
+ by kvm5.telegraphics.com.au (Postfix) with ESMTP id 5F5F923F85;
+ Sat, 14 Dec 2019 18:16:21 -0500 (EST)
+Date: Sun, 15 Dec 2019 10:16:18 +1100 (AEDT)
+From: Finn Thain <fthain@telegraphics.com.au>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Subject: Re: [PATCH 00/10] Fixes for DP8393X SONIC device emulation
+In-Reply-To: <CAL1e-=gwxSDa1NSevcCbjG1r5vg6A49Kg_FP2EL1jW+BMn7Ghw@mail.gmail.com>
+Message-ID: <alpine.LNX.2.21.1.1912150915460.8@nippy.intranet>
+References: <cover.1576286757.git.fthain@telegraphics.com.au>
+ <CAL1e-=gwxSDa1NSevcCbjG1r5vg6A49Kg_FP2EL1jW+BMn7Ghw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: joakim.tjernlund@infinera.com
-Date: Sat, 14 Dec 2019 14:51:59 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.51
+Content-Type: text/plain; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 98.124.60.144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,40 +58,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: Joakim.Tjernlund@infinera.com, qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+ Herve Poussineau <hpoussin@reactos.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTIxNDEyMTM0Ny4xNzA3
-MS0xLWpvYWtpbS50amVybmx1bmRAaW5maW5lcmEuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
-ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
-Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0hdIHBwYzogcmVtb3ZlIGV4Y2Vz
-c2l2ZSBsb2dnaW5nClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MTIxNDEyMTM0Ny4xNzA3
-MS0xLWpvYWtpbS50amVybmx1bmRAaW5maW5lcmEuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
-PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
-Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKZmF0YWw6IGZhaWxlZCB0byB3cml0ZSByZWYtcGFjayBmaWxlCmZhdGFs
-OiBUaGUgcmVtb3RlIGVuZCBodW5nIHVwIHVuZXhwZWN0ZWRseQpUcmFjZWJhY2sgKG1vc3QgcmVj
-ZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAicGF0Y2hldy10ZXN0ZXIyL3NyYy9wYXRjaGV3LWNsaSIs
-IGxpbmUgNTMxLCBpbiB0ZXN0X29uZQogICAgZ2l0X2Nsb25lX3JlcG8oY2xvbmUsIHJbInJlcG8i
-XSwgclsiaGVhZCJdLCBsb2dmLCBUcnVlKQogIEZpbGUgInBhdGNoZXctdGVzdGVyMi9zcmMvcGF0
-Y2hldy1jbGkiLCBsaW5lIDYyLCBpbiBnaXRfY2xvbmVfcmVwbwogICAgc3VicHJvY2Vzcy5jaGVj
-a19jYWxsKGNsb25lX2NtZCwgc3RkZXJyPWxvZ2YsIHN0ZG91dD1sb2dmKQogIEZpbGUgIi9vcHQv
-cmgvcmgtcHl0aG9uMzYvcm9vdC91c3IvbGliNjQvcHl0aG9uMy42L3N1YnByb2Nlc3MucHkiLCBs
-aW5lIDI5MSwgaW4gY2hlY2tfY2FsbAogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNv
-ZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snZ2l0Jywg
-J2Nsb25lJywgJy1xJywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9wYXRjaGV3LWdpdC1jYWNoZS9o
-dHRwc2dpdGh1YmNvbXBhdGNoZXdwcm9qZWN0cWVtdS0zYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVm
-N2Y0NGJkODg4NzEzMzg0JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1ycDF4c2VpeC9z
-cmMnXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMTI4LgoKCgpUaGUgZnVsbCBsb2cg
-aXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMjE0MTIxMzQ3LjE3
-MDcxLTEtam9ha2ltLnRqZXJubHVuZEBpbmZpbmVyYS5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90
-eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
-IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Sat, 14 Dec 2019, Aleksandar Markovic wrote:
+
+> On Saturday, December 14, 2019, Finn Thain <fthain@telegraphics.com.au>
+> wrote:
+> 
+> > Hi All,
+> >
+> > There is a bug in the DP8393X emulation that can stop packet reception.
+> >
+> >
+> Can you provide the details of your test scenario?
+> 
+> Thanks,
+> Aleksandar
+> 
+
+I test the qemu build like this,
+
+qemu-system-m68k -M q800 -m 512M -serial none -serial mon:stdio -g 800x600x4
+-net nic,model=dp83932,addr=00:00:00:01:02:03
+-net bridge,helper=/opt/qemu/libexec/qemu-bridge-helper,br=br0
+-append "fbcon=font:ProFont6x11 console=tty0 console=ttyS0 ignore_loglevel"
+-kernel vmlinux-4.14.157-mac-backport+
+-initrd /mnt/loop/install/cdrom/initrd.gz
+
+You can obtain this kernel binary from the linux-mac68k project on 
+sourceforge. (I usually use a mainline Linux build but it makes no 
+difference.)
+
+I normally use a disk image with Debian/m68k SID rootfs but in this 
+example I've used the initrd that you can find on the Debian/m68k 
+installer ISO.
+
+Once the guest starts, switch to a different virtual console and bring up 
+the SONIC:
+
+<ctrl>-<a> <ctrl>-<a> <2>
+# ip addr add dev eth0 192.168.65.2/24
+# ip link set dev eth0 up
+
+On the host, send a ping flood (with preload) to the guest:
+
+# ifconfig br0 192.168.65.1/24
+# ping 192.168.65.2 -f -l 20
+
+The packet reception ("deaf sonic") issue is reproduced immediately.
+
+This has been observed in both qemu-m68k and mainline qemu. See also,
+https://github.com/vivier/qemu-m68k/commit/0a45280c9fa40da8d5f30b1bb3d0513db91c3909
 
 
