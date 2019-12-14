@@ -2,48 +2,47 @@ Return-Path: <SRS0=ZS6r=2E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B8AC43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEA8CC43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:52:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F35420706
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:50:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F35420706
+	by mail.kernel.org (Postfix) with ESMTPS id 7D84724125
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:52:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D84724125
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ig504-0003Ga-Jc
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 05:50:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55011)
+	id 1ig51u-0004Tc-KO
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 05:52:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51489)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig4zP-0002rT-It
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:49:36 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig51C-00042P-Sm
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:51:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig4zN-00088C-UU
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:49:35 -0500
-Received: from mail.ilande.co.uk ([46.43.2.167]:48424
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig51A-00037A-BM
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:51:25 -0500
+Received: from mail.ilande.co.uk ([46.43.2.167]:48438
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1ig4zN-00087U-J8; Sat, 14 Dec 2019 05:49:33 -0500
+ id 1ig51A-00032s-1O
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:51:24 -0500
 Received: from host86-191-82-191.range86-191.btcentralplus.com
  ([86.191.82.191] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1ig4y7-0003gU-7r; Sat, 14 Dec 2019 10:48:15 +0000
-To: Laurent Vivier <laurent@vivier.eu>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20191212194359.13508-1-laurent@vivier.eu>
- <20191213014419.GA207300@umbus.fritz.box>
- <68431265-fd33-89de-6a61-0c823beaa16e@vivier.eu>
+ id 1ig51y-0003hm-1d; Sat, 14 Dec 2019 10:52:17 +0000
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20191212200142.15688-1-laurent@vivier.eu>
+ <20191212200142.15688-2-laurent@vivier.eu>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
@@ -69,18 +68,18 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <9c731591-3180-d9f8-e5f9-d1b34356664b@ilande.co.uk>
-Date: Sat, 14 Dec 2019 10:47:19 +0000
+Message-ID: <96416004-9170-15e4-313c-5aa195fcb4b8@ilande.co.uk>
+Date: Sat, 14 Dec 2019 10:51:19 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <68431265-fd33-89de-6a61-0c823beaa16e@vivier.eu>
+In-Reply-To: <20191212200142.15688-2-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 86.191.82.191
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH] mos6522: remove anh register
+Subject: Re: [PATCH 1/3] q800: fix ESCC base
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -97,38 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/12/2019 08:45, Laurent Vivier wrote:
+On 12/12/2019 20:01, Laurent Vivier wrote:
 
-> Le 13/12/2019 à 02:44, David Gibson a écrit :
->> On Thu, Dec 12, 2019 at 08:43:59PM +0100, Laurent Vivier wrote:
->>> Register addr 1 is defined as buffer A with handshake (vBufAH),
->>> register addr 15 is also defined as buffer A without handshake (vBufA).
->>>
->>> Linux kernel has a big "DON'T USE!" next to the register 1 addr
->>> definition (vBufAH), and only uses register 15 (vBufA).
->>>
->>> So remove the definition of 'anh' and use only 'a' (with VIA_REG_ANH and
->>> VIA_REG_A).
->>
->> I'm not actually following the rationale for removing the register.
->> Linux doesn't use it, but if it's part of the real hardware model we
->> should keep it, no?
+> 0xc020 is for Q900/Q950, Q800 uses 0xc000.
+> This value was provided to the kernel, this explains why it was working
+> even with wrong value
 > 
-> It's actually two methods to access the same register (with handshake,
-> without handshake).
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  hw/m68k/q800.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> In the datashit Register 15 is described as "Same as register 1 except
-> no handshake".
+> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+> index 4ca8678007..ef0014f4c4 100644
+> --- a/hw/m68k/q800.c
+> +++ b/hw/m68k/q800.c
+> @@ -67,7 +67,7 @@
+>  #define VIA_BASE              (IO_BASE + 0x00000)
+>  #define SONIC_PROM_BASE       (IO_BASE + 0x08000)
+>  #define SONIC_BASE            (IO_BASE + 0x0a000)
+> -#define SCC_BASE              (IO_BASE + 0x0c020)
+> +#define SCC_BASE              (IO_BASE + 0x0c000)
+>  #define ESP_BASE              (IO_BASE + 0x10000)
+>  #define ESP_PDMA              (IO_BASE + 0x10100)
+>  #define ASC_BASE              (IO_BASE + 0x14000)
 
-Indeed, certainly my reading of the specification was that it was the same register.
-I'd be inclined to add qemu_log() at unimp for the handshake registers so at least we
-can easily spot if anything is using them.
+I *think* this is correct (see the off-list message I've sent you) since if you
+assume a CHRP-like mapping then even with a base of 0xc000 then an access to 0xc020
+could potentially still be hitting the ESCC registers, but I'm not confident enough
+to give it an R-B tag :/
 
 
 ATB,
