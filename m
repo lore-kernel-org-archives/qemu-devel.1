@@ -2,45 +2,48 @@ Return-Path: <SRS0=ZS6r=2E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E219DC43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:47:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0B8AC43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:50:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B05FB20700
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:47:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B05FB20700
+	by mail.kernel.org (Postfix) with ESMTPS id 6F35420706
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:50:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F35420706
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ig4wx-0001xR-Ta
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 05:47:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44481)
+	id 1ig504-0003Ga-Jc
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 05:50:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55011)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig4wM-0001R1-00
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:46:27 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig4zP-0002rT-It
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:49:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig4wJ-0002oH-Oj
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:46:25 -0500
-Received: from mail.ilande.co.uk ([46.43.2.167]:48408
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig4zN-00088C-UU
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:49:35 -0500
+Received: from mail.ilande.co.uk ([46.43.2.167]:48424
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1ig4wE-0001Sz-Tq; Sat, 14 Dec 2019 05:46:19 -0500
+ id 1ig4zN-00087U-J8; Sat, 14 Dec 2019 05:49:33 -0500
 Received: from host86-191-82-191.range86-191.btcentralplus.com
  ([86.191.82.191] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1ig4tx-0003f9-7q; Sat, 14 Dec 2019 10:43:57 +0000
-To: bilalwasim676@gmail.com, qemu-devel@nongnu.org
-References: <20191210140617.16656-1-bilalwasim676@gmail.com>
+ id 1ig4y7-0003gU-7r; Sat, 14 Dec 2019 10:48:15 +0000
+To: Laurent Vivier <laurent@vivier.eu>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20191212194359.13508-1-laurent@vivier.eu>
+ <20191213014419.GA207300@umbus.fritz.box>
+ <68431265-fd33-89de-6a61-0c823beaa16e@vivier.eu>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
@@ -66,19 +69,18 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <21af53f8-a057-b9d4-c6ff-29c3f1df5d69@ilande.co.uk>
-Date: Sat, 14 Dec 2019 10:43:01 +0000
+Message-ID: <9c731591-3180-d9f8-e5f9-d1b34356664b@ilande.co.uk>
+Date: Sat, 14 Dec 2019 10:47:19 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191210140617.16656-1-bilalwasim676@gmail.com>
+In-Reply-To: <68431265-fd33-89de-6a61-0c823beaa16e@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.191.82.191
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v3] net/imx_fec: Adding support for MAC filtering in the
- FEC IP implementation.
+Subject: Re: [PATCH] mos6522: remove anh register
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -95,224 +97,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, jasowang@redhat.com, qemu-arm@nongnu.org,
- philmd@redhat.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/12/2019 14:06, bilalwasim676@gmail.com wrote:
+On 13/12/2019 08:45, Laurent Vivier wrote:
 
-> From: bwasim <bilalwasim676@gmail.com>
+> Le 13/12/2019 à 02:44, David Gibson a écrit :
+>> On Thu, Dec 12, 2019 at 08:43:59PM +0100, Laurent Vivier wrote:
+>>> Register addr 1 is defined as buffer A with handshake (vBufAH),
+>>> register addr 15 is also defined as buffer A without handshake (vBufA).
+>>>
+>>> Linux kernel has a big "DON'T USE!" next to the register 1 addr
+>>> definition (vBufAH), and only uses register 15 (vBufA).
+>>>
+>>> So remove the definition of 'anh' and use only 'a' (with VIA_REG_ANH and
+>>> VIA_REG_A).
+>>
+>> I'm not actually following the rationale for removing the register.
+>> Linux doesn't use it, but if it's part of the real hardware model we
+>> should keep it, no?
 > 
-> This addition ensures that the IP does NOT boot up in promiscuous mode
-> by default, and so the software only receives the desired
-> packets(Unicast, Broadcast, Unicast / Multicast hashed) by default.
-> The software running on-top of QEMU can also modify these settings and
-> disable reception of broadcast frames or make the IP receive all packets (PROM mode).
-> This patch greatly reduces the number of packets received by the
-> software running on-top of the QEMU model. Tested with the armv7-a SABRE_LITE machine.
-> Testing included running a custom OS with IPv4 / IPv6 support. Hashing
-> and filtering of packets is tested to work well. Skeleton taken from
-> the CADENCE_GEM IP and hash generation algorithm from the Linux Kernel.
+> It's actually two methods to access the same register (with handshake,
+> without handshake).
 > 
-> Signed-off-by: Bilal Wasim <bilalwasim676@gmail.com>
-> ---
->  hw/net/imx_fec.c         | 109 ++++++++++++++++++++++++++++++++++++++-
->  include/hw/net/imx_fec.h |  10 ++++
->  2 files changed, 118 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-> index bd99236864..d248f39fb0 100644
-> --- a/hw/net/imx_fec.c
-> +++ b/hw/net/imx_fec.c
-> @@ -419,6 +419,79 @@ static void imx_enet_write_bd(IMXENETBufDesc *bd, dma_addr_t addr)
->      dma_memory_write(&address_space_memory, addr, bd, sizeof(*bd));
->  }
->  
-> +/*
-> + * Calculate a FEC MAC Address hash index
-> + */
-> +static unsigned calc_mac_hash(const uint8_t *mac, uint8_t mac_length)
-> +{
-> +    uint32_t crc = net_crc32_le(mac, mac_length);
-> +
-> +    /*
-> +     * only upper 6 bits (FEC_HASH_BITS) are used
-> +     * which point to specific bit in the hash registers
-> +     */
-> +    return (crc >> (32 - FEC_HASH_BITS)) & 0x3f;
-> +}
+> In the datashit Register 15 is described as "Same as register 1 except
+> no handshake".
 
-Is it worth keeping this in a separate function? This appears to be a standard hash
-calculation and most other cards simply inline it like below:
-
-> +/*
-> + * fec_mac_address_filter:
-> + * Accept or reject this destination address?
-> + */
-> +static int fec_mac_address_filter(IMXFECState *s, const uint8_t *packet)
-> +{
-> +    const uint8_t broadcast_addr[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-> +    uint32_t addr1, addr2;
-> +    uint8_t  hash;
-> +
-> +    /* Promiscuous mode? */
-> +    if (s->regs[ENET_RCR] & ENET_RCR_PROM) {
-> +        /* Accept all packets in promiscuous mode (even if bc_rej is set). */
-> +        return FEC_RX_PROMISCUOUS_ACCEPT;
-> +    }
-> +
-> +    /* Broadcast packet? */
-> +    if (!memcmp(packet, broadcast_addr, 6)) {
-
-ETH_ALEN?
-
-> +        /* Reject broadcast packets? */
-> +        if (s->regs[ENET_RCR] & ENET_RCR_BC_REJ) {
-> +            return FEC_RX_REJECT;
-> +        }
-> +        /* Accept packets from broadcast address. */
-> +        return FEC_RX_BROADCAST_ACCEPT;
-> +    }
-> +
-> +    /* Accept packets -w- hash match? */
-> +    hash = calc_mac_hash(packet, 6);
-
-       hash = net_crc32_le(buf, ETH_ALEN) >> 26
-
-> +    /* Accept packets -w- multicast hash match? */
-> +    if ((packet[0] & 0x01) == 0x01) {
-> +        /* Computed hash matches GAUR / GALR register ? */
-> +        if (((hash < 32) && (s->regs[ENET_GALR] & (1 << hash)))
-> +                || ((hash > 31) && (s->regs[ENET_GAUR] & (1 << (hash - 32))))) {
-> +            /* Accept multicast hash enabled address. */
-> +            return FEC_RX_MULTICAST_HASH_ACCEPT;
-> +        }
-> +    } else {
-> +        /* Computed hash matches IAUR / IALR register ? */
-> +        if (((hash < 32) && (s->regs[ENET_IALR] & (1 << hash)))
-> +                || ((hash > 31) && (s->regs[ENET_IAUR] & (1 << (hash - 32))))) {
-> +            /* Accept multicast hash enabled address. */
-> +            return FEC_RX_UNICAST_HASH_ACCEPT;
-> +        }
-> +    }
-> +
-> +    /* Match Unicast address. */
-> +    addr1  = g_htonl(s->regs[ENET_PALR]);
-> +    addr2  = g_htonl(s->regs[ENET_PAUR]);
-> +    if (!(memcmp(packet, (uint8_t *) &addr1, 4) ||
-> +          memcmp(packet + 4, (uint8_t *) &addr2, 2))) {
-> +        /* Accept packet because it matches my unicast address. */
-> +        return FEC_RX_UNICAST_ACCEPT;
-> +    }
-> +
-> +    /* Return -1 because we do NOT support MAC address filtering.. */
-> +    return FEC_RX_REJECT;
-> +}
-> +
->  static void imx_eth_update(IMXFECState *s)
->  {
->      /*
-> @@ -984,7 +1057,7 @@ static void imx_eth_write(void *opaque, hwaddr offset, uint64_t value,
->      case ENET_IALR:
->      case ENET_GAUR:
->      case ENET_GALR:
-> -        /* TODO: implement MAC hash filtering.  */
-> +        s->regs[index] |= value;
->          break;
->      case ENET_TFWR:
->          if (s->is_fec) {
-> @@ -1066,8 +1139,15 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
->      uint32_t buf_addr;
->      uint8_t *crc_ptr;
->      unsigned int buf_len;
-> +    int maf;
->      size_t size = len;
->  
-> +    /* Is this destination MAC address "for us" ? */
-> +    maf = fec_mac_address_filter(s, buf);
-> +    if (maf == FEC_RX_REJECT) {
-> +        return FEC_RX_REJECT;
-> +    }
-> +
->      FEC_PRINTF("len %d\n", (int)size);
->  
->      if (!s->regs[ENET_RDAR]) {
-> @@ -1133,6 +1213,16 @@ static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
->          } else {
->              s->regs[ENET_EIR] |= ENET_INT_RXB;
->          }
-> +
-> +        /* Update descriptor based on the "maf" flag. */
-> +        if (maf == FEC_RX_BROADCAST_ACCEPT) {
-> +            /* The packet is destined for the "broadcast" address. */
-> +            bd.flags |= ENET_BD_BC;
-> +        } else if (maf == FEC_RX_MULTICAST_HASH_ACCEPT) {
-> +            /* The packet is destined for a "multicast" address. */
-> +            bd.flags |= ENET_BD_MC;
-> +        }
-> +
->          imx_fec_write_bd(&bd, addr);
->          /* Advance to the next descriptor.  */
->          if ((bd.flags & ENET_BD_W) != 0) {
-> @@ -1159,8 +1249,15 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
->      uint8_t *crc_ptr;
->      unsigned int buf_len;
->      size_t size = len;
-> +    int maf;
->      bool shift16 = s->regs[ENET_RACC] & ENET_RACC_SHIFT16;
->  
-> +    /* Is this destination MAC address "for us" ? */
-> +    maf = fec_mac_address_filter(s, buf);
-> +    if (maf == FEC_RX_REJECT) {
-> +        return FEC_RX_REJECT;
-> +    }
-> +
->      FEC_PRINTF("len %d\n", (int)size);
->  
->      if (!s->regs[ENET_RDAR]) {
-> @@ -1254,6 +1351,16 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
->                  s->regs[ENET_EIR] |= ENET_INT_RXB;
->              }
->          }
-> +
-> +        /* Update descriptor based on the "maf" flag. */
-> +        if (maf == FEC_RX_BROADCAST_ACCEPT) {
-> +            /* The packet is destined for the "broadcast" address. */
-> +            bd.flags |= ENET_BD_BC;
-> +        } else if (maf == FEC_RX_MULTICAST_HASH_ACCEPT) {
-> +            /* The packet is destined for a "multicast" address. */
-> +            bd.flags |= ENET_BD_MC;
-> +        }
-> +
->          imx_enet_write_bd(&bd, addr);
->          /* Advance to the next descriptor.  */
->          if ((bd.flags & ENET_BD_W) != 0) {
-> diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
-> index 7b3faa4019..f9cfcf6af5 100644
-> --- a/include/hw/net/imx_fec.h
-> +++ b/include/hw/net/imx_fec.h
-> @@ -275,4 +275,14 @@ typedef struct IMXFECState {
->      uint8_t frame[ENET_MAX_FRAME_SIZE];
->  } IMXFECState;
->  
-> +/* FEC address filtering defines. */
-> +#define FEC_RX_REJECT                   (-1)
-> +#define FEC_RX_PROMISCUOUS_ACCEPT       (-2)
-> +#define FEC_RX_BROADCAST_ACCEPT         (-3)
-> +#define FEC_RX_MULTICAST_HASH_ACCEPT    (-4)
-> +#define FEC_RX_UNICAST_HASH_ACCEPT      (-5)
-> +#define FEC_RX_UNICAST_ACCEPT           (-6)
-> +
-> +#define FEC_HASH_BITS                    6    /* #bits in hash */
-
-If you inline the hash calculation as above then this line is no longer required.
-
->  #endif
-
-I've done some bits on QEMU networking however I'm not familiar with this particular
-device which limits me somewhat for further review.
+Indeed, certainly my reading of the specification was that it was the same register.
+I'd be inclined to add qemu_log() at unimp for the handshake registers so at least we
+can easily spot if anything is using them.
 
 
 ATB,
