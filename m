@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 735A1C43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 02:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A7EDC43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 02:46:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3537D214AF
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 02:46:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57F1A214AF
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 02:46:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="ELjaNJLn";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="q5bLk/7R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3537D214AF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=alistair23.me header.i=@alistair23.me header.b="10N3/GNr";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="G5yBGaXw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57F1A214AF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=alistair23.me
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ifxRN-0005S2-JG
-	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 21:45:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56776)
+	id 1ifxRs-0005xD-Sm
+	for qemu-devel@archiver.kernel.org; Fri, 13 Dec 2019 21:46:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59544)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair@alistair23.me>) id 1ifxPv-0004Dx-30
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 21:44:29 -0500
+ (envelope-from <alistair@alistair23.me>) id 1ifxQ5-0004TB-QC
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 21:44:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair@alistair23.me>) id 1ifxPt-0000kg-3M
- for qemu-devel@nongnu.org; Fri, 13 Dec 2019 21:44:26 -0500
-Received: from out5-smtp.messagingengine.com ([66.111.4.29]:42297)
+ (envelope-from <alistair@alistair23.me>) id 1ifxQ2-00017Z-Uv
+ for qemu-devel@nongnu.org; Fri, 13 Dec 2019 21:44:37 -0500
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:59299)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <alistair@alistair23.me>)
- id 1ifxPo-0000ZP-Dm; Fri, 13 Dec 2019 21:44:20 -0500
+ id 1ifxPw-0000qq-7y; Fri, 13 Dec 2019 21:44:28 -0500
 Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailout.nyi.internal (Postfix) with ESMTP id 2820822381;
- Fri, 13 Dec 2019 21:44:20 -0500 (EST)
+ by mailout.nyi.internal (Postfix) with ESMTP id BE2FB2243D;
+ Fri, 13 Dec 2019 21:44:27 -0500 (EST)
 Received: from mailfrontend1 ([10.202.2.162])
- by compute7.internal (MEProxy); Fri, 13 Dec 2019 21:44:20 -0500
+ by compute7.internal (MEProxy); Fri, 13 Dec 2019 21:44:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alistair23.me;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm2; bh=Ycj47i8fK5kEa
- RcOR8Jj/ZfHwVQ6hNHq28ldpaD/6mk=; b=ELjaNJLnAn67Tw3GDymAsPIoPT+7T
- 6VuT42EkrMp8kZbWF2yxrTbZ/4g3nf1DgnD7OkeoKPYTUg1M60vtz/RDwNtxsKMP
- 3whWZVIEsuR5uuLIkMA5JvFaYCPY3j85lcrKXJwEOfEkcNy9npZKT6YYlTkW+gkw
- MjcTTF33VII2PCxqLGvFKzSc5Rp701F/T96oA3+oaEx6f5MamGHVMVIL7Z+mLLBr
- 7atMHpZ5Vk5Aai9g+V9G4JUy6fNnPEaP0LEQcAva6mbaLzfDftt06bXMlIs/CCQo
- SvqrJNoKRacj7258bpEcQXLz/6y28J89R0/K4Qq2Lw6k1p9uKpYA7XrEw==
+ :mime-version:content-transfer-encoding; s=fm2; bh=m26QZkWz9KVnh
+ sN6dgmfQqejETGJJk4nedcDJhtvacM=; b=10N3/GNrgTMyQyKsiLxpMr56YXvcL
+ RDBBfPqDKddCwlxT+j02wbAZdJLWHZOrtQrMvb8hM9hbWGiwiInNL7bKwyuHh3tx
+ Ck4ItYTmVN22I4r5dxG+N7aGaY0Q1N8lmYSxkj2yCwz/5kYP8HEzfZLzuthrQB2d
+ gd3wmL8V7+vLicOmqRnWEYN5PYw/tiXF/ZFObq6U+07Jl0pW9J5S8Eh0yR/Xikj5
+ KmW2D5X6Bna+4MN6YfUtVLrmfC5QlnjGRubVwglj5LvZ5U/t42xv717SedQX+hnF
+ tukNSA4LqncAfwSl01ktifQGIyCe3uWnG+yIxS1+2pHgfirylMsPUo3tg==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-transfer-encoding:date:from
  :in-reply-to:message-id:mime-version:references:subject:to
  :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm1; bh=Ycj47i8fK5kEaRcOR8Jj/ZfHwVQ6hNHq28ldpaD/6mk=; b=q5bLk/7R
- xAdkWeFb/1Cn9ulRsnSjegi9dvdTFZeYbyhIDQrs6fU+CQeh80Lpk+uunReVS1/+
- BKJ9qCQxVqyo182PwH74G2tfAoH8sEdvBBd20OpAat78DR4MVTKJLt0EM+PyzhlJ
- rtZIGYfVwAEIRzTbpoet6M8sfjK0jFAIYWY8FGQxUcTb7Vl9hLaaMnN+IdQLLq8Y
- 2L6EuYK1J0bJoe/5ycQWsa7j+wAt+YhfGxz9yvogbW9ywyVi5mTogiYlCCXbi8jh
- RWewJXicLljdMS3QT4b9mUfF0yiHimtUkA7iAiwABbFnH0/Must90h75ZIsOTPUY
- dzrlkowaV6wn8w==
-X-ME-Sender: <xms:hEz0XbduIHyymuhw2jPeJliEqmCNVnRAkromRTfFg-tEEnidZChqfQ>
+ fm1; bh=m26QZkWz9KVnhsN6dgmfQqejETGJJk4nedcDJhtvacM=; b=G5yBGaXw
+ jK9pfoqiMoLduCMLBSFRQc3U4vWZ86Az19VdC6ROCadAgvRMg2gH0GkXq+TEpacy
+ CjtqE1z5UsV29I64TARdtYvmt62qLmVYsNDwTFItofGKSUZwXLzpTNEOvBzqmR5i
+ 3OQ52SQomvS8d9rlAAoPyxVh8k4kbNzu93lRkrlSF+BgFk+VNNxVPnlaN/dGY5Vx
+ usKlRyGSWwe88zJM8LBgJyKLz5bc49nfhUQzWVuj7+PEvGgaaehDzvQ07uuFVT/P
+ cq+0Q/ktXen4fpkGbPYqbuuZO03vQdl17X+qUzAbdWLZju3Tkb6IhVRUSlvVIWIF
+ sSZubzgBuLqTdA==
+X-ME-Sender: <xms:i0z0XfoveIHPKtCssxclhXfVlsc1XQWE52PostS5h61ZHjUWGMRrkw>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedufedrvddttddggeelucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
  uceurghilhhouhhtmecufedttdenucenucfjughrpefhvffufffkofgjfhgggfestdekre
  dtredttdenucfhrhhomheptehlihhsthgrihhrucfhrhgrnhgtihhsuceorghlihhsthgr
  ihhrsegrlhhishhtrghirhdvfedrmhgvqeenucfkphepjeefrdelfedrkeegrddvtdekne
  curfgrrhgrmhepmhgrihhlfhhrohhmpegrlhhishhtrghirhesrghlihhsthgrihhrvdef
- rdhmvgenucevlhhushhtvghrufhiiigvpedt
-X-ME-Proxy: <xmx:hEz0XRUftwL7GcQlxZqzG-FMb82LzqtsbL2QPfC2hh5jXaU8XOgGMg>
- <xmx:hEz0Xb8udhLk1sQgqGisLKFlIC-czwC30tZ_F9V78RuTP1ifChxEfg>
- <xmx:hEz0XTghLHGMUY8OgGY_y8omck0Z3VdqgQ6JW_YP6fozHwaDt8cQWw>
- <xmx:hEz0XVIPwFgKfn596Qzn6h5jfvvXWZFmVZ5FSwbIr9zCvV0u2SZWNw>
+ rdhmvgenucevlhhushhtvghrufhiiigvpedu
+X-ME-Proxy: <xmx:i0z0XZyaemTAzZGVmhqnH_JDtWr2jsmIOPNyLCrpbrlMPzJUeryOLA>
+ <xmx:i0z0XToRIUZqAYAjWFtB3D3VKySsHO-lSj6-3i-ugbqiHfULVBlSqw>
+ <xmx:i0z0XZcRzWvZz8MtIbOQ1Vk4O83UmE8mQGyOLkB1T9fycvR5cadDyw>
+ <xmx:i0z0XbnULhAwmOP3wZgjwqy3YWatRvCFfFBtjoL9N9Utb8JJ_h81YA>
 Received: from alistair-xps-14z.alistair23.me
  (c-73-93-84-208.hsd1.ca.comcast.net [73.93.84.208])
- by mail.messagingengine.com (Postfix) with ESMTPA id 566B380059;
- Fri, 13 Dec 2019 21:44:19 -0500 (EST)
+ by mail.messagingengine.com (Postfix) with ESMTPA id E19FE8005A;
+ Fri, 13 Dec 2019 21:44:26 -0500 (EST)
 From: Alistair Francis <alistair@alistair23.me>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PATCH v6 1/4] hw/misc: Add the STM32F4xx Sysconfig device
-Date: Fri, 13 Dec 2019 18:44:18 -0800
-Message-Id: <36b89b7805c66cd115925cc738e6e0594b3241ec.1576227325.git.alistair@alistair23.me>
+Subject: [PATCH v6 3/4] hw/arm: Add the STM32F4xx SoC
+Date: Fri, 13 Dec 2019 18:44:26 -0800
+Message-Id: <b9f9cedf59427375deb33329df43af9ca12514b7.1576227325.git.alistair@alistair23.me>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <cover.1576227325.git.alistair@alistair23.me>
 References: <cover.1576227325.git.alistair@alistair23.me>
@@ -110,90 +110,68 @@ Sender: "Qemu-devel"
 Signed-off-by: Alistair Francis <alistair@alistair23.me>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- default-configs/arm-softmmu.mak    |   1 +
- hw/arm/Kconfig                     |   9 ++
- hw/misc/Kconfig                    |   3 +
- hw/misc/Makefile.objs              |   1 +
- hw/misc/stm32f4xx_syscfg.c         | 171 +++++++++++++++++++++++++++++
- hw/misc/trace-events               |   6 +
- include/hw/misc/stm32f4xx_syscfg.h |  61 ++++++++++
- 7 files changed, 252 insertions(+)
- create mode 100644 hw/misc/stm32f4xx_syscfg.c
- create mode 100644 include/hw/misc/stm32f4xx_syscfg.h
+ MAINTAINERS                    |   8 +
+ hw/arm/Kconfig                 |   3 +
+ hw/arm/Makefile.objs           |   1 +
+ hw/arm/stm32f405_soc.c         | 302 +++++++++++++++++++++++++++++++++
+ include/hw/arm/stm32f405_soc.h |  73 ++++++++
+ 5 files changed, 387 insertions(+)
+ create mode 100644 hw/arm/stm32f405_soc.c
+ create mode 100644 include/hw/arm/stm32f405_soc.h
 
-diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
-index 1f2e0e7fde..645e6201bb 100644
---- a/default-configs/arm-softmmu.mak
-+++ b/default-configs/arm-softmmu.mak
-@@ -30,6 +30,7 @@ CONFIG_Z2=y
- CONFIG_COLLIE=y
- CONFIG_ASPEED_SOC=y
- CONFIG_NETDUINO2=y
-+CONFIG_NETDUINOPLUS2=y
- CONFIG_MPS2=y
- CONFIG_RASPI=y
- CONFIG_DIGIC=y
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5e5e3e52d6..10230b3212 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -814,6 +814,14 @@ F: hw/adc/*
+ F: hw/ssi/stm32f2xx_spi.c
+ F: include/hw/*/stm32*.h
+ 
++STM32F405
++M: Alistair Francis <alistair@alistair23.me>
++M: Peter Maydell <peter.maydell@linaro.org>
++S: Maintained
++F: hw/arm/stm32f405_soc.c
++F: hw/misc/stm32f4xx_syscfg.c
++F: hw/misc/stm32f4xx_exti.c
++
+ Netduino 2
+ M: Alistair Francis <alistair@alistair23.me>
+ M: Peter Maydell <peter.maydell@linaro.org>
 diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-index c6e7782580..4660d14715 100644
+index 3d86691ae0..7bfdc3a7ac 100644
 --- a/hw/arm/Kconfig
 +++ b/hw/arm/Kconfig
-@@ -101,6 +101,10 @@ config NETDUINO2
-     bool
-     select STM32F205_SOC
- 
-+config NETDUINOPLUS2
-+    bool
-+    select STM32F405_SOC
-+
- config NSERIES
-     bool
-     select OMAP
-@@ -307,6 +311,11 @@ config STM32F205_SOC
-     select STM32F2XX_ADC
-     select STM32F2XX_SPI
+@@ -317,6 +317,9 @@ config STM32F405_SOC
+     select STM32F4XX_SYSCFG
+     select STM32F4XX_EXTI
  
 +config STM32F405_SOC
 +    bool
-+    select ARM_V7M
-+    select STM32F4XX_SYSCFG
 +
  config XLNX_ZYNQMP_ARM
      bool
      select AHCI
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 2164646553..72609650b7 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -82,6 +82,9 @@ config IMX
- config STM32F2XX_SYSCFG
-     bool
- 
-+config STM32F4XX_SYSCFG
-+    bool
-+
- config MIPS_ITU
-     bool
- 
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index ba898a5781..ea8025e0bb 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -58,6 +58,7 @@ common-obj-$(CONFIG_SLAVIO) += slavio_misc.o
- common-obj-$(CONFIG_ZYNQ) += zynq_slcr.o
- common-obj-$(CONFIG_ZYNQ) += zynq-xadc.o
- common-obj-$(CONFIG_STM32F2XX_SYSCFG) += stm32f2xx_syscfg.o
-+common-obj-$(CONFIG_STM32F4XX_SYSCFG) += stm32f4xx_syscfg.o
- obj-$(CONFIG_MIPS_CPS) += mips_cmgcr.o
- obj-$(CONFIG_MIPS_CPS) += mips_cpc.o
- obj-$(CONFIG_MIPS_ITU) += mips_itu.o
-diff --git a/hw/misc/stm32f4xx_syscfg.c b/hw/misc/stm32f4xx_syscfg.c
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index fe749f65fd..d9d54da7cf 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -36,6 +36,7 @@ obj-$(CONFIG_STRONGARM) += strongarm.o
+ obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
+ obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
+ obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
++obj-$(CONFIG_STM32F405_SOC) += stm32f405_soc.o
+ obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
+ obj-$(CONFIG_XLNX_VERSAL) += xlnx-versal.o xlnx-versal-virt.o
+ obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
+diff --git a/hw/arm/stm32f405_soc.c b/hw/arm/stm32f405_soc.c
 new file mode 100644
-index 0000000000..dbcdca59f8
+index 0000000000..f22516fdf7
 --- /dev/null
-+++ b/hw/misc/stm32f4xx_syscfg.c
-@@ -0,0 +1,171 @@
++++ b/hw/arm/stm32f405_soc.c
+@@ -0,0 +1,302 @@
 +/*
-+ * STM32F4xx SYSCFG
++ * STM32F405 SoC
 + *
 + * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
 + *
@@ -217,177 +195,291 @@ index 0000000000..dbcdca59f8
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/log.h"
-+#include "trace.h"
-+#include "hw/irq.h"
-+#include "migration/vmstate.h"
-+#include "hw/misc/stm32f4xx_syscfg.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "exec/address-spaces.h"
++#include "sysemu/sysemu.h"
++#include "hw/arm/stm32f405_soc.h"
++#include "hw/misc/unimp.h"
 +
-+static void stm32f4xx_syscfg_reset(DeviceState *dev)
++#define SYSCFG_ADD                     0x40013800
++static const uint32_t usart_addr[] = { 0x40011000, 0x40004400, 0x40004800,
++                                       0x40004C00, 0x40005000, 0x40011400,
++                                       0x40007800, 0x40007C00 };
++/* At the moment only Timer 2 to 5 are modelled */
++static const uint32_t timer_addr[] = { 0x40000000, 0x40000400,
++                                       0x40000800, 0x40000C00 };
++#define ADC_ADDR                       0x40012000
++static const uint32_t spi_addr[] =   { 0x40013000, 0x40003800, 0x40003C00,
++                                       0x40013400, 0x40015000, 0x40015400 };
++#define EXTI_ADDR                      0x40013C00
++
++#define SYSCFG_IRQ               71
++static const int usart_irq[] = { 37, 38, 39, 52, 53, 71, 82, 83 };
++static const int timer_irq[] = { 28, 29, 30, 50 };
++#define ADC_IRQ 18
++static const int spi_irq[] =   { 35, 36, 51, 0, 0, 0 };
++static const int exti_irq[] =  { 6, 7, 8, 9, 10, 23, 23, 23, 23, 23, 40,
++                                 40, 40, 40, 40, 40} ;
++
++
++static void stm32f405_soc_initfn(Object *obj)
 +{
-+    STM32F4xxSyscfgState *s = STM32F4XX_SYSCFG(dev);
++    STM32F405State *s = STM32F405_SOC(obj);
++    int i;
 +
-+    s->syscfg_memrmp = 0x00000000;
-+    s->syscfg_pmc = 0x00000000;
-+    s->syscfg_exticr[0] = 0x00000000;
-+    s->syscfg_exticr[1] = 0x00000000;
-+    s->syscfg_exticr[2] = 0x00000000;
-+    s->syscfg_exticr[3] = 0x00000000;
-+    s->syscfg_cmpcr = 0x00000000;
-+}
++    sysbus_init_child_obj(obj, "armv7m", &s->armv7m, sizeof(s->armv7m),
++                          TYPE_ARMV7M);
 +
-+static void stm32f4xx_syscfg_set_irq(void *opaque, int irq, int level)
-+{
-+    STM32F4xxSyscfgState *s = opaque;
-+    int icrreg = irq / 4;
-+    int startbit = (irq & 3) * 4;
-+    uint8_t config = config = irq / 16;
++    sysbus_init_child_obj(obj, "syscfg", &s->syscfg, sizeof(s->syscfg),
++                          TYPE_STM32F4XX_SYSCFG);
 +
-+    trace_stm32f4xx_syscfg_set_irq(irq / 16, irq % 16, level);
-+
-+    g_assert(icrreg < SYSCFG_NUM_EXTICR);
-+
-+    if (extract32(s->syscfg_exticr[icrreg], startbit, 4) == config) {
-+        qemu_set_irq(s->gpio_out[irq], level);
-+        trace_stm32f4xx_pulse_exti(irq);
-+   }
-+}
-+
-+static uint64_t stm32f4xx_syscfg_read(void *opaque, hwaddr addr,
-+                                     unsigned int size)
-+{
-+    STM32F4xxSyscfgState *s = opaque;
-+
-+    trace_stm32f4xx_syscfg_read(addr);
-+
-+    switch (addr) {
-+    case SYSCFG_MEMRMP:
-+        return s->syscfg_memrmp;
-+    case SYSCFG_PMC:
-+        return s->syscfg_pmc;
-+    case SYSCFG_EXTICR1...SYSCFG_EXTICR4:
-+        return s->syscfg_exticr[addr / 4 - SYSCFG_EXTICR1 / 4];
-+    case SYSCFG_CMPCR:
-+        return s->syscfg_cmpcr;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
-+        return 0;
++    for (i = 0; i < STM_NUM_USARTS; i++) {
++        sysbus_init_child_obj(obj, "usart[*]", &s->usart[i],
++                              sizeof(s->usart[i]), TYPE_STM32F2XX_USART);
 +    }
-+}
 +
-+static void stm32f4xx_syscfg_write(void *opaque, hwaddr addr,
-+                       uint64_t val64, unsigned int size)
-+{
-+    STM32F4xxSyscfgState *s = opaque;
-+    uint32_t value = val64;
-+
-+    trace_stm32f4xx_syscfg_write(value, addr);
-+
-+    switch (addr) {
-+    case SYSCFG_MEMRMP:
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: Changing the memory mapping isn't supported " \
-+                      "in QEMU\n", __func__);
-+        return;
-+    case SYSCFG_PMC:
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: Changing the memory mapping isn't supported " \
-+                      "in QEMU\n", __func__);
-+        return;
-+    case SYSCFG_EXTICR1...SYSCFG_EXTICR4:
-+        s->syscfg_exticr[addr / 4 - SYSCFG_EXTICR1 / 4] = (value & 0xFFFF);
-+        return;
-+    case SYSCFG_CMPCR:
-+        s->syscfg_cmpcr = value;
-+        return;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
++    for (i = 0; i < STM_NUM_TIMERS; i++) {
++        sysbus_init_child_obj(obj, "timer[*]", &s->timer[i],
++                              sizeof(s->timer[i]), TYPE_STM32F2XX_TIMER);
 +    }
++
++    for (i = 0; i < STM_NUM_ADCS; i++) {
++        sysbus_init_child_obj(obj, "adc[*]", &s->adc[i], sizeof(s->adc[i]),
++                              TYPE_STM32F2XX_ADC);
++    }
++
++    for (i = 0; i < STM_NUM_SPIS; i++) {
++        sysbus_init_child_obj(obj, "spi[*]", &s->spi[i], sizeof(s->spi[i]),
++                              TYPE_STM32F2XX_SPI);
++    }
++
++    sysbus_init_child_obj(obj, "exti", &s->exti, sizeof(s->exti),
++                          TYPE_STM32F4XX_EXTI);
 +}
 +
-+static const MemoryRegionOps stm32f4xx_syscfg_ops = {
-+    .read = stm32f4xx_syscfg_read,
-+    .write = stm32f4xx_syscfg_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
++static void stm32f405_soc_realize(DeviceState *dev_soc, Error **errp)
++{
++    STM32F405State *s = STM32F405_SOC(dev_soc);
++    MemoryRegion *system_memory = get_system_memory();
++    DeviceState *dev, *armv7m;
++    SysBusDevice *busdev;
++    Error *err = NULL;
++    int i;
++
++    memory_region_init_ram(&s->flash, NULL, "STM32F405.flash", FLASH_SIZE,
++                           &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    memory_region_init_alias(&s->flash_alias, NULL, "STM32F405.flash.alias",
++                             &s->flash, 0, FLASH_SIZE);
++
++    memory_region_set_readonly(&s->flash, true);
++    memory_region_set_readonly(&s->flash_alias, true);
++
++    memory_region_add_subregion(system_memory, FLASH_BASE_ADDRESS, &s->flash);
++    memory_region_add_subregion(system_memory, 0, &s->flash_alias);
++
++    memory_region_init_ram(&s->sram, NULL, "STM32F405.sram", SRAM_SIZE,
++                           &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, &s->sram);
++
++    armv7m = DEVICE(&s->armv7m);
++    qdev_prop_set_uint32(armv7m, "num-irq", 96);
++    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
++    qdev_prop_set_bit(armv7m, "enable-bitband", true);
++    object_property_set_link(OBJECT(&s->armv7m), OBJECT(system_memory),
++                                     "memory", &error_abort);
++    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++
++    /* System configuration controller */
++    dev = DEVICE(&s->syscfg);
++    object_property_set_bool(OBJECT(&s->syscfg), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, SYSCFG_ADD);
++    sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, SYSCFG_IRQ));
++
++    /* Attach UART (uses USART registers) and USART controllers */
++    for (i = 0; i < STM_NUM_USARTS; i++) {
++        dev = DEVICE(&(s->usart[i]));
++        qdev_prop_set_chr(dev, "chardev", serial_hd(i));
++        object_property_set_bool(OBJECT(&s->usart[i]), true, "realized", &err);
++        if (err != NULL) {
++            error_propagate(errp, err);
++            return;
++        }
++        busdev = SYS_BUS_DEVICE(dev);
++        sysbus_mmio_map(busdev, 0, usart_addr[i]);
++        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, usart_irq[i]));
++    }
++
++    /* Timer 2 to 5 */
++    for (i = 0; i < STM_NUM_TIMERS; i++) {
++        dev = DEVICE(&(s->timer[i]));
++        qdev_prop_set_uint64(dev, "clock-frequency", 1000000000);
++        object_property_set_bool(OBJECT(&s->timer[i]), true, "realized", &err);
++        if (err != NULL) {
++            error_propagate(errp, err);
++            return;
++        }
++        busdev = SYS_BUS_DEVICE(dev);
++        sysbus_mmio_map(busdev, 0, timer_addr[i]);
++        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, timer_irq[i]));
++    }
++
++    /* ADC device, the IRQs are ORed together */
++    object_initialize_child(OBJECT(s), "adc-orirq", &s->adc_irqs,
++                            sizeof(s->adc_irqs), TYPE_OR_IRQ,
++                            &err, NULL);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    object_property_set_int(OBJECT(&s->adc_irqs), STM_NUM_ADCS,
++                            "num-lines", &err);
++    object_property_set_bool(OBJECT(&s->adc_irqs), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    qdev_connect_gpio_out(DEVICE(&s->adc_irqs), 0,
++                          qdev_get_gpio_in(armv7m, ADC_IRQ));
++
++    dev = DEVICE(&(s->adc[i]));
++    object_property_set_bool(OBJECT(&s->adc[i]), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, ADC_ADDR);
++    sysbus_connect_irq(busdev, 0,
++                       qdev_get_gpio_in(DEVICE(&s->adc_irqs), i));
++
++    /* SPI devices */
++    for (i = 0; i < STM_NUM_SPIS; i++) {
++        dev = DEVICE(&(s->spi[i]));
++        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
++        if (err != NULL) {
++            error_propagate(errp, err);
++            return;
++        }
++        busdev = SYS_BUS_DEVICE(dev);
++        sysbus_mmio_map(busdev, 0, spi_addr[i]);
++        sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(armv7m, spi_irq[i]));
++    }
++
++    /* EXTI device */
++    dev = DEVICE(&s->exti);
++    object_property_set_bool(OBJECT(&s->exti), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, EXTI_ADDR);
++    for (i = 0; i < 16; i++) {
++        sysbus_connect_irq(busdev, i, qdev_get_gpio_in(armv7m, exti_irq[i]));
++    }
++    for (i = 0; i < 16; i++) {
++        qdev_connect_gpio_out(DEVICE(&s->syscfg), i, qdev_get_gpio_in(dev, i));
++    }
++
++    create_unimplemented_device("timer[7]",    0x40001400, 0x400);
++    create_unimplemented_device("timer[12]",   0x40001800, 0x400);
++    create_unimplemented_device("timer[6]",    0x40001000, 0x400);
++    create_unimplemented_device("timer[13]",   0x40001C00, 0x400);
++    create_unimplemented_device("timer[14]",   0x40002000, 0x400);
++    create_unimplemented_device("RTC and BKP", 0x40002800, 0x400);
++    create_unimplemented_device("WWDG",        0x40002C00, 0x400);
++    create_unimplemented_device("IWDG",        0x40003000, 0x400);
++    create_unimplemented_device("I2S2ext",     0x40003000, 0x400);
++    create_unimplemented_device("I2S3ext",     0x40004000, 0x400);
++    create_unimplemented_device("I2C1",        0x40005400, 0x400);
++    create_unimplemented_device("I2C2",        0x40005800, 0x400);
++    create_unimplemented_device("I2C3",        0x40005C00, 0x400);
++    create_unimplemented_device("CAN1",        0x40006400, 0x400);
++    create_unimplemented_device("CAN2",        0x40006800, 0x400);
++    create_unimplemented_device("PWR",         0x40007000, 0x400);
++    create_unimplemented_device("DAC",         0x40007400, 0x400);
++    create_unimplemented_device("timer[1]",    0x40010000, 0x400);
++    create_unimplemented_device("timer[8]",    0x40010400, 0x400);
++    create_unimplemented_device("SDIO",        0x40012C00, 0x400);
++    create_unimplemented_device("timer[9]",    0x40014000, 0x400);
++    create_unimplemented_device("timer[10]",   0x40014400, 0x400);
++    create_unimplemented_device("timer[11]",   0x40014800, 0x400);
++    create_unimplemented_device("GPIOA",       0x40020000, 0x400);
++    create_unimplemented_device("GPIOB",       0x40020400, 0x400);
++    create_unimplemented_device("GPIOC",       0x40020800, 0x400);
++    create_unimplemented_device("GPIOD",       0x40020C00, 0x400);
++    create_unimplemented_device("GPIOE",       0x40021000, 0x400);
++    create_unimplemented_device("GPIOF",       0x40021400, 0x400);
++    create_unimplemented_device("GPIOG",       0x40021800, 0x400);
++    create_unimplemented_device("GPIOH",       0x40021C00, 0x400);
++    create_unimplemented_device("GPIOI",       0x40022000, 0x400);
++    create_unimplemented_device("CRC",         0x40023000, 0x400);
++    create_unimplemented_device("RCC",         0x40023800, 0x400);
++    create_unimplemented_device("Flash Int",   0x40023C00, 0x400);
++    create_unimplemented_device("BKPSRAM",     0x40024000, 0x400);
++    create_unimplemented_device("DMA1",        0x40026000, 0x400);
++    create_unimplemented_device("DMA2",        0x40026400, 0x400);
++    create_unimplemented_device("Ethernet",    0x40028000, 0x1400);
++    create_unimplemented_device("USB OTG HS",  0x40040000, 0x30000);
++    create_unimplemented_device("USB OTG FS",  0x50000000, 0x31000);
++    create_unimplemented_device("DCMI",        0x50050000, 0x400);
++    create_unimplemented_device("RNG",         0x50060800, 0x400);
++}
++
++static Property stm32f405_soc_properties[] = {
++    DEFINE_PROP_STRING("cpu-type", STM32F405State, cpu_type),
++    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void stm32f4xx_syscfg_init(Object *obj)
-+{
-+    STM32F4xxSyscfgState *s = STM32F4XX_SYSCFG(obj);
-+
-+    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
-+
-+    memory_region_init_io(&s->mmio, obj, &stm32f4xx_syscfg_ops, s,
-+                          TYPE_STM32F4XX_SYSCFG, 0x400);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
-+
-+    qdev_init_gpio_in(DEVICE(obj), stm32f4xx_syscfg_set_irq, 16 * 9);
-+    qdev_init_gpio_out(DEVICE(obj), s->gpio_out, 16);
-+}
-+
-+static const VMStateDescription vmstate_stm32f4xx_syscfg = {
-+    .name = TYPE_STM32F4XX_SYSCFG,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(syscfg_memrmp, STM32F4xxSyscfgState),
-+        VMSTATE_UINT32(syscfg_pmc, STM32F4xxSyscfgState),
-+        VMSTATE_UINT32_ARRAY(syscfg_exticr, STM32F4xxSyscfgState,
-+                             SYSCFG_NUM_EXTICR),
-+        VMSTATE_UINT32(syscfg_cmpcr, STM32F4xxSyscfgState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static void stm32f4xx_syscfg_class_init(ObjectClass *klass, void *data)
++static void stm32f405_soc_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->reset = stm32f4xx_syscfg_reset;
-+    dc->vmsd = &vmstate_stm32f4xx_syscfg;
++    dc->realize = stm32f405_soc_realize;
++    dc->props = stm32f405_soc_properties;
++    /* No vmstate or reset required: device has no internal state */
 +}
 +
-+static const TypeInfo stm32f4xx_syscfg_info = {
-+    .name          = TYPE_STM32F4XX_SYSCFG,
++static const TypeInfo stm32f405_soc_info = {
++    .name          = TYPE_STM32F405_SOC,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(STM32F4xxSyscfgState),
-+    .instance_init = stm32f4xx_syscfg_init,
-+    .class_init    = stm32f4xx_syscfg_class_init,
++    .instance_size = sizeof(STM32F405State),
++    .instance_init = stm32f405_soc_initfn,
++    .class_init    = stm32f405_soc_class_init,
 +};
 +
-+static void stm32f4xx_syscfg_register_types(void)
++static void stm32f405_soc_types(void)
 +{
-+    type_register_static(&stm32f4xx_syscfg_info);
++    type_register_static(&stm32f405_soc_info);
 +}
 +
-+type_init(stm32f4xx_syscfg_register_types)
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 1deb1d08c1..02327562bc 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -84,6 +84,12 @@ mos6522_set_sr_int(void) "set sr_int"
- mos6522_write(uint64_t addr, uint64_t val) "reg=0x%"PRIx64 " val=0x%"PRIx64
- mos6522_read(uint64_t addr, unsigned val) "reg=0x%"PRIx64 " val=0x%x"
- 
-+# stm32f4xx_syscfg
-+stm32f4xx_syscfg_set_irq(int gpio, int line, int level) "Interupt: GPIO: %d, Line: %d; Level: %d"
-+stm32f4xx_pulse_exti(int irq) "Pulse EXTI: %d"
-+stm32f4xx_syscfg_read(uint64_t addr) "reg read: addr: 0x%" PRIx64 " "
-+stm32f4xx_syscfg_write(uint64_t addr, uint64_t data) "reg write: addr: 0x%" PRIx64 " val: 0x%" PRIx64 ""
-+
- # tz-mpc.c
- tz_mpc_reg_read(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs read: offset 0x%x data 0x%" PRIx64 " size %u"
- tz_mpc_reg_write(uint32_t offset, uint64_t data, unsigned size) "TZ MPC regs write: offset 0x%x data 0x%" PRIx64 " size %u"
-diff --git a/include/hw/misc/stm32f4xx_syscfg.h b/include/hw/misc/stm32f4xx_syscfg.h
++type_init(stm32f405_soc_types)
+diff --git a/include/hw/arm/stm32f405_soc.h b/include/hw/arm/stm32f405_soc.h
 new file mode 100644
-index 0000000000..c62c6629e5
+index 0000000000..1fe97f8c3a
 --- /dev/null
-+++ b/include/hw/misc/stm32f4xx_syscfg.h
-@@ -0,0 +1,61 @@
++++ b/include/hw/arm/stm32f405_soc.h
+@@ -0,0 +1,73 @@
 +/*
-+ * STM32F4xx SYSCFG
++ * STM32F405 SoC
 + *
 + * Copyright (c) 2014 Alistair Francis <alistair@alistair23.me>
 + *
@@ -410,41 +502,53 @@ index 0000000000..c62c6629e5
 + * THE SOFTWARE.
 + */
 +
-+#ifndef HW_STM_SYSCFG_H
-+#define HW_STM_SYSCFG_H
++#ifndef HW_ARM_STM32F405_SOC_H
++#define HW_ARM_STM32F405_SOC_H
 +
-+#include "hw/sysbus.h"
-+#include "hw/hw.h"
++#include "hw/misc/stm32f4xx_syscfg.h"
++#include "hw/timer/stm32f2xx_timer.h"
++#include "hw/char/stm32f2xx_usart.h"
++#include "hw/adc/stm32f2xx_adc.h"
++#include "hw/misc/stm32f4xx_exti.h"
++#include "hw/or-irq.h"
++#include "hw/ssi/stm32f2xx_spi.h"
++#include "hw/arm/armv7m.h"
 +
-+#define SYSCFG_MEMRMP  0x00
-+#define SYSCFG_PMC     0x04
-+#define SYSCFG_EXTICR1 0x08
-+#define SYSCFG_EXTICR2 0x0C
-+#define SYSCFG_EXTICR3 0x10
-+#define SYSCFG_EXTICR4 0x14
-+#define SYSCFG_CMPCR   0x20
++#define TYPE_STM32F405_SOC "stm32f405-soc"
++#define STM32F405_SOC(obj) \
++    OBJECT_CHECK(STM32F405State, (obj), TYPE_STM32F405_SOC)
 +
-+#define TYPE_STM32F4XX_SYSCFG "stm32f4xx-syscfg"
-+#define STM32F4XX_SYSCFG(obj) \
-+    OBJECT_CHECK(STM32F4xxSyscfgState, (obj), TYPE_STM32F4XX_SYSCFG)
++#define STM_NUM_USARTS 7
++#define STM_NUM_TIMERS 4
++#define STM_NUM_ADCS 6
++#define STM_NUM_SPIS 6
 +
-+#define SYSCFG_NUM_EXTICR 4
++#define FLASH_BASE_ADDRESS 0x08000000
++#define FLASH_SIZE (1024 * 1024)
++#define SRAM_BASE_ADDRESS 0x20000000
++#define SRAM_SIZE (192 * 1024)
 +
-+typedef struct {
-+    /* <private> */
++typedef struct STM32F405State {
++    /*< private >*/
 +    SysBusDevice parent_obj;
++    /*< public >*/
 +
-+    /* <public> */
-+    MemoryRegion mmio;
++    char *cpu_type;
 +
-+    uint32_t syscfg_memrmp;
-+    uint32_t syscfg_pmc;
-+    uint32_t syscfg_exticr[SYSCFG_NUM_EXTICR];
-+    uint32_t syscfg_cmpcr;
++    ARMv7MState armv7m;
 +
-+    qemu_irq irq;
-+    qemu_irq gpio_out[16];
-+} STM32F4xxSyscfgState;
++    STM32F4xxSyscfgState syscfg;
++    STM32F4xxExtiState exti;
++    STM32F2XXUsartState usart[STM_NUM_USARTS];
++    STM32F2XXTimerState timer[STM_NUM_TIMERS];
++    qemu_or_irq adc_irqs;
++    STM32F2XXADCState adc[STM_NUM_ADCS];
++    STM32F2XXSPIState spi[STM_NUM_SPIS];
++
++    MemoryRegion sram;
++    MemoryRegion flash;
++    MemoryRegion flash_alias;
++} STM32F405State;
 +
 +#endif
 -- 
