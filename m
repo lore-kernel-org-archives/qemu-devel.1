@@ -2,81 +2,84 @@ Return-Path: <SRS0=ZS6r=2E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.8 required=3.0 tests=DATE_IN_PAST_03_06,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D30DC43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B19CAC43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:50:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06586207FD
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:49:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D7D1207FD
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:50:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OTuq/b2a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06586207FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DlOUriSA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D7D1207FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igFI8-0003WY-23
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 16:49:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44638)
+	id 1igFIx-0004KE-L2
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 16:50:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56841)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1igFH2-0002bN-2s
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:48:29 -0500
+ (envelope-from <eblake@redhat.com>) id 1igFHp-0003Os-GV
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:49:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1igFH0-0000M0-Kj
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:48:27 -0500
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:42475)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1igFGz-0000JG-IV; Sat, 14 Dec 2019 16:48:26 -0500
-Received: by mail-ot1-x333.google.com with SMTP id 66so3765943otd.9;
- Sat, 14 Dec 2019 13:48:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=22Xie9AzVxk20tNtnNAjSLZmLhAA28fbehMxyVbIO+w=;
- b=OTuq/b2aotnqEf7kTknuq9fvbsX+vNtk/kKWduu0frt0daRER6QdMjxeeCM7OfWmeS
- 6l5C14n/4elKQPNYDaAppS2Xr+Uxf8mDBvs+K9kvDAGgeDtrvsk8zjbQQzTMvJk1lQGB
- HKZVuuILvpE7jlO/ewMb3gFVl1lguWYIjqO0/rHh6H54mv5C1kZgeD7UUdDqLLcGTAbi
- YHGZY6FzU0NeK/VB6saG3Psvw9agn8KCSeBjS7qpUHVp56Dc6h61rwa3SQPhAcM+ZNiN
- KAK5UWJBp/GXFgv/c2G2b16FeSF+VAskKHMMkqOb2/+C4U7u8g2O5QBQoDnUHB1H9s4a
- 3Ptg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=22Xie9AzVxk20tNtnNAjSLZmLhAA28fbehMxyVbIO+w=;
- b=LZ2ylxBksg4HGweoYPrVhpW715x/cJydLmVxPpnJGOuxTADoOYmXzSKdOC1HCYCkXh
- MnOkniqOLAT2W874jKk09oA0pY0ABlrv6IhaIMv4u30sDD/xlzDyEXcRGDrHdq1x/bIO
- Ol6VphCZB6CSM/IYX/FATWem9lRLvW9NuYY2vuU2N4pn6PO8nh/rHhzV3Ez6BzSh8VA5
- UZr8kE5orueGoRVwRl5GLcM88gjWRsUF53AfLJ8L1QOPtk1Ebh9tBBliSXl3LXf1BmRn
- uMY2UhnpKZ76lf8qbNtdmx5fn2+SrMg6RwBFOA9xLiAJQxoJn0/f5YZ2BVSS7NGCp+Rr
- Cm1Q==
-X-Gm-Message-State: APjAAAU/cURf3GUMKWKLhCGmJ6u+Rfvr76/Y8Gq0QNASBKM2WdGkxQLQ
- jLWPqKKxnMJTo9iIdGwfeTuz+Hq0Yp2d6FyO/w5VoA==
-X-Google-Smtp-Source: APXvYqwoU94NKUlkZlLqeUQcVXfb/fM1vgLkCA9AIv6rJJ2kAyMmrQqJE4Sr8eKEXUONgjakr+h8TIQxm1zu3sj9AFI=
-X-Received: by 2002:a05:6830:1042:: with SMTP id
- b2mr21379234otp.306.1576343854808; 
- Sat, 14 Dec 2019 09:17:34 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a9d:d21:0:0:0:0:0 with HTTP;
- Sat, 14 Dec 2019 09:17:34 -0800 (PST)
-In-Reply-To: <cover.1576286757.git.fthain@telegraphics.com.au>
-References: <cover.1576286757.git.fthain@telegraphics.com.au>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Sat, 14 Dec 2019 18:17:34 +0100
-Message-ID: <CAL1e-=gwxSDa1NSevcCbjG1r5vg6A49Kg_FP2EL1jW+BMn7Ghw@mail.gmail.com>
+ (envelope-from <eblake@redhat.com>) id 1igFHm-0002YT-5G
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:49:16 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49985
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1igFHl-0002Tv-D3
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:49:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576360150;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NDnGu7MH1eazR7aSbLsFxM1nr0iH1ef2xF6tB7Dw+dM=;
+ b=DlOUriSAi3B23YQstLvdEVMz56FGoSG5EhCuyZqZXCEnS/P3dhth4JnzLkMP1VFaX9/qoK
+ L6D56bF8SuC5FKPZYsKREnUo17cgE6KYABnAqcIsCTO4WAFgSVC44xRZNCiwxMpzenTsKp
+ sC/08Xk7tfK+t8sLdGWXACkUx73SuvU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137-kBFTSTr3P_m9Yb1UDrtp8A-1; Sat, 14 Dec 2019 08:46:11 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA0B2107ACC4;
+ Sat, 14 Dec 2019 13:46:08 +0000 (UTC)
+Received: from [10.3.116.171] (ovpn-116-171.phx2.redhat.com [10.3.116.171])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 518245D9CA;
+ Sat, 14 Dec 2019 13:46:00 +0000 (UTC)
 Subject: Re: [PATCH 00/10] Fixes for DP8393X SONIC device emulation
-To: Finn Thain <fthain@telegraphics.com.au>
-Content-Type: multipart/alternative; boundary="00000000000082848b0599ad27cd"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::333
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Finn Thain <fthain@telegraphics.com.au>, qemu-devel@nongnu.org
+References: <157628778601.20418.17236421597625110152@37313f22b938>
+ <alpine.LNX.2.21.1.1912141345460.18@nippy.intranet>
+ <b8c42c79-ed61-031d-a7f7-0af82992bd85@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b73284e3-b6e7-1e4d-0d93-6cdcdd0f2ae9@redhat.com>
+Date: Sat, 14 Dec 2019 07:45:59 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+MIME-Version: 1.0
+In-Reply-To: <b8c42c79-ed61-031d-a7f7-0af82992bd85@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: kBFTSTr3P_m9Yb1UDrtp8A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,115 +91,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- Herve Poussineau <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: jasowang@redhat.com, qemu-stable@nongnu.org, laurent@vivier.eu,
+ hpoussin@reactos.org, Paolo Bonzini <pbonzini@redhat.com>,
+ aleksandar.rikalo@rt-rk.com,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000082848b0599ad27cd
-Content-Type: text/plain; charset="UTF-8"
+On 12/14/19 7:38 AM, Philippe Mathieu-Daud=E9 wrote:
+> On 12/14/19 3:52 AM, Finn Thain wrote:
+>> On Fri, 13 Dec 2019, no-reply@patchew.org wrote:
+>>
+>>> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
+>>> 1/10 Checking commit 9c9ffc38e9b9 (dp8393x: Mask EOL bit from=20
+>>> descriptor addresses)
+>>> ERROR: return is not a function, parentheses are not required
+>>> #24: FILE: hw/net/dp8393x.c:200:
+>>> +=A0=A0=A0 return (s->regs[SONIC_URDA] << 16) | (s->regs[SONIC_CRDA] &=
+=20
+>>> 0xfffe);
+>>>
+>>> ERROR: return is not a function, parentheses are not required
+>>> #33: FILE: hw/net/dp8393x.c:220:
+>>> +=A0=A0=A0 return (s->regs[SONIC_UTDA] << 16) | (s->regs[SONIC_TTDA] &=
+=20
+>>> 0xfffe);
+>>>
+>>
+>> I expect that checkpatch.pl has no idea about operator precedence, but
+>> these parentheses could actually be omitted.
 
-On Saturday, December 14, 2019, Finn Thain <fthain@telegraphics.com.au>
-wrote:
+You are correct: It's a false positive; you can safely ignore it.
 
-> Hi All,
->
-> There is a bug in the DP8393X emulation that can stop packet reception.
->
->
-Can you provide the details of your test scenario?
+>>
+>> I kept them because I don't want readers to have to remember that bit
+>> shift operator has higher precedence than bitwise OR operator, or look i=
+t
+>> up if they don't.
+>>
+>> The existing code also has those unnecessary parentheses.
+>>
+>> Please let me know if this patch should include a code style change.
+>=20
+> This is a bug in checkpatch. Since this script doesn't have dedicated=20
+> maintainer, I Cc'ed the recent contributors:
 
-Thanks,
-Aleksandar
+However, it's complex enough, and the false positive occurs infrequently=20
+enough, that just ignoring it (instead of trying to patch checkpatch) is=20
+also fine, and probably what will happen.
 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-
-
-> Whilst debugging that issue I found that the receiver algorithm differs
-> from the one described in the National Semiconductor datasheet.
->
-> These issues and others are addressed by this patch series.
->
-> This series has only been tested with Linux/m68k guests. It needs further
-> testing with MIPS Jazz guests such as NetBSD or Windows NT.
->
-> Thanks.
->
->
-> Finn Thain (10):
->   dp8393x: Mask EOL bit from descriptor addresses
->   dp8393x: Clean up endianness hacks
->   dp8393x: Have dp8393x_receive() return the packet size
->   dp8393x: Don't advance RX descriptor twice
->   dp8393x: Update LLFA register
->   dp8393x: Clear RRRA command register bit only when appropriate
->   dp8393x: Implement TBWC0 and TBWC1 registers to restore buffer state
->   dp8393x: Implement packet size limit and RBAE interrupt
->   dp8393x: Don't stop reception upon RBE interrupt assertion
->   dp8393x: Don't clobber packet checksum
->
->  hw/net/dp8393x.c | 80 +++++++++++++++++++++++++++++++-----------------
->  1 file changed, 52 insertions(+), 28 deletions(-)
->
-> --
-> 2.23.0
->
->
->
-
---00000000000082848b0599ad27cd
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Saturday, December 14, 2019, Finn Thain &lt;<a href=3D"mailto:ft=
-hain@telegraphics.com.au">fthain@telegraphics.com.au</a>&gt; wrote:<br><blo=
-ckquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #c=
-cc solid;padding-left:1ex">Hi All,<br>
-<br>
-There is a bug in the DP8393X emulation that can stop packet reception.<br>
-<br></blockquote><div><br></div><div>Can you provide the details of your te=
-st scenario?</div><div><br></div><div>Thanks,</div><div>Aleksandar</div><di=
-v><br></div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_quot=
-e" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-Whilst debugging that issue I found that the receiver algorithm differs<br>
-from the one described in the National Semiconductor datasheet.<br>
-<br>
-These issues and others are addressed by this patch series.<br>
-<br>
-This series has only been tested with Linux/m68k guests. It needs further<b=
-r>
-testing with MIPS Jazz guests such as NetBSD or Windows NT.<br>
-<br>
-Thanks.<br>
-<br>
-<br>
-Finn Thain (10):<br>
-=C2=A0 dp8393x: Mask EOL bit from descriptor addresses<br>
-=C2=A0 dp8393x: Clean up endianness hacks<br>
-=C2=A0 dp8393x: Have dp8393x_receive() return the packet size<br>
-=C2=A0 dp8393x: Don&#39;t advance RX descriptor twice<br>
-=C2=A0 dp8393x: Update LLFA register<br>
-=C2=A0 dp8393x: Clear RRRA command register bit only when appropriate<br>
-=C2=A0 dp8393x: Implement TBWC0 and TBWC1 registers to restore buffer state=
-<br>
-=C2=A0 dp8393x: Implement packet size limit and RBAE interrupt<br>
-=C2=A0 dp8393x: Don&#39;t stop reception upon RBE interrupt assertion<br>
-=C2=A0 dp8393x: Don&#39;t clobber packet checksum<br>
-<br>
-=C2=A0hw/net/dp8393x.c | 80 ++++++++++++++++++++++++++++++<wbr>+-----------=
-------<br>
-=C2=A01 file changed, 52 insertions(+), 28 deletions(-)<br>
-<br>
--- <br>
-2.23.0<br>
-<br>
-<br>
-</blockquote>
-
---00000000000082848b0599ad27cd--
 
