@@ -2,47 +2,46 @@ Return-Path: <SRS0=ZS6r=2E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4BADC43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A690EC43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 11:00:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8954224125
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 10:56:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8954224125
+	by mail.kernel.org (Postfix) with ESMTPS id 744E324125
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 11:00:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 744E324125
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ig56H-0006eU-PN
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 05:56:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39430)
+	id 1ig5AA-0008I2-9c
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 06:00:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41951)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig55f-0006Ce-UT
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:56:05 -0500
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig586-0007Z3-8D
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:58:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig55e-0001Fz-6h
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:56:03 -0500
-Received: from mail.ilande.co.uk ([46.43.2.167]:48454
+ (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1ig584-0005ay-Uv
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:58:33 -0500
+Received: from mail.ilande.co.uk ([46.43.2.167]:48462
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1ig55d-0001Cx-5X
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:56:01 -0500
+ id 1ig584-0005WP-DT
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 05:58:32 -0500
 Received: from host86-191-82-191.range86-191.btcentralplus.com
  ([86.191.82.191] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1ig56O-0003jF-Vl; Sat, 14 Dec 2019 10:56:53 +0000
+ id 1ig58v-0003jv-H7; Sat, 14 Dec 2019 10:59:25 +0000
 To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
 References: <20191212200142.15688-1-laurent@vivier.eu>
- <20191212200142.15688-4-laurent@vivier.eu>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
@@ -68,18 +67,18 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <d5852871-077c-fba9-4a7b-bea851563954@ilande.co.uk>
-Date: Sat, 14 Dec 2019 10:55:54 +0000
+Message-ID: <c90975ff-7e20-8de3-1faf-60e542ab3413@ilande.co.uk>
+Date: Sat, 14 Dec 2019 10:58:30 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191212200142.15688-4-laurent@vivier.eu>
+In-Reply-To: <20191212200142.15688-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 86.191.82.191
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 3/3] q800: add machine id register
+Subject: Re: [PATCH 0/3] q800: update machine emulation
 X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
@@ -102,83 +101,38 @@ Sender: "Qemu-devel"
 
 On 12/12/2019 20:01, Laurent Vivier wrote:
 
-> MacOS reads this address to identify the hardware.
+> On the way to run a MacOS ROM we need a more accurate
+> emulation of the Quadra 800.
 > 
-> This is a basic implementation returning the ID of Quadra 800.
+> This series fixes the ESCC base address that was wrong but
+> as the linux kernel uses the one provided by the bootloader
+> (in our case QEMU) it was not a problem. This value
+> is hardcoded in the ROM, so QEMU must use the good one.
 > 
-> Details:
+> The two other patches update the description of the machine
+> by introducing the djMEMC memory controller and the machine id
+> register.
 > 
->   http://mess.redump.net/mess/driver_info/mac_technical_notes
+> Laurent Vivier (3):
+>   q800: fix ESCC base
+>   q800: add djMEMC memory controller
+>   q800: add machine id register
 > 
-> "There are 3 ID schemes [...]
->  The third and most scalable is a machine ID register at 0x5ffffffc.
->  The top word must be 0xa55a to be valid. Then bits 15-11 are 0 for
->  consumer Macs, 1 for portables, 2 for high-end 68k, and 3 for high-end
->  PowerPC. Bit 10 is 1 if additional ID bits appear elsewhere (e.g. in VIA1).
->  The rest of the bits are a per-model identifier.
-> 
->  Model                          Lower 16 bits of ID
-> ...
->  Quadra/Centris 610/650/800     0x2BAD"
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  hw/m68k/q800.c | 22 ++++++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-> index 9ee0cb1141..c2b2aa779f 100644
-> --- a/hw/m68k/q800.c
-> +++ b/hw/m68k/q800.c
-> @@ -97,6 +97,23 @@ static void main_cpu_reset(void *opaque)
->      cpu->env.pc = ldl_phys(cs->as, 4);
->  }
->  
-> +static uint64_t machine_id_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    return 0xa55a2bad; /* Quadra 800 ID */
-> +}
-> +
-> +static void machine_id_write(void *opaque, hwaddr addr, uint64_t val,
-> +                             unsigned size)
-> +{
-> +}
-> +
-> +static const MemoryRegionOps machine_id_ops = {
-> +    .read = machine_id_read,
-> +    .write = machine_id_write,
-> +    .valid.min_access_size = 4,
-> +    .valid.max_access_size = 4,
-> +};
+>  MAINTAINERS              |   2 +
+>  hw/m68k/Kconfig          |   1 +
+>  hw/m68k/q800.c           |  85 +++++++++----------
+>  hw/misc/Kconfig          |   3 +
+>  hw/misc/Makefile.objs    |   1 +
+>  hw/misc/djmemc.c         | 176 +++++++++++++++++++++++++++++++++++++++
+>  hw/misc/trace-events     |   4 +
+>  include/hw/misc/djmemc.h |  34 ++++++++
+>  8 files changed, 260 insertions(+), 46 deletions(-)
+>  create mode 100644 hw/misc/djmemc.c
+>  create mode 100644 include/hw/misc/djmemc.h
 
-Should there be a .endianness here just to be really safe?
-
->  static void q800_init(MachineState *machine)
->  {
->      M68kCPU *cpu = NULL;
-> @@ -110,6 +127,7 @@ static void q800_init(MachineState *machine)
->      MemoryRegion *rom;
->      MemoryRegion *ram;
->      MemoryRegion *io;
-> +    MemoryRegion *machine_id;
->      const int io_slice_nb = (IO_SIZE / IO_SLICE) - 1;
->      int i;
->      ram_addr_t ram_size = machine->ram_size;
-> @@ -159,6 +177,10 @@ static void q800_init(MachineState *machine)
->          g_free(name);
->      }
->  
-> +    machine_id = g_malloc(sizeof(*machine_id));
-> +    memory_region_init_io(machine_id, NULL, &machine_id_ops, NULL, "Machine ID", 4);
-> +    memory_region_add_subregion(get_system_memory(), 0x5ffffffc, machine_id);
-> +
->      /* djMEMC memory and interrupt controller */
->  
->      djmemc_dev = qdev_create(NULL, TYPE_DJMEMC);
-
-Otherwise looks good and I see it being poked by a MacOS ROM so:
-
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+I think this is mostly there other than a few minor style and other tweaks, however
+I'm wondering that since the q800 seems to have a few esoteric devices if it is worth
+creating a separate subdirectory for them all under hw/misc/mac or similar?
 
 
 ATB,
