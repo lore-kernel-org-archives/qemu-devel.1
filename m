@@ -2,66 +2,74 @@ Return-Path: <SRS0=ZS6r=2E=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33FEDC43603
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE7EC43603
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:12:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B5EE20866
-	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:11:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B5EE20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id CAF5D20866
+	for <qemu-devel@archiver.kernel.org>; Sat, 14 Dec 2019 21:12:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBDBCsq+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF5D20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igEgw-0003OZ-35
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 16:11:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44427)
+	id 1igEi5-0004t6-VM
+	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 16:12:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44279)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chen.zhang@intel.com>) id 1igEfZ-0002VT-91
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:09:46 -0500
+ (envelope-from <philmd@redhat.com>) id 1igEUI-0006yD-Ht
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 15:58:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chen.zhang@intel.com>) id 1igEfX-0004T1-ED
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:09:44 -0500
-Received: from mga04.intel.com ([192.55.52.120]:41617)
+ (envelope-from <philmd@redhat.com>) id 1igEUF-0003nm-UY
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 15:58:04 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24346
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
- id 1igEfX-00041m-3O
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 16:09:43 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 14 Dec 2019 09:47:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,314,1571727600"; d="scan'208";a="239618593"
-Received: from chenzh5-mobl2.ccr.corp.intel.com (HELO [10.249.175.19])
- ([10.249.175.19])
- by fmsmga004.fm.intel.com with ESMTP; 14 Dec 2019 09:47:35 -0800
-Subject: Re: [PATCH] colo: fix return without releasing RCU
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "quintela@redhat.com" <quintela@redhat.com>
-References: <1576246112-23406-2-git-send-email-pbonzini@redhat.com>
- <20191213150341.GG3713@work-vm>
-From: "Zhang, Chen" <chen.zhang@intel.com>
-Message-ID: <344c0a76-6a7d-ae34-fa09-e49284789dbc@intel.com>
-Date: Sun, 15 Dec 2019 01:47:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1igEUF-0003hY-JV
+ for qemu-devel@nongnu.org; Sat, 14 Dec 2019 15:58:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576357081;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=DU+v1+qSXxMwHczsoakDiicLnkfOmtj3Euf4AZRmwFY=;
+ b=EBDBCsq+k3aa1gdI4dc6bM05PFuNLkd/pFnjyigdnItQ068ofa3/1DdfFhtGi6E5GRj+HJ
+ LLjUYZlQLSpEBkMpjRJHjw2pQenxUsV3grDWvKoggXDucYEudPnleoMPjdO1mmeMUAuDz5
+ ByAXH3tWn0TRcV+pOmayRn6LU3vqQR8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-200-9iIaSgdkNYWGuH4yNdMIvw-1; Sat, 14 Dec 2019 10:56:33 -0500
+X-MC-Unique: 9iIaSgdkNYWGuH4yNdMIvw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B08321005502;
+ Sat, 14 Dec 2019 15:56:31 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 234905D6A7;
+ Sat, 14 Dec 2019 15:56:16 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/8] Simplify memory_region_add_subregion_overlap(...,
+ priority=0)
+Date: Sat, 14 Dec 2019 16:56:06 +0100
+Message-Id: <20191214155614.19004-1-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191213150341.GG3713@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.120
+Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,81 +81,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>, Paul Burton <pburton@wavecomp.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Alex Williamson <alex.williamson@redhat.com>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi,
 
-On 12/13/2019 11:03 PM, Dr. David Alan Gilbert wrote:
-> * Paolo Bonzini (pbonzini@redhat.com) wrote:
->> Use WITH_RCU_READ_LOCK_GUARD to avoid exiting colo_init_ram_cache
->> without releasing RCU.
->>
->> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+In this series we use coccinelle to replace:
+- memory_region_add_subregion_overlap(..., priority=3D0)
++ memory_region_add_subregion(...)
 
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+Rationale is the code is easier to read, and reviewers don't
+have to worry about overlapping because it isn't used.
 
+Last patch is a minor cleanup in variable names.
 
->
->> ---
->>   migration/ram.c | 33 +++++++++++++++++----------------
->>   1 file changed, 17 insertions(+), 16 deletions(-)
->>
->> diff --git a/migration/ram.c b/migration/ram.c
->> index 7dd7f81..8d7c015 100644
->> --- a/migration/ram.c
->> +++ b/migration/ram.c
->> @@ -3891,26 +3891,27 @@ int colo_init_ram_cache(void)
->>   {
->>       RAMBlock *block;
->>   
->> -    rcu_read_lock();
->> -    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
->> -        block->colo_cache = qemu_anon_ram_alloc(block->used_length,
->> -                                                NULL,
->> -                                                false);
->> -        if (!block->colo_cache) {
->> -            error_report("%s: Can't alloc memory for COLO cache of block %s,"
->> -                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
->> -                         block->used_length);
->> -            RAMBLOCK_FOREACH_NOT_IGNORED(block) {
->> -                if (block->colo_cache) {
->> -                    qemu_anon_ram_free(block->colo_cache, block->used_length);
->> -                    block->colo_cache = NULL;
->> +    WITH_RCU_READ_LOCK_GUARD() {
->> +        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
->> +            block->colo_cache = qemu_anon_ram_alloc(block->used_length,
->> +                                                    NULL,
->> +                                                    false);
->> +            if (!block->colo_cache) {
->> +                error_report("%s: Can't alloc memory for COLO cache of block %s,"
->> +                             "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
->> +                             block->used_length);
->> +                RAMBLOCK_FOREACH_NOT_IGNORED(block) {
->> +                    if (block->colo_cache) {
->> +                        qemu_anon_ram_free(block->colo_cache, block->used_length);
->> +                        block->colo_cache = NULL;
->> +                    }
->>                   }
->> +                return -errno;
->>               }
->> -            return -errno;
->> +            memcpy(block->colo_cache, block->host, block->used_length);
->>           }
->> -        memcpy(block->colo_cache, block->host, block->used_length);
->>       }
->> -    rcu_read_unlock();
->> +
->>       /*
->>       * Record the dirty pages that sent by PVM, we use this dirty bitmap together
->>       * with to decide which page in cache should be flushed into SVM's RAM. Here
->> -- 
->> 1.8.3.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
+I expect each subsystem maintainer to take the subsystem patches.
+
+Regards,
+
+Phil.
+
+Philippe Mathieu-Daud=C3=A9 (8):
+  hw/arm/nrf51_soc: Use memory_region_add_subregion() when priority is 0
+  hw/arm/raspi: Use memory_region_add_subregion() when priority is 0
+  hw/arm/xlnx-versal: Use memory_region_add_subregion() when priority is
+    0
+  hw/i386/intel_iommu: Use memory_region_add_subregion when priority is
+    0
+  hw/mips/boston: Use memory_region_add_subregion() when priority is 0
+  hw/vfio/pci: Use memory_region_add_subregion() when priority is 0
+  target/i386: Use memory_region_add_subregion() when priority is 0
+  target/i386/cpu: Use 'mr' for MemoryRegion variables
+
+ target/i386/cpu.h            |  2 +-
+ hw/arm/bcm2835_peripherals.c |  4 ++--
+ hw/arm/nrf51_soc.c           | 14 +++++++-------
+ hw/arm/raspi.c               |  2 +-
+ hw/arm/xlnx-versal-virt.c    |  3 +--
+ hw/arm/xlnx-versal.c         |  4 ++--
+ hw/i386/intel_iommu.c        | 11 ++++-------
+ hw/mips/boston.c             | 14 +++++++-------
+ hw/vfio/pci.c                |  3 +--
+ target/i386/cpu.c            | 18 +++++++++---------
+ target/i386/kvm.c            |  2 +-
+ 11 files changed, 36 insertions(+), 41 deletions(-)
+
+--=20
+2.21.0
+
 
