@@ -2,97 +2,58 @@ Return-Path: <SRS0=VgCP=2F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22FC7C43603
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Dec 2019 09:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62167C43603
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Dec 2019 11:00:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD71421D7E
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Dec 2019 09:59:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YkS0Gx6a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD71421D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2C1C120700
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Dec 2019 11:00:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C1C120700
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=eik.bme.hu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igQgJ-00074p-3n
-	for qemu-devel@archiver.kernel.org; Sun, 15 Dec 2019 04:59:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50694)
+	id 1igRdK-0005w6-5w
+	for qemu-devel@archiver.kernel.org; Sun, 15 Dec 2019 06:00:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48136)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1igQfg-0006cE-FU
- for qemu-devel@nongnu.org; Sun, 15 Dec 2019 04:58:41 -0500
+ (envelope-from <balaton@eik.bme.hu>) id 1igRcf-0005Qb-Dt
+ for qemu-devel@nongnu.org; Sun, 15 Dec 2019 05:59:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1igQff-0001yc-3T
- for qemu-devel@nongnu.org; Sun, 15 Dec 2019 04:58:40 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55780
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <balaton@eik.bme.hu>) id 1igRcd-0003sh-Cu
+ for qemu-devel@nongnu.org; Sun, 15 Dec 2019 05:59:36 -0500
+Received: from zero.eik.bme.hu ([152.66.115.2]:14342)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1igQfe-0001w6-Ti
- for qemu-devel@nongnu.org; Sun, 15 Dec 2019 04:58:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576403918;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ojwrHY0zHg+5NLkr12eP+nk8VjcM3a/wtoqud6h53+8=;
- b=YkS0Gx6afGZrCP9Qobodd5GAzQpNjg7xqeK33cPJkIxsrrhy+CQElM4/HumfpuL3nk+Si2
- N1XE2sdYh0JTQpRnmVe88I9p5Pw5KPeK0br6ydB0D1XOYqHwX33g8bsQ5DGh2E+24kWCNf
- yH0e+TitHYW2JEyIK20o+qxNelOfIVg=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-350-Cjy0qfHDMHCIFWU0-UCN_A-1; Sun, 15 Dec 2019 04:58:34 -0500
-Received: by mail-qt1-f198.google.com with SMTP id b24so2653559qtp.1
- for <qemu-devel@nongnu.org>; Sun, 15 Dec 2019 01:58:34 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=uglnVCAjnaUsXT9ZTT7mKFQQrU34w0ggWLPMx7AnQTk=;
- b=QcC0rk/Z2pCbhgiM6yXqNOmSGjqsjiqaJTvoy108lQc7TMRgGZaxWpW1rJBjo1/NrT
- q8e+YtcMGLzVp4zOBhTEoKl2AsEn1S27PSO/V7C+s97aUL4XnUDybTXGy9mbjXgw9bk9
- hnxs4VCIgebUMlUaRIm0yML/DJCi+SL2PA8XkFOI2v2IHw4rK0+fny194GKlWpctuQZ9
- +pghJm0p5EaSpLyM0heLYCoA4ciOOOYtOtIuwPoDPDmCWEyuYqgKDS/forSYJ15KkFWx
- 6cTB43RmDLXnwjTZkoToc+Br8zgthpFzG2lumS+7z1Bsd8q+2WmONcbm5WNbcbl0/cCK
- m9uQ==
-X-Gm-Message-State: APjAAAWSfzwnqJLrcMvVvuSYFdIy6tb9nO5wdMm2ggsSdQ1npHgA5z3P
- v7uD/qZnweWdICWobGjDU0FxvaxIW+Ib6B1J/+en4hdZn/sU3lsNRp/QSJedj5G/8+iTe3BHysG
- hBB35J1RRAnzQXis=
-X-Received: by 2002:ac8:2bb9:: with SMTP id m54mr20346506qtm.150.1576403914504; 
- Sun, 15 Dec 2019 01:58:34 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxShGzMmQTP0GPg+U7XkjAABhRbEWqYV30OwRBbm04m47kjZ2QozlKgsELOkgUl7CsWCeS0Iw==
-X-Received: by 2002:ac8:2bb9:: with SMTP id m54mr20346493qtm.150.1576403914297; 
- Sun, 15 Dec 2019 01:58:34 -0800 (PST)
-Received: from redhat.com (bzq-79-181-48-215.red.bezeqint.net. [79.181.48.215])
- by smtp.gmail.com with ESMTPSA id 184sm4752304qke.73.2019.12.15.01.58.29
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 15 Dec 2019 01:58:33 -0800 (PST)
-Date: Sun, 15 Dec 2019 04:58:27 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 12/12] hw/i386/pc: Move PC-machine specific declarations
- to 'pc_internal.h'
-Message-ID: <20191215045812-mutt-send-email-mst@kernel.org>
-References: <20191213161753.8051-1-philmd@redhat.com>
- <20191213161753.8051-13-philmd@redhat.com>
- <d9792ff4-bada-fbb9-301d-aeb19826235c@redhat.com>
+ (Exim 4.71) (envelope-from <balaton@eik.bme.hu>)
+ id 1igRcd-000371-3H; Sun, 15 Dec 2019 05:59:35 -0500
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 76AA8745980;
+ Sun, 15 Dec 2019 11:59:22 +0100 (CET)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 32E51745958; Sun, 15 Dec 2019 11:59:22 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 30E18745957;
+ Sun, 15 Dec 2019 11:59:22 +0100 (CET)
+Date: Sun, 15 Dec 2019 11:59:22 +0100 (CET)
+From: BALATON Zoltan <balaton@eik.bme.hu>
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH] ppc: remove excessive logging
+In-Reply-To: <4a608af2-62a2-3ffb-0c02-8e0ca699d586@redhat.com>
+Message-ID: <alpine.BSF.2.21.99999.352.1912151147300.3618@zero.eik.bme.hu>
+References: <20191214121347.17071-1-joakim.tjernlund@infinera.com>
+ <4a608af2-62a2-3ffb-0c02-8e0ca699d586@redhat.com>
+User-Agent: Alpine 2.21.99999 (BSF 352 2019-06-22)
 MIME-Version: 1.0
-In-Reply-To: <d9792ff4-bada-fbb9-301d-aeb19826235c@redhat.com>
-X-MC-Unique: Cjy0qfHDMHCIFWU0-UCN_A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: multipart/mixed;
+ boundary="3866299591-2028625278-1576407562=:3618"
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 152.66.115.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -104,80 +65,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <sstabellini@kernel.org>, Sergio Lopez <slp@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
- Paul Durrant <paul@xen.org>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, xen-devel@lists.xenproject.org,
- Anthony Perard <anthony.perard@citrix.com>,
- Igor Mammedov <imammedo@redhat.com>, qemu-block@nongnu.org,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Joakim Tjernlund <joakim.tjernlund@infinera.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 13, 2019 at 05:47:28PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 12/13/19 5:17 PM, Philippe Mathieu-Daud=E9 wrote:
-> > Historically, QEMU started with only one X86 machine: the PC.
-> > The 'hw/i386/pc.h' header was used to store all X86 and PC
-> > declarations. Since we have now multiple machines based on the
-> > X86 architecture, move the PC-specific declarations in a new
-> > header.
-> > We use 'internal' in the name to explicit this header is restricted
-> > to the X86 architecture. Other architecture can not access it.
-> >=20
-> > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > ---
-> > Maybe name it 'pc_machine.h'?
->=20
-> I forgot to describe here (and in the cover), what's follow after this
-> patch.
->=20
-> Patch #13 moves PCMachineClass to
->=20
-> If you ignore PCMachineState, "hw/i386/pc.h" now only contains 76 lines, =
-and
-> it is easier to see what is PC machine specific, what is X86 specific, an=
-d
-> what is device generic (not X86 related at all):
->=20
-> - GSI is common to X86 (Paolo sent [3], [6])
-> - IOAPIC is common to X86
-> - i8259 is multiarch (Paolo [2])
-> - PCI_HOST definitions and pc_pci_hole64_start() are X86
-> - pc_machine_is_smm_enabled() is X86 (Paolo sent [5])
-> - hpet
-> - tsc (Paolo sent [3])
-> - 3 more functions
->=20
-> So we can move half of this file to "pc_internal.h" and the other to
->=20
-> One problem is the Q35 MCH north bridge which directly sets the PCI
-> PCMachineState->bus in q35_host_realize(). This seems a QOM violation and=
- is
-> probably easily fixable.
->=20
-> Maybe I can apply Paolo's patches instead of this #12, move X86-generic
-> declarations to "hw/i386/x86.h", and directly git-move what's left of
-> "hw/i386/pc.h" to "pc_internal.h".
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Yea that sounds a bit better.
+--3866299591-2028625278-1576407562=:3618
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-> [3] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664627.html
-> [2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664765.html
-> [5] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664754.html
-> [6] https://www.mail-archive.com/qemu-devel@nongnu.org/msg664766.html
->=20
-> > ---
-> >   hw/i386/pc_internal.h | 144 +++++++++++++++++++++++++++++++++++++++++=
-+
-> >   include/hw/i386/pc.h  | 128 -------------------------------------
-> >   hw/i386/acpi-build.c  |   1 +
-> >   hw/i386/pc.c          |   1 +
-> >   hw/i386/pc_piix.c     |   1 +
-> >   hw/i386/pc_q35.c      |   1 +
-> >   hw/i386/pc_sysfw.c    |   1 +
-> >   hw/i386/xen/xen-hvm.c |   1 +
-> >   8 files changed, 150 insertions(+), 128 deletions(-)
-> >   create mode 100644 hw/i386/pc_internal.h
+On Sun, 15 Dec 2019, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Joakim,
+>
+> I'm cc'ing the PPC maintainers for you, so they won't miss your patch (=
+see=20
+> https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintaine=
+r and=20
+> the output of ./scripts/get_maintainer.pl -f target/ppc/excp_helper.c).
+>
+> On 12/14/19 1:13 PM, Joakim Tjernlund wrote:
+>> From: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
+>>=20
+>> ppc logs every type of Invalid instruction. This generates a lot
+>> of garbage on console when sshd/ssh_keygen executes as
+>> they try various insn to optimize its performance.
+>> The invalid operation log is still there so an unknown insn
+>> will still be logged.
+>>=20
+>> Signed-off-by: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
+>> ---
+>>
+>> 	As far as I can see, ppc is the only one emiting thsi
+>> 	debug msg for Invalid insns.
+>>=20
+>> target/ppc/excp_helper.c | 1 -
+>>   1 file changed, 1 deletion(-)
+>>=20
+>> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+>> index 50b004d00d..45c2fa3ff9 100644
+>> --- a/target/ppc/excp_helper.c
+>> +++ b/target/ppc/excp_helper.c
+>> @@ -326,7 +326,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, i=
+nt=20
+>> excp_model, int excp)
+>>               env->spr[SPR_BOOKE_ESR] =3D ESR_FP;
+>>               break;
+>>           case POWERPC_EXCP_INVAL:
+>> -            LOG_EXCP("Invalid instruction at " TARGET_FMT_lx "\n",=20
+>> env->nip);
+>
+> I don't think we want to remove a such important log. Since it make sen=
+se to=20
+> not disturb the console, maybe we can replace some of the LOG_EXCP() ca=
+lls by=20
+> qemu_log_mask(LOG_GUEST_ERROR,...) instead?
 
+I don't think that's a good idea. That would flood the -d guest_errors lo=
+g=20
+with unwanted messages that are normal not really due to guest errors. Th=
+e=20
+LOG_EXCP() is not enabled by default, you have to edit source to enable i=
+t=20
+so you can also then edit the unwanted messages as well (like commenting=20
+this one out if you don't like it). If this is removed, invalid opcodes=20
+are still logged from translate.c but the exception generated for them is=
+=20
+not logged. I don't know if that's useful or not but these are debug logs=
+=20
+so depends on what do you want to debug. I don't mind this being removed=20
+but would be also happy leaving it as it is as it's only shown for=20
+developers who enable it and might help debugging. Or maybe these could b=
+e=20
+converted to traces (although I generally find traces to be less=20
+convenient to work with than debug logs and not sure about potential=20
+performance impact). So my preferences would be in order: 1. leave it=20
+alone, 2. remove it, 3. convert to traces.
+
+Regards,
+BALATON Zoltan
+
+>
+>>               msr |=3D 0x00080000;
+>>               env->spr[SPR_BOOKE_ESR] =3D ESR_PIL;
+>>               break;
+--3866299591-2028625278-1576407562=:3618--
 
