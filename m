@@ -2,96 +2,96 @@ Return-Path: <SRS0=VgCP=2F=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5387BC43603
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Dec 2019 04:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8AB6C43603
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Dec 2019 05:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10C9B20700
-	for <qemu-devel@archiver.kernel.org>; Sun, 15 Dec 2019 04:57:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79C7A206B7
+	for <qemu-devel@archiver.kernel.org>; Sun, 15 Dec 2019 05:09:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NoPmfL4x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10C9B20700
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RZgdZR6l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79C7A206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igLyF-0008OO-7y
-	for qemu-devel@archiver.kernel.org; Sat, 14 Dec 2019 23:57:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35517)
+	id 1igM9g-00027T-Ke
+	for qemu-devel@archiver.kernel.org; Sun, 15 Dec 2019 00:09:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1igLxe-0007zW-6O
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 23:56:55 -0500
+ (envelope-from <philmd@redhat.com>) id 1igM8z-0001d9-2E
+ for qemu-devel@nongnu.org; Sun, 15 Dec 2019 00:08:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1igLxb-00088b-0g
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 23:56:52 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43913
+ (envelope-from <philmd@redhat.com>) id 1igM8x-0004d0-9C
+ for qemu-devel@nongnu.org; Sun, 15 Dec 2019 00:08:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38859
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1igLxa-00087t-Ke
- for qemu-devel@nongnu.org; Sat, 14 Dec 2019 23:56:50 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1igM8x-0004cM-4r
+ for qemu-devel@nongnu.org; Sun, 15 Dec 2019 00:08:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576385809;
+ s=mimecast20190719; t=1576386514;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=B8HFuknbXINXAAhRk14V53jaomrIIMFMcmuG8o0oqKM=;
- b=NoPmfL4xVIdugKixqq9r7tVj6ZKADB5ooPtb2w6BXP0bPDn0aINpUGjfNcjpH4Zust3fAm
- GsbsjaQ+zQLEi4c6vfURoigyL6qvHb5k9ZszI+ZoZmm33lNWdyBMQttXMRzAhY/0SmPxbb
- cr+oo0DyaCZOKj56lYydW6Q0hXJbb9E=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-eAZkUvgiOsS1drMPI86Zxg-1; Sat, 14 Dec 2019 23:56:47 -0500
-Received: by mail-wr1-f70.google.com with SMTP id z10so1758424wrt.21
- for <qemu-devel@nongnu.org>; Sat, 14 Dec 2019 20:56:47 -0800 (PST)
+ bh=FDj5lE+gPV4k+YVFT3t1OmQX6ZTeCu+eMij7H6/Od/c=;
+ b=RZgdZR6lQ/R3vrVdtm5+HpBMaDEdEjiGe1yG3GT1iBjtBM/289+474KnufDn1ZIZXk5j5t
+ 4wXJwpwJBkFMaT7xUonqgA8sePFlrGnOPy360YPPXXSObFb9dfPpgZnC3eD9cJX83Q8E4A
+ zBCS/NAJC2HfsHO2OT0WzK04OK84mfU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-jdUMgLpTMDiFEizuIdKYAQ-1; Sun, 15 Dec 2019 00:08:31 -0500
+Received: by mail-wr1-f72.google.com with SMTP id b13so397574wrx.22
+ for <qemu-devel@nongnu.org>; Sat, 14 Dec 2019 21:08:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=rDlgANhttMxSBGvPj/xsQ6/eaqHcaNJi+vyNymVXSvw=;
- b=IIRACLYvZmOsjF6k8Hbti4w80RqMKuGx/dbBVn0X8fcGsH8v0YOPhf2ITBbm3+Vvq6
- 665W7e+Rl4kJiUP9yhHSLAxBc7nQBN4MgjLCdlKBggU48zKgGU4Q+warM33aGI2Wosaa
- DZ3RVh1WsoK3cs2JQoBsAbPFblOaXfSNwMIJRgpA6YHnBxcS7G7WH3DPxi4nA6uVzwlJ
- bEXb8m9nndMfFbO8qQ8DEbLeJM5LdXGl0Lh8rGFL2da5Dg8oQojwOIWVWQKVEI9bXLNG
- KC87d1OteumMpqO0r+qnwxJTO0F/H85C6S5xqkMaH2ZGdQb4mU3bRglQYwNacRD2D/9o
- C8lw==
-X-Gm-Message-State: APjAAAVhwQkGGVZM7jZHVU/I4Wy1em9QEY/uWdfVngXvjZnR9ehVTPvV
- JYOHr1DnvYmKSPpHDGCx7m1LehZfUikFzKPvmbJbTXz+V/+T1gpCZvk7Twcw/yVNfsnIfHOiL9s
- m/GqsQW7rKSIPePE=
-X-Received: by 2002:a1c:f008:: with SMTP id a8mr22594402wmb.81.1576385806114; 
- Sat, 14 Dec 2019 20:56:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzDGyxL3C0sSEiSdhDYkbJdvhGm6ACjRaTBvWeJUbshMRGl3d/M0cKAGnHzaxGExViqWJqyKA==
-X-Received: by 2002:a1c:f008:: with SMTP id a8mr22594375wmb.81.1576385805703; 
- Sat, 14 Dec 2019 20:56:45 -0800 (PST)
+ bh=FDj5lE+gPV4k+YVFT3t1OmQX6ZTeCu+eMij7H6/Od/c=;
+ b=IQXV/tCBNzQoWWmQ1IGeSV2XVTUtHYWx6OwUxdO9T667RmOq82/5YxMLfyaMT7rIGa
+ YBK5ovVkfkFApDNSrT+QNuZqxBng3MnSvui71RMk5lhZg916PZt1XWPpZTzpU36A4wgm
+ 9x+Rg8UO6opZ3gxXBq9kRzRHIR6LaPVfSTBEejY3PaEHqYXpPoDz6tH9Wnm11nwnxKBv
+ KsOGYtwIb6DjCUZ4j6nPjRUYDEfu2hP/m5FyEyaVaUZyYF7uP2VIv/4r3V9LXyFKc/Av
+ ZAgFsaWiHgAhSJjkFS8VBX5SjAUrQCaR6XOYIHf7tQDCEoi3SY3oiMvx1S6MusnwF/8v
+ 0v1Q==
+X-Gm-Message-State: APjAAAWBpHiFLOBM2+4C4otPrEE80hqsHVHUzz036dj0J3yqHCG7YkYo
+ qQsR+N500MT+JRJbEssSB9FCeGPhmb1swk55C9n4is0ndfjD9TRRXcbNcIHoAz7+/6EXsRIi2xx
+ hWaiKhcrU6prqk6Y=
+X-Received: by 2002:a5d:6406:: with SMTP id z6mr21396300wru.294.1576386510195; 
+ Sat, 14 Dec 2019 21:08:30 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzMIuJZ0aZpgSsWFbkbij6ffxcczTodQzZQLZW04UAOms0IJObqMh1uqFO+5S1rKUT2abjEYQ==
+X-Received: by 2002:a5d:6406:: with SMTP id z6mr21396279wru.294.1576386509874; 
+ Sat, 14 Dec 2019 21:08:29 -0800 (PST)
 Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
  [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id y20sm15499882wmi.25.2019.12.14.20.56.44
+ by smtp.gmail.com with ESMTPSA id m10sm16532955wrx.19.2019.12.14.21.08.29
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 14 Dec 2019 20:56:45 -0800 (PST)
-Subject: Re: [PATCH] target/arm: Display helpful message when hflags mismatch
-To: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20191209134552.27733-1-philmd@redhat.com>
- <87d0cx32vv.fsf@linaro.org> <1d51109a-ae9f-7bfe-66d4-0e1e1266df64@linaro.org>
+ Sat, 14 Dec 2019 21:08:29 -0800 (PST)
+Subject: Re: [PATCH] ppc: remove excessive logging
+To: Joakim Tjernlund <joakim.tjernlund@infinera.com>, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>, qemu-ppc <qemu-ppc@nongnu.org>
+References: <20191214121347.17071-1-joakim.tjernlund@infinera.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1407bf23-85c2-fce2-da17-bed6766456f9@redhat.com>
-Date: Sun, 15 Dec 2019 05:56:44 +0100
+Message-ID: <4a608af2-62a2-3ffb-0c02-8e0ca699d586@redhat.com>
+Date: Sun, 15 Dec 2019 06:08:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <1d51109a-ae9f-7bfe-66d4-0e1e1266df64@linaro.org>
+In-Reply-To: <20191214121347.17071-1-joakim.tjernlund@infinera.com>
 Content-Language: en-US
-X-MC-Unique: eAZkUvgiOsS1drMPI86Zxg-1
+X-MC-Unique: jdUMgLpTMDiFEizuIdKYAQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -106,59 +106,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/12/19 1:36 AM, Richard Henderson wrote:
-> On 12/9/19 8:00 AM, Alex Benn=C3=A9e wrote:
->>> -#ifdef CONFIG_DEBUG_TCG
->>> -    assert(flags =3D=3D rebuild_hflags_internal(env));
->>> -#endif
->>> +    assert_hflags_rebuild_correctly(env);
->>
->> I'm trying to recall why we don't just use:
->>
->>    g_assert_cmphex(flags, =3D, rebuild_hflags_internal(env))
+Hi Joakim,
 
-s/=3D/=3D=3D/ ;)
+I'm cc'ing the PPC maintainers for you, so they won't miss your patch 
+(see 
+https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintainer 
+and the output of ./scripts/get_maintainer.pl -f target/ppc/excp_helper.c).
 
->>
->> I think it came up in one of the reviews.
->=20
-> checkpatch.pl.
->=20
-> Because, I believe, there is an environment variable that causes this to =
-*not*
-> abort on mismatch.
+On 12/14/19 1:13 PM, Joakim Tjernlund wrote:
+> From: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
+> 
+> ppc logs every type of Invalid instruction. This generates a lot
+> of garbage on console when sshd/ssh_keygen executes as
+> they try various insn to optimize its performance.
+> The invalid operation log is still there so an unknown insn
+> will still be logged.
+> 
+> Signed-off-by: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
+> ---
+> 
+> 	As far as I can see, ppc is the only one emiting thsi
+> 	debug msg for Invalid insns.
+> 
+> target/ppc/excp_helper.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/target/ppc/excp_helper.c b/target/ppc/excp_helper.c
+> index 50b004d00d..45c2fa3ff9 100644
+> --- a/target/ppc/excp_helper.c
+> +++ b/target/ppc/excp_helper.c
+> @@ -326,7 +326,6 @@ static inline void powerpc_excp(PowerPCCPU *cpu, int excp_model, int excp)
+>               env->spr[SPR_BOOKE_ESR] = ESR_FP;
+>               break;
+>           case POWERPC_EXCP_INVAL:
+> -            LOG_EXCP("Invalid instruction at " TARGET_FMT_lx "\n", env->nip);
 
-Indeed, see commit 6e9389563e5:
+I don't think we want to remove a such important log. Since it make 
+sense to not disturb the console, maybe we can replace some of the 
+LOG_EXCP() calls by qemu_log_mask(LOG_GUEST_ERROR,...) instead?
 
-commit 6e9389563e56607f72562bdb72db452fcd7e7f74
-Author: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Date:   Thu Apr 27 17:55:26 2017 +0100
-
-     checkpatch: Disallow glib asserts in main code
-
-     Glib commit a6a875068779 (from 2013) made many of the glib assert
-     macros non-fatal if a flag is set.
-     This causes two problems:
-       a) Compilers moan that your code is unsafe even though you've
-          put an assert in before the point of use.
-       b) Someone evil could, in a library, call
-          g_test_set_nonfatal_assertions() and cause our assertions in
-          important places not to fail and potentially allow memory=20
-overruns.
-
-     Ban most of the glib assertion functions (basically everything except
-     g_assert and g_assert_not_reached) except in tests/
-
-     This makes checkpatch gives an error such as:
-
-       ERROR: Use g_assert or g_assert_not_reached
-       #77: FILE: vl.c:4725:
-       +    g_assert_cmpstr("Chocolate", >, "Cheese");
+>               msr |= 0x00080000;
+>               env->spr[SPR_BOOKE_ESR] = ESR_PIL;
+>               break;
+> 
 
 
