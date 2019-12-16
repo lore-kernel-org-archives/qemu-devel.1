@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9700FC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:30:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B7CC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:31:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B9FF206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:30:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3BDA206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:31:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E3fAQ5rM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B9FF206D3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rZ0hP8tz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3BDA206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igoZg-00012x-VO
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:30:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51257)
+	id 1igoaa-000243-4z
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:31:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51023)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1igoG0-00088k-9k
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:45 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFk-0007nE-Ii
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFz-0000FD-1s
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:44 -0500
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:52505)
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFj-0008CY-9R
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:28 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43133)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1igoFy-0000Ea-P0
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:42 -0500
-Received: by mail-wm1-x334.google.com with SMTP id p9so6267511wmc.2
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:42 -0800 (PST)
+ id 1igoFj-00088x-2X
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:27 -0500
+Received: by mail-wr1-x441.google.com with SMTP id d16so6712015wre.10
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=wi/6WNBxanhHv1N5BExE4AXQCOcHHg7jTThmTTrFuxQ=;
- b=E3fAQ5rMQqlRQ9i4FQQsIxXvkz4kn9TgzZejAjUVtx/8JRNY4xZc73bvqFyxzLhhbP
- 1R7DbAXzszwvGyxy+ZPeaeYcUfuxu7LH8aPzSRlGM+SjyHmlNJjxL+JdJv3cDX03Zh/o
- FgZz7NwfOKOmAamu1cmElumik801kRe242CDCD52vPhTzUb1ynG/IFNrL91XZZiMLIWO
- pYSyEqh64aJpbuUjctJUVGJzT/4NndXOziAMWRECebvcA0/k1iAQTspkmql2gpM8dotE
- ay0ozQRYMSXAglHy9Ugp+1n1GnPRvs5jufVfy7CEoV6JBPItTygNimGsog8QeI9NFhgp
- 0Pgw==
+ bh=cLD2Kna7vySI7JTixY4DUbJiDAp4iUXD1298DaSCR8I=;
+ b=rZ0hP8tz8VogaUVsp9aiUXJlXyJGkkdBMyO4EzwmzsW7Gy2+xAqKdzolFes0iNaIZn
+ TdamUM9AuYEFtfQ3vl4TJqfgY+ppsMnd8IKRfyGIft+a6L5IwidZ0US09sf2BHAIZFH5
+ 24GNlToZrDd2QLHGZl5Oke+5OiZRAkODRYYPMvTqFdrde3Zu1iaUrAn5wWhbAHefZMjU
+ jV8GuCy9TJn8yGEx+2QCuuAJak/m7mt5hCFu7BnJFYcttdUkUSZ7bDtZqtNVUv7Ft3ym
+ f2khM+ZcComZoKfZgiwAlSvC65p6w3pS2BwDKsn0vCHTtZgkmpxm81lLlU7GJXojtWg0
+ IHLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=wi/6WNBxanhHv1N5BExE4AXQCOcHHg7jTThmTTrFuxQ=;
- b=XhKNSRONBqf8fesvrwvD6kdrxW7KxHQvH1vBuJdJE8HGZRBYbWvIOoagadznWcDgKm
- BRayoOQSrlaPoko7ReU0Uzkze4m3HRhjZNqe47UwZ1ue4UDcv+spAQalEiBKQzU6z7Qk
- 5QnWbnFKnpByMFY+EBqoE4p5jhoCILf3Pnjvv18KIVvafr9YzuWhryrc1SnBI60kVMja
- 9DqzZ4mHLMvm8y560xL1C+q7TPbf59r+zK9XAqLMuTpv+rUEdHc53RQUhq3FQnZ0WHlA
- wsMYp9tX4nD0lh0LzNkvXqQNNKCyelfFnXujl/3hhllSMAttnOX3EF7O0u6SDg1jJIHp
- H01w==
-X-Gm-Message-State: APjAAAUwCUqQ3ScObwyclDA7q6/W6LujOQ4VEoBdJcV/rdHYt0P+S23q
- ZBVdkdwl1jrXFt//WSi1JZfU+NhE2i4Ptw==
-X-Google-Smtp-Source: APXvYqyMEhI4I0MSbdf73r/sJFavTnfTTnDA9U6WkPPYsNAB8U2P5pi8tX0JKo5lQIIDCqWBeghOqw==
-X-Received: by 2002:a05:600c:2509:: with SMTP id
- d9mr30448057wma.148.1576494581374; 
- Mon, 16 Dec 2019 03:09:41 -0800 (PST)
+ bh=cLD2Kna7vySI7JTixY4DUbJiDAp4iUXD1298DaSCR8I=;
+ b=mw3xiJ20m+HXqQdAJDPBDKEaEAKXGGs+Fto96SZMk0CJ2IcGdFkMm92+OydPHbMEEK
+ FxjCM2krRgTzl3oMjQZrRoclnau5NraMt+pRYdT65CdH2GE1Q2a97bzRYqr7ZmLmS5d/
+ kWAM1RwIUYaCLLL317Zs12roSIv6Y4/LcCT7D808ZjZ0/I+Brr1bE9q5dttl2LMVV7me
+ TgGLvMNG2xQfOOgCgjlHsO6C1kSc0gde8fSzE01GwMlEbN/mH6Jqme7piTMOjGf6NX7/
+ i872d3fnbH+tqtqI1UkMlllVJuRbgU4I4HufFTUiMKcQSTQu2iOqEuDQXXTZrAqObTxS
+ Fl0Q==
+X-Gm-Message-State: APjAAAXz5ZkvIz/ami2aQ4PX6gWJMR8uKSQDQiycQnr7YF/0O0NjWoUZ
+ WxAule2LxfA/YyuzzqsUaQA0nzimzGUVCQ==
+X-Google-Smtp-Source: APXvYqw7CA0lEFBH/KYeeg2n0bfL6xDJGUKqfanCTrMiq+9Mugtjgo+AA2HNs/DWXkQ3LmO0zUPu5w==
+X-Received: by 2002:adf:c746:: with SMTP id b6mr28282526wrh.298.1576494565931; 
+ Mon, 16 Dec 2019 03:09:25 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.40
+ by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.24
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 03:09:40 -0800 (PST)
+ Mon, 16 Dec 2019 03:09:25 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 32/34] hw/arm/acpi: enable SHPC native hot plug
-Date: Mon, 16 Dec 2019 11:09:02 +0000
-Message-Id: <20191216110904.30815-33-peter.maydell@linaro.org>
+Subject: [PULL 17/34] gpio: fix memory leak in aspeed_gpio_init()
+Date: Mon, 16 Dec 2019 11:08:47 +0000
+Message-Id: <20191216110904.30815-18-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
 References: <20191216110904.30815-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::334
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,75 +98,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Heyi Guo <guoheyi@huawei.com>
+From: PanNengyuan <pannengyuan@huawei.com>
 
-After the introduction of generic PCIe root port and PCIe-PCI bridge,
-we will also have SHPC controller on ARM, so just enable SHPC native
-hot plug.
+Address Sanitizer shows memory leak in hw/gpio/aspeed_gpio.c:875
 
-Also update tests/data/acpi/virt/DSDT* to pass "make check".
-
-Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Heyi Guo <guoheyi@huawei.com>
-Message-id: 20191209063719.23086-3-guoheyi@huawei.com
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 20191119141211.25716-16-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/virt-acpi-build.c          |   7 ++++++-
- tests/data/acpi/virt/DSDT         | Bin 18462 -> 18462 bytes
- tests/data/acpi/virt/DSDT.memhp   | Bin 19799 -> 19799 bytes
- tests/data/acpi/virt/DSDT.numamem | Bin 18462 -> 18462 bytes
- 4 files changed, 6 insertions(+), 1 deletion(-)
+ hw/gpio/aspeed_gpio.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 51b293e0a1e..bd5f771e9be 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -267,7 +267,12 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-         aml_create_dword_field(aml_arg(3), aml_int(8), "CDW3"));
-     aml_append(ifctx, aml_store(aml_name("CDW2"), aml_name("SUPP")));
-     aml_append(ifctx, aml_store(aml_name("CDW3"), aml_name("CTRL")));
--    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1D),
-+
-+    /*
-+     * Allow OS control for all 5 features:
-+     * PCIeHotplug SHPCHotplug PME AER PCIeCapability.
-+     */
-+    aml_append(ifctx, aml_and(aml_name("CTRL"), aml_int(0x1F),
-                               aml_name("CTRL")));
+diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
+index 7acc5fa8e29..41e11ea9b04 100644
+--- a/hw/gpio/aspeed_gpio.c
++++ b/hw/gpio/aspeed_gpio.c
+@@ -876,6 +876,7 @@ static void aspeed_gpio_init(Object *obj)
+                                pin_idx % GPIOS_PER_GROUP);
+         object_property_add(obj, name, "bool", aspeed_gpio_get_pin,
+                             aspeed_gpio_set_pin, NULL, NULL, NULL);
++        g_free(name);
+     }
+ }
  
-     ifctx1 = aml_if(aml_lnot(aml_equal(aml_arg(1), aml_int(0x1))));
-diff --git a/tests/data/acpi/virt/DSDT b/tests/data/acpi/virt/DSDT
-index 05bcfc8a912f58f266aa906563ea01c24906717e..d0f3afeb134fdf1c11f64cd06dbcdd30be603b80 100644
-GIT binary patch
-delta 28
-kcmbO?fpOjhMlP3Nmk>D*1_q{tja=*8809zbbW3Ff0C~9xM*si-
-
-delta 28
-kcmbO?fpOjhMlP3Nmk>D*1_q|2ja=*87-cu_bW3Ff0C~j-M*si-
-
-diff --git a/tests/data/acpi/virt/DSDT.memhp b/tests/data/acpi/virt/DSDT.memhp
-index c041a910fdf272cb89263bb636239ae3a5e1708d..41ccc6431b917252bcbaac86c33b340c796be5ce 100644
-GIT binary patch
-delta 28
-kcmcaUi}Cs_MlP3NmymE@1_mbija=*8809zbbeqQp0Eq|*2mk;8
-
-delta 28
-kcmcaUi}Cs_MlP3NmymE@1_ma@ja=*87-cu_beqQp0ErX{2mk;8
-
-diff --git a/tests/data/acpi/virt/DSDT.numamem b/tests/data/acpi/virt/DSDT.numamem
-index 05bcfc8a912f58f266aa906563ea01c24906717e..d0f3afeb134fdf1c11f64cd06dbcdd30be603b80 100644
-GIT binary patch
-delta 28
-kcmbO?fpOjhMlP3Nmk>D*1_q{tja=*8809zbbW3Ff0C~9xM*si-
-
-delta 28
-kcmbO?fpOjhMlP3Nmk>D*1_q|2ja=*87-cu_bW3Ff0C~j-M*si-
-
 -- 
 2.20.1
 
