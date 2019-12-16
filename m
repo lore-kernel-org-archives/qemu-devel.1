@@ -2,78 +2,79 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 504AFC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C7EBC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:16:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F823206A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7A63206A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:16:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iLHS6eDB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F823206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NwjSHSjL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7A63206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igr8h-0001Jd-Nq
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 09:14:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58779)
+	id 1igrB7-0004iD-U4
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 09:16:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59614)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1igqzE-0004qm-48
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:37 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igr2D-0001BR-ML
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:07:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1igqzC-00043D-Rk
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42094
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1igqzC-00042Q-OO
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576505073;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iaB3mhmOVrr+BW+SeTs3iK+cp3Zt+YUYyPdWpraAu7A=;
- b=iLHS6eDBvxQIX5aglh4w8x7JVCGRYJXQLL9xvgOkq0z+pGy8cbn1luvS4wtap/itV1dRMQ
- YStexdpvVrD3jsP23/rGaTDm3nndMOncrKUKPuvJcja1x0fojPaFBXH0qPtvSHXq/Gt/6l
- BpdBdRyWkR7geMofwfy6BabPLNZTnXE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-jrVVURoXNyO-sGEQ6te3lw-1; Mon, 16 Dec 2019 09:04:31 -0500
-X-MC-Unique: jrVVURoXNyO-sGEQ6te3lw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E45C800D50;
- Mon, 16 Dec 2019 14:04:29 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 83197675B8;
- Mon, 16 Dec 2019 14:04:26 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH 14/16] arm/run: Allow Migration tests
-Date: Mon, 16 Dec 2019 15:02:33 +0100
-Message-Id: <20191216140235.10751-15-eric.auger@redhat.com>
-In-Reply-To: <20191216140235.10751-1-eric.auger@redhat.com>
-References: <20191216140235.10751-1-eric.auger@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1igr2B-0006Cp-Q2
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:07:41 -0500
+Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:33236)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1igr2B-0006AI-Jm
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:07:39 -0500
+Received: by mail-ot1-x32e.google.com with SMTP id b18so771864otp.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 06:07:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=xfr4RsBDQPOFJsdG34apmzlNuzmpFAcZLgDsrhJEODA=;
+ b=NwjSHSjLT8J4Tdol3XdMmczkerp0vWC+2Csy9Ojgf58C3Bf9y4skAvutsyuHk48QSx
+ Q708Ew+QTImNkng/WwMQ1jDJuFxlIDnfRKDk4So+ykoQ3ttWENR1uq6oMlUmF/uAPy7N
+ Be6JS+ExY+zj/4xImQUKwAHnTUzZcyqRiLGOrneoqlSd7Mo16m4cWtyAoUf8nAFmBGJB
+ 7NA9fJLSqjZmi7temWFfY53MSgVPskuvGV6RthcdekIS0iY/T2WLmsO1Ufnfs+W8sd4X
+ sO2rHTsgwPKL5PrewiNLJzVn190WbPeM+cKKiiMmWm6UKih+Z3M2Jw3AT+/fxGRO8fud
+ 2Q/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=xfr4RsBDQPOFJsdG34apmzlNuzmpFAcZLgDsrhJEODA=;
+ b=PvBInpl3QdUfZLDHBtacyqt8pfmSISWJNde3QLk6/m6rFMAYTNg8MOPM0m3imIz89e
+ UNY5NAdOJqF7J6uuo+N1SMsb7KO/tNBwMS5Pu32I9VKk9FnnfEGdFSjS7dVCmB5dY2bf
+ IWl0m9EfAESuRy7GOYdz1Hf1we0o0AZHmjY69YuATHLxL7TFq2n9DyTx/MG632+THix6
+ fs/fpZoZeefTgknx9gT80OEtTxFc33NeLBvhNjXvmvcxWg08nWi9EhGJu3v0vfXyuvdg
+ pi7jwZuRuMqiFWvYfYbOVUTw70n3FHfGtd7xF1T5jZIkVSliqwLiOHxW0rPurIXkT+SL
+ C2MA==
+X-Gm-Message-State: APjAAAV1gAomZQmN311p5tUhGVXRg1SKD45RfF8js4xF1LWizJ5RsMrW
+ DyAbIhkAV+3dY4Uuo0YEFGivrIRoMlqUS+VkfzACOIEBaZY=
+X-Google-Smtp-Source: APXvYqzUoPPFSZ7g4ez4P9XRclxJbtuuuIIKIdGYGGrSzsmr6MKlMecReGVfsii5yeGwKS4Kv51y+jSd/PHDz/UwDQ0=
+X-Received: by 2002:a9d:4d8a:: with SMTP id u10mr32881983otk.232.1576505258277; 
+ Mon, 16 Dec 2019 06:07:38 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191216110904.30815-1-peter.maydell@linaro.org>
+In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Dec 2019 14:07:27 +0000
+Message-ID: <CAFEAcA98eUpMieL3z3PFake18LeSQmX=aL8cmgUqotii5-+8LQ@mail.gmail.com>
+Subject: Re: [PULL 00/34] target-arm queue
+To: QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,85 +86,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, andre.przywara@arm.com,
- thuth@redhat.com, yuzenghui@huawei.com, alexandru.elisei@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let's link getchar.o to use puts and getchar from the
-tests.
+On Mon, 16 Dec 2019 at 11:09, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+>
+> First arm pullreq of 5.0!
+>
+> The following changes since commit 084a398bf8aa7634738e6c6c0103236ee1b3b72f:
+>
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-12-13 18:14:07 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20191216-1
+>
+> for you to fetch changes up to f80741d107673f162e3b097fc76a1590036cc9d1:
+>
+>   target/arm: ensure we use current exception state after SCR update (2019-12-16 10:52:58 +0000)
+>
+> ----------------------------------------------------------------
+> target-arm queue:
+>  * Add support for Cortex-M7 CPU
+>  * exynos4210_gic: Suppress gcc9 format-truncation warnings
+>  * aspeed: Various minor bug fixes and improvements
+>  * aspeed: Add support for the tacoma-bmc board
+>  * Honour HCR_EL32.TID1 and .TID2 trapping requirements
+>  * Handle trapping to EL2 of AArch32 VMRS instructions
+>  * Handle AArch32 CP15 trapping via HSTR_EL2
+>  * Add support for missing Jazelle system registers
+>  * arm/arm-powerctl: set NSACR.{CP11, CP10} bits in arm_set_cpu_on
+>  * Add support for DC CVAP & DC CVADP instructions
+>  * Fix assertion when SCR.NS is changed in Secure-SVC &c
+>  * enable SHPC native hot plug in arm ACPI
+>
+> ----------------------------------------------------------------
 
-Then allow tests belonging to the migration group to
-trigger the migration from the test code by putting
-"migrate" into the uart. Then the code can wait for the
-migration completion by using getchar().
+Applied, thanks.
 
-The __getchar implement is minimalist as it just reads the
-data register. It is just meant to read the single character
-emitted at the end of the migration by the runner script.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-It is not meant to read more data (FIFOs are not enabled).
-
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/Makefile.common |  2 +-
- arm/run             |  2 +-
- lib/arm/io.c        | 13 +++++++++++++
- 3 files changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index 7cc0f04..327f112 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -32,7 +32,7 @@ CFLAGS +=3D -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I=
- lib
- asm-offsets =3D lib/$(ARCH)/asm-offsets.h
- include $(SRCDIR)/scripts/asm-offsets.mak
-=20
--cflatobjs +=3D lib/util.o
-+cflatobjs +=3D lib/util.o lib/getchar.o
- cflatobjs +=3D lib/alloc_phys.o
- cflatobjs +=3D lib/alloc_page.o
- cflatobjs +=3D lib/vmalloc.o
-diff --git a/arm/run b/arm/run
-index 277db9b..a390ca5 100755
---- a/arm/run
-+++ b/arm/run
-@@ -61,6 +61,6 @@ fi
- M+=3D",accel=3D$ACCEL"
- command=3D"$qemu -nodefaults $M -cpu $processor $chr_testdev $pci_testde=
-v"
- command+=3D" -display none -serial stdio -kernel"
--command=3D"$(timeout_cmd) $command"
-+command=3D"$(migration_cmd) $(timeout_cmd) $command"
-=20
- run_qemu $command "$@"
-diff --git a/lib/arm/io.c b/lib/arm/io.c
-index 99fd315..aa9e1b5 100644
---- a/lib/arm/io.c
-+++ b/lib/arm/io.c
-@@ -87,6 +87,19 @@ void puts(const char *s)
- 	spin_unlock(&uart_lock);
- }
-=20
-+/*
-+ * Minimalist implementation for migration completion detection.
-+ * Needs to be improved for more advanced Rx cases
-+ */
-+int __getchar(void)
-+{
-+	int ret;
-+
-+	ret =3D  readb(uart0_base);
-+	if (!ret)
-+		return -1;
-+	return ret;
-+}
-=20
- /*
-  * Defining halt to take 'code' as an argument guarantees that it will
---=20
-2.20.1
-
+-- PMM
 
