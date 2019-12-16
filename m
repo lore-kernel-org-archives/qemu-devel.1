@@ -2,80 +2,55 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 564D8C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61FC9C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:45:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2111A206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:39:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HO1zEIcv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2111A206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 26D13206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:45:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26D13206D3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igpeQ-00052T-9z
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 07:39:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57504)
+	id 1igpl4-00006g-RI
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 07:45:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58822)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1igpde-0004Wu-8n
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:38:15 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1igpjP-0006kY-PD
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:44:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1igpdd-0007Qh-7Q
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:38:14 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33127)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1igpdd-0007Of-2B
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:38:13 -0500
-Received: by mail-oi1-x244.google.com with SMTP id v140so3250050oie.0
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 04:38:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mImmblik8R4Ino+HQdCIyq9PyHNn7E242osM/3NmQAc=;
- b=HO1zEIcvblIIlZYGzGSt09h8QVOMaK5qRQlx6UeAvDBDFQdElXf21AQxVqtdb8FrU4
- RawoJOrVJOAzfWq+buYE63de7fXJrR6stmhoTMjcCpbozcHFtX9r/KljA0NaAlVCVRdp
- +M5uo1eoGIViYRWNlqijcKvWfMSYp8a0HGx8RwBz46/o+9LduTajfipuS9vf4J65EhHO
- NCeT7cbB5WGRF4C3tjdYcLNsjBHYeagPVKG0cIJwWVdaMh3oBREly/Uxc5dYrEycZeqD
- scSvP2yTAoa35nJ3+yJAuKK0TZ8KInsy9V4dK8+2awIeqCr/RRb/292cREAEFa6LixAZ
- vTUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mImmblik8R4Ino+HQdCIyq9PyHNn7E242osM/3NmQAc=;
- b=AmJZkd8o5TTNWL4UysO23V3OhL/T6wNcVDlxNFdXSgtEgjXNSbOJStV5RNimhp9QLt
- TSmMqphvlOFKYTVmcT8g9KGWCdHYZ3M/Dl6ldspmtxUv156AN5HEdfifLN61gYmD7Fs5
- oWCUO3FOWoh1MPMvzHTXYVjY3yXFSXFhLrJu2FXF4xydBB32DxMphkIa+gPkz+BdNxFN
- wkbs3vj9+K10u3V9BZpG0E3YLCLCXpoTf8S409PMigURs5VKYyG/J0nhQ5q87DjQSflm
- wsHuBicJJSyZGComAK+Uu3RBNZUmpLyUuMX6H/tdPmt0Nxq4UoKZw7tV53XZbN37/W6c
- YaOg==
-X-Gm-Message-State: APjAAAVKCvzrZknG3t3vU13J8u7+5odw7UYncEA9bZwlM9C2SrVP5Tnz
- ScKXgtXaDp2TxxaPmsWbvydqN29qBxkYSs9GCQ0=
-X-Google-Smtp-Source: APXvYqxtAvDYk4ici8Okfyyufpo+G7pENyZYLmt5GrpdkRhsIBPUtMmOe26wWnUgrAzvIfyMrE0+cst1MwMfeWQIz0w=
-X-Received: by 2002:aca:bd85:: with SMTP id n127mr9524495oif.136.1576499892308; 
- Mon, 16 Dec 2019 04:38:12 -0800 (PST)
-MIME-Version: 1.0
-References: <1575982519-29852-1-git-send-email-aleksandar.markovic@rt-rk.com>
-In-Reply-To: <1575982519-29852-1-git-send-email-aleksandar.markovic@rt-rk.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 16 Dec 2019 13:38:01 +0100
-Message-ID: <CAL1e-=gL6aLFV2p45baffMP7NE1Tx3O5Rr_ta7_N6ebUAv2-TQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] MAINTAINERS: Fine adjustment for (mostly mips)
- content
-To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1igpjO-0006wD-0x
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:44:11 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:57768 helo=mail.rt-rk.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
+ id 1igpjN-0006vE-MQ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:44:09 -0500
+Received: from localhost (localhost [127.0.0.1])
+ by mail.rt-rk.com (Postfix) with ESMTP id DF0261A2111;
+ Mon, 16 Dec 2019 13:43:01 +0100 (CET)
+X-Virus-Scanned: amavisd-new at rt-rk.com
+Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
+ [10.10.14.106])
+ by mail.rt-rk.com (Postfix) with ESMTPSA id A27EF1A20EE;
+ Mon, 16 Dec 2019 13:43:01 +0100 (CET)
+From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 05/11] mips: fulong 2e: Renovate coding style
+Date: Mon, 16 Dec 2019 13:42:46 +0100
+Message-Id: <1576500172-11264-6-git-send-email-aleksandar.markovic@rt-rk.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1576500172-11264-1-git-send-email-aleksandar.markovic@rt-rk.com>
+References: <1576500172-11264-1-git-send-email-aleksandar.markovic@rt-rk.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,58 +62,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org, amarkovic@wavecomp.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Dec 10, 2019 at 1:57 PM Aleksandar Markovic
-<aleksandar.markovic@rt-rk.com> wrote:
->
-> From: Aleksandar Markovic <amarkovic@wavecomp.com>
->
-> v2->v3:
->
->   - changed patches 2, 3, 4 on Philippe's request
->   - add a patch on including acceptance test in MIPS section
->
-> v1->v2:
->
->   - removed patch on new git infrastructure section
->   - added a patch that adds two files in Malta section
->
-> The goal of this series is to:
->
->   * reduce the amount of "unmainatined" files (not having their
->     maintainer in "MAINTAINERS")
->   * reduce the amount of nominally maintained files, but unmaintained
->     in reality
->   * increase the role of non-mips open source participants in
->     maintaining and reviewing mips content
->
-> Best wishes to all new and former maintainers in future activities
-> and enavours!
->
-> Aleksandar Markovic (5):
->   MAINTAINERS: Add a section on UI translation
->   MAINTAINERS: Adjust maintainership for Fulong 2E board
->   MAINTAINERS: Adjust maintainership for Malta board
->   MAINTAINERS: Add three files to Malta section
->   MAINTAINERS: Add a file to MIPS section
->
->  MAINTAINERS | 15 ++++++++++++---
->  1 file changed, 12 insertions(+), 3 deletions(-)
->
+From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 
-Applied to mips queue.
+The script checkpatch.pl located in scripts folder was
+used to detect all errors and warrnings in files:
+    hw/mips/mips_fulong2e.c
+    hw/isa/vt82c686.c
+    hw/pci-host/bonito.c
+    include/hw/isa/vt82c686.h
 
-> --
-> 2.7.4
->
->
+These mips Fulong 2E machine files were edited and
+all the errors and warrings generated by the checkpatch.pl
+script were corrected and then the script was
+ran again to make sure there are no more errors and warnings.
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-Id: <1575640687-20744-6-git-send-email-Filip.Bozuta@rt-rk.com>
+---
+ hw/isa/vt82c686.c    | 23 ++++++++++----------
+ hw/pci-host/bonito.c | 60 +++++++++++++++++++++++++++++-----------------------
+ 2 files changed, 45 insertions(+), 38 deletions(-)
+
+diff --git a/hw/isa/vt82c686.c b/hw/isa/vt82c686.c
+index 616f67f..f828708 100644
+--- a/hw/isa/vt82c686.c
++++ b/hw/isa/vt82c686.c
+@@ -27,7 +27,7 @@
+ #include "qemu/timer.h"
+ #include "exec/address-spaces.h"
+ 
+-//#define DEBUG_VT82C686B
++/* #define DEBUG_VT82C686B */
+ 
+ #ifdef DEBUG_VT82C686B
+ #define DPRINTF(fmt, ...) fprintf(stderr, "%s: " fmt, __func__, ##__VA_ARGS__)
+@@ -35,8 +35,7 @@
+ #define DPRINTF(fmt, ...)
+ #endif
+ 
+-typedef struct SuperIOConfig
+-{
++typedef struct SuperIOConfig {
+     uint8_t config[0x100];
+     uint8_t index;
+     uint8_t data;
+@@ -102,7 +101,7 @@ static uint64_t superio_ioport_readb(void *opaque, hwaddr addr, unsigned size)
+     SuperIOConfig *superio_conf = opaque;
+ 
+     DPRINTF("superio_ioport_readb  address 0x%x\n", addr);
+-    return (superio_conf->config[superio_conf->index]);
++    return superio_conf->config[superio_conf->index];
+ }
+ 
+ static const MemoryRegionOps superio_ops = {
+@@ -143,7 +142,7 @@ static void vt82c686b_isa_reset(DeviceState *dev)
+ }
+ 
+ /* write config pci function0 registers. PCI-ISA bridge */
+-static void vt82c686b_write_config(PCIDevice * d, uint32_t address,
++static void vt82c686b_write_config(PCIDevice *d, uint32_t address,
+                                    uint32_t val, int len)
+ {
+     VT82C686BState *vt686 = VT82C686B_DEVICE(d);
+@@ -365,7 +364,7 @@ static void vt82c686b_pm_realize(PCIDevice *dev, Error **errp)
+     pci_set_long(pci_conf + 0x48, 0x00000001);
+ 
+     /* SMB ports:0xeee0~0xeeef */
+-    s->smb_io_base =((s->smb_io_base & 0xfff0) + 0x0);
++    s->smb_io_base = ((s->smb_io_base & 0xfff0) + 0x0);
+     pci_conf[0x90] = s->smb_io_base | 1;
+     pci_conf[0x91] = s->smb_io_base >> 8;
+     pci_conf[0xd2] = 0x90;
+@@ -462,16 +461,18 @@ static void vt82c686b_realize(PCIDevice *d, Error **errp)
+ 
+     wmask = d->wmask;
+     for (i = 0x00; i < 0xff; i++) {
+-       if (i<=0x03 || (i>=0x08 && i<=0x3f)) {
+-           wmask[i] = 0x00;
+-       }
++        if (i <= 0x03 || (i >= 0x08 && i <= 0x3f)) {
++            wmask[i] = 0x00;
++        }
+     }
+ 
+     memory_region_init_io(&vt82c->superio, OBJECT(d), &superio_ops,
+                           &vt82c->superio_conf, "superio", 2);
+     memory_region_set_enabled(&vt82c->superio, false);
+-    /* The floppy also uses 0x3f0 and 0x3f1.
+-     * But we do not emulate a floppy, so just set it here. */
++    /*
++     * The floppy also uses 0x3f0 and 0x3f1.
++     * But we do not emulate a floppy, so just set it here.
++     */
+     memory_region_add_subregion(isa_bus->address_space_io, 0x3f0,
+                                 &vt82c->superio);
+ }
+diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
+index ceee463..4692d41 100644
+--- a/hw/pci-host/bonito.c
++++ b/hw/pci-host/bonito.c
+@@ -14,7 +14,8 @@
+  * fulong 2e mini pc has a bonito north bridge.
+  */
+ 
+-/* what is the meaning of devfn in qemu and IDSEL in bonito northbridge?
++/*
++ * what is the meaning of devfn in qemu and IDSEL in bonito northbridge?
+  *
+  * devfn   pci_slot<<3  + funno
+  * one pci bus can have 32 devices and each device can have 8 functions.
+@@ -49,7 +50,7 @@
+ #include "sysemu/runstate.h"
+ #include "exec/address-spaces.h"
+ 
+-//#define DEBUG_BONITO
++/* #define DEBUG_BONITO */
+ 
+ #ifdef DEBUG_BONITO
+ #define DPRINTF(fmt, ...) fprintf(stderr, "%s: " fmt, __func__, ##__VA_ARGS__)
+@@ -60,45 +61,45 @@
+ /* from linux soure code. include/asm-mips/mips-boards/bonito64.h*/
+ #define BONITO_BOOT_BASE        0x1fc00000
+ #define BONITO_BOOT_SIZE        0x00100000
+-#define BONITO_BOOT_TOP         (BONITO_BOOT_BASE+BONITO_BOOT_SIZE-1)
++#define BONITO_BOOT_TOP         (BONITO_BOOT_BASE + BONITO_BOOT_SIZE - 1)
+ #define BONITO_FLASH_BASE       0x1c000000
+ #define BONITO_FLASH_SIZE       0x03000000
+-#define BONITO_FLASH_TOP        (BONITO_FLASH_BASE+BONITO_FLASH_SIZE-1)
++#define BONITO_FLASH_TOP        (BONITO_FLASH_BASE + BONITO_FLASH_SIZE - 1)
+ #define BONITO_SOCKET_BASE      0x1f800000
+ #define BONITO_SOCKET_SIZE      0x00400000
+-#define BONITO_SOCKET_TOP       (BONITO_SOCKET_BASE+BONITO_SOCKET_SIZE-1)
++#define BONITO_SOCKET_TOP       (BONITO_SOCKET_BASE + BONITO_SOCKET_SIZE - 1)
+ #define BONITO_REG_BASE         0x1fe00000
+ #define BONITO_REG_SIZE         0x00040000
+-#define BONITO_REG_TOP          (BONITO_REG_BASE+BONITO_REG_SIZE-1)
++#define BONITO_REG_TOP          (BONITO_REG_BASE + BONITO_REG_SIZE - 1)
+ #define BONITO_DEV_BASE         0x1ff00000
+ #define BONITO_DEV_SIZE         0x00100000
+-#define BONITO_DEV_TOP          (BONITO_DEV_BASE+BONITO_DEV_SIZE-1)
++#define BONITO_DEV_TOP          (BONITO_DEV_BASE + BONITO_DEV_SIZE - 1)
+ #define BONITO_PCILO_BASE       0x10000000
+ #define BONITO_PCILO_BASE_VA    0xb0000000
+ #define BONITO_PCILO_SIZE       0x0c000000
+-#define BONITO_PCILO_TOP        (BONITO_PCILO_BASE+BONITO_PCILO_SIZE-1)
++#define BONITO_PCILO_TOP        (BONITO_PCILO_BASE + BONITO_PCILO_SIZE - 1)
+ #define BONITO_PCILO0_BASE      0x10000000
+ #define BONITO_PCILO1_BASE      0x14000000
+ #define BONITO_PCILO2_BASE      0x18000000
+ #define BONITO_PCIHI_BASE       0x20000000
+ #define BONITO_PCIHI_SIZE       0x20000000
+-#define BONITO_PCIHI_TOP        (BONITO_PCIHI_BASE+BONITO_PCIHI_SIZE-1)
++#define BONITO_PCIHI_TOP        (BONITO_PCIHI_BASE + BONITO_PCIHI_SIZE - 1)
+ #define BONITO_PCIIO_BASE       0x1fd00000
+ #define BONITO_PCIIO_BASE_VA    0xbfd00000
+ #define BONITO_PCIIO_SIZE       0x00010000
+-#define BONITO_PCIIO_TOP        (BONITO_PCIIO_BASE+BONITO_PCIIO_SIZE-1)
++#define BONITO_PCIIO_TOP        (BONITO_PCIIO_BASE + BONITO_PCIIO_SIZE - 1)
+ #define BONITO_PCICFG_BASE      0x1fe80000
+ #define BONITO_PCICFG_SIZE      0x00080000
+-#define BONITO_PCICFG_TOP       (BONITO_PCICFG_BASE+BONITO_PCICFG_SIZE-1)
++#define BONITO_PCICFG_TOP       (BONITO_PCICFG_BASE + BONITO_PCICFG_SIZE - 1)
+ 
+ 
+ #define BONITO_PCICONFIGBASE    0x00
+ #define BONITO_REGBASE          0x100
+ 
+-#define BONITO_PCICONFIG_BASE   (BONITO_PCICONFIGBASE+BONITO_REG_BASE)
++#define BONITO_PCICONFIG_BASE   (BONITO_PCICONFIGBASE + BONITO_REG_BASE)
+ #define BONITO_PCICONFIG_SIZE   (0x100)
+ 
+-#define BONITO_INTERNAL_REG_BASE  (BONITO_REGBASE+BONITO_REG_BASE)
++#define BONITO_INTERNAL_REG_BASE  (BONITO_REGBASE + BONITO_REG_BASE)
+ #define BONITO_INTERNAL_REG_SIZE  (0x70)
+ 
+ #define BONITO_SPCICONFIG_BASE  (BONITO_PCICFG_BASE)
+@@ -111,7 +112,7 @@
+ 
+ #define BONITO_BONPONCFG        (0x00 >> 2)      /* 0x100 */
+ #define BONITO_BONGENCFG_OFFSET 0x4
+-#define BONITO_BONGENCFG        (BONITO_BONGENCFG_OFFSET>>2)   /*0x104 */
++#define BONITO_BONGENCFG        (BONITO_BONGENCFG_OFFSET >> 2)   /*0x104 */
+ 
+ /* 2. IO & IDE configuration */
+ #define BONITO_IODEVCFG         (0x08 >> 2)      /* 0x108 */
+@@ -177,15 +178,15 @@
+ /* idsel BIT = pci slot number +12 */
+ #define PCI_SLOT_BASE              12
+ #define PCI_IDSEL_VIA686B_BIT      (17)
+-#define PCI_IDSEL_VIA686B          (1<<PCI_IDSEL_VIA686B_BIT)
++#define PCI_IDSEL_VIA686B          (1 << PCI_IDSEL_VIA686B_BIT)
+ 
+-#define PCI_ADDR(busno,devno,funno,regno)  \
+-    ((((busno)<<16)&0xff0000) + (((devno)<<11)&0xf800) + (((funno)<<8)&0x700) + (regno))
++#define PCI_ADDR(busno , devno , funno , regno)  \
++    ((((busno) << 16) & 0xff0000) + (((devno) << 11) & 0xf800) + \
++    (((funno) << 8) & 0x700) + (regno))
+ 
+ typedef struct BonitoState BonitoState;
+ 
+-typedef struct PCIBonitoState
+-{
++typedef struct PCIBonitoState {
+     PCIDevice dev;
+ 
+     BonitoState *pcihost;
+@@ -239,7 +240,8 @@ static void bonito_writel(void *opaque, hwaddr addr,
+ 
+     saddr = addr >> 2;
+ 
+-    DPRINTF("bonito_writel "TARGET_FMT_plx" val %x saddr %x\n", addr, val, saddr);
++    DPRINTF("bonito_writel "TARGET_FMT_plx" val %x saddr %x\n",
++            addr, val, saddr);
+     switch (saddr) {
+     case BONITO_BONPONCFG:
+     case BONITO_IODEVCFG:
+@@ -363,7 +365,7 @@ static uint64_t bonito_ldma_readl(void *opaque, hwaddr addr,
+         return 0;
+     }
+ 
+-    val = ((uint32_t *)(&s->bonldma))[addr/sizeof(uint32_t)];
++    val = ((uint32_t *)(&s->bonldma))[addr / sizeof(uint32_t)];
+ 
+     return val;
+ }
+@@ -377,7 +379,7 @@ static void bonito_ldma_writel(void *opaque, hwaddr addr,
+         return;
+     }
+ 
+-    ((uint32_t *)(&s->bonldma))[addr/sizeof(uint32_t)] = val & 0xffffffff;
++    ((uint32_t *)(&s->bonldma))[addr / sizeof(uint32_t)] = val & 0xffffffff;
+ }
+ 
+ static const MemoryRegionOps bonito_ldma_ops = {
+@@ -400,7 +402,7 @@ static uint64_t bonito_cop_readl(void *opaque, hwaddr addr,
+         return 0;
+     }
+ 
+-    val = ((uint32_t *)(&s->boncop))[addr/sizeof(uint32_t)];
++    val = ((uint32_t *)(&s->boncop))[addr / sizeof(uint32_t)];
+ 
+     return val;
+ }
+@@ -414,7 +416,7 @@ static void bonito_cop_writel(void *opaque, hwaddr addr,
+         return;
+     }
+ 
+-    ((uint32_t *)(&s->boncop))[addr/sizeof(uint32_t)] = val & 0xffffffff;
++    ((uint32_t *)(&s->boncop))[addr / sizeof(uint32_t)] = val & 0xffffffff;
+ }
+ 
+ static const MemoryRegionOps bonito_cop_ops = {
+@@ -446,7 +448,8 @@ static uint32_t bonito_sbridge_pciaddr(void *opaque, hwaddr addr)
+     cfgaddr = addr & 0xffff;
+     cfgaddr |= (s->regs[BONITO_PCIMAP_CFG] & 0xffff) << 16;
+ 
+-    idsel = (cfgaddr & BONITO_PCICONF_IDSEL_MASK) >> BONITO_PCICONF_IDSEL_OFFSET;
++    idsel = (cfgaddr & BONITO_PCICONF_IDSEL_MASK) >>
++             BONITO_PCICONF_IDSEL_OFFSET;
+     devno = ctz32(idsel);
+     funno = (cfgaddr & BONITO_PCICONF_FUN_MASK) >> BONITO_PCICONF_FUN_OFFSET;
+     regno = (cfgaddr & BONITO_PCICONF_REG_MASK) >> BONITO_PCICONF_REG_OFFSET;
+@@ -550,7 +553,7 @@ static void pci_bonito_set_irq(void *opaque, int irq_num, int level)
+ }
+ 
+ /* map the original irq (0~3) to bonito irq (16~47, but 16~31 are unused) */
+-static int pci_bonito_map_irq(PCIDevice * pci_dev, int irq_num)
++static int pci_bonito_map_irq(PCIDevice *pci_dev, int irq_num)
+ {
+     int slot;
+ 
+@@ -618,7 +621,10 @@ static void bonito_realize(PCIDevice *dev, Error **errp)
+     SysBusDevice *sysbus = SYS_BUS_DEVICE(s->pcihost);
+     PCIHostState *phb = PCI_HOST_BRIDGE(s->pcihost);
+ 
+-    /* Bonito North Bridge, built on FPGA, VENDOR_ID/DEVICE_ID are "undefined" */
++    /*
++     * Bonito North Bridge, built on FPGA,
++     * VENDOR_ID/DEVICE_ID are "undefined"
++     */
+     pci_config_set_prog_interface(dev->config, 0x00);
+ 
+     /* set the north bridge register mapping */
+-- 
+2.7.4
+
 
