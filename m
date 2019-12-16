@@ -2,87 +2,90 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD3C8C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ACCBC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76A9B20700
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:36:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4981920700
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FH6a9wr0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76A9B20700
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="adxlnLeP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4981920700
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igofy-00016f-2e
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:36:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51066)
+	id 1igog0-0001B0-1N
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:36:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFm-0007r6-KT
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:31 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1igoMu-0008M5-Rf
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:16:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFl-0008Io-BQ
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:30 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39404)
+ (envelope-from <alex.bennee@linaro.org>) id 1igoMt-0001nd-Me
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:16:52 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44389)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1igoFl-0008Hz-4M
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:29 -0500
-Received: by mail-wm1-x343.google.com with SMTP id b72so4201057wme.4
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:29 -0800 (PST)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1igoMt-0001n8-GQ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:16:51 -0500
+Received: by mail-wr1-x443.google.com with SMTP id q10so6721802wrm.11
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:16:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=Xurk8bwctWtGSWDzsj4cIGJHvhLZxcMqw0xL6BAXFU0=;
- b=FH6a9wr0f+i24p5NOGyLNzvoiE+WuCv9veZsf23orkPio2f1cZmIpyZXtOA9eAgY58
- 4fi38AR2mvSjAV0RK0z/shyIM5kX3dqzSdkl8yEgcm1v5y67/syHZbSBfkTcbcVwYjZb
- AmpjSiDJI903CdIUMt8WskKpOnS1GLU50yJhIg+wqd9eqvWvHHAWol46Wk8n/6ylPWIe
- UDnU0d0vZa3pNPaxdbpjGxfMsa6I6f+S0ldcdEIj2ikhO7w3JeZJCYKfIgKHZmdCov5a
- 2O84xLtz0+TOEWieD9OY8o47jOINSQHZBaqABG8yicRECJd/7hulQJet0Vii0O5gMuM0
- NBDw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=g5Hton9Ll56kdz1LBD4VBc8EOQODiYzIByAV4cwmIMQ=;
+ b=adxlnLePea+1R2MHKgZeckQIKKiYo8aohlZ3k0K71Qd3T13bx8KeR5qHiZNxeO1lY0
+ /bfKeB9iLTeXyKHkgQLyONoHvFD+7O1vv6nTACU3Kl1BZ3SgakoDlvD2hfssaXK3eE2W
+ yxNKAaIrb9zcpmsp9o6LFpaj8U2BA7omIKpymBvHa6sb2MGqED9feomY7gIsnE77RlwI
+ +IgP4dFHx3ydjs1Vwf514tezgqlirWa/A4HRoA98INNV7Fwxm5jvleQB0u85tLNScHId
+ RFcPLiB473J3LTs5W+NaWwBPofwYvb9S4vOSATGUCRHVsKLH69/mZAyeoprZtH/p7zii
+ ykFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Xurk8bwctWtGSWDzsj4cIGJHvhLZxcMqw0xL6BAXFU0=;
- b=PZ7M6kFPZM1Akk2Ak1b8KYb9RtAH4F2gAh9okfatpplHdYKdmcWc+PoyKi1ReqrAn9
- Ib1yAHpvYgBPtvwUq7ZZMTi+O0BrUfBgqRuaEdXxYeyhm2BTcUqaIVgtB/nkgn4mtqba
- CLDWjvxsZvyrTfcFNpLL1+dXvISaRAchjOf7pS36Gm6rWjisClqbZeoq/7FrTHyYhgV/
- kLXl7V7NHAjEd2ttfKyn0JUXTjyh+WkDIS/BeXQsIAWuIaaYr5gMKc2q4+dQz71Am3H6
- 9BGfmdaLDdMjYJGpt6NMWV6F4KMCNdmrZ7wS7OxiM5FvEM2//x4276yEnPn80MtaQ6fO
- GD6Q==
-X-Gm-Message-State: APjAAAXRc0dVJJth/KXuUdpvgAxZL5AkALc8EscCw6l+LwbKMDLOrQDV
- 0IEl8gIyNn53PPILADc2G3xWsGQz65q24w==
-X-Google-Smtp-Source: APXvYqziwhmSa8u1Tsi0tfxvGsAKymCrh25ka5osAHocbi2CKltYESO0tvwN3cLUdcR7z2feooeROQ==
-X-Received: by 2002:a1c:67c3:: with SMTP id b186mr28812610wmc.36.1576494567902; 
- Mon, 16 Dec 2019 03:09:27 -0800 (PST)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.27
- for <qemu-devel@nongnu.org>
+ bh=g5Hton9Ll56kdz1LBD4VBc8EOQODiYzIByAV4cwmIMQ=;
+ b=EBEYAqYD319066INmAhlCEyjZca3f9Piaoun3wp0go7Ymxrbqr84mjsLmAUiZcE3Bx
+ EX8/cyNWJ1h1ol6iIdf5FwAZe3/7sOi8jT0vmzGx4HR6/UKgW0qEFwtKeTGhv6r63/2l
+ PDllv0UpLA4zgT8+LdbP9YTTDGgDIqwee7R/YGcwHvOlFcYKMYdO/x4MAwwXIfuKhQvN
+ IEl5Ha8Yc76V1rB+a8a4PSoPC4giXFeXrQxvwUEuk8mKxeXlx5/fQBM/AhC7emL2yozW
+ yvh+dn4eRewqr3Cyv0pwX54ndeaCqx2Q7V8RQxB34DJjg0BtP40USI/4Wx3EWS8p5oD0
+ e1hw==
+X-Gm-Message-State: APjAAAWqiV81vYpq5bZiOpKqAuz4qv60H/Qm4LaYnVM6wznk8KB/EmaH
+ Z8UscSui3bfKwPQm/fd5T2ie+w==
+X-Google-Smtp-Source: APXvYqwLca8B+qO00U7g1tyvKCQ906VKhP0ByN6/wt1RR+mr/Wx2DyrgPMfdwyJmgoTVENk5gE4f7Q==
+X-Received: by 2002:a5d:4d0e:: with SMTP id z14mr28592175wrt.208.1576495008979; 
+ Mon, 16 Dec 2019 03:16:48 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h66sm1793582wme.41.2019.12.16.03.16.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 03:09:27 -0800 (PST)
-From: Peter Maydell <peter.maydell@linaro.org>
+ Mon, 16 Dec 2019 03:16:46 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 412A81FF9C;
+ Mon, 16 Dec 2019 11:07:33 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 19/34] aspeed: Change the "nic" property definition
-Date: Mon, 16 Dec 2019 11:08:49 +0000
-Message-Id: <20191216110904.30815-20-peter.maydell@linaro.org>
+Subject: [PATCH  v1 12/16] Cleaned up flow of code in qemu_set_log(),
+ to simplify and clarify.
+Date: Mon, 16 Dec 2019 11:07:28 +0000
+Message-Id: <20191216110732.24027-13-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
-References: <20191216110904.30815-1-peter.maydell@linaro.org>
+In-Reply-To: <20191216110732.24027-1-alex.bennee@linaro.org>
+References: <20191216110732.24027-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,98 +97,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: fam@euphon.net, berrange@redhat.com, Robert Foley <robert.foley@linaro.org>,
+ stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Robert Foley <robert.foley@linaro.org>
 
-The Aspeed MII model has a link pointing to its associated FTGMAC100
-NIC in the machine.
+Also added some explanation of the reasoning behind the branches.
 
-Change the "nic" property definition so that it explicitly sets the
-pointer. The property isn't optional : not being able to set the link
-is a bug and QEMU should rather abort than exit in this case.
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20191119141211.25716-18-clg@kaod.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20191118211528.3221-3-robert.foley@linaro.org>
 ---
- hw/arm/aspeed_ast2600.c |  5 ++---
- hw/net/ftgmac100.c      | 19 +++++++++----------
- 2 files changed, 11 insertions(+), 13 deletions(-)
+ util/log.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index 810fd7de0c0..be88005dab8 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -183,9 +183,6 @@ static void aspeed_soc_ast2600_init(Object *obj)
- 
-         sysbus_init_child_obj(obj, "mii[*]", &s->mii[i], sizeof(s->mii[i]),
-                               TYPE_ASPEED_MII);
--        object_property_add_const_link(OBJECT(&s->mii[i]), "nic",
--                                       OBJECT(&s->ftgmac100[i]),
--                                       &error_abort);
-     }
- 
-     sysbus_init_child_obj(obj, "xdma", OBJECT(&s->xdma), sizeof(s->xdma),
-@@ -441,6 +438,8 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
-         sysbus_connect_irq(SYS_BUS_DEVICE(&s->ftgmac100[i]), 0,
-                            aspeed_soc_get_irq(s, ASPEED_ETH1 + i));
- 
-+        object_property_set_link(OBJECT(&s->mii[i]), OBJECT(&s->ftgmac100[i]),
-+                                 "nic", &error_abort);
-         object_property_set_bool(OBJECT(&s->mii[i]), true, "realized",
-                                  &err);
-         if (err) {
-diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index eb8b441461a..86ac25894a8 100644
---- a/hw/net/ftgmac100.c
-+++ b/hw/net/ftgmac100.c
-@@ -1204,17 +1204,8 @@ static void aspeed_mii_realize(DeviceState *dev, Error **errp)
+diff --git a/util/log.c b/util/log.c
+index 4316fe74eee..417d16ec66e 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -54,12 +54,25 @@ static bool log_uses_own_buffers;
+ /* enable or disable low levels log */
+ void qemu_set_log(int log_flags)
  {
-     AspeedMiiState *s = ASPEED_MII(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
--    Object *obj;
--    Error *local_err = NULL;
- 
--    obj = object_property_get_link(OBJECT(dev), "nic", &local_err);
--    if (!obj) {
--        error_propagate(errp, local_err);
--        error_prepend(errp, "required link 'nic' not found: ");
--        return;
++    bool need_to_open_file = false;
+     qemu_loglevel = log_flags;
+ #ifdef CONFIG_TRACE_LOG
+     qemu_loglevel |= LOG_TRACE;
+ #endif
+-    if (!qemu_logfile &&
+-        (is_daemonized() ? logfilename != NULL : qemu_loglevel)) {
++    /*
++     * In all cases we only log if qemu_loglevel is set.
++     * Also:
++     *   If not daemonized we will always log either to stderr
++     *     or to a file (if there is a logfilename).
++     *   If we are daemonized,
++     *     we will only log if there is a logfilename.
++     */
++    if (qemu_loglevel && (!is_daemonized() || logfilename)) {
++        need_to_open_file = true;
++    }
++    if (qemu_logfile && !need_to_open_file) {
++        qemu_log_close();
++    } else if (!qemu_logfile && need_to_open_file) {
+         if (logfilename) {
+             qemu_logfile = fopen(logfilename, log_append ? "a" : "w");
+             if (!qemu_logfile) {
+@@ -93,10 +106,6 @@ void qemu_set_log(int log_flags)
+             log_append = 1;
+         }
+     }
+-    if (qemu_logfile &&
+-        (is_daemonized() ? logfilename == NULL : !qemu_loglevel)) {
+-        qemu_log_close();
 -    }
--
--    s->nic = FTGMAC100(obj);
-+    assert(s->nic);
- 
-     memory_region_init_io(&s->iomem, OBJECT(dev), &aspeed_mii_ops, s,
-                           TYPE_ASPEED_MII, 0x8);
-@@ -1231,6 +1222,13 @@ static const VMStateDescription vmstate_aspeed_mii = {
-         VMSTATE_END_OF_LIST()
-     }
- };
-+
-+static Property aspeed_mii_properties[] = {
-+    DEFINE_PROP_LINK("nic", AspeedMiiState, nic, TYPE_FTGMAC100,
-+                     FTGMAC100State *),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
- static void aspeed_mii_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-@@ -1239,6 +1237,7 @@ static void aspeed_mii_class_init(ObjectClass *klass, void *data)
-     dc->reset = aspeed_mii_reset;
-     dc->realize = aspeed_mii_realize;
-     dc->desc = "Aspeed MII controller";
-+    dc->props = aspeed_mii_properties;
  }
  
- static const TypeInfo aspeed_mii_info = {
+ void qemu_log_needs_buffers(void)
 -- 
 2.20.1
 
