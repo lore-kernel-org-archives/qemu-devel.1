@@ -2,96 +2,98 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1ABBC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86AA0C2D0C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:02:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CFD4206EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:57:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="q0q3RHwH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CFD4206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
+	by mail.kernel.org (Postfix) with ESMTPS id 1B710206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:02:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B710206E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igroT-0000pD-MV
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 09:57:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48615)
+	id 1igrtc-0003nx-SY
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 10:02:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49675)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=24629a80a=sveith@amazon.de>) id 1igrna-0000Jo-N0
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:56:39 -0500
+ (envelope-from <groug@kaod.org>) id 1igrsH-0002h5-Kr
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:01:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=24629a80a=sveith@amazon.de>) id 1igrnZ-0000Rl-Ob
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:56:38 -0500
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:27175)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <prvs=24629a80a=sveith@amazon.de>)
- id 1igrnX-0000Kt-E7; Mon, 16 Dec 2019 09:56:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
- t=1576508196; x=1608044196;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-id:mime-version: content-transfer-encoding;
- bh=fsUpwpEZ/J/zAUOCl/OybCv/6wXahmN5L4niDYBQ4iA=;
- b=q0q3RHwHgu3keSsFVmIfXzrSl1JxqHpW/CDsffjUSXSLOC9PLUkwSi8z
- 1nmdk6kGyvJ0f2vZXDp/P5XRewfhqRd8g828bz9+tYp5BgbUt+I2OyMKj
- 2ZYHlAI8dIZWrCC/korQMnFvv8A9Gya++Ief4ACzVptVs2h2egle/rKCW U=;
-IronPort-SDR: e7Y4Ql8Nj1IXYrRrq5Dpc5izbJ5/0bHzdXL3QH4qPArt8JMbOcILdf8odWQ6VyZ6JUJ4FTPCf2
- AOf9IeQX5G7A==
-X-IronPort-AV: E=Sophos;i="5.69,321,1571702400"; d="scan'208";a="15157566"
-Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO
- email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com) ([10.47.23.38])
- by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP;
- 16 Dec 2019 14:56:24 +0000
-Received: from EX13MTAUEA001.ant.amazon.com
- (pdx4-ws-svc-p6-lb7-vlan2.pdx.amazon.com [10.170.41.162])
- by email-inbound-relay-2a-1c1b5cdd.us-west-2.amazon.com (Postfix) with ESMTPS
- id 4D354A21E7; Mon, 16 Dec 2019 14:56:23 +0000 (UTC)
-Received: from EX13D18EUC001.ant.amazon.com (10.43.164.108) by
- EX13MTAUEA001.ant.amazon.com (10.43.61.243) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 16 Dec 2019 14:56:22 +0000
-Received: from EX13D18EUC002.ant.amazon.com (10.43.164.50) by
- EX13D18EUC001.ant.amazon.com (10.43.164.108) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Mon, 16 Dec 2019 14:56:22 +0000
-Received: from EX13D18EUC002.ant.amazon.com ([10.43.164.50]) by
- EX13D18EUC002.ant.amazon.com ([10.43.164.50]) with mapi id 15.00.1367.000;
- Mon, 16 Dec 2019 14:56:21 +0000
-From: "Veith, Simon" <sveith@amazon.de>
-To: "peter.maydell@linaro.org" <peter.maydell@linaro.org>
-CC: "eric.auger@redhat.com" <eric.auger@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>
-Subject: Re: [PATCH v2 0/6] hw/arm/smmuv3: Correct stream ID and event address
- handling
-Thread-Topic: [PATCH v2 0/6] hw/arm/smmuv3: Correct stream ID and event
- address handling
-Thread-Index: AQHVsDNp2fogltgw+E+ej3y1KKrruae83nUAgAADFwA=
-Date: Mon, 16 Dec 2019 14:56:21 +0000
-Message-ID: <1576508180.11214.4.camel@amazon.de>
-References: <1576076260-18659-1-git-send-email-sveith@amazon.de>
- <CAFEAcA-Zz+Ape9z39s8uHEGUN3nOH3-o9t=EEJsm9M+oeDuebQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA-Zz+Ape9z39s8uHEGUN3nOH3-o9t=EEJsm9M+oeDuebQ@mail.gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.162.222]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F7E2C316EFBA97458F7C7324B932FDF5@amazon.com>
+ (envelope-from <groug@kaod.org>) id 1igrsG-0006GF-4P
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:01:29 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46120
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1igrsF-0006E8-VQ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:01:28 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xBGEunge098194
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 10:01:20 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2wwdt9ev8s-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 10:01:20 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Mon, 16 Dec 2019 15:01:17 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 16 Dec 2019 15:01:14 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xBGF1D0930146730
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 16 Dec 2019 15:01:13 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 29FABA405F;
+ Mon, 16 Dec 2019 15:01:13 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B8D77A405B;
+ Mon, 16 Dec 2019 15:01:12 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.39.6])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 16 Dec 2019 15:01:12 +0000 (GMT)
+Subject: [PATCH v3 1/2] cpu: Introduce cpu_class_set_parent_reset()
+From: Greg Kurz <groug@kaod.org>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Date: Mon, 16 Dec 2019 16:01:12 +0100
+In-Reply-To: <157650846660.354886.16810288202617432561.stgit@bahia.lan>
+References: <157650846660.354886.16810288202617432561.stgit@bahia.lan>
+User-Agent: StGit/unknown-version
 MIME-Version: 1.0
-Precedence: Bulk
-Content-Transfer-Encoding: base64
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 207.171.190.10
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19121615-0020-0000-0000-00000398C334
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19121615-0021-0000-0000-000021EFDA96
+Message-Id: <157650847239.354886.2782881118916307978.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-12-16_05:2019-12-16,2019-12-16 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1034 mlxscore=0
+ priorityscore=1501 spamscore=0 lowpriorityscore=0 bulkscore=0
+ suspectscore=0 adultscore=0 mlxlogscore=992 malwarescore=0 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1912160132
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,22 +102,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gTW9uLCAyMDE5LTEyLTE2IGF0IDE0OjQ1ICswMDAwLCBQZXRlciBNYXlkZWxsIHdyb3RlOg0K
-PiBTb21ldGhpbmcgZnVubnkgc2VlbXMgdG8gaGF2ZSBoYXBwZW5lZCB3aGVuIHRoaXMgc2VyaWVz
-IGdvdA0KPiBzZW50IG91dDogcGF0Y2hlcyAxLDIsMyBhcmUgY29ycmVjdGx5IGZvbGxvd3VwcyB0
-byB0aGUgY292ZXINCj4gbGV0dGVyLCBidXQgNCw1LDYgYXJlIGZvbGxvd3VwcyB0byBwYXRjaCAz
-Lg0KDQpZb3UgYXJlIGNvcnJlY3Q7IEkgaGFkIGZpeGVkIHVwIG9uZSBvZiB0aGUgcGF0Y2hlcyBh
-cyBJIHdhcyBzZW5kaW5nDQp0aGVtIG91dCwgYW5kIHRob3VnaCBJIGhhZCB0aGVuIGFkZGVkIC0t
-aW4tcmVwbHktdG8gcG9pbnRpbmcgdG8gdGhlDQpjb3ZlciBsZXR0ZXIsIGdpdC1zZW5kLWVtYWls
-IHNlZW1zIHRvIGhhdmUgYWRkZWQgYW5vdGhlciBsZXZlbCBvZg0KdGhyZWFkaW5nLiBTb3JyeSBh
-Ym91dCB0aGF0LiBJJ2xsIHJlc2VuZCB0aGUgc2VyaWVzIGFnYWluLg0KDQpSZWdhcmRzDQpTaW1v
-bgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAz
-OAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBK
-b25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1
-bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+Similarly to what we already do with qdev, use a helper to overload the
+reset QOM methods of the parent in children classes, for clarity.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Acked-by: David Hildenbrand <david@redhat.com>
+---
+ hw/core/cpu.c         |    8 ++++++++
+ include/hw/core/cpu.h |    4 ++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index db1a03c6bbb3..fde5fd395b10 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -239,6 +239,14 @@ void cpu_dump_statistics(CPUState *cpu, int flags)
+     }
+ }
+ 
++void cpu_class_set_parent_reset(CPUClass *cc,
++                                void (*child_reset)(CPUState *cpu),
++                                void (**parent_reset)(CPUState *cpu))
++{
++    *parent_reset = cc->reset;
++    cc->reset = child_reset;
++}
++
+ void cpu_reset(CPUState *cpu)
+ {
+     CPUClass *klass = CPU_GET_CLASS(cpu);
+diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+index 77c6f0529903..73e9a869a41c 100644
+--- a/include/hw/core/cpu.h
++++ b/include/hw/core/cpu.h
+@@ -1135,6 +1135,10 @@ void cpu_exec_unrealizefn(CPUState *cpu);
+  */
+ bool target_words_bigendian(void);
+ 
++void cpu_class_set_parent_reset(CPUClass *cc,
++                                void (*child_reset)(CPUState *cpu),
++                                void (**parent_reset)(CPUState *cpu));
++
+ #ifdef NEED_CPU_H
+ 
+ #ifdef CONFIG_SOFTMMU
 
 
