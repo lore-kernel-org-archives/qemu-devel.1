@@ -2,94 +2,90 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 819C1C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1A9C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:09:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D656206EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:05:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC370206CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:09:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HCGmjOw5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D656206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GI7JCyB+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC370206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igoBh-0004LE-Cu
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:05:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49192)
+	id 1igoFM-0006jw-Ja
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:09:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49941)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1igoB6-0003we-As
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:04:41 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1igoDy-00059l-7t
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:07:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1igoB3-0000mh-U3
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:04:38 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28039
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1igoB3-0000ke-Pg
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:04:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576494275;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QFx9ZMJGGLchrdWTvtIA2lU20wUiFmKf8nvAQedVx3I=;
- b=HCGmjOw55cXAQOJHbBN+Cd8f9q5hpBRz12A/WOvCpPStuRHBNBDLtTkJU5VJp/cpHoT4y1
- 1Z3Ybd7jovyi8U6ERIEp45+17m5VvgXhu1tDqR6v7dRZKBC8qin3/2a1UXlS3YWH9P9hLy
- FHB5F18b5ObSPUa8M+Fec8L68TiL0i4=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-ri91u2PFN1uyM3smtMBhaQ-1; Mon, 16 Dec 2019 06:04:32 -0500
-Received: by mail-qt1-f199.google.com with SMTP id d9so4387453qtq.13
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:04:32 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1igoDx-0003Qg-0G
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:07:38 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:34144)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1igoDw-0003Mo-Ox
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:07:36 -0500
+Received: by mail-wm1-x334.google.com with SMTP id f4so4735820wmj.1
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:07:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=g3hgguPtL+HaKFSPze+k4Gth0iQFVtrGwoUkM6o8zZk=;
+ b=GI7JCyB+Jh2GdQZxhRB8mQNh9m46u8CtZBvK5+XT2YSti5Tnq6vTNCtXNPTlyIJeu1
+ oSHWkqd+RALzhrKaYU0WL9tSoDCRtYqtcNNmI0NUKwvv/QDumkMu0Sv78TZCdVeRRBLU
+ fI1lYnWk5/RKz+3OZvsOuz85mKvjJNUsBy0GCs8Yr+6TfTiHHAvQAy9YqeSznsMxNvfg
+ Kmt+lojm+/F6LvYfySN14nh8PQdpAgVteCranzDmFFcH+U+temkjgcsQOZM58JwI3t4e
+ +mptud26jdhDfZwaQiAF6Y5giaktKv4gbCWAKEOESpXuGH+FvvfV9ZCX7tPV9n5ZNPAI
+ /WPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=KmQhJeN0hfIlFlvcoh4JWmsV2x50GreGPIA2iZaYPnk=;
- b=bcGLbDOFOXp59ZbDuyLZ0JKcffdyTypauoC2L6rH0XGXTVfv9m7Us7hfzns6P4N8E+
- s0o/ZidRYBEEa9HCbdE55n+GnqVHBfsC0PLHn4o/T0twgwWaSBNCp89YVcTDdEszJX1p
- Nh8AyzLGDNDsl6C4sP7/vYxEA/i8us2+uvGUE/sM+sBIVyadvtYCPWivHvUtzIo2Mn0D
- Rgwj38kk//v1KODahn2yx/hp+ItvxX1iGbjOmDT8KCFl/ETLJO4o+3K28gUR1iDACu+V
- g0rcKL89wvLgVSYnd2EhPit4PQyXOvsM3MZ0+xwYqXNeb5YCirYtGwNe2BITf0Gieqa0
- lBFQ==
-X-Gm-Message-State: APjAAAWFKY9AYr5l9RfTTiLV1t7IIsYKi4nLvi01whsTp279yDYzP+tH
- YhV/FviXmCdH1rSLHKkl/PRmX9a/IETBYYkJtBUHiQ8r6cqdYohIqfwyRvKjf3RVYdYvfsMho+m
- EsvnSPXaw2xp/Z+s=
-X-Received: by 2002:ac8:5313:: with SMTP id t19mr14604312qtn.375.1576494271777; 
- Mon, 16 Dec 2019 03:04:31 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy6/r5KxdTeFB59616ssUs4cRSWIa2UIxVnVjWkL4+ba1vztaaDKLO19fN0qneVlc+7vN0GWQ==
-X-Received: by 2002:ac8:5313:: with SMTP id t19mr14604289qtn.375.1576494271616; 
- Mon, 16 Dec 2019 03:04:31 -0800 (PST)
-Received: from redhat.com (bzq-111-168-31-5.red.bezeqint.net. [31.168.111.5])
- by smtp.gmail.com with ESMTPSA id
- l31sm6697820qte.30.2019.12.16.03.04.25
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=g3hgguPtL+HaKFSPze+k4Gth0iQFVtrGwoUkM6o8zZk=;
+ b=IOOq5vsqv5eQ9wpq7t+f+Ecr4riPvgtgXxsRc7GeupyzKgnLNXWcKX+7KFHNPnKv8B
+ 1Be3i5igBbkx3weoFNhcW6QQYEly7HEo5uZVX6RxkB9zP9Q2zgJGe43+1V78gkcchqwu
+ 01v5PbRoW5T26FHSVpR0wvG0FWfC/EAP1ruYE1KJZ9pAu7i/uB/4uGq2eC01Ylt9N9+s
+ ROhdnftdrq4T7tpr41KJg07qZ3WinDjcmaauDdlPa9tJB3kMVvJCmlVOpI+3BYzIVNIw
+ sfFtNlcdnbzcUX3q1rCE/c1EJ7W4sUhw20EjOD9eSk4SsDWEkrw8kYBeButgB7BtOTTj
+ Loag==
+X-Gm-Message-State: APjAAAU9NcUkdyKUS6XqdzVCC4fgf4JNaBuKSw+cZF9Tu1Yssqe8WAcu
+ r9siKoivSbqRS1BXZszJpvasQg==
+X-Google-Smtp-Source: APXvYqzjqTMI8Vzqy7eihoaWO7YQgCvmMfqh73ScTN4U6pUrLe6PFl8ye9HbQJ+m9kDrbHKJo+jMYA==
+X-Received: by 2002:a1c:9e4c:: with SMTP id h73mr8509596wme.177.1576494454347; 
+ Mon, 16 Dec 2019 03:07:34 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u18sm20848261wrt.26.2019.12.16.03.07.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 03:04:30 -0800 (PST)
-Date: Mon, 16 Dec 2019 06:04:21 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Subject: Re: [PATCH v4 0/2] virtio: make seg_max virtqueue size dependent
-Message-ID: <20191216060349-mutt-send-email-mst@kernel.org>
-References: <20191216100451.28060-1-dplotnikov@virtuozzo.com>
+ Mon, 16 Dec 2019 03:07:32 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2F5021FF8C;
+ Mon, 16 Dec 2019 11:07:32 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 01/16] configure: allow disable of cross compilation
+ containers
+Date: Mon, 16 Dec 2019 11:07:17 +0000
+Message-Id: <20191216110732.24027-2-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191216110732.24027-1-alex.bennee@linaro.org>
+References: <20191216110732.24027-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191216100451.28060-1-dplotnikov@virtuozzo.com>
-X-MC-Unique: ri91u2PFN1uyM3smtMBhaQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,47 +97,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, ehabkost@redhat.com,
- qemu-devel@nongnu.org, mreitz@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, den@virtuozzo.com
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ Stefan Weil <sw@weilnetz.de>, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Dec 16, 2019 at 01:04:49PM +0300, Denis Plotnikov wrote:
-> v4:
->   * rebased on 4.2 [MST]
+Our docker infrastructure isn't quite as multiarch as we would wish so
+lets allow the user to disable it if they want. This will allow us to
+use still run check-tcg on non-x86 CI setups.
 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Stefan Weil <sw@weilnetz.de>
+---
+ configure              | 8 +++++++-
+ tests/tcg/configure.sh | 6 ++++--
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
-Looks good. Can I get some acks from storage guys pls?
-
-> v3:
->   * add property to set in machine type [MST]
->   * add min queue size check [Stefan]
->   * add avocado based test [Max, Stefan, Eduardo, Cleber]
->=20
-> v2:
->   * the standalone patch to make seg_max virtqueue size dependent
->   * other patches are postponed
->=20
-> v1:
->   the initial series
->=20
-> Denis Plotnikov (2):
->   virtio: make seg_max virtqueue size dependent
->   tests: add virtio-scsi and virtio-blk seg_max_adjust test
->=20
->  hw/block/virtio-blk.c                     |   9 +-
->  hw/core/machine.c                         |   3 +
->  hw/scsi/vhost-scsi.c                      |   2 +
->  hw/scsi/virtio-scsi.c                     |  10 +-
->  include/hw/virtio/virtio-blk.h            |   1 +
->  include/hw/virtio/virtio-scsi.h           |   1 +
->  tests/acceptance/virtio_seg_max_adjust.py | 135 ++++++++++++++++++++++
->  7 files changed, 159 insertions(+), 2 deletions(-)
->  create mode 100755 tests/acceptance/virtio_seg_max_adjust.py
->=20
-> --=20
-> 2.17.0
+diff --git a/configure b/configure
+index 2c72e04d23f..419e1554978 100755
+--- a/configure
++++ b/configure
+@@ -302,6 +302,7 @@ audio_win_int=""
+ libs_qga=""
+ debug_info="yes"
+ stack_protector=""
++use_containers="yes"
+ 
+ if test -e "$source_path/.git"
+ then
+@@ -1539,6 +1540,10 @@ for opt do
+   ;;
+   --disable-plugins) plugins="no"
+   ;;
++  --enable-containers) use_containers="yes"
++  ;;
++  --disable-containers) use_containers="no"
++  ;;
+   *)
+       echo "ERROR: unknown option $opt"
+       echo "Try '$0 --help' for more information"
+@@ -1722,6 +1727,7 @@ Advanced options (experts only):
+                            track the maximum stack usage of stacks created by qemu_alloc_stack
+   --enable-plugins
+                            enable plugins via shared library loading
++  --disable-containers     don't use containers for cross-building
+ 
+ Optional features, enabled with --enable-FEATURE and
+ disabled with --disable-FEATURE, default is enabled if available:
+@@ -8023,7 +8029,7 @@ done
+ (for i in $cross_cc_vars; do
+   export $i
+ done
+-export target_list source_path
++export target_list source_path use_containers
+ $source_path/tests/tcg/configure.sh)
+ 
+ # temporary config to build submodules
+diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
+index 6c4a471aeae..210e68396f2 100755
+--- a/tests/tcg/configure.sh
++++ b/tests/tcg/configure.sh
+@@ -36,8 +36,10 @@ TMPC="${TMPDIR1}/qemu-conf.c"
+ TMPE="${TMPDIR1}/qemu-conf.exe"
+ 
+ container="no"
+-if has "docker" || has "podman"; then
+-  container=$($python $source_path/tests/docker/docker.py probe)
++if test $use_containers = "yes"; then
++    if has "docker" || has "podman"; then
++        container=$($python $source_path/tests/docker/docker.py probe)
++    fi
+ fi
+ 
+ # cross compilers defaults, can be overridden with --cross-cc-ARCH
+-- 
+2.20.1
 
 
