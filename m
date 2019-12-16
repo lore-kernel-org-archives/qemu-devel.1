@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A92B4C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2B02C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:27:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77448206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:26:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7DA24206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:27:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WwfSYe0c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77448206D3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qtv41et/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DA24206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igoVq-0003im-1X
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:26:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50921)
+	id 1igoXN-00066A-73
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:27:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51172)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFe-0007eR-P8
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:23 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFs-00083y-UU
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFd-0007nk-FN
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:22 -0500
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:38048)
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFr-000083-Ip
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:36 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43135)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1igoFd-0007mJ-8e
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:21 -0500
-Received: by mail-wm1-x332.google.com with SMTP id u2so6222449wmc.3
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:21 -0800 (PST)
+ id 1igoFr-00006T-CA
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:35 -0500
+Received: by mail-wr1-x441.google.com with SMTP id d16so6712516wre.10
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=sAVMne6xljKCCSIVb7x6KZ8Mn9NcByWXcsU8hgdMM68=;
- b=WwfSYe0cSD00519Wyt9qNSAu33BrF9M48OKjPfbRL9ViueU1Wd2oodfaPrWamhrkEs
- LI9pYFQicD4Wl2g2+z0w9wAp0iK1EzIbyD6dThF3PS6L/Ls7o/A9LyYe6raUQQnE/1/m
- EO9rbI4tKH8se8jdyGzd8hRH8ZPkeDNj/miP1Y+7B5KBqAPd/GdGafIH2Q9WnIy5j1SX
- FRXMfUPBfif7hLeatJjg3+ogOhDoPCizY2bcOJKWOtlPUPYWYKTyPMxJuG8xqsxrB4Ow
- /ntKa5Q33x7/LF08KumrAirG72o8d9usdiqDV7gLF+MveI3EpHQpiFCWSJivXYQz1Zvj
- rlEQ==
+ bh=ACmqU9kc4pH2AFemnhFozmUJPmfCe2y1E2GEg4ME7dE=;
+ b=Qtv41et/cAnVAjr9sEMIwdJhL+pjKHlCpFIjd9AFEhnEGk2EGzeW9XHbpWNYBF0LBY
+ uqdSCXdbsvLbL7QkrD3Zi24rB/cBwqBXbAwOo2Y214VmM7umK4UOWlALq7Fzixr/IQKG
+ KqvG+hJwJOLFCXQek/jEgQAJECT6JbVJpklD9/D4IFKHUn0ocKq+noxv51U6Im2YxLm/
+ ua7qCqLqQRgGEwAtZTihcH8iSf3YZnEmvMXDwtL4pD2NjoBDDB3JAAVo8NVGMeOgiiMN
+ 8p1GYjLpCAfHIejfMmsUtBVWQcxFFRLmZYw+ztiNFLoYIupAoQvHL/iV7kUQk8CCpPBK
+ DfRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sAVMne6xljKCCSIVb7x6KZ8Mn9NcByWXcsU8hgdMM68=;
- b=kQYlSrXUwlup72+sU24zOZZuywdCYwB8ftrIAMXQbnQzUjoczFIu8nkjEyGpvQCJpS
- YvFx9Hg1N55RiDqQhjrgLLxIVJxbcKtRENdvO/9n+jqiyj2YZpwuORUgGBUB37BSwSZ3
- pfgTp7VmPy2aaDeLg6tGGOTS6AZOxRAI2KMc3F6vcnHiKg9MyViJETHsRBeC05rQQos4
- gzhsZ/rdsybebPkyGEhb3BJQpapM4tFEROTuMPZpSnTzpRGbQpgCPfPjRCUB36zt6tCH
- yL63mtkqI2Ao+a9qnT04UuZbCKWUxBpPvJmWDf+D8xGW6Tgl2/Gy69jYKPstwbAzX5Wf
- syIA==
-X-Gm-Message-State: APjAAAUa6/CYMK0Sb5NeePRcM8br0NeD9vBlHJWciyqwlYcvsZ/9MZQ8
- ADMN93ysI5aV7clQwxVIavvhjN63zq2/yw==
-X-Google-Smtp-Source: APXvYqyaa/8pKVOirIxs8nvRTa/dlnmdXdHRmYO82nafmH/x48MXYQEFeYy0Ej14v8RM7hB6H5OXGg==
-X-Received: by 2002:a1c:4e03:: with SMTP id g3mr30847251wmh.22.1576494559675; 
- Mon, 16 Dec 2019 03:09:19 -0800 (PST)
+ bh=ACmqU9kc4pH2AFemnhFozmUJPmfCe2y1E2GEg4ME7dE=;
+ b=W8cCMyqssVZmm35+26J7wXj8HVyfo2kT8uHqr4V5i81WDSN9HTi8MFeW2CnUuBBRuR
+ q2J/TXOKJUuDAPuIeAJLtgFRam982XfjCSINJI5KqtgFzL7aZKXJCTvpbWc3lQ7EB90M
+ XAeIbFuxVPfueOLsRt9Q3ul9Xis2ZLjp4Qb9vATWQ2dZHOLm4u7SCfN28lvsKmCLCL0/
+ j+fch9ksNAr9K5LbDlbgJcfc1xxrLT1B2OuZZbY1fl5XxhmqGIrG1D9g9lMBcib+xckf
+ EXsVzHKtpYd3KogM1cVT1yOL9hEv17b/QGRJDnwuq71RHJpek/TeyozEEXVT83EF4yLJ
+ D4DA==
+X-Gm-Message-State: APjAAAVxjhA2jRFF998rPFflRaDS/G5uhllMD4xwTAhqI74MiLO0zVWg
+ scqVFEoBfsG8LXQS7hyjOWDLf2VREFt8/g==
+X-Google-Smtp-Source: APXvYqwbBo40wpngpRa9J+nQzLqTWgW1Uf+sTs8bhVdZZNjdJNR2RIpMgkWHi5IJy4GobWyChvflFQ==
+X-Received: by 2002:adf:f1d0:: with SMTP id z16mr28468734wro.209.1576494574226; 
+ Mon, 16 Dec 2019 03:09:34 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.18
+ by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.33
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 03:09:19 -0800 (PST)
+ Mon, 16 Dec 2019 03:09:33 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/34] watchdog/aspeed: Fix AST2600 frequency behaviour
-Date: Mon, 16 Dec 2019 11:08:41 +0000
-Message-Id: <20191216110904.30815-12-peter.maydell@linaro.org>
+Subject: [PULL 25/34] arm/arm-powerctl: set NSACR.{CP11,
+ CP10} bits in arm_set_cpu_on()
+Date: Mon, 16 Dec 2019 11:08:55 +0000
+Message-Id: <20191216110904.30815-26-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
 References: <20191216110904.30815-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,114 +98,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Joel Stanley <joel@jms.id.au>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
 
-The AST2600 control register sneakily changed the meaning of bit 4
-without anyone noticing. It no longer controls the 1MHz vs APB clock
-select, and instead always runs at 1MHz.
+This change ensures that the FPU can be accessed in Non-Secure mode
+when the CPU core is reset using the arm_set_cpu_on() function call.
+The NSACR.{CP11,CP10} bits define the exception level required to
+access the FPU in Non-Secure mode. Without these bits set, the CPU
+will give an undefined exception trap on the first FPU access for the
+secondary cores under Linux.
 
-The AST2500 was always 1MHz too, but it retained bit 4, making it read
-only. We can model both using the same fixed 1MHz calculation.
+This is necessary because in this power-control codepath QEMU
+is effectively emulating a bit of EL3 firmware, and has to set
+the CPU up as the EL3 firmware would.
 
-Fixes: 6b2b2a703cad ("hw: wdt_aspeed: Add AST2600 support")
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Joel Stanley <joel@jms.id.au>
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20191119141211.25716-10-clg@kaod.org
+Fixes: fc1120a7f5
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+[PMM: added clarifying para to commit message]
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/watchdog/wdt_aspeed.h |  1 +
- hw/watchdog/wdt_aspeed.c         | 21 +++++++++++++++++----
- 2 files changed, 18 insertions(+), 4 deletions(-)
+ target/arm/arm-powerctl.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
-index dfedd7662dd..819c22993a6 100644
---- a/include/hw/watchdog/wdt_aspeed.h
-+++ b/include/hw/watchdog/wdt_aspeed.h
-@@ -47,6 +47,7 @@ typedef struct AspeedWDTClass {
-     uint32_t ext_pulse_width_mask;
-     uint32_t reset_ctrl_reg;
-     void (*reset_pulse)(AspeedWDTState *s, uint32_t property);
-+    void (*wdt_reload)(AspeedWDTState *s);
- }  AspeedWDTClass;
+diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
+index f77a950db67..b064513d44a 100644
+--- a/target/arm/arm-powerctl.c
++++ b/target/arm/arm-powerctl.c
+@@ -104,6 +104,9 @@ static void arm_set_cpu_on_async_work(CPUState *target_cpu_state,
+         /* Processor is not in secure mode */
+         target_cpu->env.cp15.scr_el3 |= SCR_NS;
  
- #endif /* WDT_ASPEED_H */
-diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-index d283d07d654..122aa8daaad 100644
---- a/hw/watchdog/wdt_aspeed.c
-+++ b/hw/watchdog/wdt_aspeed.c
-@@ -93,11 +93,11 @@ static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned size)
- 
- }
- 
--static void aspeed_wdt_reload(AspeedWDTState *s, bool pclk)
-+static void aspeed_wdt_reload(AspeedWDTState *s)
- {
-     uint64_t reload;
- 
--    if (pclk) {
-+    if (!(s->regs[WDT_CTRL] & WDT_CTRL_1MHZ_CLK)) {
-         reload = muldiv64(s->regs[WDT_RELOAD_VALUE], NANOSECONDS_PER_SECOND,
-                           s->pclk_freq);
-     } else {
-@@ -109,6 +109,16 @@ static void aspeed_wdt_reload(AspeedWDTState *s, bool pclk)
-     }
- }
- 
-+static void aspeed_wdt_reload_1mhz(AspeedWDTState *s)
-+{
-+    uint64_t reload = s->regs[WDT_RELOAD_VALUE] * 1000ULL;
++        /* Set NSACR.{CP11,CP10} so NS can access the FPU */
++        target_cpu->env.cp15.nsacr |= 3 << 10;
 +
-+    if (aspeed_wdt_is_enabled(s)) {
-+        timer_mod(s->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + reload);
-+    }
-+}
-+
-+
- static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
-                              unsigned size)
- {
-@@ -130,13 +140,13 @@ static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
-     case WDT_RESTART:
-         if ((data & 0xFFFF) == WDT_RESTART_MAGIC) {
-             s->regs[WDT_STATUS] = s->regs[WDT_RELOAD_VALUE];
--            aspeed_wdt_reload(s, !(s->regs[WDT_CTRL] & WDT_CTRL_1MHZ_CLK));
-+            awc->wdt_reload(s);
-         }
-         break;
-     case WDT_CTRL:
-         if (enable && !aspeed_wdt_is_enabled(s)) {
-             s->regs[WDT_CTRL] = data;
--            aspeed_wdt_reload(s, !(data & WDT_CTRL_1MHZ_CLK));
-+            awc->wdt_reload(s);
-         } else if (!enable && aspeed_wdt_is_enabled(s)) {
-             s->regs[WDT_CTRL] = data;
-             timer_del(s->timer);
-@@ -283,6 +293,7 @@ static void aspeed_2400_wdt_class_init(ObjectClass *klass, void *data)
-     awc->offset = 0x20;
-     awc->ext_pulse_width_mask = 0xff;
-     awc->reset_ctrl_reg = SCU_RESET_CONTROL1;
-+    awc->wdt_reload = aspeed_wdt_reload;
- }
- 
- static const TypeInfo aspeed_2400_wdt_info = {
-@@ -317,6 +328,7 @@ static void aspeed_2500_wdt_class_init(ObjectClass *klass, void *data)
-     awc->ext_pulse_width_mask = 0xfffff;
-     awc->reset_ctrl_reg = SCU_RESET_CONTROL1;
-     awc->reset_pulse = aspeed_2500_wdt_reset_pulse;
-+    awc->wdt_reload = aspeed_wdt_reload_1mhz;
- }
- 
- static const TypeInfo aspeed_2500_wdt_info = {
-@@ -336,6 +348,7 @@ static void aspeed_2600_wdt_class_init(ObjectClass *klass, void *data)
-     awc->ext_pulse_width_mask = 0xfffff; /* TODO */
-     awc->reset_ctrl_reg = AST2600_SCU_RESET_CONTROL1;
-     awc->reset_pulse = aspeed_2500_wdt_reset_pulse;
-+    awc->wdt_reload = aspeed_wdt_reload_1mhz;
- }
- 
- static const TypeInfo aspeed_2600_wdt_info = {
+         /*
+          * If QEMU is providing the equivalent of EL3 firmware, then we need
+          * to make sure a CPU targeting EL2 comes out of reset with a
 -- 
 2.20.1
 
