@@ -6,67 +6,66 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5B3C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36ED7C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:52:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 096BD21582
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:52:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0186521582
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:52:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KWureBRn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 096BD21582
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a7B9y4NZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0186521582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igxLi-00041Q-M1
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 15:52:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36457)
+	id 1igxM1-0004XV-T8
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 15:52:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36390)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1igxIK-0007cC-L4
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:48:45 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1igxIA-0007JK-QM
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:48:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1igxIJ-0006aC-Hy
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:48:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41706
+ (envelope-from <eric.auger@redhat.com>) id 1igxI9-0006WL-8Q
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:48:34 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30503
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1igxIJ-0006a3-F0
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:48:43 -0500
+ id 1igxI9-0006W2-40
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:48:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576529323;
+ s=mimecast20190719; t=1576529312;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wIBn80+V74amPBupfe+F9anDq8XfKyQu39ZmejTiR10=;
- b=KWureBRnuqBP2CVxwO0mjGV0YingWtGbOdRyqivR4k3xpe+Hz/tNDaIK3kHV+of8M5mQJT
- HEXDd2fsnVHn4XwZgX2S2uRyXmUi3VBM24T7cY1/fhb8av5EGtgx50lAdkJJwRcC7v111R
- x+eszrq80Oco4ZStfZoTOVBMy45UfIM=
+ bh=tjYVs+BNNU240LHN8Sh/MBUq5QkpqVGcrM9TYOWuLzo=;
+ b=a7B9y4NZVrX1mWetk7GyO+COcOscsiQ9+6FLayeVndni+q/qJZFvBYWpzqCtLFrQF0xTAE
+ jawjG4swE4JilDrsU8MN+z5e8EfsBjlA5Q53val0bCnDKBAOzXWkukdgX36xS485z8g2M6
+ Gc6RD8JFBX3EtIl4efelECJZGw59e0M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-305-gv3zSrO2M92zwqDgWdhoog-1; Mon, 16 Dec 2019 15:48:42 -0500
-X-MC-Unique: gv3zSrO2M92zwqDgWdhoog-1
+ us-mta-401-N7zJNoN6MZy9JS5P6-AjUQ-1; Mon, 16 Dec 2019 15:48:31 -0500
+X-MC-Unique: N7zJNoN6MZy9JS5P6-AjUQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12AAB8E10DB;
- Mon, 16 Dec 2019 20:48:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEEF78024EB;
+ Mon, 16 Dec 2019 20:48:29 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5A0485D9C9;
- Mon, 16 Dec 2019 20:48:37 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 251135D9C9;
+ Mon, 16 Dec 2019 20:48:26 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH 09/10] arm/arm64: gic: Introduce setup_irq()
- helper
-Date: Mon, 16 Dec 2019 21:47:56 +0100
-Message-Id: <20191216204757.4020-10-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH 06/10] arm: pmu: Test chained counter
+Date: Mon, 16 Dec 2019 21:47:53 +0100
+Message-Id: <20191216204757.4020-7-eric.auger@redhat.com>
 In-Reply-To: <20191216204757.4020-1-eric.auger@redhat.com>
 References: <20191216204757.4020-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -92,102 +91,197 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ipi_enable() code would be reusable for other interrupts
-than IPI. Let's rename it setup_irq() and pass an interrupt
-handler pointer. We also export it to use it in other tests
-such as the PMU's one.
+Add 2 tests exercising chained counters. The first one uses
+CPU_CYCLES and the second one uses SW_INCR.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- arm/gic.c         | 24 +++---------------------
- lib/arm/asm/gic.h |  3 +++
- lib/arm/gic.c     | 11 +++++++++++
- 3 files changed, 17 insertions(+), 21 deletions(-)
+ arm/pmu.c         | 128 ++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg |  12 +++++
+ 2 files changed, 140 insertions(+)
 
-diff --git a/arm/gic.c b/arm/gic.c
-index fcf4c1f..ba43ae5 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -215,20 +215,9 @@ static void ipi_test_smp(void)
- 	report_prefix_pop();
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 139dae3..ad98771 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -113,6 +113,8 @@ static void test_event_introspection(void) {}
+ static void test_event_counter_config(void) {}
+ static void test_basic_event_count(void) {}
+ static void test_mem_access(void) {}
++static void test_chained_counters(void) {}
++static void test_chained_sw_incr(void) {}
+=20
+ #elif defined(__aarch64__)
+ #define ID_AA64DFR0_PERFMON_SHIFT 8
+@@ -459,6 +461,126 @@ static void test_mem_access(void)
+ 			read_sysreg(pmovsclr_el0));
  }
 =20
--static void ipi_enable(void)
--{
--	gic_enable_defaults();
--#ifdef __arm__
--	install_exception_handler(EXCPTN_IRQ, ipi_handler);
--#else
--	install_irq_handler(EL1H_IRQ, ipi_handler);
--#endif
--	local_irq_enable();
--}
--
- static void ipi_send(void)
- {
--	ipi_enable();
-+	setup_irq(ipi_handler);
- 	wait_on_ready();
- 	ipi_test_self();
- 	ipi_test_smp();
-@@ -238,7 +227,7 @@ static void ipi_send(void)
-=20
- static void ipi_recv(void)
- {
--	ipi_enable();
-+	setup_irq(ipi_handler);
- 	cpumask_set_cpu(smp_processor_id(), &ready);
- 	while (1)
- 		wfi();
-@@ -295,14 +284,7 @@ static void ipi_clear_active_handler(struct pt_regs =
-*regs __unused)
- static void run_active_clear_test(void)
- {
- 	report_prefix_push("active");
--	gic_enable_defaults();
--#ifdef __arm__
--	install_exception_handler(EXCPTN_IRQ, ipi_clear_active_handler);
--#else
--	install_irq_handler(EL1H_IRQ, ipi_clear_active_handler);
--#endif
--	local_irq_enable();
--
-+	setup_irq(ipi_clear_active_handler);
- 	ipi_test_self();
- 	report_prefix_pop();
- }
-diff --git a/lib/arm/asm/gic.h b/lib/arm/asm/gic.h
-index 21cdb58..55dd84b 100644
---- a/lib/arm/asm/gic.h
-+++ b/lib/arm/asm/gic.h
-@@ -82,5 +82,8 @@ void gic_set_irq_target(int irq, int cpu);
- void gic_set_irq_group(int irq, int group);
- int gic_get_irq_group(int irq);
-=20
-+typedef void (*handler_t)(struct pt_regs *regs __unused);
-+extern void setup_irq(handler_t handler);
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_H_ */
-diff --git a/lib/arm/gic.c b/lib/arm/gic.c
-index aa9cb86..8416dde 100644
---- a/lib/arm/gic.c
-+++ b/lib/arm/gic.c
-@@ -236,3 +236,14 @@ int gic_get_irq_group(int irq)
- {
- 	return gic_masked_irq_bits(irq, GICD_IGROUPR, 1, 0, ACCESS_READ);
- }
-+
-+void setup_irq(handler_t handler)
++static void test_chained_counters(void)
 +{
-+	gic_enable_defaults();
-+#ifdef __arm__
-+	install_exception_handler(EXCPTN_IRQ, handler);
-+#else
-+	install_irq_handler(EL1H_IRQ, handler);
-+#endif
-+	local_irq_enable();
++	uint32_t events[] =3D { 0x11 /* CPU_CYCLES */, 0x1E /* CHAIN */};
++
++	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
++		return;
++
++	pmu_reset();
++
++	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
++	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
++	/* enable counters #0 and #1 */
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	/* preset counter #0 at 0xFFFFFFF0 */
++	write_regn(pmevcntr, 0, 0xFFFFFFF0);
++
++	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
++
++	report(read_regn(pmevcntr, 1) =3D=3D 1, "CHAIN counter #1 incremented")=
+;
++	report(!read_sysreg(pmovsclr_el0), "check no overflow is recorded");
++
++	/* test 64b overflow */
++
++	pmu_reset();
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++
++	write_regn(pmevcntr, 0, 0xFFFFFFF0);
++	write_regn(pmevcntr, 1, 0x1);
++	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
++	report_info("overflow reg =3D 0x%lx", read_sysreg(pmovsclr_el0));
++	report(read_regn(pmevcntr, 1) =3D=3D 2, "CHAIN counter #1 incremented")=
+;
++	report(!read_sysreg(pmovsclr_el0), "check no overflow is recorded");
++
++	write_regn(pmevcntr, 0, 0xFFFFFFF0);
++	write_regn(pmevcntr, 1, 0xFFFFFFFF);
++
++	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
++	report_info("overflow reg =3D 0x%lx", read_sysreg(pmovsclr_el0));
++	report(!read_regn(pmevcntr, 1), "CHAIN counter #1 wrapped");
++	report(read_sysreg(pmovsclr_el0) =3D=3D 0x2,
++		"check no overflow is recorded");
 +}
++
++static void test_chained_sw_incr(void)
++{
++	uint32_t events[] =3D { 0x0 /* SW_INCR */, 0x0 /* SW_INCR */};
++	int i;
++
++	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
++		return;
++
++	pmu_reset();
++
++	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
++	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
++	/* enable counters #0 and #1 */
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++
++	/* preset counter #0 at 0xFFFFFFF0 */
++	write_regn(pmevcntr, 0, 0xFFFFFFF0);
++
++	for (i =3D 0; i < 100; i++)
++		write_sysreg(0x1, pmswinc_el0);
++
++	report_info("SW_INCR counter #0 has value %ld", read_regn(pmevcntr, 0))=
+;
++	report(read_regn(pmevcntr, 0) =3D=3D 0xFFFFFFF0,
++		"PWSYNC does not increment if PMCR.E is unset");
++
++	pmu_reset();
++
++	write_regn(pmevcntr, 0, 0xFFFFFFF0);
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
++
++	for (i =3D 0; i < 100; i++)
++		write_sysreg(0x3, pmswinc_el0);
++
++	report(read_regn(pmevcntr, 0)  =3D=3D 84, "counter #1 after + 100 SW_IN=
+CR");
++	report(read_regn(pmevcntr, 1)  =3D=3D 100,
++		"counter #0 after + 100 SW_INCR");
++	report_info("counter values after 100 SW_INCR #0=3D%ld #1=3D%ld",
++		    read_regn(pmevcntr, 0), read_regn(pmevcntr, 1));
++	report(read_sysreg(pmovsclr_el0) =3D=3D 0x1,
++		"overflow reg after 100 SW_INCR");
++
++	/* 64b SW_INCR */
++	pmu_reset();
++
++	events[1] =3D 0x1E /* CHAIN */;
++	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
++	write_regn(pmevcntr, 0, 0xFFFFFFF0);
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
++	for (i =3D 0; i < 100; i++)
++		write_sysreg(0x3, pmswinc_el0);
++
++	report(!read_sysreg(pmovsclr_el0) && (read_regn(pmevcntr, 1) =3D=3D 1),
++		"overflow reg after 100 SW_INCR/CHAIN");
++	report_info("overflow=3D0x%lx, #0=3D%ld #1=3D%ld", read_sysreg(pmovsclr=
+_el0),
++		    read_regn(pmevcntr, 0), read_regn(pmevcntr, 1));
++
++	/* 64b SW_INCR and overflow on CHAIN counter*/
++	pmu_reset();
++
++	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
++	write_regn(pmevcntr, 0, 0xFFFFFFF0);
++	write_regn(pmevcntr, 1, 0xFFFFFFFF);
++	write_sysreg_s(0x3, PMCNTENSET_EL0);
++	set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
++	for (i =3D 0; i < 100; i++)
++		write_sysreg(0x3, pmswinc_el0);
++
++	report((read_sysreg(pmovsclr_el0) =3D=3D 0x2) &&
++		(read_regn(pmevcntr, 1) =3D=3D 0) &&
++		(read_regn(pmevcntr, 0) =3D=3D 84),
++		"overflow reg after 100 SW_INCR/CHAIN");
++	report_info("overflow=3D0x%lx, #0=3D%ld #1=3D%ld", read_sysreg(pmovsclr=
+_el0),
++		    read_regn(pmevcntr, 0), read_regn(pmevcntr, 1));
++}
++
+ #endif
+=20
+ /*
+@@ -658,6 +780,12 @@ int main(int argc, char *argv[])
+ 	} else if (strcmp(argv[1], "mem-access") =3D=3D 0) {
+ 		report_prefix_push(argv[1]);
+ 		test_mem_access();
++	} else if (strcmp(argv[1], "chained-counters") =3D=3D 0) {
++		report_prefix_push(argv[1]);
++		test_chained_counters();
++	} else if (strcmp(argv[1], "chained-sw-incr") =3D=3D 0) {
++		report_prefix_push(argv[1]);
++		test_chained_sw_incr();
+ 	} else {
+ 		report_abort("Unknown sub-test '%s'", argv[1]);
+ 	}
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 7a59403..1bd4319 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -90,6 +90,18 @@ groups =3D pmu
+ arch =3D arm64
+ extra_params =3D -append 'mem-access'
+=20
++[pmu-chained-counters]
++file =3D pmu.flat
++groups =3D pmu
++arch =3D arm64
++extra_params =3D -append 'chained-counters'
++
++[pmu-chained-sw-incr]
++file =3D pmu.flat
++groups =3D pmu
++arch =3D arm64
++extra_params =3D -append 'chained-sw-incr'
++
+ # Test PMU support (TCG) with -icount IPC=3D1
+ #[pmu-tcg-icount-1]
+ #file =3D pmu.flat
 --=20
 2.20.1
 
