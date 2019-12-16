@@ -2,98 +2,80 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF991C2D0C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:30:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA352C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:37:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D071206CB
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:30:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 863E1206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:37:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="it2YtPzR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D071206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhV9c9Oq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 863E1206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igpWA-0001yY-E5
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 07:30:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53002)
+	id 1igpdD-0003gW-KO
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 07:37:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57119)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1igpVQ-00014E-Se
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:29:45 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1igpcU-0003CB-JN
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:37:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1igpVN-00014S-3t
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:29:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60147
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1igpVM-0000zs-I2
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:29:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576499379;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XjSiUab06wBsS+0gRmDNAgPEVjCft+UYx6pkR1oStzM=;
- b=it2YtPzRLOfaqy718klSpP2JwnUuFGMQ5iNKG222bSREvxfFGFKz/5DSvVcOidGI6OSah8
- hznotinyvn9KmQqu1vhfoxyQyML14M/b+YPb1SxqQap344cTBwr5F1MczxjhAQwuNM34HM
- yIvqm/UyzpdlRsnpvpyoipPhCz4ulSw=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-daYtpZsKOCa75E3YilwZJQ-1; Mon, 16 Dec 2019 07:29:36 -0500
-Received: by mail-wm1-f72.google.com with SMTP id m133so972239wmf.2
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 04:29:36 -0800 (PST)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1igpcR-0002p4-8D
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:37:02 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35794)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1igpcR-0002iy-37
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:36:59 -0500
+Received: by mail-ot1-x344.google.com with SMTP id o9so9056230ote.2
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 04:36:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=nQO+RaWRG6RN37ts8ibp0wOMougqSwbupGgGW7TZm2M=;
+ b=HhV9c9OqS/ymT2B3Pw6mwk3oLd4X/qYGSBiQaURIa/p4jmeek5TgXzezABScXFad0W
+ CBxGfMlu9gxASG8Lx+Aq0iYDANr6vJ8+cs5gj2iTbSARtXfjk9XukPOFCLsTRczIEHOm
+ wvQV2rSklMoVm3VJ3oA8Y87pdrKaPJlRsppDIvkLI5AyLBv0jGMtZzOuQGaZ58dlodcW
+ kIWF30PjUPtmiulHlNy5XZEQaqP5tpjG9hRkoiQSRvWp6imxXQU5Fpe/9nC8DmFhJeKw
+ tARayqVhN3eMSJT4rCV12yGq5G23FebStEBOxsGUXWjkDXebWb90g3+NyUfy9v1f3amg
+ Exlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=XjSiUab06wBsS+0gRmDNAgPEVjCft+UYx6pkR1oStzM=;
- b=Vzi042Je1S5+ivZFNPdvILxwOGOXdHkP2Gla2Dn10uV2JNDiBqcMnNaTl4bs0pDIZk
- PqUyEUTYugrxxfn8LoHdxS8E9EyHZQybYbyWJ16VgyGf2+RNsybiBAm9OhzoqLwM1PSp
- zlAO724gFoLLduwqDLzWsod+7HskRNX3SyuB+cwiIYdG9mNiCxOxF254ZOog+Fv1sohO
- TaML7WLMKBhY89dZgEvNjGPYL9YQ+E/hYlIW3DukuTSWZy0NTn3u4iv4td/f59aqi685
- /HE7qBYQXXF/RVUOD/NTtSOEHiUIx3EnIFd+nXZIF1EAUCp3Y7yXNu0k7xVGaHSe6Mvp
- ArlQ==
-X-Gm-Message-State: APjAAAWgfSGcWJHAS5o++wo3Hgc1slodllUitCA33TyPDQXX3U7IGw1d
- wdX+UAVX7DEz/pObo+dveHqAd2fIhzVrVVtHcEDpZEldcMbHfefM3Em4ww0MTrQUVUcVil5unU9
- +1ITk4GPyCxKXxr8=
-X-Received: by 2002:a1c:a745:: with SMTP id q66mr25340767wme.167.1576499375143; 
- Mon, 16 Dec 2019 04:29:35 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzrdtvFMpeWBoxASR5iaOsrNp+abbnQ05Sfner8RiC8vdO/0/TEh+maiSgGJy51Hu1Hm/X/Zw==
-X-Received: by 2002:a1c:a745:: with SMTP id q66mr25340746wme.167.1576499374915; 
- Mon, 16 Dec 2019 04:29:34 -0800 (PST)
-Received: from [192.168.10.150] ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id t190sm12490802wmt.44.2019.12.16.04.29.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Dec 2019 04:29:34 -0800 (PST)
-Subject: Re: [PULL 00/10] Bluetooth removal, and qtest & misc patches
-To: Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-References: <20191212185424.4675-1-thuth@redhat.com>
- <CAFEAcA_RQC8yswF4X8h9ya_CGLNAsJYZPZGyiqzG6sPq0bSLSQ@mail.gmail.com>
- <32967af9-3c78-0088-6e42-6ec4fa80eadc@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <3d72a5d4-15ed-3201-237b-39ce8f2b5830@redhat.com>
-Date: Mon, 16 Dec 2019 13:29:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=nQO+RaWRG6RN37ts8ibp0wOMougqSwbupGgGW7TZm2M=;
+ b=XSVKMdwI9pfEGqGXSa+YJgAFlYHykvfRCaLknsDQHMfZLrh+9iO/r9zrHk6XkQxyLj
+ PDPWdISvt9O0AG10E5aJdi4OEdbMN9cTrTpg7DCWZoCP7PR9AMBt/Y43IZ+F2ksenajQ
+ 7v2423GzNsfl6+Ugk70jLWE4ht2b1WcsCzxZeVuAKz335/WtJFxtSJO6YeKVylQnOAhw
+ qSCejdc3j2hWXkmB0cybNx+vGAhn8tlafu1jVAyQFC/Przw+xNZccemTKhZFvIg9u1RK
+ 0sgTl79udM8WwtIt2JBw5SZpWDe5qN1UO008Rd8VKKYB9C0ou5+5D/bk+zopSLfAmuol
+ UyFw==
+X-Gm-Message-State: APjAAAVbl3fCuNe5R1m8OrByTaHr1Ta7PwmfVjii8Ge54M8i5q4kDKWA
+ nl1B6i96xnJ0RrNjbV5mF4Id+J5+msrrUJzC/Zs=
+X-Google-Smtp-Source: APXvYqx3w0yp2xXirWZ+hP5nMi6a9YaN2h3+D67HRSpfVlQ3tlHRD7Yqzn7DGwYun+tqFRXMoseVVD/VTcKJy6mEruQ=
+X-Received: by 2002:a05:6830:1042:: with SMTP id
+ b2mr31452786otp.306.1576499817629; 
+ Mon, 16 Dec 2019 04:36:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <32967af9-3c78-0088-6e42-6ec4fa80eadc@redhat.com>
-Content-Language: en-US
-X-MC-Unique: daYtpZsKOCa75E3YilwZJQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
+In-Reply-To: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Mon, 16 Dec 2019 13:36:46 +0100
+Message-ID: <CAL1e-=gvSjkZ36j_+A4_G__T5WO6yL8Sh7-SOJSDvFKBT3tzZg@mail.gmail.com>
+Subject: Re: [PATCH 0/5] mips: machines: Renovate coding style
+To: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,38 +87,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Paul Burton <pburton@wavecomp.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/12/19 13:08, Thomas Huth wrote:
->> windows crossbuilds:
->>   CC      chardev/char-serial.o
->>   CC      chardev/char-socket.o
->>   CC      chardev/char-stdio.o
->>   CC      chardev/char-udp.o
->>   CC      chardev/char-win.o
->> make: *** No rule to make target
->> '/home/petmay01/qemu-for-merges/hw/bt/Kconfig', needed by
->> 'aarch64-softmmu/config-devices.mak'.  Stop.
->> make: *** Waiting for unfinished jobs....
->>   CC      chardev/char-win-stdio.o
-> These ones are really surprising to me ... *-softmmu/config-devices.mak
-> should have a proper dependency on hw/Kconfig so they should get
-> properly rebuild as far as I can tell. Could you please check the
-> *-softmmu/config-devices.mak.d dependency files whether the dependency
-> on hw/Kconfig is really there? Hmm, maybe "make" also tries to check the
-> old dependency to hw/bt/Kconfig first, before regenerating the files ...
-> not sure how to fix this properly, maybe leave an empty hw/bt/Kconfig
-> around for a while 'til all build systems have regenerated the
-> dependency files?
+On Fri, Dec 6, 2019 at 3:41 PM Filip Bozuta <Filip.Bozuta@rt-rk.com> wrote:
+>
+> The scripts checkpatch.pl located in scripts folder
+> was used to check for errors and warnings in fllowing
+> mips machines:
+>
+>     Jazz
+>     Malta
+>     Mipssim
+>     R4000
+>     Fulong 2E
+>     Boston
+>
+> All generated errors and warnings were corrected
+> and the script was ran again to make sure there
+> are no more errors and warnings
+>
+> Note:
+>
+>     Boston machine was already clear of errors
+>     and warnings so the boston machine files
+>     were not edited.
+>
+> Note:
+>
+>     One error occured due to the machro #IF 0.
+>     That error was not corrected beacuse there
+>     is some reduntant code within that macro that
+>     might be used in future versions.
+>
+> v2:
+>
+>     * changed lines in hw/mips/mips_malta.c from 848 to
+>       995 so that comments begin at the same line
+>
+>     * changed line 573 in hw/mips/mips_malta.c to fix
+>       the build error due to the function g_new0 that is
+>       used for allocating
+>
+>     * changed lines 103 and 107 in tests/acceptance/mips_malta.c
+>       so that splitting lines are aligned vertically
+>       belove the opening brackets
+>
+>     * changed line 121 in mips_r4k.c so that INITRD_PAGE_MASK so
+>       that it is aligned vertically belove the opening bracket
+>
+> Filip Bozuta (5):
+>   mips: jazz: Renovate coding style
+>   mips: malta: Renovate coding style
+>   mips: mipssim: Renovate coding style
+>   mips: r4000: Renovate coding style
+>   mips: fulong 2e: Renovate coding style
+>
+>  hw/display/jazz_led.c                    | 123 +++++++++++-----------
+>  hw/dma/rc4030.c                          |  12 ++-
+>  hw/isa/vt82c686.c                        |  23 +++--
+>  hw/mips/mips_jazz.c                      |  32 +++---
+>  hw/mips/mips_malta.c                     | 169 ++++++++++++++++---------------
+>  hw/mips/mips_r4k.c                       |  55 ++++++----
+>  hw/net/mipsnet.c                         |  44 ++++----
+>  hw/pci-host/bonito.c                     |  60 ++++++-----
+>  tests/acceptance/linux_ssh_mips_malta.py |   6 +-
+>  9 files changed, 281 insertions(+), 243 deletions(-)
+>
 
-I think in the past we've had patches where you just had to force a
-"make distclean".
+Applied to mips queue, with some minor modifications limited to
+several lines of code.
 
-Paolo
+Filip, please make sure to test build in future.
 
+(Of course, other applicable unit and integration tests should be executed too.)
+
+Thanks,
+Aleksandar
+
+> --
+> 2.7.4
+>
+>
 
