@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0B2C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE977C2D0BF
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:08:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA629206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD68A206EC
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:08:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mlvwqgp4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA629206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OTS/parC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD68A206EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igtqm-0002zr-9t
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:08:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57561)
+	id 1igtrY-00046D-EC
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:08:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFn-00062c-8T
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:52 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFT-0005bJ-NO
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFl-0000lJ-P3
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:50 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:37669)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFS-0008Mc-PF
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:31 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:36057)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtFl-0000h9-55
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:49 -0500
-Received: by mail-wr1-x444.google.com with SMTP id w15so8066939wru.4
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:48 -0800 (PST)
+ id 1igtFS-0008LH-JE
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:30 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id z3so514377wru.3
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=nb2hZFwKzalXfmKpcbYjmUeCAEo1SDTH5IqQlmfU414=;
- b=Mlvwqgp4qGA8Fg20kZKCRxrVTnH9nl3keRg5gX5ia4/a25JwygHQuQVfd3R0u9X/Ln
- jFzr/7Qpk8dRaqssdw3yIqAZe1Wd2/e8pij/SyHZN9tsh6F9r+XfXDoEObCJXf0GlzhC
- 68M6NEBkwvljigddmM2OrBXaigcwO3A/eYcDy2TwtQttDP+JtYqyWzjlP892pzNGHOpx
- dkOe9qk4bnBNuaoGgng7s0bJIdfFKXMNcFcqv1z2UI5s6KKZREO0bNf9Cwryzx5SBya7
- HZFNE19pk+APZgtq3W28aKAgL0ypJ+uupV6R+OE/AgwcLI7eEpRFFiUDmWSeHo23fg59
- rAdQ==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=qI31Sr5BEfau7aDI/0J1srKK7YhXgQE1cLHiZE6Vp/I=;
+ b=OTS/parCwNrF2TlmQ0yjUAw2H3QlPPKK0fOS30Su5MtOBKitWYfuNZfBRKkW3yupve
+ HfaVcA/tFOOVxusw5grNEjKzbcRjHE1LXFQlToK2Uf9ZVLyn4/inJ3MT7sxPVITyr5fF
+ 6/DbrorkSvJ7kATeNzilCnEPg4WCpb1waPey8S6QvAAPjHWvzMUBZoWuCMqsp+8A36LO
+ Qvr62eV1kTa/Knf3o1Yh8XhJHnvoCPQVYi8a28+gpK7tZ92ltWqClIpUJjtYlvq4MN0D
+ Z82DijNv1nCMaf83Fy9WRal8BNPKeOagnIBcIQHklPDhuPOsQsrNDyU6NLHp4v+aZ6R+
+ M4/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=nb2hZFwKzalXfmKpcbYjmUeCAEo1SDTH5IqQlmfU414=;
- b=HoHIRVuRdGAzTkYwaczKsOt5uTpSu0Aff3i2lT9xQlGna/s/Sm2ZjSZ8eVZB9RCBp2
- +d/T7LKCdoCDZZ4yujXgeZW92aBAcjvvOzgIb0ETbXxUoGMH/8BhdC1/h9ppQOB6bmgc
- gYzXVQ9DqRBaePe9n4VGHK3NDIbLxFaEXwtYkquM3d4Pj9fy/RNHguoF1BGoWErs9Orl
- g7/ajP8H9T2rvHOTaNWwmWmTOT+ImG5bYKmevHdVBX1HwlYpV+V4gKrH3BMdenfLmCPF
- O68g9JP4oJckskZbnSsDko8Y/BaXBAbuZQdr0c4GD9r1OrXYuP6+i+Hus5dreOuWbw3t
- +8BQ==
-X-Gm-Message-State: APjAAAUMwMIjE0tAe6+rqXAuOg6Li7yIl5DULrrq/IhhwcfJV2g/QXkY
- SCfRxMSH4XefLmX7MQsaOMRoc0Hs
-X-Google-Smtp-Source: APXvYqznP2mGIOd/oI3qbOORu/XNCRRVQ5dz+tEQGyoGG6EashnmbuSxwOjhbszs8HQ+Yial5Iaaew==
-X-Received: by 2002:adf:ea4f:: with SMTP id j15mr32258278wrn.356.1576513787766; 
- Mon, 16 Dec 2019 08:29:47 -0800 (PST)
+ bh=qI31Sr5BEfau7aDI/0J1srKK7YhXgQE1cLHiZE6Vp/I=;
+ b=gGQNI3tC3BpzJQzeajvkDfuM2/8zfRG89bMbXYPzslaYpFmio7lLp//Kc4sXZRYYJ+
+ KlgMyJqhpLRt97/K16J7+uDPWwJSxcEyg7uN9G6EWt9iXDR/AVIkrsWqfqjOlr/l79e9
+ 5BUR7weQQ6q45CNbqugKEOsVrXcuoQLr8vM2aihim/VNhYZ3meNO1QBnPgq1GXWQi/C9
+ KcPYnMoymI176kRjIwuern4O9Zw1qHfb+DRkmY/AePKk7A45vG0LPC9edbKJj3sKCBbv
+ vX9CHmMTmMqDDzTpWyEprASI2ZGmbzhgLCiGas0OMHtDxjIaqSAiREy1h9Ot2BuCVbIX
+ oj9A==
+X-Gm-Message-State: APjAAAUR8JfI7u3G4c5OpscNz8UKX6eKdBFuwd72z6AdeTavNrka9sEh
+ CykApH5Chc/81mgznab8BFC54WaO
+X-Google-Smtp-Source: APXvYqwuS2IL4+BBq4x83WtOT40nzDSCMv2wSR473DwG3MckOmnKndf8atuyKmVFES9IDrb1p9/cMw==
+X-Received: by 2002:a5d:6206:: with SMTP id y6mr30351583wru.130.1576513769244; 
+ Mon, 16 Dec 2019 08:29:29 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.46
+ by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.28
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Dec 2019 08:29:47 -0800 (PST)
+ Mon, 16 Dec 2019 08:29:28 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 60/62] qsp: Use WITH_RCU_READ_LOCK_GUARD
-Date: Mon, 16 Dec 2019 17:28:44 +0100
-Message-Id: <1576513726-53700-61-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 42/62] configure: set $PYTHON to a full path
+Date: Mon, 16 Dec 2019 17:28:26 +0100
+Message-Id: <1576513726-53700-43-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,66 +90,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+This will make it possible to replace it in a shebang line.
 
-The automatic rcu read lock maintenance works quite
-nicely in this case where it previously relied on a comment to
-delimit the lifetime and now has a block.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- util/qsp.c | 22 ++++++++++------------
- 1 file changed, 10 insertions(+), 12 deletions(-)
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/util/qsp.c b/util/qsp.c
-index 6226541..7d5147f 100644
---- a/util/qsp.c
-+++ b/util/qsp.c
-@@ -598,7 +598,6 @@ static void qsp_ht_delete(void *p, uint32_t h, void *htp)
- 
- static void qsp_mktree(GTree *tree, bool callsite_coalesce)
- {
--    QSPSnapshot *snap;
-     struct qht ht, coalesce_ht;
-     struct qht *htp;
- 
-@@ -610,20 +609,19 @@ static void qsp_mktree(GTree *tree, bool callsite_coalesce)
-      * We must remain in an RCU read-side critical section until we're done
-      * with the snapshot.
-      */
--    rcu_read_lock();
--    snap = atomic_rcu_read(&qsp_snapshot);
-+    WITH_RCU_READ_LOCK_GUARD() {
-+        QSPSnapshot *snap = atomic_rcu_read(&qsp_snapshot);
- 
--    /* Aggregate all results from the global hash table into a local one */
--    qht_init(&ht, qsp_entry_no_thread_cmp, QSP_INITIAL_SIZE,
--             QHT_MODE_AUTO_RESIZE | QHT_MODE_RAW_MUTEXES);
--    qht_iter(&qsp_ht, qsp_aggregate, &ht);
-+        /* Aggregate all results from the global hash table into a local one */
-+        qht_init(&ht, qsp_entry_no_thread_cmp, QSP_INITIAL_SIZE,
-+                 QHT_MODE_AUTO_RESIZE | QHT_MODE_RAW_MUTEXES);
-+        qht_iter(&qsp_ht, qsp_aggregate, &ht);
- 
--    /* compute the difference wrt the snapshot, if any */
--    if (snap) {
--        qsp_diff(&snap->ht, &ht);
-+        /* compute the difference wrt the snapshot, if any */
-+        if (snap) {
-+            qsp_diff(&snap->ht, &ht);
-+        }
-     }
--    /* done with the snapshot; RCU can reclaim it */
--    rcu_read_unlock();
- 
-     htp = &ht;
-     if (callsite_coalesce) {
+diff --git a/configure b/configure
+index 394f7f5..bbb8611 100755
+--- a/configure
++++ b/configure
+@@ -909,7 +909,7 @@ for binary in "${PYTHON-python3}" python python2
+ do
+     if has "$binary"
+     then
+-        python="$binary"
++        python=$(command -v "$binary")
+         break
+     fi
+ done
 -- 
 1.8.3.1
 
