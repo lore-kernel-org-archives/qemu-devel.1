@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE6C9C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6856CC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:26:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5D50206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:25:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33616206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:26:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pzpo0ZM3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D50206D3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O2/ibXdp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33616206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igoVS-0003Al-7s
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:25:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50787)
+	id 1igoVn-0003go-PC
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:26:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50935)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFY-0007Um-E6
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:17 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFf-0007fe-DL
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFW-0007cx-Tg
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:16 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33121)
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFe-0007qu-55
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:23 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36298)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1igoFW-0007aQ-Mr
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:14 -0500
-Received: by mail-wm1-x343.google.com with SMTP id d139so4753571wmd.0
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:14 -0800 (PST)
+ id 1igoFd-0007nc-VB
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:22 -0500
+Received: by mail-wm1-x343.google.com with SMTP id p17so6224784wma.1
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=zjLDEF6DNpTRDBT/Aj8pPr1zY4WR/x86sRDNZnQ+teI=;
- b=Pzpo0ZM30HNU4Hjs/QeBMlEflKlfmY/0QOzkC15wMBVjF/nh6nI7OgewcVTdp3zIfJ
- jPdxUiTGo1nKYLijZqxtX3jh6UMs4Js2OwFN/ysKJZ5HZhdtdLd02AYT+/oYCJUVeFBN
- jc0wZ0kWsfHw48aGz/1/vTvpr7mX/3ySvpSO+g0iwoi/qj5aqEdMtvo/9JwLptPij4t9
- rMm7TXWvVaK+zngaKJWO2Z+57lqu6ISlp1bprsy0GEQHzipM5YAXcYseMPYXmt09bRKN
- /uSUfjU6AKms7vefmzURFPZZRO3dH0DCJM8F+jJgjc/pWW+igywwwA5q83MqE5OY5oq4
- Si2g==
+ bh=oFUUQobexKmEiGcHc00gtIO7FQq8Xq2VFD8z4YpIbXU=;
+ b=O2/ibXdp/R2HNKVFg9vgznlZ9Rs7S0/UyMbitKpb3gHOG/KXDb15dZRPn/orXtyE8m
+ 5LtRN5DSwo/R4dOUWGVUVQaOE+6tkql7W6W9URa/Niz4+U7CcFd4ADmwFt6BODt+fwHo
+ TGgzjh/8IVPPMhOquRUOClouqnwrLPbtXggY+XtOMB9/hEIcOKps0zrbfY5KE82A2zkY
+ qfOTX+Bh17RU9/F5BJyl7vmsBhJZIL/j+lQ3i5KGA4Q3Acnl29gylLkD3dZ8nE8AyGz4
+ OiujELXODU3Rfi+UinYJVfysaxXGHmBehpI5XMD4cTP3Z12onT5IzXQVUpJavSmqHEhu
+ LR4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zjLDEF6DNpTRDBT/Aj8pPr1zY4WR/x86sRDNZnQ+teI=;
- b=scady/4A562Pm5Ux2UBbMvrqtbxwTAQ/CitZBZz9nMzFZ9t+c7UqzGAj6E0b/btPOM
- jgfo45jmSaCy09lOCvfIpcQ+5TqtY3PBNlDwL/QNhyO7OZle4Q/PDbTkRAOCaQ3z00Rr
- Q5eeeJYP4FLfiTtyhUYTOmSMvNuOVM8joKKMQlZ11OSwHYG3zTzGFzDwnkLIwLaB2CJq
- 06aF4VhaPLQpBtpk5TSVSNmYPuNLIMmNdxKF1Rm3UqUB8Qt6b2H8w67aFglwoAbjpv4W
- O1cGDxDuYtPTQ6hq3YtCuronlOJj04MC7bGxGekglsQE+gYRzbF1dPKGrmqlJHpfCdVM
- sntQ==
-X-Gm-Message-State: APjAAAWDxPKNNC+t88VatBVdTx7XQ9g/01y8aNuwYwFnPLGlLmF1C5kq
- FvD5lZ55f+ar+yG+mJKmAPiusM5Eqa1l9A==
-X-Google-Smtp-Source: APXvYqynOhd5Ws1YR+/xNHtr33lTCp7tHhfzFdQwdudje8i5uaBb6+jX+toelZnNSuopJH30abhMFQ==
-X-Received: by 2002:a1c:f60f:: with SMTP id w15mr28846402wmc.132.1576494553428; 
- Mon, 16 Dec 2019 03:09:13 -0800 (PST)
+ bh=oFUUQobexKmEiGcHc00gtIO7FQq8Xq2VFD8z4YpIbXU=;
+ b=U/9gg3u2CzWqVzkL6LR/8/ogxrTg+ruBAa+zSLPxf6f7t7xyoliB/ezOkIeH8vXckd
+ mtB94kgN485FqUCqJQ20Sc7aYhm9rn/f82jKct6A0B8aUUA/gXTzeLvCP0nctwgZqMup
+ zzTwq7MvidwS88Ad4WKO1uQ7HPgEsLmMrvQrNCZNX+/VkxcLDCeOK0C0ZVDGqbihLeEQ
+ sgwO6Pr4AqihDj4uDRdyH7Vw2dM2rQ3IeXC3r+sVzKlROVN1EWfJZBS2Unwk3MhjmxRf
+ O8Li66zObqiTlEKYYyg34bT9zyxhGcf8LtkpDuCy0tQDL7HP2a0O+n7P1L3pWz8dEvxg
+ gVCg==
+X-Gm-Message-State: APjAAAX3LEJi2KEdYUao/dzce614ZY1Ioi3DVQ/IsJzVV9y9eFErEHB9
+ Ep3ZQaoxInZyy+j8oQ/xUEINcmQGv/GcOw==
+X-Google-Smtp-Source: APXvYqyylastqGrQXAl8xNNK5fyzbyH6O8gEB2z+TuXcSvCK6UnEELalme4yxD/fxBe+YU3LC7KsVw==
+X-Received: by 2002:a1c:dc08:: with SMTP id t8mr30838010wmg.139.1576494560782; 
+ Mon, 16 Dec 2019 03:09:20 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.12
+ by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.19
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 03:09:12 -0800 (PST)
+ Mon, 16 Dec 2019 03:09:20 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/34] aspeed: Add a DRAM memory region at the SoC level
-Date: Mon, 16 Dec 2019 11:08:35 +0000
-Message-Id: <20191216110904.30815-6-peter.maydell@linaro.org>
+Subject: [PULL 12/34] aspeed/smc: Restore default AHB window mapping at reset
+Date: Mon, 16 Dec 2019 11:08:42 +0000
+Message-Id: <20191216110904.30815-13-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
 References: <20191216110904.30815-1-peter.maydell@linaro.org>
@@ -100,94 +100,81 @@ Sender: "Qemu-devel"
 
 From: Cédric Le Goater <clg@kaod.org>
 
-Currently, we link the DRAM memory region to the FMC model (for DMAs)
-through a property alias at the SoC level. The I2C model will need a
-similar region for DMA support, add a DRAM region property at the SoC
-level for both model to use.
+The current model only restores the Segment Register values but leaves
+the previous CS mapping behind. Introduce a helper setting the
+register value and mapping the region at the requested address. Use
+this helper when a Segment register is set and at reset.
 
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 Reviewed-by: Joel Stanley <joel@jms.id.au>
-Tested-by: Jae Hyun Yoo <jae.hyun.yoo@linux.intel.com>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20191119141211.25716-4-clg@kaod.org
+Message-id: 20191119141211.25716-11-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/aspeed_soc.h | 1 +
- hw/arm/aspeed_ast2600.c     | 7 +++++--
- hw/arm/aspeed_soc.c         | 9 +++++++--
- 3 files changed, 13 insertions(+), 4 deletions(-)
+ hw/ssi/aspeed_smc.c | 32 +++++++++++++++++++++-----------
+ 1 file changed, 21 insertions(+), 11 deletions(-)
 
-diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
-index 495c08be1b8..e84380984f7 100644
---- a/include/hw/arm/aspeed_soc.h
-+++ b/include/hw/arm/aspeed_soc.h
-@@ -40,6 +40,7 @@ typedef struct AspeedSoCState {
-     ARMCPU cpu[ASPEED_CPUS_NUM];
-     uint32_t num_cpus;
-     A15MPPrivState     a7mpcore;
-+    MemoryRegion *dram_mr;
-     MemoryRegion sram;
-     AspeedVICState vic;
-     AspeedRtcState rtc;
-diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-index 931887ac681..a403c2aae06 100644
---- a/hw/arm/aspeed_ast2600.c
-+++ b/hw/arm/aspeed_ast2600.c
-@@ -158,8 +158,6 @@ static void aspeed_soc_ast2600_init(Object *obj)
-                           typename);
-     object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs",
-                               &error_abort);
--    object_property_add_alias(obj, "dram", OBJECT(&s->fmc), "dram",
--                              &error_abort);
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index f0c7bbbad30..955ec21852a 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -475,10 +475,26 @@ static bool aspeed_smc_flash_overlap(const AspeedSMCState *s,
+     return false;
+ }
  
-     for (i = 0; i < sc->spis_num; i++) {
-         snprintf(typename, sizeof(typename), "aspeed.spi%d-%s", i + 1, socname);
-@@ -362,6 +360,11 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
++static void aspeed_smc_flash_set_segment_region(AspeedSMCState *s, int cs,
++                                                uint64_t regval)
++{
++    AspeedSMCFlash *fl = &s->flashes[cs];
++    AspeedSegments seg;
++
++    s->ctrl->reg_to_segment(s, regval, &seg);
++
++    memory_region_transaction_begin();
++    memory_region_set_size(&fl->mmio, seg.size);
++    memory_region_set_address(&fl->mmio, seg.addr - s->ctrl->flash_window_base);
++    memory_region_set_enabled(&fl->mmio, true);
++    memory_region_transaction_commit();
++
++    s->regs[R_SEG_ADDR0 + cs] = regval;
++}
++
+ static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
+                                          uint64_t new)
+ {
+-    AspeedSMCFlash *fl = &s->flashes[cs];
+     AspeedSegments seg;
+ 
+     s->ctrl->reg_to_segment(s, new, &seg);
+@@ -529,13 +545,7 @@ static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
+     aspeed_smc_flash_overlap(s, &seg, cs);
+ 
+     /* All should be fine now to move the region */
+-    memory_region_transaction_begin();
+-    memory_region_set_size(&fl->mmio, seg.size);
+-    memory_region_set_address(&fl->mmio, seg.addr - s->ctrl->flash_window_base);
+-    memory_region_set_enabled(&fl->mmio, true);
+-    memory_region_transaction_commit();
+-
+-    s->regs[R_SEG_ADDR0 + cs] = new;
++    aspeed_smc_flash_set_segment_region(s, cs, new);
+ }
+ 
+ static uint64_t aspeed_smc_flash_default_read(void *opaque, hwaddr addr,
+@@ -897,10 +907,10 @@ static void aspeed_smc_reset(DeviceState *d)
+         qemu_set_irq(s->cs_lines[i], true);
      }
  
-     /* FMC, The number of CS is set at the board level */
-+    object_property_set_link(OBJECT(&s->fmc), OBJECT(s->dram_mr), "dram", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_int(OBJECT(&s->fmc), sc->memmap[ASPEED_SDRAM],
-                             "sdram-base", &err);
-     if (err) {
-diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-index f4fe243458f..dd1ee0e3336 100644
---- a/hw/arm/aspeed_soc.c
-+++ b/hw/arm/aspeed_soc.c
-@@ -175,8 +175,6 @@ static void aspeed_soc_init(Object *obj)
-                           typename);
-     object_property_add_alias(obj, "num-cs", OBJECT(&s->fmc), "num-cs",
-                               &error_abort);
--    object_property_add_alias(obj, "dram", OBJECT(&s->fmc), "dram",
--                              &error_abort);
+-    /* setup default segment register values for all */
++    /* setup the default segment register values and regions for all */
+     for (i = 0; i < s->ctrl->max_slaves; ++i) {
+-        s->regs[R_SEG_ADDR0 + i] =
+-            s->ctrl->segment_to_reg(s, &s->ctrl->segments[i]);
++        aspeed_smc_flash_set_segment_region(s, i,
++                    s->ctrl->segment_to_reg(s, &s->ctrl->segments[i]));
+     }
  
-     for (i = 0; i < sc->spis_num; i++) {
-         snprintf(typename, sizeof(typename), "aspeed.spi%d-%s", i + 1, socname);
-@@ -323,6 +321,11 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
-                        aspeed_soc_get_irq(s, ASPEED_I2C));
- 
-     /* FMC, The number of CS is set at the board level */
-+    object_property_set_link(OBJECT(&s->fmc), OBJECT(s->dram_mr), "dram", &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     object_property_set_int(OBJECT(&s->fmc), sc->memmap[ASPEED_SDRAM],
-                             "sdram-base", &err);
-     if (err) {
-@@ -429,6 +432,8 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
- }
- static Property aspeed_soc_properties[] = {
-     DEFINE_PROP_UINT32("num-cpus", AspeedSoCState, num_cpus, 0),
-+    DEFINE_PROP_LINK("dram", AspeedSoCState, dram_mr, TYPE_MEMORY_REGION,
-+                     MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+     /* HW strapping flash type for the AST2600 controllers  */
 -- 
 2.20.1
 
