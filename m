@@ -2,72 +2,70 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 863FFC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8084C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:13:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FE63206A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:11:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92C06206A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:13:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GmSkT6+p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FE63206A5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AIylJovt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92C06206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igr5d-0005oW-UH
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 09:11:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58638)
+	id 1igr7u-0000GW-J3
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 09:13:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1igqym-0004DV-RK
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:10 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1igqzA-0004lX-Ho
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1igqyl-0003wC-90
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:08 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26976
+ (envelope-from <eric.auger@redhat.com>) id 1igqz8-00041M-VX
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:32 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21369
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1igqyk-0003w2-SA
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:07 -0500
+ id 1igqz8-000411-Oo
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576505046;
+ s=mimecast20190719; t=1576505069;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=J4yj3ipSn03wddNlzO5ReaAlW0xImmllc7BWwVZtIu4=;
- b=GmSkT6+piM9hFNuV9f9tDD6sAKvK4gMPVi0B+vava7JOSErORkMp1TppqLccjV1mjzJuVB
- TdHqzj3nEmQpiLaDuBXdBfVTVy2aR+/8AERW1MgalYx7c58AKCAq+syo5+d3ib5auo4N4z
- Pi87qmXz4SA5r6mZ0X2UJW4EpejVomQ=
+ bh=oEODYmr2qU023nvtVQu7D64kTuPbyxsd5COA3rYdVjg=;
+ b=AIylJovtuFyC3lK3zyGuwKMhrzNIViQO1pcfFMCoz2IWstoigMlnzcDaH0zQYPpTF+Zs+j
+ tHiL87yaRNxHDN+z3b2rfLu34ojqgvK+YkqIDEwJGCDxqr0paFb//VU98AoGSrnX80HZtx
+ zB7m8WD2xnMlz3CDeg90+VAwv4fN1Rg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-298-AMQbqdvGO9uyh3GUAy7FKQ-1; Mon, 16 Dec 2019 09:04:05 -0500
-X-MC-Unique: AMQbqdvGO9uyh3GUAy7FKQ-1
+ us-mta-384-n_HoM9aQPTiBfhJ9ttW-PQ-1; Mon, 16 Dec 2019 09:04:27 -0500
+X-MC-Unique: n_HoM9aQPTiBfhJ9ttW-PQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92B8B100728B;
- Mon, 16 Dec 2019 14:04:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2BCF41854351;
+ Mon, 16 Dec 2019 14:04:26 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D0E6675B8;
- Mon, 16 Dec 2019 14:03:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 26470675B9;
+ Mon, 16 Dec 2019 14:04:22 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH 07/16] arm/arm64: ITS: Set the LPI config and
- pending tables
-Date: Mon, 16 Dec 2019 15:02:26 +0100
-Message-Id: <20191216140235.10751-8-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH 13/16] arm/arm64: ITS: INT functional tests
+Date: Mon, 16 Dec 2019 15:02:32 +0100
+Message-Id: <20191216140235.10751-14-eric.auger@redhat.com>
 In-Reply-To: <20191216140235.10751-1-eric.auger@redhat.com>
 References: <20191216140235.10751-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -93,233 +91,287 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allocate the LPI configuration and per re-distributor pending table.
-Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
-by default in the config table.
+Triggers LPIs through the INT command.
 
-Also introduce a helper routine that allows to set the pending table
-bit for a given LPI.
+the test checks the LPI hits the right CPU and triggers
+the right LPI intid, ie. the translation is correct.
+
+Updates to the config table also are tested, along with inv
+and invall commands.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 ---
- lib/arm/asm/gic-v3-its.h |  3 ++
- lib/arm/asm/gic-v3.h     | 79 ++++++++++++++++++++++++++++++++++++++++
- lib/arm/gic-v3-its.c     | 65 +++++++++++++++++++++++++++++++++
- 3 files changed, 147 insertions(+)
+ arm/gic.c                | 174 +++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg        |   6 ++
+ lib/arm/asm/gic-v3-its.h |  14 ++++
+ 3 files changed, 194 insertions(+)
 
-diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index 0c0178d..0d11aed 100644
---- a/lib/arm/asm/gic-v3-its.h
-+++ b/lib/arm/asm/gic-v3-its.h
-@@ -128,6 +128,9 @@ extern void its_init(void);
- extern int its_parse_baser(int i, struct its_baser *baser);
- extern void its_setup_baser(int i, struct its_baser *baser);
- extern struct its_baser *its_lookup_baser(int type);
-+extern void set_lpi_config(int n, u8 val);
-+extern u8 get_lpi_config(int n);
-+extern void set_pending_table_bit(int rdist, int n, bool set);
+diff --git a/arm/gic.c b/arm/gic.c
+index 8b56fce..6b73258 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -34,6 +34,7 @@ static struct gic *gic;
+ static int acked[NR_CPUS], spurious[NR_CPUS];
+ static int bad_sender[NR_CPUS], bad_irq[NR_CPUS];
+ static cpumask_t ready;
++static struct its_stats lpi_stats;
 =20
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMARM_GIC_V3_ITS_H_ */
-diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
-index d02f4a4..5bf9a92 100644
---- a/lib/arm/asm/gic-v3.h
-+++ b/lib/arm/asm/gic-v3.h
-@@ -47,6 +47,83 @@
- #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
- 	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level=
- ## _SHIFT)
-=20
-+#define GIC_BASER_CACHE_nCnB            0ULL
-+#define GIC_BASER_CACHE_SameAsInner     0ULL
-+#define GIC_BASER_CACHE_nC              1ULL
-+#define GIC_BASER_CACHE_RaWt            2ULL
-+#define GIC_BASER_CACHE_RaWb            3ULL
-+#define GIC_BASER_CACHE_WaWt            4ULL
-+#define GIC_BASER_CACHE_WaWb            5ULL
-+#define GIC_BASER_CACHE_RaWaWt          6ULL
-+#define GIC_BASER_CACHE_RaWaWb          7ULL
-+#define GIC_BASER_CACHE_MASK            7ULL
-+#define GIC_BASER_NonShareable          0ULL
-+#define GIC_BASER_InnerShareable        1ULL
-+#define GIC_BASER_OuterShareable        2ULL
-+#define GIC_BASER_SHAREABILITY_MASK     3ULL
-+
-+#define GIC_BASER_CACHEABILITY(reg, inner_outer, type)                  =
-\
-+	(GIC_BASER_CACHE_##type << reg##_##inner_outer##_CACHEABILITY_SHIFT)
-+
-+#define GIC_BASER_SHAREABILITY(reg, type)                               =
-\
-+	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
-+
-+#define GICR_PROPBASER_SHAREABILITY_SHIFT               (10)
-+#define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT         (7)
-+#define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT         (56)
-+#define GICR_PROPBASER_SHAREABILITY_MASK                                =
-\
-+	GIC_BASER_SHAREABILITY(GICR_PROPBASER, SHAREABILITY_MASK)
-+#define GICR_PROPBASER_INNER_CACHEABILITY_MASK                          =
-\
-+	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, MASK)
-+#define GICR_PROPBASER_OUTER_CACHEABILITY_MASK                          =
-\
-+	GIC_BASER_CACHEABILITY(GICR_PROPBASER, OUTER, MASK)
-+#define GICR_PROPBASER_CACHEABILITY_MASK GICR_PROPBASER_INNER_CACHEABILI=
-TY_MASK
-+
-+#define GICR_PROPBASER_InnerShareable                                   =
-\
-+	GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable)
-+
-+#define GICR_PROPBASER_nCnB     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
-NNER, nCnB)
-+#define GICR_PROPBASER_nC       GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
-NNER, nC)
-+#define GICR_PROPBASER_RaWt     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
-NNER, RaWt)
-+#define GICR_PROPBASER_RaWb     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
-NNER, RaWt)
-+#define GICR_PROPBASER_WaWt     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
-NNER, WaWt)
-+#define GICR_PROPBASER_WaWb     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
-NNER, WaWb)
-+#define GICR_PROPBASER_RaWaWt   GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
-NNER, RaWaWt)
-+#define GICR_PROPBASER_RaWaWb   GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
-NNER, RaWaWb)
-+
-+#define GICR_PROPBASER_IDBITS_MASK                      (0x1f)
-+
-+#define GICR_PENDBASER_SHAREABILITY_SHIFT               (10)
-+#define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT         (7)
-+#define GICR_PENDBASER_OUTER_CACHEABILITY_SHIFT         (56)
-+#define GICR_PENDBASER_SHAREABILITY_MASK                                =
-\
-+	GIC_BASER_SHAREABILITY(GICR_PENDBASER, SHAREABILITY_MASK)
-+#define GICR_PENDBASER_INNER_CACHEABILITY_MASK                          =
-\
-+	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, MASK)
-+#define GICR_PENDBASER_OUTER_CACHEABILITY_MASK                          =
-\
-+	GIC_BASER_CACHEABILITY(GICR_PENDBASER, OUTER, MASK)
-+#define GICR_PENDBASER_CACHEABILITY_MASK GICR_PENDBASER_INNER_CACHEABILI=
-TY_MASK
-+
-+#define GICR_PENDBASER_InnerShareable                                   =
-\
-+	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable)
-+
-+#define GICR_PENDBASER_nCnB     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
-NNER, nCnB)
-+#define GICR_PENDBASER_nC       GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
-NNER, nC)
-+#define GICR_PENDBASER_RaWt     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
-NNER, RaWt)
-+#define GICR_PENDBASER_RaWb     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
-NNER, RaWt)
-+#define GICR_PENDBASER_WaWt     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
-NNER, WaWt)
-+#define GICR_PENDBASER_WaWb     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
-NNER, WaWb)
-+#define GICR_PENDBASER_RaWaWt   GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
-NNER, RaWaWt)
-+#define GICR_PENDBASER_RaWaWb   GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
-NNER, RaWaWb)
-+
-+#define GICR_PENDBASER_PTZ                              BIT_ULL(62)
-+
-+#define LPI_PROP_GROUP1		(1 << 1)
-+#define LPI_PROP_ENABLED	(1 << 0)
-+#define LPI_PROP_DEFAULT_PRIO   0xa0
-+#define LPI_PROP_DEFAULT	(LPI_PROP_DEFAULT_PRIO |			\
-+				LPI_PROP_GROUP1 | LPI_PROP_ENABLED)
-+
- #include <asm/arch_gicv3.h>
-=20
- #ifndef __ASSEMBLY__
-@@ -63,6 +140,8 @@ struct gicv3_data {
- 	void *dist_base;
- 	void *redist_bases[GICV3_NR_REDISTS];
- 	void *redist_base[NR_CPUS];
-+	void *lpi_prop;
-+	void *lpi_pend[NR_CPUS];
- 	unsigned int irq_nr;
- };
- extern struct gicv3_data gicv3_data;
-diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-index 303022f..0b5a700 100644
---- a/lib/arm/gic-v3-its.c
-+++ b/lib/arm/gic-v3-its.c
-@@ -123,3 +123,68 @@ void its_setup_baser(int i, struct its_baser *baser)
- 	writeq(val, gicv3_its_base() + GITS_BASER + i * 8);
+ static void nr_cpu_check(int nr)
+ {
+@@ -158,6 +159,54 @@ static void ipi_handler(struct pt_regs *regs __unuse=
+d)
+ 	}
  }
 =20
-+inline void set_lpi_config(int n, u8 value)
++static void lpi_handler(struct pt_regs *regs __unused)
 +{
-+	u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 8192));
-+	*entry =3D value;
++	u32 irqstat =3D gic_read_iar();
++	int irqnr =3D gic_iar_irqnr(irqstat);
++
++	gic_write_eoir(irqstat);
++	if (irqnr < 8192)
++		report(false, "Unexpected non LPI interrupt received");
++	smp_rmb(); /* pairs with wmb in lpi_stats_expect */
++	lpi_stats.observed.cpu_id =3D smp_processor_id();
++	lpi_stats.observed.lpi_id =3D irqnr;
++	smp_wmb(); /* pairs with rmb in check_lpi_stats */
 +}
 +
-+inline u8 get_lpi_config(int n)
++static void lpi_stats_expect(int exp_cpu_id, int exp_lpi_id)
 +{
-+	u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 8192));
-+	return *entry;
++	lpi_stats.expected.cpu_id =3D exp_cpu_id;
++	lpi_stats.expected.lpi_id =3D exp_lpi_id;
++	lpi_stats.observed.cpu_id =3D -1;
++	lpi_stats.observed.lpi_id =3D -1;
++	smp_wmb(); /* pairs with rmb in handler */
 +}
 +
-+/* alloc_lpi_tables: Allocate LPI config and pending tables */
-+void alloc_lpi_tables(void);
-+void alloc_lpi_tables(void)
++static void check_lpi_stats(void)
 +{
-+	unsigned long n =3D SZ_64K >> PAGE_SHIFT;
-+	unsigned long order =3D fls(n);
-+	u64 prop_val;
-+	int cpu;
-+
-+	gicv3_data.lpi_prop =3D (void *)virt_to_phys(alloc_pages(order));
-+
-+	/* ID bits =3D 13, ie. up to 14b LPI INTID */
-+	prop_val =3D ((u64)gicv3_data.lpi_prop |
-+			GICR_PROPBASER_InnerShareable |
-+			GICR_PROPBASER_WaWb |
-+			(13 & GICR_PROPBASER_IDBITS_MASK));
-+
-+	/*
-+	 * Allocate pending tables for each redistributor
-+	 * and set PROPBASER and PENDBASER
-+	 */
-+	for_each_present_cpu(cpu) {
-+		u64 pend_val;
-+		void *ptr;
-+
-+		ptr =3D gicv3_data.redist_base[cpu];
-+
-+		writeq(prop_val, ptr + GICR_PROPBASER);
-+
-+		gicv3_data.lpi_pend[cpu] =3D
-+			(void *)virt_to_phys(alloc_pages(order));
-+
-+		pend_val =3D ((u64)gicv3_data.lpi_pend[cpu] |
-+			GICR_PENDBASER_InnerShareable |
-+			GICR_PENDBASER_WaWb);
-+
-+		writeq(pend_val, ptr + GICR_PENDBASER);
++	mdelay(100);
++	smp_rmb(); /* pairs with wmb in lpi_handler */
++	if ((lpi_stats.observed.cpu_id !=3D lpi_stats.expected.cpu_id) ||
++	    (lpi_stats.observed.lpi_id !=3D lpi_stats.expected.lpi_id)) {
++		if (lpi_stats.observed.cpu_id =3D=3D -1 &&
++		    lpi_stats.observed.lpi_id =3D=3D -1) {
++			report(false,
++			       "No LPI received whereas (cpuid=3D%d, intid=3D%d) "
++			       "was expected", lpi_stats.expected.cpu_id,
++			       lpi_stats.expected.lpi_id);
++		} else {
++			report(false, "Unexpected LPI (cpuid=3D%d, intid=3D%d)",
++			       lpi_stats.observed.cpu_id,
++			       lpi_stats.observed.lpi_id);
++		}
++	} else if (lpi_stats.expected.lpi_id !=3D -1) {
++		report(true, "LPI %d on CPU %d", lpi_stats.observed.lpi_id,
++		       lpi_stats.observed.cpu_id);
++	} else {
++		report(true, "no LPI received, as expected");
 +	}
 +}
 +
-+void set_pending_table_bit(int rdist, int n, bool set)
+ static void gicv2_ipi_send_self(void)
+ {
+ 	writel(2 << 24 | IPI_IRQ, gicv2_dist_base() + GICD_SGIR);
+@@ -241,6 +290,14 @@ static void ipi_test(void *data __unused)
+ 		ipi_recv();
+ }
+=20
++static void secondary_lpi_test(void)
 +{
-+	u8 *ptr =3D phys_to_virt((phys_addr_t)gicv3_data.lpi_pend[rdist]);
-+	u8 mask =3D 1 << (n % 8), byte;
-+
-+	ptr +=3D (n / 8);
-+	byte =3D *ptr;
-+	if (set)
-+		byte |=3D  mask;
-+	else
-+		byte &=3D ~mask;
-+	*ptr =3D byte;
++	setup_irq(lpi_handler);
++	cpumask_set_cpu(smp_processor_id(), &ready);
++	while (1)
++		wfi();
 +}
++
+ static struct gic gicv2 =3D {
+ 	.ipi =3D {
+ 		.send_self =3D gicv2_ipi_send_self,
+@@ -552,6 +609,120 @@ static void test_its_baser(void)
+ 	report_info("collection baser entry_size =3D 0x%x", dev_baser->esz);
+ }
+=20
++static int its_prerequisites(int nb_cpus)
++{
++	int cpu;
++
++	if (!gicv3_its_base()) {
++		report_skip("No ITS, skip ...");
++		return -1;
++	}
++
++	if (nr_cpus < 4) {
++		report_skip("Test requires at least %d vcpus", nb_cpus);
++		return -1;
++	}
++
++	stats_reset();
++
++	setup_irq(lpi_handler);
++
++	for_each_present_cpu(cpu) {
++		if (cpu =3D=3D 0)
++			continue;
++		smp_boot_secondary(cpu, secondary_lpi_test);
++	}
++	wait_on_ready();
++
++	its_enable_defaults();
++
++	lpi_stats_expect(-1, -1);
++	check_lpi_stats();
++
++	return 0;
++}
++
++static void test_its_trigger(void)
++{
++	struct its_collection *col3, *col2;
++	struct its_device *dev2, *dev7;
++
++	if (its_prerequisites(4))
++		return;
++
++	dev2 =3D its_create_device(2 /* dev id */, 8 /* nb_ites */);
++	dev7 =3D its_create_device(7 /* dev id */, 8 /* nb_ites */);
++
++	col3 =3D its_create_collection(3 /* col id */, 3/* target PE */);
++	col2 =3D its_create_collection(2 /* col id */, 2/* target PE */);
++
++	set_lpi_config(8195, LPI_PROP_DEFAULT);
++	set_lpi_config(8196, LPI_PROP_DEFAULT);
++
++	its_send_invall(col2);
++	its_send_invall(col3);
++
++	report_prefix_push("int");
++
++	its_send_mapd(dev2, true);
++	its_send_mapd(dev7, true);
++
++	its_send_mapc(col3, true);
++	its_send_mapc(col2, true);
++
++	its_send_mapti(dev2, 8195 /* lpi id */,
++		       20 /* event id */, col3);
++	its_send_mapti(dev7, 8196 /* lpi id */,
++		       255 /* event id */, col2);
++
++	lpi_stats_expect(3, 8195);
++	its_send_int(dev2, 20);
++	check_lpi_stats();
++
++	lpi_stats_expect(2, 8196);
++	its_send_int(dev7, 255);
++	check_lpi_stats();
++
++	report_prefix_pop();
++
++	report_prefix_push("inv/invall");
++
++	/* disable 8195 */
++	set_lpi_config(8195, LPI_PROP_DEFAULT & ~0x1);
++	its_send_inv(dev2, 20);
++
++	lpi_stats_expect(-1, -1);
++	its_send_int(dev2, 20);
++	check_lpi_stats();
++
++	set_lpi_config(8195, LPI_PROP_DEFAULT);
++	/* willingly forget the INVALL*/
++	lpi_stats_expect(-1, -1);
++	its_send_int(dev2, 20);
++	check_lpi_stats();
++
++	its_send_invall(col3);
++	lpi_stats_expect(3, 8195);
++	its_send_int(dev2, 20);
++	check_lpi_stats();
++
++	report_prefix_pop();
++
++	report_prefix_push("mapd valid=3Dfalse");
++	its_send_mapd(dev2, false);
++	lpi_stats_expect(-1, -1);
++	its_send_int(dev2, 20);
++	check_lpi_stats();
++	report_prefix_pop();
++
++	report_prefix_push("mapc valid=3Dfalse");
++	its_send_mapc(col2, false);
++	lpi_stats_expect(-1, -1);
++	its_send_int(dev7, 255);
++	check_lpi_stats();
++}
++
++
+ int main(int argc, char **argv)
+ {
+ 	if (!gic_init()) {
+@@ -582,6 +753,9 @@ int main(int argc, char **argv)
+ 	} else if (strcmp(argv[1], "mmio") =3D=3D 0) {
+ 		report_prefix_push(argv[1]);
+ 		gic_test_mmio();
++	} else if (!strcmp(argv[1], "its-trigger")) {
++		report_prefix_push(argv[1]);
++		test_its_trigger();
+ 		report_prefix_pop();
+ 	} else if (strcmp(argv[1], "its-introspection") =3D=3D 0) {
+ 		report_prefix_push(argv[1]);
+diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+index 2234a0f..80a1d27 100644
+--- a/arm/unittests.cfg
++++ b/arm/unittests.cfg
+@@ -134,6 +134,12 @@ smp =3D $MAX_SMP
+ extra_params =3D -machine gic-version=3D3 -append 'its-baser'
+ groups =3D its
+=20
++[its-trigger]
++file =3D gic.flat
++smp =3D $MAX_SMP
++extra_params =3D -machine gic-version=3D3 -append 'its-trigger'
++groups =3D its
++
+ # Test PSCI emulation
+ [psci]
+ file =3D psci.flat
+diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
+index d074c17..d4fd799 100644
+--- a/lib/arm/asm/gic-v3-its.h
++++ b/lib/arm/asm/gic-v3-its.h
+@@ -162,6 +162,16 @@ struct its_data {
+ 	u32 nb_collections;	/* Allocated Collections */
+ };
+=20
++struct its_event {
++	int cpu_id;
++	int lpi_id;
++};
++
++struct its_stats {
++	struct its_event expected;
++	struct its_event observed;
++};
++
+ extern struct its_data its_data;
+=20
+ #define gicv3_its_base()		(its_data.base)
+@@ -178,6 +188,10 @@ extern void gicv3_rdist_ctrl_lpi(u32 redist, bool se=
+t);
+ extern void its_enable_defaults(void);
+ extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
+ extern struct its_collection *its_create_collection(u32 col_id, u32 targ=
+et_pe);
++extern struct its_collection *its_create_collection(u32 col_id, u32 targ=
+et);
++
++extern void set_lpi_config(int n, u8 val);
++extern u8 get_lpi_config(int n);
+=20
+ extern void its_send_mapd(struct its_device *dev, int valid);
+ extern void its_send_mapc(struct its_collection *col, int valid);
 --=20
 2.20.1
 
