@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B7CC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:31:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C4AC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:31:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3BDA206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:31:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38242206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:31:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rZ0hP8tz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3BDA206D3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cL7s36FY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38242206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igoaa-000243-4z
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:31:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51023)
+	id 1igoas-0002SO-Mj
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:31:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50984)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFk-0007nE-Ii
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:29 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFi-0007kO-Ky
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFj-0008CY-9R
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:28 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43133)
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFg-00081B-AA
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:25 -0500
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:45313)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1igoFj-00088x-2X
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:27 -0500
-Received: by mail-wr1-x441.google.com with SMTP id d16so6712015wre.10
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:26 -0800 (PST)
+ id 1igoFg-0007y8-3V
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:24 -0500
+Received: by mail-wr1-x432.google.com with SMTP id j42so2524811wrj.12
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=cLD2Kna7vySI7JTixY4DUbJiDAp4iUXD1298DaSCR8I=;
- b=rZ0hP8tz8VogaUVsp9aiUXJlXyJGkkdBMyO4EzwmzsW7Gy2+xAqKdzolFes0iNaIZn
- TdamUM9AuYEFtfQ3vl4TJqfgY+ppsMnd8IKRfyGIft+a6L5IwidZ0US09sf2BHAIZFH5
- 24GNlToZrDd2QLHGZl5Oke+5OiZRAkODRYYPMvTqFdrde3Zu1iaUrAn5wWhbAHefZMjU
- jV8GuCy9TJn8yGEx+2QCuuAJak/m7mt5hCFu7BnJFYcttdUkUSZ7bDtZqtNVUv7Ft3ym
- f2khM+ZcComZoKfZgiwAlSvC65p6w3pS2BwDKsn0vCHTtZgkmpxm81lLlU7GJXojtWg0
- IHLw==
+ bh=ibgl5PVRhP+gnfhMETg2bP2CZS3sDh+cN9nWx6vn2LY=;
+ b=cL7s36FYYnSUp00+ypOBJCgmw+G/2vEV2CQbGy8J9t9B+p1EW9D/5TmdXXih7O2cUq
+ iM8YUgr+QqnpLwYaWh7utijb18STA9RH9QiF+plb3tYH1TFj9k9yAlvh6dfdj0GfPTvM
+ dwPh/ExhIirEpwtJZtzO6qsEBXTU5xkjOdG+Knw2zqv9HUNk1U3U5M6fg8qLE9Y/fcG5
+ rCjXMyjyJDkoDk5CyD2Cm7X37G5OhSGO0VTLABTvLKYeW3P58Eewm5g2lf29KZyp9bhT
+ bhtA2jYks0n8ux50/LshFuuqVPmiV16eydlqbyL558eBc6V/Tb8FWcMebsi73AFOtlz2
+ HKRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cLD2Kna7vySI7JTixY4DUbJiDAp4iUXD1298DaSCR8I=;
- b=mw3xiJ20m+HXqQdAJDPBDKEaEAKXGGs+Fto96SZMk0CJ2IcGdFkMm92+OydPHbMEEK
- FxjCM2krRgTzl3oMjQZrRoclnau5NraMt+pRYdT65CdH2GE1Q2a97bzRYqr7ZmLmS5d/
- kWAM1RwIUYaCLLL317Zs12roSIv6Y4/LcCT7D808ZjZ0/I+Brr1bE9q5dttl2LMVV7me
- TgGLvMNG2xQfOOgCgjlHsO6C1kSc0gde8fSzE01GwMlEbN/mH6Jqme7piTMOjGf6NX7/
- i872d3fnbH+tqtqI1UkMlllVJuRbgU4I4HufFTUiMKcQSTQu2iOqEuDQXXTZrAqObTxS
- Fl0Q==
-X-Gm-Message-State: APjAAAXz5ZkvIz/ami2aQ4PX6gWJMR8uKSQDQiycQnr7YF/0O0NjWoUZ
- WxAule2LxfA/YyuzzqsUaQA0nzimzGUVCQ==
-X-Google-Smtp-Source: APXvYqw7CA0lEFBH/KYeeg2n0bfL6xDJGUKqfanCTrMiq+9Mugtjgo+AA2HNs/DWXkQ3LmO0zUPu5w==
-X-Received: by 2002:adf:c746:: with SMTP id b6mr28282526wrh.298.1576494565931; 
- Mon, 16 Dec 2019 03:09:25 -0800 (PST)
+ bh=ibgl5PVRhP+gnfhMETg2bP2CZS3sDh+cN9nWx6vn2LY=;
+ b=SBCM54xoCtOrE7ysI+pzaNCVEvDS3lSA4xTLOh8qRI+wc7/NufuqSB55zv56ZKch40
+ wYFKKxwXNXEfc/RQ2QHkMlC1ICwLeD3SUg0UKW2JOfDmyrZ5uRutIEjlv2dweSL+m7FG
+ 1RgwfbSzqppKycplApqtmM3i2QaNlXqqbRRfX/ePVK/GFDKfnqQ5tn1GTiSutY2xxB77
+ 6zLzpRPdUFabEnjr7AlH9jXBxH1E0HZa5QE/tbjYkU3dx/cOfSLsuwnv6BZRpCeKWyxW
+ rkmFkzZVT99ozaT5BZqnkFVg38cWgwp+5wvrbdQBbDbSEFJYQGj8pxKLXyVbxPrl9hC2
+ zT6A==
+X-Gm-Message-State: APjAAAXtn5d05KtTRTv9JuhghX80geoV4SHw1baOsQDmtRVnbJVZ4upD
+ v+IPh87DQQlZfWdCjqcu7Q3VamX0eTs8Gg==
+X-Google-Smtp-Source: APXvYqx/BN9gd9wnGecgzsuw5AVZys9vKpE7J7y8KWWwYF+MuvDWHLJe6Z8KS3fTm+aQ5ooXkcyzYA==
+X-Received: by 2002:adf:ffc7:: with SMTP id x7mr29301742wrs.159.1576494562698; 
+ Mon, 16 Dec 2019 03:09:22 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.24
+ by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.21
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 03:09:25 -0800 (PST)
+ Mon, 16 Dec 2019 03:09:22 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/34] gpio: fix memory leak in aspeed_gpio_init()
-Date: Mon, 16 Dec 2019 11:08:47 +0000
-Message-Id: <20191216110904.30815-18-peter.maydell@linaro.org>
+Subject: [PULL 14/34] aspeed/smc: Add AST2600 timings registers
+Date: Mon, 16 Dec 2019 11:08:44 +0000
+Message-Id: <20191216110904.30815-15-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
 References: <20191216110904.30815-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::432
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,32 +98,137 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: PanNengyuan <pannengyuan@huawei.com>
+From: Cédric Le Goater <clg@kaod.org>
 
-Address Sanitizer shows memory leak in hw/gpio/aspeed_gpio.c:875
+Each CS has its own Read Timing Compensation Register on newer SoCs.
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20191119141211.25716-16-clg@kaod.org
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-id: 20191119141211.25716-13-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/gpio/aspeed_gpio.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/hw/ssi/aspeed_smc.h |  1 +
+ hw/ssi/aspeed_smc.c         | 17 ++++++++++++++---
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/hw/gpio/aspeed_gpio.c b/hw/gpio/aspeed_gpio.c
-index 7acc5fa8e29..41e11ea9b04 100644
---- a/hw/gpio/aspeed_gpio.c
-+++ b/hw/gpio/aspeed_gpio.c
-@@ -876,6 +876,7 @@ static void aspeed_gpio_init(Object *obj)
-                                pin_idx % GPIOS_PER_GROUP);
-         object_property_add(obj, name, "bool", aspeed_gpio_get_pin,
-                             aspeed_gpio_set_pin, NULL, NULL, NULL);
-+        g_free(name);
-     }
- }
+diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+index 684d16e3361..6fbbb238f15 100644
+--- a/include/hw/ssi/aspeed_smc.h
++++ b/include/hw/ssi/aspeed_smc.h
+@@ -40,6 +40,7 @@ typedef struct AspeedSMCController {
+     uint8_t r_ce_ctrl;
+     uint8_t r_ctrl0;
+     uint8_t r_timings;
++    uint8_t nregs_timings;
+     uint8_t conf_enable_w0;
+     uint8_t max_slaves;
+     const AspeedSegments *segments;
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 86cadbe4cc0..7755eca3497 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -137,7 +137,7 @@
+ /* Checksum Calculation Result */
+ #define R_DMA_CHECKSUM    (0x90 / 4)
  
+-/* Misc Control Register #2 */
++/* Read Timing Compensation Register */
+ #define R_TIMINGS         (0x94 / 4)
+ 
+ /* SPI controller registers and bits (AST2400) */
+@@ -256,6 +256,7 @@ static const AspeedSMCController controllers[] = {
+         .r_ce_ctrl         = R_CE_CTRL,
+         .r_ctrl0           = R_CTRL0,
+         .r_timings         = R_TIMINGS,
++        .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+         .max_slaves        = 5,
+         .segments          = aspeed_segments_legacy,
+@@ -271,6 +272,7 @@ static const AspeedSMCController controllers[] = {
+         .r_ce_ctrl         = R_CE_CTRL,
+         .r_ctrl0           = R_CTRL0,
+         .r_timings         = R_TIMINGS,
++        .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+         .max_slaves        = 5,
+         .segments          = aspeed_segments_fmc,
+@@ -288,6 +290,7 @@ static const AspeedSMCController controllers[] = {
+         .r_ce_ctrl         = 0xff,
+         .r_ctrl0           = R_SPI_CTRL0,
+         .r_timings         = R_SPI_TIMINGS,
++        .nregs_timings     = 1,
+         .conf_enable_w0    = SPI_CONF_ENABLE_W0,
+         .max_slaves        = 1,
+         .segments          = aspeed_segments_spi,
+@@ -303,6 +306,7 @@ static const AspeedSMCController controllers[] = {
+         .r_ce_ctrl         = R_CE_CTRL,
+         .r_ctrl0           = R_CTRL0,
+         .r_timings         = R_TIMINGS,
++        .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+         .max_slaves        = 3,
+         .segments          = aspeed_segments_ast2500_fmc,
+@@ -320,6 +324,7 @@ static const AspeedSMCController controllers[] = {
+         .r_ce_ctrl         = R_CE_CTRL,
+         .r_ctrl0           = R_CTRL0,
+         .r_timings         = R_TIMINGS,
++        .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+         .max_slaves        = 2,
+         .segments          = aspeed_segments_ast2500_spi1,
+@@ -335,6 +340,7 @@ static const AspeedSMCController controllers[] = {
+         .r_ce_ctrl         = R_CE_CTRL,
+         .r_ctrl0           = R_CTRL0,
+         .r_timings         = R_TIMINGS,
++        .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+         .max_slaves        = 2,
+         .segments          = aspeed_segments_ast2500_spi2,
+@@ -350,6 +356,7 @@ static const AspeedSMCController controllers[] = {
+         .r_ce_ctrl         = R_CE_CTRL,
+         .r_ctrl0           = R_CTRL0,
+         .r_timings         = R_TIMINGS,
++        .nregs_timings     = 1,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+         .max_slaves        = 3,
+         .segments          = aspeed_segments_ast2600_fmc,
+@@ -365,6 +372,7 @@ static const AspeedSMCController controllers[] = {
+         .r_ce_ctrl         = R_CE_CTRL,
+         .r_ctrl0           = R_CTRL0,
+         .r_timings         = R_TIMINGS,
++        .nregs_timings     = 2,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+         .max_slaves        = 2,
+         .segments          = aspeed_segments_ast2600_spi1,
+@@ -380,6 +388,7 @@ static const AspeedSMCController controllers[] = {
+         .r_ce_ctrl         = R_CE_CTRL,
+         .r_ctrl0           = R_CTRL0,
+         .r_timings         = R_TIMINGS,
++        .nregs_timings     = 3,
+         .conf_enable_w0    = CONF_ENABLE_W0,
+         .max_slaves        = 3,
+         .segments          = aspeed_segments_ast2600_spi2,
+@@ -951,7 +960,8 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr addr, unsigned int size)
+     addr >>= 2;
+ 
+     if (addr == s->r_conf ||
+-        addr == s->r_timings ||
++        (addr >= s->r_timings &&
++         addr < s->r_timings + s->ctrl->nregs_timings) ||
+         addr == s->r_ce_ctrl ||
+         addr == R_INTR_CTRL ||
+         addr == R_DUMMY_DATA ||
+@@ -1216,7 +1226,8 @@ static void aspeed_smc_write(void *opaque, hwaddr addr, uint64_t data,
+     addr >>= 2;
+ 
+     if (addr == s->r_conf ||
+-        addr == s->r_timings ||
++        (addr >= s->r_timings &&
++         addr < s->r_timings + s->ctrl->nregs_timings) ||
+         addr == s->r_ce_ctrl) {
+         s->regs[addr] = value;
+     } else if (addr >= s->r_ctrl0 && addr < s->r_ctrl0 + s->num_cs) {
 -- 
 2.20.1
 
