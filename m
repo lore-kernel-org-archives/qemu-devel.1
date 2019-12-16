@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6856CC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:26:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A92B4C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:26:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33616206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:26:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 77448206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:26:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O2/ibXdp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33616206D3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WwfSYe0c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77448206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igoVn-0003go-PC
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:26:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50935)
+	id 1igoVq-0003im-1X
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:26:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50921)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFf-0007fe-DL
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:24 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFe-0007qu-55
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFe-0007eR-P8
  for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:23 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36298)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFd-0007nk-FN
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:22 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:38048)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1igoFd-0007nc-VB
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:22 -0500
-Received: by mail-wm1-x343.google.com with SMTP id p17so6224784wma.1
+ id 1igoFd-0007mJ-8e
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:21 -0500
+Received: by mail-wm1-x332.google.com with SMTP id u2so6222449wmc.3
  for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=oFUUQobexKmEiGcHc00gtIO7FQq8Xq2VFD8z4YpIbXU=;
- b=O2/ibXdp/R2HNKVFg9vgznlZ9Rs7S0/UyMbitKpb3gHOG/KXDb15dZRPn/orXtyE8m
- 5LtRN5DSwo/R4dOUWGVUVQaOE+6tkql7W6W9URa/Niz4+U7CcFd4ADmwFt6BODt+fwHo
- TGgzjh/8IVPPMhOquRUOClouqnwrLPbtXggY+XtOMB9/hEIcOKps0zrbfY5KE82A2zkY
- qfOTX+Bh17RU9/F5BJyl7vmsBhJZIL/j+lQ3i5KGA4Q3Acnl29gylLkD3dZ8nE8AyGz4
- OiujELXODU3Rfi+UinYJVfysaxXGHmBehpI5XMD4cTP3Z12onT5IzXQVUpJavSmqHEhu
- LR4w==
+ bh=sAVMne6xljKCCSIVb7x6KZ8Mn9NcByWXcsU8hgdMM68=;
+ b=WwfSYe0cSD00519Wyt9qNSAu33BrF9M48OKjPfbRL9ViueU1Wd2oodfaPrWamhrkEs
+ LI9pYFQicD4Wl2g2+z0w9wAp0iK1EzIbyD6dThF3PS6L/Ls7o/A9LyYe6raUQQnE/1/m
+ EO9rbI4tKH8se8jdyGzd8hRH8ZPkeDNj/miP1Y+7B5KBqAPd/GdGafIH2Q9WnIy5j1SX
+ FRXMfUPBfif7hLeatJjg3+ogOhDoPCizY2bcOJKWOtlPUPYWYKTyPMxJuG8xqsxrB4Ow
+ /ntKa5Q33x7/LF08KumrAirG72o8d9usdiqDV7gLF+MveI3EpHQpiFCWSJivXYQz1Zvj
+ rlEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=oFUUQobexKmEiGcHc00gtIO7FQq8Xq2VFD8z4YpIbXU=;
- b=U/9gg3u2CzWqVzkL6LR/8/ogxrTg+ruBAa+zSLPxf6f7t7xyoliB/ezOkIeH8vXckd
- mtB94kgN485FqUCqJQ20Sc7aYhm9rn/f82jKct6A0B8aUUA/gXTzeLvCP0nctwgZqMup
- zzTwq7MvidwS88Ad4WKO1uQ7HPgEsLmMrvQrNCZNX+/VkxcLDCeOK0C0ZVDGqbihLeEQ
- sgwO6Pr4AqihDj4uDRdyH7Vw2dM2rQ3IeXC3r+sVzKlROVN1EWfJZBS2Unwk3MhjmxRf
- O8Li66zObqiTlEKYYyg34bT9zyxhGcf8LtkpDuCy0tQDL7HP2a0O+n7P1L3pWz8dEvxg
- gVCg==
-X-Gm-Message-State: APjAAAX3LEJi2KEdYUao/dzce614ZY1Ioi3DVQ/IsJzVV9y9eFErEHB9
- Ep3ZQaoxInZyy+j8oQ/xUEINcmQGv/GcOw==
-X-Google-Smtp-Source: APXvYqyylastqGrQXAl8xNNK5fyzbyH6O8gEB2z+TuXcSvCK6UnEELalme4yxD/fxBe+YU3LC7KsVw==
-X-Received: by 2002:a1c:dc08:: with SMTP id t8mr30838010wmg.139.1576494560782; 
- Mon, 16 Dec 2019 03:09:20 -0800 (PST)
+ bh=sAVMne6xljKCCSIVb7x6KZ8Mn9NcByWXcsU8hgdMM68=;
+ b=kQYlSrXUwlup72+sU24zOZZuywdCYwB8ftrIAMXQbnQzUjoczFIu8nkjEyGpvQCJpS
+ YvFx9Hg1N55RiDqQhjrgLLxIVJxbcKtRENdvO/9n+jqiyj2YZpwuORUgGBUB37BSwSZ3
+ pfgTp7VmPy2aaDeLg6tGGOTS6AZOxRAI2KMc3F6vcnHiKg9MyViJETHsRBeC05rQQos4
+ gzhsZ/rdsybebPkyGEhb3BJQpapM4tFEROTuMPZpSnTzpRGbQpgCPfPjRCUB36zt6tCH
+ yL63mtkqI2Ao+a9qnT04UuZbCKWUxBpPvJmWDf+D8xGW6Tgl2/Gy69jYKPstwbAzX5Wf
+ syIA==
+X-Gm-Message-State: APjAAAUa6/CYMK0Sb5NeePRcM8br0NeD9vBlHJWciyqwlYcvsZ/9MZQ8
+ ADMN93ysI5aV7clQwxVIavvhjN63zq2/yw==
+X-Google-Smtp-Source: APXvYqyaa/8pKVOirIxs8nvRTa/dlnmdXdHRmYO82nafmH/x48MXYQEFeYy0Ej14v8RM7hB6H5OXGg==
+X-Received: by 2002:a1c:4e03:: with SMTP id g3mr30847251wmh.22.1576494559675; 
+ Mon, 16 Dec 2019 03:09:19 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.19
+ by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.18
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 03:09:20 -0800 (PST)
+ Mon, 16 Dec 2019 03:09:19 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/34] aspeed/smc: Restore default AHB window mapping at reset
-Date: Mon, 16 Dec 2019 11:08:42 +0000
-Message-Id: <20191216110904.30815-13-peter.maydell@linaro.org>
+Subject: [PULL 11/34] watchdog/aspeed: Fix AST2600 frequency behaviour
+Date: Mon, 16 Dec 2019 11:08:41 +0000
+Message-Id: <20191216110904.30815-12-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
 References: <20191216110904.30815-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,83 +98,114 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
 
-The current model only restores the Segment Register values but leaves
-the previous CS mapping behind. Introduce a helper setting the
-register value and mapping the region at the requested address. Use
-this helper when a Segment register is set and at reset.
+The AST2600 control register sneakily changed the meaning of bit 4
+without anyone noticing. It no longer controls the 1MHz vs APB clock
+select, and instead always runs at 1MHz.
 
+The AST2500 was always 1MHz too, but it retained bit 4, making it read
+only. We can model both using the same fixed 1MHz calculation.
+
+Fixes: 6b2b2a703cad ("hw: wdt_aspeed: Add AST2600 support")
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20191119141211.25716-11-clg@kaod.org
+Message-id: 20191119141211.25716-10-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/ssi/aspeed_smc.c | 32 +++++++++++++++++++++-----------
- 1 file changed, 21 insertions(+), 11 deletions(-)
+ include/hw/watchdog/wdt_aspeed.h |  1 +
+ hw/watchdog/wdt_aspeed.c         | 21 +++++++++++++++++----
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index f0c7bbbad30..955ec21852a 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -475,10 +475,26 @@ static bool aspeed_smc_flash_overlap(const AspeedSMCState *s,
-     return false;
+diff --git a/include/hw/watchdog/wdt_aspeed.h b/include/hw/watchdog/wdt_aspeed.h
+index dfedd7662dd..819c22993a6 100644
+--- a/include/hw/watchdog/wdt_aspeed.h
++++ b/include/hw/watchdog/wdt_aspeed.h
+@@ -47,6 +47,7 @@ typedef struct AspeedWDTClass {
+     uint32_t ext_pulse_width_mask;
+     uint32_t reset_ctrl_reg;
+     void (*reset_pulse)(AspeedWDTState *s, uint32_t property);
++    void (*wdt_reload)(AspeedWDTState *s);
+ }  AspeedWDTClass;
+ 
+ #endif /* WDT_ASPEED_H */
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index d283d07d654..122aa8daaad 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -93,11 +93,11 @@ static uint64_t aspeed_wdt_read(void *opaque, hwaddr offset, unsigned size)
+ 
  }
  
-+static void aspeed_smc_flash_set_segment_region(AspeedSMCState *s, int cs,
-+                                                uint64_t regval)
+-static void aspeed_wdt_reload(AspeedWDTState *s, bool pclk)
++static void aspeed_wdt_reload(AspeedWDTState *s)
+ {
+     uint64_t reload;
+ 
+-    if (pclk) {
++    if (!(s->regs[WDT_CTRL] & WDT_CTRL_1MHZ_CLK)) {
+         reload = muldiv64(s->regs[WDT_RELOAD_VALUE], NANOSECONDS_PER_SECOND,
+                           s->pclk_freq);
+     } else {
+@@ -109,6 +109,16 @@ static void aspeed_wdt_reload(AspeedWDTState *s, bool pclk)
+     }
+ }
+ 
++static void aspeed_wdt_reload_1mhz(AspeedWDTState *s)
 +{
-+    AspeedSMCFlash *fl = &s->flashes[cs];
-+    AspeedSegments seg;
++    uint64_t reload = s->regs[WDT_RELOAD_VALUE] * 1000ULL;
 +
-+    s->ctrl->reg_to_segment(s, regval, &seg);
-+
-+    memory_region_transaction_begin();
-+    memory_region_set_size(&fl->mmio, seg.size);
-+    memory_region_set_address(&fl->mmio, seg.addr - s->ctrl->flash_window_base);
-+    memory_region_set_enabled(&fl->mmio, true);
-+    memory_region_transaction_commit();
-+
-+    s->regs[R_SEG_ADDR0 + cs] = regval;
++    if (aspeed_wdt_is_enabled(s)) {
++        timer_mod(s->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + reload);
++    }
 +}
 +
- static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
-                                          uint64_t new)
++
+ static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
+                              unsigned size)
  {
--    AspeedSMCFlash *fl = &s->flashes[cs];
-     AspeedSegments seg;
- 
-     s->ctrl->reg_to_segment(s, new, &seg);
-@@ -529,13 +545,7 @@ static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
-     aspeed_smc_flash_overlap(s, &seg, cs);
- 
-     /* All should be fine now to move the region */
--    memory_region_transaction_begin();
--    memory_region_set_size(&fl->mmio, seg.size);
--    memory_region_set_address(&fl->mmio, seg.addr - s->ctrl->flash_window_base);
--    memory_region_set_enabled(&fl->mmio, true);
--    memory_region_transaction_commit();
--
--    s->regs[R_SEG_ADDR0 + cs] = new;
-+    aspeed_smc_flash_set_segment_region(s, cs, new);
+@@ -130,13 +140,13 @@ static void aspeed_wdt_write(void *opaque, hwaddr offset, uint64_t data,
+     case WDT_RESTART:
+         if ((data & 0xFFFF) == WDT_RESTART_MAGIC) {
+             s->regs[WDT_STATUS] = s->regs[WDT_RELOAD_VALUE];
+-            aspeed_wdt_reload(s, !(s->regs[WDT_CTRL] & WDT_CTRL_1MHZ_CLK));
++            awc->wdt_reload(s);
+         }
+         break;
+     case WDT_CTRL:
+         if (enable && !aspeed_wdt_is_enabled(s)) {
+             s->regs[WDT_CTRL] = data;
+-            aspeed_wdt_reload(s, !(data & WDT_CTRL_1MHZ_CLK));
++            awc->wdt_reload(s);
+         } else if (!enable && aspeed_wdt_is_enabled(s)) {
+             s->regs[WDT_CTRL] = data;
+             timer_del(s->timer);
+@@ -283,6 +293,7 @@ static void aspeed_2400_wdt_class_init(ObjectClass *klass, void *data)
+     awc->offset = 0x20;
+     awc->ext_pulse_width_mask = 0xff;
+     awc->reset_ctrl_reg = SCU_RESET_CONTROL1;
++    awc->wdt_reload = aspeed_wdt_reload;
  }
  
- static uint64_t aspeed_smc_flash_default_read(void *opaque, hwaddr addr,
-@@ -897,10 +907,10 @@ static void aspeed_smc_reset(DeviceState *d)
-         qemu_set_irq(s->cs_lines[i], true);
-     }
+ static const TypeInfo aspeed_2400_wdt_info = {
+@@ -317,6 +328,7 @@ static void aspeed_2500_wdt_class_init(ObjectClass *klass, void *data)
+     awc->ext_pulse_width_mask = 0xfffff;
+     awc->reset_ctrl_reg = SCU_RESET_CONTROL1;
+     awc->reset_pulse = aspeed_2500_wdt_reset_pulse;
++    awc->wdt_reload = aspeed_wdt_reload_1mhz;
+ }
  
--    /* setup default segment register values for all */
-+    /* setup the default segment register values and regions for all */
-     for (i = 0; i < s->ctrl->max_slaves; ++i) {
--        s->regs[R_SEG_ADDR0 + i] =
--            s->ctrl->segment_to_reg(s, &s->ctrl->segments[i]);
-+        aspeed_smc_flash_set_segment_region(s, i,
-+                    s->ctrl->segment_to_reg(s, &s->ctrl->segments[i]));
-     }
+ static const TypeInfo aspeed_2500_wdt_info = {
+@@ -336,6 +348,7 @@ static void aspeed_2600_wdt_class_init(ObjectClass *klass, void *data)
+     awc->ext_pulse_width_mask = 0xfffff; /* TODO */
+     awc->reset_ctrl_reg = AST2600_SCU_RESET_CONTROL1;
+     awc->reset_pulse = aspeed_2500_wdt_reset_pulse;
++    awc->wdt_reload = aspeed_wdt_reload_1mhz;
+ }
  
-     /* HW strapping flash type for the AST2600 controllers  */
+ static const TypeInfo aspeed_2600_wdt_info = {
 -- 
 2.20.1
 
