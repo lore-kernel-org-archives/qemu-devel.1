@@ -2,127 +2,132 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97087C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 19:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6057DC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:09:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6326C2146E
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 19:58:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A3852082E
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:09:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="0oqBGMdy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6326C2146E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=pass (1024-bit key) header.d=intel.onmicrosoft.com header.i=@intel.onmicrosoft.com header.b="pZTIUMOB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A3852082E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59399 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igwVg-0004S0-Hc
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 14:58:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52053)
+	id 1igwgM-0007M5-3y
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 15:09:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55216)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <felipe@nutanix.com>) id 1igwV4-00041t-1d
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 14:57:51 -0500
+ (envelope-from <julio.montes@intel.com>) id 1igwfd-0006xP-9Z
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:08:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <felipe@nutanix.com>) id 1igwV2-0004SE-0U
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 14:57:49 -0500
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:15336)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <felipe@nutanix.com>) id 1igwV1-0004If-N5
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 14:57:47 -0500
-Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
- by mx0a-002c1b01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBGJsI5J021632; Mon, 16 Dec 2019 11:57:35 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=proofpoint20171006;
- bh=MKtYYzTP5QCib/wKvU95CCxb8QzQZ+WQ87DoVxfuPDA=;
- b=0oqBGMdy5Rvg74gP+UKgz8Ce4BLrvHpjToz50hblTmGHW9tctML+q8swyEO8KFo6ndpX
- Gz1EgJeLQEHKgJZ+biesKEn0FzY4A1mkpzEeZbJ9DAqCs7sBMDcKiTv7lTtIq6I0eOGY
- hnXh8Wdoj7yHXZAz7j9Cq9K9Ja4urBqqotpyFs6NNbBWSx3l/fMEWUg3wSHjsJvIouqu
- dL6XKdtsAoBqXIKz4EKC6X+8QJ/wk5GEDVmFdomHOaYE90SBuSW0pLlgFt3vTlUqX6fM
- CKFSVqoZJrKhU3QosNqrYI9Tu5sugmxOX91ARr5pRF2evlUVVNjPq/vUearUZJNTG9Gi jg== 
-Received: from nam12-mw2-obe.outbound.protection.outlook.com
- (mail-mw2nam12lp2040.outbound.protection.outlook.com [104.47.66.40])
- by mx0a-002c1b01.pphosted.com with ESMTP id 2wvyppkx28-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 16 Dec 2019 11:57:35 -0800
+ (envelope-from <julio.montes@intel.com>) id 1igwfb-0007WD-8G
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:08:44 -0500
+Received: from mga14.intel.com ([192.55.52.115]:10362)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <julio.montes@intel.com>)
+ id 1igwfa-0007Ix-N0
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:08:43 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 16 Dec 2019 11:16:22 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,322,1571727600"; 
+ d="scan'208,217";a="247149482"
+Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
+ by fmsmga002.fm.intel.com with ESMTP; 16 Dec 2019 11:16:22 -0800
+Received: from fmsmsx120.amr.corp.intel.com (10.18.124.208) by
+ FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 16 Dec 2019 11:16:22 -0800
+Received: from FMSEDG002.ED.cps.intel.com (10.1.192.134) by
+ fmsmsx120.amr.corp.intel.com (10.18.124.208) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Mon, 16 Dec 2019 11:16:22 -0800
+Received: from NAM04-CO1-obe.outbound.protection.outlook.com (104.47.45.57) by
+ edgegateway.intel.com (192.55.55.69) with Microsoft SMTP Server
+ (TLS) id 14.3.439.0; Mon, 16 Dec 2019 11:16:22 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hn29vYxp2yOWn4VXvIRjDbOolBfs/gqb8NfHvBsI5YuzOJ0f7182MW7zshHhUxvHVdl/UBm4qu4Ne5B3ditAz227JKgohIruf79NFq0QbkOZvJvt27n8Hx99NqLUNXZXrkwSTUn64tTxF/v22yJLZ1aY7TssDtUK8VPXQSbduXw3UWJrO7Z2FVyRW38aWu8oQuwJ+OhQx186XDA+/eJHw6D1pEBvps6EfukQlel2FgGZgv8Fi/z7mcOiVjcWMW0K+Jie63KwFd/1w0QbfW5wCl+ast+Fjp1j8n/v3Y0fSeJbL3s3AoGHNQnp7i7eq7iFdK7fb2/AtlY/b7/31Ga7Qw==
+ b=gccrxFqLp8CnDtG53Fr7Dn1F1TT59IflZKSDdug2IsadiZjI9IbwEC9vNhcIYkfLqCEvG+rd1lL1iHJKPRQM/dv2jca/tOZIY73QcZVV8lLqtLvp9dhGkJJgRlzaVm61yaRSEIoHvbOTebYw7IPNZRXMoePB3emmSKoqPJwHMYlv8e4/AeGOd4HsCj0raCmQkN4cQNTzPoD2kyXYhRvWlYTHtOl8pc372MYWx1RnN3kamVCCi5rn1r2BFaQbhOyW2uFThGp+XQZm2rS7gezbPmpa/hHKyzbQy9MzsHXhua53RhZhg/33kBBj3MLRU0T0wW8xZxISXBcbGLXuHGAGpg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MKtYYzTP5QCib/wKvU95CCxb8QzQZ+WQ87DoVxfuPDA=;
- b=b858MLuQaZk+oL2nQzf8fxK1pxXoFDg9g5AIIumKpL7HXy5Yj6jwK0AOyHkxy5U5KTpfEpXH77ziSs7xxFiw1mKTOoJnWOKGUv0iGNpUZcBjCy/pg0CrTbWeoHnoFa6VtV/CwNHeHXJWNlrU7pMJYD3CYVjh0GlD3UR6c5qBS9CfroG+3keKTJXGv7vg5Y9dxTCkDUtavHkuScWrJm/CaDpivWDJR1uhMytJBQiYrR8UktNQyC34qenYycRD/Uy+Nzp8f2QbqHpLex4MLxQqO0eMaKDTtd4FdPk9gnZ95sdGB+1J6xFohNPkYHiy1Dg56H/UeG/1IpegXeghx5b2/g==
+ bh=N9gm/qz9eBVUp3G148/4Jb4emRNTQt+Sjfplz5P3VmQ=;
+ b=L8Ra+daT52AABcKp8fzdi7BRpTe2oZnB2bfhodVZpyrLVt4q8jaHnogJ/J+9WaUyiOJOm0gr7s1NlZsAIIAzjFcmAmVC2WPSeFnbw/Ix2dC7fz0G4rq7tJXqYP5YHnjqPEc55S9OSTNXHecKETqrYhHa9TufljDlNyRGhpsr4BLd1S7AgjmAsNbGmgmniaRWdvL1YbEo+TsR6Mlef1tHSO9ISzN9dNai+LNLh9kKUs5by5tNhODfVZ/T5preS2iGtzHtz3YkAVFBYAQ5tgzlh2kTbhJ5A2SDth15VPLjtmmYrtoNZxi7vAyqX3IpLZGJUXnmlXL5anFSX3uQ3FA94w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com (10.168.206.142) by
- MWHPR02MB3376.namprd02.prod.outlook.com (10.164.187.165) with Microsoft SMTP
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com; 
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=N9gm/qz9eBVUp3G148/4Jb4emRNTQt+Sjfplz5P3VmQ=;
+ b=pZTIUMOBv/ZJHkco/aDaRHkzV4dzqVnY9SXqqdvST/IRk185SCeGWXy5P+ddqkiaTKFBmZ6UdRjb2gew2Va4kM8uGeTv1NVJ/9Rce1iv4u0H579k/0UiKVlt96pUR++n2GnlN4L4Y54V+odM3+T/cJ3UG67ap0NLYvJbwEYK7P0=
+Received: from DM6PR11MB4089.namprd11.prod.outlook.com (20.176.126.91) by
+ DM6PR11MB4329.namprd11.prod.outlook.com (52.132.251.18) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2538.16; Mon, 16 Dec 2019 19:57:32 +0000
-Received: from MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c8f8:4820:a24c:3029]) by MWHPR02MB2656.namprd02.prod.outlook.com
- ([fe80::c8f8:4820:a24c:3029%10]) with mapi id 15.20.2538.019; Mon, 16 Dec
- 2019 19:57:32 +0000
-From: Felipe Franciosi <felipe@nutanix.com>
-To: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Subject: Re: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
- status update
-Thread-Topic: [RFC v4 PATCH 00/49] Initial support of multi-process qemu -
- status update
-Thread-Index: AQHVryW4uEZJ1V/hTUic5+7Y9QnlRqe35WUAgAVPdACAAAL3CA==
-Date: Mon, 16 Dec 2019 19:57:32 +0000
-Message-ID: <AFBAD3A1-0E22-4E22-AF22-C56794929D87@nutanix.com>
-References: <cover.1571905346.git.jag.raman@oracle.com>
- <20191210064716.GA6401@flaka>
- <20191213104116.GB1180977@stefanha-x1.localdomain>,
- <20191216194655.GA5922@flaka>
-In-Reply-To: <20191216194655.GA5922@flaka>
-Accept-Language: en-GB, en-US
-Content-Language: en-GB
+ 15.20.2538.20; Mon, 16 Dec 2019 19:16:21 +0000
+Received: from DM6PR11MB4089.namprd11.prod.outlook.com
+ ([fe80::3ceb:88f0:7717:7ecd]) by DM6PR11MB4089.namprd11.prod.outlook.com
+ ([fe80::3ceb:88f0:7717:7ecd%7]) with mapi id 15.20.2538.019; Mon, 16 Dec 2019
+ 19:16:20 +0000
+From: "Montes, Julio" <julio.montes@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, qemu-devel
+ <qemu-devel@nongnu.org>
+Subject: Re: qemu-4.2: failed to set MSR 0x48b to 0x1582e00000000: Assertion
+ `ret == cpu->kvm_msr_buf->nmsrs' failed.
+Thread-Topic: qemu-4.2: failed to set MSR 0x48b to 0x1582e00000000: Assertion
+ `ret == cpu->kvm_msr_buf->nmsrs' failed.
+Thread-Index: AQHVsfc5K/GHgo1+SUW1rgjP3fus/6e42ICAgABkWoCAA9UT0Q==
+Date: Mon, 16 Dec 2019 19:16:20 +0000
+Message-ID: <DM6PR11MB4089FF5F11BC215320EB502E9A510@DM6PR11MB4089.namprd11.prod.outlook.com>
+References: <DM6PR11MB4089A0B695CB84FB288068B89A540@DM6PR11MB4089.namprd11.prod.outlook.com>
+ <2c28287e-1869-751d-f7c8-04605ef4b337@redhat.com>,
+ <d969066a-b10c-ebbc-b784-a19a66a5a831@redhat.com>
+In-Reply-To: <d969066a-b10c-ebbc-b784-a19a66a5a831@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-originating-ip: [94.197.121.176]
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=julio.montes@intel.com; 
+x-originating-ip: [134.134.139.76]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a775e90f-5b8a-43d4-30e4-08d78262308a
-x-ms-traffictypediagnostic: MWHPR02MB3376:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MWHPR02MB3376184AA4224C7F1ED3708ED7510@MWHPR02MB3376.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-office365-filtering-correlation-id: 91c27921-6608-4524-9955-08d7825c6f23
+x-ms-traffictypediagnostic: DM6PR11MB4329:
+x-microsoft-antispam-prvs: <DM6PR11MB43298865936D0B77946B73319A510@DM6PR11MB4329.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5516;
 x-forefront-prvs: 02530BD3AA
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(346002)(396003)(366004)(39860400002)(136003)(189003)(199004)(6512007)(33656002)(478600001)(26005)(6506007)(2616005)(5660300002)(81166006)(81156014)(316002)(8936002)(36756003)(6486002)(66946007)(91956017)(76116006)(66476007)(66556008)(64756008)(66446008)(71200400001)(8676002)(6916009)(54906003)(4326008)(186003)(7416002)(2906002)(53546011)(86362001)(107886003)(64030200001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MWHPR02MB3376;
- H:MWHPR02MB2656.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: nutanix.com does not designate
- permitted sender hosts)
+ SFS:(10019020)(396003)(346002)(376002)(39860400002)(366004)(136003)(199004)(189003)(86362001)(316002)(64756008)(66446008)(19627405001)(478600001)(66946007)(5660300002)(52536014)(6506007)(76116006)(91956017)(26005)(186003)(81166006)(8676002)(33656002)(7696005)(8936002)(81156014)(2906002)(4326008)(71200400001)(110136005)(9686003)(966005)(66476007)(55016002)(66556008)(53546011)(81973001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DM6PR11MB4329;
+ H:DM6PR11MB4089.namprd11.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ezashc7ruvCHORo4QJ/Elb5DgcBWsYg+YMmqNiTMU6w6+pmOOnB05JbBMs0qrHwfaCU9kXu6RJsRYwg0hdg9zmGkwfN9CC7ymtG7XmByLcE+DLOlBm6Qncq3p99NAoiyF7h6IOyLVzACPbmH5k8Q/LghrMNhy+aPKneZBgPNRxfvFA+YRaYoMDc8yuLJ5VoG0uNbwblrVdPAg+pQKVz9ZnUvWIGgCx6SMhD5gY13tMkrcSLsONjH7rDwsoWVDVU4ueLZGRWxraEzJzFRXX2Ye+d+jQYMnnrXcThC4pyorVKEG8gsnp1bu/hPVj/FvHNcU6HOk12OsvenMmjuVAbQrMV7+MZ/Yque84HFQJERYU0xkrZ72s1BITY12AJEk6nNPrgim7Qamo8Vl8xzQGTXtDrKyh3gAwbPloMBw1S5RuRP9K+VT4GTV1kQb7Aw83AhhLW+3XUc7bmqojMoNMV/dOVPny6dDZwyQL6WTb+CyrBaf226h+MCKMcgYZ8qNqxh
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+x-microsoft-antispam-message-info: rPcgzxlpC80TtI3cALHTBpdyPoozFk166NIQaXQK8Z0ALYY1W/7lxX+/uzd8YLbiP2wVN8yjXbUltE9YIJjXzET0wWl5M9IVr1SyWpVTK2QJ7SOlCf6m6q1YUIEYU2dNHO7FFbJdwTGu1qtQ1flj7kEC5HnWywDvb5bk5swuFnZRxzwGM35UKe3Vh7jzPM8E+o5whEsl7e/Qv35lrr+31hUpto9rQR43V42T13/y86J6k+mv+2N6Y9PBm/ItkrXfcT2c8gdCHGwY9WVorU6SaBEO3b0JH1+80g5q6fwHzLlPGeZkkAIhaAzyLVEfPPRDXT9zczhVlXbTHwISeDUkeSeKXTrhxZShKIXTEI/BmthIYXIzY7mFca0O4mnQs8R5p0TmaGub2lnlHX6/a7jZuIPzM/VDgg/zcQ8i+ksicji0yekdR/IpSnxNVZOr+J6PxYaBFtkIEklQLy3kDZXA7PTbPnStBv/o7QJaPp4D6OB6rEvNa30MxSmx3oHROeSqZt/ISp7DG62E/KX0zWStZQ==
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+ boundary="_000_DM6PR11MB4089FF5F11BC215320EB502E9A510DM6PR11MB4089namp_"
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a775e90f-5b8a-43d4-30e4-08d78262308a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Dec 2019 19:57:32.6359 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91c27921-6608-4524-9955-08d7825c6f23
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Dec 2019 19:16:20.8671 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7bEhRZVDUpXwJOvuX1uKWq4A1Btk9IzXpwd5cSmpJsIFt9VPeqhZrlGDbfFv7A7DpiJK+kekXnPoLY0uQ/d9Geb/VoDf0Nck6yRgGjcyOHY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB3376
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-16_07:2019-12-16,2019-12-16 signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.151.68
+X-MS-Exchange-CrossTenant-userprincipalname: 3JBeOMVjBoyCJRkdUm6L7FoY/v7KP5i0Md9hWjOzBgJ00AaDvs148IHiw4dMskfhS3txBLPee5wxgQ3D1ztvpQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4329
+X-OriginatorOrg: intel.com
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -134,81 +139,305 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>, "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kraxel@redhat.com" <kraxel@redhat.com>,
- "jag.raman@oracle.com" <jag.raman@oracle.com>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "kanth.ghatraju@oracle.com" <kanth.ghatraju@oracle.com>,
- "thuth@redhat.com" <thuth@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "liran.alon@oracle.com" <liran.alon@oracle.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>,
- "rth@twiddle.net" <rth@twiddle.net>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "ross.lagerwall@citrix.com" <ross.lagerwall@citrix.com>,
- "marcandre.lureau@gmail.com" <marcandre.lureau@gmail.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SGV5YSwNCg0KPiBPbiAxNiBEZWMgMjAxOSwgYXQgMjA6NDcsIEVsZW5hIFVmaW10c2V2YSA8ZWxl
-bmEudWZpbXRzZXZhQG9yYWNsZS5jb20+IHdyb3RlOg0KPiANCj4g77u/T24gRnJpLCBEZWMgMTMs
-IDIwMTkgYXQgMTA6NDE6MTZBTSArMDAwMCwgU3RlZmFuIEhham5vY3ppIHdyb3RlOg0KPj4+IE9u
-IE1vbiwgRGVjIDA5LCAyMDE5IGF0IDEwOjQ3OjE3UE0gLTA4MDAsIEVsZW5hIFVmaW10c2V2YSB3
-cm90ZToNCj4+PiBBdCB0aGlzIG1vbWVudCB3ZSBhcmUgd29ya2luZyBvbiB0aGUgZmlyc3Qgc3Rh
-Z2Ugb2YgdGhlIHByb2plY3Qgd2l0aCBoZWxwIG9mDQo+Pj4gdGhlIE51dGFuaXggZGV2ZWxvcGVy
-cy4NCj4+PiBUaGUgcXVlc3Rpb25zIHdlIGhhdmUgZ2F0aGVyZWQgc28gZmFyIHdpbGwgYmUgYWRk
-cmVzc2VkIHdpdGggbXVzZXINCj4+PiBhbmQgUWVtdSBkZXZlbG9wZXJzIGFmdGVyIHdlIGZpbmlz
-aCB0aGUgZmlyc3Qgc3RhZ2UgYW5kIG1ha2Ugc3VyZSB3ZSB1bmRlcnN0YW5kDQo+Pj4gd2hhdCBp
-dCB3aWxsIHRha2UgZm9yIHVzIHRvIG1vdmUgb250byB0aGUgbmV4dCBzdGFnZS4NCj4+PiANCj4+
-PiBXZSB3aWxsIGFsc28gaW5jb3Jwb3JhdGUgcmVsZXZhbnQgcmV2aWV3IGZyb20gU3RlZmFuIHRo
-YXQgaGUgcHJvdmlkZWQNCj4+PiBvbiB0aGUgc2VyaWVzIDQgb2YgdGhlIHBhdGNoc2V0LiBUaGFu
-ayB5b3UgU3RlZmFuLg0KPj4+IA0KPj4+IElmIGFueW9uZSBoYXZlIGFueSBmdXJ0aGVyIHN1Z2dl
-c3Rpb25zIG9yIHF1ZXN0aW9ucyBhYm91dCB0aGUgc3RhdHVzLA0KPj4+IHBsZWFzZSByZXBseSB0
-byB0aGlzIGVtYWlsLg0KPj4gDQo+PiBIaSBFbGVuYSwNCj4+IEF0IEtWTSBGb3J1bSB3ZSBkaXNj
-dXNzZWQgc3BlbmRpbmcgMSBvciAyIHdlZWtzIHRyeWluZyBvdXQgbXVzZXIuICBBIGZldw0KPj4g
-d2Vla3MgaGF2ZSBwYXNzZWQgYW5kIGZyb20geW91ciBlbWFpbCBpdCBzb3VuZHMgbGlrZSB0aGlz
-ICJuZXh0IHN0YWdlIg0KPj4gbWlnaHQgYmUgYSBsb3Qgb2Ygd29yay4NCj4+IA0KPiANCj4gSGkg
-U3RlZmFuDQo+IA0KPiBQZXJoYXBzIHdlIHdlcmUgbm90IHRvbyBjbGVhciBhYm91dCBvdXIgd29y
-ayBpbiB0aGUgcHJldmlvdXMgZW1haWwuDQo+IE91ciBhc3N1bXB0aW9uIHdhcyB0aGF0IHRoZSBx
-dWVzdGlvbiB0aGF0IGNhbWUgZnJvbSBLVk0gRm9ydW0gd2FzDQo+IGlmIG11c2VyIGNhbiBiZSB1
-c2VkIHRvIGFjaGlldmUgdGhlIHNhbWUgd2hhdCB3ZSBoYXZlIG5vdy4NCj4gV2Ugc2hvdWxkIGhh
-dmUgYW5zd2VyZWQgY2xlYXJseSB5ZXMgdG8gdGhpcyBxdWVzdGlvbi4gIFdlIGhhdmUgbm90IHll
-dA0KPiBkaXNjb3ZlcmVkIG1ham9yIHJvYWQgYmxvY2tzLg0KPiBBdCB0aGUgbW9tZW50LCB3ZSBh
-cmUgbW9zdGx5IGVuZ2FnZWQgaW4gbGVhcm5pbmcgdGhlIGNvZGUgYW5kIGRpc2N1c3NpbmcNCj4g
-dGhlIGRlc2lnbiwgcGx1cyBzb21lIGNvZGluZyB0byBhbnN3ZXIgdGhlIHNwZWNpZmljIHF1ZXN0
-aW9ucy4NCj4gV2UgdW5kZXJzdGFuZCB0aGF0IHRoZSBiZXN0IHdheSB0byBtYWtlIGEgcHJvZ3Jl
-c3MgaXMgdG8gd29yayB3aXRoIHRoZQ0KPiB1cHN0cmVhbSBjb21tdW5pdHkgb24gZWFybHkgc3Rh
-Z2VzIGFuZCB3ZSBhZ3JlZSB3aXRoIHRoaXMgYW5kIHdpbGwgcHJlc2VudA0KPiB0aGUgcHJvcG9z
-YWwgc2hvcnRseSBmb3IgZGlzY3Vzc2lvbi4NCj4gDQo+PiBJcyB0aGVyZSBhIHdvcmstaW4tcHJv
-Z3Jlc3MgbXVzZXIgcGF0Y2ggc2VyaWVzIHlvdSBjYW4gcG9zdCB0byBzdGFydCB0aGUNCj4+IGRp
-c2N1c3Npb24gZWFybHk/ICBUaGF0IHdheSB3ZSBjYW4gYXZvaWQgcmV2aWV3ZXJzIGxpa2UgbXlz
-ZWxmIGFza2luZw0KPj4geW91IHRvIG1ha2UgY2hhbmdlcyBhZnRlciB5b3UgaGF2ZSBpbnZlc3Rl
-ZCBhIGxvdCBvZiB0aW1lLg0KPj4gDQo+IA0KPiBBYnNvbHV0ZWx5LCB0aGF0IGlzIG91ciBwbGFu
-LiBBdCB0aGUgbW9tZW50IHdlIGRvIG5vdCBoYXZlIHRoZSBwYXRjaGVzDQo+IHJlYWR5IGZvciB0
-aGUgcmV2aWV3LiBXZSBoYXZlIHNldHVwIGludGVybmFsbHkgYSBtaWxlc3RvbmUgYW5kIHdpbGwg
-YmUNCj4gc2VuZGluZyB0aGF0IGVhcmx5IHZlcnNpb24gYXMgYSB0YXJiYWxsIGFmdGVyIHdlIGhh
-dmUgaXQgY29tcGxldGVkLg0KPiBXb3VsZCBiZSBhbHNvIGEgbWVldGluZyBzb21ldGhpbmcgdGhh
-dCBjb3VsZCBoZWxwIHVzIHRvIHN0YXkgb24gdGhlIHNhbWUNCj4gcGFnZT8NCg0KUGxlYXNlIGxv
-b3AgdXMgaW4gaWYgeW91IHNvIHNldCB1cCBhIG1lZXRpbmcuDQoNCj4gDQo+PiBJdCdzIGdvb2Qg
-dGhhdCB5b3UgYXJlIGluIHRvdWNoIHdpdGggdGhlIG11c2VyIGRldmVsb3BlcnMgKHZpYSBwcml2
-YXRlDQo+PiBkaXNjdXNzaW9uPyAgSSBoYXZlbid0IHNlZW4gbXVjaCBhY3Rpdml0eSBvbiAjbXVz
-ZXIgSVJDKS4NCj4+IA0KPiANCj4gV2UgdXNlIElSQyAoSSBrbm93IEphZyBnb3Qgc29tZSBhbnN3
-ZXJzIHRoZXJlKSBhbmQgZ2l0aHViIGZvciBpc3N1ZXMNCj4gKG9uZSBvZiB3aGljaCB3YXMgYWRk
-cmVzc2VkKS4NCg0KSSB0aG91Z2h0IHRoZXJlIHdhcyBvbmx5IHRoZSBvbmUuIExldCB1cyBrbm93
-IGlmIHlvdSBydW4gaW50byBhbnkgb3RoZXIgYnVncy4gV2UgYXJlIGxvb2tpbmcgZm9yd2FyZCB0
-byBoZWFyaW5nIGFib3V0IHBlb3BsZeKAmXMgZXhwZXJpZW5jZSBhbmQgYWRkcmVzc2luZyBpc3N1
-ZXMgdGhhdCBjb21lIHdpdGggdXNlcyB3ZSBkaWRu4oCZdCBmb3Jlc2VlIG9yIHRlc3QuDQoNCkNo
-ZWVycywNCkZlbGlwZQ0KDQo+IFdlIGFyZSBob3BpbmcgdG8gZ2V0IHRoZSBjb252ZXJzYXRpb24g
-Z29pbmcgb3Zlcg0KPiB0aGUgZW1haWwuDQo+IA0KPiBKSiwgSmFnIGFuZCBFbGVuYSANCj4+IFN0
-ZWZhbg0KPiANCj4gDQo=
+--_000_DM6PR11MB4089FF5F11BC215320EB502E9A510DM6PR11MB4089namp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Paolo and Philippe
+
+> Are you running also nested on your workstation?
+
+yes, qemu in qemu
+
+> 1) running "vmxcap" on the Azure VM
+
+$ sudo ./vmxcap
+Basic VMX Information
+Traceback (most recent call last):
+  File "./vmxcap", line 280, in <module>
+    c.show()
+  File "./vmxcap", line 82, in show
+    value =3D msr().read(self.msr, 0)
+  File "./vmxcap", line 33, in __init__
+    self.f =3D open('/dev/msr0', 'rb', 0)
+IOError: [Errno 2] No such file or directory: '/dev/msr0'
+
+> 2) adding "-vmx-xsaves,-vmx-shadow-vmcs" to the "-cpu" option and, if it
+> works, add only one of the two.
+
+nop, this didn't work
+
+
+> 3) if it doesn't work, adding "-vmx" to the "-cpu" option.  Either way,
+> run "x86info -a" in the resulting VM.
+
+yes, -vmx works
+
+x86info -a  ->  https://paste.centos.org/view/f88f02f4
+
+
+thanks
+
+-
+Julio
+
+________________________________
+From: Paolo Bonzini <pbonzini@redhat.com>
+Sent: Saturday, December 14, 2019 1:30 AM
+To: Philippe Mathieu-Daud=E9 <philmd@redhat.com>; Montes, Julio <julio.mont=
+es@intel.com>; qemu-devel <qemu-devel@nongnu.org>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: qemu-4.2: failed to set MSR 0x48b to 0x1582e00000000: Assertio=
+n `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+On 14/12/19 02:31, Philippe Mathieu-Daud=E9 wrote:
+>
+> failed to launch qemu: exit status 1, error messages from qemu log:
+> qemu-system-x86_64: error: failed to set MSR 0x48b to 0x1582e00000000
+> qemu-system-x86_64: /root/qemu/target/i386/kvm.c:2947: kvm_put_msrs:
+> Assertion `ret =3D=3D cpu->kvm_msr_buf->nmsrs' failed.
+
+It could be a KVM bug too.  The following features are being enabled:
+
+#define VMX_SECONDARY_EXEC_XSAVES                   0x00100000
+#define VMX_SECONDARY_EXEC_SHADOW_VMCS              0x00004000
+#define VMX_SECONDARY_EXEC_ENABLE_INVPCID           0x00001000
+#define VMX_SECONDARY_EXEC_RDRAND_EXITING           0x00000800
+#define VMX_SECONDARY_EXEC_ENABLE_VPID              0x00000020
+#define VMX_SECONDARY_EXEC_ENABLE_EPT               0x00000002
+#define VMX_SECONDARY_EXEC_DESC                     0x00000004
+#define VMX_SECONDARY_EXEC_RDTSCP                   0x00000008
+
+Can you try:
+
+1) running "vmxcap" on the Azure VM
+
+2) adding "-vmx-xsaves,-vmx-shadow-vmcs" to the "-cpu" option and, if it
+works, add only one of the two.
+
+3) if it doesn't work, adding "-vmx" to the "-cpu" option.  Either way,
+run "x86info -a" in the resulting VM.
+
+Thanks,
+
+Paolo
+
+
+--_000_DM6PR11MB4089FF5F11BC215320EB502E9A510DM6PR11MB4089namp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
+ttom:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+Hi Paolo and Philippe</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+&gt; <font size=3D"2"><span style=3D"font-size:11pt">Are you running also n=
+ested on your workstation?</span></font><br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+yes, qemu in qemu</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+&gt; <font size=3D"2"><span style=3D"font-size:11pt">1) running &quot;vmxca=
+p&quot; on the Azure VM</span></font><br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<span><br>
+</span></div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<span>$ sudo ./vmxcap <br>
+</span>
+<div>Basic VMX Information<br>
+</div>
+<div>Traceback (most recent call last):<br>
+</div>
+<div>&nbsp; File &quot;./vmxcap&quot;, line 280, in &lt;module&gt;<br>
+</div>
+<div>&nbsp; &nbsp; c.show()<br>
+</div>
+<div>&nbsp; File &quot;./vmxcap&quot;, line 82, in show<br>
+</div>
+<div>&nbsp; &nbsp; value =3D msr().read(self.msr, 0)<br>
+</div>
+<div>&nbsp; File &quot;./vmxcap&quot;, line 33, in __init__<br>
+</div>
+<div>&nbsp; &nbsp; self.f =3D open('/dev/msr0', 'rb', 0)<br>
+</div>
+<span>IOError: [Errno 2] No such file or directory: '/dev/msr0'</span><br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+&gt; <font size=3D"2"><span style=3D"font-size:11pt">2) adding &quot;-vmx-x=
+saves,-vmx-shadow-vmcs&quot; to the &quot;-cpu&quot; option and, if it<br>
+&gt; works, add only one of the two.<br>
+</span></font></div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+nop, this didn't work</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<font size=3D"2"><span style=3D"font-size:11pt">&gt; 3) if it doesn't work,=
+ adding &quot;-vmx&quot; to the &quot;-cpu&quot; option.&nbsp; Either way,<=
+br>
+&gt; run &quot;x86info -a&quot; in the resulting VM.</span></font></div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+yes, -vmx works</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+x86info -a&nbsp; -&gt;&nbsp; <a href=3D"https://paste.centos.org/view/f88f0=
+2f4" id=3D"LPlnk201976">
+https://paste.centos.org/view/f88f02f4</a><br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+thanks</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+-</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+Julio<br>
+</div>
+<div style=3D"font-family: Calibri, Arial, Helvetica, sans-serif; font-size=
+: 12pt; color: rgb(0, 0, 0);">
+<br>
+</div>
+<div id=3D"appendonsend"></div>
+<hr style=3D"display:inline-block;width:98%" tabindex=3D"-1">
+<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" st=
+yle=3D"font-size:11pt" color=3D"#000000"><b>From:</b> Paolo Bonzini &lt;pbo=
+nzini@redhat.com&gt;<br>
+<b>Sent:</b> Saturday, December 14, 2019 1:30 AM<br>
+<b>To:</b> Philippe Mathieu-Daud=E9 &lt;philmd@redhat.com&gt;; Montes, Juli=
+o &lt;julio.montes@intel.com&gt;; qemu-devel &lt;qemu-devel@nongnu.org&gt;<=
+br>
+<b>Cc:</b> Eduardo Habkost &lt;ehabkost@redhat.com&gt;<br>
+<b>Subject:</b> Re: qemu-4.2: failed to set MSR 0x48b to 0x1582e00000000: A=
+ssertion `ret =3D=3D cpu-&gt;kvm_msr_buf-&gt;nmsrs' failed.</font>
+<div>&nbsp;</div>
+</div>
+<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt;=
+">
+<div class=3D"PlainText">On 14/12/19 02:31, Philippe Mathieu-Daud=E9 wrote:=
+<br>
+&gt; <br>
+&gt; failed to launch qemu: exit status 1, error messages from qemu log:<br=
+>
+&gt; qemu-system-x86_64: error: failed to set MSR 0x48b to 0x1582e00000000<=
+br>
+&gt; qemu-system-x86_64: /root/qemu/target/i386/kvm.c:2947: kvm_put_msrs:<b=
+r>
+&gt; Assertion `ret =3D=3D cpu-&gt;kvm_msr_buf-&gt;nmsrs' failed.<br>
+<br>
+It could be a KVM bug too.&nbsp; The following features are being enabled:<=
+br>
+<br>
+#define VMX_SECONDARY_EXEC_XSAVES&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0x001000=
+00<br>
+#define VMX_SECONDARY_EXEC_SHADOW_VMCS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0x00004000<br>
+#define VMX_SECONDARY_EXEC_ENABLE_INVPCID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp; 0x00001000<br>
+#define VMX_SECONDARY_EXEC_RDRAND_EXITING&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbs=
+p;&nbsp;&nbsp;&nbsp;&nbsp; 0x00000800<br>
+#define VMX_SECONDARY_EXEC_ENABLE_VPID&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&=
+nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0x00000020<br>
+#define VMX_SECONDARY_EXEC_ENABLE_EPT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0x00000002<br>
+#define VMX_SECONDARY_EXEC_DESC&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&n=
+bsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+; 0x00000004<br>
+#define VMX_SECONDARY_EXEC_RDTSCP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;=
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0x000000=
+08<br>
+<br>
+Can you try:<br>
+<br>
+1) running &quot;vmxcap&quot; on the Azure VM<br>
+<br>
+2) adding &quot;-vmx-xsaves,-vmx-shadow-vmcs&quot; to the &quot;-cpu&quot; =
+option and, if it<br>
+works, add only one of the two.<br>
+<br>
+3) if it doesn't work, adding &quot;-vmx&quot; to the &quot;-cpu&quot; opti=
+on.&nbsp; Either way,<br>
+run &quot;x86info -a&quot; in the resulting VM.<br>
+<br>
+Thanks,<br>
+<br>
+Paolo<br>
+<br>
+</div>
+</span></font></div>
+</body>
+</html>
+
+--_000_DM6PR11MB4089FF5F11BC215320EB502E9A510DM6PR11MB4089namp_--
 
