@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AD66C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 19:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A441C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 19:19:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9FFC20717
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 19:18:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0521320717
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 19:19:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LFRt5T27"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9FFC20717
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDQ7e7a8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0521320717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igvt6-0001Xs-UL
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 14:18:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35734)
+	id 1igvu3-0002mt-6C
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 14:19:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35783)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1igvpX-0006Mp-BU
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 14:14:56 -0500
+ (envelope-from <wainersm@redhat.com>) id 1igvpd-0006U7-SZ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 14:15:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1igvpW-0007zW-0w
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 14:14:54 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34512
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <wainersm@redhat.com>) id 1igvpc-000867-PQ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 14:15:01 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41659
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1igvpV-0007zH-Tq
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 14:14:53 -0500
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1igvpc-00085j-M3
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 14:15:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576523693;
+ s=mimecast20190719; t=1576523700;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AcD9ROGvtSV+wqMEqqKIqhvjn5QGmno0NIrziv6959U=;
- b=LFRt5T271WJgA3o6+P3jBjQeyEip/nAHOjx2l5sPsz/zo9IOELDqOslEcTEwb96j6DkTPO
- XI+AjplplHr3+q+5szsviB40Edap/XifnJQIsIURiFCyXNWcG9LEvSYvZni29wtgrp9L9T
- yLPdrelKK3KPv7gT+CxNLR0DQ07+9qQ=
+ bh=wpxDs6n6O4frSEEXe94efQ5PjWCAgHDZH3DfoyfB/D4=;
+ b=SDQ7e7a8lRciqfTboS/YwnaU1iOYAfNklwjtC08Y4Eidw1R7HpDqj+j1wsdJ+osXsrVmdw
+ zgeGms+NEc46K9D5h2NMHulUpomd72lu687cX+ExlQgaCxNZjraS+j8fzVyiUIqnEgKIP3
+ AT7zXSclBX/XMAsO3sq4XZf+c6GUESM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-352--QYynzvoNhSR8l1J7Yb8Kg-1; Mon, 16 Dec 2019 14:14:52 -0500
+ us-mta-28--xXCWYZmOguIcgGL6v61SQ-1; Mon, 16 Dec 2019 14:14:56 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3AD6310054E3;
- Mon, 16 Dec 2019 19:14:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D06521800D7B;
+ Mon, 16 Dec 2019 19:14:55 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-116-67.gru2.redhat.com
  [10.97.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 555915C1B5;
- Mon, 16 Dec 2019 19:14:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E4F265C1B5;
+ Mon, 16 Dec 2019 19:14:53 +0000 (UTC)
 From: Wainer dos Santos Moschetta <wainersm@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 2/5] python/qemu: accel: Add list_accel() method
-Date: Mon, 16 Dec 2019 16:14:35 -0300
-Message-Id: <20191216191438.93418-3-wainersm@redhat.com>
+Subject: [PATCH v4 4/5] python/qemu: accel: Add tcg_available() method
+Date: Mon, 16 Dec 2019 16:14:37 -0300
+Message-Id: <20191216191438.93418-5-wainersm@redhat.com>
 In-Reply-To: <20191216191438.93418-1-wainersm@redhat.com>
 References: <20191216191438.93418-1-wainersm@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: -QYynzvoNhSR8l1J7Yb8Kg-1
+X-MC-Unique: -xXCWYZmOguIcgGL6v61SQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,58 +91,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit cbe6d6365a48 the command `qemu -accel help` returns
-the list of accelerators enabled in the QEMU binary. This adds
-the list_accel() method which return that same list.
+This adds a method to check if the tcg accelerator is enabled
+in the QEMU binary.
 
 Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
 ---
- python/qemu/accel.py | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ python/qemu/accel.py | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/python/qemu/accel.py b/python/qemu/accel.py
-index cbeac10dd1..7395cee793 100644
+index 5fce3aa3dd..0b38ddf0ab 100644
 --- a/python/qemu/accel.py
 +++ b/python/qemu/accel.py
-@@ -14,7 +14,11 @@ accelerators.
- # the COPYING file in the top-level directory.
- #
-=20
-+import logging
- import os
-+import subprocess
+@@ -67,3 +67,11 @@ def kvm_available(target_arch=3DNone, qemu_bin=3DNone):
+     if qemu_bin and "kvm" not in list_accel(qemu_bin):
+         return False
+     return True
 +
-+LOG =3D logging.getLogger(__name__)
-=20
- # Mapping host architecture to any additional architectures it can
- # support which often includes its 32 bit cousin.
-@@ -23,6 +27,25 @@ ADDITIONAL_ARCHES =3D {
-     "aarch64" : "armhf"
- }
-=20
-+def list_accel(qemu_bin):
++def tcg_available(qemu_bin):
 +    """
-+    List accelerators enabled in the QEMU binary.
++    Check if TCG is available.
 +
-+    @param qemu_bin (str): path to the QEMU binary.
-+    @raise Exception: if failed to run `qemu -accel help`
-+    @return a list of accelerator names.
++    @param qemu_bin (str): path to the QEMU binary
 +    """
-+    if not qemu_bin:
-+        return []
-+    try:
-+        out =3D subprocess.check_output([qemu_bin, '-accel', 'help'],
-+                                      universal_newlines=3DTrue)
-+    except:
-+        LOG.debug("Failed to get the list of accelerators in %s", qemu_bin=
-)
-+        raise
-+    # Skip the first line which is the header.
-+    return [acc.strip() for acc in out.splitlines()[1:]]
-+
- def kvm_available(target_arch=3DNone):
-     host_arch =3D os.uname()[4]
-     if target_arch and target_arch !=3D host_arch:
++    return 'tcg' in list_accel(qemu_bin)
 --=20
 2.23.0
 
