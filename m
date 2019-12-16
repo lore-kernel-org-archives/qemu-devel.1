@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9456AC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:12:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 019A8C2D0C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:14:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 637A5206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:12:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5A0E206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:14:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wr69G6hm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 637A5206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kz7ecRqg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5A0E206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igtvE-0000uv-6e
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:12:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57589)
+	id 1igtwn-00032n-H8
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:14:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57281)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFo-00064O-AY
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:53 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFZ-0005mW-BW
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFn-0000pK-4k
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:52 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36401)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFY-0000Af-B4
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:37 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44899)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtFm-0000ld-IT
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:50 -0500
-Received: by mail-wr1-x441.google.com with SMTP id z3so515885wru.3
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:50 -0800 (PST)
+ id 1igtFY-000089-51
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:36 -0500
+Received: by mail-wr1-x444.google.com with SMTP id q10so8018201wrm.11
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=iSvd7kR69HHZhRhQRzsPwBtBWFePaMT2xa1YRgm+R84=;
- b=Wr69G6hmY4M6IsGX1Zcy9pTNIvrQYCiIG8cpSrPvTb/D+4+8So7lH3Jb9ndZPRmsio
- 0dRDXAo9k8JYCWgz184C289Zwp+bkV+WBS+wYODp8h7Gm0tNGlXhSgz+Ii1RllEyDKzZ
- +ru5OsMFrloFOOr/hCv6u891aPTaLrnNG00XJjo65TNuqsfZXv2IDwpIX3K9t3p2azGY
- ds6mrFt9QGLakZgshZzTBNrU/6t4To6d9Jyg/VFxmOry5n1TJ0I2G2jhLxklTln+lTkl
- loA8P30MURqigaws69spBulr4O2b4E9RKZNcsdrl5tN86LuYC2u4hzmxwbWIPudkh0ev
- oY1w==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references;
+ bh=U3vOKBgC/i6K4YScuB6kA+GIuvMW8sSGRrxjWYPsniE=;
+ b=Kz7ecRqgS8g0kMk/BTGySZ5sAGGmOEu/Uvt0Fbd4bpGxBYeoN3qAGJ5KG4A5KyJ62+
+ yB079OSks+yO/6dy8aJT+hkApyeGfJaSLFCTKBNvGJc8wcWnvJDhw0lvoKzgyqAPPsI+
+ /MfGMdLsJBtLbwEU1ffzgb9nxGIf9rhBwU5uRXs+int/x6infaBj0abzMVmi6jwW9w7t
+ YrVsmF1bvM4//Kof4+Isk2XGlxCDXo4ExaLGSnTtpoILc3zBlceZ/mZmH9xhahEAi15C
+ rMgHtmITDCoDGH8CFyYX+UGXNkxkeUGj3o0BcYU2RgGvU4zGc4z1+xdqStHyfwuQ9pnW
+ 2W9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=iSvd7kR69HHZhRhQRzsPwBtBWFePaMT2xa1YRgm+R84=;
- b=CZSJrk4iDwq2y46NTqGBgQ2fYfl1loeEXs8OrWS+rW1ROLvG0QBRUFNSAfb14wHdjZ
- JE2NaSMYmliaahx1C9x4yFVsFTx5txdJkv1x+jhEPXTzHGD4kE6QQPdDeTnkXQjWaOYx
- WarmCbzFDkYfORyBFYE0Qn2Bb9rq2ErNeg/+yqaC0ecN7W/bS39TZRqxqmwWAJAOfkz4
- Lk75q6otbRBC1CLwEew9VkD5SG1QPw3NtZq5qkOEbKF921dksGhwih0/dX9692hMX3cZ
- UFcUEaReqTseSpaJcfBYNZkn+YoxKbl4n6N8NREo1LdoHwndcc7jpoHGXE1WdQo+ZL1Z
- L7jQ==
-X-Gm-Message-State: APjAAAVOgpXUYb3h3CXDrXFlT2ogC6FHMp0/4adJTegvxJv1JMf6li/i
- EJS8YRcoLfQWoOPGoODZMFItcnHy
-X-Google-Smtp-Source: APXvYqxFF4WBvrTC4OIyBL0ho+kV9Z0aagU72rwUlAfZeqvHMdXQeZuxA0qx6Vn5OuFcEZk1lJ9HiQ==
-X-Received: by 2002:adf:f18b:: with SMTP id h11mr30146077wro.56.1576513789346; 
- Mon, 16 Dec 2019 08:29:49 -0800 (PST)
+ bh=U3vOKBgC/i6K4YScuB6kA+GIuvMW8sSGRrxjWYPsniE=;
+ b=g00Ow/OZ0PsfpPBVmPDwdwsLisbLGS/jDSMqTWTB4BAiZ3+ka6U13fSS5znuxBYUeX
+ /9yN0eyitcEinB1Ywl7Edr9RAkU7RZ1SgLkaGdDYsth9QzCMJ3Lo5N4FrwKPHZWau81y
+ b7bWpJJEADv8GlJexAq/CEMtJh0XBnqxA0eZdJKVpM35FbcUy8R5gzJtvFP8B3lH/8SQ
+ WCC3nl0mxAR+5Bar8pAVDeUO+mvy/WC5sxzRnltSBxsR4jFEbL+fXW6/nCBCCPywghHt
+ 1I7OUQJjzG9rZhhawO/2I3KYfgOwPuii6cKNA+sGOV2obh1mQihjNksVQ2YPo0FIlczm
+ MaUA==
+X-Gm-Message-State: APjAAAUP5+XvOAPbNihUi6LWpKNWypimusI9LryOJXk1X83HY2Qt0HwY
+ RshVNIgpyhES/mnsnpsd7SdkJXMw
+X-Google-Smtp-Source: APXvYqwJJxsgFJ76cLZbAoF0rKyH6MndSdPU4Kd8cSPKZ1wzaWmRvlUEgTaUD7ajuGdFq5c6OcYuRg==
+X-Received: by 2002:adf:c446:: with SMTP id a6mr30088253wrg.218.1576513774759; 
+ Mon, 16 Dec 2019 08:29:34 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.48
+ by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.33
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Dec 2019 08:29:48 -0800 (PST)
+ Mon, 16 Dec 2019 08:29:33 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 62/62] colo: fix return without releasing RCU
-Date: Mon, 16 Dec 2019 17:28:46 +0100
-Message-Id: <1576513726-53700-63-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 47/62] pci-stub: add more MSI functions
+Date: Mon, 16 Dec 2019 17:28:31 +0100
+Message-Id: <1576513726-53700-48-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,69 +90,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use WITH_RCU_READ_LOCK_GUARD to avoid exiting colo_init_ram_cache
-without releasing RCU.
+On x86, KVM needs some function from the PCI subsystem in order to set
+up interrupt routes.  Provide some stubs to support x86 machines that
+lack PCI.
 
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- migration/ram.c | 33 +++++++++++++++++----------------
- 1 file changed, 17 insertions(+), 16 deletions(-)
+ hw/pci/pci-stub.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/migration/ram.c b/migration/ram.c
-index 7dd7f81..8d7c015 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3891,26 +3891,27 @@ int colo_init_ram_cache(void)
- {
-     RAMBlock *block;
+diff --git a/hw/pci/pci-stub.c b/hw/pci/pci-stub.c
+index c04a5df..cc2a2e1 100644
+--- a/hw/pci/pci-stub.c
++++ b/hw/pci/pci-stub.c
+@@ -26,6 +26,7 @@
+ #include "qapi/qmp/qerror.h"
+ #include "hw/pci/pci.h"
+ #include "hw/pci/msi.h"
++#include "hw/pci/msix.h"
  
--    rcu_read_lock();
--    RAMBLOCK_FOREACH_NOT_IGNORED(block) {
--        block->colo_cache = qemu_anon_ram_alloc(block->used_length,
--                                                NULL,
--                                                false);
--        if (!block->colo_cache) {
--            error_report("%s: Can't alloc memory for COLO cache of block %s,"
--                         "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
--                         block->used_length);
--            RAMBLOCK_FOREACH_NOT_IGNORED(block) {
--                if (block->colo_cache) {
--                    qemu_anon_ram_free(block->colo_cache, block->used_length);
--                    block->colo_cache = NULL;
-+    WITH_RCU_READ_LOCK_GUARD() {
-+        RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-+            block->colo_cache = qemu_anon_ram_alloc(block->used_length,
-+                                                    NULL,
-+                                                    false);
-+            if (!block->colo_cache) {
-+                error_report("%s: Can't alloc memory for COLO cache of block %s,"
-+                             "size 0x" RAM_ADDR_FMT, __func__, block->idstr,
-+                             block->used_length);
-+                RAMBLOCK_FOREACH_NOT_IGNORED(block) {
-+                    if (block->colo_cache) {
-+                        qemu_anon_ram_free(block->colo_cache, block->used_length);
-+                        block->colo_cache = NULL;
-+                    }
-                 }
-+                return -errno;
-             }
--            return -errno;
-+            memcpy(block->colo_cache, block->host, block->used_length);
-         }
--        memcpy(block->colo_cache, block->host, block->used_length);
-     }
--    rcu_read_unlock();
+ bool msi_nonbroken;
+ bool pci_available;
+@@ -64,3 +65,29 @@ void msi_notify(PCIDevice *dev, unsigned int vector)
+ {
+     g_assert_not_reached();
+ }
 +
-     /*
-     * Record the dirty pages that sent by PVM, we use this dirty bitmap together
-     * with to decide which page in cache should be flushed into SVM's RAM. Here
++/* Required by target/i386/kvm.c */
++bool msi_is_masked(const PCIDevice *dev, unsigned vector)
++{
++    g_assert_not_reached();
++}
++
++MSIMessage msi_get_message(PCIDevice *dev, unsigned int vector)
++{
++    g_assert_not_reached();
++}
++
++int msix_enabled(PCIDevice *dev)
++{
++    return false;
++}
++
++bool msix_is_masked(PCIDevice *dev, unsigned vector)
++{
++    g_assert_not_reached();
++}
++
++MSIMessage msix_get_message(PCIDevice *dev, unsigned int vector)
++{
++    g_assert_not_reached();
++}
 -- 
 1.8.3.1
+
 
 
