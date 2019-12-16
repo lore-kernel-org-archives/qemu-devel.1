@@ -2,77 +2,79 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D8D2C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82085C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:57:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E85D621582
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:57:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B6E221582
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:57:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Njup6Y9f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E85D621582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="fKkhG0Rp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B6E221582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igxQP-0002oZ-LO
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 15:57:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36431)
+	id 1igxQe-00039w-6q
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 15:57:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1igxIF-0007TZ-Kv
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:48:41 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1igxKc-00033u-RZ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1igxID-0006Yf-KH
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:48:39 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24738)
+ (envelope-from <kwankhede@nvidia.com>) id 1igxKb-0007Q5-C2
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:51:06 -0500
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:5869)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1igxID-0006YP-Gs
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:48:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576529317;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qqgi4yXzByAocEYIrdhE6bBEIHbw5QcBl06XsTZ132U=;
- b=Njup6Y9fL+Qfr1ldsuF+vN1+ro5AEHNVIry+kRkCSXWBNGwH6NYw3Q6ylnuw41ZUDkrXr1
- 3U1a0p1JoIb5HCbwYzoDBbjoLkVdM6wTgqPGspvJQhGKBez5/FXvufmWnqd2nC2JAviIYS
- xczluLbnfA/hRm6iVtwoteqU1uI0GOA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-17-qieL2TobNmy6pxnl1MxLLA-1; Mon, 16 Dec 2019 15:48:28 -0500
-X-MC-Unique: qieL2TobNmy6pxnl1MxLLA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C0769108EE95;
- Mon, 16 Dec 2019 20:48:26 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D30645D9C9;
- Mon, 16 Dec 2019 20:48:21 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH 05/10] arm: pmu: Basic event counter Tests
-Date: Mon, 16 Dec 2019 21:47:52 +0100
-Message-Id: <20191216204757.4020-6-eric.auger@redhat.com>
-In-Reply-To: <20191216204757.4020-1-eric.auger@redhat.com>
-References: <20191216204757.4020-1-eric.auger@redhat.com>
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1igxKb-0007Ps-3h
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:51:05 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5df7ee1c0000>; Mon, 16 Dec 2019 12:50:36 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Mon, 16 Dec 2019 12:51:03 -0800
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Mon, 16 Dec 2019 12:51:03 -0800
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 16 Dec
+ 2019 20:51:03 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Mon, 16 Dec 2019 20:50:56 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v10 Kernel 5/5] vfio iommu: Update UNMAP_DMA ioctl to get
+ dirty bitmap before unmap
+Date: Tue, 17 Dec 2019 01:51:40 +0530
+Message-ID: <1576527700-21805-6-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1576529437; bh=NNfqr2vUhNMQwsoU1oTVwnAsTm+8VgO1yNM6gGnpjxc=;
+ h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
+ In-Reply-To:References:X-NVConfidentiality:MIME-Version:
+ Content-Type;
+ b=fKkhG0Rpo2uQO3Ql7u1tPsMGHIrYdi6htp/An+VH/Rvc607coS/qlLMRR2QUvsDC1
+ 7dBFjQZnMzH8nLwiVjV7INjbuglDcYU9M63kFCdHRjqRURv2qOOpmEKFyBjLzitEzZ
+ MpAd3lAe1qFlWZPCv7Rva8/WRBhoenFNPyqLK3RvnRRvBHcPkxa3w9b9VcW/8mzi+N
+ ftVxx2IXJH8fwB0t2GBDUyGP5ycpL8fgEVRicp2I9FX+Tiwd5lyC+IcHOmgVCeqZ5s
+ m//kTO1RkQm3OnALZAXCquXHX6fwIaSISKpvcbowUCqSJP8X9fK0lntKTS5XoD1LLl
+ a0rGHPE6//LAg==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,372 +86,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, andrew.murray@arm.com, drjones@redhat.com,
- alexandru.elisei@arm.com, andre.przywara@arm.com
+Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
+ yan.y.zhao@intel.com, kvm@vger.kernel.org, eskultet@redhat.com,
+ ziye.yang@intel.com, qemu-devel@nongnu.org, cohuck@redhat.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, felipe@nutanix.com,
+ jonathan.davies@nutanix.com, changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adds the following tests:
-- event-counter-config: test event counter configuration
-- basic-event-count:
-  - programs counters #0 and #1 to count 2 required events
-  (resp. CPU_CYCLES and INST_RETIRED). Counter #0 is preset
-  to a value close enough to the 32b
-  overflow limit so that we check the overflow bit is set
-  after the execution of the asm loop.
-- mem-access: counts MEM_ACCESS event on counters #0 and #1
-  with and without 32-bit overflow.
+Pages, pinned by external interface for requested IO virtual address
+range,  might get unpinned  and unmapped while migration is active and
+device is still running, that is, in pre-copy phase while guest driver
+still could access those pages. Host device can write to these pages while
+those were mapped. Such pages should be marked dirty so that after
+migration guest driver should still be able to complete the operation.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+To get bitmap during unmap, user should set flag
+VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP, bitmap memory should be allocated and
+zeroed by user space application. Bitmap size and page size should be set
+by user application.
+
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- arm/pmu.c         | 261 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |  18 ++++
- 2 files changed, 279 insertions(+)
+ drivers/vfio/vfio_iommu_type1.c | 63 ++++++++++++++++++++++++++++++++++++-----
+ include/uapi/linux/vfio.h       | 12 ++++++++
+ 2 files changed, 68 insertions(+), 7 deletions(-)
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index d88ef22..139dae3 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -18,9 +18,15 @@
- #include "asm/barrier.h"
- #include "asm/sysreg.h"
- #include "asm/processor.h"
-+#include <bitops.h>
-+#include <asm/gic.h>
-=20
- #define PMU_PMCR_E         (1 << 0)
-+#define PMU_PMCR_P         (1 << 1)
- #define PMU_PMCR_C         (1 << 2)
-+#define PMU_PMCR_D         (1 << 3)
-+#define PMU_PMCR_X         (1 << 4)
-+#define PMU_PMCR_DP        (1 << 5)
- #define PMU_PMCR_LC        (1 << 6)
- #define PMU_PMCR_N_SHIFT   11
- #define PMU_PMCR_N_MASK    0x1f
-@@ -104,6 +110,9 @@ static inline void precise_instrs_loop(int loop, uint=
-32_t pmcr)
-=20
- /* event counter tests only implemented for aarch64 */
- static void test_event_introspection(void) {}
-+static void test_event_counter_config(void) {}
-+static void test_basic_event_count(void) {}
-+static void test_mem_access(void) {}
-=20
- #elif defined(__aarch64__)
- #define ID_AA64DFR0_PERFMON_SHIFT 8
-@@ -145,6 +154,32 @@ static inline void precise_instrs_loop(int loop, uin=
-t32_t pmcr)
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 264449654d3f..6bd02a13903b 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -970,7 +970,8 @@ static long verify_bitmap_size(unsigned long npages, unsigned long bitmap_size)
  }
-=20
- #define PMCEID1_EL0 sys_reg(11, 3, 9, 12, 7)
-+#define PMCNTENSET_EL0 sys_reg(11, 3, 9, 12, 1)
-+#define PMCNTENCLR_EL0 sys_reg(11, 3, 9, 12, 2)
-+
-+#define PMEVTYPER_EXCLUDE_EL1 (1 << 31)
-+#define PMEVTYPER_EXCLUDE_EL0 (1 << 30)
-+
-+#define regn_el0(__reg, __n) __reg ## __n  ## _el0
-+#define write_regn(__reg, __n, __val) \
-+	write_sysreg((__val), __reg ## __n ## _el0)
-+
-+#define read_regn(__reg, __n) \
-+	read_sysreg(__reg ## __n ## _el0)
-+
-+#define print_pmevtyper(__s, __n) do { \
-+	uint32_t val; \
-+	val =3D read_regn(pmevtyper, __n);\
-+	report_info("%s pmevtyper%d=3D0x%x, eventcount=3D0x%x (p=3D%ld, u=3D%ld=
- nsk=3D%ld, nsu=3D%ld, nsh=3D%ld m=3D%ld, mt=3D%ld)", \
-+			(__s), (__n), val, val & 0xFFFF,  \
-+			(BIT_MASK(31) & val) >> 31, \
-+			(BIT_MASK(30) & val) >> 30, \
-+			(BIT_MASK(29) & val) >> 29, \
-+			(BIT_MASK(28) & val) >> 28, \
-+			(BIT_MASK(27) & val) >> 27, \
-+			(BIT_MASK(26) & val) >> 26, \
-+			(BIT_MASK(25) & val) >> 25); \
-+	} while (0)
-=20
- static bool is_event_supported(uint32_t n, bool warn)
+ 
+ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+-			     struct vfio_iommu_type1_dma_unmap *unmap)
++			     struct vfio_iommu_type1_dma_unmap *unmap,
++			     unsigned long *bitmap)
  {
-@@ -207,6 +242,223 @@ static void test_event_introspection(void)
- 	report(required_events, "Check required events are implemented");
- }
-=20
-+static inline void mem_access_loop(void *addr, int loop, uint32_t pmcr)
-+{
-+asm volatile(
-+	"       msr     pmcr_el0, %[pmcr]\n"
-+	"       isb\n"
-+	"       mov     x10, %[loop]\n"
-+	"1:     sub     x10, x10, #1\n"
-+	"       mov x8, %[addr]\n"
-+	"       ldr x9, [x8]\n"
-+	"       cmp     x10, #0x0\n"
-+	"       b.gt    1b\n"
-+	"       msr     pmcr_el0, xzr\n"
-+	"       isb\n"
-+	:
-+	: [addr] "r" (addr), [pmcr] "r" (pmcr), [loop] "r" (loop)
-+	: );
-+}
+ 	uint64_t mask;
+ 	struct vfio_dma *dma, *dma_last = NULL;
+@@ -1045,6 +1046,15 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 		if (dma->task->mm != current->mm)
+ 			break;
+ 
++		if ((unmap->flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) &&
++		    (dma_last != dma))
++			vfio_iova_dirty_bitmap(iommu, dma->iova, dma->size,
++					     unmap->bitmap_pgsize, unmap->iova,
++					     bitmap);
++		else
++			vfio_remove_unpinned_from_pfn_list(dma, true);
 +
 +
-+static void pmu_reset(void)
-+{
-+	/* reset all counters, counting disabled at PMCR level*/
-+	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-+	/* Disable all counters */
-+	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
-+	/* clear overflow reg */
-+	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
-+	/* disable overflow interrupts on all counters */
-+	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
-+	isb();
-+}
+ 		if (!RB_EMPTY_ROOT(&dma->pfn_list)) {
+ 			struct vfio_iommu_type1_dma_unmap nb_unmap;
+ 
+@@ -1070,6 +1080,7 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+ 						    &nb_unmap);
+ 			goto again;
+ 		}
 +
-+static void test_event_counter_config(void)
-+{
-+	int i;
-+
-+	if (!pmu.nb_implemented_counters) {
-+		report_skip("No event counter, skip ...");
-+		return;
-+	}
-+
-+	pmu_reset();
-+
-+	/*
-+	 * Test setting through PMESELR/PMXEVTYPER and PMEVTYPERn read,
-+	 * select counter 0
-+	 */
-+	write_sysreg(1, PMSELR_EL0);
-+	/* program this counter to count unsupported event */
-+	write_sysreg(0xEA, PMXEVTYPER_EL0);
-+	write_sysreg(0xdeadbeef, PMXEVCNTR_EL0);
-+	report((read_regn(pmevtyper, 1) & 0xFFF) =3D=3D 0xEA,
-+		"PMESELR/PMXEVTYPER/PMEVTYPERn");
-+	report((read_regn(pmevcntr, 1) =3D=3D 0xdeadbeef),
-+		"PMESELR/PMXEVCNTR/PMEVCNTRn");
-+
-+	/* try configure an unsupported event within the range [0x0, 0x3F] */
-+	for (i =3D 0; i <=3D 0x3F; i++) {
-+		if (!is_event_supported(i, false))
-+			goto test_unsupported;
-+	}
-+	report_skip("pmevtyper: all events within [0x0, 0x3F] are supported");
-+
-+test_unsupported:
-+	/* select counter 0 */
-+	write_sysreg(0, PMSELR_EL0);
-+	/* program this counter to count unsupported event */
-+	write_sysreg(i, PMXEVCNTR_EL0);
-+	/* read the counter value */
-+	read_sysreg(PMXEVCNTR_EL0);
-+	report(read_sysreg(PMXEVCNTR_EL0) =3D=3D i,
-+		"read of a counter programmed with unsupported event");
-+
-+}
-+
-+static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_even=
-ts)
-+{
-+	int i;
-+
-+	if (pmu.nb_implemented_counters < nb_events) {
-+		report_skip("Skip test as number of counters is too small (%d)",
-+			    pmu.nb_implemented_counters);
-+		return false;
-+	}
-+
-+	for (i =3D 0; i < nb_events; i++) {
-+		if (!is_event_supported(events[i], false)) {
-+			report_skip("Skip test as event %d is not supported",
-+				    events[i]);
-+			return false;
-+		}
-+	}
-+	return true;
-+}
-+
-+static void test_basic_event_count(void)
-+{
-+	uint32_t implemented_counter_mask, non_implemented_counter_mask;
-+	uint32_t counter_mask;
-+	uint32_t events[] =3D {
-+		0x11,	/* CPU_CYCLES */
-+		0x8,	/* INST_RETIRED */
-+	};
-+
-+	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-+		return;
-+
-+	implemented_counter_mask =3D (1 << pmu.nb_implemented_counters) - 1;
-+	non_implemented_counter_mask =3D ~((1 << 31) | implemented_counter_mask=
-);
-+	counter_mask =3D implemented_counter_mask | non_implemented_counter_mas=
-k;
-+
-+	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+
-+	/* disable all counters */
-+	write_sysreg_s(0xFFFFFFFF, PMCNTENCLR_EL0);
-+	report(!read_sysreg_s(PMCNTENCLR_EL0) && !read_sysreg_s(PMCNTENSET_EL0)=
-,
-+		"pmcntenclr: disable all counters");
-+
-+	/*
-+	 * clear cycle and all event counters and allow counter enablement
-+	 * through PMCNTENSET. LC is RES1.
-+	 */
-+	set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-+	isb();
-+	report(get_pmcr() =3D=3D (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset coun=
-ters");
-+
-+	/* Preset counter #0 to 0xFFFFFFF0 to trigger an overflow interrupt */
-+	write_regn(pmevcntr, 0, 0xFFFFFFF0);
-+	report(read_regn(pmevcntr, 0) =3D=3D 0xFFFFFFF0,
-+		"counter #0 preset to 0xFFFFFFF0");
-+	report(!read_regn(pmevcntr, 1), "counter #1 is 0");
-+
-+	/*
-+	 * Enable all implemented counters and also attempt to enable
-+	 * not supported counters. Counting still is disabled by !PMCR.E
-+	 */
-+	write_sysreg_s(counter_mask, PMCNTENSET_EL0);
-+
-+	/* check only those implemented are enabled */
-+	report((read_sysreg_s(PMCNTENSET_EL0) =3D=3D read_sysreg_s(PMCNTENCLR_E=
-L0)) &&
-+		(read_sysreg_s(PMCNTENSET_EL0) =3D=3D implemented_counter_mask),
-+		"pmcntenset: enabled implemented_counters");
-+
-+	/* Disable all counters but counters #0 and #1 */
-+	write_sysreg_s(~0x3, PMCNTENCLR_EL0);
-+	report((read_sysreg_s(PMCNTENSET_EL0) =3D=3D read_sysreg_s(PMCNTENCLR_E=
-L0)) &&
-+		(read_sysreg_s(PMCNTENSET_EL0) =3D=3D 0x3),
-+		"pmcntenset: just enabled #0 and #1");
-+
-+	/* clear overflow register */
-+	write_sysreg(0xFFFFFFFF, pmovsclr_el0);
-+	report(!read_sysreg(pmovsclr_el0), "check overflow reg is 0");
-+
-+	/* disable overflow interrupts on all counters*/
-+	write_sysreg(0xFFFFFFFF, pmintenclr_el1);
-+	report(!read_sysreg(pmintenclr_el1),
-+		"pmintenclr_el1=3D0, all interrupts disabled");
-+
-+	/* enable overflow interrupts on all event counters */
-+	write_sysreg(implemented_counter_mask | non_implemented_counter_mask,
-+		     pmintenset_el1);
-+	report(read_sysreg(pmintenset_el1) =3D=3D implemented_counter_mask,
-+		"overflow interrupts enabled on all implemented counters");
-+
-+	/* Set PMCR.E, execute asm code and unset PMCR.E */
-+	precise_instrs_loop(20, pmu.pmcr_ro | PMU_PMCR_E);
-+
-+	report_info("counter #0 is 0x%lx (CPU_CYCLES)",
-+		    read_regn(pmevcntr, 0));
-+	report_info("counter #1 is 0x%lx (INST_RETIRED)",
-+		    read_regn(pmevcntr, 1));
-+
-+	report_info("overflow reg =3D 0x%lx", read_sysreg(pmovsclr_el0));
-+	report(read_sysreg(pmovsclr_el0) & 0x1,
-+		"check overflow happened on #0 only");
-+}
-+
-+static void test_mem_access(void)
-+{
-+	void *addr =3D malloc(PAGE_SIZE);
-+	uint32_t events[] =3D {
-+		0x13,   /* MEM_ACCESS */
-+		0x13,   /* MEM_ACCESS */
-+	};
-+
-+	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-+		return;
-+
-+	pmu_reset();
-+
-+	write_regn(pmevtyper, 0, events[0] | PMEVTYPER_EXCLUDE_EL0);
-+	write_regn(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	isb();
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 0));
-+	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn(pmevcntr, 1));
-+	/* We may not measure exactly 20 mem access. Depends on the platform */
-+	report((read_regn(pmevcntr, 0) =3D=3D read_regn(pmevcntr, 1)) &&
-+	       (read_regn(pmevcntr, 0) >=3D 20) && !read_sysreg(pmovsclr_el0),
-+	       "Ran 20 mem accesses");
-+
-+	pmu_reset();
-+
-+	write_regn(pmevcntr, 0, 0xFFFFFFFA);
-+	write_regn(pmevcntr, 1, 0xFFFFFFF0);
-+	write_sysreg_s(0x3, PMCNTENSET_EL0);
-+	isb();
-+	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-+	report(read_sysreg(pmovsclr_el0) =3D=3D 0x3,
-+	       "Ran 20 mem accesses with expected overflows on both counters");
-+	report_info("cnt#0 =3D %ld cnt#1=3D%ld overflow=3D0x%lx",
-+			read_regn(pmevcntr, 0), read_regn(pmevcntr, 1),
-+			read_sysreg(pmovsclr_el0));
-+}
-+
- #endif
-=20
- /*
-@@ -397,6 +649,15 @@ int main(int argc, char *argv[])
- 	} else if (strcmp(argv[1], "event-introspection") =3D=3D 0) {
- 		report_prefix_push(argv[1]);
- 		test_event_introspection();
-+	} else if (strcmp(argv[1], "event-counter-config") =3D=3D 0) {
-+		report_prefix_push(argv[1]);
-+		test_event_counter_config();
-+	} else if (strcmp(argv[1], "basic-event-count") =3D=3D 0) {
-+		report_prefix_push(argv[1]);
-+		test_basic_event_count();
-+	} else if (strcmp(argv[1], "mem-access") =3D=3D 0) {
-+		report_prefix_push(argv[1]);
-+		test_mem_access();
- 	} else {
- 		report_abort("Unknown sub-test '%s'", argv[1]);
+ 		unmapped += dma->size;
+ 		vfio_remove_dma(iommu, dma);
  	}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 4433ef3..7a59403 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -72,6 +72,24 @@ groups =3D pmu
- arch =3D arm64
- extra_params =3D -append 'event-introspection'
-=20
-+[pmu-event-counter-config]
-+file =3D pmu.flat
-+groups =3D pmu
-+arch =3D arm64
-+extra_params =3D -append 'event-counter-config'
+@@ -2401,22 +2412,60 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
+ 
+ 	} else if (cmd == VFIO_IOMMU_UNMAP_DMA) {
+ 		struct vfio_iommu_type1_dma_unmap unmap;
+-		long ret;
++		unsigned long *bitmap = NULL;
++		long ret, bsize;
+ 
+ 		minsz = offsetofend(struct vfio_iommu_type1_dma_unmap, size);
+ 
+-		if (copy_from_user(&unmap, (void __user *)arg, minsz))
++		if (copy_from_user(&unmap, (void __user *)arg, sizeof(unmap)))
+ 			return -EFAULT;
+ 
+-		if (unmap.argsz < minsz || unmap.flags)
++		if (unmap.argsz < minsz ||
++		    unmap.flags & ~VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP)
+ 			return -EINVAL;
+ 
+-		ret = vfio_dma_do_unmap(iommu, &unmap);
++		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
++			unsigned long pgshift = __ffs(unmap.bitmap_pgsize);
++			uint64_t iommu_pgmask =
++			 ((uint64_t)1 << __ffs(vfio_pgsize_bitmap(iommu))) - 1;
 +
-+[pmu-basic-event-count]
-+file =3D pmu.flat
-+groups =3D pmu
-+arch =3D arm64
-+extra_params =3D -append 'basic-event-count'
++			if (((unmap.bitmap_pgsize - 1) & iommu_pgmask) !=
++			     (unmap.bitmap_pgsize - 1))
++				return -EINVAL;
 +
-+[pmu-mem-access]
-+file =3D pmu.flat
-+groups =3D pmu
-+arch =3D arm64
-+extra_params =3D -append 'mem-access'
++			bsize = verify_bitmap_size(unmap.size >> pgshift,
++						   unmap.bitmap_size);
++			if (bsize < 0)
++				return bsize;
 +
- # Test PMU support (TCG) with -icount IPC=3D1
- #[pmu-tcg-icount-1]
- #file =3D pmu.flat
---=20
-2.20.1
++			bitmap = kmalloc(bsize, GFP_KERNEL);
++			if (!bitmap)
++				return -ENOMEM;
++
++			if (copy_from_user(bitmap, (void __user *)unmap.bitmap,
++					   bsize)) {
++				ret = -EFAULT;
++				goto unmap_exit;
++			}
++		}
++
++		ret = vfio_dma_do_unmap(iommu, &unmap, bitmap);
+ 		if (ret)
+-			return ret;
++			goto unmap_exit;
+ 
+-		return copy_to_user((void __user *)arg, &unmap, minsz) ?
++		if (unmap.flags & VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP) {
++			if (copy_to_user((void __user *)unmap.bitmap, bitmap,
++					  bsize)) {
++				ret = -EFAULT;
++				goto unmap_exit;
++			}
++		}
++
++		ret = copy_to_user((void __user *)arg, &unmap, minsz) ?
+ 			-EFAULT : 0;
++unmap_exit:
++		kfree(bitmap);
++		return ret;
+ 	} else if (cmd == VFIO_IOMMU_DIRTY_PAGES) {
+ 		struct vfio_iommu_type1_dirty_bitmap range;
+ 		uint32_t mask = VFIO_IOMMU_DIRTY_PAGES_FLAG_START |
+diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+index 4ad54fbb4698..7705aea7bdaf 100644
+--- a/include/uapi/linux/vfio.h
++++ b/include/uapi/linux/vfio.h
+@@ -958,12 +958,24 @@ struct vfio_iommu_type1_dma_map {
+  * field.  No guarantee is made to the user that arbitrary unmaps of iova
+  * or size different from those used in the original mapping call will
+  * succeed.
++ * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty bitmap
++ * before unmapping IO virtual addresses. When this flag is set, user should
++ * allocate memory to get bitmap, clear the bitmap memory by setting zero and
++ * should set size of allocated memory in bitmap_size field. One bit in bitmap
++ * represents per page , page of user provided page size in 'bitmap_pgsize',
++ * consecutively starting from iova offset. Bit set indicates page at that
++ * offset from iova is dirty. Bitmap of pages in the range of unmapped size is
++ * returned in bitmap.
+  */
+ struct vfio_iommu_type1_dma_unmap {
+ 	__u32	argsz;
+ 	__u32	flags;
++#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+ 	__u64	iova;				/* IO virtual address */
+ 	__u64	size;				/* Size of mapping (bytes) */
++	__u64        bitmap_pgsize;		/* page size for bitmap */
++	__u64        bitmap_size;               /* in bytes */
++	void __user *bitmap;                    /* one bit per page */
+ };
+ 
+ #define VFIO_IOMMU_UNMAP_DMA _IO(VFIO_TYPE, VFIO_BASE + 14)
+-- 
+2.7.0
 
 
