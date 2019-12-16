@@ -2,78 +2,53 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E06C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 00:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33EF9C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 00:37:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A4072467B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 00:23:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvChM8hE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A4072467B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 05C1F2072A
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 00:37:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05C1F2072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=telegraphics.com.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igeAG-0007p4-DO
-	for qemu-devel@archiver.kernel.org; Sun, 15 Dec 2019 19:23:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58759)
+	id 1igeO6-0003Ts-4u
+	for qemu-devel@archiver.kernel.org; Sun, 15 Dec 2019 19:37:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34372)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ige95-0006M9-O4
- for qemu-devel@nongnu.org; Sun, 15 Dec 2019 19:21:56 -0500
+ (envelope-from <fthain@telegraphics.com.au>) id 1igeNX-00034u-C1
+ for qemu-devel@nongnu.org; Sun, 15 Dec 2019 19:36:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ige94-0006LB-NO
- for qemu-devel@nongnu.org; Sun, 15 Dec 2019 19:21:55 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21827
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ige94-0006KV-K7
- for qemu-devel@nongnu.org; Sun, 15 Dec 2019 19:21:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576455714;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Zyx5Q0etKOjeoIcognRvut9GjEcnClAltc5bpgSqMuo=;
- b=JvChM8hE9JU0+JcesF+Z8U8cO4Q8qHhHzHL1qMXwAhPDTvwy6Q4HCV3ix2VMdMaFAW62wl
- EkIMMIbUzNhft/1OOxf7gtqkUfxAPsowoJLETYqBphm7BbXiFY9tkZ/2k7zbtS70ZaFmx/
- 5RfZKE0ilR8/igExTV/VTVlF7GpeFGA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-NVWiawfaPkmx3dNd-7lVyQ-1; Sun, 15 Dec 2019 19:21:50 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB3D38017DF;
- Mon, 16 Dec 2019 00:21:49 +0000 (UTC)
-Received: from x1w.redhat.com (ovpn-205-147.brq.redhat.com [10.40.205.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0221F1001B00;
- Mon, 16 Dec 2019 00:21:47 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] hw/pci/pci_host: Let pci_data_[read/write] use unsigned
- 'size' argument
-Date: Mon, 16 Dec 2019 01:21:34 +0100
-Message-Id: <20191216002134.18279-3-philmd@redhat.com>
-In-Reply-To: <20191216002134.18279-1-philmd@redhat.com>
-References: <20191216002134.18279-1-philmd@redhat.com>
+ (envelope-from <fthain@telegraphics.com.au>) id 1igeNW-0006Ej-74
+ for qemu-devel@nongnu.org; Sun, 15 Dec 2019 19:36:51 -0500
+Received: from kvm5.telegraphics.com.au ([98.124.60.144]:35288)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <fthain@telegraphics.com.au>)
+ id 1igeNW-0006Ak-3X; Sun, 15 Dec 2019 19:36:50 -0500
+Received: from localhost (localhost.localdomain [127.0.0.1])
+ by kvm5.telegraphics.com.au (Postfix) with ESMTP id 7030023F85;
+ Sun, 15 Dec 2019 19:36:44 -0500 (EST)
+Date: Mon, 16 Dec 2019 11:36:41 +1100 (AEDT)
+From: Finn Thain <fthain@telegraphics.com.au>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>, 
+ Herve Poussineau <hpoussin@reactos.org>
+Subject: Re: [PATCH 00/10] Fixes for DP8393X SONIC device emulation
+In-Reply-To: <alpine.LNX.2.21.1.1912150915460.8@nippy.intranet>
+Message-ID: <alpine.LNX.2.21.1.1912160906420.11@nippy.intranet>
+References: <cover.1576286757.git.fthain@telegraphics.com.au>
+ <CAL1e-=gwxSDa1NSevcCbjG1r5vg6A49Kg_FP2EL1jW+BMn7Ghw@mail.gmail.com>
+ <alpine.LNX.2.21.1.1912150915460.8@nippy.intranet>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: NVWiawfaPkmx3dNd-7lVyQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=US-ASCII
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 98.124.60.144
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,66 +60,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Both functions are called by MemoryRegionOps.[read/write] handlers
-with unsigned 'size' argument. Both functions call
-pci_host_config_[read/write]_common() which expect a uint32_t 'len'
-parameter (also unsigned).
-Since it is pointless (and confuse) to use a signed value, use a
-unsigned type.
+On Sun, 15 Dec 2019, Finn Thain wrote:
 
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- include/hw/pci/pci_host.h | 4 ++--
- hw/pci/pci_host.c         | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+> I test the qemu build like this,
+> 
+> qemu-system-m68k -M q800 -m 512M -serial none -serial mon:stdio -g 800x600x4
+> -net nic,model=dp83932,addr=00:00:00:01:02:03
+> -net bridge,helper=/opt/qemu/libexec/qemu-bridge-helper,br=br0
+> -append "fbcon=font:ProFont6x11 console=tty0 console=ttyS0 ignore_loglevel"
+> -kernel vmlinux-4.14.157-mac-backport+
+> -initrd /mnt/loop/install/cdrom/initrd.gz
+> 
+> You can obtain this kernel binary from the linux-mac68k project on 
+> sourceforge. (I usually use a mainline Linux build but it makes no 
+> difference.)
+> 
 
-diff --git a/include/hw/pci/pci_host.h b/include/hw/pci/pci_host.h
-index ba31595fc7..9ce088bd13 100644
---- a/include/hw/pci/pci_host.h
-+++ b/include/hw/pci/pci_host.h
-@@ -62,8 +62,8 @@ void pci_host_config_write_common(PCIDevice *pci_dev, uin=
-t32_t addr,
- uint32_t pci_host_config_read_common(PCIDevice *pci_dev, uint32_t addr,
-                                      uint32_t limit, uint32_t len);
-=20
--void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, int len);
--uint32_t pci_data_read(PCIBus *s, uint32_t addr, int len);
-+void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, unsigned len);
-+uint32_t pci_data_read(PCIBus *s, uint32_t addr, unsigned len);
-=20
- extern const MemoryRegionOps pci_host_conf_le_ops;
- extern const MemoryRegionOps pci_host_conf_be_ops;
-diff --git a/hw/pci/pci_host.c b/hw/pci/pci_host.c
-index 0958d157de..ce7bcdb1d5 100644
---- a/hw/pci/pci_host.c
-+++ b/hw/pci/pci_host.c
-@@ -106,7 +106,7 @@ uint32_t pci_host_config_read_common(PCIDevice *pci_dev=
-, uint32_t addr,
-     return ret;
- }
-=20
--void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, int len)
-+void pci_data_write(PCIBus *s, uint32_t addr, uint32_t val, unsigned len)
- {
-     PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
-     uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
-@@ -119,7 +119,7 @@ void pci_data_write(PCIBus *s, uint32_t addr, uint32_t =
-val, int len)
-                                  val, len);
- }
-=20
--uint32_t pci_data_read(PCIBus *s, uint32_t addr, int len)
-+uint32_t pci_data_read(PCIBus *s, uint32_t addr, unsigned len)
- {
-     PCIDevice *pci_dev =3D pci_dev_find_by_addr(s, addr);
-     uint32_t config_addr =3D addr & (PCI_CONFIG_SPACE_SIZE - 1);
---=20
-2.21.0
+One difficulty with testing these patches with Linux guests is some old 
+bugs in drivers/net/ethernet/natsemi/sonic.c that can cause tx watchdog 
+timeouts on real hardware.
 
+I have some patches for that driver which may be useful when testing 
+QEMU's hw/net/dp8393x.c device. (I've pushed those patches to my github 
+repo.)
+
+The second obstacle I have involves testing the dp8393x device with a 
+bridge device on a Linux/i686 host.
+
+Running tcpdump in the Linux/m68k guest showed these two ping packets from 
+the host,
+
+00:15:28.480164 IP 192.168.66.1 > 192.168.66.111: ICMP echo request, id 23957, seq 11, length 64
+        0x0000:  0800 0702 0304 fe16 d9ae 6943 0800 4500  ..........iC..E.
+        0x0010:  0054 ff4d 4000 4001 359a c0a8 4201 c0a8  .T.M@.@.5...B...
+        0x0020:  426f 0800 4243 5d95 000b a0cc f65d cfee  Bo..BC]......]..
+        0x0030:  0600 0809 0a0b 0c0d 0e0f 1011 1213 1415  ................
+        0x0040:  1617 1819 1a1b 1c1d 1e1f 2021 2223 2425  ...........!"#$%
+        0x0050:  2627 2829 2a2b 2c2d 2e2f 3031 3233 3435  &'()*+,-./012345
+        0x0060:  3637 33e0 14c7                           673...
+00:15:29.341601 IP truncated-ip - 52 bytes missing! 192.168.66.1 > 192.168.66.111: ICMP echo request, id 23957, seq 12, length 64
+        0x0000:  0800 0702 0304 fe16 d9ae 6943 0800 4500  ..........iC..E.
+        0x0010:  0054 ff4e 4000 4001 3599 c0a8 4201 c0a8  .T.N@.@.5...B...
+        0x0020:  426f 0800 d61a 5d95 000c a0cc f65d        Bo....]......]
+
+Sniffing br0 on the host shows no sign of the truncated packet at all 
+which leaves a gap in the packet sequence numbers captured on the host. 
+Weird.
+
+When I log the calls to,
+
+static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+                               size_t pkt_size)
+
+the corresponding pkt_size values look like this,
+
+pkt_size 98
+pkt_size 42
+
+So this seems to show that the bug is not in dp8393x. Possibly not in 
+QEMU?
+
+I don't see any options in 'man brctl' that might explain why the host and 
+guest see different packets. I guess I'll have to find a way to avoid 
+using bridge interfaces (?)
 
