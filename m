@@ -2,81 +2,77 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5115FC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 23:45:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EE1C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 23:45:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19AFE2053B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 23:45:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32B762064B
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 23:45:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JkN0vcxL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19AFE2053B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cy5zrSVB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32B762064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33465 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih037-00021h-06
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 18:45:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53221)
+	id 1ih03h-0002pD-8g
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 18:45:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53299)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ih02C-000141-Li
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 18:44:18 -0500
+ (envelope-from <crosa@redhat.com>) id 1ih02P-0001LM-Hh
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 18:44:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <nieklinnenbank@gmail.com>) id 1ih02B-0000j6-9B
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 18:44:16 -0500
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:39277)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <nieklinnenbank@gmail.com>)
- id 1ih028-0000hz-5W; Mon, 16 Dec 2019 18:44:12 -0500
-Received: by mail-il1-x144.google.com with SMTP id x5so3910375ila.6;
- Mon, 16 Dec 2019 15:44:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=EZ/NWv3PxRZMK4GHKDW0UhZhqP3Ch9MknrvNeXjNmbU=;
- b=JkN0vcxLG4pScgBg+KCMmRrOUv2Q9njz8ci63ZMTHLCktAFlrE9h97ME8AQ/EcJrt2
- HHjtHDzBeLUUXyI7+WbrOkDSpXN4XVftNA5Puyr4PNnL12wTPg3BJmqp+gc9R3AIW5Z4
- vSUaZPY5btkx+S0UiGpds/+w2i6V/OWjiZfPg0BIkGfpVFtr06iuWhCfz19PrKjl/sWp
- HP/60WlxpJxUN8DGxVJEVeRXWTBnBzic0fMjtmMIjNdi50vM/nhO2AWbd+4C8r14ZH1C
- C2+3V8dCOV9Jwm5vyxnEsYCxjfsRsE7giWZQTxj2zwMqVOlm9kngdbOqdbXlNax9QROt
- 7+sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=EZ/NWv3PxRZMK4GHKDW0UhZhqP3Ch9MknrvNeXjNmbU=;
- b=RgXHYjD9Uimj5Sz0mmr3bpkjM+gmMVZTryvSLDQ7yPwycxmroQqJrLPPOMC7rV8Oej
- +2gINhz/2FNHRLvp/t7S+LopRhZMrj7cJTLI4uarlJm55zbyWWH0T4+CRl6/hf2CqxgM
- ZjgfDYmMFiy77Tz6fItHIqPVkKdUPS4dbTF6W+cdG8W09Pt87W7VCTTn2JET+Tnwhwp8
- w/fS46LODtKy/ZEtDZQ0O+ZTipO6/SAISJU+tNRPpPas/5Z1+9cmaJ3HNp8pveZcZMq7
- 5zwE0UxldOiFHiKjqJ1Lc57NaKZmPo6dj+hi30MIBckbQF9Q6CuvryskNwfqOieanHgb
- XuqA==
-X-Gm-Message-State: APjAAAXeeCZs8CVFaqXoRy80URb7Q4sCpufShmb09Y+Nter94O8RdfbX
- GDlFvHCe9Y4fT3amOleGpAB7O+8u2rKpdxGmNQI=
-X-Google-Smtp-Source: APXvYqwZk1jjYR5ZZvZBJsfPIAWM/xhvq4L0OgWekTThJiZnCRgKf/FUiW0M+woH9EQ099t409vWK7WOLLRANml3Oow=
-X-Received: by 2002:a92:5a45:: with SMTP id o66mr13929682ilb.67.1576539851325; 
- Mon, 16 Dec 2019 15:44:11 -0800 (PST)
+ (envelope-from <crosa@redhat.com>) id 1ih02M-0000zY-N9
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 18:44:27 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48775
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ih02M-0000xK-5b
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 18:44:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576539864;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=b2k4oefNeW4FKU9T+ddBdAZlfD3ds/PR3xEHTDFz2Vo=;
+ b=Cy5zrSVBpQ3yCdT9AB4qht1NwLBXBJw2EVdMMtmWSpvyWR7Gm/fTS3ncFs1EAEkq1388q0
+ 6hTGiRNd3eflXaoIHx++4Wi7fwFa0Jptae0c/AKDXlS/VtR+RjY47Wt/rJ/sEAJuLB5GDx
+ iQZvlZqLBnkbLA4zAQAqYsn+XdkHO5Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-74-xlxuv-8FMUaXoErFtTJHxA-1; Mon, 16 Dec 2019 18:44:21 -0500
+X-MC-Unique: xlxuv-8FMUaXoErFtTJHxA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 66A00DB20;
+ Mon, 16 Dec 2019 23:44:20 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-5.gru2.redhat.com [10.97.116.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B452605BB;
+ Mon, 16 Dec 2019 23:44:10 +0000 (UTC)
+Date: Mon, 16 Dec 2019 18:44:07 -0500
+From: Cleber Rosa <crosa@redhat.com>
+To: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Subject: Re: [PATCH v4 0/5] python/qemu: New accel module and improvements
+Message-ID: <20191216234407.GA23176@localhost.localdomain>
+References: <20191216191438.93418-1-wainersm@redhat.com>
 MIME-Version: 1.0
-References: <20191216233519.29030-1-nieklinnenbank@gmail.com>
- <20191216233519.29030-7-nieklinnenbank@gmail.com>
-In-Reply-To: <20191216233519.29030-7-nieklinnenbank@gmail.com>
-From: Niek Linnenbank <nieklinnenbank@gmail.com>
-Date: Tue, 17 Dec 2019 00:44:00 +0100
-Message-ID: <CAPan3WpW1Q3zpnqgk=MWRWe99=MQ4XoW2kw8L3tioFxfEBXd+Q@mail.gmail.com>
-Subject: Re: [PATCH v2 06/10] arm/arm-powerctl: rebuild hflags after setting
- CP15 bits in arm_set_cpu_on()
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000d007770599dac93a"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::144
+In-Reply-To: <20191216191438.93418-1-wainersm@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="mP3DRpeJDSE+ciuQ"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,151 +84,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: fam@euphon.net, ehabkost@redhat.com, philmd@redhat.com,
+ qemu-devel@nongnu.org, jsnow@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d007770599dac93a
-Content-Type: text/plain; charset="UTF-8"
-
-Hello Peter,
-
-In the previous version of this patch series I included the fix for setting
-CP10,CP11 bits
-in arm_set_cpu_on(), which is now in master (0c7f8c43daf65560). While that
-worked, I did not
-realize that setting those bits require rebuilding the flags. Philippe
-reported this [1] initially,
-later on during review we discussed [2] and attempted to correct it [3].
-
-Could you please have a short look at this? Right now I don't see anymore
-issues, but I'm just not very familiar with this area of the code.
-
-Regards,
-Niek
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg01920.html
-[2] https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg02784.html
-[3] https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg02785.html
-
-
-On Tue, Dec 17, 2019 at 12:36 AM Niek Linnenbank <nieklinnenbank@gmail.com>
-wrote:
-
-> After setting CP15 bits in arm_set_cpu_on() the cached hflags must
-> be rebuild to reflect the changed processor state. Without rebuilding,
-> the cached hflags would be inconsistent until the next call to
-> arm_rebuild_hflags(). When QEMU is compiled with debugging enabled
-> (--enable-debug), this problem is captured shortly after the first
-> call to arm_set_cpu_on() for CPUs running in ARM 32-bit non-secure mode:
->
->   qemu-system-arm: target/arm/helper.c:11359: cpu_get_tb_cpu_state:
->   Assertion `flags == rebuild_hflags_internal(env)' failed.
->   Aborted (core dumped)
->
-> Fixes: 0c7f8c43daf65
-> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
-> ---
->  target/arm/arm-powerctl.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c
-> index b064513d44..b75f813b40 100644
-> --- a/target/arm/arm-powerctl.c
-> +++ b/target/arm/arm-powerctl.c
-> @@ -127,6 +127,9 @@ static void arm_set_cpu_on_async_work(CPUState
-> *target_cpu_state,
->          target_cpu->env.regs[0] = info->context_id;
->      }
->
-> +    /* CP15 update requires rebuilding hflags */
-> +    arm_rebuild_hflags(&target_cpu->env);
-> +
->      /* Start the new CPU at the requested address */
->      cpu_set_pc(target_cpu_state, info->entry);
->
-> --
-> 2.17.1
->
->
-
--- 
-Niek Linnenbank
-
---000000000000d007770599dac93a
-Content-Type: text/html; charset="UTF-8"
+--mP3DRpeJDSE+ciuQ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div>Hello Peter,</div><div><br></div><div>In the previous=
- version of this patch series I included the fix for setting CP10,CP11 bits=
-</div><div>in arm_set_cpu_on(), which is now in master (0c7f8c43daf65560). =
-While that worked, I did not</div><div>realize that setting those bits requ=
-ire rebuilding the flags. Philippe reported this [1] initially,</div><div>l=
-ater on during review we discussed [2] and attempted to correct it [3].</di=
-v><div><br></div><div>Could you please have a short look at this? Right now=
- I don&#39;t see anymore</div><div>issues, but I&#39;m just not very famili=
-ar with this area of the code. <br></div><div><br></div><div>Regards,</div>=
-<div>Niek<br></div><div><span style=3D"font-family:arial,sans-serif"><br></=
-span></div><div><pre><span style=3D"font-family:arial,sans-serif">[1] <a hr=
-ef=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg01920.html">=
-https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg01920.html</a>
-[2] <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg027=
-84.html">https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg02784.htm=
-l</a>
-[3] <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg027=
-85.html">https://lists.gnu.org/archive/html/qemu-devel/2019-12/msg02785.htm=
-l</a></span></pre><span style=3D"font-family:arial,sans-serif"></span></div=
-><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tu=
-e, Dec 17, 2019 at 12:36 AM Niek Linnenbank &lt;<a href=3D"mailto:nieklinne=
-nbank@gmail.com">nieklinnenbank@gmail.com</a>&gt; wrote:<br></div><blockquo=
-te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
-solid rgb(204,204,204);padding-left:1ex">After setting CP15 bits in arm_set=
-_cpu_on() the cached hflags must<br>
-be rebuild to reflect the changed processor state. Without rebuilding,<br>
-the cached hflags would be inconsistent until the next call to<br>
-arm_rebuild_hflags(). When QEMU is compiled with debugging enabled<br>
-(--enable-debug), this problem is captured shortly after the first<br>
-call to arm_set_cpu_on() for CPUs running in ARM 32-bit non-secure mode:<br=
+On Mon, Dec 16, 2019 at 04:14:33PM -0300, Wainer dos Santos Moschetta wrote=
+:
+> On commit abf0bf998dcb John Snow moved some code out of __init__.py
+> to machine.py. kvm_available() remained in though. So on patch 01
+> I continue his work by creating a home for that method (the new
+> 'accel' module). Honestly I was unsure about whether move the code
+> to any existing module or make a new, but since I am adding more
+> methods related with accelerators then I thought they would deserve a
+> module.
+>=20
+> The patches 02-04 introduce new helpers and make improvements. Later
+> I intend to use those methods on the acceptance tests such as
+> to automatically set the accelerator in QEMUMachine VM via Avocado
+> tags, and skip the test if the accelerator is not available.
+>=20
+> Patch 05 just remove unneeded imports in __init__.py
 >
-<br>
-=C2=A0 qemu-system-arm: target/arm/helper.c:11359: cpu_get_tb_cpu_state:<br=
->
-=C2=A0 Assertion `flags =3D=3D rebuild_hflags_internal(env)&#39; failed.<br=
->
-=C2=A0 Aborted (core dumped)<br>
-<br>
-Fixes: 0c7f8c43daf65<br>
-Signed-off-by: Niek Linnenbank &lt;<a href=3D"mailto:nieklinnenbank@gmail.c=
-om" target=3D"_blank">nieklinnenbank@gmail.com</a>&gt;<br>
----<br>
-=C2=A0target/arm/arm-powerctl.c | 3 +++<br>
-=C2=A01 file changed, 3 insertions(+)<br>
-<br>
-diff --git a/target/arm/arm-powerctl.c b/target/arm/arm-powerctl.c<br>
-index b064513d44..b75f813b40 100644<br>
---- a/target/arm/arm-powerctl.c<br>
-+++ b/target/arm/arm-powerctl.c<br>
-@@ -127,6 +127,9 @@ static void arm_set_cpu_on_async_work(CPUState *target_=
-cpu_state,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0target_cpu-&gt;env.regs[0] =3D info-&gt;c=
-ontext_id;<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-+=C2=A0 =C2=A0 /* CP15 update requires rebuilding hflags */<br>
-+=C2=A0 =C2=A0 arm_rebuild_hflags(&amp;target_cpu-&gt;env);<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0/* Start the new CPU at the requested address */<br>
-=C2=A0 =C2=A0 =C2=A0cpu_set_pc(target_cpu_state, info-&gt;entry);<br>
-<br>
--- <br>
-2.17.1<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature"><div dir=3D"ltr"><div>Niek Linnenbank<br><br></div></div></=
-div></div>
 
---000000000000d007770599dac93a--
+FIY, queued all patches on my python-next branch.
+
+- Cleber.
+
+--mP3DRpeJDSE+ciuQ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl34FsUACgkQZX6NM6Xy
+CfOUfA/9E5ARe1b1YfG14g9YdpbCOa1WwSKqgOUz6vYTnI2Ct7NSmspWK9xxFEBp
++uISls+x1aiP89sXWN6duCNcq9nquLRiFDyW4USkqNIg9ncRxSX6zgN5Yh9GlBe+
+pYoMBuprqbYOJ1wx+z7yJRshv1v+U7JgJrvRwb4qYcX9Oi7k331f9IE03qta2KZF
+6ujxjQpfBz8vEqXeCRD1tgqe9mbla7L1oOxZhorDeEFXHhnTmWPkutfddSNgqLPQ
+ilBBKzXGkCvBK50ewrn7gSo6SVvP1jjm5EtBsHzm8Op7hOYTEL/3pzD0AUgQ+2Th
+r9wxYzg7hroNQsNtVXXYZqqrVk1YtrHoFbShzI+Ue17M4AoFk89AdAlB4fmadeyZ
+sV6h7uUWtGRF93t0MzUML7tQDZCQYL2EkJvTz9IYWj3cRodZsxm0rX59okpQaurK
+/ACLhk6Ff5zvK6lx9PV8ur2OrG40rM1B56gylLujVHIF+GNbp/JmrH3KEuciFytq
+zjNYbxNDSYVodzbK4VcgHZstPMvqCSnFUuoJXF/Y2ERJL2kfaG5q2NN8NOeUd8mf
+DAkjGsXDtg1VQ2LS16NFxjTSGY+n6vSMj5ma7EhshahQzyLXJcMw9JMOpZ5caTFL
+CTgZveIxMsPQDhJR+xK+EH/AZrlVAv1dmPjZHEtlvvRK0rAwIU8=
+=Wmrl
+-----END PGP SIGNATURE-----
+
+--mP3DRpeJDSE+ciuQ--
+
 
