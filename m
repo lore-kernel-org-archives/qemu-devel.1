@@ -2,78 +2,89 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F73C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:17:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4759EC2D0C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:19:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C51C206A5
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:17:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 16808206A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:19:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ehfn8tjV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C51C206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="wSPiJ7zv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16808206A5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igrBN-00051I-Dn
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 09:17:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58801)
+	id 1igrDe-0006qS-7B
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 09:19:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32877)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1igqzG-0004tf-7Q
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:39 -0500
+ (envelope-from <cminyard@mvista.com>) id 1igr7s-0000he-2K
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:13:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1igqzE-00044e-Dt
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:37 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27212
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1igqzE-00043T-A8
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576505075;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=olbkIGqVdpmbfsbYDxrstaTae7GtUoDRav6L33mLKZM=;
- b=Ehfn8tjVj4GtRUptdOQybGkNR5DPbjxRoWZyS8iUGYiz+IMvhvo9i5IRoUwlb/RCTiV/CD
- 9s3vpg1zAToOL6m2MAuAqcK17DZ+AZeGgWSxRig93Xs7qoE15f3lBS1v9kichL65u3tdRH
- 95S2Kg//5G7gHxT3aSXhxThrVkaKdN0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-Kf2l28LmO9O_7pIkl3byZg-1; Mon, 16 Dec 2019 09:04:34 -0500
-X-MC-Unique: Kf2l28LmO9O_7pIkl3byZg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEA6F593A2;
- Mon, 16 Dec 2019 14:04:32 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C8645675BE;
- Mon, 16 Dec 2019 14:04:29 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
- kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH 15/16] arm/arm64: ITS: migration tests
-Date: Mon, 16 Dec 2019 15:02:34 +0100
-Message-Id: <20191216140235.10751-16-eric.auger@redhat.com>
-In-Reply-To: <20191216140235.10751-1-eric.auger@redhat.com>
-References: <20191216140235.10751-1-eric.auger@redhat.com>
+ (envelope-from <cminyard@mvista.com>) id 1igr7q-0002oN-Fm
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:13:31 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:36739)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1igr7p-0002gs-TZ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:13:30 -0500
+Received: by mail-ot1-x343.google.com with SMTP id i4so9402589otr.3
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 06:13:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mvista-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=7K317lOkInAvgD928oRikb5UMaPEj5cRdLXFxA5JGM4=;
+ b=wSPiJ7zv3jWCgYN9NV12x+XdU/hXYzYrcKNMK2CZdyQd5M36nepko38NuohNDrRsvw
+ VsCwbdf+RH1uuwvXRlYsotI81LBBRV7edLbaf8hx5MuZnOo4mQ8cIq9Nc7rZODViE4LJ
+ 1AFOEiLTxCLFGqHd2yZ2rAFQIl1mrMOtBoTD9622OBAG86zuKDb5ekEwVjE6a4jwnV6Y
+ 8zsyIE8DDIRdcRVxcJW9dW6mCghOEPBdsR5E4r64oVFbDjdS2FA8PeAQ0NRw6lLGyEr0
+ v28u/RLXsymiZA0y/okKXGKTgHmzHKn+eZNLXwId1IV6hKAndTrHB9t//22bLCmeFame
+ MW5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=7K317lOkInAvgD928oRikb5UMaPEj5cRdLXFxA5JGM4=;
+ b=mmwmoXn6/uLwTWnJrFlhILiQjuX2mdWNbDQdrBcWkKXrZQiGz/UsOobNLgLlI5bhJS
+ YkXtWkEidcawm5moKl9kodJCeGVTcdrf0vjYyr0DUmV8XPFwUB+BbIG81IhUhZO1Gb4S
+ 5U+qdF1TEdR/HNg4kBVDJOY1M/GWZ+PhJ+Cs7ztwgP6dxR5p5eQrlQoSI3J7VATD3G/c
+ cRYZGLJ+oXDp1Gh5dkaSI3ClBY2/B4XhQu/qIeWi7ttWSPRW0n1KBcjQbQj9vOGxiQZD
+ LrnmUGQfR1j7PMc6zr/yRUU08fAoe+MftCByhmVeVXQZ5k0O5i8512w23oEN09ksq5yG
+ i5/Q==
+X-Gm-Message-State: APjAAAXta6bB02fMl90X94HA9n83EYrraEHwGQx2lDC+SenrafNr9ojg
+ ik1WsFSm6JK3HWqDdhz2SCxxiQ==
+X-Google-Smtp-Source: APXvYqwH5LTb+lrnWceKKIGbnbcrt4gS2O4DiK80CHHUyajGbml1JGQDu9XvGXOqnQFId1KqhkVUug==
+X-Received: by 2002:a05:6830:1149:: with SMTP id
+ x9mr33226654otq.156.1576505604138; 
+ Mon, 16 Dec 2019 06:13:24 -0800 (PST)
+Received: from minyard.net ([47.184.136.59])
+ by smtp.gmail.com with ESMTPSA id y6sm6749815oti.44.2019.12.16.06.13.22
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 16 Dec 2019 06:13:23 -0800 (PST)
+Date: Mon, 16 Dec 2019 08:13:20 -0600
+From: Corey Minyard <cminyard@mvista.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 11/21] hw/ipmi: Fix latent realize() error handling bugs
+Message-ID: <20191216141320.GA7049@minyard.net>
+References: <20191130194240.10517-1-armbru@redhat.com>
+ <20191130194240.10517-12-armbru@redhat.com>
+ <20191201182234.GA18195@minyard.net>
+ <87mubsfwzf.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87mubsfwzf.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,186 +96,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, andre.przywara@arm.com,
- thuth@redhat.com, yuzenghui@huawei.com, alexandru.elisei@arm.com
+Reply-To: cminyard@mvista.com
+Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test maps LPIs (populates the device table, the collection table,
-interrupt translation tables, configuration table), migrates and make
-sure the translation is correct on the destination.
+On Mon, Dec 16, 2019 at 10:20:04AM +0100, Markus Armbruster wrote:
+> Corey Minyard <cminyard@mvista.com> writes:
+> 
+> I've since posted v2 with a revamped commit message, and I'm ready to
+> post a pull request.  I really want the whole thing committed before the
+> Christmas break, so Vladimir can base on it more easily.  Options:
+> 
+> * You post a pull request before me.
+> 
+> * Ask me to drop this patch from my pull request, so you can take it
+>   through your tree at your leisure.
+> 
+> * Post your Reviewed-by or Acked-by for me to include in my pull
+>   request.
+> 
+> * Do nothing; I'll post my pull request later this week.
+> 
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/gic.c                | 55 +++++++++++++++++++++++++++++++++++++---
- arm/unittests.cfg        |  7 +++++
- lib/arm/asm/gic-v3-its.h |  2 ++
- lib/arm/gic-v3-its.c     | 22 ++++++++++++++++
- 4 files changed, 82 insertions(+), 4 deletions(-)
+Since you already have it ready, I'll choose the "do nothing" patch
+and let you post the pull request.  Thanks.
 
-diff --git a/arm/gic.c b/arm/gic.c
-index 6b73258..8cca743 100644
---- a/arm/gic.c
-+++ b/arm/gic.c
-@@ -642,13 +642,19 @@ static int its_prerequisites(int nb_cpus)
- 	return 0;
- }
-=20
--static void test_its_trigger(void)
-+/*
-+ * Setup the configuration for those mappings:
-+ * dev_id=3D2 event=3D20 -> vcpu 3, intid=3D8195
-+ * dev_id=3D7 event=3D255 -> vcpu 2, intid=3D8196
-+ * LPIs ready to hit
-+ */
-+static int its_setup1(void)
- {
- 	struct its_collection *col3, *col2;
- 	struct its_device *dev2, *dev7;
-=20
- 	if (its_prerequisites(4))
--		return;
-+		return -1;
-=20
- 	dev2 =3D its_create_device(2 /* dev id */, 8 /* nb_ites */);
- 	dev7 =3D its_create_device(7 /* dev id */, 8 /* nb_ites */);
-@@ -662,8 +668,6 @@ static void test_its_trigger(void)
- 	its_send_invall(col2);
- 	its_send_invall(col3);
-=20
--	report_prefix_push("int");
--
- 	its_send_mapd(dev2, true);
- 	its_send_mapd(dev7, true);
-=20
-@@ -674,6 +678,23 @@ static void test_its_trigger(void)
- 		       20 /* event id */, col3);
- 	its_send_mapti(dev7, 8196 /* lpi id */,
- 		       255 /* event id */, col2);
-+	return 0;
-+}
-+
-+static void test_its_trigger(void)
-+{
-+	struct its_collection *col3, *col2;
-+	struct its_device *dev2, *dev7;
-+
-+	if (its_setup1())
-+		return;
-+
-+	col3 =3D its_get_collection(3);
-+	col2 =3D its_get_collection(2);
-+	dev2 =3D its_get_device(2);
-+	dev7 =3D its_get_device(7);
-+
-+	report_prefix_push("int");
-=20
- 	lpi_stats_expect(3, 8195);
- 	its_send_int(dev2, 20);
-@@ -722,6 +743,28 @@ static void test_its_trigger(void)
- 	check_lpi_stats();
- }
-=20
-+static void test_its_migration(void)
-+{
-+	struct its_device *dev2, *dev7;
-+
-+	if (its_setup1())
-+		return;
-+
-+	dev2 =3D its_get_device(2);
-+	dev7 =3D its_get_device(7);
-+
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report(true, "Migration complete");
-+
-+	lpi_stats_expect(3, 8195);
-+	its_send_int(dev2, 20);
-+	check_lpi_stats();
-+
-+	lpi_stats_expect(2, 8196);
-+	its_send_int(dev7, 255);
-+	check_lpi_stats();
-+}
-=20
- int main(int argc, char **argv)
- {
-@@ -757,6 +800,10 @@ int main(int argc, char **argv)
- 		report_prefix_push(argv[1]);
- 		test_its_trigger();
- 		report_prefix_pop();
-+	} else if (!strcmp(argv[1], "its-migration")) {
-+		report_prefix_push(argv[1]);
-+		test_its_migration();
-+		report_prefix_pop();
- 	} else if (strcmp(argv[1], "its-introspection") =3D=3D 0) {
- 		report_prefix_push(argv[1]);
- 		test_its_introspection();
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 80a1d27..29e2efc 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -140,6 +140,13 @@ smp =3D $MAX_SMP
- extra_params =3D -machine gic-version=3D3 -append 'its-trigger'
- groups =3D its
-=20
-+[its-migration]
-+file =3D gic.flat
-+smp =3D $MAX_SMP
-+accel =3D kvm
-+extra_params =3D -machine gic-version=3D3 -append 'its-migration'
-+groups =3D its migration
-+
- # Test PSCI emulation
- [psci]
- file =3D psci.flat
-diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index d4fd799..c38d524 100644
---- a/lib/arm/asm/gic-v3-its.h
-+++ b/lib/arm/asm/gic-v3-its.h
-@@ -206,6 +206,8 @@ extern void its_send_movi(struct its_device *dev,
- 			  struct its_collection *col, u32 id);
- extern void its_send_sync(struct its_collection *col);
- extern void its_print_cmd_state(void);
-+extern struct its_device *its_get_device(u32 id);
-+extern struct its_collection *its_get_collection(u32 id);
-=20
- #define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
- #define ITS_FLAGS_WORKAROUND_CAVIUM_22375       (1ULL << 1)
-diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-index 9906428..e2e289c 100644
---- a/lib/arm/gic-v3-its.c
-+++ b/lib/arm/gic-v3-its.c
-@@ -330,3 +330,25 @@ struct its_collection *its_create_collection(u32 col=
-_id, u32 pe)
- 	its_data.nb_collections++;
- 	return new;
- }
-+
-+struct its_device *its_get_device(u32 id)
-+{
-+	int i;
-+
-+	for (i =3D 0; i < GITS_MAX_DEVICES; i++) {
-+		if (its_data.devices[i].device_id =3D=3D id)
-+			return &its_data.devices[i];
-+	}
-+	return NULL;
-+}
-+
-+struct its_collection *its_get_collection(u32 id)
-+{
-+	int i;
-+
-+	for (i =3D 0; i < GITS_MAX_COLLECTIONS; i++) {
-+		if (its_data.collections[i].col_id =3D=3D id)
-+			return &its_data.collections[i];
-+	}
-+	return NULL;
-+}
---=20
-2.20.1
-
+-corey
 
