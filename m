@@ -7,77 +7,82 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EBF3C43603
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B230C2D0C3
 	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:33:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE66B206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:33:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59EE12067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:33:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YqhiMz/I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE66B206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L0BClAhC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59EE12067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igtJL-0001x6-Gh
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:33:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56331)
+	id 1igtJM-00020I-5D
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:33:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56547)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtEs-0004bc-0O
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:54 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtF0-0004p4-W9
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtEq-0006oy-KX
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:53 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:53199)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtEz-00079j-Sn
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:02 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35180)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtEq-0006nX-E4
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:52 -0500
-Received: by mail-wm1-x331.google.com with SMTP id p9so7441529wmc.2
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:28:52 -0800 (PST)
+ id 1igtEz-00077r-MK
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:01 -0500
+Received: by mail-wr1-x443.google.com with SMTP id g17so8052716wro.2
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=s0NAURmWeAEU0CNcWC+Zic7UHZ5JprIxfB44NlHf3g4=;
- b=YqhiMz/I/8aUf7t4wF9wYouokdNHO7KPpS11+98zjxDxz1sxqd8asR0DlJ+MgPnyQJ
- sVTzm++QZSriD1OeetSUW3tMJoHbrvR/k9HfAwQLQNI1ttQg+KPMTgmQnBkQnNmgrbWn
- pDbK4jcl8EnzQE07stYQ2i5y3eOCGaDooeMubdNz9v1bRjZ26PoU2BpuHKxKAQReyioy
- d1ap7SOXloHsN76AT9trk+uCjCKvz+R7wWQ52OmxirIWb57qENGHkD4SY5JkBNHWajnm
- 1G00WCTU26F+f6MC3IJzmFql7XYZ/LWVDn/J8EiXLAQ0MpBTZnyaPh5DjIno+aFVxGKI
- uYfQ==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=yver+z01Ad2CgxbNm/G/S9DVzSw0YehnxQ3kmcrkoVo=;
+ b=L0BClAhCSyj7NiBVh0sMJtEzUFZK85VVU38/wYVKdDVdhefHQdGIwh4rx0mkP8Z435
+ YVPr0/E1lSVvG0ITpi4dQ0sklCvSDcEZLGEhxVj2At6co0fWAE1IEBOq819Jy/NhpPc9
+ d/09MU5QfXvaUcG+Fv+hrrEv1jYHzzJOl4pESWPTgGKejsd5AZYZ+pCJS1GwprghIDIn
+ e8OhJca5F04yHXVOgqci/m2jZvBEg00Noi2MBscFo9UX6cdYmqgGsCurf/wSfFgcI6LE
+ hbNrF9jYz4Txu2GddjtIRRC40SIiv2tMIA4cJnQZsWs3RUvOcEH6vcesthRlqAtFJjIt
+ KqFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=s0NAURmWeAEU0CNcWC+Zic7UHZ5JprIxfB44NlHf3g4=;
- b=pB9r3VFbhnNyw0Ai23OCHxBgP/2QaZqrclgdmWdBMzVjKBrkALQECTuhxQnl2laQMY
- 5KEv4swz0tgqNoqnYUKjWmm/51iZgvfF+N1jpfdOqxbu4poHNQwFOPmSgl9hLbGfuy5e
- jjRH8ShT52nHD/5hdgRJGzZKF1GDKeUVHXCskU6JsnWzMWZUVA2svOw7nDmaRwvH7Zlb
- zIXBmje08KyjuE6t2LDAvauNmOJB6MUerhairoHkW9GtqUbc6NeE+7C6YIK1/sfm/wNF
- vpNTS98QQ38E5lgZgPd+SZJX6G2f3UKhXLkeGFLa0elePXeQRKDz5Gxr/iHalqqWU2+f
- OnMg==
-X-Gm-Message-State: APjAAAWAItefEITM2rwwHKjkQbxkBa57PGbKAv/UhREcaqEiLxPQoGAh
- 2XmxOEZqr8tKiHEfBKurUwLxVV4b
-X-Google-Smtp-Source: APXvYqySMmZis8fxBaKOyK3g4TOeUN++ljEO+x6qwbO3J2TV2QliFufjpi5gTtHts1JEmc7sAZ6yAA==
-X-Received: by 2002:a7b:c001:: with SMTP id c1mr31656447wmb.96.1576513731275; 
- Mon, 16 Dec 2019 08:28:51 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=yver+z01Ad2CgxbNm/G/S9DVzSw0YehnxQ3kmcrkoVo=;
+ b=d79YdxFTFSA09wmmeoFp0Gy9HufjGty77kxAsv4X1ySR2UAaZOdjxtzrHtYazizZm3
+ F9fVoe6BMlS7UjuIhQVqJpM/OHH+2uBLWJK+KHLYzv+TrfUTH6oNnJfCNor7IMKiusuY
+ PHNSPuVNhwam8cNP13VhdLyiHYYV0UNc05rf8j291kFHbZ7Gm7MysWQosOXphd+0d6fJ
+ /SqW5NaeMe5XUxxs4VCVUGB9sSr/zcS7KaEzT3K2bcgLxhrCNuKp7Xa2H5q3GTE/kLdq
+ DwhqMvLgidQEpyZolh05DObwn9/CA0lIYqjPvsgZ3BeODigB7VnTmmpIjZlSJPLxxINF
+ iMdA==
+X-Gm-Message-State: APjAAAUXYXZ3VRO+rVqctJp9HM3Wu4Fq758kcGwFF3nFAQ8/1BQgCb7c
+ IYUjKkXLOBbNWwpYT6TyWevG3DRg
+X-Google-Smtp-Source: APXvYqzMAmaYY5Cenkkd+eTM7OvEIdizsYVw28ZUq6Et4+ethQ/b4Kl8bFhSVSjrxZ6uZzZi89qtlQ==
+X-Received: by 2002:a5d:6206:: with SMTP id y6mr30349052wru.130.1576513740437; 
+ Mon, 16 Dec 2019 08:29:00 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.28.50
+ by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.28.59
+ for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Dec 2019 08:28:50 -0800 (PST)
+ Mon, 16 Dec 2019 08:28:59 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/62] migration-test: Move hide_stderr to common commandline
-Date: Mon, 16 Dec 2019 17:27:47 +0100
-Message-Id: <1576513726-53700-4-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 13/62] vl: move icount configuration earlier
+Date: Mon, 16 Dec 2019 17:27:57 +0100
+Message-Id: <1576513726-53700-14-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,64 +94,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Juan Quintela <quintela@redhat.com>
+Once qemu_tcg_configure is turned into a QOM property setter, it will not
+be able to set a default value for mttcg_enabled.  Setting the default will
+move to the TCG instance_init function, which currently runs before "-icount"
+is processed.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Tested-by: Cornelia Huck <cohuck@redhat.com> #s390x
-Tested-by: Laurent Vivier <lvivier@redhat.com>
+However, it is harmless to do configure_icount for all accelerators; we will
+just fail later if a non-TCG accelerator is selected.  So do that.
+
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/migration-test.c | 20 ++++++++------------
- 1 file changed, 8 insertions(+), 12 deletions(-)
+ vl.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 9573861..372e66c 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -558,6 +558,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
- {
-     gchar *cmd_src, *cmd_dst;
-     gchar *cmd_source, *cmd_target;
-+    const gchar *ignore_stderr;
-     char *bootpath = NULL;
-     char *extra_opts = NULL;
-     char *shmem_path = NULL;
-@@ -661,24 +662,19 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-     g_free(extra_opts);
+diff --git a/vl.c b/vl.c
+index c0904b3..60353dc 100644
+--- a/vl.c
++++ b/vl.c
+@@ -2825,6 +2825,12 @@ static void user_register_global_props(void)
+                       global_init_func, NULL, NULL);
+ }
  
-     if (hide_stderr) {
--        gchar *tmp;
--        tmp = g_strdup_printf("%s 2>/dev/null", cmd_src);
--        g_free(cmd_src);
--        cmd_src = tmp;
--
--        tmp = g_strdup_printf("%s 2>/dev/null", cmd_dst);
--        g_free(cmd_dst);
--        cmd_dst = tmp;
-+        ignore_stderr = "2>/dev/null";
-+    } else {
-+        ignore_stderr = "";
++static int do_configure_icount(void *opaque, QemuOpts *opts, Error **errp)
++{
++    configure_icount(opts, errp);
++    return 0;
++}
++
+ int main(int argc, char **argv, char **envp)
+ {
+     int i;
+@@ -4142,6 +4148,8 @@ int main(int argc, char **argv, char **envp)
+      * Note: uses machine properties such as kernel-irqchip, must run
+      * after machine_set_property().
+      */
++    qemu_opts_foreach(qemu_find_opts("icount"),
++                      do_configure_icount, NULL, &error_fatal);
+     configure_accelerator(current_machine, argv[0]);
+ 
+     /*
+@@ -4227,13 +4235,9 @@ int main(int argc, char **argv, char **envp)
+     qemu_spice_init();
+ 
+     cpu_ticks_init();
+-    if (icount_opts) {
+-        if (!tcg_enabled()) {
+-            error_report("-icount is not allowed with hardware virtualization");
+-            exit(1);
+-        }
+-        configure_icount(icount_opts, &error_abort);
+-        qemu_opts_del(icount_opts);
++    if (use_icount && !(tcg_enabled() || qtest_enabled())) {
++        error_report("-icount is not allowed with hardware virtualization");
++        exit(1);
      }
  
--    cmd_source = g_strdup_printf("%s %s",
--                                 cmd_src, opts_src);
-+    cmd_source = g_strdup_printf("%s %s %s",
-+                                 cmd_src, opts_src, ignore_stderr);
-     g_free(cmd_src);
-     *from = qtest_init(cmd_source);
-     g_free(cmd_source);
- 
--    cmd_target = g_strdup_printf("%s %s",
--                                 cmd_dst, opts_dst);
-+    cmd_target = g_strdup_printf("%s %s %s",
-+                                 cmd_dst, opts_dst, ignore_stderr);
-     g_free(cmd_dst);
-     *to = qtest_init(cmd_target);
-     g_free(cmd_target);
+     if (tcg_enabled()) {
 -- 
 1.8.3.1
 
