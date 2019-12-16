@@ -2,71 +2,72 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D6F1C3F68F
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:11:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 863FFC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:11:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46ED6206B7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:11:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FE63206A5
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 14:11:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJZi8EbZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46ED6206B7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GmSkT6+p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FE63206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igr5a-0005iP-20
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 09:11:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58906)
+	id 1igr5d-0005oW-UH
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 09:11:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58638)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1igqzm-0005iC-9f
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:05:11 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1igqym-0004DV-RK
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1igqzk-0004Ab-S7
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:05:10 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31443
+ (envelope-from <eric.auger@redhat.com>) id 1igqyl-0003wC-90
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:08 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26976
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1igqzk-0004AQ-O8
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:05:08 -0500
+ id 1igqyk-0003w2-SA
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 09:04:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576505108;
+ s=mimecast20190719; t=1576505046;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=50Vms+tgESY3M8NHXPohpfNztkjGMy8JPeeKVTKoeLA=;
- b=WJZi8EbZR5dv6PD/koY1elsdkh2W15JkQL+Ut90O5iaAZ0CoOVOrlfCwFEjz82FmRJ18G9
- GwGh1RLuT7d8ID8zd4RQ0jP35HjDrzJuZwXDXYvpHcCAo/m4jKL9Qzu13oaIKF7Vxa1RAB
- HdqiKKNqCAoc941xealBogZiNbvzxLM=
+ bh=J4yj3ipSn03wddNlzO5ReaAlW0xImmllc7BWwVZtIu4=;
+ b=GmSkT6+piM9hFNuV9f9tDD6sAKvK4gMPVi0B+vava7JOSErORkMp1TppqLccjV1mjzJuVB
+ TdHqzj3nEmQpiLaDuBXdBfVTVy2aR+/8AERW1MgalYx7c58AKCAq+syo5+d3ib5auo4N4z
+ Pi87qmXz4SA5r6mZ0X2UJW4EpejVomQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-i2RWS0w7O9OR_4XEIYzBcg-1; Mon, 16 Dec 2019 09:04:19 -0500
-X-MC-Unique: i2RWS0w7O9OR_4XEIYzBcg-1
+ us-mta-298-AMQbqdvGO9uyh3GUAy7FKQ-1; Mon, 16 Dec 2019 09:04:05 -0500
+X-MC-Unique: AMQbqdvGO9uyh3GUAy7FKQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CCD180257B;
- Mon, 16 Dec 2019 14:04:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92B8B100728B;
+ Mon, 16 Dec 2019 14:04:03 +0000 (UTC)
 Received: from laptop.redhat.com (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3242968863;
- Mon, 16 Dec 2019 14:04:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3D0E6675B8;
+ Mon, 16 Dec 2019 14:03:58 +0000 (UTC)
 From: Eric Auger <eric.auger@redhat.com>
 To: eric.auger.pro@gmail.com, eric.auger@redhat.com, maz@kernel.org,
  kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, qemu-devel@nongnu.org,
  qemu-arm@nongnu.org
-Subject: [kvm-unit-tests PATCH 11/16] arm/arm64: ITS: Device and collection
- Initialization
-Date: Mon, 16 Dec 2019 15:02:30 +0100
-Message-Id: <20191216140235.10751-12-eric.auger@redhat.com>
+Subject: [kvm-unit-tests PATCH 07/16] arm/arm64: ITS: Set the LPI config and
+ pending tables
+Date: Mon, 16 Dec 2019 15:02:26 +0100
+Message-Id: <20191216140235.10751-8-eric.auger@redhat.com>
 In-Reply-To: <20191216140235.10751-1-eric.auger@redhat.com>
 References: <20191216140235.10751-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -74,7 +75,7 @@ X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,128 +93,232 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Introduce an helper functions to register
-- a new device, characterized by its device id and the
-  max number of event IDs that dimension its ITT (Interrupt
-  Translation Table).  The function allocates the ITT.
+Allocate the LPI configuration and per re-distributor pending table.
+Set redistributor's PROPBASER and PENDBASER. The LPIs are enabled
+by default in the config table.
 
-- a new collection, characterized by its ID and the
-  target processing engine (PE).
+Also introduce a helper routine that allows to set the pending table
+bit for a given LPI.
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
----
- lib/arm/asm/gic-v3-its.h | 20 +++++++++++++++++
- lib/arm/gic-v3-its.c     | 46 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 66 insertions(+)
+ lib/arm/asm/gic-v3-its.h |  3 ++
+ lib/arm/asm/gic-v3.h     | 79 ++++++++++++++++++++++++++++++++++++++++
+ lib/arm/gic-v3-its.c     | 65 +++++++++++++++++++++++++++++++++
+ 3 files changed, 147 insertions(+)
 
 diff --git a/lib/arm/asm/gic-v3-its.h b/lib/arm/asm/gic-v3-its.h
-index ab639c5..245ef61 100644
+index 0c0178d..0d11aed 100644
 --- a/lib/arm/asm/gic-v3-its.h
 +++ b/lib/arm/asm/gic-v3-its.h
-@@ -87,6 +87,9 @@
-=20
- #define ITS_FLAGS_CMDQ_NEEDS_FLUSHING           (1ULL << 0)
-=20
-+#define GITS_MAX_DEVICES		8
-+#define GITS_MAX_COLLECTIONS		8
-+
- struct its_typer {
- 	unsigned int ite_size;
- 	unsigned int eventid_bits;
-@@ -117,6 +120,17 @@ struct its_cmd_block {
- 	u64     raw_cmd[4];
- };
-=20
-+struct its_device {
-+	u32 device_id;	/* device ID */
-+	u32 nr_ites;	/* Max Interrupt Translation Entries */
-+	void *itt;	/* Interrupt Translation Table GPA */
-+};
-+
-+struct its_collection {
-+	u64 target_address;
-+	u16 col_id;
-+};
-+
- struct its_data {
- 	void *base;
- 	struct its_typer typer;
-@@ -124,6 +138,10 @@ struct its_data {
- 	struct its_cmd_block *cmd_base;
- 	struct its_cmd_block *cmd_write;
- 	struct its_cmd_block *cmd_readr;
-+	struct its_device devices[GITS_MAX_DEVICES];
-+	u32 nb_devices;		/* Allocated Devices */
-+	struct its_collection collections[GITS_MAX_COLLECTIONS];
-+	u32 nb_collections;	/* Allocated Collections */
- };
-=20
- extern struct its_data its_data;
-@@ -140,6 +158,8 @@ extern u8 get_lpi_config(int n);
- extern void set_pending_table_bit(int rdist, int n, bool set);
- extern void gicv3_rdist_ctrl_lpi(u32 redist, bool set);
- extern void its_enable_defaults(void);
-+extern struct its_device *its_create_device(u32 dev_id, int nr_ites);
-+extern struct its_collection *its_create_collection(u32 col_id, u32 targ=
-et_pe);
+@@ -128,6 +128,9 @@ extern void its_init(void);
+ extern int its_parse_baser(int i, struct its_baser *baser);
+ extern void its_setup_baser(int i, struct its_baser *baser);
+ extern struct its_baser *its_lookup_baser(int type);
++extern void set_lpi_config(int n, u8 val);
++extern u8 get_lpi_config(int n);
++extern void set_pending_table_bit(int rdist, int n, bool set);
 =20
  #endif /* !__ASSEMBLY__ */
  #endif /* _ASMARM_GIC_V3_ITS_H_ */
+diff --git a/lib/arm/asm/gic-v3.h b/lib/arm/asm/gic-v3.h
+index d02f4a4..5bf9a92 100644
+--- a/lib/arm/asm/gic-v3.h
++++ b/lib/arm/asm/gic-v3.h
+@@ -47,6 +47,83 @@
+ #define MPIDR_TO_SGI_AFFINITY(cluster_id, level) \
+ 	(MPIDR_AFFINITY_LEVEL(cluster_id, level) << ICC_SGI1R_AFFINITY_## level=
+ ## _SHIFT)
+=20
++#define GIC_BASER_CACHE_nCnB            0ULL
++#define GIC_BASER_CACHE_SameAsInner     0ULL
++#define GIC_BASER_CACHE_nC              1ULL
++#define GIC_BASER_CACHE_RaWt            2ULL
++#define GIC_BASER_CACHE_RaWb            3ULL
++#define GIC_BASER_CACHE_WaWt            4ULL
++#define GIC_BASER_CACHE_WaWb            5ULL
++#define GIC_BASER_CACHE_RaWaWt          6ULL
++#define GIC_BASER_CACHE_RaWaWb          7ULL
++#define GIC_BASER_CACHE_MASK            7ULL
++#define GIC_BASER_NonShareable          0ULL
++#define GIC_BASER_InnerShareable        1ULL
++#define GIC_BASER_OuterShareable        2ULL
++#define GIC_BASER_SHAREABILITY_MASK     3ULL
++
++#define GIC_BASER_CACHEABILITY(reg, inner_outer, type)                  =
+\
++	(GIC_BASER_CACHE_##type << reg##_##inner_outer##_CACHEABILITY_SHIFT)
++
++#define GIC_BASER_SHAREABILITY(reg, type)                               =
+\
++	(GIC_BASER_##type << reg##_SHAREABILITY_SHIFT)
++
++#define GICR_PROPBASER_SHAREABILITY_SHIFT               (10)
++#define GICR_PROPBASER_INNER_CACHEABILITY_SHIFT         (7)
++#define GICR_PROPBASER_OUTER_CACHEABILITY_SHIFT         (56)
++#define GICR_PROPBASER_SHAREABILITY_MASK                                =
+\
++	GIC_BASER_SHAREABILITY(GICR_PROPBASER, SHAREABILITY_MASK)
++#define GICR_PROPBASER_INNER_CACHEABILITY_MASK                          =
+\
++	GIC_BASER_CACHEABILITY(GICR_PROPBASER, INNER, MASK)
++#define GICR_PROPBASER_OUTER_CACHEABILITY_MASK                          =
+\
++	GIC_BASER_CACHEABILITY(GICR_PROPBASER, OUTER, MASK)
++#define GICR_PROPBASER_CACHEABILITY_MASK GICR_PROPBASER_INNER_CACHEABILI=
+TY_MASK
++
++#define GICR_PROPBASER_InnerShareable                                   =
+\
++	GIC_BASER_SHAREABILITY(GICR_PROPBASER, InnerShareable)
++
++#define GICR_PROPBASER_nCnB     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
+NNER, nCnB)
++#define GICR_PROPBASER_nC       GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
+NNER, nC)
++#define GICR_PROPBASER_RaWt     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
+NNER, RaWt)
++#define GICR_PROPBASER_RaWb     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
+NNER, RaWt)
++#define GICR_PROPBASER_WaWt     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
+NNER, WaWt)
++#define GICR_PROPBASER_WaWb     GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
+NNER, WaWb)
++#define GICR_PROPBASER_RaWaWt   GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
+NNER, RaWaWt)
++#define GICR_PROPBASER_RaWaWb   GIC_BASER_CACHEABILITY(GICR_PROPBASER, I=
+NNER, RaWaWb)
++
++#define GICR_PROPBASER_IDBITS_MASK                      (0x1f)
++
++#define GICR_PENDBASER_SHAREABILITY_SHIFT               (10)
++#define GICR_PENDBASER_INNER_CACHEABILITY_SHIFT         (7)
++#define GICR_PENDBASER_OUTER_CACHEABILITY_SHIFT         (56)
++#define GICR_PENDBASER_SHAREABILITY_MASK                                =
+\
++	GIC_BASER_SHAREABILITY(GICR_PENDBASER, SHAREABILITY_MASK)
++#define GICR_PENDBASER_INNER_CACHEABILITY_MASK                          =
+\
++	GIC_BASER_CACHEABILITY(GICR_PENDBASER, INNER, MASK)
++#define GICR_PENDBASER_OUTER_CACHEABILITY_MASK                          =
+\
++	GIC_BASER_CACHEABILITY(GICR_PENDBASER, OUTER, MASK)
++#define GICR_PENDBASER_CACHEABILITY_MASK GICR_PENDBASER_INNER_CACHEABILI=
+TY_MASK
++
++#define GICR_PENDBASER_InnerShareable                                   =
+\
++	GIC_BASER_SHAREABILITY(GICR_PENDBASER, InnerShareable)
++
++#define GICR_PENDBASER_nCnB     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
+NNER, nCnB)
++#define GICR_PENDBASER_nC       GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
+NNER, nC)
++#define GICR_PENDBASER_RaWt     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
+NNER, RaWt)
++#define GICR_PENDBASER_RaWb     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
+NNER, RaWt)
++#define GICR_PENDBASER_WaWt     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
+NNER, WaWt)
++#define GICR_PENDBASER_WaWb     GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
+NNER, WaWb)
++#define GICR_PENDBASER_RaWaWt   GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
+NNER, RaWaWt)
++#define GICR_PENDBASER_RaWaWb   GIC_BASER_CACHEABILITY(GICR_PENDBASER, I=
+NNER, RaWaWb)
++
++#define GICR_PENDBASER_PTZ                              BIT_ULL(62)
++
++#define LPI_PROP_GROUP1		(1 << 1)
++#define LPI_PROP_ENABLED	(1 << 0)
++#define LPI_PROP_DEFAULT_PRIO   0xa0
++#define LPI_PROP_DEFAULT	(LPI_PROP_DEFAULT_PRIO |			\
++				LPI_PROP_GROUP1 | LPI_PROP_ENABLED)
++
+ #include <asm/arch_gicv3.h>
+=20
+ #ifndef __ASSEMBLY__
+@@ -63,6 +140,8 @@ struct gicv3_data {
+ 	void *dist_base;
+ 	void *redist_bases[GICV3_NR_REDISTS];
+ 	void *redist_base[NR_CPUS];
++	void *lpi_prop;
++	void *lpi_pend[NR_CPUS];
+ 	unsigned int irq_nr;
+ };
+ extern struct gicv3_data gicv3_data;
 diff --git a/lib/arm/gic-v3-its.c b/lib/arm/gic-v3-its.c
-index 9a51ef4..9906428 100644
+index 303022f..0b5a700 100644
 --- a/lib/arm/gic-v3-its.c
 +++ b/lib/arm/gic-v3-its.c
-@@ -284,3 +284,49 @@ void its_enable_defaults(void)
-=20
- 	writel(GITS_CTLR_ENABLE, its_data.base + GITS_CTLR);
+@@ -123,3 +123,68 @@ void its_setup_baser(int i, struct its_baser *baser)
+ 	writeq(val, gicv3_its_base() + GITS_BASER + i * 8);
  }
-+
-+struct its_device *its_create_device(u32 device_id, int nr_ites)
+=20
++inline void set_lpi_config(int n, u8 value)
 +{
-+	struct its_baser *baser;
-+	struct its_device *new;
-+	unsigned long n, order;
-+
-+	if (its_data.nb_devices >=3D GITS_MAX_DEVICES)
-+		report_abort("%s redimension GITS_MAX_DEVICES", __func__);
-+
-+	baser =3D its_lookup_baser(GITS_BASER_TYPE_DEVICE);
-+	if (!baser)
-+		return NULL;
-+
-+	new =3D &its_data.devices[its_data.nb_devices];
-+
-+	new->device_id =3D device_id;
-+	new->nr_ites =3D nr_ites;
-+
-+	n =3D (baser->esz * nr_ites) >> PAGE_SHIFT;
-+	order =3D is_power_of_2(n) ? fls(n) : fls(n) + 1;
-+	new->itt =3D (void *)virt_to_phys(alloc_pages(order));
-+
-+	its_data.nb_devices++;
-+	return new;
++	u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 8192));
++	*entry =3D value;
 +}
 +
-+struct its_collection *its_create_collection(u32 col_id, u32 pe)
++inline u8 get_lpi_config(int n)
 +{
-+	struct its_collection *new;
++	u8 *entry =3D (u8 *)(gicv3_data.lpi_prop + (n - 8192));
++	return *entry;
++}
 +
-+	if (its_data.nb_collections >=3D GITS_MAX_COLLECTIONS)
-+		report_abort("%s redimension GITS_MAX_COLLECTIONS", __func__);
++/* alloc_lpi_tables: Allocate LPI config and pending tables */
++void alloc_lpi_tables(void);
++void alloc_lpi_tables(void)
++{
++	unsigned long n =3D SZ_64K >> PAGE_SHIFT;
++	unsigned long order =3D fls(n);
++	u64 prop_val;
++	int cpu;
 +
-+	new =3D &its_data.collections[its_data.nb_collections];
++	gicv3_data.lpi_prop =3D (void *)virt_to_phys(alloc_pages(order));
 +
-+	new->col_id =3D col_id;
++	/* ID bits =3D 13, ie. up to 14b LPI INTID */
++	prop_val =3D ((u64)gicv3_data.lpi_prop |
++			GICR_PROPBASER_InnerShareable |
++			GICR_PROPBASER_WaWb |
++			(13 & GICR_PROPBASER_IDBITS_MASK));
 +
-+	if (its_data.typer.pta)
-+		new->target_address =3D (u64)gicv3_data.redist_base[pe];
++	/*
++	 * Allocate pending tables for each redistributor
++	 * and set PROPBASER and PENDBASER
++	 */
++	for_each_present_cpu(cpu) {
++		u64 pend_val;
++		void *ptr;
++
++		ptr =3D gicv3_data.redist_base[cpu];
++
++		writeq(prop_val, ptr + GICR_PROPBASER);
++
++		gicv3_data.lpi_pend[cpu] =3D
++			(void *)virt_to_phys(alloc_pages(order));
++
++		pend_val =3D ((u64)gicv3_data.lpi_pend[cpu] |
++			GICR_PENDBASER_InnerShareable |
++			GICR_PENDBASER_WaWb);
++
++		writeq(pend_val, ptr + GICR_PENDBASER);
++	}
++}
++
++void set_pending_table_bit(int rdist, int n, bool set)
++{
++	u8 *ptr =3D phys_to_virt((phys_addr_t)gicv3_data.lpi_pend[rdist]);
++	u8 mask =3D 1 << (n % 8), byte;
++
++	ptr +=3D (n / 8);
++	byte =3D *ptr;
++	if (set)
++		byte |=3D  mask;
 +	else
-+		new->target_address =3D pe << 16;
-+
-+	its_data.nb_collections++;
-+	return new;
++		byte &=3D ~mask;
++	*ptr =3D byte;
 +}
 --=20
 2.20.1
