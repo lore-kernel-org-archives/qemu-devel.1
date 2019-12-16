@@ -7,78 +7,81 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7EDC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E31C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 629B0206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:58:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DAF1D206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:58:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NFzd8RJ4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 629B0206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZC3DGLH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAF1D206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igthF-0007Yh-4T
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:58:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57280)
+	id 1igthJ-0007al-8i
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:58:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFZ-0005mJ-9y
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:39 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFO-0005TF-Ui
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFX-00006q-96
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:37 -0500
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:42394)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFN-0008Bk-Rc
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:26 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51526)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtFX-0008WD-1D
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:35 -0500
-Received: by mail-wr1-x42a.google.com with SMTP id q6so8018614wro.9
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:34 -0800 (PST)
+ id 1igtFN-0008AF-Ku
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:25 -0500
+Received: by mail-wm1-x343.google.com with SMTP id d73so7442287wmd.1
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=aSZqHSbntUtBpHZTHxRbdt63b/9MEFkVMk7tfqFFtxQ=;
- b=NFzd8RJ4fC7KPB3mK8JYKI6CTVEDRgjHo0/0RNLGfx2bvfUGzC3UDTMagTl+iWESb4
- xQxPE9rGDhl37xupslxRf/PZVE1MhG8eJVVupHEu0wv+NZm0/r8hwbDKigVnl2ERmrqE
- s9073LlYM5HMYNtjAZwWH1xxIoWlp90kNnXeEe9zSshhR05F8Dikc7IbQe1SQTbuQ+z0
- Lt8d7xcoaD/CBg3Weiz5ptf3IOHSSGUfs522YRFWVx2vdW8cNRhuQrEAq7WjKRhAI+pC
- SnLPJngtT2JHdB70lLU3xyp1xs0pf2GBIrRIdV2acZGzFAFcM5rp8+MI3gvFiO6dvcTz
- 43iw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=6P+O7fP7RdRxtrVlibSaBNIUsO6tN03n2SE/FwGlPpk=;
+ b=XZC3DGLH7mD2D6Ov17IfdNUjwwHtiaAxWokeXKTpnrYblSxYPjvgQVQbxpxae/tZmP
+ fz/wCpjENNCg383tZ8bya3zYZNFhoeO0DxKL7PPB6j4njVyelnvi+gVPP7RAE6Biul0A
+ 9S79ZTf5PBem3BlKPuAfV7s/FudJJh6iRfxqPdt/k9QrP7+sPwq+3+S0G/9XmDJ15Uw/
+ Wlxn6E/1DZ2bp6MIGz1HurmbpKftfe6k7+Syt9BMYCu/IizL/J+jaCy5cPnaqktkL3sj
+ gtnf+rvcNsRYNru5poc8dPx+5twTaOoa5826P+EQEexiFIRv0KScm4gU3vfruAFtr6PG
+ C+bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references;
- bh=aSZqHSbntUtBpHZTHxRbdt63b/9MEFkVMk7tfqFFtxQ=;
- b=uMqNrnBOl8BFEperN3oAeJZ+KEbv01OPCTZmzso5XajnkWmlJK1cfz901ZPGe0O1/m
- cgKczCk4IniTFH9vgYdG+srVyxiDWXwPTTs4Q3j4xx7mtD+fRVyJqKs4k7W6mMcHJBrL
- OsX3RBuiSXlSiAzR/XPY3rd5kUg9+iWjSi/5nyYM/HbaGSsXYZX31RyY4h3kGetbPis+
- UrD2uQGlgTuvunUwnWoh4OTGyMKje5tyS3s8wVlZUBgfFQ+IbizKytMNw/U8RoYYrVkM
- PaYUs3vsbg3eRSvboXjgqkXKsRdA4EcTinGZ4yKRen4Y1hNDCrxoXf/eLIGo/h7huTPo
- an6g==
-X-Gm-Message-State: APjAAAUpA8+9G6N7B7dloMqzega58mS7smfXQtGUKi30BEDEPaUK3Tv3
- 4SwaqNV0JzVQZHy59uoLdiYEOZvs
-X-Google-Smtp-Source: APXvYqwqhAD0d45QnIdZMNeYoCwr+bcjxPiKCekAna0oED1vNqF3mPjC16TOkiIKRDZHF3w4Lr2Uew==
-X-Received: by 2002:a5d:42c5:: with SMTP id t5mr32234361wrr.73.1576513773710; 
- Mon, 16 Dec 2019 08:29:33 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=6P+O7fP7RdRxtrVlibSaBNIUsO6tN03n2SE/FwGlPpk=;
+ b=EsvQq5BEga7iL2O4dD+Xr58Zb1HIFEfRm6549oL7dQrD9m6FTHA7M/jbzG2TKaT+pH
+ qlTQ8FQ7y4YpEqBDuG+fhhfI3HXwvgL+ytegY5jpiiu9HfAUzLQ0PZgS4pz9E6TVUitT
+ LSA/P+zeeHb4K+hhAfeZ14OjCFYBrQ3B4RXx8zyPrcG+8nl3uxDyIi7HQ4KxOlNpwjnz
+ yLhPVVuibx13272DrhbvZ3NtGeEG5zxOpTUcfEaYICB+KcTBIObrHrXzET6+THiGzSpA
+ hshUyzBvtmXCVQcK7BVdkTPfrFc8uwZwsVZ3SMSenq4dKXtodjQz31Em6PxZ1qZKzeoS
+ ol5Q==
+X-Gm-Message-State: APjAAAVUa36gzSyREWQgz7CSgFWOxxfcNT+mKZuWgV9tm9gn/tY+nb3D
+ BLOrhrvmWLcQHKxyz3Q3fbRN3i3Q
+X-Google-Smtp-Source: APXvYqyBCsKVypV4RKf5k1wegG9Dbpb/4umYuP+1VGpQ96ucG+EQzRwoP/H+N3e6EmlpjIt0RkjPLQ==
+X-Received: by 2002:a7b:c38c:: with SMTP id s12mr31378772wmj.96.1576513764441; 
+ Mon, 16 Dec 2019 08:29:24 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.32
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.23
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Dec 2019 08:29:32 -0800 (PST)
+ Mon, 16 Dec 2019 08:29:23 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 46/62] hw: replace hw/i386/pc.h with a header just for the i8259
-Date: Mon, 16 Dec 2019 17:28:30 +0100
-Message-Id: <1576513726-53700-47-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 37/62] os-posix: simplify os_find_datadir
+Date: Mon, 16 Dec 2019 17:28:21 +0100
+Message-Id: <1576513726-53700-38-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42a
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,421 +93,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove the need to include i386/pc.h to get to the i8259 functions.
-This is enough to remove the inclusion of hw/i386/pc.h from all non-x86
-files.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+Use g_build_filename instead of sprintf, and g_autofree instead of
+manual freeing.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/alpha/alpha_sys.h            |  3 ++-
- hw/alpha/dp264.c                |  1 +
- hw/hppa/hppa_sys.h              |  3 ++-
- hw/hppa/machine.c               |  1 +
- hw/i386/kvm/i8259.c             |  1 +
- hw/i386/microvm.c               |  1 +
- hw/i386/pc.c                    |  1 +
- hw/i386/x86.c                   |  1 +
- hw/input/pckbd.c                |  1 -
- hw/intc/Kconfig                 |  2 ++
- hw/intc/apic.c                  |  2 +-
- hw/intc/i8259.c                 |  2 +-
- hw/intc/i8259_common.c          |  2 +-
- hw/intc/ioapic.c                |  3 ++-
- hw/isa/i82378.c                 |  2 +-
- hw/isa/lpc_ich9.c               |  1 -
- hw/isa/piix4.c                  |  2 +-
- hw/mips/gt64xxx_pci.c           |  2 +-
- hw/mips/mips_fulong2e.c         |  2 +-
- hw/mips/mips_jazz.c             |  2 +-
- hw/mips/mips_r4k.c              |  2 +-
- hw/pci-host/bonito.c            |  1 -
- hw/pci-host/prep.c              |  2 +-
- include/hw/i386/pc.h            |  8 --------
- include/hw/intc/i8259.h         | 12 ++++++++++++
- include/hw/isa/i8259_internal.h |  2 +-
- target/i386/monitor.c           |  1 -
- 27 files changed, 37 insertions(+), 26 deletions(-)
- create mode 100644 include/hw/intc/i8259.h
+ os-posix.c | 41 +++++++++++++----------------------------
+ 1 file changed, 13 insertions(+), 28 deletions(-)
 
-diff --git a/hw/alpha/alpha_sys.h b/hw/alpha/alpha_sys.h
-index 4e127a6..95033d7 100644
---- a/hw/alpha/alpha_sys.h
-+++ b/hw/alpha/alpha_sys.h
-@@ -7,7 +7,8 @@
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
- #include "hw/ide.h"
--#include "hw/i386/pc.h"
-+#include "hw/boards.h"
-+#include "hw/intc/i8259.h"
+diff --git a/os-posix.c b/os-posix.c
+index 86cffd2..3cd52e1 100644
+--- a/os-posix.c
++++ b/os-posix.c
+@@ -80,41 +80,26 @@ void os_setup_signal_handling(void)
+     sigaction(SIGTERM, &act, NULL);
+ }
  
+-/* Find a likely location for support files using the location of the binary.
+-   For installed binaries this will be "$bindir/../share/qemu".  When
+-   running from the build tree this will be "$bindir/../pc-bios".  */
+-#define SHARE_SUFFIX "/share/qemu"
+-#define BUILD_SUFFIX "/pc-bios"
++/*
++ * Find a likely location for support files using the location of the binary.
++ * When running from the build tree this will be "$bindir/../pc-bios".
++ * Otherwise, this is CONFIG_QEMU_DATADIR.
++ */
+ char *os_find_datadir(void)
+ {
+-    char *dir, *exec_dir;
+-    char *res;
+-    size_t max_len;
++    g_autofree char *exec_dir = NULL;
++    g_autofree char *dir = NULL;
  
- PCIBus *typhoon_init(ram_addr_t, ISABus **, qemu_irq *, AlphaCPU *[4],
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 51b3cf7..f2026fd 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -19,6 +19,7 @@
- #include "hw/timer/i8254.h"
- #include "hw/isa/superio.h"
- #include "hw/dma/i8257.h"
-+#include "net/net.h"
- #include "qemu/cutils.h"
- 
- #define MAX_IDE_BUS 2
-diff --git a/hw/hppa/hppa_sys.h b/hw/hppa/hppa_sys.h
-index 43d25d2..4e50196 100644
---- a/hw/hppa/hppa_sys.h
-+++ b/hw/hppa/hppa_sys.h
-@@ -6,7 +6,8 @@
- #include "hw/pci/pci.h"
- #include "hw/pci/pci_host.h"
- #include "hw/ide.h"
--#include "hw/i386/pc.h"
-+#include "hw/boards.h"
-+#include "hw/intc/i8259.h"
- 
- #include "hppa_hardware.h"
- 
-diff --git a/hw/hppa/machine.c b/hw/hppa/machine.c
-index b30aba6..5d0de26 100644
---- a/hw/hppa/machine.c
-+++ b/hw/hppa/machine.c
-@@ -19,6 +19,7 @@
- #include "hppa_sys.h"
- #include "qemu/units.h"
- #include "qapi/error.h"
-+#include "net/net.h"
- #include "qemu/log.h"
- 
- #define MAX_IDE_BUS 2
-diff --git a/hw/i386/kvm/i8259.c b/hw/i386/kvm/i8259.c
-index d0c1b1d..e404fdc 100644
---- a/hw/i386/kvm/i8259.c
-+++ b/hw/i386/kvm/i8259.c
-@@ -12,6 +12,7 @@
- 
- #include "qemu/osdep.h"
- #include "hw/isa/i8259_internal.h"
-+#include "hw/intc/i8259.h"
- #include "qemu/module.h"
- #include "hw/i386/apic_internal.h"
- #include "hw/irq.h"
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index def37e6..2068319 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -34,6 +34,7 @@
- #include "hw/i386/x86.h"
- #include "hw/i386/pc.h"
- #include "target/i386/cpu.h"
-+#include "hw/intc/i8259.h"
- #include "hw/timer/i8254.h"
- #include "hw/rtc/mc146818rtc.h"
- #include "hw/char/serial.h"
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index ab90ee3..23052c7 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -44,6 +44,7 @@
- #include "migration/vmstate.h"
- #include "multiboot.h"
- #include "hw/rtc/mc146818rtc.h"
-+#include "hw/intc/i8259.h"
- #include "hw/dma/i8257.h"
- #include "hw/timer/i8254.h"
- #include "hw/input/i8042.h"
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 394edc2..3e4aee5 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -39,6 +39,7 @@
- #include "target/i386/cpu.h"
- #include "hw/i386/topology.h"
- #include "hw/i386/fw_cfg.h"
-+#include "hw/intc/i8259.h"
- 
- #include "hw/acpi/cpu_hotplug.h"
- #include "hw/nmi.h"
-diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-index f0acfd8..2f09f78 100644
---- a/hw/input/pckbd.c
-+++ b/hw/input/pckbd.c
-@@ -26,7 +26,6 @@
- #include "qemu/log.h"
- #include "hw/isa/isa.h"
- #include "migration/vmstate.h"
--#include "hw/i386/pc.h"
- #include "hw/input/ps2.h"
- #include "hw/irq.h"
- #include "hw/input/i8042.h"
-diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
-index 5347f84..10a680b 100644
---- a/hw/intc/Kconfig
-+++ b/hw/intc/Kconfig
-@@ -9,6 +9,7 @@ config PL190
- 
- config IOAPIC
-     bool
-+    select I8259
- 
- config ARM_GIC
-     bool
-@@ -21,6 +22,7 @@ config OPENPIC
- config APIC
-     bool
-     select MSI_NONBROKEN
-+    select I8259
- 
- config ARM_GIC_KVM
-     bool
-diff --git a/hw/intc/apic.c b/hw/intc/apic.c
-index 2a74f7b..bd40467 100644
---- a/hw/intc/apic.c
-+++ b/hw/intc/apic.c
-@@ -22,10 +22,10 @@
- #include "hw/i386/apic_internal.h"
- #include "hw/i386/apic.h"
- #include "hw/i386/ioapic.h"
-+#include "hw/intc/i8259.h"
- #include "hw/pci/msi.h"
- #include "qemu/host-utils.h"
- #include "trace.h"
--#include "hw/i386/pc.h"
- #include "hw/i386/apic-msidef.h"
- #include "qapi/error.h"
- 
-diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
-index 211a989..51b27f6 100644
---- a/hw/intc/i8259.c
-+++ b/hw/intc/i8259.c
-@@ -23,7 +23,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "hw/i386/pc.h"
-+#include "hw/intc/i8259.h"
- #include "hw/irq.h"
- #include "hw/isa/isa.h"
- #include "qemu/timer.h"
-diff --git a/hw/intc/i8259_common.c b/hw/intc/i8259_common.c
-index bd37bb5..e7b1a10 100644
---- a/hw/intc/i8259_common.c
-+++ b/hw/intc/i8259_common.c
-@@ -24,7 +24,7 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "hw/i386/pc.h"
-+#include "hw/intc/i8259.h"
- #include "hw/isa/i8259_internal.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
-diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-index ead14e1..4f55776 100644
---- a/hw/intc/ioapic.c
-+++ b/hw/intc/ioapic.c
-@@ -23,10 +23,11 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "monitor/monitor.h"
--#include "hw/i386/pc.h"
- #include "hw/i386/apic.h"
- #include "hw/i386/ioapic.h"
- #include "hw/i386/ioapic_internal.h"
-+#include "hw/i386/x86.h"
-+#include "hw/intc/i8259.h"
- #include "hw/pci/msi.h"
- #include "hw/qdev-properties.h"
- #include "sysemu/kvm.h"
-diff --git a/hw/isa/i82378.c b/hw/isa/i82378.c
-index de276cd..dcb6b47 100644
---- a/hw/isa/i82378.c
-+++ b/hw/isa/i82378.c
-@@ -19,8 +19,8 @@
- 
- #include "qemu/osdep.h"
- #include "hw/pci/pci.h"
--#include "hw/i386/pc.h"
- #include "hw/irq.h"
-+#include "hw/intc/i8259.h"
- #include "hw/timer/i8254.h"
- #include "migration/vmstate.h"
- #include "hw/audio/pcspk.h"
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index 17c292e..170792a 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -35,7 +35,6 @@
- #include "hw/isa/isa.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
--#include "hw/i386/pc.h"
- #include "hw/irq.h"
- #include "hw/isa/apm.h"
- #include "hw/i386/ioapic.h"
-diff --git a/hw/isa/piix4.c b/hw/isa/piix4.c
-index 86678e6..7edec5e 100644
---- a/hw/isa/piix4.c
-+++ b/hw/isa/piix4.c
-@@ -26,11 +26,11 @@
- #include "qemu/osdep.h"
- #include "qapi/error.h"
- #include "hw/irq.h"
--#include "hw/i386/pc.h"
- #include "hw/southbridge/piix.h"
- #include "hw/pci/pci.h"
- #include "hw/isa/isa.h"
- #include "hw/sysbus.h"
-+#include "hw/intc/i8259.h"
- #include "hw/dma/i8257.h"
- #include "hw/timer/i8254.h"
- #include "hw/rtc/mc146818rtc.h"
-diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-index f1af840..b2ea13f 100644
---- a/hw/mips/gt64xxx_pci.c
-+++ b/hw/mips/gt64xxx_pci.c
-@@ -30,7 +30,7 @@
- #include "hw/pci/pci_host.h"
- #include "hw/southbridge/piix.h"
- #include "migration/vmstate.h"
--#include "hw/i386/pc.h"
-+#include "hw/intc/i8259.h"
- #include "hw/irq.h"
- #include "exec/address-spaces.h"
- #include "trace.h"
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 03a27e1..9eaa6e2 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -23,7 +23,7 @@
- #include "qemu/units.h"
- #include "qapi/error.h"
- #include "cpu.h"
--#include "hw/i386/pc.h"
-+#include "hw/intc/i8259.h"
- #include "hw/dma/i8257.h"
- #include "hw/isa/superio.h"
- #include "net/net.h"
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index d978bb6..c40b23f 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -26,7 +26,7 @@
- #include "qemu-common.h"
- #include "hw/mips/mips.h"
- #include "hw/mips/cpudevs.h"
--#include "hw/i386/pc.h"
-+#include "hw/intc/i8259.h"
- #include "hw/dma/i8257.h"
- #include "hw/char/serial.h"
- #include "hw/char/parallel.h"
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 7002423..fbbd59e 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -15,7 +15,7 @@
- #include "cpu.h"
- #include "hw/mips/mips.h"
- #include "hw/mips/cpudevs.h"
--#include "hw/i386/pc.h"
-+#include "hw/intc/i8259.h"
- #include "hw/char/serial.h"
- #include "hw/isa/isa.h"
- #include "net/net.h"
-diff --git a/hw/pci-host/bonito.c b/hw/pci-host/bonito.c
-index ceee463..c924007 100644
---- a/hw/pci-host/bonito.c
-+++ b/hw/pci-host/bonito.c
-@@ -40,7 +40,6 @@
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
- #include "hw/pci/pci.h"
--#include "hw/i386/pc.h"
- #include "hw/irq.h"
- #include "hw/mips/mips.h"
- #include "hw/pci/pci_host.h"
-diff --git a/hw/pci-host/prep.c b/hw/pci-host/prep.c
-index 85d7ba9..afa136d 100644
---- a/hw/pci-host/prep.c
-+++ b/hw/pci-host/prep.c
-@@ -32,7 +32,7 @@
- #include "hw/pci/pci_host.h"
- #include "hw/qdev-properties.h"
- #include "migration/vmstate.h"
--#include "hw/i386/pc.h"
-+#include "hw/intc/i8259.h"
- #include "hw/irq.h"
- #include "hw/loader.h"
- #include "hw/or-irq.h"
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 1f86eba..82447f8 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -134,14 +134,6 @@ typedef struct PCMachineClass {
- #define PC_MACHINE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(PCMachineClass, (klass), TYPE_PC_MACHINE)
- 
--/* i8259.c */
+     exec_dir = qemu_get_exec_dir();
+-    if (exec_dir == NULL) {
+-        return NULL;
+-    }
+-    dir = g_path_get_dirname(exec_dir);
 -
--extern DeviceState *isa_pic;
--qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq);
--qemu_irq *kvm_i8259_init(ISABus *bus);
--int pic_read_irq(DeviceState *d);
--int pic_get_output(DeviceState *d);
--
- /* ioapic.c */
- 
- /* Global System Interrupts */
-diff --git a/include/hw/intc/i8259.h b/include/hw/intc/i8259.h
-new file mode 100644
-index 0000000..e2b1e8c
---- /dev/null
-+++ b/include/hw/intc/i8259.h
-@@ -0,0 +1,12 @@
-+#ifndef HW_I8259_H
-+#define HW_I8259_H
+-    max_len = strlen(dir) +
+-        MAX(strlen(SHARE_SUFFIX), strlen(BUILD_SUFFIX)) + 1;
+-    res = g_malloc0(max_len);
+-    snprintf(res, max_len, "%s%s", dir, SHARE_SUFFIX);
+-    if (access(res, R_OK)) {
+-        snprintf(res, max_len, "%s%s", dir, BUILD_SUFFIX);
+-        if (access(res, R_OK)) {
+-            g_free(res);
+-            res = NULL;
+-        }
++    g_return_val_if_fail(exec_dir != NULL, NULL);
 +
-+/* i8259.c */
-+
-+extern DeviceState *isa_pic;
-+qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq);
-+qemu_irq *kvm_i8259_init(ISABus *bus);
-+int pic_get_output(DeviceState *d);
-+int pic_read_irq(DeviceState *d);
-+
-+#endif
-diff --git a/include/hw/isa/i8259_internal.h b/include/hw/isa/i8259_internal.h
-index ee189e4..861d70d 100644
---- a/include/hw/isa/i8259_internal.h
-+++ b/include/hw/isa/i8259_internal.h
-@@ -25,9 +25,9 @@
- #ifndef QEMU_I8259_INTERNAL_H
- #define QEMU_I8259_INTERNAL_H
++    dir = g_build_filename(exec_dir, "..", "pc-bios", NULL);
++    if (g_file_test(dir, G_FILE_TEST_IS_DIR)) {
++        return g_steal_pointer(&dir);
+     }
  
--#include "hw/i386/pc.h"
- #include "hw/isa/isa.h"
- #include "hw/intc/intc.h"
-+#include "hw/intc/i8259.h"
+-    g_free(dir);
+-    g_free(exec_dir);
+-    return res;
++    return g_strdup(CONFIG_QEMU_DATADIR);
+ }
+-#undef SHARE_SUFFIX
+-#undef BUILD_SUFFIX
  
- typedef struct PICCommonState PICCommonState;
- 
-diff --git a/target/i386/monitor.c b/target/i386/monitor.c
-index 9fb4d64..27ebfa3 100644
---- a/target/i386/monitor.c
-+++ b/target/i386/monitor.c
-@@ -28,7 +28,6 @@
- #include "monitor/hmp-target.h"
- #include "monitor/hmp.h"
- #include "qapi/qmp/qdict.h"
--#include "hw/i386/pc.h"
- #include "sysemu/kvm.h"
- #include "sysemu/sev.h"
- #include "qapi/error.h"
+ void os_set_proc_name(const char *s)
+ {
 -- 
 1.8.3.1
 
