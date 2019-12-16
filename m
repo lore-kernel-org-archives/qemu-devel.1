@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E32C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:37:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A1E9C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:37:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BAA0206E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:37:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA3E9206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:37:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QdZRFVcd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BAA0206E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZ+3HaWe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA3E9206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igtMg-0005dv-MO
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:36:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56354)
+	id 1igtMm-0005nq-9A
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:37:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56470)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtEt-0004cw-6S
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:56 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtEx-0004jc-K2
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtEr-0006rG-Ln
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:55 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:53201)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtEv-0006zM-A7
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:59 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:45282)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtEr-0006pK-EY
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:53 -0500
-Received: by mail-wm1-x333.google.com with SMTP id p9so7441606wmc.2
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:28:53 -0800 (PST)
+ id 1igtEv-0006xW-2v
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:57 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id j42so3844541wrj.12
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:28:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=zxw60BFwP9AwKgv+HLe1mvNusF8kvgQh66UrHOxl68E=;
- b=QdZRFVcdwMej2Q3oFFPXBHUAvBJ0eSsULRvYcIjxdfkSwXIWicjYGctNQE6UkVDt6x
- Fbwz9vsvOQ2zoJEMlURkJwgj3Rs4qjg4pFUGrkj28A94IPLwdYpOeo24/pCQmkwY9OHr
- 7Ff6W+L7KYB5gLY7NQ74KNeMPIz9vyzMUEmf96R7pTleMs8O5gJhiPgtJrTidzYVYCKZ
- rcu3pAcIoFDkQp3KToOQyOYht4oLDOU4o0d30yoStTpHiX+waCSsPcxMKh1yuVALuK+S
- kyw6ls7fh9oA/PM5AMfukIzpFYsdvQsOOHl9WS1/ZYjxTxNIShn61cQsWhTj9gkEUCSG
- nq3g==
+ bh=jT9I9Ps2g95xmQ93zjEe27cZoWHjzkat4j8Vl4duSTw=;
+ b=aZ+3HaWeOCiGOrOdWPNbhDMyL7jMBPUlx8Dv1ED6JsFjdQGsbJYGyFH20OJFFaMYje
+ fCjemAxrfgGv9rEp56jae8uUutW6PuywTYNLWZ6084K1bHQC++JkQHDss00EL7DAsqmS
+ b1ylVEmOOi5J2aD4IzooUX/grAuompkjaZD2KziQQGxm7sykkdh+7pFMWXAA670v6H/H
+ UXC97WVRvv6U8OzNSVgOAE2rN7ldZSZlijD0nV6hBxj+lnLQZMXe8OV6nFmnbks7gK+6
+ 6XafnEqB0uMkPLpf6mZ61rYOakO/wwj8v6b9R/7+tiZxJFZxXZlhPZ/h0Y2dEYyGQYYm
+ jeJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=zxw60BFwP9AwKgv+HLe1mvNusF8kvgQh66UrHOxl68E=;
- b=AC88p/MXirOnruZacNQSRgk7n4VcLXTwzfya5YRGT9uyn1vtylieEavhJSzceHYlBH
- zqzMc8807plVGj5mVubaN4sidQCWrhK+4izz0F7gV4JN0JgUT1SmRQssSvQ7DUjhol2n
- jQ9gW2z29WuKe+pvygQK74enLVNXCh6l2bUTnEgXGB1EUASVHj5VTflihiWBqEbtXRwx
- xnp1ZnScJZDLYibHrnEU2D7Zm4qXSFnUr9DD+nA/+Jiczn4x6upxr9zuNx+3tsLZVX+q
- ApaehhQAdj6NFy2qXPYfIXP7jZBxipH0P/T2nID7LnzRVqrVDEaU3iXXDzZE5kb08+rA
- PDfQ==
-X-Gm-Message-State: APjAAAUSF4hRclorXyIAUDj8LSjrsyrKWoBdUDKDFPPMKod5vVVEBAoI
- LmzVo2sYdD9BBYZuSt1ljdn+ovA/
-X-Google-Smtp-Source: APXvYqxlmTlz99F5WQ+eqvCP9SfD6V9jXzl5mA2E4vdNhlw/lwzipLX035ClCG2OZX/v2wxpGA9heA==
-X-Received: by 2002:a1c:6308:: with SMTP id x8mr4427109wmb.80.1576513732103;
- Mon, 16 Dec 2019 08:28:52 -0800 (PST)
+ bh=jT9I9Ps2g95xmQ93zjEe27cZoWHjzkat4j8Vl4duSTw=;
+ b=nrsDiFOd/o12dVPg3s2sru3lGMzsBMKFWS70bY1tttc9p37HtCoReMo0f3qoPVmyeL
+ Y9pfWBLl32vRWoGCXH0/0/LvxlyMcyWoCcIH/xFcrpxomf4ANaTVBBL445KkXJtrrboq
+ bdSPyhca1rc48ySvTGDmHpsqBZHqRWtkWXbFCtSDAViEGZcgzzfpSIUXiZPg0IqrAh0T
+ ZdlllucD/tQyiFNWr+pykdv6N8n4Hl09MDL+nrqfQEuPMXtVYZO/Pgcjmb+Dy0ZtSxUg
+ TixoRDId60+get3xbBzkJ5hEuukr2A/56cYvIV8jlpeGYIZOJ1zm2cdFWMGSHmlChW0J
+ N8ew==
+X-Gm-Message-State: APjAAAXNgOkGuI0L4METDaN7OfGYXZUm84ZFKVli+SwNKG9uqjDDguUm
+ R3xDLZXbMdebgGY4DKxj7jJA5by4
+X-Google-Smtp-Source: APXvYqyb2A1EPr0b4NAa9FOELWVsP8XWOaCCR0g4/NxnrEswUva/t58xEBsPpQla0gPSUROMKlOigg==
+X-Received: by 2002:adf:f18b:: with SMTP id h11mr30141404wro.56.1576513735826; 
+ Mon, 16 Dec 2019 08:28:55 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.28.51
+ by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.28.54
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Dec 2019 08:28:51 -0800 (PST)
+ Mon, 16 Dec 2019 08:28:55 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/62] migration-test: Move -machine to common commandline
-Date: Mon, 16 Dec 2019 17:27:48 +0100
-Message-Id: <1576513726-53700-5-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 08/62] migration-test: Move -serial handling to common
+ commandline
+Date: Mon, 16 Dec 2019 17:27:52 +0100
+Message-Id: <1576513726-53700-9-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::42c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,136 +101,106 @@ Signed-off-by: Juan Quintela <quintela@redhat.com>
 Tested-by: Cornelia Huck <cohuck@redhat.com> #s390x
 Tested-by: Laurent Vivier <lvivier@redhat.com>
 ---
- tests/migration-test.c | 51 +++++++++++++++++++++++++++++---------------------
- 1 file changed, 30 insertions(+), 21 deletions(-)
+ tests/migration-test.c | 41 ++++++++++++++++-------------------------
+ 1 file changed, 16 insertions(+), 25 deletions(-)
 
 diff --git a/tests/migration-test.c b/tests/migration-test.c
-index 372e66c..39203f6 100644
+index a83e43b..85e270c 100644
 --- a/tests/migration-test.c
 +++ b/tests/migration-test.c
-@@ -563,7 +563,8 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-     char *extra_opts = NULL;
-     char *shmem_path = NULL;
-     const char *arch = qtest_get_arch();
--    const char *accel = "kvm:tcg";
-+    const char *machine_type;
-+    const char *machine_args;
- 
-     opts_src = opts_src ? opts_src : "";
-     opts_dst = opts_dst ? opts_dst : "";
-@@ -582,72 +583,78 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         /* the assembled x86 boot sector should be exactly one sector large */
-         assert(sizeof(x86_bootsect) == 512);
-         init_bootfile(bootpath, x86_bootsect, sizeof(x86_bootsect));
-+        machine_type = "";
-+        machine_args = "";
-         extra_opts = use_shmem ? get_shmem_opts("150M", shmem_path) : NULL;
--        cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
-+        cmd_src = g_strdup_printf("-m 150M"
-                                   " -name source,debug-threads=on"
-                                   " -serial file:%s/src_serial"
-                                   " -drive file=%s,format=raw %s",
--                                  accel, tmpfs, bootpath,
-+                                  tmpfs, bootpath,
-                                   extra_opts ? extra_opts : "");
--        cmd_dst = g_strdup_printf("-machine accel=%s -m 150M"
-+        cmd_dst = g_strdup_printf("-m 150M"
-                                   " -name target,debug-threads=on"
-                                   " -serial file:%s/dest_serial"
-                                   " -drive file=%s,format=raw"
-                                   " -incoming %s %s",
--                                  accel, tmpfs, bootpath, uri,
-+                                  tmpfs, bootpath, uri,
-                                   extra_opts ? extra_opts : "");
+@@ -579,13 +579,10 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         machine_type = "";
+         machine_args = "";
+         memory_size = "150M";
+-        cmd_src = g_strdup_printf(" -serial file:%s/src_serial"
+-                                  " -drive file=%s,format=raw",
+-                                  tmpfs, bootpath);
+-        cmd_dst = g_strdup_printf(" -serial file:%s/dest_serial"
+-                                  " -drive file=%s,format=raw"
++        cmd_src = g_strdup_printf("-drive file=%s,format=raw", bootpath);
++        cmd_dst = g_strdup_printf("-drive file=%s,format=raw"
+                                   " -incoming %s",
+-                                  tmpfs, bootpath, uri);
++                                  bootpath, uri);
          start_address = X86_TEST_MEM_START;
          end_address = X86_TEST_MEM_END;
      } else if (g_str_equal(arch, "s390x")) {
-         init_bootfile(bootpath, s390x_elf, sizeof(s390x_elf));
-+        machine_type = "";
-+        machine_args = "";
-         extra_opts = use_shmem ? get_shmem_opts("128M", shmem_path) : NULL;
--        cmd_src = g_strdup_printf("-machine accel=%s -m 128M"
-+        cmd_src = g_strdup_printf("-m 128M"
-                                   " -name source,debug-threads=on"
-                                   " -serial file:%s/src_serial -bios %s %s",
--                                  accel, tmpfs, bootpath,
-+                                  tmpfs, bootpath,
-                                   extra_opts ? extra_opts : "");
--        cmd_dst = g_strdup_printf("-machine accel=%s -m 128M"
-+        cmd_dst = g_strdup_printf("-m 128M"
-                                   " -name target,debug-threads=on"
-                                   " -serial file:%s/dest_serial -bios %s"
-                                   " -incoming %s %s",
--                                  accel, tmpfs, bootpath, uri,
-+                                  tmpfs, bootpath, uri,
-                                   extra_opts ? extra_opts : "");
+@@ -593,28 +590,22 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         machine_type = "";
+         machine_args = "";
+         memory_size = "128M";
+-        cmd_src = g_strdup_printf(" -serial file:%s/src_serial -bios %s",
+-                                  tmpfs, bootpath);
+-        cmd_dst = g_strdup_printf(" -serial file:%s/dest_serial -bios %s"
++        cmd_src = g_strdup_printf("-bios %s", bootpath);
++        cmd_dst = g_strdup_printf("-bios %s"
+                                   " -incoming %s",
+-                                  tmpfs, bootpath, uri);
++                                  bootpath, uri);
          start_address = S390_TEST_MEM_START;
          end_address = S390_TEST_MEM_END;
      } else if (strcmp(arch, "ppc64") == 0) {
-+        machine_type = "";
-+        machine_args = ",vsmt=8";
-         extra_opts = use_shmem ? get_shmem_opts("256M", shmem_path) : NULL;
--        cmd_src = g_strdup_printf("-machine accel=%s,vsmt=8 -m 256M -nodefaults"
-+        cmd_src = g_strdup_printf("-m 256M -nodefaults"
-                                   " -name source,debug-threads=on"
-                                   " -serial file:%s/src_serial"
-                                   " -prom-env 'use-nvramrc?=true' -prom-env "
+         machine_type = "";
+         machine_args = ",vsmt=8";
+         memory_size = "256M";
+-        cmd_src = g_strdup_printf("-nodefaults"
+-                                  " -serial file:%s/src_serial"
+-                                  " -prom-env 'use-nvramrc?=true' -prom-env "
++        cmd_src = g_strdup_printf("-nodefaults "
++                                  "-prom-env 'use-nvramrc?=true' -prom-env "
                                    "'nvramrc=hex .\" _\" begin %x %x "
                                    "do i c@ 1 + i c! 1000 +loop .\" B\" 0 "
--                                  "until' %s",  accel, tmpfs, end_address,
-+                                  "until' %s", tmpfs, end_address,
-                                   start_address, extra_opts ? extra_opts : "");
--        cmd_dst = g_strdup_printf("-machine accel=%s,vsmt=8 -m 256M"
-+        cmd_dst = g_strdup_printf("-m 256M"
-                                   " -name target,debug-threads=on"
-                                   " -serial file:%s/dest_serial"
-                                   " -incoming %s %s",
--                                  accel, tmpfs, uri,
-+                                  tmpfs, uri,
-                                   extra_opts ? extra_opts : "");
- 
+-                                  "until'", tmpfs, end_address,
+-                                  start_address);
+-        cmd_dst = g_strdup_printf(" -serial file:%s/dest_serial"
+-                                  " -incoming %s",
+-                                  tmpfs, uri);
+-
++                                  "until'", end_address, start_address);
++        cmd_dst = g_strdup_printf(" -incoming %s", uri);
          start_address = PPC_TEST_MEM_START;
          end_address = PPC_TEST_MEM_END;
      } else if (strcmp(arch, "aarch64") == 0) {
-         init_bootfile(bootpath, aarch64_kernel, sizeof(aarch64_kernel));
-+        machine_type = "virt,";
-+        machine_args = "gic-version=max";
-         extra_opts = use_shmem ? get_shmem_opts("150M", shmem_path) : NULL;
--        cmd_src = g_strdup_printf("-machine virt,accel=%s,gic-version=max "
--                                  "-name vmsource,debug-threads=on -cpu max "
-+        cmd_src = g_strdup_printf("-name vmsource,debug-threads=on -cpu max "
-                                   "-m 150M -serial file:%s/src_serial "
-                                   "-kernel %s %s",
--                                  accel, tmpfs, bootpath,
-+                                  tmpfs, bootpath,
-                                   extra_opts ? extra_opts : "");
--        cmd_dst = g_strdup_printf("-machine virt,accel=%s,gic-version=max "
--                                  "-name vmdest,debug-threads=on -cpu max "
-+        cmd_dst = g_strdup_printf("-name vmdest,debug-threads=on -cpu max "
-                                   "-m 150M -serial file:%s/dest_serial "
+@@ -623,14 +614,12 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         machine_args = "gic-version=max";
+         memory_size = "150M";
+         cmd_src = g_strdup_printf("-cpu max "
+-                                  "-serial file:%s/src_serial "
+                                   "-kernel %s",
+-                                  tmpfs, bootpath);
++                                  bootpath);
+         cmd_dst = g_strdup_printf("-cpu max "
+-                                  "-serial file:%s/dest_serial "
                                    "-kernel %s "
-                                   "-incoming %s %s",
--                                  accel, tmpfs, bootpath, uri,
-+                                  tmpfs, bootpath, uri,
-                                   extra_opts ? extra_opts : "");
+                                   "-incoming %s",
+-                                  tmpfs, bootpath, uri);
++                                  bootpath, uri);
  
          start_address = ARM_TEST_MEM_START;
-@@ -667,13 +674,15 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         ignore_stderr = "";
-     }
+         end_address = ARM_TEST_MEM_END;
+@@ -661,10 +650,11 @@ static int test_migrate_start(QTestState **from, QTestState **to,
  
--    cmd_source = g_strdup_printf("%s %s %s",
-+    cmd_source = g_strdup_printf("-machine %saccel=kvm:tcg%s %s %s %s",
-+                                 machine_type, machine_args,
-                                  cmd_src, opts_src, ignore_stderr);
+     cmd_source = g_strdup_printf("-machine %saccel=kvm:tcg%s "
+                                  "-name source,debug-threads=on "
++                                 "-serial file:%s/src_serial "
+                                  "-m %s "
+                                  "%s %s %s %s",
+                                  machine_type, machine_args,
+-                                 memory_size,
++                                 tmpfs, memory_size,
+                                  cmd_src, shmem_opts, opts_src, ignore_stderr);
      g_free(cmd_src);
      *from = qtest_init(cmd_source);
-     g_free(cmd_source);
- 
--    cmd_target = g_strdup_printf("%s %s %s",
-+    cmd_target = g_strdup_printf("-machine %saccel=kvm:tcg%s %s %s %s",
-+                                 machine_type, machine_args,
-                                  cmd_dst, opts_dst, ignore_stderr);
+@@ -673,9 +663,10 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+     cmd_target = g_strdup_printf("-machine %saccel=kvm:tcg%s "
+                                  "-name target,debug-threads=on "
+                                  "-m %s "
++                                 "-serial file:%s/dest_serial "
+                                  "%s %s %s %s",
+                                  machine_type, machine_args,
+-                                 memory_size,
++                                 tmpfs, memory_size,
+                                  cmd_dst, shmem_opts, opts_dst, ignore_stderr);
      g_free(cmd_dst);
      *to = qtest_init(cmd_target);
 -- 
