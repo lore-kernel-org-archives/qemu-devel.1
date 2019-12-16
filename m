@@ -2,83 +2,86 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB02C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B73C7C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:20:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08441206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:20:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83CAC206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:20:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DznEXNuR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08441206D3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FP5AQxxP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83CAC206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igu2Z-0001xZ-KF
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:20:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43697)
+	id 1igu2h-00023b-VY
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:20:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57431)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1igtcI-0000wG-Dk
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:53:07 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFh-0005vu-8c
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1igtcH-0006Nl-06
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:53:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42203
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1igtcG-0006Mf-SC
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:53:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576515184;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6l+ZX6jfRcQPNGxAaff9khunijHeffZz2XH2nVa2low=;
- b=DznEXNuRxDsjbPo7MjO6eFx2ucVMd5jzKQrNYUDEv3NzVDO3UWA2dfKrXNVJ5jv1mH1qq8
- knbWidEw8QJ2V7hchllRMQo+hs2//jp6CFs9v7e0b6mnbR7v36RuV8b81QfT2TyHc0P1yM
- 1rdNKkdNICzjBOSF1lzzBODtmKSkJGk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-180-TQ-AMmSSOLaG5TXmBjBmWw-1; Mon, 16 Dec 2019 11:53:01 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F5BE802570;
- Mon, 16 Dec 2019 16:52:59 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (ovpn-116-122.ams2.redhat.com
- [10.36.116.122])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 50C8B60479;
- Mon, 16 Dec 2019 16:52:56 +0000 (UTC)
-Date: Mon, 16 Dec 2019 17:52:49 +0100
-From: Andrew Jones <drjones@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC PATCH v2 5/5] target/arm/cpu: Add the kvm-no-adjvtime CPU
- property
-Message-ID: <20191216165249.lygksiptf2yowqh7@kamzik.brq.redhat.com>
-References: <20191212173320.11610-1-drjones@redhat.com>
- <20191212173320.11610-6-drjones@redhat.com>
- <CAFEAcA8=FcrT8dRMDzxu14J-gv5LEDuNBNpD5yo9j3waV7u8iw@mail.gmail.com>
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFf-0000Tb-ET
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:44 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41589)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1igtFf-0000RQ-74
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:43 -0500
+Received: by mail-wr1-x442.google.com with SMTP id c9so8039739wrw.8
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=3xRW0dWjMhO1EPoHD9jweteGOAO0mpniEjjgSK1VhoQ=;
+ b=FP5AQxxPnltuwrDP8B80N0eYvqBSpLEyAYrlDRCwYaPUosIIT5fLPCxrgSq+dhNfC9
+ j6H3LkE3QgUoW+DDsa5f9y+3GqdgeSW8WgqwTygRRzOfZMEjUe7LATngT8frhKFnFDG9
+ 6vBFUpxyCIddsX6KkU+d/RjeiEB1Dr1c+w4ekUvwLKUa/zT643b0QH23ol8qpN5Vijr6
+ NzCjxzSIF49kapOrsyKCfW04RtuumDWoK7jmDmJPTsUUxTNvvoR3iyByHHxAIRsNQsu6
+ c06z1DhvaVdH7bA0PNzl1cPLW1QbV4/xO74jGXld24ooSCobCNL+aCBfAaf067mlVhOb
+ LYCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=3xRW0dWjMhO1EPoHD9jweteGOAO0mpniEjjgSK1VhoQ=;
+ b=Czph/twI8IBbY6W4Ob5G/shu3DbCqnDFsEmHui2BlU8+0tjTNf0tJG5Y4W+ltI6A4B
+ DWbpVpmVtSX3vu+09OfXaoErc25qglA5GWfrSvXZZ193+KqnZ6d46DNSSsqQFR7cswUc
+ QqcFy/FzE9mOKXw1oKsX/Bw47tdM7yxnLaobkxPkzaEPDMcNe8HpJQeAN2vpetaeXJos
+ eEJTljV1TMzeiUCY7E4T/kM+0gBUHxTa59aqfAtMzWXT6P+xUfNgCa5cNNJhWyg5CH4K
+ /9SLLi2sYfiIeFtnnpoiWgx+dQ7inrTv/weUujIerY2sBYUEB5e4l7VlSroVKRsFy74r
+ 0OxA==
+X-Gm-Message-State: APjAAAWxR2gPLjNWDkDEH+vzLXBamKp0G8ZoNk4rJCSY9RBcTh2CvJAY
+ dlv2CdwHhJn8wVYHNkOAu4CdIO3g
+X-Google-Smtp-Source: APXvYqx6+Wv6DRVFBzPSv8AHlb6daZ3L0tikByx+RLWxRhWxr395WKrY4OBLKF+q6xK6+Bx1MsIusg==
+X-Received: by 2002:a5d:68c5:: with SMTP id p5mr31916905wrw.193.1576513782101; 
+ Mon, 16 Dec 2019 08:29:42 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.41
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 16 Dec 2019 08:29:41 -0800 (PST)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 54/62] hw/i386: Simplify ioapic_init_gsi()
+Date: Mon, 16 Dec 2019 17:28:38 +0100
+Message-Id: <1576513726-53700-55-git-send-email-pbonzini@redhat.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
+References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA8=FcrT8dRMDzxu14J-gv5LEDuNBNpD5yo9j3waV7u8iw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: TQ-AMmSSOLaG5TXmBjBmWw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,131 +93,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: bijan.mottahedeh@oracle.com, Marc Zyngier <maz@kernel.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Heyi Guo <guoheyi@huawei.com>, msys.mizuma@gmail.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Dec 16, 2019 at 03:06:57PM +0000, Peter Maydell wrote:
-> On Thu, 12 Dec 2019 at 17:33, Andrew Jones <drjones@redhat.com> wrote:
-> >
-> > kvm-no-adjvtime is a KVM specific CPU property and a first of its kind.
-> > To accommodate it we also add kvm_arm_add_vcpu_properties() and a
-> > KVM specific CPU properties description to the CPU features document.
-> >
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  docs/arm-cpu-features.rst | 31 ++++++++++++++++++++++++++++++-
-> >  hw/arm/virt.c             |  8 ++++++++
-> >  include/hw/arm/virt.h     |  1 +
-> >  target/arm/cpu.c          |  2 ++
-> >  target/arm/cpu64.c        |  1 +
-> >  target/arm/kvm.c          | 28 ++++++++++++++++++++++++++++
-> >  target/arm/kvm_arm.h      | 11 +++++++++++
-> >  target/arm/monitor.c      |  1 +
-> >  tests/arm-cpu-features.c  |  4 ++++
-> >  9 files changed, 86 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
-> > index 1b367e22e16e..641ec9cb8f4a 100644
-> > --- a/docs/arm-cpu-features.rst
-> > +++ b/docs/arm-cpu-features.rst
-> > @@ -31,7 +31,9 @@ supporting the feature or only supporting the feature=
- under certain
-> >  configurations.  For example, the `aarch64` CPU feature, which, when
-> >  disabled, enables the optional AArch32 CPU feature, is only supported
-> >  when using the KVM accelerator and when running on a host CPU type tha=
-t
-> > -supports the feature.
-> > +supports the feature.  While `aarch64` currently only works with KVM,
-> > +it could work with TCG.  CPU features that are specific to KVM are
-> > +prefixed with "kvm-" and are described in "KVM VCPU Features".
-> >
-> >  CPU Feature Probing
-> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > @@ -171,6 +173,33 @@ disabling many SVE vector lengths would be quite v=
-erbose, the `sve<N>` CPU
-> >  properties have special semantics (see "SVE CPU Property Parsing
-> >  Semantics").
-> >
-> > +KVM VCPU Features
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +KVM VCPU features are CPU features that are specific to KVM, such as
-> > +paravirt features or features that enable CPU virtualization extension=
-s.
-> > +The features' CPU properties are only available when KVM is enabled an=
-d
-> > +are named with the prefix "kvm-".  KVM VCPU features may be probed,
-> > +enabled, and disabled in the same way as other CPU features.  Below is=
- the
-> > +list of KVM VCPU features and their descriptions.
-> > +
-> > +  kvm-no-adjvtime          When disabled, each time the VM transitions
-> > +                           back to running state from the paused state=
- the
-> > +                           VCPU's vitual counter is updated to ensure =
-the
->=20
-> "virtual"
->=20
-> > +                           stopped time is not counted.  This avoids t=
-ime
-> > +                           jumps surprising guest OSes and application=
-s,
-> > +                           as long as they use the virtual counter for
-> > +                           timekeeping, but has the side effect of the
-> > +                           virtual and physical counters diverging.  A=
-ll
-> > +                           timekeeping based on the virtual counter wi=
-ll
-> > +                           appear to lag behind any timekeeping that d=
-oes
-> > +                           not subtract VM stopped time.  The guest ma=
-y
-> > +                           resynchronize its virtual counter with othe=
-r
-> > +                           time sources as needed.  Enabling this KVM =
-VCPU
-> > +                           feature provides the legacy behavior, which=
- is
-> > +                           to also count stopped time with the virtual
-> > +                           counter.
->=20
-> This phrasing reads a bit confusingly to me. What I would usually expect
-> is that you get
->   name-of-option              Description of what the option does.
->=20
-> But here we have
->   name-of-option              Long description of the default behaviour,
->                               taking many lines and several sentences.
->                               Brief note at the end that enabling this
->                               feature gives the opposite effect.
->=20
-> Especially since the default-behaviour description isn't prefaced
-> with "By default" or similar, it's quite easy to start reading the
-> text assuming it's defining what the option is going to do, only
-> to get to the end and realise that it's defining what the option
-> is *not* going to do...
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-I'll take another stab at this, but my feeling is that a '-no-' option
-should be one that just turns off the default behavior, which is why I
-wrote a long description of the default behavior. If you'd prefer the
-description to be more terse, then I can certainly delete a bunch of
-the text, but then I fear what this option disables wouldn't be clear
-enough.
+All callers of ioapic_init_gsi() provide a parent. We want new
+uses to follow the same good practice and provide the parent
+name, so do not make this optional: assert the parent name is
+provided, and simplify the code.
 
->=20
-> Incidentally, if I understand things correctly, for TCG the
-> behaviour is (and has always been) that VM-stopped time is
-> not counted, because we run the emulated versions of these counters
-> off QEMU_CLOCK_VIRTUAL. So having the KVM default be the same as
-> the TCG default is nicely consistent.
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ hw/i386/x86.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-Thanks,
-drew
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index d18a3ef..d8bb5c2 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -307,15 +307,14 @@ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
+     SysBusDevice *d;
+     unsigned int i;
+ 
++    assert(parent_name);
+     if (kvm_ioapic_in_kernel()) {
+         dev = qdev_create(NULL, TYPE_KVM_IOAPIC);
+     } else {
+         dev = qdev_create(NULL, TYPE_IOAPIC);
+     }
+-    if (parent_name) {
+-        object_property_add_child(object_resolve_path(parent_name, NULL),
+-                                  "ioapic", OBJECT(dev), NULL);
+-    }
++    object_property_add_child(object_resolve_path(parent_name, NULL),
++                              "ioapic", OBJECT(dev), NULL);
+     qdev_init_nofail(dev);
+     d = SYS_BUS_DEVICE(dev);
+     sysbus_mmio_map(d, 0, IO_APIC_DEFAULT_ADDRESS);
+-- 
+1.8.3.1
+
 
 
