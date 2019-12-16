@@ -2,54 +2,73 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DB7C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 10:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6589C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 10:21:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAD96206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 10:07:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAD96206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7B63D20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 10:21:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B63D20684
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ignHT-0004Gk-0p
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 05:07:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44643)
+	id 1ignVK-0000H9-Na
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 05:21:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53619)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1ignFn-0001xx-Ag
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 05:05:28 -0500
+ (envelope-from <bounces@canonical.com>) id 1ignUd-00082e-KB
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 05:20:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1ignFl-0007Ao-HR
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 05:05:27 -0500
-Received: from relay.sw.ru ([185.231.240.75]:55874)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1ignFl-00075G-9e
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 05:05:25 -0500
-Received: from dptest2.qa.sw.ru ([10.94.4.71])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1ignFb-0001Vo-NF; Mon, 16 Dec 2019 13:05:15 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+ (envelope-from <bounces@canonical.com>) id 1ignUb-0007Fq-VE
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 05:20:47 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47412)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ignUb-0007Bw-PQ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 05:20:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ignUZ-00048g-E3
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 10:20:43 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4AA542E80C8
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 10:20:43 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 16 Dec 2019 10:06:05 -0000
+From: Damir <1856335@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/2] virtio: make seg_max virtqueue size dependent
-Date: Mon, 16 Dec 2019 13:04:50 +0300
-Message-Id: <20191216100451.28060-2-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20191216100451.28060-1-dplotnikov@virtuozzo.com>
-References: <20191216100451.28060-1-dplotnikov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: djdatte
+X-Launchpad-Bug-Reporter: Damir (djdatte)
+X-Launchpad-Bug-Modifier: Damir (djdatte)
+References: <157625616239.22064.10423897892496347105.malonedeb@gac.canonical.com>
+Message-Id: <157649076618.19251.2274802547008878034.launchpad@wampee.canonical.com>
+Subject: [Bug 1856335] Re: Cache Layout wrong on many Zen Arch CPUs
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: b31e90666a7df27d74c6e127a32282374b35c2bd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -58,164 +77,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, ehabkost@redhat.com, mst@redhat.com,
- mreitz@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, den@virtuozzo.com
+Reply-To: Bug 1856335 <1856335@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Before the patch, seg_max parameter was immutable and hardcoded
-to 126 (128 - 2) without respect to queue size. This has two negative effects:
+** Description changed:
 
-1. when queue size is < 128, we have Virtio 1.1 specfication violation:
-   (2.6.5.3.1 Driver Requirements) seq_max must be <= queue_size.
-   This violation affects the old Linux guests (ver < 4.14). These guests
-   crash on these queue_size setups.
+  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems to
+  always map Cache ass if it was an 4-Core per CCX CPU, which is
+  incorrect, and costs upwards 30% performance (more realistically 10%) in
+  L3 Cache Layout aware applications.
+  =
 
-2. when queue_size > 128, as was pointed out by Denis Lunev <den@virtuozzo.com>,
-   seg_max restrics guest's block request length which affects guests'
-   performance making them issues more block request than needed.
-   https://lists.gnu.org/archive/html/qemu-devel/2017-12/msg03721.html
+  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
+  =
 
-To mitigate this two effects, the patch adds the property adjusting seg_max
-to queue size automaticaly. Since seg_max is a guest visible parameter,
-the property is machine type managable and allows to choose between
-old (seg_max = 126 always) and new (seg_max = queue_size - 2) behaviors.
+-   <cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+-     <model fallback=3D'forbid'>EPYC-IBPB</model>
+-     <vendor>AMD</vendor>
+-     <topology sockets=3D'1' cores=3D'8' threads=3D'1'/>
++ =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
++ =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
++ =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
++ =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
+/>
+  =
 
-Not to change the behavior of the older VMs, prevent setting the default
-seg_max_adjust value for older machine types.
+  In windows, coreinfo reports correctly:
+  =
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- hw/block/virtio-blk.c           |  9 ++++++++-
- hw/core/machine.c               |  3 +++
- hw/scsi/vhost-scsi.c            |  2 ++
- hw/scsi/virtio-scsi.c           | 10 +++++++++-
- include/hw/virtio/virtio-blk.h  |  1 +
- include/hw/virtio/virtio-scsi.h |  1 +
- 6 files changed, 24 insertions(+), 2 deletions(-)
+  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
+  =
 
-diff --git a/hw/block/virtio-blk.c b/hw/block/virtio-blk.c
-index d62e6377c2..0f6f8113b7 100644
---- a/hw/block/virtio-blk.c
-+++ b/hw/block/virtio-blk.c
-@@ -908,7 +908,8 @@ static void virtio_blk_update_config(VirtIODevice *vdev, uint8_t *config)
-     blk_get_geometry(s->blk, &capacity);
-     memset(&blkcfg, 0, sizeof(blkcfg));
-     virtio_stq_p(vdev, &blkcfg.capacity, capacity);
--    virtio_stl_p(vdev, &blkcfg.seg_max, 128 - 2);
-+    virtio_stl_p(vdev, &blkcfg.seg_max,
-+                 s->conf.seg_max_adjust ? s->conf.queue_size - 2 : 128 - 2);
-     virtio_stw_p(vdev, &blkcfg.geometry.cylinders, conf->cyls);
-     virtio_stl_p(vdev, &blkcfg.blk_size, blk_size);
-     virtio_stw_p(vdev, &blkcfg.min_io_size, conf->min_io_size / blk_size);
-@@ -1133,6 +1134,11 @@ static void virtio_blk_device_realize(DeviceState *dev, Error **errp)
-         error_setg(errp, "num-queues property must be larger than 0");
-         return;
-     }
-+    if (conf->queue_size <= 2) {
-+        error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
-+                   "must be > 2", conf->queue_size);
-+        return;
-+    }
-     if (!is_power_of_2(conf->queue_size) ||
-         conf->queue_size > VIRTQUEUE_MAX_SIZE) {
-         error_setg(errp, "invalid queue-size property (%" PRIu16 "), "
-@@ -1262,6 +1268,7 @@ static Property virtio_blk_properties[] = {
-                     true),
-     DEFINE_PROP_UINT16("num-queues", VirtIOBlock, conf.num_queues, 1),
-     DEFINE_PROP_UINT16("queue-size", VirtIOBlock, conf.queue_size, 128),
-+    DEFINE_PROP_BOOL("seg-max-adjust", VirtIOBlock, conf.seg_max_adjust, true),
-     DEFINE_PROP_LINK("iothread", VirtIOBlock, conf.iothread, TYPE_IOTHREAD,
-                      IOThread *),
-     DEFINE_PROP_BIT64("discard", VirtIOBlock, host_features,
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 023548b4f3..bfa320387e 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -29,6 +29,9 @@
- 
- GlobalProperty hw_compat_4_2[] = {
-     { "virtio-blk-device", "x-enable-wce-if-config-wce", "off" },
-+    { "virtio-blk-device", "seg-max-adjust", "off"},
-+    { "virtio-scsi-device", "seg_max_adjust", "off"},
-+    { "vhost-blk-device", "seg_max_adjust", "off"},
- };
- const size_t hw_compat_4_2_len = G_N_ELEMENTS(hw_compat_4_2);
- 
-diff --git a/hw/scsi/vhost-scsi.c b/hw/scsi/vhost-scsi.c
-index c693fc748a..26f710d3ec 100644
---- a/hw/scsi/vhost-scsi.c
-+++ b/hw/scsi/vhost-scsi.c
-@@ -275,6 +275,8 @@ static Property vhost_scsi_properties[] = {
-     DEFINE_PROP_UINT32("num_queues", VirtIOSCSICommon, conf.num_queues, 1),
-     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSICommon, conf.virtqueue_size,
-                        128),
-+    DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSICommon, conf.seg_max_adjust,
-+                      true),
-     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSICommon, conf.max_sectors,
-                        0xFFFF),
-     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSICommon, conf.cmd_per_lun, 128),
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index e8b2b64d09..405cb6c953 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -654,7 +654,8 @@ static void virtio_scsi_get_config(VirtIODevice *vdev,
-     VirtIOSCSICommon *s = VIRTIO_SCSI_COMMON(vdev);
- 
-     virtio_stl_p(vdev, &scsiconf->num_queues, s->conf.num_queues);
--    virtio_stl_p(vdev, &scsiconf->seg_max, 128 - 2);
-+    virtio_stl_p(vdev, &scsiconf->seg_max,
-+                 s->conf.seg_max_adjust ? s->conf.virtqueue_size - 2 : 128 - 2);
-     virtio_stl_p(vdev, &scsiconf->max_sectors, s->conf.max_sectors);
-     virtio_stl_p(vdev, &scsiconf->cmd_per_lun, s->conf.cmd_per_lun);
-     virtio_stl_p(vdev, &scsiconf->event_info_size, sizeof(VirtIOSCSIEvent));
-@@ -893,6 +894,11 @@ void virtio_scsi_common_realize(DeviceState *dev,
-         virtio_cleanup(vdev);
-         return;
-     }
-+    if (s->conf.virtqueue_size <= 2) {
-+        error_setg(errp, "invalid virtqueue_size property (= %" PRIu16 "), "
-+                   "must be > 2", s->conf.virtqueue_size);
-+        return;
-+    }
-     s->cmd_vqs = g_new0(VirtQueue *, s->conf.num_queues);
-     s->sense_size = VIRTIO_SCSI_SENSE_DEFAULT_SIZE;
-     s->cdb_size = VIRTIO_SCSI_CDB_DEFAULT_SIZE;
-@@ -949,6 +955,8 @@ static Property virtio_scsi_properties[] = {
-     DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues, 1),
-     DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
-                                          parent_obj.conf.virtqueue_size, 128),
-+    DEFINE_PROP_BOOL("seg_max_adjust", VirtIOSCSI,
-+                      parent_obj.conf.seg_max_adjust, true),
-     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSI, parent_obj.conf.max_sectors,
-                                                   0xFFFF),
-     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSI, parent_obj.conf.cmd_per_lun,
-diff --git a/include/hw/virtio/virtio-blk.h b/include/hw/virtio/virtio-blk.h
-index 9c19f5b634..1e62f869b2 100644
---- a/include/hw/virtio/virtio-blk.h
-+++ b/include/hw/virtio/virtio-blk.h
-@@ -38,6 +38,7 @@ struct VirtIOBlkConf
-     uint32_t request_merging;
-     uint16_t num_queues;
-     uint16_t queue_size;
-+    bool seg_max_adjust;
-     uint32_t max_discard_sectors;
-     uint32_t max_write_zeroes_sectors;
-     bool x_enable_wce_if_config_wce;
-diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
-index 122f7c4b6f..24e768909d 100644
---- a/include/hw/virtio/virtio-scsi.h
-+++ b/include/hw/virtio/virtio-scsi.h
-@@ -48,6 +48,7 @@ typedef struct virtio_scsi_config VirtIOSCSIConfig;
- struct VirtIOSCSIConf {
-     uint32_t num_queues;
-     uint32_t virtqueue_size;
-+    bool seg_max_adjust;
-     uint32_t max_sectors;
-     uint32_t cmd_per_lun;
- #ifdef CONFIG_VHOST_SCSI
--- 
-2.17.0
+  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
+  =
 
+-  <cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+-     <model fallback=3D'forbid'>EPYC-IBPB</model>
+-     <vendor>AMD</vendor>
+-     <topology sockets=3D'1' cores=3D'6' threads=3D'1'/>
++ =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
++ =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
++ =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
++ =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
+/>
+  =
+
+  in windows, coreinfo reports incorrectly:
+  =
+
+  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
+  =
+
++ Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
+  =
+
+- Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm. =
+
+- =
+
+- With newer Qemu there is a fix (that does behave correctly) in using the =
+dies parameter: =
+
+-  <qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
++ With newer Qemu there is a fix (that does behave correctly) in using the =
+dies parameter:
++ =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
+  =
+
+  The problem is that the dies are exposed differently than how AMD does
+- it natively, they are exposed to Windows as sockets, which means, you
+- can't ever have a machine with more than two CCX (6 cores) as Windows
+- only supports two sockets. (Should this be reported as a separate bug?)
++ it natively, they are exposed to Windows as sockets, which means, that
++ if you are nto a business user, you can't ever have a machine with more
++ than two CCX (6 cores) as consumer versions of Windows only supports two
++ sockets. (Should this be reported as a separate bug?)
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856335
+
+Title:
+  Cache Layout wrong on many Zen Arch CPUs
+
+Status in QEMU:
+  New
+
+Bug description:
+  AMD CPUs have L3 cache per 2, 3 or 4 cores. Currently, TOPOEXT seems
+  to always map Cache ass if it was an 4-Core per CCX CPU, which is
+  incorrect, and costs upwards 30% performance (more realistically 10%)
+  in L3 Cache Layout aware applications.
+
+  Example on a 4-CCX CPU (1950X /w 8 Cores and no SMT):
+
+  =C2=A0=C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'8' threads=3D'1'=
+/>
+
+  In windows, coreinfo reports correctly:
+
+  ****----  Unified Cache 1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----****  Unified Cache 6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  On a 3-CCX CPU (3960X /w 6 cores and no SMT):
+
+  =C2=A0<cpu mode=3D'custom' match=3D'exact' check=3D'full'>
+  =C2=A0=C2=A0=C2=A0=C2=A0<model fallback=3D'forbid'>EPYC-IBPB</model>
+  =C2=A0=C2=A0=C2=A0=C2=A0<vendor>AMD</vendor>
+  =C2=A0=C2=A0=C2=A0=C2=A0<topology sockets=3D'1' cores=3D'6' threads=3D'1'=
+/>
+
+  in windows, coreinfo reports incorrectly:
+
+  ****--  Unified Cache  1, Level 3,    8 MB, Assoc  16, LineSize  64
+  ----**  Unified Cache  6, Level 3,    8 MB, Assoc  16, LineSize  64
+
+  Validated against 3.0, 3.1, 4.1 and 4.2 versions of qemu-kvm.
+
+  With newer Qemu there is a fix (that does behave correctly) in using the =
+dies parameter:
+  =C2=A0<qemu:arg value=3D'cores=3D3,threads=3D1,dies=3D2,sockets=3D1'/>
+
+  The problem is that the dies are exposed differently than how AMD does
+  it natively, they are exposed to Windows as sockets, which means, that
+  if you are nto a business user, you can't ever have a machine with
+  more than two CCX (6 cores) as consumer versions of Windows only
+  supports two sockets. (Should this be reported as a separate bug?)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856335/+subscriptions
 
