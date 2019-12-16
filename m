@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D13C3F68F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 984D2C43603
 	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:30:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7278F206D7
+	by mail.kernel.org (Postfix) with ESMTPS id 619CD2067C
 	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:30:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jec2Sint"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7278F206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ciGukR7K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 619CD2067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igtGi-0006XW-46
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:30:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56305)
+	id 1igtGh-0006XQ-RU
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:30:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtEr-0004am-3m
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:54 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtEp-0006nQ-QV
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtEq-0004a2-C7
  for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:53 -0500
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:53585)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtEo-0006lL-Ue
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:52 -0500
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:37492)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtEp-0006lY-JV
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:51 -0500
-Received: by mail-wm1-x331.google.com with SMTP id m24so6034095wmc.3
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:28:51 -0800 (PST)
+ id 1igtEo-0006in-Nw
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:50 -0500
+Received: by mail-wr1-x42f.google.com with SMTP id w15so8062844wru.4
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:28:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=J+zE46psqR1GZS+L/bb3YayL7qrQQaatDScX4KthbS4=;
- b=Jec2SintNr4xwAauSRLTtsVVllsrpOpePMK7nDBpaXfUG8ekDCh2wlobS+ynwkbCIU
- rdtU1Fs/U/tMosyzm7gBxAPmznsuahVL613/PQUSFbggfF9ZJMySgpTrslBqdn9d+zQx
- o91tlShWhBwGwT8UcElNNcuxCxmnOxyam8EoIh9XWjKiL9wt8OXvnGAVqeRSOfnOcplZ
- qS+8wSYbNx1O8RWnTnSwjABzm9gpsfgxzuK9q5DjpW8mAx6tf/vNBfcV8W3jfW7RXxfj
- vgla7Vtnd7x+/xPjCVT1b0x0ugxnjRBbebriOUPfuk1Kwvlna7FJXnm4uP3JWAumFhDh
- BV1Q==
+ bh=gryOh3U23b2tAbBDpurdFE7ycHJ1ns2a5UODB6airmA=;
+ b=ciGukR7KZKCJBP7t7MpWoD/LvjNKB3nWmUKvDCvDyuO58qmrELjFJt0MrtO1Xwt/1V
+ BcDFKPnD7+txSh+BpUNRFNVFE0xM1fPieYC2u2wii1AQIaMUuPfl2am3yJR6USaGvFL8
+ v43VjgtB+RYpgvnolVkR4vAQ2eDD0NPN5EjUwcuf4gY+27FNzpgmRRtOiUeQ/xyEez2N
+ fLesBSUVVCnJwj/qDfE0xp1ovoGcazcuyG2fTOMB/3p1SrfvaIZBuBSpHA+X+YIhfeYT
+ QENr8sv8WtA5jpy/kjIvJpI0WriSXQSucTjMxhoQcqibyrtC0B0qId1shXyLkvtzON8I
+ O6sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=J+zE46psqR1GZS+L/bb3YayL7qrQQaatDScX4KthbS4=;
- b=dP51Gh3lkop+ovfkc87Ook6+MRfZBI+oCIbY+pvAo2jStL0Y9v2Vbb881hfOhnocPX
- uazPE/9Fy/ZhGKbvVl/CVvnL7qWIB7Z5OZ0vTEDLv1zfoiE8ufp5iOIWU3ZKNfkh2ra3
- Z9nhAIEez5e7ezJrQTVhAKYNG0g6jGzI7AvKPdzSsGvtUqdIsJrjKp1zJsoDSepo4jS6
- gtlZes7FOvhWUSGpFdzzVFthVKosSfB8nh7qwKCYCkVNFenhp4eYu/obDv2W8K/wxwgK
- Aek80Vx1dCDm+WEEbVNn4twuCtlWPBPD3aNT95drIedZmefU3mY3aBlLkCw75djdcES6
- 5a6Q==
-X-Gm-Message-State: APjAAAUdPbqLWmjhQjjihYURxmKmpbIsjMi3ZhE3uREZgWOMB7VJwmHI
- QlurY7xFb6KK7NigAMdZbnHRTrNg
-X-Google-Smtp-Source: APXvYqxNesnTusSI37ikuQbHRPdBLL/ZlYVUtROHfXJ90lNS+XyVS2KzMptV8Qu9njiNNe+FB6UI2w==
-X-Received: by 2002:a7b:c38c:: with SMTP id s12mr31375948wmj.96.1576513730304; 
- Mon, 16 Dec 2019 08:28:50 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.28.49
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ bh=gryOh3U23b2tAbBDpurdFE7ycHJ1ns2a5UODB6airmA=;
+ b=clAk9tPt8fCIioKRcGdAG6MsdtsFLkOyqqKgO+sLyzcOSZBCyJPBJfXDsOTyoi3try
+ Oe/Od9PxxeqNXMq21XqHM7+Hi1dLbXZ1ceVdOhHxyAk+bWYgRmE2O3uWk1/wpAOzJt0z
+ uFhSSMucocedpWJQxWhZtMLvbNDzcOgT76HK6zI3CRztjOHwUL2B6xEtldfuBwsFq8Bu
+ vp10CLfPw19cgpH54MHOTzO+CbJ+SRuD/lJop/CWdW+hNjfjhjKCLegX8EDiSuEMB4zJ
+ Nwybdd+FdfL4ypnPmQm5SYHwBU4RZZ+4kYVyKjPzYdoFnzd5FVSaZWGzmXPOVzGUEPwl
+ gC/w==
+X-Gm-Message-State: APjAAAUrDVOJF8pMZTfH81PeyT3ZKY0RmWoSZMVqHUiVO/L0nNmEUVur
+ kbSwbUp7k+yEWI9xnqI67wRfgTIc
+X-Google-Smtp-Source: APXvYqwADZoImuP09enL61ZoqiePx+MBEJZamoAoMogjK8GZhBReCSWxl3NDG7L/3nBHnnOMOnwEqA==
+X-Received: by 2002:adf:f885:: with SMTP id u5mr31956437wrp.359.1576513729319; 
  Mon, 16 Dec 2019 08:28:49 -0800 (PST)
+Received: from 640k.lan ([93.56.166.5])
+ by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.28.48
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 16 Dec 2019 08:28:48 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/62] migration-test: Create cmd_soure and cmd_target
-Date: Mon, 16 Dec 2019 17:27:46 +0100
-Message-Id: <1576513726-53700-3-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 01/62] kvm: Reallocate dirty_bmap when we change a slot
+Date: Mon, 16 Dec 2019 17:27:45 +0100
+Message-Id: <1576513726-53700-2-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::331
+X-Received-From: 2a00:1450:4864:20::42f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,138 +89,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Juan Quintela <quintela@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-We are repeating almost everything for each machine while creating the
-command line for migration.  And once for source and another for
-destination.  We start putting there opts_src and opts_dst.
+kvm_set_phys_mem can be called to reallocate a slot by something the
+guest does (e.g. writing to PAM and other chipset registers).
+This can happen in the middle of a migration, and if we're unlucky
+it can now happen between the split 'sync' and 'clear'; the clear
+asserts if there's no bmap to clear.   Recreate the bmap whenever
+we change the slot, keeping the clear path happy.
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Tested-by: Cornelia Huck <cohuck@redhat.com> #s390x
-Tested-by: Laurent Vivier <lvivier@redhat.com>
+Typically this is triggered by the guest rebooting during a migrate.
+
+Corresponds to:
+https://bugzilla.redhat.com/show_bug.cgi?id=1772774
+https://bugzilla.redhat.com/show_bug.cgi?id=1771032
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- tests/migration-test.c | 44 +++++++++++++++++++++++++-------------------
- 1 file changed, 25 insertions(+), 19 deletions(-)
+ accel/kvm/kvm-all.c | 44 +++++++++++++++++++++++++++++---------------
+ 1 file changed, 29 insertions(+), 15 deletions(-)
 
-diff --git a/tests/migration-test.c b/tests/migration-test.c
-index ebd77a5..9573861 100644
---- a/tests/migration-test.c
-+++ b/tests/migration-test.c
-@@ -557,6 +557,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-                                const char *opts_dst)
- {
-     gchar *cmd_src, *cmd_dst;
-+    gchar *cmd_source, *cmd_target;
-     char *bootpath = NULL;
-     char *extra_opts = NULL;
-     char *shmem_path = NULL;
-@@ -584,16 +585,16 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         cmd_src = g_strdup_printf("-machine accel=%s -m 150M"
-                                   " -name source,debug-threads=on"
-                                   " -serial file:%s/src_serial"
--                                  " -drive file=%s,format=raw %s %s",
-+                                  " -drive file=%s,format=raw %s",
-                                   accel, tmpfs, bootpath,
--                                  extra_opts ? extra_opts : "", opts_src);
-+                                  extra_opts ? extra_opts : "");
-         cmd_dst = g_strdup_printf("-machine accel=%s -m 150M"
-                                   " -name target,debug-threads=on"
-                                   " -serial file:%s/dest_serial"
-                                   " -drive file=%s,format=raw"
--                                  " -incoming %s %s %s",
-+                                  " -incoming %s %s",
-                                   accel, tmpfs, bootpath, uri,
--                                  extra_opts ? extra_opts : "", opts_dst);
-+                                  extra_opts ? extra_opts : "");
-         start_address = X86_TEST_MEM_START;
-         end_address = X86_TEST_MEM_END;
-     } else if (g_str_equal(arch, "s390x")) {
-@@ -601,15 +602,15 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         extra_opts = use_shmem ? get_shmem_opts("128M", shmem_path) : NULL;
-         cmd_src = g_strdup_printf("-machine accel=%s -m 128M"
-                                   " -name source,debug-threads=on"
--                                  " -serial file:%s/src_serial -bios %s %s %s",
-+                                  " -serial file:%s/src_serial -bios %s %s",
-                                   accel, tmpfs, bootpath,
--                                  extra_opts ? extra_opts : "", opts_src);
-+                                  extra_opts ? extra_opts : "");
-         cmd_dst = g_strdup_printf("-machine accel=%s -m 128M"
-                                   " -name target,debug-threads=on"
-                                   " -serial file:%s/dest_serial -bios %s"
--                                  " -incoming %s %s %s",
-+                                  " -incoming %s %s",
-                                   accel, tmpfs, bootpath, uri,
--                                  extra_opts ? extra_opts : "", opts_dst);
-+                                  extra_opts ? extra_opts : "");
-         start_address = S390_TEST_MEM_START;
-         end_address = S390_TEST_MEM_END;
-     } else if (strcmp(arch, "ppc64") == 0) {
-@@ -620,15 +621,14 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-                                   " -prom-env 'use-nvramrc?=true' -prom-env "
-                                   "'nvramrc=hex .\" _\" begin %x %x "
-                                   "do i c@ 1 + i c! 1000 +loop .\" B\" 0 "
--                                  "until' %s %s",  accel, tmpfs, end_address,
--                                  start_address, extra_opts ? extra_opts : "",
--                                  opts_src);
-+                                  "until' %s",  accel, tmpfs, end_address,
-+                                  start_address, extra_opts ? extra_opts : "");
-         cmd_dst = g_strdup_printf("-machine accel=%s,vsmt=8 -m 256M"
-                                   " -name target,debug-threads=on"
-                                   " -serial file:%s/dest_serial"
--                                  " -incoming %s %s %s",
-+                                  " -incoming %s %s",
-                                   accel, tmpfs, uri,
--                                  extra_opts ? extra_opts : "", opts_dst);
-+                                  extra_opts ? extra_opts : "");
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index ca00daa..7b9f92d 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -518,6 +518,27 @@ static int kvm_get_dirty_pages_log_range(MemoryRegionSection *section,
  
-         start_address = PPC_TEST_MEM_START;
-         end_address = PPC_TEST_MEM_END;
-@@ -638,16 +638,16 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         cmd_src = g_strdup_printf("-machine virt,accel=%s,gic-version=max "
-                                   "-name vmsource,debug-threads=on -cpu max "
-                                   "-m 150M -serial file:%s/src_serial "
--                                  "-kernel %s %s %s",
-+                                  "-kernel %s %s",
-                                   accel, tmpfs, bootpath,
--                                  extra_opts ? extra_opts : "", opts_src);
-+                                  extra_opts ? extra_opts : "");
-         cmd_dst = g_strdup_printf("-machine virt,accel=%s,gic-version=max "
-                                   "-name vmdest,debug-threads=on -cpu max "
-                                   "-m 150M -serial file:%s/dest_serial "
-                                   "-kernel %s "
--                                  "-incoming %s %s %s",
-+                                  "-incoming %s %s",
-                                   accel, tmpfs, bootpath, uri,
--                                  extra_opts ? extra_opts : "", opts_dst);
-+                                  extra_opts ? extra_opts : "");
+ #define ALIGN(x, y)  (((x)+(y)-1) & ~((y)-1))
  
-         start_address = ARM_TEST_MEM_START;
-         end_address = ARM_TEST_MEM_END;
-@@ -671,11 +671,17 @@ static int test_migrate_start(QTestState **from, QTestState **to,
-         cmd_dst = tmp;
-     }
++/* Allocate the dirty bitmap for a slot  */
++static void kvm_memslot_init_dirty_bitmap(KVMSlot *mem)
++{
++    /*
++     * XXX bad kernel interface alert
++     * For dirty bitmap, kernel allocates array of size aligned to
++     * bits-per-long.  But for case when the kernel is 64bits and
++     * the userspace is 32bits, userspace can't align to the same
++     * bits-per-long, since sizeof(long) is different between kernel
++     * and user space.  This way, userspace will provide buffer which
++     * may be 4 bytes less than the kernel will use, resulting in
++     * userspace memory corruption (which is not detectable by valgrind
++     * too, in most cases).
++     * So for now, let's align to 64 instead of HOST_LONG_BITS here, in
++     * a hope that sizeof(long) won't become >8 any time soon.
++     */
++    hwaddr bitmap_size = ALIGN(((mem->memory_size) >> TARGET_PAGE_BITS),
++                                        /*HOST_LONG_BITS*/ 64) / 8;
++    mem->dirty_bmap = g_malloc0(bitmap_size);
++}
++
+ /**
+  * kvm_physical_sync_dirty_bitmap - Sync dirty bitmap from kernel space
+  *
+@@ -550,23 +571,9 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
+             goto out;
+         }
  
--    *from = qtest_init(cmd_src);
-+    cmd_source = g_strdup_printf("%s %s",
-+                                 cmd_src, opts_src);
-     g_free(cmd_src);
-+    *from = qtest_init(cmd_source);
-+    g_free(cmd_source);
+-        /* XXX bad kernel interface alert
+-         * For dirty bitmap, kernel allocates array of size aligned to
+-         * bits-per-long.  But for case when the kernel is 64bits and
+-         * the userspace is 32bits, userspace can't align to the same
+-         * bits-per-long, since sizeof(long) is different between kernel
+-         * and user space.  This way, userspace will provide buffer which
+-         * may be 4 bytes less than the kernel will use, resulting in
+-         * userspace memory corruption (which is not detectable by valgrind
+-         * too, in most cases).
+-         * So for now, let's align to 64 instead of HOST_LONG_BITS here, in
+-         * a hope that sizeof(long) won't become >8 any time soon.
+-         */
+         if (!mem->dirty_bmap) {
+-            hwaddr bitmap_size = ALIGN(((mem->memory_size) >> TARGET_PAGE_BITS),
+-                                        /*HOST_LONG_BITS*/ 64) / 8;
+             /* Allocate on the first log_sync, once and for all */
+-            mem->dirty_bmap = g_malloc0(bitmap_size);
++            kvm_memslot_init_dirty_bitmap(mem);
+         }
  
--    *to = qtest_init(cmd_dst);
-+    cmd_target = g_strdup_printf("%s %s",
-+                                 cmd_dst, opts_dst);
-     g_free(cmd_dst);
-+    *to = qtest_init(cmd_target);
-+    g_free(cmd_target);
+         d.dirty_bitmap = mem->dirty_bmap;
+@@ -1067,6 +1074,13 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+         mem->ram = ram;
+         mem->flags = kvm_mem_flags(mr);
  
-     /*
-      * Remove shmem file immediately to avoid memory leak in test failed case.
++        if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
++            /*
++             * Reallocate the bmap; it means it doesn't disappear in
++             * middle of a migrate.
++             */
++            kvm_memslot_init_dirty_bitmap(mem);
++        }
+         err = kvm_set_user_memory_region(kml, mem, true);
+         if (err) {
+             fprintf(stderr, "%s: error registering slot: %s\n", __func__,
 -- 
 1.8.3.1
 
