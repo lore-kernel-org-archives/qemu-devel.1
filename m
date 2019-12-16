@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA352C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 564D8C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:39:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 863E1206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:37:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2111A206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:39:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhV9c9Oq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 863E1206D3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HO1zEIcv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2111A206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igpdD-0003gW-KO
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 07:37:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57119)
+	id 1igpeQ-00052T-9z
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 07:39:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57504)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1igpcU-0003CB-JN
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:37:03 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1igpde-0004Wu-8n
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:38:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1igpcR-0002p4-8D
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:37:02 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35794)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1igpdd-0007Qh-7Q
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:38:14 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33127)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1igpcR-0002iy-37
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:36:59 -0500
-Received: by mail-ot1-x344.google.com with SMTP id o9so9056230ote.2
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 04:36:58 -0800 (PST)
+ id 1igpdd-0007Of-2B
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:38:13 -0500
+Received: by mail-oi1-x244.google.com with SMTP id v140so3250050oie.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 04:38:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nQO+RaWRG6RN37ts8ibp0wOMougqSwbupGgGW7TZm2M=;
- b=HhV9c9OqS/ymT2B3Pw6mwk3oLd4X/qYGSBiQaURIa/p4jmeek5TgXzezABScXFad0W
- CBxGfMlu9gxASG8Lx+Aq0iYDANr6vJ8+cs5gj2iTbSARtXfjk9XukPOFCLsTRczIEHOm
- wvQV2rSklMoVm3VJ3oA8Y87pdrKaPJlRsppDIvkLI5AyLBv0jGMtZzOuQGaZ58dlodcW
- kIWF30PjUPtmiulHlNy5XZEQaqP5tpjG9hRkoiQSRvWp6imxXQU5Fpe/9nC8DmFhJeKw
- tARayqVhN3eMSJT4rCV12yGq5G23FebStEBOxsGUXWjkDXebWb90g3+NyUfy9v1f3amg
- Exlw==
+ :cc; bh=mImmblik8R4Ino+HQdCIyq9PyHNn7E242osM/3NmQAc=;
+ b=HO1zEIcvblIIlZYGzGSt09h8QVOMaK5qRQlx6UeAvDBDFQdElXf21AQxVqtdb8FrU4
+ RawoJOrVJOAzfWq+buYE63de7fXJrR6stmhoTMjcCpbozcHFtX9r/KljA0NaAlVCVRdp
+ +M5uo1eoGIViYRWNlqijcKvWfMSYp8a0HGx8RwBz46/o+9LduTajfipuS9vf4J65EhHO
+ NCeT7cbB5WGRF4C3tjdYcLNsjBHYeagPVKG0cIJwWVdaMh3oBREly/Uxc5dYrEycZeqD
+ scSvP2yTAoa35nJ3+yJAuKK0TZ8KInsy9V4dK8+2awIeqCr/RRb/292cREAEFa6LixAZ
+ vTUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=nQO+RaWRG6RN37ts8ibp0wOMougqSwbupGgGW7TZm2M=;
- b=XSVKMdwI9pfEGqGXSa+YJgAFlYHykvfRCaLknsDQHMfZLrh+9iO/r9zrHk6XkQxyLj
- PDPWdISvt9O0AG10E5aJdi4OEdbMN9cTrTpg7DCWZoCP7PR9AMBt/Y43IZ+F2ksenajQ
- 7v2423GzNsfl6+Ugk70jLWE4ht2b1WcsCzxZeVuAKz335/WtJFxtSJO6YeKVylQnOAhw
- qSCejdc3j2hWXkmB0cybNx+vGAhn8tlafu1jVAyQFC/Przw+xNZccemTKhZFvIg9u1RK
- 0sgTl79udM8WwtIt2JBw5SZpWDe5qN1UO008Rd8VKKYB9C0ou5+5D/bk+zopSLfAmuol
- UyFw==
-X-Gm-Message-State: APjAAAVbl3fCuNe5R1m8OrByTaHr1Ta7PwmfVjii8Ge54M8i5q4kDKWA
- nl1B6i96xnJ0RrNjbV5mF4Id+J5+msrrUJzC/Zs=
-X-Google-Smtp-Source: APXvYqx3w0yp2xXirWZ+hP5nMi6a9YaN2h3+D67HRSpfVlQ3tlHRD7Yqzn7DGwYun+tqFRXMoseVVD/VTcKJy6mEruQ=
-X-Received: by 2002:a05:6830:1042:: with SMTP id
- b2mr31452786otp.306.1576499817629; 
- Mon, 16 Dec 2019 04:36:57 -0800 (PST)
+ bh=mImmblik8R4Ino+HQdCIyq9PyHNn7E242osM/3NmQAc=;
+ b=AmJZkd8o5TTNWL4UysO23V3OhL/T6wNcVDlxNFdXSgtEgjXNSbOJStV5RNimhp9QLt
+ TSmMqphvlOFKYTVmcT8g9KGWCdHYZ3M/Dl6ldspmtxUv156AN5HEdfifLN61gYmD7Fs5
+ oWCUO3FOWoh1MPMvzHTXYVjY3yXFSXFhLrJu2FXF4xydBB32DxMphkIa+gPkz+BdNxFN
+ wkbs3vj9+K10u3V9BZpG0E3YLCLCXpoTf8S409PMigURs5VKYyG/J0nhQ5q87DjQSflm
+ wsHuBicJJSyZGComAK+Uu3RBNZUmpLyUuMX6H/tdPmt0Nxq4UoKZw7tV53XZbN37/W6c
+ YaOg==
+X-Gm-Message-State: APjAAAVKCvzrZknG3t3vU13J8u7+5odw7UYncEA9bZwlM9C2SrVP5Tnz
+ ScKXgtXaDp2TxxaPmsWbvydqN29qBxkYSs9GCQ0=
+X-Google-Smtp-Source: APXvYqxtAvDYk4ici8Okfyyufpo+G7pENyZYLmt5GrpdkRhsIBPUtMmOe26wWnUgrAzvIfyMrE0+cst1MwMfeWQIz0w=
+X-Received: by 2002:aca:bd85:: with SMTP id n127mr9524495oif.136.1576499892308; 
+ Mon, 16 Dec 2019 04:38:12 -0800 (PST)
 MIME-Version: 1.0
-References: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
-In-Reply-To: <1575640687-20744-1-git-send-email-Filip.Bozuta@rt-rk.com>
+References: <1575982519-29852-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1575982519-29852-1-git-send-email-aleksandar.markovic@rt-rk.com>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 16 Dec 2019 13:36:46 +0100
-Message-ID: <CAL1e-=gvSjkZ36j_+A4_G__T5WO6yL8Sh7-SOJSDvFKBT3tzZg@mail.gmail.com>
-Subject: Re: [PATCH 0/5] mips: machines: Renovate coding style
-To: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+Date: Mon, 16 Dec 2019 13:38:01 +0100
+Message-ID: <CAL1e-=gL6aLFV2p45baffMP7NE1Tx3O5Rr_ta7_N6ebUAv2-TQ@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] MAINTAINERS: Fine adjustment for (mostly mips)
+ content
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,89 +87,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>, QEMU Developers <qemu-devel@nongnu.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
  =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Dec 6, 2019 at 3:41 PM Filip Bozuta <Filip.Bozuta@rt-rk.com> wrote:
+On Tue, Dec 10, 2019 at 1:57 PM Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
 >
-> The scripts checkpatch.pl located in scripts folder
-> was used to check for errors and warnings in fllowing
-> mips machines:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 >
->     Jazz
->     Malta
->     Mipssim
->     R4000
->     Fulong 2E
->     Boston
+> v2->v3:
 >
-> All generated errors and warnings were corrected
-> and the script was ran again to make sure there
-> are no more errors and warnings
+>   - changed patches 2, 3, 4 on Philippe's request
+>   - add a patch on including acceptance test in MIPS section
 >
-> Note:
+> v1->v2:
 >
->     Boston machine was already clear of errors
->     and warnings so the boston machine files
->     were not edited.
+>   - removed patch on new git infrastructure section
+>   - added a patch that adds two files in Malta section
 >
-> Note:
+> The goal of this series is to:
 >
->     One error occured due to the machro #IF 0.
->     That error was not corrected beacuse there
->     is some reduntant code within that macro that
->     might be used in future versions.
+>   * reduce the amount of "unmainatined" files (not having their
+>     maintainer in "MAINTAINERS")
+>   * reduce the amount of nominally maintained files, but unmaintained
+>     in reality
+>   * increase the role of non-mips open source participants in
+>     maintaining and reviewing mips content
 >
-> v2:
+> Best wishes to all new and former maintainers in future activities
+> and enavours!
 >
->     * changed lines in hw/mips/mips_malta.c from 848 to
->       995 so that comments begin at the same line
+> Aleksandar Markovic (5):
+>   MAINTAINERS: Add a section on UI translation
+>   MAINTAINERS: Adjust maintainership for Fulong 2E board
+>   MAINTAINERS: Adjust maintainership for Malta board
+>   MAINTAINERS: Add three files to Malta section
+>   MAINTAINERS: Add a file to MIPS section
 >
->     * changed line 573 in hw/mips/mips_malta.c to fix
->       the build error due to the function g_new0 that is
->       used for allocating
->
->     * changed lines 103 and 107 in tests/acceptance/mips_malta.c
->       so that splitting lines are aligned vertically
->       belove the opening brackets
->
->     * changed line 121 in mips_r4k.c so that INITRD_PAGE_MASK so
->       that it is aligned vertically belove the opening bracket
->
-> Filip Bozuta (5):
->   mips: jazz: Renovate coding style
->   mips: malta: Renovate coding style
->   mips: mipssim: Renovate coding style
->   mips: r4000: Renovate coding style
->   mips: fulong 2e: Renovate coding style
->
->  hw/display/jazz_led.c                    | 123 +++++++++++-----------
->  hw/dma/rc4030.c                          |  12 ++-
->  hw/isa/vt82c686.c                        |  23 +++--
->  hw/mips/mips_jazz.c                      |  32 +++---
->  hw/mips/mips_malta.c                     | 169 ++++++++++++++++---------------
->  hw/mips/mips_r4k.c                       |  55 ++++++----
->  hw/net/mipsnet.c                         |  44 ++++----
->  hw/pci-host/bonito.c                     |  60 ++++++-----
->  tests/acceptance/linux_ssh_mips_malta.py |   6 +-
->  9 files changed, 281 insertions(+), 243 deletions(-)
+>  MAINTAINERS | 15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
 >
 
-Applied to mips queue, with some minor modifications limited to
-several lines of code.
-
-Filip, please make sure to test build in future.
-
-(Of course, other applicable unit and integration tests should be executed too.)
-
-Thanks,
-Aleksandar
+Applied to mips queue.
 
 > --
 > 2.7.4
