@@ -2,62 +2,80 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D62EC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:20:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45AAAC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:21:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E2582067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:20:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E2582067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0D0872067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:21:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hOETTWNT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D0872067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igt6P-0005bS-7L
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:20:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50866)
+	id 1igt7I-0006eF-6d
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:21:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <maz@kernel.org>) id 1igt4n-0003tF-Ts
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:18:30 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igt6N-0005iU-JU
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:20:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <maz@kernel.org>) id 1igt4l-0007mc-QS
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:18:29 -0500
-Received: from inca-roads.misterjones.org ([213.251.177.50]:50356)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <maz@kernel.org>)
- id 1igt4l-0007gz-JQ; Mon, 16 Dec 2019 11:18:27 -0500
-Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
- (envelope-from <maz@kernel.org>)
- id 1igt4h-0003D3-8K; Mon, 16 Dec 2019 17:18:23 +0100
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [RFC PATCH v2 0/5] target/arm/kvm: Adjust virtual time
-X-PHP-Originating-Script: 0:main.inc
+ (envelope-from <peter.maydell@linaro.org>) id 1igt6J-00023v-4t
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:20:07 -0500
+Received: from mail-ot1-x32d.google.com ([2607:f8b0:4864:20::32d]:41825)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1igt6I-00022O-CL
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:20:02 -0500
+Received: by mail-ot1-x32d.google.com with SMTP id r27so9799877otc.8
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:20:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gCIRaN1UuvOgZhPkDYpy63lrQByRR00K0QSaIQbaMso=;
+ b=hOETTWNTWZ4ptnrPJWjK7RP+fCfuKeFUcyqVOonrJi0SOP9dfTb8jY/eQxiUg2Tpbj
+ P1EKrgNn7h6S1e87ET1liF49AtxCGZU1xRtUBfKmL7z4pIpnlss8G64BDw6K5LUtnvRG
+ M6hEd64bagIxYaSvRFmbozk6Z9/4HxLaCXVsiqjBgvZ9N9QMnekiSexTs5Re8cvwhsrk
+ nOCDYoWS8qlf5vwOvtZA5EOwtTLMRFFf+L30vTVv7UlbE9MEQg4jQRx6t+4ysenilkbS
+ ftosW0HE5pa9EVL9euLEaHs3cudxfvqw0rDZooFfy05pX/qaTqQC9Rg386CPye7Smt/j
+ Xf8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gCIRaN1UuvOgZhPkDYpy63lrQByRR00K0QSaIQbaMso=;
+ b=VvvIo3ouil3aRUHUK1gddzo+CisHrjLlK8mgImm0EPI4Lsjqx+E7kn4Lo8VEdTAfcy
+ nlCQmVG657RtYWXxiRG3G5sKdcLe4GSJVpEDDmFgk7D8y+44FtOWOKgdDpOvlMYvbKAv
+ K6y0nvD8xHa5HqicoEP5zJaGzfYqFSytBeXbbhJ8UNJS/oC404ffOnmmPUd/27O9UguY
+ UrmyKxzNbJMhe6KXYRcA+OJ2I1RPU7UJbgXUq4oFrNUh35pmxWdqZSzkqqgPSmc6me0s
+ u0lE/Y7fM/JlFHphhdDLW0MdsHgfo5XZcPlezMsdW2ZM9V0+HO14odxkA1j4sjF86BRt
+ mngQ==
+X-Gm-Message-State: APjAAAVgMfxMqs1pggsKTT/qN3Wqs9U+gosmIW9YbtjL1BHK1IjUzkiE
+ QdjkoZ5dhnO4a/vFYYUniuO40nZCdSyU+EbqQG3A2A==
+X-Google-Smtp-Source: APXvYqyinavNKZee2cVgDto2N7r5vtoTT0yI8huaUAj/DC8cAPfzySPb5R/o7fZB/wz/DiEKkUMseZURlKrDW6cQnlc=
+X-Received: by 2002:a05:6830:13d3:: with SMTP id
+ e19mr32886229otq.135.1576513201126; 
+ Mon, 16 Dec 2019 08:20:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Mon, 16 Dec 2019 16:18:23 +0000
-From: Marc Zyngier <maz@kernel.org>
-In-Reply-To: <CAFEAcA9FprSotg11rS0fM94QiciysZ6kgKhyU4eQfZg7YYaL5Q@mail.gmail.com>
-References: <20191212173320.11610-1-drjones@redhat.com>
- <CAFEAcA9FprSotg11rS0fM94QiciysZ6kgKhyU4eQfZg7YYaL5Q@mail.gmail.com>
-Message-ID: <4cb9bcfd47dff57c9ae6bb92bae87589@www.loen.fr>
-X-Sender: maz@kernel.org
-User-Agent: Roundcube Webmail/0.7.2
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: peter.maydell@linaro.org, drjones@redhat.com,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, richard.henderson@linaro.org,
- guoheyi@huawei.com, bijan.mottahedeh@oracle.com, msys.mizuma@gmail.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
- SAEximRunCond expanded to false
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 213.251.177.50
+References: <1576500172-11264-1-git-send-email-aleksandar.markovic@rt-rk.com>
+In-Reply-To: <1576500172-11264-1-git-send-email-aleksandar.markovic@rt-rk.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Dec 2019 16:19:50 +0000
+Message-ID: <CAFEAcA-6Cab0Yc_nQ9m+iq73GsmbBc7mF-h-uOnwOs2BgTi2iA@mail.gmail.com>
+Subject: Re: [PULL 00/11] MIPS queue for December 16th, 2019
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,57 +87,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jones <drjones@redhat.com>, bijan.mottahedeh@oracle.com,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
- Heyi Guo <guoheyi@huawei.com>, msys.mizuma@gmail.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-12-16 15:33, Peter Maydell wrote:
-> On Thu, 12 Dec 2019 at 17:33, Andrew Jones <drjones@redhat.com> 
-> wrote:
+On Mon, 16 Dec 2019 at 12:43, Aleksandar Markovic
+<aleksandar.markovic@rt-rk.com> wrote:
 >
->> Userspace that wants to set KVM_REG_ARM_TIMER_CNT should beware that
->> the KVM register ID is not correct.  This cannot be fixed because 
->> it's
->> UAPI and if the UAPI headers are used then it can't be a problem.
->> However, if a userspace attempts to create the ID themselves from 
->> the
->> register's specification, then they will get KVM_REG_ARM_TIMER_CVAL
->> instead, as the _CNT and _CVAL definitions have their register
->> parameters swapped.
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 >
-> So, to be clear, you mean that:
+> The following changes since commit 084a398bf8aa7634738e6c6c0103236ee1b3b72f:
 >
-> (1) the kernel headers say:
+>   Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request' into staging (2019-12-13 18:14:07 +0000)
 >
-> /* EL0 Virtual Timer Registers */
-> #define KVM_REG_ARM_TIMER_CTL           ARM64_SYS_REG(3, 3, 14, 3, 1)
-> #define KVM_REG_ARM_TIMER_CNT           ARM64_SYS_REG(3, 3, 14, 3, 2)
-> #define KVM_REG_ARM_TIMER_CVAL          ARM64_SYS_REG(3, 3, 14, 0, 2)
+> are available in the git repository at:
 >
-> (2) some of the RHSes of these are wrong
+>   https://github.com/AMarkovic/qemu tags/mips-queue-dec-16-2019
 >
-> (3) but the kernel internally is using the same 'wrong' value, so
-> userspace also needs to use that value, ie trust the #defined name
-> rather than manufacturing one ?
+> for you to fetch changes up to 5d480ddde36649a652152bf35f57ccad38f052d6:
 >
-> That's awkward. I think it would be worth at least having a kernel
-> patch to add a comment clearly documenting this bug.
+>   MAINTAINERS: Add a file to MIPS section (2019-12-16 13:16:15 +0100)
 >
-> (This error seems to only be in the 64-bit ABI, not 32-bit.)
+> ----------------------------------------------------------------
+>
+> MIPS queue for December 16th, 2019
+>
+>   - contains only maintenance/cleanup items
+>
 
-Yeah, this is pretty bad. I wonder how we managed not to notice
-this for so long... :-(.
+Applied, thanks.
 
-Andrew, could you please write a patch documenting this (both in
-the UAPI headers and in the documentation)?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.0
+for any user-visible changes.
 
-Thanks,
-
-         M.
--- 
-Jazz is not dead. It just smells funny...
+-- PMM
 
