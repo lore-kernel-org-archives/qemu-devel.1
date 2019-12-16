@@ -7,96 +7,95 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F015BC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 13:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62825C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 13:16:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABA9520663
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 13:14:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D98B20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 13:16:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TytO/Bju"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABA9520663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WewY0kIl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D98B20684
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igqD4-00050t-TB
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 08:14:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40899)
+	id 1igqEU-0006Jq-9B
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 08:16:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1igqA8-0001nE-0D
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 08:11:48 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1igqAJ-00025m-Nc
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 08:12:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1igqA6-0006sm-SS
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 08:11:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52551
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1igqAI-0007EX-Ja
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 08:11:59 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21816
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1igqA6-0006rB-Ki
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 08:11:46 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1igqAI-0007DV-Fw
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 08:11:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576501905;
+ s=mimecast20190719; t=1576501918;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/5vHxeCZJ0xVZEMwUtEzCnwTU4HB2NgrECx9MicRG6o=;
- b=TytO/BjuGEyYrAjULA8RQUTsHR7szBrrTnnuidVaSD8uTu7TSFpM32GBXqpLx8xnIsLicM
- YeOtYKBnrY4oZFRX3lVT9UpGxfQ1sScqpqypzYSx3hF1zT1b7a9hTRgRxGnxDWAfwV0n+H
- ct6keeYHq5wnPKxGg81Idfwky1TW+5U=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-ET0MaMKfOpu6Hz9V1w59kQ-1; Mon, 16 Dec 2019 08:11:34 -0500
-Received: by mail-wr1-f70.google.com with SMTP id 90so3675892wrq.6
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 05:11:34 -0800 (PST)
+ bh=5IPkGhoQaMyuuMxfZ22vfywDxIiWsIX0Gx3A5XKdmDs=;
+ b=WewY0kIl/P9l4Lj/x3E2GSNO2xDB2/UH6EpjZ0HIiIar0xCLE9+sCh3WHIDp8HgLDgKkgC
+ KW/OwQ090UZNkK8eKtld5U/32hnwK7HBoZu38ALVT8ldrrvbpTr8nABLa7ueq8hXJNFh+5
+ uaVF+duGEOYFigwi7rBJvTzU7ljD40Y=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-390-btBGIdTLM6Ox-UcA2IjEgg-1; Mon, 16 Dec 2019 08:11:56 -0500
+Received: by mail-wm1-f69.google.com with SMTP id g26so1004636wmk.6
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 05:11:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=O9cATtB6pbYt1/J3PE5x5GGao7scjTW4c1UJnxl2UqM=;
- b=WT8WEdaqLE+9VoBznBoRBo6mZTuWp9TRJmmylSnRH0o9KZJL2b9dA5efX9I4GwrTHr
- 251yMuKvXpOwqtI/GuFSuZMiR4kxwceqJndlCGbsx2LWrpN+541YmrJ1j4McuSAWspCB
- IBETIL8YJ5cXXA9xEMYD9V04CVqbyfTkEg1MCFjA7DIJyegPFAHaDP9RlSjx0y45Qav1
- GhnY5E5TplUjuSCVAZjBkxR0BBKYmmyApfiQuDRMRf7C7Ru23dAIO7pwEDItwZO4pTQc
- oKZ9Vyg387DHoXebWQCIhs98XBYWo5jyoGKf8qHpSq4r3jfvi7pQpnCIZ8PgJAAvKfOR
- enyQ==
-X-Gm-Message-State: APjAAAVGqIwTsEnWOIwjUKU+gXcD5uWs7lZ0JyNv00YcG3ojC58yV4/v
- zjlTnMsqzvMjSaHFo/KFfhQot3s8e+eD5cDdTBj2qVEfWl4PY/pD4ueHL4DJZrUou9sCeDXwM2s
- XvctX8fDhtWNJtbA=
-X-Received: by 2002:adf:df8e:: with SMTP id z14mr29964672wrl.190.1576501893618; 
- Mon, 16 Dec 2019 05:11:33 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzQRXuwtsErZVb6m+PpFDPU/O5P8Uccsrb7klFy/bxWKMqwMlqFrlhlnta+/vHq8ERR9JDVmQ==
-X-Received: by 2002:adf:df8e:: with SMTP id z14mr29964634wrl.190.1576501893313; 
- Mon, 16 Dec 2019 05:11:33 -0800 (PST)
+ bh=OVZ8qCkz+iSuAIxbiMtdabWP4u3zkLCvZUfHLBEZANg=;
+ b=fA4rIlbfB6sJ5vcAG97pJGkaiMBnbRwz8I+c3Tf84YFija9yfls15awGKTwcagnapL
+ EM90skFUiO4dIKb55fEcYXObEdmMnyKitmqGa36EVHS9gI5SwQtxUc/iHe752MajGPR9
+ EmaRKZa4YhS79XinpIfnZ6v4zSd6mcdPaAC8vGe/Rsubg7I6e1q4B5rJusRHGqFXD+P4
+ IxwhrRq4H1E0TSySJaaGkF6ob15bXLXYI3PG+Hh6E/GXnXsps4Ave1A7h2xModvJZ8s4
+ 9W/moTo4BW2pFxMWjP/wkW/BeWQ+b+o+v+6QMxBzim/aIlrAtqXq7YN4Htae1uMoxh0X
+ LfLg==
+X-Gm-Message-State: APjAAAWr3pja9PprYWBpYJgKTpluk/pkrBHzlsYlCCS2HOMLljOn/Yyb
+ 3MNEvVdhaU/5mLa5uYUm0kABSpJ57x0u5E+fqdORsWEHJB1QW5+J88zLShqbUhxgeKGmzd+jDNZ
+ F6+ET+6XnXV1AEwQ=
+X-Received: by 2002:adf:e6c5:: with SMTP id y5mr29515763wrm.210.1576501915281; 
+ Mon, 16 Dec 2019 05:11:55 -0800 (PST)
+X-Google-Smtp-Source: APXvYqw2vtXsGXckWOealAxKsd8xz8B6EZdGgNEAj2cPIngxIU6E4STQELcYok94Tp665k14zzg/Fg==
+X-Received: by 2002:adf:e6c5:: with SMTP id y5mr29515741wrm.210.1576501915086; 
+ Mon, 16 Dec 2019 05:11:55 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:cde8:2463:95a9:1d81?
  ([2001:b07:6468:f312:cde8:2463:95a9:1d81])
- by smtp.gmail.com with ESMTPSA id b16sm22033755wrj.23.2019.12.16.05.11.32
+ by smtp.gmail.com with ESMTPSA id o16sm6585832wmc.18.2019.12.16.05.11.53
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 16 Dec 2019 05:11:32 -0800 (PST)
-Subject: Re: [PATCH 06/12] hw/i386/ich9: Move unnecessary "pci_bridge.h"
- include
+ Mon, 16 Dec 2019 05:11:54 -0800 (PST)
+Subject: Re: [PATCH 09/12] hw/intc/ioapic: Make ioapic_print_redtbl() static
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20191213161753.8051-1-philmd@redhat.com>
- <20191213161753.8051-7-philmd@redhat.com>
+ <20191213161753.8051-10-philmd@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <622546ed-9117-0be8-1631-dfba81a9353d@redhat.com>
-Date: Mon, 16 Dec 2019 14:11:31 +0100
+Message-ID: <340e7a8b-b7c6-3f61-3646-c311c7c33f60@redhat.com>
+Date: Mon, 16 Dec 2019 14:11:53 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191213161753.8051-7-philmd@redhat.com>
+In-Reply-To: <20191213161753.8051-10-philmd@redhat.com>
 Content-Language: en-US
-X-MC-Unique: ET0MaMKfOpu6Hz9V1w59kQ-1
+X-MC-Unique: btBGIdTLM6Ox-UcA2IjEgg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,53 +118,44 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 13/12/19 17:17, Philippe Mathieu-Daud=C3=A9 wrote:
-> While the ICH9 chipset is a 'South Bridge', it is not a PCI bridge.
-> Nothing in "hw/i386/ich9.h" requires definitions from "pci_bridge.h"
-> so move its inclusion where it is required.
+> Since commit 0c8465440 the ioapic_print_redtbl() function is not
+> used outside of ioapic_common.c, make it static, and remove its
+> prototype declaration in "ioapic_internal.h".
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 > ---
->  include/hw/i386/ich9.h    | 1 -
->  hw/i386/acpi-build.c      | 1 +
->  hw/pci-bridge/i82801b11.c | 1 +
->  3 files changed, 2 insertions(+), 1 deletion(-)
+>  include/hw/i386/ioapic_internal.h | 1 -
+>  hw/intc/ioapic_common.c           | 2 +-
+>  2 files changed, 1 insertion(+), 2 deletions(-)
 >=20
-> diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
-> index eeb79ac1fe..369bc64671 100644
-> --- a/include/hw/i386/ich9.h
-> +++ b/include/hw/i386/ich9.h
-> @@ -7,7 +7,6 @@
->  #include "hw/isa/apm.h"
->  #include "hw/i386/ioapic.h"
->  #include "hw/pci/pci.h"
-> -#include "hw/pci/pci_bridge.h"
->  #include "hw/acpi/acpi.h"
->  #include "hw/acpi/ich9.h"
->  #include "hw/pci/pci_bus.h"
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 12ff55fcfb..291909fa05 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -27,6 +27,7 @@
->  #include "qemu/bitmap.h"
->  #include "qemu/error-report.h"
->  #include "hw/pci/pci.h"
-> +#include "hw/pci/pci_bridge.h"
->  #include "hw/core/cpu.h"
->  #include "target/i386/cpu.h"
->  #include "hw/misc/pvpanic.h"
-> diff --git a/hw/pci-bridge/i82801b11.c b/hw/pci-bridge/i82801b11.c
-> index 2b3907655b..033b3c43c4 100644
-> --- a/hw/pci-bridge/i82801b11.c
-> +++ b/hw/pci-bridge/i82801b11.c
-> @@ -43,6 +43,7 @@
+> diff --git a/include/hw/i386/ioapic_internal.h b/include/hw/i386/ioapic_i=
+nternal.h
+> index d46c87c510..8b743aeed0 100644
+> --- a/include/hw/i386/ioapic_internal.h
+> +++ b/include/hw/i386/ioapic_internal.h
+> @@ -118,7 +118,6 @@ struct IOAPICCommonState {
 > =20
->  #include "qemu/osdep.h"
->  #include "hw/pci/pci.h"
-> +#include "hw/pci/pci_bridge.h"
->  #include "migration/vmstate.h"
->  #include "qemu/module.h"
->  #include "hw/i386/ich9.h"
+>  void ioapic_reset_common(DeviceState *dev);
+> =20
+> -void ioapic_print_redtbl(Monitor *mon, IOAPICCommonState *s);
+>  void ioapic_stat_update_irq(IOAPICCommonState *s, int irq, int level);
+> =20
+>  #endif /* QEMU_IOAPIC_INTERNAL_H */
+> diff --git a/hw/intc/ioapic_common.c b/hw/intc/ioapic_common.c
+> index 5538b5b86e..72ea945377 100644
+> --- a/hw/intc/ioapic_common.c
+> +++ b/hw/intc/ioapic_common.c
+> @@ -76,7 +76,7 @@ static void ioapic_irr_dump(Monitor *mon, const char *n=
+ame, uint32_t bitmap)
+>      monitor_printf(mon, "\n");
+>  }
+> =20
+> -void ioapic_print_redtbl(Monitor *mon, IOAPICCommonState *s)
+> +static void ioapic_print_redtbl(Monitor *mon, IOAPICCommonState *s)
+>  {
+>      static const char *delm_str[] =3D {
+>          "fixed", "lowest", "SMI", "...", "NMI", "INIT", "...", "extINT"}=
+;
 >=20
 
 Queued, thanks.
