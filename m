@@ -2,53 +2,55 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B73A8C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0709EC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:48:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B2272072B
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:48:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B2272072B
+	by mail.kernel.org (Postfix) with ESMTPS id CDEB7206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 12:48:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDEB7206D3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igpnb-0003Rh-BP
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 07:48:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58765)
+	id 1igpnf-0003Xu-KU
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 07:48:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58769)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1igpjO-0006kE-7g
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1igpjO-0006kF-3G
  for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:44:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1igpjL-0006uo-PA
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1igpjL-0006ue-LB
  for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:44:09 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:42931 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:42886 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1igpjL-0005ly-DA
+ id 1igpjL-0005lE-ES
  for qemu-devel@nongnu.org; Mon, 16 Dec 2019 07:44:07 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id B1F051A2062;
+ by mail.rt-rk.com (Postfix) with ESMTP id 8C6031A20B3;
  Mon, 16 Dec 2019 13:43:01 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 8747B1A206A;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 6760C1A1D72;
  Mon, 16 Dec 2019 13:43:01 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/11] mips: malta: Renovate coding style
-Date: Mon, 16 Dec 2019 13:42:43 +0100
-Message-Id: <1576500172-11264-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PULL 00/11] MIPS queue for December 16th, 2019
+Date: Mon, 16 Dec 2019 13:42:41 +0100
+Message-Id: <1576500172-11264-1-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1576500172-11264-1-git-send-email-aleksandar.markovic@rt-rk.com>
-References: <1576500172-11264-1-git-send-email-aleksandar.markovic@rt-rk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 89.216.37.149
 X-BeenThere: qemu-devel@nongnu.org
@@ -67,311 +69,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-The script checkpatch.pl located in scripts folder was
-used to detect all errors and warrnings in files:
-    hw/mips/mips_malta.c
-    hw/mips/gt64xxx_pci.c
-    tests/acceptance/linux_ssh_mips_malta.py
+The following changes since commit 084a398bf8aa7634738e6c6c0103236ee1b3b7=
+2f:
 
-All these mips malta machine files were edited and
-all the errors and warrings generated by the checkpatch.pl
-script were corrected and then the script was
-ran again to make sure there are no more errors and warnings.
+  Merge remote-tracking branch 'remotes/stefanha/tags/block-pull-request'=
+ into staging (2019-12-13 18:14:07 +0000)
 
-Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
-Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-Message-Id: <1575640687-20744-3-git-send-email-Filip.Bozuta@rt-rk.com>
----
- hw/mips/mips_malta.c                     | 172 ++++++++++++++++---------------
+are available in the git repository at:
+
+  https://github.com/AMarkovic/qemu tags/mips-queue-dec-16-2019
+
+for you to fetch changes up to 5d480ddde36649a652152bf35f57ccad38f052d6:
+
+  MAINTAINERS: Add a file to MIPS section (2019-12-16 13:16:15 +0100)
+
+----------------------------------------------------------------
+
+MIPS queue for December 16th, 2019
+
+  - contains only maintenance/cleanup items
+
+----------------------------------------------------------------
+
+Aleksandar Markovic (5):
+  MAINTAINERS: Add a section on UI translation
+  MAINTAINERS: Adjust maintainership for Fulong 2E board
+  MAINTAINERS: Adjust maintainership for Malta board
+  MAINTAINERS: Add three files to Malta section
+  MAINTAINERS: Add a file to MIPS section
+
+Filip Bozuta (5):
+  mips: jazz: Renovate coding style
+  mips: malta: Renovate coding style
+  mips: mipssim: Renovate coding style
+  mips: r4000: Renovate coding style
+  mips: fulong 2e: Renovate coding style
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  hw/mips: Deprecate the r4k machine
+
+ MAINTAINERS                              |  17 ++-
+ hw/display/jazz_led.c                    | 123 +++++++++++-----------
+ hw/dma/rc4030.c                          |  12 ++-
+ hw/isa/vt82c686.c                        |  23 +++--
+ hw/mips/mips_jazz.c                      |  32 +++---
+ hw/mips/mips_malta.c                     | 172 ++++++++++++++++---------=
+------
+ hw/mips/mips_r4k.c                       |  56 ++++++----
+ hw/net/mipsnet.c                         |  42 ++++----
+ hw/pci-host/bonito.c                     |  60 ++++++-----
+ qemu-deprecated.texi                     |   5 +
  tests/acceptance/linux_ssh_mips_malta.py |   6 +-
- 2 files changed, 91 insertions(+), 87 deletions(-)
+ 11 files changed, 300 insertions(+), 248 deletions(-)
 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index 92e9ca5..783cd99 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -137,7 +137,8 @@ static void malta_fpga_update_display(void *opaque)
-  */
- 
- #if defined(DEBUG)
--#  define logout(fmt, ...) fprintf(stderr, "MALTA\t%-24s" fmt, __func__, ## __VA_ARGS__)
-+#  define logout(fmt, ...) \
-+          fprintf(stderr, "MALTA\t%-24s" fmt, __func__, ## __VA_ARGS__)
- #else
- #  define logout(fmt, ...) ((void)0)
- #endif
-@@ -359,7 +360,6 @@ static uint64_t malta_fpga_read(void *opaque, hwaddr addr,
- 
-     /* SWITCH Register */
-     case 0x00200:
--        /* ori a3, a3, low(ram_low_size) */
-         val = 0x00000000;
-         break;
- 
-@@ -569,7 +569,7 @@ static MaltaFPGAState *malta_fpga_init(MemoryRegion *address_space,
-     MaltaFPGAState *s;
-     Chardev *chr;
- 
--    s = (MaltaFPGAState *)g_malloc0(sizeof(MaltaFPGAState));
-+    s = g_new0(MaltaFPGAState, 1);
- 
-     memory_region_init_io(&s->iomem, NULL, &malta_fpga_ops, s,
-                           "malta-fpga", 0x100000);
-@@ -844,24 +844,24 @@ static void write_bootloader(uint8_t *base, int64_t run_addr,
-     /* Small bootloader */
-     p = (uint32_t *)base;
- 
--    stl_p(p++, 0x08000000 |                                      /* j 0x1fc00580 */
-+    stl_p(p++, 0x08000000 |                  /* j 0x1fc00580 */
-                  ((run_addr + 0x580) & 0x0fffffff) >> 2);
--    stl_p(p++, 0x00000000);                                      /* nop */
-+    stl_p(p++, 0x00000000);                  /* nop */
- 
-     /* YAMON service vector */
--    stl_p(base + 0x500, run_addr + 0x0580);      /* start: */
--    stl_p(base + 0x504, run_addr + 0x083c);      /* print_count: */
--    stl_p(base + 0x520, run_addr + 0x0580);      /* start: */
--    stl_p(base + 0x52c, run_addr + 0x0800);      /* flush_cache: */
--    stl_p(base + 0x534, run_addr + 0x0808);      /* print: */
--    stl_p(base + 0x538, run_addr + 0x0800);      /* reg_cpu_isr: */
--    stl_p(base + 0x53c, run_addr + 0x0800);      /* unred_cpu_isr: */
--    stl_p(base + 0x540, run_addr + 0x0800);      /* reg_ic_isr: */
--    stl_p(base + 0x544, run_addr + 0x0800);      /* unred_ic_isr: */
--    stl_p(base + 0x548, run_addr + 0x0800);      /* reg_esr: */
--    stl_p(base + 0x54c, run_addr + 0x0800);      /* unreg_esr: */
--    stl_p(base + 0x550, run_addr + 0x0800);      /* getchar: */
--    stl_p(base + 0x554, run_addr + 0x0800);      /* syscon_read: */
-+    stl_p(base + 0x500, run_addr + 0x0580);  /* start: */
-+    stl_p(base + 0x504, run_addr + 0x083c);  /* print_count: */
-+    stl_p(base + 0x520, run_addr + 0x0580);  /* start: */
-+    stl_p(base + 0x52c, run_addr + 0x0800);  /* flush_cache: */
-+    stl_p(base + 0x534, run_addr + 0x0808);  /* print: */
-+    stl_p(base + 0x538, run_addr + 0x0800);  /* reg_cpu_isr: */
-+    stl_p(base + 0x53c, run_addr + 0x0800);  /* unred_cpu_isr: */
-+    stl_p(base + 0x540, run_addr + 0x0800);  /* reg_ic_isr: */
-+    stl_p(base + 0x544, run_addr + 0x0800);  /* unred_ic_isr: */
-+    stl_p(base + 0x548, run_addr + 0x0800);  /* reg_esr: */
-+    stl_p(base + 0x54c, run_addr + 0x0800);  /* unreg_esr: */
-+    stl_p(base + 0x550, run_addr + 0x0800);  /* getchar: */
-+    stl_p(base + 0x554, run_addr + 0x0800);  /* syscon_read: */
- 
- 
-     /* Second part of the bootloader */
-@@ -869,9 +869,9 @@ static void write_bootloader(uint8_t *base, int64_t run_addr,
- 
-     if (semihosting_get_argc()) {
-         /* Preserve a0 content as arguments have been passed */
--        stl_p(p++, 0x00000000);                         /* nop */
-+        stl_p(p++, 0x00000000);              /* nop */
-     } else {
--        stl_p(p++, 0x24040002);                         /* addiu a0, zero, 2 */
-+        stl_p(p++, 0x24040002);              /* addiu a0, zero, 2 */
-     }
- 
-     /* lui sp, high(ENVP_ADDR) */
-@@ -892,104 +892,106 @@ static void write_bootloader(uint8_t *base, int64_t run_addr,
-     stl_p(p++, 0x34e70000 | (loaderparams.ram_low_size & 0xffff));
- 
-     /* Load BAR registers as done by YAMON */
--    stl_p(p++, 0x3c09b400);                                      /* lui t1, 0xb400 */
-+    stl_p(p++, 0x3c09b400);                  /* lui t1, 0xb400 */
- 
- #ifdef TARGET_WORDS_BIGENDIAN
--    stl_p(p++, 0x3c08df00);                                      /* lui t0, 0xdf00 */
-+    stl_p(p++, 0x3c08df00);                  /* lui t0, 0xdf00 */
- #else
--    stl_p(p++, 0x340800df);                                      /* ori t0, r0, 0x00df */
-+    stl_p(p++, 0x340800df);                  /* ori t0, r0, 0x00df */
- #endif
--    stl_p(p++, 0xad280068);                                      /* sw t0, 0x0068(t1) */
-+    stl_p(p++, 0xad280068);                  /* sw t0, 0x0068(t1) */
- 
--    stl_p(p++, 0x3c09bbe0);                                      /* lui t1, 0xbbe0 */
-+    stl_p(p++, 0x3c09bbe0);                  /* lui t1, 0xbbe0 */
- 
- #ifdef TARGET_WORDS_BIGENDIAN
--    stl_p(p++, 0x3c08c000);                                      /* lui t0, 0xc000 */
-+    stl_p(p++, 0x3c08c000);                  /* lui t0, 0xc000 */
- #else
--    stl_p(p++, 0x340800c0);                                      /* ori t0, r0, 0x00c0 */
-+    stl_p(p++, 0x340800c0);                  /* ori t0, r0, 0x00c0 */
- #endif
--    stl_p(p++, 0xad280048);                                      /* sw t0, 0x0048(t1) */
-+    stl_p(p++, 0xad280048);                  /* sw t0, 0x0048(t1) */
- #ifdef TARGET_WORDS_BIGENDIAN
--    stl_p(p++, 0x3c084000);                                      /* lui t0, 0x4000 */
-+    stl_p(p++, 0x3c084000);                  /* lui t0, 0x4000 */
- #else
--    stl_p(p++, 0x34080040);                                      /* ori t0, r0, 0x0040 */
-+    stl_p(p++, 0x34080040);                  /* ori t0, r0, 0x0040 */
- #endif
--    stl_p(p++, 0xad280050);                                      /* sw t0, 0x0050(t1) */
-+    stl_p(p++, 0xad280050);                  /* sw t0, 0x0050(t1) */
- 
- #ifdef TARGET_WORDS_BIGENDIAN
--    stl_p(p++, 0x3c088000);                                      /* lui t0, 0x8000 */
-+    stl_p(p++, 0x3c088000);                  /* lui t0, 0x8000 */
- #else
--    stl_p(p++, 0x34080080);                                      /* ori t0, r0, 0x0080 */
-+    stl_p(p++, 0x34080080);                  /* ori t0, r0, 0x0080 */
- #endif
--    stl_p(p++, 0xad280058);                                      /* sw t0, 0x0058(t1) */
-+    stl_p(p++, 0xad280058);                  /* sw t0, 0x0058(t1) */
- #ifdef TARGET_WORDS_BIGENDIAN
--    stl_p(p++, 0x3c083f00);                                      /* lui t0, 0x3f00 */
-+    stl_p(p++, 0x3c083f00);                  /* lui t0, 0x3f00 */
- #else
--    stl_p(p++, 0x3408003f);                                      /* ori t0, r0, 0x003f */
-+    stl_p(p++, 0x3408003f);                  /* ori t0, r0, 0x003f */
- #endif
--    stl_p(p++, 0xad280060);                                      /* sw t0, 0x0060(t1) */
-+    stl_p(p++, 0xad280060);                  /* sw t0, 0x0060(t1) */
- 
- #ifdef TARGET_WORDS_BIGENDIAN
--    stl_p(p++, 0x3c08c100);                                      /* lui t0, 0xc100 */
-+    stl_p(p++, 0x3c08c100);                  /* lui t0, 0xc100 */
- #else
--    stl_p(p++, 0x340800c1);                                      /* ori t0, r0, 0x00c1 */
-+    stl_p(p++, 0x340800c1);                  /* ori t0, r0, 0x00c1 */
- #endif
--    stl_p(p++, 0xad280080);                                      /* sw t0, 0x0080(t1) */
-+    stl_p(p++, 0xad280080);                  /* sw t0, 0x0080(t1) */
- #ifdef TARGET_WORDS_BIGENDIAN
--    stl_p(p++, 0x3c085e00);                                      /* lui t0, 0x5e00 */
-+    stl_p(p++, 0x3c085e00);                  /* lui t0, 0x5e00 */
- #else
--    stl_p(p++, 0x3408005e);                                      /* ori t0, r0, 0x005e */
-+    stl_p(p++, 0x3408005e);                  /* ori t0, r0, 0x005e */
- #endif
--    stl_p(p++, 0xad280088);                                      /* sw t0, 0x0088(t1) */
-+    stl_p(p++, 0xad280088);                  /* sw t0, 0x0088(t1) */
- 
-     /* Jump to kernel code */
--    stl_p(p++, 0x3c1f0000 | ((kernel_entry >> 16) & 0xffff));    /* lui ra, high(kernel_entry) */
--    stl_p(p++, 0x37ff0000 | (kernel_entry & 0xffff));            /* ori ra, ra, low(kernel_entry) */
--    stl_p(p++, 0x03e00009);                                      /* jalr ra */
--    stl_p(p++, 0x00000000);                                      /* nop */
-+    stl_p(p++, 0x3c1f0000 |
-+          ((kernel_entry >> 16) & 0xffff));  /* lui ra, high(kernel_entry) */
-+    stl_p(p++, 0x37ff0000 |
-+          (kernel_entry & 0xffff));          /* ori ra, ra, low(kernel_entry) */
-+    stl_p(p++, 0x03e00009);                  /* jalr ra */
-+    stl_p(p++, 0x00000000);                  /* nop */
- 
-     /* YAMON subroutines */
-     p = (uint32_t *) (base + 0x800);
--    stl_p(p++, 0x03e00009);                                     /* jalr ra */
--    stl_p(p++, 0x24020000);                                     /* li v0,0 */
-+    stl_p(p++, 0x03e00009);                  /* jalr ra */
-+    stl_p(p++, 0x24020000);                  /* li v0,0 */
-     /* 808 YAMON print */
--    stl_p(p++, 0x03e06821);                                     /* move t5,ra */
--    stl_p(p++, 0x00805821);                                     /* move t3,a0 */
--    stl_p(p++, 0x00a05021);                                     /* move t2,a1 */
--    stl_p(p++, 0x91440000);                                     /* lbu a0,0(t2) */
--    stl_p(p++, 0x254a0001);                                     /* addiu t2,t2,1 */
--    stl_p(p++, 0x10800005);                                     /* beqz a0,834 */
--    stl_p(p++, 0x00000000);                                     /* nop */
--    stl_p(p++, 0x0ff0021c);                                     /* jal 870 */
--    stl_p(p++, 0x00000000);                                     /* nop */
--    stl_p(p++, 0x1000fff9);                                     /* b 814 */
--    stl_p(p++, 0x00000000);                                     /* nop */
--    stl_p(p++, 0x01a00009);                                     /* jalr t5 */
--    stl_p(p++, 0x01602021);                                     /* move a0,t3 */
-+    stl_p(p++, 0x03e06821);                  /* move t5,ra */
-+    stl_p(p++, 0x00805821);                  /* move t3,a0 */
-+    stl_p(p++, 0x00a05021);                  /* move t2,a1 */
-+    stl_p(p++, 0x91440000);                  /* lbu a0,0(t2) */
-+    stl_p(p++, 0x254a0001);                  /* addiu t2,t2,1 */
-+    stl_p(p++, 0x10800005);                  /* beqz a0,834 */
-+    stl_p(p++, 0x00000000);                  /* nop */
-+    stl_p(p++, 0x0ff0021c);                  /* jal 870 */
-+    stl_p(p++, 0x00000000);                  /* nop */
-+    stl_p(p++, 0x1000fff9);                  /* b 814 */
-+    stl_p(p++, 0x00000000);                  /* nop */
-+    stl_p(p++, 0x01a00009);                  /* jalr t5 */
-+    stl_p(p++, 0x01602021);                  /* move a0,t3 */
-     /* 0x83c YAMON print_count */
--    stl_p(p++, 0x03e06821);                                     /* move t5,ra */
--    stl_p(p++, 0x00805821);                                     /* move t3,a0 */
--    stl_p(p++, 0x00a05021);                                     /* move t2,a1 */
--    stl_p(p++, 0x00c06021);                                     /* move t4,a2 */
--    stl_p(p++, 0x91440000);                                     /* lbu a0,0(t2) */
--    stl_p(p++, 0x0ff0021c);                                     /* jal 870 */
--    stl_p(p++, 0x00000000);                                     /* nop */
--    stl_p(p++, 0x254a0001);                                     /* addiu t2,t2,1 */
--    stl_p(p++, 0x258cffff);                                     /* addiu t4,t4,-1 */
--    stl_p(p++, 0x1580fffa);                                     /* bnez t4,84c */
--    stl_p(p++, 0x00000000);                                     /* nop */
--    stl_p(p++, 0x01a00009);                                     /* jalr t5 */
--    stl_p(p++, 0x01602021);                                     /* move a0,t3 */
-+    stl_p(p++, 0x03e06821);                  /* move t5,ra */
-+    stl_p(p++, 0x00805821);                  /* move t3,a0 */
-+    stl_p(p++, 0x00a05021);                  /* move t2,a1 */
-+    stl_p(p++, 0x00c06021);                  /* move t4,a2 */
-+    stl_p(p++, 0x91440000);                  /* lbu a0,0(t2) */
-+    stl_p(p++, 0x0ff0021c);                  /* jal 870 */
-+    stl_p(p++, 0x00000000);                  /* nop */
-+    stl_p(p++, 0x254a0001);                  /* addiu t2,t2,1 */
-+    stl_p(p++, 0x258cffff);                  /* addiu t4,t4,-1 */
-+    stl_p(p++, 0x1580fffa);                  /* bnez t4,84c */
-+    stl_p(p++, 0x00000000);                  /* nop */
-+    stl_p(p++, 0x01a00009);                  /* jalr t5 */
-+    stl_p(p++, 0x01602021);                  /* move a0,t3 */
-     /* 0x870 */
--    stl_p(p++, 0x3c08b800);                                     /* lui t0,0xb400 */
--    stl_p(p++, 0x350803f8);                                     /* ori t0,t0,0x3f8 */
--    stl_p(p++, 0x91090005);                                     /* lbu t1,5(t0) */
--    stl_p(p++, 0x00000000);                                     /* nop */
--    stl_p(p++, 0x31290040);                                     /* andi t1,t1,0x40 */
--    stl_p(p++, 0x1120fffc);                                     /* beqz t1,878 <outch+0x8> */
--    stl_p(p++, 0x00000000);                                     /* nop */
--    stl_p(p++, 0x03e00009);                                     /* jalr ra */
--    stl_p(p++, 0xa1040000);                                     /* sb a0,0(t0) */
-+    stl_p(p++, 0x3c08b800);                  /* lui t0,0xb400 */
-+    stl_p(p++, 0x350803f8);                  /* ori t0,t0,0x3f8 */
-+    stl_p(p++, 0x91090005);                  /* lbu t1,5(t0) */
-+    stl_p(p++, 0x00000000);                  /* nop */
-+    stl_p(p++, 0x31290040);                  /* andi t1,t1,0x40 */
-+    stl_p(p++, 0x1120fffc);                  /* beqz t1,878 <outch+0x8> */
-+    stl_p(p++, 0x00000000);                  /* nop */
-+    stl_p(p++, 0x03e00009);                  /* jalr ra */
-+    stl_p(p++, 0xa1040000);                  /* sb a0,0(t0) */
- 
- }
- 
-@@ -1242,7 +1244,7 @@ void mips_malta_init(MachineState *machine)
-     /*
-      * The whole address space decoded by the GT-64120A doesn't generate
-      * exception when accessing invalid memory. Create an empty slot to
--     * emulate this feature.\
-+     * emulate this feature.
-      */
-     empty_slot_init(0, 0x20000000);
- 
-diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/linux_ssh_mips_malta.py
-index fc13f9e..4db18de 100644
---- a/tests/acceptance/linux_ssh_mips_malta.py
-+++ b/tests/acceptance/linux_ssh_mips_malta.py
-@@ -99,10 +99,12 @@ class LinuxSSH(Test):
-     def ssh_command(self, command, is_root=True):
-         self.ssh_logger.info(command)
-         result = self.ssh_session.cmd(command)
--        stdout_lines = [line.rstrip() for line in result.stdout_text.splitlines()]
-+        stdout_lines = [line.rstrip() for line
-+                        in result.stdout_text.splitlines()]
-         for line in stdout_lines:
-             self.ssh_logger.info(line)
--        stderr_lines = [line.rstrip() for line in result.stderr_text.splitlines()]
-+        stderr_lines = [line.rstrip() for line
-+                        in result.stderr_text.splitlines()]
-         for line in stderr_lines:
-             self.ssh_logger.warning(line)
-         return stdout_lines, stderr_lines
--- 
+--=20
 2.7.4
 
 
