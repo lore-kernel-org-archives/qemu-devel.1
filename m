@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E7C1C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:59:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6873C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 21:00:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6678D21582
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 20:59:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7110821582
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 21:00:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="CrqJtDjs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6678D21582
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="qI27Qpt3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7110821582
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igxSn-0006MH-I4
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 15:59:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36891)
+	id 1igxTo-0007HH-K9
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 16:00:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36925)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1igxKH-0002UR-3g
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:50:47 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1igxKO-0002fU-9m
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:50:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1igxKG-0007KP-1E
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:50:44 -0500
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:5840)
+ (envelope-from <kwankhede@nvidia.com>) id 1igxKN-0007NN-1F
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:50:52 -0500
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:6553)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1igxKF-0007JK-SH
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:50:43 -0500
+ id 1igxKM-0007NC-S4
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 15:50:50 -0500
 Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5df7ee070000>; Mon, 16 Dec 2019 12:50:15 -0800
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5df7ee200001>; Mon, 16 Dec 2019 12:50:40 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
  by hqpgpgate101.nvidia.com (PGP Universal service);
- Mon, 16 Dec 2019 12:50:42 -0800
+ Mon, 16 Dec 2019 12:50:49 -0800
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Mon, 16 Dec 2019 12:50:42 -0800
-Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 16 Dec
- 2019 20:50:41 +0000
+ by hqpgpgate101.nvidia.com on Mon, 16 Dec 2019 12:50:49 -0800
+Received: from HQMAIL105.nvidia.com (172.20.187.12) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 16 Dec
+ 2019 20:50:48 +0000
 Received: from kwankhede-dev.nvidia.com (10.124.1.5) by HQMAIL105.nvidia.com
  (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 16 Dec 2019 20:50:35 +0000
+ Transport; Mon, 16 Dec 2019 20:50:42 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v10 Kernel 2/5] vfio iommu: Adds flag to indicate dirty pages
- tracking capability support
-Date: Tue, 17 Dec 2019 01:51:37 +0530
-Message-ID: <1576527700-21805-3-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH v10 Kernel 3/5] vfio iommu: Add ioctl defination for dirty
+ pages tracking.
+Date: Tue, 17 Dec 2019 01:51:38 +0530
+Message-ID: <1576527700-21805-4-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
 References: <1576527700-21805-1-git-send-email-kwankhede@nvidia.com>
@@ -63,18 +63,18 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1576529415; bh=UPYFmaFN47EhcHp79NnQF+QfSPH8G2xOgEgl05wOr30=;
+ t=1576529440; bh=9C0wkz7uJE+YfhvUbgMBGA/2c9koZ9iDMNMc32hwsoY=;
  h=X-PGP-Universal:From:To:CC:Subject:Date:Message-ID:X-Mailer:
  In-Reply-To:References:X-NVConfidentiality:MIME-Version:
  Content-Type;
- b=CrqJtDjsHuk0X/9bY4qyk9X5shvfKasBWgI4KMZZQKJl18ZOZqc6IXdaoHQ80/OrI
- oCsPRvnik5oqjdzbUAsoHxWwCzGaELpVLVvyvK/fG8siBeqO4bVakyRVTdtP+DmSRx
- 3dbK5OoRjhzbDH8AhdBCim1tjOAKQtumQoAxZQLqLdcG4JsIa38gv8LxxVGkO6bEE4
- 5s7N+7NdLh5n6CDUff/SIS43mmir+Xrqq/x9/c0t1D3eH/ppa9fEZhtTAcxADTI/hR
- BPdgn3xJdOFDlFxWnQttmgPX7l5IpDj9U3D2hXcN2h40IuHMlkuxdpIHVjJgYwKtoP
- DdLNNMkZNjDvA==
+ b=qI27Qpt3JBLOI2H89/9kaubuoatwhL+/O4x4/DPVQMypeIUcg3c7oxQ+Z/EDTabTy
+ 3tUcgQLb7rtsZEYKsUVIawZe0mn61y3Uq+Jt1ndX3tdbo3bnd1hWSnkb0hzmwUA1zV
+ CPO3tGxVHPRAJUf2oq+53GOrM8N3yG/g4vXqFW9BX2kwoSBoOncwVoTdDvt9BCXhQ5
+ db54xxK7je6CBeRTrmwT9XxJX0bUh30yKOrnlmh2xQrBjdYwIMKc0JZvrKyet/7dXp
+ vLMR2ktqs/55O+ihVrAaGDAcvAfoVq1ViIQCLaIWCS8KHaPQ9RS8kDVRrjz+xz9v+a
+ nR+LD0Iy5teMw==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.143
+X-Received-From: 216.228.121.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,46 +97,75 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Flag VFIO_IOMMU_INFO_DIRTY_PGS in VFIO_IOMMU_GET_INFO indicates that driver
-support dirty pages tracking.
+IOMMU container maintains a list of all pages pinned by vfio_pin_pages API.
+All pages pinned by vendor driver through this API should be considered as
+dirty during migration. When container consists of IOMMU capable device and
+all pages are pinned and mapped, then all pages are marked dirty.
+Added support to start/stop unpinned pages tracking and to get bitmap of
+all dirtied pages for requested IO virtual address range. Unpinned page
+tracking is cleared either when bitmap is read by user application or
+unpinned page tracking is stopped.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 3 ++-
- include/uapi/linux/vfio.h       | 5 +++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ include/uapi/linux/vfio.h | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 2ada8e6cdb88..3f6b04f2334f 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2234,7 +2234,8 @@ static long vfio_iommu_type1_ioctl(void *iommu_data,
- 			info.cap_offset = 0; /* output, no-recopy necessary */
- 		}
- 
--		info.flags = VFIO_IOMMU_INFO_PGSIZES;
-+		info.flags = VFIO_IOMMU_INFO_PGSIZES |
-+			     VFIO_IOMMU_INFO_DIRTY_PGS;
- 
- 		info.iova_pgsizes = vfio_pgsize_bitmap(iommu);
- 
 diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index a0817ba267c1..81847ed54eb7 100644
+index 81847ed54eb7..4ad54fbb4698 100644
 --- a/include/uapi/linux/vfio.h
 +++ b/include/uapi/linux/vfio.h
-@@ -900,8 +900,9 @@ struct vfio_device_ioeventfd {
- struct vfio_iommu_type1_info {
- 	__u32	argsz;
- 	__u32	flags;
--#define VFIO_IOMMU_INFO_PGSIZES (1 << 0)	/* supported page sizes info */
--#define VFIO_IOMMU_INFO_CAPS	(1 << 1)	/* Info supports caps */
-+#define VFIO_IOMMU_INFO_PGSIZES   (1 << 0) /* supported page sizes info */
-+#define VFIO_IOMMU_INFO_CAPS      (1 << 1) /* Info supports caps */
-+#define VFIO_IOMMU_INFO_DIRTY_PGS (1 << 2) /* supports dirty page tracking */
- 	__u64	iova_pgsizes;	/* Bitmap of supported page sizes */
- 	__u32   cap_offset;	/* Offset within info struct of first cap */
- };
+@@ -975,6 +975,49 @@ struct vfio_iommu_type1_dma_unmap {
+ #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
+ #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
+ 
++/**
++ * VFIO_IOMMU_DIRTY_PAGES - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
++ *                                     struct vfio_iommu_type1_dirty_bitmap)
++ * IOCTL is used for dirty pages tracking. Caller sets argsz, which is size of
++ * struct vfio_iommu_type1_dirty_bitmap. Caller set flag depend on which
++ * operation to perform, details as below:
++ *
++ * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_START set, indicates
++ * migration is active and IOMMU module should track pages which are being
++ * unpinned. Unpinned pages are tracked until bitmap for that range is queried
++ * or tracking is stopped by user application by setting
++ * VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP flag.
++ *
++ * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP set, indicates
++ * IOMMU should stop tracking unpinned pages and also free previously tracked
++ * unpinned pages data.
++ *
++ * When IOCTL is called with VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP flag set,
++ * IOCTL returns dirty pages bitmap for IOMMU container during migration for
++ * given IOVA range. User must allocate memory to get bitmap, zero the bitmap
++ * memory and set size of allocated memory in bitmap_size field. One bit is
++ * used to represent one page consecutively starting from iova offset. User
++ * should provide page size in 'pgsize'. Bit set in bitmap indicates page at
++ * that offset from iova is dirty.
++ *
++ * Only one flag should be set at a time.
++ *
++ */
++struct vfio_iommu_type1_dirty_bitmap {
++	__u32        argsz;
++	__u32        flags;
++#define VFIO_IOMMU_DIRTY_PAGES_FLAG_START	(1 << 0)
++#define VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP	(1 << 1)
++#define VFIO_IOMMU_DIRTY_PAGES_FLAG_GET_BITMAP	(1 << 2)
++	__u64        iova;		/* IO virtual address */
++	__u64        size;		/* Size of iova range */
++	__u64	     pgsize;		/* page size for bitmap */
++	__u64        bitmap_size;	/* in bytes */
++	void __user *bitmap;		/* one bit per page */
++};
++
++#define VFIO_IOMMU_DIRTY_PAGES             _IO(VFIO_TYPE, VFIO_BASE + 17)
++
+ /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
+ 
+ /*
 -- 
 2.7.0
 
