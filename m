@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0BCC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC131C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C49F206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:01:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96A3F206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:02:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ddCFy1xT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C49F206D7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KYm1I0r6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A3F206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igtkN-0002xg-2w
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:01:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57129)
+	id 1igtlX-00047D-Aj
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:02:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFQ-0005Wg-Sv
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:29 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFd-0005td-MN
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFP-0008FW-MT
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:28 -0500
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:41941)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtFc-0000JX-HE
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:41 -0500
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:47013)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtFP-0008E9-G7
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:27 -0500
-Received: by mail-wr1-x42c.google.com with SMTP id c9so8038595wrw.8
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:27 -0800 (PST)
+ id 1igtFc-0000IL-B1
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:40 -0500
+Received: by mail-wr1-x42c.google.com with SMTP id z7so7995433wrl.13
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=BGBt01mjWcpv3t8vsUW2U8xt8/YYqyeKISoIMxkLyoU=;
- b=ddCFy1xTxh6tEE+OIC2lkmB8CW9tWNxJmBLdv5BNg8/FhNPhI8sy6pmYPF+msuG5eT
- bULm277fHCU7KVJrQ8R/WQhwwkPoj9aehHWT6emqdkWSoFoPXElPZv0Cxpl1kezAYaWl
- OyI7jhV0UhU/26xQPxyVDLWL+skHlswuWL2LIj38C95RPGESXIFNBrwUQOzjEkVYNkOd
- Co2zVSyWOK8RrraknjtRi/eLQ9+jYU8FRQ1JBaDGPhf5C7RUZm5O7ajEMT8kPUncm83K
- 74nIkd4CZGJFsqE3P0iIN4Lur+l1bwfPpUQI7/f2eE/wP5uzxbhOPr3IbkX7CkdTXe2w
- puBA==
+ bh=bCglA2xU8XIovJ5evRIXUQsgqKR2GztUSfl273PP6MA=;
+ b=KYm1I0r6XVfiQJ9CiAaCZJ3gN0FsrHaRIsHJ6tP8GhS5xybKNgjM3+aHsBvxjUfVlE
+ KDnJkxGVdPH8IsMYst3mz4V2Qwct/bPOZgIZdu00RfjZhIsRM0spj2O9sTX3y7f0xcDK
+ PW1u/QZ+9aj5UvuQXQArV8qZw5y5XPS6Ehrm1StPyuCDfaC2cWaRHcfHCfvokirFKtvx
+ 8I7zKDdKFSzvfqvMZTxJ5u6VzG2QEMBgNBQmYNRRnq0lQJXWMO/OArBqK379pdICYbJj
+ 8kKr1iE6E38E2cOQCrBRMmRm78W7irWiVePu43fg7dgxCOGVqmBgKAD7K6rfX+Ozpldc
+ FTsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=BGBt01mjWcpv3t8vsUW2U8xt8/YYqyeKISoIMxkLyoU=;
- b=nt71P3a8TP4S2UfWtfSGAh2gumX7V4vWFT/MQwPE9uXX+WYL2rqBKABVr5ODSwRnMR
- rqVG9y4WDno6683n9Y4Nep5KA3TQ4uglhdtFgCy4ZZIrBVv8JNJnT9CCOn2AlHoEva2L
- +CHGcYuEzbETNXKIooe7gXrNTe7x+UpP9wdyJRbDruwkTlSbl6X5RDAlZ/XbYJQy0R86
- +//CQ5YYSk2whjJyeufEkQ4/pLaGIUcwZvvUfBrP2enEtxcEWAMICyezvtFW98/VzkeW
- pNA4HqpW/6ySW4LkNbE/HHDBiIEMZz+Fa1V7mX9oR1x9oIUo+pzIRGca20fbFxqJNlR0
- UJug==
-X-Gm-Message-State: APjAAAVUgVomwutKTv1XRsK06P6A71+BLaJXzxiWyHdEq8FCyAJHXfDM
- iIV7fXZre4uc0sUlJCRvXJZds0SG
-X-Google-Smtp-Source: APXvYqz/SS/O9Qa8M7+h73+TxUpOZywcyKfzuUr28sFQVcgnqQKLhi4R+eyIikh/gjkWiYYZ/a3Lzw==
-X-Received: by 2002:a5d:50cf:: with SMTP id f15mr31529530wrt.381.1576513766332; 
- Mon, 16 Dec 2019 08:29:26 -0800 (PST)
+ bh=bCglA2xU8XIovJ5evRIXUQsgqKR2GztUSfl273PP6MA=;
+ b=LB9rpGNv+1UPJP9pMokgcdQvGmvc399Uhm9J7qoyQii7aQNd1nh5f0c5C8Qg73pPhy
+ 9omkLY2YJ8F/kF/5kjrPO9ttgHTLcP0DDSoZ/+vTfS4h6ngw8o5koTjhDfooNVHXI8U2
+ 4JCDaj4+JAE7znJ7fXQrPbQb/pAYnLfOLQCJFfKWWnxBAk3x4pViAvubX6UjAl2jRwqs
+ Bjt7CvYhZNh5CI4OXaUAI9WeoxTxgt+uIZt/VTdmrYNy0Ai7yQbWfThyf5sULZMFYs/w
+ ANq6pt4ZgW0jq5yc3UD2CCQfPEp3iTyqMiTjJA+qBRXo4ak1py59vuVgWTRz10NfKSF8
+ LLSA==
+X-Gm-Message-State: APjAAAW7KHZ/Y8uAtSfHP7qKyEfStJ7MGoLDhs+inqgnff8gB4wJ6GRx
+ nRei5CnQnpYzpovTDl5JEjxlIrbC
+X-Google-Smtp-Source: APXvYqzI81c+u2qUPq4x1Y0z/xjBFlZDd7BteBUZd8hx9HyMyhMXAeGc1Y0jO8+wsMhcgqTavoNSzA==
+X-Received: by 2002:adf:ef92:: with SMTP id d18mr30256974wro.234.1576513779155; 
+ Mon, 16 Dec 2019 08:29:39 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.25
+ by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.38
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Dec 2019 08:29:25 -0800 (PST)
+ Mon, 16 Dec 2019 08:29:38 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 39/62] libvixl: remove per-target compiler flags
-Date: Mon, 16 Dec 2019 17:28:23 +0100
-Message-Id: <1576513726-53700-40-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 51/62] acpi: move PC stubs out of stubs/
+Date: Mon, 16 Dec 2019 17:28:35 +0100
+Message-Id: <1576513726-53700-52-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
@@ -94,60 +94,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are already including -D__STDC_LIMIT_MACROS in the global CXXFLAGS,
-so it makes sense to do the same for -D__STDC_CONSTANT_MACROS and
--D__STDC_FORMAT_MACROS instead of limiting that to libvixl.
-
-The -Wno-sign-compare option can also be removed since GCC 4.6 is not
-supported anymore.
+This is a small cleanup that lets microvm build entirely without
+include/hw/i386/pc.h.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure                   |  3 ++-
- disas/libvixl/Makefile.objs | 11 +----------
- 2 files changed, 3 insertions(+), 11 deletions(-)
+ hw/acpi/Makefile.objs                                | 3 ++-
+ stubs/pc_madt_cpu_entry.c => hw/acpi/acpi-x86-stub.c | 0
+ stubs/Makefile.objs                                  | 1 -
+ 3 files changed, 2 insertions(+), 2 deletions(-)
+ rename stubs/pc_madt_cpu_entry.c => hw/acpi/acpi-x86-stub.c (100%)
 
-diff --git a/configure b/configure
-index 8fb26ad..394f7f5 100755
---- a/configure
-+++ b/configure
-@@ -101,7 +101,7 @@ update_cxxflags() {
-     # Set QEMU_CXXFLAGS from QEMU_CFLAGS by filtering out those
-     # options which some versions of GCC's C++ compiler complain about
-     # because they only make sense for C programs.
--    QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS"
-+    QEMU_CXXFLAGS="$QEMU_CXXFLAGS -D__STDC_LIMIT_MACROS -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS"
+diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
+index 655a9c1..9925305 100644
+--- a/hw/acpi/Makefile.objs
++++ b/hw/acpi/Makefile.objs
+@@ -8,6 +8,7 @@ common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
+ common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
+ common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
+ common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
++common-obj-$(call lnot,$(CONFIG_PC)) += acpi-x86-stub.o
  
-     for arg in $QEMU_CFLAGS; do
-         case $arg in
-@@ -596,6 +596,7 @@ QEMU_CFLAGS="-Wall -Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
- QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
- QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
- QEMU_INCLUDES="-iquote . -iquote \$(SRC_PATH) -iquote \$(SRC_PATH)/accel/tcg -iquote \$(SRC_PATH)/include"
-+QEMU_INCLUDES="$QEMU_INCLUDES -iquote \$(SRC_PATH)/disas/libvixl"
- if test "$debug_info" = "yes"; then
-     CFLAGS="-g $CFLAGS"
-     LDFLAGS="-g $LDFLAGS"
-diff --git a/disas/libvixl/Makefile.objs b/disas/libvixl/Makefile.objs
-index 27183b7..99a637f 100644
---- a/disas/libvixl/Makefile.objs
-+++ b/disas/libvixl/Makefile.objs
-@@ -1,14 +1,5 @@
--libvixl_OBJS = vixl/utils.o \
-+common-obj-$(CONFIG_ARM_A64_DIS) = vixl/utils.o \
-                vixl/compiler-intrinsics.o \
-                vixl/a64/instructions-a64.o \
-                vixl/a64/decoder-a64.o \
-                vixl/a64/disasm-a64.o
--
--# The -Wno-sign-compare is needed only for gcc 4.6, which complains about
--# some signed-unsigned equality comparisons which later gcc versions do not.
--$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CXXFLAGS := -I$(SRC_PATH)/disas/libvixl $(QEMU_CXXFLAGS) -Wno-sign-compare
--# Ensure that C99 macros are defined regardless of the inclusion order of
--# headers in vixl. This is required at least on NetBSD.
--$(addprefix $(obj)/,$(libvixl_OBJS)): QEMU_CXXFLAGS += -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS
--
--common-obj-$(CONFIG_ARM_A64_DIS) += $(libvixl_OBJS)
+ common-obj-y += acpi_interface.o
+ common-obj-y += bios-linker-loader.o
+@@ -20,4 +21,4 @@ common-obj-$(call lnot,$(CONFIG_IPMI)) += ipmi-stub.o
+ else
+ common-obj-y += acpi-stub.o
+ endif
+-common-obj-$(CONFIG_ALL) += acpi-stub.o ipmi-stub.o
++common-obj-$(CONFIG_ALL) += acpi-stub.o acpi-x86-stub.o ipmi-stub.o
+diff --git a/stubs/pc_madt_cpu_entry.c b/hw/acpi/acpi-x86-stub.c
+similarity index 100%
+rename from stubs/pc_madt_cpu_entry.c
+rename to hw/acpi/acpi-x86-stub.c
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 4a50e95..8b0ff25 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -33,7 +33,6 @@ stub-obj-y += fd-register.o
+ stub-obj-y += qmp_memory_device.o
+ stub-obj-y += target-monitor-defs.o
+ stub-obj-y += target-get-monitor-def.o
+-stub-obj-y += pc_madt_cpu_entry.o
+ stub-obj-y += vmgenid.o
+ stub-obj-y += xen-common.o
+ stub-obj-y += xen-hvm.o
 -- 
 1.8.3.1
 
