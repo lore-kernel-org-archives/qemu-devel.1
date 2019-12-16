@@ -2,82 +2,81 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68828C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:23:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C766AC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:35:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34FA6206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:23:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F15020663
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:35:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="ZjxCzYM8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34FA6206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ac/8lu9Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F15020663
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igsDX-0002Uz-CY
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 10:23:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54395)
+	id 1igsOm-0000Hf-P6
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 10:35:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <prvs=246de4cf7=sveith@amazon.com>)
- id 1igs7b-0003oj-8Y
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:17:20 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igsNx-00084L-8d
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:34:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <prvs=246de4cf7=sveith@amazon.com>)
- id 1igs7a-0001qo-7b
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:17:19 -0500
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:28350)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <prvs=246de4cf7=sveith@amazon.com>)
- id 1igs7Y-0001l9-1o; Mon, 16 Dec 2019 10:17:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
- t=1576509437; x=1608045437;
- h=from:to:cc:subject:date:message-id:in-reply-to: references;
- bh=DnWdil9M/KHhlCYcqIHDhxnPOJB7mXEYpBcWYuPCZHo=;
- b=ZjxCzYM84JfFSa9Z9sQVZU8v82yo+3mc/KYDf/dWicJneZqF6m7OCMLM
- i+a0bM0xCBKERFwoekgt3ujBOPS1Ihp8jf+5C3bQwX04CBUDm32Zh7lzW
- L/1x23CX6GEuGdvREjVSNeaGVl4t2XHXhkqIK7RVHvcMRqPpqqxQ+g/9f 4=;
-IronPort-SDR: 7M0g3OtvPRRWfh9g4zkiGG3kZd7aWHFvz0OntyTUBMYpn+YRpnOA6OYJejATP9M7iTDGDeUOGx
- tzlI5LgVq5TQ==
-X-IronPort-AV: E=Sophos;i="5.69,322,1571702400"; 
-   d="scan'208";a="9275759"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO
- email-inbound-relay-2a-538b0bfb.us-west-2.amazon.com) ([10.124.125.6])
- by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP;
- 16 Dec 2019 15:17:15 +0000
-Received: from sveith-desktop.aka.corp.amazon.com
- (pdx2-ws-svc-lb17-vlan2.amazon.com [10.247.140.66])
- by email-inbound-relay-2a-538b0bfb.us-west-2.amazon.com (Postfix) with ESMTPS
- id 42F47A2651; Mon, 16 Dec 2019 15:17:13 +0000 (UTC)
-Received: from sveith-desktop.aka.corp.amazon.com (localhost [127.0.0.1])
- by sveith-desktop.aka.corp.amazon.com (8.15.2/8.15.2/Debian-3) with ESMTP id
- xBGFHBbE014128; Mon, 16 Dec 2019 16:17:11 +0100
-Received: (from sveith@localhost)
- by sveith-desktop.aka.corp.amazon.com (8.15.2/8.15.2/Submit) id xBGFHAp4014106;
- Mon, 16 Dec 2019 16:17:10 +0100
-From: Simon Veith <sveith@amazon.de>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: Simon Veith <sveith@amazon.de>, Eric Auger <eric.auger@redhat.com>
-Subject: [PATCH v3 5/6] hw/arm/smmuv3: Use correct bit positions in
- EVT_SET_ADDR2 macro
-Date: Mon, 16 Dec 2019 16:15:11 +0100
-Message-Id: <1576509312-13083-6-git-send-email-sveith@amazon.de>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1576509312-13083-1-git-send-email-sveith@amazon.de>
-References: <1576509312-13083-1-git-send-email-sveith@amazon.de>
-Precedence: Bulk
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 52.95.48.154
+ (envelope-from <peter.maydell@linaro.org>) id 1igsNu-0007bX-ST
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:34:12 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35132)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1igsNu-0007b1-Ia
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:34:10 -0500
+Received: by mail-oi1-x242.google.com with SMTP id k196so3623992oib.2
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 07:34:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=XlFImKkLeBBCYbNKNKMVNzlOgmpDx8oY5F19MpVJ9X0=;
+ b=ac/8lu9Qp8RqTMui7fWYkg3YW0UzDilHTCt07oFtlDFztpucpEj1EuQyWpkzPlI7xK
+ niV9XXnmznXkYllPsnWsQgLejsr2wfbSNyARJFW0aGJSp6L3OeHK3HW4oVZr43p2oohy
+ qybzctq6hNnsIo4THy/YB0ezl9kDLuGikOkmj+wJ2sf1COWNadr70A/5DhzJpZ1QtOVP
+ Noe36WVdcTh31UmRsyLaO63hupD7Xc7abZcZzn1jmzbDFqDtkSBpbjhcYgT+LnHuYBVv
+ GEo6xSfj6Tmiq7++BPfFtymsONqYTynfgarHzh+KPpdTAypq/FIj5M5NS7h45LFT7ZJC
+ kLrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=XlFImKkLeBBCYbNKNKMVNzlOgmpDx8oY5F19MpVJ9X0=;
+ b=ACgrzqa5ljheeFxUTfWGAsQZpClYe1WUUYhjAPiHJydN4a/OsHlw3JCkL5z6Q2GEId
+ 33KWyHTkJD4leSPu51yM5EyhupuxQgnKUC9HywHu5vwRxHhjUPHqsouEZta4yr6f7nAv
+ aGVKol0gtKpKaEZj+u7JvYohp6wJAATOAPCL0lysg/iVfqTBLTnrMfXPe90C3aHTG5NH
+ BiYp637DZ7CghVge3YBxpmkccjC13DPfCh9fgB5ad9SHZgz91GBz3vdRlLMGANYJr265
+ 5loZUIRa4eIKZIWCi8WNHRdYrekzmxPUXaQC0wAQRYLZkuGDHSehXHcUTWa8y6ySjZT8
+ E+kw==
+X-Gm-Message-State: APjAAAVFMShes+5Ig9xlo9KnmADW0cBm1eYNhfBULjnkkLzPWWzfyG0Z
+ zplcRfNgYcIU8CPM2IqtMWRNgI1NkJmYY8H490Cy8Q==
+X-Google-Smtp-Source: APXvYqx6JSojAgU7E1NxJd/LWb+yfZXK/wnaMHAhqtzpEt1CmfEXgx8tHt8lCEUrWdpnkqz4xQ5qQXDhPeYDWJ60Mmo=
+X-Received: by 2002:aca:f484:: with SMTP id s126mr9237783oih.48.1576510448904; 
+ Mon, 16 Dec 2019 07:34:08 -0800 (PST)
+MIME-Version: 1.0
+References: <20191212173320.11610-1-drjones@redhat.com>
+In-Reply-To: <20191212173320.11610-1-drjones@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Dec 2019 15:33:57 +0000
+Message-ID: <CAFEAcA9FprSotg11rS0fM94QiciysZ6kgKhyU4eQfZg7YYaL5Q@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/5] target/arm/kvm: Adjust virtual time
+To: Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,48 +85,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: bijan.mottahedeh@oracle.com, Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Heyi Guo <guoheyi@huawei.com>, msys.mizuma@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The bit offsets in the EVT_SET_ADDR2 macro do not match those specified
-in the ARM SMMUv3 Architecture Specification. In all events that use
-this macro, e.g. F_WALK_EABT, the faulting fetch address or IPA actually
-occupies the 32-bit words 6 and 7 in the event record contiguously, with
-the upper and lower unused bits clear due to alignment or maximum
-supported address bits. How many bits are clear depends on the
-individual event type.
+On Thu, 12 Dec 2019 at 17:33, Andrew Jones <drjones@redhat.com> wrote:
 
-Update the macro to write to the correct words in the event record so
-that guest drivers can obtain accurate address information on events.
+> Userspace that wants to set KVM_REG_ARM_TIMER_CNT should beware that
+> the KVM register ID is not correct.  This cannot be fixed because it's
+> UAPI and if the UAPI headers are used then it can't be a problem.
+> However, if a userspace attempts to create the ID themselves from the
+> register's specification, then they will get KVM_REG_ARM_TIMER_CVAL
+> instead, as the _CNT and _CVAL definitions have their register
+> parameters swapped.
 
-ref. ARM IHI 0070C, sections 7.3.12 through 7.3.16.
+So, to be clear, you mean that:
 
-Signed-off-by: Simon Veith <sveith@amazon.de>
-Cc: Eric Auger <eric.auger@redhat.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
-Acked-by: Eric Auger <eric.auger@redhat.com>
----
- hw/arm/smmuv3-internal.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+(1) the kernel headers say:
 
-diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
-index 042b435..4112394 100644
---- a/hw/arm/smmuv3-internal.h
-+++ b/hw/arm/smmuv3-internal.h
-@@ -461,8 +461,8 @@ typedef struct SMMUEventInfo {
-     } while (0)
- #define EVT_SET_ADDR2(x, addr)                            \
-     do {                                                  \
--            (x)->word[7] = deposit32((x)->word[7], 3, 29, addr >> 16);   \
--            (x)->word[7] = deposit32((x)->word[7], 0, 16, addr & 0xffff);\
-+            (x)->word[7] = (uint32_t)(addr >> 32);        \
-+            (x)->word[6] = (uint32_t)(addr & 0xffffffff); \
-     } while (0)
- 
- void smmuv3_record_event(SMMUv3State *s, SMMUEventInfo *event);
--- 
-2.7.4
+/* EL0 Virtual Timer Registers */
+#define KVM_REG_ARM_TIMER_CTL           ARM64_SYS_REG(3, 3, 14, 3, 1)
+#define KVM_REG_ARM_TIMER_CNT           ARM64_SYS_REG(3, 3, 14, 3, 2)
+#define KVM_REG_ARM_TIMER_CVAL          ARM64_SYS_REG(3, 3, 14, 0, 2)
 
+(2) some of the RHSes of these are wrong
+
+(3) but the kernel internally is using the same 'wrong' value, so
+userspace also needs to use that value, ie trust the #defined name
+rather than manufacturing one ?
+
+That's awkward. I think it would be worth at least having a kernel
+patch to add a comment clearly documenting this bug.
+
+(This error seems to only be in the 64-bit ABI, not 32-bit.)
+
+QEMU does assume that the kernel's ID register values match
+the hardware for sysregs in some ways -- we use this when we
+construct our mapping from KVM register IDs as returned by
+KVM_GET_REG_LIST to QEMU cpreg definitions and thus CPUState
+struct fields. I *think* that in this case the only visible
+effect will be that gdbstub will show you the CNT value
+if you ask it to print the value of the CVAL sysreg.
+
+thanks
+-- PMM
 
