@@ -2,86 +2,83 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B73C7C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72190C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:22:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83CAC206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:20:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FED9206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:22:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FP5AQxxP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83CAC206D3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OR5Vzfu8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FED9206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igu2h-00023b-VY
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:20:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57431)
+	id 1igu4k-0004ts-Sw
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:22:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFh-0005vu-8c
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:46 -0500
+ (envelope-from <drjones@redhat.com>) id 1igtTg-0007wg-Pl
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:44:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFf-0000Tb-ET
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:44 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41589)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtFf-0000RQ-74
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:43 -0500
-Received: by mail-wr1-x442.google.com with SMTP id c9so8039739wrw.8
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=3xRW0dWjMhO1EPoHD9jweteGOAO0mpniEjjgSK1VhoQ=;
- b=FP5AQxxPnltuwrDP8B80N0eYvqBSpLEyAYrlDRCwYaPUosIIT5fLPCxrgSq+dhNfC9
- j6H3LkE3QgUoW+DDsa5f9y+3GqdgeSW8WgqwTygRRzOfZMEjUe7LATngT8frhKFnFDG9
- 6vBFUpxyCIddsX6KkU+d/RjeiEB1Dr1c+w4ekUvwLKUa/zT643b0QH23ol8qpN5Vijr6
- NzCjxzSIF49kapOrsyKCfW04RtuumDWoK7jmDmJPTsUUxTNvvoR3iyByHHxAIRsNQsu6
- c06z1DhvaVdH7bA0PNzl1cPLW1QbV4/xO74jGXld24ooSCobCNL+aCBfAaf067mlVhOb
- LYCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=3xRW0dWjMhO1EPoHD9jweteGOAO0mpniEjjgSK1VhoQ=;
- b=Czph/twI8IBbY6W4Ob5G/shu3DbCqnDFsEmHui2BlU8+0tjTNf0tJG5Y4W+ltI6A4B
- DWbpVpmVtSX3vu+09OfXaoErc25qglA5GWfrSvXZZ193+KqnZ6d46DNSSsqQFR7cswUc
- QqcFy/FzE9mOKXw1oKsX/Bw47tdM7yxnLaobkxPkzaEPDMcNe8HpJQeAN2vpetaeXJos
- eEJTljV1TMzeiUCY7E4T/kM+0gBUHxTa59aqfAtMzWXT6P+xUfNgCa5cNNJhWyg5CH4K
- /9SLLi2sYfiIeFtnnpoiWgx+dQ7inrTv/weUujIerY2sBYUEB5e4l7VlSroVKRsFy74r
- 0OxA==
-X-Gm-Message-State: APjAAAWxR2gPLjNWDkDEH+vzLXBamKp0G8ZoNk4rJCSY9RBcTh2CvJAY
- dlv2CdwHhJn8wVYHNkOAu4CdIO3g
-X-Google-Smtp-Source: APXvYqx6+Wv6DRVFBzPSv8AHlb6daZ3L0tikByx+RLWxRhWxr395WKrY4OBLKF+q6xK6+Bx1MsIusg==
-X-Received: by 2002:a5d:68c5:: with SMTP id p5mr31916905wrw.193.1576513782101; 
- Mon, 16 Dec 2019 08:29:42 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.41
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Dec 2019 08:29:41 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 54/62] hw/i386: Simplify ioapic_init_gsi()
-Date: Mon, 16 Dec 2019 17:28:38 +0100
-Message-Id: <1576513726-53700-55-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
-References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
+ (envelope-from <drjones@redhat.com>) id 1igtTd-0005lj-TQ
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:44:12 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43560
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1igtTd-0005iv-P2
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:44:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576514649;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lB8rYaM4LIgsPJoAftgjG9mdXpweDU1tAotDnMpOJvo=;
+ b=OR5Vzfu8dVlm7K5OPuVLHdvE/5wmuODT3Ie09mPmuaSxGKRRyvN0WEyPxI/xf2uAwNiTpb
+ iDhqKNob5FVgvByCrKHJzDdTnD8trqdkpVHpcxsuvFJop50Xgxc+A9wyzk/evsyGaz0SoP
+ Wn2hnhAVQGkqsNOWh7rb0fy8L7uMRxE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-383-C6LwDkwYNX-Ln7KBtyRl8w-1; Mon, 16 Dec 2019 11:44:05 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 122EA1005512;
+ Mon, 16 Dec 2019 16:44:03 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-116-122.ams2.redhat.com
+ [10.36.116.122])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0D88210013D9;
+ Mon, 16 Dec 2019 16:43:58 +0000 (UTC)
+Date: Mon, 16 Dec 2019 17:43:55 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC PATCH v2 3/5] target/arm/kvm: Implement virtual time
+ adjustment
+Message-ID: <20191216164355.i5rpfuqlfqv2z7m7@kamzik.brq.redhat.com>
+References: <20191212173320.11610-1-drjones@redhat.com>
+ <20191212173320.11610-4-drjones@redhat.com>
+ <CAFEAcA_u94O8WYLgB8DF=pu-3V7LrNWpiQFV5mDYeeqLj1Ee2Q@mail.gmail.com>
+ <CAFEAcA9ZoOZt6Jh42hi6q91=kRM9T9z436J99NF+Ns5KVKUYow@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+In-Reply-To: <CAFEAcA9ZoOZt6Jh42hi6q91=kRM9T9z436J99NF+Ns5KVKUYow@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: C6LwDkwYNX-Ln7KBtyRl8w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,49 +90,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: bijan.mottahedeh@oracle.com, Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Heyi Guo <guoheyi@huawei.com>, msys.mizuma@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Mon, Dec 16, 2019 at 03:40:16PM +0000, Peter Maydell wrote:
+> On Mon, 16 Dec 2019 at 15:14, Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+> > How does this interact with the usual register sync to/from
+> > KVM (ie kvm_arch_get_registers(), which I think will do a
+> > GET_ONE_REG read of the TIMER_CNT register the way it does
+> > any other sysreg, inside write_kvmstate_to_list(), plus
+> > kvm_arch_set_registers() which does the write back to the
+> > kernel in write_list_to_kvmstate()) ? Presumably we want this
+> > version to take precedence by the set_virtual_time call
+> > happening after the kvm_arch_set_registers, but is this
+> > guaranteed ?
+>=20
+> ...you might also want to look at the effects of simply
+> removing the KVM_REG_ARM_TIMER_CNT entry from the
+> 'non_runtime_cpregs[]' array -- in commit 4b7a6bf402bd064
+> we explicitly stopped reading/writing this register's value
+> to/from the kernel except for inbound migration, and it
+> feels like this patchset is now rolling back that approach,
+> so maybe we should also be (configurably) rolling back some
+> of its implementation rather than just leaving it in place.
 
-All callers of ioapic_init_gsi() provide a parent. We want new
-uses to follow the same good practice and provide the parent
-name, so do not make this optional: assert the parent name is
-provided, and simplify the code.
+I feel like I already considered that, maybe even tried it, a few months
+ago when I first looked at this. I must have decided against it for some
+reason at the time, but I don't recall what. Now I can say the reason is
+because we only do this save/restore when we transition to/from paused
+state, though.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/i386/x86.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+>=20
+> I note also that the commit message there had a remark
+> about inconsistencies between VCPUs -- is the right thing
+> to handle this per-VM rather than per-VCPU somehow?
 
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index d18a3ef..d8bb5c2 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -307,15 +307,14 @@ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name)
-     SysBusDevice *d;
-     unsigned int i;
- 
-+    assert(parent_name);
-     if (kvm_ioapic_in_kernel()) {
-         dev = qdev_create(NULL, TYPE_KVM_IOAPIC);
-     } else {
-         dev = qdev_create(NULL, TYPE_IOAPIC);
-     }
--    if (parent_name) {
--        object_property_add_child(object_resolve_path(parent_name, NULL),
--                                  "ioapic", OBJECT(dev), NULL);
--    }
-+    object_property_add_child(object_resolve_path(parent_name, NULL),
-+                              "ioapic", OBJECT(dev), NULL);
-     qdev_init_nofail(dev);
-     d = SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(d, 0, IO_APIC_DEFAULT_ADDRESS);
--- 
-1.8.3.1
+per-VM would make sense, because the counters should be synchronized
+among the VCPUs. KVM does that for us, though, so whichever VCPU last
+restores its counter is the one that will determine the final value.
 
+Maybe we should have a VM ioctl instead, but ATM we only have VCPU ioctls.
+
+Thanks,
+drew
 
 
