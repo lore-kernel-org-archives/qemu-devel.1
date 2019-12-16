@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5771C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 072F4C2D0C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:23:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A6D7206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:23:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8EAC206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:23:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lh1e8t1V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A6D7206D3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nIvVcVJ8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8EAC206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igoTS-0000AB-Bv
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:23:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50915)
+	id 1igoTT-0000At-GU
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:23:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50853)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFe-0007dl-EA
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:23 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFb-0007a3-Ib
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFd-0007nT-AG
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:22 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54849)
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFa-0007jn-Ey
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:19 -0500
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:35125)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1igoFd-0007lW-45
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:21 -0500
-Received: by mail-wm1-x344.google.com with SMTP id b19so6249831wmj.4
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:20 -0800 (PST)
+ id 1igoFa-0007iP-8t
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:18 -0500
+Received: by mail-wm1-x32a.google.com with SMTP id p17so6237782wmb.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=INEC+O3trc34/sQ9VXKjuFm8nPKS5N+4sZ+l5CuQdRo=;
- b=Lh1e8t1VanEgXHprir+MfcM8kydEMOOKZ6lsmPA657uh3UJa8N3oRjM1Hr1nwhnfAO
- ucl7yInlLKGjv1R4vAC0Lc8tF7pfI2+dNPcyrPgr9LaebJSugLG22mJ3Fh/kHcg2pTNx
- P1JbPUu/fCwf73qXMPbev+W8oygWkw+oAyANN+lxSgWy+PgQcOhai7snbZBnKXFemYWz
- TiZyXkka3+zJH7aEU0STz1TqNIBxUA5Y/yqgiOFfYZVIMbtQSLViocuko0DPAi/7YwN+
- 9tnz4YZuHiw+sLwSv81hrG3Gwiq/70Sz+fKS+NdpJvrtMcvG2QV3Lwj44o+LozRkdUE2
- lbPg==
+ bh=xjn8RJQ0vY8rUfMNnaKgorm1b3kbGVHvXOz31kMfCJA=;
+ b=nIvVcVJ83qyg50OrGtQp57MU++5uJWorzNom5qGy2nT8DVGSYwyPU1pZruFXkYq33P
+ QP11F5U1CD16HhlyhU5AFuuOiUZyVdTn9ihawtcIsYLJrgFFabuRX6AGVXMrwgtmhxEH
+ d7G2fcJP29ViUpuGTPikQIn38WE6FVLBIkZdtluXHSe5QxkhHkUOd3vEEwIk2s/da4Q8
+ Wi5Q32WVKtRp7iwaJ7joWs9EGn/PNVi5+RmfXXA4+9uvHTjcY5ZD/HEcahjiM/i1one9
+ km1M0f278/PW/lJXXrs3BUYs5twkheH8ozIWIZZMHWMIV1m/aSlJg8H2faRlOLle8VxI
+ 3rKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=INEC+O3trc34/sQ9VXKjuFm8nPKS5N+4sZ+l5CuQdRo=;
- b=jz3nDKNA0eDt3TkyfnaW9p6YhFBzfxN6fclLMfoOiZvKZ+vI6emVj1QPSi8RdMEsz4
- kpwYsrqGX6He2ZIbC2O0IALJrbXyhlxqB1bAvLgAJyAom64ZkBltnK/8tuqeSkUUdEwF
- b3d7NFIZGW5LW098ywwjltKCHae35FXb4wzqPF3u71ueu0XgQk8sNuUKqmMQeHhDAY4D
- pC5uJvSc3X1Vd84fuR5/GLaXure3gcxL4r5jOIdsNpWAEETIsqojs8WLzY9slDgbePrK
- qk2s5XznuPKrhLard/TF5yGqR6ttY8GxSjC58JXMIVrBfge7FSFPN+3o/KgDF+tTe7S5
- Pz2A==
-X-Gm-Message-State: APjAAAWHcqJuTetftu21+N23DP4Ji+UnB6/RemjdlKkz6/CC8k0/9N5Z
- fOpDHweRPI6j7ulxgwt2ORK7fuwDciHQ+g==
-X-Google-Smtp-Source: APXvYqxe0fs2kpjA98H9FvOAaaBPn7OD2T3pPKvXDYEFa8pd0X/jNyhibSJ5NYszTHIwPdflYsbXFg==
-X-Received: by 2002:a1c:14e:: with SMTP id 75mr13969037wmb.123.1576494558774; 
- Mon, 16 Dec 2019 03:09:18 -0800 (PST)
+ bh=xjn8RJQ0vY8rUfMNnaKgorm1b3kbGVHvXOz31kMfCJA=;
+ b=gmrngAcWczYhz7GZVYaJMdhGhc+EVRvCO0PVAAy8lsKYxorfNfFWO9dlcse4+lUxOr
+ eCBH1l91jmXjE1PKV7jCGFMDdwG17qsErkThEvSU5FzGom4L5K5xm0VRoEo0o8Dd684O
+ jqn8+oZg8kT3vachp6UGqPmD4JJA7l4lWUxauj925pwLlIpVb4vJ/Ck90YrYbyCZUwUg
+ twNvulr8+Z/ssE4vO0xvQy5mnoFOr3Tppl1DKI1BJIi0fidhW26jDnvUnw/gzIUBPze4
+ E3EneVWd22ur5Uxi160gimR6Dn8wEUkQ7GG47vEtNFv22Y03a606yy2bYpgMreTluq94
+ sNNg==
+X-Gm-Message-State: APjAAAVwu18S/t1/HGFun6kp1DLB5N4IV8j/wArSeIybhTuMqRllAQcO
+ rkIn1xGAQiA//Oj/J9F8dOx5qrEZ67ySfg==
+X-Google-Smtp-Source: APXvYqxNdHYg0F2eJisfixjNYBbP0dCfjduPvzfhtEKampgPp4SzaSgFs5ei1bkUFNoXhzLziq9/Kg==
+X-Received: by 2002:a1c:a795:: with SMTP id q143mr28403322wme.52.1576494557023; 
+ Mon, 16 Dec 2019 03:09:17 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.18
+ by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.15
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 03:09:18 -0800 (PST)
+ Mon, 16 Dec 2019 03:09:16 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/34] watchdog/aspeed: Improve watchdog timeout message
-Date: Mon, 16 Dec 2019 11:08:40 +0000
-Message-Id: <20191216110904.30815-11-peter.maydell@linaro.org>
+Subject: [PULL 08/34] aspeed/sdmc: Make ast2600 default 1G
+Date: Mon, 16 Dec 2019 11:08:38 +0000
+Message-Id: <20191216110904.30815-9-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
 References: <20191216110904.30815-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2a00:1450:4864:20::32a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,34 +100,36 @@ Sender: "Qemu-devel"
 
 From: Joel Stanley <joel@jms.id.au>
 
-Users benefit from knowing which watchdog timer has expired. The address
-of the watchdog's registers unambiguously indicates which has expired,
-so log that.
+Most boards have this much.
 
 Reviewed-by: Cédric Le Goater <clg@kaod.org>
 Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Signed-off-by: Joel Stanley <joel@jms.id.au>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20191119141211.25716-9-clg@kaod.org
+Message-id: 20191119141211.25716-7-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/watchdog/wdt_aspeed.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ hw/misc/aspeed_sdmc.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-index 145be6f99ce..d283d07d654 100644
---- a/hw/watchdog/wdt_aspeed.c
-+++ b/hw/watchdog/wdt_aspeed.c
-@@ -219,7 +219,8 @@ static void aspeed_wdt_timer_expired(void *dev)
-         return;
+diff --git a/hw/misc/aspeed_sdmc.c b/hw/misc/aspeed_sdmc.c
+index f3a63a2e01d..2df3244b53c 100644
+--- a/hw/misc/aspeed_sdmc.c
++++ b/hw/misc/aspeed_sdmc.c
+@@ -208,10 +208,10 @@ static int ast2600_rambits(AspeedSDMCState *s)
      }
  
--    qemu_log_mask(CPU_LOG_RESET, "Watchdog timer expired.\n");
-+    qemu_log_mask(CPU_LOG_RESET, "Watchdog timer %" HWADDR_PRIx " expired.\n",
-+                  s->iomem.addr);
-     watchdog_perform_action();
-     timer_del(s->timer);
+     /* use a common default */
+-    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 512M",
++    warn_report("Invalid RAM size 0x%" PRIx64 ". Using default 1024M",
+                 s->ram_size);
+-    s->ram_size = 512 << 20;
+-    return ASPEED_SDMC_AST2600_512MB;
++    s->ram_size = 1024 << 20;
++    return ASPEED_SDMC_AST2600_1024MB;
  }
+ 
+ static void aspeed_sdmc_reset(DeviceState *dev)
 -- 
 2.20.1
 
