@@ -2,79 +2,65 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A311C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C80C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:39:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEF5F206D7
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:37:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I93oTzZ/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF5F206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C94FB206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:39:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C94FB206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iguJd-0001HQ-IY
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:37:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48806)
+	id 1iguL3-0003RU-Bz
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:39:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1igtnA-0006bo-GF
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 12:04:21 -0500
+ (envelope-from <maz@kernel.org>) id 1igto7-0007nh-7M
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 12:05:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1igtn9-000784-7W
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 12:04:20 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50867
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <maz@kernel.org>) id 1igto6-0008Li-22
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 12:05:19 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:47927)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1igtn9-00074n-2t
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 12:04:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576515858;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=x0LxTIX6dntFtwM1DHsZ4mgKEmQO8iqOb5pA9nzmJJ4=;
- b=I93oTzZ/LZU0B7W9HIwpeGZwUnjiAOSlZ70ZsbR5egNqkKyZUXWv8c1GFOxsduvQa0DCo4
- Ji7P+2LvuS+zivxV7Z/h1K9ZZnDKJEe1bpFdlx8MUOLD4E3sU37UVORoKdfQcoBfrkxPCt
- oDpreztogyVPnuiFg23hL0fp1aP5H4g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-118-wzSfNTY0ObqGdnn18DmcHQ-1; Mon, 16 Dec 2019 12:04:16 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18A96800D53;
- Mon, 16 Dec 2019 17:04:15 +0000 (UTC)
-Received: from gondolin (dhcp-192-245.str.redhat.com [10.33.192.245])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BABCA60625;
- Mon, 16 Dec 2019 17:04:11 +0000 (UTC)
-Date: Mon, 16 Dec 2019 18:04:09 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 0/2] target/s390x: Implement LOAD/STORE TO REAL ADDRESS
- inline
-Message-ID: <20191216180409.6a753390.cohuck@redhat.com>
-In-Reply-To: <20191211203614.15611-1-richard.henderson@linaro.org>
-References: <20191211203614.15611-1-richard.henderson@linaro.org>
-Organization: Red Hat GmbH
+ (Exim 4.71) (envelope-from <maz@kernel.org>)
+ id 1igto5-0008KZ-RH; Mon, 16 Dec 2019 12:05:17 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+ (envelope-from <maz@kernel.org>)
+ id 1igtnu-0004Nj-E9; Mon, 16 Dec 2019 18:05:06 +0100
+To: Andrew Jones <drjones@redhat.com>
+Subject: Re: [RFC PATCH v2 0/5] target/arm/kvm: Adjust virtual time
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: wzSfNTY0ObqGdnn18DmcHQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Date: Mon, 16 Dec 2019 17:05:06 +0000
+From: Marc Zyngier <maz@kernel.org>
+In-Reply-To: <20191216165920.qsx7ufviir74tbkl@kamzik.brq.redhat.com>
+References: <20191212173320.11610-1-drjones@redhat.com>
+ <CAFEAcA9FprSotg11rS0fM94QiciysZ6kgKhyU4eQfZg7YYaL5Q@mail.gmail.com>
+ <4cb9bcfd47dff57c9ae6bb92bae87589@www.loen.fr>
+ <20191216165920.qsx7ufviir74tbkl@kamzik.brq.redhat.com>
+Message-ID: <d1d394292a294f32c237d3ddbb0e96ad@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: drjones@redhat.com, peter.maydell@linaro.org,
+ bijan.mottahedeh@oracle.com, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, guoheyi@huawei.com,
+ msys.mizuma@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org);
+ SAEximRunCond expanded to false
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 213.251.177.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,34 +72,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-s390x@nongnu.org, qemu-devel@nongnu.org, david@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, bijan.mottahedeh@oracle.com,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Heyi Guo <guoheyi@huawei.com>, msys.mizuma@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 11 Dec 2019 12:36:12 -0800
-Richard Henderson <richard.henderson@linaro.org> wrote:
+On 2019-12-16 16:59, Andrew Jones wrote:
+> On Mon, Dec 16, 2019 at 04:18:23PM +0000, Marc Zyngier wrote:
+>> On 2019-12-16 15:33, Peter Maydell wrote:
+>> > On Thu, 12 Dec 2019 at 17:33, Andrew Jones <drjones@redhat.com> 
+>> wrote:
+>> >
+>> > > Userspace that wants to set KVM_REG_ARM_TIMER_CNT should beware 
+>> that
+>> > > the KVM register ID is not correct.  This cannot be fixed 
+>> because
+>> > > it's
+>> > > UAPI and if the UAPI headers are used then it can't be a 
+>> problem.
+>> > > However, if a userspace attempts to create the ID themselves 
+>> from
+>> > > the
+>> > > register's specification, then they will get 
+>> KVM_REG_ARM_TIMER_CVAL
+>> > > instead, as the _CNT and _CVAL definitions have their register
+>> > > parameters swapped.
+>> >
+>> > So, to be clear, you mean that:
+>> >
+>> > (1) the kernel headers say:
+>> >
+>> > /* EL0 Virtual Timer Registers */
+>> > #define KVM_REG_ARM_TIMER_CTL           ARM64_SYS_REG(3, 3, 14, 3, 
+>> 1)
+>> > #define KVM_REG_ARM_TIMER_CNT           ARM64_SYS_REG(3, 3, 14, 3, 
+>> 2)
+>> > #define KVM_REG_ARM_TIMER_CVAL          ARM64_SYS_REG(3, 3, 14, 0, 
+>> 2)
+>> >
+>> > (2) some of the RHSes of these are wrong
+>> >
+>> > (3) but the kernel internally is using the same 'wrong' value, so
+>> > userspace also needs to use that value, ie trust the #defined name
+>> > rather than manufacturing one ?
+>> >
+>> > That's awkward. I think it would be worth at least having a kernel
+>> > patch to add a comment clearly documenting this bug.
+>> >
+>> > (This error seems to only be in the 64-bit ABI, not 32-bit.)
+>>
+>> Yeah, this is pretty bad. I wonder how we managed not to notice
+>> this for so long... :-(.
+>>
+>> Andrew, could you please write a patch documenting this (both in
+>> the UAPI headers and in the documentation)?
+>>
+>
+> Will do. I'll try to get to it this week.
 
-> Found while working on other parts of cputlb,
-> this cleanup can be split out independently.
-> 
-> 
-> r~
-> 
-> 
-> Richard Henderson (2):
->   target/s390x: Split out helper_per_store_real
->   target/s390x: Implement LOAD/STORE TO REAL ADDRESS inline
-> 
->  target/s390x/helper.h      |  5 +----
->  target/s390x/mem_helper.c  | 38 --------------------------------------
->  target/s390x/misc_helper.c | 10 ++++++++++
->  target/s390x/translate.c   | 21 ++++++++-------------
->  target/s390x/insn-data.def |  8 ++++----
->  5 files changed, 23 insertions(+), 59 deletions(-)
-> 
+Thanks a lot.
 
-Should I take these via the s390 tree, or do you plan to merge them via
-another path?
-
+         M.
+-- 
+Jazz is not dead. It just smells funny...
 
