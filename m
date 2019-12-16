@@ -2,70 +2,88 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A901C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4B9C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:40:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27030206EC
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:38:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50F42206EC
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:40:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KseSJ2vv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27030206EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xOFCkSjQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50F42206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igohy-0004NW-CE
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:38:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57270)
+	id 1igojN-0006fu-QU
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:40:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51318)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1igoUV-0002S3-Cz
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:24:46 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igoG2-0008Cn-M8
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1igoUT-0002z5-Kt
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:24:43 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55338
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1igoUT-0002xt-H2
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:24:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576495481;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc; bh=YKCRP/dVpgNfKies76bZ+f07WU5ynnc4Xn7IKRKaXlQ=;
- b=KseSJ2vvlHsyWRWVZfM9RzOfd/c1pemQsBSaZq6SiJHPcwRbBn1tpKowxB3c0fEjFttLCl
- OCfcjsd1yCnM6sOrm2FTHT0YfjDEoklzkSVmrtR60I4xSZIgPL1DNRQajVbpXYIuU6j7jS
- igl8sAyE3PgN94JzT9msaqFXzM03FMQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-VTqgiDmTM0uQp9jbsDB1lg-1; Mon, 16 Dec 2019 06:24:39 -0500
-X-MC-Unique: VTqgiDmTM0uQp9jbsDB1lg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAD211800D7B;
- Mon, 16 Dec 2019 11:24:37 +0000 (UTC)
-Received: from thuth.com (ovpn-117-164.ams2.redhat.com [10.36.117.164])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C8CF619C5B;
- Mon, 16 Dec 2019 11:24:35 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org,
- Stefan Haberland <sth@linux.ibm.com>
-Subject: [RFC QEMU PATCH] pc-bios/s390-ccw: Add zipl-like "BOOT_IMAGE=x" to
- the kernel parameters
-Date: Mon, 16 Dec 2019 12:24:32 +0100
-Message-Id: <20191216112432.13412-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+ (envelope-from <peter.maydell@linaro.org>) id 1igoG1-0000PU-7R
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:46 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:34638)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1igoG1-0000JS-14
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:45 -0500
+Received: by mail-wm1-x341.google.com with SMTP id f4so4739813wmj.1
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=DIuLYiQq5xzu9Y0KMgE74Fd5M3uLmxz+SEXsEQw/Wpg=;
+ b=xOFCkSjQLtKJsLPMIl6l5z+OyX2kPYqU0eJrscUBUHKe694AP1xlpQXe4I155z6RyB
+ n8LlgxejQiOaxPWf8HhQS1YiWqCi53Unq+p527EkxW06sxE2IVK6wHb+n+QmDVIbT+fa
+ YgnCs8tCcg2jt412gnk9S/+C/6nThXrzrYhkmTfLZJ5H8GitGF7mklRbPUypcC8Y1aEL
+ oSHmXwqlXb/vxSfZ0yKY7qHV8RKRNO4uL9YNotkqjgKM0wLC0bFie0fJ7gxUnO/FkS3T
+ NA93h81MeMLdAoThT9DbnzPoRmvhOzpi/fUHz3JyhCXJLO5rivQMptv9HblmoAwOCNCC
+ 95Jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=DIuLYiQq5xzu9Y0KMgE74Fd5M3uLmxz+SEXsEQw/Wpg=;
+ b=MCHWsozPNCVAsIibTycQXypClTYlE1s0rZLDlOPl1mii7HHTQ1xXtvZZTEhoyjYwck
+ W5iQ4pU1yL4uBH7ke4lNCGDD81d+KkuWxoYv9M4TberD7iBK3cxsgac+n0tICwBLNU+0
+ YdNrSt9mGUNeK8Y9HySxAvFFE+mmN+C00gkx2KDP5eVh+7ifDkslnHqjgXSf6bHTkqCg
+ KXykBeJcVlFUOGJrU4b5v8APgTw+PujJkfW3Xo3aLlrGKLccyrat27eYL4vOWliaDduJ
+ uz/ARwurBdi0s73kFCYrTFnCYyp1qZi+yP+Utxmkafm0ERd2a6AtcKAmRUuhJ645uqfA
+ hx1g==
+X-Gm-Message-State: APjAAAX5I8hqQULmSLmdzWcrZbYf7AJEmVf2B83tlCwkVdtq61mXJWyE
+ P+Nb7CbfmVkxhdg5Bp2KMfkc1d+ejiW1Fg==
+X-Google-Smtp-Source: APXvYqwnq1SLwdgXql3mLY9JHT5MmMxhIvUnn+v5B6bp1P2UifUeOMAG/sCdCneIHxeypWMKfYM06Q==
+X-Received: by 2002:a1c:a504:: with SMTP id o4mr18825312wme.131.1576494583688; 
+ Mon, 16 Dec 2019 03:09:43 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.42
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 16 Dec 2019 03:09:42 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 34/34] target/arm: ensure we use current exception state after
+ SCR update
+Date: Mon, 16 Dec 2019 11:09:04 +0000
+Message-Id: <20191216110904.30815-35-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
+References: <20191216110904.30815-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,171 +95,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: linux-s390@vger.kernel.org, qemu-s390x@nongnu.org,
- Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?q?Jan=20H=C3=B6ppner?= <hoeppner@linux.ibm.com>, psundara@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ZIPL adds a "BOOT_IMAGE=x" to the kernel parameters to indicate which
-kernel entry has been chosen during the boot process. Apparently some
-Linux tools like "dracut" use this setting, so we should provide this
-kernel parameter with the s390-ccw bios, too.
+From: Alex Bennée <alex.bennee@linaro.org>
 
-However, it's a little bit tricky to get additional parameters from the
-s390-ccw bios into the kernel command line: Since we are running the
-ZIPL stage 3 boot loader first (which then finally jumps into the Linux
-kernel), we have to adapt to the parameter conventions of ZIPL and put
-the argument into ZIPLs "COMMAND_LINE_EXTRA" area. Unfortunately, the
-location of this area changed in the course of time (it has been moved
-between ZIPL v2.9 and v2.10), so we need to detect the right version of
-ZIPL here, too. The only reasonable way that I could figure out was the
-start address of the ZIPL stage 3 bootloader which has been changed in
-almost the same timeframe - just a little bit earlier, between v2.8 and
-v2.9, so if a user is using exactly ZIPL v2.9, they won't see the new
-BOOT_IMAGE parameter (but at least the new code in s390-ccw should also
-not hurt in this case - the area where we write the parameter to is just
-the lowest part of the stack area of ZIPL, which should be unused).
+A write to the SCR can change the effective EL by droppping the system
+from secure to non-secure mode. However if we use a cached current_el
+from before the change we'll rebuild the flags incorrectly. To fix
+this we introduce the ARM_CP_NEWEL CP flag to indicate the new EL
+should be used when recomputing the flags.
 
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1782026
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20191212114734.6962-1-alex.bennee@linaro.org
+Cc: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20191209143723.6368-1-alex.bennee@linaro.org>
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- Note: I've marked the patch as RFC since I'm not quite sure whether
- this is really the right way to address this issue: It's unfortunate
- that we have to mess with different location in ZIPL which might also
- change again in the future. As suggested by Christian on IRC last week,
- maybe it would make more sense to change ZIPL to add this parameter
- already when zipl is installed (i.e. by the Linux userspace "zipl" pro-
- gram), instead of adding it during boot time? Also, the BOOT_IMAGE para-
- meter on s390x is quite different from the BOOT_IMAGE paramter that is
- used on x86 - while s390x only uses one single number here, the x86
- variant (added by grub2, I guess) uses the boot device + full filename
- of the kernel on the boot partition. Should we maybe make the s390x
- variant more conform to x86? If so, I think this really has to be fixed
- in zipl userspace tool, and not in the s390-ccw bios (and zipl stage3
- bootloader).
+ target/arm/cpu.h       |  8 ++++++--
+ target/arm/helper.h    |  1 +
+ target/arm/helper.c    | 14 +++++++++++++-
+ target/arm/translate.c |  6 +++++-
+ 4 files changed, 25 insertions(+), 4 deletions(-)
 
- pc-bios/s390-ccw/bootmap.c  | 56 +++++++++++++++++++++++++++++++++++--
- pc-bios/s390-ccw/jump2ipl.c |  2 +-
- pc-bios/s390-ccw/s390-ccw.h |  2 ++
- 3 files changed, 57 insertions(+), 3 deletions(-)
-
-diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
-index d13b7cbd15..bc7fa597b4 100644
---- a/pc-bios/s390-ccw/bootmap.c
-+++ b/pc-bios/s390-ccw/bootmap.c
-@@ -49,6 +49,56 @@ static inline bool is_iso_vd_valid(IsoVolDesc *vd)
-            vd->type <= VOL_DESC_TYPE_PARTITION;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 4106e4ae590..5f70e9e0438 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2238,6 +2238,9 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
+  * RAISES_EXC is for when the read or write hook might raise an exception;
+  * the generated code will synchronize the CPU state before calling the hook
+  * so that it is safe for the hook to call raise_exception().
++ * NEWEL is for writes to registers that might change the exception
++ * level - typically on older ARM chips. For those cases we need to
++ * re-read the new el when recomputing the translation flags.
+  */
+ #define ARM_CP_SPECIAL           0x0001
+ #define ARM_CP_CONST             0x0002
+@@ -2257,10 +2260,11 @@ static inline uint64_t cpreg_to_kvm_id(uint32_t cpregid)
+ #define ARM_CP_SVE               0x2000
+ #define ARM_CP_NO_GDB            0x4000
+ #define ARM_CP_RAISES_EXC        0x8000
++#define ARM_CP_NEWEL             0x10000
+ /* Used only as a terminator for ARMCPRegInfo lists */
+-#define ARM_CP_SENTINEL          0xffff
++#define ARM_CP_SENTINEL          0xfffff
+ /* Mask of only the flag bits in a type field */
+-#define ARM_CP_FLAG_MASK         0xf0ff
++#define ARM_CP_FLAG_MASK         0x1f0ff
+ 
+ /* Valid values for ARMCPRegInfo state field, indicating which of
+  * the AArch32 and AArch64 execution states this register is visible in.
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 7ce5169afb5..aa3d8cd08fa 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -91,6 +91,7 @@ DEF_HELPER_2(get_user_reg, i32, env, i32)
+ DEF_HELPER_3(set_user_reg, void, env, i32, i32)
+ 
+ DEF_HELPER_FLAGS_2(rebuild_hflags_m32, TCG_CALL_NO_RWG, void, env, int)
++DEF_HELPER_FLAGS_1(rebuild_hflags_a32_newel, TCG_CALL_NO_RWG, void, env)
+ DEF_HELPER_FLAGS_2(rebuild_hflags_a32, TCG_CALL_NO_RWG, void, env, int)
+ DEF_HELPER_FLAGS_2(rebuild_hflags_a64, TCG_CALL_NO_RWG, void, env, int)
+ 
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 3a93844a3bc..5074b5f69ca 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5133,7 +5133,7 @@ static const ARMCPRegInfo el3_cp_reginfo[] = {
+       .opc0 = 3, .opc1 = 6, .crn = 1, .crm = 1, .opc2 = 0,
+       .access = PL3_RW, .fieldoffset = offsetof(CPUARMState, cp15.scr_el3),
+       .resetvalue = 0, .writefn = scr_write },
+-    { .name = "SCR",  .type = ARM_CP_ALIAS,
++    { .name = "SCR",  .type = ARM_CP_ALIAS | ARM_CP_NEWEL,
+       .cp = 15, .opc1 = 0, .crn = 1, .crm = 1, .opc2 = 0,
+       .access = PL1_RW, .accessfn = access_trap_aa32s_el1,
+       .fieldoffset = offsetoflow32(CPUARMState, cp15.scr_el3),
+@@ -11472,6 +11472,18 @@ void HELPER(rebuild_hflags_m32)(CPUARMState *env, int el)
+     env->hflags = rebuild_hflags_m32(env, fp_el, mmu_idx);
  }
  
-+/**
-+ * The ZIPL boot loader adds a BOOT_IMAGE=x to the kernel parameters
-+ * (where x is the number of the selected boot entry). Since some
-+ * programs might rely on this parameter, we mimic this behavior here.
++/*
++ * If we have triggered a EL state change we can't rely on the
++ * translator having passed it too us, we need to recompute.
 + */
-+static void add_boot_image_param(uint64_t start_addr, int index)
++void HELPER(rebuild_hflags_a32_newel)(CPUARMState *env)
 +{
-+    /* "BOOT_IMAGE=00" in EBCDIC */
-+    char bootimg_str[15] = {
-+        0xc2, 0xd6, 0xd6, 0xe3, 0x6d, 0xc9, 0xd4, 0xc1, 0xc7, 0xc5, 0x7e,
-+        0xf0, 0xf0, 0
-+    };
-+
-+    /* Only do it for Linux images */
-+    if (memcmp((char *)LINUX_MAGIC_ADDR, "S390EP", 6) != 0) {
-+        return;
-+    }
-+
-+    if (index < 10) {
-+        bootimg_str[11] = 0xf0 + index;  /* 0xf0 is '0' in EBCDIC */
-+        bootimg_str[12] = 0;
-+    } else if (index < 100) {
-+        bootimg_str[11] = 0xf0 + index / 10;
-+        bootimg_str[12] = 0xf0 + index % 10;
-+    } else {
-+        /* This should never happen since index should be < MAX_BOOT_ENTRIES */
-+        panic("BOOT_IMAGE index too big");
-+    }
-+
-+    /*
-+     * Now write the parameter to the COMMAND_LINE_EXTRA area of the zipl
-+     * stage3 boot loader that we are going to run. Unfortunately, the
-+     * location of this area changed in the course of time, but we can
-+     * use the stage3 start address to determine which area we have to
-+     * use (unless it is zipl v2.9 - the start address already has changed
-+     * there but the area has not been moved yet ... so for this version
-+     * we are writing the parameters into the unused stack area instead
-+     * and thus the BOOT_PARAM won't show up there)
-+     */
-+    if ((start_addr & 0x7fffffff) == 0xa050) {
-+        *(uint64_t *)0xa020 = true;
-+        memcpy((char *)0xa000 - 0x400, bootimg_str, sizeof(bootimg_str));
-+    } else if ((start_addr & 0x7fffffff) == 0xa000) {
-+        *(uint64_t *)0x9020 = true;
-+        memcpy((char *)0xe000, bootimg_str, sizeof(bootimg_str));
-+    } else {
-+        sclp_print("\nWarning: Unsupported ZIPL stage 3 start address.\n");
-+    }
++    int el = arm_current_el(env);
++    int fp_el = fp_exception_el(env, el);
++    ARMMMUIdx mmu_idx = arm_mmu_idx_el(env, el);
++    env->hflags = rebuild_hflags_a32(env, fp_el, mmu_idx);
 +}
 +
- /***********************************************************************
-  * IPL an ECKD DASD (CDL or LDL/CMS format)
-  */
-@@ -480,7 +530,7 @@ static void zipl_load_segment(ComponentEntry *entry)
- }
- 
- /* Run a zipl program */
--static void zipl_run(ScsiBlockPtr *pte)
-+static void zipl_run(ScsiBlockPtr *pte, int loadparm)
+ void HELPER(rebuild_hflags_a32)(CPUARMState *env, int el)
  {
-     ComponentHeader *header;
-     ComponentEntry *entry;
-@@ -515,6 +565,8 @@ static void zipl_run(ScsiBlockPtr *pte)
- 
-     IPL_assert(entry->component_type == ZIPL_COMP_ENTRY_EXEC, "No EXEC entry");
- 
-+    add_boot_image_param(entry->load_address, loadparm);
-+
-     /* should not return */
-     jump_to_IPL_code(entry->load_address);
- }
-@@ -565,7 +617,7 @@ static void ipl_scsi(void)
-     IPL_assert(loadparm < MAX_BOOT_ENTRIES, "loadparm value greater than"
-                " maximum number of boot entries allowed");
- 
--    zipl_run(&prog_table->entry[loadparm].scsi); /* no return */
-+    zipl_run(&prog_table->entry[loadparm].scsi, loadparm); /* no return */
- }
- 
- /***********************************************************************
-diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
-index 266f1502b9..36090631f9 100644
---- a/pc-bios/s390-ccw/jump2ipl.c
-+++ b/pc-bios/s390-ccw/jump2ipl.c
-@@ -77,7 +77,7 @@ void jump_to_low_kernel(void)
-      * kernel start address (when jumping to the PSW-at-zero address instead,
-      * the kernel startup code fails when we booted from a network device).
-      */
--    if (!memcmp((char *)0x10008, "S390EP", 6)) {
-+    if (!memcmp((char *)LINUX_MAGIC_ADDR, "S390EP", 6)) {
-         jump_to_IPL_code(KERN_IMAGE_START);
-     }
- 
-diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
-index 11bce7d73c..3e23c3c400 100644
---- a/pc-bios/s390-ccw/s390-ccw.h
-+++ b/pc-bios/s390-ccw/s390-ccw.h
-@@ -46,6 +46,8 @@ typedef unsigned long long __u64;
- 
- #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
- 
-+#define LINUX_MAGIC_ADDR  0x010008UL
-+
- #include "cio.h"
- #include "iplb.h"
- 
+     int fp_el = fp_exception_el(env, el);
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index f162be8434f..2b6c1f91bf9 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -7083,7 +7083,11 @@ static int disas_coproc_insn(DisasContext *s, uint32_t insn)
+             if (arm_dc_feature(s, ARM_FEATURE_M)) {
+                 gen_helper_rebuild_hflags_m32(cpu_env, tcg_el);
+             } else {
+-                gen_helper_rebuild_hflags_a32(cpu_env, tcg_el);
++                if (ri->type & ARM_CP_NEWEL) {
++                    gen_helper_rebuild_hflags_a32_newel(cpu_env);
++                } else {
++                    gen_helper_rebuild_hflags_a32(cpu_env, tcg_el);
++                }
+             }
+             tcg_temp_free_i32(tcg_el);
+             /*
 -- 
-2.18.1
+2.20.1
 
 
