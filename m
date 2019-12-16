@@ -2,92 +2,81 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD101C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FDCBC43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:07:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1694206E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:04:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1694206E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0879D206D7
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 15:07:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uqmwW+fR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0879D206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igruu-0005H2-LX
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 10:04:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49708)
+	id 1igryW-0007De-UO
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 10:07:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51068)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1igrsM-0002q9-Tz
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:01:37 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1igrxn-0006WO-K0
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:07:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1igrsG-0006GX-Od
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:01:34 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4370
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1igrsG-0006GK-IU
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:01:28 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xBGEuoeg013773
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 10:01:26 -0500
-Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wwe8ae6ur-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 10:01:26 -0500
-Received: from localhost
- by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Mon, 16 Dec 2019 15:01:24 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Mon, 16 Dec 2019 15:01:19 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
- [9.149.105.232])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xBGF1Ike22609976
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 16 Dec 2019 15:01:19 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D374F5205A;
- Mon, 16 Dec 2019 15:01:18 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.39.6])
- by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 799A252057;
- Mon, 16 Dec 2019 15:01:18 +0000 (GMT)
-Subject: [PATCH v3 2/2] cpu: Use cpu_class_set_parent_reset()
-From: Greg Kurz <groug@kaod.org>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Date: Mon, 16 Dec 2019 16:01:18 +0100
-In-Reply-To: <157650846660.354886.16810288202617432561.stgit@bahia.lan>
-References: <157650846660.354886.16810288202617432561.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
+ (envelope-from <peter.maydell@linaro.org>) id 1igrxm-0004FG-22
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:07:11 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:47003)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1igrxl-0004F1-J1
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 10:07:10 -0500
+Received: by mail-ot1-x343.google.com with SMTP id g18so9526962otj.13
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 07:07:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=M4gc9ntqhanedepx8Ouedw0ub+Hoa52EfUirIvEEHhg=;
+ b=uqmwW+fREXSpfQGpaTkBbzzz0spe3Wj17FrZZ8ZAQUPSWnhi/67ccNcfbfi6nArTTk
+ H0cyJsj+ixBGwFheiXnfYzxvnuL9YB4B3MlhZwjlANvnfg61Es2S+nt/aQyMMcd59Tq6
+ 0xe4cOdnZ41yELMo0iYh7Me1dgHOdZNpg7rm5WmuEn25fkUKKCxPUBSNb7z2pHQ6Ksbi
+ uwA52PmjtCSFou3/RYG3AP7c5GvcMDoT9i7Jjha1pnWycze642HZVi47ZHaPU42EQyxs
+ JXPr16yIwNqpYBiBr+/EIjM6bShrFBppEzR7DxrBcrJiCuP6eIvdR8XDsA7Cw4Iv2JYA
+ oNhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=M4gc9ntqhanedepx8Ouedw0ub+Hoa52EfUirIvEEHhg=;
+ b=it6L3l4m+TAuU8HNHMQeLST5uD+0agvpam0TLA2P54x7Pag1Nu60dde6Lk09sy9zZv
+ 6QzzFOlFdyh0jfyMG9AsuLMDQfSSzwWPBceuVHg3z61ScZx7tU/h3EAa3k99MSwMO+AC
+ SN/lFelebMzy+aMjkU0BYPtURwvBbxlr0FjWhPbc9Iv49yO48onLhmQSl/3basoMp3qH
+ qc/7zff0+Gbebft9XG9u0QXGAi43zosXg27qEyCFRlZqu8S+L6QJzhW9u7OxH8xNTYwb
+ YoU5Lbne3Rf5TH8Klqke8xYpIt2gMJURQOZo20St2YgNQQ++t2D+f7joxTH5LcYYLC6y
+ W5rw==
+X-Gm-Message-State: APjAAAV/YId3tXXo+NaG14gjO8VdpiHL+/CXAD3PLqfMJV3z+odteZ3C
+ jB3YwiRAiR7chc6kEB25GTxnZMvdRy0Xib7PvBX6npO5n48=
+X-Google-Smtp-Source: APXvYqyfeMPpiv04dgODSyI8HlmcgHy/V11GbI9vyMjfEEYcvB0sKMdEOJFgmqTnZMmRcXdfaSdYpm+4cyvnon7nzNQ=
+X-Received: by 2002:a05:6830:4a4:: with SMTP id
+ l4mr32723896otd.91.1576508828697; 
+ Mon, 16 Dec 2019 07:07:08 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19121615-0028-0000-0000-000003C926A8
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19121615-0029-0000-0000-0000248C6B56
-Message-Id: <157650847817.354886.7047137349018460524.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-16_05:2019-12-16,2019-12-16 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 bulkscore=0
- phishscore=0 lowpriorityscore=0 malwarescore=0 priorityscore=1501
- adultscore=0 mlxscore=0 clxscore=1034 mlxlogscore=999 spamscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912160132
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+References: <20191212173320.11610-1-drjones@redhat.com>
+ <20191212173320.11610-6-drjones@redhat.com>
+In-Reply-To: <20191212173320.11610-6-drjones@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 16 Dec 2019 15:06:57 +0000
+Message-ID: <CAFEAcA8=FcrT8dRMDzxu14J-gv5LEDuNBNpD5yo9j3waV7u8iw@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 5/5] target/arm/cpu: Add the kvm-no-adjvtime CPU
+ property
+To: Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,313 +88,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, David Hildenbrand <david@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: bijan.mottahedeh@oracle.com, Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Heyi Guo <guoheyi@huawei.com>, msys.mizuma@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert all targets to use cpu_class_set_parent_reset() with the following
-coccinelle script:
+On Thu, 12 Dec 2019 at 17:33, Andrew Jones <drjones@redhat.com> wrote:
+>
+> kvm-no-adjvtime is a KVM specific CPU property and a first of its kind.
+> To accommodate it we also add kvm_arm_add_vcpu_properties() and a
+> KVM specific CPU properties description to the CPU features document.
+>
+> Signed-off-by: Andrew Jones <drjones@redhat.com>
+> ---
+>  docs/arm-cpu-features.rst | 31 ++++++++++++++++++++++++++++++-
+>  hw/arm/virt.c             |  8 ++++++++
+>  include/hw/arm/virt.h     |  1 +
+>  target/arm/cpu.c          |  2 ++
+>  target/arm/cpu64.c        |  1 +
+>  target/arm/kvm.c          | 28 ++++++++++++++++++++++++++++
+>  target/arm/kvm_arm.h      | 11 +++++++++++
+>  target/arm/monitor.c      |  1 +
+>  tests/arm-cpu-features.c  |  4 ++++
+>  9 files changed, 86 insertions(+), 1 deletion(-)
+>
+> diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
+> index 1b367e22e16e..641ec9cb8f4a 100644
+> --- a/docs/arm-cpu-features.rst
+> +++ b/docs/arm-cpu-features.rst
+> @@ -31,7 +31,9 @@ supporting the feature or only supporting the feature under certain
+>  configurations.  For example, the `aarch64` CPU feature, which, when
+>  disabled, enables the optional AArch32 CPU feature, is only supported
+>  when using the KVM accelerator and when running on a host CPU type that
+> -supports the feature.
+> +supports the feature.  While `aarch64` currently only works with KVM,
+> +it could work with TCG.  CPU features that are specific to KVM are
+> +prefixed with "kvm-" and are described in "KVM VCPU Features".
+>
+>  CPU Feature Probing
+>  ===================
+> @@ -171,6 +173,33 @@ disabling many SVE vector lengths would be quite verbose, the `sve<N>` CPU
+>  properties have special semantics (see "SVE CPU Property Parsing
+>  Semantics").
+>
+> +KVM VCPU Features
+> +=================
+> +
+> +KVM VCPU features are CPU features that are specific to KVM, such as
+> +paravirt features or features that enable CPU virtualization extensions.
+> +The features' CPU properties are only available when KVM is enabled and
+> +are named with the prefix "kvm-".  KVM VCPU features may be probed,
+> +enabled, and disabled in the same way as other CPU features.  Below is the
+> +list of KVM VCPU features and their descriptions.
+> +
+> +  kvm-no-adjvtime          When disabled, each time the VM transitions
+> +                           back to running state from the paused state the
+> +                           VCPU's vitual counter is updated to ensure the
 
-@@
-type CPUParentClass;
-CPUParentClass *pcc;
-CPUClass *cc;
-identifier parent_fn;
-identifier child_fn;
-@@
-+cpu_class_set_parent_reset(cc, child_fn, &pcc->parent_fn);
--pcc->parent_fn = cc->reset;
-...
--cc->reset = child_fn;
+"virtual"
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Acked-by: David Hildenbrand <david@redhat.com>
----
- target/arm/cpu.c                |    3 +--
- target/cris/cpu.c               |    3 +--
- target/i386/cpu.c               |    3 +--
- target/lm32/cpu.c               |    3 +--
- target/m68k/cpu.c               |    3 +--
- target/microblaze/cpu.c         |    3 +--
- target/mips/cpu.c               |    3 +--
- target/moxie/cpu.c              |    3 +--
- target/nios2/cpu.c              |    3 +--
- target/openrisc/cpu.c           |    3 +--
- target/ppc/translate_init.inc.c |    3 +--
- target/riscv/cpu.c              |    3 +--
- target/s390x/cpu.c              |    3 +--
- target/sh4/cpu.c                |    3 +--
- target/sparc/cpu.c              |    3 +--
- target/tilegx/cpu.c             |    3 +--
- target/tricore/cpu.c            |    3 +--
- target/xtensa/cpu.c             |    3 +--
- 18 files changed, 18 insertions(+), 36 deletions(-)
+> +                           stopped time is not counted.  This avoids time
+> +                           jumps surprising guest OSes and applications,
+> +                           as long as they use the virtual counter for
+> +                           timekeeping, but has the side effect of the
+> +                           virtual and physical counters diverging.  All
+> +                           timekeeping based on the virtual counter will
+> +                           appear to lag behind any timekeeping that does
+> +                           not subtract VM stopped time.  The guest may
+> +                           resynchronize its virtual counter with other
+> +                           time sources as needed.  Enabling this KVM VCPU
+> +                           feature provides the legacy behavior, which is
+> +                           to also count stopped time with the virtual
+> +                           counter.
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 7a4ac9339bf9..712a9425fdf5 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2625,8 +2625,7 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
-                                     &acc->parent_realize);
-     dc->props = arm_cpu_properties;
- 
--    acc->parent_reset = cc->reset;
--    cc->reset = arm_cpu_reset;
-+    cpu_class_set_parent_reset(cc, arm_cpu_reset, &acc->parent_reset);
- 
-     cc->class_by_name = arm_cpu_class_by_name;
-     cc->has_work = arm_cpu_has_work;
-diff --git a/target/cris/cpu.c b/target/cris/cpu.c
-index 7adfd6caf4ed..486675e3822f 100644
---- a/target/cris/cpu.c
-+++ b/target/cris/cpu.c
-@@ -256,8 +256,7 @@ static void cris_cpu_class_init(ObjectClass *oc, void *data)
-     device_class_set_parent_realize(dc, cris_cpu_realizefn,
-                                     &ccc->parent_realize);
- 
--    ccc->parent_reset = cc->reset;
--    cc->reset = cris_cpu_reset;
-+    cpu_class_set_parent_reset(cc, cris_cpu_reset, &ccc->parent_reset);
- 
-     cc->class_by_name = cris_cpu_class_by_name;
-     cc->has_work = cris_cpu_has_work;
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 69f518a21a9b..57d36931725d 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -7049,8 +7049,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
-                                       &xcc->parent_unrealize);
-     dc->props = x86_cpu_properties;
- 
--    xcc->parent_reset = cc->reset;
--    cc->reset = x86_cpu_reset;
-+    cpu_class_set_parent_reset(cc, x86_cpu_reset, &xcc->parent_reset);
-     cc->reset_dump_flags = CPU_DUMP_FPU | CPU_DUMP_CCOP;
- 
-     cc->class_by_name = x86_cpu_class_by_name;
-diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
-index b35537de6285..687bf35e6588 100644
---- a/target/lm32/cpu.c
-+++ b/target/lm32/cpu.c
-@@ -218,8 +218,7 @@ static void lm32_cpu_class_init(ObjectClass *oc, void *data)
- 
-     device_class_set_parent_realize(dc, lm32_cpu_realizefn,
-                                     &lcc->parent_realize);
--    lcc->parent_reset = cc->reset;
--    cc->reset = lm32_cpu_reset;
-+    cpu_class_set_parent_reset(cc, lm32_cpu_reset, &lcc->parent_reset);
- 
-     cc->class_by_name = lm32_cpu_class_by_name;
-     cc->has_work = lm32_cpu_has_work;
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index e6596de29c2c..176d95e6fcfb 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -257,8 +257,7 @@ static void m68k_cpu_class_init(ObjectClass *c, void *data)
- 
-     device_class_set_parent_realize(dc, m68k_cpu_realizefn,
-                                     &mcc->parent_realize);
--    mcc->parent_reset = cc->reset;
--    cc->reset = m68k_cpu_reset;
-+    cpu_class_set_parent_reset(cc, m68k_cpu_reset, &mcc->parent_reset);
- 
-     cc->class_by_name = m68k_cpu_class_by_name;
-     cc->has_work = m68k_cpu_has_work;
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 9cfd7445e7da..71d88f603b2e 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -292,8 +292,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
- 
-     device_class_set_parent_realize(dc, mb_cpu_realizefn,
-                                     &mcc->parent_realize);
--    mcc->parent_reset = cc->reset;
--    cc->reset = mb_cpu_reset;
-+    cpu_class_set_parent_reset(cc, mb_cpu_reset, &mcc->parent_reset);
- 
-     cc->class_by_name = mb_cpu_class_by_name;
-     cc->has_work = mb_cpu_has_work;
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index bbcf7ca4635c..6cd6b9650baa 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -189,8 +189,7 @@ static void mips_cpu_class_init(ObjectClass *c, void *data)
- 
-     device_class_set_parent_realize(dc, mips_cpu_realizefn,
-                                     &mcc->parent_realize);
--    mcc->parent_reset = cc->reset;
--    cc->reset = mips_cpu_reset;
-+    cpu_class_set_parent_reset(cc, mips_cpu_reset, &mcc->parent_reset);
- 
-     cc->class_by_name = mips_cpu_class_by_name;
-     cc->has_work = mips_cpu_has_work;
-diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
-index 48996d0554f2..cf47bc709b54 100644
---- a/target/moxie/cpu.c
-+++ b/target/moxie/cpu.c
-@@ -101,8 +101,7 @@ static void moxie_cpu_class_init(ObjectClass *oc, void *data)
- 
-     device_class_set_parent_realize(dc, moxie_cpu_realizefn,
-                                     &mcc->parent_realize);
--    mcc->parent_reset = cc->reset;
--    cc->reset = moxie_cpu_reset;
-+    cpu_class_set_parent_reset(cc, moxie_cpu_reset, &mcc->parent_reset);
- 
-     cc->class_by_name = moxie_cpu_class_by_name;
- 
-diff --git a/target/nios2/cpu.c b/target/nios2/cpu.c
-index ca9c7a6df5d1..bbdbc0c6fbf0 100644
---- a/target/nios2/cpu.c
-+++ b/target/nios2/cpu.c
-@@ -188,8 +188,7 @@ static void nios2_cpu_class_init(ObjectClass *oc, void *data)
-     device_class_set_parent_realize(dc, nios2_cpu_realizefn,
-                                     &ncc->parent_realize);
-     dc->props = nios2_properties;
--    ncc->parent_reset = cc->reset;
--    cc->reset = nios2_cpu_reset;
-+    cpu_class_set_parent_reset(cc, nios2_cpu_reset, &ncc->parent_reset);
- 
-     cc->class_by_name = nios2_cpu_class_by_name;
-     cc->has_work = nios2_cpu_has_work;
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index 506aec6bfba5..5cd04dafab69 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -150,8 +150,7 @@ static void openrisc_cpu_class_init(ObjectClass *oc, void *data)
- 
-     device_class_set_parent_realize(dc, openrisc_cpu_realizefn,
-                                     &occ->parent_realize);
--    occ->parent_reset = cc->reset;
--    cc->reset = openrisc_cpu_reset;
-+    cpu_class_set_parent_reset(cc, openrisc_cpu_reset, &occ->parent_reset);
- 
-     cc->class_by_name = openrisc_cpu_class_by_name;
-     cc->has_work = openrisc_cpu_has_work;
-diff --git a/target/ppc/translate_init.inc.c b/target/ppc/translate_init.inc.c
-index ba726dec4d00..e5773a99fffd 100644
---- a/target/ppc/translate_init.inc.c
-+++ b/target/ppc/translate_init.inc.c
-@@ -10614,8 +10614,7 @@ static void ppc_cpu_class_init(ObjectClass *oc, void *data)
-     pcc->interrupts_big_endian = ppc_cpu_interrupts_big_endian_always;
-     dc->props = ppc_cpu_properties;
- 
--    pcc->parent_reset = cc->reset;
--    cc->reset = ppc_cpu_reset;
-+    cpu_class_set_parent_reset(cc, ppc_cpu_reset, &pcc->parent_reset);
- 
-     cc->class_by_name = ppc_cpu_class_by_name;
-     pcc->parent_parse_features = cc->parse_features;
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index d37861a4305b..d6f187272859 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -462,8 +462,7 @@ static void riscv_cpu_class_init(ObjectClass *c, void *data)
-     device_class_set_parent_realize(dc, riscv_cpu_realize,
-                                     &mcc->parent_realize);
- 
--    mcc->parent_reset = cc->reset;
--    cc->reset = riscv_cpu_reset;
-+    cpu_class_set_parent_reset(cc, riscv_cpu_reset, &mcc->parent_reset);
- 
-     cc->class_by_name = riscv_cpu_class_by_name;
-     cc->has_work = riscv_cpu_has_work;
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 99ea09085a30..80b93435a74b 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -448,12 +448,11 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
-     dc->props = s390x_cpu_properties;
-     dc->user_creatable = true;
- 
--    scc->parent_reset = cc->reset;
-+    cpu_class_set_parent_reset(cc, s390_cpu_reset_full, &scc->parent_reset);
- #if !defined(CONFIG_USER_ONLY)
-     scc->load_normal = s390_cpu_load_normal;
- #endif
-     scc->reset = s390_cpu_reset;
--    cc->reset = s390_cpu_reset_full;
-     cc->class_by_name = s390_cpu_class_by_name,
-     cc->has_work = s390_cpu_has_work;
- #ifdef CONFIG_TCG
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index d0a7707991fe..70c8d8170ff3 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -214,8 +214,7 @@ static void superh_cpu_class_init(ObjectClass *oc, void *data)
-     device_class_set_parent_realize(dc, superh_cpu_realizefn,
-                                     &scc->parent_realize);
- 
--    scc->parent_reset = cc->reset;
--    cc->reset = superh_cpu_reset;
-+    cpu_class_set_parent_reset(cc, superh_cpu_reset, &scc->parent_reset);
- 
-     cc->class_by_name = superh_cpu_class_by_name;
-     cc->has_work = superh_cpu_has_work;
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index bc659295520f..9c306e52717e 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -859,8 +859,7 @@ static void sparc_cpu_class_init(ObjectClass *oc, void *data)
-                                     &scc->parent_realize);
-     dc->props = sparc_cpu_properties;
- 
--    scc->parent_reset = cc->reset;
--    cc->reset = sparc_cpu_reset;
-+    cpu_class_set_parent_reset(cc, sparc_cpu_reset, &scc->parent_reset);
- 
-     cc->class_by_name = sparc_cpu_class_by_name;
-     cc->parse_features = sparc_cpu_parse_features;
-diff --git a/target/tilegx/cpu.c b/target/tilegx/cpu.c
-index 2b2a7ccc313f..cd422a0467a0 100644
---- a/target/tilegx/cpu.c
-+++ b/target/tilegx/cpu.c
-@@ -142,8 +142,7 @@ static void tilegx_cpu_class_init(ObjectClass *oc, void *data)
-     device_class_set_parent_realize(dc, tilegx_cpu_realizefn,
-                                     &tcc->parent_realize);
- 
--    tcc->parent_reset = cc->reset;
--    cc->reset = tilegx_cpu_reset;
-+    cpu_class_set_parent_reset(cc, tilegx_cpu_reset, &tcc->parent_reset);
- 
-     cc->class_by_name = tilegx_cpu_class_by_name;
-     cc->has_work = tilegx_cpu_has_work;
-diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
-index df807c1d7437..85bc9f03a1ee 100644
---- a/target/tricore/cpu.c
-+++ b/target/tricore/cpu.c
-@@ -153,8 +153,7 @@ static void tricore_cpu_class_init(ObjectClass *c, void *data)
-     device_class_set_parent_realize(dc, tricore_cpu_realizefn,
-                                     &mcc->parent_realize);
- 
--    mcc->parent_reset = cc->reset;
--    cc->reset = tricore_cpu_reset;
-+    cpu_class_set_parent_reset(cc, tricore_cpu_reset, &mcc->parent_reset);
-     cc->class_by_name = tricore_cpu_class_by_name;
-     cc->has_work = tricore_cpu_has_work;
- 
-diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
-index c65dcf9dd782..4856aee8eca6 100644
---- a/target/xtensa/cpu.c
-+++ b/target/xtensa/cpu.c
-@@ -184,8 +184,7 @@ static void xtensa_cpu_class_init(ObjectClass *oc, void *data)
-     device_class_set_parent_realize(dc, xtensa_cpu_realizefn,
-                                     &xcc->parent_realize);
- 
--    xcc->parent_reset = cc->reset;
--    cc->reset = xtensa_cpu_reset;
-+    cpu_class_set_parent_reset(cc, xtensa_cpu_reset, &xcc->parent_reset);
- 
-     cc->class_by_name = xtensa_cpu_class_by_name;
-     cc->has_work = xtensa_cpu_has_work;
+This phrasing reads a bit confusingly to me. What I would usually expect
+is that you get
+  name-of-option              Description of what the option does.
 
+But here we have
+  name-of-option              Long description of the default behaviour,
+                              taking many lines and several sentences.
+                              Brief note at the end that enabling this
+                              feature gives the opposite effect.
+
+Especially since the default-behaviour description isn't prefaced
+with "By default" or similar, it's quite easy to start reading the
+text assuming it's defining what the option is going to do, only
+to get to the end and realise that it's defining what the option
+is *not* going to do...
+
+Incidentally, if I understand things correctly, for TCG the
+behaviour is (and has always been) that VM-stopped time is
+not counted, because we run the emulated versions of these counters
+off QEMU_CLOCK_VIRTUAL. So having the KVM default be the same as
+the TCG default is nicely consistent.
+
+thanks
+-- PMM
 
