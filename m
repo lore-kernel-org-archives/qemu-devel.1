@@ -2,83 +2,83 @@ Return-Path: <SRS0=u0tK=2G=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B84CC43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:17:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB02C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:20:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17E76206D3
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:17:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 08441206D3
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 17:20:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="liRhNVTQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E76206D3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DznEXNuR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08441206D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igtzb-0006vg-Kf
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:17:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57310)
+	id 1igu2Z-0001xZ-KF
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 12:20:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFa-0005ov-SP
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:40 -0500
+ (envelope-from <drjones@redhat.com>) id 1igtcI-0000wG-Dk
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:53:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtFZ-0000D3-Ab
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:38 -0500
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:43812)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtFZ-0000B2-39
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:37 -0500
-Received: by mail-wr1-x42b.google.com with SMTP id d16so8037934wre.10
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=o36I1VuzLK8GMxppob8RAkcgsIWx5hcgxVqZBzm9Eo8=;
- b=liRhNVTQ+MkxvHpguBmpJbNXtTZSvUtWzi5MwTqtkdqDfTX70HYVxxKT0oRDG98d3F
- 6c3nZVIlbw25oTLHOYsDGYsYxZAy7Bl5SS/hXuUjWqDh9/0hlRBFuHTaWFniWb1eKavp
- ZetSHrv2QuYn93pKP67TJM4JDJwAfrM3ldp7TvLCNTTooFByU/g00g1sjcuvwL8Bgvzw
- bBBNFQCpEKE2wm+Geu5R+pHs6RpAwDIGwSEF9o5BQTnMj3D+SCHf5U8VZLc8Ld1HNde4
- X/u4lMsLEPPKrHvvoanc4ni+SjRxvwxE4+Js3KC0IF3FCKD/DTDw2reAiuH8uGuBN9rm
- dLcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references;
- bh=o36I1VuzLK8GMxppob8RAkcgsIWx5hcgxVqZBzm9Eo8=;
- b=bO1o8FZwSrcqQI7Lvt98l6hrjuaVScAZUHDXcj+qAjCAv8om/0qGdb4IKH4gbPOWFV
- LJFw1CLe+B2ZltzQUO2TI5KzQGvvB1Nne06eD6030bEFqRr8vEmmVmBWG6d4p1jG+sis
- P5rV7wFaeuhyev1T6BOejwdy5ptwEjKrL/6XTPaLuR5h4U0bQt0iaybHnwoMDt4rEMHH
- gIl1ut0TTwY8m+8prJ0GhQAxcUeWEcz423PLN4zDbm7mgnwguBhl9KbPY547wXrkNxa1
- QBv4yR1UBmjMf8sMZxS4Oz+WUa7u5WrDkwRFjtPZdo6OFYjWJjBzHTX+On1gdtly275r
- W3Ig==
-X-Gm-Message-State: APjAAAUx1rdNc84t98D7nkgYsWDAfQ9ke0+lxrD87VgJoWNQSXfbcJmx
- CjR1HYAUzOS70xrQl6ItTL/0vouT
-X-Google-Smtp-Source: APXvYqzEAs8HZkWCM5BviZjOt56NVmoKJl/noN3NrQZ5W9UYs8fAQ9GHtSZO60WaOIl8G43RO/ARjw==
-X-Received: by 2002:adf:f70b:: with SMTP id r11mr33205249wrp.388.1576513775853; 
- Mon, 16 Dec 2019 08:29:35 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.34
- for <qemu-devel@nongnu.org>
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Dec 2019 08:29:35 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 48/62] x86: move SMM property to X86MachineState
-Date: Mon, 16 Dec 2019 17:28:32 +0100
-Message-Id: <1576513726-53700-49-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
-References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::42b
+ (envelope-from <drjones@redhat.com>) id 1igtcH-0006Nl-06
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:53:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42203
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1igtcG-0006Mf-SC
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:53:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576515184;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6l+ZX6jfRcQPNGxAaff9khunijHeffZz2XH2nVa2low=;
+ b=DznEXNuRxDsjbPo7MjO6eFx2ucVMd5jzKQrNYUDEv3NzVDO3UWA2dfKrXNVJ5jv1mH1qq8
+ knbWidEw8QJ2V7hchllRMQo+hs2//jp6CFs9v7e0b6mnbR7v36RuV8b81QfT2TyHc0P1yM
+ 1rdNKkdNICzjBOSF1lzzBODtmKSkJGk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-180-TQ-AMmSSOLaG5TXmBjBmWw-1; Mon, 16 Dec 2019 11:53:01 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F5BE802570;
+ Mon, 16 Dec 2019 16:52:59 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-116-122.ams2.redhat.com
+ [10.36.116.122])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 50C8B60479;
+ Mon, 16 Dec 2019 16:52:56 +0000 (UTC)
+Date: Mon, 16 Dec 2019 17:52:49 +0100
+From: Andrew Jones <drjones@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC PATCH v2 5/5] target/arm/cpu: Add the kvm-no-adjvtime CPU
+ property
+Message-ID: <20191216165249.lygksiptf2yowqh7@kamzik.brq.redhat.com>
+References: <20191212173320.11610-1-drjones@redhat.com>
+ <20191212173320.11610-6-drjones@redhat.com>
+ <CAFEAcA8=FcrT8dRMDzxu14J-gv5LEDuNBNpD5yo9j3waV7u8iw@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA8=FcrT8dRMDzxu14J-gv5LEDuNBNpD5yo9j3waV7u8iw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: TQ-AMmSSOLaG5TXmBjBmWw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,283 +90,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: bijan.mottahedeh@oracle.com, Marc Zyngier <maz@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>,
+ Heyi Guo <guoheyi@huawei.com>, msys.mizuma@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add it to microvm as well, it is a generic property of the x86
-architecture.
+On Mon, Dec 16, 2019 at 03:06:57PM +0000, Peter Maydell wrote:
+> On Thu, 12 Dec 2019 at 17:33, Andrew Jones <drjones@redhat.com> wrote:
+> >
+> > kvm-no-adjvtime is a KVM specific CPU property and a first of its kind.
+> > To accommodate it we also add kvm_arm_add_vcpu_properties() and a
+> > KVM specific CPU properties description to the CPU features document.
+> >
+> > Signed-off-by: Andrew Jones <drjones@redhat.com>
+> > ---
+> >  docs/arm-cpu-features.rst | 31 ++++++++++++++++++++++++++++++-
+> >  hw/arm/virt.c             |  8 ++++++++
+> >  include/hw/arm/virt.h     |  1 +
+> >  target/arm/cpu.c          |  2 ++
+> >  target/arm/cpu64.c        |  1 +
+> >  target/arm/kvm.c          | 28 ++++++++++++++++++++++++++++
+> >  target/arm/kvm_arm.h      | 11 +++++++++++
+> >  target/arm/monitor.c      |  1 +
+> >  tests/arm-cpu-features.c  |  4 ++++
+> >  9 files changed, 86 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
+> > index 1b367e22e16e..641ec9cb8f4a 100644
+> > --- a/docs/arm-cpu-features.rst
+> > +++ b/docs/arm-cpu-features.rst
+> > @@ -31,7 +31,9 @@ supporting the feature or only supporting the feature=
+ under certain
+> >  configurations.  For example, the `aarch64` CPU feature, which, when
+> >  disabled, enables the optional AArch32 CPU feature, is only supported
+> >  when using the KVM accelerator and when running on a host CPU type tha=
+t
+> > -supports the feature.
+> > +supports the feature.  While `aarch64` currently only works with KVM,
+> > +it could work with TCG.  CPU features that are specific to KVM are
+> > +prefixed with "kvm-" and are described in "KVM VCPU Features".
+> >
+> >  CPU Feature Probing
+> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > @@ -171,6 +173,33 @@ disabling many SVE vector lengths would be quite v=
+erbose, the `sve<N>` CPU
+> >  properties have special semantics (see "SVE CPU Property Parsing
+> >  Semantics").
+> >
+> > +KVM VCPU Features
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +KVM VCPU features are CPU features that are specific to KVM, such as
+> > +paravirt features or features that enable CPU virtualization extension=
+s.
+> > +The features' CPU properties are only available when KVM is enabled an=
+d
+> > +are named with the prefix "kvm-".  KVM VCPU features may be probed,
+> > +enabled, and disabled in the same way as other CPU features.  Below is=
+ the
+> > +list of KVM VCPU features and their descriptions.
+> > +
+> > +  kvm-no-adjvtime          When disabled, each time the VM transitions
+> > +                           back to running state from the paused state=
+ the
+> > +                           VCPU's vitual counter is updated to ensure =
+the
+>=20
+> "virtual"
+>=20
+> > +                           stopped time is not counted.  This avoids t=
+ime
+> > +                           jumps surprising guest OSes and application=
+s,
+> > +                           as long as they use the virtual counter for
+> > +                           timekeeping, but has the side effect of the
+> > +                           virtual and physical counters diverging.  A=
+ll
+> > +                           timekeeping based on the virtual counter wi=
+ll
+> > +                           appear to lag behind any timekeeping that d=
+oes
+> > +                           not subtract VM stopped time.  The guest ma=
+y
+> > +                           resynchronize its virtual counter with othe=
+r
+> > +                           time sources as needed.  Enabling this KVM =
+VCPU
+> > +                           feature provides the legacy behavior, which=
+ is
+> > +                           to also count stopped time with the virtual
+> > +                           counter.
+>=20
+> This phrasing reads a bit confusingly to me. What I would usually expect
+> is that you get
+>   name-of-option              Description of what the option does.
+>=20
+> But here we have
+>   name-of-option              Long description of the default behaviour,
+>                               taking many lines and several sentences.
+>                               Brief note at the end that enabling this
+>                               feature gives the opposite effect.
+>=20
+> Especially since the default-behaviour description isn't prefaced
+> with "By default" or similar, it's quite easy to start reading the
+> text assuming it's defining what the option is going to do, only
+> to get to the end and realise that it's defining what the option
+> is *not* going to do...
 
-Suggested-by: Sergio Lopez <slp@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/i386/pc.c          | 49 -------------------------------------------------
- hw/i386/pc_piix.c     |  6 +++---
- hw/i386/pc_q35.c      |  2 +-
- hw/i386/x86.c         | 50 +++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/i386/pc.h  |  3 ---
- include/hw/i386/x86.h |  5 +++++
- target/i386/kvm.c     |  3 +--
- 7 files changed, 59 insertions(+), 59 deletions(-)
+I'll take another stab at this, but my feeling is that a '-no-' option
+should be one that just turns off the default behavior, which is why I
+wrote a long description of the default behavior. If you'd prefer the
+description to be more terse, then I can certainly delete a bunch of
+the text, but then I fear what this option disables wouldn't be clear
+enough.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 23052c7..4d7f7dd 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2028,48 +2028,6 @@ static void pc_machine_set_vmport(Object *obj, Visitor *v, const char *name,
-     visit_type_OnOffAuto(v, name, &pcms->vmport, errp);
- }
- 
--bool pc_machine_is_smm_enabled(PCMachineState *pcms)
--{
--    bool smm_available = false;
--
--    if (pcms->smm == ON_OFF_AUTO_OFF) {
--        return false;
--    }
--
--    if (tcg_enabled() || qtest_enabled()) {
--        smm_available = true;
--    } else if (kvm_enabled()) {
--        smm_available = kvm_has_smm();
--    }
--
--    if (smm_available) {
--        return true;
--    }
--
--    if (pcms->smm == ON_OFF_AUTO_ON) {
--        error_report("System Management Mode not supported by this hypervisor.");
--        exit(1);
--    }
--    return false;
--}
--
--static void pc_machine_get_smm(Object *obj, Visitor *v, const char *name,
--                               void *opaque, Error **errp)
--{
--    PCMachineState *pcms = PC_MACHINE(obj);
--    OnOffAuto smm = pcms->smm;
--
--    visit_type_OnOffAuto(v, name, &smm, errp);
--}
--
--static void pc_machine_set_smm(Object *obj, Visitor *v, const char *name,
--                               void *opaque, Error **errp)
--{
--    PCMachineState *pcms = PC_MACHINE(obj);
--
--    visit_type_OnOffAuto(v, name, &pcms->smm, errp);
--}
--
- static bool pc_machine_get_smbus(Object *obj, Error **errp)
- {
-     PCMachineState *pcms = PC_MACHINE(obj);
-@@ -2116,7 +2074,6 @@ static void pc_machine_initfn(Object *obj)
- {
-     PCMachineState *pcms = PC_MACHINE(obj);
- 
--    pcms->smm = ON_OFF_AUTO_AUTO;
- #ifdef CONFIG_VMPORT
-     pcms->vmport = ON_OFF_AUTO_AUTO;
- #else
-@@ -2223,12 +2180,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-         pc_machine_get_device_memory_region_size, NULL,
-         NULL, NULL, &error_abort);
- 
--    object_class_property_add(oc, PC_MACHINE_SMM, "OnOffAuto",
--        pc_machine_get_smm, pc_machine_set_smm,
--        NULL, NULL, &error_abort);
--    object_class_property_set_description(oc, PC_MACHINE_SMM,
--        "Enable SMM (pc & q35)", &error_abort);
--
-     object_class_property_add(oc, PC_MACHINE_VMPORT, "OnOffAuto",
-         pc_machine_get_vmport, pc_machine_set_vmport,
-         NULL, NULL, &error_abort);
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 87aced0..dc88d9c 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -281,7 +281,7 @@ else {
-         /* TODO: Populate SPD eeprom data.  */
-         pcms->smbus = piix4_pm_init(pci_bus, piix3_devfn + 3, 0xb100,
-                                     x86ms->gsi[9], smi_irq,
--                                    pc_machine_is_smm_enabled(pcms),
-+                                    x86_machine_is_smm_enabled(x86ms),
-                                     &piix4_pm);
-         smbus_eeprom_init(pcms->smbus, 8, NULL, 0);
- 
-@@ -309,9 +309,9 @@ else {
- 
- static void pc_compat_2_3_fn(MachineState *machine)
- {
--    PCMachineState *pcms = PC_MACHINE(machine);
-+    X86MachineState *x86ms = X86_MACHINE(machine);
-     if (kvm_enabled()) {
--        pcms->smm = ON_OFF_AUTO_OFF;
-+        x86ms->smm = ON_OFF_AUTO_OFF;
-     }
- }
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 2608cd0..30784ec 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -276,7 +276,7 @@ static void pc_q35_init(MachineState *machine)
-                          0xff0104);
- 
-     /* connect pm stuff to lpc */
--    ich9_lpc_pm_init(lpc, pc_machine_is_smm_enabled(pcms));
-+    ich9_lpc_pm_init(lpc, x86_machine_is_smm_enabled(x86ms));
- 
-     if (pcms->sata_enabled) {
-         /* ahci and SATA device, for q35 1 ahci controller is built-in */
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index 3e4aee5..6fb01e4 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -746,10 +746,53 @@ static void x86_machine_set_max_ram_below_4g(Object *obj, Visitor *v,
-     x86ms->max_ram_below_4g = value;
- }
- 
-+bool x86_machine_is_smm_enabled(X86MachineState *x86ms)
-+{
-+    bool smm_available = false;
-+
-+    if (x86ms->smm == ON_OFF_AUTO_OFF) {
-+        return false;
-+    }
-+
-+    if (tcg_enabled() || qtest_enabled()) {
-+        smm_available = true;
-+    } else if (kvm_enabled()) {
-+        smm_available = kvm_has_smm();
-+    }
-+
-+    if (smm_available) {
-+        return true;
-+    }
-+
-+    if (x86ms->smm == ON_OFF_AUTO_ON) {
-+        error_report("System Management Mode not supported by this hypervisor.");
-+        exit(1);
-+    }
-+    return false;
-+}
-+
-+static void x86_machine_get_smm(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
-+    OnOffAuto smm = x86ms->smm;
-+
-+    visit_type_OnOffAuto(v, name, &smm, errp);
-+}
-+
-+static void x86_machine_set_smm(Object *obj, Visitor *v, const char *name,
-+                               void *opaque, Error **errp)
-+{
-+    X86MachineState *x86ms = X86_MACHINE(obj);
-+
-+    visit_type_OnOffAuto(v, name, &x86ms->smm, errp);
-+}
-+
- static void x86_machine_initfn(Object *obj)
- {
-     X86MachineState *x86ms = X86_MACHINE(obj);
- 
-+    x86ms->smm = ON_OFF_AUTO_AUTO;
-     x86ms->max_ram_below_4g = 0; /* use default */
-     x86ms->smp_dies = 1;
- }
-@@ -770,9 +813,14 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
-     object_class_property_add(oc, X86_MACHINE_MAX_RAM_BELOW_4G, "size",
-         x86_machine_get_max_ram_below_4g, x86_machine_set_max_ram_below_4g,
-         NULL, NULL, &error_abort);
--
-     object_class_property_set_description(oc, X86_MACHINE_MAX_RAM_BELOW_4G,
-         "Maximum ram below the 4G boundary (32bit boundary)", &error_abort);
-+
-+    object_class_property_add(oc, X86_MACHINE_SMM, "OnOffAuto",
-+        x86_machine_get_smm, x86_machine_set_smm,
-+        NULL, NULL, &error_abort);
-+    object_class_property_set_description(oc, X86_MACHINE_SMM,
-+        "Enable SMM", &error_abort);
- }
- 
- static const TypeInfo x86_machine_info = {
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 82447f8..ca641e8 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -43,7 +43,6 @@ struct PCMachineState {
- 
-     /* Configuration options: */
-     OnOffAuto vmport;
--    OnOffAuto smm;
- 
-     bool acpi_build_enabled;
-     bool smbus_enabled;
-@@ -61,7 +60,6 @@ struct PCMachineState {
- #define PC_MACHINE_ACPI_DEVICE_PROP "acpi-device"
- #define PC_MACHINE_DEVMEM_REGION_SIZE "device-memory-region-size"
- #define PC_MACHINE_VMPORT           "vmport"
--#define PC_MACHINE_SMM              "smm"
- #define PC_MACHINE_SMBUS            "smbus"
- #define PC_MACHINE_SATA             "sata"
- #define PC_MACHINE_PIT              "pit"
-@@ -165,7 +163,6 @@ void vmmouse_set_data(const uint32_t *data);
- /* pc.c */
- extern int fd_bootchk;
- 
--bool pc_machine_is_smm_enabled(PCMachineState *pcms);
- void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
- 
- void pc_hot_add_cpu(MachineState *ms, const int64_t id, Error **errp);
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index 4b84917..97d1575 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -60,6 +60,8 @@ typedef struct {
-     uint16_t boot_cpus;
-     unsigned smp_dies;
- 
-+    OnOffAuto smm;
-+
-     /*
-      * Address space used by IOAPIC device. All IOAPIC interrupts
-      * will be translated to MSI messages in the address space.
-@@ -68,6 +70,7 @@ typedef struct {
- } X86MachineState;
- 
- #define X86_MACHINE_MAX_RAM_BELOW_4G "max-ram-below-4g"
-+#define X86_MACHINE_SMM              "smm"
- 
- #define TYPE_X86_MACHINE   MACHINE_TYPE_NAME("x86")
- #define X86_MACHINE(obj) \
-@@ -95,4 +98,6 @@ void x86_load_linux(X86MachineState *x86ms,
-                     bool pvh_enabled,
-                     bool linuxboot_dma_enabled);
- 
-+bool x86_machine_is_smm_enabled(X86MachineState *x86ms);
-+
- #endif
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index ef63f3a..c7ff67a 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -2173,8 +2173,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     }
- 
-     if (kvm_check_extension(s, KVM_CAP_X86_SMM) &&
--        object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE) &&
--        pc_machine_is_smm_enabled(PC_MACHINE(ms))) {
-+        x86_machine_is_smm_enabled(X86_MACHINE(ms))) {
-         smram_machine_done.notify = register_smram_listener;
-         qemu_add_machine_init_done_notifier(&smram_machine_done);
-     }
--- 
-1.8.3.1
+>=20
+> Incidentally, if I understand things correctly, for TCG the
+> behaviour is (and has always been) that VM-stopped time is
+> not counted, because we run the emulated versions of these counters
+> off QEMU_CLOCK_VIRTUAL. So having the KVM default be the same as
+> the TCG default is nicely consistent.
 
+Thanks,
+drew
 
 
