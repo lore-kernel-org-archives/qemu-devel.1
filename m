@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F06C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:21:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD61C2D0BF
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:21:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A65AD20725
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:21:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23D62206CB
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 11:21:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MWpNzHn3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65AD20725
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="axYov1R8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23D62206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igoRI-000541-7Y
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:21:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50839)
+	id 1igoRK-00054E-4V
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 06:21:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFa-0007Yt-QS
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFa-0007Xp-5X
  for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1igoFZ-0007gp-4C
+ (envelope-from <peter.maydell@linaro.org>) id 1igoFY-0007ea-2W
  for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:18 -0500
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:55909)
+Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:33145)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1igoFY-0007fh-TS
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:17 -0500
-Received: by mail-wm1-x32b.google.com with SMTP id q9so6246033wmj.5
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:16 -0800 (PST)
+ id 1igoFX-0007dS-RD
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 06:09:16 -0500
+Received: by mail-wr1-x42a.google.com with SMTP id b6so6755346wrq.0
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 03:09:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=sqHoAwkhNl/Lv1gv8tFshXJ8XtXJpiotpdOiAG6Y6qE=;
- b=MWpNzHn3+99FF5Q++GWsN1zi3j9pf91a+5ma60V0Xk71xaaLBDjXKfcpXZO/ybS15N
- vP6BJ9sPxwBTbxl+dCyiw3BwPPN4K5SxgXOwx3hZmNDM2XHELuZxy/5or/gOR1rOksNv
- eK5LsoCKd6bP5xvKKrGRLOCvIozJGwuorRvq/J81YnbD6sMN3EXxbCQApnhVvV3ME8SO
- +0/Hy0p813fHMdhSdvL53JXxYN8I8DZTe42EBTLSdXRuplOw5Y68I8ddk+raH+ed9zyA
- eto6/wBCv42fQ3c1YL9NM4Ax4n8jDl9UA3rkXoZrelqwMR/Gje1KL3Fr0oeTwjrgmgGi
- AEug==
+ bh=aPucyTu35BZg4N9KmO26YmX+t5sHuLkag3CqvOlVE04=;
+ b=axYov1R8/NI+yKHDH1XvqKiMeiD5024DedaqZnjUxVk/w6A46Butd6sIJRA1ybno64
+ Y3Jn5U0RK78wAdRsrWKMVXsCR+KVvpmTaiJjIZFfJj29Qe2p7QHIk6QBuai/DzrWdCJ2
+ EL/cM9qGWZCzJ1zY54DnyZcbvio7MXnT24uTt537snhleb5R/IYPSff+40Bx1cmscNTQ
+ XI4ySZxgGZNl6kcwOurQHKelmvcpU8p3gQDeULtFZBPGIIK4UcvHkiZO2WwuFMlNnVpg
+ kZMmxa1DDk+/xrId/c3rLstf6EDLtaM6L9mFb34Nvhx52uW4NSHIUTMjUfOMx6wQe42W
+ Aj0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sqHoAwkhNl/Lv1gv8tFshXJ8XtXJpiotpdOiAG6Y6qE=;
- b=jL6i/rTB0gw8Q5QRkmQq08J1dhlobqZTwib3Ok+GJdJZ2thxxGwiAE+ihTLHrwlh+r
- u4UTKmEnZCbDEZqFXF+Xvy2kNiGMiVKtt/8KBNnqNAR2SGh27cdNbyZ+8lgj4Q9GXfEq
- Y9+ICo7s+O7SmOyv4/26x05zPUfmfj1m8OWrVhE8vtTvUIFTV7zVCrYSd5CxxpkzxF5v
- 4sJqBudLiKqxF/q2QurMM1m4xSH+RM9eOS1up1KP0jssFvmDxD//7ztlOhc/gFqRYNa2
- o647GJV/KBuWOcH4Ndixa/XttVwWBqrbaPPGlJ1WbRCHw3stOzLzqUqgncVPsqwD23eq
- S+6g==
-X-Gm-Message-State: APjAAAVtj9vaB3QWfzjdNUlS4/vPEdwSlrqbRcCmNERjND9jJP3QFYvp
- Ipd5hZlnMyE2zvm7D3aGLHhVRoTD1DO1kA==
-X-Google-Smtp-Source: APXvYqw6L2YCMc+TEe43brqQEjzvN8DGKvBr9swrn+yRDl8yXcHmwhm8u67w1YPU8NoXIe4X1NvWzg==
-X-Received: by 2002:a1c:f008:: with SMTP id a8mr29021132wmb.81.1576494555578; 
- Mon, 16 Dec 2019 03:09:15 -0800 (PST)
+ bh=aPucyTu35BZg4N9KmO26YmX+t5sHuLkag3CqvOlVE04=;
+ b=bPFo0BIOlqa7r8X+yJjt9ln5CAl66JCogLNWQewJw58twgdca5FdxcwJXOgWZ3xC7o
+ WRZ9tu+UevHTkhU3PbR3FKoh+uGi1y/RO137P9tJsDbtuP8c0KONSduoq4SWyb0xSkeH
+ vR1/JEgEFga/nqTxyhFs9+Hc3+cHefPxjEEHUJhQSIFYiFiTxciX/89FRS4osd88EEfI
+ 1qO5y2cvTFXbucjElTEVOdeeXx10/5ZD8OI9cZVQVHAjGPgl+/zm4dE6O5/tGnKprQD8
+ BFzGW2QLRT67F4KNtgZi/1HWv0lwXlIGrSU3Bhz1iIdM/F3EGSXCTDqrGqzN32iQigfe
+ 4wJg==
+X-Gm-Message-State: APjAAAU1NxfoXKUd10FAzpg75ndiBfHaBDfJyOz4gS8tlLhHPLGriIo8
+ xFhB4ssXrGEqaTGv6uT1TaPcMj3GtcPajw==
+X-Google-Smtp-Source: APXvYqw2mOlJmnjUB+2W5nfW7/Ii3nJfCv7F7udgZO9tNN8ksMQujK8bsPcZs0d337cKEpaIXTH9YQ==
+X-Received: by 2002:adf:fe90:: with SMTP id l16mr31221339wrr.265.1576494554552; 
+ Mon, 16 Dec 2019 03:09:14 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.14
+ by smtp.gmail.com with ESMTPSA id x10sm20976131wrp.58.2019.12.16.03.09.13
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 16 Dec 2019 03:09:15 -0800 (PST)
+ Mon, 16 Dec 2019 03:09:14 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/34] aspeed/i2c: Add trace events
-Date: Mon, 16 Dec 2019 11:08:37 +0000
-Message-Id: <20191216110904.30815-8-peter.maydell@linaro.org>
+Subject: [PULL 06/34] aspeed/i2c: Add support for DMA transfers
+Date: Mon, 16 Dec 2019 11:08:36 +0000
+Message-Id: <20191216110904.30815-7-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191216110904.30815-1-peter.maydell@linaro.org>
 References: <20191216110904.30815-1-peter.maydell@linaro.org>
@@ -82,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32b
+X-Received-From: 2a00:1450:4864:20::42a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,238 +100,345 @@ Sender: "Qemu-devel"
 
 From: Cédric Le Goater <clg@kaod.org>
 
+The I2C controller of the Aspeed AST2500 and AST2600 SoCs supports DMA
+transfers to and from DRAM.
+
+A pair of registers defines the buffer address and the length of the
+DMA transfer. The address should be aligned on 4 bytes and the maximum
+length should not exceed 4K. The receive or transmit DMA transfer can
+then be initiated with specific bits in the Command/Status register of
+the controller.
+
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 Reviewed-by: Joel Stanley <joel@jms.id.au>
 Tested-by: Jae Hyun Yoo <jae.hyun.yoo@linux.intel.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-id: 20191119141211.25716-6-clg@kaod.org
+Message-id: 20191119141211.25716-5-clg@kaod.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/i2c/aspeed_i2c.c | 93 ++++++++++++++++++++++++++++++++++++++-------
- hw/i2c/trace-events |  9 +++++
- 2 files changed, 89 insertions(+), 13 deletions(-)
+ include/hw/i2c/aspeed_i2c.h |   5 ++
+ hw/arm/aspeed_ast2600.c     |   5 ++
+ hw/arm/aspeed_soc.c         |   5 ++
+ hw/i2c/aspeed_i2c.c         | 126 +++++++++++++++++++++++++++++++++++-
+ 4 files changed, 138 insertions(+), 3 deletions(-)
 
+diff --git a/include/hw/i2c/aspeed_i2c.h b/include/hw/i2c/aspeed_i2c.h
+index 7a555072dfb..f1b9e5bf91e 100644
+--- a/include/hw/i2c/aspeed_i2c.h
++++ b/include/hw/i2c/aspeed_i2c.h
+@@ -52,6 +52,8 @@ typedef struct AspeedI2CBus {
+     uint32_t cmd;
+     uint32_t buf;
+     uint32_t pool_ctrl;
++    uint32_t dma_addr;
++    uint32_t dma_len;
+ } AspeedI2CBus;
+ 
+ typedef struct AspeedI2CState {
+@@ -66,6 +68,8 @@ typedef struct AspeedI2CState {
+     uint8_t pool[ASPEED_I2C_MAX_POOL_SIZE];
+ 
+     AspeedI2CBus busses[ASPEED_I2C_NR_BUSSES];
++    MemoryRegion *dram_mr;
++    AddressSpace dram_as;
+ } AspeedI2CState;
+ 
+ #define ASPEED_I2C_CLASS(klass) \
+@@ -85,6 +89,7 @@ typedef struct AspeedI2CClass {
+     hwaddr pool_base;
+     uint8_t *(*bus_pool_base)(AspeedI2CBus *);
+     bool check_sram;
++    bool has_dma;
+ 
+ } AspeedI2CClass;
+ 
+diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+index a403c2aae06..0881eb25983 100644
+--- a/hw/arm/aspeed_ast2600.c
++++ b/hw/arm/aspeed_ast2600.c
+@@ -343,6 +343,11 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     /* I2C */
++    object_property_set_link(OBJECT(&s->i2c), OBJECT(s->dram_mr), "dram", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(&s->i2c), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index dd1ee0e3336..b01c9774419 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -311,6 +311,11 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+     }
+ 
+     /* I2C */
++    object_property_set_link(OBJECT(&s->i2c), OBJECT(s->dram_mr), "dram", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+     object_property_set_bool(OBJECT(&s->i2c), true, "realized", &err);
+     if (err) {
+         error_propagate(errp, err);
 diff --git a/hw/i2c/aspeed_i2c.c b/hw/i2c/aspeed_i2c.c
-index 030d9c56be6..2da04a4bff3 100644
+index c7929aa2850..030d9c56be6 100644
 --- a/hw/i2c/aspeed_i2c.c
 +++ b/hw/i2c/aspeed_i2c.c
-@@ -28,6 +28,7 @@
+@@ -23,8 +23,11 @@
+ #include "migration/vmstate.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
++#include "qemu/error-report.h"
++#include "qapi/error.h"
  #include "hw/i2c/aspeed_i2c.h"
  #include "hw/irq.h"
- #include "hw/qdev-properties.h"
-+#include "trace.h"
++#include "hw/qdev-properties.h"
  
  /* I2C Global Register */
  
-@@ -158,6 +159,13 @@ static inline void aspeed_i2c_bus_raise_interrupt(AspeedI2CBus *bus)
- {
-     AspeedI2CClass *aic = ASPEED_I2C_GET_CLASS(bus->controller);
+@@ -138,7 +141,8 @@
+ #define   I2CD_BYTE_BUF_TX_MASK            0xff
+ #define   I2CD_BYTE_BUF_RX_SHIFT           8
+ #define   I2CD_BYTE_BUF_RX_MASK            0xff
+-
++#define I2CD_DMA_ADDR           0x24       /* DMA Buffer Address */
++#define I2CD_DMA_LEN            0x28       /* DMA Transfer Length < 4KB */
  
-+    trace_aspeed_i2c_bus_raise_interrupt(bus->intr_status,
-+          bus->intr_status & I2CD_INTR_TX_NAK ? "nak|" : "",
-+          bus->intr_status & I2CD_INTR_TX_ACK ? "ack|" : "",
-+          bus->intr_status & I2CD_INTR_RX_DONE ? "done|" : "",
-+          bus->intr_status & I2CD_INTR_NORMAL_STOP ? "normal|" : "",
-+          bus->intr_status & I2CD_INTR_ABNORMAL ? "abnormal" : "");
-+
-     bus->intr_status &= bus->intr_ctrl;
-     if (bus->intr_status) {
-         bus->controller->intr_status |= 1 << bus->id;
-@@ -170,41 +178,57 @@ static uint64_t aspeed_i2c_bus_read(void *opaque, hwaddr offset,
+ static inline bool aspeed_i2c_bus_is_master(AspeedI2CBus *bus)
+ {
+@@ -165,6 +169,7 @@ static uint64_t aspeed_i2c_bus_read(void *opaque, hwaddr offset,
+                                     unsigned size)
  {
      AspeedI2CBus *bus = opaque;
-     AspeedI2CClass *aic = ASPEED_I2C_GET_CLASS(bus->controller);
-+    uint64_t value = -1;
++    AspeedI2CClass *aic = ASPEED_I2C_GET_CLASS(bus->controller);
  
      switch (offset) {
      case I2CD_FUN_CTRL_REG:
--        return bus->ctrl;
-+        value = bus->ctrl;
-+        break;
-     case I2CD_AC_TIMING_REG1:
--        return bus->timing[0];
-+        value = bus->timing[0];
-+        break;
-     case I2CD_AC_TIMING_REG2:
--        return bus->timing[1];
-+        value = bus->timing[1];
-+        break;
-     case I2CD_INTR_CTRL_REG:
--        return bus->intr_ctrl;
-+        value = bus->intr_ctrl;
-+        break;
-     case I2CD_INTR_STS_REG:
--        return bus->intr_status;
-+        value = bus->intr_status;
-+        break;
-     case I2CD_POOL_CTRL_REG:
--        return bus->pool_ctrl;
-+        value = bus->pool_ctrl;
-+        break;
-     case I2CD_BYTE_BUF_REG:
--        return bus->buf;
-+        value = bus->buf;
-+        break;
+@@ -183,6 +188,18 @@ static uint64_t aspeed_i2c_bus_read(void *opaque, hwaddr offset,
+         return bus->buf;
      case I2CD_CMD_REG:
--        return bus->cmd | (i2c_bus_busy(bus->bus) << 16);
-+        value = bus->cmd | (i2c_bus_busy(bus->bus) << 16);
-+        break;
-     case I2CD_DMA_ADDR:
-         if (!aic->has_dma) {
-             qemu_log_mask(LOG_GUEST_ERROR, "%s: No DMA support\n",  __func__);
--            return -1;
-+            break;
-         }
--        return bus->dma_addr;
-+        value = bus->dma_addr;
-+        break;
-     case I2CD_DMA_LEN:
-         if (!aic->has_dma) {
-             qemu_log_mask(LOG_GUEST_ERROR, "%s: No DMA support\n",  __func__);
--            return -1;
-+            break;
-         }
--        return bus->dma_len;
-+        value = bus->dma_len;
-+        break;
-+
+         return bus->cmd | (i2c_bus_busy(bus->bus) << 16);
++    case I2CD_DMA_ADDR:
++        if (!aic->has_dma) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: No DMA support\n",  __func__);
++            return -1;
++        }
++        return bus->dma_addr;
++    case I2CD_DMA_LEN:
++        if (!aic->has_dma) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: No DMA support\n",  __func__);
++            return -1;
++        }
++        return bus->dma_len;
      default:
          qemu_log_mask(LOG_GUEST_ERROR,
                        "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__, offset);
--        return -1;
-+        value = -1;
-+        break;
-     }
-+
-+    trace_aspeed_i2c_bus_read(bus->id, offset, size, value);
-+    return value;
+@@ -201,6 +218,24 @@ static uint8_t aspeed_i2c_get_state(AspeedI2CBus *bus)
+     return (bus->cmd >> I2CD_TX_STATE_SHIFT) & I2CD_TX_STATE_MASK;
  }
  
- static void aspeed_i2c_set_state(AspeedI2CBus *bus, uint8_t state)
-@@ -246,6 +270,9 @@ static int aspeed_i2c_bus_send(AspeedI2CBus *bus, uint8_t pool_start)
-         for (i = pool_start; i < I2CD_POOL_TX_COUNT(bus->pool_ctrl); i++) {
-             uint8_t *pool_base = aic->bus_pool_base(bus);
- 
-+            trace_aspeed_i2c_bus_send("BUF", i + 1,
-+                                      I2CD_POOL_TX_COUNT(bus->pool_ctrl),
-+                                      pool_base[i]);
-             ret = i2c_send(bus->bus, pool_base[i]);
-             if (ret) {
-                 break;
-@@ -256,6 +283,7 @@ static int aspeed_i2c_bus_send(AspeedI2CBus *bus, uint8_t pool_start)
-         while (bus->dma_len) {
-             uint8_t data;
-             aspeed_i2c_dma_read(bus, &data);
-+            trace_aspeed_i2c_bus_send("DMA", bus->dma_len, bus->dma_len, data);
-             ret = i2c_send(bus->bus, data);
-             if (ret) {
-                 break;
-@@ -263,6 +291,7 @@ static int aspeed_i2c_bus_send(AspeedI2CBus *bus, uint8_t pool_start)
-         }
-         bus->cmd &= ~I2CD_TX_DMA_ENABLE;
-     } else {
-+        trace_aspeed_i2c_bus_send("BYTE", pool_start, 1, bus->buf);
-         ret = i2c_send(bus->bus, bus->buf);
-     }
- 
-@@ -281,6 +310,9 @@ static void aspeed_i2c_bus_recv(AspeedI2CBus *bus)
- 
-         for (i = 0; i < I2CD_POOL_RX_SIZE(bus->pool_ctrl); i++) {
-             pool_base[i] = i2c_recv(bus->bus);
-+            trace_aspeed_i2c_bus_recv("BUF", i + 1,
-+                                      I2CD_POOL_RX_SIZE(bus->pool_ctrl),
-+                                      pool_base[i]);
-         }
- 
-         /* Update RX count */
-@@ -294,6 +326,7 @@ static void aspeed_i2c_bus_recv(AspeedI2CBus *bus)
-             MemTxResult result;
- 
-             data = i2c_recv(bus->bus);
-+            trace_aspeed_i2c_bus_recv("DMA", bus->dma_len, bus->dma_len, data);
-             result = address_space_write(&s->dram_as, bus->dma_addr,
-                                          MEMTXATTRS_UNSPECIFIED, &data, 1);
-             if (result != MEMTX_OK) {
-@@ -307,6 +340,7 @@ static void aspeed_i2c_bus_recv(AspeedI2CBus *bus)
-         bus->cmd &= ~I2CD_RX_DMA_ENABLE;
-     } else {
-         data = i2c_recv(bus->bus);
-+        trace_aspeed_i2c_bus_recv("BYTE", 1, 1, bus->buf);
-         bus->buf = (data & I2CD_BYTE_BUF_RX_MASK) << I2CD_BYTE_BUF_RX_SHIFT;
-     }
- }
-@@ -364,6 +398,33 @@ static bool aspeed_i2c_check_sram(AspeedI2CBus *bus)
-     return true;
- }
- 
-+static void aspeed_i2c_bus_cmd_dump(AspeedI2CBus *bus)
++static int aspeed_i2c_dma_read(AspeedI2CBus *bus, uint8_t *data)
 +{
-+    g_autofree char *cmd_flags;
-+    uint32_t count;
++    MemTxResult result;
++    AspeedI2CState *s = bus->controller;
 +
-+    if (bus->cmd & (I2CD_RX_BUFF_ENABLE | I2CD_RX_BUFF_ENABLE)) {
-+        count = I2CD_POOL_TX_COUNT(bus->pool_ctrl);
-+    } else if (bus->cmd & (I2CD_RX_DMA_ENABLE | I2CD_RX_DMA_ENABLE)) {
-+        count = bus->dma_len;
-+    } else { /* BYTE mode */
-+        count = 1;
++    result = address_space_read(&s->dram_as, bus->dma_addr,
++                                MEMTXATTRS_UNSPECIFIED, data, 1);
++    if (result != MEMTX_OK) {
++        qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM read failed @%08x\n",
++                      __func__, bus->dma_addr);
++        return -1;
 +    }
 +
-+    cmd_flags = g_strdup_printf("%s%s%s%s%s%s%s%s%s",
-+                                bus->cmd & I2CD_M_START_CMD ? "start|" : "",
-+                                bus->cmd & I2CD_RX_DMA_ENABLE ? "rxdma|" : "",
-+                                bus->cmd & I2CD_TX_DMA_ENABLE ? "txdma|" : "",
-+                                bus->cmd & I2CD_RX_BUFF_ENABLE ? "rxbuf|" : "",
-+                                bus->cmd & I2CD_TX_BUFF_ENABLE ? "txbuf|" : "",
-+                                bus->cmd & I2CD_M_TX_CMD ? "tx|" : "",
-+                                bus->cmd & I2CD_M_RX_CMD ? "rx|" : "",
-+                                bus->cmd & I2CD_M_S_RX_CMD_LAST ? "last|" : "",
-+                                bus->cmd & I2CD_M_STOP_CMD ? "stop" : "");
-+
-+    trace_aspeed_i2c_bus_cmd(bus->cmd, cmd_flags, count, bus->intr_status);
++    bus->dma_addr++;
++    bus->dma_len--;
++    return 0;
 +}
 +
- /*
-  * The state machine needs some refinement. It is only used to track
-  * invalid STOP commands for the moment.
-@@ -379,6 +440,10 @@ static void aspeed_i2c_bus_handle_cmd(AspeedI2CBus *bus, uint64_t value)
-         return;
-     }
- 
-+    if (trace_event_get_state_backends(TRACE_ASPEED_I2C_BUS_CMD)) {
-+        aspeed_i2c_bus_cmd_dump(bus);
-+    }
-+
-     if (bus->cmd & I2CD_M_START_CMD) {
-         uint8_t state = aspeed_i2c_get_state(bus) & I2CD_MACTIVE ?
-             I2CD_MSTARTR : I2CD_MSTART;
-@@ -465,6 +530,8 @@ static void aspeed_i2c_bus_write(void *opaque, hwaddr offset,
+ static int aspeed_i2c_bus_send(AspeedI2CBus *bus, uint8_t pool_start)
+ {
      AspeedI2CClass *aic = ASPEED_I2C_GET_CLASS(bus->controller);
-     bool handle_rx;
+@@ -217,6 +252,16 @@ static int aspeed_i2c_bus_send(AspeedI2CBus *bus, uint8_t pool_start)
+             }
+         }
+         bus->cmd &= ~I2CD_TX_BUFF_ENABLE;
++    } else if (bus->cmd & I2CD_TX_DMA_ENABLE) {
++        while (bus->dma_len) {
++            uint8_t data;
++            aspeed_i2c_dma_read(bus, &data);
++            ret = i2c_send(bus->bus, data);
++            if (ret) {
++                break;
++            }
++        }
++        bus->cmd &= ~I2CD_TX_DMA_ENABLE;
+     } else {
+         ret = i2c_send(bus->bus, bus->buf);
+     }
+@@ -242,6 +287,24 @@ static void aspeed_i2c_bus_recv(AspeedI2CBus *bus)
+         bus->pool_ctrl &= ~(0xff << 24);
+         bus->pool_ctrl |= (i & 0xff) << 24;
+         bus->cmd &= ~I2CD_RX_BUFF_ENABLE;
++    } else if (bus->cmd & I2CD_RX_DMA_ENABLE) {
++        uint8_t data;
++
++        while (bus->dma_len) {
++            MemTxResult result;
++
++            data = i2c_recv(bus->bus);
++            result = address_space_write(&s->dram_as, bus->dma_addr,
++                                         MEMTXATTRS_UNSPECIFIED, &data, 1);
++            if (result != MEMTX_OK) {
++                qemu_log_mask(LOG_GUEST_ERROR, "%s: DRAM write failed @%08x\n",
++                              __func__, bus->dma_addr);
++                return;
++            }
++            bus->dma_addr++;
++            bus->dma_len--;
++        }
++        bus->cmd &= ~I2CD_RX_DMA_ENABLE;
+     } else {
+         data = i2c_recv(bus->bus);
+         bus->buf = (data & I2CD_BYTE_BUF_RX_MASK) << I2CD_BYTE_BUF_RX_SHIFT;
+@@ -268,6 +331,11 @@ static uint8_t aspeed_i2c_get_addr(AspeedI2CBus *bus)
+         uint8_t *pool_base = aic->bus_pool_base(bus);
  
-+    trace_aspeed_i2c_bus_write(bus->id, offset, size, value);
+         return pool_base[0];
++    } else if (bus->cmd & I2CD_TX_DMA_ENABLE) {
++        uint8_t data;
 +
-     switch (offset) {
-     case I2CD_FUN_CTRL_REG:
-         if (value & I2CD_SLAVE_EN) {
-diff --git a/hw/i2c/trace-events b/hw/i2c/trace-events
-index e1c810d5bd0..08db8fa6892 100644
---- a/hw/i2c/trace-events
-+++ b/hw/i2c/trace-events
-@@ -5,3 +5,12 @@
- i2c_event(const char *event, uint8_t address) "%s(addr:0x%02x)"
- i2c_send(uint8_t address, uint8_t data) "send(addr:0x%02x) data:0x%02x"
- i2c_recv(uint8_t address, uint8_t data) "recv(addr:0x%02x) data:0x%02x"
++        aspeed_i2c_dma_read(bus, &data);
++        return data;
+     } else {
+         return bus->buf;
+     }
+@@ -344,6 +412,10 @@ static void aspeed_i2c_bus_handle_cmd(AspeedI2CBus *bus, uint64_t value)
+                  */
+                 pool_start++;
+             }
++        } else if (bus->cmd & I2CD_TX_DMA_ENABLE) {
++            if (bus->dma_len == 0) {
++                bus->cmd &= ~I2CD_M_TX_CMD;
++            }
+         } else {
+             bus->cmd &= ~I2CD_M_TX_CMD;
+         }
+@@ -447,9 +519,35 @@ static void aspeed_i2c_bus_write(void *opaque, hwaddr offset,
+             break;
+         }
+ 
++        if (!aic->has_dma &&
++            value & (I2CD_RX_DMA_ENABLE | I2CD_TX_DMA_ENABLE)) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: No DMA support\n",  __func__);
++            break;
++        }
 +
-+# aspeed_i2c.c
+         aspeed_i2c_bus_handle_cmd(bus, value);
+         aspeed_i2c_bus_raise_interrupt(bus);
+         break;
++    case I2CD_DMA_ADDR:
++        if (!aic->has_dma) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: No DMA support\n",  __func__);
++            break;
++        }
 +
-+aspeed_i2c_bus_cmd(uint32_t cmd, const char *cmd_flags, uint32_t count, uint32_t intr_status) "handling cmd=0x%x %s count=%d intr=0x%x"
-+aspeed_i2c_bus_raise_interrupt(uint32_t intr_status, const char *str1, const char *str2, const char *str3, const char *str4, const char *str5) "handled intr=0x%x %s%s%s%s%s"
-+aspeed_i2c_bus_read(uint32_t busid, uint64_t offset, unsigned size, uint64_t value) "bus[%d]: To 0x%" PRIx64 " of size %u: 0x%" PRIx64
-+aspeed_i2c_bus_write(uint32_t busid, uint64_t offset, unsigned size, uint64_t value) "bus[%d]: To 0x%" PRIx64 " of size %u: 0x%" PRIx64
-+aspeed_i2c_bus_send(const char *mode, int i, int count, uint8_t byte) "%s send %d/%d 0x%02x"
-+aspeed_i2c_bus_recv(const char *mode, int i, int count, uint8_t byte) "%s recv %d/%d 0x%02x"
++        bus->dma_addr = value & 0xfffffffc;
++        break;
++
++    case I2CD_DMA_LEN:
++        if (!aic->has_dma) {
++            qemu_log_mask(LOG_GUEST_ERROR, "%s: No DMA support\n",  __func__);
++            break;
++        }
++
++        bus->dma_len = value & 0xfff;
++        if (!bus->dma_len) {
++            qemu_log_mask(LOG_UNIMP, "%s: invalid DMA length\n",  __func__);
++        }
++        break;
+ 
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: Bad offset 0x%" HWADDR_PRIx "\n",
+@@ -542,8 +640,8 @@ static const MemoryRegionOps aspeed_i2c_pool_ops = {
+ 
+ static const VMStateDescription aspeed_i2c_bus_vmstate = {
+     .name = TYPE_ASPEED_I2C,
+-    .version_id = 2,
+-    .minimum_version_id = 2,
++    .version_id = 3,
++    .minimum_version_id = 3,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT8(id, AspeedI2CBus),
+         VMSTATE_UINT32(ctrl, AspeedI2CBus),
+@@ -553,6 +651,8 @@ static const VMStateDescription aspeed_i2c_bus_vmstate = {
+         VMSTATE_UINT32(cmd, AspeedI2CBus),
+         VMSTATE_UINT32(buf, AspeedI2CBus),
+         VMSTATE_UINT32(pool_ctrl, AspeedI2CBus),
++        VMSTATE_UINT32(dma_addr, AspeedI2CBus),
++        VMSTATE_UINT32(dma_len, AspeedI2CBus),
+         VMSTATE_END_OF_LIST()
+     }
+ };
+@@ -584,6 +684,8 @@ static void aspeed_i2c_reset(DeviceState *dev)
+         s->busses[i].intr_status = 0;
+         s->busses[i].cmd = 0;
+         s->busses[i].buf = 0;
++        s->busses[i].dma_addr = 0;
++        s->busses[i].dma_len = 0;
+         i2c_end_transfer(s->busses[i].bus);
+     }
+ }
+@@ -640,14 +742,30 @@ static void aspeed_i2c_realize(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->pool_iomem, OBJECT(s), &aspeed_i2c_pool_ops, s,
+                           "aspeed.i2c-pool", aic->pool_size);
+     memory_region_add_subregion(&s->iomem, aic->pool_base, &s->pool_iomem);
++
++    if (aic->has_dma) {
++        if (!s->dram_mr) {
++            error_setg(errp, TYPE_ASPEED_I2C ": 'dram' link not set");
++            return;
++        }
++
++        address_space_init(&s->dram_as, s->dram_mr, "dma-dram");
++    }
+ }
+ 
++static Property aspeed_i2c_properties[] = {
++    DEFINE_PROP_LINK("dram", AspeedI2CState, dram_mr,
++                     TYPE_MEMORY_REGION, MemoryRegion *),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void aspeed_i2c_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+ 
+     dc->vmsd = &aspeed_i2c_vmstate;
+     dc->reset = aspeed_i2c_reset;
++    dc->props = aspeed_i2c_properties;
+     dc->realize = aspeed_i2c_realize;
+     dc->desc = "Aspeed I2C Controller";
+ }
+@@ -721,6 +839,7 @@ static void aspeed_2500_i2c_class_init(ObjectClass *klass, void *data)
+     aic->pool_base = 0x200;
+     aic->bus_pool_base = aspeed_2500_i2c_bus_pool_base;
+     aic->check_sram = true;
++    aic->has_dma = true;
+ }
+ 
+ static const TypeInfo aspeed_2500_i2c_info = {
+@@ -753,6 +872,7 @@ static void aspeed_2600_i2c_class_init(ObjectClass *klass, void *data)
+     aic->pool_size = 0x200;
+     aic->pool_base = 0xC00;
+     aic->bus_pool_base = aspeed_2600_i2c_bus_pool_base;
++    aic->has_dma = true;
+ }
+ 
+ static const TypeInfo aspeed_2600_i2c_info = {
 -- 
 2.20.1
 
