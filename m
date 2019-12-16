@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CF1C43603
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECCC0C43603
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:39:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D81E9206E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:38:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6483206E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 16 Dec 2019 16:39:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBGyytqP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D81E9206E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxbOI9WP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6483206E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1igtNr-00075h-4M
-	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:38:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56670)
+	id 1igtPS-0001Al-E3
+	for qemu-devel@archiver.kernel.org; Mon, 16 Dec 2019 11:39:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtF6-0004xO-Fe
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:09 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtEx-0004iz-7l
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1igtF5-0007LU-CF
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:08 -0500
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:43815)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1igtEw-00070w-2w
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:59 -0500
+Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:53581)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1igtF5-0007JX-5c
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:29:07 -0500
-Received: by mail-wr1-x432.google.com with SMTP id d16so8035923wre.10
- for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:29:07 -0800 (PST)
+ id 1igtEv-0006z7-Sa
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 11:28:58 -0500
+Received: by mail-wm1-x32c.google.com with SMTP id m24so6034546wmc.3
+ for <qemu-devel@nongnu.org>; Mon, 16 Dec 2019 08:28:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=YxoUvt3Ps00ZPMRYsL2yZ0hkryLbuyO6moys9UaojTo=;
- b=LBGyytqPFmYvd7qfKp/kzjUZ++0fxnh0bwCn81ZOtAtX9xcL+hH27ZE4c9oNjGfyzN
- Nf9CSowaA2axFHVFe6EDYLfGTELyKo5Io6oLbdzdx720u4pUCtFwnvmZV3fZLTVaWLlV
- 08QFn+tfy1UAn1zW7EPywE8h5Ic5dYNDAVj+DjaxPwyA+NqkcJRPXWzEM2B9zgo3/sD8
- WGMH3hSUXxoKWTSe9mfoMThK4SIL3i+jvLZprRa24XVyt+/2S9rLga7zKw7yuAoVio0v
- e63k0cHEFnlEvyvUeWGr/upHMZwLtz2kuMkDPYQclh/KE1o8bpG+STtcWxvAaSC5bF5M
- B2Cw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=3ihEo7p0QbN2mTro2zOBTwTmqJafQZGvJFrYh7PK3bc=;
+ b=hxbOI9WPbLZK3RpWV7/cYjs31honWKW26bVGaTJjdKcdsZBZiwnZNezCWQBNqb2Uib
+ lQRX8ADfKJ6851sOu2vZO4U+ueDjpZtinr39JJPpfC+FsJzrCApqXlIRSpX8ldRw8TgY
+ FvFcVdLAlQDrWofyhhEc9ylwB9PLD47zoPV3ywRtHQn0Rd47UVprp4r7VpAgVSZ5ahWU
+ NC+Odwl3ioIOLUNXbx7HoVUtQbMaLYbbEhc0EohZi2EM436SJYZUTKAMphzE7zGp12/1
+ RDfPCu+w6qlop6/vAsUPYgaXPTpB/yInDEINVlhAWx7SLQgbi7bUaKs+2cPi8xqDgoOi
+ fHPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=YxoUvt3Ps00ZPMRYsL2yZ0hkryLbuyO6moys9UaojTo=;
- b=lQuzY2mEtzjQ4fVPffppzcjRVPxov0Xk78C2zyZ+0LK27EfPj1KCFqYPvH7EFduiri
- UjEHlVtAQFJL+5mNj7qcH2Rtcv021UoRHaUdzFxiSyt4smRY3WcNjQOhmxXykirGvedE
- AytSVsmmBoMvVgW4IuXrSc+z9hLRL0dhDa+o+UmOQRCxC/GjFW1krPqgeSAvbWotEEO+
- Co4MGKXBykiLej5A1Jfe5JfOIDjc0dZ7C1iYHugIMvkLS8aIcEC09uXFYALkTZ9oWSCe
- W1aldLmf48QhRZMGgLhkrmonQNvRTTYsh88UrpAZmCT1pLiHGH00fzu5ejk0iCQimxBk
- Kbzg==
-X-Gm-Message-State: APjAAAVXfwxJIrZmT+1tt3hS1l3gc5JPSYz9g0ViJfbW1claUYET4k9f
- e4IFXl21SZ2gzpdCbJ+psyFNJqNZ
-X-Google-Smtp-Source: APXvYqzQAHlgYUKzYuAa/zn4Ln+fPDJv7vTq2RZb7uMjPVBt/FwidpuhhZMQf6xH7paWP5AdvO4Eig==
-X-Received: by 2002:adf:f885:: with SMTP id u5mr31958112wrp.359.1576513745888; 
- Mon, 16 Dec 2019 08:29:05 -0800 (PST)
+ bh=3ihEo7p0QbN2mTro2zOBTwTmqJafQZGvJFrYh7PK3bc=;
+ b=XYfqbAEX6av8Qz6TjAguDwxQ8ZWtNyuzlnSe2o0zMS8MmhiYSwMEBVveVlzeeQXn+m
+ 1cO3Y6DFQAvYtgDOCiI5JnbDp+ZMBCFrdnuEt1ttO/3/84BMcEtCQS6734VzFoys5GQ6
+ B+8iTvPq4kVq63SJDG2fXJ273W20meWjIyBvqnZWb+KdLbzocnkNkiVKA3HTmgHJcDbe
+ lPWMTh6JVdN2XwY6IPizL2qw/kCR6K7aVj0+fxJ/olLygaEm/EUqHg02DTGZXzqd10MR
+ jAb0IwB4O/NelLL66DnynsC3KT8k6IkjMNqhcwgVjVg32+5JHrup3UQD4GWjIThXpGk9
+ xmBQ==
+X-Gm-Message-State: APjAAAUhTJQ97unFE443fbCmcuPHFSmGDjXdzSox5wTZCVQtGpRyWO6o
+ gci4tYoVjE+ZgpsU5SOVPGpa15E/
+X-Google-Smtp-Source: APXvYqxJw2EVkh/w9RmOma6rBmNuN1jS8omOA0WJsb8y5SH0Ohmi0V+ByvfN1j1RbdWnWHzfRcaebg==
+X-Received: by 2002:a1c:9d8b:: with SMTP id g133mr30263697wme.27.1576513736631; 
+ Mon, 16 Dec 2019 08:28:56 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.29.04
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id q68sm19962334wme.14.2019.12.16.08.28.55
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 16 Dec 2019 08:29:04 -0800 (PST)
+ Mon, 16 Dec 2019 08:28:56 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/62] vl: introduce object_parse_property_opt
-Date: Mon, 16 Dec 2019 17:28:02 +0100
-Message-Id: <1576513726-53700-19-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 09/62] migration-test: Move -incomming handling to common
+ commandline
+Date: Mon, 16 Dec 2019 17:27:53 +0100
+Message-Id: <1576513726-53700-10-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 References: <1576513726-53700-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::432
+X-Received-From: 2a00:1450:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,80 +90,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We will reuse the parsing loop of machine_set_property soon for "-accel",
-but we do not want the "_" -> "-" conversion since "-accel" can just
-standardize on dashes.  We will also add a bunch of legacy option handling
-to keep the QOM machine object clean.  Extract the loop into a separate
-function, and keep the legacy handling in machine_set_property.
+From: Juan Quintela <quintela@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Tested-by: Cornelia Huck <cohuck@redhat.com> #s390x
+Tested-by: Laurent Vivier <lvivier@redhat.com>
 ---
- vl.c | 35 ++++++++++++++++++++---------------
- 1 file changed, 20 insertions(+), 15 deletions(-)
+ tests/migration-test.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
 
-diff --git a/vl.c b/vl.c
-index 14c78bc..2f6b0dd 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2615,27 +2615,17 @@ static MachineClass *select_machine(void)
-     return machine_class;
- }
- 
--static int machine_set_property(void *opaque,
--                                const char *name, const char *value,
--                                Error **errp)
-+static int object_parse_property_opt(Object *obj,
-+                                     const char *name, const char *value,
-+                                     const char *skip, Error **errp)
- {
--    Object *obj = OBJECT(opaque);
-     Error *local_err = NULL;
--    char *p, *qom_name;
- 
--    if (strcmp(name, "type") == 0) {
-+    if (g_str_equal(name, skip)) {
-         return 0;
-     }
- 
--    qom_name = g_strdup(name);
--    for (p = qom_name; *p; p++) {
--        if (*p == '_') {
--            *p = '-';
--        }
--    }
+diff --git a/tests/migration-test.c b/tests/migration-test.c
+index 85e270c..5ab8cfd 100644
+--- a/tests/migration-test.c
++++ b/tests/migration-test.c
+@@ -580,9 +580,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         machine_args = "";
+         memory_size = "150M";
+         cmd_src = g_strdup_printf("-drive file=%s,format=raw", bootpath);
+-        cmd_dst = g_strdup_printf("-drive file=%s,format=raw"
+-                                  " -incoming %s",
+-                                  bootpath, uri);
++        cmd_dst = g_strdup(cmd_src);
+         start_address = X86_TEST_MEM_START;
+         end_address = X86_TEST_MEM_END;
+     } else if (g_str_equal(arch, "s390x")) {
+@@ -591,9 +589,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         machine_args = "";
+         memory_size = "128M";
+         cmd_src = g_strdup_printf("-bios %s", bootpath);
+-        cmd_dst = g_strdup_printf("-bios %s"
+-                                  " -incoming %s",
+-                                  bootpath, uri);
++        cmd_dst = g_strdup(cmd_src);
+         start_address = S390_TEST_MEM_START;
+         end_address = S390_TEST_MEM_END;
+     } else if (strcmp(arch, "ppc64") == 0) {
+@@ -605,7 +601,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+                                   "'nvramrc=hex .\" _\" begin %x %x "
+                                   "do i c@ 1 + i c! 1000 +loop .\" B\" 0 "
+                                   "until'", end_address, start_address);
+-        cmd_dst = g_strdup_printf(" -incoming %s", uri);
++        cmd_dst = g_strdup("");
+         start_address = PPC_TEST_MEM_START;
+         end_address = PPC_TEST_MEM_END;
+     } else if (strcmp(arch, "aarch64") == 0) {
+@@ -616,11 +612,7 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+         cmd_src = g_strdup_printf("-cpu max "
+                                   "-kernel %s",
+                                   bootpath);
+-        cmd_dst = g_strdup_printf("-cpu max "
+-                                  "-kernel %s "
+-                                  "-incoming %s",
+-                                  bootpath, uri);
 -
--    object_property_parse(obj, value, qom_name, &local_err);
--    g_free(qom_name);
-+    object_property_parse(obj, value, name, &local_err);
++        cmd_dst = g_strdup(cmd_src);
+         start_address = ARM_TEST_MEM_START;
+         end_address = ARM_TEST_MEM_END;
  
-     if (local_err) {
-         error_propagate(errp, local_err);
-@@ -2645,6 +2635,21 @@ static int machine_set_property(void *opaque,
-     return 0;
- }
+@@ -650,11 +642,11 @@ static int test_migrate_start(QTestState **from, QTestState **to,
  
-+static int machine_set_property(void *opaque,
-+                                const char *name, const char *value,
-+                                Error **errp)
-+{
-+    g_autofree char *qom_name = g_strdup(name);
-+    char *p;
-+
-+    for (p = qom_name; *p; p++) {
-+        if (*p == '_') {
-+            *p = '-';
-+        }
-+    }
-+
-+    return object_parse_property_opt(opaque, name, value, "type", errp);
-+}
- 
- /*
-  * Initial object creation happens before all other
+     cmd_source = g_strdup_printf("-machine %saccel=kvm:tcg%s "
+                                  "-name source,debug-threads=on "
+-                                 "-serial file:%s/src_serial "
+                                  "-m %s "
++                                 "-serial file:%s/src_serial "
+                                  "%s %s %s %s",
+                                  machine_type, machine_args,
+-                                 tmpfs, memory_size,
++                                 memory_size, tmpfs,
+                                  cmd_src, shmem_opts, opts_src, ignore_stderr);
+     g_free(cmd_src);
+     *from = qtest_init(cmd_source);
+@@ -664,9 +656,10 @@ static int test_migrate_start(QTestState **from, QTestState **to,
+                                  "-name target,debug-threads=on "
+                                  "-m %s "
+                                  "-serial file:%s/dest_serial "
++                                 "-incoming %s "
+                                  "%s %s %s %s",
+                                  machine_type, machine_args,
+-                                 tmpfs, memory_size,
++                                 memory_size, tmpfs, uri,
+                                  cmd_dst, shmem_opts, opts_dst, ignore_stderr);
+     g_free(cmd_dst);
+     *to = qtest_init(cmd_target);
 -- 
 1.8.3.1
 
