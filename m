@@ -2,79 +2,62 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C04E5C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:50:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B5EC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:51:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B2BE20733
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:50:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E3C2E20733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:50:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iRejAdWY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B2BE20733
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OBnGOYAN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3C2E20733
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih5kN-00016q-Cq
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:50:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52761)
+	id 1ih5l4-0002Ol-Oj
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:50:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36046)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1ih5EE-0004fz-Ly
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 00:17:03 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4kh-0003C6-W4
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1ih5ED-0004NV-MH
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 00:17:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44456
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4kg-0000eq-SO
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:31 -0500
+Received: from ozlabs.org ([203.11.71.1]:45995)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1ih5ED-0004NL-IB
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 00:17:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576559821;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4qq4jTy9B7rJaMCrbWTWfG84h4ysQyyseP8ZANiJzoQ=;
- b=iRejAdWYTEWmV73TMsHrRwGW3QVbYrOruw0pGB/UqUmnYLiuJOFOqaa1S7ya4zoqrD6PL5
- MO0T7ZVc+qQSaEH/UvsG2LOqB5+s0hhXmhbGF8H6LHgBMBq+skf6OMOQEgAlxDEQ/SXkef
- YugadPXDNmLXCHX3EoOJV6NjJYjxAuc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-216-wEkOI788MXGneOCTt-wEHA-1; Tue, 17 Dec 2019 00:16:59 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 97FEB8017DF;
- Tue, 17 Dec 2019 05:16:57 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-116-6.gru2.redhat.com
- [10.97.116.6])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4735E19C4F;
- Tue, 17 Dec 2019 05:16:49 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 15/15] python/qemu: Remove unneeded imports in __init__
-Date: Tue, 17 Dec 2019 00:15:21 -0500
-Message-Id: <20191217051521.1239-16-crosa@redhat.com>
-In-Reply-To: <20191217051521.1239-1-crosa@redhat.com>
-References: <20191217051521.1239-1-crosa@redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1ih4kg-0008Ml-Gy; Mon, 16 Dec 2019 23:46:30 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47cQWk6TzBz9sTr; Tue, 17 Dec 2019 15:43:43 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1576557826;
+ bh=dvxrJfW6c+Bk0ahYO+qDrE1ZifZjK+c5PPctx0EOceM=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=OBnGOYANRdRyXC/PfmjVsMDrrk3JhfPheo1E7oWnqnBuumIY0qexvh4nQqpFyb1xs
+ od9j8WzVrKCQbycP4rnNve//5iZHx3ARhqcVD2Ng23ACaV3hADnNJZIInVZeW/D1Lb
+ Z2V3/k5hmenCDtz2Wuj6KRMT7+pVcNEylp8ZfN6I=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 77/88] ppc/pnv: Drop PnvPsiClass::chip_type
+Date: Tue, 17 Dec 2019 15:43:11 +1100
+Message-Id: <20191217044322.351838-78-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20191217044322.351838-1-david@gibson.dropbear.id.au>
+References: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: wEkOI788MXGneOCTt-wEHA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,50 +69,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Beraldo Leal <bleal@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-ppc@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-__init_.py import some sub-modules unnecessarily. So let's
-clean it up.
+It isn't used anymore.
 
-Signed-off-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Suggested-by: Cleber Rosa <crosa@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20191216191438.93418-6-wainersm@redhat.com>
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <157623838530.360005.15470128760871845396.stgit@bahia.lan>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- python/qemu/__init__.py | 6 ------
- 1 file changed, 6 deletions(-)
+ hw/ppc/pnv_psi.c         | 3 ---
+ include/hw/ppc/pnv_psi.h | 1 -
+ 2 files changed, 4 deletions(-)
 
-diff --git a/python/qemu/__init__.py b/python/qemu/__init__.py
-index eff17a306e..4ca06c34a4 100644
---- a/python/qemu/__init__.py
-+++ b/python/qemu/__init__.py
-@@ -9,9 +9,3 @@
- # This work is licensed under the terms of the GNU GPL, version 2.  See
- # the COPYING file in the top-level directory.
- #
--# Based on qmp.py.
--#
--
--from . import qmp
--from . import machine
--from . import accel
+diff --git a/hw/ppc/pnv_psi.c b/hw/ppc/pnv_psi.c
+index 98a82b25e0..75e20d9da0 100644
+--- a/hw/ppc/pnv_psi.c
++++ b/hw/ppc/pnv_psi.c
+@@ -574,7 +574,6 @@ static void pnv_psi_power8_class_init(ObjectClass *kl=
+ass, void *data)
+     dc->desc    =3D "PowerNV PSI Controller POWER8";
+     dc->realize =3D pnv_psi_power8_realize;
+=20
+-    ppc->chip_type =3D  PNV_CHIP_POWER8;
+     ppc->xscom_pcba =3D PNV_XSCOM_PSIHB_BASE;
+     ppc->xscom_size =3D PNV_XSCOM_PSIHB_SIZE;
+     ppc->bar_mask   =3D PSIHB_BAR_MASK;
+@@ -884,7 +883,6 @@ static void pnv_psi_power9_class_init(ObjectClass *kl=
+ass, void *data)
+     dc->desc    =3D "PowerNV PSI Controller POWER9";
+     dc->realize =3D pnv_psi_power9_realize;
+=20
+-    ppc->chip_type  =3D PNV_CHIP_POWER9;
+     ppc->xscom_pcba =3D PNV9_XSCOM_PSIHB_BASE;
+     ppc->xscom_size =3D PNV9_XSCOM_PSIHB_SIZE;
+     ppc->bar_mask   =3D PSIHB9_BAR_MASK;
+@@ -915,7 +913,6 @@ static void pnv_psi_power10_class_init(ObjectClass *k=
+lass, void *data)
+=20
+     dc->desc    =3D "PowerNV PSI Controller POWER10";
+=20
+-    ppc->chip_type  =3D PNV_CHIP_POWER10;
+     ppc->xscom_pcba =3D PNV10_XSCOM_PSIHB_BASE;
+     ppc->xscom_size =3D PNV10_XSCOM_PSIHB_SIZE;
+     ppc->compat     =3D compat;
+diff --git a/include/hw/ppc/pnv_psi.h b/include/hw/ppc/pnv_psi.h
+index fc068c95e5..f0f5b55197 100644
+--- a/include/hw/ppc/pnv_psi.h
++++ b/include/hw/ppc/pnv_psi.h
+@@ -79,7 +79,6 @@ typedef struct Pnv9Psi {
+ typedef struct PnvPsiClass {
+     SysBusDeviceClass parent_class;
+=20
+-    int chip_type;
+     uint32_t xscom_pcba;
+     uint32_t xscom_size;
+     uint64_t bar_mask;
 --=20
-2.21.0
+2.23.0
 
 
