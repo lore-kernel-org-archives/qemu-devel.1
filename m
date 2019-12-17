@@ -7,56 +7,58 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44530C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E5EC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:37:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 102362082E
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:36:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A449920733
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:37:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hJSjFhMV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 102362082E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="fYnBEn3Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A449920733
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih5Ww-0007D1-1i
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:36:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35350)
+	id 1ih5Xi-0008MU-Kq
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:37:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35793)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4k0-0002LV-Ib
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:45:55 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4kV-0002qf-3X
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4jz-0007xj-GE
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:45:48 -0500
-Received: from ozlabs.org ([203.11.71.1]:37161)
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4kT-00009a-QO
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:18 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:48477 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ih4jw-0007Oo-7q; Mon, 16 Dec 2019 23:45:45 -0500
+ id 1ih4kT-00082o-Fp; Mon, 16 Dec 2019 23:46:17 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47cQWg16NBz9sTT; Tue, 17 Dec 2019 15:43:39 +1100 (AEDT)
+ id 47cQWj5gTRz9sTs; Tue, 17 Dec 2019 15:43:44 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576557823;
- bh=n8oIL2+nZlBzgcIXuaZwztF3/7D7XKvuOUrx0Eqt9sE=;
+ d=gibson.dropbear.id.au; s=201602; t=1576557825;
+ bh=ljmL1lYaXFyfFF9azN9Hfb8Gm1J0BuKOdNiP9RTy5kU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=hJSjFhMVW78KPVlwr0fANyBoB0doLE9l2tF4Q5zNpEBUckYaIOp17/RLyHS9TM1PW
- ehp8PYXSgoclv/8o8VDbKq/gRa0WzVBIQsVcnTlHirxicMbO79D/yy75kX0PeN5gi/
- aDG63tCaxVJSBasM4GNgX6bBmQMSZoW6uwO6gp3o=
+ b=fYnBEn3Q97fzOecWLnZ4a4awkx9f7ReJymTAUJRx2FNwmNtuA3kr8QV0KDHNGwPXy
+ LCbRnR/SFseP+DwKhoXif2sKMaLqB2Zj34MGSCtpFrKFbQF2uj+VdoBcPo5vsn49hl
+ ShZurNJ+boqCSISIWtaWqDauyWSpCLPppECqxnCM=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 60/88] ppc: Make PPCVirtualHypervisor an incomplete type
-Date: Tue, 17 Dec 2019 15:42:54 +1100
-Message-Id: <20191217044322.351838-61-david@gibson.dropbear.id.au>
+Subject: [PULL 83/88] ppc/pnv: Pass XSCOM base address and address size to
+ pnv_dt_xscom()
+Date: Tue, 17 Dec 2019 15:43:17 +1100
+Message-Id: <20191217044322.351838-84-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 References: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,33 +78,107 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-PPCVirtualHypervisor is an interface instance. It should never be
-dereferenced. Drop the dummy type definition for extra safety, which
-is the common practice with QOM interfaces.
+Since pnv_dt_xscom() is called from chip specific dt_populate() hooks,
+it shouldn't have to guess the chip type in order to populate the "reg"
+property. Just pass the base address and address size as arguments.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <157589808041.21182.18121655959115011353.stgit@bahia.lan>
+Message-Id: <157623841868.360005.17577624823547136435.stgit@bahia.lan>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu.h | 4 ----
- 1 file changed, 4 deletions(-)
+ hw/ppc/pnv.c               | 12 +++++++++---
+ hw/ppc/pnv_xscom.c         | 16 +++-------------
+ include/hw/ppc/pnv_xscom.h |  3 ++-
+ 3 files changed, 14 insertions(+), 17 deletions(-)
 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index f9528fc29d..60cf030ce6 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1222,10 +1222,6 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr(uint32_t pvr=
-);
- PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr);
- PowerPCCPUClass *ppc_cpu_get_family_class(PowerPCCPUClass *pcc);
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index 16f4e407ee..c0a5703b74 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -282,7 +282,9 @@ static void pnv_chip_power8_dt_populate(PnvChip *chip=
+, void *fdt)
+ {
+     int i;
 =20
--struct PPCVirtualHypervisor {
--    Object parent;
--};
+-    pnv_dt_xscom(chip, fdt, 0);
++    pnv_dt_xscom(chip, fdt, 0,
++                 cpu_to_be64(PNV_XSCOM_BASE(chip)),
++                 cpu_to_be64(PNV_XSCOM_SIZE));
+=20
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D chip->cores[i];
+@@ -302,7 +304,9 @@ static void pnv_chip_power9_dt_populate(PnvChip *chip=
+, void *fdt)
+ {
+     int i;
+=20
+-    pnv_dt_xscom(chip, fdt, 0);
++    pnv_dt_xscom(chip, fdt, 0,
++                 cpu_to_be64(PNV9_XSCOM_BASE(chip)),
++                 cpu_to_be64(PNV9_XSCOM_SIZE));
+=20
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D chip->cores[i];
+@@ -321,7 +325,9 @@ static void pnv_chip_power10_dt_populate(PnvChip *chi=
+p, void *fdt)
+ {
+     int i;
+=20
+-    pnv_dt_xscom(chip, fdt, 0);
++    pnv_dt_xscom(chip, fdt, 0,
++                 cpu_to_be64(PNV10_XSCOM_BASE(chip)),
++                 cpu_to_be64(PNV10_XSCOM_SIZE));
+=20
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D chip->cores[i];
+diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+index df926003f2..8189767eb0 100644
+--- a/hw/ppc/pnv_xscom.c
++++ b/hw/ppc/pnv_xscom.c
+@@ -286,24 +286,14 @@ static const char compat_p8[] =3D "ibm,power8-xscom=
+\0ibm,xscom";
+ static const char compat_p9[] =3D "ibm,power9-xscom\0ibm,xscom";
+ static const char compat_p10[] =3D "ibm,power10-xscom\0ibm,xscom";
+=20
+-int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset)
++int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset,
++                 uint64_t xscom_base, uint64_t xscom_size)
+ {
+-    uint64_t reg[2];
++    uint64_t reg[] =3D { xscom_base, xscom_size };
+     int xscom_offset;
+     ForeachPopulateArgs args;
+     char *name;
+=20
+-    if (pnv_chip_is_power10(chip)) {
+-        reg[0] =3D cpu_to_be64(PNV10_XSCOM_BASE(chip));
+-        reg[1] =3D cpu_to_be64(PNV10_XSCOM_SIZE);
+-    } else if (pnv_chip_is_power9(chip)) {
+-        reg[0] =3D cpu_to_be64(PNV9_XSCOM_BASE(chip));
+-        reg[1] =3D cpu_to_be64(PNV9_XSCOM_SIZE);
+-    } else {
+-        reg[0] =3D cpu_to_be64(PNV_XSCOM_BASE(chip));
+-        reg[1] =3D cpu_to_be64(PNV_XSCOM_SIZE);
+-    }
 -
- struct PPCVirtualHypervisorClass {
-     InterfaceClass parent;
-     void (*hypercall)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
+     name =3D g_strdup_printf("xscom@%" PRIx64, be64_to_cpu(reg[0]));
+     xscom_offset =3D fdt_add_subnode(fdt, root_offset, name);
+     _FDT(xscom_offset);
+diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+index 2bdb7ae84f..ad53f788b4 100644
+--- a/include/hw/ppc/pnv_xscom.h
++++ b/include/hw/ppc/pnv_xscom.h
+@@ -114,7 +114,8 @@ typedef struct PnvXScomInterfaceClass {
+ #define PNV10_XSCOM_PSIHB_SIZE     0x100
+=20
+ void pnv_xscom_realize(PnvChip *chip, uint64_t size, Error **errp);
+-int pnv_dt_xscom(PnvChip *chip, void *fdt, int offset);
++int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset,
++                 uint64_t xscom_base, uint64_t xscom_size);
+=20
+ void pnv_xscom_add_subregion(PnvChip *chip, hwaddr offset,
+                              MemoryRegion *mr);
 --=20
 2.23.0
 
