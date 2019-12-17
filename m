@@ -2,100 +2,95 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C579C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A039C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:59:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27CF321835
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:55:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E54E321835
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:58:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XNcPD3er"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27CF321835
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UvmpMEBe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E54E321835
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihG8X-0002hj-81
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 11:55:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56234)
+	id 1ihGBW-0004mo-Us
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 11:58:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1ihG3b-0004LJ-Dk
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:50:51 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1ihGAb-000484-5t
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:58:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1ihG3Z-0005ka-O6
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:50:47 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:51408
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1ihG3Z-0005jG-JF
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:50:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576601443;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Hxi4TFPUAhXySks0MDg1YAzEzstwrloAcjIJSqHZj1U=;
- b=XNcPD3erCJ2pmg2N3rgG5QJrwu0bulGZqdXzv8una6NNhXrnwJwOtXjaZVj/iNoZLzJ1gI
- jibt//3mUsKmVCclpB+sLIFooXU8PUUJA2YHY07jKH3e2Sm35u3WA0Ij87JcOZ6vEgXSLw
- ITR49mt3vhBvv3ABxVYdSoumV5QcqOk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-_4vmNwiONZ6GyUXw8_zGEA-1; Tue, 17 Dec 2019 11:50:42 -0500
-Received: by mail-wm1-f72.google.com with SMTP id l11so963742wmi.0
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 08:50:42 -0800 (PST)
+ (envelope-from <richard.henderson@linaro.org>) id 1ihGAZ-0000a4-R0
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:58:00 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:37505)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1ihGAZ-0000Ze-JC
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:57:59 -0500
+Received: by mail-pg1-x544.google.com with SMTP id q127so5993003pga.4
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 08:57:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=35wX1HYRxAyJpHe8LnX7Y8fHENDYiRGdXDfL0VomOJk=;
+ b=UvmpMEBeJL+ECJ45w+tDMOp5Z20XmhytSXycmInXunj53NsW2u3OqhdJQOKvxxy8tD
+ a4dOnPftC4f8DbKjUWErjeK+7sRp7WNtOl6Hu1mUSYvEYGO9HhjxynKc9FNCHAGFOZ+i
+ /Y/CvKeUHmM7cv5bYYV95KpSfKOz+5rXEoiJ1TtY1+uHF3TgLorXJsjSnanX/99qAoXr
+ jl9wbLKKY+5SnBxlSaeLa9lEEHaBwHzDaH/1ws42G3cl5gyG785ydEiAi0DHLQd5DTW3
+ UL2vbNMEAcCp/mkZ2eA488V+OFd+SLCsOZ7AOVnQdH4j32M91oAFovAZWIqBp5M1dety
+ N+nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=aQejgbF//N7qVjT/SefZZofdV97veJrrkximXLqTP+A=;
- b=Bvkedte1kTQTQVqV72hvOsIMMPV9DxJMTqwqh6mDO3NIa19SXUak7Woz4finH2RIEP
- kh9ug0TqxcKYuHyDkfJjYJhXzZEMvaLDDtAN+lcrKp19yKCi6R+WEma5qmWZljse94JY
- MzAfamJ/CJsfqhmk2USS/X79DAW1XCSRw4QlXU1sNYTYB+inaElpgDvQMShc3WkHSd1i
- pUlZPk44vp1oZPlYl1liqvs/YHumZ/7IiNIo9PnsIm9iPuKlYnljBhOZDAjCrGFu6v6Q
- cr3VI18S121fwHE3+vTgWfMoN/yx00DSsoYfOsBzRwS4DYfrZdOV7sOboRU7Zx/479Ki
- 97Ig==
-X-Gm-Message-State: APjAAAXr2PRvZ6AFDtFsmHAasKoSjl9WV3OMgt7nBijbLSZ6aW23IgJo
- Om0PHSBrkJWupY3r7HmFTdurYBjpM2ikYaB4zxfnfOWHOvHtBTNtfmu7xOEsKRlF/8zDKW+qs5b
- et7itvj2kj3EAics=
-X-Received: by 2002:adf:fc0c:: with SMTP id i12mr40284773wrr.74.1576601440827; 
- Tue, 17 Dec 2019 08:50:40 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzMWX+DFZaPRiAJdgMUIPC3pOtgwgD77koA4kzYE32onbQoSruQixU1C2EpCg2MAQDxpzSFXg==
-X-Received: by 2002:adf:fc0c:: with SMTP id i12mr40284727wrr.74.1576601440590; 
- Tue, 17 Dec 2019 08:50:40 -0800 (PST)
-Received: from [192.168.1.35] (34.red-83-42-66.dynamicip.rima-tde.net.
- [83.42.66.34])
- by smtp.gmail.com with ESMTPSA id s1sm3636122wmc.23.2019.12.17.08.50.37
+ bh=35wX1HYRxAyJpHe8LnX7Y8fHENDYiRGdXDfL0VomOJk=;
+ b=SMTrpoTPMoIdtkyEC1dWOGt0F+DXYG86FtYk7n/LycoSSSsrRo8ZJNUzxUrpbhLX5K
+ FcMrNewYDS9FQYS+qNNnS6jMl8plWoc5TRgX2MhvaImKun+gHzFHlK46EgYnLobQt56d
+ NzyH0hq2oXNgHnGQmACngXt2kGXzV8X7G7NCYxNrgRXI1fLmzc+5ht3uhG8Xu9b8ILnY
+ Ng/4VV2D7mBgZwOLBEfpfTTxixIRU8Wov8bu/OWj/cnJS5+hG7PUXRa9jl3IY/sYhaby
+ TEWKM3mg5RtFQjbdtkvvUsynxMRXPbpy0mXL+DAvJr4g61MGLKwAfBeIe12V5SpNOc6V
+ X82A==
+X-Gm-Message-State: APjAAAU0nFpJOGry7GkZ2tGcfT2308JrtOzU0k7ApIn9Ctl6V1SMyjY5
+ JT8kRJQ8Xs8MQwgkxr/plBPxwQ==
+X-Google-Smtp-Source: APXvYqzjIHAl4TyhYYjoygIu3rxBy0b9BmBu3q1ol9CDjY/iPCaMQ0zQkYrXp9MC0tSuX2AUyGRXLg==
+X-Received: by 2002:a63:cc02:: with SMTP id x2mr26541622pgf.114.1576601878297; 
+ Tue, 17 Dec 2019 08:57:58 -0800 (PST)
+Received: from ?IPv6:2605:e000:c74f:dc00:6838:d2b2:17e2:8445?
+ ([2605:e000:c74f:dc00:6838:d2b2:17e2:8445])
+ by smtp.gmail.com with ESMTPSA id a15sm28528346pfh.169.2019.12.17.08.57.56
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 17 Dec 2019 08:50:39 -0800 (PST)
-Subject: Re: [PATCH 00/14] chardev: Use QEMUChrEvent enum in IOEventHandler
- typedef
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
-References: <20191217163808.20068-1-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <154a68ee-c683-d5c5-dad8-df483aa00c20@redhat.com>
-Date: Tue, 17 Dec 2019 17:50:37 +0100
+ Tue, 17 Dec 2019 08:57:57 -0800 (PST)
+Subject: Re: [PATCH] memory: Do not allow subregion out of the parent region
+ range
+To: Christophe de Dinechin <dinechin@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20191214160223.20012-1-philmd@redhat.com>
+ <da81a3e7-62a8-f46e-c12f-4dead2a9091f@redhat.com>
+ <92bb8e12-3ece-9811-438b-8fa64d2bde66@redhat.com>
+ <4a07cc6f-8762-145e-2b54-c61b0e287f19@redhat.com>
+ <127AF076-D309-4952-B572-52587A93F46A@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c5c27111-efc5-0a05-bdbd-415533e5bc30@linaro.org>
+Date: Tue, 17 Dec 2019 06:57:53 -1000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <20191217163808.20068-1-philmd@redhat.com>
+In-Reply-To: <127AF076-D309-4952-B572-52587A93F46A@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: _4vmNwiONZ6GyUXw8_zGEA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,127 +103,52 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Li Zhijian <lizhijian@cn.fujitsu.com>, Paul Burton <pburton@wavecomp.com>,
- Jason Wang <jasowang@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Alberto Garcia <berto@igalia.com>, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, Joel Stanley <joel@jms.id.au>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Antony Pavlov <antonynpavlov@gmail.com>, Laurent Vivier <lvivier@redhat.com>,
- Corey Minyard <minyard@acm.org>, Amit Shah <amit@kernel.org>,
- Alistair Francis <alistair@alistair23.me>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Kevin Wolf <kwolf@redhat.com>, qemu-riscv@nongnu.org,
- Igor Mitsyanko <i.mitsyanko@gmail.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Zhang Chen <chen.zhang@intel.com>, Michael Walle <michael@walle.cc>,
- Palmer Dabbelt <palmer@dabbelt.com>, Thomas Huth <huth@tuxfamily.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+ "Michael S. Tsirkin" <mst@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
+ qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 12/17/19 5:37 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi,
->=20
-> After this chat on #qemu IRC:
-> 13:20 <stsquad> so what is the difference between a IOReadHandler and IOE=
-ventHandler?
-> 13:25 <f4bug> stsquad: one is in-band and the other out-of-band?
-> 13:26 <stsquad> f4bug: ahh yes it seems so - connect/disconnect etc...
-> 13:27 <f4bug> see QEMUChrEvent for IOEventHandler
->=20
-> I thought it might be a good opportunity to make the IOEventHandler
-> typedef meaning more obvious, by using the QEMUChrEvent enum.
->=20
-> To be able to build I had to explicit a 'default' case when frontends
-> use a switch(event) case and do not handle all events.
->=20
-> Then I used a coccinelle spatch to change the various IOEventHandler.
-> I don't think the last patch can be split, but suggestions are welcome!
->=20
-> Regards,
->=20
-> Phil.
->=20
-> PD: I use git-publish. To avoid spamming too much, I'm using per-patch
-> Cc tag, after the '---' separator. This way each recipient should get
-> the cover and the specific patches of interests, + the last one.
->=20
-> Sent with: 'git publish --suppress-cc=3Dcccmd'
+On 12/17/19 1:58 AM, Christophe de Dinechin wrote:
+> 
+> 
+>> On 17 Dec 2019, at 11:51, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On 16/12/19 18:46, Philippe Mathieu-Daudé wrote:
+>>>>>
+>>>>
+>>>> I think in some cases this could be intentional, for example if you have
+>>>> different models with different BAR sizes and you organize this with the
+>>>> same tree of MemoryRegion and different sizes for the parent.
+>>>
+>>> But if a child is outside of the parent range, it can't be reached,
+>>> right? I'm confused, maybe AddressSpace can do that, but MemoryRegion
+>>> shouldn't?
+>>
+>> Yes, the idea is that you could have for one version of the device
+>>
+>>   parent 0x000-0x7ff
+>>     stuff 0x000-0x3ff
+>>     morestuff 0x400-0x7ff
+>>
+>> and for another
+>>
+>>   parent 0x000-0x3ff
+>>     stuff 0x000-0x3ff
+>>     morestuff 0x400-0x7ff
+>>
+>> where parent is the BAR, and you can share the code to generate the tree
+>> underneath parent.
+> 
+> I can see why you would have code reuse reasons to do that,
+> but frankly it looks buggy and confusing. In the rare cases
+> where this is indented, maybe add a flag making it explicit?
 
-While 'git-publish --verbose' show it was adding recipient from the tags:
-(mbox) Adding cc: ...
-(mbox) Adding cc: ...
+The guest OS is programming the BAR, producing a configuration that, while it
+doesn't make sense, is also legal per PCI.  QEMU cannot abort for this
+configuration.
 
-It still sent each patch to everybody from the cover:
-Server:
-MAIL FROM:
-RCPT TO: ...
-RCPT TO: ...
 
-Maybe the list was cached in the tag and I should have use the=20
---override-cc flag too:
-
-   --override-cc     Ignore any profile or saved CC emails
-
-I apologize for the no-relevant patches I spammed you with :(
-
-> Cc: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-> Cc: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Alex Benn=C3=A9e" <alex.bennee@linaro.org>
-> Cc: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
-> Cc: Andrzej Zaborowski <balrogg@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> Cc: Alistair Francis <alistair@alistair23.me>
-> Cc: Antony Pavlov <antonynpavlov@gmail.com>
-> Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>
-> Cc: Fabien Chouteau <chouteau@adacore.com>
-> Cc: KONRAD Frederic <frederic.konrad@adacore.com>
-> Cc: Peter Chubb <peter.chubb@nicta.com.au>
-> Cc: Alberto Garcia <berto@igalia.com>
-> Cc: Michael Walle <michael@walle.cc>
-> Cc: Thomas Huth <huth@tuxfamily.org>
-> Cc: Joel Stanley <joel@jms.id.au>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Halil Pasic <pasic@linux.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Laurent Vivier <lvivier@redhat.com>
-> Cc: Amit Shah <amit@kernel.org>
-> Cc: Corey Minyard <minyard@acm.org>
-> Cc: Paul Burton <pburton@wavecomp.com>
-> Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-> Cc: Aurelien Jarno <aurelien@aurel32.net>
-> Cc: Aleksandar Markovic <amarkovic@wavecomp.com>
-> Cc: Palmer Dabbelt <palmer@dabbelt.com>
-> Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-> Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
-> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> Cc: Zhang Chen <chen.zhang@intel.com>
-> Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
-> Cc: Jason Wang <jasowang@redhat.com>
-> Cc: qemu-arm@nongnu.org
-> Cc: qemu-block@nongnu.org
-> Cc: qemu-s390x@nongnu.org
-> Cc: qemu-riscv@nongnu.org
-
+r~
 
