@@ -2,84 +2,94 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31398C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:18:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 261A0C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:20:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFE4F206D7
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:18:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E7489206D7
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 18:20:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h9Fc7tZ9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFE4F206D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6IOTw/R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7489206D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihHQf-00030W-5o
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 13:18:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41503)
+	id 1ihHSs-0004GP-3J
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 13:20:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42566)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1ihHQ0-0002aG-Nl
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:18:01 -0500
+ (envelope-from <thuth@redhat.com>) id 1ihHRz-0003f3-92
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:20:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1ihHPz-0004Bb-Pz
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:18:00 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35061)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1ihHPz-0004BK-L5
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:17:59 -0500
-Received: by mail-oi1-x243.google.com with SMTP id k4so1764935oik.2
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 10:17:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qlIwL1T3vKUuJdwbGQZhWiwt5TeFlxqC2m+K9m7lAqQ=;
- b=h9Fc7tZ99YviEXkMLvSUkH7xWmcwMcqZYT7Tc5KjpcjG9YB0MItnFTUuLao4zfrVcj
- Pe+9Da6L9PXzrToM9zxz/pYJv1LO4PMjMifxh/uLdMNiTWW1OvsI9mx596PFrznOj8/Y
- YKd9adQZEv/zPIsQkDXNS35k9sva+ULYS37TlaqRRmTt8CeGjKBh0rbuTrCU5ruetMis
- 7gXS2D+OQDpXl/5Pc4CQfpiN+wwhKbWCZCb4DGAUwzCM6xS1DAxRDVnipfiySvSMmWwX
- B5znODy4cdMEiB1Gebel3o/kItDQX92ZSgNophdVOrg1GeWUv+ZvTN2Ep9VN9iZRbTVv
- 0unQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qlIwL1T3vKUuJdwbGQZhWiwt5TeFlxqC2m+K9m7lAqQ=;
- b=gZfKgKpQ+/JBii4d8xE2BXSBmsS7XAwsTuvtcloeedhGikqifgzZISEVyirPT/RZzJ
- uo7BcnxLTu7FGUtEJdX543erQcUtVyCdXYNS+JPUOukjRk89A1VcvkPn2cZos0UKE36i
- 7FyIjMUABre6CN0rnyWmW0pMGGybtHigrhqbXZd1myfVo+x/dUiOdiL7/fy+K4gfXMh4
- pUJ7YGh2BqerJ8XCgoiIDOZ2wz+nD6yn/DVuw6K/KNlPaARt+AU7/4PhB8sudlEVxHJZ
- uHhyEFL90ixNPDJq5BJbQRTAmV55C+ia+kHen5GqEss6GuTdXQA6+LcVBmzzD/Z6Tao2
- S7Ug==
-X-Gm-Message-State: APjAAAWKXwZXHpR43KPqIkCOwTemVYW/YQyrXJ+9v/x8YtaRo3R0A3lK
- GFcFiJrcy1MEjmggRuCvcx2XjNvo5D0nVG2SYU9bOQ==
-X-Google-Smtp-Source: APXvYqxOlsSRsLH9CI7geb3ZZimHuKE92z/GCFMiOmoJ0+E8I+Ily8k90w1N7qGz8gFQ2MxXCcdJ0qEAsb1Q9C/29Dw=
-X-Received: by 2002:aca:f484:: with SMTP id s126mr2198088oih.48.1576606678698; 
- Tue, 17 Dec 2019 10:17:58 -0800 (PST)
+ (envelope-from <thuth@redhat.com>) id 1ihHRw-0002ED-OP
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:20:01 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56155
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihHRw-00020r-KG
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 13:20:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576606799;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=0oCB44ImxGjxysxotT94ZHxQmdyxzOuJT5wCRVNxOdE=;
+ b=W6IOTw/R4g5ZI7P0knDeDcbTnN6yJ78g1vyU3tTwadKHic4WWaNVDn8qt5fKMv6eiis+X4
+ NYPC2+hnhxNPsj+gbXe1nvPLFcwv7nNGrC16Vkj+hH18VpftHMj4ebpHkdP6pLpceBYtl8
+ EstPEFy0Vyh3mwd5wgHxjInz4DOZG7w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-295-aF5SWCLtPvutiEwnGBO-ew-1; Tue, 17 Dec 2019 13:19:54 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0AF05107ACC4;
+ Tue, 17 Dec 2019 18:19:53 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-149.ams2.redhat.com [10.36.116.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0EA2319C58;
+ Tue, 17 Dec 2019 18:19:50 +0000 (UTC)
+Subject: Re: QEMU for Qualcomm Hexagon - KVM Forum talk and code available
+To: Taylor Simpson <tsimpson@quicinc.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <BYAPR02MB48863165DEE32E5C563E93F4DE650@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <CAL1e-=jvmJNiZR4iLDL-97qm=v+2s0cwn5YTzJQ=JZ_gwOe4tQ@mail.gmail.com>
+ <BYAPR02MB4886C8D82898F1E406C124F8DE7E0@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <BYAPR02MB48865884056A88B660B620FCDE770@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <87d0dw83uz.fsf@linaro.org>
+ <BYAPR02MB48866E2D82D9C76ABBECA842DE760@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <ffe58977-f251-df34-4bd0-62e32f78cc1a@linaro.org>
+ <SN6PR02MB48953397AA553FA7456E7CFCDE700@SN6PR02MB4895.namprd02.prod.outlook.com>
+ <BYAPR02MB488640DD7CC887E5FCC0F167DE500@BYAPR02MB4886.namprd02.prod.outlook.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <2654856b-b4b7-c3c4-0919-104854090d81@redhat.com>
+Date: Tue, 17 Dec 2019 19:19:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20191214160223.20012-1-philmd@redhat.com>
- <da81a3e7-62a8-f46e-c12f-4dead2a9091f@redhat.com>
- <92bb8e12-3ece-9811-438b-8fa64d2bde66@redhat.com>
- <4a07cc6f-8762-145e-2b54-c61b0e287f19@redhat.com>
- <127AF076-D309-4952-B572-52587A93F46A@redhat.com>
- <c5c27111-efc5-0a05-bdbd-415533e5bc30@linaro.org>
-In-Reply-To: <c5c27111-efc5-0a05-bdbd-415533e5bc30@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 17 Dec 2019 18:17:47 +0000
-Message-ID: <CAFEAcA955AwoDiuYxm0mJKV1qzyBorAz06dqi0tg2kMBT9GMTA@mail.gmail.com>
-Subject: Re: [PATCH] memory: Do not allow subregion out of the parent region
- range
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+In-Reply-To: <BYAPR02MB488640DD7CC887E5FCC0F167DE500@BYAPR02MB4886.namprd02.prod.outlook.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: aF5SWCLtPvutiEwnGBO-ew-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,50 +101,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Alex Williamson <alex.williamson@redhat.com>,
- Christophe de Dinechin <dinechin@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Alessandro Di Federico <ale@rev.ng>, "nizzo@rev.ng" <nizzo@rev.ng>,
+ =?UTF-8?Q?Niccol=c3=b2_Izzo?= <izzoniccolo@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 17 Dec 2019 at 16:57, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 12/17/19 1:58 AM, Christophe de Dinechin wrote:
-> >
-> >
-> >> On 17 Dec 2019, at 11:51, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >> Yes, the idea is that you could have for one version of the device
-> >>
-> >>   parent 0x000-0x7ff
-> >>     stuff 0x000-0x3ff
-> >>     morestuff 0x400-0x7ff
-> >>
-> >> and for another
-> >>
-> >>   parent 0x000-0x3ff
-> >>     stuff 0x000-0x3ff
-> >>     morestuff 0x400-0x7ff
-> >>
-> >> where parent is the BAR, and you can share the code to generate the tree
-> >> underneath parent.
-> >
-> > I can see why you would have code reuse reasons to do that,
-> > but frankly it looks buggy and confusing. In the rare cases
-> > where this is indented, maybe add a flag making it explicit?
->
-> The guest OS is programming the BAR, producing a configuration that, while it
-> doesn't make sense, is also legal per PCI.  QEMU cannot abort for this
-> configuration.
+On 17/12/2019 19.14, Taylor Simpson wrote:
+> Hi again,
+> 
+> Per Aleksandar's feedback, I'm finishing up the rewrite of the code imported from the existing Hexagon simulator.  Once I'm finished with that work, I'll start breaking down the code into a patch series.  I have a couple of questions I hope someone would be kind enough to answer.
+> 
+> Question 1:
+> I see this error from checkpatch.pl
+> ERROR: Macros with complex values should be enclosed in parenthesis
+> However, there are times when the code will not compile with parenthesis.
 
-Does guest programming of the PCI BAR size actually change the size
-of the 'parent' region, or does it just result in the creation
-of an appropriately sized alias into 'parent' ?
+checkpatch.pl sometimes reports false positives - or things that do not
+make sense in all cases, like the parenthesis here. You can simply
+ignore the warnings / errors in that case.
 
-thanks
--- PMM
+ Thomas
+
 
