@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F1E6C2D0C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37456C2D0CD
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:48:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46D44218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:46:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46D44218AC
+	by mail.kernel.org (Postfix) with ESMTPS id 10A34218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 12:48:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10A34218AC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihCFX-0005Kj-BN
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 07:46:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52494)
+	id 1ihCGr-00074z-4L
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 07:48:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1ihCEa-0004UQ-R9
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:45:54 -0500
+ (envelope-from <bounces@canonical.com>) id 1ihCEl-0004gA-96
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:46:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1ihCEZ-0008U2-LP
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:45:52 -0500
-Received: from indium.canonical.com ([91.189.90.7]:35114)
+ (envelope-from <bounces@canonical.com>) id 1ihCEj-0008WM-Vu
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:46:03 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35806)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1ihCEZ-0008Ts-Fn
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:45:51 -0500
+ id 1ihCEj-0008VY-OY
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 07:46:01 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1ihCEW-0003eX-LB
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 12:45:48 +0000
+ id 1ihCEg-00040G-Au
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 12:45:58 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 6240C2E8118
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 12:45:46 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 80D192E80DD
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 12:45:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 17 Dec 2019 12:37:57 -0000
-From: Launchpad Bug Tracker <1851552@bugs.launchpad.net>
+Date: Tue, 17 Dec 2019 12:38:11 -0000
+From: Vasili <1851552@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=cloud-init; status=New; importance=Undecided;
@@ -65,9 +65,9 @@ X-Launchpad-Bug-Security-Vulnerability: no
 X-Launchpad-Bug-Commenters: daniel-thewatkins janitor legovini raharper smoser
  vasili.namatov
 X-Launchpad-Bug-Reporter: Vasili (vasili.namatov)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
+X-Launchpad-Bug-Modifier: Vasili (vasili.namatov)
 References: <157306761727.2702.10828795840242046904.malonedeb@gac.canonical.com>
-Message-Id: <157658627811.15384.13029577990632955260.malone@wampee.canonical.com>
+Message-Id: <157658629127.14566.7589239350219795426.launchpad@wampee.canonical.com>
 Subject: [Bug 1851552] Re: since ubuntu 18 bionic release and latest,
  the ubuntu18 cloud image is unable to boot up on openstack instance 
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -76,7 +76,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3982295c9c98404d1a29e650d395ab3405540990
+X-Launchpad-Hash: 4469229a7788de35bef6a18d88ff66266283013b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -95,10 +95,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Status changed to 'Confirmed' because the bug affects multiple users.
-
-** Changed in: cloud-init (Ubuntu)
-       Status: New =3D> Confirmed
+** Also affects: nova
+   Importance: Undecided
+       Status: New
 
 -- =
 
