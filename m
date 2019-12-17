@@ -2,65 +2,84 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59145C2D0BF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25029C2D0BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:57:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35A77206EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:55:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35A77206EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E49E8206EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:57:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPzS9o6k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E49E8206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihH4e-0007oR-DJ
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:55:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59842)
+	id 1ihH5o-0000WA-4x
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:57:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1ihH3e-0006vh-Pt
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:54:55 -0500
+ (envelope-from <thuth@redhat.com>) id 1ihH4g-00080v-9A
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:56:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1ihH3d-0008Ut-Oy
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:54:54 -0500
-Received: from 8.mo69.mail-out.ovh.net ([46.105.56.233]:54057)
+ (envelope-from <thuth@redhat.com>) id 1ihH4f-0002Eq-1T
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:55:58 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39373
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ihH3d-0008HL-JI
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:54:53 -0500
-Received: from player711.ha.ovh.net (unknown [10.108.54.72])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 210FC74C62
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 18:54:41 +0100 (CET)
-Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
- [90.76.50.223]) (Authenticated sender: clg@kaod.org)
- by player711.ha.ovh.net (Postfix) with ESMTPSA id 5CE0FD4A870A;
- Tue, 17 Dec 2019 17:54:34 +0000 (UTC)
-Subject: Re: [PATCH 4/6] hw/timer/aspeed_timer: Add a fall through comment
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihH4e-0002Cd-UL
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:55:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1576605356;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=XonMyJTSYe6axvH2XhPYMlGqglKHeb2J0yyugOm/J1I=;
+ b=CPzS9o6klYqRavTeoQ/+ici5sjuyN6tscaMlJCWotBghTJqC+THeKP5TmU6mVVFAETdYEk
+ eGPBxM7VF56U7L/rkxMYq9UWPaaZsMsKNcCyljeiABv3aIHguYS/l/w3O4eJUWeWy0JKHB
+ INTZPoczuOLCQX64SXFUjtZKU/8NVjs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-94uUp8tSNAyWNMdnECtJXQ-1; Tue, 17 Dec 2019 12:55:54 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88ED1107ACCA;
+ Tue, 17 Dec 2019 17:55:53 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-116-149.ams2.redhat.com [10.36.116.149])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 881E960BE0;
+ Tue, 17 Dec 2019 17:55:49 +0000 (UTC)
+Subject: Re: [PATCH 3/6] hw/net/imx_fec: Rewrite fall through comments
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20191217173425.5082-1-philmd@redhat.com>
- <20191217173425.5082-5-philmd@redhat.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <9bbdf21b-a330-b8d2-5fa6-8649adeb9143@kaod.org>
-Date: Tue, 17 Dec 2019 18:54:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ <20191217173425.5082-4-philmd@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <2fc74b64-0a0b-c437-e925-4c16d3907da7@redhat.com>
+Date: Tue, 17 Dec 2019 18:55:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191217173425.5082-5-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191217173425.5082-4-philmd@redhat.com>
 Content-Language: en-US
-X-Ovh-Tracer-Id: 1612570142561831856
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddtjedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 94uUp8tSNAyWNMdnECtJXQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.56.233
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,58 +92,74 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
- Joel Stanley <joel@jms.id.au>
+ Jason Wang <jasowang@redhat.com>, qemu-arm@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/12/2019 18:34, Philippe Mathieu-Daud=C3=A9 wrote:
-> Reported by GCC9 when building with CFLAG -Wimplicit-fallthrough=3D2:
+On 17/12/2019 18.34, Philippe Mathieu-Daud=C3=A9 wrote:
+> GCC9 is confused by this comment when building with CFLAG
+> -Wimplicit-fallthrough=3D2:
 >=20
->   hw/timer/aspeed_timer.c: In function =E2=80=98aspeed_timer_set_value=E2=
-=80=99:
->   hw/timer/aspeed_timer.c:283:24: error: this statement may fall throug=
-h [-Werror=3Dimplicit-fallthrough=3D]
->     283 |         if (old_reload || !t->reload) {
->         |             ~~~~~~~~~~~^~~~~~~~~~~~~
->   hw/timer/aspeed_timer.c:287:5: note: here
->     287 |     case TIMER_REG_STATUS:
+>   hw/net/imx_fec.c: In function =E2=80=98imx_eth_write=E2=80=99:
+>   hw/net/imx_fec.c:906:12: error: this statement may fall through [-Werro=
+r=3Dimplicit-fallthrough=3D]
+>     906 |         if (unlikely(single_tx_ring)) {
+>         |            ^
+>   hw/net/imx_fec.c:912:5: note: here
+>     912 |     case ENET_TDAR:     /* FALLTHROUGH */
 >         |     ^~~~
 >   cc1: all warnings being treated as errors
 >=20
-> Add the missing fall through comment.
+> Rewrite the comments in the correct place,  using 'fall through'
+> which is recognized by GCC and static analyzers.
 >=20
-> Fixes: 1403f364472
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-
-
 > ---
-> Cc: "C=C3=A9dric Le Goater" <clg@kaod.org>
+> Cc: Peter Chubb <peter.chubb@nicta.com.au>
 > Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Andrew Jeffery <andrew@aj.id.au>
-> Cc: Joel Stanley <joel@jms.id.au>
+> Cc: Jason Wang <jasowang@redhat.com>
 > Cc: qemu-arm@nongnu.org
 > ---
->  hw/timer/aspeed_timer.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  hw/net/imx_fec.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 >=20
-> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
-> index a8c38cc118..c91f18415c 100644
-> --- a/hw/timer/aspeed_timer.c
-> +++ b/hw/timer/aspeed_timer.c
-> @@ -283,7 +283,7 @@ static void aspeed_timer_set_value(AspeedTimerCtrlS=
-tate *s, int timer, int reg,
->          if (old_reload || !t->reload) {
->              break;
+> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+> index bd99236864..30cc07753d 100644
+> --- a/hw/net/imx_fec.c
+> +++ b/hw/net/imx_fec.c
+> @@ -901,15 +901,17 @@ static void imx_eth_write(void *opaque, hwaddr offs=
+et, uint64_t value,
+>              s->regs[index] =3D 0;
 >          }
-> -
-> +        /* fall through to re-enable */
->      case TIMER_REG_STATUS:
->          if (timer_enabled(t)) {
->              uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+>          break;
+> -    case ENET_TDAR1:    /* FALLTHROUGH */
+> -    case ENET_TDAR2:    /* FALLTHROUGH */
+> +        /* fall through */
+
+Wrong location. And I think you don't need any comment here at all, GCC
+should stay silent without it?
+
+> +    case ENET_TDAR1:
+> +    case ENET_TDAR2:
+>          if (unlikely(single_tx_ring)) {
+>              qemu_log_mask(LOG_GUEST_ERROR,
+>                            "[%s]%s: trying to access TDAR2 or TDAR1\n",
+>                            TYPE_IMX_FEC, __func__);
+>              return;
+>          }
+> -    case ENET_TDAR:     /* FALLTHROUGH */
+> +        /* fall through */
+
+I'd suggest to simply remove it, too.
+
+> +    case ENET_TDAR:
+>          if (s->regs[ENET_ECR] & ENET_ECR_ETHEREN) {
+>              s->regs[index] =3D ENET_TDAR_TDAR;
+>              imx_eth_do_tx(s, index);
 >=20
+
+ Thomas
 
 
