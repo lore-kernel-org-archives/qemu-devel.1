@@ -2,84 +2,65 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12DFDC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59145C2D0BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:55:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D460F24679
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:52:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JUcQ/ASW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D460F24679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35A77206EC
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 17:55:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35A77206EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihH1I-0006GA-1e
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:52:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58392)
+	id 1ihH4e-0007oR-DJ
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 12:55:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1ihH0g-0005qp-Hh
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:51:51 -0500
+ (envelope-from <clg@kaod.org>) id 1ihH3e-0006vh-Pt
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:54:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1ihH0e-00008q-7c
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:51:49 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35020
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1ihH3d-0008Ut-Oy
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:54:54 -0500
+Received: from 8.mo69.mail-out.ovh.net ([46.105.56.233]:54057)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1ihH0e-00005d-41
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:51:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576605107;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3aDE1L+Xb5p32jzMEtH//uQo4KQnaVnoXx6owLvWO2Y=;
- b=JUcQ/ASWXWGKmhGtE3FAmiFTG1HaLV7wNmh8TJwVkMWnEG3z46XLQI5znv7x/U8t9bKARn
- TguXKgUXjSb3wbe/xzf62B+YHjszPnQ/TMjEQVlYlt3FushAcuSXqQb08rjUybbYNwF5Rg
- EdFFWg9fXxKa4MAkvXakKFMmzz+GAEI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-60zssl8ZNhC-tKwPzrpKmA-1; Tue, 17 Dec 2019 12:51:46 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F20BC107ACE3
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 17:51:44 +0000 (UTC)
-Received: from work-vm (ovpn-117-232.ams2.redhat.com [10.36.117.232])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4CD9560BE0;
- Tue, 17 Dec 2019 17:51:41 +0000 (UTC)
-Date: Tue, 17 Dec 2019 17:51:39 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [RFC PATCH 10/14] monitor/hmp: Explicit we ignore a QEMUChrEvent
- in IOEventHandler
-Message-ID: <20191217175139.GF2780@work-vm>
-References: <20191217163808.20068-1-philmd@redhat.com>
- <20191217163808.20068-11-philmd@redhat.com>
- <20191217173722.GD2780@work-vm>
- <b167f6ce-c39b-370b-5016-abd2f859390b@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1ihH3d-0008HL-JI
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 12:54:53 -0500
+Received: from player711.ha.ovh.net (unknown [10.108.54.72])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 210FC74C62
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 18:54:41 +0100 (CET)
+Received: from kaod.org (lfbn-tou-1-1227-223.w90-76.abo.wanadoo.fr
+ [90.76.50.223]) (Authenticated sender: clg@kaod.org)
+ by player711.ha.ovh.net (Postfix) with ESMTPSA id 5CE0FD4A870A;
+ Tue, 17 Dec 2019 17:54:34 +0000 (UTC)
+Subject: Re: [PATCH 4/6] hw/timer/aspeed_timer: Add a fall through comment
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191217173425.5082-1-philmd@redhat.com>
+ <20191217173425.5082-5-philmd@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <9bbdf21b-a330-b8d2-5fa6-8649adeb9143@kaod.org>
+Date: Tue, 17 Dec 2019 18:54:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <b167f6ce-c39b-370b-5016-abd2f859390b@redhat.com>
-User-Agent: Mutt/1.13.0 (2019-11-30)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 60zssl8ZNhC-tKwPzrpKmA-1
-X-Mimecast-Spam-Score: 0
+In-Reply-To: <20191217173425.5082-5-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 1612570142561831856
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrvddtjedguddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduuddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.56.233
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,87 +72,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, Andrew Jeffery <andrew@aj.id.au>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Philippe Mathieu-Daud=C3=A9 (philmd@redhat.com) wrote:
-> On 12/17/19 6:37 PM, Dr. David Alan Gilbert wrote:
-> > * Philippe Mathieu-Daud=C3=A9 (philmd@redhat.com) wrote:
-> > > The Chardev events are listed in the QEMUChrEvent enum. To be
-> > > able to use this enum in the IOEventHandler typedef, we need to
-> > > explicit when frontends ignore some events, to silent GCC the
-> > > following warnings:
-> > >=20
-> > >      CC      monitor/hmp.o
-> > >    monitor/hmp.c: In function =E2=80=98monitor_event=E2=80=99:
-> > >    monitor/hmp.c:1330:5: error: enumeration value =E2=80=98CHR_EVENT_=
-BREAK=E2=80=99 not handled in switch [-Werror=3Dswitch]
-> > >     1330 |     switch (event) {
-> > >          |     ^~~~~~
-> > >    cc1: all warnings being treated as errors
-> > >=20
-> > > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> > > ---
-> >=20
-> >=20
-> > Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >    for HMP
-> >=20
-> > Note that the use of 'default' will make life more unpredictable
-> > if you ever come to add a new event type.
+On 17/12/2019 18:34, Philippe Mathieu-Daud=C3=A9 wrote:
+> Reported by GCC9 when building with CFLAG -Wimplicit-fallthrough=3D2:
 >=20
-> You are right, this patch not good as it dumbly ignore the warning...
-> I will add all the missing cases:
+>   hw/timer/aspeed_timer.c: In function =E2=80=98aspeed_timer_set_value=E2=
+=80=99:
+>   hw/timer/aspeed_timer.c:283:24: error: this statement may fall throug=
+h [-Werror=3Dimplicit-fallthrough=3D]
+>     283 |         if (old_reload || !t->reload) {
+>         |             ~~~~~~~~~~~^~~~~~~~~~~~~
+>   hw/timer/aspeed_timer.c:287:5: note: here
+>     287 |     case TIMER_REG_STATUS:
+>         |     ^~~~
+>   cc1: all warnings being treated as errors
 >=20
-> -- >8 --
-> @@ -1371,6 +1371,10 @@ static void monitor_event(void *opaque, int event)
->          mon_refcount--;
->          monitor_fdsets_cleanup();
->          break;
-> +
-> +    case CHR_EVENT_BREAK:
-> +        /* Ignored */
-> +        break;
->      }
->  }
+> Add the missing fall through comment.
 >=20
+> Fixes: 1403f364472
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+
 > ---
+> Cc: "C=C3=A9dric Le Goater" <clg@kaod.org>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Andrew Jeffery <andrew@aj.id.au>
+> Cc: Joel Stanley <joel@jms.id.au>
+> Cc: qemu-arm@nongnu.org
+> ---
+>  hw/timer/aspeed_timer.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> And keep your Acked-by. Thanks!
-
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
+> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+> index a8c38cc118..c91f18415c 100644
+> --- a/hw/timer/aspeed_timer.c
+> +++ b/hw/timer/aspeed_timer.c
+> @@ -283,7 +283,7 @@ static void aspeed_timer_set_value(AspeedTimerCtrlS=
+tate *s, int timer, int reg,
+>          if (old_reload || !t->reload) {
+>              break;
+>          }
+> -
+> +        /* fall through to re-enable */
+>      case TIMER_REG_STATUS:
+>          if (timer_enabled(t)) {
+>              uint64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
 >=20
-> > > Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > ---
-> > >   monitor/hmp.c | 4 ++++
-> > >   1 file changed, 4 insertions(+)
-> > >=20
-> > > diff --git a/monitor/hmp.c b/monitor/hmp.c
-> > > index 8942e28933..d84238c120 100644
-> > > --- a/monitor/hmp.c
-> > > +++ b/monitor/hmp.c
-> > > @@ -1371,6 +1371,10 @@ static void monitor_event(void *opaque, int ev=
-ent)
-> > >           mon_refcount--;
-> > >           monitor_fdsets_cleanup();
-> > >           break;
-> > > +
-> > > +    default:
-> > > +        /* Ignore */
-> > > +        break;
-> > >       }
-> > >   }
-> > > --=20
-> > > 2.21.0
-> > >=20
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
