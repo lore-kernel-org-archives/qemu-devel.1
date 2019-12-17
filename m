@@ -6,76 +6,77 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E6C8C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:36:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D190C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:38:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49CF821582
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:36:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3922C21739
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 06:38:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ECFxTNZX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CF821582
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZvtmSxu/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3922C21739
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih6Su-0004jQ-Tz
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 01:36:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48868)
+	id 1ih6V5-00080v-QD
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 01:38:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49125)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1ih6Jw-0000iJ-VQ
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:02 -0500
+ (envelope-from <armbru@redhat.com>) id 1ih6K1-0000oL-GN
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1ih6Jv-0000v3-PI
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:00 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:57597
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1ih6K0-0001NR-12
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27854
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ih6Jv-0000qO-LY
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:26:59 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1ih6Jz-0001LU-SZ
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 01:27:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576564019;
+ s=mimecast20190719; t=1576564023;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=QVnaCBinN0VE5AFdXTdiBTMzWvyDhGUr6yaVglp9a9g=;
- b=ECFxTNZXx5sBfvlxBP45kJvuXpDyFO4HZr5cNQXoDj5kW0TigH73y3pDfvi1TIwi0UAAFW
- RsglSN9/HHrzDhGW+BQiC0vTh/6UomWpSvWI9DBjNhVQbTFDgEN6hJB/DyRNYszRViOf6a
- Q9pWBIEpiDsLqfFxm3lNRdSbMrMwt54=
+ bh=FZ2DbNqFEAdNbbqQ3g6CSccV8ATliONK13wR0ePiKL0=;
+ b=ZvtmSxu/DVdF5w/JK1ykIjKTrn9b+FJVvCroKmz3gWP4QOkneSNL8Dg2f4atpCWPlMC8xU
+ 9YH0CitRmxfvRJ7gOvh8Vf9qzsrMaJyVu1EMCkkRC/CQbiupbHyEtaYbuK/tS8tt9sFxdI
+ TKwYdjYLauspL7ynX1EfxJr7RVvPqOQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-DKW35x33ObGmihWFoMX5gw-1; Tue, 17 Dec 2019 01:26:57 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-413-iU1fIHmYPi-DZ0pWfOOeJQ-1; Tue, 17 Dec 2019 01:27:02 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2CC61005512
- for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 06:26:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9ADB800D41;
+ Tue, 17 Dec 2019 06:27:00 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-116-42.ams2.redhat.com
  [10.36.116.42])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FBF019C4F;
- Tue, 17 Dec 2019 06:26:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 728CF6886C;
+ Tue, 17 Dec 2019 06:26:58 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5B60C11385D4; Tue, 17 Dec 2019 07:26:51 +0100 (CET)
+ id AE4441136430; Tue, 17 Dec 2019 07:26:51 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/34] hw/acpi: Fix legacy CPU plug error API violations
-Date: Tue, 17 Dec 2019 07:26:24 +0100
-Message-Id: <20191217062651.9687-8-armbru@redhat.com>
+Subject: [PULL 32/34] backends/cryptodev: drop local_err from
+ cryptodev_backend_complete()
+Date: Tue, 17 Dec 2019 07:26:49 +0100
+Message-Id: <20191217062651.9687-33-armbru@redhat.com>
 In-Reply-To: <20191217062651.9687-1-armbru@redhat.com>
 References: <20191217062651.9687-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: DKW35x33ObGmihWFoMX5gw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: iU1fIHmYPi-DZ0pWfOOeJQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,69 +88,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Gonglei <arei.gonglei@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-legacy_acpi_cpu_plug_cb() dereferences @errp when
-acpi_set_cpu_present_bit() fails.  That's wrong; see the big comment
-in error.h.  Introduced in commit cc43364de7 "acpi/cpu-hotplug:
-introduce helper function to keep bit setting in one place".
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-No caller actually passes null, and acpi_set_cpu_present_bit() can't
-actually fail.
+No reason for local_err here, use errp directly instead.
 
-Fix anyway: drop acpi_set_cpu_present_bit()'s @errp parameter.
-
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Gonglei <arei.gonglei@huawei.com>
+Message-Id: <20191205174635.18758-20-vsementsov@virtuozzo.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Message-Id: <20191204093625.14836-7-armbru@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/acpi/cpu_hotplug.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ backends/cryptodev.c | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-diff --git a/hw/acpi/cpu_hotplug.c b/hw/acpi/cpu_hotplug.c
-index 3ac2045a95..9c3bcc84de 100644
---- a/hw/acpi/cpu_hotplug.c
-+++ b/hw/acpi/cpu_hotplug.c
-@@ -55,8 +55,7 @@ static const MemoryRegionOps AcpiCpuHotplug_ops =3D {
-     },
- };
-=20
--static void acpi_set_cpu_present_bit(AcpiCpuHotplug *g, CPUState *cpu,
--                                     Error **errp)
-+static void acpi_set_cpu_present_bit(AcpiCpuHotplug *g, CPUState *cpu)
+diff --git a/backends/cryptodev.c b/backends/cryptodev.c
+index 3c071eab95..5a9735684e 100644
+--- a/backends/cryptodev.c
++++ b/backends/cryptodev.c
+@@ -176,19 +176,10 @@ cryptodev_backend_complete(UserCreatable *uc, Error *=
+*errp)
  {
-     CPUClass *k =3D CPU_GET_CLASS(cpu);
-     int64_t cpu_id;
-@@ -74,10 +73,7 @@ static void acpi_set_cpu_present_bit(AcpiCpuHotplug *g, =
-CPUState *cpu,
- void legacy_acpi_cpu_plug_cb(HotplugHandler *hotplug_dev,
-                              AcpiCpuHotplug *g, DeviceState *dev, Error **=
-errp)
- {
--    acpi_set_cpu_present_bit(g, CPU(dev), errp);
--    if (*errp !=3D NULL) {
--        return;
--    }
-+    acpi_set_cpu_present_bit(g, CPU(dev));
-     acpi_send_event(DEVICE(hotplug_dev), ACPI_CPU_HOTPLUG_STATUS);
- }
+     CryptoDevBackend *backend =3D CRYPTODEV_BACKEND(uc);
+     CryptoDevBackendClass *bc =3D CRYPTODEV_BACKEND_GET_CLASS(uc);
+-    Error *local_err =3D NULL;
 =20
-@@ -92,7 +88,7 @@ void legacy_acpi_cpu_hotplug_init(MemoryRegion *parent, O=
-bject *owner,
-     gpe_cpu->device =3D owner;
-=20
-     CPU_FOREACH(cpu) {
--        acpi_set_cpu_present_bit(gpe_cpu, cpu, &error_abort);
-+        acpi_set_cpu_present_bit(gpe_cpu, cpu);
+     if (bc->init) {
+-        bc->init(backend, &local_err);
+-        if (local_err) {
+-            goto out;
+-        }
++        bc->init(backend, errp);
      }
+-
+-    return;
+-
+-out:
+-    error_propagate(errp, local_err);
  }
 =20
+ void cryptodev_backend_set_used(CryptoDevBackend *backend, bool used)
 --=20
 2.21.0
 
