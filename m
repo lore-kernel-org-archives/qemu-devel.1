@@ -2,80 +2,96 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1109C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D80C3C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:05:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAA312067C
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1F0B207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 10:05:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VedcHy5M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAA312067C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EYzMOHii"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1F0B207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih9ij-00031U-J4
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 05:04:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35957)
+	id 1ih9jO-0003xr-Op
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 05:05:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eric.auger@redhat.com>) id 1ih9i6-0002UI-Ku
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:04:11 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1ih9iY-000318-Ls
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eric.auger@redhat.com>) id 1ih9i1-00069F-P7
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:04:10 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54850
+ (envelope-from <pbonzini@redhat.com>) id 1ih9iX-0006EY-ID
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:04:38 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35125
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
- id 1ih9i1-00069B-Kh
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:04:05 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1ih9iX-0006EU-EP
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 05:04:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576577044;
+ s=mimecast20190719; t=1576577077;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YTdJ9BlYlKA52aob596FqEnZ+Y7D0Vb4IPmF21pH2xE=;
- b=VedcHy5Mg2DJfe34cwxHcfkDLxtoi1poqRXvzu5lc91CVgDk4zHaJBj53c1i89kuzH5OHA
- wF8W92iuqXG/7HZNR/Fz1QzZmbwqUje3R34dNQh+yYK1wX5mQPbWf0kXYDSbMSNmDOuoOx
- kBHgKTMwY0+wt0yFst4OSPyuJ1qBkoY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-40-ct_whX23NC2rkIxa7qnbow-1; Tue, 17 Dec 2019 05:04:03 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C012107ACC7;
- Tue, 17 Dec 2019 10:04:02 +0000 (UTC)
-Received: from [10.36.116.117] (ovpn-116-117.ams2.redhat.com [10.36.116.117])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D3A37C836;
- Tue, 17 Dec 2019 10:04:01 +0000 (UTC)
-Subject: Re: [PATCH v3 0/6] hw/arm/smmuv3: Correct stream ID and event address
- handling
-To: Simon Veith <sveith@amazon.de>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-References: <1576509312-13083-1-git-send-email-sveith@amazon.de>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <e0a55905-e76e-40d2-3d9b-06ea5b917001@redhat.com>
-Date: Tue, 17 Dec 2019 11:03:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ bh=loAK4kVwopibUcm9RXYBoS7F17AJtpqG86ZIEZJUItE=;
+ b=EYzMOHii4hYjKZmVmwsEU53avx8e53dyuhrXTujWJ5OEJhIEE85MScDR0ep0SXIWR5ECu7
+ AkX/6yI+YNn6KDW45nizX9yHsOHYUX8yTygp8dzxedsDisJiwYxWEh+X9lMPpmaZIGQ3e3
+ 4nXax4TvxPowOpf3lm3AqzRXfXx77P8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-ivCw0fHBM_mJoO3j6QE0uw-1; Tue, 17 Dec 2019 05:04:35 -0500
+Received: by mail-wm1-f69.google.com with SMTP id q21so179688wmc.7
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 02:04:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=D6qcer7pEfC9pWYO7pBi1lXIWSygHQ8u1k+W/Teuk1I=;
+ b=FB51Jq9b/s9A3KZ6LUjM/j4zjqnrT/VheW+HnYnHTcT155k5SYl6FlaOn+Gz4ExP3g
+ dnksA2eyJGCYV+HYwmjjZTAIOCAU2tCvCjRioFO9nClgA74kKMm5I6AXFutNgRuso5yp
+ VQc48+ruOgxGoPs0tKU3FEokTCkjrOhP6Cj86q9PQhAci8R3UZJSh+vUGr0XJU4wer5M
+ bxs1rp0dcwM4PWtFhcE2aUkfRRwmiahk39HTWrM2A6sN5DrcLkXpo8EmHbGMjK+XpXK5
+ dncVG20tgT63Rbwhn74cwaKpdfZmdFM4oQJC5jYLYqGx397cN7LxyN2eciqnPclIuyAQ
+ Bj4g==
+X-Gm-Message-State: APjAAAW5plVxsyWItZ/9V5j5OG2BEqXevQpqzu+RwcVs5ySHUt/a0gd9
+ e9I8SRHQgW6GofIh+TwIgtKVy8UxoH6yfbDGgchqiQEyAEF4G+P/qzLJJJwr27BfJ9DR8izjrtV
+ R2PAn0AeGa7goA2Y=
+X-Received: by 2002:a7b:cc97:: with SMTP id p23mr4646939wma.89.1576577073987; 
+ Tue, 17 Dec 2019 02:04:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxjBawQMNs9dzsP9xZl/9p00EI/6jhUNWsR0TLx5Mmfp3lKCVP1M4gP5if+xKyTno73Wi6ryQ==
+X-Received: by 2002:a7b:cc97:: with SMTP id p23mr4646911wma.89.1576577073720; 
+ Tue, 17 Dec 2019 02:04:33 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:503f:4ffc:fc4a:f29a?
+ ([2001:b07:6468:f312:503f:4ffc:fc4a:f29a])
+ by smtp.gmail.com with ESMTPSA id v83sm2480731wmg.16.2019.12.17.02.04.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 17 Dec 2019 02:04:33 -0800 (PST)
+Subject: Re: [PATCH] Semihost SYS_READC implementation (v6)
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <87h83w4dod.fsf@keithp.com>
+ <20191104204230.12249-1-keithp@keithp.com> <87h81zwdmw.fsf@linaro.org>
+ <5a3b1155-4242-831c-8ae4-e9fb07f1cdb2@redhat.com> <87eex3wa9a.fsf@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <77dd4863-6301-b17d-529c-451d491d4794@redhat.com>
+Date: Tue, 17 Dec 2019 11:04:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <1576509312-13083-1-git-send-email-sveith@amazon.de>
+In-Reply-To: <87eex3wa9a.fsf@linaro.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: ct_whX23NC2rkIxa7qnbow-1
+X-MC-Unique: ivCw0fHBM_mJoO3j6QE0uw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -90,57 +106,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Keith Packard <keithp@keithp.com>,
+ Riku Voipio <riku.voipio@iki.fi>, qemu-devel@nongnu.org,
+ Laurent Vivier <laurent@vivier.eu>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On 17/12/19 10:51, Alex Benn=C3=A9e wrote:
+>>> Secondly if the vCPU is paused (via console or gdbstub) we need to
+>>> unwind from our blocking position and be in a position to restart
+>>> cleanly.
+>> Perhaps if fifo8_is_empty(&c->fifo) the CPU could update the PC back to
+>> the SVC instruction and enter a halted state?  Perhaps with a new
+>> CPU_INTERRUPT_* flag that would be checked in arm_cpu_has_work.
+> I don't think the PC has been updated at this point - but we don't want
+> that logic in the common semihosting code. If we cpu_loop_exit the
+> exception is still in effect and will re-run when we start again.
 
-On 12/16/19 4:15 PM, Simon Veith wrote:
-> While working on the Linux SMMUv3 driver, I noticed a few cases where the QEMU
-> SMMUv3 behavior relating to stream tables was inconsistent with our hardware.
-> 
-> Also, when debugging those differences, I found that the errors reported through
-> the QEMU SMMUv3 event queue contained the address fields in an incorrect
-> position.
-> 
-> These patches correct the QEMU SMMUv3 behavior to match the specification (and
-> the behavior that I observed in our hardware). Linux guests normally will not
-> notice these issues, but other SMMUv3 driver implementations might.
-> 
-> Changes in v2:
-> 
-> * New patch "hw/arm/smmuv3: Correct SMMU_BASE_ADDR_MASK value" added
-> * Updated patch "hw/arm/smmuv3: Check stream IDs against actual table LOG2SIZE"
-> * Updated patch "hw/arm/smmuv3: Align stream table base address to table size"
-> 
-> Changes in v3:
-> 
-> * No changes, but sending again to correct a patch submission mishap that
->   confused Patchew
-> 
-> Simon Veith (6):
->   hw/arm/smmuv3: Apply address mask to linear strtab base address
->   hw/arm/smmuv3: Correct SMMU_BASE_ADDR_MASK value
->   hw/arm/smmuv3: Check stream IDs against actual table LOG2SIZE
->   hw/arm/smmuv3: Align stream table base address to table size
->   hw/arm/smmuv3: Use correct bit positions in EVT_SET_ADDR2 macro
->   hw/arm/smmuv3: Report F_STE_FETCH fault address in correct word
->     position
+So that would work?  cpu_loop_exit if the FIFO is empty, reentering via
+cpu_interrupt and clearing the interrupt signal in do_arm_semihosting.
 
-The series looks good to me. Also tested against non regression.
+> What we really want to do is fall back to the same halting semantics
+> that leave us in qemu_wait_io_event until there is something to process.
+> Is there any particular reason a blocking semihosting event isn't like
+> any other IO event?
 
-Tested-by: Eric Auger <eric.auger@redhat.com>
+The "io" in wait_io_event really stands for "iothread".  Usually in
+system emulation "waiting for I/O events" means "waiting for an
+interrupt" with a halt instruction (for ARM, WFE/WFI), hence my suggestion.
 
-Thanks
+Thanks,
 
-Eric
-
-
-> 
->  hw/arm/smmuv3-internal.h |  6 +++---
->  hw/arm/smmuv3.c          | 28 +++++++++++++++++++++-------
->  2 files changed, 24 insertions(+), 10 deletions(-)
-> 
+Paolo
 
 
