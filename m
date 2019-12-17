@@ -7,57 +7,58 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37702C43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:21:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE71C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:22:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB2ED2072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:21:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47EDB2072B
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 05:22:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="KG9QV8+O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB2ED2072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Ni2znKjV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47EDB2072B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih5IC-00023b-Qc
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:21:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34749)
+	id 1ih5J7-0002vh-5h
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 00:22:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36016)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4jK-0001bf-JV
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:45:07 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4kf-00038a-Se
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1ih4jJ-00070S-6l
- for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:45:06 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:37427 helo=ozlabs.org)
+ (envelope-from <dgibson@ozlabs.org>) id 1ih4ke-0000a4-Ht
+ for qemu-devel@nongnu.org; Mon, 16 Dec 2019 23:46:29 -0500
+Received: from ozlabs.org ([203.11.71.1]:37773)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1ih4jI-0006Th-SR; Mon, 16 Dec 2019 23:45:05 -0500
+ id 1ih4ke-0008Jk-5u; Mon, 16 Dec 2019 23:46:28 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47cQWb257xz9sTQ; Tue, 17 Dec 2019 15:43:37 +1100 (AEDT)
+ id 47cQWk50zcz9sTh; Tue, 17 Dec 2019 15:43:45 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1576557819;
- bh=oFqXJ1bVqdgNlGJhZqQ6IZxCwNPyaxw8gt/RF4wb3xk=;
+ d=gibson.dropbear.id.au; s=201602; t=1576557826;
+ bh=6Nu5aL34GOYK0IMDawQWJzLfK3WQGy47SluL54q3xhg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=KG9QV8+OXaRx58yZUiHCwDPlhSt0j3Coq65NXD3zYd7aF0NanHpFL9luHSAIeCYRp
- hHsvWkdy+CFew+U24weuFXhcSHvD2nq8yoPppE5yNDYwWhkI1bhWnAg2B7+Zfemnre
- 0s2i2w5hMdwE3D0107LGW2o+JHNwMcNpD7ehCZvM=
+ b=Ni2znKjVFrqnfj4OlHb9kDl1zg0cYeK8EMsiMjzotGYwRCEuSN2WXPKupQ7djnQXW
+ 8AgDCkMVwrsNH4mgkc3lmLxYvDAUJHMZGhPgQAGE4jmc6ySUZCxDVv9lpGv1m7wx6Y
+ YvgiqXSobvh4z79sJPVCjxtKVOiUrC/SzHqcDNf4=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 52/88] spapr: Don't trigger a CAS reboot for XICS/XIVE mode
- changeover
-Date: Tue, 17 Dec 2019 15:42:46 +1100
-Message-Id: <20191217044322.351838-53-david@gibson.dropbear.id.au>
+Subject: [PULL 84/88] ppc/pnv: Pass content of the "compatible" property to
+ pnv_dt_xscom()
+Date: Tue, 17 Dec 2019 15:43:18 +1100
+Message-Id: <20191217044322.351838-85-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 References: <20191217044322.351838-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,108 +71,136 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: lvivier@redhat.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
- Cedric Le Goater <clg@fr.ibm.com>, qemu-ppc@nongnu.org, clg@kaod.org,
- David Gibson <david@gibson.dropbear.id.au>
+ qemu-ppc@nongnu.org, clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PAPR allows the interrupt controller used on a POWER9 machine (XICS or
-XIVE) to be selected by the guest operating system, by using the
-ibm,client-architecture-support (CAS) feature negotiation call.
+From: Greg Kurz <groug@kaod.org>
 
-Currently, if the guest selects an interrupt controller different from th=
-e
-one selected at initial boot, this causes the system to be reset with the
-new model and the boot starts again.  This means we run through the SLOF
-boot process twice, as well as any other bootloader (e.g. grub) in use
-before the OS calls CAS.  This can be confusing and/or inconvenient for
-users.
+Since pnv_dt_xscom() is called from chip specific dt_populate() hooks,
+it shouldn't have to guess the chip type in order to populate the
+"compatible" property. Just pass the compat string and its size as
+arguments.
 
-Thanks to two fairly recent changes, we no longer need this reboot.  1) w=
-e
-now completely regenerate the device tree when CAS is called (meaning we
-don't need special case updates for all the device tree changes caused by
-the interrupt controller mode change),  2) we now have explicit code path=
-s
-to activate and deactivate the different interrupt controllers, rather th=
-an
-just implicitly calling those at machine reset time.
-
-We can therefore eliminate the reboot for changing irq mode, simply by
-putting a call to spapr_irq_update_active_intc() before we call
-spapr_h_cas_compose_response() (which gives the updated device tree to
-the guest firmware and OS).
-
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <157623842430.360005.9513965612524265862.stgit@bahia.lan>
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Cedric Le Goater <clg@fr.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_hcall.c | 33 +++++++++++++--------------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
+ hw/ppc/pnv.c               | 12 +++++++++---
+ hw/ppc/pnv_xscom.c         | 20 +++-----------------
+ include/hw/ppc/pnv_xscom.h |  3 ++-
+ 3 files changed, 14 insertions(+), 21 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 140f05c1c6..05a7ca275b 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1767,21 +1767,10 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
-     }
-     spapr->cas_pre_isa3_guest =3D !spapr_ovec_test(ov1_guest, OV1_PPC_3_=
-00);
-     spapr_ovec_cleanup(ov1_guest);
--    if (!spapr->cas_reboot) {
--        /* If spapr_machine_reset() did not set up a HPT but one is nece=
-ssary
--         * (because the guest isn't going to use radix) then set it up h=
-ere. */
--        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
--            /* legacy hash or new hash: */
--            spapr_setup_hpt_and_vrma(spapr);
--        }
--        spapr->cas_reboot =3D
--            (spapr_h_cas_compose_response(spapr, args[1], args[2],
--                                          ov5_updates) !=3D 0);
+diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+index c0a5703b74..b3388038c6 100644
+--- a/hw/ppc/pnv.c
++++ b/hw/ppc/pnv.c
+@@ -280,11 +280,13 @@ static void pnv_dt_icp(PnvChip *chip, void *fdt, ui=
+nt32_t pir,
+=20
+ static void pnv_chip_power8_dt_populate(PnvChip *chip, void *fdt)
+ {
++    static const char compat[] =3D "ibm,power8-xscom\0ibm,xscom";
+     int i;
+=20
+     pnv_dt_xscom(chip, fdt, 0,
+                  cpu_to_be64(PNV_XSCOM_BASE(chip)),
+-                 cpu_to_be64(PNV_XSCOM_SIZE));
++                 cpu_to_be64(PNV_XSCOM_SIZE),
++                 compat, sizeof(compat));
+=20
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D chip->cores[i];
+@@ -302,11 +304,13 @@ static void pnv_chip_power8_dt_populate(PnvChip *ch=
+ip, void *fdt)
+=20
+ static void pnv_chip_power9_dt_populate(PnvChip *chip, void *fdt)
+ {
++    static const char compat[] =3D "ibm,power9-xscom\0ibm,xscom";
+     int i;
+=20
+     pnv_dt_xscom(chip, fdt, 0,
+                  cpu_to_be64(PNV9_XSCOM_BASE(chip)),
+-                 cpu_to_be64(PNV9_XSCOM_SIZE));
++                 cpu_to_be64(PNV9_XSCOM_SIZE),
++                 compat, sizeof(compat));
+=20
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D chip->cores[i];
+@@ -323,11 +327,13 @@ static void pnv_chip_power9_dt_populate(PnvChip *ch=
+ip, void *fdt)
+=20
+ static void pnv_chip_power10_dt_populate(PnvChip *chip, void *fdt)
+ {
++    static const char compat[] =3D "ibm,power10-xscom\0ibm,xscom";
+     int i;
+=20
+     pnv_dt_xscom(chip, fdt, 0,
+                  cpu_to_be64(PNV10_XSCOM_BASE(chip)),
+-                 cpu_to_be64(PNV10_XSCOM_SIZE));
++                 cpu_to_be64(PNV10_XSCOM_SIZE),
++                 compat, sizeof(compat));
+=20
+     for (i =3D 0; i < chip->nr_cores; i++) {
+         PnvCore *pnv_core =3D chip->cores[i];
+diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+index 8189767eb0..5ae9dfbb88 100644
+--- a/hw/ppc/pnv_xscom.c
++++ b/hw/ppc/pnv_xscom.c
+@@ -282,12 +282,9 @@ static int xscom_dt_child(Object *child, void *opaqu=
+e)
+     return 0;
+ }
+=20
+-static const char compat_p8[] =3D "ibm,power8-xscom\0ibm,xscom";
+-static const char compat_p9[] =3D "ibm,power9-xscom\0ibm,xscom";
+-static const char compat_p10[] =3D "ibm,power10-xscom\0ibm,xscom";
+-
+ int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset,
+-                 uint64_t xscom_base, uint64_t xscom_size)
++                 uint64_t xscom_base, uint64_t xscom_size,
++                 const char *compat, int compat_size)
+ {
+     uint64_t reg[] =3D { xscom_base, xscom_size };
+     int xscom_offset;
+@@ -302,18 +299,7 @@ int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_=
+offset,
+     _FDT((fdt_setprop_cell(fdt, xscom_offset, "#address-cells", 1)));
+     _FDT((fdt_setprop_cell(fdt, xscom_offset, "#size-cells", 1)));
+     _FDT((fdt_setprop(fdt, xscom_offset, "reg", reg, sizeof(reg))));
+-
+-    if (pnv_chip_is_power10(chip)) {
+-        _FDT((fdt_setprop(fdt, xscom_offset, "compatible", compat_p10,
+-                          sizeof(compat_p10))));
+-    } else if (pnv_chip_is_power9(chip)) {
+-        _FDT((fdt_setprop(fdt, xscom_offset, "compatible", compat_p9,
+-                          sizeof(compat_p9))));
+-    } else {
+-        _FDT((fdt_setprop(fdt, xscom_offset, "compatible", compat_p8,
+-                          sizeof(compat_p8))));
 -    }
+-
++    _FDT((fdt_setprop(fdt, xscom_offset, "compatible", compat, compat_si=
+ze)));
+     _FDT((fdt_setprop(fdt, xscom_offset, "scom-controller", NULL, 0)));
 =20
-     /*
--     * Ensure the guest asks for an interrupt mode we support; otherwise
--     * terminate the boot.
-+     * Ensure the guest asks for an interrupt mode we support;
-+     * otherwise terminate the boot.
-      */
-     if (guest_xive) {
-         if (!spapr->irq->xive) {
-@@ -1797,14 +1786,18 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
-         }
-     }
+     args.fdt =3D fdt;
+diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
+index ad53f788b4..f74c81a980 100644
+--- a/include/hw/ppc/pnv_xscom.h
++++ b/include/hw/ppc/pnv_xscom.h
+@@ -115,7 +115,8 @@ typedef struct PnvXScomInterfaceClass {
 =20
--    /*
--     * Generate a machine reset when we have an update of the
--     * interrupt mode. Only required when the machine supports both
--     * modes.
--     */
-+    spapr_irq_update_active_intc(spapr);
-+
-     if (!spapr->cas_reboot) {
--        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_EXPL=
-OIT)
--            && spapr->irq->xics && spapr->irq->xive;
-+        /* If spapr_machine_reset() did not set up a HPT but one is nece=
-ssary
-+         * (because the guest isn't going to use radix) then set it up h=
-ere. */
-+        if ((spapr->patb_entry & PATE1_GR) && !guest_radix) {
-+            /* legacy hash or new hash: */
-+            spapr_setup_hpt_and_vrma(spapr);
-+        }
-+        spapr->cas_reboot =3D
-+            (spapr_h_cas_compose_response(spapr, args[1], args[2],
-+                                          ov5_updates) !=3D 0);
-     }
+ void pnv_xscom_realize(PnvChip *chip, uint64_t size, Error **errp);
+ int pnv_dt_xscom(PnvChip *chip, void *fdt, int root_offset,
+-                 uint64_t xscom_base, uint64_t xscom_size);
++                 uint64_t xscom_base, uint64_t xscom_size,
++                 const char *compat, int compat_size);
 =20
-     spapr_ovec_cleanup(ov5_updates);
+ void pnv_xscom_add_subregion(PnvChip *chip, hwaddr offset,
+                              MemoryRegion *mr);
 --=20
 2.23.0
 
