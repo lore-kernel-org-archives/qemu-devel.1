@@ -2,71 +2,74 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CBCC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 08:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC726C43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 08:44:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 826EF207FF
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 08:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8227207FF
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 08:44:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUmIAHG+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 826EF207FF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WVehIeOR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8227207FF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ih8Rm-0002vZ-LS
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 03:43:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32905)
+	id 1ih8Sk-0003o3-V7
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 03:44:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ih8RB-0002U8-QD
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:42:39 -0500
+ (envelope-from <thuth@redhat.com>) id 1ih8RT-0002mw-3B
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:43:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ih8R8-0007oJ-8M
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:42:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50447
+ (envelope-from <thuth@redhat.com>) id 1ih8RI-0008OM-FW
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:42:55 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42277
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ih8R8-0007mv-3W
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:42:34 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ih8RH-0008KZ-UQ
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 03:42:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576572153;
+ s=mimecast20190719; t=1576572163;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Dm9HhKVzTOuAXnV6JPJx2A8N3dmAelMfkSAoeZikMCY=;
- b=ZUmIAHG+nqHCK2D51vFlrb+ckfrgvK07WzPFDtghGr7OW0RdHDI3f/j5YLlw3qAQkrYGAN
- tzwIWzkUoAGH7O57v+s1TQH/Ra7zqTsjK9iExRcrtnQGiBqptnDl2oO35OPZ62bg8uTNul
- tJi/mY18UaTnPPW1GS+sn1cSUvxhbZU=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vWVkn2kR3yzw7Srf7n8X4NwwqZrKSlhWH2UaPxJsTt8=;
+ b=WVehIeOR8GMHxWQ2G5X7KyVDvZFr2zfP4AKHAGWwl3tjYW8KpYBtj8JRiCOC8wp8NhZfRw
+ q/KNlKmmAbtv/hl1HqIDv9chF6bYhBSkKBu7vRQs62ccurPRVMXWg8qGl4QXmB0BCqLEXT
+ sez0nOgkQ2WQpLYQYDTC+Ebz+UOZ0wg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-xMPm4jebO46R3Fx9Kd7xhw-1; Tue, 17 Dec 2019 03:42:31 -0500
+ us-mta-102-hsb_Q_3xOCGKwKaflxHHOg-1; Tue, 17 Dec 2019 03:42:35 -0500
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B329E800D41;
- Tue, 17 Dec 2019 08:42:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20F6F800D41;
+ Tue, 17 Dec 2019 08:42:34 +0000 (UTC)
 Received: from thuth.com (ovpn-116-149.ams2.redhat.com [10.36.116.149])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1589560BE2;
- Tue, 17 Dec 2019 08:42:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1AABD60BE2;
+ Tue, 17 Dec 2019 08:42:30 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
  Stefan Hajnoczi <stefanha@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PULL v2 00/10] Bluetooth removal, and qtest & misc patches
-Date: Tue, 17 Dec 2019 09:42:22 +0100
-Message-Id: <20191217084223.10231-1-thuth@redhat.com>
+Subject: [PULL v2 03/10] Remove the core bluetooth code
+Date: Tue, 17 Dec 2019 09:42:23 +0100
+Message-Id: <20191217084223.10231-2-thuth@redhat.com>
+In-Reply-To: <20191217084223.10231-1-thuth@redhat.com>
+References: <20191217084223.10231-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: xMPm4jebO46R3Fx9Kd7xhw-1
+X-MC-Unique: hsb_Q_3xOCGKwKaflxHHOg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -88,102 +91,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- Hi!
+It's been deprecated since QEMU v3.1. We've explicitly asked in the
+deprecation message that people should speak up on qemu-devel in case
+they are still actively using the bluetooth part of QEMU, but nobody
+ever replied that they are really still using it.
 
-The following changes since commit cb88904a54903ef6ba21a68a61d9cd51e2166304=
-:
+I've tried it on my own to use this bluetooth subsystem for one of my
+guests, but I was also not able to get it running anymore: When I was
+trying to pass-through a real bluetooth device, either the guest did
+not see the device at all, or the guest crashed.
 
-  Merge remote-tracking branch 'remotes/amarkovic/tags/mips-queue-dec-16-20=
-19' into staging (2019-12-16 14:07:56 +0000)
+Even worse for the emulated device: When running
 
-are available in the Git repository at:
+ qemu-system-x86_64 -bt device:keyboard
 
-  https://gitlab.com/huth/qemu.git tags/pull-request-2019-12-17
+QEMU crashes once you hit a key.
 
-for you to fetch changes up to 0f555602c7430ae55b5a4bacf39ce9e483e11193:
+So it seems like the bluetooth stack is not only neglected, it is
+completely bitrotten, as far as I can tell. The only attention that
+this code got during the past years were some CVEs that have been
+spotted there. So this code is a burden for the developers, without
+any real benefit anymore. Time to remove it.
 
-  tests: use g_test_rand_int (2019-12-17 09:05:23 +0100)
+Note: hw/bt/Kconfig only gets cleared but not removed here yet.
+Otherwise there is a problem with the *-softmmu/config-devices.mak.d
+dependency files - they still contain a reference to this file which
+gets evaluated first on some build hosts, before the file gets
+properly recreated. To avoid breaking these builders, we still need
+the file around for some time. It will get removed in a couple of
+weeks instead.
 
-----------------------------------------------------------------
-* Removal of the deprecated bluetooth code
-* Some qtest and misc patches
-----------------------------------------------------------------
-
-v2: Unfortunately, I was not able to reproduce the build problem that
-    Peter reported for the v1 pull request. So I'm trying to work-around
-    the issue now by leaving an empty hw/bt/Kconfig file around this time.
-    I'll remove it by another patch later in a couple of weeks instead.
-
-Cole Robinson (1):
-      tests: fix modules-test 'duplicate test case' error
-
-Laurent Vivier (1):
-      pseries: disable migration-test if /dev/kvm cannot be used
-
-Marc-Andr=C3=A9 Lureau (1):
-      glib: use portable g_setenv()
-
-Markus Armbruster (1):
-      hw/misc/ivshmem: Bury dead legacy INTx code
-
-Paolo Bonzini (1):
-      tests: use g_test_rand_int
-
-Thomas Huth (4):
-      hw/arm/nseries: Replace the bluetooth chardev with a "null" chardev
-      hw/usb: Remove the USB bluetooth dongle device
-      Remove the core bluetooth code
-      Remove libbluetooth / bluez from the CI tests
-
-Wainer dos Santos Moschetta (1):
-      tests/Makefile: Fix check-report.* targets shown in check-help
-
- .gitlab-ci.yml                             |    2 +-
- Makefile.objs                              |    2 -
- bt-host.c                                  |  198 ---
- bt-vhci.c                                  |  167 --
- configure                                  |   31 -
- hw/Kconfig                                 |    1 -
- hw/Makefile.objs                           |    1 -
- hw/arm/nseries.c                           |   16 +-
- hw/bt/Kconfig                              |    2 -
- hw/bt/Makefile.objs                        |    3 -
- hw/bt/core.c                               |  143 --
- hw/bt/hci-csr.c                            |  512 -------
- hw/bt/hci.c                                | 2263 ------------------------=
-----
- hw/bt/hid.c                                |  553 -------
- hw/bt/l2cap.c                              | 1367 -----------------
- hw/bt/sdp.c                                |  989 ------------
- hw/misc/ivshmem.c                          |   35 -
- hw/usb/Kconfig                             |    5 -
- hw/usb/Makefile.objs                       |    1 -
- hw/usb/dev-bluetooth.c                     |  581 -------
- include/hw/bt.h                            | 2177 ------------------------=
---
- include/sysemu/bt.h                        |   20 -
- include/sysemu/os-win32.h                  |    2 -
- os-win32.c                                 |   22 -
- qemu-deprecated.texi                       |    7 -
- qemu-doc.texi                              |   17 -
- qemu-options.hx                            |   79 -
- tests/Makefile.include                     |    4 +-
- tests/docker/dockerfiles/fedora.docker     |    1 -
- tests/docker/dockerfiles/ubuntu.docker     |    1 -
- tests/docker/dockerfiles/ubuntu1804.docker |    1 -
- tests/ivshmem-test.c                       |    2 +-
- tests/libqtest.c                           |    2 +-
- tests/migration-test.c                     |    3 +-
- tests/modules-test.c                       |    3 +-
- tests/test-bitmap.c                        |    8 +-
- tests/test-crypto-tlscredsx509.c           |    2 +-
- tests/test-crypto-tlssession.c             |    2 +-
- tests/test-io-channel-tls.c                |    2 +-
- tests/test-qga.c                           |    4 +-
- tests/test-vmstate.c                       |    2 +-
- ui/sdl2.c                                  |    2 +-
- vl.c                                       |  136 --
- 43 files changed, 26 insertions(+), 9345 deletions(-)
+Message-Id: <20191120091014.16883-4-thuth@redhat.com>
+Reviewed-by: J=C3=A1n Tomko <jtomko@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ Makefile.objs        |    2 -
+ bt-host.c            |  198 ----
+ bt-vhci.c            |  167 ----
+ configure            |   31 -
+ hw/Kconfig           |    1 -
+ hw/Makefile.objs     |    1 -
+ hw/bt/Kconfig        |    2 -
+ hw/bt/Makefile.objs  |    3 -
+ hw/bt/core.c         |  143 ---
+ hw/bt/hci-csr.c      |  512 ----------
+ hw/bt/hci.c          | 2263 ------------------------------------------
+ hw/bt/hid.c          |  553 -----------
+ hw/bt/l2cap.c        | 1367 -------------------------
+ hw/bt/sdp.c          |  989 ------------------
+ include/hw/bt.h      | 2177 ----------------------------------------
+ include/sysemu/bt.h  |   20 -
+ qemu-deprecated.texi |    7 -
+ qemu-options.hx      |   79 --
+ vl.c                 |  136 ---
+ 19 files changed, 8651 deletions(-)
  delete mode 100644 bt-host.c
  delete mode 100644 bt-vhci.c
  delete mode 100644 hw/bt/Makefile.objs
@@ -193,8 +155,9049 @@ Wainer dos Santos Moschetta (1):
  delete mode 100644 hw/bt/hid.c
  delete mode 100644 hw/bt/l2cap.c
  delete mode 100644 hw/bt/sdp.c
- delete mode 100644 hw/usb/dev-bluetooth.c
  delete mode 100644 include/hw/bt.h
  delete mode 100644 include/sysemu/bt.h
+
+diff --git a/Makefile.objs b/Makefile.objs
+index 11ba1a36bd..4e4d6ddbb3 100644
+--- a/Makefile.objs
++++ b/Makefile.objs
+@@ -65,8 +65,6 @@ common-obj-y +=3D replay/
+=20
+ common-obj-y +=3D ui/
+ common-obj-m +=3D ui/
+-common-obj-y +=3D bt-host.o bt-vhci.o
+-bt-host.o-cflags :=3D $(BLUEZ_CFLAGS)
+=20
+ common-obj-y +=3D dma-helpers.o
+ common-obj-y +=3D vl.o
+diff --git a/bt-host.c b/bt-host.c
+deleted file mode 100644
+index 2f8f631c25..0000000000
+--- a/bt-host.c
++++ /dev/null
+@@ -1,198 +0,0 @@
+-/*
+- * Wrap a host Bluetooth HCI socket in a struct HCIInfo.
+- *
+- * Copyright (C) 2008 Andrzej Zaborowski  <balrog@zabor.org>
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 or
+- * (at your option) version 3 of the License.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License along
+- * with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qemu-common.h"
+-#include "sysemu/bt.h"
+-#include "qemu/main-loop.h"
+-
+-#ifndef _WIN32
+-# include <sys/ioctl.h>
+-# include <sys/uio.h>
+-# ifdef CONFIG_BLUEZ
+-#  include <bluetooth/bluetooth.h>
+-#  include <bluetooth/hci.h>
+-#  include <bluetooth/hci_lib.h>
+-# else
+-#  include "hw/bt.h"
+-#  define HCI_MAX_FRAME_SIZE=091028
+-# endif
+-
+-struct bt_host_hci_s {
+-    struct HCIInfo hci;
+-    int fd;
+-
+-    uint8_t hdr[HCI_MAX_FRAME_SIZE];
+-    int len;
+-};
+-
+-static void bt_host_send(struct HCIInfo *hci,
+-                int type, const uint8_t *data, int len)
+-{
+-    struct bt_host_hci_s *s =3D (struct bt_host_hci_s *) hci;
+-    uint8_t pkt =3D type;
+-    struct iovec iv[2];
+-
+-    iv[0].iov_base =3D (void *)&pkt;
+-    iv[0].iov_len  =3D 1;
+-    iv[1].iov_base =3D (void *) data;
+-    iv[1].iov_len  =3D len;
+-
+-    while (writev(s->fd, iv, 2) < 0) {
+-        if (errno !=3D EAGAIN && errno !=3D EINTR) {
+-            fprintf(stderr, "qemu: error %i writing bluetooth packet.\n",
+-                            errno);
+-            return;
+-        }
+-    }
+-}
+-
+-static void bt_host_cmd(struct HCIInfo *hci, const uint8_t *data, int len)
+-{
+-    bt_host_send(hci, HCI_COMMAND_PKT, data, len);
+-}
+-
+-static void bt_host_acl(struct HCIInfo *hci, const uint8_t *data, int len)
+-{
+-    bt_host_send(hci, HCI_ACLDATA_PKT, data, len);
+-}
+-
+-static void bt_host_sco(struct HCIInfo *hci, const uint8_t *data, int len)
+-{
+-    bt_host_send(hci, HCI_SCODATA_PKT, data, len);
+-}
+-
+-static void bt_host_read(void *opaque)
+-{
+-    struct bt_host_hci_s *s =3D (struct bt_host_hci_s *) opaque;
+-    uint8_t *pkt;
+-    int pktlen;
+-
+-    /* Seems that we can't read only the header first and then the amount
+-     * of data indicated in the header because Linux will discard everythi=
+ng
+-     * that's not been read in one go.  */
+-    s->len =3D read(s->fd, s->hdr, sizeof(s->hdr));
+-
+-    if (s->len < 0) {
+-        fprintf(stderr, "qemu: error %i reading HCI frame\n", errno);
+-        return;
+-    }
+-
+-    pkt =3D s->hdr;
+-    while (s->len --)
+-        switch (*pkt ++) {
+-        case HCI_EVENT_PKT:
+-            if (s->len < 2)
+-                goto bad_pkt;
+-
+-            pktlen =3D MIN(pkt[1] + 2, s->len);
+-            s->hci.evt_recv(s->hci.opaque, pkt, pktlen);
+-            s->len -=3D pktlen;
+-            pkt +=3D pktlen;
+-
+-            /* TODO: if this is an Inquiry Result event, it's also
+-             * interpreted by Linux kernel before we received it, possibly
+-             * we should clean the kernel Inquiry cache through
+-             * ioctl(s->fd, HCI_INQUIRY, ...).  */
+-            break;
+-
+-        case HCI_ACLDATA_PKT:
+-            if (s->len < 4)
+-                goto bad_pkt;
+-
+-            pktlen =3D MIN(((pkt[3] << 8) | pkt[2]) + 4, s->len);
+-            s->hci.acl_recv(s->hci.opaque, pkt, pktlen);
+-            s->len -=3D pktlen;
+-            pkt +=3D pktlen;
+-            break;
+-
+-        case HCI_SCODATA_PKT:
+-            if (s->len < 3)
+-                goto bad_pkt;
+-
+-            pktlen =3D MIN(pkt[2] + 3, s->len);
+-            s->len -=3D pktlen;
+-            pkt +=3D pktlen;
+-            break;
+-
+-        default:
+-        bad_pkt:
+-            fprintf(stderr, "qemu: bad HCI packet type %02x\n", pkt[-1]);
+-        }
+-}
+-
+-static int bt_host_bdaddr_set(struct HCIInfo *hci, const uint8_t *bd_addr)
+-{
+-    return -ENOTSUP;
+-}
+-
+-struct HCIInfo *bt_host_hci(const char *id)
+-{
+-    struct bt_host_hci_s *s;
+-    int fd =3D -1;
+-# ifdef CONFIG_BLUEZ
+-    int dev_id =3D hci_devid(id);
+-    struct hci_filter flt;
+-
+-    if (dev_id < 0) {
+-        fprintf(stderr, "qemu: `%s' not available\n", id);
+-        return 0;
+-    }
+-
+-    fd =3D hci_open_dev(dev_id);
+-
+-    /* XXX: can we ensure nobody else has the device opened?  */
+-# endif
+-
+-    if (fd < 0) {
+-        fprintf(stderr, "qemu: Can't open `%s': %s (%i)\n",
+-                        id, strerror(errno), errno);
+-        return NULL;
+-    }
+-
+-# ifdef CONFIG_BLUEZ
+-    hci_filter_clear(&flt);
+-    hci_filter_all_ptypes(&flt);
+-    hci_filter_all_events(&flt);
+-
+-    if (qemu_setsockopt(fd, SOL_HCI, HCI_FILTER, &flt, sizeof(flt)) < 0) {
+-        fprintf(stderr, "qemu: Can't set HCI filter on socket (%i)\n", err=
+no);
+-        return 0;
+-    }
+-# endif
+-
+-    s =3D g_malloc0(sizeof(struct bt_host_hci_s));
+-    s->fd =3D fd;
+-    s->hci.cmd_send =3D bt_host_cmd;
+-    s->hci.sco_send =3D bt_host_sco;
+-    s->hci.acl_send =3D bt_host_acl;
+-    s->hci.bdaddr_set =3D bt_host_bdaddr_set;
+-
+-    qemu_set_fd_handler(s->fd, bt_host_read, NULL, s);
+-
+-    return &s->hci;
+-}
+-#else
+-struct HCIInfo *bt_host_hci(const char *id)
+-{
+-    fprintf(stderr, "qemu: bluetooth passthrough not supported (yet)\n");
+-
+-    return 0;
+-}
+-#endif
+diff --git a/bt-vhci.c b/bt-vhci.c
+deleted file mode 100644
+index 886e146743..0000000000
+--- a/bt-vhci.c
++++ /dev/null
+@@ -1,167 +0,0 @@
+-/*
+- * Support for host VHCIs inside qemu scatternets.
+- *
+- * Copyright (C) 2008 Andrzej Zaborowski  <balrog@zabor.org>
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 or
+- * (at your option) version 3 of the License.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License along
+- * with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "sysemu/bt.h"
+-#include "hw/bt.h"
+-#include "qemu/main-loop.h"
+-
+-#define VHCI_DEV=09"/dev/vhci"
+-#define VHCI_UDEV=09"/dev/hci_vhci"
+-
+-struct bt_vhci_s {
+-    int fd;
+-    struct HCIInfo *info;
+-
+-    uint8_t hdr[4096];
+-    int len;
+-};
+-
+-static void vhci_read(void *opaque)
+-{
+-    struct bt_vhci_s *s =3D (struct bt_vhci_s *) opaque;
+-    uint8_t *pkt;
+-    int pktlen;
+-
+-    /* Seems that we can't read only the header first and then the amount
+-     * of data indicated in the header because Linux will discard everythi=
+ng
+-     * that's not been read in one go.  */
+-    s->len =3D read(s->fd, s->hdr, sizeof(s->hdr));
+-
+-    if (s->len < 0) {
+-        fprintf(stderr, "qemu: error %i reading the PDU\n", errno);
+-        return;
+-    }
+-
+-    pkt =3D s->hdr;
+-    while (s->len --)
+-        switch (*pkt ++) {
+-        case HCI_COMMAND_PKT:
+-            if (s->len < 3)
+-                goto bad_pkt;
+-
+-            pktlen =3D MIN(pkt[2] + 3, s->len);
+-            s->info->cmd_send(s->info, pkt, pktlen);
+-            s->len -=3D pktlen;
+-            pkt +=3D pktlen;
+-            break;
+-
+-        case HCI_ACLDATA_PKT:
+-            if (s->len < 4)
+-                goto bad_pkt;
+-
+-            pktlen =3D MIN(((pkt[3] << 8) | pkt[2]) + 4, s->len);
+-            s->info->acl_send(s->info, pkt, pktlen);
+-            s->len -=3D pktlen;
+-            pkt +=3D pktlen;
+-            break;
+-
+-        case HCI_SCODATA_PKT:
+-            if (s->len < 3)
+-                goto bad_pkt;
+-
+-            pktlen =3D MIN(pkt[2] + 3, s->len);
+-            s->info->sco_send(s->info, pkt, pktlen);
+-            s->len -=3D pktlen;
+-            pkt +=3D pktlen;
+-            break;
+-
+-        default:
+-        bad_pkt:
+-            fprintf(stderr, "qemu: bad HCI packet type %02x\n", pkt[-1]);
+-        }
+-}
+-
+-static void vhci_host_send(void *opaque,
+-                int type, const uint8_t *data, int len)
+-{
+-    struct bt_vhci_s *s =3D (struct bt_vhci_s *) opaque;
+-#if 0
+-    uint8_t pkt =3D type;
+-    struct iovec iv[2];
+-
+-    iv[0].iov_base =3D &pkt;
+-    iv[0].iov_len  =3D 1;
+-    iv[1].iov_base =3D (void *) data;
+-    iv[1].iov_len  =3D len;
+-
+-    while (writev(s->fd, iv, 2) < 0)
+-        if (errno !=3D EAGAIN && errno !=3D EINTR) {
+-            fprintf(stderr, "qemu: error %i writing bluetooth packet.\n",
+-                            errno);
+-            return;
+-        }
+-#else
+-    /* Apparently VHCI wants us to write everything in one chunk :-(  */
+-    static uint8_t buf[4096];
+-
+-    buf[0] =3D type;
+-    memcpy(buf + 1, data, len);
+-
+-    while (write(s->fd, buf, len + 1) < 0)
+-        if (errno !=3D EAGAIN && errno !=3D EINTR) {
+-            fprintf(stderr, "qemu: error %i writing bluetooth packet.\n",
+-                            errno);
+-            return;
+-        }
+-#endif
+-}
+-
+-static void vhci_out_hci_packet_event(void *opaque,
+-                const uint8_t *data, int len)
+-{
+-    vhci_host_send(opaque, HCI_EVENT_PKT, data, len);
+-}
+-
+-static void vhci_out_hci_packet_acl(void *opaque,
+-                const uint8_t *data, int len)
+-{
+-    vhci_host_send(opaque, HCI_ACLDATA_PKT, data, len);
+-}
+-
+-void bt_vhci_init(struct HCIInfo *info)
+-{
+-    struct bt_vhci_s *s;
+-    int err[2];
+-    int fd;
+-
+-    fd =3D open(VHCI_DEV, O_RDWR);
+-    err[0] =3D errno;
+-    if (fd < 0) {
+-        fd =3D open(VHCI_UDEV, O_RDWR);
+-        err[1] =3D errno;
+-    }
+-
+-    if (fd < 0) {
+-        fprintf(stderr, "qemu: Can't open `%s': %s (%i)\n",
+-                        VHCI_DEV, strerror(err[0]), err[0]);
+-        fprintf(stderr, "qemu: Can't open `%s': %s (%i)\n",
+-                        VHCI_UDEV, strerror(err[1]), err[1]);
+-        exit(-1);
+-    }
+-
+-    s =3D g_malloc0(sizeof(struct bt_vhci_s));
+-    s->fd =3D fd;
+-    s->info =3D info ?: qemu_next_hci();
+-    s->info->opaque =3D s;
+-    s->info->evt_recv =3D vhci_out_hci_packet_event;
+-    s->info->acl_recv =3D vhci_out_hci_packet_acl;
+-
+-    qemu_set_fd_handler(s->fd, vhci_read, NULL, s);
+-}
+diff --git a/configure b/configure
+index 2c72e04d23..84b413dbfc 100755
+--- a/configure
++++ b/configure
+@@ -349,7 +349,6 @@ unset target_list_exclude
+ # Distributions want to ensure that several features are compiled in, and =
+it
+ # is impossible without a --enable-foo that exits if a feature is not foun=
+d.
+=20
+-bluez=3D""
+ brlapi=3D""
+ curl=3D""
+ curses=3D""
+@@ -1151,10 +1150,6 @@ for opt do
+   ;;
+   --enable-brlapi) brlapi=3D"yes"
+   ;;
+-  --disable-bluez) bluez=3D"no"
+-  ;;
+-  --enable-bluez) bluez=3D"yes"
+-  ;;
+   --disable-kvm) kvm=3D"no"
+   ;;
+   --enable-kvm) kvm=3D"yes"
+@@ -1762,7 +1757,6 @@ disabled with --disable-FEATURE, default is enabled i=
+f available:
+   curl            curl connectivity
+   membarrier      membarrier system call (for Linux 4.14+ or Windows)
+   fdt             fdt device tree
+-  bluez           bluez stack connectivity
+   kvm             KVM acceleration support
+   hax             HAX acceleration support
+   hvf             Hypervisor.framework acceleration support
+@@ -3665,26 +3659,6 @@ EOF
+   fi
+ fi # test "$curl"
+=20
+-##########################################
+-# bluez support probe
+-if test "$bluez" !=3D "no" ; then
+-  cat > $TMPC << EOF
+-#include <bluetooth/bluetooth.h>
+-int main(void) { return bt_error(0); }
+-EOF
+-  bluez_cflags=3D$($pkg_config --cflags bluez 2>/dev/null)
+-  bluez_libs=3D$($pkg_config --libs bluez 2>/dev/null)
+-  if compile_prog "$bluez_cflags" "$bluez_libs" ; then
+-    bluez=3Dyes
+-    libs_softmmu=3D"$bluez_libs $libs_softmmu"
+-  else
+-    if test "$bluez" =3D "yes" ; then
+-      feature_not_found "bluez" "Install bluez-libs/libbluetooth devel"
+-    fi
+-    bluez=3D"no"
+-  fi
+-fi
+-
+ ##########################################
+ # glib support probe
+=20
+@@ -6493,7 +6467,6 @@ if test "$xen" =3D "yes" ; then
+   echo "xen ctrl version  $xen_ctrl_version"
+ fi
+ echo "brlapi support    $brlapi"
+-echo "bluez  support    $bluez"
+ echo "Documentation     $docs"
+ echo "PIE               $pie"
+ echo "vde support       $vde"
+@@ -6917,10 +6890,6 @@ if test "$brlapi" =3D "yes" ; then
+   echo "CONFIG_BRLAPI=3Dy" >> $config_host_mak
+   echo "BRLAPI_LIBS=3D$brlapi_libs" >> $config_host_mak
+ fi
+-if test "$bluez" =3D "yes" ; then
+-  echo "CONFIG_BLUEZ=3Dy" >> $config_host_mak
+-  echo "BLUEZ_CFLAGS=3D$bluez_cflags" >> $config_host_mak
+-fi
+ if test "$gtk" =3D "yes" ; then
+   echo "CONFIG_GTK=3Dm" >> $config_host_mak
+   echo "GTK_CFLAGS=3D$gtk_cflags" >> $config_host_mak
+diff --git a/hw/Kconfig b/hw/Kconfig
+index b9685b3944..ecf491bf04 100644
+--- a/hw/Kconfig
++++ b/hw/Kconfig
+@@ -4,7 +4,6 @@ source acpi/Kconfig
+ source adc/Kconfig
+ source audio/Kconfig
+ source block/Kconfig
+-source bt/Kconfig
+ source char/Kconfig
+ source core/Kconfig
+ source display/Kconfig
+diff --git a/hw/Makefile.objs b/hw/Makefile.objs
+index 66eef20561..660e2b4373 100644
+--- a/hw/Makefile.objs
++++ b/hw/Makefile.objs
+@@ -5,7 +5,6 @@ devices-dirs-y +=3D acpi/
+ devices-dirs-y +=3D adc/
+ devices-dirs-y +=3D audio/
+ devices-dirs-y +=3D block/
+-devices-dirs-y +=3D bt/
+ devices-dirs-y +=3D char/
+ devices-dirs-y +=3D cpu/
+ devices-dirs-y +=3D display/
+diff --git a/hw/bt/Kconfig b/hw/bt/Kconfig
+index 554a9ee75e..e69de29bb2 100644
+--- a/hw/bt/Kconfig
++++ b/hw/bt/Kconfig
+@@ -1,2 +0,0 @@
+-config BLUETOOTH
+-    bool
+diff --git a/hw/bt/Makefile.objs b/hw/bt/Makefile.objs
+deleted file mode 100644
+index 867a7d2e8a..0000000000
+--- a/hw/bt/Makefile.objs
++++ /dev/null
+@@ -1,3 +0,0 @@
+-common-obj-y +=3D core.o l2cap.o sdp.o hci.o hid.o
+-common-obj-y +=3D hci-csr.o
+-
+diff --git a/hw/bt/core.c b/hw/bt/core.c
+deleted file mode 100644
+index dfb196e2a4..0000000000
+--- a/hw/bt/core.c
++++ /dev/null
+@@ -1,143 +0,0 @@
+-/*
+- * Convenience functions for bluetooth.
+- *
+- * Copyright (C) 2008 Andrzej Zaborowski  <balrog@zabor.org>
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 or
+- * (at your option) version 3 of the License.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License along
+- * with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qemu/error-report.h"
+-#include "sysemu/bt.h"
+-#include "hw/bt.h"
+-
+-/* Slave implementations can ignore this */
+-static void bt_dummy_lmp_mode_change(struct bt_link_s *link)
+-{
+-}
+-
+-/* Slaves should never receive these PDUs */
+-static void bt_dummy_lmp_connection_complete(struct bt_link_s *link)
+-{
+-    if (link->slave->reject_reason)
+-        error_report("%s: stray LMP_not_accepted received, fixme", __func_=
+_);
+-    else
+-        error_report("%s: stray LMP_accepted received, fixme", __func__);
+-    exit(-1);
+-}
+-
+-static void bt_dummy_lmp_disconnect_master(struct bt_link_s *link)
+-{
+-    error_report("%s: stray LMP_detach received, fixme", __func__);
+-    exit(-1);
+-}
+-
+-static void bt_dummy_lmp_acl_resp(struct bt_link_s *link,
+-                const uint8_t *data, int start, int len)
+-{
+-    error_report("%s: stray ACL response PDU, fixme", __func__);
+-    exit(-1);
+-}
+-
+-/* Slaves that don't hold any additional per link state can use these */
+-static void bt_dummy_lmp_connection_request(struct bt_link_s *req)
+-{
+-    struct bt_link_s *link =3D g_malloc0(sizeof(struct bt_link_s));
+-
+-    link->slave =3D req->slave;
+-    link->host =3D req->host;
+-
+-    req->host->reject_reason =3D 0;
+-    req->host->lmp_connection_complete(link);
+-}
+-
+-static void bt_dummy_lmp_disconnect_slave(struct bt_link_s *link)
+-{
+-    g_free(link);
+-}
+-
+-static void bt_dummy_destroy(struct bt_device_s *device)
+-{
+-    bt_device_done(device);
+-    g_free(device);
+-}
+-
+-static int bt_dev_idx =3D 0;
+-
+-void bt_device_init(struct bt_device_s *dev, struct bt_scatternet_s *net)
+-{
+-    memset(dev, 0, sizeof(*dev));
+-    dev->inquiry_scan =3D 1;
+-    dev->page_scan =3D 1;
+-
+-    dev->bd_addr.b[0] =3D bt_dev_idx & 0xff;
+-    dev->bd_addr.b[1] =3D bt_dev_idx >> 8;
+-    dev->bd_addr.b[2] =3D 0xd0;
+-    dev->bd_addr.b[3] =3D 0xba;
+-    dev->bd_addr.b[4] =3D 0xbe;
+-    dev->bd_addr.b[5] =3D 0xba;
+-    bt_dev_idx ++;
+-
+-    /* Simple slave-only devices need to implement only .lmp_acl_data */
+-    dev->lmp_connection_complete =3D bt_dummy_lmp_connection_complete;
+-    dev->lmp_disconnect_master =3D bt_dummy_lmp_disconnect_master;
+-    dev->lmp_acl_resp =3D bt_dummy_lmp_acl_resp;
+-    dev->lmp_mode_change =3D bt_dummy_lmp_mode_change;
+-    dev->lmp_connection_request =3D bt_dummy_lmp_connection_request;
+-    dev->lmp_disconnect_slave =3D bt_dummy_lmp_disconnect_slave;
+-
+-    dev->handle_destroy =3D bt_dummy_destroy;
+-
+-    dev->net =3D net;
+-    dev->next =3D net->slave;
+-    net->slave =3D dev;
+-}
+-
+-void bt_device_done(struct bt_device_s *dev)
+-{
+-    struct bt_device_s **p =3D &dev->net->slave;
+-
+-    while (*p && *p !=3D dev)
+-        p =3D &(*p)->next;
+-    if (*p !=3D dev) {
+-        error_report("%s: bad bt device \"%s\"", __func__,
+-                     dev->lmp_name ?: "(null)");
+-        exit(-1);
+-    }
+-
+-    *p =3D dev->next;
+-}
+-
+-static struct bt_vlan_s {
+-    struct bt_scatternet_s net;
+-    int id;
+-    struct bt_vlan_s *next;
+-} *first_bt_vlan;
+-
+-/* find or alloc a new bluetooth "VLAN" */
+-struct bt_scatternet_s *qemu_find_bt_vlan(int id)
+-{
+-    struct bt_vlan_s **pvlan, *vlan;
+-    for (vlan =3D first_bt_vlan; vlan !=3D NULL; vlan =3D vlan->next) {
+-        if (vlan->id =3D=3D id)
+-            return &vlan->net;
+-    }
+-    vlan =3D g_malloc0(sizeof(struct bt_vlan_s));
+-    vlan->id =3D id;
+-    pvlan =3D &first_bt_vlan;
+-    while (*pvlan !=3D NULL)
+-        pvlan =3D &(*pvlan)->next;
+-    *pvlan =3D vlan;
+-    return &vlan->net;
+-}
+diff --git a/hw/bt/hci-csr.c b/hw/bt/hci-csr.c
+deleted file mode 100644
+index 3d60654f44..0000000000
+--- a/hw/bt/hci-csr.c
++++ /dev/null
+@@ -1,512 +0,0 @@
+-/*
+- * Bluetooth serial HCI transport.
+- * CSR41814 HCI with H4p vendor extensions.
+- *
+- * Copyright (C) 2008 Andrzej Zaborowski  <balrog@zabor.org>
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 or
+- * (at your option) version 3 of the License.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License along
+- * with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qemu/error-report.h"
+-#include "qemu/module.h"
+-#include "chardev/char-serial.h"
+-#include "qemu/timer.h"
+-#include "qemu/bswap.h"
+-#include "hw/irq.h"
+-#include "sysemu/bt.h"
+-#include "hw/bt.h"
+-#include "qapi/error.h"
+-
+-struct csrhci_s {
+-    Chardev parent;
+-    int enable;
+-    qemu_irq *pins;
+-    int pin_state;
+-    int modem_state;
+-#define FIFO_LEN=094096
+-    int out_start;
+-    int out_len;
+-    int out_size;
+-    uint8_t outfifo[FIFO_LEN * 2];
+-    uint8_t inpkt[FIFO_LEN];
+-    enum {
+-        CSR_HDR_LEN,
+-        CSR_DATA_LEN,
+-        CSR_DATA
+-    } in_state;
+-    int in_len;
+-    int in_hdr;
+-    int in_needed;
+-    QEMUTimer *out_tm;
+-    int64_t baud_delay;
+-
+-    bdaddr_t bd_addr;
+-    struct HCIInfo *hci;
+-};
+-
+-#define TYPE_CHARDEV_HCI "chardev-hci"
+-#define HCI_CHARDEV(obj) OBJECT_CHECK(struct csrhci_s, (obj), TYPE_CHARDEV=
+_HCI)
+-
+-/* H4+ packet types */
+-enum {
+-    H4_CMD_PKT   =3D 1,
+-    H4_ACL_PKT   =3D 2,
+-    H4_SCO_PKT   =3D 3,
+-    H4_EVT_PKT   =3D 4,
+-    H4_NEG_PKT   =3D 6,
+-    H4_ALIVE_PKT =3D 7,
+-};
+-
+-/* CSR41814 negotiation start magic packet */
+-static const uint8_t csrhci_neg_packet[] =3D {
+-    H4_NEG_PKT, 10,
+-    0x00, 0xa0, 0x01, 0x00, 0x00,
+-    0x4c, 0x00, 0x96, 0x00, 0x00,
+-};
+-
+-/* CSR41814 vendor-specific command OCFs */
+-enum {
+-    OCF_CSR_SEND_FIRMWARE =3D 0x000,
+-};
+-
+-static inline void csrhci_fifo_wake(struct csrhci_s *s)
+-{
+-    Chardev *chr =3D CHARDEV(s);
+-
+-    if (!s->enable || !s->out_len)
+-        return;
+-
+-    /* XXX: Should wait for s->modem_state & CHR_TIOCM_RTS? */
+-    if (qemu_chr_be_can_write(chr)) {
+-        qemu_chr_be_write(chr, s->outfifo + s->out_start++, 1);
+-        s->out_len--;
+-        if (s->out_start >=3D s->out_size) {
+-            s->out_start =3D 0;
+-            s->out_size =3D FIFO_LEN;
+-        }
+-    }
+-
+-    if (s->out_len)
+-        timer_mod(s->out_tm, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + s->ba=
+ud_delay);
+-}
+-
+-#define csrhci_out_packetz(s, len) memset(csrhci_out_packet(s, len), 0, le=
+n)
+-static uint8_t *csrhci_out_packet(struct csrhci_s *s, int len)
+-{
+-    int off =3D s->out_start + s->out_len;
+-
+-    /* TODO: do the padding here, i.e. align len */
+-    s->out_len +=3D len;
+-
+-    if (off < FIFO_LEN) {
+-        if (off + len > FIFO_LEN && (s->out_size =3D off + len) > FIFO_LEN=
+ * 2) {
+-            error_report("%s: can't alloc %i bytes", __func__, len);
+-            exit(-1);
+-        }
+-        return s->outfifo + off;
+-    }
+-
+-    if (s->out_len > s->out_size) {
+-        error_report("%s: can't alloc %i bytes", __func__, len);
+-        exit(-1);
+-    }
+-
+-    return s->outfifo + off - s->out_size;
+-}
+-
+-static inline uint8_t *csrhci_out_packet_csr(struct csrhci_s *s,
+-                int type, int len)
+-{
+-    uint8_t *ret =3D csrhci_out_packetz(s, len + 2);
+-
+-    *ret ++ =3D type;
+-    *ret ++ =3D len;
+-
+-    return ret;
+-}
+-
+-static inline uint8_t *csrhci_out_packet_event(struct csrhci_s *s,
+-                int evt, int len)
+-{
+-    uint8_t *ret =3D csrhci_out_packetz(s,
+-                    len + 1 + sizeof(struct hci_event_hdr));
+-
+-    *ret ++ =3D H4_EVT_PKT;
+-    ((struct hci_event_hdr *) ret)->evt =3D evt;
+-    ((struct hci_event_hdr *) ret)->plen =3D len;
+-
+-    return ret + sizeof(struct hci_event_hdr);
+-}
+-
+-static void csrhci_in_packet_vendor(struct csrhci_s *s, int ocf,
+-                uint8_t *data, int len)
+-{
+-    int offset;
+-    uint8_t *rpkt;
+-
+-    switch (ocf) {
+-    case OCF_CSR_SEND_FIRMWARE:
+-        /* Check if this is the bd_address packet */
+-        if (len >=3D 18 + 8 && data[12] =3D=3D 0x01 && data[13] =3D=3D 0x0=
+0) {
+-            offset =3D 18;
+-            s->bd_addr.b[0] =3D data[offset + 7];=09/* Beyond cmd packet e=
+nd(!?) */
+-            s->bd_addr.b[1] =3D data[offset + 6];
+-            s->bd_addr.b[2] =3D data[offset + 4];
+-            s->bd_addr.b[3] =3D data[offset + 0];
+-            s->bd_addr.b[4] =3D data[offset + 3];
+-            s->bd_addr.b[5] =3D data[offset + 2];
+-
+-            s->hci->bdaddr_set(s->hci, s->bd_addr.b);
+-            error_report("%s: bd_address loaded from firmware: "
+-                         "%02x:%02x:%02x:%02x:%02x:%02x", __func__,
+-                         s->bd_addr.b[0], s->bd_addr.b[1], s->bd_addr.b[2]=
+,
+-                         s->bd_addr.b[3], s->bd_addr.b[4], s->bd_addr.b[5]=
+);
+-        }
+-
+-        rpkt =3D csrhci_out_packet_event(s, EVT_VENDOR, 11);
+-        /* Status bytes: no error */
+-        rpkt[9] =3D 0x00;
+-        rpkt[10] =3D 0x00;
+-        break;
+-
+-    default:
+-        error_report("%s: got a bad CMD packet", __func__);
+-        return;
+-    }
+-
+-    csrhci_fifo_wake(s);
+-}
+-
+-static void csrhci_in_packet(struct csrhci_s *s, uint8_t *pkt)
+-{
+-    uint8_t *rpkt;
+-    int opc;
+-
+-    switch (*pkt ++) {
+-    case H4_CMD_PKT:
+-        opc =3D le16_to_cpu(((struct hci_command_hdr *) pkt)->opcode);
+-        if (cmd_opcode_ogf(opc) =3D=3D OGF_VENDOR_CMD) {
+-            csrhci_in_packet_vendor(s, cmd_opcode_ocf(opc),
+-                            pkt + sizeof(struct hci_command_hdr),
+-                            s->in_len - sizeof(struct hci_command_hdr) - 1=
+);
+-            return;
+-        }
+-
+-        /* TODO: if the command is OCF_READ_LOCAL_COMMANDS or the likes,
+-         * we need to send it to the HCI layer and then add our supported
+-         * commands to the returned mask (such as OGF_VENDOR_CMD).  With
+-         * bt-hci.c we could just have hooks for this kind of commands but
+-         * we can't with bt-host.c.  */
+-
+-        s->hci->cmd_send(s->hci, pkt, s->in_len - 1);
+-        break;
+-
+-    case H4_EVT_PKT:
+-        goto bad_pkt;
+-
+-    case H4_ACL_PKT:
+-        s->hci->acl_send(s->hci, pkt, s->in_len - 1);
+-        break;
+-
+-    case H4_SCO_PKT:
+-        s->hci->sco_send(s->hci, pkt, s->in_len - 1);
+-        break;
+-
+-    case H4_NEG_PKT:
+-        if (s->in_hdr !=3D sizeof(csrhci_neg_packet) ||
+-                        memcmp(pkt - 1, csrhci_neg_packet, s->in_hdr)) {
+-            error_report("%s: got a bad NEG packet", __func__);
+-            return;
+-        }
+-        pkt +=3D 2;
+-
+-        rpkt =3D csrhci_out_packet_csr(s, H4_NEG_PKT, 10);
+-
+-        *rpkt ++ =3D 0x20;=09/* Operational settings negotiation Ok */
+-        memcpy(rpkt, pkt, 7); rpkt +=3D 7;
+-        *rpkt ++ =3D 0xff;
+-        *rpkt =3D 0xff;
+-        break;
+-
+-    case H4_ALIVE_PKT:
+-        if (s->in_hdr !=3D 4 || pkt[1] !=3D 0x55 || pkt[2] !=3D 0x00) {
+-            error_report("%s: got a bad ALIVE packet", __func__);
+-            return;
+-        }
+-
+-        rpkt =3D csrhci_out_packet_csr(s, H4_ALIVE_PKT, 2);
+-
+-        *rpkt ++ =3D 0xcc;
+-        *rpkt =3D 0x00;
+-        break;
+-
+-    default:
+-    bad_pkt:
+-        /* TODO: error out */
+-        error_report("%s: got a bad packet", __func__);
+-        break;
+-    }
+-
+-    csrhci_fifo_wake(s);
+-}
+-
+-static int csrhci_header_len(const uint8_t *pkt)
+-{
+-    switch (pkt[0]) {
+-    case H4_CMD_PKT:
+-        return HCI_COMMAND_HDR_SIZE;
+-    case H4_EVT_PKT:
+-        return HCI_EVENT_HDR_SIZE;
+-    case H4_ACL_PKT:
+-        return HCI_ACL_HDR_SIZE;
+-    case H4_SCO_PKT:
+-        return HCI_SCO_HDR_SIZE;
+-    case H4_NEG_PKT:
+-        return pkt[1] + 1;
+-    case H4_ALIVE_PKT:
+-        return 3;
+-    }
+-
+-    exit(-1);
+-}
+-
+-static int csrhci_data_len(const uint8_t *pkt)
+-{
+-    switch (*pkt ++) {
+-    case H4_CMD_PKT:
+-        /* It seems that vendor-specific command packets for H4+ are all
+-         * one byte longer than indicated in the standard header.  */
+-        if (le16_to_cpu(((struct hci_command_hdr *) pkt)->opcode) =3D=3D 0=
+xfc00)
+-            return (((struct hci_command_hdr *) pkt)->plen + 1) & ~1;
+-
+-        return ((struct hci_command_hdr *) pkt)->plen;
+-    case H4_EVT_PKT:
+-        return ((struct hci_event_hdr *) pkt)->plen;
+-    case H4_ACL_PKT:
+-        return le16_to_cpu(((struct hci_acl_hdr *) pkt)->dlen);
+-    case H4_SCO_PKT:
+-        return ((struct hci_sco_hdr *) pkt)->dlen;
+-    case H4_NEG_PKT:
+-    case H4_ALIVE_PKT:
+-        return 0;
+-    }
+-
+-    exit(-1);
+-}
+-
+-static void csrhci_ready_for_next_inpkt(struct csrhci_s *s)
+-{
+-    s->in_state =3D CSR_HDR_LEN;
+-    s->in_len =3D 0;
+-    s->in_needed =3D 2;
+-    s->in_hdr =3D INT_MAX;
+-}
+-
+-static int csrhci_write(struct Chardev *chr,
+-                const uint8_t *buf, int len)
+-{
+-    struct csrhci_s *s =3D (struct csrhci_s *)chr;
+-    int total =3D 0;
+-
+-    if (!s->enable)
+-        return 0;
+-
+-    for (;;) {
+-        int cnt =3D MIN(len, s->in_needed - s->in_len);
+-        if (cnt) {
+-            memcpy(s->inpkt + s->in_len, buf, cnt);
+-            s->in_len +=3D cnt;
+-            buf +=3D cnt;
+-            len -=3D cnt;
+-            total +=3D cnt;
+-        }
+-
+-        if (s->in_len < s->in_needed) {
+-            break;
+-        }
+-
+-        if (s->in_state =3D=3D CSR_HDR_LEN) {
+-            s->in_hdr =3D csrhci_header_len(s->inpkt) + 1;
+-            assert(s->in_hdr >=3D s->in_needed);
+-            s->in_needed =3D s->in_hdr;
+-            s->in_state =3D CSR_DATA_LEN;
+-            continue;
+-        }
+-
+-        if (s->in_state =3D=3D CSR_DATA_LEN) {
+-            s->in_needed +=3D csrhci_data_len(s->inpkt);
+-            /* hci_acl_hdr could specify more than 4096 bytes, so assert. =
+ */
+-            assert(s->in_needed <=3D sizeof(s->inpkt));
+-            s->in_state =3D CSR_DATA;
+-            continue;
+-        }
+-
+-        if (s->in_state =3D=3D CSR_DATA) {
+-            csrhci_in_packet(s, s->inpkt);
+-            csrhci_ready_for_next_inpkt(s);
+-        }
+-    }
+-
+-    return total;
+-}
+-
+-static void csrhci_out_hci_packet_event(void *opaque,
+-                const uint8_t *data, int len)
+-{
+-    struct csrhci_s *s =3D (struct csrhci_s *) opaque;
+-    uint8_t *pkt =3D csrhci_out_packet(s, (len + 2) & ~1);=09/* Align */
+-
+-    *pkt ++ =3D H4_EVT_PKT;
+-    memcpy(pkt, data, len);
+-
+-    csrhci_fifo_wake(s);
+-}
+-
+-static void csrhci_out_hci_packet_acl(void *opaque,
+-                const uint8_t *data, int len)
+-{
+-    struct csrhci_s *s =3D (struct csrhci_s *) opaque;
+-    uint8_t *pkt =3D csrhci_out_packet(s, (len + 2) & ~1);=09/* Align */
+-
+-    *pkt ++ =3D H4_ACL_PKT;
+-    pkt[len & ~1] =3D 0;
+-    memcpy(pkt, data, len);
+-
+-    csrhci_fifo_wake(s);
+-}
+-
+-static int csrhci_ioctl(struct Chardev *chr, int cmd, void *arg)
+-{
+-    QEMUSerialSetParams *ssp;
+-    struct csrhci_s *s =3D (struct csrhci_s *) chr;
+-    int prev_state =3D s->modem_state;
+-
+-    switch (cmd) {
+-    case CHR_IOCTL_SERIAL_SET_PARAMS:
+-        ssp =3D (QEMUSerialSetParams *) arg;
+-        s->baud_delay =3D NANOSECONDS_PER_SECOND / ssp->speed;
+-        /* Moments later... (but shorter than 100ms) */
+-        s->modem_state |=3D CHR_TIOCM_CTS;
+-        break;
+-
+-    case CHR_IOCTL_SERIAL_GET_TIOCM:
+-        *(int *) arg =3D s->modem_state;
+-        break;
+-
+-    case CHR_IOCTL_SERIAL_SET_TIOCM:
+-        s->modem_state =3D *(int *) arg;
+-        if (~s->modem_state & prev_state & CHR_TIOCM_RTS)
+-            s->modem_state &=3D ~CHR_TIOCM_CTS;
+-        break;
+-
+-    default:
+-        return -ENOTSUP;
+-    }
+-    return 0;
+-}
+-
+-static void csrhci_reset(struct csrhci_s *s)
+-{
+-    s->out_len =3D 0;
+-    s->out_size =3D FIFO_LEN;
+-    csrhci_ready_for_next_inpkt(s);
+-    s->baud_delay =3D NANOSECONDS_PER_SECOND;
+-    s->enable =3D 0;
+-
+-    s->modem_state =3D 0;
+-    /* After a while... (but sooner than 10ms) */
+-    s->modem_state |=3D CHR_TIOCM_CTS;
+-
+-    memset(&s->bd_addr, 0, sizeof(bdaddr_t));
+-}
+-
+-static void csrhci_out_tick(void *opaque)
+-{
+-    csrhci_fifo_wake((struct csrhci_s *) opaque);
+-}
+-
+-static void csrhci_pins(void *opaque, int line, int level)
+-{
+-    struct csrhci_s *s =3D (struct csrhci_s *) opaque;
+-    int state =3D s->pin_state;
+-
+-    s->pin_state &=3D ~(1 << line);
+-    s->pin_state |=3D (!!level) << line;
+-
+-    if ((state & ~s->pin_state) & (1 << csrhci_pin_reset)) {
+-        /* TODO: Disappear from lower layers */
+-        csrhci_reset(s);
+-    }
+-
+-    if (s->pin_state =3D=3D 3 && state !=3D 3) {
+-        s->enable =3D 1;
+-        /* TODO: Wake lower layers up */
+-    }
+-}
+-
+-qemu_irq *csrhci_pins_get(Chardev *chr)
+-{
+-    struct csrhci_s *s =3D (struct csrhci_s *) chr;
+-
+-    return s->pins;
+-}
+-
+-static void csrhci_open(Chardev *chr,
+-                        ChardevBackend *backend,
+-                        bool *be_opened,
+-                        Error **errp)
+-{
+-    struct csrhci_s *s =3D HCI_CHARDEV(chr);
+-
+-    s->hci =3D qemu_next_hci();
+-    s->hci->opaque =3D s;
+-    s->hci->evt_recv =3D csrhci_out_hci_packet_event;
+-    s->hci->acl_recv =3D csrhci_out_hci_packet_acl;
+-
+-    s->out_tm =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, csrhci_out_tick, s);
+-    s->pins =3D qemu_allocate_irqs(csrhci_pins, s, __csrhci_pins);
+-    csrhci_reset(s);
+-    *be_opened =3D false;
+-}
+-
+-static void char_hci_class_init(ObjectClass *oc, void *data)
+-{
+-    ChardevClass *cc =3D CHARDEV_CLASS(oc);
+-
+-    cc->internal =3D true;
+-    cc->open =3D csrhci_open;
+-    cc->chr_write =3D csrhci_write;
+-    cc->chr_ioctl =3D csrhci_ioctl;
+-}
+-
+-static const TypeInfo char_hci_type_info =3D {
+-    .name =3D TYPE_CHARDEV_HCI,
+-    .parent =3D TYPE_CHARDEV,
+-    .instance_size =3D sizeof(struct csrhci_s),
+-    .class_init =3D char_hci_class_init,
+-};
+-
+-Chardev *uart_hci_init(void)
+-{
+-    return qemu_chardev_new(NULL, TYPE_CHARDEV_HCI,
+-                            NULL, NULL, &error_abort);
+-}
+-
+-static void register_types(void)
+-{
+-    type_register_static(&char_hci_type_info);
+-}
+-
+-type_init(register_types);
+diff --git a/hw/bt/hci.c b/hw/bt/hci.c
+deleted file mode 100644
+index c7958f6c35..0000000000
+--- a/hw/bt/hci.c
++++ /dev/null
+@@ -1,2263 +0,0 @@
+-/*
+- * QEMU Bluetooth HCI logic.
+- *
+- * Copyright (C) 2007 OpenMoko, Inc.
+- * Copyright (C) 2008 Andrzej Zaborowski  <balrog@zabor.org>
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 of
+- * the License, or (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qemu/error-report.h"
+-#include "qapi/error.h"
+-#include "qemu/timer.h"
+-#include "hw/usb.h"
+-#include "sysemu/bt.h"
+-#include "hw/bt.h"
+-#include "qapi/qmp/qerror.h"
+-#include "sysemu/replay.h"
+-#include "qemu/cutils.h"
+-
+-struct bt_hci_s {
+-    uint8_t *(*evt_packet)(void *opaque);
+-    void (*evt_submit)(void *opaque, int len);
+-    void *opaque;
+-    uint8_t evt_buf[256];
+-
+-    uint8_t acl_buf[4096];
+-    int acl_len;
+-
+-    uint16_t asb_handle;
+-    uint16_t psb_handle;
+-
+-    int last_cmd;=09/* Note: Always little-endian */
+-
+-    struct bt_device_s *conn_req_host;
+-
+-    struct {
+-        int inquire;
+-        int periodic;
+-        int responses_left;
+-        int responses;
+-        QEMUTimer *inquiry_done;
+-        QEMUTimer *inquiry_next;
+-        int inquiry_length;
+-        int inquiry_period;
+-        int inquiry_mode;
+-
+-#define HCI_HANDLE_OFFSET=090x20
+-#define HCI_HANDLES_MAX=09=090x10
+-        struct bt_hci_master_link_s {
+-            struct bt_link_s *link;
+-            void (*lmp_acl_data)(struct bt_link_s *link,
+-                            const uint8_t *data, int start, int len);
+-            QEMUTimer *acl_mode_timer;
+-        } handle[HCI_HANDLES_MAX];
+-        uint32_t role_bmp;
+-        int last_handle;
+-        int connecting;
+-        bdaddr_t awaiting_bdaddr[HCI_HANDLES_MAX];
+-    } lm;
+-
+-    uint8_t event_mask[8];
+-    uint16_t voice_setting;=09/* Notw: Always little-endian */
+-    uint16_t conn_accept_tout;
+-    QEMUTimer *conn_accept_timer;
+-
+-    struct HCIInfo info;
+-    struct bt_device_s device;
+-
+-    Error *replay_blocker;
+-};
+-
+-#define DEFAULT_RSSI_DBM=0920
+-
+-#define hci_from_info(ptr)=09container_of((ptr), struct bt_hci_s, info)
+-#define hci_from_device(ptr)=09container_of((ptr), struct bt_hci_s, device=
+)
+-
+-struct bt_hci_link_s {
+-    struct bt_link_s btlink;
+-    uint16_t handle;=09/* Local */
+-};
+-
+-/* LMP layer emulation */
+-#if 0
+-static void bt_submit_lmp(struct bt_device_s *bt, int length, uint8_t *dat=
+a)
+-{
+-    int resp, resplen, error, op, tr;
+-    uint8_t respdata[17];
+-
+-    if (length < 1)
+-        return;
+-
+-    tr =3D *data & 1;
+-    op =3D *(data ++) >> 1;
+-    resp =3D LMP_ACCEPTED;
+-    resplen =3D 2;
+-    respdata[1] =3D op;
+-    error =3D 0;
+-    length --;
+-
+-    if (op >=3D 0x7c) {=09/* Extended opcode */
+-        op |=3D *(data ++) << 8;
+-        resp =3D LMP_ACCEPTED_EXT;
+-        resplen =3D 4;
+-        respdata[0] =3D op >> 8;
+-        respdata[1] =3D op & 0xff;
+-        length --;
+-    }
+-
+-    switch (op) {
+-    case LMP_ACCEPTED:
+-        /* data[0]=09Op code
+-         */
+-        if (length < 1) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        resp =3D 0;
+-        break;
+-
+-    case LMP_ACCEPTED_EXT:
+-        /* data[0]=09Escape op code
+-         * data[1]=09Extended op code
+-         */
+-        if (length < 2) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        resp =3D 0;
+-        break;
+-
+-    case LMP_NOT_ACCEPTED:
+-        /* data[0]=09Op code
+-         * data[1]=09Error code
+-         */
+-        if (length < 2) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        resp =3D 0;
+-        break;
+-
+-    case LMP_NOT_ACCEPTED_EXT:
+-        /* data[0]=09Op code
+-         * data[1]=09Extended op code
+-         * data[2]=09Error code
+-         */
+-        if (length < 3) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        resp =3D 0;
+-        break;
+-
+-    case LMP_HOST_CONNECTION_REQ:
+-        break;
+-
+-    case LMP_SETUP_COMPLETE:
+-        resp =3D LMP_SETUP_COMPLETE;
+-        resplen =3D 1;
+-        bt->setup =3D 1;
+-        break;
+-
+-    case LMP_DETACH:
+-        /* data[0]=09Error code
+-         */
+-        if (length < 1) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        bt->setup =3D 0;
+-        resp =3D 0;
+-        break;
+-
+-    case LMP_SUPERVISION_TIMEOUT:
+-        /* data[0,1]=09Supervision timeout
+-         */
+-        if (length < 2) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        resp =3D 0;
+-        break;
+-
+-    case LMP_QUALITY_OF_SERVICE:
+-        resp =3D 0;
+-        /* Fall through */
+-    case LMP_QOS_REQ:
+-        /* data[0,1]=09Poll interval
+-         * data[2]=09N(BC)
+-         */
+-        if (length < 3) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        break;
+-
+-    case LMP_MAX_SLOT:
+-        resp =3D 0;
+-        /* Fall through */
+-    case LMP_MAX_SLOT_REQ:
+-        /* data[0]=09Max slots
+-         */
+-        if (length < 1) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        break;
+-
+-    case LMP_AU_RAND:
+-    case LMP_IN_RAND:
+-    case LMP_COMB_KEY:
+-        /* data[0-15]=09Random number
+-         */
+-        if (length < 16) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        if (op =3D=3D LMP_AU_RAND) {
+-            if (bt->key_present) {
+-                resp =3D LMP_SRES;
+-                resplen =3D 5;
+-                /* XXX: [Part H] Section 6.1 on page 801 */
+-            } else {
+-                error =3D HCI_PIN_OR_KEY_MISSING;
+-                goto not_accepted;
+-            }
+-        } else if (op =3D=3D LMP_IN_RAND) {
+-            error =3D HCI_PAIRING_NOT_ALLOWED;
+-            goto not_accepted;
+-        } else {
+-            /* XXX: [Part H] Section 3.2 on page 779 */
+-            resp =3D LMP_UNIT_KEY;
+-            resplen =3D 17;
+-            memcpy(respdata + 1, bt->key, 16);
+-
+-            error =3D HCI_UNIT_LINK_KEY_USED;
+-            goto not_accepted;
+-        }
+-        break;
+-
+-    case LMP_UNIT_KEY:
+-        /* data[0-15]=09Key
+-         */
+-        if (length < 16) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        memcpy(bt->key, data, 16);
+-        bt->key_present =3D 1;
+-        break;
+-
+-    case LMP_SRES:
+-        /* data[0-3]=09Authentication response
+-         */
+-        if (length < 4) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        break;
+-
+-    case LMP_CLKOFFSET_REQ:
+-        resp =3D LMP_CLKOFFSET_RES;
+-        resplen =3D 3;
+-        respdata[1] =3D 0x33;
+-        respdata[2] =3D 0x33;
+-        break;
+-
+-    case LMP_CLKOFFSET_RES:
+-        /* data[0,1]=09Clock offset
+-         * (Slave to master only)
+-         */
+-        if (length < 2) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        break;
+-
+-    case LMP_VERSION_REQ:
+-    case LMP_VERSION_RES:
+-        /* data[0]=09VersNr
+-         * data[1,2]=09CompId
+-         * data[3,4]=09SubVersNr
+-         */
+-        if (length < 5) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        if (op =3D=3D LMP_VERSION_REQ) {
+-            resp =3D LMP_VERSION_RES;
+-            resplen =3D 6;
+-            respdata[1] =3D 0x20;
+-            respdata[2] =3D 0xff;
+-            respdata[3] =3D 0xff;
+-            respdata[4] =3D 0xff;
+-            respdata[5] =3D 0xff;
+-        } else
+-            resp =3D 0;
+-        break;
+-
+-    case LMP_FEATURES_REQ:
+-    case LMP_FEATURES_RES:
+-        /* data[0-7]=09Features
+-         */
+-        if (length < 8) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        if (op =3D=3D LMP_FEATURES_REQ) {
+-            resp =3D LMP_FEATURES_RES;
+-            resplen =3D 9;
+-            respdata[1] =3D (bt->lmp_caps >> 0) & 0xff;
+-            respdata[2] =3D (bt->lmp_caps >> 8) & 0xff;
+-            respdata[3] =3D (bt->lmp_caps >> 16) & 0xff;
+-            respdata[4] =3D (bt->lmp_caps >> 24) & 0xff;
+-            respdata[5] =3D (bt->lmp_caps >> 32) & 0xff;
+-            respdata[6] =3D (bt->lmp_caps >> 40) & 0xff;
+-            respdata[7] =3D (bt->lmp_caps >> 48) & 0xff;
+-            respdata[8] =3D (bt->lmp_caps >> 56) & 0xff;
+-        } else
+-            resp =3D 0;
+-        break;
+-
+-    case LMP_NAME_REQ:
+-        /* data[0]=09Name offset
+-         */
+-        if (length < 1) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        resp =3D LMP_NAME_RES;
+-        resplen =3D 17;
+-        respdata[1] =3D data[0];
+-        respdata[2] =3D strlen(bt->lmp_name);
+-        memset(respdata + 3, 0x00, 14);
+-        if (respdata[2] > respdata[1])
+-            memcpy(respdata + 3, bt->lmp_name + respdata[1],
+-                            respdata[2] - respdata[1]);
+-        break;
+-
+-    case LMP_NAME_RES:
+-        /* data[0]=09Name offset
+-         * data[1]=09Name length
+-         * data[2-15]=09Name fragment
+-         */
+-        if (length < 16) {
+-            error =3D HCI_UNSUPPORTED_LMP_PARAMETER_VALUE;
+-            goto not_accepted;
+-        }
+-        resp =3D 0;
+-        break;
+-
+-    default:
+-        error =3D HCI_UNKNOWN_LMP_PDU;
+-        /* Fall through */
+-    not_accepted:
+-        if (op >> 8) {
+-            resp =3D LMP_NOT_ACCEPTED_EXT;
+-            resplen =3D 5;
+-            respdata[0] =3D op >> 8;
+-            respdata[1] =3D op & 0xff;
+-            respdata[2] =3D error;
+-        } else {
+-            resp =3D LMP_NOT_ACCEPTED;
+-            resplen =3D 3;
+-            respdata[0] =3D op & 0xff;
+-            respdata[1] =3D error;
+-        }
+-    }
+-
+-    if (resp =3D=3D 0)
+-        return;
+-
+-    if (resp >> 8) {
+-        respdata[0] =3D resp >> 8;
+-        respdata[1] =3D resp & 0xff;
+-    } else
+-        respdata[0] =3D resp & 0xff;
+-
+-    respdata[0] <<=3D 1;
+-    respdata[0] |=3D tr;
+-}
+-
+-static void bt_submit_raw_acl(struct bt_piconet_s *net, int length, uint8_=
+t *data)
+-{
+-    struct bt_device_s *slave;
+-    if (length < 1)
+-        return;
+-
+-    slave =3D 0;
+-#if 0
+-    slave =3D net->slave;
+-#endif
+-
+-    switch (data[0] & 3) {
+-    case LLID_ACLC:
+-        bt_submit_lmp(slave, length - 1, data + 1);
+-        break;
+-    case LLID_ACLU_START:
+-#if 0
+-        bt_sumbit_l2cap(slave, length - 1, data + 1, (data[0] >> 2) & 1);
+-        breka;
+-#endif
+-    default:
+-    case LLID_ACLU_CONT:
+-        break;
+-    }
+-}
+-#endif
+-
+-/* HCI layer emulation */
+-
+-/* Note: we could ignore endianness because unswapped handles will still
+- * be valid as connection identifiers for the guest - they don't have to
+- * be continuously allocated.  We do it though, to preserve similar
+- * behaviour between hosts.  Some things, like the BD_ADDR cannot be
+- * preserved though (for example if a real hci is used).  */
+-#define HNDL(raw) cpu_to_le16(raw)
+-
+-static const uint8_t bt_event_reserved_mask[8] =3D {
+-    0xff, 0x9f, 0xfb, 0xff, 0x07, 0x18, 0x00, 0x00,
+-};
+-
+-
+-static void null_hci_send(struct HCIInfo *hci, const uint8_t *data, int le=
+n)
+-{
+-}
+-
+-static int null_hci_addr_set(struct HCIInfo *hci, const uint8_t *bd_addr)
+-{
+-    return -ENOTSUP;
+-}
+-
+-struct HCIInfo null_hci =3D {
+-    .cmd_send =3D null_hci_send,
+-    .sco_send =3D null_hci_send,
+-    .acl_send =3D null_hci_send,
+-    .bdaddr_set =3D null_hci_addr_set,
+-};
+-
+-
+-static inline uint8_t *bt_hci_event_start(struct bt_hci_s *hci,
+-                int evt, int len)
+-{
+-    uint8_t *packet, mask;
+-    int mask_byte;
+-
+-    if (len > 255) {
+-        error_report("%s: HCI event params too long (%ib)", __func__, len)=
+;
+-        exit(-1);
+-    }
+-
+-    mask_byte =3D (evt - 1) >> 3;
+-    mask =3D 1 << ((evt - 1) & 3);
+-    if (mask & bt_event_reserved_mask[mask_byte] & ~hci->event_mask[mask_b=
+yte])
+-        return NULL;
+-
+-    packet =3D hci->evt_packet(hci->opaque);
+-    packet[0] =3D evt;
+-    packet[1] =3D len;
+-
+-    return &packet[2];
+-}
+-
+-static inline void bt_hci_event(struct bt_hci_s *hci, int evt,
+-                void *params, int len)
+-{
+-    uint8_t *packet =3D bt_hci_event_start(hci, evt, len);
+-
+-    if (!packet)
+-        return;
+-
+-    if (len)
+-        memcpy(packet, params, len);
+-
+-    hci->evt_submit(hci->opaque, len + 2);
+-}
+-
+-static inline void bt_hci_event_status(struct bt_hci_s *hci, int status)
+-{
+-    evt_cmd_status params =3D {
+-        .status=09=3D status,
+-        .ncmd=09=3D 1,
+-        .opcode=09=3D hci->last_cmd,
+-    };
+-
+-    bt_hci_event(hci, EVT_CMD_STATUS, &params, EVT_CMD_STATUS_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete(struct bt_hci_s *hci,
+-                void *ret, int len)
+-{
+-    uint8_t *packet =3D bt_hci_event_start(hci, EVT_CMD_COMPLETE,
+-                    len + EVT_CMD_COMPLETE_SIZE);
+-    evt_cmd_complete *params =3D (evt_cmd_complete *) packet;
+-
+-    if (!packet)
+-        return;
+-
+-    params->ncmd=09=3D 1;
+-    params->opcode=09=3D hci->last_cmd;
+-    if (len)
+-        memcpy(&packet[EVT_CMD_COMPLETE_SIZE], ret, len);
+-
+-    hci->evt_submit(hci->opaque, len + EVT_CMD_COMPLETE_SIZE + 2);
+-}
+-
+-static void bt_hci_inquiry_done(void *opaque)
+-{
+-    struct bt_hci_s *hci =3D (struct bt_hci_s *) opaque;
+-    uint8_t status =3D HCI_SUCCESS;
+-
+-    if (!hci->lm.periodic)
+-        hci->lm.inquire =3D 0;
+-
+-    /* The specification is inconsistent about this one.  Page 565 reads
+-     * "The event parameters of Inquiry Complete event will have a summary
+-     * of the result from the Inquiry process, which reports the number of
+-     * nearby Bluetooth devices that responded [so hci->responses].", but
+-     * Event Parameters (see page 729) has only Status.  */
+-    bt_hci_event(hci, EVT_INQUIRY_COMPLETE, &status, 1);
+-}
+-
+-static void bt_hci_inquiry_result_standard(struct bt_hci_s *hci,
+-                struct bt_device_s *slave)
+-{
+-    inquiry_info params =3D {
+-        .num_responses=09=09=3D 1,
+-        .bdaddr=09=09=09=3D BAINIT(&slave->bd_addr),
+-        .pscan_rep_mode=09=09=3D 0x00,=09/* R0 */
+-        .pscan_period_mode=09=3D 0x00,=09/* P0 - deprecated */
+-        .pscan_mode=09=09=3D 0x00,=09/* Standard scan - deprecated */
+-        .dev_class[0]=09=09=3D slave->class[0],
+-        .dev_class[1]=09=09=3D slave->class[1],
+-        .dev_class[2]=09=09=3D slave->class[2],
+-        /* TODO: return the clkoff *differenece* */
+-        .clock_offset=09=09=3D slave->clkoff,=09/* Note: no swapping */
+-    };
+-
+-    bt_hci_event(hci, EVT_INQUIRY_RESULT, &params, INQUIRY_INFO_SIZE);
+-}
+-
+-static void bt_hci_inquiry_result_with_rssi(struct bt_hci_s *hci,
+-                struct bt_device_s *slave)
+-{
+-    inquiry_info_with_rssi params =3D {
+-        .num_responses=09=09=3D 1,
+-        .bdaddr=09=09=09=3D BAINIT(&slave->bd_addr),
+-        .pscan_rep_mode=09=09=3D 0x00,=09/* R0 */
+-        .pscan_period_mode=09=3D 0x00,=09/* P0 - deprecated */
+-        .dev_class[0]=09=09=3D slave->class[0],
+-        .dev_class[1]=09=09=3D slave->class[1],
+-        .dev_class[2]=09=09=3D slave->class[2],
+-        /* TODO: return the clkoff *differenece* */
+-        .clock_offset=09=09=3D slave->clkoff,=09/* Note: no swapping */
+-        .rssi=09=09=09=3D DEFAULT_RSSI_DBM,
+-    };
+-
+-    bt_hci_event(hci, EVT_INQUIRY_RESULT_WITH_RSSI,
+-                    &params, INQUIRY_INFO_WITH_RSSI_SIZE);
+-}
+-
+-static void bt_hci_inquiry_result(struct bt_hci_s *hci,
+-                struct bt_device_s *slave)
+-{
+-    if (!slave->inquiry_scan || !hci->lm.responses_left)
+-        return;
+-
+-    hci->lm.responses_left --;
+-    hci->lm.responses ++;
+-
+-    switch (hci->lm.inquiry_mode) {
+-    case 0x00:
+-        bt_hci_inquiry_result_standard(hci, slave);
+-        return;
+-    case 0x01:
+-        bt_hci_inquiry_result_with_rssi(hci, slave);
+-        return;
+-    default:
+-        error_report("%s: bad inquiry mode %02x", __func__,
+-                     hci->lm.inquiry_mode);
+-        exit(-1);
+-    }
+-}
+-
+-static void bt_hci_mod_timer_1280ms(QEMUTimer *timer, int period)
+-{
+-    timer_mod(timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+-                     (uint64_t)(period << 7) * 10000000);
+-}
+-
+-static void bt_hci_inquiry_start(struct bt_hci_s *hci, int length)
+-{
+-    struct bt_device_s *slave;
+-
+-    hci->lm.inquiry_length =3D length;
+-    for (slave =3D hci->device.net->slave; slave; slave =3D slave->next)
+-        /* Don't uncover ourselves.  */
+-        if (slave !=3D &hci->device)
+-            bt_hci_inquiry_result(hci, slave);
+-
+-    /* TODO: register for a callback on a new device's addition to the
+-     * scatternet so that if it's added before inquiry_length expires,
+-     * an Inquiry Result is generated immediately.  Alternatively re-loop
+-     * through the devices on the inquiry_length expiration and report
+-     * devices not seen before.  */
+-    if (hci->lm.responses_left)
+-        bt_hci_mod_timer_1280ms(hci->lm.inquiry_done, hci->lm.inquiry_leng=
+th);
+-    else
+-        bt_hci_inquiry_done(hci);
+-
+-    if (hci->lm.periodic)
+-        bt_hci_mod_timer_1280ms(hci->lm.inquiry_next, hci->lm.inquiry_peri=
+od);
+-}
+-
+-static void bt_hci_inquiry_next(void *opaque)
+-{
+-    struct bt_hci_s *hci =3D (struct bt_hci_s *) opaque;
+-
+-    hci->lm.responses_left +=3D hci->lm.responses;
+-    hci->lm.responses =3D 0;
+-    bt_hci_inquiry_start(hci,  hci->lm.inquiry_length);
+-}
+-
+-static inline int bt_hci_handle_bad(struct bt_hci_s *hci, uint16_t handle)
+-{
+-    return !(handle & HCI_HANDLE_OFFSET) ||
+-            handle >=3D (HCI_HANDLE_OFFSET | HCI_HANDLES_MAX) ||
+-            !hci->lm.handle[handle & ~HCI_HANDLE_OFFSET].link;
+-}
+-
+-static inline int bt_hci_role_master(struct bt_hci_s *hci, uint16_t handle=
+)
+-{
+-    return !!(hci->lm.role_bmp & (1 << (handle & ~HCI_HANDLE_OFFSET)));
+-}
+-
+-static inline struct bt_device_s *bt_hci_remote_dev(struct bt_hci_s *hci,
+-                uint16_t handle)
+-{
+-    struct bt_link_s *link =3D hci->lm.handle[handle & ~HCI_HANDLE_OFFSET]=
+.link;
+-
+-    return bt_hci_role_master(hci, handle) ? link->slave : link->host;
+-}
+-
+-static void bt_hci_mode_tick(void *opaque);
+-static void bt_hci_lmp_link_establish(struct bt_hci_s *hci,
+-                struct bt_link_s *link, int master)
+-{
+-    hci->lm.handle[hci->lm.last_handle].link =3D link;
+-
+-    if (master) {
+-        /* We are the master side of an ACL link */
+-        hci->lm.role_bmp |=3D 1 << hci->lm.last_handle;
+-
+-        hci->lm.handle[hci->lm.last_handle].lmp_acl_data =3D
+-                link->slave->lmp_acl_data;
+-    } else {
+-        /* We are the slave side of an ACL link */
+-        hci->lm.role_bmp &=3D ~(1 << hci->lm.last_handle);
+-
+-        hci->lm.handle[hci->lm.last_handle].lmp_acl_data =3D
+-                link->host->lmp_acl_resp;
+-    }
+-
+-    /* Mode */
+-    if (master) {
+-        link->acl_mode =3D acl_active;
+-        hci->lm.handle[hci->lm.last_handle].acl_mode_timer =3D
+-                timer_new_ns(QEMU_CLOCK_VIRTUAL, bt_hci_mode_tick, link);
+-    }
+-}
+-
+-static void bt_hci_lmp_link_teardown(struct bt_hci_s *hci, uint16_t handle=
+)
+-{
+-    handle &=3D ~HCI_HANDLE_OFFSET;
+-    hci->lm.handle[handle].link =3D NULL;
+-
+-    if (bt_hci_role_master(hci, handle)) {
+-        timer_del(hci->lm.handle[handle].acl_mode_timer);
+-        timer_free(hci->lm.handle[handle].acl_mode_timer);
+-    }
+-}
+-
+-static int bt_hci_connect(struct bt_hci_s *hci, bdaddr_t *bdaddr)
+-{
+-    struct bt_device_s *slave;
+-    struct bt_link_s link;
+-
+-    for (slave =3D hci->device.net->slave; slave; slave =3D slave->next)
+-        if (slave->page_scan && !bacmp(&slave->bd_addr, bdaddr))
+-            break;
+-    if (!slave || slave =3D=3D &hci->device)
+-        return -ENODEV;
+-
+-    bacpy(&hci->lm.awaiting_bdaddr[hci->lm.connecting ++], &slave->bd_addr=
+);
+-
+-    link.slave =3D slave;
+-    link.host =3D &hci->device;
+-    link.slave->lmp_connection_request(&link);=09/* Always last */
+-
+-    return 0;
+-}
+-
+-static void bt_hci_connection_reject(struct bt_hci_s *hci,
+-                struct bt_device_s *host, uint8_t because)
+-{
+-    struct bt_link_s link =3D {
+-        .slave=09=3D &hci->device,
+-        .host=09=3D host,
+-        /* Rest uninitialised */
+-    };
+-
+-    host->reject_reason =3D because;
+-    host->lmp_connection_complete(&link);
+-}
+-
+-static void bt_hci_connection_reject_event(struct bt_hci_s *hci,
+-                bdaddr_t *bdaddr)
+-{
+-    evt_conn_complete params;
+-
+-    params.status=09=3D HCI_NO_CONNECTION;
+-    params.handle=09=3D 0;
+-    bacpy(&params.bdaddr, bdaddr);
+-    params.link_type=09=3D ACL_LINK;
+-    params.encr_mode=09=3D 0x00;=09=09/* Encryption not required */
+-    bt_hci_event(hci, EVT_CONN_COMPLETE, &params, EVT_CONN_COMPLETE_SIZE);
+-}
+-
+-static void bt_hci_connection_accept(struct bt_hci_s *hci,
+-                struct bt_device_s *host)
+-{
+-    struct bt_hci_link_s *link =3D g_malloc0(sizeof(struct bt_hci_link_s))=
+;
+-    evt_conn_complete params;
+-    uint16_t handle;
+-    uint8_t status =3D HCI_SUCCESS;
+-    int tries =3D HCI_HANDLES_MAX;
+-
+-    /* Make a connection handle */
+-    do {
+-        while (hci->lm.handle[++ hci->lm.last_handle].link && -- tries)
+-            hci->lm.last_handle &=3D HCI_HANDLES_MAX - 1;
+-        handle =3D hci->lm.last_handle | HCI_HANDLE_OFFSET;
+-    } while ((handle =3D=3D hci->asb_handle || handle =3D=3D hci->psb_hand=
+le) &&
+-            tries);
+-
+-    if (!tries) {
+-        g_free(link);
+-        bt_hci_connection_reject(hci, host, HCI_REJECTED_LIMITED_RESOURCES=
+);
+-        status =3D HCI_NO_CONNECTION;
+-        goto complete;
+-    }
+-
+-    link->btlink.slave=09=3D &hci->device;
+-    link->btlink.host=09=3D host;
+-    link->handle =3D handle;
+-
+-    /* Link established */
+-    bt_hci_lmp_link_establish(hci, &link->btlink, 0);
+-
+-complete:
+-    params.status=09=3D status;
+-    params.handle=09=3D HNDL(handle);
+-    bacpy(&params.bdaddr, &host->bd_addr);
+-    params.link_type=09=3D ACL_LINK;
+-    params.encr_mode=09=3D 0x00;=09=09/* Encryption not required */
+-    bt_hci_event(hci, EVT_CONN_COMPLETE, &params, EVT_CONN_COMPLETE_SIZE);
+-
+-    /* Neets to be done at the very end because it can trigger a (nested)
+-     * disconnected, in case the other and had cancelled the request
+-     * locally.  */
+-    if (status =3D=3D HCI_SUCCESS) {
+-        host->reject_reason =3D 0;
+-        host->lmp_connection_complete(&link->btlink);
+-    }
+-}
+-
+-static void bt_hci_lmp_connection_request(struct bt_link_s *link)
+-{
+-    struct bt_hci_s *hci =3D hci_from_device(link->slave);
+-    evt_conn_request params;
+-
+-    if (hci->conn_req_host) {
+-        bt_hci_connection_reject(hci, link->host,
+-                                 HCI_REJECTED_LIMITED_RESOURCES);
+-        return;
+-    }
+-    hci->conn_req_host =3D link->host;
+-    /* TODO: if masked and auto-accept, then auto-accept,
+-     * if masked and not auto-accept, then auto-reject */
+-    /* TODO: kick the hci->conn_accept_timer, timeout after
+-     * hci->conn_accept_tout * 0.625 msec */
+-
+-    bacpy(&params.bdaddr, &link->host->bd_addr);
+-    memcpy(&params.dev_class, &link->host->class, sizeof(params.dev_class)=
+);
+-    params.link_type=09=3D ACL_LINK;
+-    bt_hci_event(hci, EVT_CONN_REQUEST, &params, EVT_CONN_REQUEST_SIZE);
+-}
+-
+-static void bt_hci_conn_accept_timeout(void *opaque)
+-{
+-    struct bt_hci_s *hci =3D (struct bt_hci_s *) opaque;
+-
+-    if (!hci->conn_req_host)
+-        /* Already accepted or rejected.  If the other end cancelled the
+-         * connection request then we still have to reject or accept it
+-         * and then we'll get a disconnect.  */
+-        return;
+-
+-    /* TODO */
+-}
+-
+-/* Remove from the list of devices which we wanted to connect to and
+- * are awaiting a response from.  If the callback sees a response from
+- * a device which is not on the list it will assume it's a connection
+- * that's been cancelled by the host in the meantime and immediately
+- * try to detach the link and send a Connection Complete.  */
+-static int bt_hci_lmp_connection_ready(struct bt_hci_s *hci,
+-                bdaddr_t *bdaddr)
+-{
+-    int i;
+-
+-    for (i =3D 0; i < hci->lm.connecting; i ++)
+-        if (!bacmp(&hci->lm.awaiting_bdaddr[i], bdaddr)) {
+-            if (i < -- hci->lm.connecting)
+-                bacpy(&hci->lm.awaiting_bdaddr[i],
+-                                &hci->lm.awaiting_bdaddr[hci->lm.connectin=
+g]);
+-            return 0;
+-        }
+-
+-    return 1;
+-}
+-
+-static void bt_hci_lmp_connection_complete(struct bt_link_s *link)
+-{
+-    struct bt_hci_s *hci =3D hci_from_device(link->host);
+-    evt_conn_complete params;
+-    uint16_t handle;
+-    uint8_t status =3D HCI_SUCCESS;
+-    int tries =3D HCI_HANDLES_MAX;
+-
+-    if (bt_hci_lmp_connection_ready(hci, &link->slave->bd_addr)) {
+-        if (!hci->device.reject_reason)
+-            link->slave->lmp_disconnect_slave(link);
+-        handle =3D 0;
+-        status =3D HCI_NO_CONNECTION;
+-        goto complete;
+-    }
+-
+-    if (hci->device.reject_reason) {
+-        handle =3D 0;
+-        status =3D hci->device.reject_reason;
+-        goto complete;
+-    }
+-
+-    /* Make a connection handle */
+-    do {
+-        while (hci->lm.handle[++ hci->lm.last_handle].link && -- tries)
+-            hci->lm.last_handle &=3D HCI_HANDLES_MAX - 1;
+-        handle =3D hci->lm.last_handle | HCI_HANDLE_OFFSET;
+-    } while ((handle =3D=3D hci->asb_handle || handle =3D=3D hci->psb_hand=
+le) &&
+-            tries);
+-
+-    if (!tries) {
+-        link->slave->lmp_disconnect_slave(link);
+-        status =3D HCI_NO_CONNECTION;
+-        goto complete;
+-    }
+-
+-    /* Link established */
+-    link->handle =3D handle;
+-    bt_hci_lmp_link_establish(hci, link, 1);
+-
+-complete:
+-    params.status=09=3D status;
+-    params.handle=09=3D HNDL(handle);
+-    params.link_type=09=3D ACL_LINK;
+-    bacpy(&params.bdaddr, &link->slave->bd_addr);
+-    params.encr_mode=09=3D 0x00;=09=09/* Encryption not required */
+-    bt_hci_event(hci, EVT_CONN_COMPLETE, &params, EVT_CONN_COMPLETE_SIZE);
+-}
+-
+-static void bt_hci_disconnect(struct bt_hci_s *hci,
+-                uint16_t handle, int reason)
+-{
+-    struct bt_link_s *btlink =3D
+-            hci->lm.handle[handle & ~HCI_HANDLE_OFFSET].link;
+-    struct bt_hci_link_s *link;
+-    evt_disconn_complete params;
+-
+-    if (bt_hci_role_master(hci, handle)) {
+-        btlink->slave->reject_reason =3D reason;
+-        btlink->slave->lmp_disconnect_slave(btlink);
+-        /* The link pointer is invalid from now on */
+-
+-        goto complete;
+-    }
+-
+-    btlink->host->reject_reason =3D reason;
+-    btlink->host->lmp_disconnect_master(btlink);
+-
+-    /* We are the slave, we get to clean this burden */
+-    link =3D (struct bt_hci_link_s *) btlink;
+-    g_free(link);
+-
+-complete:
+-    bt_hci_lmp_link_teardown(hci, handle);
+-
+-    params.status=09=3D HCI_SUCCESS;
+-    params.handle=09=3D HNDL(handle);
+-    params.reason=09=3D HCI_CONNECTION_TERMINATED;
+-    bt_hci_event(hci, EVT_DISCONN_COMPLETE,
+-                    &params, EVT_DISCONN_COMPLETE_SIZE);
+-}
+-
+-/* TODO: use only one function */
+-static void bt_hci_lmp_disconnect_host(struct bt_link_s *link)
+-{
+-    struct bt_hci_s *hci =3D hci_from_device(link->host);
+-    uint16_t handle =3D link->handle;
+-    evt_disconn_complete params;
+-
+-    bt_hci_lmp_link_teardown(hci, handle);
+-
+-    params.status=09=3D HCI_SUCCESS;
+-    params.handle=09=3D HNDL(handle);
+-    params.reason=09=3D hci->device.reject_reason;
+-    bt_hci_event(hci, EVT_DISCONN_COMPLETE,
+-                    &params, EVT_DISCONN_COMPLETE_SIZE);
+-}
+-
+-static void bt_hci_lmp_disconnect_slave(struct bt_link_s *btlink)
+-{
+-    struct bt_hci_link_s *link =3D (struct bt_hci_link_s *) btlink;
+-    struct bt_hci_s *hci =3D hci_from_device(btlink->slave);
+-    uint16_t handle =3D link->handle;
+-    evt_disconn_complete params;
+-
+-    g_free(link);
+-
+-    bt_hci_lmp_link_teardown(hci, handle);
+-
+-    params.status=09=3D HCI_SUCCESS;
+-    params.handle=09=3D HNDL(handle);
+-    params.reason=09=3D hci->device.reject_reason;
+-    bt_hci_event(hci, EVT_DISCONN_COMPLETE,
+-                    &params, EVT_DISCONN_COMPLETE_SIZE);
+-}
+-
+-static int bt_hci_name_req(struct bt_hci_s *hci, bdaddr_t *bdaddr)
+-{
+-    struct bt_device_s *slave;
+-    evt_remote_name_req_complete params;
+-
+-    for (slave =3D hci->device.net->slave; slave; slave =3D slave->next)
+-        if (slave->page_scan && !bacmp(&slave->bd_addr, bdaddr))
+-            break;
+-    if (!slave)
+-        return -ENODEV;
+-
+-    bt_hci_event_status(hci, HCI_SUCCESS);
+-
+-    params.status       =3D HCI_SUCCESS;
+-    bacpy(&params.bdaddr, &slave->bd_addr);
+-    pstrcpy(params.name, sizeof(params.name), slave->lmp_name ?: "");
+-    bt_hci_event(hci, EVT_REMOTE_NAME_REQ_COMPLETE,
+-                    &params, EVT_REMOTE_NAME_REQ_COMPLETE_SIZE);
+-
+-    return 0;
+-}
+-
+-static int bt_hci_features_req(struct bt_hci_s *hci, uint16_t handle)
+-{
+-    struct bt_device_s *slave;
+-    evt_read_remote_features_complete params;
+-
+-    if (bt_hci_handle_bad(hci, handle))
+-        return -ENODEV;
+-
+-    slave =3D bt_hci_remote_dev(hci, handle);
+-
+-    bt_hci_event_status(hci, HCI_SUCCESS);
+-
+-    params.status=09=3D HCI_SUCCESS;
+-    params.handle=09=3D HNDL(handle);
+-    params.features[0]=09=3D (slave->lmp_caps >>  0) & 0xff;
+-    params.features[1]=09=3D (slave->lmp_caps >>  8) & 0xff;
+-    params.features[2]=09=3D (slave->lmp_caps >> 16) & 0xff;
+-    params.features[3]=09=3D (slave->lmp_caps >> 24) & 0xff;
+-    params.features[4]=09=3D (slave->lmp_caps >> 32) & 0xff;
+-    params.features[5]=09=3D (slave->lmp_caps >> 40) & 0xff;
+-    params.features[6]=09=3D (slave->lmp_caps >> 48) & 0xff;
+-    params.features[7]=09=3D (slave->lmp_caps >> 56) & 0xff;
+-    bt_hci_event(hci, EVT_READ_REMOTE_FEATURES_COMPLETE,
+-                    &params, EVT_READ_REMOTE_FEATURES_COMPLETE_SIZE);
+-
+-    return 0;
+-}
+-
+-static int bt_hci_version_req(struct bt_hci_s *hci, uint16_t handle)
+-{
+-    evt_read_remote_version_complete params;
+-
+-    if (bt_hci_handle_bad(hci, handle))
+-        return -ENODEV;
+-
+-    bt_hci_remote_dev(hci, handle);
+-
+-    bt_hci_event_status(hci, HCI_SUCCESS);
+-
+-    params.status=09=3D HCI_SUCCESS;
+-    params.handle=09=3D HNDL(handle);
+-    params.lmp_ver=09=3D 0x03;
+-    params.manufacturer=09=3D cpu_to_le16(0xa000);
+-    params.lmp_subver=09=3D cpu_to_le16(0xa607);
+-    bt_hci_event(hci, EVT_READ_REMOTE_VERSION_COMPLETE,
+-                    &params, EVT_READ_REMOTE_VERSION_COMPLETE_SIZE);
+-
+-    return 0;
+-}
+-
+-static int bt_hci_clkoffset_req(struct bt_hci_s *hci, uint16_t handle)
+-{
+-    struct bt_device_s *slave;
+-    evt_read_clock_offset_complete params;
+-
+-    if (bt_hci_handle_bad(hci, handle))
+-        return -ENODEV;
+-
+-    slave =3D bt_hci_remote_dev(hci, handle);
+-
+-    bt_hci_event_status(hci, HCI_SUCCESS);
+-
+-    params.status=09=3D HCI_SUCCESS;
+-    params.handle=09=3D HNDL(handle);
+-    /* TODO: return the clkoff *differenece* */
+-    params.clock_offset=09=3D slave->clkoff;=09/* Note: no swapping */
+-    bt_hci_event(hci, EVT_READ_CLOCK_OFFSET_COMPLETE,
+-                    &params, EVT_READ_CLOCK_OFFSET_COMPLETE_SIZE);
+-
+-    return 0;
+-}
+-
+-static void bt_hci_event_mode(struct bt_hci_s *hci, struct bt_link_s *link=
+,
+-                uint16_t handle)
+-{
+-    evt_mode_change params =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .handle=09=09=3D HNDL(handle),
+-        .mode=09=09=3D link->acl_mode,
+-        .interval=09=3D cpu_to_le16(link->acl_interval),
+-    };
+-
+-    bt_hci_event(hci, EVT_MODE_CHANGE, &params, EVT_MODE_CHANGE_SIZE);
+-}
+-
+-static void bt_hci_lmp_mode_change_master(struct bt_hci_s *hci,
+-                struct bt_link_s *link, int mode, uint16_t interval)
+-{
+-    link->acl_mode =3D mode;
+-    link->acl_interval =3D interval;
+-
+-    bt_hci_event_mode(hci, link, link->handle);
+-
+-    link->slave->lmp_mode_change(link);
+-}
+-
+-static void bt_hci_lmp_mode_change_slave(struct bt_link_s *btlink)
+-{
+-    struct bt_hci_link_s *link =3D (struct bt_hci_link_s *) btlink;
+-    struct bt_hci_s *hci =3D hci_from_device(btlink->slave);
+-
+-    bt_hci_event_mode(hci, btlink, link->handle);
+-}
+-
+-static int bt_hci_mode_change(struct bt_hci_s *hci, uint16_t handle,
+-                int interval, int mode)
+-{
+-    struct bt_hci_master_link_s *link;
+-
+-    if (bt_hci_handle_bad(hci, handle) || !bt_hci_role_master(hci, handle)=
+)
+-        return -ENODEV;
+-
+-    link =3D &hci->lm.handle[handle & ~HCI_HANDLE_OFFSET];
+-    if (link->link->acl_mode !=3D acl_active) {
+-        bt_hci_event_status(hci, HCI_COMMAND_DISALLOWED);
+-        return 0;
+-    }
+-
+-    bt_hci_event_status(hci, HCI_SUCCESS);
+-
+-    timer_mod(link->acl_mode_timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) =
++
+-                                    ((uint64_t)interval * 625) * 1000);
+-    bt_hci_lmp_mode_change_master(hci, link->link, mode, interval);
+-
+-    return 0;
+-}
+-
+-static int bt_hci_mode_cancel(struct bt_hci_s *hci, uint16_t handle, int m=
+ode)
+-{
+-    struct bt_hci_master_link_s *link;
+-
+-    if (bt_hci_handle_bad(hci, handle) || !bt_hci_role_master(hci, handle)=
+)
+-        return -ENODEV;
+-
+-    link =3D &hci->lm.handle[handle & ~HCI_HANDLE_OFFSET];
+-    if (link->link->acl_mode !=3D mode) {
+-        bt_hci_event_status(hci, HCI_COMMAND_DISALLOWED);
+-
+-        return 0;
+-    }
+-
+-    bt_hci_event_status(hci, HCI_SUCCESS);
+-
+-    timer_del(link->acl_mode_timer);
+-    bt_hci_lmp_mode_change_master(hci, link->link, acl_active, 0);
+-
+-    return 0;
+-}
+-
+-static void bt_hci_mode_tick(void *opaque)
+-{
+-    struct bt_link_s *link =3D opaque;
+-    struct bt_hci_s *hci =3D hci_from_device(link->host);
+-
+-    bt_hci_lmp_mode_change_master(hci, link, acl_active, 0);
+-}
+-
+-static void bt_hci_reset(struct bt_hci_s *hci)
+-{
+-    hci->acl_len =3D 0;
+-    hci->last_cmd =3D 0;
+-    hci->lm.connecting =3D 0;
+-
+-    hci->event_mask[0] =3D 0xff;
+-    hci->event_mask[1] =3D 0xff;
+-    hci->event_mask[2] =3D 0xff;
+-    hci->event_mask[3] =3D 0xff;
+-    hci->event_mask[4] =3D 0xff;
+-    hci->event_mask[5] =3D 0x1f;
+-    hci->event_mask[6] =3D 0x00;
+-    hci->event_mask[7] =3D 0x00;
+-    hci->device.inquiry_scan =3D 0;
+-    hci->device.page_scan =3D 0;
+-    g_free((void *) hci->device.lmp_name);
+-    hci->device.lmp_name =3D NULL;
+-    hci->device.class[0] =3D 0x00;
+-    hci->device.class[1] =3D 0x00;
+-    hci->device.class[2] =3D 0x00;
+-    hci->voice_setting =3D 0x0000;
+-    hci->conn_accept_tout =3D 0x1f40;
+-    hci->lm.inquiry_mode =3D 0x00;
+-
+-    hci->psb_handle =3D 0x000;
+-    hci->asb_handle =3D 0x000;
+-
+-    /* XXX: timer_del(sl->acl_mode_timer); for all links */
+-    timer_del(hci->lm.inquiry_done);
+-    timer_del(hci->lm.inquiry_next);
+-    timer_del(hci->conn_accept_timer);
+-}
+-
+-static void bt_hci_read_local_version_rp(struct bt_hci_s *hci)
+-{
+-    read_local_version_rp lv =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .hci_ver=09=3D 0x03,
+-        .hci_rev=09=3D cpu_to_le16(0xa607),
+-        .lmp_ver=09=3D 0x03,
+-        .manufacturer=09=3D cpu_to_le16(0xa000),
+-        .lmp_subver=09=3D cpu_to_le16(0xa607),
+-    };
+-
+-    bt_hci_event_complete(hci, &lv, READ_LOCAL_VERSION_RP_SIZE);
+-}
+-
+-static void bt_hci_read_local_commands_rp(struct bt_hci_s *hci)
+-{
+-    read_local_commands_rp lc =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .commands=09=3D {
+-            /* Keep updated! */
+-            /* Also, keep in sync with hci->device.lmp_caps in bt_new_hci =
+*/
+-            0xbf, 0x80, 0xf9, 0x03, 0xb2, 0xc0, 0x03, 0xc3,
+-            0x00, 0x0f, 0x80, 0x00, 0xc0, 0x00, 0xe8, 0x13,
+-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+-        },
+-    };
+-
+-    bt_hci_event_complete(hci, &lc, READ_LOCAL_COMMANDS_RP_SIZE);
+-}
+-
+-static void bt_hci_read_local_features_rp(struct bt_hci_s *hci)
+-{
+-    read_local_features_rp lf =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .features=09=3D {
+-            (hci->device.lmp_caps >>  0) & 0xff,
+-            (hci->device.lmp_caps >>  8) & 0xff,
+-            (hci->device.lmp_caps >> 16) & 0xff,
+-            (hci->device.lmp_caps >> 24) & 0xff,
+-            (hci->device.lmp_caps >> 32) & 0xff,
+-            (hci->device.lmp_caps >> 40) & 0xff,
+-            (hci->device.lmp_caps >> 48) & 0xff,
+-            (hci->device.lmp_caps >> 56) & 0xff,
+-        },
+-    };
+-
+-    bt_hci_event_complete(hci, &lf, READ_LOCAL_FEATURES_RP_SIZE);
+-}
+-
+-static void bt_hci_read_local_ext_features_rp(struct bt_hci_s *hci, int pa=
+ge)
+-{
+-    read_local_ext_features_rp lef =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .page_num=09=3D page,
+-        .max_page_num=09=3D 0x00,
+-        .features=09=3D {
+-            /* Keep updated! */
+-            0x5f, 0x35, 0x85, 0x7e, 0x9b, 0x19, 0x00, 0x80,
+-        },
+-    };
+-    if (page)
+-        memset(lef.features, 0, sizeof(lef.features));
+-
+-    bt_hci_event_complete(hci, &lef, READ_LOCAL_EXT_FEATURES_RP_SIZE);
+-}
+-
+-static void bt_hci_read_buffer_size_rp(struct bt_hci_s *hci)
+-{
+-    read_buffer_size_rp bs =3D {
+-        /* This can be made configurable, for one standard USB dongle HCI
+-         * the four values are cpu_to_le16(0x0180), 0x40,
+-         * cpu_to_le16(0x0008), cpu_to_le16(0x0008).  */
+-        .status=09=09=3D HCI_SUCCESS,
+-        .acl_mtu=09=3D cpu_to_le16(0x0200),
+-        .sco_mtu=09=3D 0,
+-        .acl_max_pkt=09=3D cpu_to_le16(0x0001),
+-        .sco_max_pkt=09=3D cpu_to_le16(0x0000),
+-    };
+-
+-    bt_hci_event_complete(hci, &bs, READ_BUFFER_SIZE_RP_SIZE);
+-}
+-
+-/* Deprecated in V2.0 (page 661) */
+-static void bt_hci_read_country_code_rp(struct bt_hci_s *hci)
+-{
+-    read_country_code_rp cc =3D{
+-        .status=09=09=3D HCI_SUCCESS,
+-        .country_code=09=3D 0x00,=09/* North America & Europe^1 and Japan =
+*/
+-    };
+-
+-    bt_hci_event_complete(hci, &cc, READ_COUNTRY_CODE_RP_SIZE);
+-
+-    /* ^1. Except France, sorry */
+-}
+-
+-static void bt_hci_read_bd_addr_rp(struct bt_hci_s *hci)
+-{
+-    read_bd_addr_rp ba =3D {
+-        .status =3D HCI_SUCCESS,
+-        .bdaddr =3D BAINIT(&hci->device.bd_addr),
+-    };
+-
+-    bt_hci_event_complete(hci, &ba, READ_BD_ADDR_RP_SIZE);
+-}
+-
+-static int bt_hci_link_quality_rp(struct bt_hci_s *hci, uint16_t handle)
+-{
+-    read_link_quality_rp lq =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .handle=09=09=3D HNDL(handle),
+-        .link_quality=09=3D 0xff,
+-    };
+-
+-    if (bt_hci_handle_bad(hci, handle))
+-        lq.status =3D HCI_NO_CONNECTION;
+-
+-    bt_hci_event_complete(hci, &lq, READ_LINK_QUALITY_RP_SIZE);
+-    return 0;
+-}
+-
+-/* Generate a Command Complete event with only the Status parameter */
+-static inline void bt_hci_event_complete_status(struct bt_hci_s *hci,
+-                uint8_t status)
+-{
+-    bt_hci_event_complete(hci, &status, 1);
+-}
+-
+-static inline void bt_hci_event_complete_conn_cancel(struct bt_hci_s *hci,
+-                uint8_t status, bdaddr_t *bd_addr)
+-{
+-    create_conn_cancel_rp params =3D {
+-        .status =3D status,
+-        .bdaddr =3D BAINIT(bd_addr),
+-    };
+-
+-    bt_hci_event_complete(hci, &params, CREATE_CONN_CANCEL_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_auth_complete(struct bt_hci_s *hci,
+-                uint16_t handle)
+-{
+-    evt_auth_complete params =3D {
+-        .status =3D HCI_SUCCESS,
+-        .handle =3D HNDL(handle),
+-    };
+-
+-    bt_hci_event(hci, EVT_AUTH_COMPLETE, &params, EVT_AUTH_COMPLETE_SIZE);
+-}
+-
+-static inline void bt_hci_event_encrypt_change(struct bt_hci_s *hci,
+-                uint16_t handle, uint8_t mode)
+-{
+-    evt_encrypt_change params =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .handle=09=09=3D HNDL(handle),
+-        .encrypt=09=3D mode,
+-    };
+-
+-    bt_hci_event(hci, EVT_ENCRYPT_CHANGE, &params, EVT_ENCRYPT_CHANGE_SIZE=
+);
+-}
+-
+-static inline void bt_hci_event_complete_name_cancel(struct bt_hci_s *hci,
+-                bdaddr_t *bd_addr)
+-{
+-    remote_name_req_cancel_rp params =3D {
+-        .status =3D HCI_INVALID_PARAMETERS,
+-        .bdaddr =3D BAINIT(bd_addr),
+-    };
+-
+-    bt_hci_event_complete(hci, &params, REMOTE_NAME_REQ_CANCEL_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_read_remote_ext_features(struct bt_hci_s *=
+hci,
+-                uint16_t handle)
+-{
+-    evt_read_remote_ext_features_complete params =3D {
+-        .status =3D HCI_UNSUPPORTED_FEATURE,
+-        .handle =3D HNDL(handle),
+-        /* Rest uninitialised */
+-    };
+-
+-    bt_hci_event(hci, EVT_READ_REMOTE_EXT_FEATURES_COMPLETE,
+-                    &params, EVT_READ_REMOTE_EXT_FEATURES_COMPLETE_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete_lmp_handle(struct bt_hci_s *hci,
+-                uint16_t handle)
+-{
+-    read_lmp_handle_rp params =3D {
+-        .status=09=09=3D HCI_NO_CONNECTION,
+-        .handle=09=09=3D HNDL(handle),
+-        .reserved=09=3D 0,
+-        /* Rest uninitialised */
+-    };
+-
+-    bt_hci_event_complete(hci, &params, READ_LMP_HANDLE_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete_role_discovery(struct bt_hci_s *h=
+ci,
+-                int status, uint16_t handle, int master)
+-{
+-    role_discovery_rp params =3D {
+-        .status=09=09=3D status,
+-        .handle=09=09=3D HNDL(handle),
+-        .role=09=09=3D master ? 0x00 : 0x01,
+-    };
+-
+-    bt_hci_event_complete(hci, &params, ROLE_DISCOVERY_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete_flush(struct bt_hci_s *hci,
+-                int status, uint16_t handle)
+-{
+-    flush_rp params =3D {
+-        .status=09=09=3D status,
+-        .handle=09=09=3D HNDL(handle),
+-    };
+-
+-    bt_hci_event_complete(hci, &params, FLUSH_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete_read_local_name(struct bt_hci_s *=
+hci)
+-{
+-    read_local_name_rp params;
+-    params.status =3D HCI_SUCCESS;
+-    memset(params.name, 0, sizeof(params.name));
+-    if (hci->device.lmp_name)
+-        pstrcpy(params.name, sizeof(params.name), hci->device.lmp_name);
+-
+-    bt_hci_event_complete(hci, &params, READ_LOCAL_NAME_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete_read_conn_accept_timeout(
+-                struct bt_hci_s *hci)
+-{
+-    read_conn_accept_timeout_rp params =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .timeout=09=3D cpu_to_le16(hci->conn_accept_tout),
+-    };
+-
+-    bt_hci_event_complete(hci, &params, READ_CONN_ACCEPT_TIMEOUT_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete_read_scan_enable(struct bt_hci_s =
+*hci)
+-{
+-    read_scan_enable_rp params =3D {
+-        .status =3D HCI_SUCCESS,
+-        .enable =3D
+-                (hci->device.inquiry_scan ? SCAN_INQUIRY : 0) |
+-                (hci->device.page_scan ? SCAN_PAGE : 0),
+-    };
+-
+-    bt_hci_event_complete(hci, &params, READ_SCAN_ENABLE_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete_read_local_class(struct bt_hci_s =
+*hci)
+-{
+-    read_class_of_dev_rp params;
+-
+-    params.status =3D HCI_SUCCESS;
+-    memcpy(params.dev_class, hci->device.class, sizeof(params.dev_class));
+-
+-    bt_hci_event_complete(hci, &params, READ_CLASS_OF_DEV_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete_voice_setting(struct bt_hci_s *hc=
+i)
+-{
+-    read_voice_setting_rp params =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .voice_setting=09=3D hci->voice_setting,=09/* Note: no swapping */
+-    };
+-
+-    bt_hci_event_complete(hci, &params, READ_VOICE_SETTING_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_complete_read_inquiry_mode(
+-                struct bt_hci_s *hci)
+-{
+-    read_inquiry_mode_rp params =3D {
+-        .status=09=09=3D HCI_SUCCESS,
+-        .mode=09=09=3D hci->lm.inquiry_mode,
+-    };
+-
+-    bt_hci_event_complete(hci, &params, READ_INQUIRY_MODE_RP_SIZE);
+-}
+-
+-static inline void bt_hci_event_num_comp_pkts(struct bt_hci_s *hci,
+-                uint16_t handle, int packets)
+-{
+-    uint16_t buf[EVT_NUM_COMP_PKTS_SIZE(1) / 2 + 1];
+-    evt_num_comp_pkts *params =3D (void *) ((uint8_t *) buf + 1);
+-
+-    params->num_hndl=09=09=09=3D 1;
+-    params->connection->handle=09=09=3D HNDL(handle);
+-    params->connection->num_packets=09=3D cpu_to_le16(packets);
+-
+-    bt_hci_event(hci, EVT_NUM_COMP_PKTS, params, EVT_NUM_COMP_PKTS_SIZE(1)=
+);
+-}
+-
+-static void bt_submit_hci(struct HCIInfo *info,
+-                const uint8_t *data, int length)
+-{
+-    struct bt_hci_s *hci =3D hci_from_info(info);
+-    uint16_t cmd;
+-    int paramlen, i;
+-
+-    if (length < HCI_COMMAND_HDR_SIZE)
+-        goto short_hci;
+-
+-    memcpy(&hci->last_cmd, data, 2);
+-
+-    cmd =3D (data[1] << 8) | data[0];
+-    paramlen =3D data[2];
+-    if (cmd_opcode_ogf(cmd) =3D=3D 0 || cmd_opcode_ocf(cmd) =3D=3D 0)=09/*=
+ NOP */
+-        return;
+-
+-    data +=3D HCI_COMMAND_HDR_SIZE;
+-    length -=3D HCI_COMMAND_HDR_SIZE;
+-
+-    if (paramlen > length)
+-        return;
+-
+-#define PARAM(cmd, param)=09(((cmd##_cp *) data)->param)
+-#define PARAM16(cmd, param) lduw_le_p(&PARAM(cmd, param))
+-#define PARAMHANDLE(cmd) PARAM16(cmd, handle)
+-#define LENGTH_CHECK(cmd)=09if (length < sizeof(cmd##_cp)) goto short_hci
+-    /* Note: the supported commands bitmask in bt_hci_read_local_commands_=
+rp
+-     * needs to be updated every time a command is implemented here!  */
+-    switch (cmd) {
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_INQUIRY):
+-        LENGTH_CHECK(inquiry);
+-
+-        if (PARAM(inquiry, length) < 1) {
+-            bt_hci_event_complete_status(hci, HCI_INVALID_PARAMETERS);
+-            break;
+-        }
+-
+-        hci->lm.inquire =3D 1;
+-        hci->lm.periodic =3D 0;
+-        hci->lm.responses_left =3D PARAM(inquiry, num_rsp) ?: INT_MAX;
+-        hci->lm.responses =3D 0;
+-        bt_hci_event_status(hci, HCI_SUCCESS);
+-        bt_hci_inquiry_start(hci, PARAM(inquiry, length));
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_INQUIRY_CANCEL):
+-        if (!hci->lm.inquire || hci->lm.periodic) {
+-            fprintf(stderr, "%s: Inquiry Cancel should only be issued afte=
+r "
+-                            "the Inquiry command has been issued, a Comman=
+d "
+-                            "Status event has been received for the Inquir=
+y "
+-                            "command, and before the Inquiry Complete even=
+t "
+-                            "occurs", __func__);
+-            bt_hci_event_complete_status(hci, HCI_COMMAND_DISALLOWED);
+-            break;
+-        }
+-
+-        hci->lm.inquire =3D 0;
+-        timer_del(hci->lm.inquiry_done);
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_PERIODIC_INQUIRY):
+-        LENGTH_CHECK(periodic_inquiry);
+-
+-        if (!(PARAM(periodic_inquiry, length) <
+-                                PARAM16(periodic_inquiry, min_period) &&
+-                                PARAM16(periodic_inquiry, min_period) <
+-                                PARAM16(periodic_inquiry, max_period)) ||
+-                        PARAM(periodic_inquiry, length) < 1 ||
+-                        PARAM16(periodic_inquiry, min_period) < 2 ||
+-                        PARAM16(periodic_inquiry, max_period) < 3) {
+-            bt_hci_event_complete_status(hci, HCI_INVALID_PARAMETERS);
+-            break;
+-        }
+-
+-        hci->lm.inquire =3D 1;
+-        hci->lm.periodic =3D 1;
+-        hci->lm.responses_left =3D PARAM(periodic_inquiry, num_rsp);
+-        hci->lm.responses =3D 0;
+-        hci->lm.inquiry_period =3D PARAM16(periodic_inquiry, max_period);
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        bt_hci_inquiry_start(hci, PARAM(periodic_inquiry, length));
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_EXIT_PERIODIC_INQUIRY):
+-        if (!hci->lm.inquire || !hci->lm.periodic) {
+-            fprintf(stderr, "%s: Inquiry Cancel should only be issued afte=
+r "
+-                            "the Inquiry command has been issued, a Comman=
+d "
+-                            "Status event has been received for the Inquir=
+y "
+-                            "command, and before the Inquiry Complete even=
+t "
+-                            "occurs", __func__);
+-            bt_hci_event_complete_status(hci, HCI_COMMAND_DISALLOWED);
+-            break;
+-        }
+-        hci->lm.inquire =3D 0;
+-        timer_del(hci->lm.inquiry_done);
+-        timer_del(hci->lm.inquiry_next);
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_CREATE_CONN):
+-        LENGTH_CHECK(create_conn);
+-
+-        if (hci->lm.connecting >=3D HCI_HANDLES_MAX) {
+-            bt_hci_event_status(hci, HCI_REJECTED_LIMITED_RESOURCES);
+-            break;
+-        }
+-        bt_hci_event_status(hci, HCI_SUCCESS);
+-
+-        if (bt_hci_connect(hci, &PARAM(create_conn, bdaddr)))
+-            bt_hci_connection_reject_event(hci, &PARAM(create_conn, bdaddr=
+));
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_DISCONNECT):
+-        LENGTH_CHECK(disconnect);
+-
+-        if (bt_hci_handle_bad(hci, PARAMHANDLE(disconnect))) {
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-            break;
+-        }
+-
+-        bt_hci_event_status(hci, HCI_SUCCESS);
+-        bt_hci_disconnect(hci, PARAMHANDLE(disconnect),
+-                        PARAM(disconnect, reason));
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_CREATE_CONN_CANCEL):
+-        LENGTH_CHECK(create_conn_cancel);
+-
+-        if (bt_hci_lmp_connection_ready(hci,
+-                                &PARAM(create_conn_cancel, bdaddr))) {
+-            for (i =3D 0; i < HCI_HANDLES_MAX; i ++)
+-                if (bt_hci_role_master(hci, i) && hci->lm.handle[i].link &=
+&
+-                                !bacmp(&hci->lm.handle[i].link->slave->bd_=
+addr,
+-                                        &PARAM(create_conn_cancel, bdaddr)=
+))
+-                   break;
+-
+-            bt_hci_event_complete_conn_cancel(hci, i < HCI_HANDLES_MAX ?
+-                            HCI_ACL_CONNECTION_EXISTS : HCI_NO_CONNECTION,
+-                            &PARAM(create_conn_cancel, bdaddr));
+-        } else
+-            bt_hci_event_complete_conn_cancel(hci, HCI_SUCCESS,
+-                            &PARAM(create_conn_cancel, bdaddr));
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_ACCEPT_CONN_REQ):
+-        LENGTH_CHECK(accept_conn_req);
+-
+-        if (!hci->conn_req_host ||
+-                        bacmp(&PARAM(accept_conn_req, bdaddr),
+-                                &hci->conn_req_host->bd_addr)) {
+-            bt_hci_event_status(hci, HCI_INVALID_PARAMETERS);
+-            break;
+-        }
+-
+-        bt_hci_event_status(hci, HCI_SUCCESS);
+-        bt_hci_connection_accept(hci, hci->conn_req_host);
+-        hci->conn_req_host =3D NULL;
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_REJECT_CONN_REQ):
+-        LENGTH_CHECK(reject_conn_req);
+-
+-        if (!hci->conn_req_host ||
+-                        bacmp(&PARAM(reject_conn_req, bdaddr),
+-                                &hci->conn_req_host->bd_addr)) {
+-            bt_hci_event_status(hci, HCI_INVALID_PARAMETERS);
+-            break;
+-        }
+-
+-        bt_hci_event_status(hci, HCI_SUCCESS);
+-        bt_hci_connection_reject(hci, hci->conn_req_host,
+-                        PARAM(reject_conn_req, reason));
+-        bt_hci_connection_reject_event(hci, &hci->conn_req_host->bd_addr);
+-        hci->conn_req_host =3D NULL;
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_AUTH_REQUESTED):
+-        LENGTH_CHECK(auth_requested);
+-
+-        if (bt_hci_handle_bad(hci, PARAMHANDLE(auth_requested)))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        else {
+-            bt_hci_event_status(hci, HCI_SUCCESS);
+-            bt_hci_event_auth_complete(hci, PARAMHANDLE(auth_requested));
+-        }
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_SET_CONN_ENCRYPT):
+-        LENGTH_CHECK(set_conn_encrypt);
+-
+-        if (bt_hci_handle_bad(hci, PARAMHANDLE(set_conn_encrypt)))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        else {
+-            bt_hci_event_status(hci, HCI_SUCCESS);
+-            bt_hci_event_encrypt_change(hci,
+-                            PARAMHANDLE(set_conn_encrypt),
+-                            PARAM(set_conn_encrypt, encrypt));
+-        }
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_REMOTE_NAME_REQ):
+-        LENGTH_CHECK(remote_name_req);
+-
+-        if (bt_hci_name_req(hci, &PARAM(remote_name_req, bdaddr)))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_REMOTE_NAME_REQ_CANCEL):
+-        LENGTH_CHECK(remote_name_req_cancel);
+-
+-        bt_hci_event_complete_name_cancel(hci,
+-                        &PARAM(remote_name_req_cancel, bdaddr));
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_READ_REMOTE_FEATURES):
+-        LENGTH_CHECK(read_remote_features);
+-
+-        if (bt_hci_features_req(hci, PARAMHANDLE(read_remote_features)))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_READ_REMOTE_EXT_FEATURES):
+-        LENGTH_CHECK(read_remote_ext_features);
+-
+-        if (bt_hci_handle_bad(hci, PARAMHANDLE(read_remote_ext_features)))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        else {
+-            bt_hci_event_status(hci, HCI_SUCCESS);
+-            bt_hci_event_read_remote_ext_features(hci,
+-                            PARAMHANDLE(read_remote_ext_features));
+-        }
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_READ_REMOTE_VERSION):
+-        LENGTH_CHECK(read_remote_version);
+-
+-        if (bt_hci_version_req(hci, PARAMHANDLE(read_remote_version)))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_READ_CLOCK_OFFSET):
+-        LENGTH_CHECK(read_clock_offset);
+-
+-        if (bt_hci_clkoffset_req(hci, PARAMHANDLE(read_clock_offset)))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_CTL, OCF_READ_LMP_HANDLE):
+-        LENGTH_CHECK(read_lmp_handle);
+-
+-        /* TODO: */
+-        bt_hci_event_complete_lmp_handle(hci, PARAMHANDLE(read_lmp_handle)=
+);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_POLICY, OCF_HOLD_MODE):
+-        LENGTH_CHECK(hold_mode);
+-
+-        if (PARAM16(hold_mode, min_interval) >
+-                        PARAM16(hold_mode, max_interval) ||
+-                        PARAM16(hold_mode, min_interval) < 0x0002 ||
+-                        PARAM16(hold_mode, max_interval) > 0xff00 ||
+-                        (PARAM16(hold_mode, min_interval) & 1) ||
+-                        (PARAM16(hold_mode, max_interval) & 1)) {
+-            bt_hci_event_status(hci, HCI_INVALID_PARAMETERS);
+-            break;
+-        }
+-
+-        if (bt_hci_mode_change(hci, PARAMHANDLE(hold_mode),
+-                                PARAM16(hold_mode, max_interval),
+-                                acl_hold))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_POLICY, OCF_PARK_MODE):
+-        LENGTH_CHECK(park_mode);
+-
+-        if (PARAM16(park_mode, min_interval) >
+-                        PARAM16(park_mode, max_interval) ||
+-                        PARAM16(park_mode, min_interval) < 0x000e ||
+-                        (PARAM16(park_mode, min_interval) & 1) ||
+-                        (PARAM16(park_mode, max_interval) & 1)) {
+-            bt_hci_event_status(hci, HCI_INVALID_PARAMETERS);
+-            break;
+-        }
+-
+-        if (bt_hci_mode_change(hci, PARAMHANDLE(park_mode),
+-                                PARAM16(park_mode, max_interval),
+-                                acl_parked))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_POLICY, OCF_EXIT_PARK_MODE):
+-        LENGTH_CHECK(exit_park_mode);
+-
+-        if (bt_hci_mode_cancel(hci, PARAMHANDLE(exit_park_mode),
+-                                acl_parked))
+-            bt_hci_event_status(hci, HCI_NO_CONNECTION);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_LINK_POLICY, OCF_ROLE_DISCOVERY):
+-        LENGTH_CHECK(role_discovery);
+-
+-        if (bt_hci_handle_bad(hci, PARAMHANDLE(role_discovery)))
+-            bt_hci_event_complete_role_discovery(hci,
+-                            HCI_NO_CONNECTION, PARAMHANDLE(role_discovery)=
+, 0);
+-        else
+-            bt_hci_event_complete_role_discovery(hci,
+-                            HCI_SUCCESS, PARAMHANDLE(role_discovery),
+-                            bt_hci_role_master(hci,
+-                                    PARAMHANDLE(role_discovery)));
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_SET_EVENT_MASK):
+-        LENGTH_CHECK(set_event_mask);
+-
+-        memcpy(hci->event_mask, PARAM(set_event_mask, mask), 8);
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_RESET):
+-        bt_hci_reset(hci);
+-        bt_hci_event_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_SET_EVENT_FLT):
+-        if (length >=3D 1 && PARAM(set_event_flt, flt_type) =3D=3D FLT_CLE=
+AR_ALL)
+-            /* No length check */;
+-        else
+-            LENGTH_CHECK(set_event_flt);
+-
+-        /* Filters are not implemented */
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_FLUSH):
+-        LENGTH_CHECK(flush);
+-
+-        if (bt_hci_handle_bad(hci, PARAMHANDLE(flush)))
+-            bt_hci_event_complete_flush(hci,
+-                            HCI_NO_CONNECTION, PARAMHANDLE(flush));
+-        else {
+-            /* TODO: ordering? */
+-            bt_hci_event(hci, EVT_FLUSH_OCCURRED,
+-                            &PARAM(flush, handle),
+-                            EVT_FLUSH_OCCURRED_SIZE);
+-            bt_hci_event_complete_flush(hci,
+-                            HCI_SUCCESS, PARAMHANDLE(flush));
+-        }
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_CHANGE_LOCAL_NAME):
+-        LENGTH_CHECK(change_local_name);
+-
+-        g_free((void *) hci->device.lmp_name);
+-        hci->device.lmp_name =3D g_strndup(PARAM(change_local_name, name),
+-                        sizeof(PARAM(change_local_name, name)));
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_LOCAL_NAME):
+-        bt_hci_event_complete_read_local_name(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_CONN_ACCEPT_TIMEOUT):
+-        bt_hci_event_complete_read_conn_accept_timeout(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_WRITE_CONN_ACCEPT_TIMEOUT):
+-        /* TODO */
+-        LENGTH_CHECK(write_conn_accept_timeout);
+-
+-        if (PARAM16(write_conn_accept_timeout, timeout) < 0x0001 ||
+-                        PARAM16(write_conn_accept_timeout, timeout) > 0xb5=
+40) {
+-            bt_hci_event_complete_status(hci, HCI_INVALID_PARAMETERS);
+-            break;
+-        }
+-
+-        hci->conn_accept_tout =3D PARAM16(write_conn_accept_timeout, timeo=
+ut);
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_SCAN_ENABLE):
+-        bt_hci_event_complete_read_scan_enable(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_WRITE_SCAN_ENABLE):
+-        LENGTH_CHECK(write_scan_enable);
+-
+-        /* TODO: check that the remaining bits are all 0 */
+-        hci->device.inquiry_scan =3D
+-                !!(PARAM(write_scan_enable, scan_enable) & SCAN_INQUIRY);
+-        hci->device.page_scan =3D
+-                !!(PARAM(write_scan_enable, scan_enable) & SCAN_PAGE);
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_CLASS_OF_DEV):
+-        bt_hci_event_complete_read_local_class(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_WRITE_CLASS_OF_DEV):
+-        LENGTH_CHECK(write_class_of_dev);
+-
+-        memcpy(hci->device.class, PARAM(write_class_of_dev, dev_class),
+-                        sizeof(PARAM(write_class_of_dev, dev_class)));
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_VOICE_SETTING):
+-        bt_hci_event_complete_voice_setting(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_WRITE_VOICE_SETTING):
+-        LENGTH_CHECK(write_voice_setting);
+-
+-        hci->voice_setting =3D PARAM(write_voice_setting, voice_setting);
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_HOST_NUMBER_OF_COMPLETED_PACKET=
+S):
+-        if (length < data[0] * 2 + 1)
+-            goto short_hci;
+-
+-        for (i =3D 0; i < data[0]; i ++)
+-            if (bt_hci_handle_bad(hci,
+-                                    data[i * 2 + 1] | (data[i * 2 + 2] << =
+8)))
+-                bt_hci_event_complete_status(hci, HCI_INVALID_PARAMETERS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_READ_INQUIRY_MODE):
+-        /* Only if (local_features[3] & 0x40) && (local_commands[12] & 0x4=
+0)
+-         * else
+-         *     goto unknown_command */
+-        bt_hci_event_complete_read_inquiry_mode(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_HOST_CTL, OCF_WRITE_INQUIRY_MODE):
+-        /* Only if (local_features[3] & 0x40) && (local_commands[12] & 0x8=
+0)
+-         * else
+-         *     goto unknown_command */
+-        LENGTH_CHECK(write_inquiry_mode);
+-
+-        if (PARAM(write_inquiry_mode, mode) > 0x01) {
+-            bt_hci_event_complete_status(hci, HCI_INVALID_PARAMETERS);
+-            break;
+-        }
+-
+-        hci->lm.inquiry_mode =3D PARAM(write_inquiry_mode, mode);
+-        bt_hci_event_complete_status(hci, HCI_SUCCESS);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_INFO_PARAM, OCF_READ_LOCAL_VERSION):
+-        bt_hci_read_local_version_rp(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_INFO_PARAM, OCF_READ_LOCAL_COMMANDS):
+-        bt_hci_read_local_commands_rp(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_INFO_PARAM, OCF_READ_LOCAL_FEATURES):
+-        bt_hci_read_local_features_rp(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_INFO_PARAM, OCF_READ_LOCAL_EXT_FEATURES):
+-        LENGTH_CHECK(read_local_ext_features);
+-
+-        bt_hci_read_local_ext_features_rp(hci,
+-                        PARAM(read_local_ext_features, page_num));
+-        break;
+-
+-    case cmd_opcode_pack(OGF_INFO_PARAM, OCF_READ_BUFFER_SIZE):
+-        bt_hci_read_buffer_size_rp(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_INFO_PARAM, OCF_READ_COUNTRY_CODE):
+-        bt_hci_read_country_code_rp(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_INFO_PARAM, OCF_READ_BD_ADDR):
+-        bt_hci_read_bd_addr_rp(hci);
+-        break;
+-
+-    case cmd_opcode_pack(OGF_STATUS_PARAM, OCF_READ_LINK_QUALITY):
+-        LENGTH_CHECK(read_link_quality);
+-
+-        bt_hci_link_quality_rp(hci, PARAMHANDLE(read_link_quality));
+-        break;
+-
+-    default:
+-        bt_hci_event_status(hci, HCI_UNKNOWN_COMMAND);
+-        break;
+-
+-    short_hci:
+-        error_report("%s: HCI packet too short (%iB)", __func__, length);
+-        bt_hci_event_status(hci, HCI_INVALID_PARAMETERS);
+-        break;
+-    }
+-}
+-
+-/* We could perform fragmentation here, we can't do "recombination" becaus=
+e
+- * at this layer the length of the payload is not know ahead, so we only
+- * know that a packet contained the last fragment of the SDU when the next
+- * SDU starts.  */
+-static inline void bt_hci_lmp_acl_data(struct bt_hci_s *hci, uint16_t hand=
+le,
+-                const uint8_t *data, int start, int len)
+-{
+-    struct hci_acl_hdr *pkt =3D (void *) hci->acl_buf;
+-
+-    /* TODO: packet flags */
+-    /* TODO: avoid memcpy'ing */
+-
+-    if (len + HCI_ACL_HDR_SIZE > sizeof(hci->acl_buf)) {
+-        error_report("%s: can't take ACL packets %i bytes long",
+-                     __func__, len);
+-        return;
+-    }
+-    memcpy(hci->acl_buf + HCI_ACL_HDR_SIZE, data, len);
+-
+-    pkt->handle =3D cpu_to_le16(
+-                    acl_handle_pack(handle, start ? ACL_START : ACL_CONT))=
+;
+-    pkt->dlen =3D cpu_to_le16(len);
+-    hci->info.acl_recv(hci->info.opaque,
+-                    hci->acl_buf, len + HCI_ACL_HDR_SIZE);
+-}
+-
+-static void bt_hci_lmp_acl_data_slave(struct bt_link_s *btlink,
+-                const uint8_t *data, int start, int len)
+-{
+-    struct bt_hci_link_s *link =3D (struct bt_hci_link_s *) btlink;
+-
+-    bt_hci_lmp_acl_data(hci_from_device(btlink->slave),
+-                    link->handle, data, start, len);
+-}
+-
+-static void bt_hci_lmp_acl_data_host(struct bt_link_s *link,
+-                const uint8_t *data, int start, int len)
+-{
+-    bt_hci_lmp_acl_data(hci_from_device(link->host),
+-                    link->handle, data, start, len);
+-}
+-
+-static void bt_submit_acl(struct HCIInfo *info,
+-                const uint8_t *data, int length)
+-{
+-    struct bt_hci_s *hci =3D hci_from_info(info);
+-    uint16_t handle;
+-    int datalen, flags;
+-    struct bt_link_s *link;
+-
+-    if (length < HCI_ACL_HDR_SIZE) {
+-        error_report("%s: ACL packet too short (%iB)", __func__, length);
+-        return;
+-    }
+-
+-    handle =3D acl_handle((data[1] << 8) | data[0]);
+-    flags =3D acl_flags((data[1] << 8) | data[0]);
+-    datalen =3D (data[3] << 8) | data[2];
+-    data +=3D HCI_ACL_HDR_SIZE;
+-    length -=3D HCI_ACL_HDR_SIZE;
+-
+-    if (bt_hci_handle_bad(hci, handle)) {
+-        error_report("%s: invalid ACL handle %03x", __func__, handle);
+-        /* TODO: signal an error */
+-        return;
+-    }
+-    handle &=3D ~HCI_HANDLE_OFFSET;
+-
+-    if (datalen > length) {
+-        error_report("%s: ACL packet too short (%iB < %iB)",
+-                     __func__, length, datalen);
+-        return;
+-    }
+-
+-    link =3D hci->lm.handle[handle].link;
+-
+-    if ((flags & ~3) =3D=3D ACL_ACTIVE_BCAST) {
+-        if (!hci->asb_handle)
+-            hci->asb_handle =3D handle;
+-        else if (handle !=3D hci->asb_handle) {
+-            error_report("%s: Bad handle %03x in Active Slave Broadcast",
+-                         __func__, handle);
+-            /* TODO: signal an error */
+-            return;
+-        }
+-
+-        /* TODO */
+-    }
+-
+-    if ((flags & ~3) =3D=3D ACL_PICO_BCAST) {
+-        if (!hci->psb_handle)
+-            hci->psb_handle =3D handle;
+-        else if (handle !=3D hci->psb_handle) {
+-            error_report("%s: Bad handle %03x in Parked Slave Broadcast",
+-                            __func__, handle);
+-            /* TODO: signal an error */
+-            return;
+-        }
+-
+-        /* TODO */
+-    }
+-
+-    /* TODO: increase counter and send EVT_NUM_COMP_PKTS */
+-    bt_hci_event_num_comp_pkts(hci, handle | HCI_HANDLE_OFFSET, 1);
+-
+-    /* Do this last as it can trigger further events even in this HCI */
+-    hci->lm.handle[handle].lmp_acl_data(link, data,
+-                    (flags & 3) =3D=3D ACL_START, length);
+-}
+-
+-static void bt_submit_sco(struct HCIInfo *info,
+-                const uint8_t *data, int length)
+-{
+-    struct bt_hci_s *hci =3D hci_from_info(info);
+-    uint16_t handle;
+-    int datalen;
+-
+-    if (length < 3)
+-        return;
+-
+-    handle =3D acl_handle((data[1] << 8) | data[0]);
+-    datalen =3D data[2];
+-    length -=3D 3;
+-
+-    if (bt_hci_handle_bad(hci, handle)) {
+-        error_report("%s: invalid SCO handle %03x", __func__, handle);
+-        return;
+-    }
+-
+-    if (datalen > length) {
+-        error_report("%s: SCO packet too short (%iB < %iB)",
+-                     __func__, length, datalen);
+-        return;
+-    }
+-
+-    /* TODO */
+-
+-    /* TODO: increase counter and send EVT_NUM_COMP_PKTS if synchronous
+-     * Flow Control is enabled.
+-     * (See Read/Write_Synchronous_Flow_Control_Enable on page 513 and
+-     * page 514.)  */
+-}
+-
+-static uint8_t *bt_hci_evt_packet(void *opaque)
+-{
+-    /* TODO: allocate a packet from upper layer */
+-    struct bt_hci_s *s =3D opaque;
+-
+-    return s->evt_buf;
+-}
+-
+-static void bt_hci_evt_submit(void *opaque, int len)
+-{
+-    /* TODO: notify upper layer */
+-    struct bt_hci_s *s =3D opaque;
+-
+-    s->info.evt_recv(s->info.opaque, s->evt_buf, len);
+-}
+-
+-static int bt_hci_bdaddr_set(struct HCIInfo *info, const uint8_t *bd_addr)
+-{
+-    struct bt_hci_s *hci =3D hci_from_info(info);
+-
+-    bacpy(&hci->device.bd_addr, (const bdaddr_t *) bd_addr);
+-    return 0;
+-}
+-
+-static void bt_hci_done(struct HCIInfo *info);
+-static void bt_hci_destroy(struct bt_device_s *dev)
+-{
+-    struct bt_hci_s *hci =3D hci_from_device(dev);
+-
+-    bt_hci_done(&hci->info);
+-}
+-
+-struct HCIInfo *bt_new_hci(struct bt_scatternet_s *net)
+-{
+-    struct bt_hci_s *s =3D g_malloc0(sizeof(struct bt_hci_s));
+-
+-    s->lm.inquiry_done =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, bt_hci_inquiry=
+_done, s);
+-    s->lm.inquiry_next =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, bt_hci_inquiry=
+_next, s);
+-    s->conn_accept_timer =3D
+-            timer_new_ns(QEMU_CLOCK_VIRTUAL, bt_hci_conn_accept_timeout, s=
+);
+-
+-    s->evt_packet =3D bt_hci_evt_packet;
+-    s->evt_submit =3D bt_hci_evt_submit;
+-    s->opaque =3D s;
+-
+-    bt_device_init(&s->device, net);
+-    s->device.lmp_connection_request =3D bt_hci_lmp_connection_request;
+-    s->device.lmp_connection_complete =3D bt_hci_lmp_connection_complete;
+-    s->device.lmp_disconnect_master =3D bt_hci_lmp_disconnect_host;
+-    s->device.lmp_disconnect_slave =3D bt_hci_lmp_disconnect_slave;
+-    s->device.lmp_acl_data =3D bt_hci_lmp_acl_data_slave;
+-    s->device.lmp_acl_resp =3D bt_hci_lmp_acl_data_host;
+-    s->device.lmp_mode_change =3D bt_hci_lmp_mode_change_slave;
+-
+-    /* Keep updated! */
+-    /* Also keep in sync with supported commands bitmask in
+-     * bt_hci_read_local_commands_rp */
+-    s->device.lmp_caps =3D 0x8000199b7e85355fll;
+-
+-    bt_hci_reset(s);
+-
+-    s->info.cmd_send =3D bt_submit_hci;
+-    s->info.sco_send =3D bt_submit_sco;
+-    s->info.acl_send =3D bt_submit_acl;
+-    s->info.bdaddr_set =3D bt_hci_bdaddr_set;
+-
+-    s->device.handle_destroy =3D bt_hci_destroy;
+-
+-    error_setg(&s->replay_blocker, QERR_REPLAY_NOT_SUPPORTED, "-bt hci");
+-    replay_add_blocker(s->replay_blocker);
+-
+-    return &s->info;
+-}
+-
+-struct HCIInfo *hci_init(const char *str)
+-{
+-    char *endp;
+-    struct bt_scatternet_s *vlan =3D 0;
+-
+-    if (!strcmp(str, "null"))
+-        /* null */
+-        return &null_hci;
+-    else if (!strncmp(str, "host", 4) && (str[4] =3D=3D '\0' || str[4] =3D=
+=3D ':'))
+-        /* host[:hciN] */
+-        return bt_host_hci(str[4] ? str + 5 : "hci0");
+-    else if (!strncmp(str, "hci", 3)) {
+-        /* hci[,vlan=3Dn] */
+-        if (str[3]) {
+-            if (!strncmp(str + 3, ",vlan=3D", 6)) {
+-                vlan =3D qemu_find_bt_vlan(strtol(str + 9, &endp, 0));
+-                if (*endp)
+-                    vlan =3D 0;
+-            }
+-        } else
+-            vlan =3D qemu_find_bt_vlan(0);
+-        if (vlan)
+-           return bt_new_hci(vlan);
+-    }
+-
+-    error_report("Unknown bluetooth HCI `%s'.", str);
+-
+-    return 0;
+-}
+-
+-static void bt_hci_done(struct HCIInfo *info)
+-{
+-    struct bt_hci_s *hci =3D hci_from_info(info);
+-    int handle;
+-
+-    bt_device_done(&hci->device);
+-
+-    g_free((void *) hci->device.lmp_name);
+-
+-    /* Be gentle and send DISCONNECT to all connected peers and those
+-     * currently waiting for us to accept or reject a connection request.
+-     * This frees the links.  */
+-    if (hci->conn_req_host) {
+-        bt_hci_connection_reject(hci,
+-                                 hci->conn_req_host, HCI_OE_POWER_OFF);
+-        return;
+-    }
+-
+-    for (handle =3D HCI_HANDLE_OFFSET;
+-                    handle < (HCI_HANDLE_OFFSET | HCI_HANDLES_MAX); handle=
+ ++)
+-        if (!bt_hci_handle_bad(hci, handle))
+-            bt_hci_disconnect(hci, handle, HCI_OE_POWER_OFF);
+-
+-    /* TODO: this is not enough actually, there may be slaves from whom
+-     * we have requested a connection who will soon (or not) respond with
+-     * an accept or a reject, so we should also check if hci->lm.connectin=
+g
+-     * is non-zero and if so, avoid freeing the hci but otherwise disappea=
+r
+-     * from all qemu social life (e.g. stop scanning and request to be
+-     * removed from s->device.net) and arrange for
+-     * s->device.lmp_connection_complete to free the remaining bits once
+-     * hci->lm.awaiting_bdaddr[] is empty.  */
+-
+-    timer_free(hci->lm.inquiry_done);
+-    timer_free(hci->lm.inquiry_next);
+-    timer_free(hci->conn_accept_timer);
+-
+-    g_free(hci);
+-}
+diff --git a/hw/bt/hid.c b/hw/bt/hid.c
+deleted file mode 100644
+index 066ca99ed2..0000000000
+--- a/hw/bt/hid.c
++++ /dev/null
+@@ -1,553 +0,0 @@
+-/*
+- * QEMU Bluetooth HID Profile wrapper for USB HID.
+- *
+- * Copyright (C) 2007-2008 OpenMoko, Inc.
+- * Written by Andrzej Zaborowski <andrew@openedhand.com>
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 or
+- * (at your option) version 3 of the License.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License along
+- * with this program; if not, if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qemu/timer.h"
+-#include "ui/console.h"
+-#include "hw/input/hid.h"
+-#include "hw/bt.h"
+-
+-enum hid_transaction_req {
+-    BT_HANDSHAKE=09=09=09=3D 0x0,
+-    BT_HID_CONTROL=09=09=09=3D 0x1,
+-    BT_GET_REPORT=09=09=09=3D 0x4,
+-    BT_SET_REPORT=09=09=09=3D 0x5,
+-    BT_GET_PROTOCOL=09=09=09=3D 0x6,
+-    BT_SET_PROTOCOL=09=09=09=3D 0x7,
+-    BT_GET_IDLE=09=09=09=09=3D 0x8,
+-    BT_SET_IDLE=09=09=09=09=3D 0x9,
+-    BT_DATA=09=09=09=09=3D 0xa,
+-    BT_DATC=09=09=09=09=3D 0xb,
+-};
+-
+-enum hid_transaction_handshake {
+-    BT_HS_SUCCESSFUL=09=09=09=3D 0x0,
+-    BT_HS_NOT_READY=09=09=09=3D 0x1,
+-    BT_HS_ERR_INVALID_REPORT_ID=09=09=3D 0x2,
+-    BT_HS_ERR_UNSUPPORTED_REQUEST=09=3D 0x3,
+-    BT_HS_ERR_INVALID_PARAMETER=09=09=3D 0x4,
+-    BT_HS_ERR_UNKNOWN=09=09=09=3D 0xe,
+-    BT_HS_ERR_FATAL=09=09=09=3D 0xf,
+-};
+-
+-enum hid_transaction_control {
+-    BT_HC_NOP=09=09=09=09=3D 0x0,
+-    BT_HC_HARD_RESET=09=09=09=3D 0x1,
+-    BT_HC_SOFT_RESET=09=09=09=3D 0x2,
+-    BT_HC_SUSPEND=09=09=09=3D 0x3,
+-    BT_HC_EXIT_SUSPEND=09=09=09=3D 0x4,
+-    BT_HC_VIRTUAL_CABLE_UNPLUG=09=09=3D 0x5,
+-};
+-
+-enum hid_protocol {
+-    BT_HID_PROTO_BOOT=09=09=09=3D 0,
+-    BT_HID_PROTO_REPORT=09=09=09=3D 1,
+-};
+-
+-enum hid_boot_reportid {
+-    BT_HID_BOOT_INVALID=09=09=09=3D 0,
+-    BT_HID_BOOT_KEYBOARD,
+-    BT_HID_BOOT_MOUSE,
+-};
+-
+-enum hid_data_pkt {
+-    BT_DATA_OTHER=09=09=09=3D 0,
+-    BT_DATA_INPUT,
+-    BT_DATA_OUTPUT,
+-    BT_DATA_FEATURE,
+-};
+-
+-#define BT_HID_MTU=09=09=0948
+-
+-/* HID interface requests */
+-#define GET_REPORT=09=09=090xa101
+-#define GET_IDLE=09=09=090xa102
+-#define GET_PROTOCOL=09=09=090xa103
+-#define SET_REPORT=09=09=090x2109
+-#define SET_IDLE=09=09=090x210a
+-#define SET_PROTOCOL=09=09=090x210b
+-
+-struct bt_hid_device_s {
+-    struct bt_l2cap_device_s btdev;
+-    struct bt_l2cap_conn_params_s *control;
+-    struct bt_l2cap_conn_params_s *interrupt;
+-    HIDState hid;
+-
+-    int proto;
+-    int connected;
+-    int data_type;
+-    int intr_state;
+-    struct {
+-        int len;
+-        uint8_t buffer[1024];
+-    } dataother, datain, dataout, feature, intrdataout;
+-    enum {
+-        bt_state_ready,
+-        bt_state_transaction,
+-        bt_state_suspend,
+-    } state;
+-};
+-
+-static void bt_hid_reset(struct bt_hid_device_s *s)
+-{
+-    struct bt_scatternet_s *net =3D s->btdev.device.net;
+-
+-    /* Go as far as... */
+-    bt_l2cap_device_done(&s->btdev);
+-    bt_l2cap_device_init(&s->btdev, net);
+-
+-    hid_reset(&s->hid);
+-    s->proto =3D BT_HID_PROTO_REPORT;
+-    s->state =3D bt_state_ready;
+-    s->dataother.len =3D 0;
+-    s->datain.len =3D 0;
+-    s->dataout.len =3D 0;
+-    s->feature.len =3D 0;
+-    s->intrdataout.len =3D 0;
+-    s->intr_state =3D 0;
+-}
+-
+-static int bt_hid_out(struct bt_hid_device_s *s)
+-{
+-    if (s->data_type =3D=3D BT_DATA_OUTPUT) {
+-        /* nothing */
+-        ;
+-    }
+-
+-    if (s->data_type =3D=3D BT_DATA_FEATURE) {
+-        /* XXX:
+-         * does this send a USB_REQ_CLEAR_FEATURE/USB_REQ_SET_FEATURE
+-         * or a SET_REPORT? */
+-        ;
+-    }
+-
+-    return -1;
+-}
+-
+-static int bt_hid_in(struct bt_hid_device_s *s)
+-{
+-    s->datain.len =3D hid_keyboard_poll(&s->hid, s->datain.buffer,
+-                                      sizeof(s->datain.buffer));
+-    return s->datain.len;
+-}
+-
+-static void bt_hid_send_handshake(struct bt_hid_device_s *s, int result)
+-{
+-    *s->control->sdu_out(s->control, 1) =3D
+-            (BT_HANDSHAKE << 4) | result;
+-    s->control->sdu_submit(s->control);
+-}
+-
+-static void bt_hid_send_control(struct bt_hid_device_s *s, int operation)
+-{
+-    *s->control->sdu_out(s->control, 1) =3D
+-            (BT_HID_CONTROL << 4) | operation;
+-    s->control->sdu_submit(s->control);
+-}
+-
+-static void bt_hid_disconnect(struct bt_hid_device_s *s)
+-{
+-    /* Disconnect s->control and s->interrupt */
+-}
+-
+-static void bt_hid_send_data(struct bt_l2cap_conn_params_s *ch, int type,
+-                const uint8_t *data, int len)
+-{
+-    uint8_t *pkt, hdr =3D (BT_DATA << 4) | type;
+-    int plen;
+-
+-    do {
+-        plen =3D MIN(len, ch->remote_mtu - 1);
+-        pkt =3D ch->sdu_out(ch, plen + 1);
+-
+-        pkt[0] =3D hdr;
+-        if (plen)
+-            memcpy(pkt + 1, data, plen);
+-        ch->sdu_submit(ch);
+-
+-        len -=3D plen;
+-        data +=3D plen;
+-        hdr =3D (BT_DATC << 4) | type;
+-    } while (plen =3D=3D ch->remote_mtu - 1);
+-}
+-
+-static void bt_hid_control_transaction(struct bt_hid_device_s *s,
+-                const uint8_t *data, int len)
+-{
+-    uint8_t type, parameter;
+-    int rlen, ret =3D -1;
+-    if (len < 1)
+-        return;
+-
+-    type =3D data[0] >> 4;
+-    parameter =3D data[0] & 0xf;
+-
+-    switch (type) {
+-    case BT_HANDSHAKE:
+-    case BT_DATA:
+-        switch (parameter) {
+-        default:
+-            /* These are not expected to be sent this direction.  */
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-        }
+-        break;
+-
+-    case BT_HID_CONTROL:
+-        if (len !=3D 1 || (parameter !=3D BT_HC_VIRTUAL_CABLE_UNPLUG &&
+-                                s->state =3D=3D bt_state_transaction)) {
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        }
+-        switch (parameter) {
+-        case BT_HC_NOP:
+-            break;
+-        case BT_HC_HARD_RESET:
+-        case BT_HC_SOFT_RESET:
+-            bt_hid_reset(s);
+-            break;
+-        case BT_HC_SUSPEND:
+-            if (s->state =3D=3D bt_state_ready)
+-                s->state =3D bt_state_suspend;
+-            else
+-                ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        case BT_HC_EXIT_SUSPEND:
+-            if (s->state =3D=3D bt_state_suspend)
+-                s->state =3D bt_state_ready;
+-            else
+-                ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        case BT_HC_VIRTUAL_CABLE_UNPLUG:
+-            bt_hid_disconnect(s);
+-            break;
+-        default:
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-        }
+-        break;
+-
+-    case BT_GET_REPORT:
+-        /* No ReportIDs declared.  */
+-        if (((parameter & 8) && len !=3D 3) ||
+-                        (!(parameter & 8) && len !=3D 1) ||
+-                        s->state !=3D bt_state_ready) {
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        }
+-        if (parameter & 8)
+-            rlen =3D data[2] | (data[3] << 8);
+-        else
+-            rlen =3D INT_MAX;
+-        switch (parameter & 3) {
+-        case BT_DATA_OTHER:
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        case BT_DATA_INPUT:
+-            /* Here we can as well poll s->usbdev */
+-            bt_hid_send_data(s->control, BT_DATA_INPUT,
+-                            s->datain.buffer, MIN(rlen, s->datain.len));
+-            break;
+-        case BT_DATA_OUTPUT:
+-            bt_hid_send_data(s->control, BT_DATA_OUTPUT,
+-                            s->dataout.buffer, MIN(rlen, s->dataout.len));
+-            break;
+-        case BT_DATA_FEATURE:
+-            bt_hid_send_data(s->control, BT_DATA_FEATURE,
+-                            s->feature.buffer, MIN(rlen, s->feature.len));
+-            break;
+-        }
+-        break;
+-
+-    case BT_SET_REPORT:
+-        if (len < 2 || len > BT_HID_MTU || s->state !=3D bt_state_ready ||
+-                        (parameter & 3) =3D=3D BT_DATA_OTHER ||
+-                        (parameter & 3) =3D=3D BT_DATA_INPUT) {
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        }
+-        s->data_type =3D parameter & 3;
+-        if (s->data_type =3D=3D BT_DATA_OUTPUT) {
+-            s->dataout.len =3D len - 1;
+-            memcpy(s->dataout.buffer, data + 1, s->dataout.len);
+-        } else {
+-            s->feature.len =3D len - 1;
+-            memcpy(s->feature.buffer, data + 1, s->feature.len);
+-        }
+-        if (len =3D=3D BT_HID_MTU)
+-            s->state =3D bt_state_transaction;
+-        else
+-            bt_hid_out(s);
+-        break;
+-
+-    case BT_GET_PROTOCOL:
+-        if (len !=3D 1 || s->state =3D=3D bt_state_transaction) {
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        }
+-        *s->control->sdu_out(s->control, 1) =3D s->proto;
+-        s->control->sdu_submit(s->control);
+-        break;
+-
+-    case BT_SET_PROTOCOL:
+-        if (len !=3D 1 || s->state =3D=3D bt_state_transaction ||
+-                        (parameter !=3D BT_HID_PROTO_BOOT &&
+-                         parameter !=3D BT_HID_PROTO_REPORT)) {
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        }
+-        s->proto =3D parameter;
+-        s->hid.protocol =3D parameter;
+-        ret =3D BT_HS_SUCCESSFUL;
+-        break;
+-
+-    case BT_GET_IDLE:
+-        if (len !=3D 1 || s->state =3D=3D bt_state_transaction) {
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        }
+-        *s->control->sdu_out(s->control, 1) =3D s->hid.idle;
+-        s->control->sdu_submit(s->control);
+-        break;
+-
+-    case BT_SET_IDLE:
+-        if (len !=3D 2 || s->state =3D=3D bt_state_transaction) {
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        }
+-
+-        s->hid.idle =3D data[1];
+-        /* XXX: Does this generate a handshake? */
+-        break;
+-
+-    case BT_DATC:
+-        if (len > BT_HID_MTU || s->state !=3D bt_state_transaction) {
+-            ret =3D BT_HS_ERR_INVALID_PARAMETER;
+-            break;
+-        }
+-        if (s->data_type =3D=3D BT_DATA_OUTPUT) {
+-            memcpy(s->dataout.buffer + s->dataout.len, data + 1, len - 1);
+-            s->dataout.len +=3D len - 1;
+-        } else {
+-            memcpy(s->feature.buffer + s->feature.len, data + 1, len - 1);
+-            s->feature.len +=3D len - 1;
+-        }
+-        if (len < BT_HID_MTU) {
+-            bt_hid_out(s);
+-            s->state =3D bt_state_ready;
+-        }
+-        break;
+-
+-    default:
+-        ret =3D BT_HS_ERR_UNSUPPORTED_REQUEST;
+-    }
+-
+-    if (ret !=3D -1)
+-        bt_hid_send_handshake(s, ret);
+-}
+-
+-static void bt_hid_control_sdu(void *opaque, const uint8_t *data, int len)
+-{
+-    struct bt_hid_device_s *hid =3D opaque;
+-
+-    bt_hid_control_transaction(hid, data, len);
+-}
+-
+-static void bt_hid_datain(HIDState *hs)
+-{
+-    struct bt_hid_device_s *hid =3D
+-        container_of(hs, struct bt_hid_device_s, hid);
+-
+-    /* If suspended, wake-up and send a wake-up event first.  We might
+-     * want to also inspect the input report and ignore event like
+-     * mouse movements until a button event occurs.  */
+-    if (hid->state =3D=3D bt_state_suspend) {
+-        hid->state =3D bt_state_ready;
+-    }
+-
+-    if (bt_hid_in(hid) > 0)
+-        /* TODO: when in boot-mode precede any Input reports with the Repo=
+rtID
+-         * byte, here and in GetReport/SetReport on the Control channel.  =
+*/
+-        bt_hid_send_data(hid->interrupt, BT_DATA_INPUT,
+-                        hid->datain.buffer, hid->datain.len);
+-}
+-
+-static void bt_hid_interrupt_sdu(void *opaque, const uint8_t *data, int le=
+n)
+-{
+-    struct bt_hid_device_s *hid =3D opaque;
+-
+-    if (len > BT_HID_MTU || len < 1)
+-        goto bad;
+-    if ((data[0] & 3) !=3D BT_DATA_OUTPUT)
+-        goto bad;
+-    if ((data[0] >> 4) =3D=3D BT_DATA) {
+-        if (hid->intr_state)
+-            goto bad;
+-
+-        hid->data_type =3D BT_DATA_OUTPUT;
+-        hid->intrdataout.len =3D 0;
+-    } else if ((data[0] >> 4) =3D=3D BT_DATC) {
+-        if (!hid->intr_state)
+-            goto bad;
+-    } else
+-        goto bad;
+-
+-    memcpy(hid->intrdataout.buffer + hid->intrdataout.len, data + 1, len -=
+ 1);
+-    hid->intrdataout.len +=3D len - 1;
+-    hid->intr_state =3D (len =3D=3D BT_HID_MTU);
+-    if (!hid->intr_state) {
+-        memcpy(hid->dataout.buffer, hid->intrdataout.buffer,
+-                        hid->dataout.len =3D hid->intrdataout.len);
+-        bt_hid_out(hid);
+-    }
+-
+-    return;
+-bad:
+-    error_report("%s: bad transaction on Interrupt channel.",
+-                    __func__);
+-}
+-
+-/* "Virtual cable" plug/unplug event.  */
+-static void bt_hid_connected_update(struct bt_hid_device_s *hid)
+-{
+-    int prev =3D hid->connected;
+-
+-    hid->connected =3D hid->control && hid->interrupt;
+-
+-    /* Stop page-/inquiry-scanning when a host is connected.  */
+-    hid->btdev.device.page_scan =3D !hid->connected;
+-    hid->btdev.device.inquiry_scan =3D !hid->connected;
+-
+-    if (hid->connected && !prev) {
+-        hid_reset(&hid->hid);
+-        hid->proto =3D BT_HID_PROTO_REPORT;
+-    }
+-
+-    /* Should set HIDVirtualCable in SDP (possibly need to check that SDP
+-     * isn't destroyed yet, in case we're being called from handle_destroy=
+) */
+-}
+-
+-static void bt_hid_close_control(void *opaque)
+-{
+-    struct bt_hid_device_s *hid =3D opaque;
+-
+-    hid->control =3D NULL;
+-    bt_hid_connected_update(hid);
+-}
+-
+-static void bt_hid_close_interrupt(void *opaque)
+-{
+-    struct bt_hid_device_s *hid =3D opaque;
+-
+-    hid->interrupt =3D NULL;
+-    bt_hid_connected_update(hid);
+-}
+-
+-static int bt_hid_new_control_ch(struct bt_l2cap_device_s *dev,
+-                struct bt_l2cap_conn_params_s *params)
+-{
+-    struct bt_hid_device_s *hid =3D (struct bt_hid_device_s *) dev;
+-
+-    if (hid->control)
+-        return 1;
+-
+-    hid->control =3D params;
+-    hid->control->opaque =3D hid;
+-    hid->control->close =3D bt_hid_close_control;
+-    hid->control->sdu_in =3D bt_hid_control_sdu;
+-
+-    bt_hid_connected_update(hid);
+-
+-    return 0;
+-}
+-
+-static int bt_hid_new_interrupt_ch(struct bt_l2cap_device_s *dev,
+-                struct bt_l2cap_conn_params_s *params)
+-{
+-    struct bt_hid_device_s *hid =3D (struct bt_hid_device_s *) dev;
+-
+-    if (hid->interrupt)
+-        return 1;
+-
+-    hid->interrupt =3D params;
+-    hid->interrupt->opaque =3D hid;
+-    hid->interrupt->close =3D bt_hid_close_interrupt;
+-    hid->interrupt->sdu_in =3D bt_hid_interrupt_sdu;
+-
+-    bt_hid_connected_update(hid);
+-
+-    return 0;
+-}
+-
+-static void bt_hid_destroy(struct bt_device_s *dev)
+-{
+-    struct bt_hid_device_s *hid =3D (struct bt_hid_device_s *) dev;
+-
+-    if (hid->connected)
+-        bt_hid_send_control(hid, BT_HC_VIRTUAL_CABLE_UNPLUG);
+-    bt_l2cap_device_done(&hid->btdev);
+-
+-    hid_free(&hid->hid);
+-
+-    g_free(hid);
+-}
+-
+-enum peripheral_minor_class {
+-    class_other=09=09=3D 0 << 4,
+-    class_keyboard=09=3D 1 << 4,
+-    class_pointing=09=3D 2 << 4,
+-    class_combo=09=09=3D 3 << 4,
+-};
+-
+-static struct bt_device_s *bt_hid_init(struct bt_scatternet_s *net,
+-                                       enum peripheral_minor_class minor)
+-{
+-    struct bt_hid_device_s *s =3D g_malloc0(sizeof(*s));
+-    uint32_t class =3D
+-            /* Format type */
+-            (0 << 0) |
+-            /* Device class */
+-            (minor << 2) |
+-            (5 << 8) |  /* "Peripheral" */
+-            /* Service classes */
+-            (1 << 13) | /* Limited discoverable mode */
+-            (1 << 19);  /* Capturing device (?) */
+-
+-    bt_l2cap_device_init(&s->btdev, net);
+-    bt_l2cap_sdp_init(&s->btdev);
+-    bt_l2cap_psm_register(&s->btdev, BT_PSM_HID_CTRL,
+-                    BT_HID_MTU, bt_hid_new_control_ch);
+-    bt_l2cap_psm_register(&s->btdev, BT_PSM_HID_INTR,
+-                    BT_HID_MTU, bt_hid_new_interrupt_ch);
+-
+-    hid_init(&s->hid, HID_KEYBOARD, bt_hid_datain);
+-    s->btdev.device.lmp_name =3D "BT Keyboard";
+-
+-    s->btdev.device.handle_destroy =3D bt_hid_destroy;
+-
+-    s->btdev.device.class[0] =3D (class >>  0) & 0xff;
+-    s->btdev.device.class[1] =3D (class >>  8) & 0xff;
+-    s->btdev.device.class[2] =3D (class >> 16) & 0xff;
+-
+-    return &s->btdev.device;
+-}
+-
+-struct bt_device_s *bt_keyboard_init(struct bt_scatternet_s *net)
+-{
+-    return bt_hid_init(net, class_keyboard);
+-}
+diff --git a/hw/bt/l2cap.c b/hw/bt/l2cap.c
+deleted file mode 100644
+index d67098a719..0000000000
+--- a/hw/bt/l2cap.c
++++ /dev/null
+@@ -1,1367 +0,0 @@
+-/*
+- * QEMU Bluetooth L2CAP logic.
+- *
+- * Copyright (C) 2008 Andrzej Zaborowski  <balrog@zabor.org>
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 of
+- * the License, or (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qemu/error-report.h"
+-#include "qemu/timer.h"
+-#include "qemu/bswap.h"
+-#include "hw/bt.h"
+-
+-#define L2CAP_CID_MAX=090x100=09/* Between 0x40 and 0x10000 */
+-
+-struct l2cap_instance_s {
+-    struct bt_link_s *link;
+-    struct bt_l2cap_device_s *dev;
+-    int role;
+-
+-    uint8_t frame_in[65535 + L2CAP_HDR_SIZE] __attribute__ ((aligned (4)))=
+;
+-    int frame_in_len;
+-
+-    uint8_t frame_out[65535 + L2CAP_HDR_SIZE] __attribute__ ((aligned (4))=
+);
+-    int frame_out_len;
+-
+-    /* Signalling channel timers.  They exist per-request but we can make
+-     * sure we have no more than one outstanding request at any time.  */
+-    QEMUTimer *rtx;
+-    QEMUTimer *ertx;
+-
+-    int last_id;
+-    int next_id;
+-
+-    struct l2cap_chan_s {
+-        struct bt_l2cap_conn_params_s params;
+-
+-        void (*frame_in)(struct l2cap_chan_s *chan, uint16_t cid,
+-                        const l2cap_hdr *hdr, int len);
+-        int mps;
+-        int min_mtu;
+-
+-        struct l2cap_instance_s *l2cap;
+-
+-        /* Only allocated channels */
+-        uint16_t remote_cid;
+-#define L2CAP_CFG_INIT=092
+-#define L2CAP_CFG_ACC=091
+-        int config_req_id; /* TODO: handle outgoing requests generically *=
+/
+-        int config;
+-
+-        /* Only connection-oriented channels.  Note: if we allow the tx an=
+d
+-         * rx traffic to be in different modes at any time, we need two.  =
+*/
+-        int mode;
+-
+-        /* Only flow-controlled, connection-oriented channels */
+-        uint8_t sdu[65536]; /* TODO: dynamically allocate */
+-        int len_cur, len_total;
+-        int rexmit;
+-        int monitor_timeout;
+-        QEMUTimer *monitor_timer;
+-        QEMUTimer *retransmission_timer;
+-    } *cid[L2CAP_CID_MAX];
+-    /* The channel state machine states map as following:
+-     * CLOSED           -> !cid[N]
+-     * WAIT_CONNECT     -> never occurs
+-     * WAIT_CONNECT_RSP -> never occurs
+-     * CONFIG           -> cid[N] && config < 3
+-     *   WAIT_CONFIG         -> never occurs, cid[N] && config =3D=3D 0 &&=
+ !config_r
+-     *   WAIT_SEND_CONFIG    -> never occurs, cid[N] && config =3D=3D 1 &&=
+ !config_r
+-     *   WAIT_CONFIG_REQ_RSP -> cid[N] && config =3D=3D 0 && config_req_id
+-     *   WAIT_CONFIG_RSP     -> cid[N] && config =3D=3D 1 && config_req_id
+-     *   WAIT_CONFIG_REQ     -> cid[N] && config =3D=3D 2
+-     * OPEN             -> cid[N] && config =3D=3D 3
+-     * WAIT_DISCONNECT  -> never occurs
+-     */
+-
+-    struct l2cap_chan_s signalling_ch;
+-    struct l2cap_chan_s group_ch;
+-};
+-
+-struct slave_l2cap_instance_s {
+-    struct bt_link_s link;=09/* Underlying logical link (ACL) */
+-    struct l2cap_instance_s l2cap;
+-};
+-
+-struct bt_l2cap_psm_s {
+-    int psm;
+-    int min_mtu;
+-    int (*new_channel)(struct bt_l2cap_device_s *device,
+-                    struct bt_l2cap_conn_params_s *params);
+-    struct bt_l2cap_psm_s *next;
+-};
+-
+-static const uint16_t l2cap_fcs16_table[256] =3D {
+-    0x0000, 0xc0c1, 0xc181, 0x0140, 0xc301, 0x03c0, 0x0280, 0xc241,
+-    0xc601, 0x06c0, 0x0780, 0xc741, 0x0500, 0xc5c1, 0xc481, 0x0440,
+-    0xcc01, 0x0cc0, 0x0d80, 0xcd41, 0x0f00, 0xcfc1, 0xce81, 0x0e40,
+-    0x0a00, 0xcac1, 0xcb81, 0x0b40, 0xc901, 0x09c0, 0x0880, 0xc841,
+-    0xd801, 0x18c0, 0x1980, 0xd941, 0x1b00, 0xdbc1, 0xda81, 0x1a40,
+-    0x1e00, 0xdec1, 0xdf81, 0x1f40, 0xdd01, 0x1dc0, 0x1c80, 0xdc41,
+-    0x1400, 0xd4c1, 0xd581, 0x1540, 0xd701, 0x17c0, 0x1680, 0xd641,
+-    0xd201, 0x12c0, 0x1380, 0xd341, 0x1100, 0xd1c1, 0xd081, 0x1040,
+-    0xf001, 0x30c0, 0x3180, 0xf141, 0x3300, 0xf3c1, 0xf281, 0x3240,
+-    0x3600, 0xf6c1, 0xf781, 0x3740, 0xf501, 0x35c0, 0x3480, 0xf441,
+-    0x3c00, 0xfcc1, 0xfd81, 0x3d40, 0xff01, 0x3fc0, 0x3e80, 0xfe41,
+-    0xfa01, 0x3ac0, 0x3b80, 0xfb41, 0x3900, 0xf9c1, 0xf881, 0x3840,
+-    0x2800, 0xe8c1, 0xe981, 0x2940, 0xeb01, 0x2bc0, 0x2a80, 0xea41,
+-    0xee01, 0x2ec0, 0x2f80, 0xef41, 0x2d00, 0xedc1, 0xec81, 0x2c40,
+-    0xe401, 0x24c0, 0x2580, 0xe541, 0x2700, 0xe7c1, 0xe681, 0x2640,
+-    0x2200, 0xe2c1, 0xe381, 0x2340, 0xe101, 0x21c0, 0x2080, 0xe041,
+-    0xa001, 0x60c0, 0x6180, 0xa141, 0x6300, 0xa3c1, 0xa281, 0x6240,
+-    0x6600, 0xa6c1, 0xa781, 0x6740, 0xa501, 0x65c0, 0x6480, 0xa441,
+-    0x6c00, 0xacc1, 0xad81, 0x6d40, 0xaf01, 0x6fc0, 0x6e80, 0xae41,
+-    0xaa01, 0x6ac0, 0x6b80, 0xab41, 0x6900, 0xa9c1, 0xa881, 0x6840,
+-    0x7800, 0xb8c1, 0xb981, 0x7940, 0xbb01, 0x7bc0, 0x7a80, 0xba41,
+-    0xbe01, 0x7ec0, 0x7f80, 0xbf41, 0x7d00, 0xbdc1, 0xbc81, 0x7c40,
+-    0xb401, 0x74c0, 0x7580, 0xb541, 0x7700, 0xb7c1, 0xb681, 0x7640,
+-    0x7200, 0xb2c1, 0xb381, 0x7340, 0xb101, 0x71c0, 0x7080, 0xb041,
+-    0x5000, 0x90c1, 0x9181, 0x5140, 0x9301, 0x53c0, 0x5280, 0x9241,
+-    0x9601, 0x56c0, 0x5780, 0x9741, 0x5500, 0x95c1, 0x9481, 0x5440,
+-    0x9c01, 0x5cc0, 0x5d80, 0x9d41, 0x5f00, 0x9fc1, 0x9e81, 0x5e40,
+-    0x5a00, 0x9ac1, 0x9b81, 0x5b40, 0x9901, 0x59c0, 0x5880, 0x9841,
+-    0x8801, 0x48c0, 0x4980, 0x8941, 0x4b00, 0x8bc1, 0x8a81, 0x4a40,
+-    0x4e00, 0x8ec1, 0x8f81, 0x4f40, 0x8d01, 0x4dc0, 0x4c80, 0x8c41,
+-    0x4400, 0x84c1, 0x8581, 0x4540, 0x8701, 0x47c0, 0x4680, 0x8641,
+-    0x8201, 0x42c0, 0x4380, 0x8341, 0x4100, 0x81c1, 0x8081, 0x4040,
+-};
+-
+-static uint16_t l2cap_fcs16(const uint8_t *message, int len)
+-{
+-    uint16_t fcs =3D 0x0000;
+-
+-    while (len --)
+-#if 0
+-    {
+-        int i;
+-
+-        fcs ^=3D *message ++;
+-        for (i =3D 8; i; -- i)
+-            if (fcs & 1)
+-                fcs =3D (fcs >> 1) ^ 0xa001;
+-            else
+-                fcs =3D (fcs >> 1);
+-    }
+-#else
+-        fcs =3D (fcs >> 8) ^ l2cap_fcs16_table[(fcs ^ *message ++) & 0xff]=
+;
+-#endif
+-
+-    return fcs;
+-}
+-
+-/* L2CAP layer logic (protocol) */
+-
+-static void l2cap_retransmission_timer_update(struct l2cap_chan_s *ch)
+-{
+-#if 0
+-    if (ch->mode !=3D L2CAP_MODE_BASIC && ch->rexmit)
+-        timer_mod(ch->retransmission_timer);
+-    else
+-        timer_del(ch->retransmission_timer);
+-#endif
+-}
+-
+-static void l2cap_monitor_timer_update(struct l2cap_chan_s *ch)
+-{
+-#if 0
+-    if (ch->mode !=3D L2CAP_MODE_BASIC && !ch->rexmit)
+-        timer_mod(ch->monitor_timer);
+-    else
+-        timer_del(ch->monitor_timer);
+-#endif
+-}
+-
+-static void l2cap_command_reject(struct l2cap_instance_s *l2cap, int id,
+-                uint16_t reason, const void *data, int plen)
+-{
+-    uint8_t *pkt;
+-    l2cap_cmd_hdr *hdr;
+-    l2cap_cmd_rej *params;
+-    uint16_t len;
+-
+-    reason =3D cpu_to_le16(reason);
+-    len =3D cpu_to_le16(L2CAP_CMD_REJ_SIZE + plen);
+-
+-    pkt =3D l2cap->signalling_ch.params.sdu_out(&l2cap->signalling_ch.para=
+ms,
+-                    L2CAP_CMD_HDR_SIZE + L2CAP_CMD_REJ_SIZE + plen);
+-    hdr =3D (void *) (pkt + 0);
+-    params =3D (void *) (pkt + L2CAP_CMD_HDR_SIZE);
+-
+-    hdr->code =3D L2CAP_COMMAND_REJ;
+-    hdr->ident =3D id;
+-    memcpy(&hdr->len, &len, sizeof(hdr->len));
+-    memcpy(&params->reason, &reason, sizeof(reason));
+-    if (plen)
+-       memcpy(pkt + L2CAP_CMD_HDR_SIZE + L2CAP_CMD_REJ_SIZE, data, plen);
+-
+-    l2cap->signalling_ch.params.sdu_submit(&l2cap->signalling_ch.params);
+-}
+-
+-static void l2cap_command_reject_cid(struct l2cap_instance_s *l2cap, int i=
+d,
+-                uint16_t reason, uint16_t dcid, uint16_t scid)
+-{
+-    l2cap_cmd_rej_cid params =3D {
+-        .dcid =3D dcid,
+-        .scid =3D scid,
+-    };
+-
+-    l2cap_command_reject(l2cap, id, reason, &params, L2CAP_CMD_REJ_CID_SIZ=
+E);
+-}
+-
+-static void l2cap_connection_response(struct l2cap_instance_s *l2cap,
+-                int dcid, int scid, int result, int status)
+-{
+-    uint8_t *pkt;
+-    l2cap_cmd_hdr *hdr;
+-    l2cap_conn_rsp *params;
+-
+-    pkt =3D l2cap->signalling_ch.params.sdu_out(&l2cap->signalling_ch.para=
+ms,
+-                    L2CAP_CMD_HDR_SIZE + L2CAP_CONN_RSP_SIZE);
+-    hdr =3D (void *) (pkt + 0);
+-    params =3D (void *) (pkt + L2CAP_CMD_HDR_SIZE);
+-
+-    hdr->code =3D L2CAP_CONN_RSP;
+-    hdr->ident =3D l2cap->last_id;
+-    hdr->len =3D cpu_to_le16(L2CAP_CONN_RSP_SIZE);
+-
+-    params->dcid =3D cpu_to_le16(dcid);
+-    params->scid =3D cpu_to_le16(scid);
+-    params->result =3D cpu_to_le16(result);
+-    params->status =3D cpu_to_le16(status);
+-
+-    l2cap->signalling_ch.params.sdu_submit(&l2cap->signalling_ch.params);
+-}
+-
+-static void l2cap_configuration_request(struct l2cap_instance_s *l2cap,
+-                int dcid, int flag, const uint8_t *data, int len)
+-{
+-    uint8_t *pkt;
+-    l2cap_cmd_hdr *hdr;
+-    l2cap_conf_req *params;
+-
+-    pkt =3D l2cap->signalling_ch.params.sdu_out(&l2cap->signalling_ch.para=
+ms,
+-                    L2CAP_CMD_HDR_SIZE + L2CAP_CONF_REQ_SIZE(len));
+-    hdr =3D (void *) (pkt + 0);
+-    params =3D (void *) (pkt + L2CAP_CMD_HDR_SIZE);
+-
+-    /* TODO: unify the id sequencing */
+-    l2cap->last_id =3D l2cap->next_id;
+-    l2cap->next_id =3D l2cap->next_id =3D=3D 255 ? 1 : l2cap->next_id + 1;
+-
+-    hdr->code =3D L2CAP_CONF_REQ;
+-    hdr->ident =3D l2cap->last_id;
+-    hdr->len =3D cpu_to_le16(L2CAP_CONF_REQ_SIZE(len));
+-
+-    params->dcid =3D cpu_to_le16(dcid);
+-    params->flags =3D cpu_to_le16(flag);
+-    if (len)
+-        memcpy(params->data, data, len);
+-
+-    l2cap->signalling_ch.params.sdu_submit(&l2cap->signalling_ch.params);
+-}
+-
+-static void l2cap_configuration_response(struct l2cap_instance_s *l2cap,
+-                int scid, int flag, int result, const uint8_t *data, int l=
+en)
+-{
+-    uint8_t *pkt;
+-    l2cap_cmd_hdr *hdr;
+-    l2cap_conf_rsp *params;
+-
+-    pkt =3D l2cap->signalling_ch.params.sdu_out(&l2cap->signalling_ch.para=
+ms,
+-                    L2CAP_CMD_HDR_SIZE + L2CAP_CONF_RSP_SIZE(len));
+-    hdr =3D (void *) (pkt + 0);
+-    params =3D (void *) (pkt + L2CAP_CMD_HDR_SIZE);
+-
+-    hdr->code =3D L2CAP_CONF_RSP;
+-    hdr->ident =3D l2cap->last_id;
+-    hdr->len =3D cpu_to_le16(L2CAP_CONF_RSP_SIZE(len));
+-
+-    params->scid =3D cpu_to_le16(scid);
+-    params->flags =3D cpu_to_le16(flag);
+-    params->result =3D cpu_to_le16(result);
+-    if (len)
+-        memcpy(params->data, data, len);
+-
+-    l2cap->signalling_ch.params.sdu_submit(&l2cap->signalling_ch.params);
+-}
+-
+-static void l2cap_disconnection_response(struct l2cap_instance_s *l2cap,
+-                int dcid, int scid)
+-{
+-    uint8_t *pkt;
+-    l2cap_cmd_hdr *hdr;
+-    l2cap_disconn_rsp *params;
+-
+-    pkt =3D l2cap->signalling_ch.params.sdu_out(&l2cap->signalling_ch.para=
+ms,
+-                    L2CAP_CMD_HDR_SIZE + L2CAP_DISCONN_RSP_SIZE);
+-    hdr =3D (void *) (pkt + 0);
+-    params =3D (void *) (pkt + L2CAP_CMD_HDR_SIZE);
+-
+-    hdr->code =3D L2CAP_DISCONN_RSP;
+-    hdr->ident =3D l2cap->last_id;
+-    hdr->len =3D cpu_to_le16(L2CAP_DISCONN_RSP_SIZE);
+-
+-    params->dcid =3D cpu_to_le16(dcid);
+-    params->scid =3D cpu_to_le16(scid);
+-
+-    l2cap->signalling_ch.params.sdu_submit(&l2cap->signalling_ch.params);
+-}
+-
+-static void l2cap_echo_response(struct l2cap_instance_s *l2cap,
+-                const uint8_t *data, int len)
+-{
+-    uint8_t *pkt;
+-    l2cap_cmd_hdr *hdr;
+-    uint8_t *params;
+-
+-    pkt =3D l2cap->signalling_ch.params.sdu_out(&l2cap->signalling_ch.para=
+ms,
+-                    L2CAP_CMD_HDR_SIZE + len);
+-    hdr =3D (void *) (pkt + 0);
+-    params =3D (void *) (pkt + L2CAP_CMD_HDR_SIZE);
+-
+-    hdr->code =3D L2CAP_ECHO_RSP;
+-    hdr->ident =3D l2cap->last_id;
+-    hdr->len =3D cpu_to_le16(len);
+-
+-    memcpy(params, data, len);
+-
+-    l2cap->signalling_ch.params.sdu_submit(&l2cap->signalling_ch.params);
+-}
+-
+-static void l2cap_info_response(struct l2cap_instance_s *l2cap, int type,
+-                int result, const uint8_t *data, int len)
+-{
+-    uint8_t *pkt;
+-    l2cap_cmd_hdr *hdr;
+-    l2cap_info_rsp *params;
+-
+-    pkt =3D l2cap->signalling_ch.params.sdu_out(&l2cap->signalling_ch.para=
+ms,
+-                    L2CAP_CMD_HDR_SIZE + L2CAP_INFO_RSP_SIZE + len);
+-    hdr =3D (void *) (pkt + 0);
+-    params =3D (void *) (pkt + L2CAP_CMD_HDR_SIZE);
+-
+-    hdr->code =3D L2CAP_INFO_RSP;
+-    hdr->ident =3D l2cap->last_id;
+-    hdr->len =3D cpu_to_le16(L2CAP_INFO_RSP_SIZE + len);
+-
+-    params->type =3D cpu_to_le16(type);
+-    params->result =3D cpu_to_le16(result);
+-    if (len)
+-       memcpy(params->data, data, len);
+-
+-    l2cap->signalling_ch.params.sdu_submit(&l2cap->signalling_ch.params);
+-}
+-
+-static uint8_t *l2cap_bframe_out(struct bt_l2cap_conn_params_s *parm, int =
+len);
+-static void l2cap_bframe_submit(struct bt_l2cap_conn_params_s *parms);
+-#if 0
+-static uint8_t *l2cap_iframe_out(struct bt_l2cap_conn_params_s *parm, int =
+len);
+-static void l2cap_iframe_submit(struct bt_l2cap_conn_params_s *parm);
+-#endif
+-static void l2cap_bframe_in(struct l2cap_chan_s *ch, uint16_t cid,
+-                const l2cap_hdr *hdr, int len);
+-static void l2cap_iframe_in(struct l2cap_chan_s *ch, uint16_t cid,
+-                const l2cap_hdr *hdr, int len);
+-
+-static int l2cap_cid_new(struct l2cap_instance_s *l2cap)
+-{
+-    int i;
+-
+-    for (i =3D L2CAP_CID_ALLOC; i < L2CAP_CID_MAX; i ++)
+-        if (!l2cap->cid[i])
+-            return i;
+-
+-    return L2CAP_CID_INVALID;
+-}
+-
+-static inline struct bt_l2cap_psm_s *l2cap_psm(
+-                struct bt_l2cap_device_s *device, int psm)
+-{
+-    struct bt_l2cap_psm_s *ret =3D device->first_psm;
+-
+-    while (ret && ret->psm !=3D psm)
+-        ret =3D ret->next;
+-
+-    return ret;
+-}
+-
+-static struct l2cap_chan_s *l2cap_channel_open(struct l2cap_instance_s *l2=
+cap,
+-                int psm, int source_cid)
+-{
+-    struct l2cap_chan_s *ch =3D NULL;
+-    struct bt_l2cap_psm_s *psm_info;
+-    int result, status;
+-    int cid =3D l2cap_cid_new(l2cap);
+-
+-    if (cid) {
+-        /* See what the channel is to be used for.. */
+-        psm_info =3D l2cap_psm(l2cap->dev, psm);
+-
+-        if (psm_info) {
+-            /* Device supports this use-case.  */
+-            ch =3D g_malloc0(sizeof(*ch));
+-            ch->params.sdu_out =3D l2cap_bframe_out;
+-            ch->params.sdu_submit =3D l2cap_bframe_submit;
+-            ch->frame_in =3D l2cap_bframe_in;
+-            ch->mps =3D 65536;
+-            ch->min_mtu =3D MAX(48, psm_info->min_mtu);
+-            ch->params.remote_mtu =3D MAX(672, ch->min_mtu);
+-            ch->remote_cid =3D source_cid;
+-            ch->mode =3D L2CAP_MODE_BASIC;
+-            ch->l2cap =3D l2cap;
+-
+-            /* Does it feel like opening yet another channel though?  */
+-            if (!psm_info->new_channel(l2cap->dev, &ch->params)) {
+-                l2cap->cid[cid] =3D ch;
+-
+-                result =3D L2CAP_CR_SUCCESS;
+-                status =3D L2CAP_CS_NO_INFO;
+-            } else {
+-                g_free(ch);
+-                ch =3D NULL;
+-                result =3D L2CAP_CR_NO_MEM;
+-                status =3D L2CAP_CS_NO_INFO;
+-            }
+-        } else {
+-            result =3D L2CAP_CR_BAD_PSM;
+-            status =3D L2CAP_CS_NO_INFO;
+-        }
+-    } else {
+-        result =3D L2CAP_CR_NO_MEM;
+-        status =3D L2CAP_CS_NO_INFO;
+-    }
+-
+-    l2cap_connection_response(l2cap, cid, source_cid, result, status);
+-
+-    return ch;
+-}
+-
+-static void l2cap_channel_close(struct l2cap_instance_s *l2cap,
+-                int cid, int source_cid)
+-{
+-    struct l2cap_chan_s *ch =3D NULL;
+-
+-    /* According to Volume 3, section 6.1.1, pg 1048 of BT Core V2.0, a
+-     * connection in CLOSED state still responds with a L2CAP_DisconnectRs=
+p
+-     * message on an L2CAP_DisconnectReq event.  */
+-    if (unlikely(cid < L2CAP_CID_ALLOC)) {
+-        l2cap_command_reject_cid(l2cap, l2cap->last_id, L2CAP_REJ_CID_INVA=
+L,
+-                        cid, source_cid);
+-        return;
+-    }
+-    if (likely(cid >=3D L2CAP_CID_ALLOC && cid < L2CAP_CID_MAX))
+-        ch =3D l2cap->cid[cid];
+-
+-    if (likely(ch)) {
+-        if (ch->remote_cid !=3D source_cid) {
+-            error_report("%s: Ignoring a Disconnection Request with the "
+-                            "invalid SCID %04x.", __func__, source_cid);
+-            return;
+-        }
+-
+-        l2cap->cid[cid] =3D NULL;
+-
+-        ch->params.close(ch->params.opaque);
+-        g_free(ch);
+-    }
+-
+-    l2cap_disconnection_response(l2cap, cid, source_cid);
+-}
+-
+-static void l2cap_channel_config_null(struct l2cap_instance_s *l2cap,
+-                struct l2cap_chan_s *ch)
+-{
+-    l2cap_configuration_request(l2cap, ch->remote_cid, 0, NULL, 0);
+-    ch->config_req_id =3D l2cap->last_id;
+-    ch->config &=3D ~L2CAP_CFG_INIT;
+-}
+-
+-static void l2cap_channel_config_req_event(struct l2cap_instance_s *l2cap,
+-                struct l2cap_chan_s *ch)
+-{
+-    /* Use all default channel options and terminate negotiation.  */
+-    l2cap_channel_config_null(l2cap, ch);
+-}
+-
+-static int l2cap_channel_config(struct l2cap_instance_s *l2cap,
+-                struct l2cap_chan_s *ch, int flag,
+-                const uint8_t *data, int len)
+-{
+-    l2cap_conf_opt *opt;
+-    l2cap_conf_opt_qos *qos;
+-    uint32_t val;
+-    uint8_t rsp[len];
+-    int result =3D L2CAP_CONF_SUCCESS;
+-
+-    data =3D memcpy(rsp, data, len);
+-    while (len) {
+-        opt =3D (void *) data;
+-
+-        if (len < L2CAP_CONF_OPT_SIZE ||
+-                        len < L2CAP_CONF_OPT_SIZE + opt->len) {
+-            result =3D L2CAP_CONF_REJECT;
+-            break;
+-        }
+-        data +=3D L2CAP_CONF_OPT_SIZE + opt->len;
+-        len -=3D L2CAP_CONF_OPT_SIZE + opt->len;
+-
+-        switch (opt->type & 0x7f) {
+-        case L2CAP_CONF_MTU:
+-            if (opt->len !=3D 2) {
+-                result =3D L2CAP_CONF_REJECT;
+-                break;
+-            }
+-
+-            /* MTU */
+-            val =3D lduw_le_p(opt->val);
+-            if (val < ch->min_mtu) {
+-                stw_le_p(opt->val, ch->min_mtu);
+-                result =3D L2CAP_CONF_UNACCEPT;
+-                break;
+-            }
+-
+-            ch->params.remote_mtu =3D val;
+-            break;
+-
+-        case L2CAP_CONF_FLUSH_TO:
+-            if (opt->len !=3D 2) {
+-                result =3D L2CAP_CONF_REJECT;
+-                break;
+-            }
+-
+-            /* Flush Timeout */
+-            val =3D lduw_le_p(opt->val);
+-            if (val < 0x0001) {
+-                opt->val[0] =3D 0xff;
+-                opt->val[1] =3D 0xff;
+-                result =3D L2CAP_CONF_UNACCEPT;
+-                break;
+-            }
+-            break;
+-
+-        case L2CAP_CONF_QOS:
+-            if (opt->len !=3D L2CAP_CONF_OPT_QOS_SIZE) {
+-                result =3D L2CAP_CONF_REJECT;
+-                break;
+-            }
+-            qos =3D (void *) opt->val;
+-
+-            /* Flags */
+-            val =3D qos->flags;
+-            if (val) {
+-                qos->flags =3D 0;
+-                result =3D L2CAP_CONF_UNACCEPT;
+-            }
+-
+-            /* Service type */
+-            val =3D qos->service_type;
+-            if (val !=3D L2CAP_CONF_QOS_BEST_EFFORT &&
+-                            val !=3D L2CAP_CONF_QOS_NO_TRAFFIC) {
+-                qos->service_type =3D L2CAP_CONF_QOS_BEST_EFFORT;
+-                result =3D L2CAP_CONF_UNACCEPT;
+-            }
+-
+-            if (val !=3D L2CAP_CONF_QOS_NO_TRAFFIC) {
+-                /* XXX: These values should possibly be calculated
+-                 * based on LM / baseband properties also.  */
+-
+-                /* Token rate */
+-                val =3D le32_to_cpu(qos->token_rate);
+-                if (val =3D=3D L2CAP_CONF_QOS_WILDCARD)
+-                    qos->token_rate =3D cpu_to_le32(0x100000);
+-
+-                /* Token bucket size */
+-                val =3D le32_to_cpu(qos->token_bucket_size);
+-                if (val =3D=3D L2CAP_CONF_QOS_WILDCARD)
+-                    qos->token_bucket_size =3D cpu_to_le32(65500);
+-
+-                /* Any Peak bandwidth value is correct to return as-is */
+-                /* Any Access latency value is correct to return as-is */
+-                /* Any Delay variation value is correct to return as-is */
+-            }
+-            break;
+-
+-        case L2CAP_CONF_RFC:
+-            if (opt->len !=3D 9) {
+-                result =3D L2CAP_CONF_REJECT;
+-                break;
+-            }
+-
+-            /* Mode */
+-            val =3D opt->val[0];
+-            switch (val) {
+-            case L2CAP_MODE_BASIC:
+-                ch->mode =3D val;
+-                ch->frame_in =3D l2cap_bframe_in;
+-
+-                /* All other parameters shall be ignored */
+-                break;
+-
+-            case L2CAP_MODE_RETRANS:
+-            case L2CAP_MODE_FLOWCTL:
+-                ch->mode =3D val;
+-                ch->frame_in =3D l2cap_iframe_in;
+-                /* Note: most of these parameters refer to incoming traffi=
+c
+-                 * so we don't need to save them as long as we can accept
+-                 * incoming PDUs at any values of the parameters.  */
+-
+-                /* TxWindow size */
+-                val =3D opt->val[1];
+-                if (val < 1 || val > 32) {
+-                    opt->val[1] =3D 32;
+-                    result =3D L2CAP_CONF_UNACCEPT;
+-                    break;
+-                }
+-
+-                /* MaxTransmit */
+-                val =3D opt->val[2];
+-                if (val < 1) {
+-                    opt->val[2] =3D 1;
+-                    result =3D L2CAP_CONF_UNACCEPT;
+-                    break;
+-                }
+-
+-                /* Remote Retransmission time-out shouldn't affect local
+-                 * operation (?) */
+-
+-                /* The Monitor time-out drives the local Monitor timer (?)=
+,
+-                 * so save the value.  */
+-                val =3D (opt->val[6] << 8) | opt->val[5];
+-                if (val < 30) {
+-                    opt->val[5] =3D 100 & 0xff;
+-                    opt->val[6] =3D 100 >> 8;
+-                    result =3D L2CAP_CONF_UNACCEPT;
+-                    break;
+-                }
+-                ch->monitor_timeout =3D val;
+-                l2cap_monitor_timer_update(ch);
+-
+-                /* MPS */
+-                val =3D (opt->val[8] << 8) | opt->val[7];
+-                if (val < ch->min_mtu) {
+-                    opt->val[7] =3D ch->min_mtu & 0xff;
+-                    opt->val[8] =3D ch->min_mtu >> 8;
+-                    result =3D L2CAP_CONF_UNACCEPT;
+-                    break;
+-                }
+-                ch->mps =3D val;
+-                break;
+-
+-            default:
+-                result =3D L2CAP_CONF_UNACCEPT;
+-                break;
+-            }
+-            break;
+-
+-        default:
+-            if (!(opt->type >> 7))
+-                result =3D L2CAP_CONF_UNKNOWN;
+-            break;
+-        }
+-
+-        if (result !=3D L2CAP_CONF_SUCCESS)
+-            break;=09/* XXX: should continue? */
+-    }
+-
+-    l2cap_configuration_response(l2cap, ch->remote_cid,
+-                    flag, result, rsp, len);
+-
+-    return result =3D=3D L2CAP_CONF_SUCCESS && !flag;
+-}
+-
+-static void l2cap_channel_config_req_msg(struct l2cap_instance_s *l2cap,
+-                int flag, int cid, const uint8_t *data, int len)
+-{
+-    struct l2cap_chan_s *ch;
+-
+-    if (unlikely(cid >=3D L2CAP_CID_MAX || !l2cap->cid[cid])) {
+-        l2cap_command_reject_cid(l2cap, l2cap->last_id, L2CAP_REJ_CID_INVA=
+L,
+-                        cid, 0x0000);
+-        return;
+-    }
+-    ch =3D l2cap->cid[cid];
+-
+-    /* From OPEN go to WAIT_CONFIG_REQ and from WAIT_CONFIG_REQ_RSP to
+-     * WAIT_CONFIG_REQ_RSP.  This is assuming the transition chart for OPE=
+N
+-     * on pg 1053, section 6.1.5, volume 3 of BT Core V2.0 has a mistake
+-     * and on options-acceptable we go back to OPEN and otherwise to
+-     * WAIT_CONFIG_REQ and not the other way.  */
+-    ch->config &=3D ~L2CAP_CFG_ACC;
+-
+-    if (l2cap_channel_config(l2cap, ch, flag, data, len))
+-        /* Go to OPEN or WAIT_CONFIG_RSP */
+-        ch->config |=3D L2CAP_CFG_ACC;
+-
+-    /* TODO: if the incoming traffic flow control or retransmission mode
+-     * changed then we probably need to also generate the
+-     * ConfigureChannel_Req event and set the outgoing traffic to the same
+-     * mode.  */
+-    if (!(ch->config & L2CAP_CFG_INIT) && (ch->config & L2CAP_CFG_ACC) &&
+-                    !ch->config_req_id)
+-        l2cap_channel_config_req_event(l2cap, ch);
+-}
+-
+-static int l2cap_channel_config_rsp_msg(struct l2cap_instance_s *l2cap,
+-                int result, int flag, int cid, const uint8_t *data, int le=
+n)
+-{
+-    struct l2cap_chan_s *ch;
+-
+-    if (unlikely(cid >=3D L2CAP_CID_MAX || !l2cap->cid[cid])) {
+-        l2cap_command_reject_cid(l2cap, l2cap->last_id, L2CAP_REJ_CID_INVA=
+L,
+-                        cid, 0x0000);
+-        return 0;
+-    }
+-    ch =3D l2cap->cid[cid];
+-
+-    if (ch->config_req_id !=3D l2cap->last_id)
+-        return 1;
+-    ch->config_req_id =3D 0;
+-
+-    if (result =3D=3D L2CAP_CONF_SUCCESS) {
+-        if (!flag)
+-            ch->config |=3D L2CAP_CFG_INIT;
+-        else
+-            l2cap_channel_config_null(l2cap, ch);
+-    } else
+-        /* Retry until we succeed */
+-        l2cap_channel_config_req_event(l2cap, ch);
+-
+-    return 0;
+-}
+-
+-static void l2cap_channel_open_req_msg(struct l2cap_instance_s *l2cap,
+-                int psm, int source_cid)
+-{
+-    struct l2cap_chan_s *ch =3D l2cap_channel_open(l2cap, psm, source_cid)=
+;
+-
+-    if (!ch)
+-        return;
+-
+-    /* Optional */
+-    if (!(ch->config & L2CAP_CFG_INIT) && !ch->config_req_id)
+-        l2cap_channel_config_req_event(l2cap, ch);
+-}
+-
+-static void l2cap_info(struct l2cap_instance_s *l2cap, int type)
+-{
+-    uint8_t data[4];
+-    int len =3D 0;
+-    int result =3D L2CAP_IR_SUCCESS;
+-
+-    switch (type) {
+-    case L2CAP_IT_CL_MTU:
+-        data[len ++] =3D l2cap->group_ch.mps & 0xff;
+-        data[len ++] =3D l2cap->group_ch.mps >> 8;
+-        break;
+-
+-    case L2CAP_IT_FEAT_MASK:
+-        /* (Prematurely) report Flow control and Retransmission modes.  */
+-        data[len ++] =3D 0x03;
+-        data[len ++] =3D 0x00;
+-        data[len ++] =3D 0x00;
+-        data[len ++] =3D 0x00;
+-        break;
+-
+-    default:
+-        result =3D L2CAP_IR_NOTSUPP;
+-    }
+-
+-    l2cap_info_response(l2cap, type, result, data, len);
+-}
+-
+-static void l2cap_command(struct l2cap_instance_s *l2cap, int code, int id=
+,
+-                const uint8_t *params, int len)
+-{
+-    int err;
+-
+-#if 0
+-    /* TODO: do the IDs really have to be in sequence?  */
+-    if (!id || (id !=3D l2cap->last_id && id !=3D l2cap->next_id)) {
+-        error_report("%s: out of sequence command packet ignored.",
+-                        __func__);
+-        return;
+-    }
+-#else
+-    l2cap->next_id =3D id;
+-#endif
+-    if (id =3D=3D l2cap->next_id) {
+-        l2cap->last_id =3D l2cap->next_id;
+-        l2cap->next_id =3D l2cap->next_id =3D=3D 255 ? 1 : l2cap->next_id =
++ 1;
+-    } else {
+-        /* TODO: Need to re-send the same response, without re-executing
+-         * the corresponding command!  */
+-    }
+-
+-    switch (code) {
+-    case L2CAP_COMMAND_REJ:
+-        if (unlikely(len !=3D 2 && len !=3D 4 && len !=3D 6)) {
+-            err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-            goto reject;
+-        }
+-
+-        /* We never issue commands other than Command Reject currently.  *=
+/
+-        error_report("%s: stray Command Reject (%02x, %04x) "
+-                     "packet, ignoring.", __func__, id,
+-                     le16_to_cpu(((l2cap_cmd_rej *) params)->reason));
+-        break;
+-
+-    case L2CAP_CONN_REQ:
+-        if (unlikely(len !=3D L2CAP_CONN_REQ_SIZE)) {
+-            err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-            goto reject;
+-        }
+-
+-        l2cap_channel_open_req_msg(l2cap,
+-                        le16_to_cpu(((l2cap_conn_req *) params)->psm),
+-                        le16_to_cpu(((l2cap_conn_req *) params)->scid));
+-        break;
+-
+-    case L2CAP_CONN_RSP:
+-        if (unlikely(len !=3D L2CAP_CONN_RSP_SIZE)) {
+-            err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-            goto reject;
+-        }
+-
+-        /* We never issue Connection Requests currently. TODO  */
+-        error_report("%s: unexpected Connection Response (%02x) "
+-                     "packet, ignoring.", __func__, id);
+-        break;
+-
+-    case L2CAP_CONF_REQ:
+-        if (unlikely(len < L2CAP_CONF_REQ_SIZE(0))) {
+-            err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-            goto reject;
+-        }
+-
+-        l2cap_channel_config_req_msg(l2cap,
+-                        le16_to_cpu(((l2cap_conf_req *) params)->flags) & =
+1,
+-                        le16_to_cpu(((l2cap_conf_req *) params)->dcid),
+-                        ((l2cap_conf_req *) params)->data,
+-                        len - L2CAP_CONF_REQ_SIZE(0));
+-        break;
+-
+-    case L2CAP_CONF_RSP:
+-        if (unlikely(len < L2CAP_CONF_RSP_SIZE(0))) {
+-            err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-            goto reject;
+-        }
+-
+-        if (l2cap_channel_config_rsp_msg(l2cap,
+-                        le16_to_cpu(((l2cap_conf_rsp *) params)->result),
+-                        le16_to_cpu(((l2cap_conf_rsp *) params)->flags) & =
+1,
+-                        le16_to_cpu(((l2cap_conf_rsp *) params)->scid),
+-                        ((l2cap_conf_rsp *) params)->data,
+-                        len - L2CAP_CONF_RSP_SIZE(0)))
+-            error_report("%s: unexpected Configure Response (%02x) "
+-                         "packet, ignoring.", __func__, id);
+-        break;
+-
+-    case L2CAP_DISCONN_REQ:
+-        if (unlikely(len !=3D L2CAP_DISCONN_REQ_SIZE)) {
+-            err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-            goto reject;
+-        }
+-
+-        l2cap_channel_close(l2cap,
+-                        le16_to_cpu(((l2cap_disconn_req *) params)->dcid),
+-                        le16_to_cpu(((l2cap_disconn_req *) params)->scid))=
+;
+-        break;
+-
+-    case L2CAP_DISCONN_RSP:
+-        if (unlikely(len !=3D L2CAP_DISCONN_RSP_SIZE)) {
+-            err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-            goto reject;
+-        }
+-
+-        /* We never issue Disconnection Requests currently. TODO  */
+-        error_report("%s: unexpected Disconnection Response (%02x) "
+-                     "packet, ignoring.", __func__, id);
+-        break;
+-
+-    case L2CAP_ECHO_REQ:
+-        l2cap_echo_response(l2cap, params, len);
+-        break;
+-
+-    case L2CAP_ECHO_RSP:
+-        /* We never issue Echo Requests currently. TODO  */
+-        error_report("%s: unexpected Echo Response (%02x) "
+-                     "packet, ignoring.", __func__, id);
+-        break;
+-
+-    case L2CAP_INFO_REQ:
+-        if (unlikely(len !=3D L2CAP_INFO_REQ_SIZE)) {
+-            err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-            goto reject;
+-        }
+-
+-        l2cap_info(l2cap, le16_to_cpu(((l2cap_info_req *) params)->type));
+-        break;
+-
+-    case L2CAP_INFO_RSP:
+-        if (unlikely(len !=3D L2CAP_INFO_RSP_SIZE)) {
+-            err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-            goto reject;
+-        }
+-
+-        /* We never issue Information Requests currently. TODO  */
+-        error_report("%s: unexpected Information Response (%02x) "
+-                     "packet, ignoring.", __func__, id);
+-        break;
+-
+-    default:
+-        err =3D L2CAP_REJ_CMD_NOT_UNDERSTOOD;
+-    reject:
+-        l2cap_command_reject(l2cap, id, err, 0, 0);
+-        break;
+-    }
+-}
+-
+-static void l2cap_rexmit_enable(struct l2cap_chan_s *ch, int enable)
+-{
+-    ch->rexmit =3D enable;
+-
+-    l2cap_retransmission_timer_update(ch);
+-    l2cap_monitor_timer_update(ch);
+-}
+-
+-/* Command frame SDU */
+-static void l2cap_cframe_in(void *opaque, const uint8_t *data, int len)
+-{
+-    struct l2cap_instance_s *l2cap =3D opaque;
+-    const l2cap_cmd_hdr *hdr;
+-    int clen;
+-
+-    while (len) {
+-        hdr =3D (void *) data;
+-        if (len < L2CAP_CMD_HDR_SIZE)
+-            /* TODO: signal an error */
+-            return;
+-        len -=3D L2CAP_CMD_HDR_SIZE;
+-        data +=3D L2CAP_CMD_HDR_SIZE;
+-
+-        clen =3D le16_to_cpu(hdr->len);
+-        if (len < clen) {
+-            l2cap_command_reject(l2cap, hdr->ident,
+-                            L2CAP_REJ_CMD_NOT_UNDERSTOOD, 0, 0);
+-            break;
+-        }
+-
+-        l2cap_command(l2cap, hdr->code, hdr->ident, data, clen);
+-        len -=3D clen;
+-        data +=3D clen;
+-    }
+-}
+-
+-/* Group frame SDU */
+-static void l2cap_gframe_in(void *opaque, const uint8_t *data, int len)
+-{
+-}
+-
+-/* Supervisory frame */
+-static void l2cap_sframe_in(struct l2cap_chan_s *ch, uint16_t ctrl)
+-{
+-}
+-
+-/* Basic L2CAP mode Information frame */
+-static void l2cap_bframe_in(struct l2cap_chan_s *ch, uint16_t cid,
+-                const l2cap_hdr *hdr, int len)
+-{
+-    /* We have a full SDU, no further processing */
+-    ch->params.sdu_in(ch->params.opaque, hdr->data, len);
+-}
+-
+-/* Flow Control and Retransmission mode frame */
+-static void l2cap_iframe_in(struct l2cap_chan_s *ch, uint16_t cid,
+-                const l2cap_hdr *hdr, int len)
+-{
+-    uint16_t fcs =3D lduw_le_p(hdr->data + len - 2);
+-
+-    if (len < 4)
+-        goto len_error;
+-    if (l2cap_fcs16((const uint8_t *) hdr, L2CAP_HDR_SIZE + len - 2) !=3D =
+fcs)
+-        goto fcs_error;
+-
+-    if ((hdr->data[0] >> 7) =3D=3D ch->rexmit)
+-        l2cap_rexmit_enable(ch, !(hdr->data[0] >> 7));
+-
+-    if (hdr->data[0] & 1) {
+-        if (len !=3D 4) {
+-            /* TODO: Signal an error? */
+-            return;
+-        }
+-        l2cap_sframe_in(ch, lduw_le_p(hdr->data));
+-        return;
+-    }
+-
+-    switch (hdr->data[1] >> 6) {=09/* SAR */
+-    case L2CAP_SAR_NO_SEG:
+-        if (ch->len_total)
+-            goto seg_error;
+-        if (len - 4 > ch->mps)
+-            goto len_error;
+-
+-        ch->params.sdu_in(ch->params.opaque, hdr->data + 2, len - 4);
+-        break;
+-
+-    case L2CAP_SAR_START:
+-        if (ch->len_total || len < 6)
+-            goto seg_error;
+-        if (len - 6 > ch->mps)
+-            goto len_error;
+-
+-        ch->len_total =3D lduw_le_p(hdr->data + 2);
+-        if (len >=3D 6 + ch->len_total)
+-            goto seg_error;
+-
+-        ch->len_cur =3D len - 6;
+-        memcpy(ch->sdu, hdr->data + 4, ch->len_cur);
+-        break;
+-
+-    case L2CAP_SAR_END:
+-        if (!ch->len_total || ch->len_cur + len - 4 < ch->len_total)
+-            goto seg_error;
+-        if (len - 4 > ch->mps)
+-            goto len_error;
+-
+-        memcpy(ch->sdu + ch->len_cur, hdr->data + 2, len - 4);
+-        ch->params.sdu_in(ch->params.opaque, ch->sdu, ch->len_total);
+-        break;
+-
+-    case L2CAP_SAR_CONT:
+-        if (!ch->len_total || ch->len_cur + len - 4 >=3D ch->len_total)
+-            goto seg_error;
+-        if (len - 4 > ch->mps)
+-            goto len_error;
+-
+-        memcpy(ch->sdu + ch->len_cur, hdr->data + 2, len - 4);
+-        ch->len_cur +=3D len - 4;
+-        break;
+-
+-    seg_error:
+-    len_error:=09/* TODO */
+-    fcs_error:=09/* TODO */
+-        ch->len_cur =3D 0;
+-        ch->len_total =3D 0;
+-        break;
+-    }
+-}
+-
+-static void l2cap_frame_in(struct l2cap_instance_s *l2cap,
+-                const l2cap_hdr *frame)
+-{
+-    uint16_t cid =3D le16_to_cpu(frame->cid);
+-    uint16_t len =3D le16_to_cpu(frame->len);
+-
+-    if (unlikely(cid >=3D L2CAP_CID_MAX || !l2cap->cid[cid])) {
+-        error_report("%s: frame addressed to a non-existent L2CAP "
+-                     "channel %04x received.", __func__, cid);
+-        return;
+-    }
+-
+-    l2cap->cid[cid]->frame_in(l2cap->cid[cid], cid, frame, len);
+-}
+-
+-/* "Recombination" */
+-static void l2cap_pdu_in(struct l2cap_instance_s *l2cap,
+-                const uint8_t *data, int len)
+-{
+-    const l2cap_hdr *hdr =3D (void *) l2cap->frame_in;
+-
+-    if (unlikely(len + l2cap->frame_in_len > sizeof(l2cap->frame_in))) {
+-        if (l2cap->frame_in_len < sizeof(l2cap->frame_in)) {
+-            memcpy(l2cap->frame_in + l2cap->frame_in_len, data,
+-                            sizeof(l2cap->frame_in) - l2cap->frame_in_len)=
+;
+-            l2cap->frame_in_len =3D sizeof(l2cap->frame_in);
+-            /* TODO: truncate */
+-            l2cap_frame_in(l2cap, hdr);
+-        }
+-
+-        return;
+-    }
+-
+-    memcpy(l2cap->frame_in + l2cap->frame_in_len, data, len);
+-    l2cap->frame_in_len +=3D len;
+-
+-    if (len >=3D L2CAP_HDR_SIZE)
+-        if (len >=3D L2CAP_HDR_SIZE + le16_to_cpu(hdr->len))
+-            l2cap_frame_in(l2cap, hdr);
+-            /* There is never a start of a new PDU in the same ACL packet,=
+ so
+-             * no need to memmove the remaining payload and loop.  */
+-}
+-
+-static inline uint8_t *l2cap_pdu_out(struct l2cap_instance_s *l2cap,
+-                uint16_t cid, uint16_t len)
+-{
+-    l2cap_hdr *hdr =3D (void *) l2cap->frame_out;
+-
+-    l2cap->frame_out_len =3D len + L2CAP_HDR_SIZE;
+-
+-    hdr->cid =3D cpu_to_le16(cid);
+-    hdr->len =3D cpu_to_le16(len);
+-
+-    return l2cap->frame_out + L2CAP_HDR_SIZE;
+-}
+-
+-static inline void l2cap_pdu_submit(struct l2cap_instance_s *l2cap)
+-{
+-    /* TODO: Fragmentation */
+-    (l2cap->role ?
+-     l2cap->link->slave->lmp_acl_data : l2cap->link->host->lmp_acl_resp)
+-            (l2cap->link, l2cap->frame_out, 1, l2cap->frame_out_len);
+-}
+-
+-static uint8_t *l2cap_bframe_out(struct bt_l2cap_conn_params_s *parm, int =
+len)
+-{
+-    struct l2cap_chan_s *chan =3D (struct l2cap_chan_s *) parm;
+-
+-    if (len > chan->params.remote_mtu) {
+-        error_report("%s: B-Frame for CID %04x longer than %i octets.",
+-                     __func__,
+-                     chan->remote_cid, chan->params.remote_mtu);
+-        exit(-1);
+-    }
+-
+-    return l2cap_pdu_out(chan->l2cap, chan->remote_cid, len);
+-}
+-
+-static void l2cap_bframe_submit(struct bt_l2cap_conn_params_s *parms)
+-{
+-    struct l2cap_chan_s *chan =3D (struct l2cap_chan_s *) parms;
+-
+-    l2cap_pdu_submit(chan->l2cap);
+-}
+-
+-#if 0
+-/* Stub: Only used if an emulated device requests outgoing flow control */
+-static uint8_t *l2cap_iframe_out(struct bt_l2cap_conn_params_s *parm, int =
+len)
+-{
+-    struct l2cap_chan_s *chan =3D (struct l2cap_chan_s *) parm;
+-
+-    if (len > chan->params.remote_mtu) {
+-        /* TODO: slice into segments and queue each segment as a separate
+-         * I-Frame in a FIFO of I-Frames, local to the CID.  */
+-    } else {
+-        /* TODO: add to the FIFO of I-Frames, local to the CID.  */
+-        /* Possibly we need to return a pointer to a contiguous buffer
+-         * for now and then memcpy from it into FIFOs in l2cap_iframe_subm=
+it
+-         * while segmenting at the same time.  */
+-    }
+-    return 0;
+-}
+-
+-static void l2cap_iframe_submit(struct bt_l2cap_conn_params_s *parm)
+-{
+-    /* TODO: If flow control indicates clear to send, start submitting the
+-     * invidual I-Frames from the FIFO, but don't remove them from there.
+-     * Kick the appropriate timer until we get an S-Frame, and only then
+-     * remove from FIFO or resubmit and re-kick the timer if the timer
+-     * expired.  */
+-}
+-#endif
+-
+-static void l2cap_init(struct l2cap_instance_s *l2cap,
+-                struct bt_link_s *link, int role)
+-{
+-    l2cap->link =3D link;
+-    l2cap->role =3D role;
+-    l2cap->dev =3D (struct bt_l2cap_device_s *)
+-            (role ? link->host : link->slave);
+-
+-    l2cap->next_id =3D 1;
+-
+-    /* Establish the signalling channel */
+-    l2cap->signalling_ch.params.sdu_in =3D l2cap_cframe_in;
+-    l2cap->signalling_ch.params.sdu_out =3D l2cap_bframe_out;
+-    l2cap->signalling_ch.params.sdu_submit =3D l2cap_bframe_submit;
+-    l2cap->signalling_ch.params.opaque =3D l2cap;
+-    l2cap->signalling_ch.params.remote_mtu =3D 48;
+-    l2cap->signalling_ch.remote_cid =3D L2CAP_CID_SIGNALLING;
+-    l2cap->signalling_ch.frame_in =3D l2cap_bframe_in;
+-    l2cap->signalling_ch.mps =3D 65536;
+-    l2cap->signalling_ch.min_mtu =3D 48;
+-    l2cap->signalling_ch.mode =3D L2CAP_MODE_BASIC;
+-    l2cap->signalling_ch.l2cap =3D l2cap;
+-    l2cap->cid[L2CAP_CID_SIGNALLING] =3D &l2cap->signalling_ch;
+-
+-    /* Establish the connection-less data channel */
+-    l2cap->group_ch.params.sdu_in =3D l2cap_gframe_in;
+-    l2cap->group_ch.params.opaque =3D l2cap;
+-    l2cap->group_ch.frame_in =3D l2cap_bframe_in;
+-    l2cap->group_ch.mps =3D 65533;
+-    l2cap->group_ch.l2cap =3D l2cap;
+-    l2cap->group_ch.remote_cid =3D L2CAP_CID_INVALID;
+-    l2cap->cid[L2CAP_CID_GROUP] =3D &l2cap->group_ch;
+-}
+-
+-static void l2cap_teardown(struct l2cap_instance_s *l2cap, int send_discon=
+nect)
+-{
+-    int cid;
+-
+-    /* Don't send DISCONNECT if we are currently handling a DISCONNECT
+-     * sent from the other side.  */
+-    if (send_disconnect) {
+-        if (l2cap->role)
+-            l2cap->dev->device.lmp_disconnect_slave(l2cap->link);
+-            /* l2cap->link is invalid from now on.  */
+-        else
+-            l2cap->dev->device.lmp_disconnect_master(l2cap->link);
+-    }
+-
+-    for (cid =3D L2CAP_CID_ALLOC; cid < L2CAP_CID_MAX; cid ++)
+-        if (l2cap->cid[cid]) {
+-            l2cap->cid[cid]->params.close(l2cap->cid[cid]->params.opaque);
+-            g_free(l2cap->cid[cid]);
+-        }
+-
+-    if (l2cap->role)
+-        g_free(l2cap);
+-    else
+-        g_free(l2cap->link);
+-}
+-
+-/* L2CAP glue to lower layers in bluetooth stack (LMP) */
+-
+-static void l2cap_lmp_connection_request(struct bt_link_s *link)
+-{
+-    struct bt_l2cap_device_s *dev =3D (struct bt_l2cap_device_s *) link->s=
+lave;
+-    struct slave_l2cap_instance_s *l2cap;
+-
+-    /* Always accept - we only get called if (dev->device->page_scan).  */
+-
+-    l2cap =3D g_malloc0(sizeof(struct slave_l2cap_instance_s));
+-    l2cap->link.slave =3D &dev->device;
+-    l2cap->link.host =3D link->host;
+-    l2cap_init(&l2cap->l2cap, &l2cap->link, 0);
+-
+-    /* Always at the end */
+-    link->host->reject_reason =3D 0;
+-    link->host->lmp_connection_complete(&l2cap->link);
+-}
+-
+-/* Stub */
+-static void l2cap_lmp_connection_complete(struct bt_link_s *link)
+-{
+-    struct bt_l2cap_device_s *dev =3D (struct bt_l2cap_device_s *) link->h=
+ost;
+-    struct l2cap_instance_s *l2cap;
+-
+-    if (dev->device.reject_reason) {
+-        /* Signal to upper layer */
+-        return;
+-    }
+-
+-    l2cap =3D g_malloc0(sizeof(struct l2cap_instance_s));
+-    l2cap_init(l2cap, link, 1);
+-
+-    link->acl_mode =3D acl_active;
+-
+-    /* Signal to upper layer */
+-}
+-
+-/* Stub */
+-static void l2cap_lmp_disconnect_host(struct bt_link_s *link)
+-{
+-    struct bt_l2cap_device_s *dev =3D (struct bt_l2cap_device_s *) link->h=
+ost;
+-    struct l2cap_instance_s *l2cap =3D
+-            /* TODO: Retrieve from upper layer */ (void *) dev;
+-
+-    /* Signal to upper layer */
+-
+-    l2cap_teardown(l2cap, 0);
+-}
+-
+-static void l2cap_lmp_disconnect_slave(struct bt_link_s *link)
+-{
+-    struct slave_l2cap_instance_s *l2cap =3D
+-            (struct slave_l2cap_instance_s *) link;
+-
+-    l2cap_teardown(&l2cap->l2cap, 0);
+-}
+-
+-static void l2cap_lmp_acl_data_slave(struct bt_link_s *link,
+-                const uint8_t *data, int start, int len)
+-{
+-    struct slave_l2cap_instance_s *l2cap =3D
+-            (struct slave_l2cap_instance_s *) link;
+-
+-    if (start)
+-        l2cap->l2cap.frame_in_len =3D 0;
+-
+-    l2cap_pdu_in(&l2cap->l2cap, data, len);
+-}
+-
+-/* Stub */
+-static void l2cap_lmp_acl_data_host(struct bt_link_s *link,
+-                const uint8_t *data, int start, int len)
+-{
+-    struct bt_l2cap_device_s *dev =3D (struct bt_l2cap_device_s *) link->h=
+ost;
+-    struct l2cap_instance_s *l2cap =3D
+-            /* TODO: Retrieve from upper layer */ (void *) dev;
+-
+-    if (start)
+-        l2cap->frame_in_len =3D 0;
+-
+-    l2cap_pdu_in(l2cap, data, len);
+-}
+-
+-static void l2cap_dummy_destroy(struct bt_device_s *dev)
+-{
+-    struct bt_l2cap_device_s *l2cap_dev =3D (struct bt_l2cap_device_s *) d=
+ev;
+-
+-    bt_l2cap_device_done(l2cap_dev);
+-}
+-
+-void bt_l2cap_device_init(struct bt_l2cap_device_s *dev,
+-                struct bt_scatternet_s *net)
+-{
+-    bt_device_init(&dev->device, net);
+-
+-    dev->device.lmp_connection_request =3D l2cap_lmp_connection_request;
+-    dev->device.lmp_connection_complete =3D l2cap_lmp_connection_complete;
+-    dev->device.lmp_disconnect_master =3D l2cap_lmp_disconnect_host;
+-    dev->device.lmp_disconnect_slave =3D l2cap_lmp_disconnect_slave;
+-    dev->device.lmp_acl_data =3D l2cap_lmp_acl_data_slave;
+-    dev->device.lmp_acl_resp =3D l2cap_lmp_acl_data_host;
+-
+-    dev->device.handle_destroy =3D l2cap_dummy_destroy;
+-}
+-
+-void bt_l2cap_device_done(struct bt_l2cap_device_s *dev)
+-{
+-    bt_device_done(&dev->device);
+-
+-    /* Should keep a list of all instances and go through it and
+-     * invoke l2cap_teardown() for each.  */
+-}
+-
+-void bt_l2cap_psm_register(struct bt_l2cap_device_s *dev, int psm, int min=
+_mtu,
+-                int (*new_channel)(struct bt_l2cap_device_s *dev,
+-                        struct bt_l2cap_conn_params_s *params))
+-{
+-    struct bt_l2cap_psm_s *new_psm =3D l2cap_psm(dev, psm);
+-
+-    if (new_psm) {
+-        error_report("%s: PSM %04x already registered for device `%s'.",
+-                     __func__, psm, dev->device.lmp_name);
+-        exit(-1);
+-    }
+-
+-    new_psm =3D g_malloc0(sizeof(*new_psm));
+-    new_psm->psm =3D psm;
+-    new_psm->min_mtu =3D min_mtu;
+-    new_psm->new_channel =3D new_channel;
+-    new_psm->next =3D dev->first_psm;
+-    dev->first_psm =3D new_psm;
+-}
+diff --git a/hw/bt/sdp.c b/hw/bt/sdp.c
+deleted file mode 100644
+index 2860d76c85..0000000000
+--- a/hw/bt/sdp.c
++++ /dev/null
+@@ -1,989 +0,0 @@
+-/*
+- * Service Discover Protocol server for QEMU L2CAP devices
+- *
+- * Copyright (C) 2008 Andrzej Zaborowski  <balrog@zabor.org>
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 of
+- * the License, or (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License along
+- * with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#include "qemu/osdep.h"
+-#include "qemu/error-report.h"
+-#include "qemu/host-utils.h"
+-#include "hw/bt.h"
+-
+-struct bt_l2cap_sdp_state_s {
+-    struct bt_l2cap_conn_params_s *channel;
+-
+-    struct sdp_service_record_s {
+-        int match;
+-
+-        int *uuid;
+-        int uuids;
+-        struct sdp_service_attribute_s {
+-            int match;
+-
+-            int attribute_id;
+-            int len;
+-            void *pair;
+-        } *attribute_list;
+-        int attributes;
+-    } *service_list;
+-    int services;
+-};
+-
+-static ssize_t sdp_datalen(const uint8_t **element, ssize_t *left)
+-{
+-    uint32_t len =3D *(*element) ++ & SDP_DSIZE_MASK;
+-
+-    if (!*left)
+-        return -1;
+-    (*left) --;
+-
+-    if (len < SDP_DSIZE_NEXT1)
+-        return 1 << len;
+-    else if (len =3D=3D SDP_DSIZE_NEXT1) {
+-        if (*left < 1)
+-            return -1;
+-        (*left) --;
+-
+-        return *(*element) ++;
+-    } else if (len =3D=3D SDP_DSIZE_NEXT2) {
+-        if (*left < 2)
+-            return -1;
+-        (*left) -=3D 2;
+-
+-        len =3D (*(*element) ++) << 8;
+-        return len | (*(*element) ++);
+-    } else {
+-        if (*left < 4)
+-            return -1;
+-        (*left) -=3D 4;
+-
+-        len =3D (*(*element) ++) << 24;
+-        len |=3D (*(*element) ++) << 16;
+-        len |=3D (*(*element) ++) << 8;
+-        return len | (*(*element) ++);
+-    }
+-}
+-
+-static const uint8_t bt_base_uuid[12] =3D {
+-    0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb=
+,
+-};
+-
+-static int sdp_uuid_match(struct sdp_service_record_s *record,
+-                const uint8_t *uuid, ssize_t datalen)
+-{
+-    int *lo, hi, val;
+-
+-    if (datalen =3D=3D 16 || datalen =3D=3D 4) {
+-        if (datalen =3D=3D 16 && memcmp(uuid + 4, bt_base_uuid, 12))
+-            return 0;
+-
+-        if (uuid[0] | uuid[1])
+-            return 0;
+-        uuid +=3D 2;
+-    }
+-
+-    val =3D (uuid[0] << 8) | uuid[1];
+-    lo =3D record->uuid;
+-    hi =3D record->uuids;
+-    while (hi >>=3D 1)
+-        if (lo[hi] <=3D val)
+-            lo +=3D hi;
+-
+-    return *lo =3D=3D val;
+-}
+-
+-#define CONTINUATION_PARAM_SIZE=09(1 + sizeof(int))
+-#define MAX_PDU_OUT_SIZE=0996=09/* Arbitrary */
+-#define PDU_HEADER_SIZE=09=095
+-#define MAX_RSP_PARAM_SIZE=09(MAX_PDU_OUT_SIZE - PDU_HEADER_SIZE - \
+-                CONTINUATION_PARAM_SIZE)
+-
+-static int sdp_svc_match(struct bt_l2cap_sdp_state_s *sdp,
+-                const uint8_t **req, ssize_t *len)
+-{
+-    size_t datalen;
+-    int i;
+-
+-    if ((**req & ~SDP_DSIZE_MASK) !=3D SDP_DTYPE_UUID)
+-        return 1;
+-
+-    datalen =3D sdp_datalen(req, len);
+-    if (datalen !=3D 2 && datalen !=3D 4 && datalen !=3D 16)
+-        return 1;
+-
+-    for (i =3D 0; i < sdp->services; i ++)
+-        if (sdp_uuid_match(&sdp->service_list[i], *req, datalen))
+-            sdp->service_list[i].match =3D 1;
+-
+-    (*req) +=3D datalen;
+-    (*len) -=3D datalen;
+-
+-    return 0;
+-}
+-
+-static ssize_t sdp_svc_search(struct bt_l2cap_sdp_state_s *sdp,
+-                uint8_t *rsp, const uint8_t *req, ssize_t len)
+-{
+-    ssize_t seqlen;
+-    int i, count, start, end, max;
+-    int32_t handle;
+-
+-    /* Perform the search */
+-    for (i =3D 0; i < sdp->services; i ++)
+-        sdp->service_list[i].match =3D 0;
+-
+-    if (len < 1)
+-        return -SDP_INVALID_SYNTAX;
+-    if ((*req & ~SDP_DSIZE_MASK) =3D=3D SDP_DTYPE_SEQ) {
+-        seqlen =3D sdp_datalen(&req, &len);
+-        if (seqlen < 3 || len < seqlen)
+-            return -SDP_INVALID_SYNTAX;
+-        len -=3D seqlen;
+-        while (seqlen)
+-            if (sdp_svc_match(sdp, &req, &seqlen))
+-                return -SDP_INVALID_SYNTAX;
+-    } else {
+-        if (sdp_svc_match(sdp, &req, &len)) {
+-            return -SDP_INVALID_SYNTAX;
+-        }
+-    }
+-
+-    if (len < 3)
+-        return -SDP_INVALID_SYNTAX;
+-    max =3D (req[0] << 8) | req[1];
+-    req +=3D 2;
+-    len -=3D 2;
+-
+-    if (*req) {
+-        if (len <=3D sizeof(int))
+-            return -SDP_INVALID_SYNTAX;
+-        len -=3D sizeof(int);
+-        memcpy(&start, req + 1, sizeof(int));
+-    } else
+-        start =3D 0;
+-
+-    if (len > 1)
+-        return -SDP_INVALID_SYNTAX;
+-
+-    /* Output the results */
+-    len =3D 4;
+-    count =3D 0;
+-    end =3D start;
+-    for (i =3D 0; i < sdp->services; i ++)
+-        if (sdp->service_list[i].match) {
+-            if (count >=3D start && count < max && len + 4 < MAX_RSP_PARAM=
+_SIZE) {
+-                handle =3D i;
+-                memcpy(rsp + len, &handle, 4);
+-                len +=3D 4;
+-                end =3D count + 1;
+-            }
+-
+-            count ++;
+-        }
+-
+-    rsp[0] =3D count >> 8;
+-    rsp[1] =3D count & 0xff;
+-    rsp[2] =3D (end - start) >> 8;
+-    rsp[3] =3D (end - start) & 0xff;
+-
+-    if (end < count) {
+-        rsp[len ++] =3D sizeof(int);
+-        memcpy(rsp + len, &end, sizeof(int));
+-        len +=3D 4;
+-    } else
+-        rsp[len ++] =3D 0;
+-
+-    return len;
+-}
+-
+-static int sdp_attr_match(struct sdp_service_record_s *record,
+-                const uint8_t **req, ssize_t *len)
+-{
+-    int i, start, end;
+-
+-    if (**req =3D=3D (SDP_DTYPE_UINT | SDP_DSIZE_2)) {
+-        (*req) ++;
+-        if (*len < 3)
+-            return 1;
+-
+-        start =3D (*(*req) ++) << 8;
+-        start |=3D *(*req) ++;
+-        end =3D start;
+-        *len -=3D 3;
+-    } else if (**req =3D=3D (SDP_DTYPE_UINT | SDP_DSIZE_4)) {
+-        (*req) ++;
+-        if (*len < 5)
+-            return 1;
+-
+-        start =3D (*(*req) ++) << 8;
+-        start |=3D *(*req) ++;
+-        end =3D (*(*req) ++) << 8;
+-        end |=3D *(*req) ++;
+-        *len -=3D 5;
+-    } else
+-        return 1;
+-
+-    for (i =3D 0; i < record->attributes; i ++)
+-        if (record->attribute_list[i].attribute_id >=3D start &&
+-                        record->attribute_list[i].attribute_id <=3D end)
+-            record->attribute_list[i].match =3D 1;
+-
+-    return 0;
+-}
+-
+-static ssize_t sdp_attr_get(struct bt_l2cap_sdp_state_s *sdp,
+-                uint8_t *rsp, const uint8_t *req, ssize_t len)
+-{
+-    ssize_t seqlen;
+-    int i, start, end, max;
+-    int32_t handle;
+-    struct sdp_service_record_s *record;
+-    uint8_t *lst;
+-
+-    /* Perform the search */
+-    if (len < 7)
+-        return -SDP_INVALID_SYNTAX;
+-    memcpy(&handle, req, 4);
+-    req +=3D 4;
+-    len -=3D 4;
+-
+-    if (handle < 0 || handle > sdp->services)
+-        return -SDP_INVALID_RECORD_HANDLE;
+-    record =3D &sdp->service_list[handle];
+-
+-    for (i =3D 0; i < record->attributes; i ++)
+-        record->attribute_list[i].match =3D 0;
+-
+-    max =3D (req[0] << 8) | req[1];
+-    req +=3D 2;
+-    len -=3D 2;
+-    if (max < 0x0007)
+-        return -SDP_INVALID_SYNTAX;
+-
+-    if ((*req & ~SDP_DSIZE_MASK) =3D=3D SDP_DTYPE_SEQ) {
+-        seqlen =3D sdp_datalen(&req, &len);
+-        if (seqlen < 3 || len < seqlen)
+-            return -SDP_INVALID_SYNTAX;
+-        len -=3D seqlen;
+-
+-        while (seqlen)
+-            if (sdp_attr_match(record, &req, &seqlen))
+-                return -SDP_INVALID_SYNTAX;
+-    } else {
+-        if (sdp_attr_match(record, &req, &len)) {
+-            return -SDP_INVALID_SYNTAX;
+-        }
+-    }
+-
+-    if (len < 1)
+-        return -SDP_INVALID_SYNTAX;
+-
+-    if (*req) {
+-        if (len <=3D sizeof(int))
+-            return -SDP_INVALID_SYNTAX;
+-        len -=3D sizeof(int);
+-        memcpy(&start, req + 1, sizeof(int));
+-    } else
+-        start =3D 0;
+-
+-    if (len > 1)
+-        return -SDP_INVALID_SYNTAX;
+-
+-    /* Output the results */
+-    lst =3D rsp + 2;
+-    max =3D MIN(max, MAX_RSP_PARAM_SIZE);
+-    len =3D 3 - start;
+-    end =3D 0;
+-    for (i =3D 0; i < record->attributes; i ++)
+-        if (record->attribute_list[i].match) {
+-            if (len >=3D 0 && len + record->attribute_list[i].len < max) {
+-                memcpy(lst + len, record->attribute_list[i].pair,
+-                                record->attribute_list[i].len);
+-                end =3D len + record->attribute_list[i].len;
+-            }
+-            len +=3D record->attribute_list[i].len;
+-        }
+-    if (0 >=3D start) {
+-       lst[0] =3D SDP_DTYPE_SEQ | SDP_DSIZE_NEXT2;
+-       lst[1] =3D (len + start - 3) >> 8;
+-       lst[2] =3D (len + start - 3) & 0xff;
+-    }
+-
+-    rsp[0] =3D end >> 8;
+-    rsp[1] =3D end & 0xff;
+-
+-    if (end < len) {
+-        len =3D end + start;
+-        lst[end ++] =3D sizeof(int);
+-        memcpy(lst + end, &len, sizeof(int));
+-        end +=3D sizeof(int);
+-    } else
+-        lst[end ++] =3D 0;
+-
+-    return end + 2;
+-}
+-
+-static int sdp_svc_attr_match(struct bt_l2cap_sdp_state_s *sdp,
+-                const uint8_t **req, ssize_t *len)
+-{
+-    int i, j, start, end;
+-    struct sdp_service_record_s *record;
+-
+-    if (**req =3D=3D (SDP_DTYPE_UINT | SDP_DSIZE_2)) {
+-        (*req) ++;
+-        if (*len < 3)
+-            return 1;
+-
+-        start =3D (*(*req) ++) << 8;
+-        start |=3D *(*req) ++;
+-        end =3D start;
+-        *len -=3D 3;
+-    } else if (**req =3D=3D (SDP_DTYPE_UINT | SDP_DSIZE_4)) {
+-        (*req) ++;
+-        if (*len < 5)
+-            return 1;
+-
+-        start =3D (*(*req) ++) << 8;
+-        start |=3D *(*req) ++;
+-        end =3D (*(*req) ++) << 8;
+-        end |=3D *(*req) ++;
+-        *len -=3D 5;
+-    } else
+-        return 1;
+-
+-    for (i =3D 0; i < sdp->services; i ++)
+-        if ((record =3D &sdp->service_list[i])->match)
+-            for (j =3D 0; j < record->attributes; j ++)
+-                if (record->attribute_list[j].attribute_id >=3D start &&
+-                                record->attribute_list[j].attribute_id <=
+=3D end)
+-                    record->attribute_list[j].match =3D 1;
+-
+-    return 0;
+-}
+-
+-static ssize_t sdp_svc_search_attr_get(struct bt_l2cap_sdp_state_s *sdp,
+-                uint8_t *rsp, const uint8_t *req, ssize_t len)
+-{
+-    ssize_t seqlen;
+-    int i, j, start, end, max;
+-    struct sdp_service_record_s *record;
+-    uint8_t *lst;
+-
+-    /* Perform the search */
+-    for (i =3D 0; i < sdp->services; i ++) {
+-        sdp->service_list[i].match =3D 0;
+-            for (j =3D 0; j < sdp->service_list[i].attributes; j ++)
+-                sdp->service_list[i].attribute_list[j].match =3D 0;
+-    }
+-
+-    if (len < 1)
+-        return -SDP_INVALID_SYNTAX;
+-    if ((*req & ~SDP_DSIZE_MASK) =3D=3D SDP_DTYPE_SEQ) {
+-        seqlen =3D sdp_datalen(&req, &len);
+-        if (seqlen < 3 || len < seqlen)
+-            return -SDP_INVALID_SYNTAX;
+-        len -=3D seqlen;
+-
+-        while (seqlen)
+-            if (sdp_svc_match(sdp, &req, &seqlen))
+-                return -SDP_INVALID_SYNTAX;
+-    } else {
+-        if (sdp_svc_match(sdp, &req, &len)) {
+-            return -SDP_INVALID_SYNTAX;
+-        }
+-    }
+-
+-    if (len < 3)
+-        return -SDP_INVALID_SYNTAX;
+-    max =3D (req[0] << 8) | req[1];
+-    req +=3D 2;
+-    len -=3D 2;
+-    if (max < 0x0007)
+-        return -SDP_INVALID_SYNTAX;
+-
+-    if ((*req & ~SDP_DSIZE_MASK) =3D=3D SDP_DTYPE_SEQ) {
+-        seqlen =3D sdp_datalen(&req, &len);
+-        if (seqlen < 3 || len < seqlen)
+-            return -SDP_INVALID_SYNTAX;
+-        len -=3D seqlen;
+-
+-        while (seqlen)
+-            if (sdp_svc_attr_match(sdp, &req, &seqlen))
+-                return -SDP_INVALID_SYNTAX;
+-    } else {
+-        if (sdp_svc_attr_match(sdp, &req, &len)) {
+-            return -SDP_INVALID_SYNTAX;
+-        }
+-    }
+-
+-    if (len < 1)
+-        return -SDP_INVALID_SYNTAX;
+-
+-    if (*req) {
+-        if (len <=3D sizeof(int))
+-            return -SDP_INVALID_SYNTAX;
+-        len -=3D sizeof(int);
+-        memcpy(&start, req + 1, sizeof(int));
+-    } else
+-        start =3D 0;
+-
+-    if (len > 1)
+-        return -SDP_INVALID_SYNTAX;
+-
+-    /* Output the results */
+-    /* This assumes empty attribute lists are never to be returned even
+-     * for matching Service Records.  In practice this shouldn't happen
+-     * as the requestor will usually include the always present
+-     * ServiceRecordHandle AttributeID in AttributeIDList.  */
+-    lst =3D rsp + 2;
+-    max =3D MIN(max, MAX_RSP_PARAM_SIZE);
+-    len =3D 3 - start;
+-    end =3D 0;
+-    for (i =3D 0; i < sdp->services; i ++)
+-        if ((record =3D &sdp->service_list[i])->match) {
+-            len +=3D 3;
+-            seqlen =3D len;
+-            for (j =3D 0; j < record->attributes; j ++)
+-                if (record->attribute_list[j].match) {
+-                    if (len >=3D 0)
+-                        if (len + record->attribute_list[j].len < max) {
+-                            memcpy(lst + len, record->attribute_list[j].pa=
+ir,
+-                                            record->attribute_list[j].len)=
+;
+-                            end =3D len + record->attribute_list[j].len;
+-                        }
+-                    len +=3D record->attribute_list[j].len;
+-                }
+-            if (seqlen =3D=3D len)
+-                len -=3D 3;
+-            else if (seqlen >=3D 3 && seqlen < max) {
+-                lst[seqlen - 3] =3D SDP_DTYPE_SEQ | SDP_DSIZE_NEXT2;
+-                lst[seqlen - 2] =3D (len - seqlen) >> 8;
+-                lst[seqlen - 1] =3D (len - seqlen) & 0xff;
+-            }
+-        }
+-    if (len =3D=3D 3 - start)
+-        len -=3D 3;
+-    else if (0 >=3D start) {
+-       lst[0] =3D SDP_DTYPE_SEQ | SDP_DSIZE_NEXT2;
+-       lst[1] =3D (len + start - 3) >> 8;
+-       lst[2] =3D (len + start - 3) & 0xff;
+-    }
+-
+-    rsp[0] =3D end >> 8;
+-    rsp[1] =3D end & 0xff;
+-
+-    if (end < len) {
+-        len =3D end + start;
+-        lst[end ++] =3D sizeof(int);
+-        memcpy(lst + end, &len, sizeof(int));
+-        end +=3D sizeof(int);
+-    } else
+-        lst[end ++] =3D 0;
+-
+-    return end + 2;
+-}
+-
+-static void bt_l2cap_sdp_sdu_in(void *opaque, const uint8_t *data, int len=
+)
+-{
+-    struct bt_l2cap_sdp_state_s *sdp =3D opaque;
+-    enum bt_sdp_cmd pdu_id;
+-    uint8_t rsp[MAX_PDU_OUT_SIZE - PDU_HEADER_SIZE], *sdu_out;
+-    int transaction_id, plen;
+-    int err =3D 0;
+-    int rsp_len =3D 0;
+-
+-    if (len < 5) {
+-        error_report("%s: short SDP PDU (%iB).", __func__, len);
+-        return;
+-    }
+-
+-    pdu_id =3D *data ++;
+-    transaction_id =3D (data[0] << 8) | data[1];
+-    plen =3D (data[2] << 8) | data[3];
+-    data +=3D 4;
+-    len -=3D 5;
+-
+-    if (len !=3D plen) {
+-        error_report("%s: wrong SDP PDU length (%iB !=3D %iB).",
+-                        __func__, plen, len);
+-        err =3D SDP_INVALID_PDU_SIZE;
+-        goto respond;
+-    }
+-
+-    switch (pdu_id) {
+-    case SDP_SVC_SEARCH_REQ:
+-        rsp_len =3D sdp_svc_search(sdp, rsp, data, len);
+-        pdu_id =3D SDP_SVC_SEARCH_RSP;
+-        break;
+-
+-    case SDP_SVC_ATTR_REQ:
+-        rsp_len =3D sdp_attr_get(sdp, rsp, data, len);
+-        pdu_id =3D SDP_SVC_ATTR_RSP;
+-        break;
+-
+-    case SDP_SVC_SEARCH_ATTR_REQ:
+-        rsp_len =3D sdp_svc_search_attr_get(sdp, rsp, data, len);
+-        pdu_id =3D SDP_SVC_SEARCH_ATTR_RSP;
+-        break;
+-
+-    case SDP_ERROR_RSP:
+-    case SDP_SVC_ATTR_RSP:
+-    case SDP_SVC_SEARCH_RSP:
+-    case SDP_SVC_SEARCH_ATTR_RSP:
+-    default:
+-        error_report("%s: unexpected SDP PDU ID %02x.",
+-                        __func__, pdu_id);
+-        err =3D SDP_INVALID_SYNTAX;
+-        break;
+-    }
+-
+-    if (rsp_len < 0) {
+-        err =3D -rsp_len;
+-        rsp_len =3D 0;
+-    }
+-
+-respond:
+-    if (err) {
+-        pdu_id =3D SDP_ERROR_RSP;
+-        rsp[rsp_len ++] =3D err >> 8;
+-        rsp[rsp_len ++] =3D err & 0xff;
+-    }
+-
+-    sdu_out =3D sdp->channel->sdu_out(sdp->channel, rsp_len + PDU_HEADER_S=
+IZE);
+-
+-    sdu_out[0] =3D pdu_id;
+-    sdu_out[1] =3D transaction_id >> 8;
+-    sdu_out[2] =3D transaction_id & 0xff;
+-    sdu_out[3] =3D rsp_len >> 8;
+-    sdu_out[4] =3D rsp_len & 0xff;
+-    memcpy(sdu_out + PDU_HEADER_SIZE, rsp, rsp_len);
+-
+-    sdp->channel->sdu_submit(sdp->channel);
+-}
+-
+-static void bt_l2cap_sdp_close_ch(void *opaque)
+-{
+-    struct bt_l2cap_sdp_state_s *sdp =3D opaque;
+-    int i;
+-
+-    for (i =3D 0; i < sdp->services; i ++) {
+-        g_free(sdp->service_list[i].attribute_list[0].pair);
+-        g_free(sdp->service_list[i].attribute_list);
+-        g_free(sdp->service_list[i].uuid);
+-    }
+-    g_free(sdp->service_list);
+-    g_free(sdp);
+-}
+-
+-struct sdp_def_service_s {
+-    uint16_t class_uuid;
+-    struct sdp_def_attribute_s {
+-        uint16_t id;
+-        struct sdp_def_data_element_s {
+-            uint8_t type;
+-            union {
+-                uint32_t uint;
+-                const char *str;
+-                struct sdp_def_data_element_s *list;
+-            } value;
+-        } data;
+-    } attributes[];
+-};
+-
+-/* Calculate a safe byte count to allocate that will store the given
+- * element, at the same time count elements of a UUID type.  */
+-static int sdp_attr_max_size(struct sdp_def_data_element_s *element,
+-                int *uuids)
+-{
+-    int type =3D element->type & ~SDP_DSIZE_MASK;
+-    int len;
+-
+-    if (type =3D=3D SDP_DTYPE_UINT || type =3D=3D SDP_DTYPE_UUID ||
+-                    type =3D=3D SDP_DTYPE_BOOL) {
+-        if (type =3D=3D SDP_DTYPE_UUID)
+-            (*uuids) ++;
+-        return 1 + (1 << (element->type & SDP_DSIZE_MASK));
+-    }
+-
+-    if (type =3D=3D SDP_DTYPE_STRING || type =3D=3D SDP_DTYPE_URL) {
+-        if (element->type & SDP_DSIZE_MASK) {
+-            for (len =3D 0; element->value.str[len] |
+-                            element->value.str[len + 1]; len ++);
+-            return len;
+-        } else
+-            return 2 + strlen(element->value.str);
+-    }
+-
+-    if (type !=3D SDP_DTYPE_SEQ)
+-        exit(-1);
+-    len =3D 2;
+-    element =3D element->value.list;
+-    while (element->type)
+-        len +=3D sdp_attr_max_size(element ++, uuids);
+-    if (len > 255)
+-        exit (-1);
+-
+-    return len;
+-}
+-
+-static int sdp_attr_write(uint8_t *data,
+-                struct sdp_def_data_element_s *element, int **uuid)
+-{
+-    int type =3D element->type & ~SDP_DSIZE_MASK;
+-    int len =3D 0;
+-
+-    if (type =3D=3D SDP_DTYPE_UINT || type =3D=3D SDP_DTYPE_BOOL) {
+-        data[len ++] =3D element->type;
+-        if ((element->type & SDP_DSIZE_MASK) =3D=3D SDP_DSIZE_1)
+-            data[len ++] =3D (element->value.uint >>  0) & 0xff;
+-        else if ((element->type & SDP_DSIZE_MASK) =3D=3D SDP_DSIZE_2) {
+-            data[len ++] =3D (element->value.uint >>  8) & 0xff;
+-            data[len ++] =3D (element->value.uint >>  0) & 0xff;
+-        } else if ((element->type & SDP_DSIZE_MASK) =3D=3D SDP_DSIZE_4) {
+-            data[len ++] =3D (element->value.uint >>  24) & 0xff;
+-            data[len ++] =3D (element->value.uint >>  16) & 0xff;
+-            data[len ++] =3D (element->value.uint >>  8) & 0xff;
+-            data[len ++] =3D (element->value.uint >>  0) & 0xff;
+-        }
+-
+-        return len;
+-    }
+-
+-    if (type =3D=3D SDP_DTYPE_UUID) {
+-        *(*uuid) ++ =3D element->value.uint;
+-
+-        data[len ++] =3D element->type;
+-        data[len ++] =3D (element->value.uint >>  24) & 0xff;
+-        data[len ++] =3D (element->value.uint >>  16) & 0xff;
+-        data[len ++] =3D (element->value.uint >>  8) & 0xff;
+-        data[len ++] =3D (element->value.uint >>  0) & 0xff;
+-        memcpy(data + len, bt_base_uuid, 12);
+-
+-        return len + 12;
+-    }
+-
+-    data[0] =3D type | SDP_DSIZE_NEXT1;
+-    if (type =3D=3D SDP_DTYPE_STRING || type =3D=3D SDP_DTYPE_URL) {
+-        if (element->type & SDP_DSIZE_MASK)
+-            for (len =3D 0; element->value.str[len] |
+-                            element->value.str[len + 1]; len ++);
+-        else
+-            len =3D strlen(element->value.str);
+-        memcpy(data + 2, element->value.str, data[1] =3D len);
+-
+-        return len + 2;
+-    }
+-
+-    len =3D 2;
+-    element =3D element->value.list;
+-    while (element->type)
+-        len +=3D sdp_attr_write(data + len, element ++, uuid);
+-    data[1] =3D len - 2;
+-
+-    return len;
+-}
+-
+-static int sdp_attributeid_compare(const struct sdp_service_attribute_s *a=
+,
+-                const struct sdp_service_attribute_s *b)
+-{
+-    return (int) b->attribute_id - a->attribute_id;
+-}
+-
+-static int sdp_uuid_compare(const int *a, const int *b)
+-{
+-    return *a - *b;
+-}
+-
+-static void sdp_service_record_build(struct sdp_service_record_s *record,
+-                struct sdp_def_service_s *def, int handle)
+-{
+-    int len =3D 0;
+-    uint8_t *data;
+-    int *uuid;
+-
+-    record->uuids =3D 0;
+-    while (def->attributes[record->attributes].data.type) {
+-        len +=3D 3;
+-        len +=3D sdp_attr_max_size(&def->attributes[record->attributes ++]=
+.data,
+-                        &record->uuids);
+-    }
+-
+-    assert(len > 0);
+-    record->uuids =3D pow2ceil(record->uuids);
+-    record->attribute_list =3D
+-            g_malloc0(record->attributes * sizeof(*record->attribute_list)=
+);
+-    record->uuid =3D
+-            g_malloc0(record->uuids * sizeof(*record->uuid));
+-    data =3D g_malloc(len);
+-
+-    record->attributes =3D 0;
+-    uuid =3D record->uuid;
+-    while (def->attributes[record->attributes].data.type) {
+-        int attribute_id =3D def->attributes[record->attributes].id;
+-        record->attribute_list[record->attributes].pair =3D data;
+-        record->attribute_list[record->attributes].attribute_id =3D attrib=
+ute_id;
+-
+-        len =3D 0;
+-        data[len ++] =3D SDP_DTYPE_UINT | SDP_DSIZE_2;
+-        data[len ++] =3D attribute_id >> 8;
+-        data[len ++] =3D attribute_id & 0xff;
+-        len +=3D sdp_attr_write(data + len,
+-                        &def->attributes[record->attributes].data, &uuid);
+-
+-        /* Special case: assign a ServiceRecordHandle in sequence */
+-        if (def->attributes[record->attributes].id =3D=3D SDP_ATTR_RECORD_=
+HANDLE)
+-            def->attributes[record->attributes].data.value.uint =3D handle=
+;
+-        /* Note: we could also assign a ServiceDescription based on
+-         * sdp->device.device->lmp_name.  */
+-
+-        record->attribute_list[record->attributes ++].len =3D len;
+-        data +=3D len;
+-    }
+-
+-    /* Sort the attribute list by the AttributeID.  The first must be
+-     * SDP_ATTR_RECORD_HANDLE so that bt_l2cap_sdp_close_ch can free
+-     * the buffer.
+-     */
+-    qsort(record->attribute_list, record->attributes,
+-                    sizeof(*record->attribute_list),
+-                    (void *) sdp_attributeid_compare);
+-    assert(record->attribute_list[0].pair =3D=3D data);
+-
+-    /* Sort the searchable UUIDs list for bisection */
+-    qsort(record->uuid, record->uuids,
+-                    sizeof(*record->uuid),
+-                    (void *) sdp_uuid_compare);
+-}
+-
+-static void sdp_service_db_build(struct bt_l2cap_sdp_state_s *sdp,
+-                struct sdp_def_service_s **service)
+-{
+-    sdp->services =3D 0;
+-    while (service[sdp->services])
+-        sdp->services ++;
+-    sdp->service_list =3D
+-            g_malloc0(sdp->services * sizeof(*sdp->service_list));
+-
+-    sdp->services =3D 0;
+-    while (*service) {
+-        sdp_service_record_build(&sdp->service_list[sdp->services],
+-                        *service, sdp->services);
+-        service ++;
+-        sdp->services ++;
+-    }
+-}
+-
+-#define LAST { .type =3D 0 }
+-#define SERVICE(name, attrs)=09=09=09=09\
+-    static struct sdp_def_service_s glue(glue(sdp_service_, name), _s) =3D=
+ { \
+-        .attributes =3D { attrs { .data =3D LAST } },=09\
+-    };
+-#define ATTRIBUTE(attrid, val)=09{ .id =3D glue(SDP_ATTR_, attrid), .data =
+=3D val },
+-#define UINT8(val)=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_UINT | SDP_DSIZE_1,=09\
+-        .value.uint =3D val,=09=09=09=09\
+-    },
+-#define UINT16(val)=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_UINT | SDP_DSIZE_2,=09\
+-        .value.uint =3D val,=09=09=09=09\
+-    },
+-#define UINT32(val)=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_UINT | SDP_DSIZE_4,=09\
+-        .value.uint =3D val,=09=09=09=09\
+-    },
+-#define UUID128(val)=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_UUID | SDP_DSIZE_16,=09\
+-        .value.uint =3D val,=09=09=09=09\
+-    },
+-#define SDP_TRUE=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_BOOL | SDP_DSIZE_1,=09\
+-        .value.uint =3D 1,=09=09=09=09\
+-    },
+-#define SDP_FALSE=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_BOOL | SDP_DSIZE_1,=09\
+-        .value.uint =3D 0,=09=09=09=09\
+-    },
+-#define STRING(val)=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_STRING,=09=09=09\
+-        .value.str  =3D val,=09=09=09=09\
+-    },
+-#define ARRAY(...)=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_STRING | SDP_DSIZE_2,=09\
+-        .value.str  =3D (char []) { __VA_ARGS__, 0, 0 },=09\
+-    },
+-#define URL(val)=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_URL,=09=09=09\
+-        .value.str  =3D val,=09=09=09=09\
+-    },
+-#if 1
+-#define LIST(val)=09{=09=09=09=09\
+-        .type       =3D SDP_DTYPE_SEQ,=09=09=09\
+-        .value.list =3D (struct sdp_def_data_element_s []) { val LAST }, \
+-    },
+-#endif
+-
+-/* Try to keep each single attribute below MAX_PDU_OUT_SIZE bytes
+- * in resulting SDP data representation size.  */
+-
+-SERVICE(hid,
+-    ATTRIBUTE(RECORD_HANDLE,   UINT32(0))=09/* Filled in later */
+-    ATTRIBUTE(SVCLASS_ID_LIST, LIST(UUID128(HID_SVCLASS_ID)))
+-    ATTRIBUTE(RECORD_STATE,    UINT32(1))
+-    ATTRIBUTE(PROTO_DESC_LIST, LIST(
+-        LIST(UUID128(L2CAP_UUID) UINT16(BT_PSM_HID_CTRL))
+-        LIST(UUID128(HIDP_UUID))
+-    ))
+-    ATTRIBUTE(BROWSE_GRP_LIST, LIST(UUID128(0x1002)))
+-    ATTRIBUTE(LANG_BASE_ATTR_ID_LIST, LIST(
+-        UINT16(0x656e) UINT16(0x006a) UINT16(0x0100)
+-    ))
+-    ATTRIBUTE(PFILE_DESC_LIST, LIST(
+-        LIST(UUID128(HID_PROFILE_ID) UINT16(0x0100))
+-    ))
+-    ATTRIBUTE(DOC_URL,         URL("http://bellard.org/qemu/user-doc.html"=
+))
+-    ATTRIBUTE(SVCNAME_PRIMARY, STRING("QEMU Bluetooth HID"))
+-    ATTRIBUTE(SVCDESC_PRIMARY, STRING("QEMU Keyboard/Mouse"))
+-    ATTRIBUTE(SVCPROV_PRIMARY, STRING("QEMU"))
+-
+-    /* Profile specific */
+-    ATTRIBUTE(DEVICE_RELEASE_NUMBER,=09UINT16(0x0091)) /* Deprecated, remo=
+ve */
+-    ATTRIBUTE(PARSER_VERSION,=09=09UINT16(0x0111))
+-    /* TODO: extract from l2cap_device->device.class[0] */
+-    ATTRIBUTE(DEVICE_SUBCLASS,=09=09UINT8(0x40))
+-    ATTRIBUTE(COUNTRY_CODE,=09=09UINT8(0x15))
+-    ATTRIBUTE(VIRTUAL_CABLE,=09=09SDP_TRUE)
+-    ATTRIBUTE(RECONNECT_INITIATE,=09SDP_FALSE)
+-    /* TODO: extract from hid->usbdev->report_desc */
+-    ATTRIBUTE(DESCRIPTOR_LIST,=09=09LIST(
+-        LIST(UINT8(0x22) ARRAY(
+-            0x05, 0x01,=09/* Usage Page (Generic Desktop) */
+-            0x09, 0x06,=09/* Usage (Keyboard) */
+-            0xa1, 0x01,=09/* Collection (Application) */
+-            0x75, 0x01,=09/*   Report Size (1) */
+-            0x95, 0x08,=09/*   Report Count (8) */
+-            0x05, 0x07,=09/*   Usage Page (Key Codes) */
+-            0x19, 0xe0,=09/*   Usage Minimum (224) */
+-            0x29, 0xe7,=09/*   Usage Maximum (231) */
+-            0x15, 0x00,=09/*   Logical Minimum (0) */
+-            0x25, 0x01,=09/*   Logical Maximum (1) */
+-            0x81, 0x02,=09/*   Input (Data, Variable, Absolute) */
+-            0x95, 0x01,=09/*   Report Count (1) */
+-            0x75, 0x08,=09/*   Report Size (8) */
+-            0x81, 0x01,=09/*   Input (Constant) */
+-            0x95, 0x05,=09/*   Report Count (5) */
+-            0x75, 0x01,=09/*   Report Size (1) */
+-            0x05, 0x08,=09/*   Usage Page (LEDs) */
+-            0x19, 0x01,=09/*   Usage Minimum (1) */
+-            0x29, 0x05,=09/*   Usage Maximum (5) */
+-            0x91, 0x02,=09/*   Output (Data, Variable, Absolute) */
+-            0x95, 0x01,=09/*   Report Count (1) */
+-            0x75, 0x03,=09/*   Report Size (3) */
+-            0x91, 0x01,=09/*   Output (Constant) */
+-            0x95, 0x06,=09/*   Report Count (6) */
+-            0x75, 0x08,=09/*   Report Size (8) */
+-            0x15, 0x00,=09/*   Logical Minimum (0) */
+-            0x25, 0xff,=09/*   Logical Maximum (255) */
+-            0x05, 0x07,=09/*   Usage Page (Key Codes) */
+-            0x19, 0x00,=09/*   Usage Minimum (0) */
+-            0x29, 0xff,=09/*   Usage Maximum (255) */
+-            0x81, 0x00,=09/*   Input (Data, Array) */
+-            0xc0=09/* End Collection */
+-    ))))
+-    ATTRIBUTE(LANG_ID_BASE_LIST,=09LIST(
+-        LIST(UINT16(0x0409) UINT16(0x0100))
+-    ))
+-    ATTRIBUTE(SDP_DISABLE,=09=09SDP_FALSE)
+-    ATTRIBUTE(BATTERY_POWER,=09=09SDP_TRUE)
+-    ATTRIBUTE(REMOTE_WAKEUP,=09=09SDP_TRUE)
+-    ATTRIBUTE(BOOT_DEVICE,=09=09SDP_TRUE)=09/* XXX: untested */
+-    ATTRIBUTE(SUPERVISION_TIMEOUT,=09UINT16(0x0c80))
+-    ATTRIBUTE(NORMALLY_CONNECTABLE,=09SDP_TRUE)
+-    ATTRIBUTE(PROFILE_VERSION,=09=09UINT16(0x0100))
+-)
+-
+-SERVICE(sdp,
+-    ATTRIBUTE(RECORD_HANDLE,   UINT32(0))=09/* Filled in later */
+-    ATTRIBUTE(SVCLASS_ID_LIST, LIST(UUID128(SDP_SERVER_SVCLASS_ID)))
+-    ATTRIBUTE(RECORD_STATE,    UINT32(1))
+-    ATTRIBUTE(PROTO_DESC_LIST, LIST(
+-        LIST(UUID128(L2CAP_UUID) UINT16(BT_PSM_SDP))
+-        LIST(UUID128(SDP_UUID))
+-    ))
+-    ATTRIBUTE(BROWSE_GRP_LIST, LIST(UUID128(0x1002)))
+-    ATTRIBUTE(LANG_BASE_ATTR_ID_LIST, LIST(
+-        UINT16(0x656e) UINT16(0x006a) UINT16(0x0100)
+-    ))
+-    ATTRIBUTE(PFILE_DESC_LIST, LIST(
+-        LIST(UUID128(SDP_SERVER_PROFILE_ID) UINT16(0x0100))
+-    ))
+-    ATTRIBUTE(DOC_URL,         URL("http://bellard.org/qemu/user-doc.html"=
+))
+-    ATTRIBUTE(SVCPROV_PRIMARY, STRING("QEMU"))
+-
+-    /* Profile specific */
+-    ATTRIBUTE(VERSION_NUM_LIST, LIST(UINT16(0x0100)))
+-    ATTRIBUTE(SVCDB_STATE    , UINT32(1))
+-)
+-
+-SERVICE(pnp,
+-    ATTRIBUTE(RECORD_HANDLE,   UINT32(0))=09/* Filled in later */
+-    ATTRIBUTE(SVCLASS_ID_LIST, LIST(UUID128(PNP_INFO_SVCLASS_ID)))
+-    ATTRIBUTE(RECORD_STATE,    UINT32(1))
+-    ATTRIBUTE(PROTO_DESC_LIST, LIST(
+-        LIST(UUID128(L2CAP_UUID) UINT16(BT_PSM_SDP))
+-        LIST(UUID128(SDP_UUID))
+-    ))
+-    ATTRIBUTE(BROWSE_GRP_LIST, LIST(UUID128(0x1002)))
+-    ATTRIBUTE(LANG_BASE_ATTR_ID_LIST, LIST(
+-        UINT16(0x656e) UINT16(0x006a) UINT16(0x0100)
+-    ))
+-    ATTRIBUTE(PFILE_DESC_LIST, LIST(
+-        LIST(UUID128(PNP_INFO_PROFILE_ID) UINT16(0x0100))
+-    ))
+-    ATTRIBUTE(DOC_URL,         URL("http://bellard.org/qemu/user-doc.html"=
+))
+-    ATTRIBUTE(SVCPROV_PRIMARY, STRING("QEMU"))
+-
+-    /* Profile specific */
+-    ATTRIBUTE(SPECIFICATION_ID, UINT16(0x0100))
+-    ATTRIBUTE(VERSION,         UINT16(0x0100))
+-    ATTRIBUTE(PRIMARY_RECORD,  SDP_TRUE)
+-)
+-
+-static int bt_l2cap_sdp_new_ch(struct bt_l2cap_device_s *dev,
+-                struct bt_l2cap_conn_params_s *params)
+-{
+-    struct bt_l2cap_sdp_state_s *sdp =3D g_malloc0(sizeof(*sdp));
+-    struct sdp_def_service_s *services[] =3D {
+-        &sdp_service_sdp_s,
+-        &sdp_service_hid_s,
+-        &sdp_service_pnp_s,
+-        NULL,
+-    };
+-
+-    sdp->channel =3D params;
+-    sdp->channel->opaque =3D sdp;
+-    sdp->channel->close =3D bt_l2cap_sdp_close_ch;
+-    sdp->channel->sdu_in =3D bt_l2cap_sdp_sdu_in;
+-
+-    sdp_service_db_build(sdp, services);
+-
+-    return 0;
+-}
+-
+-void bt_l2cap_sdp_init(struct bt_l2cap_device_s *dev)
+-{
+-    bt_l2cap_psm_register(dev, BT_PSM_SDP,
+-                    MAX_PDU_OUT_SIZE, bt_l2cap_sdp_new_ch);
+-}
+diff --git a/include/hw/bt.h b/include/hw/bt.h
+deleted file mode 100644
+index d9ee2fc29a..0000000000
+--- a/include/hw/bt.h
++++ /dev/null
+@@ -1,2177 +0,0 @@
+-/*
+- * QEMU Bluetooth HCI helpers.
+- *
+- * Copyright (C) 2007 OpenMoko, Inc.
+- * Written by Andrzej Zaborowski <andrew@openedhand.com>
+- *
+- * Useful definitions taken from BlueZ project's headers.
+- * Copyright (C) 2000-2001  Qualcomm Incorporated
+- * Copyright (C) 2002-2003  Maxim Krasnyansky <maxk@qualcomm.com>
+- * Copyright (C) 2002-2006  Marcel Holtmann <marcel@holtmann.org>
+- *
+- * This program is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU General Public License as
+- * published by the Free Software Foundation; either version 2 of
+- * the License, or (at your option) any later version.
+- *
+- * This program is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- * GNU General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#ifndef HW_BT_H
+-#define HW_BT_H
+-
+-
+-/* BD Address */
+-typedef struct {
+-    uint8_t b[6];
+-} QEMU_PACKED bdaddr_t;
+-
+-#define BDADDR_ANY=09(&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
+-#define BDADDR_ALL=09(&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
+-#define BDADDR_LOCAL=09(&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
+-
+-/* Copy, swap, convert BD Address */
+-static inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
+-{
+-    return memcmp(ba1, ba2, sizeof(bdaddr_t));
+-}
+-static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
+-{
+-    memcpy(dst, src, sizeof(bdaddr_t));
+-}
+-
+-#define BAINIT(orig)=09{ .b =3D {=09=09\
+-    (orig)->b[0], (orig)->b[1], (orig)->b[2],=09\
+-    (orig)->b[3], (orig)->b[4], (orig)->b[5],=09\
+-}, }
+-
+-/* The twisted structures of a bluetooth environment */
+-struct bt_device_s;
+-struct bt_scatternet_s;
+-struct bt_piconet_s;
+-struct bt_link_s;
+-
+-struct bt_scatternet_s {
+-    struct bt_device_s *slave;
+-};
+-
+-struct bt_link_s {
+-    struct bt_device_s *slave, *host;
+-    uint16_t handle;=09=09/* Master (host) side handle */
+-    uint16_t acl_interval;
+-    enum {
+-        acl_active,
+-        acl_hold,
+-        acl_sniff,
+-        acl_parked,
+-    } acl_mode;
+-};
+-
+-struct bt_device_s {
+-    int lt_addr;
+-    bdaddr_t bd_addr;
+-    int mtu;
+-    int setup;
+-    struct bt_scatternet_s *net;
+-
+-    uint8_t key[16];
+-    int key_present;
+-    uint8_t class[3];
+-
+-    uint8_t reject_reason;
+-
+-    uint64_t lmp_caps;
+-    const char *lmp_name;
+-    void (*lmp_connection_request)(struct bt_link_s *link);
+-    void (*lmp_connection_complete)(struct bt_link_s *link);
+-    void (*lmp_disconnect_master)(struct bt_link_s *link);
+-    void (*lmp_disconnect_slave)(struct bt_link_s *link);
+-    void (*lmp_acl_data)(struct bt_link_s *link, const uint8_t *data,
+-                    int start, int len);
+-    void (*lmp_acl_resp)(struct bt_link_s *link, const uint8_t *data,
+-                    int start, int len);
+-    void (*lmp_mode_change)(struct bt_link_s *link);
+-
+-    void (*handle_destroy)(struct bt_device_s *device);
+-    struct bt_device_s *next;=09/* Next in the piconet/scatternet */
+-
+-    int inquiry_scan;
+-    int page_scan;
+-
+-    uint16_t clkoff;=09/* Note: Always little-endian */
+-};
+-
+-extern struct HCIInfo null_hci;
+-/* bt.c */
+-void bt_device_init(struct bt_device_s *dev, struct bt_scatternet_s *net);
+-void bt_device_done(struct bt_device_s *dev);
+-struct bt_scatternet_s *qemu_find_bt_vlan(int id);
+-
+-/* bt-hci.c */
+-struct HCIInfo *bt_new_hci(struct bt_scatternet_s *net);
+-struct HCIInfo *hci_init(const char *str);
+-
+-/* bt-vhci.c */
+-void bt_vhci_init(struct HCIInfo *info);
+-
+-/* bt-hci-csr.c */
+-enum {
+-    csrhci_pin_reset,
+-    csrhci_pin_wakeup,
+-    __csrhci_pins,
+-};
+-qemu_irq *csrhci_pins_get(Chardev *chr);
+-Chardev *uart_hci_init(void);
+-
+-/* bt-l2cap.c */
+-struct bt_l2cap_device_s;
+-struct bt_l2cap_conn_params_s;
+-struct bt_l2cap_psm_s;
+-void bt_l2cap_device_init(struct bt_l2cap_device_s *dev,
+-                struct bt_scatternet_s *net);
+-void bt_l2cap_device_done(struct bt_l2cap_device_s *dev);
+-void bt_l2cap_psm_register(struct bt_l2cap_device_s *dev, int psm,
+-                int min_mtu, int (*new_channel)(struct bt_l2cap_device_s *=
+dev,
+-                        struct bt_l2cap_conn_params_s *params));
+-
+-struct bt_l2cap_device_s {
+-    struct bt_device_s device;
+-    struct bt_l2cap_psm_s *first_psm;
+-};
+-
+-struct bt_l2cap_conn_params_s {
+-    /* Input */
+-    uint8_t *(*sdu_out)(struct bt_l2cap_conn_params_s *chan, int len);
+-    void (*sdu_submit)(struct bt_l2cap_conn_params_s *chan);
+-    int remote_mtu;
+-    /* Output */
+-    void *opaque;
+-    void (*sdu_in)(void *opaque, const uint8_t *data, int len);
+-    void (*close)(void *opaque);
+-};
+-
+-enum bt_l2cap_psm_predef {
+-    BT_PSM_SDP=09=09=3D 0x0001,
+-    BT_PSM_RFCOMM=09=3D 0x0003,
+-    BT_PSM_TELEPHONY=09=3D 0x0005,
+-    BT_PSM_TCS=09=09=3D 0x0007,
+-    BT_PSM_BNEP=09=09=3D 0x000f,
+-    BT_PSM_HID_CTRL=09=3D 0x0011,
+-    BT_PSM_HID_INTR=09=3D 0x0013,
+-    BT_PSM_UPNP=09=09=3D 0x0015,
+-    BT_PSM_AVCTP=09=3D 0x0017,
+-    BT_PSM_AVDTP=09=3D 0x0019,
+-};
+-
+-/* bt-sdp.c */
+-void bt_l2cap_sdp_init(struct bt_l2cap_device_s *dev);
+-
+-/* bt-hid.c */
+-struct bt_device_s *bt_keyboard_init(struct bt_scatternet_s *net);
+-
+-/* Link Management Protocol layer defines */
+-
+-#define LLID_ACLU_CONT=09=090x1
+-#define LLID_ACLU_START=09=090x2
+-#define LLID_ACLC=09=090x3
+-
+-enum lmp_pdu_type {
+-    LMP_NAME_REQ=09=09=3D 0x0001,
+-    LMP_NAME_RES=09=09=3D 0x0002,
+-    LMP_ACCEPTED=09=09=3D 0x0003,
+-    LMP_NOT_ACCEPTED=09=09=3D 0x0004,
+-    LMP_CLKOFFSET_REQ=09=09=3D 0x0005,
+-    LMP_CLKOFFSET_RES=09=09=3D 0x0006,
+-    LMP_DETACH=09=09=09=3D 0x0007,
+-    LMP_IN_RAND=09=09=09=3D 0x0008,
+-    LMP_COMB_KEY=09=09=3D 0x0009,
+-    LMP_UNIT_KEY=09=09=3D 0x000a,
+-    LMP_AU_RAND=09=09=09=3D 0x000b,
+-    LMP_SRES=09=09=09=3D 0x000c,
+-    LMP_TEMP_RAND=09=09=3D 0x000d,
+-    LMP_TEMP_KEY=09=09=3D 0x000e,
+-    LMP_CRYPT_MODE_REQ=09=09=3D 0x000f,
+-    LMP_CRYPT_KEY_SIZE_REQ=09=3D 0x0010,
+-    LMP_START_ENCRYPT_REQ=09=3D 0x0011,
+-    LMP_STOP_ENCRYPT_REQ=09=3D 0x0012,
+-    LMP_SWITCH_REQ=09=09=3D 0x0013,
+-    LMP_HOLD=09=09=09=3D 0x0014,
+-    LMP_HOLD_REQ=09=09=3D 0x0015,
+-    LMP_SNIFF_REQ=09=09=3D 0x0017,
+-    LMP_UNSNIFF_REQ=09=09=3D 0x0018,
+-    LMP_LMP_PARK_REQ=09=09=3D 0x0019,
+-    LMP_SET_BCAST_SCAN_WND=09=3D 0x001b,
+-    LMP_MODIFY_BEACON=09=09=3D 0x001c,
+-    LMP_UNPARK_BD_ADDR_REQ=09=3D 0x001d,
+-    LMP_UNPARK_PM_ADDR_REQ=09=3D 0x001e,
+-    LMP_INCR_POWER_REQ=09=09=3D 0x001f,
+-    LMP_DECR_POWER_REQ=09=09=3D 0x0020,
+-    LMP_MAX_POWER=09=09=3D 0x0021,
+-    LMP_MIN_POWER=09=09=3D 0x0022,
+-    LMP_AUTO_RATE=09=09=3D 0x0023,
+-    LMP_PREFERRED_RATE=09=09=3D 0x0024,
+-    LMP_VERSION_REQ=09=09=3D 0x0025,
+-    LMP_VERSION_RES=09=09=3D 0x0026,
+-    LMP_FEATURES_REQ=09=09=3D 0x0027,
+-    LMP_FEATURES_RES=09=09=3D 0x0028,
+-    LMP_QUALITY_OF_SERVICE=09=3D 0x0029,
+-    LMP_QOS_REQ=09=09=09=3D 0x002a,
+-    LMP_RM_SCO_LINK_REQ=09=09=3D 0x002b,
+-    LMP_SCO_LINK_REQ=09=09=3D 0x002c,
+-    LMP_MAX_SLOT=09=09=3D 0x002d,
+-    LMP_MAX_SLOT_REQ=09=09=3D 0x002e,
+-    LMP_TIMING_ACCURACY_REQ=09=3D 0x002f,
+-    LMP_TIMING_ACCURACY_RES=09=3D 0x0030,
+-    LMP_SETUP_COMPLETE=09=09=3D 0x0031,
+-    LMP_USE_SEMIPERM_KEY=09=3D 0x0032,
+-    LMP_HOST_CONNECTION_REQ=09=3D 0x0033,
+-    LMP_SLOT_OFFSET=09=09=3D 0x0034,
+-    LMP_PAGE_MODE_REQ=09=09=3D 0x0035,
+-    LMP_PAGE_SCAN_MODE_REQ=09=3D 0x0036,
+-    LMP_SUPERVISION_TIMEOUT=09=3D 0x0037,
+-    LMP_TEST_ACTIVATE=09=09=3D 0x0038,
+-    LMP_TEST_CONTROL=09=09=3D 0x0039,
+-    LMP_CRYPT_KEY_MASK_REQ=09=3D 0x003a,
+-    LMP_CRYPT_KEY_MASK_RES=09=3D 0x003b,
+-    LMP_SET_AFH=09=09=09=3D 0x003c,
+-    LMP_ACCEPTED_EXT=09=09=3D 0x7f01,
+-    LMP_NOT_ACCEPTED_EXT=09=3D 0x7f02,
+-    LMP_FEATURES_REQ_EXT=09=3D 0x7f03,
+-    LMP_FEATURES_RES_EXT=09=3D 0x7f04,
+-    LMP_PACKET_TYPE_TBL_REQ=09=3D 0x7f0b,
+-    LMP_ESCO_LINK_REQ=09=09=3D 0x7f0c,
+-    LMP_RM_ESCO_LINK_REQ=09=3D 0x7f0d,
+-    LMP_CHANNEL_CLASS_REQ=09=3D 0x7f10,
+-    LMP_CHANNEL_CLASS=09=09=3D 0x7f11,
+-};
+-
+-/* Host Controller Interface layer defines */
+-
+-enum hci_packet_type {
+-    HCI_COMMAND_PKT=09=09=3D 0x01,
+-    HCI_ACLDATA_PKT=09=09=3D 0x02,
+-    HCI_SCODATA_PKT=09=09=3D 0x03,
+-    HCI_EVENT_PKT=09=09=3D 0x04,
+-    HCI_VENDOR_PKT=09=09=3D 0xff,
+-};
+-
+-enum bt_packet_type {
+-    HCI_2DH1=09=3D 1 << 1,
+-    HCI_3DH1=09=3D 1 << 2,
+-    HCI_DM1=09=3D 1 << 3,
+-    HCI_DH1=09=3D 1 << 4,
+-    HCI_2DH3=09=3D 1 << 8,
+-    HCI_3DH3=09=3D 1 << 9,
+-    HCI_DM3=09=3D 1 << 10,
+-    HCI_DH3=09=3D 1 << 11,
+-    HCI_2DH5=09=3D 1 << 12,
+-    HCI_3DH5=09=3D 1 << 13,
+-    HCI_DM5=09=3D 1 << 14,
+-    HCI_DH5=09=3D 1 << 15,
+-};
+-
+-enum sco_packet_type {
+-    HCI_HV1=09=3D 1 << 5,
+-    HCI_HV2=09=3D 1 << 6,
+-    HCI_HV3=09=3D 1 << 7,
+-};
+-
+-enum ev_packet_type {
+-    HCI_EV3=09=3D 1 << 3,
+-    HCI_EV4=09=3D 1 << 4,
+-    HCI_EV5=09=3D 1 << 5,
+-    HCI_2EV3=09=3D 1 << 6,
+-    HCI_3EV3=09=3D 1 << 7,
+-    HCI_2EV5=09=3D 1 << 8,
+-    HCI_3EV5=09=3D 1 << 9,
+-};
+-
+-enum hci_error_code {
+-    HCI_SUCCESS=09=09=09=09=3D 0x00,
+-    HCI_UNKNOWN_COMMAND=09=09=09=3D 0x01,
+-    HCI_NO_CONNECTION=09=09=09=3D 0x02,
+-    HCI_HARDWARE_FAILURE=09=09=3D 0x03,
+-    HCI_PAGE_TIMEOUT=09=09=09=3D 0x04,
+-    HCI_AUTHENTICATION_FAILURE=09=09=3D 0x05,
+-    HCI_PIN_OR_KEY_MISSING=09=09=3D 0x06,
+-    HCI_MEMORY_FULL=09=09=09=3D 0x07,
+-    HCI_CONNECTION_TIMEOUT=09=09=3D 0x08,
+-    HCI_MAX_NUMBER_OF_CONNECTIONS=09=3D 0x09,
+-    HCI_MAX_NUMBER_OF_SCO_CONNECTIONS=09=3D 0x0a,
+-    HCI_ACL_CONNECTION_EXISTS=09=09=3D 0x0b,
+-    HCI_COMMAND_DISALLOWED=09=09=3D 0x0c,
+-    HCI_REJECTED_LIMITED_RESOURCES=09=3D 0x0d,
+-    HCI_REJECTED_SECURITY=09=09=3D 0x0e,
+-    HCI_REJECTED_PERSONAL=09=09=3D 0x0f,
+-    HCI_HOST_TIMEOUT=09=09=09=3D 0x10,
+-    HCI_UNSUPPORTED_FEATURE=09=09=3D 0x11,
+-    HCI_INVALID_PARAMETERS=09=09=3D 0x12,
+-    HCI_OE_USER_ENDED_CONNECTION=09=3D 0x13,
+-    HCI_OE_LOW_RESOURCES=09=09=3D 0x14,
+-    HCI_OE_POWER_OFF=09=09=09=3D 0x15,
+-    HCI_CONNECTION_TERMINATED=09=09=3D 0x16,
+-    HCI_REPEATED_ATTEMPTS=09=09=3D 0x17,
+-    HCI_PAIRING_NOT_ALLOWED=09=09=3D 0x18,
+-    HCI_UNKNOWN_LMP_PDU=09=09=09=3D 0x19,
+-    HCI_UNSUPPORTED_REMOTE_FEATURE=09=3D 0x1a,
+-    HCI_SCO_OFFSET_REJECTED=09=09=3D 0x1b,
+-    HCI_SCO_INTERVAL_REJECTED=09=09=3D 0x1c,
+-    HCI_AIR_MODE_REJECTED=09=09=3D 0x1d,
+-    HCI_INVALID_LMP_PARAMETERS=09=09=3D 0x1e,
+-    HCI_UNSPECIFIED_ERROR=09=09=3D 0x1f,
+-    HCI_UNSUPPORTED_LMP_PARAMETER_VALUE=09=3D 0x20,
+-    HCI_ROLE_CHANGE_NOT_ALLOWED=09=09=3D 0x21,
+-    HCI_LMP_RESPONSE_TIMEOUT=09=09=3D 0x22,
+-    HCI_LMP_ERROR_TRANSACTION_COLLISION=09=3D 0x23,
+-    HCI_LMP_PDU_NOT_ALLOWED=09=09=3D 0x24,
+-    HCI_ENCRYPTION_MODE_NOT_ACCEPTED=09=3D 0x25,
+-    HCI_UNIT_LINK_KEY_USED=09=09=3D 0x26,
+-    HCI_QOS_NOT_SUPPORTED=09=09=3D 0x27,
+-    HCI_INSTANT_PASSED=09=09=09=3D 0x28,
+-    HCI_PAIRING_NOT_SUPPORTED=09=09=3D 0x29,
+-    HCI_TRANSACTION_COLLISION=09=09=3D 0x2a,
+-    HCI_QOS_UNACCEPTABLE_PARAMETER=09=3D 0x2c,
+-    HCI_QOS_REJECTED=09=09=09=3D 0x2d,
+-    HCI_CLASSIFICATION_NOT_SUPPORTED=09=3D 0x2e,
+-    HCI_INSUFFICIENT_SECURITY=09=09=3D 0x2f,
+-    HCI_PARAMETER_OUT_OF_RANGE=09=09=3D 0x30,
+-    HCI_ROLE_SWITCH_PENDING=09=09=3D 0x32,
+-    HCI_SLOT_VIOLATION=09=09=09=3D 0x34,
+-    HCI_ROLE_SWITCH_FAILED=09=09=3D 0x35,
+-};
+-
+-enum acl_flag_bits {
+-    ACL_CONT=09=09=3D 1 << 0,
+-    ACL_START=09=09=3D 1 << 1,
+-    ACL_ACTIVE_BCAST=09=3D 1 << 2,
+-    ACL_PICO_BCAST=09=3D 1 << 3,
+-};
+-
+-enum baseband_link_type {
+-    SCO_LINK=09=09=3D 0x00,
+-    ACL_LINK=09=09=3D 0x01,
+-};
+-
+-enum lmp_feature_bits0 {
+-    LMP_3SLOT=09=09=3D 1 << 0,
+-    LMP_5SLOT=09=09=3D 1 << 1,
+-    LMP_ENCRYPT=09=09=3D 1 << 2,
+-    LMP_SOFFSET=09=09=3D 1 << 3,
+-    LMP_TACCURACY=09=3D 1 << 4,
+-    LMP_RSWITCH=09=09=3D 1 << 5,
+-    LMP_HOLD_MODE=09=3D 1 << 6,
+-    LMP_SNIFF_MODE=09=3D 1 << 7,
+-};
+-
+-enum lmp_feature_bits1 {
+-    LMP_PARK=09=09=3D 1 << 0,
+-    LMP_RSSI=09=09=3D 1 << 1,
+-    LMP_QUALITY=09=09=3D 1 << 2,
+-    LMP_SCO=09=09=3D 1 << 3,
+-    LMP_HV2=09=09=3D 1 << 4,
+-    LMP_HV3=09=09=3D 1 << 5,
+-    LMP_ULAW=09=09=3D 1 << 6,
+-    LMP_ALAW=09=09=3D 1 << 7,
+-};
+-
+-enum lmp_feature_bits2 {
+-    LMP_CVSD=09=09=3D 1 << 0,
+-    LMP_PSCHEME=09=09=3D 1 << 1,
+-    LMP_PCONTROL=09=3D 1 << 2,
+-    LMP_TRSP_SCO=09=3D 1 << 3,
+-    LMP_BCAST_ENC=09=3D 1 << 7,
+-};
+-
+-enum lmp_feature_bits3 {
+-    LMP_EDR_ACL_2M=09=3D 1 << 1,
+-    LMP_EDR_ACL_3M=09=3D 1 << 2,
+-    LMP_ENH_ISCAN=09=3D 1 << 3,
+-    LMP_ILACE_ISCAN=09=3D 1 << 4,
+-    LMP_ILACE_PSCAN=09=3D 1 << 5,
+-    LMP_RSSI_INQ=09=3D 1 << 6,
+-    LMP_ESCO=09=09=3D 1 << 7,
+-};
+-
+-enum lmp_feature_bits4 {
+-    LMP_EV4=09=09=3D 1 << 0,
+-    LMP_EV5=09=09=3D 1 << 1,
+-    LMP_AFH_CAP_SLV=09=3D 1 << 3,
+-    LMP_AFH_CLS_SLV=09=3D 1 << 4,
+-    LMP_EDR_3SLOT=09=3D 1 << 7,
+-};
+-
+-enum lmp_feature_bits5 {
+-    LMP_EDR_5SLOT=09=3D 1 << 0,
+-    LMP_SNIFF_SUBR=09=3D 1 << 1,
+-    LMP_AFH_CAP_MST=09=3D 1 << 3,
+-    LMP_AFH_CLS_MST=09=3D 1 << 4,
+-    LMP_EDR_ESCO_2M=09=3D 1 << 5,
+-    LMP_EDR_ESCO_3M=09=3D 1 << 6,
+-    LMP_EDR_3S_ESCO=09=3D 1 << 7,
+-};
+-
+-enum lmp_feature_bits6 {
+-    LMP_EXT_INQ=09=09=3D 1 << 0,
+-};
+-
+-enum lmp_feature_bits7 {
+-    LMP_EXT_FEAT=09=3D 1 << 7,
+-};
+-
+-enum hci_link_policy {
+-    HCI_LP_RSWITCH=09=3D 1 << 0,
+-    HCI_LP_HOLD=09=09=3D 1 << 1,
+-    HCI_LP_SNIFF=09=3D 1 << 2,
+-    HCI_LP_PARK=09=09=3D 1 << 3,
+-};
+-
+-enum hci_link_mode {
+-    HCI_LM_ACCEPT=09=3D 1 << 15,
+-    HCI_LM_MASTER=09=3D 1 << 0,
+-    HCI_LM_AUTH=09=09=3D 1 << 1,
+-    HCI_LM_ENCRYPT=09=3D 1 << 2,
+-    HCI_LM_TRUSTED=09=3D 1 << 3,
+-    HCI_LM_RELIABLE=09=3D 1 << 4,
+-    HCI_LM_SECURE=09=3D 1 << 5,
+-};
+-
+-/* HCI Commands */
+-
+-/* Link Control */
+-#define OGF_LINK_CTL=09=090x01
+-
+-#define OCF_INQUIRY=09=09=090x0001
+-typedef struct {
+-    uint8_t=09lap[3];
+-    uint8_t=09length;=09=09/* 1.28s units */
+-    uint8_t=09num_rsp;
+-} QEMU_PACKED inquiry_cp;
+-#define INQUIRY_CP_SIZE 5
+-
+-typedef struct {
+-    uint8_t=09=09status;
+-    bdaddr_t=09bdaddr;
+-} QEMU_PACKED status_bdaddr_rp;
+-#define STATUS_BDADDR_RP_SIZE 7
+-
+-#define OCF_INQUIRY_CANCEL=09=090x0002
+-
+-#define OCF_PERIODIC_INQUIRY=09=090x0003
+-typedef struct {
+-    uint16_t=09max_period;=09/* 1.28s units */
+-    uint16_t=09min_period;=09/* 1.28s units */
+-    uint8_t=09lap[3];
+-    uint8_t=09length;=09=09/* 1.28s units */
+-    uint8_t=09num_rsp;
+-} QEMU_PACKED periodic_inquiry_cp;
+-#define PERIODIC_INQUIRY_CP_SIZE 9
+-
+-#define OCF_EXIT_PERIODIC_INQUIRY=090x0004
+-
+-#define OCF_CREATE_CONN=09=09=090x0005
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint16_t=09pkt_type;
+-    uint8_t=09pscan_rep_mode;
+-    uint8_t=09pscan_mode;
+-    uint16_t=09clock_offset;
+-    uint8_t=09role_switch;
+-} QEMU_PACKED create_conn_cp;
+-#define CREATE_CONN_CP_SIZE 13
+-
+-#define OCF_DISCONNECT=09=09=090x0006
+-typedef struct {
+-    uint16_t=09handle;
+-    uint8_t=09reason;
+-} QEMU_PACKED disconnect_cp;
+-#define DISCONNECT_CP_SIZE 3
+-
+-#define OCF_ADD_SCO=09=09=090x0007
+-typedef struct {
+-    uint16_t=09handle;
+-    uint16_t=09pkt_type;
+-} QEMU_PACKED add_sco_cp;
+-#define ADD_SCO_CP_SIZE 4
+-
+-#define OCF_CREATE_CONN_CANCEL=09=090x0008
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-} QEMU_PACKED create_conn_cancel_cp;
+-#define CREATE_CONN_CANCEL_CP_SIZE 6
+-
+-typedef struct {
+-    uint8_t=09status;
+-    bdaddr_t=09bdaddr;
+-} QEMU_PACKED create_conn_cancel_rp;
+-#define CREATE_CONN_CANCEL_RP_SIZE 7
+-
+-#define OCF_ACCEPT_CONN_REQ=09=090x0009
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09role;
+-} QEMU_PACKED accept_conn_req_cp;
+-#define ACCEPT_CONN_REQ_CP_SIZE=097
+-
+-#define OCF_REJECT_CONN_REQ=09=090x000A
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09reason;
+-} QEMU_PACKED reject_conn_req_cp;
+-#define REJECT_CONN_REQ_CP_SIZE=097
+-
+-#define OCF_LINK_KEY_REPLY=09=090x000B
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09link_key[16];
+-} QEMU_PACKED link_key_reply_cp;
+-#define LINK_KEY_REPLY_CP_SIZE 22
+-
+-#define OCF_LINK_KEY_NEG_REPLY=09=090x000C
+-
+-#define OCF_PIN_CODE_REPLY=09=090x000D
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09pin_len;
+-    uint8_t=09pin_code[16];
+-} QEMU_PACKED pin_code_reply_cp;
+-#define PIN_CODE_REPLY_CP_SIZE 23
+-
+-#define OCF_PIN_CODE_NEG_REPLY=09=090x000E
+-
+-#define OCF_SET_CONN_PTYPE=09=090x000F
+-typedef struct {
+-    uint16_t=09 handle;
+-    uint16_t=09 pkt_type;
+-} QEMU_PACKED set_conn_ptype_cp;
+-#define SET_CONN_PTYPE_CP_SIZE 4
+-
+-#define OCF_AUTH_REQUESTED=09=090x0011
+-typedef struct {
+-    uint16_t=09 handle;
+-} QEMU_PACKED auth_requested_cp;
+-#define AUTH_REQUESTED_CP_SIZE 2
+-
+-#define OCF_SET_CONN_ENCRYPT=09=090x0013
+-typedef struct {
+-    uint16_t=09handle;
+-    uint8_t=09encrypt;
+-} QEMU_PACKED set_conn_encrypt_cp;
+-#define SET_CONN_ENCRYPT_CP_SIZE 3
+-
+-#define OCF_CHANGE_CONN_LINK_KEY=090x0015
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED change_conn_link_key_cp;
+-#define CHANGE_CONN_LINK_KEY_CP_SIZE 2
+-
+-#define OCF_MASTER_LINK_KEY=09=090x0017
+-typedef struct {
+-    uint8_t=09key_flag;
+-} QEMU_PACKED master_link_key_cp;
+-#define MASTER_LINK_KEY_CP_SIZE 1
+-
+-#define OCF_REMOTE_NAME_REQ=09=090x0019
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09pscan_rep_mode;
+-    uint8_t=09pscan_mode;
+-    uint16_t=09clock_offset;
+-} QEMU_PACKED remote_name_req_cp;
+-#define REMOTE_NAME_REQ_CP_SIZE 10
+-
+-#define OCF_REMOTE_NAME_REQ_CANCEL=090x001A
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-} QEMU_PACKED remote_name_req_cancel_cp;
+-#define REMOTE_NAME_REQ_CANCEL_CP_SIZE 6
+-
+-typedef struct {
+-    uint8_t=09=09status;
+-    bdaddr_t=09bdaddr;
+-} QEMU_PACKED remote_name_req_cancel_rp;
+-#define REMOTE_NAME_REQ_CANCEL_RP_SIZE 7
+-
+-#define OCF_READ_REMOTE_FEATURES=090x001B
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED read_remote_features_cp;
+-#define READ_REMOTE_FEATURES_CP_SIZE 2
+-
+-#define OCF_READ_REMOTE_EXT_FEATURES=090x001C
+-typedef struct {
+-    uint16_t=09handle;
+-    uint8_t=09page_num;
+-} QEMU_PACKED read_remote_ext_features_cp;
+-#define READ_REMOTE_EXT_FEATURES_CP_SIZE 3
+-
+-#define OCF_READ_REMOTE_VERSION=09=090x001D
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED read_remote_version_cp;
+-#define READ_REMOTE_VERSION_CP_SIZE 2
+-
+-#define OCF_READ_CLOCK_OFFSET=09=090x001F
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED read_clock_offset_cp;
+-#define READ_CLOCK_OFFSET_CP_SIZE 2
+-
+-#define OCF_READ_LMP_HANDLE=09=090x0020
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED read_lmp_handle_cp;
+-#define READ_LMP_HANDLE_CP_SIZE 2
+-
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09lmp_handle;
+-    uint32_t=09reserved;
+-} QEMU_PACKED read_lmp_handle_rp;
+-#define READ_LMP_HANDLE_RP_SIZE 8
+-
+-#define OCF_SETUP_SYNC_CONN=09=090x0028
+-typedef struct {
+-    uint16_t=09handle;
+-    uint32_t=09tx_bandwidth;
+-    uint32_t=09rx_bandwidth;
+-    uint16_t=09max_latency;
+-    uint16_t=09voice_setting;
+-    uint8_t=09retrans_effort;
+-    uint16_t=09pkt_type;
+-} QEMU_PACKED setup_sync_conn_cp;
+-#define SETUP_SYNC_CONN_CP_SIZE 17
+-
+-#define OCF_ACCEPT_SYNC_CONN_REQ=090x0029
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint32_t=09tx_bandwidth;
+-    uint32_t=09rx_bandwidth;
+-    uint16_t=09max_latency;
+-    uint16_t=09voice_setting;
+-    uint8_t=09retrans_effort;
+-    uint16_t=09pkt_type;
+-} QEMU_PACKED accept_sync_conn_req_cp;
+-#define ACCEPT_SYNC_CONN_REQ_CP_SIZE 21
+-
+-#define OCF_REJECT_SYNC_CONN_REQ=090x002A
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09reason;
+-} QEMU_PACKED reject_sync_conn_req_cp;
+-#define REJECT_SYNC_CONN_REQ_CP_SIZE 7
+-
+-/* Link Policy */
+-#define OGF_LINK_POLICY=09=090x02
+-
+-#define OCF_HOLD_MODE=09=09=090x0001
+-typedef struct {
+-    uint16_t=09handle;
+-    uint16_t=09max_interval;
+-    uint16_t=09min_interval;
+-} QEMU_PACKED hold_mode_cp;
+-#define HOLD_MODE_CP_SIZE 6
+-
+-#define OCF_SNIFF_MODE=09=09=090x0003
+-typedef struct {
+-    uint16_t=09handle;
+-    uint16_t=09max_interval;
+-    uint16_t=09min_interval;
+-    uint16_t=09attempt;
+-    uint16_t=09timeout;
+-} QEMU_PACKED sniff_mode_cp;
+-#define SNIFF_MODE_CP_SIZE 10
+-
+-#define OCF_EXIT_SNIFF_MODE=09=090x0004
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED exit_sniff_mode_cp;
+-#define EXIT_SNIFF_MODE_CP_SIZE 2
+-
+-#define OCF_PARK_MODE=09=09=090x0005
+-typedef struct {
+-    uint16_t=09handle;
+-    uint16_t=09max_interval;
+-    uint16_t=09min_interval;
+-} QEMU_PACKED park_mode_cp;
+-#define PARK_MODE_CP_SIZE 6
+-
+-#define OCF_EXIT_PARK_MODE=09=090x0006
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED exit_park_mode_cp;
+-#define EXIT_PARK_MODE_CP_SIZE 2
+-
+-#define OCF_QOS_SETUP=09=09=090x0007
+-typedef struct {
+-    uint8_t=09service_type;=09=09/* 1 =3D best effort */
+-    uint32_t=09token_rate;=09=09/* Byte per seconds */
+-    uint32_t=09peak_bandwidth;=09=09/* Byte per seconds */
+-    uint32_t=09latency;=09=09/* Microseconds */
+-    uint32_t=09delay_variation;=09/* Microseconds */
+-} QEMU_PACKED hci_qos;
+-#define HCI_QOS_CP_SIZE 17
+-typedef struct {
+-    uint16_t =09handle;
+-    uint8_t =09flags;=09=09=09/* Reserved */
+-    hci_qos =09qos;
+-} QEMU_PACKED qos_setup_cp;
+-#define QOS_SETUP_CP_SIZE (3 + HCI_QOS_CP_SIZE)
+-
+-#define OCF_ROLE_DISCOVERY=09=090x0009
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED role_discovery_cp;
+-#define ROLE_DISCOVERY_CP_SIZE 2
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09role;
+-} QEMU_PACKED role_discovery_rp;
+-#define ROLE_DISCOVERY_RP_SIZE 4
+-
+-#define OCF_SWITCH_ROLE=09=09=090x000B
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09role;
+-} QEMU_PACKED switch_role_cp;
+-#define SWITCH_ROLE_CP_SIZE 7
+-
+-#define OCF_READ_LINK_POLICY=09=090x000C
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED read_link_policy_cp;
+-#define READ_LINK_POLICY_CP_SIZE 2
+-typedef struct {
+-    uint8_t =09status;
+-    uint16_t=09handle;
+-    uint16_t=09policy;
+-} QEMU_PACKED read_link_policy_rp;
+-#define READ_LINK_POLICY_RP_SIZE 5
+-
+-#define OCF_WRITE_LINK_POLICY=09=090x000D
+-typedef struct {
+-    uint16_t=09handle;
+-    uint16_t=09policy;
+-} QEMU_PACKED write_link_policy_cp;
+-#define WRITE_LINK_POLICY_CP_SIZE 4
+-typedef struct {
+-    uint8_t =09status;
+-    uint16_t=09handle;
+-} QEMU_PACKED write_link_policy_rp;
+-#define WRITE_LINK_POLICY_RP_SIZE 3
+-
+-#define OCF_READ_DEFAULT_LINK_POLICY=090x000E
+-
+-#define OCF_WRITE_DEFAULT_LINK_POLICY=090x000F
+-
+-#define OCF_FLOW_SPECIFICATION=09=090x0010
+-
+-#define OCF_SNIFF_SUBRATE=09=090x0011
+-typedef struct {
+-    uint16_t=09handle;
+-    uint16_t=09max_remote_latency;
+-    uint16_t=09max_local_latency;
+-    uint16_t=09min_remote_timeout;
+-    uint16_t=09min_local_timeout;
+-} QEMU_PACKED sniff_subrate_cp;
+-#define SNIFF_SUBRATE_CP_SIZE 10
+-
+-/* Host Controller and Baseband */
+-#define OGF_HOST_CTL=09=090x03
+-
+-#define OCF_SET_EVENT_MASK=09=090x0001
+-typedef struct {
+-    uint8_t=09mask[8];
+-} QEMU_PACKED set_event_mask_cp;
+-#define SET_EVENT_MASK_CP_SIZE 8
+-
+-#define OCF_RESET=09=09=090x0003
+-
+-#define OCF_SET_EVENT_FLT=09=090x0005
+-typedef struct {
+-    uint8_t=09flt_type;
+-    uint8_t=09cond_type;
+-    uint8_t=09condition[0];
+-} QEMU_PACKED set_event_flt_cp;
+-#define SET_EVENT_FLT_CP_SIZE 2
+-
+-enum bt_filter_type {
+-    FLT_CLEAR_ALL=09=09=3D 0x00,
+-    FLT_INQ_RESULT=09=09=3D 0x01,
+-    FLT_CONN_SETUP=09=09=3D 0x02,
+-};
+-enum inq_result_cond_type {
+-    INQ_RESULT_RETURN_ALL=09=3D 0x00,
+-    INQ_RESULT_RETURN_CLASS=09=3D 0x01,
+-    INQ_RESULT_RETURN_BDADDR=09=3D 0x02,
+-};
+-enum conn_setup_cond_type {
+-    CONN_SETUP_ALLOW_ALL=09=3D 0x00,
+-    CONN_SETUP_ALLOW_CLASS=09=3D 0x01,
+-    CONN_SETUP_ALLOW_BDADDR=09=3D 0x02,
+-};
+-enum conn_setup_cond {
+-    CONN_SETUP_AUTO_OFF=09=09=3D 0x01,
+-    CONN_SETUP_AUTO_ON=09=09=3D 0x02,
+-};
+-
+-#define OCF_FLUSH=09=09=090x0008
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED flush_cp;
+-#define FLUSH_CP_SIZE 2
+-
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-} QEMU_PACKED flush_rp;
+-#define FLUSH_RP_SIZE 3
+-
+-#define OCF_READ_PIN_TYPE=09=090x0009
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09pin_type;
+-} QEMU_PACKED read_pin_type_rp;
+-#define READ_PIN_TYPE_RP_SIZE 2
+-
+-#define OCF_WRITE_PIN_TYPE=09=090x000A
+-typedef struct {
+-    uint8_t=09pin_type;
+-} QEMU_PACKED write_pin_type_cp;
+-#define WRITE_PIN_TYPE_CP_SIZE 1
+-
+-#define OCF_CREATE_NEW_UNIT_KEY=09=090x000B
+-
+-#define OCF_READ_STORED_LINK_KEY=090x000D
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09read_all;
+-} QEMU_PACKED read_stored_link_key_cp;
+-#define READ_STORED_LINK_KEY_CP_SIZE 7
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09max_keys;
+-    uint16_t=09num_keys;
+-} QEMU_PACKED read_stored_link_key_rp;
+-#define READ_STORED_LINK_KEY_RP_SIZE 5
+-
+-#define OCF_WRITE_STORED_LINK_KEY=090x0011
+-typedef struct {
+-    uint8_t=09num_keys;
+-    /* variable length part */
+-} QEMU_PACKED write_stored_link_key_cp;
+-#define WRITE_STORED_LINK_KEY_CP_SIZE 1
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09num_keys;
+-} QEMU_PACKED write_stored_link_key_rp;
+-#define READ_WRITE_LINK_KEY_RP_SIZE 2
+-
+-#define OCF_DELETE_STORED_LINK_KEY=090x0012
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09delete_all;
+-} QEMU_PACKED delete_stored_link_key_cp;
+-#define DELETE_STORED_LINK_KEY_CP_SIZE 7
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09num_keys;
+-} QEMU_PACKED delete_stored_link_key_rp;
+-#define DELETE_STORED_LINK_KEY_RP_SIZE 3
+-
+-#define OCF_CHANGE_LOCAL_NAME=09=090x0013
+-typedef struct {
+-    char=09name[248];
+-} QEMU_PACKED change_local_name_cp;
+-#define CHANGE_LOCAL_NAME_CP_SIZE 248=20
+-
+-#define OCF_READ_LOCAL_NAME=09=090x0014
+-typedef struct {
+-    uint8_t=09status;
+-    char=09name[248];
+-} QEMU_PACKED read_local_name_rp;
+-#define READ_LOCAL_NAME_RP_SIZE 249=20
+-
+-#define OCF_READ_CONN_ACCEPT_TIMEOUT=090x0015
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09timeout;
+-} QEMU_PACKED read_conn_accept_timeout_rp;
+-#define READ_CONN_ACCEPT_TIMEOUT_RP_SIZE 3
+-
+-#define OCF_WRITE_CONN_ACCEPT_TIMEOUT=090x0016
+-typedef struct {
+-    uint16_t=09timeout;
+-} QEMU_PACKED write_conn_accept_timeout_cp;
+-#define WRITE_CONN_ACCEPT_TIMEOUT_CP_SIZE 2
+-
+-#define OCF_READ_PAGE_TIMEOUT=09=090x0017
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09timeout;
+-} QEMU_PACKED read_page_timeout_rp;
+-#define READ_PAGE_TIMEOUT_RP_SIZE 3
+-
+-#define OCF_WRITE_PAGE_TIMEOUT=09=090x0018
+-typedef struct {
+-    uint16_t=09timeout;
+-} QEMU_PACKED write_page_timeout_cp;
+-#define WRITE_PAGE_TIMEOUT_CP_SIZE 2
+-
+-#define OCF_READ_SCAN_ENABLE=09=090x0019
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09enable;
+-} QEMU_PACKED read_scan_enable_rp;
+-#define READ_SCAN_ENABLE_RP_SIZE 2
+-
+-#define OCF_WRITE_SCAN_ENABLE=09=090x001A
+-typedef struct {
+-    uint8_t=09scan_enable;
+-} QEMU_PACKED write_scan_enable_cp;
+-#define WRITE_SCAN_ENABLE_CP_SIZE 1
+-
+-enum scan_enable_bits {
+-    SCAN_DISABLED=09=09=3D 0,
+-    SCAN_INQUIRY=09=09=3D 1 << 0,
+-    SCAN_PAGE=09=09=09=3D 1 << 1,
+-};
+-
+-#define OCF_READ_PAGE_ACTIVITY=09=090x001B
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09interval;
+-    uint16_t=09window;
+-} QEMU_PACKED read_page_activity_rp;
+-#define READ_PAGE_ACTIVITY_RP_SIZE 5
+-
+-#define OCF_WRITE_PAGE_ACTIVITY=09=090x001C
+-typedef struct {
+-    uint16_t=09interval;
+-    uint16_t=09window;
+-} QEMU_PACKED write_page_activity_cp;
+-#define WRITE_PAGE_ACTIVITY_CP_SIZE 4
+-
+-#define OCF_READ_INQ_ACTIVITY=09=090x001D
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09interval;
+-    uint16_t=09window;
+-} QEMU_PACKED read_inq_activity_rp;
+-#define READ_INQ_ACTIVITY_RP_SIZE 5
+-
+-#define OCF_WRITE_INQ_ACTIVITY=09=090x001E
+-typedef struct {
+-    uint16_t=09interval;
+-    uint16_t=09window;
+-} QEMU_PACKED write_inq_activity_cp;
+-#define WRITE_INQ_ACTIVITY_CP_SIZE 4
+-
+-#define OCF_READ_AUTH_ENABLE=09=090x001F
+-
+-#define OCF_WRITE_AUTH_ENABLE=09=090x0020
+-
+-#define AUTH_DISABLED=09=090x00
+-#define AUTH_ENABLED=09=090x01
+-
+-#define OCF_READ_ENCRYPT_MODE=09=090x0021
+-
+-#define OCF_WRITE_ENCRYPT_MODE=09=090x0022
+-
+-#define ENCRYPT_DISABLED=090x00
+-#define ENCRYPT_P2P=09=090x01
+-#define ENCRYPT_BOTH=09=090x02
+-
+-#define OCF_READ_CLASS_OF_DEV=09=090x0023
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09dev_class[3];
+-} QEMU_PACKED read_class_of_dev_rp;
+-#define READ_CLASS_OF_DEV_RP_SIZE 4=20
+-
+-#define OCF_WRITE_CLASS_OF_DEV=09=090x0024
+-typedef struct {
+-    uint8_t=09dev_class[3];
+-} QEMU_PACKED write_class_of_dev_cp;
+-#define WRITE_CLASS_OF_DEV_CP_SIZE 3
+-
+-#define OCF_READ_VOICE_SETTING=09=090x0025
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09voice_setting;
+-} QEMU_PACKED read_voice_setting_rp;
+-#define READ_VOICE_SETTING_RP_SIZE 3
+-
+-#define OCF_WRITE_VOICE_SETTING=09=090x0026
+-typedef struct {
+-    uint16_t=09voice_setting;
+-} QEMU_PACKED write_voice_setting_cp;
+-#define WRITE_VOICE_SETTING_CP_SIZE 2
+-
+-#define OCF_READ_AUTOMATIC_FLUSH_TIMEOUT=090x0027
+-
+-#define OCF_WRITE_AUTOMATIC_FLUSH_TIMEOUT=090x0028
+-
+-#define OCF_READ_NUM_BROADCAST_RETRANS=090x0029
+-
+-#define OCF_WRITE_NUM_BROADCAST_RETRANS=090x002A
+-
+-#define OCF_READ_HOLD_MODE_ACTIVITY=090x002B
+-
+-#define OCF_WRITE_HOLD_MODE_ACTIVITY=090x002C
+-
+-#define OCF_READ_TRANSMIT_POWER_LEVEL=090x002D
+-typedef struct {
+-    uint16_t=09handle;
+-    uint8_t=09type;
+-} QEMU_PACKED read_transmit_power_level_cp;
+-#define READ_TRANSMIT_POWER_LEVEL_CP_SIZE 3
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    int8_t=09level;
+-} QEMU_PACKED read_transmit_power_level_rp;
+-#define READ_TRANSMIT_POWER_LEVEL_RP_SIZE 4
+-
+-#define OCF_HOST_BUFFER_SIZE=09=090x0033
+-typedef struct {
+-    uint16_t=09acl_mtu;
+-    uint8_t=09sco_mtu;
+-    uint16_t=09acl_max_pkt;
+-    uint16_t=09sco_max_pkt;
+-} QEMU_PACKED host_buffer_size_cp;
+-#define HOST_BUFFER_SIZE_CP_SIZE 7
+-
+-#define OCF_HOST_NUMBER_OF_COMPLETED_PACKETS=090x0035
+-
+-#define OCF_READ_LINK_SUPERVISION_TIMEOUT=090x0036
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint16_t=09link_sup_to;
+-} QEMU_PACKED read_link_supervision_timeout_rp;
+-#define READ_LINK_SUPERVISION_TIMEOUT_RP_SIZE 5
+-
+-#define OCF_WRITE_LINK_SUPERVISION_TIMEOUT=090x0037
+-typedef struct {
+-    uint16_t=09handle;
+-    uint16_t=09link_sup_to;
+-} QEMU_PACKED write_link_supervision_timeout_cp;
+-#define WRITE_LINK_SUPERVISION_TIMEOUT_CP_SIZE 4
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-} QEMU_PACKED write_link_supervision_timeout_rp;
+-#define WRITE_LINK_SUPERVISION_TIMEOUT_RP_SIZE 3
+-
+-#define OCF_READ_NUM_SUPPORTED_IAC=090x0038
+-
+-#define MAX_IAC_LAP 0x40
+-#define OCF_READ_CURRENT_IAC_LAP=090x0039
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09num_current_iac;
+-    uint8_t=09lap[MAX_IAC_LAP][3];
+-} QEMU_PACKED read_current_iac_lap_rp;
+-#define READ_CURRENT_IAC_LAP_RP_SIZE 2+3*MAX_IAC_LAP
+-
+-#define OCF_WRITE_CURRENT_IAC_LAP=090x003A
+-typedef struct {
+-    uint8_t=09num_current_iac;
+-    uint8_t=09lap[MAX_IAC_LAP][3];
+-} QEMU_PACKED write_current_iac_lap_cp;
+-#define WRITE_CURRENT_IAC_LAP_CP_SIZE 1+3*MAX_IAC_LAP
+-
+-#define OCF_READ_PAGE_SCAN_PERIOD_MODE=090x003B
+-
+-#define OCF_WRITE_PAGE_SCAN_PERIOD_MODE=090x003C
+-
+-#define OCF_READ_PAGE_SCAN_MODE=09=090x003D
+-
+-#define OCF_WRITE_PAGE_SCAN_MODE=090x003E
+-
+-#define OCF_SET_AFH_CLASSIFICATION=090x003F
+-typedef struct {
+-    uint8_t=09map[10];
+-} QEMU_PACKED set_afh_classification_cp;
+-#define SET_AFH_CLASSIFICATION_CP_SIZE 10
+-typedef struct {
+-    uint8_t=09status;
+-} QEMU_PACKED set_afh_classification_rp;
+-#define SET_AFH_CLASSIFICATION_RP_SIZE 1
+-
+-#define OCF_READ_INQUIRY_SCAN_TYPE=090x0042
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09type;
+-} QEMU_PACKED read_inquiry_scan_type_rp;
+-#define READ_INQUIRY_SCAN_TYPE_RP_SIZE 2
+-
+-#define OCF_WRITE_INQUIRY_SCAN_TYPE=090x0043
+-typedef struct {
+-    uint8_t=09type;
+-} QEMU_PACKED write_inquiry_scan_type_cp;
+-#define WRITE_INQUIRY_SCAN_TYPE_CP_SIZE 1
+-typedef struct {
+-    uint8_t=09status;
+-} QEMU_PACKED write_inquiry_scan_type_rp;
+-#define WRITE_INQUIRY_SCAN_TYPE_RP_SIZE 1
+-
+-#define OCF_READ_INQUIRY_MODE=09=090x0044
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09mode;
+-} QEMU_PACKED read_inquiry_mode_rp;
+-#define READ_INQUIRY_MODE_RP_SIZE 2
+-
+-#define OCF_WRITE_INQUIRY_MODE=09=090x0045
+-typedef struct {
+-    uint8_t=09mode;
+-} QEMU_PACKED write_inquiry_mode_cp;
+-#define WRITE_INQUIRY_MODE_CP_SIZE 1
+-typedef struct {
+-    uint8_t=09status;
+-} QEMU_PACKED write_inquiry_mode_rp;
+-#define WRITE_INQUIRY_MODE_RP_SIZE 1
+-
+-#define OCF_READ_PAGE_SCAN_TYPE=09=090x0046
+-
+-#define OCF_WRITE_PAGE_SCAN_TYPE=090x0047
+-
+-#define OCF_READ_AFH_MODE=09=090x0048
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09mode;
+-} QEMU_PACKED read_afh_mode_rp;
+-#define READ_AFH_MODE_RP_SIZE 2
+-
+-#define OCF_WRITE_AFH_MODE=09=090x0049
+-typedef struct {
+-    uint8_t=09mode;
+-} QEMU_PACKED write_afh_mode_cp;
+-#define WRITE_AFH_MODE_CP_SIZE 1
+-typedef struct {
+-    uint8_t=09status;
+-} QEMU_PACKED write_afh_mode_rp;
+-#define WRITE_AFH_MODE_RP_SIZE 1
+-
+-#define OCF_READ_EXT_INQUIRY_RESPONSE=090x0051
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09fec;
+-    uint8_t=09data[240];
+-} QEMU_PACKED read_ext_inquiry_response_rp;
+-#define READ_EXT_INQUIRY_RESPONSE_RP_SIZE 242
+-
+-#define OCF_WRITE_EXT_INQUIRY_RESPONSE=090x0052
+-typedef struct {
+-    uint8_t=09fec;
+-    uint8_t=09data[240];
+-} QEMU_PACKED write_ext_inquiry_response_cp;
+-#define WRITE_EXT_INQUIRY_RESPONSE_CP_SIZE 241
+-typedef struct {
+-    uint8_t=09status;
+-} QEMU_PACKED write_ext_inquiry_response_rp;
+-#define WRITE_EXT_INQUIRY_RESPONSE_RP_SIZE 1
+-
+-/* Informational Parameters */
+-#define OGF_INFO_PARAM=09=090x04
+-
+-#define OCF_READ_LOCAL_VERSION=09=090x0001
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09hci_ver;
+-    uint16_t=09hci_rev;
+-    uint8_t=09lmp_ver;
+-    uint16_t=09manufacturer;
+-    uint16_t=09lmp_subver;
+-} QEMU_PACKED read_local_version_rp;
+-#define READ_LOCAL_VERSION_RP_SIZE 9
+-
+-#define OCF_READ_LOCAL_COMMANDS=09=090x0002
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09commands[64];
+-} QEMU_PACKED read_local_commands_rp;
+-#define READ_LOCAL_COMMANDS_RP_SIZE 65
+-
+-#define OCF_READ_LOCAL_FEATURES=09=090x0003
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09features[8];
+-} QEMU_PACKED read_local_features_rp;
+-#define READ_LOCAL_FEATURES_RP_SIZE 9
+-
+-#define OCF_READ_LOCAL_EXT_FEATURES=090x0004
+-typedef struct {
+-    uint8_t=09page_num;
+-} QEMU_PACKED read_local_ext_features_cp;
+-#define READ_LOCAL_EXT_FEATURES_CP_SIZE 1
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09page_num;
+-    uint8_t=09max_page_num;
+-    uint8_t=09features[8];
+-} QEMU_PACKED read_local_ext_features_rp;
+-#define READ_LOCAL_EXT_FEATURES_RP_SIZE 11
+-
+-#define OCF_READ_BUFFER_SIZE=09=090x0005
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09acl_mtu;
+-    uint8_t=09sco_mtu;
+-    uint16_t=09acl_max_pkt;
+-    uint16_t=09sco_max_pkt;
+-} QEMU_PACKED read_buffer_size_rp;
+-#define READ_BUFFER_SIZE_RP_SIZE 8
+-
+-#define OCF_READ_COUNTRY_CODE=09=090x0007
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09country_code;
+-} QEMU_PACKED read_country_code_rp;
+-#define READ_COUNTRY_CODE_RP_SIZE 2
+-
+-#define OCF_READ_BD_ADDR=09=090x0009
+-typedef struct {
+-    uint8_t=09status;
+-    bdaddr_t=09bdaddr;
+-} QEMU_PACKED read_bd_addr_rp;
+-#define READ_BD_ADDR_RP_SIZE 7
+-
+-/* Status params */
+-#define OGF_STATUS_PARAM=090x05
+-
+-#define OCF_READ_FAILED_CONTACT_COUNTER=09=090x0001
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09counter;
+-} QEMU_PACKED read_failed_contact_counter_rp;
+-#define READ_FAILED_CONTACT_COUNTER_RP_SIZE 4
+-
+-#define OCF_RESET_FAILED_CONTACT_COUNTER=090x0002
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-} QEMU_PACKED reset_failed_contact_counter_rp;
+-#define RESET_FAILED_CONTACT_COUNTER_RP_SIZE 3
+-
+-#define OCF_READ_LINK_QUALITY=09=090x0003
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED read_link_quality_cp;
+-#define READ_LINK_QUALITY_CP_SIZE 2
+-
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09link_quality;
+-} QEMU_PACKED read_link_quality_rp;
+-#define READ_LINK_QUALITY_RP_SIZE 4
+-
+-#define OCF_READ_RSSI=09=09=090x0005
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    int8_t=09rssi;
+-} QEMU_PACKED read_rssi_rp;
+-#define READ_RSSI_RP_SIZE 4
+-
+-#define OCF_READ_AFH_MAP=09=090x0006
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09mode;
+-    uint8_t=09map[10];
+-} QEMU_PACKED read_afh_map_rp;
+-#define READ_AFH_MAP_RP_SIZE 14
+-
+-#define OCF_READ_CLOCK=09=09=090x0007
+-typedef struct {
+-    uint16_t=09handle;
+-    uint8_t=09which_clock;
+-} QEMU_PACKED read_clock_cp;
+-#define READ_CLOCK_CP_SIZE 3
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint32_t=09clock;
+-    uint16_t=09accuracy;
+-} QEMU_PACKED read_clock_rp;
+-#define READ_CLOCK_RP_SIZE 9
+-
+-/* Testing commands */
+-#define OGF_TESTING_CMD=09=090x3e
+-
+-/* Vendor specific commands */
+-#define OGF_VENDOR_CMD=09=090x3f
+-
+-/* HCI Events */
+-
+-#define EVT_INQUIRY_COMPLETE=09=090x01
+-
+-#define EVT_INQUIRY_RESULT=09=090x02
+-typedef struct {
+-    uint8_t=09num_responses;
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09pscan_rep_mode;
+-    uint8_t=09pscan_period_mode;
+-    uint8_t=09pscan_mode;
+-    uint8_t=09dev_class[3];
+-    uint16_t=09clock_offset;
+-} QEMU_PACKED inquiry_info;
+-#define INQUIRY_INFO_SIZE 15
+-
+-#define EVT_CONN_COMPLETE=09=090x03
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09link_type;
+-    uint8_t=09encr_mode;
+-} QEMU_PACKED evt_conn_complete;
+-#define EVT_CONN_COMPLETE_SIZE 11
+-
+-#define EVT_CONN_REQUEST=09=090x04
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09dev_class[3];
+-    uint8_t=09link_type;
+-} QEMU_PACKED evt_conn_request;
+-#define EVT_CONN_REQUEST_SIZE 10
+-
+-#define EVT_DISCONN_COMPLETE=09=090x05
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09reason;
+-} QEMU_PACKED evt_disconn_complete;
+-#define EVT_DISCONN_COMPLETE_SIZE 4
+-
+-#define EVT_AUTH_COMPLETE=09=090x06
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-} QEMU_PACKED evt_auth_complete;
+-#define EVT_AUTH_COMPLETE_SIZE 3
+-
+-#define EVT_REMOTE_NAME_REQ_COMPLETE=090x07
+-typedef struct {
+-    uint8_t=09status;
+-    bdaddr_t=09bdaddr;
+-    char=09name[248];
+-} QEMU_PACKED evt_remote_name_req_complete;
+-#define EVT_REMOTE_NAME_REQ_COMPLETE_SIZE 255
+-
+-#define EVT_ENCRYPT_CHANGE=09=090x08
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09encrypt;
+-} QEMU_PACKED evt_encrypt_change;
+-#define EVT_ENCRYPT_CHANGE_SIZE 4
+-
+-#define EVT_CHANGE_CONN_LINK_KEY_COMPLETE=090x09
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-}  QEMU_PACKED evt_change_conn_link_key_complete;
+-#define EVT_CHANGE_CONN_LINK_KEY_COMPLETE_SIZE 3
+-
+-#define EVT_MASTER_LINK_KEY_COMPLETE=09=090x0A
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09key_flag;
+-} QEMU_PACKED evt_master_link_key_complete;
+-#define EVT_MASTER_LINK_KEY_COMPLETE_SIZE 4
+-
+-#define EVT_READ_REMOTE_FEATURES_COMPLETE=090x0B
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09features[8];
+-} QEMU_PACKED evt_read_remote_features_complete;
+-#define EVT_READ_REMOTE_FEATURES_COMPLETE_SIZE 11
+-
+-#define EVT_READ_REMOTE_VERSION_COMPLETE=090x0C
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09lmp_ver;
+-    uint16_t=09manufacturer;
+-    uint16_t=09lmp_subver;
+-} QEMU_PACKED evt_read_remote_version_complete;
+-#define EVT_READ_REMOTE_VERSION_COMPLETE_SIZE 8
+-
+-#define EVT_QOS_SETUP_COMPLETE=09=090x0D
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09flags;=09=09=09/* Reserved */
+-    hci_qos=09qos;
+-} QEMU_PACKED evt_qos_setup_complete;
+-#define EVT_QOS_SETUP_COMPLETE_SIZE (4 + HCI_QOS_CP_SIZE)
+-
+-#define EVT_CMD_COMPLETE =09=090x0E
+-typedef struct {
+-    uint8_t=09ncmd;
+-    uint16_t=09opcode;
+-} QEMU_PACKED evt_cmd_complete;
+-#define EVT_CMD_COMPLETE_SIZE 3
+-
+-#define EVT_CMD_STATUS =09=09=090x0F
+-typedef struct {
+-    uint8_t=09status;
+-    uint8_t=09ncmd;
+-    uint16_t=09opcode;
+-} QEMU_PACKED evt_cmd_status;
+-#define EVT_CMD_STATUS_SIZE 4
+-
+-#define EVT_HARDWARE_ERROR=09=090x10
+-typedef struct {
+-    uint8_t=09code;
+-} QEMU_PACKED evt_hardware_error;
+-#define EVT_HARDWARE_ERROR_SIZE 1
+-
+-#define EVT_FLUSH_OCCURRED=09=090x11
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED evt_flush_occurred;
+-#define EVT_FLUSH_OCCURRED_SIZE 2
+-
+-#define EVT_ROLE_CHANGE=09=09=090x12
+-typedef struct {
+-    uint8_t=09status;
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09role;
+-} QEMU_PACKED evt_role_change;
+-#define EVT_ROLE_CHANGE_SIZE 8
+-
+-#define EVT_NUM_COMP_PKTS=09=090x13
+-typedef struct {
+-    uint8_t=09num_hndl;
+-    struct {
+-        uint16_t handle;
+-        uint16_t num_packets;
+-    } connection[0];
+-} QEMU_PACKED evt_num_comp_pkts;
+-#define EVT_NUM_COMP_PKTS_SIZE(num_hndl) (1 + 4 * (num_hndl))
+-
+-#define EVT_MODE_CHANGE=09=09=090x14
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09mode;
+-    uint16_t=09interval;
+-} QEMU_PACKED evt_mode_change;
+-#define EVT_MODE_CHANGE_SIZE 6
+-
+-#define EVT_RETURN_LINK_KEYS=09=090x15
+-typedef struct {
+-    uint8_t=09num_keys;
+-    /* variable length part */
+-} QEMU_PACKED evt_return_link_keys;
+-#define EVT_RETURN_LINK_KEYS_SIZE 1
+-
+-#define EVT_PIN_CODE_REQ=09=090x16
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-} QEMU_PACKED evt_pin_code_req;
+-#define EVT_PIN_CODE_REQ_SIZE 6
+-
+-#define EVT_LINK_KEY_REQ=09=090x17
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-} QEMU_PACKED evt_link_key_req;
+-#define EVT_LINK_KEY_REQ_SIZE 6
+-
+-#define EVT_LINK_KEY_NOTIFY=09=090x18
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09link_key[16];
+-    uint8_t=09key_type;
+-} QEMU_PACKED evt_link_key_notify;
+-#define EVT_LINK_KEY_NOTIFY_SIZE 23
+-
+-#define EVT_LOOPBACK_COMMAND=09=090x19
+-
+-#define EVT_DATA_BUFFER_OVERFLOW=090x1A
+-typedef struct {
+-    uint8_t=09link_type;
+-} QEMU_PACKED evt_data_buffer_overflow;
+-#define EVT_DATA_BUFFER_OVERFLOW_SIZE 1
+-
+-#define EVT_MAX_SLOTS_CHANGE=09=090x1B
+-typedef struct {
+-    uint16_t=09handle;
+-    uint8_t=09max_slots;
+-} QEMU_PACKED evt_max_slots_change;
+-#define EVT_MAX_SLOTS_CHANGE_SIZE 3
+-
+-#define EVT_READ_CLOCK_OFFSET_COMPLETE=090x1C
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint16_t=09clock_offset;
+-} QEMU_PACKED evt_read_clock_offset_complete;
+-#define EVT_READ_CLOCK_OFFSET_COMPLETE_SIZE 5
+-
+-#define EVT_CONN_PTYPE_CHANGED=09=090x1D
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint16_t=09ptype;
+-} QEMU_PACKED evt_conn_ptype_changed;
+-#define EVT_CONN_PTYPE_CHANGED_SIZE 5
+-
+-#define EVT_QOS_VIOLATION=09=090x1E
+-typedef struct {
+-    uint16_t=09handle;
+-} QEMU_PACKED evt_qos_violation;
+-#define EVT_QOS_VIOLATION_SIZE 2
+-
+-#define EVT_PSCAN_REP_MODE_CHANGE=090x20
+-typedef struct {
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09pscan_rep_mode;
+-} QEMU_PACKED evt_pscan_rep_mode_change;
+-#define EVT_PSCAN_REP_MODE_CHANGE_SIZE 7
+-
+-#define EVT_FLOW_SPEC_COMPLETE=09=090x21
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09flags;
+-    uint8_t=09direction;
+-    hci_qos=09qos;
+-} QEMU_PACKED evt_flow_spec_complete;
+-#define EVT_FLOW_SPEC_COMPLETE_SIZE (5 + HCI_QOS_CP_SIZE)
+-
+-#define EVT_INQUIRY_RESULT_WITH_RSSI=090x22
+-typedef struct {
+-    uint8_t=09num_responses;
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09pscan_rep_mode;
+-    uint8_t=09pscan_period_mode;
+-    uint8_t=09dev_class[3];
+-    uint16_t=09clock_offset;
+-    int8_t=09rssi;
+-} QEMU_PACKED inquiry_info_with_rssi;
+-#define INQUIRY_INFO_WITH_RSSI_SIZE 15
+-typedef struct {
+-    uint8_t=09num_responses;
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09pscan_rep_mode;
+-    uint8_t=09pscan_period_mode;
+-    uint8_t=09pscan_mode;
+-    uint8_t=09dev_class[3];
+-    uint16_t=09clock_offset;
+-    int8_t=09rssi;
+-} QEMU_PACKED inquiry_info_with_rssi_and_pscan_mode;
+-#define INQUIRY_INFO_WITH_RSSI_AND_PSCAN_MODE_SIZE 16
+-
+-#define EVT_READ_REMOTE_EXT_FEATURES_COMPLETE=090x23
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09page_num;
+-    uint8_t=09max_page_num;
+-    uint8_t=09features[8];
+-} QEMU_PACKED evt_read_remote_ext_features_complete;
+-#define EVT_READ_REMOTE_EXT_FEATURES_COMPLETE_SIZE 13
+-
+-#define EVT_SYNC_CONN_COMPLETE=09=090x2C
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    bdaddr_t=09bdaddr;
+-    uint8_t=09link_type;
+-    uint8_t=09trans_interval;
+-    uint8_t=09retrans_window;
+-    uint16_t=09rx_pkt_len;
+-    uint16_t=09tx_pkt_len;
+-    uint8_t=09air_mode;
+-} QEMU_PACKED evt_sync_conn_complete;
+-#define EVT_SYNC_CONN_COMPLETE_SIZE 17
+-
+-#define EVT_SYNC_CONN_CHANGED=09=090x2D
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint8_t=09trans_interval;
+-    uint8_t=09retrans_window;
+-    uint16_t=09rx_pkt_len;
+-    uint16_t=09tx_pkt_len;
+-} QEMU_PACKED evt_sync_conn_changed;
+-#define EVT_SYNC_CONN_CHANGED_SIZE 9
+-
+-#define EVT_SNIFF_SUBRATE=09=090x2E
+-typedef struct {
+-    uint8_t=09status;
+-    uint16_t=09handle;
+-    uint16_t=09max_remote_latency;
+-    uint16_t=09max_local_latency;
+-    uint16_t=09min_remote_timeout;
+-    uint16_t=09min_local_timeout;
+-} QEMU_PACKED evt_sniff_subrate;
+-#define EVT_SNIFF_SUBRATE_SIZE 11
+-
+-#define EVT_TESTING=09=09=090xFE
+-
+-#define EVT_VENDOR=09=09=090xFF
+-
+-/* Command opcode pack/unpack */
+-#define cmd_opcode_pack(ogf, ocf)=09(uint16_t)((ocf & 0x03ff)|(ogf << 10))
+-#define cmd_opcode_ogf(op)=09=09(op >> 10)
+-#define cmd_opcode_ocf(op)=09=09(op & 0x03ff)
+-
+-/* ACL handle and flags pack/unpack */
+-#define acl_handle_pack(h, f)=09(uint16_t)(((h) & 0x0fff)|((f) << 12))
+-#define acl_handle(h)=09=09((h) & 0x0fff)
+-#define acl_flags(h)=09=09((h) >> 12)
+-
+-/* HCI Packet structures */
+-#define HCI_COMMAND_HDR_SIZE=093
+-#define HCI_EVENT_HDR_SIZE=092
+-#define HCI_ACL_HDR_SIZE=094
+-#define HCI_SCO_HDR_SIZE=093
+-
+-struct hci_command_hdr {
+-    uint16_t =09opcode;=09=09/* OCF & OGF */
+-    uint8_t=09plen;
+-} QEMU_PACKED;
+-
+-struct hci_event_hdr {
+-    uint8_t=09evt;
+-    uint8_t=09plen;
+-} QEMU_PACKED;
+-
+-struct hci_acl_hdr {
+-    uint16_t=09handle;=09=09/* Handle & Flags(PB, BC) */
+-    uint16_t=09dlen;
+-} QEMU_PACKED;
+-
+-struct hci_sco_hdr {
+-    uint16_t=09handle;
+-    uint8_t=09dlen;
+-} QEMU_PACKED;
+-
+-/* L2CAP layer defines */
+-
+-enum bt_l2cap_lm_bits {
+-    L2CAP_LM_MASTER=09=3D 1 << 0,
+-    L2CAP_LM_AUTH=09=3D 1 << 1,
+-    L2CAP_LM_ENCRYPT=09=3D 1 << 2,
+-    L2CAP_LM_TRUSTED=09=3D 1 << 3,
+-    L2CAP_LM_RELIABLE=09=3D 1 << 4,
+-    L2CAP_LM_SECURE=09=3D 1 << 5,
+-};
+-
+-enum bt_l2cap_cid_predef {
+-    L2CAP_CID_INVALID=09=3D 0x0000,
+-    L2CAP_CID_SIGNALLING=3D 0x0001,
+-    L2CAP_CID_GROUP=09=3D 0x0002,
+-    L2CAP_CID_ALLOC=09=3D 0x0040,
+-};
+-
+-/* L2CAP command codes */
+-enum bt_l2cap_cmd {
+-    L2CAP_COMMAND_REJ=09=3D 1,
+-    L2CAP_CONN_REQ,
+-    L2CAP_CONN_RSP,
+-    L2CAP_CONF_REQ,
+-    L2CAP_CONF_RSP,
+-    L2CAP_DISCONN_REQ,
+-    L2CAP_DISCONN_RSP,
+-    L2CAP_ECHO_REQ,
+-    L2CAP_ECHO_RSP,
+-    L2CAP_INFO_REQ,
+-    L2CAP_INFO_RSP,
+-};
+-
+-enum bt_l2cap_sar_bits {
+-    L2CAP_SAR_NO_SEG=09=3D 0,
+-    L2CAP_SAR_START,
+-    L2CAP_SAR_END,
+-    L2CAP_SAR_CONT,
+-};
+-
+-/* L2CAP structures */
+-typedef struct {
+-    uint16_t=09len;
+-    uint16_t=09cid;
+-    uint8_t=09data[0];
+-} QEMU_PACKED l2cap_hdr;
+-#define L2CAP_HDR_SIZE 4
+-
+-typedef struct {
+-    uint8_t=09code;
+-    uint8_t=09ident;
+-    uint16_t=09len;
+-} QEMU_PACKED l2cap_cmd_hdr;
+-#define L2CAP_CMD_HDR_SIZE 4
+-
+-typedef struct {
+-    uint16_t=09reason;
+-} QEMU_PACKED l2cap_cmd_rej;
+-#define L2CAP_CMD_REJ_SIZE 2
+-
+-typedef struct {
+-    uint16_t=09dcid;
+-    uint16_t=09scid;
+-} QEMU_PACKED l2cap_cmd_rej_cid;
+-#define L2CAP_CMD_REJ_CID_SIZE 4
+-
+-/* reject reason */
+-enum bt_l2cap_rej_reason {
+-    L2CAP_REJ_CMD_NOT_UNDERSTOOD =3D 0,
+-    L2CAP_REJ_SIG_TOOBIG,
+-    L2CAP_REJ_CID_INVAL,
+-};
+-
+-typedef struct {
+-    uint16_t=09psm;
+-    uint16_t=09scid;
+-} QEMU_PACKED l2cap_conn_req;
+-#define L2CAP_CONN_REQ_SIZE 4
+-
+-typedef struct {
+-    uint16_t=09dcid;
+-    uint16_t=09scid;
+-    uint16_t=09result;
+-    uint16_t=09status;
+-} QEMU_PACKED l2cap_conn_rsp;
+-#define L2CAP_CONN_RSP_SIZE 8
+-
+-/* connect result */
+-enum bt_l2cap_conn_res {
+-    L2CAP_CR_SUCCESS=09=3D 0,
+-    L2CAP_CR_PEND,
+-    L2CAP_CR_BAD_PSM,
+-    L2CAP_CR_SEC_BLOCK,
+-    L2CAP_CR_NO_MEM,
+-};
+-
+-/* connect status */
+-enum bt_l2cap_conn_stat {
+-    L2CAP_CS_NO_INFO=09=3D 0,
+-    L2CAP_CS_AUTHEN_PEND,
+-    L2CAP_CS_AUTHOR_PEND,
+-};
+-
+-typedef struct {
+-    uint16_t=09dcid;
+-    uint16_t=09flags;
+-    uint8_t=09data[0];
+-} QEMU_PACKED l2cap_conf_req;
+-#define L2CAP_CONF_REQ_SIZE(datalen) (4 + (datalen))
+-
+-typedef struct {
+-    uint16_t=09scid;
+-    uint16_t=09flags;
+-    uint16_t=09result;
+-    uint8_t=09data[0];
+-} QEMU_PACKED l2cap_conf_rsp;
+-#define L2CAP_CONF_RSP_SIZE(datalen) (6 + datalen)
+-
+-enum bt_l2cap_conf_res {
+-    L2CAP_CONF_SUCCESS=09=3D 0,
+-    L2CAP_CONF_UNACCEPT,
+-    L2CAP_CONF_REJECT,
+-    L2CAP_CONF_UNKNOWN,
+-};
+-
+-typedef struct {
+-    uint8_t=09type;
+-    uint8_t=09len;
+-    uint8_t=09val[0];
+-} QEMU_PACKED l2cap_conf_opt;
+-#define L2CAP_CONF_OPT_SIZE 2
+-
+-enum bt_l2cap_conf_val {
+-    L2CAP_CONF_MTU=09=3D 1,
+-    L2CAP_CONF_FLUSH_TO,
+-    L2CAP_CONF_QOS,
+-    L2CAP_CONF_RFC,
+-    L2CAP_CONF_RFC_MODE=09=3D L2CAP_CONF_RFC,
+-};
+-
+-typedef struct {
+-    uint8_t=09flags;
+-    uint8_t=09service_type;
+-    uint32_t=09token_rate;
+-    uint32_t=09token_bucket_size;
+-    uint32_t=09peak_bandwidth;
+-    uint32_t=09latency;
+-    uint32_t=09delay_variation;
+-} QEMU_PACKED l2cap_conf_opt_qos;
+-#define L2CAP_CONF_OPT_QOS_SIZE 22
+-
+-enum bt_l2cap_conf_opt_qos_st {
+-    L2CAP_CONF_QOS_NO_TRAFFIC =3D 0x00,
+-    L2CAP_CONF_QOS_BEST_EFFORT,
+-    L2CAP_CONF_QOS_GUARANTEED,
+-};
+-
+-#define L2CAP_CONF_QOS_WILDCARD=090xffffffff
+-
+-enum bt_l2cap_mode {
+-    L2CAP_MODE_BASIC=09=3D 0,
+-    L2CAP_MODE_RETRANS=09=3D 1,
+-    L2CAP_MODE_FLOWCTL=09=3D 2,
+-};
+-
+-typedef struct {
+-    uint16_t=09dcid;
+-    uint16_t=09scid;
+-} QEMU_PACKED l2cap_disconn_req;
+-#define L2CAP_DISCONN_REQ_SIZE 4
+-
+-typedef struct {
+-    uint16_t=09dcid;
+-    uint16_t=09scid;
+-} QEMU_PACKED l2cap_disconn_rsp;
+-#define L2CAP_DISCONN_RSP_SIZE 4
+-
+-typedef struct {
+-    uint16_t=09type;
+-} QEMU_PACKED l2cap_info_req;
+-#define L2CAP_INFO_REQ_SIZE 2
+-
+-typedef struct {
+-    uint16_t=09type;
+-    uint16_t=09result;
+-    uint8_t=09data[0];
+-} QEMU_PACKED l2cap_info_rsp;
+-#define L2CAP_INFO_RSP_SIZE 4
+-
+-/* info type */
+-enum bt_l2cap_info_type {
+-    L2CAP_IT_CL_MTU=09=3D 1,
+-    L2CAP_IT_FEAT_MASK,
+-};
+-
+-/* info result */
+-enum bt_l2cap_info_result {
+-    L2CAP_IR_SUCCESS=09=3D 0,
+-    L2CAP_IR_NOTSUPP,
+-};
+-
+-/* Service Discovery Protocol defines */
+-/* Note that all multibyte values in lower layer protocols (above in this =
+file)
+- * are little-endian while SDP is big-endian.  */
+-
+-/* Protocol UUIDs */
+-enum sdp_proto_uuid {
+-    SDP_UUID=09=09=3D 0x0001,
+-    UDP_UUID=09=09=3D 0x0002,
+-    RFCOMM_UUID=09=09=3D 0x0003,
+-    TCP_UUID=09=09=3D 0x0004,
+-    TCS_BIN_UUID=09=3D 0x0005,
+-    TCS_AT_UUID=09=09=3D 0x0006,
+-    OBEX_UUID=09=09=3D 0x0008,
+-    IP_UUID=09=09=3D 0x0009,
+-    FTP_UUID=09=09=3D 0x000a,
+-    HTTP_UUID=09=09=3D 0x000c,
+-    WSP_UUID=09=09=3D 0x000e,
+-    BNEP_UUID=09=09=3D 0x000f,
+-    UPNP_UUID=09=09=3D 0x0010,
+-    HIDP_UUID=09=09=3D 0x0011,
+-    HCRP_CTRL_UUID=09=3D 0x0012,
+-    HCRP_DATA_UUID=09=3D 0x0014,
+-    HCRP_NOTE_UUID=09=3D 0x0016,
+-    AVCTP_UUID=09=09=3D 0x0017,
+-    AVDTP_UUID=09=09=3D 0x0019,
+-    CMTP_UUID=09=09=3D 0x001b,
+-    UDI_UUID=09=09=3D 0x001d,
+-    MCAP_CTRL_UUID=09=3D 0x001e,
+-    MCAP_DATA_UUID=09=3D 0x001f,
+-    L2CAP_UUID=09=09=3D 0x0100,
+-};
+-
+-/*
+- * Service class identifiers of standard services and service groups
+- */
+-enum service_class_id {
+-    SDP_SERVER_SVCLASS_ID=09=09=3D 0x1000,
+-    BROWSE_GRP_DESC_SVCLASS_ID=09=09=3D 0x1001,
+-    PUBLIC_BROWSE_GROUP=09=09=09=3D 0x1002,
+-    SERIAL_PORT_SVCLASS_ID=09=09=3D 0x1101,
+-    LAN_ACCESS_SVCLASS_ID=09=09=3D 0x1102,
+-    DIALUP_NET_SVCLASS_ID=09=09=3D 0x1103,
+-    IRMC_SYNC_SVCLASS_ID=09=09=3D 0x1104,
+-    OBEX_OBJPUSH_SVCLASS_ID=09=09=3D 0x1105,
+-    OBEX_FILETRANS_SVCLASS_ID=09=09=3D 0x1106,
+-    IRMC_SYNC_CMD_SVCLASS_ID=09=09=3D 0x1107,
+-    HEADSET_SVCLASS_ID=09=09=09=3D 0x1108,
+-    CORDLESS_TELEPHONY_SVCLASS_ID=09=3D 0x1109,
+-    AUDIO_SOURCE_SVCLASS_ID=09=09=3D 0x110a,
+-    AUDIO_SINK_SVCLASS_ID=09=09=3D 0x110b,
+-    AV_REMOTE_TARGET_SVCLASS_ID=09=09=3D 0x110c,
+-    ADVANCED_AUDIO_SVCLASS_ID=09=09=3D 0x110d,
+-    AV_REMOTE_SVCLASS_ID=09=09=3D 0x110e,
+-    VIDEO_CONF_SVCLASS_ID=09=09=3D 0x110f,
+-    INTERCOM_SVCLASS_ID=09=09=09=3D 0x1110,
+-    FAX_SVCLASS_ID=09=09=09=3D 0x1111,
+-    HEADSET_AGW_SVCLASS_ID=09=09=3D 0x1112,
+-    WAP_SVCLASS_ID=09=09=09=3D 0x1113,
+-    WAP_CLIENT_SVCLASS_ID=09=09=3D 0x1114,
+-    PANU_SVCLASS_ID=09=09=09=3D 0x1115,
+-    NAP_SVCLASS_ID=09=09=09=3D 0x1116,
+-    GN_SVCLASS_ID=09=09=09=3D 0x1117,
+-    DIRECT_PRINTING_SVCLASS_ID=09=09=3D 0x1118,
+-    REFERENCE_PRINTING_SVCLASS_ID=09=3D 0x1119,
+-    IMAGING_SVCLASS_ID=09=09=09=3D 0x111a,
+-    IMAGING_RESPONDER_SVCLASS_ID=09=3D 0x111b,
+-    IMAGING_ARCHIVE_SVCLASS_ID=09=09=3D 0x111c,
+-    IMAGING_REFOBJS_SVCLASS_ID=09=09=3D 0x111d,
+-    HANDSFREE_SVCLASS_ID=09=09=3D 0x111e,
+-    HANDSFREE_AGW_SVCLASS_ID=09=09=3D 0x111f,
+-    DIRECT_PRT_REFOBJS_SVCLASS_ID=09=3D 0x1120,
+-    REFLECTED_UI_SVCLASS_ID=09=09=3D 0x1121,
+-    BASIC_PRINTING_SVCLASS_ID=09=09=3D 0x1122,
+-    PRINTING_STATUS_SVCLASS_ID=09=09=3D 0x1123,
+-    HID_SVCLASS_ID=09=09=09=3D 0x1124,
+-    HCR_SVCLASS_ID=09=09=09=3D 0x1125,
+-    HCR_PRINT_SVCLASS_ID=09=09=3D 0x1126,
+-    HCR_SCAN_SVCLASS_ID=09=09=09=3D 0x1127,
+-    CIP_SVCLASS_ID=09=09=09=3D 0x1128,
+-    VIDEO_CONF_GW_SVCLASS_ID=09=09=3D 0x1129,
+-    UDI_MT_SVCLASS_ID=09=09=09=3D 0x112a,
+-    UDI_TA_SVCLASS_ID=09=09=09=3D 0x112b,
+-    AV_SVCLASS_ID=09=09=09=3D 0x112c,
+-    SAP_SVCLASS_ID=09=09=09=3D 0x112d,
+-    PBAP_PCE_SVCLASS_ID=09=09=09=3D 0x112e,
+-    PBAP_PSE_SVCLASS_ID=09=09=09=3D 0x112f,
+-    PBAP_SVCLASS_ID=09=09=09=3D 0x1130,
+-    PNP_INFO_SVCLASS_ID=09=09=09=3D 0x1200,
+-    GENERIC_NETWORKING_SVCLASS_ID=09=3D 0x1201,
+-    GENERIC_FILETRANS_SVCLASS_ID=09=3D 0x1202,
+-    GENERIC_AUDIO_SVCLASS_ID=09=09=3D 0x1203,
+-    GENERIC_TELEPHONY_SVCLASS_ID=09=3D 0x1204,
+-    UPNP_SVCLASS_ID=09=09=09=3D 0x1205,
+-    UPNP_IP_SVCLASS_ID=09=09=09=3D 0x1206,
+-    UPNP_PAN_SVCLASS_ID=09=09=09=3D 0x1300,
+-    UPNP_LAP_SVCLASS_ID=09=09=09=3D 0x1301,
+-    UPNP_L2CAP_SVCLASS_ID=09=09=3D 0x1302,
+-    VIDEO_SOURCE_SVCLASS_ID=09=09=3D 0x1303,
+-    VIDEO_SINK_SVCLASS_ID=09=09=3D 0x1304,
+-    VIDEO_DISTRIBUTION_SVCLASS_ID=09=3D 0x1305,
+-    MDP_SVCLASS_ID=09=09=09=3D 0x1400,
+-    MDP_SOURCE_SVCLASS_ID=09=09=3D 0x1401,
+-    MDP_SINK_SVCLASS_ID=09=09=09=3D 0x1402,
+-    APPLE_AGENT_SVCLASS_ID=09=09=3D 0x2112,
+-};
+-
+-/*
+- * Standard profile descriptor identifiers; note these
+- * may be identical to some of the service classes defined above
+- */
+-#define SDP_SERVER_PROFILE_ID=09=09SDP_SERVER_SVCLASS_ID
+-#define BROWSE_GRP_DESC_PROFILE_ID=09BROWSE_GRP_DESC_SVCLASS_ID
+-#define SERIAL_PORT_PROFILE_ID=09=09SERIAL_PORT_SVCLASS_ID
+-#define LAN_ACCESS_PROFILE_ID=09=09LAN_ACCESS_SVCLASS_ID
+-#define DIALUP_NET_PROFILE_ID=09=09DIALUP_NET_SVCLASS_ID
+-#define IRMC_SYNC_PROFILE_ID=09=09IRMC_SYNC_SVCLASS_ID
+-#define OBEX_OBJPUSH_PROFILE_ID=09=09OBEX_OBJPUSH_SVCLASS_ID
+-#define OBEX_FILETRANS_PROFILE_ID=09OBEX_FILETRANS_SVCLASS_ID
+-#define IRMC_SYNC_CMD_PROFILE_ID=09IRMC_SYNC_CMD_SVCLASS_ID
+-#define HEADSET_PROFILE_ID=09=09HEADSET_SVCLASS_ID
+-#define CORDLESS_TELEPHONY_PROFILE_ID=09CORDLESS_TELEPHONY_SVCLASS_ID
+-#define AUDIO_SOURCE_PROFILE_ID=09=09AUDIO_SOURCE_SVCLASS_ID
+-#define AUDIO_SINK_PROFILE_ID=09=09AUDIO_SINK_SVCLASS_ID
+-#define AV_REMOTE_TARGET_PROFILE_ID=09AV_REMOTE_TARGET_SVCLASS_ID
+-#define ADVANCED_AUDIO_PROFILE_ID=09ADVANCED_AUDIO_SVCLASS_ID
+-#define AV_REMOTE_PROFILE_ID=09=09AV_REMOTE_SVCLASS_ID
+-#define VIDEO_CONF_PROFILE_ID=09=09VIDEO_CONF_SVCLASS_ID
+-#define INTERCOM_PROFILE_ID=09=09INTERCOM_SVCLASS_ID
+-#define FAX_PROFILE_ID=09=09=09FAX_SVCLASS_ID
+-#define HEADSET_AGW_PROFILE_ID=09=09HEADSET_AGW_SVCLASS_ID
+-#define WAP_PROFILE_ID=09=09=09WAP_SVCLASS_ID
+-#define WAP_CLIENT_PROFILE_ID=09=09WAP_CLIENT_SVCLASS_ID
+-#define PANU_PROFILE_ID=09=09=09PANU_SVCLASS_ID
+-#define NAP_PROFILE_ID=09=09=09NAP_SVCLASS_ID
+-#define GN_PROFILE_ID=09=09=09GN_SVCLASS_ID
+-#define DIRECT_PRINTING_PROFILE_ID=09DIRECT_PRINTING_SVCLASS_ID
+-#define REFERENCE_PRINTING_PROFILE_ID=09REFERENCE_PRINTING_SVCLASS_ID
+-#define IMAGING_PROFILE_ID=09=09IMAGING_SVCLASS_ID
+-#define IMAGING_RESPONDER_PROFILE_ID=09IMAGING_RESPONDER_SVCLASS_ID
+-#define IMAGING_ARCHIVE_PROFILE_ID=09IMAGING_ARCHIVE_SVCLASS_ID
+-#define IMAGING_REFOBJS_PROFILE_ID=09IMAGING_REFOBJS_SVCLASS_ID
+-#define HANDSFREE_PROFILE_ID=09=09HANDSFREE_SVCLASS_ID
+-#define HANDSFREE_AGW_PROFILE_ID=09HANDSFREE_AGW_SVCLASS_ID
+-#define DIRECT_PRT_REFOBJS_PROFILE_ID=09DIRECT_PRT_REFOBJS_SVCLASS_ID
+-#define REFLECTED_UI_PROFILE_ID=09=09REFLECTED_UI_SVCLASS_ID
+-#define BASIC_PRINTING_PROFILE_ID=09BASIC_PRINTING_SVCLASS_ID
+-#define PRINTING_STATUS_PROFILE_ID=09PRINTING_STATUS_SVCLASS_ID
+-#define HID_PROFILE_ID=09=09=09HID_SVCLASS_ID
+-#define HCR_PROFILE_ID=09=09=09HCR_SCAN_SVCLASS_ID
+-#define HCR_PRINT_PROFILE_ID=09=09HCR_PRINT_SVCLASS_ID
+-#define HCR_SCAN_PROFILE_ID=09=09HCR_SCAN_SVCLASS_ID
+-#define CIP_PROFILE_ID=09=09=09CIP_SVCLASS_ID
+-#define VIDEO_CONF_GW_PROFILE_ID=09VIDEO_CONF_GW_SVCLASS_ID
+-#define UDI_MT_PROFILE_ID=09=09UDI_MT_SVCLASS_ID
+-#define UDI_TA_PROFILE_ID=09=09UDI_TA_SVCLASS_ID
+-#define AV_PROFILE_ID=09=09=09AV_SVCLASS_ID
+-#define SAP_PROFILE_ID=09=09=09SAP_SVCLASS_ID
+-#define PBAP_PCE_PROFILE_ID=09=09PBAP_PCE_SVCLASS_ID
+-#define PBAP_PSE_PROFILE_ID=09=09PBAP_PSE_SVCLASS_ID
+-#define PBAP_PROFILE_ID=09=09=09PBAP_SVCLASS_ID
+-#define PNP_INFO_PROFILE_ID=09=09PNP_INFO_SVCLASS_ID
+-#define GENERIC_NETWORKING_PROFILE_ID=09GENERIC_NETWORKING_SVCLASS_ID
+-#define GENERIC_FILETRANS_PROFILE_ID=09GENERIC_FILETRANS_SVCLASS_ID
+-#define GENERIC_AUDIO_PROFILE_ID=09GENERIC_AUDIO_SVCLASS_ID
+-#define GENERIC_TELEPHONY_PROFILE_ID=09GENERIC_TELEPHONY_SVCLASS_ID
+-#define UPNP_PROFILE_ID=09=09=09UPNP_SVCLASS_ID
+-#define UPNP_IP_PROFILE_ID=09=09UPNP_IP_SVCLASS_ID
+-#define UPNP_PAN_PROFILE_ID=09=09UPNP_PAN_SVCLASS_ID
+-#define UPNP_LAP_PROFILE_ID=09=09UPNP_LAP_SVCLASS_ID
+-#define UPNP_L2CAP_PROFILE_ID=09=09UPNP_L2CAP_SVCLASS_ID
+-#define VIDEO_SOURCE_PROFILE_ID=09=09VIDEO_SOURCE_SVCLASS_ID
+-#define VIDEO_SINK_PROFILE_ID=09=09VIDEO_SINK_SVCLASS_ID
+-#define VIDEO_DISTRIBUTION_PROFILE_ID=09VIDEO_DISTRIBUTION_SVCLASS_ID
+-#define MDP_PROFILE_ID=09=09=09MDP_SVCLASS_ID
+-#define MDP_SOURCE_PROFILE_ID=09=09MDP_SROUCE_SVCLASS_ID
+-#define MDP_SINK_PROFILE_ID=09=09MDP_SINK_SVCLASS_ID
+-#define APPLE_AGENT_PROFILE_ID=09=09APPLE_AGENT_SVCLASS_ID
+-
+-/* Data Representation */
+-enum bt_sdp_data_type {
+-    SDP_DTYPE_NIL=09=3D 0 << 3,
+-    SDP_DTYPE_UINT=09=3D 1 << 3,
+-    SDP_DTYPE_SINT=09=3D 2 << 3,
+-    SDP_DTYPE_UUID=09=3D 3 << 3,
+-    SDP_DTYPE_STRING=09=3D 4 << 3,
+-    SDP_DTYPE_BOOL=09=3D 5 << 3,
+-    SDP_DTYPE_SEQ=09=3D 6 << 3,
+-    SDP_DTYPE_ALT=09=3D 7 << 3,
+-    SDP_DTYPE_URL=09=3D 8 << 3,
+-};
+-
+-enum bt_sdp_data_size {
+-    SDP_DSIZE_1=09=09=3D 0,
+-    SDP_DSIZE_2,
+-    SDP_DSIZE_4,
+-    SDP_DSIZE_8,
+-    SDP_DSIZE_16,
+-    SDP_DSIZE_NEXT1,
+-    SDP_DSIZE_NEXT2,
+-    SDP_DSIZE_NEXT4,
+-    SDP_DSIZE_MASK =3D SDP_DSIZE_NEXT4,
+-};
+-
+-enum bt_sdp_cmd {
+-    SDP_ERROR_RSP=09=09=3D 0x01,
+-    SDP_SVC_SEARCH_REQ=09=09=3D 0x02,
+-    SDP_SVC_SEARCH_RSP=09=09=3D 0x03,
+-    SDP_SVC_ATTR_REQ=09=09=3D 0x04,
+-    SDP_SVC_ATTR_RSP=09=09=3D 0x05,
+-    SDP_SVC_SEARCH_ATTR_REQ=09=3D 0x06,
+-    SDP_SVC_SEARCH_ATTR_RSP=09=3D 0x07,
+-};
+-
+-enum bt_sdp_errorcode {
+-    SDP_INVALID_VERSION=09=09=3D 0x0001,
+-    SDP_INVALID_RECORD_HANDLE=09=3D 0x0002,
+-    SDP_INVALID_SYNTAX=09=09=3D 0x0003,
+-    SDP_INVALID_PDU_SIZE=09=3D 0x0004,
+-    SDP_INVALID_CSTATE=09=09=3D 0x0005,
+-};
+-
+-/*
+- * String identifiers are based on the SDP spec stating that
+- * "base attribute id of the primary (universal) language must be 0x0100"
+- *
+- * Other languages should have their own offset; e.g.:
+- * #define XXXLangBase yyyy
+- * #define AttrServiceName_XXX=090x0000+XXXLangBase
+- */
+-#define SDP_PRIMARY_LANG_BASE =09=090x0100
+-
+-enum bt_sdp_attribute_id {
+-    SDP_ATTR_RECORD_HANDLE=09=09=09=3D 0x0000,
+-    SDP_ATTR_SVCLASS_ID_LIST=09=09=09=3D 0x0001,
+-    SDP_ATTR_RECORD_STATE=09=09=09=3D 0x0002,
+-    SDP_ATTR_SERVICE_ID=09=09=09=09=3D 0x0003,
+-    SDP_ATTR_PROTO_DESC_LIST=09=09=09=3D 0x0004,
+-    SDP_ATTR_BROWSE_GRP_LIST=09=09=09=3D 0x0005,
+-    SDP_ATTR_LANG_BASE_ATTR_ID_LIST=09=09=3D 0x0006,
+-    SDP_ATTR_SVCINFO_TTL=09=09=09=3D 0x0007,
+-    SDP_ATTR_SERVICE_AVAILABILITY=09=09=3D 0x0008,
+-    SDP_ATTR_PFILE_DESC_LIST=09=09=09=3D 0x0009,
+-    SDP_ATTR_DOC_URL=09=09=09=09=3D 0x000a,
+-    SDP_ATTR_CLNT_EXEC_URL=09=09=09=3D 0x000b,
+-    SDP_ATTR_ICON_URL=09=09=09=09=3D 0x000c,
+-    SDP_ATTR_ADD_PROTO_DESC_LIST=09=09=3D 0x000d,
+-
+-    SDP_ATTR_SVCNAME_PRIMARY=09=09=09=3D SDP_PRIMARY_LANG_BASE + 0,
+-    SDP_ATTR_SVCDESC_PRIMARY=09=09=09=3D SDP_PRIMARY_LANG_BASE + 1,
+-    SDP_ATTR_SVCPROV_PRIMARY=09=09=09=3D SDP_PRIMARY_LANG_BASE + 2,
+-
+-    SDP_ATTR_GROUP_ID=09=09=09=09=3D 0x0200,
+-    SDP_ATTR_IP_SUBNET=09=09=09=09=3D 0x0200,
+-
+-    /* SDP */
+-    SDP_ATTR_VERSION_NUM_LIST=09=09=09=3D 0x0200,
+-    SDP_ATTR_SVCDB_STATE=09=09=09=3D 0x0201,
+-
+-    SDP_ATTR_SERVICE_VERSION=09=09=09=3D 0x0300,
+-    SDP_ATTR_EXTERNAL_NETWORK=09=09=09=3D 0x0301,
+-    SDP_ATTR_SUPPORTED_DATA_STORES_LIST=09=09=3D 0x0301,
+-    SDP_ATTR_FAX_CLASS1_SUPPORT=09=09=09=3D 0x0302,
+-    SDP_ATTR_REMOTE_AUDIO_VOLUME_CONTROL=09=3D 0x0302,
+-    SDP_ATTR_FAX_CLASS20_SUPPORT=09=09=3D 0x0303,
+-    SDP_ATTR_SUPPORTED_FORMATS_LIST=09=09=3D 0x0303,
+-    SDP_ATTR_FAX_CLASS2_SUPPORT=09=09=09=3D 0x0304,
+-    SDP_ATTR_AUDIO_FEEDBACK_SUPPORT=09=09=3D 0x0305,
+-    SDP_ATTR_NETWORK_ADDRESS=09=09=09=3D 0x0306,
+-    SDP_ATTR_WAP_GATEWAY=09=09=09=3D 0x0307,
+-    SDP_ATTR_HOMEPAGE_URL=09=09=09=3D 0x0308,
+-    SDP_ATTR_WAP_STACK_TYPE=09=09=09=3D 0x0309,
+-    SDP_ATTR_SECURITY_DESC=09=09=09=3D 0x030a,
+-    SDP_ATTR_NET_ACCESS_TYPE=09=09=09=3D 0x030b,
+-    SDP_ATTR_MAX_NET_ACCESSRATE=09=09=09=3D 0x030c,
+-    SDP_ATTR_IP4_SUBNET=09=09=09=09=3D 0x030d,
+-    SDP_ATTR_IP6_SUBNET=09=09=09=09=3D 0x030e,
+-    SDP_ATTR_SUPPORTED_CAPABILITIES=09=09=3D 0x0310,
+-    SDP_ATTR_SUPPORTED_FEATURES=09=09=09=3D 0x0311,
+-    SDP_ATTR_SUPPORTED_FUNCTIONS=09=09=3D 0x0312,
+-    SDP_ATTR_TOTAL_IMAGING_DATA_CAPACITY=09=3D 0x0313,
+-    SDP_ATTR_SUPPORTED_REPOSITORIES=09=09=3D 0x0314,
+-
+-    /* PnP Information */
+-    SDP_ATTR_SPECIFICATION_ID=09=09=09=3D 0x0200,
+-    SDP_ATTR_VENDOR_ID=09=09=09=09=3D 0x0201,
+-    SDP_ATTR_PRODUCT_ID=09=09=09=09=3D 0x0202,
+-    SDP_ATTR_VERSION=09=09=09=09=3D 0x0203,
+-    SDP_ATTR_PRIMARY_RECORD=09=09=09=3D 0x0204,
+-    SDP_ATTR_VENDOR_ID_SOURCE=09=09=09=3D 0x0205,
+-
+-    /* BT HID */
+-    SDP_ATTR_DEVICE_RELEASE_NUMBER=09=09=3D 0x0200,
+-    SDP_ATTR_PARSER_VERSION=09=09=09=3D 0x0201,
+-    SDP_ATTR_DEVICE_SUBCLASS=09=09=09=3D 0x0202,
+-    SDP_ATTR_COUNTRY_CODE=09=09=09=3D 0x0203,
+-    SDP_ATTR_VIRTUAL_CABLE=09=09=09=3D 0x0204,
+-    SDP_ATTR_RECONNECT_INITIATE=09=09=09=3D 0x0205,
+-    SDP_ATTR_DESCRIPTOR_LIST=09=09=09=3D 0x0206,
+-    SDP_ATTR_LANG_ID_BASE_LIST=09=09=09=3D 0x0207,
+-    SDP_ATTR_SDP_DISABLE=09=09=09=3D 0x0208,
+-    SDP_ATTR_BATTERY_POWER=09=09=09=3D 0x0209,
+-    SDP_ATTR_REMOTE_WAKEUP=09=09=09=3D 0x020a,
+-    SDP_ATTR_PROFILE_VERSION=09=09=09=3D 0x020b,
+-    SDP_ATTR_SUPERVISION_TIMEOUT=09=09=3D 0x020c,
+-    SDP_ATTR_NORMALLY_CONNECTABLE=09=09=3D 0x020d,
+-    SDP_ATTR_BOOT_DEVICE=09=09=09=3D 0x020e,
+-};
+-
+-#endif
+diff --git a/include/sysemu/bt.h b/include/sysemu/bt.h
+deleted file mode 100644
+index 2fd8c0f14b..0000000000
+--- a/include/sysemu/bt.h
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#ifndef SYSEMU_BT_H
+-#define SYSEMU_BT_H
+-
+-/* BT HCI info */
+-
+-typedef struct HCIInfo {
+-    int (*bdaddr_set)(struct HCIInfo *hci, const uint8_t *bd_addr);
+-    void (*cmd_send)(struct HCIInfo *hci, const uint8_t *data, int len);
+-    void (*sco_send)(struct HCIInfo *hci, const uint8_t *data, int len);
+-    void (*acl_send)(struct HCIInfo *hci, const uint8_t *data, int len);
+-    void *opaque;
+-    void (*evt_recv)(void *opaque, const uint8_t *data, int len);
+-    void (*acl_recv)(void *opaque, const uint8_t *data, int len);
+-} HCIInfo;
+-
+-/* bt-host.c */
+-struct HCIInfo *bt_host_hci(const char *id);
+-struct HCIInfo *qemu_next_hci(void);
+-
+-#endif
+diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+index f909be56ae..62680f7bd5 100644
+--- a/qemu-deprecated.texi
++++ b/qemu-deprecated.texi
+@@ -242,13 +242,6 @@ via the CPU ``mmu`` option when using the ``rv32`` or =
+``rv64`` CPUs.
+=20
+ @section System emulator devices
+=20
+-@subsection bluetooth (since 3.1)
+-
+-The bluetooth subsystem is unmaintained since many years and likely bitrot=
+ten
+-quite a bit. It will be removed without replacement unless some users spea=
+ks
+-up at the @email{qemu-devel@@nongnu.org} mailing list with information abo=
+ut
+-their usecases.
+-
+ @subsection ide-drive (since 4.2)
+=20
+ The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 3ff8c4e07a..c63e794b64 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -3115,85 +3115,6 @@ STEXI
+ ETEXI
+ DEFHEADING()
+=20
+-DEFHEADING(Bluetooth(R) options:)
+-STEXI
+-@table @option
+-ETEXI
+-
+-DEF("bt", HAS_ARG, QEMU_OPTION_bt, \
+-    "-bt hci,null    dumb bluetooth HCI - doesn't respond to commands\n" \
+-    "-bt hci,host[:id]\n" \
+-    "                use host's HCI with the given name\n" \
+-    "-bt hci[,vlan=3Dn]\n" \
+-    "                emulate a standard HCI in virtual scatternet 'n'\n" \
+-    "-bt vhci[,vlan=3Dn]\n" \
+-    "                add host computer to virtual scatternet 'n' using VHC=
+I\n" \
+-    "-bt device:dev[,vlan=3Dn]\n" \
+-    "                emulate a bluetooth device 'dev' in scatternet 'n'\n"=
+,
+-    QEMU_ARCH_ALL)
+-STEXI
+-@item -bt hci[...]
+-@findex -bt
+-Defines the function of the corresponding Bluetooth HCI.  -bt options
+-are matched with the HCIs present in the chosen machine type.  For
+-example when emulating a machine with only one HCI built into it, only
+-the first @code{-bt hci[...]} option is valid and defines the HCI's
+-logic.  The Transport Layer is decided by the machine type.  Currently
+-the machines @code{n800} and @code{n810} have one HCI and all other
+-machines have none.
+-
+-Note: This option and the whole bluetooth subsystem is considered as depre=
+cated.
+-If you still use it, please send a mail to @email{qemu-devel@@nongnu.org} =
+where
+-you describe your usecase.
+-
+-@anchor{bt-hcis}
+-The following three types are recognized:
+-
+-@table @option
+-@item -bt hci,null
+-(default) The corresponding Bluetooth HCI assumes no internal logic
+-and will not respond to any HCI commands or emit events.
+-
+-@item -bt hci,host[:@var{id}]
+-(@code{bluez} only) The corresponding HCI passes commands / events
+-to / from the physical HCI identified by the name @var{id} (default:
+-@code{hci0}) on the computer running QEMU.  Only available on @code{bluez}
+-capable systems like Linux.
+-
+-@item -bt hci[,vlan=3D@var{n}]
+-Add a virtual, standard HCI that will participate in the Bluetooth
+-scatternet @var{n} (default @code{0}).  Similarly to @option{-net}
+-VLANs, devices inside a bluetooth network @var{n} can only communicate
+-with other devices in the same network (scatternet).
+-@end table
+-
+-@item -bt vhci[,vlan=3D@var{n}]
+-(Linux-host only) Create a HCI in scatternet @var{n} (default 0) attached
+-to the host bluetooth stack instead of to the emulated target.  This
+-allows the host and target machines to participate in a common scatternet
+-and communicate.  Requires the Linux @code{vhci} driver installed.  Can
+-be used as following:
+-
+-@example
+-@value{qemu_system} [...OPTIONS...] -bt hci,vlan=3D5 -bt vhci,vlan=3D5
+-@end example
+-
+-@item -bt device:@var{dev}[,vlan=3D@var{n}]
+-Emulate a bluetooth device @var{dev} and place it in network @var{n}
+-(default @code{0}).  QEMU can only emulate one type of bluetooth devices
+-currently:
+-
+-@table @option
+-@item keyboard
+-Virtual wireless keyboard implementing the HIDP bluetooth profile.
+-@end table
+-ETEXI
+-
+-STEXI
+-@end table
+-ETEXI
+-DEFHEADING()
+-
+ #ifdef CONFIG_TPM
+ DEFHEADING(TPM device options:)
+=20
+diff --git a/vl.c b/vl.c
+index c0904b365b..94508300c3 100644
+--- a/vl.c
++++ b/vl.c
+@@ -62,14 +62,12 @@ int main(int argc, char **argv)
+ #include "hw/isa/isa.h"
+ #include "hw/scsi/scsi.h"
+ #include "hw/display/vga.h"
+-#include "hw/bt.h"
+ #include "sysemu/watchdog.h"
+ #include "hw/firmware/smbios.h"
+ #include "hw/acpi/acpi.h"
+ #include "hw/xen/xen.h"
+ #include "hw/loader.h"
+ #include "monitor/qdev.h"
+-#include "sysemu/bt.h"
+ #include "net/net.h"
+ #include "net/slirp.h"
+ #include "monitor/monitor.h"
+@@ -914,128 +912,6 @@ static void configure_rtc(QemuOpts *opts)
+     }
+ }
+=20
+-/***********************************************************/
+-/* Bluetooth support */
+-static int nb_hcis;
+-static int cur_hci;
+-static struct HCIInfo *hci_table[MAX_NICS];
+-
+-struct HCIInfo *qemu_next_hci(void)
+-{
+-    if (cur_hci =3D=3D nb_hcis)
+-        return &null_hci;
+-
+-    return hci_table[cur_hci++];
+-}
+-
+-static int bt_hci_parse(const char *str)
+-{
+-    struct HCIInfo *hci;
+-    bdaddr_t bdaddr;
+-
+-    if (nb_hcis >=3D MAX_NICS) {
+-        error_report("too many bluetooth HCIs (max %i)", MAX_NICS);
+-        return -1;
+-    }
+-
+-    hci =3D hci_init(str);
+-    if (!hci)
+-        return -1;
+-
+-    bdaddr.b[0] =3D 0x52;
+-    bdaddr.b[1] =3D 0x54;
+-    bdaddr.b[2] =3D 0x00;
+-    bdaddr.b[3] =3D 0x12;
+-    bdaddr.b[4] =3D 0x34;
+-    bdaddr.b[5] =3D 0x56 + nb_hcis;
+-    hci->bdaddr_set(hci, bdaddr.b);
+-
+-    hci_table[nb_hcis++] =3D hci;
+-
+-    return 0;
+-}
+-
+-static void bt_vhci_add(int vlan_id)
+-{
+-    struct bt_scatternet_s *vlan =3D qemu_find_bt_vlan(vlan_id);
+-
+-    if (!vlan->slave)
+-        warn_report("adding a VHCI to an empty scatternet %i",
+-                    vlan_id);
+-
+-    bt_vhci_init(bt_new_hci(vlan));
+-}
+-
+-static struct bt_device_s *bt_device_add(const char *opt)
+-{
+-    struct bt_scatternet_s *vlan;
+-    int vlan_id =3D 0;
+-    char *endp =3D strstr(opt, ",vlan=3D");
+-    int len =3D (endp ? endp - opt : strlen(opt)) + 1;
+-    char devname[10];
+-
+-    pstrcpy(devname, MIN(sizeof(devname), len), opt);
+-
+-    if (endp) {
+-        vlan_id =3D strtol(endp + 6, &endp, 0);
+-        if (*endp) {
+-            error_report("unrecognised bluetooth vlan Id");
+-            return 0;
+-        }
+-    }
+-
+-    vlan =3D qemu_find_bt_vlan(vlan_id);
+-
+-    if (!vlan->slave)
+-        warn_report("adding a slave device to an empty scatternet %i",
+-                    vlan_id);
+-
+-    if (!strcmp(devname, "keyboard"))
+-        return bt_keyboard_init(vlan);
+-
+-    error_report("unsupported bluetooth device '%s'", devname);
+-    return 0;
+-}
+-
+-static int bt_parse(const char *opt)
+-{
+-    const char *endp, *p;
+-    int vlan;
+-
+-    if (strstart(opt, "hci", &endp)) {
+-        if (!*endp || *endp =3D=3D ',') {
+-            if (*endp)
+-                if (!strstart(endp, ",vlan=3D", 0))
+-                    opt =3D endp + 1;
+-
+-            return bt_hci_parse(opt);
+-       }
+-    } else if (strstart(opt, "vhci", &endp)) {
+-        if (!*endp || *endp =3D=3D ',') {
+-            if (*endp) {
+-                if (strstart(endp, ",vlan=3D", &p)) {
+-                    vlan =3D strtol(p, (char **) &endp, 0);
+-                    if (*endp) {
+-                        error_report("bad scatternet '%s'", p);
+-                        return 1;
+-                    }
+-                } else {
+-                    error_report("bad parameter '%s'", endp + 1);
+-                    return 1;
+-                }
+-            } else
+-                vlan =3D 0;
+-
+-            bt_vhci_add(vlan);
+-            return 0;
+-        }
+-    } else if (strstart(opt, "device:", &endp))
+-        return !bt_device_add(endp);
+-
+-    error_report("bad bluetooth parameter '%s'", opt);
+-    return 1;
+-}
+-
+ static int parse_name(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     const char *proc_name;
+@@ -2319,7 +2195,6 @@ static void monitor_parse(const char *optarg, const c=
+har *mode, bool pretty)
+ struct device_config {
+     enum {
+         DEV_USB,       /* -usbdevice     */
+-        DEV_BT,        /* -bt            */
+         DEV_SERIAL,    /* -serial        */
+         DEV_PARALLEL,  /* -parallel      */
+         DEV_DEBUGCON,  /* -debugcon */
+@@ -3128,13 +3003,6 @@ int main(int argc, char **argv, char **envp)
+                 }
+                 break;
+ #endif
+-            case QEMU_OPTION_bt:
+-                warn_report("The bluetooth subsystem is deprecated and wil=
+l "
+-                            "be removed soon. If the bluetooth subsystem i=
+s "
+-                            "still useful for you, please send a mail to "
+-                            "qemu-devel@nongnu.org with your usecase.");
+-                add_device_config(DEV_BT, optarg);
+-                break;
+             case QEMU_OPTION_audio_help:
+                 audio_legacy_help();
+                 exit (0);
+@@ -4259,10 +4127,6 @@ int main(int argc, char **argv, char **envp)
+=20
+     tpm_init();
+=20
+-    /* init the bluetooth world */
+-    if (foreach_device_config(DEV_BT, bt_parse))
+-        exit(1);
+-
+     if (!xen_enabled()) {
+         /* On 32-bit hosts, QEMU is limited by virtual address space */
+         if (ram_size > (2047 << 20) && HOST_LONG_BITS =3D=3D 32) {
+--=20
+2.18.1
 
 
