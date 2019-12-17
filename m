@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 094F8C43603
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8FAFC2D0CD
 	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 15:01:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD5122146E
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 15:01:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 966402146E
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 15:01:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XdisyUet"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD5122146E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P8eCld62"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 966402146E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihEME-0007w8-Ek
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 10:01:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40124)
+	id 1ihEMF-0007ug-AP
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 10:01:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1ihEKM-0006L2-Ul
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:00:00 -0500
+ (envelope-from <kwolf@redhat.com>) id 1ihEKV-0006UX-KS
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:00:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1ihEKK-00040Q-Fc
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 09:59:57 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46238
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1ihEKT-0004RJ-Qg
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:00:07 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48385
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihEKJ-0003rZ-Ui
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 09:59:56 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1ihEKT-0004QR-My
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 10:00:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576594794;
+ s=mimecast20190719; t=1576594805;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rz8XplpVE9Nfga1S43gkcI04Wv87Es806T4s0FizFFk=;
- b=XdisyUetB9AHCpcSIeD/aKaorsaggzVq9+m4bXa9w2aJf8XcpTBkMnoC3ovuIH5n4+VOgS
- 4FyOmYkowdMxy4jGYl3DwBOJHYUDJv65AIiQZWmwX+YD4Fwh+muwGpw/kvvmO/v2lEkWwZ
- TBLJCnjLHAlYu5xRArhbYs6+w8imj0k=
+ bh=e3TfjD0fS7Mp3hQfmRnugCBI6yIIHc/ijdcZX5e1m5I=;
+ b=P8eCld62F3fkhX0n6FrPgRBUYROfAvq7Fws7lT4qXtVpK1fo5agouguVnXFyH+/d5ZxfLV
+ v19zB1DvMr9l6b+o1zkSTd7lgAqnGNk0P6CQmQHgJnf5tQckNYjLFG30vDzwEFbPV1ask+
+ +865qtNGXTiS7sGbPzaENGeMiHgpyPw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-D_x5C5CGPSOc4BS9ENpVkg-1; Tue, 17 Dec 2019 09:59:53 -0500
+ us-mta-119-viLUFcDeP0qCt-bRBysEtg-1; Tue, 17 Dec 2019 09:59:59 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 587CE18AAFD4;
- Tue, 17 Dec 2019 14:59:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AADB2800C76;
+ Tue, 17 Dec 2019 14:59:57 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-117-20.ams2.redhat.com [10.36.117.20])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9482B26FA3;
- Tue, 17 Dec 2019 14:59:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A0E3926576;
+ Tue, 17 Dec 2019 14:59:52 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 2/3] hmp: Allow using qdev ID for qemu-io command
-Date: Tue, 17 Dec 2019 15:59:38 +0100
-Message-Id: <20191217145939.5537-3-kwolf@redhat.com>
+Subject: [PATCH 3/3] iotests: Test external snapshot with VM state
+Date: Tue, 17 Dec 2019 15:59:39 +0100
+Message-Id: <20191217145939.5537-4-kwolf@redhat.com>
 In-Reply-To: <20191217145939.5537-1-kwolf@redhat.com>
 References: <20191217145939.5537-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: D_x5C5CGPSOc4BS9ENpVkg-1
+X-MC-Unique: viLUFcDeP0qCt-bRBysEtg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,86 +89,197 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In order to issue requests on an existing BlockBackend with the
-'qemu-io' HMP command, allow specifying the BlockBackend not only with a
-BlockBackend name, but also with a qdev ID/QOM path for a device that
-owns the (possibly anonymous) BlockBackend.
-
-Because qdev names could be conflicting with BlockBackend and node
-names, introduce a -d option to explicitly address a device. If the
-option is not given, a BlockBackend or a node is addressed.
+This tests creating an external snapshot with VM state (which results in
+an active overlay over an inactive backing file, which is also the root
+node of an inactive BlockBackend), re-activating the images and
+performing some operations to test that the re-activation worked as
+intended.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- monitor/hmp-cmds.c | 28 ++++++++++++++++++----------
- hmp-commands.hx    |  8 +++++---
- 2 files changed, 23 insertions(+), 13 deletions(-)
+ tests/qemu-iotests/280     | 83 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/280.out | 50 +++++++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 134 insertions(+)
+ create mode 100755 tests/qemu-iotests/280
+ create mode 100644 tests/qemu-iotests/280.out
 
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index b2551c16d1..5f8941d298 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -2468,23 +2468,31 @@ void hmp_qemu_io(Monitor *mon, const QDict *qdict)
- {
-     BlockBackend *blk;
-     BlockBackend *local_blk =3D NULL;
-+    bool qdev =3D qdict_get_try_bool(qdict, "qdev", false);
-     const char* device =3D qdict_get_str(qdict, "device");
-     const char* command =3D qdict_get_str(qdict, "command");
-     Error *err =3D NULL;
-     int ret;
-=20
--    blk =3D blk_by_name(device);
--    if (!blk) {
--        BlockDriverState *bs =3D bdrv_lookup_bs(NULL, device, &err);
--        if (bs) {
--            blk =3D local_blk =3D blk_new(bdrv_get_aio_context(bs),
--                                      0, BLK_PERM_ALL);
--            ret =3D blk_insert_bs(blk, bs, &err);
--            if (ret < 0) {
-+    if (qdev) {
-+        blk =3D blk_by_qdev_id(device, &err);
-+        if (!blk) {
-+            goto fail;
-+        }
-+    } else {
-+        blk =3D blk_by_name(device);
-+        if (!blk) {
-+            BlockDriverState *bs =3D bdrv_lookup_bs(NULL, device, &err);
-+            if (bs) {
-+                blk =3D local_blk =3D blk_new(bdrv_get_aio_context(bs),
-+                                          0, BLK_PERM_ALL);
-+                ret =3D blk_insert_bs(blk, bs, &err);
-+                if (ret < 0) {
-+                    goto fail;
-+                }
-+            } else {
-                 goto fail;
-             }
--        } else {
--            goto fail;
-         }
-     }
-=20
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index cfcc044ce4..dc23185de4 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1875,9 +1875,11 @@ ETEXI
-=20
-     {
-         .name       =3D "qemu-io",
--        .args_type  =3D "device:B,command:s",
--        .params     =3D "[device] \"[command]\"",
--        .help       =3D "run a qemu-io command on a block device",
-+        .args_type  =3D "qdev:-d,device:B,command:s",
-+        .params     =3D "[-d] [device] \"[command]\"",
-+        .help       =3D "run a qemu-io command on a block device\n\t\t\t"
-+                      "-d: [device] is a device ID rather than a "
-+                      "drive ID or node name",
-         .cmd        =3D hmp_qemu_io,
-     },
-=20
+diff --git a/tests/qemu-iotests/280 b/tests/qemu-iotests/280
+new file mode 100755
+index 0000000000..0b1fa8e1d8
+--- /dev/null
++++ b/tests/qemu-iotests/280
+@@ -0,0 +1,83 @@
++#!/usr/bin/env python
++#
++# Copyright (C) 2019 Red Hat, Inc.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++# Creator/Owner: Kevin Wolf <kwolf@redhat.com>
++#
++# Test migration to file for taking an external snapshot with VM state.
++
++import iotests
++import os
++
++iotests.verify_image_format(supported_fmts=3D['qcow2'])
++iotests.verify_protocol(supported=3D['file'])
++iotests.verify_platform(['linux'])
++
++with iotests.FilePath('base') as base_path , \
++     iotests.FilePath('top') as top_path, \
++     iotests.VM() as vm:
++
++    iotests.qemu_img_log('create', '-f', iotests.imgfmt, base_path, '64M')
++
++    iotests.log('=3D=3D=3D Launch VM =3D=3D=3D')
++    vm.add_object('iothread,id=3Diothread0')
++    vm.add_blockdev('file,filename=3D%s,node-name=3Dbase-file' % (base_pat=
+h))
++    vm.add_blockdev('%s,file=3Dbase-file,node-name=3Dbase-fmt' % (iotests.=
+imgfmt))
++    vm.add_device('virtio-blk,drive=3Dbase-fmt,iothread=3Diothread0,id=3Dv=
+da')
++    vm.launch()
++
++    vm.enable_migration_events('VM')
++
++    iotests.log('\n=3D=3D=3D Migrate to file =3D=3D=3D')
++    vm.qmp_log('migrate', uri=3D'exec:cat > /dev/null')
++
++    with iotests.Timeout(3, 'Migration does not complete'):
++        vm.wait_migration()
++
++    iotests.log('\nVM is now stopped:')
++    iotests.log(vm.qmp('query-migrate')['return']['status'])
++    vm.qmp_log('query-status')
++
++    iotests.log('\n=3D=3D=3D Create a snapshot of the disk image =3D=3D=3D=
+')
++    vm.blockdev_create({
++        'driver': 'file',
++        'filename': top_path,
++        'size': 0,
++    })
++    vm.qmp_log('blockdev-add', node_name=3D'top-file',
++               driver=3D'file', filename=3Dtop_path,
++               filters=3D[iotests.filter_qmp_testfiles])
++
++    vm.blockdev_create({
++        'driver': iotests.imgfmt,
++        'file': 'top-file',
++        'size': 1024 * 1024,
++    })
++    vm.qmp_log('blockdev-add', node_name=3D'top-fmt',
++               driver=3Diotests.imgfmt, file=3D'top-file')
++
++    vm.qmp_log('blockdev-snapshot', node=3D'base-fmt', overlay=3D'top-fmt'=
+)
++
++    iotests.log('\n=3D=3D=3D Resume the VM and simulate a write request =
+=3D=3D=3D')
++    vm.qmp_log('cont')
++    iotests.log(vm.hmp_qemu_io('-d vda/virtio-backend', 'write 4k 4k'))
++
++    iotests.log('\n=3D=3D=3D Commit it to the backing file =3D=3D=3D')
++    result =3D vm.qmp_log('block-commit', job_id=3D'job0', auto_dismiss=3D=
+False,
++                        device=3D'top-fmt', top_node=3D'top-fmt',
++                        filters=3D[iotests.filter_qmp_testfiles])
++    if 'return' in result:
++        vm.run_job('job0')
+diff --git a/tests/qemu-iotests/280.out b/tests/qemu-iotests/280.out
+new file mode 100644
+index 0000000000..5d382faaa8
+--- /dev/null
++++ b/tests/qemu-iotests/280.out
+@@ -0,0 +1,50 @@
++Formatting 'TEST_DIR/PID-base', fmt=3Dqcow2 size=3D67108864 cluster_size=
+=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
++
++=3D=3D=3D Launch VM =3D=3D=3D
++Enabling migration QMP events on VM...
++{"return": {}}
++
++=3D=3D=3D Migrate to file =3D=3D=3D
++{"execute": "migrate", "arguments": {"uri": "exec:cat > /dev/null"}}
++{"return": {}}
++{"data": {"status": "setup"}, "event": "MIGRATION", "timestamp": {"microse=
+conds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "active"}, "event": "MIGRATION", "timestamp": {"micros=
+econds": "USECS", "seconds": "SECS"}}
++{"data": {"status": "completed"}, "event": "MIGRATION", "timestamp": {"mic=
+roseconds": "USECS", "seconds": "SECS"}}
++
++VM is now stopped:
++completed
++{"execute": "query-status", "arguments": {}}
++{"return": {"running": false, "singlestep": false, "status": "postmigrate"=
+}}
++
++=3D=3D=3D Create a snapshot of the disk image =3D=3D=3D
++{"execute": "blockdev-create", "arguments": {"job-id": "job0", "options": =
+{"driver": "file", "filename": "TEST_DIR/PID-top", "size": 0}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++{"execute": "blockdev-add", "arguments": {"driver": "file", "filename": "T=
+EST_DIR/PID-top", "node-name": "top-file"}}
++{"return": {}}
++{"execute": "blockdev-create", "arguments": {"job-id": "job0", "options": =
+{"driver": "qcow2", "file": "top-file", "size": 1048576}}}
++{"return": {}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
++
++{"execute": "blockdev-add", "arguments": {"driver": "qcow2", "file": "top-=
+file", "node-name": "top-fmt"}}
++{"return": {}}
++{"execute": "blockdev-snapshot", "arguments": {"node": "base-fmt", "overla=
+y": "top-fmt"}}
++{"return": {}}
++
++=3D=3D=3D Resume the VM and simulate a write request =3D=3D=3D
++{"execute": "cont", "arguments": {}}
++{"return": {}}
++{"return": ""}
++
++=3D=3D=3D Commit it to the backing file =3D=3D=3D
++{"execute": "block-commit", "arguments": {"auto-dismiss": false, "device":=
+ "top-fmt", "job-id": "job0", "top-node": "top-fmt"}}
++{"return": {}}
++{"execute": "job-complete", "arguments": {"id": "job0"}}
++{"return": {}}
++{"data": {"device": "job0", "len": 65536, "offset": 65536, "speed": 0, "ty=
+pe": "commit"}, "event": "BLOCK_JOB_READY", "timestamp": {"microseconds": "=
+USECS", "seconds": "SECS"}}
++{"data": {"device": "job0", "len": 65536, "offset": 65536, "speed": 0, "ty=
+pe": "commit"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds=
+": "USECS", "seconds": "SECS"}}
++{"execute": "job-dismiss", "arguments": {"id": "job0"}}
++{"return": {}}
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index eb57ddc72c..cb2b789e44 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -287,3 +287,4 @@
+ 273 backing quick
+ 277 rw quick
+ 279 rw backing quick
++280 rw migration quick
 --=20
 2.20.1
 
