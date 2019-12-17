@@ -2,86 +2,87 @@ Return-Path: <SRS0=zFtV=2H=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4882EC43603
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFECAC43603
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:32:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12C5B21582
-	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:29:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b9VFVssN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12C5B21582
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C329421835
+	for <qemu-devel@archiver.kernel.org>; Tue, 17 Dec 2019 16:32:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C329421835
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1ihFia-0007Zt-EN
-	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 11:29:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48678)
+	id 1ihFla-0001OB-VA
+	for qemu-devel@archiver.kernel.org; Tue, 17 Dec 2019 11:32:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49642)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1ihFhi-0006da-NN
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:28:11 -0500
+ (envelope-from <bounces@canonical.com>) id 1ihFkn-0000vz-A5
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:31:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1ihFhf-0005CN-Ef
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:28:08 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:51500
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ihFhf-0005AD-2a
- for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:28:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1576600086;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=29QsIsimFZUmIbFiqSt1DDtCg86xzhtCMexBtAtqszc=;
- b=b9VFVssNdsAWaA/1M+y0eI3YPfn/jO/RgvOC8BSC4o9BD9EdHysng8+77vmlFYj9paFybc
- 6K0PqMS9NUvQmXXmrCBmTmXgvibaJRpebbrnAqUZJDoDGNogHmAj+Rnxp/1az1eXt+bFly
- h3vyq72VfBFGcNPhZRqdhpc0rlFrzDE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-50-2NdgqrvNNhG7eFypDzkOaA-1; Tue, 17 Dec 2019 11:27:59 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECFD4185432F;
- Tue, 17 Dec 2019 16:27:56 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-116-149.ams2.redhat.com [10.36.116.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5AF555D9E2;
- Tue, 17 Dec 2019 16:27:50 +0000 (UTC)
-Subject: Re: [Bug 1856706] [NEW] target/mips/op_helper.c:971:duplicated
- branches ?
-To: Bug 1856706 <1856706@bugs.launchpad.net>, qemu-devel@nongnu.org,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-References: <157658912470.5706.7275804988501900768.malonedeb@gac.canonical.com>
-From: Thomas Huth <thuth@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <bf392e35-7962-38fa-6dce-d4d8bb5ef485@redhat.com>
-Date: Tue, 17 Dec 2019 17:27:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <bounces@canonical.com>) id 1ihFkm-0002wD-6f
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:31:21 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33012)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1ihFkm-0002q6-10
+ for qemu-devel@nongnu.org; Tue, 17 Dec 2019 11:31:20 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1ihFkh-0002TG-Gf
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 16:31:15 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 826A52E813C
+ for <qemu-devel@nongnu.org>; Tue, 17 Dec 2019 16:31:12 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <157658912470.5706.7275804988501900768.malonedeb@gac.canonical.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: 2NdgqrvNNhG7eFypDzkOaA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 17 Dec 2019 16:23:18 -0000
+From: Thomas Huth <1851552@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=cloud-init; status=New; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: product=networking-calico; status=New; importance=Undecided; 
+ assignee=None; 
+X-Launchpad-Bug: product=nova; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: product=openstack-community; status=New; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: product=qemu-kvm; status=New; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=cloud-init; component=main;
+ status=Confirmed; importance=Undecided; assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=New; importance=Undecided; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: daniel-thewatkins janitor legovini raharper smoser
+ vasili.namatov
+X-Launchpad-Bug-Reporter: Vasili (vasili.namatov)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <157306761727.2702.10828795840242046904.malonedeb@gac.canonical.com>
+Message-Id: <157659980370.14847.14516311050317747770.launchpad@wampee.canonical.com>
+Subject: [Bug 1851552] Re: since ubuntu 18 bionic release and latest,
+ the ubuntu18 cloud image is unable to boot up on openstack instance 
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bceb5ef013b87ef7aafe0755545ceb689ca7ac60";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 45acec45cf5eb75d55817d717bf8ad0b5b3e00e7
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,35 +91,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Bug 1851552 <1851552@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/12/2019 14.25, dcb wrote:
-> Public bug reported:
-> 
-> qemu-4.2.0/target/mips/op_helper.c:971:8: warning: this condition has
-> identical branches [-Wduplicated-branches]
-> 
-> Source code is
-> 
->    if (other_tc == other->current_tc) {
->         tccause = other->CP0_Cause;
->     } else {
->         tccause = other->CP0_Cause;
->     }
-> 
-> Possible cut'n'paste error ?
+** Project changed: qemu =3D> qemu (Ubuntu)
 
- Hi Edgar,
+-- =
 
-you added the code in 2011 ... do you still remember the details here,
-whether that was on purpose or whether it should look differently?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1851552
 
- Thomas
+Title:
+  since ubuntu 18 bionic release and latest, the ubuntu18 cloud image is
+  unable to boot up on openstack instance
 
+Status in cloud-init:
+  New
+Status in networking-calico:
+  New
+Status in OpenStack Compute (nova):
+  New
+Status in OpenStack Community Project:
+  New
+Status in qemu-kvm:
+  New
+Status in cloud-init package in Ubuntu:
+  Confirmed
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  Openstack Queens release which is running on ubuntu 18 LTS Controller and=
+ Compute.
+  Tried to boot up the instance via horizon dashboard without success.
+  Nova flow works perfect.
+  When access to console I discovered that the boot process stuck in the mi=
+ddle.
+  [[0;1;31m TIME [0m] Timed out waiting for device dev-vdb.device.
+  [[0;1;33mDEPEND[0m] Dependency failed for /mnt.
+  [[0;1;33mDEPEND[0m] Dependency failed for File System Check on /dev/vdb.
+  It receives IP but looks like not get configured at time.
+  since ubuntu 18 there is netplan feature managing the network interfaces
+  please advise.
+
+  more details as follow:
+  https://bugs.launchpad.net/networking-calico/+bug/1851548
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/cloud-init/+bug/1851552/+subscriptions
 
